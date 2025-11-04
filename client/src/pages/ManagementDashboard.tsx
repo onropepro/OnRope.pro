@@ -14,6 +14,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage, FormDes
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import { Progress } from "@/components/ui/progress";
+import { HighRiseBuilding } from "@/components/HighRiseBuilding";
 import { useToast } from "@/hooks/use-toast";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { useLocation } from "wouter";
@@ -597,33 +598,25 @@ export default function ManagementDashboard() {
           
           {selectedProject && (
             <div className="space-y-4">
+              <HighRiseBuilding
+                floors={selectedProject.floorCount}
+                completedDrops={selectedProject.completedDrops || 0}
+                totalDrops={selectedProject.totalDrops}
+                className="mb-4"
+              />
+
               <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <div className="text-xs text-muted-foreground mb-1">Floors</div>
-                  <div className="font-bold">{selectedProject.floorCount}</div>
+                <div className="text-center p-3 bg-muted/50 rounded-lg">
+                  <div className="text-xl font-bold">{selectedProject.dailyDropTarget}</div>
+                  <div className="text-xs text-muted-foreground mt-1">Daily Target</div>
                 </div>
-                <div>
-                  <div className="text-xs text-muted-foreground mb-1">Daily Target</div>
-                  <div className="font-bold">{selectedProject.dailyDropTarget} drops</div>
-                </div>
-              </div>
-
-              <Separator />
-
-              <div>
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-sm font-medium">Overall Progress</span>
-                  <span className="text-sm font-bold">
-                    {Math.round(((selectedProject.completedDrops || 0) / selectedProject.totalDrops) * 100)}%
-                  </span>
-                </div>
-                <Progress 
-                  value={((selectedProject.completedDrops || 0) / selectedProject.totalDrops) * 100} 
-                  className="h-3 mb-2" 
-                />
-                <div className="flex items-center justify-between text-sm text-muted-foreground">
-                  <span>{selectedProject.completedDrops || 0} / {selectedProject.totalDrops} drops completed</span>
-                  <span className="font-medium">{selectedProject.totalDrops - (selectedProject.completedDrops || 0)} remaining</span>
+                <div className="text-center p-3 bg-muted/50 rounded-lg">
+                  <div className="text-xl font-bold">
+                    {selectedProject.completedDrops && selectedProject.completedDrops > 0 
+                      ? Math.ceil((selectedProject.totalDrops - selectedProject.completedDrops) / selectedProject.dailyDropTarget) 
+                      : "N/A"}
+                  </div>
+                  <div className="text-xs text-muted-foreground mt-1">Days Remaining</div>
                 </div>
               </div>
 
@@ -640,6 +633,7 @@ export default function ManagementDashboard() {
                   variant="outline" 
                   onClick={() => setShowProjectDetailDialog(false)}
                   className="h-10"
+                  data-testid="button-close-project-detail"
                 >
                   Close
                 </Button>

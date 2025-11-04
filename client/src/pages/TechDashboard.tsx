@@ -14,6 +14,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { Progress } from "@/components/ui/progress";
+import { HighRiseBuilding } from "@/components/HighRiseBuilding";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
 const dropLogSchema = z.object({
@@ -276,7 +277,7 @@ export default function TechDashboard() {
 
       {/* Drop Logging Dialog */}
       <Dialog open={showDropDialog} onOpenChange={setShowDropDialog}>
-        <DialogContent>
+        <DialogContent className="max-w-md">
           <DialogHeader>
             <DialogTitle>Log Drops</DialogTitle>
             <DialogDescription>
@@ -285,6 +286,32 @@ export default function TechDashboard() {
               )}
             </DialogDescription>
           </DialogHeader>
+          
+          {selectedProject && (
+            <div className="mb-4">
+              <HighRiseBuilding
+                floors={selectedProject.floorCount}
+                completedDrops={selectedProject.completedDrops || 0}
+                totalDrops={selectedProject.totalDrops}
+                className="mb-4"
+              />
+              <div className="grid grid-cols-2 gap-4">
+                <div className="text-center p-3 bg-muted/50 rounded-lg">
+                  <div className="text-xl font-bold">{selectedProject.dailyDropTarget}</div>
+                  <div className="text-xs text-muted-foreground mt-1">Daily Target</div>
+                </div>
+                <div className="text-center p-3 bg-muted/50 rounded-lg">
+                  <div className="text-xl font-bold">
+                    {selectedProject.completedDrops && selectedProject.completedDrops > 0 
+                      ? Math.ceil((selectedProject.totalDrops - selectedProject.completedDrops) / selectedProject.dailyDropTarget) 
+                      : "N/A"}
+                  </div>
+                  <div className="text-xs text-muted-foreground mt-1">Days Remaining</div>
+                </div>
+              </div>
+              <Separator className="my-4" />
+            </div>
+          )}
           
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
