@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import { useLocation } from "wouter";
 import { HighRiseBuilding } from "@/components/HighRiseBuilding";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -26,6 +27,7 @@ type ComplaintFormData = z.infer<typeof complaintSchema>;
 export default function ResidentDashboard() {
   const [activeTab, setActiveTab] = useState("building");
   const { toast } = useToast();
+  const [, setLocation] = useLocation();
 
   // Fetch projects (resident's building)
   const { data: projectsData, isLoading } = useQuery({
@@ -97,6 +99,18 @@ export default function ResidentDashboard() {
     submitComplaintMutation.mutate(data);
   };
 
+  const handleLogout = async () => {
+    try {
+      await fetch("/api/logout", {
+        method: "POST",
+        credentials: "include",
+      });
+      setLocation("/");
+    } catch (error) {
+      toast({ title: "Error", description: "Failed to logout", variant: "destructive" });
+    }
+  };
+
   if (isLoading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
@@ -127,8 +141,8 @@ export default function ResidentDashboard() {
       <header className="sticky top-0 z-[100] bg-card border-b border-card-border shadow-sm">
         <div className="px-4 h-16 flex items-center justify-between">
           <h1 className="text-lg font-bold">Building Progress</h1>
-          <Button variant="ghost" size="icon" className="min-w-11 min-h-11" data-testid="button-menu">
-            <span className="material-icons">menu</span>
+          <Button variant="ghost" size="icon" className="min-w-11 min-h-11" data-testid="button-logout" onClick={handleLogout}>
+            <span className="material-icons">logout</span>
           </Button>
         </div>
       </header>

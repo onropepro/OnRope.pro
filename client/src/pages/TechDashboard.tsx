@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -25,6 +26,7 @@ type DropLogFormData = z.infer<typeof dropLogSchema>;
 export default function TechDashboard() {
   const [activeTab, setActiveTab] = useState("log-drops");
   const { toast } = useToast();
+  const [, setLocation] = useLocation();
 
   // Fetch projects
   const { data: projectsData } = useQuery({
@@ -87,6 +89,18 @@ export default function TechDashboard() {
     logDropsMutation.mutate(data);
   };
 
+  const handleLogout = async () => {
+    try {
+      await fetch("/api/logout", {
+        method: "POST",
+        credentials: "include",
+      });
+      setLocation("/");
+    } catch (error) {
+      toast({ title: "Error", description: "Failed to logout", variant: "destructive" });
+    }
+  };
+
   return (
     <div className="min-h-screen bg-background pb-20">
       {/* Header with Daily Target */}
@@ -99,8 +113,8 @@ export default function TechDashboard() {
               <div className="text-lg font-bold">{dailyTarget} Drops</div>
             </div>
           </div>
-          <Button variant="ghost" size="icon" className="text-primary-foreground min-w-11 min-h-11" data-testid="button-menu">
-            <span className="material-icons">menu</span>
+          <Button variant="ghost" size="icon" className="text-primary-foreground min-w-11 min-h-11" data-testid="button-logout" onClick={handleLogout}>
+            <span className="material-icons">logout</span>
           </Button>
         </div>
       </header>
@@ -140,7 +154,7 @@ export default function TechDashboard() {
                               </SelectTrigger>
                             </FormControl>
                             <SelectContent>
-                              {mockProjects.map((project) => (
+                              {projects.map((project: any) => (
                                 <SelectItem key={project.id} value={project.id}>
                                   {project.strataPlanNumber} - {project.jobType}
                                 </SelectItem>
