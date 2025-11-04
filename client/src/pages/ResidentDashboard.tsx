@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
@@ -28,6 +28,13 @@ export default function ResidentDashboard() {
   const [activeTab, setActiveTab] = useState("building");
   const { toast } = useToast();
   const [, setLocation] = useLocation();
+
+  // Fetch current user
+  const { data: userData } = useQuery({
+    queryKey: ["/api/user"],
+  });
+
+  const currentUser = userData?.user;
 
   // Fetch projects (resident's building)
   const { data: projectsData, isLoading } = useQuery({
@@ -61,6 +68,14 @@ export default function ResidentDashboard() {
       message: "",
     },
   });
+
+  // Update form values when user data loads
+  useEffect(() => {
+    if (currentUser) {
+      form.setValue("residentName", currentUser.name || "");
+      form.setValue("unitNumber", currentUser.unitNumber || "");
+    }
+  }, [currentUser, form]);
 
   const submitComplaintMutation = useMutation({
     mutationFn: async (data: ComplaintFormData) => {
