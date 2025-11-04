@@ -1,4 +1,6 @@
 import { useState } from "react";
+import { useQuery, useMutation } from "@tanstack/react-query";
+import { queryClient } from "@/lib/queryClient";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -11,6 +13,8 @@ import { z } from "zod";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage, FormDescription } from "@/components/ui/form";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
+import { useToast } from "@/hooks/use-toast";
+import type { Project } from "@shared/schema";
 
 const projectSchema = z.object({
   strataPlanNumber: z.string().min(1, "Strata plan number is required"),
@@ -34,19 +38,20 @@ export default function ManagementDashboard() {
   const [showProjectDialog, setShowProjectDialog] = useState(false);
   const [showEmployeeDialog, setShowEmployeeDialog] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const { toast } = useToast();
 
-  // Mock data
-  const mockProjects = [
-    { id: "1", strataPlanNumber: "LMS2345", jobType: "Window Cleaning", status: "active", totalDrops: 240, completedDrops: 156, floorCount: 24 },
-    { id: "2", strataPlanNumber: "LMS6789", jobType: "Pressure Washing", status: "active", totalDrops: 120, completedDrops: 45, floorCount: 12 },
-    { id: "3", strataPlanNumber: "LMS1111", jobType: "Dryer Vent Cleaning", status: "completed", totalDrops: 80, completedDrops: 80, floorCount: 8 },
-  ];
+  // Fetch projects
+  const { data: projectsData, isLoading: projectsLoading } = useQuery({
+    queryKey: ["/api/projects"],
+  });
 
-  const mockEmployees = [
-    { id: "1", email: "john@company.com", role: "operations_manager", name: "John Manager" },
-    { id: "2", email: "jane@company.com", role: "supervisor", name: "Jane Supervisor" },
-    { id: "3", email: "tech1@company.com", role: "rope_access_tech", techLevel: "Level 2", name: "Tech Smith" },
-  ];
+  // Fetch employees
+  const { data: employeesData, isLoading: employeesLoading } = useQuery({
+    queryKey: ["/api/employees"],
+  });
+
+  const projects = projectsData?.projects || [];
+  const employees = employeesData?.employees || [];
 
   const projectForm = useForm<ProjectFormData>({
     resolver: zodResolver(projectSchema),
@@ -68,24 +73,92 @@ export default function ManagementDashboard() {
     },
   });
 
+  const createProjectMutation = useMutation({
+    mutationFn: async (data: ProjectFormData) => {
+      const response = await fetch("/api/projects", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          ...data,
+          totalDrops: parseInt(data.totalDrops),
+          dailyDropTarget: parseInt(data.dailyDropTarget),
+          floorCount: parseInt(data.floorCount),
+        }),
+        credentials: "include",
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || "Failed to create project");
+      }
+
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/projects"] });
+      setShowProjectDialog(false);
+      projectForm.reset();
+      toast({ title: "Project created successfully" });
+    },
+    onError: (error: Error) => {
+      toast({ title: "Error", description: error.message, variant: "destructive" });
+    },
+  });
+
+  const createEmployeeMutation = useMutation({
+    mutationFn: async (data: EmployeeFormData) => {
+      const response = await fetch("/api/employees", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+        credentials: "include",
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || "Failed to create employee");
+      }
+
+      return response.json();
+    },
+    onSuccess: (result) => {
+      queryClient.invalidateQueries({ queryKey: ["/api/employees"] });
+      setShowEmployeeDialog(false);
+      employeeForm.reset();
+      toast({
+        title: "Employee created successfully",
+        description: `Temporary password: ${result.tempPassword}`,
+      });
+    },
+    onError: (error: Error) => {
+      toast({ title: "Error", description: error.message, variant: "destructive" });
+    },
+  });
+
   const onProjectSubmit = async (data: ProjectFormData) => {
-    console.log("Create project:", data);
-    setShowProjectDialog(false);
-    projectForm.reset();
+    createProjectMutation.mutate(data);
   };
 
   const onEmployeeSubmit = async (data: EmployeeFormData) => {
-    console.log("Create employee:", data);
-    setShowEmployeeDialog(false);
-    employeeForm.reset();
+    createEmployeeMutation.mutate(data);
   };
 
   const selectedRole = employeeForm.watch("role");
 
-  const filteredProjects = mockProjects.filter(p => 
+  const filteredProjects = projects.filter((p: Project) => 
     p.strataPlanNumber.toLowerCase().includes(searchQuery.toLowerCase()) ||
     p.jobType.toLowerCase().includes(searchQuery.toLowerCase())
   );
+
+  if (projectsLoading || employeesLoading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-center">
+          <div className="text-lg font-medium">Loading...</div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background pb-20">
@@ -237,51 +310,50 @@ export default function ManagementDashboard() {
               <div>
                 <h3 className="text-sm font-medium text-muted-foreground mb-3">Active Projects</h3>
                 <div className="space-y-2">
-                  {filteredProjects.filter(p => p.status === "active").map((project) => (
-                    <Card key={project.id} className="hover-elevate active-elevate-2 cursor-pointer" data-testid={`project-card-${project.id}`}>
-                      <CardContent className="p-4">
-                        <div className="flex items-start justify-between mb-2">
-                          <div>
-                            <div className="font-bold">{project.strataPlanNumber}</div>
-                            <div className="text-sm text-muted-foreground">{project.jobType.replace('_', ' ')}</div>
-                          </div>
-                          <Badge variant="secondary">{project.floorCount} Floors</Badge>
-                        </div>
-                        <div className="mt-3">
-                          <div className="flex items-center justify-between text-sm mb-1">
-                            <span className="text-muted-foreground">Progress</span>
-                            <span className="font-medium">{Math.round((project.completedDrops / project.totalDrops) * 100)}%</span>
-                          </div>
-                          <div className="h-2 bg-muted rounded-full overflow-hidden">
-                            <div 
-                              className="h-full bg-primary transition-all duration-300"
-                              style={{ width: `${(project.completedDrops / project.totalDrops) * 100}%` }}
-                            ></div>
-                          </div>
-                          <div className="text-xs text-muted-foreground mt-1">
-                            {project.completedDrops} / {project.totalDrops} drops
-                          </div>
-                        </div>
+                  {filteredProjects.filter((p: Project) => p.status === "active").length === 0 ? (
+                    <Card>
+                      <CardContent className="p-8 text-center text-muted-foreground">
+                        <span className="material-icons text-4xl mb-2 opacity-50">apartment</span>
+                        <div>No active projects yet</div>
                       </CardContent>
                     </Card>
-                  ))}
+                  ) : (
+                    filteredProjects.filter((p: Project) => p.status === "active").map((project: Project) => (
+                      <Card key={project.id} className="hover-elevate active-elevate-2 cursor-pointer" data-testid={`project-card-${project.id}`}>
+                        <CardContent className="p-4">
+                          <div className="flex items-start justify-between mb-2">
+                            <div>
+                              <div className="font-bold">{project.strataPlanNumber}</div>
+                              <div className="text-sm text-muted-foreground capitalize">{project.jobType.replace(/_/g, ' ')}</div>
+                            </div>
+                            <Badge variant="secondary">{project.floorCount} Floors</Badge>
+                          </div>
+                          <div className="mt-3">
+                            <div className="text-xs text-muted-foreground mt-1">
+                              Total: {project.totalDrops} drops
+                            </div>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    ))
+                  )}
                 </div>
               </div>
 
               {/* Completed Projects */}
-              {filteredProjects.filter(p => p.status === "completed").length > 0 && (
+              {filteredProjects.filter((p: Project) => p.status === "completed").length > 0 && (
                 <>
                   <Separator className="my-6" />
                   <div>
                     <h3 className="text-sm font-medium text-muted-foreground mb-3">Completed Projects</h3>
                     <div className="space-y-2">
-                      {filteredProjects.filter(p => p.status === "completed").map((project) => (
+                      {filteredProjects.filter((p: Project) => p.status === "completed").map((project: Project) => (
                         <Card key={project.id} className="opacity-75" data-testid={`completed-project-${project.id}`}>
                           <CardContent className="p-4">
                             <div className="flex items-start justify-between">
                               <div>
                                 <div className="font-bold">{project.strataPlanNumber}</div>
-                                <div className="text-sm text-muted-foreground">{project.jobType.replace('_', ' ')}</div>
+                                <div className="text-sm text-muted-foreground capitalize">{project.jobType.replace(/_/g, ' ')}</div>
                               </div>
                               <Badge variant="default" className="bg-status-closed">Completed</Badge>
                             </div>
@@ -389,24 +461,32 @@ export default function ManagementDashboard() {
 
               {/* Employee List */}
               <div className="space-y-2">
-                {mockEmployees.map((employee) => (
-                  <Card key={employee.id} data-testid={`employee-card-${employee.id}`}>
-                    <CardContent className="p-4">
-                      <div className="flex items-start justify-between">
-                        <div className="flex-1">
-                          <div className="font-medium">{employee.name}</div>
-                          <div className="text-sm text-muted-foreground">{employee.email}</div>
-                          {employee.techLevel && (
-                            <div className="text-xs text-muted-foreground mt-1">{employee.techLevel}</div>
-                          )}
-                        </div>
-                        <Badge variant="secondary" className="text-xs">
-                          {employee.role.replace('_', ' ')}
-                        </Badge>
-                      </div>
+                {employees.length === 0 ? (
+                  <Card>
+                    <CardContent className="p-8 text-center text-muted-foreground">
+                      <span className="material-icons text-4xl mb-2 opacity-50">people</span>
+                      <div>No employees yet</div>
                     </CardContent>
                   </Card>
-                ))}
+                ) : (
+                  employees.map((employee: any) => (
+                    <Card key={employee.id} data-testid={`employee-card-${employee.id}`}>
+                      <CardContent className="p-4">
+                        <div className="flex items-start justify-between">
+                          <div className="flex-1">
+                            <div className="font-medium">{employee.email}</div>
+                            {employee.techLevel && (
+                              <div className="text-xs text-muted-foreground mt-1">{employee.techLevel}</div>
+                            )}
+                          </div>
+                          <Badge variant="secondary" className="text-xs capitalize">
+                            {employee.role.replace(/_/g, ' ')}
+                          </Badge>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))
+                )}
               </div>
             </div>
           </TabsContent>

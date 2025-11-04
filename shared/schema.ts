@@ -34,6 +34,7 @@ export const users = pgTable("users", {
   
   // Company-specific fields
   companyName: varchar("company_name"), // for company role
+  companyId: varchar("company_id").references(() => users.id, { onDelete: "cascade" }), // for employees - links to their company
   
   // Resident-specific fields
   name: varchar("name"), // for resident role
@@ -83,6 +84,7 @@ export const complaints = pgTable("complaints", {
   unitNumber: varchar("unit_number").notNull(),
   message: text("message").notNull(),
   status: varchar("status").notNull().default('open'), // open | closed
+  viewedAt: timestamp("viewed_at"), // When staff first viewed this complaint
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });

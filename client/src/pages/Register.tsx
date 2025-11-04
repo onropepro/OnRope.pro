@@ -55,13 +55,62 @@ export default function Register() {
   });
 
   const onResidentSubmit = async (data: ResidentFormData) => {
-    console.log("Resident registration:", data);
-    // Will be connected to API in integration phase
+    try {
+      const { confirmPassword, ...registrationData } = data;
+      
+      const response = await fetch("/api/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          ...registrationData,
+          role: "resident",
+          passwordHash: data.password,
+        }),
+        credentials: "include",
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        residentForm.setError("email", { message: result.message || "Registration failed" });
+        return;
+      }
+
+      // Redirect to resident dashboard
+      window.location.href = "/resident";
+    } catch (error) {
+      residentForm.setError("email", { message: "An error occurred. Please try again." });
+    }
   };
 
   const onCompanySubmit = async (data: CompanyFormData) => {
-    console.log("Company registration:", data);
-    // Will be connected to API in integration phase
+    try {
+      const { confirmPassword, ...registrationData } = data;
+      
+      const response = await fetch("/api/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          ...registrationData,
+          role: "company",
+          email: null,
+          passwordHash: data.password,
+        }),
+        credentials: "include",
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        companyForm.setError("companyName", { message: result.message || "Registration failed" });
+        return;
+      }
+
+      // Redirect to management dashboard
+      window.location.href = "/management";
+    } catch (error) {
+      companyForm.setError("companyName", { message: "An error occurred. Please try again." });
+    }
   };
 
   return (

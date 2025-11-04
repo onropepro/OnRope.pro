@@ -1,4 +1,7 @@
 import { useState } from "react";
+import { useQuery, useMutation } from "@tanstack/react-query";
+import { queryClient } from "@/lib/queryClient";
+import { useToast } from "@/hooks/use-toast";
 import { HighRiseBuilding } from "@/components/HighRiseBuilding";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -22,16 +25,29 @@ type ComplaintFormData = z.infer<typeof complaintSchema>;
 
 export default function ResidentDashboard() {
   const [activeTab, setActiveTab] = useState("building");
+  const { toast } = useToast();
 
-  // Mock data - will be replaced with real data from API
-  const mockProject = {
-    strataPlanNumber: "LMS2345",
-    jobType: "Window Cleaning",
-    floorCount: 24,
-    totalDrops: 240,
-    completedDrops: 156,
-    dailyDropTarget: 20,
-    progressPercentage: 65,
+  // Fetch projects (resident's building)
+  const { data: projectsData, isLoading } = useQuery({
+    queryKey: ["/api/projects"],
+  });
+
+  // Fetch progress for the project
+  const project = projectsData?.projects?.[0];
+  
+  const { data: progressData } = useQuery({
+    queryKey: ["/api/projects", project?.id, "progress"],
+    enabled: !!project?.id,
+  });
+
+  const projectData = {
+    strataPlanNumber: project?.strataPlanNumber || "",
+    jobType: project?.jobType?.replace(/_/g, ' ') || "Window Cleaning",
+    floorCount: project?.floorCount || 24,
+    totalDrops: project?.totalDrops || 0,
+    completedDrops: progressData?.completedDrops || 0,
+    dailyDropTarget: project?.dailyDropTarget || 20,
+    progressPercentage: progressData?.progressPercentage || 0,
   };
 
   const form = useForm<ComplaintFormData>({
@@ -44,11 +60,66 @@ export default function ResidentDashboard() {
     },
   });
 
+  const submitComplaintMutation = useMutation({
+    mutationFn: async (data: ComplaintFormData) => {
+      if (!project?.id) {
+        throw new Error("Project not found");
+      }
+
+      const response = await fetch("/api/complaints", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          ...data,
+          projectId: project.id,
+        }),
+        credentials: "include",
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || "Failed to submit feedback");
+      }
+
+      return response.json();
+    },
+    onSuccess: () => {
+      form.reset();
+      toast({ title: "Feedback submitted successfully" });
+      setActiveTab("building");
+    },
+    onError: (error: Error) => {
+      toast({ title: "Error", description: error.message, variant: "destructive" });
+    },
+  });
+
   const onSubmit = async (data: ComplaintFormData) => {
-    console.log("Complaint submitted:", data);
-    // Will be connected to API in integration phase
-    form.reset();
+    submitComplaintMutation.mutate(data);
   };
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-lg font-medium">Loading...</div>
+      </div>
+    );
+  }
+
+  if (!project) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center p-4">
+        <Card className="w-full max-w-md text-center">
+          <CardContent className="pt-12 pb-8">
+            <span className="material-icons text-6xl text-muted-foreground mb-4">apartment</span>
+            <h2 className="text-xl font-bold mb-2">No Building Found</h2>
+            <p className="text-muted-foreground">
+              No active project found for your strata plan number.
+            </p>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background pb-20">
@@ -68,11 +139,11 @@ export default function ResidentDashboard() {
           <CardHeader>
             <div className="flex items-start justify-between">
               <div>
-                <CardTitle data-testid="text-strata-number">{mockProject.strataPlanNumber}</CardTitle>
-                <CardDescription className="mt-1">{mockProject.jobType}</CardDescription>
+                <CardTitle data-testid="text-strata-number">{projectData.strataPlanNumber}</CardTitle>
+                <CardDescription className="mt-1 capitalize">{projectData.jobType}</CardDescription>
               </div>
               <Badge variant="secondary" className="text-sm">
-                {mockProject.floorCount} Floors
+                {projectData.floorCount} Floors
               </Badge>
             </div>
           </CardHeader>
@@ -88,20 +159,20 @@ export default function ResidentDashboard() {
             <Card>
               <CardContent className="pt-6">
                 <HighRiseBuilding
-                  floors={mockProject.floorCount}
-                  completedDrops={mockProject.completedDrops}
-                  totalDrops={mockProject.totalDrops}
+                  floors={projectData.floorCount}
+                  completedDrops={projectData.completedDrops}
+                  totalDrops={projectData.totalDrops}
                   className="mb-6"
                 />
 
                 <div className="grid grid-cols-2 gap-4 mt-6">
                   <div className="text-center p-4 bg-muted/50 rounded-lg">
-                    <div className="text-2xl font-bold text-foreground">{mockProject.dailyDropTarget}</div>
+                    <div className="text-2xl font-bold text-foreground">{projectData.dailyDropTarget}</div>
                     <div className="text-xs text-muted-foreground mt-1">Daily Target</div>
                   </div>
                   <div className="text-center p-4 bg-muted/50 rounded-lg">
                     <div className="text-2xl font-bold text-foreground">
-                      {Math.ceil((mockProject.totalDrops - mockProject.completedDrops) / mockProject.dailyDropTarget)}
+                      {projectData.completedDrops > 0 ? Math.ceil((projectData.totalDrops - projectData.completedDrops) / projectData.dailyDropTarget) : "N/A"}
                     </div>
                     <div className="text-xs text-muted-foreground mt-1">Days Remaining</div>
                   </div>

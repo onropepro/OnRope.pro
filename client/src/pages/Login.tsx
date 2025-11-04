@@ -23,8 +23,34 @@ export default function Login() {
   });
 
   const onSubmit = async (data: LoginFormData) => {
-    console.log("Login:", data);
-    // Will be connected to API in integration phase
+    try {
+      const response = await fetch("/api/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+        credentials: "include",
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        form.setError("identifier", { message: result.message || "Login failed" });
+        return;
+      }
+
+      // Redirect based on role
+      const user = result.user;
+      if (user.role === "resident") {
+        window.location.href = "/resident";
+      } else if (user.role === "rope_access_tech") {
+        window.location.href = "/tech";
+      } else {
+        // company, operations_manager, supervisor
+        window.location.href = "/management";
+      }
+    } catch (error) {
+      form.setError("identifier", { message: "An error occurred. Please try again." });
+    }
   };
 
   return (

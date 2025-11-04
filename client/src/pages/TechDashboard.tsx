@@ -1,4 +1,7 @@
 import { useState } from "react";
+import { useQuery, useMutation } from "@tanstack/react-query";
+import { queryClient } from "@/lib/queryClient";
+import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -21,34 +24,21 @@ type DropLogFormData = z.infer<typeof dropLogSchema>;
 
 export default function TechDashboard() {
   const [activeTab, setActiveTab] = useState("log-drops");
+  const { toast } = useToast();
 
-  // Mock data - will be replaced with real data from API
-  const dailyTarget = 20;
-  const mockProjects = [
-    { id: "1", strataPlanNumber: "LMS2345", jobType: "Window Cleaning", address: "123 Main St" },
-    { id: "2", strataPlanNumber: "LMS6789", jobType: "Pressure Washing", address: "456 Oak Ave" },
-  ];
+  // Fetch projects
+  const { data: projectsData } = useQuery({
+    queryKey: ["/api/projects"],
+  });
 
-  const mockComplaints = [
-    {
-      id: "1",
-      strataPlanNumber: "LMS2345",
-      residentName: "John Smith",
-      unitNumber: "302",
-      message: "Water spots on windows after cleaning",
-      status: "open",
-      createdAt: "2024-01-15",
-    },
-    {
-      id: "2",
-      strataPlanNumber: "LMS6789",
-      residentName: "Jane Doe",
-      unitNumber: "105",
-      message: "Requesting update on completion date",
-      status: "open",
-      createdAt: "2024-01-14",
-    },
-  ];
+  // Fetch complaints
+  const { data: complaintsData } = useQuery({
+    queryKey: ["/api/complaints"],
+  });
+
+  const projects = projectsData?.projects || [];
+  const complaints = complaintsData?.complaints || [];
+  const dailyTarget = 20; // Can be fetched from user profile later
 
   const form = useForm<DropLogFormData>({
     resolver: zodResolver(dropLogSchema),
@@ -59,14 +49,42 @@ export default function TechDashboard() {
     },
   });
 
+  const logDropsMutation = useMutation({
+    mutationFn: async (data: DropLogFormData) => {
+      const response = await fetch("/api/drops", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          projectId: data.projectId,
+          date: data.date,
+          dropsCompleted: parseInt(data.dropsCompleted),
+        }),
+        credentials: "include",
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || "Failed to log drops");
+      }
+
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/projects"] });
+      form.reset({
+        projectId: "",
+        date: new Date().toISOString().split('T')[0],
+        dropsCompleted: "",
+      });
+      toast({ title: "Drops logged successfully" });
+    },
+    onError: (error: Error) => {
+      toast({ title: "Error", description: error.message, variant: "destructive" });
+    },
+  });
+
   const onSubmit = async (data: DropLogFormData) => {
-    console.log("Drop log:", data);
-    // Will be connected to API in integration phase
-    form.reset({
-      projectId: "",
-      date: new Date().toISOString().split('T')[0],
-      dropsCompleted: "",
-    });
+    logDropsMutation.mutate(data);
   };
 
   return (
@@ -181,45 +199,41 @@ export default function TechDashboard() {
 
           <TabsContent value="complaints">
             <div className="space-y-4">
-              {mockProjects.map((project) => {
-                const projectComplaints = mockComplaints.filter(c => c.strataPlanNumber === project.strataPlanNumber);
-                
-                if (projectComplaints.length === 0) return null;
-
-                return (
-                  <div key={project.id}>
-                    <div className="flex items-center gap-2 mb-3">
-                      <span className="material-icons text-muted-foreground text-sm">apartment</span>
-                      <span className="text-sm font-medium">{project.strataPlanNumber}</span>
-                      <Badge variant="secondary" className="text-xs">{projectComplaints.length}</Badge>
-                    </div>
-                    <div className="space-y-2">
-                      {projectComplaints.map((complaint) => (
-                        <Card key={complaint.id} className="hover-elevate active-elevate-2 cursor-pointer" data-testid={`complaint-card-${complaint.id}`}>
-                          <CardContent className="p-4">
-                            <div className="flex items-start justify-between mb-2">
-                              <div className="flex-1">
-                                <div className="font-medium text-sm">{complaint.residentName}</div>
-                                <div className="text-xs text-muted-foreground">Unit {complaint.unitNumber}</div>
-                              </div>
-                              <Badge variant={complaint.status === "open" ? "default" : "secondary"} className="text-xs">
-                                {complaint.status}
-                              </Badge>
-                            </div>
-                            <p className="text-sm text-muted-foreground line-clamp-2 mb-2">
-                              {complaint.message}
-                            </p>
-                            <div className="text-xs text-muted-foreground">
-                              {new Date(complaint.createdAt).toLocaleDateString()}
-                            </div>
-                          </CardContent>
-                        </Card>
-                      ))}
-                    </div>
-                    <Separator className="my-6" />
-                  </div>
-                );
-              })}
+              {complaints.length === 0 ? (
+                <Card>
+                  <CardContent className="p-8 text-center text-muted-foreground">
+                    <span className="material-icons text-4xl mb-2 opacity-50">feedback</span>
+                    <div>No feedback yet</div>
+                  </CardContent>
+                </Card>
+              ) : (
+                complaints.map((complaint: any) => (
+                  <Card
+                    key={complaint.id}
+                    className="hover-elevate active-elevate-2 cursor-pointer"
+                    data-testid={`complaint-card-${complaint.id}`}
+                    onClick={() => window.location.href = `/complaints/${complaint.id}`}
+                  >
+                    <CardContent className="p-4">
+                      <div className="flex items-start justify-between mb-2">
+                        <div className="flex-1">
+                          <div className="font-medium text-sm">{complaint.residentName}</div>
+                          <div className="text-xs text-muted-foreground">Unit {complaint.unitNumber}</div>
+                        </div>
+                        <Badge variant={complaint.status === "open" ? "default" : "secondary"} className="text-xs">
+                          {complaint.status}
+                        </Badge>
+                      </div>
+                      <p className="text-sm text-muted-foreground line-clamp-2 mb-2">
+                        {complaint.message}
+                      </p>
+                      <div className="text-xs text-muted-foreground">
+                        {new Date(complaint.createdAt).toLocaleDateString()}
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))
+              )}
             </div>
           </TabsContent>
         </Tabs>
