@@ -157,26 +157,58 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Unable to determine company" });
       }
       
-      const employeeData = req.body;
+      const { email, password, role, techLevel } = req.body;
       
-      // Generate temporary password
-      const tempPassword = Math.random().toString(36).slice(-8);
+      if (!password || password.length < 6) {
+        return res.status(400).json({ message: "Password must be at least 6 characters" });
+      }
+      
+      // Hash the provided password
+      const passwordHash = await bcrypt.hash(password, 10);
       
       // Create employee account linked to company
       const employee = await storage.createUser({
-        ...employeeData,
+        email,
+        role,
+        techLevel: role === "rope_access_tech" ? techLevel : null,
         companyId, // Link employee to this company
-        passwordHash: tempPassword,
-        isTempPassword: true,
+        passwordHash,
       });
       
-      // In production, send email with temp password here
-      console.log(`New employee created: ${employee.email}, temp password: ${tempPassword}`);
-      
-      const { passwordHash, ...employeeWithoutPassword } = employee;
-      res.json({ employee: employeeWithoutPassword, tempPassword });
+      const { passwordHash: _, ...employeeWithoutPassword } = employee;
+      res.json({ employee: employeeWithoutPassword });
     } catch (error) {
       console.error("Create employee error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+  
+  // Delete employee
+  app.delete("/api/employees/:id", requireAuth, requireRole("company", "operations_manager"), async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      const companyId = currentUser.role === "company" ? currentUser.id : currentUser.companyId;
+      
+      if (!companyId) {
+        return res.status(400).json({ message: "Unable to determine company" });
+      }
+      
+      // Get the employee to verify they belong to this company
+      const employee = await storage.getUserById(req.params.id);
+      
+      if (!employee || employee.companyId !== companyId) {
+        return res.status(403).json({ message: "Access denied" });
+      }
+      
+      await storage.deleteUser(req.params.id);
+      res.json({ message: "Employee deleted successfully" });
+    } catch (error) {
+      console.error("Delete employee error:", error);
       res.status(500).json({ message: "Internal server error" });
     }
   });

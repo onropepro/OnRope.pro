@@ -14,6 +14,8 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage, FormDes
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/hooks/use-toast";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
+import { useLocation } from "wouter";
 import type { Project } from "@shared/schema";
 
 const projectSchema = z.object({
@@ -26,6 +28,7 @@ const projectSchema = z.object({
 
 const employeeSchema = z.object({
   email: z.string().email("Invalid email address"),
+  password: z.string().min(6, "Password must be at least 6 characters"),
   role: z.enum(["operations_manager", "supervisor", "rope_access_tech"]),
   techLevel: z.string().optional(),
 });
@@ -38,7 +41,9 @@ export default function ManagementDashboard() {
   const [showProjectDialog, setShowProjectDialog] = useState(false);
   const [showEmployeeDialog, setShowEmployeeDialog] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [employeeToDelete, setEmployeeToDelete] = useState<string | null>(null);
   const { toast } = useToast();
+  const [, setLocation] = useLocation();
 
   // Fetch projects
   const { data: projectsData, isLoading: projectsLoading } = useQuery({
@@ -68,6 +73,7 @@ export default function ManagementDashboard() {
     resolver: zodResolver(employeeSchema),
     defaultValues: {
       email: "",
+      password: "",
       role: "rope_access_tech",
       techLevel: "",
     },
@@ -121,13 +127,12 @@ export default function ManagementDashboard() {
 
       return response.json();
     },
-    onSuccess: (result) => {
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/employees"] });
       setShowEmployeeDialog(false);
       employeeForm.reset();
       toast({
         title: "Employee created successfully",
-        description: `Temporary password: ${result.tempPassword}`,
       });
     },
     onError: (error: Error) => {
@@ -141,6 +146,42 @@ export default function ManagementDashboard() {
 
   const onEmployeeSubmit = async (data: EmployeeFormData) => {
     createEmployeeMutation.mutate(data);
+  };
+
+  const deleteEmployeeMutation = useMutation({
+    mutationFn: async (employeeId: string) => {
+      const response = await fetch(`/api/employees/${employeeId}`, {
+        method: "DELETE",
+        credentials: "include",
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || "Failed to delete employee");
+      }
+
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/employees"] });
+      setEmployeeToDelete(null);
+      toast({ title: "Employee deleted successfully" });
+    },
+    onError: (error: Error) => {
+      toast({ title: "Error", description: error.message, variant: "destructive" });
+    },
+  });
+
+  const handleLogout = async () => {
+    try {
+      await fetch("/api/logout", {
+        method: "POST",
+        credentials: "include",
+      });
+      setLocation("/");
+    } catch (error) {
+      toast({ title: "Error", description: "Failed to logout", variant: "destructive" });
+    }
   };
 
   const selectedRole = employeeForm.watch("role");
@@ -166,8 +207,8 @@ export default function ManagementDashboard() {
       <header className="sticky top-0 z-[100] bg-card border-b border-card-border shadow-sm">
         <div className="px-4 h-16 flex items-center justify-between">
           <h1 className="text-lg font-bold">Management</h1>
-          <Button variant="ghost" size="icon" className="min-w-11 min-h-11" data-testid="button-menu">
-            <span className="material-icons">menu</span>
+          <Button variant="ghost" size="icon" className="min-w-11 min-h-11" data-testid="button-logout" onClick={handleLogout}>
+            <span className="material-icons">logout</span>
           </Button>
         </div>
       </header>
@@ -381,7 +422,7 @@ export default function ManagementDashboard() {
                   <DialogHeader>
                     <DialogTitle>Create Employee Account</DialogTitle>
                     <DialogDescription>
-                      A temporary password will be sent to their email
+                      Enter login credentials for the new employee
                     </DialogDescription>
                   </DialogHeader>
                   <Form {...employeeForm}>
@@ -397,6 +438,23 @@ export default function ManagementDashboard() {
                             </FormControl>
                             <FormDescription className="text-xs">
                               Will be used as username
+                            </FormDescription>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      <FormField
+                        control={employeeForm.control}
+                        name="password"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Temporary Password</FormLabel>
+                            <FormControl>
+                              <Input type="text" placeholder="Enter temporary password" {...field} data-testid="input-employee-password" className="h-12" />
+                            </FormControl>
+                            <FormDescription className="text-xs">
+                              Give this password to the employee
                             </FormDescription>
                             <FormMessage />
                           </FormItem>
@@ -472,16 +530,27 @@ export default function ManagementDashboard() {
                   employees.map((employee: any) => (
                     <Card key={employee.id} data-testid={`employee-card-${employee.id}`}>
                       <CardContent className="p-4">
-                        <div className="flex items-start justify-between">
+                        <div className="flex items-start justify-between gap-3">
                           <div className="flex-1">
                             <div className="font-medium">{employee.email}</div>
                             {employee.techLevel && (
                               <div className="text-xs text-muted-foreground mt-1">{employee.techLevel}</div>
                             )}
                           </div>
-                          <Badge variant="secondary" className="text-xs capitalize">
-                            {employee.role.replace(/_/g, ' ')}
-                          </Badge>
+                          <div className="flex items-center gap-2">
+                            <Badge variant="secondary" className="text-xs capitalize">
+                              {employee.role.replace(/_/g, ' ')}
+                            </Badge>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              onClick={() => setEmployeeToDelete(employee.id)}
+                              data-testid={`button-delete-employee-${employee.id}`}
+                              className="h-9 w-9 text-destructive hover:text-destructive"
+                            >
+                              <span className="material-icons text-sm">delete</span>
+                            </Button>
+                          </div>
                         </div>
                       </CardContent>
                     </Card>
@@ -492,6 +561,28 @@ export default function ManagementDashboard() {
           </TabsContent>
         </Tabs>
       </div>
+
+      {/* Delete Employee Confirmation Dialog */}
+      <AlertDialog open={employeeToDelete !== null} onOpenChange={(open) => !open && setEmployeeToDelete(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Employee</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete this employee? This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel data-testid="button-cancel-delete">Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => employeeToDelete && deleteEmployeeMutation.mutate(employeeToDelete)}
+              data-testid="button-confirm-delete"
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

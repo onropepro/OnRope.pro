@@ -46,6 +46,10 @@ export class Storage {
       .orderBy(desc(users.createdAt));
   }
 
+  async deleteUser(userId: string): Promise<void> {
+    await db.delete(users).where(eq(users.id, userId));
+  }
+
   // Project operations
   async createProject(project: InsertProject): Promise<Project> {
     const result = await db.insert(projects).values(project).returning();
