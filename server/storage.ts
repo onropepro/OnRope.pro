@@ -113,6 +113,15 @@ export class Storage {
     return result[0];
   }
 
+  async getDropLogsByUserAndDate(userId: string, date: string): Promise<DropLog[]> {
+    return db.select().from(dropLogs)
+      .where(and(
+        eq(dropLogs.userId, userId),
+        eq(dropLogs.date, date)
+      ))
+      .orderBy(desc(dropLogs.createdAt));
+  }
+
   async updateDropLog(id: string, dropsCompleted: number): Promise<DropLog> {
     const result = await db.update(dropLogs)
       .set({ dropsCompleted, updatedAt: new Date() })

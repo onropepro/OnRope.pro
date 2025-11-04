@@ -13,6 +13,7 @@ import { z } from "zod";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage, FormDescription } from "@/components/ui/form";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
+import { Progress } from "@/components/ui/progress";
 import { useToast } from "@/hooks/use-toast";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { useLocation } from "wouter";
@@ -40,6 +41,8 @@ export default function ManagementDashboard() {
   const [activeTab, setActiveTab] = useState("projects");
   const [showProjectDialog, setShowProjectDialog] = useState(false);
   const [showEmployeeDialog, setShowEmployeeDialog] = useState(false);
+  const [selectedProject, setSelectedProject] = useState<Project | null>(null);
+  const [showProjectDetailDialog, setShowProjectDetailDialog] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [employeeToDelete, setEmployeeToDelete] = useState<string | null>(null);
   const { toast } = useToast();
@@ -359,24 +362,42 @@ export default function ManagementDashboard() {
                       </CardContent>
                     </Card>
                   ) : (
-                    filteredProjects.filter((p: Project) => p.status === "active").map((project: Project) => (
-                      <Card key={project.id} className="hover-elevate active-elevate-2 cursor-pointer" data-testid={`project-card-${project.id}`}>
-                        <CardContent className="p-4">
-                          <div className="flex items-start justify-between mb-2">
-                            <div>
-                              <div className="font-bold">{project.strataPlanNumber}</div>
-                              <div className="text-sm text-muted-foreground capitalize">{project.jobType.replace(/_/g, ' ')}</div>
+                    filteredProjects.filter((p: Project) => p.status === "active").map((project: Project) => {
+                      const completedDrops = project.completedDrops || 0;
+                      const progressPercent = (completedDrops / project.totalDrops) * 100;
+
+                      return (
+                        <Card 
+                          key={project.id} 
+                          className="hover-elevate active-elevate-2 cursor-pointer" 
+                          data-testid={`project-card-${project.id}`}
+                          onClick={() => {
+                            setSelectedProject(project);
+                            setShowProjectDetailDialog(true);
+                          }}
+                        >
+                          <CardContent className="p-4">
+                            <div className="flex items-start justify-between mb-3">
+                              <div className="flex-1">
+                                <div className="font-bold">{project.strataPlanNumber}</div>
+                                <div className="text-sm text-muted-foreground capitalize">{project.jobType.replace(/_/g, ' ')}</div>
+                              </div>
+                              <Badge variant="secondary">{project.floorCount} Floors</Badge>
                             </div>
-                            <Badge variant="secondary">{project.floorCount} Floors</Badge>
-                          </div>
-                          <div className="mt-3">
-                            <div className="text-xs text-muted-foreground mt-1">
-                              Total: {project.totalDrops} drops
+                            <div className="space-y-2">
+                              <div className="flex items-center justify-between text-sm">
+                                <span className="text-muted-foreground">Progress</span>
+                                <span className="font-bold">{Math.round(progressPercent)}%</span>
+                              </div>
+                              <Progress value={progressPercent} className="h-2" />
+                              <div className="flex items-center justify-between text-xs text-muted-foreground">
+                                <span>{completedDrops} / {project.totalDrops} drops</span>
+                              </div>
                             </div>
-                          </div>
-                        </CardContent>
-                      </Card>
-                    ))
+                          </CardContent>
+                        </Card>
+                      );
+                    })
                   )}
                 </div>
               </div>
@@ -561,6 +582,72 @@ export default function ManagementDashboard() {
           </TabsContent>
         </Tabs>
       </div>
+
+      {/* Project Detail Dialog */}
+      <Dialog open={showProjectDetailDialog} onOpenChange={setShowProjectDetailDialog}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Project Details</DialogTitle>
+            <DialogDescription>
+              {selectedProject && (
+                <>{selectedProject.strataPlanNumber} - {selectedProject.jobType.replace(/_/g, ' ')}</>
+              )}
+            </DialogDescription>
+          </DialogHeader>
+          
+          {selectedProject && (
+            <div className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <div className="text-xs text-muted-foreground mb-1">Floors</div>
+                  <div className="font-bold">{selectedProject.floorCount}</div>
+                </div>
+                <div>
+                  <div className="text-xs text-muted-foreground mb-1">Daily Target</div>
+                  <div className="font-bold">{selectedProject.dailyDropTarget} drops</div>
+                </div>
+              </div>
+
+              <Separator />
+
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-sm font-medium">Overall Progress</span>
+                  <span className="text-sm font-bold">
+                    {Math.round(((selectedProject.completedDrops || 0) / selectedProject.totalDrops) * 100)}%
+                  </span>
+                </div>
+                <Progress 
+                  value={((selectedProject.completedDrops || 0) / selectedProject.totalDrops) * 100} 
+                  className="h-3 mb-2" 
+                />
+                <div className="flex items-center justify-between text-sm text-muted-foreground">
+                  <span>{selectedProject.completedDrops || 0} / {selectedProject.totalDrops} drops completed</span>
+                  <span className="font-medium">{selectedProject.totalDrops - (selectedProject.completedDrops || 0)} remaining</span>
+                </div>
+              </div>
+
+              <Separator />
+
+              <div className="flex items-center justify-between">
+                <div>
+                  <div className="text-xs text-muted-foreground mb-1">Status</div>
+                  <Badge variant={selectedProject.status === "active" ? "default" : "secondary"} className="capitalize">
+                    {selectedProject.status}
+                  </Badge>
+                </div>
+                <Button 
+                  variant="outline" 
+                  onClick={() => setShowProjectDetailDialog(false)}
+                  className="h-10"
+                >
+                  Close
+                </Button>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
 
       {/* Delete Employee Confirmation Dialog */}
       <AlertDialog open={employeeToDelete !== null} onOpenChange={(open) => !open && setEmployeeToDelete(null)}>

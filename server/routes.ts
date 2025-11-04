@@ -535,6 +535,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: "Internal server error" });
     }
   });
+
+  // Get current user's drops for today (for daily target tracking)
+  app.get("/api/my-drops-today", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const today = new Date().toISOString().split('T')[0];
+      const dropLogs = await storage.getDropLogsByUserAndDate(req.session.userId!, today);
+      
+      const totalDropsToday = dropLogs.reduce((sum, log) => sum + log.dropsCompleted, 0);
+      
+      res.json({ 
+        totalDropsToday,
+        dropLogs 
+      });
+    } catch (error) {
+      console.error("Get today's drops error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
   
   // ==================== COMPLAINT ROUTES ====================
   
