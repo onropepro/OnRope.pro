@@ -163,16 +163,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Password must be at least 6 characters" });
       }
       
-      // Hash the provided password
-      const passwordHash = await bcrypt.hash(password, 10);
-      
       // Create employee account linked to company
+      // Storage will hash the password
       const employee = await storage.createUser({
         email,
         role,
         techLevel: role === "rope_access_tech" ? techLevel : null,
         companyId, // Link employee to this company
-        passwordHash,
+        passwordHash: password, // Storage will hash this
       });
       
       const { passwordHash: _, ...employeeWithoutPassword } = employee;
