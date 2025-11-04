@@ -6,9 +6,17 @@ export default {
   theme: {
     extend: {
       borderRadius: {
-        lg: ".5625rem", /* 9px */
+        lg: ".5rem", /* 8px - Material Design 3 */
         md: ".375rem", /* 6px */
         sm: ".1875rem", /* 3px */
+      },
+      minHeight: {
+        '11': '2.75rem', /* 44px - minimum touch target */
+        '12': '3rem', /* 48px - comfortable touch target */
+      },
+      spacing: {
+        '18': '4.5rem', /* 72px */
+        '22': '5.5rem', /* 88px */
       },
       colors: {
         // Flat / base colors (regular buttons)
@@ -76,10 +84,8 @@ export default {
           border: "var(--sidebar-accent-border)"
         },
         status: {
-          online: "rgb(34 197 94)",
-          away: "rgb(245 158 11)",
-          busy: "rgb(239 68 68)",
-          offline: "rgb(156 163 175)",
+          open: "hsl(24 80% 48%)", // Orange for open complaints
+          closed: "hsl(142 76% 36%)", // Green for closed complaints
         },
       },
       fontFamily: {
@@ -96,10 +102,15 @@ export default {
           from: { height: "var(--radix-accordion-content-height)" },
           to: { height: "0" },
         },
+        "pulse-window": {
+          "0%, 100%": { opacity: "0.3" },
+          "50%": { opacity: "1" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
+        "pulse-window": "pulse-window 2s ease-in-out infinite",
       },
     },
   },
