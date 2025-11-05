@@ -329,7 +329,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
         projects = [];
       }
       
-      res.json({ projects });
+      // Add completedDrops to each project
+      const projectsWithProgress = await Promise.all(
+        projects.map(async (project) => {
+          const { totalCompleted } = await storage.getProjectProgress(project.id);
+          return {
+            ...project,
+            completedDrops: totalCompleted,
+          };
+        })
+      );
+      
+      res.json({ projects: projectsWithProgress });
     } catch (error) {
       console.error("Get projects error:", error);
       res.status(500).json({ message: "Internal server error" });
