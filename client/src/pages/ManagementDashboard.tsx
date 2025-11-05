@@ -116,10 +116,17 @@ export default function ManagementDashboard() {
     queryKey: ["/api/all-work-sessions"],
     enabled: projects.length > 0,
   });
+  
+  // Fetch all complaints for the company
+  const { data: complaintsData, isLoading: complaintsLoading } = useQuery({
+    queryKey: ["/api/complaints"],
+  });
+  
   const employees = employeesData?.employees || [];
   const todayDrops = myDropsData?.totalDropsToday || 0;
   const dailyTarget = projects[0]?.dailyDropTarget || 20;
   const companyName = companyData?.company?.companyName || "";
+  const complaints = complaintsData?.complaints || [];
 
   // Calculate overall target met statistics across all projects
   const allWorkSessions = allWorkSessionsData?.sessions || [];
@@ -502,7 +509,7 @@ export default function ManagementDashboard() {
 
       <div className="p-4 max-w-4xl mx-auto">
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid w-full grid-cols-4 mb-4">
+          <TabsList className="grid w-full grid-cols-5 mb-4">
             <TabsTrigger value="projects" data-testid="tab-projects">
               <span className="material-icons text-sm mr-2">apartment</span>
               Projects
@@ -510,6 +517,10 @@ export default function ManagementDashboard() {
             <TabsTrigger value="performance" data-testid="tab-performance">
               <span className="material-icons text-sm mr-2">analytics</span>
               Performance
+            </TabsTrigger>
+            <TabsTrigger value="complaints" data-testid="tab-complaints">
+              <span className="material-icons text-sm mr-2">feedback</span>
+              Complaints
             </TabsTrigger>
             <TabsTrigger value="my-drops" data-testid="tab-my-drops">
               <span className="material-icons text-sm mr-2">checklist</span>
@@ -1194,6 +1205,62 @@ export default function ManagementDashboard() {
                 </Form>
               </DialogContent>
             </Dialog>
+          </TabsContent>
+
+          <TabsContent value="complaints">
+            <div className="space-y-4">
+              <Card>
+                <CardHeader>
+                  <CardTitle>All Complaints</CardTitle>
+                  <CardDescription>
+                    View and manage resident feedback across all projects
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  {complaintsLoading ? (
+                    <div className="text-center py-8 text-muted-foreground">Loading complaints...</div>
+                  ) : complaints.length === 0 ? (
+                    <div className="text-center py-8 text-muted-foreground">No complaints yet</div>
+                  ) : (
+                    <div className="space-y-3">
+                      {complaints.map((complaint: any) => (
+                        <Card 
+                          key={complaint.id} 
+                          className="hover-elevate cursor-pointer"
+                          onClick={() => setLocation(`/complaints/${complaint.id}`)}
+                          data-testid={`complaint-card-${complaint.id}`}
+                        >
+                          <CardContent className="p-4">
+                            <div className="flex items-start justify-between gap-3">
+                              <div className="flex-1">
+                                <div className="flex items-center gap-2 mb-2">
+                                  <span className="font-medium">{complaint.residentName}</span>
+                                  <Badge variant={complaint.status === 'open' ? 'default' : 'secondary'} className="text-xs">
+                                    {complaint.status}
+                                  </Badge>
+                                </div>
+                                <div className="text-sm text-muted-foreground mb-1">
+                                  Unit {complaint.unitNumber} • {complaint.phoneNumber}
+                                </div>
+                                {complaint.projectId && (
+                                  <div className="text-xs text-muted-foreground mb-2">
+                                    Project-specific complaint
+                                  </div>
+                                )}
+                                <p className="text-sm line-clamp-2">{complaint.message}</p>
+                                <div className="text-xs text-muted-foreground mt-2">
+                                  {new Date(complaint.createdAt).toLocaleDateString()}
+                                </div>
+                              </div>
+                            </div>
+                          </CardContent>
+                        </Card>
+                      ))}
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            </div>
           </TabsContent>
 
           <TabsContent value="employees">
