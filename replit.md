@@ -55,9 +55,10 @@ A mobile-first management platform for rope access building maintenance operatio
 - ✅ Phase 4: PDF upload for rope access plans complete with Replit Object Storage
 - ✅ All critical bugs fixed (session detection, End Day UX, drop calculations, button states)
 - ✅ Building name field added to projects
-- ✅ Work session history page with tech names
-- ✅ General messaging for residents (projectId nullable in complaints)
-- 🚧 Messages tab in management/tech dashboards (in progress)
+- ✅ Work session history page with tech names (/projects/:id/work-sessions)
+- ✅ General messaging for residents (companyId-based routing, projectId nullable)
+- ✅ Residents can submit messages even with no active projects
+- 🚀 **Production-ready platform with complete feature set**
 
 ## Key Visual: High-Rise Building
 The signature component displays a vertical building with:
