@@ -396,6 +396,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         })
       );
       
+      // Disable caching to ensure fresh data
+      res.set('Cache-Control', 'no-store, no-cache, must-revalidate, private');
       res.json({ projects: projectsWithProgress });
     } catch (error) {
       console.error("Get projects error:", error);
@@ -430,7 +432,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "Project not found" });
       }
       
-      res.json({ project });
+      // Add completedDrops to the project
+      const { totalCompleted } = await storage.getProjectProgress(project.id);
+      const projectWithProgress = {
+        ...project,
+        completedDrops: totalCompleted,
+      };
+      
+      res.set('Cache-Control', 'no-store, no-cache, must-revalidate, private');
+      res.json({ project: projectWithProgress });
     } catch (error) {
       console.error("Get project error:", error);
       res.status(500).json({ message: "Internal server error" });
