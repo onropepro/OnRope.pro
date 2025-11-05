@@ -31,6 +31,8 @@ A mobile-first management platform for rope access building maintenance operatio
 - `/resident` - Resident dashboard with building visualization and complaint submission
 - `/tech` - Technician dashboard with drop logging and complaint viewing
 - `/management` - Company/Manager dashboard with project and employee management
+- `/projects/:id` - Project detail page with building visualization, stats, and delete capability
+- `/projects/:id/work-sessions` - Work session history with tech names
 - `/complaints/:id` - Complaint detail with notes (tech/management access)
 
 ## Database Schema
@@ -87,4 +89,5 @@ The signature component displays a vertical building with:
 - ✅ Implemented proper object storage with @google-cloud/storage
 - ✅ Fixed all button state transitions and NaN displays
 - ✅ Added project deletion with confirmation dialog (warns about cascade deletion of work sessions, drop logs, complaints)
+- ✅ Converted project details to dedicated page at /projects/:id (no longer a dialog)
 - ✅ Architect-approved and production-ready
