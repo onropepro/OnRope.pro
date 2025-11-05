@@ -343,6 +343,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const projectData = insertProjectSchema.parse({
         ...req.body,
         companyId,
+        targetCompletionDate: req.body.targetCompletionDate || null,
       });
       
       const project = await storage.createProject(projectData);
