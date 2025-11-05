@@ -8,15 +8,7 @@ import { ObjectStorageService } from "./objectStorage";
 
 // Authentication middleware
 export function requireAuth(req: Request, res: Response, next: NextFunction) {
-  console.log("requireAuth check - session:", {
-    sessionID: req.sessionID,
-    userId: req.session.userId,
-    role: req.session.role,
-    cookie: req.session.cookie,
-  });
-  
   if (!req.session.userId) {
-    console.log("requireAuth FAILED - no userId in session");
     return res.status(401).json({ message: "Unauthorized - Please log in" });
   }
   next();

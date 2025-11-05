@@ -264,6 +264,7 @@ export default function ManagementDashboard() {
 
   const createEmployeeMutation = useMutation({
     mutationFn: async (data: EmployeeFormData) => {
+      console.log("Creating employee with data:", data);
       const response = await fetch("/api/employees", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -271,14 +272,25 @@ export default function ManagementDashboard() {
         credentials: "include",
       });
 
+      console.log("Employee creation response:", response.status, response.statusText);
+
       if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.message || "Failed to create employee");
+        const errorText = await response.text();
+        console.error("Employee creation failed:", errorText);
+        let errorMessage = "Failed to create employee";
+        try {
+          const errorJson = JSON.parse(errorText);
+          errorMessage = errorJson.message || errorMessage;
+        } catch (e) {
+          errorMessage = errorText || errorMessage;
+        }
+        throw new Error(errorMessage);
       }
 
       return response.json();
     },
     onSuccess: () => {
+      console.log("Employee created successfully");
       queryClient.invalidateQueries({ queryKey: ["/api/employees"] });
       setShowEmployeeDialog(false);
       employeeForm.reset();
@@ -287,6 +299,7 @@ export default function ManagementDashboard() {
       });
     },
     onError: (error: Error) => {
+      console.error("Employee creation error:", error);
       toast({ title: "Error", description: error.message, variant: "destructive" });
     },
   });
@@ -333,6 +346,8 @@ export default function ManagementDashboard() {
   };
 
   const onEmployeeSubmit = async (data: EmployeeFormData) => {
+    console.log("Employee form submitted:", data);
+    console.log("Form errors:", employeeForm.formState.errors);
     createEmployeeMutation.mutate(data);
   };
 
@@ -581,7 +596,7 @@ export default function ManagementDashboard() {
                       <span className="hidden sm:inline">New Project</span>
                     </Button>
                   </DialogTrigger>
-                  <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto">
+                  <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto md:max-h-none md:overflow-visible">
                     <DialogHeader>
                       <DialogTitle>Create New Project</DialogTitle>
                       <DialogDescription>Add a new building maintenance project</DialogDescription>
@@ -1343,7 +1358,7 @@ export default function ManagementDashboard() {
                     Add New Employee
                   </Button>
                 </DialogTrigger>
-                <DialogContent className="max-w-md">
+                <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto md:max-h-none md:overflow-visible">
                   <DialogHeader>
                     <DialogTitle>Create Employee Account</DialogTitle>
                     <DialogDescription>
