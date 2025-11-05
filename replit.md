@@ -44,7 +44,7 @@ A mobile-first management platform for rope access building maintenance operatio
 - **sessions**: Express session storage
 
 ## Design System
-- **Colors**: Blue primary (trust/professionalism), orange for open complaints, green for closed
+- **Colors**: Blue primary (trust/professionalism), yellow warning for lit windows, orange for open complaints, green for closed
 - **Typography**: Roboto font family throughout, Material Icons
 - **Touch Targets**: 44px minimum, 48px comfortable (h-12 buttons/inputs)
 - **Spacing**: Consistent with Tailwind's 4-unit scale (p-4, gap-4, mb-4)
@@ -67,7 +67,9 @@ A mobile-first management platform for rope access building maintenance operatio
 The signature component displays a vertical building with:
 - Dynamic floor count matching project specifications
 - 4 windows per floor
-- Lit windows (yellow glow) indicating completed floors based on drop progress
+- **Sequential window lighting**: Windows light up left-to-right, top-to-bottom (not full floors)
+- Lit windows show bright yellow glow based on drop completion percentage
+- Formula: windowsCompleted = (completedDrops / totalDrops) × totalWindows
 - Floor numbers on left side
 - Progress percentage and drop counts above building
 - Centered visualization on resident dashboard
@@ -94,4 +96,7 @@ The signature component displays a vertical building with:
 - ✅ **Fixed pie chart visibility**: Corrected API endpoint method name from `getWorkSessionsForProject()` to `getWorkSessionsByProject()`
 - ✅ **Fixed project detail page**: Added completedDrops calculation to `/api/projects/:id` endpoint
 - ✅ **Added cache-control headers**: Prevents stale data in UI (no-store, no-cache headers on project endpoints)
+- ✅ **Window lighting enhancement**: Changed from full-floor lighting to sequential window-by-window (left-to-right, top-to-bottom)
+- ✅ **Added warning color theme**: Bright yellow (--warning: 48 96% 53%) for lit windows in both light/dark modes
+- ✅ **Performance tab**: Moved "Overall Target Performance" pie chart to dedicated Performance tab in management dashboard
 - ✅ Architect-approved and production-ready
