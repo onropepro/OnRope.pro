@@ -601,7 +601,8 @@ export default function ManagementDashboard() {
                   ) : (
                     filteredProjects.filter((p: Project) => p.status === "active").map((project: Project) => {
                       const completedDrops = project.completedDrops || 0;
-                      const progressPercent = (completedDrops / project.totalDrops) * 100;
+                      const totalDrops = project.totalDrops || 0;
+                      const progressPercent = totalDrops > 0 ? (completedDrops / totalDrops) * 100 : 0;
 
                       return (
                         <Card 
@@ -628,7 +629,7 @@ export default function ManagementDashboard() {
                               </div>
                               <Progress value={progressPercent} className="h-2" />
                               <div className="flex items-center justify-between text-xs text-muted-foreground">
-                                <span>{completedDrops} / {project.totalDrops} drops</span>
+                                <span>{completedDrops} / {totalDrops} drops</span>
                               </div>
                             </div>
                           </CardContent>

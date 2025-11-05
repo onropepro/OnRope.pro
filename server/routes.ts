@@ -615,13 +615,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       // Create new work session
-      const today = new Date().toISOString().split('T')[0];
+      const now = new Date();
       const session = await storage.startWorkSession({
         projectId,
         employeeId: currentUser.id,
         companyId: project.companyId,
-        workDate: today,
-        startTime: new Date().toISOString(),
+        workDate: now,
+        startTime: now,
       });
       
       res.json({ session });

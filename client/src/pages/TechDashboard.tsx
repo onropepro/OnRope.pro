@@ -328,8 +328,9 @@ export default function TechDashboard() {
               ) : (
                 projects.map((project: any) => {
                   const completedDrops = project.completedDrops || 0;
-                  const progressPercent = (completedDrops / project.totalDrops) * 100;
-                  const remainingProjectDrops = project.totalDrops - completedDrops;
+                  const totalDrops = project.totalDrops || 0;
+                  const progressPercent = totalDrops > 0 ? (completedDrops / totalDrops) * 100 : 0;
+                  const remainingProjectDrops = totalDrops - completedDrops;
 
                   return (
                     <Card
