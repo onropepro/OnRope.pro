@@ -152,12 +152,14 @@ export default function ManagementDashboard() {
   useEffect(() => {
     const checkActiveSession = async () => {
       if (projects.length > 0) {
+        let foundActive = false;
         try {
           // Check all projects for an active session
           for (const project of projects) {
             try {
               const response = await fetch(`/api/projects/${project.id}/my-work-sessions`, {
                 credentials: "include",
+                cache: "no-store", // Force fresh data
               });
               if (response.ok) {
                 const data = await response.json();
@@ -165,6 +167,7 @@ export default function ManagementDashboard() {
                 if (active) {
                   setActiveSession(active);
                   setSelectedProject(project);
+                  foundActive = true;
                   return; // Found active session, stop searching
                 }
               }
@@ -172,6 +175,10 @@ export default function ManagementDashboard() {
               // Continue to next project if this one fails
               continue;
             }
+          }
+          // Only clear if we successfully checked and found nothing
+          if (!foundActive) {
+            setActiveSession(null);
           }
         } catch (error) {
           console.error("Failed to check active session:", error);
