@@ -88,31 +88,29 @@ export default function ResidentDashboard() {
 
   const submitComplaintMutation = useMutation({
     mutationFn: async (data: ComplaintFormData) => {
-      if (!activeProject?.id) {
-        throw new Error("Project not found");
-      }
-
       const response = await fetch("/api/complaints", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           ...data,
-          projectId: activeProject.id,
+          projectId: activeProject?.id || null, // Allow null for general messages
         }),
         credentials: "include",
       });
 
       if (!response.ok) {
         const error = await response.json();
-        throw new Error(error.message || "Failed to submit feedback");
+        throw new Error(error.message || "Failed to submit message");
       }
 
       return response.json();
     },
     onSuccess: () => {
       form.reset();
-      toast({ title: "Feedback submitted successfully" });
-      setActiveTab("building");
+      toast({ title: "Message submitted successfully" });
+      if (activeProject) {
+        setActiveTab("building");
+      }
     },
     onError: (error: Error) => {
       toast({ title: "Error", description: error.message, variant: "destructive" });
@@ -145,13 +143,126 @@ export default function ResidentDashboard() {
 
   if (!activeProject && completedProjects.length === 0) {
     return (
+      <div className="min-h-screen bg-background flex flex-col">
+        <header className="flex items-center justify-between p-4 border-b">
+          <div className="flex items-center gap-3">
+            <span className="material-icons text-2xl text-primary">apartment</span>
+            <h1 className="text-xl font-semibold">Resident Portal</h1>
+          </div>
+          <Button variant="ghost" onClick={handleLogout} data-testid="button-logout">
+            <span className="material-icons">logout</span>
+          </Button>
+        </header>
+
+        <main className="flex-1 p-4 space-y-4">
+          <Card className="shadow-lg">
+            <CardContent className="pt-8 pb-6 text-center">
+              <span className="material-icons text-6xl text-muted-foreground mb-3">info</span>
+              <h2 className="text-xl font-bold mb-2">No Work Scheduled</h2>
+              <p className="text-muted-foreground text-sm">
+                No maintenance work has been scheduled for your building yet.
+              </p>
+            </CardContent>
+          </Card>
+
+          <Card className="shadow-lg">
+            <CardHeader>
+              <CardTitle>Send a Message</CardTitle>
+              <CardDescription>
+                Have a question or concern? Send us a message and we'll get back to you.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Form {...form}>
+                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                  <FormField
+                    control={form.control}
+                    name="residentName"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Your Name *</FormLabel>
+                        <FormControl>
+                          <Input {...field} data-testid="input-resident-name" className="h-12" />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="phoneNumber"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Phone Number *</FormLabel>
+                        <FormControl>
+                          <Input type="tel" {...field} data-testid="input-phone" className="h-12" />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="unitNumber"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Unit Number *</FormLabel>
+                        <FormControl>
+                          <Input {...field} data-testid="input-unit" className="h-12" />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="message"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Message *</FormLabel>
+                        <FormControl>
+                          <Textarea 
+                            {...field} 
+                            placeholder="Type your message here..."
+                            data-testid="input-message" 
+                            className="min-h-32"
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <Button
+                    type="submit"
+                    className="w-full h-12"
+                    disabled={submitComplaintMutation.isPending}
+                    data-testid="button-submit-message"
+                  >
+                    {submitComplaintMutation.isPending ? "Sending..." : "Send Message"}
+                  </Button>
+                </form>
+              </Form>
+            </CardContent>
+          </Card>
+        </main>
+      </div>
+    );
+  }
+
+  // Show the old "no work scheduled" if there are completed projects
+  if (!activeProject) {
+    return (
       <div className="min-h-screen bg-background flex items-center justify-center p-4">
         <Card className="w-full max-w-md text-center shadow-lg">
           <CardContent className="pt-12 pb-8">
             <span className="material-icons text-7xl text-muted-foreground mb-4">apartment</span>
-            <h2 className="text-2xl font-bold mb-2">No Work Scheduled</h2>
+            <h2 className="text-2xl font-bold mb-2">No Active Work</h2>
             <p className="text-muted-foreground mb-4">
-              No maintenance work has been added to your building yet.
+              All scheduled maintenance for your building has been completed.
             </p>
             <p className="text-sm text-muted-foreground">
               Contact your building management for more information.

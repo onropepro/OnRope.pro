@@ -819,8 +819,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const currentUser = await storage.getUserById(req.session.userId!);
       
+      let companyId = req.body.companyId;
+      
+      // For residents, find the company from their strataPlanNumber
+      if (currentUser?.role === "resident" && currentUser.strataPlanNumber) {
+        // Look for any project with this strata plan to get the company
+        const projects = await storage.getProjectsByStrataPlan(currentUser.strataPlanNumber);
+        if (projects.length > 0) {
+          companyId = projects[0].companyId;
+        }
+      }
+      
       const complaintData = insertComplaintSchema.parse({
         ...req.body,
+        companyId: companyId || req.body.companyId,
         residentId: currentUser?.role === "resident" ? currentUser.id : null,
       });
       
