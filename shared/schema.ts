@@ -59,7 +59,13 @@ export const projects = pgTable("projects", {
   strataPlanNumber: varchar("strata_plan_number").notNull(),
   buildingAddress: text("building_address"), // Building address visible to all employees
   jobType: varchar("job_type").notNull(), // window_cleaning | dryer_vent_cleaning | pressure_washing
-  totalDrops: integer("total_drops").notNull(),
+  
+  // Elevation-specific drop totals
+  totalDropsNorth: integer("total_drops_north").notNull().default(0),
+  totalDropsEast: integer("total_drops_east").notNull().default(0),
+  totalDropsSouth: integer("total_drops_south").notNull().default(0),
+  totalDropsWest: integer("total_drops_west").notNull().default(0),
+  
   dailyDropTarget: integer("daily_drop_target").notNull(),
   floorCount: integer("floor_count").notNull(),
   targetCompletionDate: date("target_completion_date"), // Optional target completion date
@@ -69,18 +75,24 @@ export const projects = pgTable("projects", {
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
-// Drop logs table - tracks daily drops per project per tech
+// Drop logs table - tracks daily drops per project per tech per elevation
 export const dropLogs = pgTable("drop_logs", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   projectId: varchar("project_id").notNull().references(() => projects.id, { onDelete: "cascade" }),
   userId: varchar("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
   date: date("date").notNull(),
-  dropsCompleted: integer("drops_completed").notNull(),
+  
+  // Elevation-specific drops completed
+  dropsCompletedNorth: integer("drops_completed_north").notNull().default(0),
+  dropsCompletedEast: integer("drops_completed_east").notNull().default(0),
+  dropsCompletedSouth: integer("drops_completed_south").notNull().default(0),
+  dropsCompletedWest: integer("drops_completed_west").notNull().default(0),
+  
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
-// Work sessions table - tracks daily work sessions with start/end times
+// Work sessions table - tracks daily work sessions with start/end times per elevation
 export const workSessions = pgTable("work_sessions", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   projectId: varchar("project_id").notNull().references(() => projects.id, { onDelete: "cascade" }),
@@ -89,8 +101,14 @@ export const workSessions = pgTable("work_sessions", {
   workDate: date("work_date").notNull(), // Date of the work session
   startTime: timestamp("start_time").notNull(),
   endTime: timestamp("end_time"), // Null if session is still active
-  dropsCompleted: integer("drops_completed"), // Entered when ending the session
-  shortfallReason: text("shortfall_reason"), // Required if drops < dailyDropTarget
+  
+  // Elevation-specific drops completed
+  dropsCompletedNorth: integer("drops_completed_north").default(0),
+  dropsCompletedEast: integer("drops_completed_east").default(0),
+  dropsCompletedSouth: integer("drops_completed_south").default(0),
+  dropsCompletedWest: integer("drops_completed_west").default(0),
+  
+  shortfallReason: text("shortfall_reason"), // Required if total drops < dailyDropTarget
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 }, (table) => [

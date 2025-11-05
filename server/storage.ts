@@ -128,39 +128,73 @@ export class Storage {
       .orderBy(desc(dropLogs.createdAt));
   }
 
-  async updateDropLog(id: string, dropsCompleted: number): Promise<DropLog> {
+  async updateDropLog(
+    id: string, 
+    dropsCompletedNorth: number,
+    dropsCompletedEast: number,
+    dropsCompletedSouth: number,
+    dropsCompletedWest: number
+  ): Promise<DropLog> {
     const result = await db.update(dropLogs)
-      .set({ dropsCompleted, updatedAt: new Date() })
+      .set({ 
+        dropsCompletedNorth,
+        dropsCompletedEast,
+        dropsCompletedSouth,
+        dropsCompletedWest,
+        updatedAt: new Date() 
+      })
       .where(eq(dropLogs.id, id))
       .returning();
     return result[0];
   }
 
-  async getProjectProgress(projectId: string): Promise<{ totalCompleted: number }> {
-    // Get drops from drop_logs table
+  async getProjectProgress(projectId: string): Promise<{ 
+    north: number;
+    east: number;
+    south: number;
+    west: number;
+    total: number;
+  }> {
+    // Get drops from drop_logs table - sum each elevation separately
     const dropLogsResult = await db.select({
-      totalCompleted: sql<number>`COALESCE(SUM(${dropLogs.dropsCompleted}), 0)`,
+      north: sql<number>`COALESCE(SUM(${dropLogs.dropsCompletedNorth}), 0)`,
+      east: sql<number>`COALESCE(SUM(${dropLogs.dropsCompletedEast}), 0)`,
+      south: sql<number>`COALESCE(SUM(${dropLogs.dropsCompletedSouth}), 0)`,
+      west: sql<number>`COALESCE(SUM(${dropLogs.dropsCompletedWest}), 0)`,
     })
     .from(dropLogs)
     .where(eq(dropLogs.projectId, projectId));
     
     // Get drops from work_sessions table (ONLY completed sessions with endTime set)
     const workSessionsResult = await db.select({
-      totalCompleted: sql<number>`COALESCE(SUM(${workSessions.dropsCompleted}), 0)`,
+      north: sql<number>`COALESCE(SUM(${workSessions.dropsCompletedNorth}), 0)`,
+      east: sql<number>`COALESCE(SUM(${workSessions.dropsCompletedEast}), 0)`,
+      south: sql<number>`COALESCE(SUM(${workSessions.dropsCompletedSouth}), 0)`,
+      west: sql<number>`COALESCE(SUM(${workSessions.dropsCompletedWest}), 0)`,
     })
     .from(workSessions)
     .where(
       and(
         eq(workSessions.projectId, projectId),
-        sql`${workSessions.endTime} IS NOT NULL`,
-        sql`${workSessions.dropsCompleted} IS NOT NULL`
+        sql`${workSessions.endTime} IS NOT NULL`
       )
     );
     
-    const dropLogsTotal = Number(dropLogsResult[0]?.totalCompleted || 0);
-    const workSessionsTotal = Number(workSessionsResult[0]?.totalCompleted || 0);
+    const dropLogsData = dropLogsResult[0] || { north: 0, east: 0, south: 0, west: 0 };
+    const workSessionsData = workSessionsResult[0] || { north: 0, east: 0, south: 0, west: 0 };
     
-    return { totalCompleted: dropLogsTotal + workSessionsTotal };
+    const north = Number(dropLogsData.north) + Number(workSessionsData.north);
+    const east = Number(dropLogsData.east) + Number(workSessionsData.east);
+    const south = Number(dropLogsData.south) + Number(workSessionsData.south);
+    const west = Number(dropLogsData.west) + Number(workSessionsData.west);
+    
+    return {
+      north,
+      east,
+      south,
+      west,
+      total: north + east + south + west
+    };
   }
 
   // Complaint operations
@@ -308,11 +342,21 @@ export class Storage {
     return result[0];
   }
 
-  async endWorkSession(sessionId: string, dropsCompleted: number, shortfallReason?: string): Promise<WorkSession> {
+  async endWorkSession(
+    sessionId: string, 
+    dropsCompletedNorth: number,
+    dropsCompletedEast: number,
+    dropsCompletedSouth: number,
+    dropsCompletedWest: number,
+    shortfallReason?: string
+  ): Promise<WorkSession> {
     const result = await db.update(workSessions)
       .set({
         endTime: sql`NOW()`,
-        dropsCompleted,
+        dropsCompletedNorth,
+        dropsCompletedEast,
+        dropsCompletedSouth,
+        dropsCompletedWest,
         shortfallReason,
         updatedAt: sql`NOW()`,
       })
@@ -330,7 +374,10 @@ export class Storage {
       workDate: workSessions.workDate,
       startTime: workSessions.startTime,
       endTime: workSessions.endTime,
-      dropsCompleted: workSessions.dropsCompleted,
+      dropsCompletedNorth: workSessions.dropsCompletedNorth,
+      dropsCompletedEast: workSessions.dropsCompletedEast,
+      dropsCompletedSouth: workSessions.dropsCompletedSouth,
+      dropsCompletedWest: workSessions.dropsCompletedWest,
       shortfallReason: workSessions.shortfallReason,
       createdAt: workSessions.createdAt,
       updatedAt: workSessions.updatedAt,
