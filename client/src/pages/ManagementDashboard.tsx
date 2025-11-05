@@ -355,8 +355,11 @@ export default function ManagementDashboard() {
       return apiRequest("POST", `/api/projects/${projectId}/work-sessions/start`, {});
     },
     onSuccess: (data) => {
+      console.log("Start day response:", data);
       setActiveSession(data.session);
       setShowStartDayDialog(false);
+      queryClient.invalidateQueries({ queryKey: ["/api/projects"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/my-drops-today"] });
       toast({ title: "Work session started", description: "Good luck today!" });
     },
     onError: (error: Error) => {
