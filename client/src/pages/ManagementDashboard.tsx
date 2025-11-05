@@ -4,6 +4,7 @@ import { queryClient, apiRequest } from "@/lib/queryClient";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
@@ -531,28 +532,31 @@ export default function ManagementDashboard() {
 
       <div className="p-4 max-w-4xl mx-auto">
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid w-full grid-cols-5 mb-4">
-            <TabsTrigger value="projects" data-testid="tab-projects">
-              <span className="material-icons text-sm mr-2">apartment</span>
-              Projects
-            </TabsTrigger>
-            <TabsTrigger value="performance" data-testid="tab-performance">
-              <span className="material-icons text-sm mr-2">analytics</span>
-              Performance
-            </TabsTrigger>
-            <TabsTrigger value="complaints" data-testid="tab-complaints">
-              <span className="material-icons text-sm mr-2">feedback</span>
-              Complaints
-            </TabsTrigger>
-            <TabsTrigger value="my-drops" data-testid="tab-my-drops">
-              <span className="material-icons text-sm mr-2">checklist</span>
-              My Drops
-            </TabsTrigger>
-            <TabsTrigger value="employees" data-testid="tab-employees">
-              <span className="material-icons text-sm mr-2">people</span>
-              Employees
-            </TabsTrigger>
-          </TabsList>
+          <ScrollArea className="w-full mb-4">
+            <TabsList className="inline-flex h-12 items-center justify-start rounded-full bg-muted p-1 text-muted-foreground w-full sm:w-auto">
+              <TabsTrigger value="projects" data-testid="tab-projects" className="inline-flex items-center justify-center whitespace-nowrap rounded-full px-4 py-2 text-sm font-medium transition-all min-w-[110px] sm:min-w-0">
+                <span className="material-icons text-sm mr-2">apartment</span>
+                Projects
+              </TabsTrigger>
+              <TabsTrigger value="performance" data-testid="tab-performance" className="inline-flex items-center justify-center whitespace-nowrap rounded-full px-4 py-2 text-sm font-medium transition-all min-w-[120px] sm:min-w-0">
+                <span className="material-icons text-sm mr-2">analytics</span>
+                Performance
+              </TabsTrigger>
+              <TabsTrigger value="complaints" data-testid="tab-complaints" className="inline-flex items-center justify-center whitespace-nowrap rounded-full px-4 py-2 text-sm font-medium transition-all min-w-[120px] sm:min-w-0">
+                <span className="material-icons text-sm mr-2">feedback</span>
+                Complaints
+              </TabsTrigger>
+              <TabsTrigger value="my-drops" data-testid="tab-my-drops" className="inline-flex items-center justify-center whitespace-nowrap rounded-full px-4 py-2 text-sm font-medium transition-all min-w-[110px] sm:min-w-0">
+                <span className="material-icons text-sm mr-2">checklist</span>
+                My Drops
+              </TabsTrigger>
+              <TabsTrigger value="employees" data-testid="tab-employees" className="inline-flex items-center justify-center whitespace-nowrap rounded-full px-4 py-2 text-sm font-medium transition-all min-w-[110px] sm:min-w-0">
+                <span className="material-icons text-sm mr-2">people</span>
+                Employees
+              </TabsTrigger>
+            </TabsList>
+            <ScrollBar orientation="horizontal" />
+          </ScrollArea>
 
           <TabsContent value="projects">
             <div className="space-y-4">

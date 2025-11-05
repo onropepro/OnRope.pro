@@ -63,17 +63,19 @@ A mobile-first management platform for rope access building maintenance operatio
 - ✅ Project deletion feature with confirmation dialog and cascade warnings
 - 🚀 **Production-ready platform with complete feature set**
 
-## Key Visual: High-Rise Building
-The signature component displays a vertical building with horizontal progress bars:
+## Key Visual: 4-Elevation Building System
+The signature component displays FOUR buildings side-by-side representing the 4 elevations (North, East, South, West):
+- Each elevation has its own vertical building visualization with horizontal progress bars
 - Dynamic floor count matching project specifications
 - Each floor is a thin horizontal bar (16px height)
 - **Horizontal progress fill**: Yellow bar fills from LEFT TO RIGHT on each floor
-- All floors show same completion percentage simultaneously
-- Progress formula: `Math.min(100, (completedDrops / totalDrops) × 100)`
+- **Independent progress tracking**: Each elevation shows its own completion percentage
+- Progress formula per elevation: `Math.min(100, (completedDropsElevation / totalDropsElevation) × 100)`
+- Overall progress: Sum of all completed drops / sum of all total drops
 - Yellow fill width matches progress percentage (e.g., 16% = bar fills 16% from left edge)
-- Floor numbers displayed on left side
-- Progress percentage and drop counts shown above building
-- Visualization displayed on: Resident Dashboard, Project Details, Management Dashboard
+- Floor numbers displayed on left side of each building
+- Progress percentage and drop counts shown above each building
+- Visualization displayed on: Resident Dashboard, Project Details, Management Dashboard, Work Session History
 
 ## Current State
 **Full-stack application ready for production use:**
@@ -104,4 +106,13 @@ The signature component displays a vertical building with horizontal progress ba
 - ✅ **Progress percentage clamping**: Added Math.min(100, ...) to prevent visual overflow on data anomalies
 - ✅ **Complaints tab**: Added dedicated Complaints tab to management dashboard showing all resident feedback across all projects with navigation to complaint details
 - ✅ **Database reset**: All project data cleared from database while preserving user accounts (residents, techs, management)
+- ✅ **4-Elevation System Complete**: Projects now track North/East/South/West drops independently with:
+  - Create project form with 4 separate elevation input fields (2x2 grid)
+  - End Day dialog with elevation dropdown selection
+  - Backend storage and validation for elevation-specific drops
+  - Building visualization showing 4 buildings side-by-side
+  - Independent progress tracking per elevation
+  - Fixed `||` to `??` in fallback logic to preserve zero values
+  - GET `/api/projects/:id` returns all elevation-specific completed drops
+- ✅ **Mobile-responsive tabs**: Management dashboard tabs now use horizontal scrolling on mobile (no more cramped/overlapping text)
 - ✅ Architect-approved and production-ready
