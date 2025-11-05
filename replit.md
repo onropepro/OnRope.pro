@@ -102,4 +102,6 @@ The signature component displays a vertical building with horizontal progress ba
 - ✅ **Horizontal progress bar visualization**: Changed building from window-by-window lighting to continuous horizontal fill (left-to-right) on all floors
 - ✅ **IRATA level validation**: Employee creation now requires IRATA level selection for rope access technicians (validation enforced with proper form control binding)
 - ✅ **Progress percentage clamping**: Added Math.min(100, ...) to prevent visual overflow on data anomalies
+- ✅ **Complaints tab**: Added dedicated Complaints tab to management dashboard showing all resident feedback across all projects with navigation to complaint details
+- ✅ **Database reset**: All project data cleared from database while preserving user accounts (residents, techs, management)
 - ✅ Architect-approved and production-ready
