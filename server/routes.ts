@@ -157,7 +157,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Unable to determine company" });
       }
       
-      const { email, password, role, techLevel } = req.body;
+      const { name, email, password, role, techLevel } = req.body;
       
       if (!password || password.length < 6) {
         return res.status(400).json({ message: "Password must be at least 6 characters" });
@@ -166,6 +166,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Create employee account linked to company
       // Storage will hash the password
       const employee = await storage.createUser({
+        name,
         email,
         role,
         techLevel: role === "rope_access_tech" ? techLevel : null,

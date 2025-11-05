@@ -36,8 +36,10 @@ export const users = pgTable("users", {
   companyName: varchar("company_name"), // for company role
   companyId: varchar("company_id").references(() => users.id, { onDelete: "cascade" }), // for employees - links to their company
   
+  // Shared fields
+  name: varchar("name"), // for resident and employee roles
+  
   // Resident-specific fields
-  name: varchar("name"), // for resident role
   strataPlanNumber: varchar("strata_plan_number"), // for resident role
   unitNumber: varchar("unit_number"), // for resident role
   

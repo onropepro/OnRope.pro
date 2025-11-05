@@ -29,6 +29,7 @@ const projectSchema = z.object({
 });
 
 const employeeSchema = z.object({
+  name: z.string().min(1, "Name is required"),
   email: z.string().email("Invalid email address"),
   password: z.string().min(6, "Password must be at least 6 characters"),
   role: z.enum(["operations_manager", "supervisor", "rope_access_tech"]),
@@ -76,6 +77,7 @@ export default function ManagementDashboard() {
   const employeeForm = useForm<EmployeeFormData>({
     resolver: zodResolver(employeeSchema),
     defaultValues: {
+      name: "",
       email: "",
       password: "",
       role: "rope_access_tech",
@@ -449,6 +451,20 @@ export default function ManagementDashboard() {
                   </DialogHeader>
                   <Form {...employeeForm}>
                     <form onSubmit={employeeForm.handleSubmit(onEmployeeSubmit)} className="space-y-4">
+                      <FormField
+                        control={employeeForm.control}
+                        name="name"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Full Name</FormLabel>
+                            <FormControl>
+                              <Input placeholder="John Doe" {...field} data-testid="input-employee-name" className="h-12" />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
                       <FormField
                         control={employeeForm.control}
                         name="email"
