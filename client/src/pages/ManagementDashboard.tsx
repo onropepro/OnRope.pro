@@ -586,7 +586,7 @@ export default function ManagementDashboard() {
 
       {/* Project Detail Dialog */}
       <Dialog open={showProjectDetailDialog} onOpenChange={setShowProjectDetailDialog}>
-        <DialogContent className="max-w-md">
+        <DialogContent className="max-w-md max-h-[90vh] flex flex-col">
           <DialogHeader>
             <DialogTitle>Project Details</DialogTitle>
             <DialogDescription>
@@ -597,7 +597,7 @@ export default function ManagementDashboard() {
           </DialogHeader>
           
           {selectedProject && (
-            <div className="space-y-4">
+            <div className="space-y-4 overflow-y-auto pr-2">
               <HighRiseBuilding
                 floors={selectedProject.floorCount}
                 completedDrops={selectedProject.completedDrops || 0}
