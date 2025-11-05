@@ -90,4 +90,8 @@ The signature component displays a vertical building with:
 - ✅ Fixed all button state transitions and NaN displays
 - ✅ Added project deletion with confirmation dialog (warns about cascade deletion of work sessions, drop logs, complaints)
 - ✅ Converted project details to dedicated page at /projects/:id (no longer a dialog)
+- ✅ **Fixed building progress calculation bug**: `getProjectProgress()` now aggregates drops from BOTH drop_logs AND work_sessions (where endTime IS NOT NULL)
+- ✅ **Fixed pie chart visibility**: Corrected API endpoint method name from `getWorkSessionsForProject()` to `getWorkSessionsByProject()`
+- ✅ **Fixed project detail page**: Added completedDrops calculation to `/api/projects/:id` endpoint
+- ✅ **Added cache-control headers**: Prevents stale data in UI (no-store, no-cache headers on project endpoints)
 - ✅ Architect-approved and production-ready
