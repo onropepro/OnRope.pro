@@ -817,10 +817,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const allSessions = [];
       for (const project of projects) {
         const projectSessions = await storage.getWorkSessionsByProject(project.id, companyId);
-        // Add dailyDropTarget from project to each session
+        // Add dailyDropTarget and calculate total dropsCompleted from elevation fields
         const sessionsWithTarget = projectSessions.map(session => ({
           ...session,
           dailyDropTarget: project.dailyDropTarget,
+          dropsCompleted: (session.dropsCompletedNorth || 0) + 
+                         (session.dropsCompletedEast || 0) + 
+                         (session.dropsCompletedSouth || 0) + 
+                         (session.dropsCompletedWest || 0),
         }));
         allSessions.push(...sessionsWithTarget);
       }

@@ -12,6 +12,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import { Progress } from "@/components/ui/progress";
 import { HighRiseBuilding } from "@/components/HighRiseBuilding";
@@ -26,6 +27,7 @@ const dropLogSchema = z.object({
 });
 
 const endDaySchema = z.object({
+  elevation: z.enum(["north", "east", "south", "west"], { required_error: "Please select an elevation" }),
   dropsCompleted: z.string().min(1, "Number of drops is required"),
   shortfallReason: z.string().optional(),
 });
@@ -87,6 +89,7 @@ export default function TechDashboard() {
   const endDayForm = useForm<EndDayFormData>({
     resolver: zodResolver(endDaySchema),
     defaultValues: {
+      elevation: "north",
       dropsCompleted: "",
       shortfallReason: "",
     },
@@ -111,8 +114,18 @@ export default function TechDashboard() {
 
   const endDayMutation = useMutation({
     mutationFn: async (data: EndDayFormData & { sessionId: string; projectId: string }) => {
+      const dropsCompleted = parseInt(data.dropsCompleted);
+      
+      // Map elevation to the correct field
+      const elevationFields = {
+        dropsCompletedNorth: data.elevation === "north" ? dropsCompleted : 0,
+        dropsCompletedEast: data.elevation === "east" ? dropsCompleted : 0,
+        dropsCompletedSouth: data.elevation === "south" ? dropsCompleted : 0,
+        dropsCompletedWest: data.elevation === "west" ? dropsCompleted : 0,
+      };
+      
       return apiRequest("PATCH", `/api/projects/${data.projectId}/work-sessions/${data.sessionId}/end`, {
-        dropsCompleted: parseInt(data.dropsCompleted),
+        ...elevationFields,
         shortfallReason: data.shortfallReason,
       });
     },
@@ -291,6 +304,8 @@ export default function TechDashboard() {
                   return (
                     <Card
                       key={project.id}
+                      className="hover-elevate cursor-pointer"
+                      onClick={() => setLocation(`/projects/${project.id}`)}
                       data-testid={`project-card-${project.id}`}
                     >
                       <CardContent className="p-4">
@@ -405,6 +420,30 @@ export default function TechDashboard() {
 
           <Form {...endDayForm}>
             <form onSubmit={endDayForm.handleSubmit(onEndDaySubmit)} className="space-y-4">
+              <FormField
+                control={endDayForm.control}
+                name="elevation"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Building Elevation</FormLabel>
+                    <Select onValueChange={field.onChange} value={field.value}>
+                      <FormControl>
+                        <SelectTrigger className="h-12" data-testid="select-elevation">
+                          <SelectValue placeholder="Select elevation" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="north" data-testid="option-north">North</SelectItem>
+                        <SelectItem value="east" data-testid="option-east">East</SelectItem>
+                        <SelectItem value="south" data-testid="option-south">South</SelectItem>
+                        <SelectItem value="west" data-testid="option-west">West</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
               <FormField
                 control={endDayForm.control}
                 name="dropsCompleted"
