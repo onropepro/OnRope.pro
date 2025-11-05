@@ -137,13 +137,30 @@ export class Storage {
   }
 
   async getProjectProgress(projectId: string): Promise<{ totalCompleted: number }> {
-    const result = await db.select({
+    // Get drops from drop_logs table
+    const dropLogsResult = await db.select({
       totalCompleted: sql<number>`COALESCE(SUM(${dropLogs.dropsCompleted}), 0)`,
     })
     .from(dropLogs)
     .where(eq(dropLogs.projectId, projectId));
     
-    return { totalCompleted: Number(result[0]?.totalCompleted || 0) };
+    // Get drops from work_sessions table (ONLY completed sessions with endTime set)
+    const workSessionsResult = await db.select({
+      totalCompleted: sql<number>`COALESCE(SUM(${workSessions.dropsCompleted}), 0)`,
+    })
+    .from(workSessions)
+    .where(
+      and(
+        eq(workSessions.projectId, projectId),
+        sql`${workSessions.endTime} IS NOT NULL`,
+        sql`${workSessions.dropsCompleted} IS NOT NULL`
+      )
+    );
+    
+    const dropLogsTotal = Number(dropLogsResult[0]?.totalCompleted || 0);
+    const workSessionsTotal = Number(workSessionsResult[0]?.totalCompleted || 0);
+    
+    return { totalCompleted: dropLogsTotal + workSessionsTotal };
   }
 
   // Complaint operations

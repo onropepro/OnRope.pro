@@ -792,13 +792,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "User not found" });
       }
       
+      // Determine company ID
+      const companyId = currentUser.role === "company" ? currentUser.id : currentUser.companyId;
+      
+      if (!companyId) {
+        return res.status(400).json({ message: "Unable to determine company" });
+      }
+      
       // Get all projects for the company
-      const projects = await storage.getAllProjects(currentUser.companyId);
+      const projects = await storage.getProjectsByCompany(companyId);
       
       // Collect all work sessions across all projects with their project's daily target
       const allSessions = [];
       for (const project of projects) {
-        const projectSessions = await storage.getWorkSessionsForProject(project.id);
+        const projectSessions = await storage.getWorkSessionsByProject(project.id, companyId);
         // Add dailyDropTarget from project to each session
         const sessionsWithTarget = projectSessions.map(session => ({
           ...session,
