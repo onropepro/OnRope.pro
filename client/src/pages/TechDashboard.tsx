@@ -335,6 +335,21 @@ export default function TechDashboard() {
                           <div className="text-xs text-muted-foreground">
                             Daily Target: {project.dailyDropTarget} drops
                           </div>
+                          {project.ropeAccessPlanUrl && (
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="w-full mt-2"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                window.open(project.ropeAccessPlanUrl, '_blank');
+                              }}
+                              data-testid={`button-view-pdf-${project.id}`}
+                            >
+                              <span className="material-icons text-sm mr-2">description</span>
+                              View Fall Protection Plan (PDF)
+                            </Button>
+                          )}
                         </div>
                       </CardContent>
                     </Card>
