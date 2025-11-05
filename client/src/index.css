@@ -68,6 +68,10 @@
 
   --destructive-foreground: 0 72% 98%;
 
+  --warning: 48 96% 53%;
+
+  --warning-foreground: 48 96% 12%;
+
   --input: 210 8% 72%;
   --ring: 210 85% 42%;
   --chart-1: 210 85% 38%;
@@ -185,6 +189,10 @@
   --destructive: 0 72% 48%;
 
   --destructive-foreground: 0 72% 98%;
+
+  --warning: 48 96% 60%;
+
+  --warning-foreground: 48 96% 12%;
 
   --input: 210 8% 32%;
   --ring: 210 85% 48%;

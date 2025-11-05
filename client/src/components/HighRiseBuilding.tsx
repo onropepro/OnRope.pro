@@ -9,15 +9,29 @@ interface HighRiseBuildingProps {
 
 export function HighRiseBuilding({ floors, completedDrops, totalDrops, className = "" }: HighRiseBuildingProps) {
   const progressPercentage = totalDrops > 0 ? (completedDrops / totalDrops) * 100 : 0;
-  const floorsCompleted = Math.floor((progressPercentage / 100) * floors);
+  
+  // Calculate how many windows should be lit (drops go left-to-right, top-to-bottom)
+  const totalWindows = floors * 4; // 4 windows per floor
+  const windowsCompleted = totalDrops > 0 ? Math.floor((completedDrops / totalDrops) * totalWindows) : 0;
   
   const buildingFloors = useMemo(() => {
     return Array.from({ length: floors }, (_, index) => {
-      const floorNumber = floors - index; // Top to bottom
-      const isCompleted = floorNumber <= floorsCompleted;
-      return { floorNumber, isCompleted };
+      const floorNumber = floors - index; // Top to bottom (floor 25, 24, 23...)
+      
+      // Calculate which windows on this floor should be lit
+      // Windows are numbered sequentially from top-left (position 0) to bottom-right
+      const floorIndex = index; // 0 = top floor, 1 = second floor, etc.
+      const firstWindowPosition = floorIndex * 4; // Position of first window on this floor
+      
+      const windows = [1, 2, 3, 4].map((windowNum) => {
+        const windowPosition = firstWindowPosition + (windowNum - 1);
+        const isLit = windowPosition < windowsCompleted;
+        return { windowNum, isLit };
+      });
+      
+      return { floorNumber, windows };
     });
-  }, [floors, floorsCompleted]);
+  }, [floors, windowsCompleted]);
 
   return (
     <div className={`flex flex-col items-center ${className}`} data-testid="highrise-building">
@@ -40,7 +54,7 @@ export function HighRiseBuilding({ floors, completedDrops, totalDrops, className
           
           {/* Floors Container */}
           <div className="flex flex-col-reverse">
-            {buildingFloors.map(({ floorNumber, isCompleted }) => (
+            {buildingFloors.map(({ floorNumber, windows }) => (
               <div
                 key={floorNumber}
                 className="relative border-b border-card-border last:border-b-0"
@@ -54,22 +68,22 @@ export function HighRiseBuilding({ floors, completedDrops, totalDrops, className
 
                 {/* Windows Row */}
                 <div className="h-full flex items-center justify-center gap-2 px-3">
-                  {[1, 2, 3, 4].map((windowNum) => (
+                  {windows.map(({ windowNum, isLit }) => (
                     <div
                       key={windowNum}
                       className={`w-8 h-6 rounded-sm border transition-all duration-500 ${
-                        isCompleted
-                          ? 'bg-yellow-400 border-yellow-500 shadow-[0_0_8px_rgba(250,204,21,0.6)]'
+                        isLit
+                          ? 'bg-warning border-warning shadow-lg'
                           : 'bg-muted/30 border-muted'
                       }`}
                       data-testid={`window-${floorNumber}-${windowNum}`}
                     >
                       {/* Window Panes */}
                       <div className="h-full w-full grid grid-cols-2 gap-[1px]">
-                        <div className={`${isCompleted ? 'bg-yellow-300/40' : 'bg-background/20'}`}></div>
-                        <div className={`${isCompleted ? 'bg-yellow-300/40' : 'bg-background/20'}`}></div>
-                        <div className={`${isCompleted ? 'bg-yellow-300/40' : 'bg-background/20'}`}></div>
-                        <div className={`${isCompleted ? 'bg-yellow-300/40' : 'bg-background/20'}`}></div>
+                        <div className={`${isLit ? 'bg-warning/50' : 'bg-background/20'}`}></div>
+                        <div className={`${isLit ? 'bg-warning/50' : 'bg-background/20'}`}></div>
+                        <div className={`${isLit ? 'bg-warning/50' : 'bg-background/20'}`}></div>
+                        <div className={`${isLit ? 'bg-warning/50' : 'bg-background/20'}`}></div>
                       </div>
                     </div>
                   ))}

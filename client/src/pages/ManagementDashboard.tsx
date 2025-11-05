@@ -511,6 +511,52 @@ export default function ManagementDashboard() {
 
           <TabsContent value="projects">
             <div className="space-y-4">
+              {/* Overall Target Performance Chart */}
+              {completedSessions.length > 0 && (
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Overall Target Performance</CardTitle>
+                    <CardDescription>Across all projects and work sessions</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="flex flex-col items-center">
+                      <ResponsiveContainer width="100%" height={250}>
+                        <PieChart>
+                          <Pie
+                            data={performancePieData}
+                            cx="50%"
+                            cy="50%"
+                            labelLine={false}
+                            label={({ name, value, percent }) => 
+                              value > 0 ? `${name}: ${value} (${(percent * 100).toFixed(0)}%)` : null
+                            }
+                            outerRadius={70}
+                            fill="#8884d8"
+                            dataKey="value"
+                          >
+                            {performancePieData.map((entry, index) => (
+                              <Cell key={`cell-${index}`} fill={entry.color} />
+                            ))}
+                          </Pie>
+                          <Tooltip />
+                          <Legend />
+                        </PieChart>
+                      </ResponsiveContainer>
+                      <div className="grid grid-cols-2 gap-4 mt-2 w-full max-w-xs">
+                        <div className="text-center">
+                          <div className="text-2xl font-bold text-primary">{targetMetCount}</div>
+                          <div className="text-xs text-muted-foreground">Target Met</div>
+                        </div>
+                        <div className="text-center">
+                          <div className="text-2xl font-bold text-destructive">{belowTargetCount}</div>
+                          <div className="text-xs text-muted-foreground">Below Target</div>
+                        </div>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+              
               {/* Search and Create */}
               <div className="flex gap-2">
                 <div className="relative flex-1">
