@@ -36,7 +36,6 @@ type EndDayFormData = z.infer<typeof endDaySchema>;
 export default function TechDashboard() {
   const [activeTab, setActiveTab] = useState("projects");
   const [selectedProject, setSelectedProject] = useState<any>(null);
-  const [showDropDialog, setShowDropDialog] = useState(false);
   const [showStartDayDialog, setShowStartDayDialog] = useState(false);
   const [showEndDayDialog, setShowEndDayDialog] = useState(false);
   const [activeSession, setActiveSession] = useState<any>(null);
@@ -85,64 +84,11 @@ export default function TechDashboard() {
   const dailyTarget = projects[0]?.dailyDropTarget || 20;
   const remainingDrops = Math.max(0, dailyTarget - todayDrops);
 
-  const form = useForm<DropLogFormData>({
-    resolver: zodResolver(dropLogSchema),
-    defaultValues: {
-      projectId: "",
-      date: new Date().toISOString().split('T')[0],
-      dropsCompleted: "",
-    },
-  });
-
   const endDayForm = useForm<EndDayFormData>({
     resolver: zodResolver(endDaySchema),
     defaultValues: {
       dropsCompleted: "",
       shortfallReason: "",
-    },
-  });
-
-  // Auto-fill project when dialog opens
-  useEffect(() => {
-    if (selectedProject) {
-      form.setValue("projectId", selectedProject.id);
-    }
-  }, [selectedProject, form]);
-
-  const logDropsMutation = useMutation({
-    mutationFn: async (data: DropLogFormData) => {
-      const response = await fetch("/api/drops", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          projectId: data.projectId,
-          date: data.date,
-          dropsCompleted: parseInt(data.dropsCompleted),
-        }),
-        credentials: "include",
-      });
-
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.message || "Failed to log drops");
-      }
-
-      return response.json();
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/projects"] });
-      queryClient.invalidateQueries({ queryKey: ["/api/my-drops-today"] });
-      form.reset({
-        projectId: "",
-        date: new Date().toISOString().split('T')[0],
-        dropsCompleted: "",
-      });
-      setShowDropDialog(false);
-      setSelectedProject(null);
-      toast({ title: "Drops logged successfully" });
-    },
-    onError: (error: Error) => {
-      toast({ title: "Error", description: error.message, variant: "destructive" });
     },
   });
 
@@ -183,21 +129,26 @@ export default function TechDashboard() {
   // Check for active session on component mount
   useEffect(() => {
     const checkActiveSession = async () => {
-      if (projects.length > 0 && projects[0]?.id) {
+      if (projects.length > 0) {
         try {
-          const response = await fetch(`/api/projects/${projects[0].id}/my-work-sessions`, {
-            credentials: "include",
-          });
-          if (response.ok) {
-            const data = await response.json();
-            const active = data.sessions?.find((s: any) => !s.endTime);
-            if (active) {
-              setActiveSession(active);
-              // Set selectedProject to match the active session's project
-              const sessionProject = projects.find((p: any) => p.id === active.projectId);
-              if (sessionProject) {
-                setSelectedProject(sessionProject);
+          // Check all projects for an active session
+          for (const project of projects) {
+            try {
+              const response = await fetch(`/api/projects/${project.id}/my-work-sessions`, {
+                credentials: "include",
+              });
+              if (response.ok) {
+                const data = await response.json();
+                const active = data.sessions?.find((s: any) => !s.endTime);
+                if (active) {
+                  setActiveSession(active);
+                  setSelectedProject(project);
+                  return; // Found active session, stop searching
+                }
               }
+            } catch (fetchError) {
+              // Continue to next project if this one fails
+              continue;
             }
           }
         } catch (error) {
@@ -207,10 +158,6 @@ export default function TechDashboard() {
     };
     checkActiveSession();
   }, [projects]);
-
-  const onSubmit = async (data: DropLogFormData) => {
-    logDropsMutation.mutate(data);
-  };
 
   const handleLogout = async () => {
     try {
@@ -222,11 +169,6 @@ export default function TechDashboard() {
     } catch (error) {
       toast({ title: "Error", description: "Failed to logout", variant: "destructive" });
     }
-  };
-
-  const handleProjectClick = (project: any) => {
-    setSelectedProject(project);
-    setShowDropDialog(true);
   };
 
   const handleStartDay = () => {
@@ -335,9 +277,7 @@ export default function TechDashboard() {
                   return (
                     <Card
                       key={project.id}
-                      className="hover-elevate active-elevate-2 cursor-pointer"
                       data-testid={`project-card-${project.id}`}
-                      onClick={() => handleProjectClick(project)}
                     >
                       <CardContent className="p-4">
                         <div className="flex items-start justify-between mb-3">
@@ -362,17 +302,10 @@ export default function TechDashboard() {
                           </div>
                         </div>
 
-                        <div className="mt-3 pt-3 border-t flex items-center justify-between">
+                        <div className="mt-3 pt-3 border-t">
                           <div className="text-xs text-muted-foreground">
                             Daily Target: {project.dailyDropTarget} drops
                           </div>
-                          <Button size="sm" variant="default" onClick={(e) => {
-                            e.stopPropagation();
-                            handleProjectClick(project);
-                          }}>
-                            <span className="material-icons text-sm mr-1">add_circle</span>
-                            Add Drops
-                          </Button>
                         </div>
                       </CardContent>
                     </Card>
@@ -423,110 +356,6 @@ export default function TechDashboard() {
           </TabsContent>
         </Tabs>
       </div>
-
-      {/* Drop Logging Dialog */}
-      <Dialog open={showDropDialog} onOpenChange={setShowDropDialog}>
-        <DialogContent className="max-w-md max-h-[90vh] flex flex-col">
-          <DialogHeader>
-            <DialogTitle>Log Drops</DialogTitle>
-            <DialogDescription>
-              {selectedProject && (
-                <>Record drops for {selectedProject.strataPlanNumber}</>
-              )}
-            </DialogDescription>
-          </DialogHeader>
-          
-          <div className="overflow-y-auto pr-2">
-            {selectedProject && (
-              <div className="mb-4">
-                <HighRiseBuilding
-                  floors={selectedProject.floorCount}
-                  completedDrops={selectedProject.completedDrops || 0}
-                  totalDrops={selectedProject.totalDrops}
-                  className="mb-4"
-                />
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="text-center p-3 bg-muted/50 rounded-lg">
-                    <div className="text-xl font-bold">{selectedProject.dailyDropTarget}</div>
-                    <div className="text-xs text-muted-foreground mt-1">Daily Target</div>
-                  </div>
-                  <div className="text-center p-3 bg-muted/50 rounded-lg">
-                    <div className="text-xl font-bold">
-                      {selectedProject.completedDrops && selectedProject.completedDrops > 0 
-                        ? Math.ceil((selectedProject.totalDrops - selectedProject.completedDrops) / selectedProject.dailyDropTarget) 
-                        : "N/A"}
-                    </div>
-                    <div className="text-xs text-muted-foreground mt-1">Days Remaining</div>
-                  </div>
-                </div>
-                <Separator className="my-4" />
-              </div>
-            )}
-            
-            <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-              <FormField
-                control={form.control}
-                name="date"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Date</FormLabel>
-                    <FormControl>
-                      <Input type="date" {...field} data-testid="input-date" className="h-12" />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="dropsCompleted"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Drops Completed</FormLabel>
-                    <FormControl>
-                      <Input 
-                        type="number" 
-                        min="1"
-                        placeholder="0" 
-                        {...field} 
-                        data-testid="input-drops" 
-                        className="h-12 text-2xl font-bold text-center" 
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <div className="flex gap-2">
-                <Button
-                  type="button"
-                  variant="outline"
-                  className="flex-1 h-12"
-                  onClick={() => {
-                    setShowDropDialog(false);
-                    setSelectedProject(null);
-                  }}
-                >
-                  Cancel
-                </Button>
-                <Button 
-                  type="submit" 
-                  className="flex-1 h-12" 
-                  data-testid="button-submit-drops"
-                  disabled={logDropsMutation.isPending}
-                >
-                  <span className="material-icons mr-2">check_circle</span>
-                  {logDropsMutation.isPending ? "Logging..." : "Log Drops"}
-                </Button>
-              </div>
-            </form>
-          </Form>
-          </div>
-        </DialogContent>
-      </Dialog>
 
       {/* Start Day Confirmation Dialog */}
       <AlertDialog open={showStartDayDialog} onOpenChange={setShowStartDayDialog}>

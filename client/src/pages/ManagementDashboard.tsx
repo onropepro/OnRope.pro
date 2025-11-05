@@ -153,21 +153,26 @@ export default function ManagementDashboard() {
   // Check for active session on component mount
   useEffect(() => {
     const checkActiveSession = async () => {
-      if (projects.length > 0 && projects[0]?.id) {
+      if (projects.length > 0) {
         try {
-          const response = await fetch(`/api/projects/${projects[0].id}/my-work-sessions`, {
-            credentials: "include",
-          });
-          if (response.ok) {
-            const data = await response.json();
-            const active = data.sessions?.find((s: any) => !s.endTime);
-            if (active) {
-              setActiveSession(active);
-              // Set selectedProject to match the active session's project
-              const sessionProject = projects.find((p: Project) => p.id === active.projectId);
-              if (sessionProject) {
-                setSelectedProject(sessionProject);
+          // Check all projects for an active session
+          for (const project of projects) {
+            try {
+              const response = await fetch(`/api/projects/${project.id}/my-work-sessions`, {
+                credentials: "include",
+              });
+              if (response.ok) {
+                const data = await response.json();
+                const active = data.sessions?.find((s: any) => !s.endTime);
+                if (active) {
+                  setActiveSession(active);
+                  setSelectedProject(project);
+                  return; // Found active session, stop searching
+                }
               }
+            } catch (fetchError) {
+              // Continue to next project if this one fails
+              continue;
             }
           }
         } catch (error) {
