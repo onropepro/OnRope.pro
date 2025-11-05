@@ -99,6 +99,7 @@ export default function TechDashboard() {
     onSuccess: (data) => {
       setActiveSession(data.session);
       setShowStartDayDialog(false);
+      queryClient.invalidateQueries({ queryKey: ["/api/projects"] });
       toast({ title: "Work session started", description: "Good luck today!" });
     },
     onError: (error: Error) => {

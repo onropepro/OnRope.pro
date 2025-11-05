@@ -11,6 +11,7 @@ import ResidentDashboard from "@/pages/ResidentDashboard";
 import TechDashboard from "@/pages/TechDashboard";
 import ManagementDashboard from "@/pages/ManagementDashboard";
 import ComplaintDetail from "@/pages/ComplaintDetail";
+import WorkSessionHistory from "@/pages/WorkSessionHistory";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -26,6 +27,7 @@ function Router() {
       <Route path="/tech" component={TechDashboard} />
       <Route path="/management" component={ManagementDashboard} />
       <Route path="/complaints/:id" component={ComplaintDetail} />
+      <Route path="/projects/:id/work-sessions" component={WorkSessionHistory} />
       <Route component={NotFound} />
     </Switch>
   );

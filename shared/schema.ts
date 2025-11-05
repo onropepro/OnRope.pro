@@ -55,6 +55,7 @@ export const users = pgTable("users", {
 export const projects = pgTable("projects", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   companyId: varchar("company_id").notNull().references(() => users.id, { onDelete: "cascade" }), // Foreign key to company
+  buildingName: varchar("building_name").notNull(), // Building name for display
   strataPlanNumber: varchar("strata_plan_number").notNull(),
   buildingAddress: text("building_address"), // Building address visible to all employees
   jobType: varchar("job_type").notNull(), // window_cleaning | dryer_vent_cleaning | pressure_washing

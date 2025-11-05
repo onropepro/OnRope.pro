@@ -304,8 +304,23 @@ export class Storage {
     return result[0];
   }
 
-  async getWorkSessionsByProject(projectId: string, companyId: string): Promise<WorkSession[]> {
-    return db.select().from(workSessions)
+  async getWorkSessionsByProject(projectId: string, companyId: string): Promise<any[]> {
+    const result = await db.select({
+      id: workSessions.id,
+      projectId: workSessions.projectId,
+      employeeId: workSessions.employeeId,
+      companyId: workSessions.companyId,
+      workDate: workSessions.workDate,
+      startTime: workSessions.startTime,
+      endTime: workSessions.endTime,
+      dropsCompleted: workSessions.dropsCompleted,
+      shortfallReason: workSessions.shortfallReason,
+      createdAt: workSessions.createdAt,
+      updatedAt: workSessions.updatedAt,
+      techName: users.name,
+    })
+      .from(workSessions)
+      .leftJoin(users, eq(workSessions.employeeId, users.id))
       .where(
         and(
           eq(workSessions.projectId, projectId),
@@ -313,6 +328,7 @@ export class Storage {
         )
       )
       .orderBy(desc(workSessions.workDate), desc(workSessions.startTime));
+    return result;
   }
 
   async getWorkSessionsByEmployee(employeeId: string, projectId: string): Promise<WorkSession[]> {

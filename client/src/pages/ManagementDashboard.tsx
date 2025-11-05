@@ -23,6 +23,7 @@ import type { Project } from "@shared/schema";
 
 const projectSchema = z.object({
   strataPlanNumber: z.string().min(1, "Strata plan number is required"),
+  buildingName: z.string().min(1, "Building name is required"),
   buildingAddress: z.string().optional(),
   jobType: z.enum(["window_cleaning", "dryer_vent_cleaning", "pressure_washing"]),
   totalDrops: z.string().min(1, "Total drops is required"),
@@ -116,6 +117,7 @@ export default function ManagementDashboard() {
     resolver: zodResolver(projectSchema),
     defaultValues: {
       strataPlanNumber: "",
+      buildingName: "",
       buildingAddress: "",
       jobType: "window_cleaning",
       totalDrops: "",
@@ -530,6 +532,20 @@ export default function ManagementDashboard() {
                               <FormLabel>Strata Plan Number</FormLabel>
                               <FormControl>
                                 <Input placeholder="LMS2345" {...field} data-testid="input-strata-plan-number" className="h-12" />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+
+                        <FormField
+                          control={projectForm.control}
+                          name="buildingName"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Building Name</FormLabel>
+                              <FormControl>
+                                <Input placeholder="Harbour View Towers" {...field} data-testid="input-building-name" className="h-12" />
                               </FormControl>
                               <FormMessage />
                             </FormItem>
