@@ -90,10 +90,10 @@ export default function WorkSessionHistory() {
             <div className="flex justify-center">
               <HighRiseBuilding
                 floors={project.floorCount}
-                totalDropsNorth={project.totalDropsNorth || Math.floor(project.totalDrops / 4) + (project.totalDrops % 4 > 0 ? 1 : 0)}
-                totalDropsEast={project.totalDropsEast || Math.floor(project.totalDrops / 4) + (project.totalDrops % 4 > 1 ? 1 : 0)}
-                totalDropsSouth={project.totalDropsSouth || Math.floor(project.totalDrops / 4) + (project.totalDrops % 4 > 2 ? 1 : 0)}
-                totalDropsWest={project.totalDropsWest || Math.floor(project.totalDrops / 4)}
+                totalDropsNorth={project.totalDropsNorth ?? Math.floor(project.totalDrops / 4) + (project.totalDrops % 4 > 0 ? 1 : 0)}
+                totalDropsEast={project.totalDropsEast ?? Math.floor(project.totalDrops / 4) + (project.totalDrops % 4 > 1 ? 1 : 0)}
+                totalDropsSouth={project.totalDropsSouth ?? Math.floor(project.totalDrops / 4) + (project.totalDrops % 4 > 2 ? 1 : 0)}
+                totalDropsWest={project.totalDropsWest ?? Math.floor(project.totalDrops / 4)}
                 completedDropsNorth={Math.floor(completedDrops / 4) + (completedDrops % 4 > 0 ? 1 : 0)}
                 completedDropsEast={Math.floor(completedDrops / 4) + (completedDrops % 4 > 1 ? 1 : 0)}
                 completedDropsSouth={Math.floor(completedDrops / 4) + (completedDrops % 4 > 2 ? 1 : 0)}

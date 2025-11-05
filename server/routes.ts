@@ -433,11 +433,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "Project not found" });
       }
       
-      // Add completedDrops to the project
-      const { totalCompleted } = await storage.getProjectProgress(project.id);
+      // Add completed drops (total and per-elevation) to the project
+      const { north, east, south, west, total } = await storage.getProjectProgress(project.id);
       const projectWithProgress = {
         ...project,
-        completedDrops: totalCompleted,
+        completedDrops: total,
+        completedDropsNorth: north,
+        completedDropsEast: east,
+        completedDropsSouth: south,
+        completedDropsWest: west,
       };
       
       res.set('Cache-Control', 'no-store, no-cache, must-revalidate, private');
@@ -719,7 +723,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       const { sessionId } = req.params;
-      const { dropsCompleted, shortfallReason } = req.body;
+      const { dropsCompletedNorth, dropsCompletedEast, dropsCompletedSouth, dropsCompletedWest, shortfallReason } = req.body;
       
       // Get the session to verify ownership
       const activeSession = await storage.getActiveWorkSession(currentUser.id, req.params.projectId);
@@ -734,21 +738,31 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "Project not found" });
       }
       
-      // Validate drops completed
-      if (typeof dropsCompleted !== 'number' || dropsCompleted < 0) {
+      // Validate elevation drops (ensure they are numbers and non-negative)
+      const north = typeof dropsCompletedNorth === 'number' ? dropsCompletedNorth : 0;
+      const east = typeof dropsCompletedEast === 'number' ? dropsCompletedEast : 0;
+      const south = typeof dropsCompletedSouth === 'number' ? dropsCompletedSouth : 0;
+      const west = typeof dropsCompletedWest === 'number' ? dropsCompletedWest : 0;
+      
+      if (north < 0 || east < 0 || south < 0 || west < 0) {
         return res.status(400).json({ message: "Invalid drops completed value" });
       }
       
+      const totalDropsCompleted = north + east + south + west;
+      
       // If drops < target, require shortfall reason
-      if (dropsCompleted < project.dailyDropTarget && (!shortfallReason || shortfallReason.trim() === '')) {
+      if (totalDropsCompleted < project.dailyDropTarget && (!shortfallReason || shortfallReason.trim() === '')) {
         return res.status(400).json({ message: "Shortfall reason is required when drops completed is less than the daily target" });
       }
       
-      // End the session
+      // End the session with elevation-specific drops
       const session = await storage.endWorkSession(
         sessionId,
-        dropsCompleted,
-        dropsCompleted < project.dailyDropTarget ? shortfallReason : undefined
+        north,
+        east,
+        south,
+        west,
+        totalDropsCompleted < project.dailyDropTarget ? shortfallReason : undefined
       );
       
       res.json({ session });

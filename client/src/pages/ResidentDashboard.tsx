@@ -413,14 +413,14 @@ export default function ResidentDashboard() {
               <CardContent className="pt-6">
                 <HighRiseBuilding
                   floors={projectData.floorCount}
-                  totalDropsNorth={projectData.totalDropsNorth || Math.floor(projectData.totalDrops / 4) + (projectData.totalDrops % 4 > 0 ? 1 : 0)}
-                  totalDropsEast={projectData.totalDropsEast || Math.floor(projectData.totalDrops / 4) + (projectData.totalDrops % 4 > 1 ? 1 : 0)}
-                  totalDropsSouth={projectData.totalDropsSouth || Math.floor(projectData.totalDrops / 4) + (projectData.totalDrops % 4 > 2 ? 1 : 0)}
-                  totalDropsWest={projectData.totalDropsWest || Math.floor(projectData.totalDrops / 4)}
-                  completedDropsNorth={projectData.completedDropsNorth || Math.floor(projectData.completedDrops / 4) + (projectData.completedDrops % 4 > 0 ? 1 : 0)}
-                  completedDropsEast={projectData.completedDropsEast || Math.floor(projectData.completedDrops / 4) + (projectData.completedDrops % 4 > 1 ? 1 : 0)}
-                  completedDropsSouth={projectData.completedDropsSouth || Math.floor(projectData.completedDrops / 4) + (projectData.completedDrops % 4 > 2 ? 1 : 0)}
-                  completedDropsWest={projectData.completedDropsWest || Math.floor(projectData.completedDrops / 4)}
+                  totalDropsNorth={projectData.totalDropsNorth ?? Math.floor(projectData.totalDrops / 4) + (projectData.totalDrops % 4 > 0 ? 1 : 0)}
+                  totalDropsEast={projectData.totalDropsEast ?? Math.floor(projectData.totalDrops / 4) + (projectData.totalDrops % 4 > 1 ? 1 : 0)}
+                  totalDropsSouth={projectData.totalDropsSouth ?? Math.floor(projectData.totalDrops / 4) + (projectData.totalDrops % 4 > 2 ? 1 : 0)}
+                  totalDropsWest={projectData.totalDropsWest ?? Math.floor(projectData.totalDrops / 4)}
+                  completedDropsNorth={projectData.completedDropsNorth ?? Math.floor(projectData.completedDrops / 4) + (projectData.completedDrops % 4 > 0 ? 1 : 0)}
+                  completedDropsEast={projectData.completedDropsEast ?? Math.floor(projectData.completedDrops / 4) + (projectData.completedDrops % 4 > 1 ? 1 : 0)}
+                  completedDropsSouth={projectData.completedDropsSouth ?? Math.floor(projectData.completedDrops / 4) + (projectData.completedDrops % 4 > 2 ? 1 : 0)}
+                  completedDropsWest={projectData.completedDropsWest ?? Math.floor(projectData.completedDrops / 4)}
                   className="mb-6"
                 />
 

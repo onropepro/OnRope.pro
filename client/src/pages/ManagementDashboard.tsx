@@ -27,7 +27,10 @@ const projectSchema = z.object({
   buildingName: z.string().min(1, "Building name is required"),
   buildingAddress: z.string().optional(),
   jobType: z.enum(["window_cleaning", "dryer_vent_cleaning", "pressure_washing"]),
-  totalDrops: z.string().min(1, "Total drops is required"),
+  totalDropsNorth: z.string().min(1, "Total drops (North) is required"),
+  totalDropsEast: z.string().min(1, "Total drops (East) is required"),
+  totalDropsSouth: z.string().min(1, "Total drops (South) is required"),
+  totalDropsWest: z.string().min(1, "Total drops (West) is required"),
   dailyDropTarget: z.string().min(1, "Daily drop target is required"),
   floorCount: z.string().min(1, "Floor count is required"),
   targetCompletionDate: z.string().optional(),
@@ -147,7 +150,10 @@ export default function ManagementDashboard() {
       buildingName: "",
       buildingAddress: "",
       jobType: "window_cleaning",
-      totalDrops: "",
+      totalDropsNorth: "",
+      totalDropsEast: "",
+      totalDropsSouth: "",
+      totalDropsWest: "",
       dailyDropTarget: "",
       floorCount: "",
       targetCompletionDate: "",
@@ -224,7 +230,11 @@ export default function ManagementDashboard() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           ...data,
-          totalDrops: parseInt(data.totalDrops),
+          totalDropsNorth: parseInt(data.totalDropsNorth),
+          totalDropsEast: parseInt(data.totalDropsEast),
+          totalDropsSouth: parseInt(data.totalDropsSouth),
+          totalDropsWest: parseInt(data.totalDropsWest),
+          totalDrops: parseInt(data.totalDropsNorth) + parseInt(data.totalDropsEast) + parseInt(data.totalDropsSouth) + parseInt(data.totalDropsWest),
           dailyDropTarget: parseInt(data.dailyDropTarget),
           floorCount: parseInt(data.floorCount),
           ropeAccessPlanUrl: data.ropeAccessPlanUrl || undefined,
@@ -656,19 +666,63 @@ export default function ManagementDashboard() {
                           )}
                         />
 
-                        <FormField
-                          control={projectForm.control}
-                          name="totalDrops"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Total Drops</FormLabel>
-                              <FormControl>
-                                <Input type="number" min="1" {...field} data-testid="input-total-drops" className="h-12" />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
+                        <div className="space-y-2">
+                          <label className="text-sm font-medium">Total Drops per Elevation</label>
+                          <div className="grid grid-cols-2 gap-4">
+                            <FormField
+                              control={projectForm.control}
+                              name="totalDropsNorth"
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel>North</FormLabel>
+                                  <FormControl>
+                                    <Input type="number" min="1" {...field} data-testid="input-total-drops-north" className="h-12" />
+                                  </FormControl>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+                            <FormField
+                              control={projectForm.control}
+                              name="totalDropsEast"
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel>East</FormLabel>
+                                  <FormControl>
+                                    <Input type="number" min="1" {...field} data-testid="input-total-drops-east" className="h-12" />
+                                  </FormControl>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+                            <FormField
+                              control={projectForm.control}
+                              name="totalDropsSouth"
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel>South</FormLabel>
+                                  <FormControl>
+                                    <Input type="number" min="1" {...field} data-testid="input-total-drops-south" className="h-12" />
+                                  </FormControl>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+                            <FormField
+                              control={projectForm.control}
+                              name="totalDropsWest"
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel>West</FormLabel>
+                                  <FormControl>
+                                    <Input type="number" min="1" {...field} data-testid="input-total-drops-west" className="h-12" />
+                                  </FormControl>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+                          </div>
+                        </div>
 
                         <FormField
                           control={projectForm.control}

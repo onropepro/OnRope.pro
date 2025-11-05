@@ -96,14 +96,14 @@ export default function ProjectDetail() {
             {/* Building Visualization */}
             <HighRiseBuilding
               floors={project.floorCount}
-              totalDropsNorth={project.totalDropsNorth || Math.floor(project.totalDrops / 4) + (project.totalDrops % 4 > 0 ? 1 : 0)}
-              totalDropsEast={project.totalDropsEast || Math.floor(project.totalDrops / 4) + (project.totalDrops % 4 > 1 ? 1 : 0)}
-              totalDropsSouth={project.totalDropsSouth || Math.floor(project.totalDrops / 4) + (project.totalDrops % 4 > 2 ? 1 : 0)}
-              totalDropsWest={project.totalDropsWest || Math.floor(project.totalDrops / 4)}
-              completedDropsNorth={project.completedDropsNorth || Math.floor((project.completedDrops || 0) / 4) + ((project.completedDrops || 0) % 4 > 0 ? 1 : 0)}
-              completedDropsEast={project.completedDropsEast || Math.floor((project.completedDrops || 0) / 4) + ((project.completedDrops || 0) % 4 > 1 ? 1 : 0)}
-              completedDropsSouth={project.completedDropsSouth || Math.floor((project.completedDrops || 0) / 4) + ((project.completedDrops || 0) % 4 > 2 ? 1 : 0)}
-              completedDropsWest={project.completedDropsWest || Math.floor((project.completedDrops || 0) / 4)}
+              totalDropsNorth={project.totalDropsNorth ?? Math.floor(project.totalDrops / 4) + (project.totalDrops % 4 > 0 ? 1 : 0)}
+              totalDropsEast={project.totalDropsEast ?? Math.floor(project.totalDrops / 4) + (project.totalDrops % 4 > 1 ? 1 : 0)}
+              totalDropsSouth={project.totalDropsSouth ?? Math.floor(project.totalDrops / 4) + (project.totalDrops % 4 > 2 ? 1 : 0)}
+              totalDropsWest={project.totalDropsWest ?? Math.floor(project.totalDrops / 4)}
+              completedDropsNorth={project.completedDropsNorth ?? Math.floor((project.completedDrops || 0) / 4) + ((project.completedDrops || 0) % 4 > 0 ? 1 : 0)}
+              completedDropsEast={project.completedDropsEast ?? Math.floor((project.completedDrops || 0) / 4) + ((project.completedDrops || 0) % 4 > 1 ? 1 : 0)}
+              completedDropsSouth={project.completedDropsSouth ?? Math.floor((project.completedDrops || 0) / 4) + ((project.completedDrops || 0) % 4 > 2 ? 1 : 0)}
+              completedDropsWest={project.completedDropsWest ?? Math.floor((project.completedDrops || 0) / 4)}
               className="mb-4"
             />
 
