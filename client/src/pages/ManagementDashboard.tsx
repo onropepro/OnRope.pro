@@ -148,11 +148,10 @@ export default function ManagementDashboard() {
     },
   });
 
-  // Check for active session on component mount
+  // Check for active session on component mount - only run once
   useEffect(() => {
     const checkActiveSession = async () => {
-      if (projects.length > 0) {
-        let foundActive = false;
+      if (projects.length > 0 && !activeSession) {
         try {
           // Check all projects for an active session
           for (const project of projects) {
@@ -167,7 +166,6 @@ export default function ManagementDashboard() {
                 if (active) {
                   setActiveSession(active);
                   setSelectedProject(project);
-                  foundActive = true;
                   return; // Found active session, stop searching
                 }
               }
@@ -176,17 +174,13 @@ export default function ManagementDashboard() {
               continue;
             }
           }
-          // Only clear if we successfully checked and found nothing
-          if (!foundActive) {
-            setActiveSession(null);
-          }
         } catch (error) {
           console.error("Failed to check active session:", error);
         }
       }
     };
     checkActiveSession();
-  }, [projects]);
+  }, [projects, activeSession]);
 
   const createProjectMutation = useMutation({
     mutationFn: async (data: ProjectFormData & { ropeAccessPlanUrl?: string | null }) => {
@@ -1239,7 +1233,9 @@ export default function ManagementDashboard() {
                 )}
               />
 
-              {activeSession && endDayForm.watch("dropsCompleted") && parseInt(endDayForm.watch("dropsCompleted")) < dailyTarget && (
+              {activeSession && 
+                endDayForm.watch("dropsCompleted") !== "" && 
+                parseInt(endDayForm.watch("dropsCompleted")) < dailyTarget && (
                 <FormField
                   control={endDayForm.control}
                   name="shortfallReason"
