@@ -38,8 +38,15 @@ const employeeSchema = z.object({
   techLevel: z.string().optional(),
 });
 
+const dropLogSchema = z.object({
+  projectId: z.string().min(1, "Please select a project"),
+  date: z.string().min(1, "Date is required"),
+  dropsCompleted: z.string().min(1, "Number of drops is required"),
+});
+
 type ProjectFormData = z.infer<typeof projectSchema>;
 type EmployeeFormData = z.infer<typeof employeeSchema>;
+type DropLogFormData = z.infer<typeof dropLogSchema>;
 
 export default function ManagementDashboard() {
   const [activeTab, setActiveTab] = useState("projects");
@@ -49,6 +56,8 @@ export default function ManagementDashboard() {
   const [showProjectDetailDialog, setShowProjectDetailDialog] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [employeeToDelete, setEmployeeToDelete] = useState<string | null>(null);
+  const [showDropDialog, setShowDropDialog] = useState(false);
+  const [dropProject, setDropProject] = useState<any>(null);
   const { toast } = useToast();
   const [, setLocation] = useLocation();
 
@@ -62,8 +71,15 @@ export default function ManagementDashboard() {
     queryKey: ["/api/employees"],
   });
 
+  // Fetch today's drops for daily target
+  const { data: myDropsData } = useQuery({
+    queryKey: ["/api/my-drops-today"],
+  });
+
   const projects = projectsData?.projects || [];
   const employees = employeesData?.employees || [];
+  const todayDrops = myDropsData?.totalDropsToday || 0;
+  const dailyTarget = projects[0]?.dailyDropTarget || 20;
 
   const projectForm = useForm<ProjectFormData>({
     resolver: zodResolver(projectSchema),
@@ -86,6 +102,15 @@ export default function ManagementDashboard() {
       password: "",
       role: "rope_access_tech",
       techLevel: "",
+    },
+  });
+
+  const dropForm = useForm<DropLogFormData>({
+    resolver: zodResolver(dropLogSchema),
+    defaultValues: {
+      projectId: "",
+      date: new Date().toISOString().split('T')[0],
+      dropsCompleted: "",
     },
   });
 
@@ -182,6 +207,43 @@ export default function ManagementDashboard() {
     },
   });
 
+  const logDropsMutation = useMutation({
+    mutationFn: async (data: DropLogFormData) => {
+      const response = await fetch("/api/drops", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          projectId: data.projectId,
+          date: data.date,
+          dropsCompleted: parseInt(data.dropsCompleted),
+        }),
+        credentials: "include",
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || "Failed to log drops");
+      }
+
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/projects"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/my-drops-today"] });
+      dropForm.reset({
+        projectId: "",
+        date: new Date().toISOString().split('T')[0],
+        dropsCompleted: "",
+      });
+      setShowDropDialog(false);
+      setDropProject(null);
+      toast({ title: "Drops logged successfully" });
+    },
+    onError: (error: Error) => {
+      toast({ title: "Error", description: error.message, variant: "destructive" });
+    },
+  });
+
   const handleLogout = async () => {
     try {
       await fetch("/api/logout", {
@@ -225,10 +287,14 @@ export default function ManagementDashboard() {
 
       <div className="p-4 max-w-4xl mx-auto">
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid w-full grid-cols-2 mb-4">
+          <TabsList className="grid w-full grid-cols-3 mb-4">
             <TabsTrigger value="projects" data-testid="tab-projects">
               <span className="material-icons text-sm mr-2">apartment</span>
               Projects
+            </TabsTrigger>
+            <TabsTrigger value="my-drops" data-testid="tab-my-drops">
+              <span className="material-icons text-sm mr-2">checklist</span>
+              My Drops
             </TabsTrigger>
             <TabsTrigger value="employees" data-testid="tab-employees">
               <span className="material-icons text-sm mr-2">people</span>
@@ -465,6 +531,186 @@ export default function ManagementDashboard() {
                 </>
               )}
             </div>
+          </TabsContent>
+
+          <TabsContent value="my-drops">
+            <div className="space-y-4">
+              {/* Daily Progress Card */}
+              <Card className="bg-gradient-to-br from-primary/5 to-primary/10 border-primary/20">
+                <CardHeader>
+                  <div className="flex items-center justify-between">
+                    <CardTitle className="text-lg">Today's Progress</CardTitle>
+                    <Badge variant="secondary" className="text-lg px-3">
+                      {todayDrops} / {dailyTarget}
+                    </Badge>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <Progress value={(todayDrops / dailyTarget) * 100} className="h-3 mb-3" />
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="text-muted-foreground">Remaining today</span>
+                    <span className="font-medium">{Math.max(0, dailyTarget - todayDrops)} drops</span>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Projects List */}
+              {projects.length === 0 ? (
+                <Card className="text-center shadow-lg">
+                  <CardContent className="pt-12 pb-8">
+                    <span className="material-icons text-7xl text-muted-foreground mb-4">apartment</span>
+                    <h3 className="text-xl font-bold mb-2">No Active Projects</h3>
+                    <p className="text-muted-foreground">
+                      No projects available for drop logging yet
+                    </p>
+                  </CardContent>
+                </Card>
+              ) : (
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between mb-2">
+                    <h3 className="text-sm font-medium text-muted-foreground">Active Projects</h3>
+                    <span className="text-xs text-muted-foreground">{projects.length} project{projects.length !== 1 ? 's' : ''}</span>
+                  </div>
+                  {projects.map((project: Project) => {
+                    const progressPercentage = project.totalDrops > 0 
+                      ? Math.round((project.completedDrops / project.totalDrops) * 100)
+                      : 0;
+
+                    return (
+                      <Card key={project.id} className="hover-elevate">
+                        <CardHeader className="pb-3">
+                          <div className="flex items-start justify-between gap-3">
+                            <div className="flex-1 min-w-0">
+                              <CardTitle className="text-base truncate" data-testid={`text-project-${project.id}`}>
+                                {project.strataPlanNumber}
+                              </CardTitle>
+                              <CardDescription className="capitalize">
+                                {project.jobType.replace(/_/g, ' ')}
+                              </CardDescription>
+                            </div>
+                            <Button
+                              size="sm"
+                              className="gap-2 shrink-0"
+                              onClick={() => {
+                                setDropProject(project);
+                                dropForm.setValue("projectId", project.id);
+                                setShowDropDialog(true);
+                              }}
+                              data-testid={`button-log-drops-${project.id}`}
+                            >
+                              <span className="material-icons text-sm">add</span>
+                              Log Drops
+                            </Button>
+                          </div>
+                        </CardHeader>
+                        <CardContent className="space-y-3">
+                          <div>
+                            <div className="flex justify-between text-sm mb-2">
+                              <span className="text-muted-foreground">Progress</span>
+                              <span className="font-medium">{progressPercentage}%</span>
+                            </div>
+                            <Progress value={progressPercentage} className="h-2" />
+                          </div>
+                          <div className="grid grid-cols-2 gap-3 text-sm">
+                            <div className="flex items-center gap-2">
+                              <span className="material-icons text-sm text-muted-foreground">check_circle</span>
+                              <div>
+                                <div className="font-medium">{project.completedDrops}</div>
+                                <div className="text-xs text-muted-foreground">Completed</div>
+                              </div>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <span className="material-icons text-sm text-muted-foreground">pending</span>
+                              <div>
+                                <div className="font-medium">{project.totalDrops - project.completedDrops}</div>
+                                <div className="text-xs text-muted-foreground">Remaining</div>
+                              </div>
+                            </div>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+
+            {/* Drop Logging Dialog */}
+            <Dialog open={showDropDialog} onOpenChange={setShowDropDialog}>
+              <DialogContent className="max-w-md">
+                <DialogHeader>
+                  <DialogTitle>Log Daily Drops</DialogTitle>
+                  <DialogDescription>
+                    Record completed drops for {dropProject?.strataPlanNumber || 'this project'}
+                  </DialogDescription>
+                </DialogHeader>
+                <Form {...dropForm}>
+                  <form onSubmit={dropForm.handleSubmit((data) => logDropsMutation.mutate(data))} className="space-y-4">
+                    <FormField
+                      control={dropForm.control}
+                      name="date"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Date</FormLabel>
+                          <FormControl>
+                            <Input type="date" {...field} data-testid="input-drop-date" className="h-12" />
+                          </FormControl>
+                          <FormDescription className="text-xs">
+                            You can log drops for any past date
+                          </FormDescription>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={dropForm.control}
+                      name="dropsCompleted"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Number of Drops Completed</FormLabel>
+                          <FormControl>
+                            <Input 
+                              type="number" 
+                              min="1"
+                              placeholder="Enter number of drops" 
+                              {...field} 
+                              data-testid="input-drops-completed" 
+                              className="h-12" 
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <div className="flex gap-2 pt-2">
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={() => {
+                          setShowDropDialog(false);
+                          setDropProject(null);
+                          dropForm.reset();
+                        }}
+                        className="flex-1 h-12"
+                        data-testid="button-cancel-drop"
+                      >
+                        Cancel
+                      </Button>
+                      <Button 
+                        type="submit" 
+                        className="flex-1 h-12"
+                        disabled={logDropsMutation.isPending}
+                        data-testid="button-submit-drop"
+                      >
+                        {logDropsMutation.isPending ? "Logging..." : "Log Drops"}
+                      </Button>
+                    </div>
+                  </form>
+                </Form>
+              </DialogContent>
+            </Dialog>
           </TabsContent>
 
           <TabsContent value="employees">
