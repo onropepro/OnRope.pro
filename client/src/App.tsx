@@ -12,6 +12,7 @@ import TechDashboard from "@/pages/TechDashboard";
 import ManagementDashboard from "@/pages/ManagementDashboard";
 import ComplaintDetail from "@/pages/ComplaintDetail";
 import WorkSessionHistory from "@/pages/WorkSessionHistory";
+import ProjectDetail from "@/pages/ProjectDetail";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -28,6 +29,7 @@ function Router() {
       <Route path="/management" component={ManagementDashboard} />
       <Route path="/complaints/:id" component={ComplaintDetail} />
       <Route path="/projects/:id/work-sessions" component={WorkSessionHistory} />
+      <Route path="/projects/:id" component={ProjectDetail} />
       <Route component={NotFound} />
     </Switch>
   );

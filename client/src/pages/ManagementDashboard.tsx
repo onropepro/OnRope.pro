@@ -62,10 +62,8 @@ export default function ManagementDashboard() {
   const [showProjectDialog, setShowProjectDialog] = useState(false);
   const [showEmployeeDialog, setShowEmployeeDialog] = useState(false);
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
-  const [showProjectDetailDialog, setShowProjectDetailDialog] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [employeeToDelete, setEmployeeToDelete] = useState<string | null>(null);
-  const [projectToDelete, setProjectToDelete] = useState<string | null>(null);
   const [showDropDialog, setShowDropDialog] = useState(false);
   const [dropProject, setDropProject] = useState<any>(null);
   const [showStartDayDialog, setShowStartDayDialog] = useState(false);
@@ -100,12 +98,6 @@ export default function ManagementDashboard() {
   const { data: companyData } = useQuery({
     queryKey: ["/api/companies", userData?.user?.companyId],
     enabled: !!userData?.user?.companyId,
-  });
-
-  // Fetch work sessions for selected project
-  const { data: workSessionsData } = useQuery({
-    queryKey: ["/api/projects", selectedProject?.id, "work-sessions"],
-    enabled: !!selectedProject?.id && showProjectDetailDialog,
   });
 
   const projects = projectsData?.projects || [];
@@ -315,31 +307,6 @@ export default function ManagementDashboard() {
       queryClient.invalidateQueries({ queryKey: ["/api/employees"] });
       setEmployeeToDelete(null);
       toast({ title: "Employee deleted successfully" });
-    },
-    onError: (error: Error) => {
-      toast({ title: "Error", description: error.message, variant: "destructive" });
-    },
-  });
-
-  const deleteProjectMutation = useMutation({
-    mutationFn: async (projectId: string) => {
-      const response = await fetch(`/api/projects/${projectId}`, {
-        method: "DELETE",
-        credentials: "include",
-      });
-
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.message || "Failed to delete project");
-      }
-
-      return response.json();
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/projects"] });
-      setProjectToDelete(null);
-      setShowProjectDetailDialog(false);
-      toast({ title: "Project deleted successfully" });
     },
     onError: (error: Error) => {
       toast({ title: "Error", description: error.message, variant: "destructive" });
@@ -752,10 +719,7 @@ export default function ManagementDashboard() {
                           key={project.id} 
                           className="hover-elevate active-elevate-2 cursor-pointer" 
                           data-testid={`project-card-${project.id}`}
-                          onClick={() => {
-                            setSelectedProject(project);
-                            setShowProjectDetailDialog(true);
-                          }}
+                          onClick={() => setLocation(`/projects/${project.id}`)}
                         >
                           <CardContent className="p-4">
                             <div className="flex items-start justify-between mb-3">
@@ -791,7 +755,12 @@ export default function ManagementDashboard() {
                     <h3 className="text-sm font-medium text-muted-foreground mb-3">Completed Projects</h3>
                     <div className="space-y-2">
                       {filteredProjects.filter((p: Project) => p.status === "completed").map((project: Project) => (
-                        <Card key={project.id} className="opacity-75" data-testid={`completed-project-${project.id}`}>
+                        <Card 
+                          key={project.id} 
+                          className="opacity-75 hover-elevate active-elevate-2 cursor-pointer" 
+                          data-testid={`completed-project-${project.id}`}
+                          onClick={() => setLocation(`/projects/${project.id}`)}
+                        >
                           <CardContent className="p-4">
                             <div className="flex items-start justify-between">
                               <div>
@@ -1183,97 +1152,6 @@ export default function ManagementDashboard() {
         </Tabs>
       </div>
 
-      {/* Project Detail Dialog */}
-      <Dialog open={showProjectDetailDialog} onOpenChange={setShowProjectDetailDialog}>
-        <DialogContent className="max-w-md max-h-[90vh] flex flex-col">
-          <DialogHeader>
-            <DialogTitle>Project Details</DialogTitle>
-            <DialogDescription>
-              {selectedProject && (
-                <>{selectedProject.strataPlanNumber} - {selectedProject.jobType.replace(/_/g, ' ')}</>
-              )}
-            </DialogDescription>
-          </DialogHeader>
-          
-          {selectedProject && (
-            <div className="space-y-4 overflow-y-auto pr-2">
-              <HighRiseBuilding
-                floors={selectedProject.floorCount}
-                completedDrops={selectedProject.completedDrops || 0}
-                totalDrops={selectedProject.totalDrops}
-                className="mb-4"
-              />
-
-              <div className="grid grid-cols-2 gap-4">
-                <div className="text-center p-3 bg-muted/50 rounded-lg">
-                  <div className="text-xl font-bold">{selectedProject.dailyDropTarget}</div>
-                  <div className="text-xs text-muted-foreground mt-1">Daily Target</div>
-                </div>
-                <div className="text-center p-3 bg-muted/50 rounded-lg">
-                  <div className="text-xl font-bold">
-                    {selectedProject.completedDrops && selectedProject.completedDrops > 0 
-                      ? Math.ceil((selectedProject.totalDrops - selectedProject.completedDrops) / selectedProject.dailyDropTarget) 
-                      : "N/A"}
-                  </div>
-                  <div className="text-xs text-muted-foreground mt-1">Days Remaining</div>
-                </div>
-              </div>
-
-              <Separator />
-
-              {/* Work Session History Link */}
-              <Button
-                variant="outline"
-                className="w-full h-12 gap-2"
-                onClick={() => {
-                  setShowProjectDetailDialog(false);
-                  setLocation(`/projects/${selectedProject.id}/work-sessions`);
-                }}
-                data-testid="button-view-work-sessions"
-              >
-                <span className="material-icons text-lg">history</span>
-                View Work Session History
-              </Button>
-
-              <Separator />
-
-              <div className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <div className="text-xs text-muted-foreground mb-1">Status</div>
-                    <Badge variant={selectedProject.status === "active" ? "default" : "secondary"} className="capitalize">
-                      {selectedProject.status}
-                    </Badge>
-                  </div>
-                </div>
-
-                <div className="flex gap-2">
-                  <Button 
-                    variant="destructive" 
-                    onClick={() => {
-                      setProjectToDelete(selectedProject.id);
-                    }}
-                    className="flex-1 h-10"
-                    data-testid="button-delete-project"
-                  >
-                    <span className="material-icons mr-2 text-sm">delete</span>
-                    Delete Project
-                  </Button>
-                  <Button 
-                    variant="outline" 
-                    onClick={() => setShowProjectDetailDialog(false)}
-                    className="flex-1 h-10"
-                    data-testid="button-close-project-detail"
-                  >
-                    Close
-                  </Button>
-                </div>
-              </div>
-            </div>
-          )}
-        </DialogContent>
-      </Dialog>
-
       {/* Delete Employee Confirmation Dialog */}
       <AlertDialog open={employeeToDelete !== null} onOpenChange={(open) => !open && setEmployeeToDelete(null)}>
         <AlertDialogContent>
@@ -1291,28 +1169,6 @@ export default function ManagementDashboard() {
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
               Delete
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
-
-      {/* Delete Project Confirmation Dialog */}
-      <AlertDialog open={projectToDelete !== null} onOpenChange={(open) => !open && setProjectToDelete(null)}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Delete Project</AlertDialogTitle>
-            <AlertDialogDescription>
-              Are you sure you want to delete this project? This will permanently remove all associated work sessions, drop logs, and complaints. This action cannot be undone.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel data-testid="button-cancel-delete-project">Cancel</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={() => projectToDelete && deleteProjectMutation.mutate(projectToDelete)}
-              data-testid="button-confirm-delete-project"
-              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-            >
-              Delete Project
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
