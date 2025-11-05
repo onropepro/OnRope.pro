@@ -79,6 +79,24 @@ export const dropLogs = pgTable("drop_logs", {
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
+// Work sessions table - tracks daily work sessions with start/end times
+export const workSessions = pgTable("work_sessions", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  projectId: varchar("project_id").notNull().references(() => projects.id, { onDelete: "cascade" }),
+  employeeId: varchar("employee_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  companyId: varchar("company_id").notNull().references(() => users.id, { onDelete: "cascade" }), // For multi-tenant isolation
+  workDate: date("work_date").notNull(), // Date of the work session
+  startTime: timestamp("start_time").notNull(),
+  endTime: timestamp("end_time"), // Null if session is still active
+  dropsCompleted: integer("drops_completed"), // Entered when ending the session
+  shortfallReason: text("shortfall_reason"), // Required if drops < dailyDropTarget
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+}, (table) => [
+  index("IDX_work_sessions_company_project_date").on(table.companyId, table.projectId, table.workDate),
+  index("IDX_work_sessions_employee_project").on(table.employeeId, table.projectId),
+]);
+
 // Complaints table
 export const complaints = pgTable("complaints", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
@@ -107,6 +125,7 @@ export const complaintNotes = pgTable("complaint_notes", {
 export const usersRelations = relations(users, ({ many }) => ({
   projects: many(projects), // For company role
   dropLogs: many(dropLogs),
+  workSessions: many(workSessions), // For employee roles
   complaints: many(complaints), // For resident role
   complaintNotes: many(complaintNotes),
 }));
@@ -117,6 +136,7 @@ export const projectsRelations = relations(projects, ({ one, many }) => ({
     references: [users.id],
   }),
   dropLogs: many(dropLogs),
+  workSessions: many(workSessions),
   complaints: many(complaints),
 }));
 
@@ -127,6 +147,21 @@ export const dropLogsRelations = relations(dropLogs, ({ one }) => ({
   }),
   user: one(users, {
     fields: [dropLogs.userId],
+    references: [users.id],
+  }),
+}));
+
+export const workSessionsRelations = relations(workSessions, ({ one }) => ({
+  project: one(projects, {
+    fields: [workSessions.projectId],
+    references: [projects.id],
+  }),
+  employee: one(users, {
+    fields: [workSessions.employeeId],
+    references: [users.id],
+  }),
+  company: one(users, {
+    fields: [workSessions.companyId],
     references: [users.id],
   }),
 }));
@@ -174,6 +209,12 @@ export const insertDropLogSchema = createInsertSchema(dropLogs).omit({
   updatedAt: true,
 });
 
+export const insertWorkSessionSchema = createInsertSchema(workSessions).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
 export const insertComplaintSchema = createInsertSchema(complaints).omit({
   id: true,
   createdAt: true,
@@ -195,6 +236,9 @@ export type InsertProject = z.infer<typeof insertProjectSchema>;
 
 export type DropLog = typeof dropLogs.$inferSelect;
 export type InsertDropLog = z.infer<typeof insertDropLogSchema>;
+
+export type WorkSession = typeof workSessions.$inferSelect;
+export type InsertWorkSession = z.infer<typeof insertWorkSessionSchema>;
 
 export type Complaint = typeof complaints.$inferSelect;
 export type InsertComplaint = z.infer<typeof insertComplaintSchema>;

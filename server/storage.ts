@@ -1,7 +1,7 @@
 import { db } from "./db";
-import { users, projects, dropLogs, complaints, complaintNotes } from "@shared/schema";
-import type { User, InsertUser, Project, InsertProject, DropLog, InsertDropLog, Complaint, InsertComplaint, ComplaintNote, InsertComplaintNote } from "@shared/schema";
-import { eq, and, desc, sql } from "drizzle-orm";
+import { users, projects, dropLogs, workSessions, complaints, complaintNotes } from "@shared/schema";
+import type { User, InsertUser, Project, InsertProject, DropLog, InsertDropLog, WorkSession, InsertWorkSession, Complaint, InsertComplaint, ComplaintNote, InsertComplaintNote } from "@shared/schema";
+import { eq, and, desc, sql, isNull } from "drizzle-orm";
 import bcrypt from "bcrypt";
 
 const SALT_ROUNDS = 10;
@@ -264,6 +264,60 @@ export class Storage {
     return db.select().from(complaintNotes)
       .where(eq(complaintNotes.complaintId, complaintId))
       .orderBy(complaintNotes.createdAt);
+  }
+
+  // Work session operations
+  async startWorkSession(session: InsertWorkSession): Promise<WorkSession> {
+    const result = await db.insert(workSessions).values(session).returning();
+    return result[0];
+  }
+
+  async getActiveWorkSession(employeeId: string, projectId: string): Promise<WorkSession | undefined> {
+    const result = await db.select().from(workSessions)
+      .where(
+        and(
+          eq(workSessions.employeeId, employeeId),
+          eq(workSessions.projectId, projectId),
+          isNull(workSessions.endTime)
+        )
+      )
+      .limit(1);
+    return result[0];
+  }
+
+  async endWorkSession(sessionId: string, dropsCompleted: number, shortfallReason?: string): Promise<WorkSession> {
+    const result = await db.update(workSessions)
+      .set({
+        endTime: sql`NOW()`,
+        dropsCompleted,
+        shortfallReason,
+        updatedAt: sql`NOW()`,
+      })
+      .where(eq(workSessions.id, sessionId))
+      .returning();
+    return result[0];
+  }
+
+  async getWorkSessionsByProject(projectId: string, companyId: string): Promise<WorkSession[]> {
+    return db.select().from(workSessions)
+      .where(
+        and(
+          eq(workSessions.projectId, projectId),
+          eq(workSessions.companyId, companyId)
+        )
+      )
+      .orderBy(desc(workSessions.workDate), desc(workSessions.startTime));
+  }
+
+  async getWorkSessionsByEmployee(employeeId: string, projectId: string): Promise<WorkSession[]> {
+    return db.select().from(workSessions)
+      .where(
+        and(
+          eq(workSessions.employeeId, employeeId),
+          eq(workSessions.projectId, projectId)
+        )
+      )
+      .orderBy(desc(workSessions.workDate));
   }
 }
 

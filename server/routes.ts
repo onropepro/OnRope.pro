@@ -555,6 +555,175 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
+  // ==================== WORK SESSION ROUTES ====================
+  
+  // Start a work session
+  app.post("/api/projects/:projectId/work-sessions/start", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      const { projectId } = req.params;
+      
+      // Verify employee has access to this project
+      const hasAccess = await storage.verifyProjectAccess(
+        projectId,
+        currentUser.id,
+        currentUser.role,
+        currentUser.companyId
+      );
+      
+      if (!hasAccess) {
+        return res.status(403).json({ message: "Access denied - you cannot work on this project" });
+      }
+      
+      // Check if there's already an active session for this employee on this project
+      const activeSession = await storage.getActiveWorkSession(currentUser.id, projectId);
+      
+      if (activeSession) {
+        return res.status(400).json({ message: "You already have an active work session for this project" });
+      }
+      
+      // Get project to access company ID
+      const project = await storage.getProjectById(projectId);
+      if (!project) {
+        return res.status(404).json({ message: "Project not found" });
+      }
+      
+      // Create new work session
+      const today = new Date().toISOString().split('T')[0];
+      const session = await storage.startWorkSession({
+        projectId,
+        employeeId: currentUser.id,
+        companyId: project.companyId,
+        workDate: today,
+        startTime: new Date().toISOString(),
+      });
+      
+      res.json({ session });
+    } catch (error) {
+      console.error("Start work session error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+  
+  // End a work session
+  app.patch("/api/projects/:projectId/work-sessions/:sessionId/end", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      const { sessionId } = req.params;
+      const { dropsCompleted, shortfallReason } = req.body;
+      
+      // Get the session to verify ownership
+      const activeSession = await storage.getActiveWorkSession(currentUser.id, req.params.projectId);
+      
+      if (!activeSession || activeSession.id !== sessionId) {
+        return res.status(403).json({ message: "Access denied - not your active session" });
+      }
+      
+      // Get project to check daily target
+      const project = await storage.getProjectById(req.params.projectId);
+      if (!project) {
+        return res.status(404).json({ message: "Project not found" });
+      }
+      
+      // Validate drops completed
+      if (typeof dropsCompleted !== 'number' || dropsCompleted < 0) {
+        return res.status(400).json({ message: "Invalid drops completed value" });
+      }
+      
+      // If drops < target, require shortfall reason
+      if (dropsCompleted < project.dailyDropTarget && (!shortfallReason || shortfallReason.trim() === '')) {
+        return res.status(400).json({ message: "Shortfall reason is required when drops completed is less than the daily target" });
+      }
+      
+      // End the session
+      const session = await storage.endWorkSession(
+        sessionId,
+        dropsCompleted,
+        dropsCompleted < project.dailyDropTarget ? shortfallReason : undefined
+      );
+      
+      res.json({ session });
+    } catch (error) {
+      console.error("End work session error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+  
+  // Get work sessions for a project (management view)
+  app.get("/api/projects/:projectId/work-sessions", requireAuth, requireRole("company", "operations_manager", "supervisor"), async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      // Get company ID
+      const companyId = currentUser.role === "company" ? currentUser.id : currentUser.companyId;
+      
+      if (!companyId) {
+        return res.status(400).json({ message: "Unable to determine company" });
+      }
+      
+      // Verify access to project
+      const hasAccess = await storage.verifyProjectAccess(
+        req.params.projectId,
+        currentUser.id,
+        currentUser.role,
+        currentUser.companyId
+      );
+      
+      if (!hasAccess) {
+        return res.status(403).json({ message: "Access denied" });
+      }
+      
+      const sessions = await storage.getWorkSessionsByProject(req.params.projectId, companyId);
+      res.json({ sessions });
+    } catch (error) {
+      console.error("Get work sessions error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+  
+  // Get employee's own work sessions for a project
+  app.get("/api/projects/:projectId/my-work-sessions", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      // Verify access to project
+      const hasAccess = await storage.verifyProjectAccess(
+        req.params.projectId,
+        currentUser.id,
+        currentUser.role,
+        currentUser.companyId
+      );
+      
+      if (!hasAccess) {
+        return res.status(403).json({ message: "Access denied" });
+      }
+      
+      const sessions = await storage.getWorkSessionsByEmployee(currentUser.id, req.params.projectId);
+      res.json({ sessions });
+    } catch (error) {
+      console.error("Get my work sessions error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+  
   // ==================== COMPLAINT ROUTES ====================
   
   // Create complaint
