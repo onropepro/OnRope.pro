@@ -138,6 +138,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: "Internal server error" });
     }
   });
+
+  // Get company information by ID
+  app.get("/api/companies/:companyId", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const company = await storage.getUserById(req.params.companyId);
+      
+      if (!company || company.role !== "company") {
+        return res.status(404).json({ message: "Company not found" });
+      }
+
+      // Return only public company information
+      res.json({ 
+        company: {
+          id: company.id,
+          companyName: company.companyName,
+        }
+      });
+    } catch (error) {
+      console.error("Get company error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
   
   // ==================== EMPLOYEE ROUTES ====================
   
@@ -301,9 +323,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
           projects = [];
         }
       } else if (currentUser.role === "resident") {
-        // Return only project matching resident's strata plan
-        const project = await storage.getProjectByStrataPlan(currentUser.strataPlanNumber || "");
-        projects = project ? [project] : [];
+        // Return ALL projects (active and completed) matching resident's strata plan
+        projects = await storage.getAllProjectsByStrataPlan(currentUser.strataPlanNumber || "");
       } else {
         projects = [];
       }

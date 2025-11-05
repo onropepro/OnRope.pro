@@ -41,21 +41,30 @@ export default function ResidentDashboard() {
     queryKey: ["/api/projects"],
   });
 
-  // Fetch progress for the project
-  const project = projectsData?.projects?.[0];
+  // Separate active and completed projects
+  const allProjects = projectsData?.projects || [];
+  const activeProjects = allProjects.filter((p: any) => p.status === 'active');
+  const completedProjects = allProjects.filter((p: any) => p.status === 'completed');
+  const activeProject = activeProjects[0];
   
   const { data: progressData } = useQuery({
-    queryKey: ["/api/projects", project?.id, "progress"],
-    enabled: !!project?.id,
+    queryKey: ["/api/projects", activeProject?.id, "progress"],
+    enabled: !!activeProject?.id,
+  });
+
+  // Fetch company information for active project
+  const { data: companyData } = useQuery({
+    queryKey: ["/api/companies", activeProject?.companyId],
+    enabled: !!activeProject?.companyId,
   });
 
   const projectData = {
-    strataPlanNumber: project?.strataPlanNumber || "",
-    jobType: project?.jobType?.replace(/_/g, ' ') || "Window Cleaning",
-    floorCount: project?.floorCount || 24,
-    totalDrops: project?.totalDrops || 0,
+    strataPlanNumber: activeProject?.strataPlanNumber || "",
+    jobType: activeProject?.jobType?.replace(/_/g, ' ') || "Window Cleaning",
+    floorCount: activeProject?.floorCount || 24,
+    totalDrops: activeProject?.totalDrops || 0,
     completedDrops: progressData?.completedDrops || 0,
-    dailyDropTarget: project?.dailyDropTarget || 20,
+    dailyDropTarget: activeProject?.dailyDropTarget || 20,
     progressPercentage: progressData?.progressPercentage || 0,
   };
 
@@ -79,7 +88,7 @@ export default function ResidentDashboard() {
 
   const submitComplaintMutation = useMutation({
     mutationFn: async (data: ComplaintFormData) => {
-      if (!project?.id) {
+      if (!activeProject?.id) {
         throw new Error("Project not found");
       }
 
@@ -88,7 +97,7 @@ export default function ResidentDashboard() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           ...data,
-          projectId: project.id,
+          projectId: activeProject.id,
         }),
         credentials: "include",
       });
@@ -134,18 +143,65 @@ export default function ResidentDashboard() {
     );
   }
 
-  if (!project) {
+  if (!activeProject && completedProjects.length === 0) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center p-4">
-        <Card className="w-full max-w-md text-center">
+        <Card className="w-full max-w-md text-center shadow-lg">
           <CardContent className="pt-12 pb-8">
-            <span className="material-icons text-6xl text-muted-foreground mb-4">apartment</span>
-            <h2 className="text-xl font-bold mb-2">No Building Found</h2>
-            <p className="text-muted-foreground">
-              No active project found for your strata plan number.
+            <span className="material-icons text-7xl text-muted-foreground mb-4">apartment</span>
+            <h2 className="text-2xl font-bold mb-2">No Work Scheduled</h2>
+            <p className="text-muted-foreground mb-4">
+              No maintenance work has been added to your building yet.
+            </p>
+            <p className="text-sm text-muted-foreground">
+              Contact your building management for more information.
             </p>
           </CardContent>
         </Card>
+      </div>
+    );
+  }
+
+  if (!activeProject && completedProjects.length > 0) {
+    return (
+      <div className="min-h-screen bg-background pb-20">
+        <header className="sticky top-0 z-[100] bg-card border-b border-card-border shadow-sm">
+          <div className="px-4 h-16 flex items-center justify-between">
+            <h1 className="text-lg font-bold">Building History</h1>
+            <Button variant="ghost" size="icon" className="min-w-11 min-h-11" data-testid="button-logout" onClick={handleLogout}>
+              <span className="material-icons">logout</span>
+            </Button>
+          </div>
+        </header>
+        
+        <div className="p-4 max-w-2xl mx-auto">
+          <Card className="mb-4 text-center shadow-lg">
+            <CardContent className="pt-8 pb-6">
+              <span className="material-icons text-6xl text-status-closed mb-3">check_circle</span>
+              <h2 className="text-xl font-bold mb-2">No Active Projects</h2>
+              <p className="text-muted-foreground">
+                All work on your building has been completed.
+              </p>
+            </CardContent>
+          </Card>
+
+          <h3 className="text-sm font-medium text-muted-foreground mb-3">Completed Projects</h3>
+          <div className="space-y-3">
+            {completedProjects.map((proj: any) => (
+              <Card key={proj.id} className="hover-elevate">
+                <CardHeader>
+                  <div className="flex items-start justify-between">
+                    <div>
+                      <CardTitle className="text-base">{proj.strataPlanNumber}</CardTitle>
+                      <CardDescription className="capitalize">{proj.jobType?.replace(/_/g, ' ')}</CardDescription>
+                    </div>
+                    <Badge variant="secondary" className="bg-status-closed/10 text-status-closed">Completed</Badge>
+                  </div>
+                </CardHeader>
+              </Card>
+            ))}
+          </div>
+        </div>
       </div>
     );
   }
@@ -155,7 +211,14 @@ export default function ResidentDashboard() {
       {/* Header */}
       <header className="sticky top-0 z-[100] bg-card border-b border-card-border shadow-sm">
         <div className="px-4 h-16 flex items-center justify-between">
-          <h1 className="text-lg font-bold">Building Progress</h1>
+          <div>
+            <h1 className="text-lg font-bold">Building Progress</h1>
+            {companyData?.company?.companyName && (
+              <p className="text-xs text-muted-foreground">
+                {projectData.jobType} by {companyData.company.companyName}
+              </p>
+            )}
+          </div>
           <Button variant="ghost" size="icon" className="min-w-11 min-h-11" data-testid="button-logout" onClick={handleLogout}>
             <span className="material-icons">logout</span>
           </Button>

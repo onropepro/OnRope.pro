@@ -74,6 +74,12 @@ export class Storage {
     return result[0];
   }
 
+  async getAllProjectsByStrataPlan(strataPlanNumber: string): Promise<Project[]> {
+    return db.select().from(projects)
+      .where(eq(projects.strataPlanNumber, strataPlanNumber))
+      .orderBy(desc(projects.createdAt));
+  }
+
   async getAllProjects(): Promise<Project[]> {
     return db.select().from(projects).orderBy(desc(projects.createdAt));
   }

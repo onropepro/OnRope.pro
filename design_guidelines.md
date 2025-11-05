@@ -1,253 +1,162 @@
 # Design Guidelines: Rope Access Management Platform
 
-## Design Approach
+## System & Principles
 
-**Selected System:** Material Design 3  
-**Rationale:** Mobile-first industrial operations platform requiring proven productivity patterns. Material Design 3 excels at data-dense interfaces, role-based dashboards, and form-heavy workflows critical for field technicians managing high-rise maintenance operations.
+**Design System:** Material Design 3 with Premium Enhancements  
+**Core Principles:** Mobile-first (44px touch targets), enterprise polish (layered elevations), clear visual hierarchy, data clarity (high-contrast), professional safety-conscious aesthetic.
 
-## Core Design Principles
+## Typography (Roboto via Google Fonts)
 
-1. **Mobile-First Excellence** - One-handed operation prioritized
-2. **Role Clarity** - Immediate visual distinction between dashboards
-3. **Safety & Trust** - Industrial-grade professionalism in every interaction
-4. **Data Visibility** - Critical metrics (drop targets, completion status) always accessible
-5. **Touch-Optimized** - 44px minimum targets, generous spacing
-6. **Quick-Scan Design** - High contrast, clear labels, logical grouping
+```css
+Display (Hero): 3rem/700/1.1/-0.02em
+H1 (Dashboard): 2rem/700/1.2
+H2 (Sections): 1.5rem/600/1.3
+H3 (Cards): 1.25rem/600/1.4
+Body Large: 1rem/400/1.6
+Body: 0.875rem/400/1.5
+Caption: 0.75rem/400/1.4/+0.4px
+Button: 0.875rem/500/uppercase/+0.5px
+```
 
-## Typography
+**Rules:** Dashboard headers use Display, card titles max H3, body text 1.5-1.6 line-height, captions for metadata only.
 
-**Font Family:** Roboto (Google Fonts CDN)
+## Layout & Spacing
 
-**Type Scale:**
-- Display (Dashboard Headers): 2.5rem (40px), weight 700, tight line-height 1.1
-- H1 (Page Titles): 2rem (32px), weight 700
-- H2 (Section Headers): 1.5rem (24px), weight 600
-- H3 (Card Titles): 1.25rem (20px), weight 600
-- Body Large (Primary Content): 1rem (16px), weight 400
-- Body (Standard): 0.875rem (14px), weight 400
-- Caption (Metadata): 0.75rem (12px), weight 400
-- Button: 0.875rem (14px), weight 500, uppercase, letter-spacing 0.5px
+**Tailwind Units:** 2(8px), 4(16px), 6(24px), 8(32px)  
+- Micro (gap-2, p-2): Icon-label pairs  
+- Standard (gap-4, p-4, mb-4): Card internals, form fields  
+- Section (p-6, mb-6): Card padding, breaks  
+- Major (p-8, mb-8): Dashboard sections  
 
-**Line Heights:** 1.5 body text, 1.2 headings, 1.1 display
+**Containers:**  
+- Mobile: Full width, px-4, single column, gap-4  
+- Desktop (md:): max-w-7xl centered, 2-col grids (gap-6), 240px fixed sidebar  
 
-## Layout System
+**Polish:** 4px radius (rounded-lg) cards, 8px (rounded-xl) modals, layered shadows (base elevation-1, modals elevation-3), min 24px between major sections.
 
-**Spacing Primitives:** Tailwind units 2, 4, 6, 8
+## Navigation
 
-- **Component Internal:** p-2, gap-2
-- **Standard Spacing:** p-4, gap-4, mb-4
-- **Section Spacing:** p-6, mb-6, mt-6
-- **Major Breaks:** p-8, mb-8, mt-8
+**Top App Bar** (h-16, shadow-lg):  
+- Desktop: Logo 48px | Breadcrumbs | Avatar menu  
+- Mobile: Logo 40px | Role badge | Hamburger (44px)  
+- Backdrop-blur-sm on scroll
 
-**Mobile Container:**
-- Full width, px-4 horizontal padding
-- Safe area insets for notched devices
-- Single column stacking with gap-4
+**Bottom Nav** (Mobile, h-16, fixed):  
+4 tabs (Dashboard/Projects/Complaints/Profile), 56px tap width, icon 24px + caption stacked, 3px active indicator, 150ms transitions.
 
-**Desktop Expansion (md: breakpoint):**
-- max-w-7xl centered containers
-- Two-column grids for dashboard cards
-- Three-column layouts for employee/project lists
+**Desktop Sidebar** (w-60, fixed):  
+Logo header (h-20, p-6), grouped nav (caption headers), items h-12/px-4/rounded-lg, 4px left accent on active, hover backgrounds.
 
-## Component Library
+## Core Components
 
-### Navigation
+### Hero Stats Panel
+Full-width card (p-8, mb-8, rounded-xl), Display metric + 2×2 grid (mobile) / 1×4 (desktop) secondary metrics (H1 numbers + caption labels + 24px icons), h-2 rounded progress bar, role-specific messaging.
 
-**Top App Bar (Persistent):**
-- Fixed top, h-16, shadow-md elevation
-- Left: Company logo (40px height)
-- Center: User role badge + daily drop count for Rope Techs (H3 size)
-- Right: Menu icon (32px touch target expanded to 44px)
+### Project Cards
+```
+- Elevated, rounded-xl, p-6, mb-4
+- 80×80px thumbnail (rounded-lg, float left desktop)
+- H3 title (weight 700) + status badge
+- Metadata: plan • type • floors (body, dot separators)
+- H2 percentage + h-3 progress bar
+- Footer CTA: h-12 (w-full mobile, w-auto px-8 desktop)
+- 200ms expand transition, hover shadow-xl
+```
 
-**Bottom Navigation (Role-Based):**
-- Fixed bottom, h-16, elevated
-- 4 primary tabs: Dashboard, Projects, Complaints, Profile
-- Icon (24px) + label (caption) stacked vertically
-- Active state: filled icon, indicator bar above
-- 56px minimum touch width per tab
+### High-Rise Visualization (SVG)
+- Height: floor_count × 45px, cap 300px mobile/600px desktop  
+- Width: 240px mobile/320px desktop  
+- 5 windows/floor (12×12px, gap-2), state-coded completion  
+- Floor numbers (-ml-8, caption), 20px rooftop detail  
+- Multi-layer shadows, responsive scaling
 
-### Dashboard Components
+### Complaint Cards
+List style (p-4, mb-3, rounded-lg): H3 name + urgency badge, unit/date row (16px icons, caption), 2-line description preview, status indicator. Mobile: swipe-left 44px actions. Desktop: hover inline actions.
 
-**Hero Statistics Panel:**
-- Full-width card, p-6, mb-6, elevated
-- Display-size primary metric (today's drops completed)
-- Secondary metrics in grid: target drops, completion %, week total
-- Progress visualization bar, h-4, rounded-full
-- Role-specific messaging (motivational for techs, analytical for managers)
+## Forms
 
-**Project Cards:**
-- Elevated, rounded-xl, p-5, mb-4
-- Header row: Building name (H3) + status badge (filled or outlined)
-- Metadata grid: Strata plan, job type, floor count
-- Visual progress: Percentage (H2) + horizontal bar
-- Completion estimate with calendar icon
-- Footer CTA: "View Details" button (h-12, full width)
-- Tap card for expansion with smooth transition
+**Text Inputs** (h-12, rounded-lg, px-4 py-3):  
+Floating labels (150ms), focus shadow + label animation, error messages (caption + icon), asterisk for required, mb-4 spacing.
 
-**High-Rise Building Visualization (Resident Dashboard):**
-- Custom SVG, centered with my-8 margin
-- Dynamic height: floor count × 45px (min 300px, max 600px mobile)
-- Building width: 240px mobile, 320px desktop
-- Windows: 12px squares, 5 per floor, gap-2 spacing
-- Window states: completed (visual treatment), pending (muted)
-- Floor numbers: left-aligned, caption size, -ml-8 offset
-- Building elevation shadow for depth
-- Rooftop detail: 20px cap with equipment silhouettes
+**Multi-Step Forms:**  
+Progress stepper (32px circles, icons/numbers, connecting lines), step labels, p-6 sections, sticky bottom nav (Back text + Continue primary h-12).
 
-**Complaint Summary Cards:**
-- p-4, mb-3, rounded-lg, subtle elevation
-- Header: Resident name (H3) + urgency badge
-- Unit number + date (caption row with icons)
-- Preview: 2-line truncated text, body size
-- Status indicator: Open (outlined), In Progress (filled), Closed (success state)
-- Swipe-left reveals quick actions (archive, escalate)
+**File Upload** (border-2 dashed, h-40, rounded-xl):  
+48px icon + body instruction + caption formats, drag-active solid border, thumbnails 40×40px + remove button 32px.
 
-### Forms & Input
+**Date Pickers:**  
+Bottom sheet (mobile) / dropdown (desktop), quick chips (Today/Yesterday/7 Days), calendar 7-col grid 40px cells.
 
-**Standard Input Fields:**
-- Full width, h-12, rounded-lg
-- p-4 internal, mb-4 vertical spacing
-- Floating labels with 200ms transition
-- Required asterisk, error messages (caption, below field)
-- Focus state with elevated shadow
+## Data Display
 
-**Multi-Step Project Creation:**
-- Progress stepper at top (4 steps: Details, Schedule, Team, Review)
-- Current step highlighted, completed steps with checkmarks
-- Step titles (body) below icons
-- Each step: full-screen form section with p-6
-- Navigation: "Back" (text button) + "Next" (primary, h-12, full width)
+**Employee Directory:**  
+h-20 items, 40px avatar + body large name (weight 500) + role badge, caption email row (16px icon), 44px overflow menu, sticky h-12 rounded-full search (mb-4).
 
-**PDF Upload Zone:**
-- Dashed border, h-40, rounded-lg
-- Centered upload icon (48px) + instruction text (body large)
-- Drag-and-drop active state with visual feedback
-- Upload preview: filename + size + remove icon (24px)
+**Manager Stats:**  
+2×2 mobile / 4×1 desktop grid, elevated p-6 cards: Display number, caption uppercase label, 16px trend icon + percentage, integrated charts, chip time tabs.
 
-**Date Pickers:**
-- Bottom sheet modal on tap
-- Quick actions: Today, Yesterday, Last 7 Days (chip buttons)
-- Calendar grid: 7-column, 40px cells
-- Selected date: filled state, clear visual distinction
+**Complaint Detail:**  
+Full-screen, hero card with contact CTA (h-12), vertical timeline (caption timestamps + body events + 24px icons), accordion sections, 56px FAB (bottom-right, shadow-xl), sticky action bar (h-12 buttons).
 
-**Number Inputs (Drop Counts):**
-- Center-aligned, H2 size display
-- Left/right stepper buttons (44px square, icon-only)
-- Manual edit on tap with numeric keyboard
-- Validation: max daily target warning
+## Interactive Elements
 
-### Data Display
+**Search:** h-12 rounded-full px-4, 20px prefix icon, X clear button, 200ms debounce filtering.
 
-**Employee Directory:**
-- List items, h-20, px-4, not cards
-- Avatar placeholder (40px circle) + name (body large) + role (caption)
-- Email with mail icon (caption row)
-- Right-aligned overflow menu (vertical dots, 44px touch)
-- Dividers between items
-- Search bar sticky at top: h-12, rounded-full, icon prefix
+**Filters:** Bottom sheet/sidebar, H3 categories, multi-select chips with checkmarks, date pickers, Apply (primary) + Reset (text) buttons.
 
-**Complaint Detail View:**
-- Full-screen with back navigation
-- Hero info card: resident details, contact button, unit #
-- Timeline visualization: complaint submission → updates → resolution
-- Each timeline entry: timestamp (caption) + description (body)
-- Accordion sections: Notes (expandable), Attachments, History
-- Add note: floating action button (56px circle, bottom-right, elevated)
-- Action bar sticky bottom: "Mark Resolved" + "Escalate" (h-12 each)
+**Status Badges:** px-3 py-1.5 rounded-full caption, 16px icon prefix, filled (active) / outlined (inactive). States: Open, In Progress, Completed, Overdue, Urgent.
 
-**Statistics Dashboard (Manager Role):**
-- KPI grid: 2×2 on mobile, 4×1 on desktop
-- Each metric card: large number (display) + label (caption) + trend indicator
-- Chart integration: bar charts for weekly drops, line for completion trends
-- Time range selector: tabs for Week, Month, Quarter, Year
+**Buttons:**
+```
+Primary: h-12 px-8 rounded-lg shadow-md weight-500
+Secondary: h-12 px-8 rounded-lg outlined no-shadow
+Text: h-12 px-4 no-background
+Icon: 44×44px minimum, 24px centered icon
+FAB: 56px circle shadow-xl 24px icon
+```
 
-### Interactive Elements
+## Feedback States
 
-**Search Functionality:**
-- Persistent search bar on list views
-- h-12, rounded-full, px-4, icon prefix (20px)
-- Real-time filtering as user types
-- Clear button (X icon) when text present
-- Placeholder examples: "Search strata plans", "Find employee"
+**Empty:** Centered p-12, 96px icon, H2 title + body description (max-w-md) + primary CTA.
 
-**Filters Panel:**
-- Bottom sheet modal, triggered by filter icon
-- Section headers (H3) for filter categories
-- Chip groups for multi-select options
-- Date range picker for temporal filters
-- Apply/Reset buttons at bottom (h-12 each)
+**Loading:** Skeleton shimmer (2s loop) or 48px spinner + caption.
 
-**Status Badges:**
-- Inline, px-3, py-1, rounded-full, caption text
-- Icon prefix (16px) for quick recognition
-- Variants: Open, In Progress, Completed, Overdue, Urgent
-- Filled for active states, outlined for inactive
+**Toasts:** Bottom (16px above nav mobile / 24px desktop), rounded-lg px-4 py-3 shadow-xl, 24px icon + body message + optional action, 4s auto-dismiss.
 
-### Feedback & States
+**Success:** Full-screen modal, 96px animated checkmark, H2 title + body large detail, primary action h-12 px-8.
 
-**Empty States:**
-- Centered layout, p-12
-- Illustration or large icon (96px)
-- Title (H2) + description (body) + CTA button
-- Examples: "No complaints yet", "Start your first project"
+## Media Assets
 
-**Loading States:**
-- Skeleton screens for cards (shimmer animation)
-- Full-page spinner: centered, 48px, with "Loading..." caption
-- Progress bars for file uploads with percentage
+**Hero Images** (Desktop dashboards only):  
+1920×600px WebP, rope access techs on high-rises, gradient overlay (60% dark-to-transparent top), backdrop-blur-md CTAs.
 
-**Toast Notifications:**
-- Bottom of screen, 16px above nav bar
-- Rounded-lg, px-4, py-3, shadow-lg
-- Icon (24px) + message (body) + action (text button)
-- 4-second auto-dismiss, swipe to dismiss
+**Thumbnails:**  
+Projects: 80×80px rounded-lg object-cover, fallback 32px building silhouette.  
+Avatars: 40px lists / 96px profile, initials fallback.
 
-**Success Confirmations:**
-- Full-screen modal with checkmark icon (96px)
-- Success message (H2) + detail text (body)
-- Primary action button: "Done" or "View Project" (h-12)
+**Icons (Material Icons):**  
+16px inline, 20px sidebar, 24px buttons/cards, 32px headers, 48px uploads, 96px empty states.  
+Core set: apartment, domain, upload, calendar_today, add_circle, edit, delete, check_circle, error, pending, menu, arrow_back, more_vert, person, admin_panel_settings, support_agent, priority_high, analytics.
 
-## Icons
+## Animations (Minimal)
 
-**Library:** Material Icons (Google Fonts)  
-**Sizes:** 16px (inline), 24px (standard), 32px (headers), 48px (features), 96px (empty states)
+```
+Page transitions: 200ms ease-out
+Card expand: 200ms ease-in-out
+Skeleton shimmer: 2s loop
+Success checkmark: 500ms scale-bounce
+Progress fill: 300ms
+Modal fade: 150ms
+```
+**Avoid:** Scroll-triggered, parallax, hover micro-interactions, decorative motion.
 
-**Icon Set:**
-- Buildings: apartment, domain
-- Actions: upload_file, calendar_today, add_circle, edit
-- Status: check_circle, error, pending, schedule
-- Navigation: menu, arrow_back, more_vert
-- Roles: person, admin_panel_settings, engineering
-- Complaints: comment, support_agent, priority_high
+## Accessibility
 
-## Images
-
-**Hero Images (Desktop Dashboard Views):**
-- Location: Top of Operations Manager and Supervisor dashboards
-- Specs: 1920×600px, optimized WebP format
-- Content: Professional rope access technicians on high-rise buildings, safety equipment visible, urban skyline backdrop
-- Treatment: Subtle gradient overlay (top to bottom) for text legibility
-- Buttons on image: Blurred backdrop (backdrop-blur-md), semi-transparent background
-
-**Building Thumbnails (Project Cards):**
-- Location: Left side of project cards, 80×80px rounded-lg
-- Content: Actual building photos when available, placeholder building icon otherwise
-- Fallback: Branded placeholder with building silhouette
-
-**Profile Avatars:**
-- 40px circles in lists, 96px in profile view
-- Initials fallback when photo unavailable
-- Consistent across all role views
-
-## Accessibility & Mobile Optimization
-
-- 44×44px minimum touch targets (invisible padding extensions when needed)
-- WCAG AA contrast ratios enforced
-- Focus indicators: 2px offset ring
-- Semantic HTML structure throughout
-- Aria labels for icon-only buttons
-- Form labels always visible, never placeholder-only
-- Pull-to-refresh on data lists
-- Swipe gestures for secondary actions (delete, archive)
-- Safe area handling for notched devices
-- Haptic feedback on critical actions (iOS)
+- WCAG AA contrast  
+- 2px focus rings with offset  
+- Semantic HTML + aria-labels on icon buttons  
+- 44×44px touch targets (invisible padding)  
+- Pull-to-refresh on lists  
+- Haptic feedback (iOS critical actions)  
+- Safe area insets (notched devices)  
+- Reduced motion support
