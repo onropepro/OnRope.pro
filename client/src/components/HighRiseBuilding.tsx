@@ -89,7 +89,7 @@ export function HighRiseBuilding({ floors, completedDrops, totalDrops, className
       {/* Progress Info */}
       <div className="mt-6 text-center">
         <div className="text-xs text-muted-foreground">
-          {floorsCompleted} of {floors} floors completed
+          {completedDrops} of {totalDrops} drops completed
         </div>
       </div>
     </div>

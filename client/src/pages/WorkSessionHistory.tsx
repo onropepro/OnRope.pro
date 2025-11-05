@@ -50,10 +50,6 @@ export default function WorkSessionHistory() {
   const progressPercent = project.totalDrops > 0 
     ? Math.round((completedDrops / project.totalDrops) * 100) 
     : 0;
-  
-  const floorsCompleted = project.floorCount > 0
-    ? Math.floor((completedDrops / project.totalDrops) * project.floorCount)
-    : 0;
 
   // Calculate target met statistics
   const completedSessions = workSessions.filter((s: any) => s.endTime !== null);
@@ -93,9 +89,7 @@ export default function WorkSessionHistory() {
             {/* Building Visualization */}
             <div className="flex justify-center">
               <HighRiseBuilding
-                floorCount={project.floorCount}
-                floorsCompleted={floorsCompleted}
-                progressPercent={progressPercent}
+                floors={project.floorCount}
                 completedDrops={completedDrops}
                 totalDrops={project.totalDrops}
               />
