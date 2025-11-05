@@ -477,8 +477,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   // ==================== DROP LOG ROUTES ====================
   
-  // Create or update drop log
-  app.post("/api/drops", requireAuth, requireRole("rope_access_tech"), async (req: Request, res: Response) => {
+  // Create or update drop log - allow all employee roles to log drops
+  app.post("/api/drops", requireAuth, requireRole("rope_access_tech", "operations_manager", "supervisor", "company"), async (req: Request, res: Response) => {
     try {
       const currentUser = await storage.getUserById(req.session.userId!);
       
