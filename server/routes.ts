@@ -62,6 +62,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
       req.session.userId = user.id;
       req.session.role = user.role;
       
+      // Save session before responding (critical for production)
+      await new Promise<void>((resolve, reject) => {
+        req.session.save((err) => {
+          if (err) reject(err);
+          else resolve();
+        });
+      });
+      
       // Return user without password
       const { passwordHash, ...userWithoutPassword } = user;
       res.json({ user: userWithoutPassword });
@@ -104,6 +112,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Create session
       req.session.userId = user.id;
       req.session.role = user.role;
+      
+      // Save session before responding (critical for production)
+      await new Promise<void>((resolve, reject) => {
+        req.session.save((err) => {
+          if (err) reject(err);
+          else resolve();
+        });
+      });
       
       // Return user without password
       const { passwordHash, ...userWithoutPassword } = user;
