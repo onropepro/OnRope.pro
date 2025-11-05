@@ -21,6 +21,7 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { useLocation } from "wouter";
 import { Textarea } from "@/components/ui/textarea";
 import type { Project } from "@shared/schema";
+import { normalizeStrataPlan } from "@shared/schema";
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from "recharts";
 
 const projectSchema = z.object({
@@ -292,6 +293,12 @@ export default function ManagementDashboard() {
   });
 
   const onProjectSubmit = async (data: ProjectFormData) => {
+    // Normalize strata plan number (remove spaces, uppercase)
+    const normalizedData = {
+      ...data,
+      strataPlanNumber: normalizeStrataPlan(data.strataPlanNumber),
+    };
+    
     let ropeAccessPlanUrl = null;
     
     // Upload PDF if one was selected
@@ -326,7 +333,7 @@ export default function ManagementDashboard() {
     }
     
     createProjectMutation.mutate({
-      ...data,
+      ...normalizedData,
       ropeAccessPlanUrl,
     });
     setUploadedPlanFile(null);

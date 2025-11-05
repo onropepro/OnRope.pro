@@ -14,6 +14,14 @@ import {
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
+// Utility function to normalize strata plan numbers
+export function normalizeStrataPlan(strataPlan: string): string {
+  return strataPlan
+    .toUpperCase()
+    .trim()
+    .replace(/\s+/g, ''); // Remove all whitespace
+}
+
 // Session storage table for authentication
 export const sessions = pgTable(
   "sessions",

@@ -1,7 +1,7 @@
 import type { Express, Request, Response, NextFunction } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { insertUserSchema, insertProjectSchema, insertDropLogSchema, insertComplaintSchema, insertComplaintNoteSchema } from "@shared/schema";
+import { insertUserSchema, insertProjectSchema, insertDropLogSchema, insertComplaintSchema, insertComplaintNoteSchema, normalizeStrataPlan } from "@shared/schema";
 import { z } from "zod";
 import multer from "multer";
 import { ObjectStorageService } from "./objectStorage";
@@ -364,6 +364,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       const projectData = insertProjectSchema.parse({
         ...req.body,
+        strataPlanNumber: normalizeStrataPlan(req.body.strataPlanNumber),
         companyId,
         targetCompletionDate: req.body.targetCompletionDate || null,
       });
