@@ -8,7 +8,7 @@ interface HighRiseBuildingProps {
 }
 
 export function HighRiseBuilding({ floors, completedDrops, totalDrops, className = "" }: HighRiseBuildingProps) {
-  const progressPercentage = totalDrops > 0 ? (completedDrops / totalDrops) * 100 : 0;
+  const progressPercentage = totalDrops > 0 ? Math.min(100, (completedDrops / totalDrops) * 100) : 0;
   
   // Building acts as a vertical progress bar - continuous fill from bottom to top
   const buildingFloors = useMemo(() => {
@@ -37,16 +37,12 @@ export function HighRiseBuilding({ floors, completedDrops, totalDrops, className
           {/* Roof */}
           <div className="h-3 bg-muted border-b border-card-border"></div>
           
-          {/* Floors Container - Progress Bar Style */}
-          <div className="flex flex-col">
-            {buildingFloors.map(({ floorNumber, isLit }) => (
+          {/* Floors Container - Horizontal Progress Bar Style */}
+          <div className="relative flex flex-col">
+            {buildingFloors.map(({ floorNumber }) => (
               <div
                 key={floorNumber}
-                className={`relative border-b border-card-border last:border-b-0 transition-all duration-500 ${
-                  isLit 
-                    ? 'bg-warning/90 border-warning' 
-                    : 'bg-muted/10 border-muted'
-                }`}
+                className="relative border-b border-card-border last:border-b-0 bg-muted/10"
                 style={{ height: '16px' }}
                 data-testid={`floor-${floorNumber}`}
               >
@@ -54,6 +50,13 @@ export function HighRiseBuilding({ floors, completedDrops, totalDrops, className
                 <div className="absolute -left-10 top-1/2 -translate-y-1/2 text-xs text-muted-foreground font-mono w-8 text-right">
                   {floorNumber}
                 </div>
+                
+                {/* Horizontal Progress Fill (Left to Right) */}
+                <div 
+                  className="absolute left-0 top-0 bottom-0 bg-warning/90 transition-all duration-500"
+                  style={{ width: `${progressPercentage}%` }}
+                  data-testid={`progress-fill-floor-${floorNumber}`}
+                />
               </div>
             ))}
           </div>

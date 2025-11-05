@@ -40,6 +40,14 @@ const employeeSchema = z.object({
   password: z.string().min(6, "Password must be at least 6 characters"),
   role: z.enum(["operations_manager", "supervisor", "rope_access_tech"]),
   techLevel: z.string().optional(),
+}).refine((data) => {
+  if (data.role === "rope_access_tech" && !data.techLevel) {
+    return false;
+  }
+  return true;
+}, {
+  message: "IRATA level is required for rope access technicians",
+  path: ["techLevel"],
 });
 
 const dropLogSchema = z.object({
@@ -1284,11 +1292,11 @@ export default function ManagementDashboard() {
                           name="techLevel"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>Tech Level</FormLabel>
-                              <Select onValueChange={field.onChange} defaultValue={field.value}>
+                              <FormLabel>IRATA Level</FormLabel>
+                              <Select onValueChange={field.onChange} value={field.value}>
                                 <FormControl>
                                   <SelectTrigger className="h-12" data-testid="select-tech-level">
-                                    <SelectValue placeholder="Select level" />
+                                    <SelectValue placeholder="Select IRATA level" />
                                   </SelectTrigger>
                                 </FormControl>
                                 <SelectContent>
