@@ -76,10 +76,22 @@ export default function ManagementDashboard() {
     queryKey: ["/api/my-drops-today"],
   });
 
+  // Fetch current user to get company info
+  const { data: userData } = useQuery({
+    queryKey: ["/api/user"],
+  });
+
+  // Fetch company information
+  const { data: companyData } = useQuery({
+    queryKey: ["/api/companies", userData?.user?.companyId],
+    enabled: !!userData?.user?.companyId,
+  });
+
   const projects = projectsData?.projects || [];
   const employees = employeesData?.employees || [];
   const todayDrops = myDropsData?.totalDropsToday || 0;
   const dailyTarget = projects[0]?.dailyDropTarget || 20;
+  const companyName = companyData?.company?.companyName || "";
 
   const projectForm = useForm<ProjectFormData>({
     resolver: zodResolver(projectSchema),
@@ -278,7 +290,12 @@ export default function ManagementDashboard() {
       {/* Header */}
       <header className="sticky top-0 z-[100] bg-card border-b border-card-border shadow-sm">
         <div className="px-4 h-16 flex items-center justify-between">
-          <h1 className="text-lg font-bold">Management</h1>
+          <div>
+            <h1 className="text-lg font-bold">Management</h1>
+            {companyName && (
+              <p className="text-xs text-muted-foreground">{companyName}</p>
+            )}
+          </div>
           <Button variant="ghost" size="icon" className="min-w-11 min-h-11" data-testid="button-logout" onClick={handleLogout}>
             <span className="material-icons">logout</span>
           </Button>

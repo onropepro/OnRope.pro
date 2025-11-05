@@ -48,8 +48,20 @@ export default function TechDashboard() {
     queryKey: ["/api/my-drops-today"],
   });
 
+  // Fetch current user to get company info
+  const { data: userData } = useQuery({
+    queryKey: ["/api/user"],
+  });
+
+  // Fetch company information
+  const { data: companyData } = useQuery({
+    queryKey: ["/api/companies", userData?.user?.companyId],
+    enabled: !!userData?.user?.companyId,
+  });
+
   const projects = projectsData?.projects || [];
   const complaints = complaintsData?.complaints || [];
+  const companyName = companyData?.company?.companyName || "";
   
   // Calculate daily progress
   useEffect(() => {
@@ -140,10 +152,13 @@ export default function TechDashboard() {
     <div className="min-h-screen bg-background pb-20">
       {/* Header with Daily Target */}
       <header className="sticky top-0 z-[100] bg-primary text-primary-foreground shadow-md">
-        <div className="px-4 h-16 flex items-center justify-between">
+        <div className="px-4 py-2 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <span className="material-icons text-2xl">construction</span>
             <div>
+              {companyName && (
+                <div className="text-xs opacity-75 mb-0.5">{companyName}</div>
+              )}
               <div className="text-xs opacity-90">Remaining Today</div>
               <div className="text-lg font-bold">{remainingDrops} / {dailyTarget} Drops</div>
               <Progress value={(todayDrops / dailyTarget) * 100} className="h-1 mt-1 w-32" />
