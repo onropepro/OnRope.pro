@@ -808,48 +808,123 @@ export default function ManagementDashboard() {
           <TabsContent value="performance">
             <div className="space-y-4">
               {completedSessions.length > 0 ? (
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Overall Target Performance</CardTitle>
-                    <CardDescription>Across all projects and work sessions</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="flex flex-col items-center">
-                      <ResponsiveContainer width="100%" height={250}>
-                        <PieChart>
-                          <Pie
-                            data={performancePieData}
-                            cx="50%"
-                            cy="50%"
-                            labelLine={false}
-                            label={({ name, value, percent }) => 
-                              value > 0 ? `${name}: ${value} (${(percent * 100).toFixed(0)}%)` : null
-                            }
-                            outerRadius={70}
-                            fill="#8884d8"
-                            dataKey="value"
-                          >
-                            {performancePieData.map((entry, index) => (
-                              <Cell key={`cell-${index}`} fill={entry.color} />
-                            ))}
-                          </Pie>
-                          <Tooltip />
-                          <Legend />
-                        </PieChart>
-                      </ResponsiveContainer>
-                      <div className="grid grid-cols-2 gap-4 mt-2 w-full max-w-xs">
-                        <div className="text-center">
-                          <div className="text-2xl font-bold text-primary" data-testid="performance-target-met">{targetMetCount}</div>
-                          <div className="text-xs text-muted-foreground">Target Met</div>
-                        </div>
-                        <div className="text-center">
-                          <div className="text-2xl font-bold text-destructive" data-testid="performance-below-target">{belowTargetCount}</div>
-                          <div className="text-xs text-muted-foreground">Below Target</div>
+                <>
+                  {/* Overall Performance */}
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>Overall Target Performance</CardTitle>
+                      <CardDescription>Across all projects and work sessions</CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="flex flex-col items-center">
+                        <ResponsiveContainer width="100%" height={250}>
+                          <PieChart>
+                            <Pie
+                              data={performancePieData}
+                              cx="50%"
+                              cy="50%"
+                              labelLine={false}
+                              label={({ name, value, percent }) => 
+                                value > 0 ? `${name}: ${value} (${(percent * 100).toFixed(0)}%)` : null
+                              }
+                              outerRadius={70}
+                              fill="#8884d8"
+                              dataKey="value"
+                            >
+                              {performancePieData.map((entry, index) => (
+                                <Cell key={`cell-${index}`} fill={entry.color} />
+                              ))}
+                            </Pie>
+                            <Tooltip />
+                            <Legend />
+                          </PieChart>
+                        </ResponsiveContainer>
+                        <div className="grid grid-cols-2 gap-4 mt-2 w-full max-w-xs">
+                          <div className="text-center">
+                            <div className="text-2xl font-bold text-primary" data-testid="performance-target-met">{targetMetCount}</div>
+                            <div className="text-xs text-muted-foreground">Target Met</div>
+                          </div>
+                          <div className="text-center">
+                            <div className="text-2xl font-bold text-destructive" data-testid="performance-below-target">{belowTargetCount}</div>
+                            <div className="text-xs text-muted-foreground">Below Target</div>
+                          </div>
                         </div>
                       </div>
+                    </CardContent>
+                  </Card>
+
+                  {/* Per-Employee Performance */}
+                  <div>
+                    <h3 className="text-sm font-medium text-muted-foreground mb-3">Performance by Employee</h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {(() => {
+                        // Group sessions by employee
+                        const sessionsByEmployee = completedSessions.reduce((acc: any, session: any) => {
+                          const employeeName = session.techName || 'Unknown';
+                          if (!acc[employeeName]) {
+                            acc[employeeName] = [];
+                          }
+                          acc[employeeName].push(session);
+                          return acc;
+                        }, {});
+
+                        return Object.entries(sessionsByEmployee).map(([employeeName, sessions]: [string, any]) => {
+                          const employeeTargetMet = sessions.filter((s: any) => s.dropsCompleted >= s.dailyDropTarget).length;
+                          const employeeBelowTarget = sessions.filter((s: any) => s.dropsCompleted < s.dailyDropTarget).length;
+                          
+                          const employeePieData = [
+                            { name: "Target Met", value: employeeTargetMet, color: "hsl(var(--primary))" },
+                            { name: "Below Target", value: employeeBelowTarget, color: "hsl(var(--destructive))" },
+                          ];
+
+                          return (
+                            <Card key={employeeName}>
+                              <CardHeader>
+                                <CardTitle className="text-base">{employeeName}</CardTitle>
+                                <CardDescription className="text-xs">{sessions.length} work session{sessions.length !== 1 ? 's' : ''}</CardDescription>
+                              </CardHeader>
+                              <CardContent>
+                                <div className="flex flex-col items-center">
+                                  <ResponsiveContainer width="100%" height={180}>
+                                    <PieChart>
+                                      <Pie
+                                        data={employeePieData}
+                                        cx="50%"
+                                        cy="50%"
+                                        labelLine={false}
+                                        label={({ name, value, percent }) => 
+                                          value > 0 ? `${value} (${(percent * 100).toFixed(0)}%)` : null
+                                        }
+                                        outerRadius={50}
+                                        fill="#8884d8"
+                                        dataKey="value"
+                                      >
+                                        {employeePieData.map((entry, index) => (
+                                          <Cell key={`cell-${index}`} fill={entry.color} />
+                                        ))}
+                                      </Pie>
+                                      <Tooltip />
+                                    </PieChart>
+                                  </ResponsiveContainer>
+                                  <div className="grid grid-cols-2 gap-2 mt-2 w-full text-center">
+                                    <div>
+                                      <div className="text-lg font-bold text-primary">{employeeTargetMet}</div>
+                                      <div className="text-xs text-muted-foreground">Met</div>
+                                    </div>
+                                    <div>
+                                      <div className="text-lg font-bold text-destructive">{employeeBelowTarget}</div>
+                                      <div className="text-xs text-muted-foreground">Below</div>
+                                    </div>
+                                  </div>
+                                </div>
+                              </CardContent>
+                            </Card>
+                          );
+                        });
+                      })()}
                     </div>
-                  </CardContent>
-                </Card>
+                  </div>
+                </>
               ) : (
                 <Card>
                   <CardContent className="p-8 text-center text-muted-foreground">

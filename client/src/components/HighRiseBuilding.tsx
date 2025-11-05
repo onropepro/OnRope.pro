@@ -10,28 +10,13 @@ interface HighRiseBuildingProps {
 export function HighRiseBuilding({ floors, completedDrops, totalDrops, className = "" }: HighRiseBuildingProps) {
   const progressPercentage = totalDrops > 0 ? (completedDrops / totalDrops) * 100 : 0;
   
-  // Calculate how many windows should be lit (drops go left-to-right, top-to-bottom)
-  const totalWindows = floors * 4; // 4 windows per floor
-  const windowsCompleted = totalDrops > 0 ? Math.floor((completedDrops / totalDrops) * totalWindows) : 0;
-  
+  // Building acts as a vertical progress bar - continuous fill from bottom to top
   const buildingFloors = useMemo(() => {
     return Array.from({ length: floors }, (_, index) => {
       const floorNumber = floors - index; // Top to bottom (floor 25, 24, 23...)
-      
-      // Calculate which windows on this floor should be lit
-      // Windows are numbered sequentially from top-left (position 0) to bottom-right
-      const floorIndex = index; // 0 = top floor, 1 = second floor, etc.
-      const firstWindowPosition = floorIndex * 4; // Position of first window on this floor
-      
-      const windows = [1, 2, 3, 4].map((windowNum) => {
-        const windowPosition = firstWindowPosition + (windowNum - 1);
-        const isLit = windowPosition < windowsCompleted;
-        return { windowNum, isLit };
-      });
-      
-      return { floorNumber, windows };
+      return { floorNumber };
     });
-  }, [floors, windowsCompleted]);
+  }, [floors]);
 
   return (
     <div className={`flex flex-col items-center ${className}`} data-testid="highrise-building">
@@ -52,41 +37,22 @@ export function HighRiseBuilding({ floors, completedDrops, totalDrops, className
           {/* Roof */}
           <div className="h-3 bg-muted border-b border-card-border"></div>
           
-          {/* Floors Container */}
-          <div className="flex flex-col-reverse">
-            {buildingFloors.map(({ floorNumber, windows }) => (
+          {/* Floors Container - Progress Bar Style */}
+          <div className="flex flex-col">
+            {buildingFloors.map(({ floorNumber, isLit }) => (
               <div
                 key={floorNumber}
-                className="relative border-b border-card-border last:border-b-0"
-                style={{ height: '40px' }}
+                className={`relative border-b border-card-border last:border-b-0 transition-all duration-500 ${
+                  isLit 
+                    ? 'bg-warning/90 border-warning' 
+                    : 'bg-muted/10 border-muted'
+                }`}
+                style={{ height: '16px' }}
                 data-testid={`floor-${floorNumber}`}
               >
                 {/* Floor Number */}
                 <div className="absolute -left-10 top-1/2 -translate-y-1/2 text-xs text-muted-foreground font-mono w-8 text-right">
                   {floorNumber}
-                </div>
-
-                {/* Windows Row */}
-                <div className="h-full flex items-center justify-center gap-2 px-3">
-                  {windows.map(({ windowNum, isLit }) => (
-                    <div
-                      key={windowNum}
-                      className={`w-8 h-6 rounded-sm border transition-all duration-500 ${
-                        isLit
-                          ? 'bg-warning border-warning shadow-lg'
-                          : 'bg-muted/30 border-muted'
-                      }`}
-                      data-testid={`window-${floorNumber}-${windowNum}`}
-                    >
-                      {/* Window Panes */}
-                      <div className="h-full w-full grid grid-cols-2 gap-[1px]">
-                        <div className={`${isLit ? 'bg-warning/50' : 'bg-background/20'}`}></div>
-                        <div className={`${isLit ? 'bg-warning/50' : 'bg-background/20'}`}></div>
-                        <div className={`${isLit ? 'bg-warning/50' : 'bg-background/20'}`}></div>
-                        <div className={`${isLit ? 'bg-warning/50' : 'bg-background/20'}`}></div>
-                      </div>
-                    </div>
-                  ))}
                 </div>
               </div>
             ))}
