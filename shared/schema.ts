@@ -56,10 +56,12 @@ export const projects = pgTable("projects", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   companyId: varchar("company_id").notNull().references(() => users.id, { onDelete: "cascade" }), // Foreign key to company
   strataPlanNumber: varchar("strata_plan_number").notNull(),
+  buildingAddress: text("building_address"), // Building address visible to all employees
   jobType: varchar("job_type").notNull(), // window_cleaning | dryer_vent_cleaning | pressure_washing
   totalDrops: integer("total_drops").notNull(),
   dailyDropTarget: integer("daily_drop_target").notNull(),
   floorCount: integer("floor_count").notNull(),
+  targetCompletionDate: date("target_completion_date"), // Optional target completion date
   ropeAccessPlanUrl: text("rope_access_plan_url"), // URL to PDF in object storage
   status: varchar("status").notNull().default('active'), // active | completed
   createdAt: timestamp("created_at").defaultNow(),

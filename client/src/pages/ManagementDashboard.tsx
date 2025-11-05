@@ -22,10 +22,12 @@ import type { Project } from "@shared/schema";
 
 const projectSchema = z.object({
   strataPlanNumber: z.string().min(1, "Strata plan number is required"),
+  buildingAddress: z.string().optional(),
   jobType: z.enum(["window_cleaning", "dryer_vent_cleaning", "pressure_washing"]),
   totalDrops: z.string().min(1, "Total drops is required"),
   dailyDropTarget: z.string().min(1, "Daily drop target is required"),
   floorCount: z.string().min(1, "Floor count is required"),
+  targetCompletionDate: z.string().optional(),
 });
 
 const employeeSchema = z.object({
@@ -67,10 +69,12 @@ export default function ManagementDashboard() {
     resolver: zodResolver(projectSchema),
     defaultValues: {
       strataPlanNumber: "",
+      buildingAddress: "",
       jobType: "window_cleaning",
       totalDrops: "",
       dailyDropTarget: "",
       floorCount: "",
+      targetCompletionDate: "",
     },
   });
 
@@ -278,6 +282,23 @@ export default function ManagementDashboard() {
 
                         <FormField
                           control={projectForm.control}
+                          name="buildingAddress"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Building Address (Optional)</FormLabel>
+                              <FormControl>
+                                <Input placeholder="123 Main St, Vancouver, BC" {...field} data-testid="input-building-address" className="h-12" />
+                              </FormControl>
+                              <FormDescription className="text-xs">
+                                Visible to all employees
+                              </FormDescription>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+
+                        <FormField
+                          control={projectForm.control}
                           name="jobType"
                           render={({ field }) => (
                             <FormItem>
@@ -339,6 +360,20 @@ export default function ManagementDashboard() {
                               <FormDescription className="text-xs">
                                 Visible to rope access techs
                               </FormDescription>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+
+                        <FormField
+                          control={projectForm.control}
+                          name="targetCompletionDate"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Target Completion Date (Optional)</FormLabel>
+                              <FormControl>
+                                <Input type="date" {...field} data-testid="input-target-date" className="h-12" />
+                              </FormControl>
                               <FormMessage />
                             </FormItem>
                           )}
