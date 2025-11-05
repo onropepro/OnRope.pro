@@ -1229,7 +1229,7 @@ export default function ManagementDashboard() {
                 )}
               />
 
-              {activeSession && parseInt(endDayForm.watch("dropsCompleted") || "0") < dailyTarget && (
+              {activeSession && endDayForm.watch("dropsCompleted") && parseInt(endDayForm.watch("dropsCompleted")) < dailyTarget && (
                 <FormField
                   control={endDayForm.control}
                   name="shortfallReason"
