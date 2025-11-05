@@ -190,6 +190,16 @@ export default function TechDashboard() {
 
   const onEndDaySubmit = async (data: EndDayFormData) => {
     if (activeSession) {
+      const dropsCompleted = parseInt(data.dropsCompleted);
+      
+      // Validate shortfall reason is required when drops < target
+      if (dropsCompleted < dailyTarget && !data.shortfallReason?.trim()) {
+        endDayForm.setError("shortfallReason", {
+          message: "Please explain why the daily target wasn't met"
+        });
+        return;
+      }
+      
       endDayMutation.mutate({
         ...data,
         sessionId: activeSession.id,

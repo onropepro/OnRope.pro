@@ -29,6 +29,7 @@ const projectSchema = z.object({
   dailyDropTarget: z.string().min(1, "Daily drop target is required"),
   floorCount: z.string().min(1, "Floor count is required"),
   targetCompletionDate: z.string().optional(),
+  ropeAccessPlan: z.any().optional(),
 });
 
 const employeeSchema = z.object({
@@ -68,6 +69,8 @@ export default function ManagementDashboard() {
   const [showStartDayDialog, setShowStartDayDialog] = useState(false);
   const [showEndDayDialog, setShowEndDayDialog] = useState(false);
   const [activeSession, setActiveSession] = useState<any>(null);
+  const [uploadedPlanFile, setUploadedPlanFile] = useState<File | null>(null);
+  const [isUploadingPlan, setIsUploadingPlan] = useState(false);
   const { toast } = useToast();
   const [, setLocation] = useLocation();
 
@@ -184,7 +187,7 @@ export default function ManagementDashboard() {
   }, [projects]);
 
   const createProjectMutation = useMutation({
-    mutationFn: async (data: ProjectFormData) => {
+    mutationFn: async (data: ProjectFormData & { ropeAccessPlanUrl?: string | null }) => {
       const response = await fetch("/api/projects", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -193,6 +196,7 @@ export default function ManagementDashboard() {
           totalDrops: parseInt(data.totalDrops),
           dailyDropTarget: parseInt(data.dailyDropTarget),
           floorCount: parseInt(data.floorCount),
+          ropeAccessPlanUrl: data.ropeAccessPlanUrl || undefined,
         }),
         credentials: "include",
       });
@@ -208,6 +212,7 @@ export default function ManagementDashboard() {
       queryClient.invalidateQueries({ queryKey: ["/api/projects"] });
       setShowProjectDialog(false);
       projectForm.reset();
+      setUploadedPlanFile(null);
       toast({ title: "Project created successfully" });
     },
     onError: (error: Error) => {
@@ -245,7 +250,44 @@ export default function ManagementDashboard() {
   });
 
   const onProjectSubmit = async (data: ProjectFormData) => {
-    createProjectMutation.mutate(data);
+    let ropeAccessPlanUrl = null;
+    
+    // Upload PDF if one was selected
+    if (uploadedPlanFile) {
+      setIsUploadingPlan(true);
+      try {
+        const formData = new FormData();
+        formData.append('file', uploadedPlanFile);
+        
+        const uploadResponse = await fetch('/api/upload-rope-access-plan', {
+          method: 'POST',
+          body: formData,
+          credentials: 'include',
+        });
+        
+        if (!uploadResponse.ok) {
+          throw new Error('Failed to upload fall protection plan');
+        }
+        
+        const uploadResult = await uploadResponse.json();
+        ropeAccessPlanUrl = uploadResult.url;
+      } catch (error) {
+        setIsUploadingPlan(false);
+        toast({ 
+          title: "Upload failed", 
+          description: error instanceof Error ? error.message : "Failed to upload PDF", 
+          variant: "destructive" 
+        });
+        return;
+      }
+      setIsUploadingPlan(false);
+    }
+    
+    createProjectMutation.mutate({
+      ...data,
+      ropeAccessPlanUrl,
+    });
+    setUploadedPlanFile(null);
   };
 
   const onEmployeeSubmit = async (data: EmployeeFormData) => {
@@ -379,6 +421,16 @@ export default function ManagementDashboard() {
   const onEndDaySubmit = async (data: EndDayFormData) => {
     if (!activeSession) {
       toast({ title: "Error", description: "No active work session found", variant: "destructive" });
+      return;
+    }
+    
+    const dropsCompleted = parseInt(data.dropsCompleted);
+    
+    // Validate shortfall reason is required when drops < target
+    if (dropsCompleted < dailyTarget && !data.shortfallReason?.trim()) {
+      endDayForm.setError("shortfallReason", {
+        message: "Please explain why the daily target wasn't met"
+      });
       return;
     }
     
@@ -583,8 +635,52 @@ export default function ManagementDashboard() {
                           )}
                         />
 
-                        <Button type="submit" className="w-full h-12" data-testid="button-submit-project">
-                          Create Project
+                        <div className="space-y-2">
+                          <label className="text-sm font-medium">Fall Protection Plan (PDF)</label>
+                          <Input
+                            type="file"
+                            accept=".pdf"
+                            onChange={(e) => {
+                              const file = e.target.files?.[0];
+                              if (file) {
+                                if (file.type !== 'application/pdf') {
+                                  toast({ title: "Invalid file", description: "Please select a PDF file", variant: "destructive" });
+                                  e.target.value = '';
+                                  return;
+                                }
+                                setUploadedPlanFile(file);
+                              }
+                            }}
+                            data-testid="input-rope-access-plan"
+                            className="h-12"
+                          />
+                          {uploadedPlanFile && (
+                            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                              <span className="material-icons text-base">description</span>
+                              <span>{uploadedPlanFile.name}</span>
+                              <Button
+                                type="button"
+                                variant="ghost"
+                                size="icon"
+                                className="h-6 w-6 ml-auto"
+                                onClick={() => setUploadedPlanFile(null)}
+                              >
+                                <span className="material-icons text-base">close</span>
+                              </Button>
+                            </div>
+                          )}
+                          <FormDescription className="text-xs">
+                            Optional: Upload the rope access/fall protection plan PDF
+                          </FormDescription>
+                        </div>
+
+                        <Button 
+                          type="submit" 
+                          className="w-full h-12" 
+                          data-testid="button-submit-project"
+                          disabled={isUploadingPlan}
+                        >
+                          {isUploadingPlan ? "Uploading..." : "Create Project"}
                         </Button>
                       </form>
                     </Form>

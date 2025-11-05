@@ -3,6 +3,8 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { insertUserSchema, insertProjectSchema, insertDropLogSchema, insertComplaintSchema, insertComplaintNoteSchema } from "@shared/schema";
 import { z } from "zod";
+import multer from "multer";
+import { ObjectStorageService } from "./objectStorage";
 
 // Authentication middleware
 export function requireAuth(req: Request, res: Response, next: NextFunction) {
@@ -267,6 +269,60 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // ==================== PROJECT ROUTES ====================
+  
+  // Upload rope access plan PDF
+  const upload = multer({ 
+    storage: multer.memoryStorage(),
+    limits: { fileSize: 10 * 1024 * 1024 }, // 10MB max
+    fileFilter: (req, file, cb) => {
+      if (file.mimetype === 'application/pdf') {
+        cb(null, true);
+      } else {
+        cb(new Error('Only PDF files are allowed'));
+      }
+    }
+  });
+  
+  app.post("/api/upload-rope-access-plan", requireAuth, requireRole("company", "operations_manager"), upload.single('file'), async (req: Request, res: Response) => {
+    try {
+      if (!req.file) {
+        return res.status(400).json({ message: "No file uploaded" });
+      }
+      
+      // Generate unique filename
+      const timestamp = Date.now();
+      const filename = `rope-access-plan-${timestamp}.pdf`;
+      
+      // Upload to object storage
+      const objectStorageService = new ObjectStorageService();
+      const url = await objectStorageService.uploadPublicFile(
+        filename,
+        req.file.buffer,
+        'application/pdf'
+      );
+      
+      res.json({ url });
+    } catch (error) {
+      console.error("File upload error:", error);
+      res.status(500).json({ message: "Failed to upload file" });
+    }
+  });
+  
+  // Serve public files from object storage
+  app.get("/public-objects/:filePath(*)", async (req: Request, res: Response) => {
+    const filePath = req.params.filePath;
+    const objectStorageService = new ObjectStorageService();
+    try {
+      const file = await objectStorageService.searchPublicObject(filePath);
+      if (!file) {
+        return res.status(404).json({ error: "File not found" });
+      }
+      objectStorageService.downloadObject(file, res);
+    } catch (error) {
+      console.error("Error searching for public object:", error);
+      return res.status(500).json({ error: "Internal server error" });
+    }
+  });
   
   // Create project
   app.post("/api/projects", requireAuth, requireRole("company", "operations_manager"), async (req: Request, res: Response) => {
