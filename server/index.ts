@@ -7,6 +7,9 @@ import { setupVite, serveStatic, log } from "./vite";
 
 const app = express();
 
+// Trust proxy - required for secure cookies behind Replit's HTTPS proxy
+app.set('trust proxy', 1);
+
 // Session configuration
 const PgSession = connectPg(session);
 app.use(session({
