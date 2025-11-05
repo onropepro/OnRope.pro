@@ -65,6 +65,7 @@ export default function ManagementDashboard() {
   const [showProjectDetailDialog, setShowProjectDetailDialog] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [employeeToDelete, setEmployeeToDelete] = useState<string | null>(null);
+  const [projectToDelete, setProjectToDelete] = useState<string | null>(null);
   const [showDropDialog, setShowDropDialog] = useState(false);
   const [dropProject, setDropProject] = useState<any>(null);
   const [showStartDayDialog, setShowStartDayDialog] = useState(false);
@@ -314,6 +315,31 @@ export default function ManagementDashboard() {
       queryClient.invalidateQueries({ queryKey: ["/api/employees"] });
       setEmployeeToDelete(null);
       toast({ title: "Employee deleted successfully" });
+    },
+    onError: (error: Error) => {
+      toast({ title: "Error", description: error.message, variant: "destructive" });
+    },
+  });
+
+  const deleteProjectMutation = useMutation({
+    mutationFn: async (projectId: string) => {
+      const response = await fetch(`/api/projects/${projectId}`, {
+        method: "DELETE",
+        credentials: "include",
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || "Failed to delete project");
+      }
+
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/projects"] });
+      setProjectToDelete(null);
+      setShowProjectDetailDialog(false);
+      toast({ title: "Project deleted successfully" });
     },
     onError: (error: Error) => {
       toast({ title: "Error", description: error.message, variant: "destructive" });
@@ -1195,82 +1221,53 @@ export default function ManagementDashboard() {
 
               <Separator />
 
-              {/* Work Session History */}
-              <div>
-                <h3 className="text-sm font-semibold mb-3 flex items-center gap-2">
-                  <span className="material-icons text-sm">history</span>
-                  Work Session History
-                </h3>
-                {workSessionsData?.sessions && workSessionsData.sessions.length > 0 ? (
-                  <div className="space-y-2 max-h-64 overflow-y-auto">
-                    {workSessionsData.sessions.map((session: any) => (
-                      <Card key={session.id} className="p-3">
-                        <div className="flex items-start justify-between gap-2">
-                          <div className="flex-1">
-                            <div className="text-sm font-medium">
-                              {new Date(session.workDate).toLocaleDateString('en-US', { 
-                                month: 'short', 
-                                day: 'numeric', 
-                                year: 'numeric' 
-                              })}
-                            </div>
-                            <div className="text-xs text-muted-foreground mt-1">
-                              {session.startTime && new Date(session.startTime).toLocaleTimeString('en-US', {
-                                hour: 'numeric',
-                                minute: '2-digit'
-                              })}
-                              {session.endTime && ` - ${new Date(session.endTime).toLocaleTimeString('en-US', {
-                                hour: 'numeric',
-                                minute: '2-digit'
-                              })}`}
-                              {!session.endTime && " - In Progress"}
-                            </div>
-                          </div>
-                          <div className="text-right">
-                            {session.dropsCompleted !== null ? (
-                              <>
-                                <div className="text-lg font-bold">{session.dropsCompleted}</div>
-                                <div className="text-xs text-muted-foreground">drops</div>
-                              </>
-                            ) : (
-                              <Badge variant="secondary" className="text-xs">Active</Badge>
-                            )}
-                          </div>
-                        </div>
-                        {session.shortfallReason && (
-                          <div className="mt-2 pt-2 border-t">
-                            <div className="text-xs font-medium text-muted-foreground mb-1">Shortfall Reason:</div>
-                            <div className="text-xs">{session.shortfallReason}</div>
-                          </div>
-                        )}
-                      </Card>
-                    ))}
-                  </div>
-                ) : (
-                  <div className="text-center p-4 text-sm text-muted-foreground bg-muted/30 rounded-lg">
-                    <span className="material-icons text-2xl mb-1 opacity-50">schedule</span>
-                    <div>No work sessions yet</div>
-                  </div>
-                )}
-              </div>
+              {/* Work Session History Link */}
+              <Button
+                variant="outline"
+                className="w-full h-12 gap-2"
+                onClick={() => {
+                  setShowProjectDetailDialog(false);
+                  setLocation(`/projects/${selectedProject.id}/work-sessions`);
+                }}
+                data-testid="button-view-work-sessions"
+              >
+                <span className="material-icons text-lg">history</span>
+                View Work Session History
+              </Button>
 
               <Separator />
 
-              <div className="flex items-center justify-between">
-                <div>
-                  <div className="text-xs text-muted-foreground mb-1">Status</div>
-                  <Badge variant={selectedProject.status === "active" ? "default" : "secondary"} className="capitalize">
-                    {selectedProject.status}
-                  </Badge>
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <div className="text-xs text-muted-foreground mb-1">Status</div>
+                    <Badge variant={selectedProject.status === "active" ? "default" : "secondary"} className="capitalize">
+                      {selectedProject.status}
+                    </Badge>
+                  </div>
                 </div>
-                <Button 
-                  variant="outline" 
-                  onClick={() => setShowProjectDetailDialog(false)}
-                  className="h-10"
-                  data-testid="button-close-project-detail"
-                >
-                  Close
-                </Button>
+
+                <div className="flex gap-2">
+                  <Button 
+                    variant="destructive" 
+                    onClick={() => {
+                      setProjectToDelete(selectedProject.id);
+                    }}
+                    className="flex-1 h-10"
+                    data-testid="button-delete-project"
+                  >
+                    <span className="material-icons mr-2 text-sm">delete</span>
+                    Delete Project
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    onClick={() => setShowProjectDetailDialog(false)}
+                    className="flex-1 h-10"
+                    data-testid="button-close-project-detail"
+                  >
+                    Close
+                  </Button>
+                </div>
               </div>
             </div>
           )}
@@ -1294,6 +1291,28 @@ export default function ManagementDashboard() {
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
               Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Delete Project Confirmation Dialog */}
+      <AlertDialog open={projectToDelete !== null} onOpenChange={(open) => !open && setProjectToDelete(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Project</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete this project? This will permanently remove all associated work sessions, drop logs, and complaints. This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel data-testid="button-cancel-delete-project">Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => projectToDelete && deleteProjectMutation.mutate(projectToDelete)}
+              data-testid="button-confirm-delete-project"
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              Delete Project
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
