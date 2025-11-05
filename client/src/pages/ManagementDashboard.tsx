@@ -20,6 +20,7 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { useLocation } from "wouter";
 import { Textarea } from "@/components/ui/textarea";
 import type { Project } from "@shared/schema";
+import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from "recharts";
 
 const projectSchema = z.object({
   strataPlanNumber: z.string().min(1, "Strata plan number is required"),
@@ -101,10 +102,27 @@ export default function ManagementDashboard() {
   });
 
   const projects = projectsData?.projects || [];
+
+  // Fetch all work sessions across all projects for pie chart
+  const { data: allWorkSessionsData } = useQuery({
+    queryKey: ["/api/all-work-sessions"],
+    enabled: projects.length > 0,
+  });
   const employees = employeesData?.employees || [];
   const todayDrops = myDropsData?.totalDropsToday || 0;
   const dailyTarget = projects[0]?.dailyDropTarget || 20;
   const companyName = companyData?.company?.companyName || "";
+
+  // Calculate overall target met statistics across all projects
+  const allWorkSessions = allWorkSessionsData?.sessions || [];
+  const completedSessions = allWorkSessions.filter((s: any) => s.endTime !== null);
+  const targetMetCount = completedSessions.filter((s: any) => s.dropsCompleted >= s.dailyDropTarget).length;
+  const belowTargetCount = completedSessions.filter((s: any) => s.dropsCompleted < s.dailyDropTarget).length;
+  
+  const performancePieData = [
+    { name: "Target Met", value: targetMetCount, color: "hsl(var(--primary))" },
+    { name: "Below Target", value: belowTargetCount, color: "hsl(var(--destructive))" },
+  ];
 
   const projectForm = useForm<ProjectFormData>({
     resolver: zodResolver(projectSchema),
@@ -828,6 +846,52 @@ export default function ManagementDashboard() {
                   </div>
                 </CardContent>
               </Card>
+
+              {/* Overall Target Performance Chart */}
+              {completedSessions.length > 0 && (
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Overall Target Performance</CardTitle>
+                    <CardDescription>Across all projects and work sessions</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="flex flex-col items-center">
+                      <ResponsiveContainer width="100%" height={250}>
+                        <PieChart>
+                          <Pie
+                            data={performancePieData}
+                            cx="50%"
+                            cy="50%"
+                            labelLine={false}
+                            label={({ name, value, percent }) => 
+                              value > 0 ? `${name}: ${value} (${(percent * 100).toFixed(0)}%)` : null
+                            }
+                            outerRadius={70}
+                            fill="#8884d8"
+                            dataKey="value"
+                          >
+                            {performancePieData.map((entry, index) => (
+                              <Cell key={`cell-${index}`} fill={entry.color} />
+                            ))}
+                          </Pie>
+                          <Tooltip />
+                          <Legend />
+                        </PieChart>
+                      </ResponsiveContainer>
+                      <div className="grid grid-cols-2 gap-4 mt-2 w-full max-w-xs">
+                        <div className="text-center">
+                          <div className="text-2xl font-bold text-primary">{targetMetCount}</div>
+                          <div className="text-xs text-muted-foreground">Target Met</div>
+                        </div>
+                        <div className="text-center">
+                          <div className="text-2xl font-bold text-destructive">{belowTargetCount}</div>
+                          <div className="text-xs text-muted-foreground">Below Target</div>
+                        </div>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
 
               {/* Projects List */}
               {projects.length === 0 ? (

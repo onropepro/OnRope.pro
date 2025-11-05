@@ -7,6 +7,7 @@ import { Progress } from "@/components/ui/progress";
 import { HighRiseBuilding } from "@/components/HighRiseBuilding";
 import { ArrowLeft } from "lucide-react";
 import { format } from "date-fns";
+import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from "recharts";
 
 export default function WorkSessionHistory() {
   const [, params] = useRoute("/projects/:id/work-sessions");
@@ -53,6 +54,16 @@ export default function WorkSessionHistory() {
   const floorsCompleted = project.floorCount > 0
     ? Math.floor((completedDrops / project.totalDrops) * project.floorCount)
     : 0;
+
+  // Calculate target met statistics
+  const completedSessions = workSessions.filter((s: any) => s.endTime !== null);
+  const targetMetCount = completedSessions.filter((s: any) => s.dropsCompleted >= project.dailyDropTarget).length;
+  const belowTargetCount = completedSessions.filter((s: any) => s.dropsCompleted < project.dailyDropTarget).length;
+  
+  const pieData = [
+    { name: "Target Met", value: targetMetCount, color: "hsl(var(--primary))" },
+    { name: "Below Target", value: belowTargetCount, color: "hsl(var(--destructive))" },
+  ];
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
@@ -104,6 +115,51 @@ export default function WorkSessionHistory() {
           </CardContent>
         </Card>
 
+        {/* Target Performance Chart */}
+        {completedSessions.length > 0 && (
+          <Card>
+            <CardHeader>
+              <CardTitle>Target Performance</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="flex flex-col items-center">
+                <ResponsiveContainer width="100%" height={300}>
+                  <PieChart>
+                    <Pie
+                      data={pieData}
+                      cx="50%"
+                      cy="50%"
+                      labelLine={false}
+                      label={({ name, value, percent }) => 
+                        `${name}: ${value} (${(percent * 100).toFixed(0)}%)`
+                      }
+                      outerRadius={80}
+                      fill="#8884d8"
+                      dataKey="value"
+                    >
+                      {pieData.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={entry.color} />
+                      ))}
+                    </Pie>
+                    <Tooltip />
+                    <Legend />
+                  </PieChart>
+                </ResponsiveContainer>
+                <div className="grid grid-cols-2 gap-4 mt-4 w-full max-w-sm">
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-primary">{targetMetCount}</div>
+                    <div className="text-sm text-muted-foreground">Target Met</div>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-destructive">{belowTargetCount}</div>
+                    <div className="text-sm text-muted-foreground">Below Target</div>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
         {/* Work Sessions List */}
         <Card>
           <CardHeader>
@@ -133,7 +189,7 @@ export default function WorkSessionHistory() {
                             {format(sessionDate, "EEEE, MMM d, yyyy")}
                           </p>
                           {isCompleted ? (
-                            <Badge variant={metTarget ? "default" : "secondary"}>
+                            <Badge variant={metTarget ? "default" : "destructive"} data-testid={`badge-${metTarget ? "met" : "below"}-target`}>
                               {metTarget ? "Target Met" : "Below Target"}
                             </Badge>
                           ) : (

@@ -783,6 +783,37 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
+  // Get all work sessions across all company projects
+  app.get("/api/all-work-sessions", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      // Get all projects for the company
+      const projects = await storage.getAllProjects(currentUser.companyId);
+      
+      // Collect all work sessions across all projects with their project's daily target
+      const allSessions = [];
+      for (const project of projects) {
+        const projectSessions = await storage.getWorkSessionsForProject(project.id);
+        // Add dailyDropTarget from project to each session
+        const sessionsWithTarget = projectSessions.map(session => ({
+          ...session,
+          dailyDropTarget: project.dailyDropTarget,
+        }));
+        allSessions.push(...sessionsWithTarget);
+      }
+      
+      res.json({ sessions: allSessions });
+    } catch (error) {
+      console.error("Failed to fetch all work sessions:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+  
   // Get employee's own work sessions for a project
   app.get("/api/projects/:projectId/my-work-sessions", requireAuth, async (req: Request, res: Response) => {
     try {
