@@ -64,15 +64,16 @@ A mobile-first management platform for rope access building maintenance operatio
 - 🚀 **Production-ready platform with complete feature set**
 
 ## Key Visual: High-Rise Building
-The signature component displays a vertical building with:
+The signature component displays a vertical building with horizontal progress bars:
 - Dynamic floor count matching project specifications
-- 4 windows per floor
-- **Sequential window lighting**: Windows light up left-to-right, top-to-bottom (not full floors)
-- Lit windows show bright yellow glow based on drop completion percentage
-- Formula: windowsCompleted = (completedDrops / totalDrops) × totalWindows
-- Floor numbers on left side
-- Progress percentage and drop counts above building
-- Centered visualization on resident dashboard
+- Each floor is a thin horizontal bar (16px height)
+- **Horizontal progress fill**: Yellow bar fills from LEFT TO RIGHT on each floor
+- All floors show same completion percentage simultaneously
+- Progress formula: `Math.min(100, (completedDrops / totalDrops) × 100)`
+- Yellow fill width matches progress percentage (e.g., 16% = bar fills 16% from left edge)
+- Floor numbers displayed on left side
+- Progress percentage and drop counts shown above building
+- Visualization displayed on: Resident Dashboard, Project Details, Management Dashboard
 
 ## Current State
 **Full-stack application ready for production use:**
@@ -96,7 +97,9 @@ The signature component displays a vertical building with:
 - ✅ **Fixed pie chart visibility**: Corrected API endpoint method name from `getWorkSessionsForProject()` to `getWorkSessionsByProject()`
 - ✅ **Fixed project detail page**: Added completedDrops calculation to `/api/projects/:id` endpoint
 - ✅ **Added cache-control headers**: Prevents stale data in UI (no-store, no-cache headers on project endpoints)
-- ✅ **Window lighting enhancement**: Changed from full-floor lighting to sequential window-by-window (left-to-right, top-to-bottom)
-- ✅ **Added warning color theme**: Bright yellow (--warning: 48 96% 53%) for lit windows in both light/dark modes
 - ✅ **Performance tab**: Moved "Overall Target Performance" pie chart to dedicated Performance tab in management dashboard
+- ✅ **Per-employee performance charts**: Added individual pie charts for each technician showing Target Met vs Below Target sessions
+- ✅ **Horizontal progress bar visualization**: Changed building from window-by-window lighting to continuous horizontal fill (left-to-right) on all floors
+- ✅ **IRATA level validation**: Employee creation now requires IRATA level selection for rope access technicians (validation enforced with proper form control binding)
+- ✅ **Progress percentage clamping**: Added Math.min(100, ...) to prevent visual overflow on data anomalies
 - ✅ Architect-approved and production-ready
