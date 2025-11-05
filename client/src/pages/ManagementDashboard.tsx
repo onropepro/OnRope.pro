@@ -1463,8 +1463,8 @@ export default function ManagementDashboard() {
                         />
                       )}
 
-                      <Button type="submit" className="w-full h-12" data-testid="button-submit-employee">
-                        Create Employee
+                      <Button type="submit" className="w-full h-12" data-testid="button-submit-employee" disabled={createEmployeeMutation.isPending}>
+                        {createEmployeeMutation.isPending ? "Creating..." : "Create Employee"}
                       </Button>
                     </form>
                   </Form>
