@@ -7,7 +7,7 @@ A mobile-first management platform for rope access building maintenance operatio
 - **Visual Progress Tracking**: High-rise building visualization with lit windows showing completed drops
 - **Drop Logging**: Technicians can log daily drops with historical entry capability
 - **Complaint Management**: Residents can submit feedback; management can track and respond with notes
-- **Project Management**: Create projects with strata plan numbers, floor counts, and rope access plans
+- **Project Management**: Create projects with strata plan numbers, floor counts, and rope access plans; delete projects with cascade warnings
 - **Employee Management**: Company-controlled onboarding with role-based permissions
 
 ## Tech Stack
@@ -58,6 +58,7 @@ A mobile-first management platform for rope access building maintenance operatio
 - ✅ Work session history page with tech names (/projects/:id/work-sessions)
 - ✅ General messaging for residents (companyId-based routing, projectId nullable)
 - ✅ Residents can submit messages even with no active projects
+- ✅ Project deletion feature with confirmation dialog and cascade warnings
 - 🚀 **Production-ready platform with complete feature set**
 
 ## Key Visual: High-Rise Building
@@ -80,9 +81,10 @@ The signature component displays a vertical building with:
 - PDF rope access plan uploads using Replit Object Storage
 - Fully mobile-responsive with Material Design 3 aesthetic
 
-**Recent Fixes (Nov 5, 2025):**
+**Recent Updates (Nov 5, 2025):**
 - ✅ Fixed critical session detection bug (now checks ALL projects with async/await)
 - ✅ Improved End Day UX (shortfall reason only appears when drops < target)
 - ✅ Implemented proper object storage with @google-cloud/storage
 - ✅ Fixed all button state transitions and NaN displays
+- ✅ Added project deletion with confirmation dialog (warns about cascade deletion of work sessions, drop logs, complaints)
 - ✅ Architect-approved and production-ready
