@@ -115,4 +115,5 @@ The signature component displays FOUR buildings side-by-side representing the 4 
   - Fixed `||` to `??` in fallback logic to preserve zero values
   - GET `/api/projects/:id` returns all elevation-specific completed drops
 - ✅ **Mobile-responsive tabs**: Management dashboard tabs now use horizontal scrolling on mobile (no more cramped/overlapping text)
+- ✅ **Improved error handling**: Employee creation now shows clear "Email address is already in use" message for duplicate emails (defensive error checks for Postgres constraint violations)
 - ✅ Architect-approved and production-ready

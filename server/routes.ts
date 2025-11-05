@@ -200,9 +200,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       const { passwordHash: _, ...employeeWithoutPassword } = employee;
       res.json({ employee: employeeWithoutPassword });
-    } catch (error) {
+    } catch (error: any) {
       console.error("Create employee error:", error);
-      res.status(500).json({ message: "Internal server error" });
+      
+      // Check for duplicate email (Postgres unique constraint violation)
+      if (error && typeof error === 'object' && error.code === '23505' && error.constraint?.includes('email')) {
+        return res.status(409).json({ message: "Email address is already in use" });
+      }
+      
+      res.status(500).json({ message: "Failed to create employee" });
     }
   });
   
