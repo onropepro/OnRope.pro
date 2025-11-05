@@ -581,13 +581,16 @@ export default function ManagementDashboard() {
                       <span className="hidden sm:inline">New Project</span>
                     </Button>
                   </DialogTrigger>
-                  <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto md:max-h-none md:overflow-visible">
-                    <DialogHeader>
-                      <DialogTitle>Create New Project</DialogTitle>
-                      <DialogDescription>Add a new building maintenance project</DialogDescription>
-                    </DialogHeader>
-                    <Form {...projectForm}>
-                      <form onSubmit={projectForm.handleSubmit(onProjectSubmit)} className="space-y-4">
+                  <DialogContent className="max-w-md p-0 max-h-[95vh] flex flex-col">
+                    <div className="p-6 border-b">
+                      <DialogHeader>
+                        <DialogTitle>Create New Project</DialogTitle>
+                        <DialogDescription>Add a new building maintenance project</DialogDescription>
+                      </DialogHeader>
+                    </div>
+                    <div className="overflow-y-auto flex-1 p-6">
+                      <Form {...projectForm}>
+                        <form onSubmit={projectForm.handleSubmit(onProjectSubmit)} className="space-y-4">
                         <FormField
                           control={projectForm.control}
                           name="strataPlanNumber"
@@ -808,6 +811,7 @@ export default function ManagementDashboard() {
                         </Button>
                       </form>
                     </Form>
+                    </div>
                   </DialogContent>
                 </Dialog>
               </div>
@@ -1343,15 +1347,18 @@ export default function ManagementDashboard() {
                     Add New Employee
                   </Button>
                 </DialogTrigger>
-                <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto md:max-h-none md:overflow-visible">
-                  <DialogHeader>
-                    <DialogTitle>Create Employee Account</DialogTitle>
-                    <DialogDescription>
-                      Enter login credentials for the new employee
-                    </DialogDescription>
-                  </DialogHeader>
-                  <Form {...employeeForm}>
-                    <form onSubmit={employeeForm.handleSubmit(onEmployeeSubmit)} className="space-y-4">
+                <DialogContent className="max-w-md p-0 max-h-[95vh] flex flex-col">
+                  <div className="p-6 border-b">
+                    <DialogHeader>
+                      <DialogTitle>Create Employee Account</DialogTitle>
+                      <DialogDescription>
+                        Enter login credentials for the new employee
+                      </DialogDescription>
+                    </DialogHeader>
+                  </div>
+                  <div className="overflow-y-auto flex-1 p-6">
+                    <Form {...employeeForm}>
+                      <form onSubmit={employeeForm.handleSubmit(onEmployeeSubmit)} className="space-y-4">
                       <FormField
                         control={employeeForm.control}
                         name="name"
@@ -1453,6 +1460,7 @@ export default function ManagementDashboard() {
                       </Button>
                     </form>
                   </Form>
+                  </div>
                 </DialogContent>
               </Dialog>
 
