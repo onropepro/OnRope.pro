@@ -168,32 +168,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Create employee (Company/Operations Manager only)
   app.post("/api/employees", requireAuth, requireRole("company", "operations_manager"), async (req: Request, res: Response) => {
     try {
-      console.log("=== CREATE EMPLOYEE REQUEST ===");
-      console.log("Body:", req.body);
-      console.log("Session userId:", req.session.userId);
-      
       const currentUser = await storage.getUserById(req.session.userId!);
-      console.log("Current user:", currentUser?.email, currentUser?.role);
       
       if (!currentUser) {
-        console.log("ERROR: User not found");
         return res.status(404).json({ message: "User not found" });
       }
       
       // Get company ID (company themselves or the employee's company)
       const companyId = currentUser.role === "company" ? currentUser.id : currentUser.companyId;
-      console.log("Company ID:", companyId);
       
       if (!companyId) {
-        console.log("ERROR: Unable to determine company");
         return res.status(400).json({ message: "Unable to determine company" });
       }
       
       const { name, email, password, role, techLevel } = req.body;
-      console.log("Creating employee:", { name, email, role, techLevel });
       
       if (!password || password.length < 6) {
-        console.log("ERROR: Password too short");
         return res.status(400).json({ message: "Password must be at least 6 characters" });
       }
       

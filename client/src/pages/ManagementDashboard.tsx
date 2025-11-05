@@ -264,7 +264,6 @@ export default function ManagementDashboard() {
 
   const createEmployeeMutation = useMutation({
     mutationFn: async (data: EmployeeFormData) => {
-      console.log("Creating employee with data:", data);
       const response = await fetch("/api/employees", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -272,25 +271,14 @@ export default function ManagementDashboard() {
         credentials: "include",
       });
 
-      console.log("Employee creation response:", response.status, response.statusText);
-
       if (!response.ok) {
-        const errorText = await response.text();
-        console.error("Employee creation failed:", errorText);
-        let errorMessage = "Failed to create employee";
-        try {
-          const errorJson = JSON.parse(errorText);
-          errorMessage = errorJson.message || errorMessage;
-        } catch (e) {
-          errorMessage = errorText || errorMessage;
-        }
-        throw new Error(errorMessage);
+        const error = await response.json();
+        throw new Error(error.message || "Failed to create employee");
       }
 
       return response.json();
     },
     onSuccess: () => {
-      console.log("Employee created successfully");
       queryClient.invalidateQueries({ queryKey: ["/api/employees"] });
       setShowEmployeeDialog(false);
       employeeForm.reset();
@@ -299,7 +287,6 @@ export default function ManagementDashboard() {
       });
     },
     onError: (error: Error) => {
-      console.error("Employee creation error:", error);
       toast({ title: "Error", description: error.message, variant: "destructive" });
     },
   });
@@ -346,8 +333,6 @@ export default function ManagementDashboard() {
   };
 
   const onEmployeeSubmit = async (data: EmployeeFormData) => {
-    console.log("Employee form submitted:", data);
-    console.log("Form errors:", employeeForm.formState.errors);
     createEmployeeMutation.mutate(data);
   };
 
