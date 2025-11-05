@@ -253,69 +253,119 @@ export default function ResidentDashboard() {
     );
   }
 
-  // Show the old "no work scheduled" if there are completed projects
-  if (!activeProject) {
-    return (
-      <div className="min-h-screen bg-background flex items-center justify-center p-4">
-        <Card className="w-full max-w-md text-center shadow-lg">
-          <CardContent className="pt-12 pb-8">
-            <span className="material-icons text-7xl text-muted-foreground mb-4">apartment</span>
-            <h2 className="text-2xl font-bold mb-2">No Active Work</h2>
-            <p className="text-muted-foreground mb-4">
-              All scheduled maintenance for your building has been completed.
-            </p>
-            <p className="text-sm text-muted-foreground">
-              Contact your building management for more information.
-            </p>
-          </CardContent>
-        </Card>
-      </div>
-    );
-  }
-
+  // If no active project but has completed projects, show message form with different message
   if (!activeProject && completedProjects.length > 0) {
     return (
-      <div className="min-h-screen bg-background pb-20">
-        <header className="sticky top-0 z-[100] bg-card border-b border-card-border shadow-sm">
-          <div className="px-4 h-16 flex items-center justify-between">
-            <h1 className="text-lg font-bold">Building History</h1>
-            <Button variant="ghost" size="icon" className="min-w-11 min-h-11" data-testid="button-logout" onClick={handleLogout}>
-              <span className="material-icons">logout</span>
-            </Button>
+      <div className="min-h-screen bg-background flex flex-col">
+        <header className="flex items-center justify-between p-4 border-b">
+          <div className="flex items-center gap-3">
+            <span className="material-icons text-2xl text-primary">apartment</span>
+            <h1 className="text-xl font-semibold">Resident Portal</h1>
           </div>
+          <Button variant="ghost" onClick={handleLogout} data-testid="button-logout">
+            <span className="material-icons">logout</span>
+          </Button>
         </header>
-        
-        <div className="p-4 max-w-2xl mx-auto">
-          <Card className="mb-4 text-center shadow-lg">
-            <CardContent className="pt-8 pb-6">
-              <span className="material-icons text-6xl text-status-closed mb-3">check_circle</span>
-              <h2 className="text-xl font-bold mb-2">No Active Projects</h2>
-              <p className="text-muted-foreground">
-                All work on your building has been completed.
+
+        <main className="flex-1 p-4 space-y-4">
+          <Card className="shadow-lg">
+            <CardContent className="pt-8 pb-6 text-center">
+              <span className="material-icons text-6xl text-green-600 mb-3">check_circle</span>
+              <h2 className="text-xl font-bold mb-2">Work Completed</h2>
+              <p className="text-muted-foreground text-sm">
+                All scheduled maintenance for your building has been completed.
               </p>
             </CardContent>
           </Card>
 
-          <h3 className="text-sm font-medium text-muted-foreground mb-3">Completed Projects</h3>
-          <div className="space-y-3">
-            {completedProjects.map((proj: any) => (
-              <Card key={proj.id} className="hover-elevate">
-                <CardHeader>
-                  <div className="flex items-start justify-between">
-                    <div>
-                      <CardTitle className="text-base">{proj.strataPlanNumber}</CardTitle>
-                      <CardDescription className="capitalize">{proj.jobType?.replace(/_/g, ' ')}</CardDescription>
-                    </div>
-                    <Badge variant="secondary" className="bg-status-closed/10 text-status-closed">Completed</Badge>
-                  </div>
-                </CardHeader>
-              </Card>
-            ))}
-          </div>
-        </div>
+          <Card className="shadow-lg">
+            <CardHeader>
+              <CardTitle>Send a Message</CardTitle>
+              <CardDescription>
+                Have a question or concern? Send us a message and we'll get back to you.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Form {...form}>
+                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                  <FormField
+                    control={form.control}
+                    name="residentName"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Your Name *</FormLabel>
+                        <FormControl>
+                          <Input {...field} data-testid="input-resident-name" className="h-12" />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="phoneNumber"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Phone Number *</FormLabel>
+                        <FormControl>
+                          <Input type="tel" {...field} data-testid="input-phone" className="h-12" />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="unitNumber"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Unit Number *</FormLabel>
+                        <FormControl>
+                          <Input {...field} data-testid="input-unit" className="h-12" />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="message"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Message *</FormLabel>
+                        <FormControl>
+                          <Textarea 
+                            {...field} 
+                            placeholder="Type your message here..."
+                            data-testid="input-message" 
+                            className="min-h-32"
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <Button
+                    type="submit"
+                    className="w-full h-12"
+                    disabled={submitComplaintMutation.isPending}
+                    data-testid="button-submit-message"
+                  >
+                    {submitComplaintMutation.isPending ? "Sending..." : "Send Message"}
+                  </Button>
+                </form>
+              </Form>
+            </CardContent>
+          </Card>
+        </main>
       </div>
     );
   }
+
 
   return (
     <div className="min-h-screen bg-background pb-20">

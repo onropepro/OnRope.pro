@@ -821,18 +821,32 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       let companyId = req.body.companyId;
       
-      // For residents, find the company from their strataPlanNumber
-      if (currentUser?.role === "resident" && currentUser.strataPlanNumber) {
-        // Look for any project with this strata plan to get the company
-        const projects = await storage.getProjectsByStrataPlan(currentUser.strataPlanNumber);
-        if (projects.length > 0) {
-          companyId = projects[0].companyId;
+      // Resolve companyId before validation
+      if (!companyId) {
+        // If projectId is provided, get company from project
+        if (req.body.projectId) {
+          const project = await storage.getProjectById(req.body.projectId);
+          if (project) {
+            companyId = project.companyId;
+          }
+        }
+        // For residents without projectId, find company from their strataPlanNumber
+        else if (currentUser?.role === "resident" && currentUser.strataPlanNumber) {
+          const projects = await storage.getProjectsByStrataPlan(currentUser.strataPlanNumber);
+          if (projects.length > 0) {
+            companyId = projects[0].companyId;
+          } else {
+            return res.status(400).json({ 
+              message: "No company found for your building. Please contact support." 
+            });
+          }
         }
       }
       
+      // Now validate with companyId resolved
       const complaintData = insertComplaintSchema.parse({
         ...req.body,
-        companyId: companyId || req.body.companyId,
+        companyId,
         residentId: currentUser?.role === "resident" ? currentUser.id : null,
       });
       
