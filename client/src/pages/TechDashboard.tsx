@@ -385,7 +385,7 @@ export default function TechDashboard() {
                                 data-testid={`button-view-pdf-${project.id}`}
                               >
                                 <span className="material-icons text-sm mr-2">description</span>
-                                View PDF
+                                View Rope Access Plan
                               </Button>
                               <Button
                                 variant="outline"
