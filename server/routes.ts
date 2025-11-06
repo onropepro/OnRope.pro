@@ -764,6 +764,58 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: "Internal server error" });
     }
   });
+
+  // Get residents for a project
+  app.get("/api/projects/:id/residents", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      // Only company and management roles can view residents
+      if (!["company", "operations_manager", "supervisor"].includes(currentUser.role)) {
+        return res.status(403).json({ message: "Access denied" });
+      }
+      
+      // Verify access to this project
+      const hasAccess = await storage.verifyProjectAccess(
+        req.params.id,
+        currentUser.id,
+        currentUser.role,
+        currentUser.companyId
+      );
+      
+      if (!hasAccess) {
+        return res.status(403).json({ message: "Access denied" });
+      }
+      
+      const project = await storage.getProjectById(req.params.id);
+      
+      if (!project) {
+        return res.status(404).json({ message: "Project not found" });
+      }
+      
+      // Get all residents with matching strata plan number
+      const residents = await storage.getResidentsByStrataPlan(project.strataPlanNumber);
+      
+      // Return residents without sensitive data
+      const residentsData = residents.map(resident => ({
+        id: resident.id,
+        email: resident.email,
+        name: resident.name,
+        unitNumber: resident.unitNumber,
+        phoneNumber: resident.phoneNumber,
+        strataPlanNumber: resident.strataPlanNumber,
+      }));
+      
+      res.json({ residents: residentsData });
+    } catch (error) {
+      console.error("Get project residents error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
   
   // Update project status
   app.patch("/api/projects/:id/status", requireAuth, requireRole("company", "operations_manager"), async (req: Request, res: Response) => {

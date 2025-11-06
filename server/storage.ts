@@ -58,6 +58,17 @@ export class Storage {
     return result[0];
   }
 
+  async getResidentsByStrataPlan(strataPlanNumber: string): Promise<User[]> {
+    return db.select().from(users)
+      .where(
+        and(
+          eq(users.role, "resident"),
+          eq(users.strataPlanNumber, strataPlanNumber)
+        )
+      )
+      .orderBy(users.email);
+  }
+
   // Project operations
   async createProject(project: InsertProject): Promise<Project> {
     const result = await db.insert(projects).values(project).returning();
