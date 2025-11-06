@@ -91,6 +91,15 @@ The signature component displays FOUR buildings side-by-side representing the 4 
 - Universal profile management for all users
 
 **Recent Updates (Nov 6, 2025):**
+- ✅ **CRITICAL BUG FIXES**:
+  - **Route Protection**: Added ProtectedRoute component to enforce role-based access control
+    - Prevents unauthorized users from accessing management/tech/resident dashboards via URL manipulation
+    - Redirects users to appropriate dashboard based on their role
+  - **Work Session History**: Fixed 0% progress display and missing data
+    - Now correctly uses elevation-specific fields (totalDropsNorth/East/South/West)
+    - Fixed target performance calculations to sum all elevation drops per session
+  - **Progress Calculations**: Removed all references to non-existent `project.totalDrops` field
+    - All progress now calculated from elevation-specific completed drops
 - ✅ **Employee List Enhancement**: Displays employee names and IRATA levels instead of emails
 - ✅ **Universal Profile Page**: All users (residents, staff, company) can update personal information and change passwords
   - Profile navigation button in all dashboard headers
