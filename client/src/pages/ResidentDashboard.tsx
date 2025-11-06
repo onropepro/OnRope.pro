@@ -95,6 +95,7 @@ export default function ResidentDashboard() {
     if (currentUser) {
       form.setValue("residentName", currentUser.name || "");
       form.setValue("unitNumber", currentUser.unitNumber || "");
+      form.setValue("phoneNumber", currentUser.phoneNumber || "");
     }
   }, [currentUser, form]);
 
