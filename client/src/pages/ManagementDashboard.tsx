@@ -540,7 +540,49 @@ export default function ManagementDashboard() {
 
       <div className="p-4 max-w-4xl mx-auto">
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <ScrollArea className="w-full mb-4">
+          {/* Mobile Dropdown */}
+          <div className="block sm:hidden mb-4">
+            <Select value={activeTab} onValueChange={setActiveTab}>
+              <SelectTrigger className="h-12 w-full" data-testid="select-tab-mobile">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="projects">
+                  <div className="flex items-center gap-2">
+                    <span className="material-icons text-sm">apartment</span>
+                    Projects
+                  </div>
+                </SelectItem>
+                <SelectItem value="performance">
+                  <div className="flex items-center gap-2">
+                    <span className="material-icons text-sm">analytics</span>
+                    Performance
+                  </div>
+                </SelectItem>
+                <SelectItem value="complaints">
+                  <div className="flex items-center gap-2">
+                    <span className="material-icons text-sm">feedback</span>
+                    Complaints
+                  </div>
+                </SelectItem>
+                <SelectItem value="my-drops">
+                  <div className="flex items-center gap-2">
+                    <span className="material-icons text-sm">checklist</span>
+                    My Drops
+                  </div>
+                </SelectItem>
+                <SelectItem value="employees">
+                  <div className="flex items-center gap-2">
+                    <span className="material-icons text-sm">people</span>
+                    Employees
+                  </div>
+                </SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* Desktop Tabs */}
+          <ScrollArea className="hidden sm:block w-full mb-4">
             <TabsList className="inline-flex h-12 items-center justify-start rounded-full bg-muted p-1 text-muted-foreground w-full sm:w-auto">
               <TabsTrigger value="projects" data-testid="tab-projects" className="inline-flex items-center justify-center whitespace-nowrap rounded-full px-4 py-2 text-sm font-medium transition-all min-w-[110px] sm:min-w-0">
                 <span className="material-icons text-sm mr-2">apartment</span>
