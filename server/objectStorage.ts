@@ -138,7 +138,6 @@ export class ObjectStorageService {
       metadata: {
         contentType,
       },
-      public: true,
       resumable: false,
     });
 
