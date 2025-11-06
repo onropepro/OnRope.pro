@@ -20,6 +20,7 @@ import { useToast } from "@/hooks/use-toast";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { useLocation } from "wouter";
 import { Textarea } from "@/components/ui/textarea";
+import { Checkbox } from "@/components/ui/checkbox";
 import type { Project } from "@shared/schema";
 import { normalizeStrataPlan } from "@shared/schema";
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from "recharts";
@@ -28,7 +29,7 @@ const projectSchema = z.object({
   strataPlanNumber: z.string().min(1, "Strata plan number is required"),
   buildingName: z.string().min(1, "Building name is required"),
   buildingAddress: z.string().optional(),
-  jobType: z.enum(["window_cleaning", "dryer_vent_cleaning", "pressure_washing"]),
+  jobType: z.enum(["window_cleaning", "dryer_vent_cleaning", "pressure_washing", "in_suit_dryer_vent_cleaning", "parkade_pressure_cleaning", "ground_window_cleaning"]),
   totalDropsNorth: z.string().min(1, "Total drops (North) is required"),
   totalDropsEast: z.string().min(1, "Total drops (East) is required"),
   totalDropsSouth: z.string().min(1, "Total drops (South) is required"),
@@ -37,14 +38,55 @@ const projectSchema = z.object({
   floorCount: z.string().min(1, "Floor count is required"),
   targetCompletionDate: z.string().optional(),
   ropeAccessPlan: z.any().optional(),
+  suitsPerDay: z.string().optional(),
+  floorsPerDay: z.string().optional(),
+  stallsPerDay: z.string().optional(),
+}).superRefine((data, ctx) => {
+  if (data.jobType === "in_suit_dryer_vent_cleaning") {
+    if (!data.suitsPerDay && !data.floorsPerDay) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Either suits per day or floors per day is required for in-suit dryer vent cleaning",
+        path: ["suitsPerDay"],
+      });
+    }
+  }
+  if (data.jobType === "parkade_pressure_cleaning") {
+    if (!data.stallsPerDay) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Stalls per day is required for parkade pressure cleaning",
+        path: ["stallsPerDay"],
+      });
+    }
+  }
 });
+
+// Available permissions for employees
+const AVAILABLE_PERMISSIONS = [
+  { id: "view_projects", label: "View Projects" },
+  { id: "create_projects", label: "Create Projects" },
+  { id: "edit_projects", label: "Edit Projects" },
+  { id: "delete_projects", label: "Delete Projects" },
+  { id: "view_employees", label: "View Employees" },
+  { id: "create_employees", label: "Create Employees" },
+  { id: "edit_employees", label: "Edit Employees" },
+  { id: "delete_employees", label: "Delete Employees" },
+  { id: "log_drops", label: "Log Drops" },
+  { id: "view_complaints", label: "View Complaints" },
+  { id: "manage_complaints", label: "Manage Complaints" },
+  { id: "view_work_sessions", label: "View Work Sessions" },
+  { id: "manage_work_sessions", label: "Manage Work Sessions" },
+  { id: "view_analytics", label: "View Analytics" },
+] as const;
 
 const employeeSchema = z.object({
   name: z.string().min(1, "Name is required"),
   email: z.string().email("Invalid email address"),
   password: z.string().min(6, "Password must be at least 6 characters"),
-  role: z.enum(["operations_manager", "supervisor", "rope_access_tech"]),
+  role: z.enum(["operations_manager", "supervisor", "rope_access_tech", "manager", "ground_crew", "ground_crew_supervisor"]),
   techLevel: z.string().optional(),
+  permissions: z.array(z.string()).default([]),
 }).refine((data) => {
   if (data.role === "rope_access_tech" && !data.techLevel) {
     return false;
@@ -58,8 +100,9 @@ const employeeSchema = z.object({
 const editEmployeeSchema = z.object({
   name: z.string().min(1, "Name is required"),
   email: z.string().email("Invalid email address"),
-  role: z.enum(["operations_manager", "supervisor", "rope_access_tech"]),
+  role: z.enum(["operations_manager", "supervisor", "rope_access_tech", "manager", "ground_crew", "ground_crew_supervisor"]),
   techLevel: z.string().optional(),
+  permissions: z.array(z.string()).default([]),
 }).refine((data) => {
   if (data.role === "rope_access_tech" && !data.techLevel) {
     return false;
@@ -189,6 +232,7 @@ export default function ManagementDashboard() {
       password: "",
       role: "rope_access_tech",
       techLevel: "",
+      permissions: [],
     },
   });
 
@@ -199,6 +243,7 @@ export default function ManagementDashboard() {
       email: "",
       role: "rope_access_tech",
       techLevel: "",
+      permissions: [],
     },
   });
 
@@ -269,6 +314,9 @@ export default function ManagementDashboard() {
           dailyDropTarget: parseInt(data.dailyDropTarget),
           floorCount: parseInt(data.floorCount),
           ropeAccessPlanUrl: data.ropeAccessPlanUrl || undefined,
+          suitsPerDay: data.suitsPerDay ? parseInt(data.suitsPerDay) : undefined,
+          floorsPerDay: data.floorsPerDay ? parseInt(data.floorsPerDay) : undefined,
+          stallsPerDay: data.stallsPerDay ? parseInt(data.stallsPerDay) : undefined,
         }),
         credentials: "include",
       });
@@ -328,6 +376,7 @@ export default function ManagementDashboard() {
         email: data.email,
         role: data.role,
         techLevel: data.techLevel,
+        permissions: data.permissions,
       });
 
       return response;
@@ -405,6 +454,7 @@ export default function ManagementDashboard() {
       email: employee.email || "",
       role: employee.role,
       techLevel: employee.techLevel || "",
+      permissions: employee.permissions || [],
     });
     setShowEditEmployeeDialog(true);
   };
@@ -777,12 +827,62 @@ export default function ManagementDashboard() {
                                   <SelectItem value="window_cleaning">Window Cleaning</SelectItem>
                                   <SelectItem value="dryer_vent_cleaning">Dryer Vent Cleaning</SelectItem>
                                   <SelectItem value="pressure_washing">Pressure Washing</SelectItem>
+                                  <SelectItem value="in_suit_dryer_vent_cleaning">In-suit Dryer Vent Cleaning</SelectItem>
+                                  <SelectItem value="parkade_pressure_cleaning">Parkade Pressure Cleaning</SelectItem>
+                                  <SelectItem value="ground_window_cleaning">Ground Window Cleaning</SelectItem>
                                 </SelectContent>
                               </Select>
                               <FormMessage />
                             </FormItem>
                           )}
                         />
+
+                        {projectForm.watch("jobType") === "in_suit_dryer_vent_cleaning" && (
+                          <div className="grid grid-cols-2 gap-4">
+                            <FormField
+                              control={projectForm.control}
+                              name="suitsPerDay"
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel>Suits per Day</FormLabel>
+                                  <FormControl>
+                                    <Input type="number" min="0" placeholder="e.g., 10" {...field} data-testid="input-suits-per-day" className="h-12" />
+                                  </FormControl>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+                            <FormField
+                              control={projectForm.control}
+                              name="floorsPerDay"
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel>Floors per Day (alt.)</FormLabel>
+                                  <FormControl>
+                                    <Input type="number" min="0" placeholder="e.g., 5" {...field} data-testid="input-floors-per-day" className="h-12" />
+                                  </FormControl>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+                          </div>
+                        )}
+
+                        {projectForm.watch("jobType") === "parkade_pressure_cleaning" && (
+                          <FormField
+                            control={projectForm.control}
+                            name="stallsPerDay"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Stalls per Day</FormLabel>
+                                <FormControl>
+                                  <Input type="number" min="0" placeholder="e.g., 20" {...field} data-testid="input-stalls-per-day" className="h-12" />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                        )}
 
                         <FormField
                           control={projectForm.control}
@@ -1548,6 +1648,9 @@ export default function ManagementDashboard() {
                                 <SelectItem value="operations_manager">Operations Manager</SelectItem>
                                 <SelectItem value="supervisor">Supervisor</SelectItem>
                                 <SelectItem value="rope_access_tech">Rope Access Technician</SelectItem>
+                                <SelectItem value="manager">Manager</SelectItem>
+                                <SelectItem value="ground_crew">Ground Crew</SelectItem>
+                                <SelectItem value="ground_crew_supervisor">Ground Crew Supervisor</SelectItem>
                               </SelectContent>
                             </Select>
                             <FormMessage />
@@ -1579,6 +1682,58 @@ export default function ManagementDashboard() {
                           )}
                         />
                       )}
+
+                      <FormField
+                        control={employeeForm.control}
+                        name="permissions"
+                        render={() => (
+                          <FormItem>
+                            <div className="mb-4">
+                              <FormLabel className="text-base">Permissions</FormLabel>
+                              <FormDescription className="text-xs">
+                                Select which features this employee can access
+                              </FormDescription>
+                            </div>
+                            <div className="grid grid-cols-1 gap-3">
+                              {AVAILABLE_PERMISSIONS.map((permission) => (
+                                <FormField
+                                  key={permission.id}
+                                  control={employeeForm.control}
+                                  name="permissions"
+                                  render={({ field }) => {
+                                    return (
+                                      <FormItem
+                                        key={permission.id}
+                                        className="flex flex-row items-start space-x-3 space-y-0"
+                                      >
+                                        <FormControl>
+                                          <Checkbox
+                                            checked={field.value?.includes(permission.id)}
+                                            onCheckedChange={(checked) => {
+                                              return checked
+                                                ? field.onChange([...field.value, permission.id])
+                                                : field.onChange(
+                                                    field.value?.filter(
+                                                      (value) => value !== permission.id
+                                                    )
+                                                  )
+                                            }}
+                                            data-testid={`checkbox-permission-${permission.id}`}
+                                          />
+                                        </FormControl>
+                                        <FormLabel className="text-sm font-normal">
+                                          {permission.label}
+                                        </FormLabel>
+                                      </FormItem>
+                                    )
+                                  }}
+                                />
+                              ))}
+                            </div>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
 
                       <Button type="submit" className="w-full h-12" data-testid="button-submit-employee" disabled={createEmployeeMutation.isPending}>
                         {createEmployeeMutation.isPending ? "Creating..." : "Create Employee"}
@@ -1699,6 +1854,9 @@ export default function ManagementDashboard() {
                           <SelectItem value="operations_manager">Operations Manager</SelectItem>
                           <SelectItem value="supervisor">Supervisor</SelectItem>
                           <SelectItem value="rope_access_tech">Rope Access Tech</SelectItem>
+                          <SelectItem value="manager">Manager</SelectItem>
+                          <SelectItem value="ground_crew">Ground Crew</SelectItem>
+                          <SelectItem value="ground_crew_supervisor">Ground Crew Supervisor</SelectItem>
                         </SelectContent>
                       </Select>
                       <FormMessage />
@@ -1730,6 +1888,58 @@ export default function ManagementDashboard() {
                     )}
                   />
                 )}
+
+                <FormField
+                  control={editEmployeeForm.control}
+                  name="permissions"
+                  render={() => (
+                    <FormItem>
+                      <div className="mb-4">
+                        <FormLabel className="text-base">Permissions</FormLabel>
+                        <FormDescription className="text-xs">
+                          Select which features this employee can access
+                        </FormDescription>
+                      </div>
+                      <div className="grid grid-cols-1 gap-3">
+                        {AVAILABLE_PERMISSIONS.map((permission) => (
+                          <FormField
+                            key={permission.id}
+                            control={editEmployeeForm.control}
+                            name="permissions"
+                            render={({ field }) => {
+                              return (
+                                <FormItem
+                                  key={permission.id}
+                                  className="flex flex-row items-start space-x-3 space-y-0"
+                                >
+                                  <FormControl>
+                                    <Checkbox
+                                      checked={field.value?.includes(permission.id)}
+                                      onCheckedChange={(checked) => {
+                                        return checked
+                                          ? field.onChange([...field.value, permission.id])
+                                          : field.onChange(
+                                              field.value?.filter(
+                                                (value) => value !== permission.id
+                                              )
+                                            )
+                                      }}
+                                      data-testid={`checkbox-edit-permission-${permission.id}`}
+                                    />
+                                  </FormControl>
+                                  <FormLabel className="text-sm font-normal">
+                                    {permission.label}
+                                  </FormLabel>
+                                </FormItem>
+                              )
+                            }}
+                          />
+                        ))}
+                      </div>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
                 <Button type="submit" className="w-full h-12" data-testid="button-submit-edit-employee" disabled={editEmployeeMutation.isPending}>
                   {editEmployeeMutation.isPending ? "Updating..." : "Update Employee"}

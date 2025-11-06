@@ -33,12 +33,12 @@ export const sessions = pgTable(
   (table) => [index("IDX_session_expire").on(table.expire)],
 );
 
-// Users table - supports multiple roles: company, resident, operations_manager, supervisor, rope_access_tech
+// Users table - supports multiple roles
 export const users = pgTable("users", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   email: varchar("email").unique(), // null for company accounts
   passwordHash: text("password_hash").notNull(),
-  role: varchar("role").notNull(), // company | resident | operations_manager | supervisor | rope_access_tech
+  role: varchar("role").notNull(), // company | resident | operations_manager | supervisor | rope_access_tech | manager | ground_crew | ground_crew_supervisor
   
   // Company-specific fields
   companyName: varchar("company_name"), // for company role
@@ -53,6 +53,7 @@ export const users = pgTable("users", {
   
   // Employee-specific fields
   techLevel: varchar("tech_level"), // for rope_access_tech role (e.g., "Level 1", "Level 2", "Level 3")
+  permissions: text("permissions").array().default(sql`ARRAY[]::text[]`), // Array of permission strings for employees
   isTempPassword: boolean("is_temp_password").default(false),
   
   createdAt: timestamp("created_at").defaultNow(),
@@ -66,7 +67,7 @@ export const projects = pgTable("projects", {
   buildingName: varchar("building_name").notNull(), // Building name for display
   strataPlanNumber: varchar("strata_plan_number").notNull(),
   buildingAddress: text("building_address"), // Building address visible to all employees
-  jobType: varchar("job_type").notNull(), // window_cleaning | dryer_vent_cleaning | pressure_washing
+  jobType: varchar("job_type").notNull(), // window_cleaning | dryer_vent_cleaning | pressure_washing | in_suit_dryer_vent_cleaning | parkade_pressure_cleaning | ground_window_cleaning
   
   // Elevation-specific drop totals
   totalDropsNorth: integer("total_drops_north").notNull().default(0),
@@ -80,6 +81,12 @@ export const projects = pgTable("projects", {
   ropeAccessPlanUrl: text("rope_access_plan_url"), // URL to PDF in object storage
   imageUrls: text("image_urls").array().default(sql`ARRAY[]::text[]`), // Array of image URLs from object storage
   status: varchar("status").notNull().default('active'), // active | completed
+  
+  // Service-specific expectation fields
+  suitsPerDay: integer("suits_per_day"), // For in_suit_dryer_vent_cleaning
+  floorsPerDay: integer("floors_per_day"), // Alternative for in_suit_dryer_vent_cleaning
+  stallsPerDay: integer("stalls_per_day"), // For parkade_pressure_cleaning
+  
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
