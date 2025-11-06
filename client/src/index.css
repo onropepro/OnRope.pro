@@ -409,11 +409,36 @@
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
     border: 1px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 8px 32px rgba(30, 64, 175, 0.08);
   }
 
   .dark .glass-card {
     background: rgba(31, 41, 55, 0.7);
     border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  }
+
+  /* Dot pattern background */
+  .dot-pattern {
+    background-image: radial-gradient(circle, rgba(30, 64, 175, 0.05) 1px, transparent 1px);
+    background-size: 20px 20px;
+  }
+
+  .dark .dot-pattern {
+    background-image: radial-gradient(circle, rgba(59, 130, 246, 0.08) 1px, transparent 1px);
+  }
+
+  /* Premium gradient backgrounds */
+  .gradient-bg {
+    background: linear-gradient(135deg, #EFF6FF 0%, #DBEAFE 50%, #BFDBFE 100%);
+  }
+
+  .dark .gradient-bg {
+    background: linear-gradient(135deg, #0F172A 0%, #1E293B 50%, #334155 100%);
+  }
+
+  .gradient-accent {
+    background: linear-gradient(135deg, rgba(59,130,246,0.1) 0%, rgba(139,92,246,0.05) 100%);
   }
 
   /* Gradient text utility */
@@ -422,5 +447,14 @@
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
+  }
+
+  /* Enhanced shadows */
+  .shadow-premium {
+    box-shadow: 0 12px 20px -4px rgba(30, 64, 175, 0.15), 0 4px 8px -4px rgba(30, 64, 175, 0.08);
+  }
+
+  .dark .shadow-premium {
+    box-shadow: 0 12px 20px -4px rgba(0, 0, 0, 0.4), 0 4px 8px -4px rgba(0, 0, 0, 0.2);
   }
 }

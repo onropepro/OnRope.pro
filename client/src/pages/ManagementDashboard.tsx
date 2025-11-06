@@ -644,9 +644,9 @@ export default function ManagementDashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-background pb-20">
+    <div className="min-h-screen gradient-bg dot-pattern pb-20">
       {/* Header */}
-      <header className="sticky top-0 z-[100] bg-card border-b border-card-border shadow-sm">
+      <header className="sticky top-0 z-[100] glass-card border-0 shadow-premium">
         <div className="px-4 h-16 flex items-center justify-between">
           <div>
             <h1 className="text-lg font-bold">Management</h1>
@@ -1063,7 +1063,7 @@ export default function ManagementDashboard() {
                       return (
                         <Card 
                           key={project.id} 
-                          className="hover-elevate active-elevate-2 cursor-pointer" 
+                          className="glass-card border-0 shadow-premium hover-elevate active-elevate-2 cursor-pointer" 
                           data-testid={`project-card-${project.id}`}
                           onClick={() => setLocation(`/projects/${project.id}`)}
                         >

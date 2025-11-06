@@ -206,7 +206,7 @@ export default function ProjectDetail() {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
+    <div className="min-h-screen gradient-bg dot-pattern p-4">
       <div className="max-w-2xl mx-auto space-y-6">
         {/* Header */}
         <div className="mb-6 flex items-center gap-4">
@@ -228,7 +228,7 @@ export default function ProjectDetail() {
         </div>
 
         {/* Main Content Card */}
-        <Card>
+        <Card className="glass-card border-0 shadow-premium">
           <CardContent className="p-6 space-y-6">
             {/* Building Visualization */}
             <HighRiseBuilding
@@ -435,7 +435,7 @@ export default function ProjectDetail() {
 
         {/* Target Performance Chart - Management Only */}
         {isManagement && completedSessions.length > 0 && (
-          <Card>
+          <Card className="glass-card border-0 shadow-premium">
             <CardHeader>
               <CardTitle>Target Performance</CardTitle>
             </CardHeader>
@@ -480,7 +480,7 @@ export default function ProjectDetail() {
 
         {/* Residents List - Management Only */}
         {isManagement && (
-          <Card>
+          <Card className="glass-card border-0 shadow-premium">
             <CardHeader>
               <CardTitle>Residents</CardTitle>
             </CardHeader>
@@ -528,7 +528,7 @@ export default function ProjectDetail() {
         )}
 
         {/* Work Sessions List */}
-        <Card>
+        <Card className="glass-card border-0 shadow-premium">
           <CardHeader>
             <CardTitle>Work Session History</CardTitle>
           </CardHeader>

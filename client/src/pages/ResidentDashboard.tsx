@@ -372,9 +372,9 @@ export default function ResidentDashboard() {
 
 
   return (
-    <div className="min-h-screen bg-background pb-20">
+    <div className="min-h-screen gradient-bg dot-pattern pb-20">
       {/* Header */}
-      <header className="sticky top-0 z-[100] bg-card border-b border-card-border shadow-sm">
+      <header className="sticky top-0 z-[100] glass-card border-0 shadow-premium">
         <div className="px-4 h-16 flex items-center justify-between">
           <div>
             <h1 className="text-lg font-bold">
@@ -399,7 +399,7 @@ export default function ResidentDashboard() {
 
       <div className="p-4 max-w-2xl mx-auto">
         {/* Building Info Card */}
-        <Card className="mb-4">
+        <Card className="glass-card border-0 shadow-premium mb-4">
           <CardHeader>
             <div className="flex items-start justify-between">
               <div>
@@ -420,7 +420,7 @@ export default function ResidentDashboard() {
           </TabsList>
 
           <TabsContent value="building">
-            <Card>
+            <Card className="glass-card border-0 shadow-premium">
               <CardContent className="pt-6">
                 <HighRiseBuilding
                   floors={projectData.floorCount}
@@ -452,7 +452,7 @@ export default function ResidentDashboard() {
           </TabsContent>
 
           <TabsContent value="complaints">
-            <Card>
+            <Card className="glass-card border-0 shadow-premium">
               <CardHeader>
                 <CardTitle>Submit Feedback/Comments/Request</CardTitle>
                 <CardDescription>Let us know if you have any concerns or questions</CardDescription>
