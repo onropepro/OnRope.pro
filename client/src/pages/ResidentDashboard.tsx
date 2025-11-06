@@ -14,6 +14,7 @@ import { z } from "zod";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 
 const complaintSchema = z.object({
   residentName: z.string().min(1, "Name is required"),
@@ -26,6 +27,7 @@ type ComplaintFormData = z.infer<typeof complaintSchema>;
 
 export default function ResidentDashboard() {
   const [activeTab, setActiveTab] = useState("building");
+  const [showLogoutDialog, setShowLogoutDialog] = useState(false);
   const { toast } = useToast();
   const [, setLocation] = useLocation();
 
@@ -121,7 +123,7 @@ export default function ResidentDashboard() {
     submitComplaintMutation.mutate(data);
   };
 
-  const handleLogout = async () => {
+  const confirmLogout = async () => {
     try {
       await fetch("/api/logout", {
         method: "POST",
@@ -149,7 +151,7 @@ export default function ResidentDashboard() {
             <span className="material-icons text-2xl text-primary">apartment</span>
             <h1 className="text-xl font-semibold">Resident Portal</h1>
           </div>
-          <Button variant="ghost" onClick={handleLogout} data-testid="button-logout">
+          <Button variant="ghost" onClick={() => setShowLogoutDialog(true)} data-testid="button-logout">
             <span className="material-icons">logout</span>
           </Button>
         </header>
@@ -262,7 +264,7 @@ export default function ResidentDashboard() {
             <span className="material-icons text-2xl text-primary">apartment</span>
             <h1 className="text-xl font-semibold">Resident Portal</h1>
           </div>
-          <Button variant="ghost" onClick={handleLogout} data-testid="button-logout">
+          <Button variant="ghost" onClick={() => setShowLogoutDialog(true)} data-testid="button-logout">
             <span className="material-icons">logout</span>
           </Button>
         </header>
@@ -527,6 +529,24 @@ export default function ResidentDashboard() {
           </TabsContent>
         </Tabs>
       </div>
+
+      {/* Logout Confirmation Dialog */}
+      <AlertDialog open={showLogoutDialog} onOpenChange={setShowLogoutDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Confirm Logout</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to logout?
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel data-testid="button-cancel-logout">Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmLogout} data-testid="button-confirm-logout">
+              Logout
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

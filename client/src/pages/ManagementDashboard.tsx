@@ -83,6 +83,7 @@ export default function ManagementDashboard() {
   const [dropProject, setDropProject] = useState<any>(null);
   const [showStartDayDialog, setShowStartDayDialog] = useState(false);
   const [showEndDayDialog, setShowEndDayDialog] = useState(false);
+  const [showLogoutDialog, setShowLogoutDialog] = useState(false);
   const [activeSession, setActiveSession] = useState<any>(null);
   const [uploadedPlanFile, setUploadedPlanFile] = useState<File | null>(null);
   const [isUploadingPlan, setIsUploadingPlan] = useState(false);
@@ -452,7 +453,7 @@ export default function ManagementDashboard() {
     },
   });
 
-  const handleLogout = async () => {
+  const confirmLogout = async () => {
     try {
       await fetch("/api/logout", {
         method: "POST",
@@ -536,7 +537,7 @@ export default function ManagementDashboard() {
             <Button variant="ghost" size="icon" className="min-w-11 min-h-11" data-testid="button-profile" onClick={() => setLocation("/profile")}>
               <span className="material-icons">person</span>
             </Button>
-            <Button variant="ghost" size="icon" className="min-w-11 min-h-11" data-testid="button-logout" onClick={handleLogout}>
+            <Button variant="ghost" size="icon" className="min-w-11 min-h-11" data-testid="button-logout" onClick={() => setShowLogoutDialog(true)}>
               <span className="material-icons">logout</span>
             </Button>
           </div>
@@ -1716,6 +1717,24 @@ export default function ManagementDashboard() {
           </Form>
         </DialogContent>
       </Dialog>
+
+      {/* Logout Confirmation Dialog */}
+      <AlertDialog open={showLogoutDialog} onOpenChange={setShowLogoutDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Confirm Logout</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to logout?
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel data-testid="button-cancel-logout">Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmLogout} data-testid="button-confirm-logout">
+              Logout
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

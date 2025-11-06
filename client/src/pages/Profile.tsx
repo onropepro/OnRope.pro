@@ -37,6 +37,7 @@ export default function Profile() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [showLogoutDialog, setShowLogoutDialog] = useState(false);
   const [deletePassword, setDeletePassword] = useState("");
 
   const { data: userData, isLoading } = useQuery({
@@ -116,7 +117,7 @@ export default function Profile() {
     setDeletePassword("");
   };
 
-  const handleLogout = async () => {
+  const confirmLogout = async () => {
     try {
       await fetch("/api/logout", {
         method: "POST",
@@ -125,6 +126,7 @@ export default function Profile() {
       setLocation("/");
     } catch (error) {
       console.error("Logout error:", error);
+      toast({ title: "Error", description: "Failed to logout", variant: "destructive" });
     }
   };
 
@@ -178,7 +180,7 @@ export default function Profile() {
             size="icon"
             className="min-w-11 min-h-11"
             data-testid="button-logout"
-            onClick={handleLogout}
+            onClick={() => setShowLogoutDialog(true)}
           >
             <span className="material-icons">logout</span>
           </Button>
@@ -456,6 +458,24 @@ export default function Profile() {
               data-testid="button-confirm-delete-account"
             >
               Delete Account
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Logout Confirmation Dialog */}
+      <AlertDialog open={showLogoutDialog} onOpenChange={setShowLogoutDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Confirm Logout</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to logout?
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel data-testid="button-cancel-logout">Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmLogout} data-testid="button-confirm-logout">
+              Logout
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
