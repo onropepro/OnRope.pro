@@ -388,7 +388,7 @@ export default function ResidentDashboard() {
             <Button variant="ghost" size="icon" className="min-w-11 min-h-11" data-testid="button-profile" onClick={() => setLocation("/profile")}>
               <span className="material-icons">person</span>
             </Button>
-            <Button variant="ghost" size="icon" className="min-w-11 min-h-11" data-testid="button-logout" onClick={handleLogout}>
+            <Button variant="ghost" size="icon" className="min-w-11 min-h-11" data-testid="button-logout" onClick={() => setShowLogoutDialog(true)}>
               <span className="material-icons">logout</span>
             </Button>
           </div>
