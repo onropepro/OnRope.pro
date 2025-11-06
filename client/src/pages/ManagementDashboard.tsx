@@ -314,11 +314,12 @@ export default function ManagementDashboard() {
           credentials: 'include',
         });
         
+        const uploadResult = await uploadResponse.json();
+        
         if (!uploadResponse.ok) {
-          throw new Error('Failed to upload fall protection plan');
+          throw new Error(uploadResult.message || 'Failed to upload fall protection plan');
         }
         
-        const uploadResult = await uploadResponse.json();
         ropeAccessPlanUrl = uploadResult.url;
       } catch (error) {
         setIsUploadingPlan(false);

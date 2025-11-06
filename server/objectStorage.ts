@@ -133,12 +133,13 @@ export class ObjectStorageService {
     const bucket = objectStorageClient.bucket(bucketName);
     const file = bucket.file(objectName);
 
-    // Upload the file
+    // Upload the file (resumable: false for better performance on small files)
     await file.save(fileBuffer, {
       metadata: {
         contentType,
       },
       public: true,
+      resumable: false,
     });
 
     // Return the public URL path
