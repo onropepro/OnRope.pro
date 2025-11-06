@@ -323,14 +323,11 @@ export default function ManagementDashboard() {
 
   const editEmployeeMutation = useMutation({
     mutationFn: async (data: EditEmployeeFormData & { id: string }) => {
-      const response = await apiRequest(`/api/employees/${data.id}`, {
-        method: "PATCH",
-        body: JSON.stringify({
-          name: data.name,
-          email: data.email,
-          role: data.role,
-          techLevel: data.techLevel,
-        }),
+      const response = await apiRequest("PATCH", `/api/employees/${data.id}`, {
+        name: data.name,
+        email: data.email,
+        role: data.role,
+        techLevel: data.techLevel,
       });
 
       return response;

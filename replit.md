@@ -1,191 +1,50 @@
 # Rope Access Management Platform
 
 ## Overview
-A mobile-first management platform for rope access building maintenance operations (window washing, dryer vent cleaning, pressure washing). The platform provides role-based access for Company accounts, Residents, Operations Managers, Supervisors, and Rope Access Technicians.
+A mobile-first management platform designed for rope access building maintenance operations (e.g., window washing, dryer vent cleaning, pressure washing). The platform provides role-based access for various stakeholders including Company accounts, Residents, Operations Managers, Supervisors, and Rope Access Technicians. Its purpose is to streamline project management, employee oversight, visual progress tracking, and resident communication, aiming for a production-ready solution that enhances efficiency and transparency in building maintenance.
 
-## Key Features
-- **Visual Progress Tracking**: High-rise building visualization with lit windows showing completed drops
-- **Drop Logging**: Technicians can log daily drops with historical entry capability
-- **Complaint Management**: Residents can submit feedback; management can track and respond with notes
-- **Project Management**: Create projects with strata plan numbers, floor counts, and rope access plans; delete projects with cascade warnings
-- **Employee Management**: Company-controlled onboarding with role-based permissions
-- **Project Photo Gallery**: All staff can upload photos from camera or library, displayed in 3-column gallery on project detail page
+## User Preferences
+I prefer simple language and clear, concise explanations. I want an iterative development approach where I can provide feedback frequently. Please ask before making any major architectural changes or deleting significant portions of code. I prefer a collaborative interaction style.
 
-## Tech Stack
-- **Frontend**: React + TypeScript with Wouter routing
-- **Backend**: Express.js with custom authentication
-- **Database**: PostgreSQL with Drizzle ORM
-- **Storage**: Replit Object Storage for PDF rope access plans and project photo galleries
-- **UI**: Shadcn components with Material Design 3 aesthetic
-- **Styling**: Tailwind CSS with Roboto font family
+## System Architecture
+The platform is built with a **mobile-first approach** and features a modern, premium aesthetic.
 
-## User Roles
-1. **Company**: Manages projects and employees, no email login
-2. **Resident**: Views progress, submits complaints, email login
-3. **Operations Manager**: Full project oversight, employee management
-4. **Supervisor**: Project monitoring, complaint resolution
-5. **Rope Access Tech**: Daily drop logging, complaint viewing with tech level tracking
+**UI/UX Decisions:**
+- **Design System:** Material Design 3 aesthetic using Shadcn components.
+- **Colors:** Premium Ocean Blue primary (217 91% 60%), sophisticated slate backgrounds, blue-tinted shadows for depth. Dark mode enhanced with deep navy backgrounds.
+- **Visual Style:** Modern premium with glass-morphism effects, gradient accents, enhanced shadows. Subtle dot pattern texture overlay on the body.
+- **Typography:** Roboto font family throughout, Material Icons.
+- **Interactivity:** 44px minimum touch targets (48px comfortable), 0.75rem (12px) border radius.
+- **Layout:** Single column layouts, bottom navigation, full-width forms for mobile responsiveness.
+- **Key Visual Component:** A signature "4-Elevation Building System" displays four buildings side-by-side (North, East, South, West). Each elevation shows independent, horizontal progress bars filling from left-to-right based on completed drops, with dynamic floor counts and percentage displays.
 
-## Routes
-- `/` - Login page
-- `/register` - Registration (Resident/Company tabs)
-- `/resident` - Resident dashboard with building visualization and complaint submission
-- `/tech` - Technician dashboard with drop logging and complaint viewing
-- `/management` - Company/Manager dashboard with project and employee management
-- `/projects/:id` - Project detail page with building visualization, stats, work session history, and delete capability
-- `/projects/:id/work-sessions` - Work session history (legacy route, functionality now integrated into project detail page)
-- `/complaints/:id` - Complaint detail with notes (tech/management access)
+**Technical Implementations & Feature Specifications:**
+- **Role-Based Access Control:** Multi-role user system (Company, Resident, Operations Manager, Supervisor, Rope Access Tech) with distinct permissions and dashboards.
+- **Project Management:** Create and manage projects including strata plan numbers, floor counts, and rope access plans (PDF upload). Supports project deletion with cascade warnings.
+- **Employee Management:** Company-controlled onboarding, editing employee details (name, email, role, IRATA level).
+- **Progress Tracking:** Visual progress through the 4-Elevation Building System. Daily drop logging by technicians with historical entry and dynamic shortfall reason validation.
+- **Complaint Management:** Residents can submit feedback; management can track and respond with notes.
+- **Photo Gallery:** Staff can upload photos to projects from camera or library, displayed in a 3-column responsive gallery.
+- **Universal Profile Management:** All users can update personal information and change passwords. Company owners can delete their entire account with cascade.
+- **Authentication:** Custom Express.js authentication with session storage.
 
-## Database Schema
-- **users**: Multi-role with custom fields (company name, resident info, tech levels)
-- **projects**: Strata plan tracking with floor counts, drops, completion status, and imageUrls array for photo gallery
-- **drop_logs**: Daily drop entries per project per tech with date flexibility
-- **complaints**: Resident feedback with status tracking
-- **complaint_notes**: Tech/management responses to complaints
-- **sessions**: Express session storage
+**System Design Choices:**
+- **Frontend:** React + TypeScript with Wouter for routing.
+- **Backend:** Express.js.
+- **Database:** PostgreSQL with Drizzle ORM.
+- **Styling:** Tailwind CSS.
+- **API Endpoints:** Structured for managing users, projects, drop logs, complaints, and sessions. Includes endpoints for photo uploads and user profile management.
+- **Security:** `app.set('trust proxy', 1)` for session cookie persistence behind Replit's HTTPS proxy. ProtectedRoute component for robust role-based access control.
 
-## Design System
-- **Colors**: Premium Ocean Blue primary (217 91% 60%), sophisticated slate backgrounds, blue-tinted shadows for depth
-- **Visual Style**: Modern premium aesthetic with glass-morphism effects, gradient accents, enhanced shadows
-- **Typography**: Roboto font family throughout, Material Icons
-- **Touch Targets**: 44px minimum, 48px comfortable (h-12 buttons/inputs)
-- **Spacing**: Consistent with Tailwind's 4-unit scale (p-4, gap-4, mb-4)
-- **Border Radius**: 0.75rem (12px) for modern, friendly appearance
-- **Shadows**: Blue-tinted shadows (rgba(30, 64, 175, ...)) for cohesive depth system
-- **Mobile-First**: Single column layouts, bottom navigation, full-width forms
-- **Special Effects**: Subtle dot pattern texture overlay, glass-card utility for elevated surfaces
-
-## Development Status
-- ✅ Phase 1: Frontend components and routing complete
-- ✅ Phase 2: Backend API integration complete
-- ✅ Phase 3: Authentication middleware complete
-- ✅ Phase 4: PDF upload for rope access plans complete with Replit Object Storage
-- ✅ All critical bugs fixed (session detection, End Day UX, drop calculations, button states)
-- ✅ Building name field added to projects
-- ✅ Work session history page with tech names (/projects/:id/work-sessions)
-- ✅ General messaging for residents (companyId-based routing, projectId nullable)
-- ✅ Residents can submit messages even with no active projects
-- ✅ Project deletion feature with confirmation dialog and cascade warnings
-- 🚀 **Production-ready platform with complete feature set**
-
-## Key Visual: 4-Elevation Building System
-The signature component displays FOUR buildings side-by-side representing the 4 elevations (North, East, South, West):
-- Each elevation has its own vertical building visualization with horizontal progress bars
-- Dynamic floor count matching project specifications
-- Each floor is a thin horizontal bar (16px height)
-- **Horizontal progress fill**: Yellow bar fills from LEFT TO RIGHT on each floor
-- **Independent progress tracking**: Each elevation shows its own completion percentage
-- Progress formula per elevation: `Math.min(100, (completedDropsElevation / totalDropsElevation) × 100)`
-- Overall progress: Sum of all completed drops / sum of all total drops
-- Yellow fill width matches progress percentage (e.g., 16% = bar fills 16% from left edge)
-- Floor numbers displayed on left side of each building
-- Progress percentage and drop counts shown above each building
-- Visualization displayed on: Resident Dashboard, Project Details, Management Dashboard, Work Session History
-
-## Current State
-**Full-stack application ready for production use:**
-- Complete authentication system with role-based access control
-- PostgreSQL database with Drizzle ORM
-- Work session tracking with Start Day/End Day functionality
-- Daily drop logging with historical entry support and dynamic shortfall reason validation
-- Building visualization showing completed floors (lit windows)
-- Resident complaint management with internal notes
-- PDF rope access plan uploads using Replit Object Storage
-- Fully mobile-responsive with Material Design 3 aesthetic
-- Universal profile management for all users
-
-**Recent Updates (Nov 6, 2025):**
-- ✅ **Work Session History Integration**: Removed separate page, integrated all content into project detail
-  - Removed "View Work Session History" button from project detail page
-  - Work session list now displays directly on project detail page
-  - Target Performance pie chart shows on project detail (management only)
-  - Improved UX - all project information in one place without navigation
-  - Legacy /projects/:id/work-sessions route still exists but is no longer linked
-- ✅ **Design Modernization**: Complete visual overhaul for premium, sophisticated appearance
-  - Updated color palette to Ocean Blue primary (217 91% 60%) with sophisticated slate backgrounds
-  - Enhanced shadow system with blue-tinted shadows (rgba(30, 64, 175, ...)) for depth
-  - Increased border radius to 0.75rem (12px) for modern look
-  - Added glass-card utility for glass-morphism effects with backdrop-filter blur
-  - Subtle dot pattern texture overlay on body for visual depth
-  - Gradient text utility for premium accents
-  - Dark mode enhanced with deep navy backgrounds (222 47% 11%)
-  - All changes maintain WCAG AA contrast compliance
-- ✅ **Logout Confirmation Dialogs**: Added confirmation prompts before logout on all pages
-  - AlertDialog appears when logout button clicked (prevents accidental logout)
-  - Consistent implementation across Resident, Tech, Management dashboards and Profile page
-  - Test IDs: `button-logout`, `button-confirm-logout`, `button-cancel-logout`
-- ✅ **Project Progress Display Fix**: Fixed "0% / 0 / 0 drops" bug in management dashboard project list
-  - Updated `/api/projects` endpoint to calculate `totalDrops` from elevation-specific fields
-  - Projects now correctly show progress (e.g., "26% / 12 / 47 drops")
-  - Calculation: `totalDrops = totalDropsNorth + totalDropsEast + totalDropsSouth + totalDropsWest`
-- ✅ **Work Session History Access**: Enabled technicians to view their work session history
-  - Added `rope_access_tech` to allowed roles for `/projects/:id/work-sessions` route
-  - Updated backend API endpoint to include technicians in authorization
-  - Back button navigates to project detail page for all user types
-- ✅ **Management-Only Analytics**: Target Performance pie chart on Work Session History page
-  - Pie chart showing Target Met vs Below Target sessions visible only to management
-  - Technicians see project progress and session history but not performance analytics
-  - Role-based conditional rendering using `isManagement` check
-- ✅ **CRITICAL BUG FIXES**:
-  - **Route Protection**: Added ProtectedRoute component to enforce role-based access control
-    - Prevents unauthorized users from accessing management/tech/resident dashboards via URL manipulation
-    - Redirects users to appropriate dashboard based on their role
-  - **Work Session History**: Fixed 0% progress display and missing data
-    - Now correctly uses elevation-specific fields (totalDropsNorth/East/South/West)
-    - Fixed target performance calculations to sum all elevation drops per session
-  - **Progress Calculations**: Removed all references to non-existent `project.totalDrops` field
-    - All progress now calculated from elevation-specific completed drops
-- ✅ **Employee List Enhancement**: Displays employee names and IRATA levels instead of emails
-- ✅ **Universal Profile Page**: All users (residents, staff, company) can update personal information and change passwords
-  - Profile navigation button in all dashboard headers
-  - Role-specific fields (company name, unit number, etc.)
-  - Password change with verification
-  - PATCH `/api/user/profile` and `/api/user/password` endpoints
-- ✅ **Company Account Deletion**: Company owners can delete their entire account with cascade
-  - DELETE `/api/user/account` endpoint (company role only)
-  - Password verification required
-  - Cascades to all employees, projects, work sessions, drop logs, and complaints via database constraints
-  - Confirmation dialog with warnings
-- ✅ **UI Improvements**: 
-  - Mobile-responsive dropdown tabs on management dashboard
-  - "View PDF" changed to "View Rope Access Plan" across UI
-  - Project deletion restricted to company and operations_manager roles only
-- ✅ **Project Photo Gallery**: Staff can now upload photos from camera or library to projects
-  - POST `/api/projects/:id/images` endpoint with staff-only access (company, operations_manager, supervisor, rope_access_tech)
-  - Mobile-first camera capture support with `capture="environment"` attribute
-  - File picker for library selection
-  - 3-column responsive gallery grid on ProjectDetail page
-  - Images stored in Replit Object Storage with URLs in `imageUrls` array
-  - Proper cache invalidation after uploads
-  - 5MB file size limit with image/* mimetype validation
-
-**Updates (Nov 5, 2025):**
-- ✅ Fixed critical session detection bug (now checks ALL projects with async/await)
-- ✅ Improved End Day UX (shortfall reason only appears when drops < target)
-- ✅ Implemented proper object storage with @google-cloud/storage
-- ✅ Fixed all button state transitions and NaN displays
-- ✅ Added project deletion with confirmation dialog (warns about cascade deletion of work sessions, drop logs, complaints)
-- ✅ Converted project details to dedicated page at /projects/:id (no longer a dialog)
-- ✅ **Fixed building progress calculation bug**: `getProjectProgress()` now aggregates drops from BOTH drop_logs AND work_sessions (where endTime IS NOT NULL)
-- ✅ **Fixed pie chart visibility**: Corrected API endpoint method name from `getWorkSessionsForProject()` to `getWorkSessionsByProject()`
-- ✅ **Fixed project detail page**: Added completedDrops calculation to `/api/projects/:id` endpoint
-- ✅ **Added cache-control headers**: Prevents stale data in UI (no-store, no-cache headers on project endpoints)
-- ✅ **Performance tab**: Moved "Overall Target Performance" pie chart to dedicated Performance tab in management dashboard
-- ✅ **Per-employee performance charts**: Added individual pie charts for each technician showing Target Met vs Below Target sessions
-- ✅ **Horizontal progress bar visualization**: Changed building from window-by-window lighting to continuous horizontal fill (left-to-right) on all floors
-- ✅ **IRATA level validation**: Employee creation now requires IRATA level selection for rope access technicians (validation enforced with proper form control binding)
-- ✅ **Progress percentage clamping**: Added Math.min(100, ...) to prevent visual overflow on data anomalies
-- ✅ **Complaints tab**: Added dedicated Complaints tab to management dashboard showing all resident feedback across all projects with navigation to complaint details
-- ✅ **Database reset**: All project data cleared from database while preserving user accounts (residents, techs, management)
-- ✅ **4-Elevation System Complete**: Projects now track North/East/South/West drops independently with:
-  - Create project form with 4 separate elevation input fields (2x2 grid)
-  - End Day dialog with elevation dropdown selection
-  - Backend storage and validation for elevation-specific drops
-  - Building visualization showing 4 buildings side-by-side
-  - Independent progress tracking per elevation
-  - Fixed `||` to `??` in fallback logic to preserve zero values
-  - GET `/api/projects/:id` returns all elevation-specific completed drops
-- ✅ **Mobile-responsive tabs**: Management dashboard tabs now use horizontal scrolling on mobile (no more cramped/overlapping text)
-- ✅ **Improved error handling**: Employee creation now shows clear "Email address is already in use" message for duplicate emails (defensive error checks for Postgres constraint violations)
-- ✅ **CRITICAL FIX**: Added `app.set('trust proxy', 1)` to fix session cookies in production (sessions now persist correctly behind Replit's HTTPS proxy)
-- ✅ Architect-approved and production-ready
+## External Dependencies
+- **Replit Object Storage:** Used for storing PDF rope access plans and project photo galleries.
+- **PostgreSQL:** Relational database for all application data.
+- **Express.js:** Backend web application framework.
+- **React:** Frontend library.
+- **TypeScript:** Typed superset of JavaScript.
+- **Wouter:** Lightweight React router.
+- **Drizzle ORM:** ORM for PostgreSQL.
+- **Shadcn:** UI component library.
+- **Tailwind CSS:** Utility-first CSS framework.
+- **Material Icons:** Icon library.
+- **@google-cloud/storage:** (Implicitly for object storage, though Replit's is a managed service)

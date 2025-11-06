@@ -50,10 +50,12 @@ export class Storage {
     await db.delete(users).where(eq(users.id, userId));
   }
 
-  async updateUser(userId: string, updates: Partial<User>): Promise<void> {
-    await db.update(users)
+  async updateUser(userId: string, updates: Partial<User>): Promise<User> {
+    const result = await db.update(users)
       .set(updates)
-      .where(eq(users.id, userId));
+      .where(eq(users.id, userId))
+      .returning();
+    return result[0];
   }
 
   // Project operations
