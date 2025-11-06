@@ -482,7 +482,7 @@ export default function ProjectDetail() {
         {isManagement && (
           <Card className="glass-card border-0 shadow-premium">
             <CardHeader>
-              <CardTitle>Residents</CardTitle>
+              <CardTitle>Residents linked to project {project?.strataPlanNumber}</CardTitle>
             </CardHeader>
             <CardContent>
               {residents.length === 0 ? (
