@@ -15,23 +15,49 @@ import WorkSessionHistory from "@/pages/WorkSessionHistory";
 import ProjectDetail from "@/pages/ProjectDetail";
 import Profile from "@/pages/Profile";
 import NotFound from "@/pages/not-found";
+import ProtectedRoute from "@/components/ProtectedRoute";
 
 function Router() {
-  // This will be enhanced with authentication logic in the integration phase
-  // For now, routes are accessible for development
-  
   return (
     <Switch>
       <Route path="/" component={Login} />
       <Route path="/register" component={Register} />
       <Route path="/login" component={Login} />
-      <Route path="/resident" component={ResidentDashboard} />
-      <Route path="/tech" component={TechDashboard} />
-      <Route path="/management" component={ManagementDashboard} />
-      <Route path="/complaints/:id" component={ComplaintDetail} />
-      <Route path="/projects/:id/work-sessions" component={WorkSessionHistory} />
-      <Route path="/projects/:id" component={ProjectDetail} />
-      <Route path="/profile" component={Profile} />
+      <Route path="/resident">
+        <ProtectedRoute allowedRoles={["resident"]}>
+          <ResidentDashboard />
+        </ProtectedRoute>
+      </Route>
+      <Route path="/tech">
+        <ProtectedRoute allowedRoles={["rope_access_tech"]}>
+          <TechDashboard />
+        </ProtectedRoute>
+      </Route>
+      <Route path="/management">
+        <ProtectedRoute allowedRoles={["company", "operations_manager", "supervisor"]}>
+          <ManagementDashboard />
+        </ProtectedRoute>
+      </Route>
+      <Route path="/complaints/:id">
+        <ProtectedRoute allowedRoles={["company", "operations_manager", "supervisor", "rope_access_tech"]}>
+          <ComplaintDetail />
+        </ProtectedRoute>
+      </Route>
+      <Route path="/projects/:id/work-sessions">
+        <ProtectedRoute allowedRoles={["company", "operations_manager", "supervisor"]}>
+          <WorkSessionHistory />
+        </ProtectedRoute>
+      </Route>
+      <Route path="/projects/:id">
+        <ProtectedRoute>
+          <ProjectDetail />
+        </ProtectedRoute>
+      </Route>
+      <Route path="/profile">
+        <ProtectedRoute>
+          <Profile />
+        </ProtectedRoute>
+      </Route>
       <Route component={NotFound} />
     </Switch>
   );

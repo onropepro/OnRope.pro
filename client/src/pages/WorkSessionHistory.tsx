@@ -43,18 +43,36 @@ export default function WorkSessionHistory() {
     );
   }
 
-  const completedDrops = workSessions
-    .filter((s: any) => s.dropsCompleted !== null)
-    .reduce((sum: number, s: any) => sum + (s.dropsCompleted || 0), 0);
+  // Calculate total drops from elevation-specific fields
+  const totalDrops = (project.totalDropsNorth ?? 0) + (project.totalDropsEast ?? 0) + 
+                     (project.totalDropsSouth ?? 0) + (project.totalDropsWest ?? 0);
+
+  // Calculate completed drops from work sessions (elevation-specific)
+  const completedSessions = workSessions.filter((s: any) => s.endTime !== null);
   
-  const progressPercent = project.totalDrops > 0 
-    ? Math.round((completedDrops / project.totalDrops) * 100) 
+  const completedDropsNorth = completedSessions.reduce((sum: number, s: any) => sum + (s.dropsCompletedNorth ?? 0), 0);
+  const completedDropsEast = completedSessions.reduce((sum: number, s: any) => sum + (s.dropsCompletedEast ?? 0), 0);
+  const completedDropsSouth = completedSessions.reduce((sum: number, s: any) => sum + (s.dropsCompletedSouth ?? 0), 0);
+  const completedDropsWest = completedSessions.reduce((sum: number, s: any) => sum + (s.dropsCompletedWest ?? 0), 0);
+  
+  const completedDrops = completedDropsNorth + completedDropsEast + completedDropsSouth + completedDropsWest;
+  
+  const progressPercent = totalDrops > 0 
+    ? Math.round((completedDrops / totalDrops) * 100) 
     : 0;
 
-  // Calculate target met statistics
-  const completedSessions = workSessions.filter((s: any) => s.endTime !== null);
-  const targetMetCount = completedSessions.filter((s: any) => s.dropsCompleted >= project.dailyDropTarget).length;
-  const belowTargetCount = completedSessions.filter((s: any) => s.dropsCompleted < project.dailyDropTarget).length;
+  // Calculate target met statistics (sum all elevation drops per session)
+  const targetMetCount = completedSessions.filter((s: any) => {
+    const totalSessionDrops = (s.dropsCompletedNorth ?? 0) + (s.dropsCompletedEast ?? 0) + 
+                              (s.dropsCompletedSouth ?? 0) + (s.dropsCompletedWest ?? 0);
+    return totalSessionDrops >= project.dailyDropTarget;
+  }).length;
+  
+  const belowTargetCount = completedSessions.filter((s: any) => {
+    const totalSessionDrops = (s.dropsCompletedNorth ?? 0) + (s.dropsCompletedEast ?? 0) + 
+                              (s.dropsCompletedSouth ?? 0) + (s.dropsCompletedWest ?? 0);
+    return totalSessionDrops < project.dailyDropTarget;
+  }).length;
   
   const pieData = [
     { name: "Target Met", value: targetMetCount, color: "hsl(var(--primary))" },
@@ -90,14 +108,14 @@ export default function WorkSessionHistory() {
             <div className="flex justify-center">
               <HighRiseBuilding
                 floors={project.floorCount}
-                totalDropsNorth={project.totalDropsNorth ?? Math.floor(project.totalDrops / 4) + (project.totalDrops % 4 > 0 ? 1 : 0)}
-                totalDropsEast={project.totalDropsEast ?? Math.floor(project.totalDrops / 4) + (project.totalDrops % 4 > 1 ? 1 : 0)}
-                totalDropsSouth={project.totalDropsSouth ?? Math.floor(project.totalDrops / 4) + (project.totalDrops % 4 > 2 ? 1 : 0)}
-                totalDropsWest={project.totalDropsWest ?? Math.floor(project.totalDrops / 4)}
-                completedDropsNorth={Math.floor(completedDrops / 4) + (completedDrops % 4 > 0 ? 1 : 0)}
-                completedDropsEast={Math.floor(completedDrops / 4) + (completedDrops % 4 > 1 ? 1 : 0)}
-                completedDropsSouth={Math.floor(completedDrops / 4) + (completedDrops % 4 > 2 ? 1 : 0)}
-                completedDropsWest={Math.floor(completedDrops / 4)}
+                totalDropsNorth={project.totalDropsNorth ?? 0}
+                totalDropsEast={project.totalDropsEast ?? 0}
+                totalDropsSouth={project.totalDropsSouth ?? 0}
+                totalDropsWest={project.totalDropsWest ?? 0}
+                completedDropsNorth={completedDropsNorth}
+                completedDropsEast={completedDropsEast}
+                completedDropsSouth={completedDropsSouth}
+                completedDropsWest={completedDropsWest}
               />
             </div>
 
@@ -109,7 +127,7 @@ export default function WorkSessionHistory() {
               </div>
               <Progress value={progressPercent} className="h-2" />
               <p className="text-xs text-muted-foreground text-center">
-                {completedDrops} of {project.totalDrops} drops completed
+                {completedDrops} of {totalDrops} drops completed
               </p>
             </div>
           </CardContent>
@@ -175,7 +193,9 @@ export default function WorkSessionHistory() {
                 {workSessions.map((session: any) => {
                   const sessionDate = new Date(session.workDate);
                   const isCompleted = session.endTime !== null;
-                  const metTarget = session.dropsCompleted >= project.dailyDropTarget;
+                  const sessionDrops = (session.dropsCompletedNorth ?? 0) + (session.dropsCompletedEast ?? 0) + 
+                                       (session.dropsCompletedSouth ?? 0) + (session.dropsCompletedWest ?? 0);
+                  const metTarget = sessionDrops >= project.dailyDropTarget;
 
                   return (
                     <div
@@ -202,7 +222,7 @@ export default function WorkSessionHistory() {
                         {isCompleted && (
                           <>
                             <p className="text-sm">
-                              Drops: {session.dropsCompleted} / {project.dailyDropTarget} target
+                              Drops: {sessionDrops} / {project.dailyDropTarget} target
                             </p>
                             {session.shortfallReason && (
                               <p className="text-sm text-muted-foreground italic">
