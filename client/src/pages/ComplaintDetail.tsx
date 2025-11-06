@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
+import { useLocation } from "wouter";
 import { queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { useForm } from "react-hook-form";
@@ -27,6 +28,7 @@ type ComplaintNote = {
 
 export default function ComplaintDetail() {
   const { toast } = useToast();
+  const [, setLocation] = useLocation();
   const complaintId = window.location.pathname.split("/complaints/")[1];
   const [userRole, setUserRole] = useState<string>("");
 
@@ -143,7 +145,13 @@ export default function ComplaintDetail() {
       {/* Header */}
       <header className="sticky top-0 z-[100] bg-card border-b border-card-border shadow-sm">
         <div className="px-4 h-16 flex items-center gap-3">
-          <Button variant="ghost" size="icon" className="min-w-11 min-h-11" data-testid="button-back">
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            className="min-w-11 min-h-11" 
+            onClick={() => setLocation("/management-dashboard")}
+            data-testid="button-back"
+          >
             <span className="material-icons">arrow_back</span>
           </Button>
           <h1 className="text-lg font-bold flex-1">Feedback Details</h1>
