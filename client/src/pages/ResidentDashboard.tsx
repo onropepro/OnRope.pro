@@ -407,7 +407,7 @@ export default function ResidentDashboard() {
         <Tabs value={activeTab} onValueChange={setActiveTab}>
           <TabsList className="grid w-full grid-cols-2 mb-4">
             <TabsTrigger value="building" data-testid="tab-building">Progress</TabsTrigger>
-            <TabsTrigger value="complaints" data-testid="tab-complaints">Feedback</TabsTrigger>
+            <TabsTrigger value="complaints" data-testid="tab-complaints">Feedback/Comments/Request</TabsTrigger>
           </TabsList>
 
           <TabsContent value="building">
@@ -445,7 +445,7 @@ export default function ResidentDashboard() {
           <TabsContent value="complaints">
             <Card>
               <CardHeader>
-                <CardTitle>Submit Feedback</CardTitle>
+                <CardTitle>Submit Feedback/Comments/Request</CardTitle>
                 <CardDescription>Let us know if you have any concerns or questions</CardDescription>
               </CardHeader>
               <CardContent>
