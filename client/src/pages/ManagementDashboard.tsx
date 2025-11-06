@@ -55,6 +55,21 @@ const employeeSchema = z.object({
   path: ["techLevel"],
 });
 
+const editEmployeeSchema = z.object({
+  name: z.string().min(1, "Name is required"),
+  email: z.string().email("Invalid email address"),
+  role: z.enum(["operations_manager", "supervisor", "rope_access_tech"]),
+  techLevel: z.string().optional(),
+}).refine((data) => {
+  if (data.role === "rope_access_tech" && !data.techLevel) {
+    return false;
+  }
+  return true;
+}, {
+  message: "IRATA level is required for rope access technicians",
+  path: ["techLevel"],
+});
+
 const dropLogSchema = z.object({
   projectId: z.string().min(1, "Please select a project"),
   date: z.string().min(1, "Date is required"),
@@ -69,6 +84,7 @@ const endDaySchema = z.object({
 
 type ProjectFormData = z.infer<typeof projectSchema>;
 type EmployeeFormData = z.infer<typeof employeeSchema>;
+type EditEmployeeFormData = z.infer<typeof editEmployeeSchema>;
 type DropLogFormData = z.infer<typeof dropLogSchema>;
 type EndDayFormData = z.infer<typeof endDaySchema>;
 
@@ -76,6 +92,8 @@ export default function ManagementDashboard() {
   const [activeTab, setActiveTab] = useState("projects");
   const [showProjectDialog, setShowProjectDialog] = useState(false);
   const [showEmployeeDialog, setShowEmployeeDialog] = useState(false);
+  const [showEditEmployeeDialog, setShowEditEmployeeDialog] = useState(false);
+  const [employeeToEdit, setEmployeeToEdit] = useState<any | null>(null);
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [employeeToDelete, setEmployeeToDelete] = useState<string | null>(null);
@@ -169,6 +187,16 @@ export default function ManagementDashboard() {
       name: "",
       email: "",
       password: "",
+      role: "rope_access_tech",
+      techLevel: "",
+    },
+  });
+
+  const editEmployeeForm = useForm<EditEmployeeFormData>({
+    resolver: zodResolver(editEmployeeSchema),
+    defaultValues: {
+      name: "",
+      email: "",
       role: "rope_access_tech",
       techLevel: "",
     },
@@ -293,6 +321,34 @@ export default function ManagementDashboard() {
     },
   });
 
+  const editEmployeeMutation = useMutation({
+    mutationFn: async (data: EditEmployeeFormData & { id: string }) => {
+      const response = await apiRequest(`/api/employees/${data.id}`, {
+        method: "PATCH",
+        body: JSON.stringify({
+          name: data.name,
+          email: data.email,
+          role: data.role,
+          techLevel: data.techLevel,
+        }),
+      });
+
+      return response;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/employees"] });
+      setShowEditEmployeeDialog(false);
+      setEmployeeToEdit(null);
+      editEmployeeForm.reset();
+      toast({
+        title: "Employee updated successfully",
+      });
+    },
+    onError: (error: Error) => {
+      toast({ title: "Error", description: error.message, variant: "destructive" });
+    },
+  });
+
   const onProjectSubmit = async (data: ProjectFormData) => {
     // Normalize strata plan number (remove spaces, uppercase)
     const normalizedData = {
@@ -343,6 +399,22 @@ export default function ManagementDashboard() {
 
   const onEmployeeSubmit = async (data: EmployeeFormData) => {
     createEmployeeMutation.mutate(data);
+  };
+
+  const handleEditEmployee = (employee: any) => {
+    setEmployeeToEdit(employee);
+    editEmployeeForm.reset({
+      name: employee.name || "",
+      email: employee.email || "",
+      role: employee.role,
+      techLevel: employee.techLevel || "",
+    });
+    setShowEditEmployeeDialog(true);
+  };
+
+  const onEditEmployeeSubmit = async (data: EditEmployeeFormData) => {
+    if (!employeeToEdit) return;
+    editEmployeeMutation.mutate({ ...data, id: employeeToEdit.id });
   };
 
   const deleteEmployeeMutation = useMutation({
@@ -1547,6 +1619,15 @@ export default function ManagementDashboard() {
                             <Button
                               variant="ghost"
                               size="icon"
+                              onClick={() => handleEditEmployee(employee)}
+                              data-testid={`button-edit-employee-${employee.id}`}
+                              className="h-9 w-9"
+                            >
+                              <span className="material-icons text-sm">edit</span>
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="icon"
                               onClick={() => setEmployeeToDelete(employee.id)}
                               data-testid={`button-delete-employee-${employee.id}`}
                               className="h-9 w-9 text-destructive hover:text-destructive"
@@ -1564,6 +1645,103 @@ export default function ManagementDashboard() {
           </TabsContent>
         </Tabs>
       </div>
+
+      {/* Edit Employee Dialog */}
+      <Dialog open={showEditEmployeeDialog} onOpenChange={setShowEditEmployeeDialog}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Edit Employee</DialogTitle>
+            <DialogDescription>
+              Update employee information
+            </DialogDescription>
+          </DialogHeader>
+          <div className="max-h-[70vh] overflow-y-auto pr-2">
+            <Form {...editEmployeeForm}>
+              <form onSubmit={editEmployeeForm.handleSubmit(onEditEmployeeSubmit)} className="space-y-4">
+                <FormField
+                  control={editEmployeeForm.control}
+                  name="name"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Full Name</FormLabel>
+                      <FormControl>
+                        <Input placeholder="John Doe" {...field} className="h-12" data-testid="input-edit-employee-name" />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={editEmployeeForm.control}
+                  name="email"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Email</FormLabel>
+                      <FormControl>
+                        <Input type="email" placeholder="john@example.com" {...field} className="h-12" data-testid="input-edit-employee-email" />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={editEmployeeForm.control}
+                  name="role"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Role</FormLabel>
+                      <Select onValueChange={field.onChange} value={field.value}>
+                        <FormControl>
+                          <SelectTrigger className="h-12" data-testid="select-edit-employee-role">
+                            <SelectValue placeholder="Select role" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="operations_manager">Operations Manager</SelectItem>
+                          <SelectItem value="supervisor">Supervisor</SelectItem>
+                          <SelectItem value="rope_access_tech">Rope Access Tech</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                {editEmployeeForm.watch("role") === "rope_access_tech" && (
+                  <FormField
+                    control={editEmployeeForm.control}
+                    name="techLevel"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>IRATA Level</FormLabel>
+                        <Select onValueChange={field.onChange} value={field.value}>
+                          <FormControl>
+                            <SelectTrigger className="h-12" data-testid="select-edit-tech-level">
+                              <SelectValue placeholder="Select IRATA level" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            <SelectItem value="Level 1">Level 1</SelectItem>
+                            <SelectItem value="Level 2">Level 2</SelectItem>
+                            <SelectItem value="Level 3">Level 3</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                )}
+
+                <Button type="submit" className="w-full h-12" data-testid="button-submit-edit-employee" disabled={editEmployeeMutation.isPending}>
+                  {editEmployeeMutation.isPending ? "Updating..." : "Update Employee"}
+                </Button>
+              </form>
+            </Form>
+          </div>
+        </DialogContent>
+      </Dialog>
 
       {/* Delete Employee Confirmation Dialog */}
       <AlertDialog open={employeeToDelete !== null} onOpenChange={(open) => !open && setEmployeeToDelete(null)}>

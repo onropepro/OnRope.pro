@@ -350,6 +350,52 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
+  // Update employee
+  app.patch("/api/employees/:id", requireAuth, requireRole("company", "operations_manager"), async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      const companyId = currentUser.role === "company" ? currentUser.id : currentUser.companyId;
+      
+      if (!companyId) {
+        return res.status(400).json({ message: "Unable to determine company" });
+      }
+      
+      // Get the employee to verify they belong to this company
+      const employee = await storage.getUserById(req.params.id);
+      
+      if (!employee || employee.companyId !== companyId) {
+        return res.status(403).json({ message: "Access denied" });
+      }
+      
+      const { name, email, role, techLevel } = req.body;
+      
+      // Update employee
+      const updatedEmployee = await storage.updateUser(req.params.id, {
+        name,
+        email,
+        role,
+        techLevel: role === "rope_access_tech" ? techLevel : null,
+      });
+      
+      const { passwordHash: _, ...employeeWithoutPassword } = updatedEmployee;
+      res.json({ employee: employeeWithoutPassword });
+    } catch (error: any) {
+      console.error("Update employee error:", error);
+      
+      // Check for duplicate email (Postgres unique constraint violation)
+      if (error && typeof error === 'object' && error.code === '23505' && error.constraint?.includes('email')) {
+        return res.status(409).json({ message: "Email address is already in use" });
+      }
+      
+      res.status(500).json({ message: "Failed to update employee" });
+    }
+  });
+  
   // Delete employee
   app.delete("/api/employees/:id", requireAuth, requireRole("company", "operations_manager"), async (req: Request, res: Response) => {
     try {
