@@ -45,11 +45,15 @@ A mobile-first management platform for rope access building maintenance operatio
 - **sessions**: Express session storage
 
 ## Design System
-- **Colors**: Blue primary (trust/professionalism), yellow warning for lit windows, orange for open complaints, green for closed
+- **Colors**: Premium Ocean Blue primary (217 91% 60%), sophisticated slate backgrounds, blue-tinted shadows for depth
+- **Visual Style**: Modern premium aesthetic with glass-morphism effects, gradient accents, enhanced shadows
 - **Typography**: Roboto font family throughout, Material Icons
 - **Touch Targets**: 44px minimum, 48px comfortable (h-12 buttons/inputs)
 - **Spacing**: Consistent with Tailwind's 4-unit scale (p-4, gap-4, mb-4)
+- **Border Radius**: 0.75rem (12px) for modern, friendly appearance
+- **Shadows**: Blue-tinted shadows (rgba(30, 64, 175, ...)) for cohesive depth system
 - **Mobile-First**: Single column layouts, bottom navigation, full-width forms
+- **Special Effects**: Subtle dot pattern texture overlay, glass-card utility for elevated surfaces
 
 ## Development Status
 - ✅ Phase 1: Frontend components and routing complete
@@ -91,6 +95,15 @@ The signature component displays FOUR buildings side-by-side representing the 4 
 - Universal profile management for all users
 
 **Recent Updates (Nov 6, 2025):**
+- ✅ **Design Modernization**: Complete visual overhaul for premium, sophisticated appearance
+  - Updated color palette to Ocean Blue primary (217 91% 60%) with sophisticated slate backgrounds
+  - Enhanced shadow system with blue-tinted shadows (rgba(30, 64, 175, ...)) for depth
+  - Increased border radius to 0.75rem (12px) for modern look
+  - Added glass-card utility for glass-morphism effects with backdrop-filter blur
+  - Subtle dot pattern texture overlay on body for visual depth
+  - Gradient text utility for premium accents
+  - Dark mode enhanced with deep navy backgrounds (222 47% 11%)
+  - All changes maintain WCAG AA contrast compliance
 - ✅ **Logout Confirmation Dialogs**: Added confirmation prompts before logout on all pages
   - AlertDialog appears when logout button clicked (prevents accidental logout)
   - Consistent implementation across Resident, Tech, Management dashboards and Profile page
