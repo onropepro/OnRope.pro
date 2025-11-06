@@ -373,7 +373,9 @@ export default function ResidentDashboard() {
       <header className="sticky top-0 z-[100] bg-card border-b border-card-border shadow-sm">
         <div className="px-4 h-16 flex items-center justify-between">
           <div>
-            <h1 className="text-lg font-bold">Building Progress</h1>
+            <h1 className="text-lg font-bold">
+              Building Progress{activeProject?.buildingName ? ` for ${activeProject.buildingName}` : ''}
+            </h1>
             {companyData?.company?.companyName && (
               <p className="text-xs text-muted-foreground">
                 {projectData.jobType} by {companyData.company.companyName}
