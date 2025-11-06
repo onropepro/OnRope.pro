@@ -109,7 +109,7 @@ export default function Login() {
                 <CardDescription className="text-xs">Management Platform</CardDescription>
               </div>
             </div>
-            <CardTitle className="text-3xl font-bold">Welcome Back</CardTitle>
+            <CardTitle className="text-3xl font-bold">Welcome</CardTitle>
             <CardDescription className="text-base">
               Sign in to access your dashboard and manage operations
             </CardDescription>
