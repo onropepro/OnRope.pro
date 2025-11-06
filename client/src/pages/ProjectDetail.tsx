@@ -24,7 +24,15 @@ export default function ProjectDetail() {
     enabled: !!id,
   });
 
+  const { data: userData } = useQuery({
+    queryKey: ["/api/user"],
+  });
+
   const project = projectData?.project as Project | undefined;
+  const currentUser = userData?.user;
+  
+  // Only company and operations_manager can delete projects
+  const canDeleteProject = currentUser?.role === "company" || currentUser?.role === "operations_manager";
 
   const deleteProjectMutation = useMutation({
     mutationFn: async (projectId: string) => {
@@ -352,15 +360,17 @@ export default function ProjectDetail() {
                 </Badge>
               </div>
 
-              <Button 
-                variant="destructive" 
-                onClick={() => setShowDeleteDialog(true)}
-                className="w-full h-12"
-                data-testid="button-delete-project"
-              >
-                <span className="material-icons mr-2">delete</span>
-                Delete Project
-              </Button>
+              {canDeleteProject && (
+                <Button 
+                  variant="destructive" 
+                  onClick={() => setShowDeleteDialog(true)}
+                  className="w-full h-12"
+                  data-testid="button-delete-project"
+                >
+                  <span className="material-icons mr-2">delete</span>
+                  Delete Project
+                </Button>
+              )}
             </div>
           </CardContent>
         </Card>
