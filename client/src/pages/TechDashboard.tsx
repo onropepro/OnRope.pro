@@ -42,6 +42,7 @@ export default function TechDashboard() {
   const [showEndDayDialog, setShowEndDayDialog] = useState(false);
   const [activeSession, setActiveSession] = useState<any>(null);
   const [todayDrops, setTodayDrops] = useState(0);
+  const [uploadingPdfForProject, setUploadingPdfForProject] = useState<string | null>(null);
   const { toast } = useToast();
   const [, setLocation] = useLocation();
 
@@ -199,6 +200,37 @@ export default function TechDashboard() {
     setShowEndDayDialog(true);
   };
 
+  const handlePdfUpload = async (projectId: string, file: File) => {
+    setUploadingPdfForProject(projectId);
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+      
+      const response = await fetch(`/api/projects/${projectId}/rope-access-plan`, {
+        method: 'PATCH',
+        body: formData,
+        credentials: 'include',
+      });
+      
+      const result = await response.json();
+      
+      if (!response.ok) {
+        throw new Error(result.message || 'Failed to upload PDF');
+      }
+      
+      queryClient.invalidateQueries({ queryKey: ["/api/projects"] });
+      toast({ title: "PDF uploaded successfully" });
+    } catch (error) {
+      toast({ 
+        title: "Upload failed", 
+        description: error instanceof Error ? error.message : "Failed to upload PDF", 
+        variant: "destructive" 
+      });
+    } finally {
+      setUploadingPdfForProject(null);
+    }
+  };
+
   const confirmStartDay = () => {
     if (selectedProject) {
       startDayMutation.mutate(selectedProject.id);
@@ -331,25 +363,70 @@ export default function TechDashboard() {
                           </div>
                         </div>
 
-                        <div className="mt-3 pt-3 border-t">
+                        <div className="mt-3 pt-3 border-t space-y-2">
                           <div className="text-xs text-muted-foreground">
                             Daily Target: {project.dailyDropTarget} drops
                           </div>
-                          {project.ropeAccessPlanUrl && (
+                          {project.ropeAccessPlanUrl ? (
+                            <div className="flex gap-2">
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                className="flex-1"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  window.open(project.ropeAccessPlanUrl, '_blank');
+                                }}
+                                data-testid={`button-view-pdf-${project.id}`}
+                              >
+                                <span className="material-icons text-sm mr-2">description</span>
+                                View PDF
+                              </Button>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  document.getElementById(`pdf-upload-${project.id}`)?.click();
+                                }}
+                                disabled={uploadingPdfForProject === project.id}
+                                data-testid={`button-replace-pdf-${project.id}`}
+                              >
+                                <span className="material-icons text-sm mr-2">upload</span>
+                                {uploadingPdfForProject === project.id ? "..." : "Replace"}
+                              </Button>
+                            </div>
+                          ) : (
                             <Button
                               variant="outline"
                               size="sm"
-                              className="w-full mt-2"
+                              className="w-full"
                               onClick={(e) => {
                                 e.stopPropagation();
-                                window.open(project.ropeAccessPlanUrl, '_blank');
+                                document.getElementById(`pdf-upload-${project.id}`)?.click();
                               }}
-                              data-testid={`button-view-pdf-${project.id}`}
+                              disabled={uploadingPdfForProject === project.id}
+                              data-testid={`button-upload-pdf-${project.id}`}
                             >
-                              <span className="material-icons text-sm mr-2">description</span>
-                              View Fall Protection Plan (PDF)
+                              <span className="material-icons text-sm mr-2">upload</span>
+                              {uploadingPdfForProject === project.id ? "Uploading..." : "Upload Fall Protection Plan (PDF)"}
                             </Button>
                           )}
+                          <input
+                            id={`pdf-upload-${project.id}`}
+                            type="file"
+                            accept="application/pdf"
+                            className="hidden"
+                            onClick={(e) => e.stopPropagation()}
+                            onChange={(e) => {
+                              e.stopPropagation();
+                              const file = e.target.files?.[0];
+                              if (file) {
+                                handlePdfUpload(project.id, file);
+                                e.target.value = '';
+                              }
+                            }}
+                          />
                         </div>
                       </CardContent>
                     </Card>

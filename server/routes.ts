@@ -305,7 +305,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
-  app.post("/api/upload-rope-access-plan", requireAuth, requireRole("company", "operations_manager"), upload.single('file'), async (req: Request, res: Response) => {
+  app.post("/api/upload-rope-access-plan", requireAuth, requireRole("company", "operations_manager", "rope_access_tech"), upload.single('file'), async (req: Request, res: Response) => {
     try {
       if (!req.file) {
         return res.status(400).json({ message: "No file uploaded" });
@@ -324,6 +324,55 @@ export async function registerRoutes(app: Express): Promise<Server> {
       );
       
       res.json({ url });
+    } catch (error) {
+      console.error("File upload error details:", error);
+      const errorMessage = error instanceof Error ? error.message : "Failed to upload file";
+      res.status(500).json({ message: `Upload failed: ${errorMessage}` });
+    }
+  });
+  
+  // Update project's rope access plan
+  app.patch("/api/projects/:id/rope-access-plan", requireAuth, requireRole("company", "operations_manager", "rope_access_tech"), upload.single('file'), async (req: Request, res: Response) => {
+    try {
+      if (!req.file) {
+        return res.status(400).json({ message: "No file uploaded" });
+      }
+      
+      const projectId = req.params.id;
+      const currentUser = await storage.getUserById(req.session.userId!);
+      
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      // Get the project to verify access
+      const project = await storage.getProjectById(projectId);
+      if (!project) {
+        return res.status(404).json({ message: "Project not found" });
+      }
+      
+      // Verify user has access to this project (same company)
+      const userCompanyId = currentUser.role === "company" ? currentUser.id : currentUser.companyId;
+      if (project.companyId !== userCompanyId) {
+        return res.status(403).json({ message: "Access denied" });
+      }
+      
+      // Generate unique filename
+      const timestamp = Date.now();
+      const filename = `rope-access-plan-${timestamp}.pdf`;
+      
+      // Upload to object storage
+      const objectStorageService = new ObjectStorageService();
+      const url = await objectStorageService.uploadPublicFile(
+        filename,
+        req.file.buffer,
+        'application/pdf'
+      );
+      
+      // Update project with new PDF URL
+      const updatedProject = await storage.updateProject(projectId, { ropeAccessPlanUrl: url });
+      
+      res.json({ project: updatedProject, url });
     } catch (error) {
       console.error("File upload error details:", error);
       const errorMessage = error instanceof Error ? error.message : "Failed to upload file";

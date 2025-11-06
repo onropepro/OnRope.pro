@@ -16,6 +16,7 @@ export default function ProjectDetail() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [uploadingPdf, setUploadingPdf] = useState(false);
 
   const { data: projectData, isLoading } = useQuery({
     queryKey: ["/api/projects", id],
@@ -47,6 +48,40 @@ export default function ProjectDetail() {
       toast({ title: "Error", description: error.message, variant: "destructive" });
     },
   });
+
+  const handlePdfUpload = async (file: File) => {
+    if (!id) return;
+    
+    setUploadingPdf(true);
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+      
+      const response = await fetch(`/api/projects/${id}/rope-access-plan`, {
+        method: 'PATCH',
+        body: formData,
+        credentials: 'include',
+      });
+      
+      const result = await response.json();
+      
+      if (!response.ok) {
+        throw new Error(result.message || 'Failed to upload PDF');
+      }
+      
+      queryClient.invalidateQueries({ queryKey: ["/api/projects", id] });
+      queryClient.invalidateQueries({ queryKey: ["/api/projects"] });
+      toast({ title: "PDF uploaded successfully" });
+    } catch (error) {
+      toast({ 
+        title: "Upload failed", 
+        description: error instanceof Error ? error.message : "Failed to upload PDF", 
+        variant: "destructive" 
+      });
+    } finally {
+      setUploadingPdf(false);
+    }
+  };
 
   if (isLoading) {
     return (
@@ -135,6 +170,60 @@ export default function ProjectDetail() {
               <span className="material-icons text-lg">history</span>
               View Work Session History
             </Button>
+
+            <Separator />
+
+            {/* PDF Upload/View Section */}
+            <div className="space-y-3">
+              <div className="text-sm text-muted-foreground">Fall Protection Plan (PDF)</div>
+              {project.ropeAccessPlanUrl ? (
+                <div className="flex gap-2">
+                  <Button
+                    variant="outline"
+                    className="flex-1 h-12 gap-2"
+                    onClick={() => window.open(project.ropeAccessPlanUrl!, '_blank')}
+                    data-testid="button-view-pdf"
+                  >
+                    <span className="material-icons text-lg">description</span>
+                    View Current PDF
+                  </Button>
+                  <Button
+                    variant="outline"
+                    className="h-12 gap-2"
+                    onClick={() => document.getElementById('pdf-upload-input')?.click()}
+                    disabled={uploadingPdf}
+                    data-testid="button-replace-pdf"
+                  >
+                    <span className="material-icons text-lg">upload</span>
+                    {uploadingPdf ? "Uploading..." : "Replace"}
+                  </Button>
+                </div>
+              ) : (
+                <Button
+                  variant="outline"
+                  className="w-full h-12 gap-2"
+                  onClick={() => document.getElementById('pdf-upload-input')?.click()}
+                  disabled={uploadingPdf}
+                  data-testid="button-upload-pdf"
+                >
+                  <span className="material-icons text-lg">upload</span>
+                  {uploadingPdf ? "Uploading..." : "Upload PDF"}
+                </Button>
+              )}
+              <input
+                id="pdf-upload-input"
+                type="file"
+                accept="application/pdf"
+                className="hidden"
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (file) {
+                    handlePdfUpload(file);
+                    e.target.value = '';
+                  }
+                }}
+              />
+            </div>
 
             <Separator />
 
