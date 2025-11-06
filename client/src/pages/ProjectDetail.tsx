@@ -2,13 +2,16 @@ import { useQuery, useMutation } from "@tanstack/react-query";
 import { useParams, useLocation } from "wouter";
 import { queryClient } from "@/lib/queryClient";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
+import { Progress } from "@/components/ui/progress";
 import { HighRiseBuilding } from "@/components/HighRiseBuilding";
 import { useToast } from "@/hooks/use-toast";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { useState } from "react";
+import { format } from "date-fns";
+import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from "recharts";
 import type { Project } from "@shared/schema";
 
 export default function ProjectDetail() {
@@ -28,11 +31,23 @@ export default function ProjectDetail() {
     queryKey: ["/api/user"],
   });
 
+  // Fetch work sessions for this project
+  const { data: workSessionsData } = useQuery({
+    queryKey: ["/api/projects", id, "work-sessions"],
+    enabled: !!id,
+  });
+
   const project = projectData?.project as Project | undefined;
   const currentUser = userData?.user;
+  const workSessions = workSessionsData?.sessions || [];
   
   // Only company and operations_manager can delete projects
   const canDeleteProject = currentUser?.role === "company" || currentUser?.role === "operations_manager";
+  
+  // Check if user is management (show pie chart only for management)
+  const isManagement = currentUser?.role === "company" || 
+                       currentUser?.role === "operations_manager" || 
+                       currentUser?.role === "supervisor";
 
   const deleteProjectMutation = useMutation({
     mutationFn: async (projectId: string) => {
@@ -146,9 +161,45 @@ export default function ProjectDetail() {
     );
   }
 
+  // Calculate total drops from elevation-specific fields
+  const totalDrops = (project.totalDropsNorth ?? 0) + (project.totalDropsEast ?? 0) + 
+                     (project.totalDropsSouth ?? 0) + (project.totalDropsWest ?? 0);
+
+  // Calculate completed drops from work sessions (elevation-specific)
+  const completedSessions = workSessions.filter((s: any) => s.endTime !== null);
+  
+  const completedDropsNorth = completedSessions.reduce((sum: number, s: any) => sum + (s.dropsCompletedNorth ?? 0), 0);
+  const completedDropsEast = completedSessions.reduce((sum: number, s: any) => sum + (s.dropsCompletedEast ?? 0), 0);
+  const completedDropsSouth = completedSessions.reduce((sum: number, s: any) => sum + (s.dropsCompletedSouth ?? 0), 0);
+  const completedDropsWest = completedSessions.reduce((sum: number, s: any) => sum + (s.dropsCompletedWest ?? 0), 0);
+  
+  const completedDrops = completedDropsNorth + completedDropsEast + completedDropsSouth + completedDropsWest;
+  
+  const progressPercent = totalDrops > 0 
+    ? Math.min(100, Math.round((completedDrops / totalDrops) * 100))
+    : 0;
+
+  // Calculate target met statistics (sum all elevation drops per session)
+  const targetMetCount = completedSessions.filter((s: any) => {
+    const totalSessionDrops = (s.dropsCompletedNorth ?? 0) + (s.dropsCompletedEast ?? 0) + 
+                              (s.dropsCompletedSouth ?? 0) + (s.dropsCompletedWest ?? 0);
+    return totalSessionDrops >= project.dailyDropTarget;
+  }).length;
+  
+  const belowTargetCount = completedSessions.filter((s: any) => {
+    const totalSessionDrops = (s.dropsCompletedNorth ?? 0) + (s.dropsCompletedEast ?? 0) + 
+                              (s.dropsCompletedSouth ?? 0) + (s.dropsCompletedWest ?? 0);
+    return totalSessionDrops < project.dailyDropTarget;
+  }).length;
+  
+  const pieData = [
+    { name: "Target Met", value: targetMetCount, color: "hsl(var(--primary))" },
+    { name: "Below Target", value: belowTargetCount, color: "hsl(var(--destructive))" },
+  ];
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
-      <div className="max-w-2xl mx-auto">
+      <div className="max-w-2xl mx-auto space-y-6">
         {/* Header */}
         <div className="mb-6 flex items-center gap-4">
           <Button
@@ -178,12 +229,24 @@ export default function ProjectDetail() {
               totalDropsEast={project.totalDropsEast ?? Math.floor(project.totalDrops / 4) + (project.totalDrops % 4 > 1 ? 1 : 0)}
               totalDropsSouth={project.totalDropsSouth ?? Math.floor(project.totalDrops / 4) + (project.totalDrops % 4 > 2 ? 1 : 0)}
               totalDropsWest={project.totalDropsWest ?? Math.floor(project.totalDrops / 4)}
-              completedDropsNorth={project.completedDropsNorth ?? Math.floor((project.completedDrops || 0) / 4) + ((project.completedDrops || 0) % 4 > 0 ? 1 : 0)}
-              completedDropsEast={project.completedDropsEast ?? Math.floor((project.completedDrops || 0) / 4) + ((project.completedDrops || 0) % 4 > 1 ? 1 : 0)}
-              completedDropsSouth={project.completedDropsSouth ?? Math.floor((project.completedDrops || 0) / 4) + ((project.completedDrops || 0) % 4 > 2 ? 1 : 0)}
-              completedDropsWest={project.completedDropsWest ?? Math.floor((project.completedDrops || 0) / 4)}
+              completedDropsNorth={completedDropsNorth}
+              completedDropsEast={completedDropsEast}
+              completedDropsSouth={completedDropsSouth}
+              completedDropsWest={completedDropsWest}
               className="mb-4"
             />
+
+            {/* Progress Stats */}
+            <div className="space-y-2">
+              <div className="flex justify-between text-sm">
+                <span className="text-muted-foreground">Overall Progress</span>
+                <span className="font-medium">{progressPercent}%</span>
+              </div>
+              <Progress value={progressPercent} className="h-2" />
+              <p className="text-xs text-muted-foreground text-center">
+                {completedDrops} of {totalDrops} drops completed
+              </p>
+            </div>
 
             {/* Stats */}
             <div className="grid grid-cols-2 gap-4">
@@ -193,26 +256,13 @@ export default function ProjectDetail() {
               </div>
               <div className="text-center p-4 bg-muted/50 rounded-lg">
                 <div className="text-2xl font-bold">
-                  {project.completedDrops && project.completedDrops > 0 
-                    ? Math.ceil((project.totalDrops - project.completedDrops) / project.dailyDropTarget) 
+                  {completedDrops > 0 
+                    ? Math.ceil((totalDrops - completedDrops) / project.dailyDropTarget) 
                     : "N/A"}
                 </div>
                 <div className="text-sm text-muted-foreground mt-1">Days Remaining</div>
               </div>
             </div>
-
-            <Separator />
-
-            {/* Work Session History Button */}
-            <Button
-              variant="outline"
-              className="w-full h-12 gap-2"
-              onClick={() => setLocation(`/projects/${project.id}/work-sessions`)}
-              data-testid="button-view-work-sessions"
-            >
-              <span className="material-icons text-lg">history</span>
-              View Work Session History
-            </Button>
 
             <Separator />
 
@@ -372,6 +422,121 @@ export default function ProjectDetail() {
                 </Button>
               )}
             </div>
+          </CardContent>
+        </Card>
+
+        {/* Target Performance Chart - Management Only */}
+        {isManagement && completedSessions.length > 0 && (
+          <Card>
+            <CardHeader>
+              <CardTitle>Target Performance</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="flex flex-col items-center">
+                <ResponsiveContainer width="100%" height={300}>
+                  <PieChart>
+                    <Pie
+                      data={pieData}
+                      cx="50%"
+                      cy="50%"
+                      labelLine={false}
+                      label={({ name, value, percent }) => 
+                        `${name}: ${value} (${(percent * 100).toFixed(0)}%)`
+                      }
+                      outerRadius={80}
+                      fill="#8884d8"
+                      dataKey="value"
+                    >
+                      {pieData.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={entry.color} />
+                      ))}
+                    </Pie>
+                    <Tooltip />
+                    <Legend />
+                  </PieChart>
+                </ResponsiveContainer>
+                <div className="grid grid-cols-2 gap-4 mt-4 w-full max-w-sm">
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-primary">{targetMetCount}</div>
+                    <div className="text-sm text-muted-foreground">Target Met</div>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-destructive">{belowTargetCount}</div>
+                    <div className="text-sm text-muted-foreground">Below Target</div>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Work Sessions List */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Work Session History</CardTitle>
+          </CardHeader>
+          <CardContent>
+            {workSessions.length === 0 ? (
+              <p className="text-center text-muted-foreground py-8">
+                No work sessions recorded yet
+              </p>
+            ) : (
+              <div className="space-y-3">
+                {workSessions.map((session: any) => {
+                  const sessionDate = new Date(session.workDate);
+                  const isCompleted = session.endTime !== null;
+                  const sessionDrops = (session.dropsCompletedNorth ?? 0) + (session.dropsCompletedEast ?? 0) + 
+                                       (session.dropsCompletedSouth ?? 0) + (session.dropsCompletedWest ?? 0);
+                  const metTarget = sessionDrops >= project.dailyDropTarget;
+
+                  return (
+                    <div
+                      key={session.id}
+                      className="flex items-center justify-between p-4 rounded-lg border bg-card hover-elevate"
+                      data-testid={`session-${session.id}`}
+                    >
+                      <div className="flex-1 space-y-1">
+                        <div className="flex items-center gap-2">
+                          <p className="font-medium">
+                            {format(sessionDate, "EEEE, MMM d, yyyy")}
+                          </p>
+                          {isCompleted ? (
+                            <Badge variant={metTarget ? "default" : "destructive"} data-testid={`badge-${metTarget ? "met" : "below"}-target`}>
+                              {metTarget ? "Target Met" : "Below Target"}
+                            </Badge>
+                          ) : (
+                            <Badge variant="outline">In Progress</Badge>
+                          )}
+                        </div>
+                        <p className="text-sm text-muted-foreground">
+                          Tech: {session.techName || "Unknown"}
+                        </p>
+                        {isCompleted && (
+                          <>
+                            <p className="text-sm">
+                              Drops: {sessionDrops} / {project.dailyDropTarget} target
+                            </p>
+                            {session.shortfallReason && (
+                              <p className="text-sm text-muted-foreground italic">
+                                Note: {session.shortfallReason}
+                              </p>
+                            )}
+                          </>
+                        )}
+                      </div>
+                      <div className="text-right text-sm text-muted-foreground">
+                        {isCompleted && (
+                          <p>
+                            {format(new Date(session.startTime), "h:mm a")} -{" "}
+                            {format(new Date(session.endTime), "h:mm a")}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
           </CardContent>
         </Card>
       </div>
