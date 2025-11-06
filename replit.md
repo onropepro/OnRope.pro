@@ -9,12 +9,13 @@ A mobile-first management platform for rope access building maintenance operatio
 - **Complaint Management**: Residents can submit feedback; management can track and respond with notes
 - **Project Management**: Create projects with strata plan numbers, floor counts, and rope access plans; delete projects with cascade warnings
 - **Employee Management**: Company-controlled onboarding with role-based permissions
+- **Project Photo Gallery**: All staff can upload photos from camera or library, displayed in 3-column gallery on project detail page
 
 ## Tech Stack
 - **Frontend**: React + TypeScript with Wouter routing
 - **Backend**: Express.js with custom authentication
 - **Database**: PostgreSQL with Drizzle ORM
-- **Storage**: Replit Object Storage for PDF rope access plans
+- **Storage**: Replit Object Storage for PDF rope access plans and project photo galleries
 - **UI**: Shadcn components with Material Design 3 aesthetic
 - **Styling**: Tailwind CSS with Roboto font family
 
@@ -37,7 +38,7 @@ A mobile-first management platform for rope access building maintenance operatio
 
 ## Database Schema
 - **users**: Multi-role with custom fields (company name, resident info, tech levels)
-- **projects**: Strata plan tracking with floor counts, drops, and completion status
+- **projects**: Strata plan tracking with floor counts, drops, completion status, and imageUrls array for photo gallery
 - **drop_logs**: Daily drop entries per project per tech with date flexibility
 - **complaints**: Resident feedback with status tracking
 - **complaint_notes**: Tech/management responses to complaints
@@ -88,7 +89,17 @@ The signature component displays FOUR buildings side-by-side representing the 4 
 - PDF rope access plan uploads using Replit Object Storage
 - Fully mobile-responsive with Material Design 3 aesthetic
 
-**Recent Updates (Nov 5, 2025):**
+**Recent Updates (Nov 6, 2025):**
+- ✅ **Project Photo Gallery**: Staff can now upload photos from camera or library to projects
+  - POST `/api/projects/:id/images` endpoint with staff-only access (company, operations_manager, supervisor, rope_access_tech)
+  - Mobile-first camera capture support with `capture="environment"` attribute
+  - File picker for library selection
+  - 3-column responsive gallery grid on ProjectDetail page
+  - Images stored in Replit Object Storage with URLs in `imageUrls` array
+  - Proper cache invalidation after uploads
+  - 5MB file size limit with image/* mimetype validation
+
+**Updates (Nov 5, 2025):**
 - ✅ Fixed critical session detection bug (now checks ALL projects with async/await)
 - ✅ Improved End Day UX (shortfall reason only appears when drops < target)
 - ✅ Implemented proper object storage with @google-cloud/storage
