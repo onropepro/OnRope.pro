@@ -84,6 +84,14 @@ export class Storage {
     return db.select().from(projects).orderBy(desc(projects.createdAt));
   }
 
+  async updateProject(id: string, updates: Partial<InsertProject>): Promise<Project> {
+    const result = await db.update(projects)
+      .set({ ...updates, updatedAt: new Date() })
+      .where(eq(projects.id, id))
+      .returning();
+    return result[0];
+  }
+
   async updateProjectStatus(id: string, status: string): Promise<Project> {
     const result = await db.update(projects)
       .set({ status, updatedAt: new Date() })
