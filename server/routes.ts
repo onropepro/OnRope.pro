@@ -908,16 +908,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "Project not found" });
       }
       
-      const { totalCompleted } = await storage.getProjectProgress(req.params.id);
+      const { north, east, south, west, total } = await storage.getProjectProgress(req.params.id);
       const totalDrops = (project.totalDropsNorth ?? 0) + 
                         (project.totalDropsEast ?? 0) + 
                         (project.totalDropsSouth ?? 0) + 
                         (project.totalDropsWest ?? 0);
-      const progressPercentage = totalDrops > 0 ? (totalCompleted / totalDrops) * 100 : 0;
+      const progressPercentage = totalDrops > 0 ? (total / totalDrops) * 100 : 0;
       
       res.json({
-        completedDrops: totalCompleted,
+        completedDrops: total,
+        completedDropsNorth: north,
+        completedDropsEast: east,
+        completedDropsSouth: south,
+        completedDropsWest: west,
         totalDrops,
+        totalDropsNorth: project.totalDropsNorth ?? 0,
+        totalDropsEast: project.totalDropsEast ?? 0,
+        totalDropsSouth: project.totalDropsSouth ?? 0,
+        totalDropsWest: project.totalDropsWest ?? 0,
         progressPercentage: Math.round(progressPercentage),
       });
     } catch (error) {
