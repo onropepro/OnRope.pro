@@ -50,6 +50,7 @@ export const users = pgTable("users", {
   // Resident-specific fields
   strataPlanNumber: varchar("strata_plan_number"), // for resident role
   unitNumber: varchar("unit_number"), // for resident role
+  phoneNumber: varchar("phone_number"), // for resident role
   
   // Employee-specific fields
   techLevel: varchar("tech_level"), // for rope_access_tech role (e.g., "Level 1", "Level 2", "Level 3")

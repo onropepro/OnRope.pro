@@ -11,6 +11,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 const residentSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
   email: z.string().email("Invalid email address"),
+  phoneNumber: z.string().min(10, "Phone number must be at least 10 digits"),
   password: z.string().min(6, "Password must be at least 6 characters"),
   confirmPassword: z.string().min(1, "Please confirm your password"),
   strataPlanNumber: z.string().min(1, "Strata plan number is required"),
@@ -40,6 +41,7 @@ export default function Register() {
     defaultValues: {
       name: "",
       email: "",
+      phoneNumber: "",
       password: "",
       confirmPassword: "",
       strataPlanNumber: "",
@@ -154,6 +156,20 @@ export default function Register() {
                         <FormLabel>Email</FormLabel>
                         <FormControl>
                           <Input type="email" placeholder="you@example.com" {...field} data-testid="input-email" className="h-12" />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={residentForm.control}
+                    name="phoneNumber"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Phone Number</FormLabel>
+                        <FormControl>
+                          <Input type="tel" placeholder="604-123-4567" {...field} data-testid="input-phone-number" className="h-12" />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
