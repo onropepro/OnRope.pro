@@ -45,9 +45,16 @@ export default function ProjectDetail() {
     enabled: !!id && (currentUser?.role === "company" || currentUser?.role === "operations_manager" || currentUser?.role === "supervisor"),
   });
 
+  // Fetch complaints for this project
+  const { data: complaintsData } = useQuery({
+    queryKey: ["/api/projects", id, "complaints"],
+    enabled: !!id,
+  });
+
   const project = projectData?.project as Project | undefined;
   const workSessions = workSessionsData?.sessions || [];
   const residents = residentsData?.residents || [];
+  const complaints = complaintsData?.complaints || [];
   
   // Only company and operations_manager can delete projects
   const canDeleteProject = currentUser?.role === "company" || currentUser?.role === "operations_manager";
@@ -405,6 +412,63 @@ export default function ProjectDetail() {
                   }
                 }}
               />
+            </div>
+
+            <Separator />
+
+            {/* Resident Feedback Section */}
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <div className="text-sm text-muted-foreground">Resident Feedback</div>
+                <Badge variant="secondary" className="text-xs">
+                  {complaints.length} {complaints.length === 1 ? 'complaint' : 'complaints'}
+                </Badge>
+              </div>
+              
+              {complaints.length === 0 ? (
+                <div className="text-center py-6 text-muted-foreground text-sm border rounded-lg">
+                  No feedback received yet
+                </div>
+              ) : (
+                <div className="space-y-2">
+                  {complaints.map((complaint: any) => {
+                    const status = complaint.status;
+                    const isViewed = complaint.viewedAt !== null;
+                    
+                    let statusBadge;
+                    if (status === 'closed') {
+                      statusBadge = <Badge variant="secondary" className="bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/20 text-xs">Closed</Badge>;
+                    } else if (isViewed) {
+                      statusBadge = <Badge variant="secondary" className="bg-blue-500/10 text-blue-700 dark:text-blue-400 border-blue-500/20 text-xs">Viewed</Badge>;
+                    } else {
+                      statusBadge = <Badge variant="secondary" className="bg-orange-500/10 text-orange-700 dark:text-orange-400 border-orange-500/20 text-xs">New</Badge>;
+                    }
+                    
+                    return (
+                      <Card 
+                        key={complaint.id}
+                        className="hover-elevate cursor-pointer"
+                        onClick={() => setLocation(`/complaints/${complaint.id}`)}
+                        data-testid={`complaint-card-${complaint.id}`}
+                      >
+                        <CardContent className="p-3">
+                          <div className="flex items-start justify-between gap-2 mb-2">
+                            <div className="flex-1 min-w-0">
+                              <div className="text-sm font-medium">{complaint.residentName}</div>
+                              <div className="text-xs text-muted-foreground">Unit {complaint.unitNumber}</div>
+                            </div>
+                            {statusBadge}
+                          </div>
+                          <p className="text-sm line-clamp-2 mb-2">{complaint.message}</p>
+                          <div className="text-xs text-muted-foreground">
+                            {new Date(complaint.createdAt).toLocaleDateString()}
+                          </div>
+                        </CardContent>
+                      </Card>
+                    );
+                  })}
+                </div>
+              )}
             </div>
 
             <Separator />

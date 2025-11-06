@@ -1305,7 +1305,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
-  // Get all complaints (filtered by role)
+  // Get all complaints (filtered by role) - for management dashboard
   app.get("/api/complaints", requireAuth, async (req: Request, res: Response) => {
     try {
       const currentUser = await storage.getUserById(req.session.userId!);
@@ -1337,6 +1337,46 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({ complaints });
     } catch (error) {
       console.error("Get complaints error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+  
+  // Get complaints for a specific project
+  app.get("/api/projects/:id/complaints", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      const projectId = req.params.id;
+      
+      // Verify user has access to this project
+      const project = await storage.getProjectById(projectId);
+      if (!project) {
+        return res.status(404).json({ message: "Project not found" });
+      }
+      
+      // Check access based on role
+      if (currentUser.role === "company") {
+        if (project.companyId !== currentUser.id) {
+          return res.status(403).json({ message: "Access denied" });
+        }
+      } else if (currentUser.role === "operations_manager" || currentUser.role === "supervisor" || currentUser.role === "rope_access_tech") {
+        if (project.companyId !== currentUser.companyId) {
+          return res.status(403).json({ message: "Access denied" });
+        }
+      } else {
+        return res.status(403).json({ message: "Access denied" });
+      }
+      
+      // Get complaints for this project
+      const complaints = await storage.getComplaintsByProject(projectId);
+      
+      res.json({ complaints });
+    } catch (error) {
+      console.error("Get project complaints error:", error);
       res.status(500).json({ message: "Internal server error" });
     }
   });
