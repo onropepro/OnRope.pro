@@ -68,7 +68,7 @@ export const projects = pgTable("projects", {
   buildingName: varchar("building_name").notNull(), // Building name for display
   strataPlanNumber: varchar("strata_plan_number").notNull(),
   buildingAddress: text("building_address"), // Building address visible to all employees
-  jobType: varchar("job_type").notNull(), // window_cleaning | dryer_vent_cleaning | pressure_washing | in_suit_dryer_vent_cleaning | parkade_pressure_cleaning | ground_window_cleaning
+  jobType: varchar("job_type").notNull(), // window_cleaning | dryer_vent_cleaning | pressure_washing | in_suite_dryer_vent_cleaning | parkade_pressure_cleaning | ground_window_cleaning
   
   // Elevation-specific drop totals
   totalDropsNorth: integer("total_drops_north").notNull().default(0),
@@ -84,8 +84,8 @@ export const projects = pgTable("projects", {
   status: varchar("status").notNull().default('active'), // active | completed
   
   // Service-specific expectation fields
-  suitsPerDay: integer("suits_per_day"), // For in_suit_dryer_vent_cleaning
-  floorsPerDay: integer("floors_per_day"), // Alternative for in_suit_dryer_vent_cleaning
+  suitesPerDay: integer("suites_per_day"), // For in_suite_dryer_vent_cleaning
+  floorsPerDay: integer("floors_per_day"), // Alternative for in_suite_dryer_vent_cleaning
   stallsPerDay: integer("stalls_per_day"), // For parkade_pressure_cleaning
   
   createdAt: timestamp("created_at").defaultNow(),

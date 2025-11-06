@@ -29,7 +29,7 @@ const projectSchema = z.object({
   strataPlanNumber: z.string().min(1, "Strata plan number is required"),
   buildingName: z.string().min(1, "Building name is required"),
   buildingAddress: z.string().optional(),
-  jobType: z.enum(["window_cleaning", "dryer_vent_cleaning", "pressure_washing", "in_suit_dryer_vent_cleaning", "parkade_pressure_cleaning", "ground_window_cleaning"]),
+  jobType: z.enum(["window_cleaning", "dryer_vent_cleaning", "pressure_washing", "in_suite_dryer_vent_cleaning", "parkade_pressure_cleaning", "ground_window_cleaning"]),
   totalDropsNorth: z.string().min(1, "Total drops (North) is required"),
   totalDropsEast: z.string().min(1, "Total drops (East) is required"),
   totalDropsSouth: z.string().min(1, "Total drops (South) is required"),
@@ -38,16 +38,16 @@ const projectSchema = z.object({
   floorCount: z.string().min(1, "Floor count is required"),
   targetCompletionDate: z.string().optional(),
   ropeAccessPlan: z.any().optional(),
-  suitsPerDay: z.string().optional(),
+  suitesPerDay: z.string().optional(),
   floorsPerDay: z.string().optional(),
   stallsPerDay: z.string().optional(),
 }).superRefine((data, ctx) => {
-  if (data.jobType === "in_suit_dryer_vent_cleaning") {
-    if (!data.suitsPerDay && !data.floorsPerDay) {
+  if (data.jobType === "in_suite_dryer_vent_cleaning") {
+    if (!data.suitesPerDay && !data.floorsPerDay) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
-        message: "Either suits per day or floors per day is required for in-suit dryer vent cleaning",
-        path: ["suitsPerDay"],
+        message: "Either suites per day or floors per day is required for in-suite dryer vent cleaning",
+        path: ["suitesPerDay"],
       });
     }
   }
@@ -316,7 +316,7 @@ export default function ManagementDashboard() {
           dailyDropTarget: parseInt(data.dailyDropTarget),
           floorCount: parseInt(data.floorCount),
           ropeAccessPlanUrl: data.ropeAccessPlanUrl || undefined,
-          suitsPerDay: data.suitsPerDay ? parseInt(data.suitsPerDay) : undefined,
+          suitesPerDay: data.suitesPerDay ? parseInt(data.suitesPerDay) : undefined,
           floorsPerDay: data.floorsPerDay ? parseInt(data.floorsPerDay) : undefined,
           stallsPerDay: data.stallsPerDay ? parseInt(data.stallsPerDay) : undefined,
         }),
@@ -829,7 +829,7 @@ export default function ManagementDashboard() {
                                   <SelectItem value="window_cleaning">Window Cleaning</SelectItem>
                                   <SelectItem value="dryer_vent_cleaning">Dryer Vent Cleaning</SelectItem>
                                   <SelectItem value="pressure_washing">Pressure Washing</SelectItem>
-                                  <SelectItem value="in_suit_dryer_vent_cleaning">In-suit Dryer Vent Cleaning</SelectItem>
+                                  <SelectItem value="in_suite_dryer_vent_cleaning">In-Suite Dryer Vent Cleaning</SelectItem>
                                   <SelectItem value="parkade_pressure_cleaning">Parkade Pressure Cleaning</SelectItem>
                                   <SelectItem value="ground_window_cleaning">Ground Window Cleaning</SelectItem>
                                 </SelectContent>
@@ -839,16 +839,16 @@ export default function ManagementDashboard() {
                           )}
                         />
 
-                        {projectForm.watch("jobType") === "in_suit_dryer_vent_cleaning" && (
+                        {projectForm.watch("jobType") === "in_suite_dryer_vent_cleaning" && (
                           <div className="grid grid-cols-2 gap-4">
                             <FormField
                               control={projectForm.control}
-                              name="suitsPerDay"
+                              name="suitesPerDay"
                               render={({ field }) => (
                                 <FormItem>
-                                  <FormLabel>Suits per Day</FormLabel>
+                                  <FormLabel>Suites per Day</FormLabel>
                                   <FormControl>
-                                    <Input type="number" min="0" placeholder="e.g., 10" {...field} data-testid="input-suits-per-day" className="h-12" />
+                                    <Input type="number" min="0" placeholder="e.g., 10" {...field} data-testid="input-suites-per-day" className="h-12" />
                                   </FormControl>
                                   <FormMessage />
                                 </FormItem>
