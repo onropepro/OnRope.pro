@@ -1041,8 +1041,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
-  // Get work sessions for a project (management view)
-  app.get("/api/projects/:projectId/work-sessions", requireAuth, requireRole("company", "operations_manager", "supervisor"), async (req: Request, res: Response) => {
+  // Get work sessions for a project (management and tech view)
+  app.get("/api/projects/:projectId/work-sessions", requireAuth, requireRole("company", "operations_manager", "supervisor", "rope_access_tech"), async (req: Request, res: Response) => {
     try {
       const currentUser = await storage.getUserById(req.session.userId!);
       

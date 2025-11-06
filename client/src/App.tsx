@@ -44,7 +44,7 @@ function Router() {
         </ProtectedRoute>
       </Route>
       <Route path="/projects/:id/work-sessions">
-        <ProtectedRoute allowedRoles={["company", "operations_manager", "supervisor"]}>
+        <ProtectedRoute allowedRoles={["company", "operations_manager", "supervisor", "rope_access_tech"]}>
           <WorkSessionHistory />
         </ProtectedRoute>
       </Route>
