@@ -91,6 +91,22 @@ The signature component displays FOUR buildings side-by-side representing the 4 
 - Universal profile management for all users
 
 **Recent Updates (Nov 6, 2025):**
+- ✅ **Logout Confirmation Dialogs**: Added confirmation prompts before logout on all pages
+  - AlertDialog appears when logout button clicked (prevents accidental logout)
+  - Consistent implementation across Resident, Tech, Management dashboards and Profile page
+  - Test IDs: `button-logout`, `button-confirm-logout`, `button-cancel-logout`
+- ✅ **Project Progress Display Fix**: Fixed "0% / 0 / 0 drops" bug in management dashboard project list
+  - Updated `/api/projects` endpoint to calculate `totalDrops` from elevation-specific fields
+  - Projects now correctly show progress (e.g., "26% / 12 / 47 drops")
+  - Calculation: `totalDrops = totalDropsNorth + totalDropsEast + totalDropsSouth + totalDropsWest`
+- ✅ **Work Session History Access**: Enabled technicians to view their work session history
+  - Added `rope_access_tech` to allowed roles for `/projects/:id/work-sessions` route
+  - Updated backend API endpoint to include technicians in authorization
+  - Back button navigates to project detail page for all user types
+- ✅ **Management-Only Analytics**: Target Performance pie chart on Work Session History page
+  - Pie chart showing Target Met vs Below Target sessions visible only to management
+  - Technicians see project progress and session history but not performance analytics
+  - Role-based conditional rendering using `isManagement` check
 - ✅ **CRITICAL BUG FIXES**:
   - **Route Protection**: Added ProtectedRoute component to enforce role-based access control
     - Prevents unauthorized users from accessing management/tech/resident dashboards via URL manipulation
