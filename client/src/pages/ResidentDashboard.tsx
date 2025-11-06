@@ -386,95 +386,97 @@ export default function ResidentDashboard() {
 
 
   return (
-    <div className="min-h-screen gradient-bg dot-pattern pb-20">
-      {/* Header */}
-      <header className="sticky top-0 z-[100] glass-card border-0 shadow-premium">
-        <div className="px-4 h-16 flex items-center justify-between">
-          <div>
-            <h1 className="text-lg font-bold">
-              Building Progress{activeProject?.buildingName ? ` for ${activeProject.buildingName}` : ''}
-            </h1>
-            {companyData?.company?.companyName && (
-              <p className="text-xs text-muted-foreground">
-                {projectData.jobType} by {companyData.company.companyName}
-              </p>
-            )}
-          </div>
-          <div className="flex items-center gap-2">
-            <Button variant="ghost" size="icon" className="min-w-11 min-h-11" data-testid="button-profile" onClick={() => setLocation("/profile")}>
-              <span className="material-icons">person</span>
-            </Button>
-            <Button variant="ghost" size="icon" className="min-w-11 min-h-11" data-testid="button-logout" onClick={() => setShowLogoutDialog(true)}>
-              <span className="material-icons">logout</span>
-            </Button>
+    <div className="min-h-screen flex flex-col bg-gradient-to-br from-primary/5 via-background to-primary/10">
+      {/* Modern Header */}
+      <header className="sticky top-0 z-[100] bg-card/80 backdrop-blur-xl border-b border-border/50 shadow-lg">
+        <div className="container max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="h-20 flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <div className="h-12 w-12 rounded-xl bg-gradient-to-br from-primary to-primary/60 flex items-center justify-center shadow-lg">
+                <span className="material-icons text-white text-2xl">domain</span>
+              </div>
+              <div>
+                <h1 className="text-xl font-bold tracking-tight" data-testid="text-strata-number">
+                  {projectData.strataPlanNumber}
+                </h1>
+                <p className="text-sm text-muted-foreground capitalize">
+                  {projectData.jobType}
+                  {companyData?.company?.companyName && ` • ${companyData.company.companyName}`}
+                </p>
+              </div>
+            </div>
+            <div className="flex items-center gap-3">
+              <Badge variant="secondary" className="text-base px-4 py-2">
+                <span className="material-icons text-sm mr-1.5">layers</span>
+                {projectData.floorCount} Floors
+              </Badge>
+              <Button variant="ghost" size="icon" className="min-w-11 min-h-11" data-testid="button-profile" onClick={() => setLocation("/profile")}>
+                <span className="material-icons">person</span>
+              </Button>
+              <Button variant="ghost" size="icon" className="min-w-11 min-h-11" data-testid="button-logout" onClick={() => setShowLogoutDialog(true)}>
+                <span className="material-icons">logout</span>
+              </Button>
+            </div>
           </div>
         </div>
       </header>
 
-      <div className="p-4 max-w-2xl mx-auto">
-        {/* Building Info Card */}
-        <Card className="glass-card border-0 shadow-premium mb-4">
-          <CardHeader>
-            <div className="flex items-start justify-between">
-              <div>
-                <CardTitle data-testid="text-strata-number">{projectData.strataPlanNumber}</CardTitle>
-                <CardDescription className="mt-1 capitalize">{projectData.jobType}</CardDescription>
-              </div>
-              <Badge variant="secondary" className="text-sm">
-                {projectData.floorCount} Floors
-              </Badge>
-            </div>
-          </CardHeader>
-        </Card>
-
-        <Tabs value={activeTab} onValueChange={setActiveTab}>
+      {/* Main Content - Full Width */}
+      <div className="flex-1 container max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <TabsList className="grid w-full grid-cols-3 mb-4">
             <TabsTrigger value="building" data-testid="tab-building">Progress</TabsTrigger>
             <TabsTrigger value="submit" data-testid="tab-submit">Submit</TabsTrigger>
             <TabsTrigger value="history" data-testid="tab-history">My Complaints</TabsTrigger>
           </TabsList>
 
-          <TabsContent value="building">
-            <Card className="glass-card border-0 shadow-premium">
-              <CardContent className="pt-6">
-                <HighRiseBuilding
-                  floors={projectData.floorCount}
-                  totalDropsNorth={projectData.totalDropsNorth ?? Math.floor(projectData.totalDrops / 4) + (projectData.totalDrops % 4 > 0 ? 1 : 0)}
-                  totalDropsEast={projectData.totalDropsEast ?? Math.floor(projectData.totalDrops / 4) + (projectData.totalDrops % 4 > 1 ? 1 : 0)}
-                  totalDropsSouth={projectData.totalDropsSouth ?? Math.floor(projectData.totalDrops / 4) + (projectData.totalDrops % 4 > 2 ? 1 : 0)}
-                  totalDropsWest={projectData.totalDropsWest ?? Math.floor(projectData.totalDrops / 4)}
-                  completedDropsNorth={projectData.completedDropsNorth ?? Math.floor(projectData.completedDrops / 4) + (projectData.completedDrops % 4 > 0 ? 1 : 0)}
-                  completedDropsEast={projectData.completedDropsEast ?? Math.floor(projectData.completedDrops / 4) + (projectData.completedDrops % 4 > 1 ? 1 : 0)}
-                  completedDropsSouth={projectData.completedDropsSouth ?? Math.floor(projectData.completedDrops / 4) + (projectData.completedDrops % 4 > 2 ? 1 : 0)}
-                  completedDropsWest={projectData.completedDropsWest ?? Math.floor(projectData.completedDrops / 4)}
-                  className="mb-6"
-                />
+          <TabsContent value="building" className="mt-6">
+            <div className="bg-card/60 backdrop-blur-sm rounded-2xl border border-border/50 shadow-xl p-6 sm:p-8">
+              <HighRiseBuilding
+                floors={projectData.floorCount}
+                totalDropsNorth={projectData.totalDropsNorth ?? Math.floor(projectData.totalDrops / 4) + (projectData.totalDrops % 4 > 0 ? 1 : 0)}
+                totalDropsEast={projectData.totalDropsEast ?? Math.floor(projectData.totalDrops / 4) + (projectData.totalDrops % 4 > 1 ? 1 : 0)}
+                totalDropsSouth={projectData.totalDropsSouth ?? Math.floor(projectData.totalDrops / 4) + (projectData.totalDrops % 4 > 2 ? 1 : 0)}
+                totalDropsWest={projectData.totalDropsWest ?? Math.floor(projectData.totalDrops / 4)}
+                completedDropsNorth={projectData.completedDropsNorth ?? Math.floor(projectData.completedDrops / 4) + (projectData.completedDrops % 4 > 0 ? 1 : 0)}
+                completedDropsEast={projectData.completedDropsEast ?? Math.floor(projectData.completedDrops / 4) + (projectData.completedDrops % 4 > 1 ? 1 : 0)}
+                completedDropsSouth={projectData.completedDropsSouth ?? Math.floor(projectData.completedDrops / 4) + (projectData.completedDrops % 4 > 2 ? 1 : 0)}
+                completedDropsWest={projectData.completedDropsWest ?? Math.floor(projectData.completedDrops / 4)}
+                className="mb-8"
+              />
 
-                <div className="grid grid-cols-2 gap-4 mt-6">
-                  <div className="text-center p-4 bg-muted/50 rounded-lg">
-                    <div className="text-2xl font-bold text-foreground">{projectData.dailyDropTarget}</div>
-                    <div className="text-xs text-muted-foreground mt-1">Daily Target</div>
-                  </div>
-                  <div className="text-center p-4 bg-muted/50 rounded-lg">
-                    <div className="text-2xl font-bold text-foreground">
-                      {projectData.completedDrops > 0 ? Math.ceil((projectData.totalDrops - projectData.completedDrops) / projectData.dailyDropTarget) : "N/A"}
-                    </div>
-                    <div className="text-xs text-muted-foreground mt-1">Days Remaining</div>
-                  </div>
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-8">
+                <div className="text-center p-6 bg-gradient-to-br from-primary/10 to-primary/5 rounded-xl border border-primary/20">
+                  <div className="text-3xl font-bold text-primary mb-1">{projectData.dailyDropTarget}</div>
+                  <div className="text-sm text-muted-foreground">Daily Target</div>
                 </div>
-              </CardContent>
-            </Card>
+                <div className="text-center p-6 bg-gradient-to-br from-blue-500/10 to-blue-500/5 rounded-xl border border-blue-500/20">
+                  <div className="text-3xl font-bold text-blue-600 dark:text-blue-400 mb-1">
+                    {projectData.completedDrops > 0 ? Math.ceil((projectData.totalDrops - projectData.completedDrops) / projectData.dailyDropTarget) : "N/A"}
+                  </div>
+                  <div className="text-sm text-muted-foreground">Days Remaining</div>
+                </div>
+                <div className="text-center p-6 bg-gradient-to-br from-green-500/10 to-green-500/5 rounded-xl border border-green-500/20">
+                  <div className="text-3xl font-bold text-green-600 dark:text-green-400 mb-1">{projectData.completedDrops}</div>
+                  <div className="text-sm text-muted-foreground">Completed</div>
+                </div>
+                <div className="text-center p-6 bg-gradient-to-br from-orange-500/10 to-orange-500/5 rounded-xl border border-orange-500/20">
+                  <div className="text-3xl font-bold text-orange-600 dark:text-orange-400 mb-1">{projectData.totalDrops - projectData.completedDrops}</div>
+                  <div className="text-sm text-muted-foreground">Remaining</div>
+                </div>
+              </div>
+            </div>
           </TabsContent>
 
-          <TabsContent value="submit">
-            <Card className="glass-card border-0 shadow-premium">
-              <CardHeader>
-                <CardTitle>Submit Feedback/Comments/Request</CardTitle>
-                <CardDescription>Let us know if you have any concerns or questions</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <Form {...form}>
-                  <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+          <TabsContent value="submit" className="mt-6">
+            <div className="bg-card/60 backdrop-blur-sm rounded-2xl border border-border/50 shadow-xl p-6 sm:p-8">
+              <div className="mb-6">
+                <h2 className="text-2xl font-bold mb-2">Submit Feedback</h2>
+                <p className="text-muted-foreground">Let us know if you have any concerns or questions about the work</p>
+              </div>
+              
+              <Form {...form}>
+                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
                     <FormField
                       control={form.control}
                       name="residentName"
@@ -536,22 +538,20 @@ export default function ResidentDashboard() {
                       )}
                     />
 
-                    <Button type="submit" className="w-full h-12" data-testid="button-submit-complaint">
-                      Submit Feedback
-                    </Button>
-                  </form>
-                </Form>
-              </CardContent>
-            </Card>
+                  <Button type="submit" className="w-full h-12" data-testid="button-submit-complaint">
+                    Submit Feedback
+                  </Button>
+                </form>
+              </Form>
+            </div>
           </TabsContent>
 
-          <TabsContent value="history">
-            <Card className="glass-card border-0 shadow-premium">
-              <CardHeader>
-                <CardTitle>My Complaint History</CardTitle>
-                <CardDescription>View the status of your submitted feedback</CardDescription>
-              </CardHeader>
-              <CardContent>
+          <TabsContent value="history" className="mt-6">
+            <div className="bg-card/60 backdrop-blur-sm rounded-2xl border border-border/50 shadow-xl p-6 sm:p-8">
+              <div className="mb-6">
+                <h2 className="text-2xl font-bold mb-2">My Complaint History</h2>
+                <p className="text-muted-foreground">View the status of your submitted feedback</p>
+              </div>
                 {!complaintsData?.complaints || complaintsData.complaints.length === 0 ? (
                   <div className="text-center py-8">
                     <span className="material-icons text-6xl text-muted-foreground mb-3">feedback</span>
@@ -602,8 +602,7 @@ export default function ResidentDashboard() {
                     })}
                   </div>
                 )}
-              </CardContent>
-            </Card>
+            </div>
           </TabsContent>
         </Tabs>
       </div>
