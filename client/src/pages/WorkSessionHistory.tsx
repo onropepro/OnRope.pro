@@ -14,6 +14,11 @@ export default function WorkSessionHistory() {
   const [, setLocation] = useLocation();
   const projectId = params?.id;
 
+  // Fetch current user to check role
+  const { data: userData } = useQuery({
+    queryKey: ["/api/user"],
+  });
+
   // Fetch project details
   const { data: projectData } = useQuery({
     queryKey: ["/api/projects", projectId],
@@ -26,8 +31,14 @@ export default function WorkSessionHistory() {
     enabled: !!projectId,
   });
 
+  const user = userData?.user;
   const project = projectData?.project;
   const workSessions = workSessionsData?.sessions || [];
+  
+  // Check if user is management (show pie chart only for management)
+  const isManagement = user?.role === "company" || 
+                       user?.role === "operations_manager" || 
+                       user?.role === "supervisor";
 
   if (!project) {
     return (
@@ -87,7 +98,7 @@ export default function WorkSessionHistory() {
           <Button
             variant="ghost"
             size="icon"
-            onClick={() => setLocation("/management")}
+            onClick={() => setLocation(`/projects/${projectId}`)}
             data-testid="button-back"
           >
             <ArrowLeft className="h-5 w-5" />
@@ -133,8 +144,8 @@ export default function WorkSessionHistory() {
           </CardContent>
         </Card>
 
-        {/* Target Performance Chart */}
-        {completedSessions.length > 0 && (
+        {/* Target Performance Chart - Management Only */}
+        {isManagement && completedSessions.length > 0 && (
           <Card>
             <CardHeader>
               <CardTitle>Target Performance</CardTitle>
