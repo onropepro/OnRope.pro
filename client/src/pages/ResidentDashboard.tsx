@@ -62,6 +62,12 @@ export default function ResidentDashboard() {
     enabled: !!activeProject?.companyId,
   });
 
+  // Fetch resident's complaints
+  const { data: complaintsData } = useQuery({
+    queryKey: ["/api/complaints"],
+    refetchInterval: 10000, // Refetch every 10 seconds for status updates
+  });
+
   const projectData = {
     strataPlanNumber: activeProject?.strataPlanNumber || "",
     jobType: activeProject?.jobType?.replace(/_/g, ' ') || "Window Cleaning",
@@ -120,10 +126,9 @@ export default function ResidentDashboard() {
     },
     onSuccess: () => {
       form.reset();
+      queryClient.invalidateQueries({ queryKey: ["/api/complaints"] });
       toast({ title: "Message submitted successfully" });
-      if (activeProject) {
-        setActiveTab("building");
-      }
+      setActiveTab("history");
     },
     onError: (error: Error) => {
       toast({ title: "Error", description: error.message, variant: "destructive" });
@@ -423,9 +428,10 @@ export default function ResidentDashboard() {
         </Card>
 
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid w-full grid-cols-2 mb-4">
+          <TabsList className="grid w-full grid-cols-3 mb-4">
             <TabsTrigger value="building" data-testid="tab-building">Progress</TabsTrigger>
-            <TabsTrigger value="complaints" data-testid="tab-complaints">Feedback/Comments/Request</TabsTrigger>
+            <TabsTrigger value="submit" data-testid="tab-submit">Submit</TabsTrigger>
+            <TabsTrigger value="history" data-testid="tab-history">My Complaints</TabsTrigger>
           </TabsList>
 
           <TabsContent value="building">
@@ -460,7 +466,7 @@ export default function ResidentDashboard() {
             </Card>
           </TabsContent>
 
-          <TabsContent value="complaints">
+          <TabsContent value="submit">
             <Card className="glass-card border-0 shadow-premium">
               <CardHeader>
                 <CardTitle>Submit Feedback/Comments/Request</CardTitle>
@@ -535,6 +541,67 @@ export default function ResidentDashboard() {
                     </Button>
                   </form>
                 </Form>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="history">
+            <Card className="glass-card border-0 shadow-premium">
+              <CardHeader>
+                <CardTitle>My Complaint History</CardTitle>
+                <CardDescription>View the status of your submitted feedback</CardDescription>
+              </CardHeader>
+              <CardContent>
+                {!complaintsData?.complaints || complaintsData.complaints.length === 0 ? (
+                  <div className="text-center py-8">
+                    <span className="material-icons text-6xl text-muted-foreground mb-3">feedback</span>
+                    <p className="text-muted-foreground">No complaints submitted yet</p>
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    {complaintsData.complaints.map((complaint: any) => {
+                      const status = complaint.status;
+                      const isViewed = complaint.viewedAt !== null;
+                      
+                      let statusBadge;
+                      let statusIcon;
+                      if (status === 'closed') {
+                        statusBadge = <Badge variant="secondary" className="bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/20">Closed</Badge>;
+                        statusIcon = <span className="material-icons text-green-600">check_circle</span>;
+                      } else if (isViewed) {
+                        statusBadge = <Badge variant="secondary" className="bg-blue-500/10 text-blue-700 dark:text-blue-400 border-blue-500/20">Viewed</Badge>;
+                        statusIcon = <span className="material-icons text-blue-600">visibility</span>;
+                      } else {
+                        statusBadge = <Badge variant="secondary" className="bg-orange-500/10 text-orange-700 dark:text-orange-400 border-orange-500/20">Open</Badge>;
+                        statusIcon = <span className="material-icons text-orange-600">pending</span>;
+                      }
+                      
+                      return (
+                        <div
+                          key={complaint.id}
+                          className="p-4 rounded-lg border bg-card space-y-3"
+                          data-testid={`complaint-${complaint.id}`}
+                        >
+                          <div className="flex items-start justify-between gap-3">
+                            <div className="flex items-start gap-2 flex-1">
+                              {statusIcon}
+                              <div className="flex-1 min-w-0">
+                                <p className="text-sm text-muted-foreground line-clamp-2">
+                                  {complaint.message}
+                                </p>
+                              </div>
+                            </div>
+                            {statusBadge}
+                          </div>
+                          <div className="flex items-center justify-between text-xs text-muted-foreground">
+                            <span>Unit {complaint.unitNumber}</span>
+                            <span>{new Date(complaint.createdAt).toLocaleDateString()}</span>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
               </CardContent>
             </Card>
           </TabsContent>
