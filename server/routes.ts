@@ -242,6 +242,43 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Delete company account (company role only)
+  app.delete("/api/user/account", requireAuth, requireRole("company"), async (req: Request, res: Response) => {
+    try {
+      const { password } = req.body;
+      
+      if (!password) {
+        return res.status(400).json({ message: "Password is required to delete account" });
+      }
+      
+      const user = await storage.getUserById(req.session.userId!);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      // Verify password
+      const isValid = await bcrypt.compare(password, user.passwordHash);
+      if (!isValid) {
+        return res.status(400).json({ message: "Incorrect password" });
+      }
+      
+      // Delete user (cascades to all employees, projects, work sessions, drop logs, complaints)
+      await storage.deleteUser(user.id);
+      
+      // Destroy session
+      req.session.destroy((err) => {
+        if (err) {
+          console.error("Session destroy error:", err);
+        }
+      });
+      
+      res.json({ message: "Account deleted successfully" });
+    } catch (error) {
+      console.error("Delete account error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
   // Get company information by ID
   app.get("/api/companies/:companyId", requireAuth, async (req: Request, res: Response) => {
     try {

@@ -88,8 +88,24 @@ The signature component displays FOUR buildings side-by-side representing the 4 
 - Resident complaint management with internal notes
 - PDF rope access plan uploads using Replit Object Storage
 - Fully mobile-responsive with Material Design 3 aesthetic
+- Universal profile management for all users
 
 **Recent Updates (Nov 6, 2025):**
+- ✅ **Employee List Enhancement**: Displays employee names and IRATA levels instead of emails
+- ✅ **Universal Profile Page**: All users (residents, staff, company) can update personal information and change passwords
+  - Profile navigation button in all dashboard headers
+  - Role-specific fields (company name, unit number, etc.)
+  - Password change with verification
+  - PATCH `/api/user/profile` and `/api/user/password` endpoints
+- ✅ **Company Account Deletion**: Company owners can delete their entire account with cascade
+  - DELETE `/api/user/account` endpoint (company role only)
+  - Password verification required
+  - Cascades to all employees, projects, work sessions, drop logs, and complaints via database constraints
+  - Confirmation dialog with warnings
+- ✅ **UI Improvements**: 
+  - Mobile-responsive dropdown tabs on management dashboard
+  - "View PDF" changed to "View Rope Access Plan" across UI
+  - Project deletion restricted to company and operations_manager roles only
 - ✅ **Project Photo Gallery**: Staff can now upload photos from camera or library to projects
   - POST `/api/projects/:id/images` endpoint with staff-only access (company, operations_manager, supervisor, rope_access_tech)
   - Mobile-first camera capture support with `capture="environment"` attribute

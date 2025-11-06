@@ -11,6 +11,8 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
+import { useState } from "react";
 
 const profileSchema = z.object({
   name: z.string().min(1, "Name is required"),
@@ -34,6 +36,8 @@ type PasswordFormData = z.infer<typeof passwordSchema>;
 export default function Profile() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [deletePassword, setDeletePassword] = useState("");
 
   const { data: userData, isLoading } = useQuery({
     queryKey: ["/api/user"],
@@ -88,6 +92,29 @@ export default function Profile() {
       toast({ title: "Error", description: error.message, variant: "destructive" });
     },
   });
+
+  const deleteAccountMutation = useMutation({
+    mutationFn: async (password: string) => {
+      return apiRequest("DELETE", "/api/user/account", { password });
+    },
+    onSuccess: () => {
+      toast({ title: "Account deleted successfully" });
+      setLocation("/");
+    },
+    onError: (error: Error) => {
+      toast({ title: "Error", description: error.message, variant: "destructive" });
+    },
+  });
+
+  const handleDeleteAccount = () => {
+    if (!deletePassword) {
+      toast({ title: "Error", description: "Please enter your password", variant: "destructive" });
+      return;
+    }
+    deleteAccountMutation.mutate(deletePassword);
+    setShowDeleteDialog(false);
+    setDeletePassword("");
+  };
 
   const handleLogout = async () => {
     try {
@@ -359,7 +386,80 @@ export default function Profile() {
             </Form>
           </CardContent>
         </Card>
+
+        {/* Delete Account - Company Only */}
+        {user?.role === "company" && (
+          <>
+            <Separator />
+            <Card className="border-destructive">
+              <CardHeader>
+                <CardTitle className="text-destructive">Delete Account</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <p className="text-sm text-muted-foreground">
+                    Permanently delete your company account and all associated data. This action cannot be undone.
+                  </p>
+                  <p className="text-sm text-destructive font-medium">
+                    Warning: This will delete all employees, projects, work sessions, drop logs, and complaints.
+                  </p>
+                  <Button
+                    variant="destructive"
+                    className="w-full h-12"
+                    onClick={() => setShowDeleteDialog(true)}
+                    data-testid="button-delete-account"
+                  >
+                    <span className="material-icons mr-2">delete_forever</span>
+                    Delete Company Account
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          </>
+        )}
       </div>
+
+      {/* Delete Account Confirmation Dialog */}
+      <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Company Account</AlertDialogTitle>
+            <AlertDialogDescription>
+              This will permanently delete your company account, all employees, projects, work sessions, drop logs, and complaints. This action cannot be undone.
+              
+              Please enter your password to confirm.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <div className="py-4">
+            <Input
+              type="password"
+              placeholder="Enter your password"
+              value={deletePassword}
+              onChange={(e) => setDeletePassword(e.target.value)}
+              className="h-12"
+              data-testid="input-delete-password"
+            />
+          </div>
+          <AlertDialogFooter>
+            <AlertDialogCancel
+              onClick={() => {
+                setShowDeleteDialog(false);
+                setDeletePassword("");
+              }}
+              data-testid="button-cancel-delete-account"
+            >
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDeleteAccount}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              data-testid="button-confirm-delete-account"
+            >
+              Delete Account
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
