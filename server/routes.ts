@@ -646,13 +646,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
         projects = [];
       }
       
-      // Add completedDrops to each project
+      // Add completedDrops and totalDrops to each project
       const projectsWithProgress = await Promise.all(
         projects.map(async (project) => {
           const { totalCompleted } = await storage.getProjectProgress(project.id);
+          const totalDrops = (project.totalDropsNorth ?? 0) + 
+                            (project.totalDropsEast ?? 0) + 
+                            (project.totalDropsSouth ?? 0) + 
+                            (project.totalDropsWest ?? 0);
           return {
             ...project,
             completedDrops: totalCompleted,
+            totalDrops,
           };
         })
       );
@@ -804,11 +809,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       const { totalCompleted } = await storage.getProjectProgress(req.params.id);
-      const progressPercentage = project.totalDrops > 0 ? (totalCompleted / project.totalDrops) * 100 : 0;
+      const totalDrops = (project.totalDropsNorth ?? 0) + 
+                        (project.totalDropsEast ?? 0) + 
+                        (project.totalDropsSouth ?? 0) + 
+                        (project.totalDropsWest ?? 0);
+      const progressPercentage = totalDrops > 0 ? (totalCompleted / totalDrops) * 100 : 0;
       
       res.json({
         completedDrops: totalCompleted,
-        totalDrops: project.totalDrops,
+        totalDrops,
         progressPercentage: Math.round(progressPercentage),
       });
     } catch (error) {
