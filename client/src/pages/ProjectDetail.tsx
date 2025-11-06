@@ -37,9 +37,16 @@ export default function ProjectDetail() {
     enabled: !!id,
   });
 
+  // Fetch residents for this project (management only)
+  const { data: residentsData } = useQuery({
+    queryKey: ["/api/projects", id, "residents"],
+    enabled: !!id && (currentUser?.role === "company" || currentUser?.role === "operations_manager" || currentUser?.role === "supervisor"),
+  });
+
   const project = projectData?.project as Project | undefined;
   const currentUser = userData?.user;
   const workSessions = workSessionsData?.sessions || [];
+  const residents = residentsData?.residents || [];
   
   // Only company and operations_manager can delete projects
   const canDeleteProject = currentUser?.role === "company" || currentUser?.role === "operations_manager";
@@ -466,6 +473,55 @@ export default function ProjectDetail() {
                   </div>
                 </div>
               </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Residents List - Management Only */}
+        {isManagement && (
+          <Card>
+            <CardHeader>
+              <CardTitle>Residents</CardTitle>
+            </CardHeader>
+            <CardContent>
+              {residents.length === 0 ? (
+                <p className="text-center text-muted-foreground py-8">
+                  No residents linked to this project
+                </p>
+              ) : (
+                <div className="space-y-3">
+                  {residents.map((resident: any) => (
+                    <div
+                      key={resident.id}
+                      className="p-4 rounded-lg border bg-card"
+                      data-testid={`resident-${resident.id}`}
+                    >
+                      <div className="space-y-2">
+                        <div className="flex items-center gap-2">
+                          <span className="material-icons text-lg text-muted-foreground">person</span>
+                          <p className="font-medium">{resident.name}</p>
+                        </div>
+                        {resident.unitNumber && (
+                          <div className="flex items-center gap-2">
+                            <span className="material-icons text-lg text-muted-foreground">home</span>
+                            <p className="text-sm text-muted-foreground">Unit {resident.unitNumber}</p>
+                          </div>
+                        )}
+                        <div className="flex items-center gap-2">
+                          <span className="material-icons text-lg text-muted-foreground">email</span>
+                          <p className="text-sm text-muted-foreground">{resident.email}</p>
+                        </div>
+                        {resident.phoneNumber && (
+                          <div className="flex items-center gap-2">
+                            <span className="material-icons text-lg text-muted-foreground">phone</span>
+                            <p className="text-sm text-muted-foreground">{resident.phoneNumber}</p>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
             </CardContent>
           </Card>
         )}
