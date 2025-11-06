@@ -273,9 +273,14 @@ export default function TechDashboard() {
               <Progress value={(todayDrops / dailyTarget) * 100} className="h-1 mt-1 w-32" />
             </div>
           </div>
-          <Button variant="ghost" size="icon" className="text-primary-foreground min-w-11 min-h-11" data-testid="button-logout" onClick={handleLogout}>
-            <span className="material-icons">logout</span>
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button variant="ghost" size="icon" className="text-primary-foreground min-w-11 min-h-11" data-testid="button-profile" onClick={() => setLocation("/profile")}>
+              <span className="material-icons">person</span>
+            </Button>
+            <Button variant="ghost" size="icon" className="text-primary-foreground min-w-11 min-h-11" data-testid="button-logout" onClick={handleLogout}>
+              <span className="material-icons">logout</span>
+            </Button>
+          </div>
         </div>
       </header>
 

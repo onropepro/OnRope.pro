@@ -3,6 +3,7 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { insertUserSchema, insertProjectSchema, insertDropLogSchema, insertComplaintSchema, insertComplaintNoteSchema, normalizeStrataPlan } from "@shared/schema";
 import { z } from "zod";
+import bcrypt from "bcrypt";
 import multer from "multer";
 import { ObjectStorageService } from "./objectStorage";
 
@@ -153,6 +154,90 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({ user: userWithoutPassword });
     } catch (error) {
       console.error("Get user error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Update user profile
+  app.patch("/api/user/profile", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const user = await storage.getUserById(req.session.userId!);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      const updates: any = {};
+      
+      // Allow updating name for all users
+      if (req.body.name !== undefined) {
+        updates.name = req.body.name;
+      }
+      
+      // Allow updating email for non-company users
+      if (req.body.email !== undefined && user.role !== "company") {
+        // Check if email is already in use by another user
+        const existingUser = await storage.getUserByEmail(req.body.email);
+        if (existingUser && existingUser.id !== user.id) {
+          return res.status(400).json({ message: "Email address is already in use" });
+        }
+        updates.email = req.body.email;
+      }
+      
+      // Role-specific updates
+      if (user.role === "resident") {
+        if (req.body.unitNumber !== undefined) {
+          updates.unitNumber = req.body.unitNumber;
+        }
+      }
+      
+      if (user.role === "company") {
+        if (req.body.companyName !== undefined) {
+          updates.companyName = req.body.companyName;
+        }
+      }
+      
+      await storage.updateUser(user.id, updates);
+      const updatedUser = await storage.getUserById(user.id);
+      
+      const { passwordHash, ...userWithoutPassword } = updatedUser!;
+      res.json({ user: userWithoutPassword, message: "Profile updated successfully" });
+    } catch (error) {
+      console.error("Update profile error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Change password
+  app.patch("/api/user/password", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const { currentPassword, newPassword } = req.body;
+      
+      if (!currentPassword || !newPassword) {
+        return res.status(400).json({ message: "Current and new passwords are required" });
+      }
+      
+      if (newPassword.length < 6) {
+        return res.status(400).json({ message: "New password must be at least 6 characters" });
+      }
+      
+      const user = await storage.getUserById(req.session.userId!);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      // Verify current password
+      const isValid = await bcrypt.compare(currentPassword, user.passwordHash);
+      if (!isValid) {
+        return res.status(400).json({ message: "Current password is incorrect" });
+      }
+      
+      // Hash and update new password
+      const passwordHash = await bcrypt.hash(newPassword, 10);
+      await storage.updateUser(user.id, { passwordHash, isTempPassword: false });
+      
+      res.json({ message: "Password changed successfully" });
+    } catch (error) {
+      console.error("Change password error:", error);
       res.status(500).json({ message: "Internal server error" });
     }
   });

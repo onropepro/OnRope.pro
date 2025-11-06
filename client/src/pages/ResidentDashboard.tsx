@@ -382,9 +382,14 @@ export default function ResidentDashboard() {
               </p>
             )}
           </div>
-          <Button variant="ghost" size="icon" className="min-w-11 min-h-11" data-testid="button-logout" onClick={handleLogout}>
-            <span className="material-icons">logout</span>
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button variant="ghost" size="icon" className="min-w-11 min-h-11" data-testid="button-profile" onClick={() => setLocation("/profile")}>
+              <span className="material-icons">person</span>
+            </Button>
+            <Button variant="ghost" size="icon" className="min-w-11 min-h-11" data-testid="button-logout" onClick={handleLogout}>
+              <span className="material-icons">logout</span>
+            </Button>
+          </div>
         </div>
       </header>
 

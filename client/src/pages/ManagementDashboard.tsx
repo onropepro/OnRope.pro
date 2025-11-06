@@ -532,9 +532,14 @@ export default function ManagementDashboard() {
               <p className="text-xs text-muted-foreground">{companyName}</p>
             )}
           </div>
-          <Button variant="ghost" size="icon" className="min-w-11 min-h-11" data-testid="button-logout" onClick={handleLogout}>
-            <span className="material-icons">logout</span>
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button variant="ghost" size="icon" className="min-w-11 min-h-11" data-testid="button-profile" onClick={() => setLocation("/profile")}>
+              <span className="material-icons">person</span>
+            </Button>
+            <Button variant="ghost" size="icon" className="min-w-11 min-h-11" data-testid="button-logout" onClick={handleLogout}>
+              <span className="material-icons">logout</span>
+            </Button>
+          </div>
         </div>
       </header>
 
@@ -1529,9 +1534,9 @@ export default function ManagementDashboard() {
                       <CardContent className="p-4">
                         <div className="flex items-start justify-between gap-3">
                           <div className="flex-1">
-                            <div className="font-medium">{employee.email}</div>
+                            <div className="font-medium">{employee.name || employee.email}</div>
                             {employee.techLevel && (
-                              <div className="text-xs text-muted-foreground mt-1">{employee.techLevel}</div>
+                              <div className="text-xs text-muted-foreground mt-1">IRATA {employee.techLevel}</div>
                             )}
                           </div>
                           <div className="flex items-center gap-2">
