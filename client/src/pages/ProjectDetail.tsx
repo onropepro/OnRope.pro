@@ -31,6 +31,8 @@ export default function ProjectDetail() {
     queryKey: ["/api/user"],
   });
 
+  const currentUser = userData?.user;
+
   // Fetch work sessions for this project
   const { data: workSessionsData } = useQuery({
     queryKey: ["/api/projects", id, "work-sessions"],
@@ -44,7 +46,6 @@ export default function ProjectDetail() {
   });
 
   const project = projectData?.project as Project | undefined;
-  const currentUser = userData?.user;
   const workSessions = workSessionsData?.sessions || [];
   const residents = residentsData?.residents || [];
   
