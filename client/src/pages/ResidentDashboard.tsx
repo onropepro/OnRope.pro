@@ -38,9 +38,11 @@ export default function ResidentDashboard() {
 
   const currentUser = userData?.user;
 
-  // Fetch projects (resident's building)
+  // Fetch projects (resident's building) with auto-refresh for real-time progress
   const { data: projectsData, isLoading } = useQuery({
     queryKey: ["/api/projects"],
+    refetchInterval: 10000, // Refetch every 10 seconds
+    refetchOnWindowFocus: true,
   });
 
   // Separate active and completed projects

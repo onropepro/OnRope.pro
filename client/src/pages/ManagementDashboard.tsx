@@ -151,9 +151,11 @@ export default function ManagementDashboard() {
   const { toast } = useToast();
   const [, setLocation] = useLocation();
 
-  // Fetch projects
+  // Fetch projects with auto-refresh to show real-time progress
   const { data: projectsData, isLoading: projectsLoading } = useQuery({
     queryKey: ["/api/projects"],
+    refetchInterval: 10000, // Refetch every 10 seconds
+    refetchOnWindowFocus: true,
   });
 
   // Fetch employees
