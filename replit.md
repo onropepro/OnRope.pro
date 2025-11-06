@@ -32,8 +32,8 @@ A mobile-first management platform for rope access building maintenance operatio
 - `/resident` - Resident dashboard with building visualization and complaint submission
 - `/tech` - Technician dashboard with drop logging and complaint viewing
 - `/management` - Company/Manager dashboard with project and employee management
-- `/projects/:id` - Project detail page with building visualization, stats, and delete capability
-- `/projects/:id/work-sessions` - Work session history with tech names
+- `/projects/:id` - Project detail page with building visualization, stats, work session history, and delete capability
+- `/projects/:id/work-sessions` - Work session history (legacy route, functionality now integrated into project detail page)
 - `/complaints/:id` - Complaint detail with notes (tech/management access)
 
 ## Database Schema
@@ -95,6 +95,12 @@ The signature component displays FOUR buildings side-by-side representing the 4 
 - Universal profile management for all users
 
 **Recent Updates (Nov 6, 2025):**
+- ✅ **Work Session History Integration**: Removed separate page, integrated all content into project detail
+  - Removed "View Work Session History" button from project detail page
+  - Work session list now displays directly on project detail page
+  - Target Performance pie chart shows on project detail (management only)
+  - Improved UX - all project information in one place without navigation
+  - Legacy /projects/:id/work-sessions route still exists but is no longer linked
 - ✅ **Design Modernization**: Complete visual overhaul for premium, sophisticated appearance
   - Updated color palette to Ocean Blue primary (217 91% 60%) with sophisticated slate backgrounds
   - Enhanced shadow system with blue-tinted shadows (rgba(30, 64, 175, ...)) for depth
