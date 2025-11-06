@@ -697,14 +697,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Add completedDrops and totalDrops to each project
       const projectsWithProgress = await Promise.all(
         projects.map(async (project) => {
-          const { totalCompleted } = await storage.getProjectProgress(project.id);
+          const { total } = await storage.getProjectProgress(project.id);
           const totalDrops = (project.totalDropsNorth ?? 0) + 
                             (project.totalDropsEast ?? 0) + 
                             (project.totalDropsSouth ?? 0) + 
                             (project.totalDropsWest ?? 0);
           return {
             ...project,
-            completedDrops: totalCompleted,
+            completedDrops: total,
             totalDrops,
           };
         })
