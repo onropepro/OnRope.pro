@@ -17,6 +17,7 @@ export default function ProjectDetail() {
   const { toast } = useToast();
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [uploadingPdf, setUploadingPdf] = useState(false);
+  const [uploadingImage, setUploadingImage] = useState(false);
 
   const { data: projectData, isLoading } = useQuery({
     queryKey: ["/api/projects", id],
@@ -80,6 +81,40 @@ export default function ProjectDetail() {
       });
     } finally {
       setUploadingPdf(false);
+    }
+  };
+
+  const handleImageUpload = async (file: File) => {
+    if (!id) return;
+    
+    setUploadingImage(true);
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+      
+      const response = await fetch(`/api/projects/${id}/images`, {
+        method: 'POST',
+        body: formData,
+        credentials: 'include',
+      });
+      
+      const result = await response.json();
+      
+      if (!response.ok) {
+        throw new Error(result.message || 'Failed to upload image');
+      }
+      
+      queryClient.invalidateQueries({ queryKey: ["/api/projects", id] });
+      queryClient.invalidateQueries({ queryKey: ["/api/projects"] });
+      toast({ title: "Image uploaded successfully" });
+    } catch (error) {
+      toast({ 
+        title: "Upload failed", 
+        description: error instanceof Error ? error.message : "Failed to upload image", 
+        variant: "destructive" 
+      });
+    } finally {
+      setUploadingImage(false);
     }
   };
 
@@ -219,6 +254,87 @@ export default function ProjectDetail() {
                   const file = e.target.files?.[0];
                   if (file) {
                     handlePdfUpload(file);
+                    e.target.value = '';
+                  }
+                }}
+              />
+            </div>
+
+            <Separator />
+
+            {/* Project Photos Section */}
+            <div className="space-y-3">
+              <div className="text-sm text-muted-foreground">Project Photos</div>
+              
+              {/* Image Gallery */}
+              {project.imageUrls && project.imageUrls.length > 0 && (
+                <div className="grid grid-cols-3 gap-2 mb-3">
+                  {project.imageUrls.map((imageUrl, index) => (
+                    <div
+                      key={index}
+                      className="aspect-square rounded-lg overflow-hidden border"
+                    >
+                      <img
+                        src={imageUrl}
+                        alt={`Project photo ${index + 1}`}
+                        className="w-full h-full object-cover"
+                        data-testid={`project-image-${index}`}
+                      />
+                    </div>
+                  ))}
+                </div>
+              )}
+              
+              {/* Upload Buttons */}
+              <div className="flex gap-2">
+                <Button
+                  variant="outline"
+                  className="flex-1 h-12 gap-2"
+                  onClick={() => document.getElementById('image-camera-input')?.click()}
+                  disabled={uploadingImage}
+                  data-testid="button-take-photo"
+                >
+                  <span className="material-icons text-lg">photo_camera</span>
+                  {uploadingImage ? "Uploading..." : "Take Photo"}
+                </Button>
+                <Button
+                  variant="outline"
+                  className="flex-1 h-12 gap-2"
+                  onClick={() => document.getElementById('image-file-input')?.click()}
+                  disabled={uploadingImage}
+                  data-testid="button-upload-from-library"
+                >
+                  <span className="material-icons text-lg">photo_library</span>
+                  {uploadingImage ? "Uploading..." : "From Library"}
+                </Button>
+              </div>
+              
+              {/* Camera input (mobile-first) */}
+              <input
+                id="image-camera-input"
+                type="file"
+                accept="image/*"
+                capture="environment"
+                className="hidden"
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (file) {
+                    handleImageUpload(file);
+                    e.target.value = '';
+                  }
+                }}
+              />
+              
+              {/* File picker input */}
+              <input
+                id="image-file-input"
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (file) {
+                    handleImageUpload(file);
                     e.target.value = '';
                   }
                 }}

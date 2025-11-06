@@ -305,6 +305,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
+  // Upload images (photos)
+  const imageUpload = multer({
+    storage: multer.memoryStorage(),
+    limits: { fileSize: 5 * 1024 * 1024 }, // 5MB max
+    fileFilter: (req, file, cb) => {
+      if (file.mimetype.startsWith('image/')) {
+        cb(null, true);
+      } else {
+        cb(new Error('Only image files are allowed'));
+      }
+    }
+  });
+  
   app.post("/api/upload-rope-access-plan", requireAuth, requireRole("company", "operations_manager", "rope_access_tech"), upload.single('file'), async (req: Request, res: Response) => {
     try {
       if (!req.file) {
@@ -376,6 +389,58 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("File upload error details:", error);
       const errorMessage = error instanceof Error ? error.message : "Failed to upload file";
+      res.status(500).json({ message: `Upload failed: ${errorMessage}` });
+    }
+  });
+  
+  // Upload image to project
+  app.post("/api/projects/:id/images", requireAuth, requireRole("company", "operations_manager", "supervisor", "rope_access_tech"), imageUpload.single('file'), async (req: Request, res: Response) => {
+    try {
+      if (!req.file) {
+        return res.status(400).json({ message: "No file uploaded" });
+      }
+      
+      const projectId = req.params.id;
+      const currentUser = await storage.getUserById(req.session.userId!);
+      
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      // Get the project to verify access
+      const project = await storage.getProjectById(projectId);
+      if (!project) {
+        return res.status(404).json({ message: "Project not found" });
+      }
+      
+      // Verify user has access to this project (same company)
+      const userCompanyId = currentUser.role === "company" ? currentUser.id : currentUser.companyId;
+      if (project.companyId !== userCompanyId) {
+        return res.status(403).json({ message: "Access denied" });
+      }
+      
+      // Generate unique filename
+      const timestamp = Date.now();
+      const ext = req.file.mimetype.split('/')[1];
+      const filename = `project-image-${projectId}-${timestamp}.${ext}`;
+      
+      // Upload to object storage
+      const objectStorageService = new ObjectStorageService();
+      const url = await objectStorageService.uploadPublicFile(
+        filename,
+        req.file.buffer,
+        req.file.mimetype
+      );
+      
+      // Append URL to project's imageUrls array
+      const currentImageUrls = project.imageUrls || [];
+      const updatedImageUrls = [...currentImageUrls, url];
+      const updatedProject = await storage.updateProject(projectId, { imageUrls: updatedImageUrls });
+      
+      res.json({ project: updatedProject, url });
+    } catch (error) {
+      console.error("Image upload error details:", error);
+      const errorMessage = error instanceof Error ? error.message : "Failed to upload image";
       res.status(500).json({ message: `Upload failed: ${errorMessage}` });
     }
   });
