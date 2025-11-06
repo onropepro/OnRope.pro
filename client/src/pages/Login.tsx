@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
 
 const loginSchema = z.object({
   identifier: z.string().min(1, "Email or company name is required"),
@@ -55,44 +56,76 @@ export default function Login() {
     <div className="min-h-screen bg-gradient-to-br from-primary/5 via-background to-primary/10 flex items-center justify-center p-4">
       <div className="w-full max-w-6xl grid md:grid-cols-2 gap-8 items-center">
         {/* Hero Section - Hidden on mobile */}
-        <div className="hidden md:flex flex-col justify-center space-y-6 pr-8">
-          <div className="space-y-4">
+        <div className="hidden md:flex flex-col justify-center space-y-8 pr-8">
+          <div className="space-y-6">
             <div className="inline-flex items-center gap-2 px-4 py-2 bg-primary/10 rounded-full text-sm font-medium text-primary">
-              <span className="material-icons text-lg">domain</span>
-              Professional Building Maintenance
+              <span className="material-icons text-lg">apartment</span>
+              Professional High-Rise Maintenance
             </div>
             <h1 className="text-5xl font-bold tracking-tight leading-tight">
               Rope Access{" "}
               <span className="bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
-                Management
+                Management Platform
               </span>
             </h1>
             <p className="text-xl text-muted-foreground leading-relaxed">
-              Comprehensive platform for high-rise building maintenance operations. Track progress, manage teams, and deliver excellence.
+              The comprehensive solution for managing building maintenance operations. From project planning to completion tracking, streamline your entire workflow with precision and transparency.
             </p>
           </div>
           
-          <div className="grid grid-cols-3 gap-4 pt-4">
-            <div className="space-y-1">
-              <div className="flex items-center gap-2 text-primary">
-                <span className="material-icons text-2xl">speed</span>
-                <div className="text-2xl font-bold">Real-time</div>
+          {/* Key Features */}
+          <div className="space-y-4">
+            <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">Platform Features</h3>
+            <div className="grid gap-3">
+              <div className="flex items-start gap-3">
+                <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
+                  <span className="material-icons text-primary">location_city</span>
+                </div>
+                <div>
+                  <div className="font-semibold text-sm">4-Elevation Building Visualization</div>
+                  <div className="text-sm text-muted-foreground">Track progress across all building sides (North, East, South, West) with real-time completion metrics</div>
+                </div>
               </div>
-              <div className="text-sm text-muted-foreground">Progress Tracking</div>
+              <div className="flex items-start gap-3">
+                <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
+                  <span className="material-icons text-primary">assignment</span>
+                </div>
+                <div>
+                  <div className="font-semibold text-sm">Daily Drop Logging & Work Sessions</div>
+                  <div className="text-sm text-muted-foreground">Log work progress, track performance analytics, and maintain detailed session history</div>
+                </div>
+              </div>
+              <div className="flex items-start gap-3">
+                <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
+                  <span className="material-icons text-primary">people</span>
+                </div>
+                <div>
+                  <div className="font-semibold text-sm">Multi-Role Access Control</div>
+                  <div className="text-sm text-muted-foreground">Customized dashboards for companies, managers, technicians, and residents</div>
+                </div>
+              </div>
+              <div className="flex items-start gap-3">
+                <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
+                  <span className="material-icons text-primary">photo_library</span>
+                </div>
+                <div>
+                  <div className="font-semibold text-sm">Photo Documentation & Complaints</div>
+                  <div className="text-sm text-muted-foreground">Upload progress photos, manage resident feedback, and maintain project documentation</div>
+                </div>
+              </div>
             </div>
-            <div className="space-y-1">
-              <div className="flex items-center gap-2 text-primary">
-                <span className="material-icons text-2xl">groups</span>
-                <div className="text-2xl font-bold">Team</div>
-              </div>
-              <div className="text-sm text-muted-foreground">Management</div>
-            </div>
-            <div className="space-y-1">
-              <div className="flex items-center gap-2 text-primary">
-                <span className="material-icons text-2xl">verified</span>
-                <div className="text-2xl font-bold">Safety</div>
-              </div>
-              <div className="text-sm text-muted-foreground">First Priority</div>
+          </div>
+
+          {/* Services */}
+          <div className="space-y-3">
+            <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">Supported Services</h3>
+            <div className="flex flex-wrap gap-2">
+              <Badge variant="secondary" className="px-3 py-1">Window Cleaning</Badge>
+              <Badge variant="secondary" className="px-3 py-1">Dryer Vent Cleaning</Badge>
+              <Badge variant="secondary" className="px-3 py-1">Pressure Washing</Badge>
+              <Badge variant="secondary" className="px-3 py-1">In-Suite Services</Badge>
+              <Badge variant="secondary" className="px-3 py-1">Parkade Cleaning</Badge>
+              <Badge variant="secondary" className="px-3 py-1">Ground Window Cleaning</Badge>
             </div>
           </div>
         </div>
@@ -102,7 +135,7 @@ export default function Login() {
           <CardHeader className="space-y-3 pb-6">
             <div className="flex items-center gap-3 md:hidden mb-2">
               <div className="h-12 w-12 rounded-xl bg-primary/10 flex items-center justify-center">
-                <span className="material-icons text-2xl text-primary">domain</span>
+                <span className="material-icons text-2xl text-primary">apartment</span>
               </div>
               <div>
                 <CardTitle className="text-2xl">Rope Access</CardTitle>
@@ -193,11 +226,35 @@ export default function Login() {
               data-testid="link-register"
             >
               <span className="material-icons mr-2">person_add</span>
-              Create an Account
+              Create Company Account
             </Button>
 
-            <div className="pt-4 text-center text-xs text-muted-foreground">
-              <p>Secure access for companies, managers, technicians, and residents</p>
+            {/* Mobile-only feature highlights */}
+            <div className="md:hidden pt-4 space-y-4 border-t">
+              <h3 className="text-sm font-semibold text-center">Built for All Stakeholders</h3>
+              <div className="grid grid-cols-2 gap-3 text-center">
+                <div className="space-y-1">
+                  <span className="material-icons text-primary text-2xl">business</span>
+                  <div className="text-xs font-medium">Companies</div>
+                </div>
+                <div className="space-y-1">
+                  <span className="material-icons text-primary text-2xl">manage_accounts</span>
+                  <div className="text-xs font-medium">Managers</div>
+                </div>
+                <div className="space-y-1">
+                  <span className="material-icons text-primary text-2xl">engineering</span>
+                  <div className="text-xs font-medium">Technicians</div>
+                </div>
+                <div className="space-y-1">
+                  <span className="material-icons text-primary text-2xl">home</span>
+                  <div className="text-xs font-medium">Residents</div>
+                </div>
+              </div>
+            </div>
+
+            <div className="pt-2 text-center text-xs text-muted-foreground space-y-1">
+              <p className="font-medium">Secure, Professional, Transparent</p>
+              <p>Purpose-built for rope access and building maintenance operations</p>
             </div>
           </CardContent>
         </Card>
