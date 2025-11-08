@@ -9,6 +9,10 @@ import { Progress } from "@/components/ui/progress";
 import { HighRiseBuilding } from "@/components/HighRiseBuilding";
 import { useToast } from "@/hooks/use-toast";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import { useState } from "react";
 import { format } from "date-fns";
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from "recharts";
@@ -21,6 +25,10 @@ export default function ProjectDetail() {
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [uploadingPdf, setUploadingPdf] = useState(false);
   const [uploadingImage, setUploadingImage] = useState(false);
+  const [showPhotoDialog, setShowPhotoDialog] = useState(false);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [photoUnitNumber, setPhotoUnitNumber] = useState("");
+  const [photoComment, setPhotoComment] = useState("");
 
   const { data: projectData, isLoading } = useQuery({
     queryKey: ["/api/projects", id],
@@ -51,10 +59,17 @@ export default function ProjectDetail() {
     enabled: !!id,
   });
 
+  // Fetch photos for this project
+  const { data: photosData } = useQuery({
+    queryKey: ["/api/projects", id, "photos"],
+    enabled: !!id,
+  });
+
   const project = projectData?.project as Project | undefined;
   const workSessions = workSessionsData?.sessions || [];
   const residents = residentsData?.residents || [];
   const complaints = complaintsData?.complaints || [];
+  const photos = photosData?.photos || [];
   
   // Only company and operations_manager can delete projects
   const canDeleteProject = currentUser?.role === "company" || currentUser?.role === "operations_manager";
@@ -122,13 +137,22 @@ export default function ProjectDetail() {
     }
   };
 
-  const handleImageUpload = async (file: File) => {
-    if (!id) return;
+  const handleFileSelected = (file: File) => {
+    setSelectedFile(file);
+    setShowPhotoDialog(true);
+  };
+
+  const handlePhotoDialogSubmit = async () => {
+    if (!id || !selectedFile) return;
     
     setUploadingImage(true);
+    setShowPhotoDialog(false);
+    
     try {
       const formData = new FormData();
-      formData.append('file', file);
+      formData.append('file', selectedFile);
+      formData.append('unitNumber', photoUnitNumber);
+      formData.append('comment', photoComment);
       
       const response = await fetch(`/api/projects/${id}/images`, {
         method: 'POST',
@@ -142,18 +166,30 @@ export default function ProjectDetail() {
         throw new Error(result.message || 'Failed to upload image');
       }
       
+      queryClient.invalidateQueries({ queryKey: ["/api/projects", id, "photos"] });
       queryClient.invalidateQueries({ queryKey: ["/api/projects", id] });
-      queryClient.invalidateQueries({ queryKey: ["/api/projects"] });
-      toast({ title: "Image uploaded successfully" });
+      toast({ title: "Photo uploaded successfully" });
+      
+      // Reset form
+      setSelectedFile(null);
+      setPhotoUnitNumber("");
+      setPhotoComment("");
     } catch (error) {
       toast({ 
         title: "Upload failed", 
-        description: error instanceof Error ? error.message : "Failed to upload image", 
+        description: error instanceof Error ? error.message : "Failed to upload photo", 
         variant: "destructive" 
       });
     } finally {
       setUploadingImage(false);
     }
+  };
+
+  const handlePhotoDialogCancel = () => {
+    setShowPhotoDialog(false);
+    setSelectedFile(null);
+    setPhotoUnitNumber("");
+    setPhotoComment("");
   };
 
   if (isLoading) {
@@ -337,22 +373,41 @@ export default function ProjectDetail() {
 
             {/* Project Photos Section */}
             <div className="space-y-3">
-              <div className="text-sm text-muted-foreground">Project Photos</div>
+              <div className="flex items-center justify-between">
+                <div className="text-sm text-muted-foreground">Project Photos</div>
+                <Badge variant="secondary" className="text-xs">
+                  {photos.length} {photos.length === 1 ? 'photo' : 'photos'}
+                </Badge>
+              </div>
               
               {/* Image Gallery */}
-              {project.imageUrls && project.imageUrls.length > 0 && (
+              {photos.length > 0 && (
                 <div className="grid grid-cols-3 gap-2 mb-3">
-                  {project.imageUrls.map((imageUrl, index) => (
+                  {photos.map((photo: any) => (
                     <div
-                      key={index}
-                      className="aspect-square rounded-lg overflow-hidden border"
+                      key={photo.id}
+                      className="aspect-square rounded-lg overflow-hidden border bg-card hover-elevate group relative"
                     >
                       <img
-                        src={imageUrl}
-                        alt={`Project photo ${index + 1}`}
+                        src={photo.imageUrl}
+                        alt={photo.comment || `Project photo`}
                         className="w-full h-full object-cover"
-                        data-testid={`project-image-${index}`}
+                        data-testid={`project-image-${photo.id}`}
                       />
+                      {(photo.unitNumber || photo.comment) && (
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-end p-2">
+                          {photo.unitNumber && (
+                            <div className="text-xs font-medium text-white">
+                              Unit {photo.unitNumber}
+                            </div>
+                          )}
+                          {photo.comment && (
+                            <div className="text-xs text-white/90 line-clamp-2">
+                              {photo.comment}
+                            </div>
+                          )}
+                        </div>
+                      )}
                     </div>
                   ))}
                 </div>
@@ -392,7 +447,7 @@ export default function ProjectDetail() {
                 onChange={(e) => {
                   const file = e.target.files?.[0];
                   if (file) {
-                    handleImageUpload(file);
+                    handleFileSelected(file);
                     e.target.value = '';
                   }
                 }}
@@ -407,7 +462,7 @@ export default function ProjectDetail() {
                 onChange={(e) => {
                   const file = e.target.files?.[0];
                   if (file) {
-                    handleImageUpload(file);
+                    handleFileSelected(file);
                     e.target.value = '';
                   }
                 }}
@@ -683,6 +738,63 @@ export default function ProjectDetail() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* Photo Upload Dialog */}
+      <Dialog open={showPhotoDialog} onOpenChange={(open) => !open && handlePhotoDialogCancel()}>
+        <DialogContent className="sm:max-w-md" data-testid="dialog-photo-upload">
+          <DialogHeader>
+            <DialogTitle>Upload Photo</DialogTitle>
+            <DialogDescription>
+              Add unit number and comment to help residents identify their work.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="unitNumber">Unit Number (Optional)</Label>
+              <Input
+                id="unitNumber"
+                placeholder="e.g., 301, 1205"
+                value={photoUnitNumber}
+                onChange={(e) => setPhotoUnitNumber(e.target.value)}
+                data-testid="input-unit-number"
+              />
+              <p className="text-xs text-muted-foreground">
+                Enter the unit number if this photo is specific to a resident's suite.
+              </p>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="comment">Comment (Optional)</Label>
+              <Textarea
+                id="comment"
+                placeholder="e.g., Before cleaning, After cleaning, Window detail"
+                value={photoComment}
+                onChange={(e) => setPhotoComment(e.target.value)}
+                rows={3}
+                data-testid="input-photo-comment"
+              />
+              <p className="text-xs text-muted-foreground">
+                Add a description or note about this photo.
+              </p>
+            </div>
+          </div>
+          <DialogFooter className="flex gap-2">
+            <Button
+              variant="outline"
+              onClick={handlePhotoDialogCancel}
+              data-testid="button-cancel-upload"
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={handlePhotoDialogSubmit}
+              disabled={!selectedFile}
+              data-testid="button-submit-upload"
+            >
+              Upload Photo
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
