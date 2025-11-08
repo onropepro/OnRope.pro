@@ -1,6 +1,6 @@
 import { db } from "./db";
-import { users, projects, dropLogs, workSessions, complaints, complaintNotes } from "@shared/schema";
-import type { User, InsertUser, Project, InsertProject, DropLog, InsertDropLog, WorkSession, InsertWorkSession, Complaint, InsertComplaint, ComplaintNote, InsertComplaintNote } from "@shared/schema";
+import { users, projects, dropLogs, workSessions, complaints, complaintNotes, projectPhotos } from "@shared/schema";
+import type { User, InsertUser, Project, InsertProject, DropLog, InsertDropLog, WorkSession, InsertWorkSession, Complaint, InsertComplaint, ComplaintNote, InsertComplaintNote, ProjectPhoto, InsertProjectPhoto } from "@shared/schema";
 import { eq, and, desc, sql, isNull } from "drizzle-orm";
 import bcrypt from "bcrypt";
 
@@ -431,6 +431,44 @@ export class Storage {
         )
       )
       .orderBy(desc(workSessions.workDate));
+  }
+
+  async createProjectPhoto(photo: InsertProjectPhoto): Promise<ProjectPhoto> {
+    const result = await db.insert(projectPhotos).values(photo).returning();
+    return result[0];
+  }
+
+  async getProjectPhotos(projectId: string): Promise<ProjectPhoto[]> {
+    return db.select().from(projectPhotos)
+      .where(eq(projectPhotos.projectId, projectId))
+      .orderBy(desc(projectPhotos.createdAt));
+  }
+
+  async getPhotosByUnitNumber(unitNumber: string, companyId: string): Promise<any[]> {
+    const result = await db.select({
+      id: projectPhotos.id,
+      projectId: projectPhotos.projectId,
+      imageUrl: projectPhotos.imageUrl,
+      unitNumber: projectPhotos.unitNumber,
+      comment: projectPhotos.comment,
+      createdAt: projectPhotos.createdAt,
+      buildingName: projects.buildingName,
+      buildingAddress: projects.buildingAddress,
+    })
+      .from(projectPhotos)
+      .leftJoin(projects, eq(projectPhotos.projectId, projects.id))
+      .where(
+        and(
+          eq(projectPhotos.unitNumber, unitNumber),
+          eq(projectPhotos.companyId, companyId)
+        )
+      )
+      .orderBy(desc(projectPhotos.createdAt));
+    return result;
+  }
+
+  async deleteProjectPhoto(photoId: string): Promise<void> {
+    await db.delete(projectPhotos).where(eq(projectPhotos.id, photoId));
   }
 }
 

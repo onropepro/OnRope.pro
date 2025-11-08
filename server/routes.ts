@@ -563,7 +563,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
-  // Upload image to project
+  // Upload image to project with optional unit number and comment
   app.post("/api/projects/:id/images", requireAuth, requireRole("company", "operations_manager", "supervisor", "rope_access_tech"), imageUpload.single('file'), async (req: Request, res: Response) => {
     try {
       if (!req.file) {
@@ -571,6 +571,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       const projectId = req.params.id;
+      const { unitNumber, comment } = req.body;
       const currentUser = await storage.getUserById(req.session.userId!);
       
       if (!currentUser) {
@@ -602,16 +603,90 @@ export async function registerRoutes(app: Express): Promise<Server> {
         req.file.mimetype
       );
       
-      // Append URL to project's imageUrls array
-      const currentImageUrls = project.imageUrls || [];
-      const updatedImageUrls = [...currentImageUrls, url];
-      const updatedProject = await storage.updateProject(projectId, { imageUrls: updatedImageUrls });
+      // Create photo record in database with optional unit number and comment
+      const photo = await storage.createProjectPhoto({
+        projectId,
+        companyId: project.companyId,
+        uploadedBy: currentUser.id,
+        imageUrl: url,
+        unitNumber: unitNumber || null,
+        comment: comment || null,
+      });
       
-      res.json({ project: updatedProject, url });
+      res.json({ photo, url });
     } catch (error) {
       console.error("Image upload error details:", error);
       const errorMessage = error instanceof Error ? error.message : "Failed to upload image";
       res.status(500).json({ message: `Upload failed: ${errorMessage}` });
+    }
+  });
+
+  // Get photos for a project
+  app.get("/api/projects/:id/photos", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const projectId = req.params.id;
+      const currentUser = await storage.getUserById(req.session.userId!);
+      
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      // Get the project to verify access
+      const project = await storage.getProjectById(projectId);
+      if (!project) {
+        return res.status(404).json({ message: "Project not found" });
+      }
+      
+      // Verify user has access to this project
+      const userCompanyId = currentUser.role === "company" ? currentUser.id : currentUser.companyId;
+      const userStrataPlan = currentUser.role === "resident" ? currentUser.strataPlanNumber : null;
+      
+      if (currentUser.role === "resident") {
+        // Residents can only see photos for projects matching their strata plan
+        if (project.strataPlanNumber !== userStrataPlan) {
+          return res.status(403).json({ message: "Access denied" });
+        }
+      } else {
+        // Staff must be from same company
+        if (project.companyId !== userCompanyId) {
+          return res.status(403).json({ message: "Access denied" });
+        }
+      }
+      
+      const photos = await storage.getProjectPhotos(projectId);
+      res.json({ photos });
+    } catch (error) {
+      console.error("Get photos error:", error);
+      const errorMessage = error instanceof Error ? error.message : "Failed to get photos";
+      res.status(500).json({ message: errorMessage });
+    }
+  });
+
+  // Get photos for resident's unit
+  app.get("/api/my-unit-photos", requireAuth, requireRole("resident"), async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      
+      if (!currentUser || !currentUser.unitNumber) {
+        return res.status(400).json({ message: "Unit number not found" });
+      }
+      
+      // Get all projects for this resident's strata plan to determine company
+      const userProjects = await storage.getProjectsByStrataNumber(currentUser.strataPlanNumber!);
+      
+      if (userProjects.length === 0) {
+        return res.json({ photos: [] });
+      }
+      
+      // Use first project's company (all projects for a strata plan should be from same company)
+      const companyId = userProjects[0].companyId;
+      
+      const photos = await storage.getPhotosByUnitNumber(currentUser.unitNumber, companyId);
+      res.json({ photos });
+    } catch (error) {
+      console.error("Get unit photos error:", error);
+      const errorMessage = error instanceof Error ? error.message : "Failed to get unit photos";
+      res.status(500).json({ message: errorMessage });
     }
   });
   
