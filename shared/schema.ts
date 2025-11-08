@@ -173,6 +173,62 @@ export const projectPhotos = pgTable("project_photos", {
   index("IDX_project_photos_unit").on(table.unitNumber, table.projectId),
 ]);
 
+// Harness inspections table - daily safety inspections before work
+export const harnessInspections = pgTable("harness_inspections", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  companyId: varchar("company_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  projectId: varchar("project_id").references(() => projects.id, { onDelete: "cascade" }), // Optional
+  workerId: varchar("worker_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  inspectionDate: date("inspection_date").notNull(),
+  
+  // Basic information
+  inspectorName: varchar("inspector_name").notNull(),
+  manufacturer: varchar("manufacturer"),
+  personalHarnessId: varchar("personal_harness_id"),
+  lanyardType: varchar("lanyard_type"), // not_specified | shock_absorber | etc
+  
+  // Harness & Lanyard Components (NO = pass, YES = fail for most)
+  frayedEdges: boolean("frayed_edges").notNull(),
+  brokenFibers: boolean("broken_fibers").notNull(),
+  pulledStitching: boolean("pulled_stitching").notNull(),
+  cutsWear: boolean("cuts_wear").notNull(),
+  dRingsChemicalDamage: boolean("d_rings_chemical_damage").notNull(),
+  dRingsPadsExcessiveWear: boolean("d_rings_pads_excessive_wear").notNull(),
+  dRingsBentDistorted: boolean("d_rings_bent_distorted").notNull(),
+  dRingsCracksBreaks: boolean("d_rings_cracks_breaks").notNull(),
+  buckleMechanism: boolean("buckle_mechanism").notNull(),
+  tongueBucklesBentDistorted: boolean("tongue_buckles_bent_distorted").notNull(),
+  tongueBucklesSharpEdges: boolean("tongue_buckles_sharp_edges").notNull(),
+  tongueBucklesMoveFreely: boolean("tongue_buckles_move_freely").notNull(),
+  connectorsExcessiveWear: boolean("connectors_excessive_wear").notNull(),
+  connectorsLoose: boolean("connectors_loose").notNull(),
+  connectorsBrokenDistorted: boolean("connectors_broken_distorted").notNull(),
+  connectorsCracksHoles: boolean("connectors_cracks_holes").notNull(),
+  sharpRoughEdges: boolean("sharp_rough_edges").notNull(),
+  
+  // Lanyard Inspection (YES = pass for these)
+  burnsTearsCracks: boolean("burns_tears_cracks").notNull(),
+  chemicalDamage: boolean("chemical_damage").notNull(),
+  excessiveSoiling: boolean("excessive_soiling").notNull(),
+  connectorsHooksWork: boolean("connectors_hooks_work").notNull(),
+  lockingMechanismsWork: boolean("locking_mechanisms_work").notNull(),
+  shockAbsorberIntact: boolean("shock_absorber_intact").notNull(),
+  excessiveWearSigns: boolean("excessive_wear_signs").notNull(),
+  
+  // Service date and comments
+  dateInService: date("date_in_service"),
+  comments: text("comments"),
+  
+  // PDF storage
+  pdfUrl: text("pdf_url"),
+  
+  createdAt: timestamp("created_at").defaultNow(),
+}, (table) => [
+  index("IDX_harness_inspections_company_date").on(table.companyId, table.inspectionDate),
+  index("IDX_harness_inspections_worker").on(table.workerId, table.inspectionDate),
+  index("IDX_harness_inspections_project").on(table.projectId),
+]);
+
 // Relations
 export const usersRelations = relations(users, ({ many }) => ({
   projects: many(projects), // For company role
@@ -249,6 +305,21 @@ export const projectPhotosRelations = relations(projectPhotos, ({ one }) => ({
   }),
   uploadedByUser: one(users, {
     fields: [projectPhotos.uploadedBy],
+    references: [users.id],
+  }),
+}));
+
+export const harnessInspectionsRelations = relations(harnessInspections, ({ one }) => ({
+  company: one(users, {
+    fields: [harnessInspections.companyId],
+    references: [users.id],
+  }),
+  project: one(projects, {
+    fields: [harnessInspections.projectId],
+    references: [projects.id],
+  }),
+  worker: one(users, {
+    fields: [harnessInspections.workerId],
     references: [users.id],
   }),
 }));
@@ -336,6 +407,12 @@ export const insertProjectPhotoSchema = createInsertSchema(projectPhotos).omit({
   createdAt: true,
 });
 
+export const insertHarnessInspectionSchema = createInsertSchema(harnessInspections).omit({
+  id: true,
+  createdAt: true,
+  pdfUrl: true, // Generated server-side
+});
+
 // Type exports
 export type User = typeof users.$inferSelect;
 export type InsertUser = z.infer<typeof insertUserSchema>;
@@ -357,6 +434,9 @@ export type InsertComplaintNote = z.infer<typeof insertComplaintNoteSchema>;
 
 export type ProjectPhoto = typeof projectPhotos.$inferSelect;
 export type InsertProjectPhoto = z.infer<typeof insertProjectPhotoSchema>;
+
+export type HarnessInspection = typeof harnessInspections.$inferSelect;
+export type InsertHarnessInspection = z.infer<typeof insertHarnessInspectionSchema>;
 
 // Extended types for frontend use with relations
 export type ProjectWithProgress = Project & {
