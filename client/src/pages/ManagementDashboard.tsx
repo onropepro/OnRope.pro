@@ -30,10 +30,10 @@ const projectSchema = z.object({
   buildingName: z.string().min(1, "Building name is required"),
   buildingAddress: z.string().optional(),
   jobType: z.enum(["window_cleaning", "dryer_vent_cleaning", "pressure_washing", "in_suite_dryer_vent_cleaning", "parkade_pressure_cleaning", "ground_window_cleaning"]),
-  totalDropsNorth: z.string().min(1, "Total drops (North) is required"),
-  totalDropsEast: z.string().min(1, "Total drops (East) is required"),
-  totalDropsSouth: z.string().min(1, "Total drops (South) is required"),
-  totalDropsWest: z.string().min(1, "Total drops (West) is required"),
+  totalDropsNorth: z.string().optional(),
+  totalDropsEast: z.string().optional(),
+  totalDropsSouth: z.string().optional(),
+  totalDropsWest: z.string().optional(),
   dailyDropTarget: z.string().min(1, "Daily drop target is required"),
   floorCount: z.string().min(1, "Floor count is required"),
   targetCompletionDate: z.string().optional(),
@@ -42,6 +42,38 @@ const projectSchema = z.object({
   floorsPerDay: z.string().optional(),
   stallsPerDay: z.string().optional(),
 }).superRefine((data, ctx) => {
+  // For non-in-suite jobs, elevation fields are required
+  if (data.jobType !== "in_suite_dryer_vent_cleaning") {
+    if (!data.totalDropsNorth || data.totalDropsNorth.trim() === "") {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Total drops (North) is required",
+        path: ["totalDropsNorth"],
+      });
+    }
+    if (!data.totalDropsEast || data.totalDropsEast.trim() === "") {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Total drops (East) is required",
+        path: ["totalDropsEast"],
+      });
+    }
+    if (!data.totalDropsSouth || data.totalDropsSouth.trim() === "") {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Total drops (South) is required",
+        path: ["totalDropsSouth"],
+      });
+    }
+    if (!data.totalDropsWest || data.totalDropsWest.trim() === "") {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Total drops (West) is required",
+        path: ["totalDropsWest"],
+      });
+    }
+  }
+  
   if (data.jobType === "in_suite_dryer_vent_cleaning") {
     if (!data.suitesPerDay && !data.floorsPerDay) {
       ctx.addIssue({
