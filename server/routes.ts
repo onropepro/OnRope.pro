@@ -1624,8 +1624,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Unable to determine company" });
       }
       
-      const inspectionData = insertHarnessInspectionSchema.parse({
+      // Convert empty strings to undefined for optional fields
+      const cleanedBody = {
         ...req.body,
+        dateInService: req.body.dateInService || undefined,
+        projectId: (req.body.projectId === "none" || !req.body.projectId) ? undefined : req.body.projectId,
+      };
+      
+      const inspectionData = insertHarnessInspectionSchema.parse({
+        ...cleanedBody,
         companyId,
         workerId: req.session.userId,
       });
