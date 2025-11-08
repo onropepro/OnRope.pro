@@ -79,8 +79,13 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
+        <div className="fixed top-0 left-0 right-0 z-[9999] bg-red-600 text-white text-center py-1 text-sm font-medium">
+          Free version for testing purposes only
+        </div>
+        <div className="pt-8">
+          <Router />
+        </div>
         <Toaster />
-        <Router />
       </TooltipProvider>
     </QueryClientProvider>
   );

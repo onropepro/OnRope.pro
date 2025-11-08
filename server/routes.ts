@@ -1334,8 +1334,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   // ==================== COMPLAINT ROUTES ====================
   
-  // Create complaint
-  app.post("/api/complaints", requireAuth, async (req: Request, res: Response) => {
+  // Create complaint (with optional photo upload)
+  app.post("/api/complaints", requireAuth, imageUpload.single('photo'), async (req: Request, res: Response) => {
     try {
       const currentUser = await storage.getUserById(req.session.userId!);
       
@@ -1363,10 +1363,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       }
       
+      // Handle photo upload if provided
+      let photoUrl = null;
+      if (req.file) {
+        const objectStorageService = new ObjectStorageService();
+        const timestamp = Date.now();
+        const filename = `complaints/${companyId}/${timestamp}-${req.file.originalname}`;
+        photoUrl = await objectStorageService.uploadPublicFile(
+          filename,
+          req.file.buffer,
+          req.file.mimetype
+        );
+      }
+      
       // Now validate with companyId resolved
       const complaintData = insertComplaintSchema.parse({
         ...req.body,
         companyId,
+        photoUrl,
         residentId: currentUser?.role === "resident" ? currentUser.id : null,
       });
       
