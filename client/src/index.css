@@ -14,8 +14,8 @@
   --elevate-1: rgba(0,0,0, .03);
   --elevate-2: rgba(0,0,0, .08);
 
-  /* Ghost - Clean minimal page background */
-  --background: 0 0% 98%;
+  /* Slate - Darker background for drama */
+  --background: 0 0% 93%;
 
   /* Midnight - Strong contrast text */
   --foreground: 0 0% 4%;
