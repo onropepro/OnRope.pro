@@ -1,6 +1,6 @@
 import { db } from "./db";
-import { users, projects, dropLogs, workSessions, complaints, complaintNotes, projectPhotos, harnessInspections } from "@shared/schema";
-import type { User, InsertUser, Project, InsertProject, DropLog, InsertDropLog, WorkSession, InsertWorkSession, Complaint, InsertComplaint, ComplaintNote, InsertComplaintNote, ProjectPhoto, InsertProjectPhoto, HarnessInspection, InsertHarnessInspection } from "@shared/schema";
+import { users, projects, dropLogs, workSessions, complaints, complaintNotes, projectPhotos, harnessInspections, toolboxMeetings } from "@shared/schema";
+import type { User, InsertUser, Project, InsertProject, DropLog, InsertDropLog, WorkSession, InsertWorkSession, Complaint, InsertComplaint, ComplaintNote, InsertComplaintNote, ProjectPhoto, InsertProjectPhoto, HarnessInspection, InsertHarnessInspection, ToolboxMeeting, InsertToolboxMeeting } from "@shared/schema";
 import { eq, and, desc, sql, isNull } from "drizzle-orm";
 import bcrypt from "bcrypt";
 
@@ -499,6 +499,32 @@ export class Storage {
     const result = await db.update(harnessInspections)
       .set({ pdfUrl })
       .where(eq(harnessInspections.id, id))
+      .returning();
+    return result[0];
+  }
+
+  // Toolbox meeting operations
+  async createToolboxMeeting(meeting: InsertToolboxMeeting): Promise<ToolboxMeeting> {
+    const result = await db.insert(toolboxMeetings).values(meeting).returning();
+    return result[0];
+  }
+
+  async getToolboxMeetingsByCompany(companyId: string): Promise<ToolboxMeeting[]> {
+    return db.select().from(toolboxMeetings)
+      .where(eq(toolboxMeetings.companyId, companyId))
+      .orderBy(desc(toolboxMeetings.meetingDate), desc(toolboxMeetings.createdAt));
+  }
+
+  async getToolboxMeetingsByProject(projectId: string): Promise<ToolboxMeeting[]> {
+    return db.select().from(toolboxMeetings)
+      .where(eq(toolboxMeetings.projectId, projectId))
+      .orderBy(desc(toolboxMeetings.meetingDate));
+  }
+
+  async updateToolboxMeeting(id: string, pdfUrl: string): Promise<ToolboxMeeting> {
+    const result = await db.update(toolboxMeetings)
+      .set({ pdfUrl })
+      .where(eq(toolboxMeetings.id, id))
       .returning();
     return result[0];
   }
