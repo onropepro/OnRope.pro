@@ -65,11 +65,18 @@ export default function ProjectDetail() {
     enabled: !!id,
   });
 
+  // Fetch toolbox meetings for this project
+  const { data: toolboxMeetingsData } = useQuery({
+    queryKey: ["/api/projects", id, "toolbox-meetings"],
+    enabled: !!id,
+  });
+
   const project = projectData?.project as Project | undefined;
   const workSessions = workSessionsData?.sessions || [];
   const residents = residentsData?.residents || [];
   const complaints = complaintsData?.complaints || [];
   const photos = photosData?.photos || [];
+  const toolboxMeetings = toolboxMeetingsData?.meetings || [];
   
   // Only company and operations_manager can delete projects
   const canDeleteProject = currentUser?.role === "company" || currentUser?.role === "operations_manager";
@@ -467,6 +474,63 @@ export default function ProjectDetail() {
                   }
                 }}
               />
+            </div>
+
+            <Separator />
+
+            {/* Toolbox Meetings Section */}
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <div className="text-sm text-muted-foreground">Toolbox Meetings</div>
+                <Badge variant="secondary" className="text-xs">
+                  {toolboxMeetings.length} {toolboxMeetings.length === 1 ? 'meeting' : 'meetings'}
+                </Badge>
+              </div>
+
+              {/* Meeting List */}
+              {toolboxMeetings.length > 0 && (
+                <div className="space-y-2 mb-3">
+                  {toolboxMeetings.slice(0, 3).map((meeting: any) => (
+                    <Card
+                      key={meeting.id}
+                      className="hover-elevate cursor-pointer"
+                      data-testid={`toolbox-meeting-${meeting.id}`}
+                    >
+                      <CardContent className="p-3">
+                        <div className="flex items-start justify-between gap-2 mb-1">
+                          <div className="flex-1 min-w-0">
+                            <div className="text-sm font-medium">
+                              {format(new Date(meeting.meetingDate), 'MMMM d, yyyy')}
+                            </div>
+                            <div className="text-xs text-muted-foreground">
+                              Conducted by: {meeting.conductedByName}
+                            </div>
+                          </div>
+                          <Badge variant="secondary" className="text-xs">
+                            {meeting.attendees?.length || 0} attendees
+                          </Badge>
+                        </div>
+                        {meeting.customTopic && (
+                          <p className="text-xs text-muted-foreground mt-1">
+                            Custom: {meeting.customTopic}
+                          </p>
+                        )}
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              )}
+
+              {/* Create Toolbox Meeting Button */}
+              <Button
+                variant="default"
+                className="w-full h-12 gap-2"
+                onClick={() => setLocation("/toolbox-meeting")}
+                data-testid="button-create-toolbox-meeting"
+              >
+                <span className="material-icons text-lg">assignment</span>
+                Conduct Toolbox Meeting
+              </Button>
             </div>
 
             <Separator />
