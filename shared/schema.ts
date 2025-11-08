@@ -173,6 +173,20 @@ export const projectPhotos = pgTable("project_photos", {
   index("IDX_project_photos_unit").on(table.unitNumber, table.projectId),
 ]);
 
+// Job comments table - techs can add comments about project work
+export const jobComments = pgTable("job_comments", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  projectId: varchar("project_id").notNull().references(() => projects.id, { onDelete: "cascade" }),
+  companyId: varchar("company_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  userId: varchar("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  userName: varchar("user_name").notNull(), // Denormalized for display
+  comment: text("comment").notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
+}, (table) => [
+  index("IDX_job_comments_project").on(table.projectId, table.createdAt),
+  index("IDX_job_comments_company").on(table.companyId),
+]);
+
 // Harness inspections table - daily safety inspections before work
 export const harnessInspections = pgTable("harness_inspections", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
@@ -359,6 +373,21 @@ export const projectPhotosRelations = relations(projectPhotos, ({ one }) => ({
   }),
 }));
 
+export const jobCommentsRelations = relations(jobComments, ({ one }) => ({
+  project: one(projects, {
+    fields: [jobComments.projectId],
+    references: [projects.id],
+  }),
+  user: one(users, {
+    fields: [jobComments.userId],
+    references: [users.id],
+  }),
+  company: one(users, {
+    fields: [jobComments.companyId],
+    references: [users.id],
+  }),
+}));
+
 export const harnessInspectionsRelations = relations(harnessInspections, ({ one }) => ({
   company: one(users, {
     fields: [harnessInspections.companyId],
@@ -457,6 +486,11 @@ export const insertProjectPhotoSchema = createInsertSchema(projectPhotos).omit({
   createdAt: true,
 });
 
+export const insertJobCommentSchema = createInsertSchema(jobComments).omit({
+  id: true,
+  createdAt: true,
+});
+
 export const insertHarnessInspectionSchema = createInsertSchema(harnessInspections).omit({
   id: true,
   createdAt: true,
@@ -490,6 +524,9 @@ export type InsertComplaintNote = z.infer<typeof insertComplaintNoteSchema>;
 
 export type ProjectPhoto = typeof projectPhotos.$inferSelect;
 export type InsertProjectPhoto = z.infer<typeof insertProjectPhotoSchema>;
+
+export type JobComment = typeof jobComments.$inferSelect;
+export type InsertJobComment = z.infer<typeof insertJobCommentSchema>;
 
 export type HarnessInspection = typeof harnessInspections.$inferSelect;
 export type InsertHarnessInspection = z.infer<typeof insertHarnessInspectionSchema>;
