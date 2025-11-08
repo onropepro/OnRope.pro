@@ -802,7 +802,14 @@ export default function ManagementDashboard() {
                     </div>
                     <div className="overflow-y-auto flex-1 p-6">
                       <Form {...projectForm}>
-                        <form onSubmit={projectForm.handleSubmit(onProjectSubmit)} className="space-y-4" id="create-project-form">
+                        <form onSubmit={projectForm.handleSubmit(onProjectSubmit, (errors) => {
+                          console.log("Form validation errors:", errors);
+                          toast({ 
+                            title: "Form validation failed", 
+                            description: "Please check all required fields", 
+                            variant: "destructive" 
+                          });
+                        })} className="space-y-4" id="create-project-form">
                         <FormField
                           control={projectForm.control}
                           name="strataPlanNumber"
