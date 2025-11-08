@@ -235,6 +235,7 @@ export default function ToolboxMeetingForm() {
                         <Input
                           type="date"
                           {...field}
+                          className="text-base"
                           data-testid="input-meeting-date"
                         />
                       </FormControl>
