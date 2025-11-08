@@ -235,12 +235,24 @@ export default function ManagementDashboard() {
   const { data: complaintsData, isLoading: complaintsLoading } = useQuery({
     queryKey: ["/api/complaints"],
   });
+
+  // Fetch harness inspections
+  const { data: harnessInspectionsData } = useQuery({
+    queryKey: ["/api/harness-inspections"],
+  });
+
+  // Fetch toolbox meetings
+  const { data: toolboxMeetingsData } = useQuery({
+    queryKey: ["/api/toolbox-meetings"],
+  });
   
   const employees = employeesData?.employees || [];
   const todayDrops = myDropsData?.totalDropsToday || 0;
   const dailyTarget = projects[0]?.dailyDropTarget || 20;
   const companyName = companyData?.company?.companyName || "";
   const complaints = complaintsData?.complaints || [];
+  const harnessInspections = harnessInspectionsData?.inspections || [];
+  const toolboxMeetings = toolboxMeetingsData?.meetings || [];
 
   // Calculate overall target met statistics across all projects
   const allWorkSessions = allWorkSessionsData?.sessions || [];
@@ -1907,17 +1919,49 @@ export default function ManagementDashboard() {
                   Harness Safety Inspections
                 </CardTitle>
                 <CardDescription>
-                  Daily harness inspection records organized by date
+                  Daily harness inspection records - {harnessInspections.length} total
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="text-center py-12 text-muted-foreground">
-                  <span className="material-icons text-5xl mb-4 opacity-50">folder_open</span>
-                  <div className="text-lg mb-2">Inspection Records</div>
-                  <div className="text-sm">
-                    PDF downloads and folder organization coming soon
+                {harnessInspections.length === 0 ? (
+                  <div className="text-center py-12 text-muted-foreground">
+                    <span className="material-icons text-5xl mb-4 opacity-50">folder_open</span>
+                    <div className="text-lg mb-2">No Inspections Yet</div>
+                    <div className="text-sm">
+                      Harness inspections will appear here once submitted
+                    </div>
                   </div>
-                </div>
+                ) : (
+                  <div className="space-y-2">
+                    {harnessInspections.map((inspection: any) => (
+                      <Card key={inspection.id} className="hover-elevate">
+                        <CardContent className="p-4">
+                          <div className="flex items-start justify-between gap-3">
+                            <div className="flex-1 min-w-0">
+                              <div className="font-medium">{inspection.inspectorName}</div>
+                              <div className="text-sm text-muted-foreground">
+                                {new Date(inspection.inspectionDate).toLocaleDateString('en-US', { 
+                                  weekday: 'short', 
+                                  year: 'numeric', 
+                                  month: 'short', 
+                                  day: 'numeric' 
+                                })}
+                              </div>
+                              {inspection.manufacturer && (
+                                <div className="text-xs text-muted-foreground mt-1">
+                                  Manufacturer: {inspection.manufacturer}
+                                </div>
+                              )}
+                            </div>
+                            <Badge variant="secondary" className="text-xs">
+                              {inspection.lanyardType || 'Standard'}
+                            </Badge>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+                )}
               </CardContent>
             </Card>
 
@@ -1929,17 +1973,51 @@ export default function ManagementDashboard() {
                   Toolbox Meetings
                 </CardTitle>
                 <CardDescription>
-                  Safety meeting records organized by date
+                  Safety meeting records - {toolboxMeetings.length} total
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="text-center py-12 text-muted-foreground">
-                  <span className="material-icons text-5xl mb-4 opacity-50">folder_open</span>
-                  <div className="text-lg mb-2">Meeting Records</div>
-                  <div className="text-sm">
-                    PDF downloads and folder organization coming soon
+                {toolboxMeetings.length === 0 ? (
+                  <div className="text-center py-12 text-muted-foreground">
+                    <span className="material-icons text-5xl mb-4 opacity-50">folder_open</span>
+                    <div className="text-lg mb-2">No Meetings Yet</div>
+                    <div className="text-sm">
+                      Toolbox meeting records will appear here once submitted
+                    </div>
                   </div>
-                </div>
+                ) : (
+                  <div className="space-y-2">
+                    {toolboxMeetings.map((meeting: any) => (
+                      <Card key={meeting.id} className="hover-elevate">
+                        <CardContent className="p-4">
+                          <div className="flex items-start justify-between gap-3">
+                            <div className="flex-1 min-w-0">
+                              <div className="font-medium">
+                                {new Date(meeting.meetingDate).toLocaleDateString('en-US', { 
+                                  weekday: 'short', 
+                                  year: 'numeric', 
+                                  month: 'short', 
+                                  day: 'numeric' 
+                                })}
+                              </div>
+                              <div className="text-sm text-muted-foreground">
+                                Conducted by: {meeting.conductedByName}
+                              </div>
+                              {meeting.customTopic && (
+                                <div className="text-xs text-muted-foreground mt-1">
+                                  Custom Topic: {meeting.customTopic}
+                                </div>
+                              )}
+                            </div>
+                            <Badge variant="secondary" className="text-xs">
+                              {meeting.attendees?.length || 0} attendees
+                            </Badge>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+                )}
               </CardContent>
             </Card>
           </TabsContent>
