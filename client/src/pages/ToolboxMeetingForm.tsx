@@ -118,15 +118,12 @@ export default function ToolboxMeetingForm() {
     mutationFn: async (data: ToolboxMeetingFormValues) => {
       const attendeesArray = data.attendees.split("\n").map(a => a.trim()).filter(a => a.length > 0);
       
-      const response = await apiRequest<{ meeting: any }>("/api/toolbox-meetings", {
-        method: "POST",
-        body: JSON.stringify({
-          ...data,
-          attendees: attendeesArray,
-        }),
+      const response = await apiRequest("POST", "/api/toolbox-meetings", {
+        ...data,
+        attendees: attendeesArray,
       });
       
-      return response;
+      return response.json();
     },
     onSuccess: () => {
       toast({

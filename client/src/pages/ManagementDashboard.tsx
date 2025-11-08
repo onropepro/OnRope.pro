@@ -192,6 +192,8 @@ export default function ManagementDashboard() {
   const [activeSession, setActiveSession] = useState<any>(null);
   const [uploadedPlanFile, setUploadedPlanFile] = useState<File | null>(null);
   const [isUploadingPlan, setIsUploadingPlan] = useState(false);
+  const [selectedInspection, setSelectedInspection] = useState<any>(null);
+  const [selectedMeeting, setSelectedMeeting] = useState<any>(null);
   const { toast } = useToast();
   const [, setLocation] = useLocation();
 
@@ -1934,7 +1936,12 @@ export default function ManagementDashboard() {
                 ) : (
                   <div className="space-y-2">
                     {harnessInspections.map((inspection: any) => (
-                      <Card key={inspection.id} className="hover-elevate">
+                      <Card 
+                        key={inspection.id} 
+                        className="hover-elevate cursor-pointer"
+                        onClick={() => setSelectedInspection(inspection)}
+                        data-testid={`inspection-card-${inspection.id}`}
+                      >
                         <CardContent className="p-4">
                           <div className="flex items-start justify-between gap-3">
                             <div className="flex-1 min-w-0">
@@ -1953,9 +1960,12 @@ export default function ManagementDashboard() {
                                 </div>
                               )}
                             </div>
-                            <Badge variant="secondary" className="text-xs">
-                              {inspection.lanyardType || 'Standard'}
-                            </Badge>
+                            <div className="flex items-center gap-2">
+                              <Badge variant="secondary" className="text-xs">
+                                {inspection.lanyardType || 'Standard'}
+                              </Badge>
+                              <span className="material-icons text-muted-foreground">chevron_right</span>
+                            </div>
                           </div>
                         </CardContent>
                       </Card>
@@ -1988,7 +1998,12 @@ export default function ManagementDashboard() {
                 ) : (
                   <div className="space-y-2">
                     {toolboxMeetings.map((meeting: any) => (
-                      <Card key={meeting.id} className="hover-elevate">
+                      <Card 
+                        key={meeting.id} 
+                        className="hover-elevate cursor-pointer"
+                        onClick={() => setSelectedMeeting(meeting)}
+                        data-testid={`meeting-card-${meeting.id}`}
+                      >
                         <CardContent className="p-4">
                           <div className="flex items-start justify-between gap-3">
                             <div className="flex-1 min-w-0">
@@ -2009,9 +2024,12 @@ export default function ManagementDashboard() {
                                 </div>
                               )}
                             </div>
-                            <Badge variant="secondary" className="text-xs">
-                              {meeting.attendees?.length || 0} attendees
-                            </Badge>
+                            <div className="flex items-center gap-2">
+                              <Badge variant="secondary" className="text-xs">
+                                {meeting.attendees?.length || 0} attendees
+                              </Badge>
+                              <span className="material-icons text-muted-foreground">chevron_right</span>
+                            </div>
                           </div>
                         </CardContent>
                       </Card>
@@ -2326,6 +2344,163 @@ export default function ManagementDashboard() {
               </div>
             </form>
           </Form>
+        </DialogContent>
+      </Dialog>
+
+      {/* Harness Inspection Details Dialog */}
+      <Dialog open={!!selectedInspection} onOpenChange={() => setSelectedInspection(null)}>
+        <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <span className="material-icons">verified_user</span>
+              Harness Inspection Details
+            </DialogTitle>
+          </DialogHeader>
+          {selectedInspection && (
+            <div className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <div className="text-sm font-medium text-muted-foreground">Inspector</div>
+                  <div className="text-base">{selectedInspection.inspectorName}</div>
+                </div>
+                <div>
+                  <div className="text-sm font-medium text-muted-foreground">Date</div>
+                  <div className="text-base">
+                    {new Date(selectedInspection.inspectionDate).toLocaleDateString('en-US', { 
+                      weekday: 'long', 
+                      year: 'numeric', 
+                      month: 'long', 
+                      day: 'numeric' 
+                    })}
+                  </div>
+                </div>
+                <div>
+                  <div className="text-sm font-medium text-muted-foreground">Manufacturer</div>
+                  <div className="text-base">{selectedInspection.manufacturer || 'N/A'}</div>
+                </div>
+                <div>
+                  <div className="text-sm font-medium text-muted-foreground">Model</div>
+                  <div className="text-base">{selectedInspection.model || 'N/A'}</div>
+                </div>
+                <div>
+                  <div className="text-sm font-medium text-muted-foreground">Serial Number</div>
+                  <div className="text-base">{selectedInspection.serialNumber || 'N/A'}</div>
+                </div>
+                <div>
+                  <div className="text-sm font-medium text-muted-foreground">Lanyard Type</div>
+                  <div className="text-base">{selectedInspection.lanyardType || 'N/A'}</div>
+                </div>
+              </div>
+              
+              {selectedInspection.manufactureDate && (
+                <div>
+                  <div className="text-sm font-medium text-muted-foreground">Manufacture Date</div>
+                  <div className="text-base">
+                    {new Date(selectedInspection.manufactureDate).toLocaleDateString()}
+                  </div>
+                </div>
+              )}
+              
+              {selectedInspection.notes && (
+                <div>
+                  <div className="text-sm font-medium text-muted-foreground mb-1">Additional Notes</div>
+                  <div className="text-base bg-muted p-3 rounded-md">
+                    {selectedInspection.notes}
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Toolbox Meeting Details Dialog */}
+      <Dialog open={!!selectedMeeting} onOpenChange={() => setSelectedMeeting(null)}>
+        <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <span className="material-icons">assignment</span>
+              Toolbox Meeting Details
+            </DialogTitle>
+          </DialogHeader>
+          {selectedMeeting && (
+            <div className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <div className="text-sm font-medium text-muted-foreground">Date</div>
+                  <div className="text-base">
+                    {new Date(selectedMeeting.meetingDate).toLocaleDateString('en-US', { 
+                      weekday: 'long', 
+                      year: 'numeric', 
+                      month: 'long', 
+                      day: 'numeric' 
+                    })}
+                  </div>
+                </div>
+                <div>
+                  <div className="text-sm font-medium text-muted-foreground">Conducted By</div>
+                  <div className="text-base">{selectedMeeting.conductedByName}</div>
+                </div>
+              </div>
+
+              {selectedMeeting.customTopic && (
+                <div>
+                  <div className="text-sm font-medium text-muted-foreground mb-1">Custom Topic</div>
+                  <div className="text-base bg-muted p-3 rounded-md">
+                    {selectedMeeting.customTopic}
+                  </div>
+                </div>
+              )}
+
+              <div>
+                <div className="text-sm font-medium text-muted-foreground mb-2">Topics Covered</div>
+                <div className="flex flex-wrap gap-2">
+                  {selectedMeeting.topicFallProtection && <Badge>Fall Protection Systems</Badge>}
+                  {selectedMeeting.topicAnchorPoints && <Badge>Anchor Point Selection</Badge>}
+                  {selectedMeeting.topicRopeInspection && <Badge>Rope Inspection</Badge>}
+                  {selectedMeeting.topicKnotTying && <Badge>Knot Tying Techniques</Badge>}
+                  {selectedMeeting.topicPPECheck && <Badge>PPE Inspection</Badge>}
+                  {selectedMeeting.topicWeatherConditions && <Badge>Weather Assessment</Badge>}
+                  {selectedMeeting.topicCommunication && <Badge>Communication Protocols</Badge>}
+                  {selectedMeeting.topicEmergencyEvacuation && <Badge>Emergency Procedures</Badge>}
+                  {selectedMeeting.topicHazardAssessment && <Badge>Hazard Assessment</Badge>}
+                  {selectedMeeting.topicLoadCalculations && <Badge>Load Calculations</Badge>}
+                  {selectedMeeting.topicEquipmentCompatibility && <Badge>Equipment Compatibility</Badge>}
+                  {selectedMeeting.topicDescenderAscender && <Badge>Descender/Ascender Use</Badge>}
+                  {selectedMeeting.topicEdgeProtection && <Badge>Edge Protection</Badge>}
+                  {selectedMeeting.topicSwingFall && <Badge>Swing Fall Hazards</Badge>}
+                  {selectedMeeting.topicMedicalFitness && <Badge>Medical Fitness</Badge>}
+                  {selectedMeeting.topicToolDropPrevention && <Badge>Tool Drop Prevention</Badge>}
+                  {selectedMeeting.topicRegulations && <Badge>Working at Heights Regulations</Badge>}
+                  {selectedMeeting.topicRescueProcedures && <Badge>Rescue Procedures</Badge>}
+                  {selectedMeeting.topicSiteHazards && <Badge>Site-Specific Hazards</Badge>}
+                  {selectedMeeting.topicBuddySystem && <Badge>Buddy System</Badge>}
+                </div>
+              </div>
+
+              <div>
+                <div className="text-sm font-medium text-muted-foreground mb-2">
+                  Attendees ({selectedMeeting.attendees?.length || 0})
+                </div>
+                <div className="bg-muted p-3 rounded-md">
+                  {selectedMeeting.attendees?.map((attendee: string, idx: number) => (
+                    <div key={idx} className="py-1">
+                      {idx + 1}. {attendee}
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {selectedMeeting.additionalNotes && (
+                <div>
+                  <div className="text-sm font-medium text-muted-foreground mb-1">Additional Notes</div>
+                  <div className="text-base bg-muted p-3 rounded-md">
+                    {selectedMeeting.additionalNotes}
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
         </DialogContent>
       </Dialog>
 
