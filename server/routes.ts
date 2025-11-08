@@ -1,7 +1,7 @@
 import type { Express, Request, Response, NextFunction } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { insertUserSchema, insertProjectSchema, insertDropLogSchema, insertComplaintSchema, insertComplaintNoteSchema, insertHarnessInspectionSchema, normalizeStrataPlan } from "@shared/schema";
+import { insertUserSchema, insertProjectSchema, insertDropLogSchema, insertComplaintSchema, insertComplaintNoteSchema, insertHarnessInspectionSchema, insertToolboxMeetingSchema, normalizeStrataPlan } from "@shared/schema";
 import { z } from "zod";
 import bcrypt from "bcrypt";
 import multer from "multer";
@@ -1676,6 +1676,70 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({ inspections });
     } catch (error) {
       console.error("Get my harness inspections error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Toolbox meeting routes
+  app.post("/api/toolbox-meetings", requireAuth, requireRole("rope_access_tech", "supervisor", "operations_manager", "company"), async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      const companyId = currentUser.role === "company" ? currentUser.id : currentUser.companyId;
+      
+      if (!companyId) {
+        return res.status(400).json({ message: "Unable to determine company" });
+      }
+      
+      const meetingData = insertToolboxMeetingSchema.parse({
+        ...req.body,
+        companyId,
+        conductedBy: req.session.userId,
+      });
+      
+      const meeting = await storage.createToolboxMeeting(meetingData);
+      res.json({ meeting });
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Validation error", errors: error.errors });
+      }
+      console.error("Create toolbox meeting error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.get("/api/toolbox-meetings", requireAuth, requireRole("operations_manager", "supervisor", "company"), async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      const companyId = currentUser.role === "company" ? currentUser.id : currentUser.companyId;
+      
+      if (!companyId) {
+        return res.status(400).json({ message: "Unable to determine company" });
+      }
+      
+      const meetings = await storage.getToolboxMeetingsByCompany(companyId);
+      res.json({ meetings });
+    } catch (error) {
+      console.error("Get toolbox meetings error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.get("/api/projects/:projectId/toolbox-meetings", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const meetings = await storage.getToolboxMeetingsByProject(req.params.projectId);
+      res.json({ meetings });
+    } catch (error) {
+      console.error("Get project toolbox meetings error:", error);
       res.status(500).json({ message: "Internal server error" });
     }
   });
