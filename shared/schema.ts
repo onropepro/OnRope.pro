@@ -158,6 +158,21 @@ export const complaintNotes = pgTable("complaint_notes", {
   createdAt: timestamp("created_at").defaultNow(),
 });
 
+// Project photos table - photos with optional unit number and comment tagging
+export const projectPhotos = pgTable("project_photos", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  projectId: varchar("project_id").notNull().references(() => projects.id, { onDelete: "cascade" }),
+  companyId: varchar("company_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  uploadedBy: varchar("uploaded_by").notNull().references(() => users.id, { onDelete: "cascade" }),
+  imageUrl: text("image_url").notNull(),
+  unitNumber: varchar("unit_number"), // Optional - for tagging photos to specific units
+  comment: text("comment"), // Optional comment about the photo
+  createdAt: timestamp("created_at").defaultNow(),
+}, (table) => [
+  index("IDX_project_photos_project").on(table.projectId),
+  index("IDX_project_photos_unit").on(table.unitNumber, table.projectId),
+]);
+
 // Relations
 export const usersRelations = relations(users, ({ many }) => ({
   projects: many(projects), // For company role
@@ -175,6 +190,7 @@ export const projectsRelations = relations(projects, ({ one, many }) => ({
   dropLogs: many(dropLogs),
   workSessions: many(workSessions),
   complaints: many(complaints),
+  photos: many(projectPhotos),
 }));
 
 export const dropLogsRelations = relations(dropLogs, ({ one }) => ({
@@ -226,6 +242,17 @@ export const complaintNotesRelations = relations(complaintNotes, ({ one }) => ({
   }),
 }));
 
+export const projectPhotosRelations = relations(projectPhotos, ({ one }) => ({
+  project: one(projects, {
+    fields: [projectPhotos.projectId],
+    references: [projects.id],
+  }),
+  uploadedByUser: one(users, {
+    fields: [projectPhotos.uploadedBy],
+    references: [users.id],
+  }),
+}));
+
 // Zod schemas for validation
 export const insertUserSchema = createInsertSchema(users).omit({
   id: true,
@@ -264,6 +291,11 @@ export const insertComplaintNoteSchema = createInsertSchema(complaintNotes).omit
   createdAt: true,
 });
 
+export const insertProjectPhotoSchema = createInsertSchema(projectPhotos).omit({
+  id: true,
+  createdAt: true,
+});
+
 // Type exports
 export type User = typeof users.$inferSelect;
 export type InsertUser = z.infer<typeof insertUserSchema>;
@@ -282,6 +314,9 @@ export type InsertComplaint = z.infer<typeof insertComplaintSchema>;
 
 export type ComplaintNote = typeof complaintNotes.$inferSelect;
 export type InsertComplaintNote = z.infer<typeof insertComplaintNoteSchema>;
+
+export type ProjectPhoto = typeof projectPhotos.$inferSelect;
+export type InsertProjectPhoto = z.infer<typeof insertProjectPhotoSchema>;
 
 // Extended types for frontend use with relations
 export type ProjectWithProgress = Project & {
