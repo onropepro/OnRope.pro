@@ -340,11 +340,14 @@ export default function ManagementDashboard() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           ...data,
-          totalDropsNorth: parseInt(data.totalDropsNorth),
-          totalDropsEast: parseInt(data.totalDropsEast),
-          totalDropsSouth: parseInt(data.totalDropsSouth),
-          totalDropsWest: parseInt(data.totalDropsWest),
-          totalDrops: parseInt(data.totalDropsNorth) + parseInt(data.totalDropsEast) + parseInt(data.totalDropsSouth) + parseInt(data.totalDropsWest),
+          totalDropsNorth: data.totalDropsNorth ? parseInt(data.totalDropsNorth) : 0,
+          totalDropsEast: data.totalDropsEast ? parseInt(data.totalDropsEast) : 0,
+          totalDropsSouth: data.totalDropsSouth ? parseInt(data.totalDropsSouth) : 0,
+          totalDropsWest: data.totalDropsWest ? parseInt(data.totalDropsWest) : 0,
+          totalDrops: (data.totalDropsNorth ? parseInt(data.totalDropsNorth) : 0) + 
+                     (data.totalDropsEast ? parseInt(data.totalDropsEast) : 0) + 
+                     (data.totalDropsSouth ? parseInt(data.totalDropsSouth) : 0) + 
+                     (data.totalDropsWest ? parseInt(data.totalDropsWest) : 0),
           dailyDropTarget: parseInt(data.dailyDropTarget),
           floorCount: parseInt(data.floorCount),
           ropeAccessPlanUrl: data.ropeAccessPlanUrl || undefined,
