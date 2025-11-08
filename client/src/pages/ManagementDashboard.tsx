@@ -676,14 +676,14 @@ export default function ManagementDashboard() {
   }
 
   return (
-    <div className="min-h-screen gradient-bg dot-pattern pb-20">
+    <div className="min-h-screen bg-background pb-20">
       {/* Header */}
-      <header className="sticky top-0 z-[100] glass-card border-0 shadow-premium">
-        <div className="px-4 h-16 flex items-center justify-between">
+      <header className="sticky top-0 z-[100] bg-card border-b shadow-md">
+        <div className="px-4 h-20 flex items-center justify-between max-w-7xl mx-auto">
           <div>
-            <h1 className="text-lg font-bold">Management</h1>
+            <h1 className="text-2xl font-bold tracking-tight">Management</h1>
             {companyName && (
-              <p className="text-xs text-muted-foreground">{companyName}</p>
+              <p className="text-sm text-muted-foreground mt-0.5">{companyName}</p>
             )}
           </div>
           <div className="flex items-center gap-2">
@@ -770,23 +770,23 @@ export default function ManagementDashboard() {
           <TabsContent value="projects">
             <div className="space-y-4">
               {/* Search and Create */}
-              <div className="flex gap-2">
+              <div className="flex gap-3">
                 <div className="relative flex-1">
-                  <span className="material-icons absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">
+                  <span className="material-icons absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground text-base">
                     search
                   </span>
                   <Input
                     placeholder="Search by strata plan number..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="h-12 pl-10"
+                    className="h-14 pl-12 text-base shadow-sm border-2 focus-visible:ring-2"
                     data-testid="input-search-projects"
                   />
                 </div>
                 <Dialog open={showProjectDialog} onOpenChange={setShowProjectDialog}>
                   <DialogTrigger asChild>
-                    <Button className="h-12 gap-2" data-testid="button-create-project">
-                      <span className="material-icons">add</span>
+                    <Button className="h-14 px-6 gap-2 shadow-md hover:shadow-lg text-base font-semibold" data-testid="button-create-project">
+                      <span className="material-icons text-xl">add_circle</span>
                       <span className="hidden sm:inline">New Project</span>
                     </Button>
                   </DialogTrigger>
@@ -1081,8 +1081,11 @@ export default function ManagementDashboard() {
 
               {/* Active Projects */}
               <div>
-                <h3 className="text-sm font-medium text-muted-foreground mb-3">Active Projects</h3>
-                <div className="space-y-2">
+                <div className="flex items-center gap-2 mb-6 mt-8">
+                  <div className="h-8 w-1 bg-primary rounded-full"></div>
+                  <h2 className="text-xl font-bold">Active Projects</h2>
+                </div>
+                <div className="space-y-4">
                   {filteredProjects.filter((p: Project) => p.status === "active").length === 0 ? (
                     <Card>
                       <CardContent className="p-8 text-center text-muted-foreground">
@@ -1099,26 +1102,33 @@ export default function ManagementDashboard() {
                       return (
                         <Card 
                           key={project.id} 
-                          className="glass-card border-0 shadow-premium hover-elevate active-elevate-2 cursor-pointer" 
+                          className="group relative border-l-4 border-l-primary shadow-lg hover:shadow-2xl transition-all duration-200 cursor-pointer overflow-visible bg-gradient-to-br from-background to-muted/30" 
                           data-testid={`project-card-${project.id}`}
                           onClick={() => setLocation(`/projects/${project.id}`)}
                         >
-                          <CardContent className="p-4">
-                            <div className="flex items-start justify-between mb-3">
+                          <CardContent className="p-6">
+                            <div className="flex items-start justify-between mb-4">
                               <div className="flex-1">
-                                <div className="font-bold">{project.strataPlanNumber}</div>
-                                <div className="text-sm text-muted-foreground capitalize">{project.jobType.replace(/_/g, ' ')}</div>
+                                <div className="text-xl font-bold mb-1">{project.strataPlanNumber}</div>
+                                <div className="text-sm text-muted-foreground capitalize flex items-center gap-2">
+                                  <span className="material-icons text-base">business</span>
+                                  {project.jobType.replace(/_/g, ' ')}
+                                </div>
                               </div>
-                              <Badge variant="secondary">{project.floorCount} Floors</Badge>
+                              <Badge variant="secondary" className="text-sm px-3 py-1">
+                                <span className="material-icons text-xs mr-1">layers</span>
+                                {project.floorCount}
+                              </Badge>
                             </div>
-                            <div className="space-y-2">
-                              <div className="flex items-center justify-between text-sm">
-                                <span className="text-muted-foreground">Progress</span>
-                                <span className="font-bold">{Math.round(progressPercent)}%</span>
+                            <div className="space-y-3">
+                              <div className="flex items-center justify-between">
+                                <span className="text-sm text-muted-foreground">Progress</span>
+                                <span className="text-2xl font-bold">{Math.round(progressPercent)}%</span>
                               </div>
-                              <Progress value={progressPercent} className="h-2" />
-                              <div className="flex items-center justify-between text-xs text-muted-foreground">
-                                <span>{completedDrops} / {totalDrops} drops</span>
+                              <Progress value={progressPercent} className="h-3" />
+                              <div className="flex items-center justify-between text-sm">
+                                <span className="text-muted-foreground">{completedDrops} / {totalDrops} drops</span>
+                                <span className="material-icons text-primary group-hover:translate-x-1 transition-transform">arrow_forward</span>
                               </div>
                             </div>
                           </CardContent>
@@ -1132,24 +1142,33 @@ export default function ManagementDashboard() {
               {/* Completed Projects */}
               {filteredProjects.filter((p: Project) => p.status === "completed").length > 0 && (
                 <>
-                  <Separator className="my-6" />
+                  <Separator className="my-8" />
                   <div>
-                    <h3 className="text-sm font-medium text-muted-foreground mb-3">Completed Projects</h3>
-                    <div className="space-y-2">
+                    <div className="flex items-center gap-2 mb-6">
+                      <div className="h-8 w-1 bg-success rounded-full"></div>
+                      <h2 className="text-xl font-bold">Completed Projects</h2>
+                    </div>
+                    <div className="space-y-4">
                       {filteredProjects.filter((p: Project) => p.status === "completed").map((project: Project) => (
                         <Card 
                           key={project.id} 
-                          className="opacity-75 hover-elevate active-elevate-2 cursor-pointer" 
+                          className="group border-l-4 border-l-success shadow-md hover:shadow-lg transition-all duration-200 cursor-pointer bg-gradient-to-br from-background to-success/5" 
                           data-testid={`completed-project-${project.id}`}
                           onClick={() => setLocation(`/projects/${project.id}`)}
                         >
-                          <CardContent className="p-4">
+                          <CardContent className="p-5">
                             <div className="flex items-start justify-between">
-                              <div>
-                                <div className="font-bold">{project.strataPlanNumber}</div>
-                                <div className="text-sm text-muted-foreground capitalize">{project.jobType.replace(/_/g, ' ')}</div>
+                              <div className="flex-1">
+                                <div className="text-lg font-bold mb-1">{project.strataPlanNumber}</div>
+                                <div className="text-sm text-muted-foreground capitalize flex items-center gap-2">
+                                  <span className="material-icons text-base text-success">check_circle</span>
+                                  {project.jobType.replace(/_/g, ' ')}
+                                </div>
                               </div>
-                              <Badge variant="default" className="bg-status-closed">Completed</Badge>
+                              <Badge variant="default" className="bg-success hover:bg-success text-white">
+                                <span className="material-icons text-xs mr-1">done_all</span>
+                                Complete
+                              </Badge>
                             </div>
                           </CardContent>
                         </Card>
