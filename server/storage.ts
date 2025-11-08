@@ -1,6 +1,6 @@
 import { db } from "./db";
-import { users, projects, dropLogs, workSessions, complaints, complaintNotes, projectPhotos, harnessInspections, toolboxMeetings } from "@shared/schema";
-import type { User, InsertUser, Project, InsertProject, DropLog, InsertDropLog, WorkSession, InsertWorkSession, Complaint, InsertComplaint, ComplaintNote, InsertComplaintNote, ProjectPhoto, InsertProjectPhoto, HarnessInspection, InsertHarnessInspection, ToolboxMeeting, InsertToolboxMeeting } from "@shared/schema";
+import { users, projects, dropLogs, workSessions, complaints, complaintNotes, projectPhotos, jobComments, harnessInspections, toolboxMeetings } from "@shared/schema";
+import type { User, InsertUser, Project, InsertProject, DropLog, InsertDropLog, WorkSession, InsertWorkSession, Complaint, InsertComplaint, ComplaintNote, InsertComplaintNote, ProjectPhoto, InsertProjectPhoto, JobComment, InsertJobComment, HarnessInspection, InsertHarnessInspection, ToolboxMeeting, InsertToolboxMeeting } from "@shared/schema";
 import { eq, and, desc, sql, isNull } from "drizzle-orm";
 import bcrypt from "bcrypt";
 
@@ -492,6 +492,18 @@ export class Storage {
 
   async deleteProjectPhoto(photoId: string): Promise<void> {
     await db.delete(projectPhotos).where(eq(projectPhotos.id, photoId));
+  }
+
+  // Job comment operations
+  async createJobComment(comment: InsertJobComment): Promise<JobComment> {
+    const result = await db.insert(jobComments).values(comment).returning();
+    return result[0];
+  }
+
+  async getJobCommentsByProject(projectId: string): Promise<JobComment[]> {
+    return db.select().from(jobComments)
+      .where(eq(jobComments.projectId, projectId))
+      .orderBy(desc(jobComments.createdAt));
   }
 
   // Harness inspection operations
