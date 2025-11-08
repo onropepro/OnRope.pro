@@ -293,6 +293,19 @@ export default function TechDashboard() {
       </header>
 
       <div className="p-4 max-w-2xl mx-auto">
+        {/* Safety Inspection Section */}
+        <div className="mb-4">
+          <Button
+            onClick={() => setLocation("/harness-inspection")}
+            variant="outline"
+            className="w-full h-12 mb-2 border-primary/20 hover-elevate"
+            data-testid="button-harness-inspection"
+          >
+            <span className="material-icons mr-2">verified_user</span>
+            Daily Harness Inspection
+          </Button>
+        </div>
+
         {/* Start/End Day Section */}
         <div className="mb-4">
           {!activeSession ? (

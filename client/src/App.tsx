@@ -14,6 +14,7 @@ import ComplaintDetail from "@/pages/ComplaintDetail";
 import WorkSessionHistory from "@/pages/WorkSessionHistory";
 import ProjectDetail from "@/pages/ProjectDetail";
 import Profile from "@/pages/Profile";
+import HarnessInspectionForm from "@/pages/HarnessInspectionForm";
 import NotFound from "@/pages/not-found";
 import ProtectedRoute from "@/components/ProtectedRoute";
 
@@ -56,6 +57,11 @@ function Router() {
       <Route path="/profile">
         <ProtectedRoute>
           <Profile />
+        </ProtectedRoute>
+      </Route>
+      <Route path="/harness-inspection">
+        <ProtectedRoute allowedRoles={["rope_access_tech", "supervisor", "operations_manager", "company"]}>
+          <HarnessInspectionForm />
         </ProtectedRoute>
       </Route>
       <Route component={NotFound} />
