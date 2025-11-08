@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
-import { useLocation } from "wouter";
+import { useLocation, Link } from "wouter";
 import { HighRiseBuilding } from "@/components/HighRiseBuilding";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -652,27 +652,31 @@ export default function ResidentDashboard() {
                       }
                       
                       return (
-                        <div
+                        <Link
                           key={complaint.id}
-                          className="p-4 rounded-lg border bg-card space-y-3"
-                          data-testid={`complaint-${complaint.id}`}
+                          href={`/complaints/${complaint.id}`}
                         >
-                          <div className="flex items-start justify-between gap-3">
-                            <div className="flex items-start gap-2 flex-1">
-                              {statusIcon}
-                              <div className="flex-1 min-w-0">
-                                <p className="text-sm text-muted-foreground line-clamp-2">
-                                  {complaint.message}
-                                </p>
+                          <div
+                            className="p-4 rounded-lg border bg-card space-y-3 hover-elevate active-elevate-2 cursor-pointer"
+                            data-testid={`complaint-${complaint.id}`}
+                          >
+                            <div className="flex items-start justify-between gap-3">
+                              <div className="flex items-start gap-2 flex-1">
+                                {statusIcon}
+                                <div className="flex-1 min-w-0">
+                                  <p className="text-sm text-muted-foreground line-clamp-2">
+                                    {complaint.message}
+                                  </p>
+                                </div>
                               </div>
+                              {statusBadge}
                             </div>
-                            {statusBadge}
+                            <div className="flex items-center justify-between text-xs text-muted-foreground">
+                              <span>Unit {complaint.unitNumber}</span>
+                              <span>{new Date(complaint.createdAt).toLocaleDateString()}</span>
+                            </div>
                           </div>
-                          <div className="flex items-center justify-between text-xs text-muted-foreground">
-                            <span>Unit {complaint.unitNumber}</span>
-                            <span>{new Date(complaint.createdAt).toLocaleDateString()}</span>
-                          </div>
-                        </div>
+                        </Link>
                       );
                     })}
                   </div>
