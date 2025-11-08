@@ -900,80 +900,84 @@ export default function ManagementDashboard() {
                           )}
                         />
 
-                        <div className="space-y-2">
-                          <label className="text-sm font-medium">Total Drops per Elevation</label>
-                          <div className="grid grid-cols-2 gap-4">
-                            <FormField
-                              control={projectForm.control}
-                              name="totalDropsNorth"
-                              render={({ field }) => (
-                                <FormItem>
-                                  <FormLabel>North</FormLabel>
-                                  <FormControl>
-                                    <Input type="number" min="1" {...field} data-testid="input-total-drops-north" className="h-12" />
-                                  </FormControl>
-                                  <FormMessage />
-                                </FormItem>
-                              )}
-                            />
-                            <FormField
-                              control={projectForm.control}
-                              name="totalDropsEast"
-                              render={({ field }) => (
-                                <FormItem>
-                                  <FormLabel>East</FormLabel>
-                                  <FormControl>
-                                    <Input type="number" min="1" {...field} data-testid="input-total-drops-east" className="h-12" />
-                                  </FormControl>
-                                  <FormMessage />
-                                </FormItem>
-                              )}
-                            />
-                            <FormField
-                              control={projectForm.control}
-                              name="totalDropsSouth"
-                              render={({ field }) => (
-                                <FormItem>
-                                  <FormLabel>South</FormLabel>
-                                  <FormControl>
-                                    <Input type="number" min="1" {...field} data-testid="input-total-drops-south" className="h-12" />
-                                  </FormControl>
-                                  <FormMessage />
-                                </FormItem>
-                              )}
-                            />
-                            <FormField
-                              control={projectForm.control}
-                              name="totalDropsWest"
-                              render={({ field }) => (
-                                <FormItem>
-                                  <FormLabel>West</FormLabel>
-                                  <FormControl>
-                                    <Input type="number" min="1" {...field} data-testid="input-total-drops-west" className="h-12" />
-                                  </FormControl>
-                                  <FormMessage />
-                                </FormItem>
-                              )}
-                            />
-                          </div>
-                        </div>
+                        {projectForm.watch("jobType") !== "in_suite_dryer_vent_cleaning" && (
+                          <>
+                            <div className="space-y-2">
+                              <label className="text-sm font-medium">Total Drops per Elevation</label>
+                              <div className="grid grid-cols-2 gap-4">
+                                <FormField
+                                  control={projectForm.control}
+                                  name="totalDropsNorth"
+                                  render={({ field }) => (
+                                    <FormItem>
+                                      <FormLabel>North</FormLabel>
+                                      <FormControl>
+                                        <Input type="number" min="1" {...field} data-testid="input-total-drops-north" className="h-12" />
+                                      </FormControl>
+                                      <FormMessage />
+                                    </FormItem>
+                                  )}
+                                />
+                                <FormField
+                                  control={projectForm.control}
+                                  name="totalDropsEast"
+                                  render={({ field }) => (
+                                    <FormItem>
+                                      <FormLabel>East</FormLabel>
+                                      <FormControl>
+                                        <Input type="number" min="1" {...field} data-testid="input-total-drops-east" className="h-12" />
+                                      </FormControl>
+                                      <FormMessage />
+                                    </FormItem>
+                                  )}
+                                />
+                                <FormField
+                                  control={projectForm.control}
+                                  name="totalDropsSouth"
+                                  render={({ field }) => (
+                                    <FormItem>
+                                      <FormLabel>South</FormLabel>
+                                      <FormControl>
+                                        <Input type="number" min="1" {...field} data-testid="input-total-drops-south" className="h-12" />
+                                      </FormControl>
+                                      <FormMessage />
+                                    </FormItem>
+                                  )}
+                                />
+                                <FormField
+                                  control={projectForm.control}
+                                  name="totalDropsWest"
+                                  render={({ field }) => (
+                                    <FormItem>
+                                      <FormLabel>West</FormLabel>
+                                      <FormControl>
+                                        <Input type="number" min="1" {...field} data-testid="input-total-drops-west" className="h-12" />
+                                      </FormControl>
+                                      <FormMessage />
+                                    </FormItem>
+                                  )}
+                                />
+                              </div>
+                            </div>
 
-                        <FormField
-                          control={projectForm.control}
-                          name="dailyDropTarget"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Daily Drop Target</FormLabel>
-                              <FormControl>
-                                <Input type="number" min="1" {...field} data-testid="input-daily-target" className="h-12" />
-                              </FormControl>
-                              <FormDescription className="text-xs">
-                                Visible to rope access techs
-                              </FormDescription>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
+                            <FormField
+                              control={projectForm.control}
+                              name="dailyDropTarget"
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel>Daily Drop Target</FormLabel>
+                                  <FormControl>
+                                    <Input type="number" min="1" {...field} data-testid="input-daily-target" className="h-12" />
+                                  </FormControl>
+                                  <FormDescription className="text-xs">
+                                    Visible to rope access techs
+                                  </FormDescription>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+                          </>
+                        )}
 
                         <FormField
                           control={projectForm.control}
