@@ -1,7 +1,7 @@
 import type { Express, Request, Response, NextFunction } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { insertUserSchema, insertProjectSchema, insertDropLogSchema, insertComplaintSchema, insertComplaintNoteSchema, normalizeStrataPlan } from "@shared/schema";
+import { insertUserSchema, insertProjectSchema, insertDropLogSchema, insertComplaintSchema, insertComplaintNoteSchema, insertHarnessInspectionSchema, normalizeStrataPlan } from "@shared/schema";
 import { z } from "zod";
 import bcrypt from "bcrypt";
 import multer from "multer";
@@ -1605,6 +1605,70 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Validation error", errors: error.errors });
       }
       console.error("Create complaint note error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Harness inspection routes
+  app.post("/api/harness-inspections", requireAuth, requireRole("rope_access_tech", "supervisor", "operations_manager", "company"), async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      const companyId = currentUser.role === "company" ? currentUser.id : currentUser.companyId;
+      
+      if (!companyId) {
+        return res.status(400).json({ message: "Unable to determine company" });
+      }
+      
+      const inspectionData = insertHarnessInspectionSchema.parse({
+        ...req.body,
+        companyId,
+        workerId: req.session.userId,
+      });
+      
+      const inspection = await storage.createHarnessInspection(inspectionData);
+      res.json({ inspection });
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Validation error", errors: error.errors });
+      }
+      console.error("Create harness inspection error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.get("/api/harness-inspections", requireAuth, requireRole("operations_manager", "supervisor", "company"), async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      const companyId = currentUser.role === "company" ? currentUser.id : currentUser.companyId;
+      
+      if (!companyId) {
+        return res.status(400).json({ message: "Unable to determine company" });
+      }
+      
+      const inspections = await storage.getHarnessInspectionsByCompany(companyId);
+      res.json({ inspections });
+    } catch (error) {
+      console.error("Get harness inspections error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.get("/api/my-harness-inspections", requireAuth, requireRole("rope_access_tech"), async (req: Request, res: Response) => {
+    try {
+      const inspections = await storage.getHarnessInspectionsByWorker(req.session.userId!);
+      res.json({ inspections });
+    } catch (error) {
+      console.error("Get my harness inspections error:", error);
       res.status(500).json({ message: "Internal server error" });
     }
   });
