@@ -1898,11 +1898,12 @@ export default function ManagementDashboard() {
             </div>
           </TabsContent>
 
-          <TabsContent value="documents">
+          <TabsContent value="documents" className="space-y-6">
+            {/* Harness Inspections */}
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
-                  <span className="material-icons">description</span>
+                  <span className="material-icons">verified_user</span>
                   Harness Safety Inspections
                 </CardTitle>
                 <CardDescription>
@@ -1912,9 +1913,31 @@ export default function ManagementDashboard() {
               <CardContent>
                 <div className="text-center py-12 text-muted-foreground">
                   <span className="material-icons text-5xl mb-4 opacity-50">folder_open</span>
-                  <div className="text-lg mb-2">Documents Feature Coming Soon</div>
+                  <div className="text-lg mb-2">Inspection Records</div>
                   <div className="text-sm">
-                    Harness inspections will be organized by Year &gt; Month &gt; Day with PDF download capability
+                    PDF downloads and folder organization coming soon
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Toolbox Meetings */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <span className="material-icons">assignment</span>
+                  Toolbox Meetings
+                </CardTitle>
+                <CardDescription>
+                  Safety meeting records organized by date
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="text-center py-12 text-muted-foreground">
+                  <span className="material-icons text-5xl mb-4 opacity-50">folder_open</span>
+                  <div className="text-lg mb-2">Meeting Records</div>
+                  <div className="text-sm">
+                    PDF downloads and folder organization coming soon
                   </div>
                 </div>
               </CardContent>
