@@ -229,6 +229,56 @@ export const harnessInspections = pgTable("harness_inspections", {
   index("IDX_harness_inspections_project").on(table.projectId),
 ]);
 
+// Toolbox meetings table
+export const toolboxMeetings = pgTable("toolbox_meetings", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  companyId: varchar("company_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  projectId: varchar("project_id").notNull().references(() => projects.id, { onDelete: "cascade" }),
+  conductedBy: varchar("conducted_by").notNull().references(() => users.id, { onDelete: "cascade" }),
+  meetingDate: date("meeting_date").notNull(),
+  
+  // Meeting details
+  conductedByName: varchar("conducted_by_name").notNull(),
+  attendees: text("attendees").array().notNull().default(sql`ARRAY[]::text[]`), // Array of attendee names
+  
+  // Topics discussed (checkboxes for standard topics)
+  topicFallProtection: boolean("topic_fall_protection").notNull().default(false),
+  topicAnchorPoints: boolean("topic_anchor_points").notNull().default(false),
+  topicRopeInspection: boolean("topic_rope_inspection").notNull().default(false),
+  topicKnotTying: boolean("topic_knot_tying").notNull().default(false),
+  topicPPECheck: boolean("topic_ppe_check").notNull().default(false),
+  topicWeatherConditions: boolean("topic_weather_conditions").notNull().default(false),
+  topicCommunication: boolean("topic_communication").notNull().default(false),
+  topicEmergencyEvacuation: boolean("topic_emergency_evacuation").notNull().default(false),
+  topicHazardAssessment: boolean("topic_hazard_assessment").notNull().default(false),
+  topicLoadCalculations: boolean("topic_load_calculations").notNull().default(false),
+  topicEquipmentCompatibility: boolean("topic_equipment_compatibility").notNull().default(false),
+  topicDescenderAscender: boolean("topic_descender_ascender").notNull().default(false),
+  topicEdgeProtection: boolean("topic_edge_protection").notNull().default(false),
+  topicSwingFall: boolean("topic_swing_fall").notNull().default(false),
+  topicMedicalFitness: boolean("topic_medical_fitness").notNull().default(false),
+  topicToolDropPrevention: boolean("topic_tool_drop_prevention").notNull().default(false),
+  topicRegulations: boolean("topic_regulations").notNull().default(false),
+  topicRescueProcedures: boolean("topic_rescue_procedures").notNull().default(false),
+  topicSiteHazards: boolean("topic_site_hazards").notNull().default(false),
+  topicBuddySystem: boolean("topic_buddy_system").notNull().default(false),
+  
+  // Custom topic field
+  customTopic: text("custom_topic"),
+  
+  // Additional notes
+  additionalNotes: text("additional_notes"),
+  
+  // PDF storage
+  pdfUrl: text("pdf_url"),
+  
+  createdAt: timestamp("created_at").defaultNow(),
+}, (table) => [
+  index("IDX_toolbox_meetings_company_date").on(table.companyId, table.meetingDate),
+  index("IDX_toolbox_meetings_project").on(table.projectId, table.meetingDate),
+  index("IDX_toolbox_meetings_conductor").on(table.conductedBy, table.meetingDate),
+]);
+
 // Relations
 export const usersRelations = relations(users, ({ many }) => ({
   projects: many(projects), // For company role
@@ -413,6 +463,12 @@ export const insertHarnessInspectionSchema = createInsertSchema(harnessInspectio
   pdfUrl: true, // Generated server-side
 });
 
+export const insertToolboxMeetingSchema = createInsertSchema(toolboxMeetings).omit({
+  id: true,
+  createdAt: true,
+  pdfUrl: true, // Generated server-side
+});
+
 // Type exports
 export type User = typeof users.$inferSelect;
 export type InsertUser = z.infer<typeof insertUserSchema>;
@@ -437,6 +493,9 @@ export type InsertProjectPhoto = z.infer<typeof insertProjectPhotoSchema>;
 
 export type HarnessInspection = typeof harnessInspections.$inferSelect;
 export type InsertHarnessInspection = z.infer<typeof insertHarnessInspectionSchema>;
+
+export type ToolboxMeeting = typeof toolboxMeetings.$inferSelect;
+export type InsertToolboxMeeting = z.infer<typeof insertToolboxMeetingSchema>;
 
 // Extended types for frontend use with relations
 export type ProjectWithProgress = Project & {
