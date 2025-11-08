@@ -69,11 +69,6 @@ export default function ResidentDashboard() {
     refetchInterval: 10000, // Refetch every 10 seconds for status updates
   });
 
-  // Fetch photos tagged with resident's unit number
-  const { data: unitPhotosData } = useQuery({
-    queryKey: ["/api/my-unit-photos"],
-    enabled: !!currentUser?.unitNumber,
-  });
 
   const projectData = {
     strataPlanNumber: activeProject?.strataPlanNumber || "",
@@ -488,9 +483,8 @@ export default function ResidentDashboard() {
       {/* Main Content - Full Width */}
       <div className="flex-1 container max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-4 mb-4">
+          <TabsList className="grid w-full grid-cols-3 mb-4">
             <TabsTrigger value="building" data-testid="tab-building">Progress</TabsTrigger>
-            <TabsTrigger value="photos" data-testid="tab-photos">My Photos</TabsTrigger>
             <TabsTrigger value="submit" data-testid="tab-submit">Submit</TabsTrigger>
             <TabsTrigger value="history" data-testid="tab-history">Complaints</TabsTrigger>
           </TabsList>
@@ -531,80 +525,6 @@ export default function ResidentDashboard() {
                 </div>
               </div>
             </div>
-          </TabsContent>
-
-          <TabsContent value="photos" className="mt-6">
-            <Card className="shadow-xl border-border/50">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <span className="material-icons text-primary">photo_library</span>
-                  My Unit Photos
-                </CardTitle>
-                <CardDescription>
-                  View photos tagged for unit {currentUser?.unitNumber || "—"}
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                {!currentUser?.unitNumber ? (
-                  <div className="text-center py-12 text-muted-foreground">
-                    <span className="material-icons text-5xl mb-3 opacity-50">image_not_supported</span>
-                    <p>No unit number found in your profile.</p>
-                  </div>
-                ) : unitPhotosData?.photos?.length === 0 ? (
-                  <div className="text-center py-12 text-muted-foreground">
-                    <span className="material-icons text-5xl mb-3 opacity-50">photo_library</span>
-                    <p className="text-lg mb-2">No photos yet</p>
-                    <p className="text-sm">Photos tagged for your unit will appear here.</p>
-                  </div>
-                ) : (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {unitPhotosData?.photos?.map((photo: any) => (
-                      <div key={photo.id} className="bg-card rounded-lg overflow-hidden border hover-elevate group">
-                        <div className="aspect-video relative overflow-hidden">
-                          <img
-                            src={photo.imageUrl}
-                            alt={photo.comment || "Unit photo"}
-                            className="w-full h-full object-cover"
-                            data-testid={`unit-photo-${photo.id}`}
-                          />
-                        </div>
-                        <div className="p-3 space-y-2">
-                          <div className="flex items-start justify-between gap-2">
-                            <div className="flex-1 min-w-0">
-                              {photo.buildingName && (
-                                <div className="text-sm font-medium truncate">
-                                  {photo.buildingName}
-                                </div>
-                              )}
-                              {photo.buildingAddress && (
-                                <div className="text-xs text-muted-foreground truncate">
-                                  {photo.buildingAddress}
-                                </div>
-                              )}
-                            </div>
-                            <Badge variant="secondary" className="text-xs shrink-0">
-                              Unit {photo.unitNumber}
-                            </Badge>
-                          </div>
-                          {photo.comment && (
-                            <div className="text-sm text-muted-foreground border-t pt-2">
-                              {photo.comment}
-                            </div>
-                          )}
-                          <div className="text-xs text-muted-foreground border-t pt-2">
-                            {new Date(photo.createdAt).toLocaleDateString('en-US', { 
-                              month: 'short', 
-                              day: 'numeric', 
-                              year: 'numeric' 
-                            })}
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </CardContent>
-            </Card>
           </TabsContent>
 
           <TabsContent value="submit" className="mt-6">

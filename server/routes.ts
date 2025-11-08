@@ -1511,7 +1511,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // Get complaint notes (staff only, residents cannot see notes)
-  app.get("/api/complaints/:id/notes", requireAuth, requireRole("rope_access_tech", "supervisor", "operations_manager", "company"), async (req: Request, res: Response) => {
+  app.get("/api/complaints/:id/notes", requireAuth, async (req: Request, res: Response) => {
     try {
       const currentUser = await storage.getUserById(req.session.userId!);
       
@@ -1531,7 +1531,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(403).json({ message: "Access denied" });
       }
       
-      const notes = await storage.getNotesByComplaint(req.params.id);
+      const allNotes = await storage.getNotesByComplaint(req.params.id);
+      
+      // Residents can only see notes marked as visible to residents
+      // Staff can see all notes
+      const notes = currentUser.role === "resident" 
+        ? allNotes.filter(note => note.visibleToResident) 
+        : allNotes;
+      
       res.json({ notes });
     } catch (error) {
       console.error("Get complaint notes error:", error);
