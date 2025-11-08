@@ -429,7 +429,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // Get all employees
-  app.get("/api/employees", requireAuth, requireRole("company", "operations_manager", "supervisor"), async (req: Request, res: Response) => {
+  app.get("/api/employees", requireAuth, requireRole("company", "operations_manager", "supervisor", "rope_access_tech"), async (req: Request, res: Response) => {
     try {
       const currentUser = await storage.getUserById(req.session.userId!);
       
