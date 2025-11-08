@@ -821,7 +821,7 @@ export default function ManagementDashboard() {
                             description: "Please check all required fields", 
                             variant: "destructive" 
                           });
-                        })} className="space-y-4" id="create-project-form">
+                        })} className="space-y-4">
                         <FormField
                           control={projectForm.control}
                           name="strataPlanNumber"
@@ -1085,19 +1085,17 @@ export default function ManagementDashboard() {
                             Optional: Upload the rope access/fall protection plan PDF
                           </FormDescription>
                         </div>
+
+                        <Button 
+                          type="submit" 
+                          className="w-full h-12" 
+                          data-testid="button-submit-project"
+                          disabled={isUploadingPlan}
+                        >
+                          {isUploadingPlan ? "Uploading..." : "Create Project"}
+                        </Button>
                       </form>
                     </Form>
-                    </div>
-                    <div className="p-6 border-t bg-card sticky bottom-0">
-                      <Button 
-                        type="submit" 
-                        form="create-project-form"
-                        className="w-full h-14 text-base font-semibold shadow-md" 
-                        data-testid="button-submit-project"
-                        disabled={isUploadingPlan}
-                      >
-                        {isUploadingPlan ? "Uploading..." : "Create Project"}
-                      </Button>
                     </div>
                   </DialogContent>
                 </Dialog>
