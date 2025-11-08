@@ -257,28 +257,32 @@ export default function ProjectDetail() {
   ];
 
   return (
-    <div className="min-h-screen gradient-bg dot-pattern p-4">
-      <div className="max-w-2xl mx-auto space-y-6">
-        {/* Header */}
-        <div className="mb-6 flex items-center gap-4">
-          <Button
-            variant="ghost"
-            onClick={() => setLocation("/management")}
-            className="h-12 gap-2"
-            data-testid="button-back"
-          >
-            <span className="material-icons">arrow_back</span>
-            Back
-          </Button>
-          <div className="flex-1">
-            <h1 className="text-2xl font-bold text-gray-900">{project.buildingName}</h1>
-            <p className="text-sm text-gray-600">
-              {project.strataPlanNumber} - {project.jobType.replace(/_/g, ' ')}
-            </p>
+    <div className="min-h-screen gradient-bg dot-pattern pb-6">
+      {/* Sticky Header */}
+      <div className="sticky top-0 z-50 bg-background/95 backdrop-blur-sm border-b shadow-sm">
+        <div className="max-w-2xl mx-auto p-4">
+          <div className="flex items-center gap-4">
+            <Button
+              variant="ghost"
+              onClick={() => setLocation("/management")}
+              className="h-12 gap-2"
+              data-testid="button-back"
+            >
+              <span className="material-icons">arrow_back</span>
+              Back
+            </Button>
+            <div className="flex-1">
+              <h1 className="text-xl font-bold">{project.buildingName}</h1>
+              <p className="text-xs text-muted-foreground">
+                {project.strataPlanNumber} - {project.jobType.replace(/_/g, ' ')}
+              </p>
+            </div>
           </div>
         </div>
+      </div>
 
-        {/* Main Content Card */}
+      <div className="max-w-2xl mx-auto p-4 space-y-6">
+        {/* Building Visualization Card */}
         <Card className="glass-card border-0 shadow-premium">
           <CardContent className="p-6 space-y-6">
             {/* Building Visualization */}
@@ -322,9 +326,43 @@ export default function ProjectDetail() {
                 <div className="text-sm text-muted-foreground mt-1">Days Remaining</div>
               </div>
             </div>
+          </CardContent>
+        </Card>
 
-            <Separator />
+        {/* Quick Actions */}
+        <div className="space-y-3">
+          <h2 className="text-sm font-semibold text-muted-foreground px-1">Quick Actions</h2>
+          <div className="grid grid-cols-2 gap-3">
+            <Button
+              variant="outline"
+              className="h-auto flex-col gap-2 p-4"
+              onClick={() => setLocation("/harness-inspection")}
+              data-testid="button-harness-inspection"
+            >
+              <span className="material-icons text-primary text-2xl">verified_user</span>
+              <div className="text-center">
+                <div className="font-semibold text-sm">Harness Inspection</div>
+                <div className="text-xs text-muted-foreground">Fill daily form</div>
+              </div>
+            </Button>
+            <Button
+              variant="outline"
+              className="h-auto flex-col gap-2 p-4"
+              onClick={() => setLocation("/toolbox-meeting")}
+              data-testid="button-toolbox-meeting"
+            >
+              <span className="material-icons text-primary text-2xl">group</span>
+              <div className="text-center">
+                <div className="font-semibold text-sm">Toolbox Meeting</div>
+                <div className="text-xs text-muted-foreground">Record safety meeting</div>
+              </div>
+            </Button>
+          </div>
+        </div>
 
+        {/* Other Content Card */}
+        <Card className="glass-card border-0 shadow-premium">
+          <CardContent className="p-6 space-y-6">
             {/* PDF Upload/View Section */}
             <div className="space-y-3">
               <div className="text-sm text-muted-foreground">Fall Protection Plan (PDF)</div>
