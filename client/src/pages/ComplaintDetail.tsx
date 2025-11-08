@@ -219,6 +219,21 @@ export default function ComplaintDetail() {
               <div className="text-xs text-muted-foreground mb-2">Message</div>
               <p className="text-sm" data-testid="text-message">{complaint.message}</p>
             </div>
+
+            {complaint.photoUrl && (
+              <>
+                <Separator />
+                <div>
+                  <div className="text-xs text-muted-foreground mb-2">Attached Photo</div>
+                  <img 
+                    src={complaint.photoUrl} 
+                    alt="Complaint attachment" 
+                    className="rounded-lg max-w-full h-auto border"
+                    data-testid="img-complaint-photo"
+                  />
+                </div>
+              </>
+            )}
           </CardContent>
         </Card>
 

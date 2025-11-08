@@ -28,6 +28,7 @@ type ComplaintFormData = z.infer<typeof complaintSchema>;
 export default function ResidentDashboard() {
   const [activeTab, setActiveTab] = useState("building");
   const [showLogoutDialog, setShowLogoutDialog] = useState(false);
+  const [selectedPhoto, setSelectedPhoto] = useState<File | null>(null);
   const { toast } = useToast();
   const [, setLocation] = useLocation();
 
@@ -113,13 +114,20 @@ export default function ResidentDashboard() {
 
   const submitComplaintMutation = useMutation({
     mutationFn: async (data: ComplaintFormData) => {
+      const formData = new FormData();
+      formData.append("residentName", data.residentName);
+      formData.append("phoneNumber", data.phoneNumber);
+      formData.append("unitNumber", data.unitNumber);
+      formData.append("message", data.message);
+      formData.append("projectId", activeProject?.id || "");
+      
+      if (selectedPhoto) {
+        formData.append("photo", selectedPhoto);
+      }
+      
       const response = await fetch("/api/complaints", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          ...data,
-          projectId: activeProject?.id || null, // Allow null for general messages
-        }),
+        body: formData,
         credentials: "include",
       });
 
@@ -132,6 +140,7 @@ export default function ResidentDashboard() {
     },
     onSuccess: () => {
       form.reset();
+      setSelectedPhoto(null);
       queryClient.invalidateQueries({ queryKey: ["/api/complaints"] });
       toast({ title: "Message submitted successfully" });
       setActiveTab("history");
@@ -143,6 +152,23 @@ export default function ResidentDashboard() {
 
   const onSubmit = async (data: ComplaintFormData) => {
     submitComplaintMutation.mutate(data);
+  };
+  
+  const handlePhotoChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      // Validate file type
+      if (!file.type.startsWith('image/')) {
+        toast({ title: "Error", description: "Please select an image file", variant: "destructive" });
+        return;
+      }
+      // Validate file size (max 10MB)
+      if (file.size > 10 * 1024 * 1024) {
+        toast({ title: "Error", description: "Image size must be less than 10MB", variant: "destructive" });
+        return;
+      }
+      setSelectedPhoto(file);
+    }
   };
 
   const confirmLogout = async () => {
@@ -260,6 +286,22 @@ export default function ResidentDashboard() {
                     )}
                   />
 
+                  <div>
+                    <label className="text-sm font-medium mb-2 block">Attach Photo (Optional)</label>
+                    <Input
+                      type="file"
+                      accept="image/*"
+                      onChange={handlePhotoChange}
+                      data-testid="input-complaint-photo"
+                      className="h-12"
+                    />
+                    {selectedPhoto && (
+                      <p className="text-xs text-muted-foreground mt-1">
+                        Selected: {selectedPhoto.name}
+                      </p>
+                    )}
+                  </div>
+
                   <Button
                     type="submit"
                     className="w-full h-12"
@@ -372,6 +414,22 @@ export default function ResidentDashboard() {
                       </FormItem>
                     )}
                   />
+
+                  <div>
+                    <label className="text-sm font-medium mb-2 block">Attach Photo (Optional)</label>
+                    <Input
+                      type="file"
+                      accept="image/*"
+                      onChange={handlePhotoChange}
+                      data-testid="input-complaint-photo"
+                      className="h-12"
+                    />
+                    {selectedPhoto && (
+                      <p className="text-xs text-muted-foreground mt-1">
+                        Selected: {selectedPhoto.name}
+                      </p>
+                    )}
+                  </div>
 
                   <Button
                     type="submit"
@@ -618,6 +676,22 @@ export default function ResidentDashboard() {
                         </FormItem>
                       )}
                     />
+
+                    <div>
+                      <label className="text-sm font-medium mb-2 block">Attach Photo (Optional)</label>
+                      <Input
+                        type="file"
+                        accept="image/*"
+                        onChange={handlePhotoChange}
+                        data-testid="input-complaint-photo"
+                        className="h-12"
+                      />
+                      {selectedPhoto && (
+                        <p className="text-xs text-muted-foreground mt-1">
+                          Selected: {selectedPhoto.name}
+                        </p>
+                      )}
+                    </div>
 
                   <Button type="submit" className="w-full h-12" data-testid="button-submit-complaint">
                     Submit Feedback
