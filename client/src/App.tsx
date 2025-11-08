@@ -41,7 +41,7 @@ function Router() {
         </ProtectedRoute>
       </Route>
       <Route path="/complaints/:id">
-        <ProtectedRoute allowedRoles={["company", "operations_manager", "supervisor", "rope_access_tech"]}>
+        <ProtectedRoute allowedRoles={["company", "operations_manager", "supervisor", "rope_access_tech", "resident"]}>
           <ComplaintDetail />
         </ProtectedRoute>
       </Route>
