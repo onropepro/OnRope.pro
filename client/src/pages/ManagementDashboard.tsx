@@ -34,7 +34,7 @@ const projectSchema = z.object({
   totalDropsEast: z.string().optional(),
   totalDropsSouth: z.string().optional(),
   totalDropsWest: z.string().optional(),
-  dailyDropTarget: z.string().min(1, "Daily drop target is required"),
+  dailyDropTarget: z.string().optional(),
   floorCount: z.string().min(1, "Floor count is required"),
   targetCompletionDate: z.string().optional(),
   ropeAccessPlan: z.any().optional(),
@@ -42,8 +42,20 @@ const projectSchema = z.object({
   floorsPerDay: z.string().optional(),
   stallsPerDay: z.string().optional(),
 }).superRefine((data, ctx) => {
-  // For non-in-suite jobs, elevation fields are required
-  if (data.jobType !== "in_suite_dryer_vent_cleaning") {
+  // Job types that use drop-based tracking
+  const dropBasedJobTypes = ["window_cleaning", "dryer_vent_cleaning", "pressure_washing"];
+  
+  if (dropBasedJobTypes.includes(data.jobType)) {
+    // For drop-based jobs, dailyDropTarget is required
+    if (!data.dailyDropTarget || data.dailyDropTarget.trim() === "") {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Daily drop target is required",
+        path: ["dailyDropTarget"],
+      });
+    }
+    
+    // Elevation fields are also required for drop-based jobs
     if (!data.totalDropsNorth || data.totalDropsNorth.trim() === "") {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
@@ -348,7 +360,7 @@ export default function ManagementDashboard() {
                      (data.totalDropsEast ? parseInt(data.totalDropsEast) : 0) + 
                      (data.totalDropsSouth ? parseInt(data.totalDropsSouth) : 0) + 
                      (data.totalDropsWest ? parseInt(data.totalDropsWest) : 0),
-          dailyDropTarget: parseInt(data.dailyDropTarget),
+          dailyDropTarget: data.dailyDropTarget ? parseInt(data.dailyDropTarget) : undefined,
           floorCount: parseInt(data.floorCount),
           ropeAccessPlanUrl: data.ropeAccessPlanUrl || undefined,
           suitesPerDay: data.suitesPerDay ? parseInt(data.suitesPerDay) : undefined,

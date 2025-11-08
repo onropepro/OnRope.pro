@@ -722,11 +722,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Unable to determine company" });
       }
       
+      // Job types that don't use drop-based tracking
+      const nonDropJobTypes = ['in_suite_dryer_vent_cleaning', 'parkade_pressure_cleaning', 'ground_window_cleaning'];
+      const isNonDropJob = nonDropJobTypes.includes(req.body.jobType);
+      
       const projectData = insertProjectSchema.parse({
         ...req.body,
         strataPlanNumber: normalizeStrataPlan(req.body.strataPlanNumber),
         companyId,
         targetCompletionDate: req.body.targetCompletionDate || null,
+        // Default dailyDropTarget to 0 for non-drop job types
+        dailyDropTarget: isNonDropJob ? 0 : req.body.dailyDropTarget,
       });
       
       const project = await storage.createProject(projectData);

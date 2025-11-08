@@ -260,12 +260,52 @@ export const insertUserSchema = createInsertSchema(users).omit({
   updatedAt: true,
 });
 
-export const insertProjectSchema = createInsertSchema(projects).omit({
-  id: true,
-  createdAt: true,
-  updatedAt: true,
-  status: true,
-});
+export const insertProjectSchema = createInsertSchema(projects)
+  .omit({
+    id: true,
+    createdAt: true,
+    updatedAt: true,
+    status: true,
+  })
+  .extend({
+    dailyDropTarget: z.number().optional(),
+  })
+  .superRefine((data, ctx) => {
+    // Job types that use drop-based tracking
+    const dropBasedJobTypes = ['window_cleaning', 'dryer_vent_cleaning', 'pressure_washing'];
+    
+    if (dropBasedJobTypes.includes(data.jobType)) {
+      // For drop-based jobs, dailyDropTarget is required
+      if (!data.dailyDropTarget || data.dailyDropTarget <= 0) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "Daily drop target is required",
+          path: ["dailyDropTarget"],
+        });
+      }
+    }
+    
+    // Job-specific validations for non-drop jobs
+    if (data.jobType === 'in_suite_dryer_vent_cleaning') {
+      if (!data.suitesPerDay && !data.floorsPerDay) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "Either suites per day or floors per day is required",
+          path: ["suitesPerDay"],
+        });
+      }
+    }
+    
+    if (data.jobType === 'parkade_pressure_cleaning') {
+      if (!data.stallsPerDay) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "Stalls per day is required",
+          path: ["stallsPerDay"],
+        });
+      }
+    }
+  });
 
 export const insertDropLogSchema = createInsertSchema(dropLogs).omit({
   id: true,
