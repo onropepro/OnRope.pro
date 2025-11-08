@@ -467,6 +467,29 @@ export class Storage {
     return result;
   }
 
+  async getPhotosByUnitAndStrataPlan(unitNumber: string, strataPlanNumber: string): Promise<any[]> {
+    const result = await db.select({
+      id: projectPhotos.id,
+      projectId: projectPhotos.projectId,
+      imageUrl: projectPhotos.imageUrl,
+      unitNumber: projectPhotos.unitNumber,
+      comment: projectPhotos.comment,
+      createdAt: projectPhotos.createdAt,
+      buildingName: projects.buildingName,
+      buildingAddress: projects.buildingAddress,
+    })
+      .from(projectPhotos)
+      .leftJoin(projects, eq(projectPhotos.projectId, projects.id))
+      .where(
+        and(
+          eq(projectPhotos.unitNumber, unitNumber),
+          eq(projects.strataPlanNumber, strataPlanNumber)
+        )
+      )
+      .orderBy(desc(projectPhotos.createdAt));
+    return result;
+  }
+
   async deleteProjectPhoto(photoId: string): Promise<void> {
     await db.delete(projectPhotos).where(eq(projectPhotos.id, photoId));
   }

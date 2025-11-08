@@ -667,21 +667,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const currentUser = await storage.getUserById(req.session.userId!);
       
-      if (!currentUser || !currentUser.unitNumber) {
-        return res.status(400).json({ message: "Unit number not found" });
+      if (!currentUser || !currentUser.unitNumber || !currentUser.strataPlanNumber) {
+        return res.status(400).json({ message: "Unit number or strata plan number not found" });
       }
       
-      // Get all projects for this resident's strata plan to determine company
-      const userProjects = await storage.getProjectsByStrataNumber(currentUser.strataPlanNumber!);
+      // Get photos by unit number and strata plan number (works across all companies)
+      const photos = await storage.getPhotosByUnitAndStrataPlan(
+        currentUser.unitNumber, 
+        currentUser.strataPlanNumber
+      );
       
-      if (userProjects.length === 0) {
-        return res.json({ photos: [] });
-      }
-      
-      // Use first project's company (all projects for a strata plan should be from same company)
-      const companyId = userProjects[0].companyId;
-      
-      const photos = await storage.getPhotosByUnitNumber(currentUser.unitNumber, companyId);
       res.json({ photos });
     } catch (error) {
       console.error("Get unit photos error:", error);
