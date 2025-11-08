@@ -394,75 +394,76 @@ export default function ProjectDetail() {
           </div>
         </div>
 
-        {/* Other Content Card */}
+        {/* PDF Upload/View Card */}
         <Card className="glass-card border-0 shadow-premium">
-          <CardContent className="p-6 space-y-6">
-            {/* PDF Upload/View Section */}
-            <div className="space-y-3">
-              <div className="text-sm text-muted-foreground">Fall Protection Plan (PDF)</div>
-              {project.ropeAccessPlanUrl ? (
-                <div className="flex gap-2">
-                  <Button
-                    variant="outline"
-                    className="flex-1 h-12 gap-2"
-                    onClick={() => window.open(project.ropeAccessPlanUrl!, '_blank')}
-                    data-testid="button-view-pdf"
-                  >
-                    <span className="material-icons text-lg">description</span>
-                    View Current PDF
-                  </Button>
-                  <Button
-                    variant="outline"
-                    className="h-12 gap-2"
-                    onClick={() => document.getElementById('pdf-upload-input')?.click()}
-                    disabled={uploadingPdf}
-                    data-testid="button-replace-pdf"
-                  >
-                    <span className="material-icons text-lg">upload</span>
-                    {uploadingPdf ? "Uploading..." : "Replace"}
-                  </Button>
-                </div>
-              ) : (
+          <CardHeader>
+            <CardTitle className="text-base">Fall Protection Plan</CardTitle>
+          </CardHeader>
+          <CardContent>
+            {project.ropeAccessPlanUrl ? (
+              <div className="flex gap-2">
                 <Button
                   variant="outline"
-                  className="w-full h-12 gap-2"
+                  className="flex-1 h-12 gap-2"
+                  onClick={() => window.open(project.ropeAccessPlanUrl!, '_blank')}
+                  data-testid="button-view-pdf"
+                >
+                  <span className="material-icons text-lg">description</span>
+                  View Current PDF
+                </Button>
+                <Button
+                  variant="outline"
+                  className="h-12 gap-2"
                   onClick={() => document.getElementById('pdf-upload-input')?.click()}
                   disabled={uploadingPdf}
-                  data-testid="button-upload-pdf"
+                  data-testid="button-replace-pdf"
                 >
                   <span className="material-icons text-lg">upload</span>
-                  {uploadingPdf ? "Uploading..." : "Upload PDF"}
+                  {uploadingPdf ? "Uploading..." : "Replace"}
                 </Button>
-              )}
-              <input
-                id="pdf-upload-input"
-                type="file"
-                accept="application/pdf"
-                className="hidden"
-                onChange={(e) => {
-                  const file = e.target.files?.[0];
-                  if (file) {
-                    handlePdfUpload(file);
-                    e.target.value = '';
-                  }
-                }}
-              />
-            </div>
-
-            <Separator />
-
-            {/* Project Photos Section */}
-            <div className="space-y-3">
-              <div className="flex items-center justify-between">
-                <div className="text-sm text-muted-foreground">Project Photos</div>
-                <Badge variant="secondary" className="text-xs">
-                  {photos.length} {photos.length === 1 ? 'photo' : 'photos'}
-                </Badge>
               </div>
-              
-              {/* Image Gallery */}
-              {photos.length > 0 && (
-                <div className="grid grid-cols-3 gap-2 mb-3">
+            ) : (
+              <Button
+                variant="outline"
+                className="w-full h-12 gap-2"
+                onClick={() => document.getElementById('pdf-upload-input')?.click()}
+                disabled={uploadingPdf}
+                data-testid="button-upload-pdf"
+              >
+                <span className="material-icons text-lg">upload</span>
+                {uploadingPdf ? "Uploading..." : "Upload PDF"}
+              </Button>
+            )}
+            <input
+              id="pdf-upload-input"
+              type="file"
+              accept="application/pdf"
+              className="hidden"
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+                if (file) {
+                  handlePdfUpload(file);
+                  e.target.value = '';
+                }
+              }}
+            />
+          </CardContent>
+        </Card>
+
+        {/* Project Photos Card */}
+        <Card className="glass-card border-0 shadow-premium">
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <CardTitle className="text-base">Project Photos</CardTitle>
+              <Badge variant="secondary" className="text-xs">
+                {photos.length} {photos.length === 1 ? 'photo' : 'photos'}
+              </Badge>
+            </div>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            {/* Image Gallery */}
+            {photos.length > 0 && (
+              <div className="grid grid-cols-3 gap-2">
                   {photos.map((photo: any) => (
                     <div
                       key={photo.id}
@@ -492,73 +493,75 @@ export default function ProjectDetail() {
                   ))}
                 </div>
               )}
-              
-              {/* Upload Buttons */}
-              <div className="flex gap-2">
-                <Button
-                  variant="outline"
-                  className="flex-1 h-12 gap-2"
-                  onClick={() => document.getElementById('image-camera-input')?.click()}
-                  disabled={uploadingImage}
-                  data-testid="button-take-photo"
-                >
-                  <span className="material-icons text-lg">photo_camera</span>
-                  {uploadingImage ? "Uploading..." : "Take Photo"}
-                </Button>
-                <Button
-                  variant="outline"
-                  className="flex-1 h-12 gap-2"
-                  onClick={() => document.getElementById('image-file-input')?.click()}
-                  disabled={uploadingImage}
-                  data-testid="button-upload-from-library"
-                >
-                  <span className="material-icons text-lg">photo_library</span>
-                  {uploadingImage ? "Uploading..." : "From Library"}
-                </Button>
-              </div>
-              
-              {/* Camera input (mobile-first) */}
-              <input
-                id="image-camera-input"
-                type="file"
-                accept="image/*"
-                capture="environment"
-                className="hidden"
-                onChange={(e) => {
-                  const file = e.target.files?.[0];
-                  if (file) {
-                    handleFileSelected(file);
-                    e.target.value = '';
-                  }
-                }}
-              />
-              
-              {/* File picker input */}
-              <input
-                id="image-file-input"
-                type="file"
-                accept="image/*"
-                className="hidden"
-                onChange={(e) => {
-                  const file = e.target.files?.[0];
-                  if (file) {
-                    handleFileSelected(file);
-                    e.target.value = '';
-                  }
-                }}
-              />
+            
+            {/* Upload Buttons */}
+            <div className="flex gap-2">
+              <Button
+                variant="outline"
+                className="flex-1 h-12 gap-2"
+                onClick={() => document.getElementById('image-camera-input')?.click()}
+                disabled={uploadingImage}
+                data-testid="button-take-photo"
+              >
+                <span className="material-icons text-lg">photo_camera</span>
+                {uploadingImage ? "Uploading..." : "Take Photo"}
+              </Button>
+              <Button
+                variant="outline"
+                className="flex-1 h-12 gap-2"
+                onClick={() => document.getElementById('image-file-input')?.click()}
+                disabled={uploadingImage}
+                data-testid="button-upload-from-library"
+              >
+                <span className="material-icons text-lg">photo_library</span>
+                {uploadingImage ? "Uploading..." : "From Library"}
+              </Button>
             </div>
+            
+            {/* Camera input (mobile-first) */}
+            <input
+              id="image-camera-input"
+              type="file"
+              accept="image/*"
+              capture="environment"
+              className="hidden"
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+                if (file) {
+                  handleFileSelected(file);
+                  e.target.value = '';
+                }
+              }}
+            />
+            
+            {/* File picker input */}
+            <input
+              id="image-file-input"
+              type="file"
+              accept="image/*"
+              className="hidden"
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+                if (file) {
+                  handleFileSelected(file);
+                  e.target.value = '';
+                }
+              }}
+            />
+          </CardContent>
+        </Card>
 
-            <Separator />
-
-            {/* Toolbox Meetings Section */}
-            <div className="space-y-3">
-              <div className="flex items-center justify-between">
-                <div className="text-sm text-muted-foreground">Toolbox Meetings</div>
-                <Badge variant="secondary" className="text-xs">
-                  {toolboxMeetings.length} {toolboxMeetings.length === 1 ? 'meeting' : 'meetings'}
-                </Badge>
-              </div>
+        {/* Toolbox Meetings Card */}
+        <Card className="glass-card border-0 shadow-premium">
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <CardTitle className="text-base">Toolbox Meetings</CardTitle>
+              <Badge variant="secondary" className="text-xs">
+                {toolboxMeetings.length} {toolboxMeetings.length === 1 ? 'meeting' : 'meetings'}
+              </Badge>
+            </div>
+          </CardHeader>
+          <CardContent className="space-y-3">
 
               {/* Meeting List */}
               {toolboxMeetings.length > 0 && (
@@ -595,28 +598,30 @@ export default function ProjectDetail() {
                 </div>
               )}
 
-              {/* Create Toolbox Meeting Button */}
-              <Button
-                variant="default"
-                className="w-full h-12 gap-2"
-                onClick={() => setLocation("/toolbox-meeting")}
-                data-testid="button-create-toolbox-meeting"
-              >
-                <span className="material-icons text-lg">assignment</span>
-                Conduct Toolbox Meeting
-              </Button>
+            {/* Create Toolbox Meeting Button */}
+            <Button
+              variant="default"
+              className="w-full h-12 gap-2"
+              onClick={() => setLocation("/toolbox-meeting")}
+              data-testid="button-create-toolbox-meeting"
+            >
+              <span className="material-icons text-lg">assignment</span>
+              Conduct Toolbox Meeting
+            </Button>
+          </CardContent>
+        </Card>
+
+        {/* Resident Feedback Card */}
+        <Card className="glass-card border-0 shadow-premium">
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <CardTitle className="text-base">Resident Feedback</CardTitle>
+              <Badge variant="secondary" className="text-xs">
+                {complaints.length} {complaints.length === 1 ? 'complaint' : 'complaints'}
+              </Badge>
             </div>
-
-            <Separator />
-
-            {/* Resident Feedback Section */}
-            <div className="space-y-3">
-              <div className="flex items-center justify-between">
-                <div className="text-sm text-muted-foreground">Resident Feedback</div>
-                <Badge variant="secondary" className="text-xs">
-                  {complaints.length} {complaints.length === 1 ? 'complaint' : 'complaints'}
-                </Badge>
-              </div>
+          </CardHeader>
+          <CardContent>
               
               {complaints.length === 0 ? (
                 <div className="text-center py-6 text-muted-foreground text-sm border rounded-lg">
@@ -662,18 +667,20 @@ export default function ProjectDetail() {
                   })}
                 </div>
               )}
+          </CardContent>
+        </Card>
+
+        {/* Job Comments Card */}
+        <Card className="glass-card border-0 shadow-premium">
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <CardTitle className="text-base">Job Comments</CardTitle>
+              <Badge variant="secondary" className="text-xs">
+                {jobComments.length} {jobComments.length === 1 ? 'comment' : 'comments'}
+              </Badge>
             </div>
-
-            <Separator />
-
-            {/* Job Comments Section */}
-            <div className="space-y-3">
-              <div className="flex items-center justify-between">
-                <div className="text-sm text-muted-foreground">Job Comments</div>
-                <Badge variant="secondary" className="text-xs">
-                  {jobComments.length} {jobComments.length === 1 ? 'comment' : 'comments'}
-                </Badge>
-              </div>
+          </CardHeader>
+          <CardContent className="space-y-3">
 
               {/* Comment Form */}
               <div className="space-y-2">
@@ -722,12 +729,16 @@ export default function ProjectDetail() {
                   ))}
                 </div>
               )}
-            </div>
+          </CardContent>
+        </Card>
 
-            <Separator />
-
-            {/* Status & Actions */}
-            <div className="space-y-4">
+        {/* Status & Actions Card */}
+        {canDeleteProject && (
+          <Card className="glass-card border-0 shadow-premium">
+            <CardHeader>
+              <CardTitle className="text-base">Project Actions</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
               <div>
                 <div className="text-sm text-muted-foreground mb-2">Status</div>
                 <Badge variant={project.status === "active" ? "default" : "secondary"} className="capitalize">
@@ -735,20 +746,18 @@ export default function ProjectDetail() {
                 </Badge>
               </div>
 
-              {canDeleteProject && (
-                <Button 
-                  variant="destructive" 
-                  onClick={() => setShowDeleteDialog(true)}
-                  className="w-full h-12"
-                  data-testid="button-delete-project"
-                >
-                  <span className="material-icons mr-2">delete</span>
-                  Delete Project
-                </Button>
-              )}
-            </div>
-          </CardContent>
-        </Card>
+              <Button 
+                variant="destructive" 
+                onClick={() => setShowDeleteDialog(true)}
+                className="w-full h-12"
+                data-testid="button-delete-project"
+              >
+                <span className="material-icons mr-2">delete</span>
+                Delete Project
+              </Button>
+            </CardContent>
+          </Card>
+        )}
 
         {/* Target Performance Chart - Management Only */}
         {isManagement && completedSessions.length > 0 && (
