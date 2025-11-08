@@ -5,6 +5,7 @@ import { z } from "zod";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
@@ -77,10 +78,17 @@ export default function ToolboxMeetingForm() {
   const [, navigate] = useLocation();
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [selectedEmployees, setSelectedEmployees] = useState<string[]>([]);
 
   const { data: projectsData } = useQuery<{ projects: Project[] }>({
     queryKey: ["/api/projects"],
   });
+
+  const { data: employeesData } = useQuery<{ employees: any[] }>({
+    queryKey: ["/api/employees"],
+  });
+
+  const employees = employeesData?.employees || [];
 
   const form = useForm<ToolboxMeetingFormValues>({
     resolver: zodResolver(toolboxMeetingFormSchema),
@@ -114,13 +122,20 @@ export default function ToolboxMeetingForm() {
     },
   });
 
+  const toggleEmployee = (employeeName: string) => {
+    setSelectedEmployees(prev => 
+      prev.includes(employeeName)
+        ? prev.filter(name => name !== employeeName)
+        : [...prev, employeeName]
+    );
+  };
+
   const createMeetingMutation = useMutation({
     mutationFn: async (data: ToolboxMeetingFormValues) => {
-      const attendeesArray = data.attendees.split("\n").map(a => a.trim()).filter(a => a.length > 0);
-      
+      // Use selectedEmployees instead of parsing textarea
       const response = await apiRequest("POST", "/api/toolbox-meetings", {
         ...data,
-        attendees: attendeesArray,
+        attendees: selectedEmployees,
       });
       
       return response.json();
@@ -143,6 +158,15 @@ export default function ToolboxMeetingForm() {
   });
 
   const onSubmit = async (data: ToolboxMeetingFormValues) => {
+    if (selectedEmployees.length === 0) {
+      toast({
+        title: "Error",
+        description: "Please select at least one attendee",
+        variant: "destructive",
+      });
+      return;
+    }
+    
     setIsSubmitting(true);
     try {
       await createMeetingMutation.mutateAsync(data);
@@ -237,24 +261,83 @@ export default function ToolboxMeetingForm() {
                   )}
                 />
 
-                <FormField
-                  control={form.control}
-                  name="attendees"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Attendees (one per line) *</FormLabel>
-                      <FormControl>
-                        <Textarea
-                          {...field}
-                          placeholder="John Smith&#10;Jane Doe&#10;Mike Johnson"
-                          className="min-h-24"
-                          data-testid="input-attendees"
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
+                <div className="space-y-3">
+                  <div>
+                    <FormLabel>Attendees *</FormLabel>
+                    <p className="text-sm text-muted-foreground mt-1">
+                      Tap employees to select attendees
+                    </p>
+                  </div>
+                  
+                  {selectedEmployees.length > 0 && (
+                    <div className="bg-muted p-3 rounded-md">
+                      <div className="text-sm font-medium mb-2">
+                        Selected ({selectedEmployees.length})
+                      </div>
+                      <div className="flex flex-wrap gap-2">
+                        {selectedEmployees.map((name, idx) => (
+                          <Badge 
+                            key={idx} 
+                            variant="secondary"
+                            className="cursor-pointer hover-elevate"
+                            onClick={() => toggleEmployee(name)}
+                          >
+                            {name} ×
+                          </Badge>
+                        ))}
+                      </div>
+                    </div>
                   )}
-                />
+
+                  <div className="grid grid-cols-2 gap-2">
+                    {employees.map((employee) => (
+                      <Card
+                        key={employee.id}
+                        className={`cursor-pointer hover-elevate transition-colors ${
+                          selectedEmployees.includes(employee.name)
+                            ? 'bg-primary/10 border-primary'
+                            : ''
+                        }`}
+                        onClick={() => toggleEmployee(employee.name)}
+                        data-testid={`employee-card-${employee.id}`}
+                      >
+                        <CardContent className="p-3">
+                          <div className="flex items-center gap-2">
+                            <div
+                              className={`w-5 h-5 rounded border-2 flex items-center justify-center ${
+                                selectedEmployees.includes(employee.name)
+                                  ? 'bg-primary border-primary'
+                                  : 'border-muted-foreground'
+                              }`}
+                            >
+                              {selectedEmployees.includes(employee.name) && (
+                                <span className="material-icons text-primary-foreground text-sm">
+                                  check
+                                </span>
+                              )}
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <div className="font-medium text-sm truncate">
+                                {employee.name}
+                              </div>
+                              {employee.techLevel && (
+                                <div className="text-xs text-muted-foreground">
+                                  {employee.techLevel}
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+                  
+                  {selectedEmployees.length === 0 && (
+                    <p className="text-sm text-destructive">
+                      Please select at least one attendee
+                    </p>
+                  )}
+                </div>
 
                 <div className="space-y-4">
                   <h3 className="font-semibold text-lg">Topics Discussed</h3>

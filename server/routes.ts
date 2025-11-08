@@ -1675,6 +1675,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.delete("/api/harness-inspections/:id", requireAuth, requireRole("operations_manager", "supervisor", "company"), async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      await storage.deleteHarnessInspection(id);
+      res.json({ message: "Harness inspection deleted successfully" });
+    } catch (error) {
+      console.error("Delete harness inspection error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
   // Toolbox meeting routes
   app.post("/api/toolbox-meetings", requireAuth, requireRole("rope_access_tech", "supervisor", "operations_manager", "company"), async (req: Request, res: Response) => {
     try {
@@ -1735,6 +1746,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({ meetings });
     } catch (error) {
       console.error("Get project toolbox meetings error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.delete("/api/toolbox-meetings/:id", requireAuth, requireRole("operations_manager", "supervisor", "company"), async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      await storage.deleteToolboxMeeting(id);
+      res.json({ message: "Toolbox meeting deleted successfully" });
+    } catch (error) {
+      console.error("Delete toolbox meeting error:", error);
       res.status(500).json({ message: "Internal server error" });
     }
   });

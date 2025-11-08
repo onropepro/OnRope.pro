@@ -526,6 +526,10 @@ export class Storage {
     return result[0];
   }
 
+  async deleteHarnessInspection(id: string): Promise<void> {
+    await db.delete(harnessInspections).where(eq(harnessInspections.id, id));
+  }
+
   // Toolbox meeting operations
   async createToolboxMeeting(meeting: InsertToolboxMeeting): Promise<ToolboxMeeting> {
     const result = await db.insert(toolboxMeetings).values(meeting).returning();
@@ -550,6 +554,10 @@ export class Storage {
       .where(eq(toolboxMeetings.id, id))
       .returning();
     return result[0];
+  }
+
+  async deleteToolboxMeeting(id: string): Promise<void> {
+    await db.delete(toolboxMeetings).where(eq(toolboxMeetings.id, id));
   }
 }
 

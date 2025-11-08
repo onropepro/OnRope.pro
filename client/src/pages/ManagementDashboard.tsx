@@ -551,6 +551,54 @@ export default function ManagementDashboard() {
     },
   });
 
+  const deleteInspectionMutation = useMutation({
+    mutationFn: async (inspectionId: string) => {
+      const response = await fetch(`/api/harness-inspections/${inspectionId}`, {
+        method: "DELETE",
+        credentials: "include",
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || "Failed to delete inspection");
+      }
+
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/harness-inspections"] });
+      setSelectedInspection(null);
+      toast({ title: "Harness inspection deleted successfully" });
+    },
+    onError: (error: Error) => {
+      toast({ title: "Error", description: error.message, variant: "destructive" });
+    },
+  });
+
+  const deleteMeetingMutation = useMutation({
+    mutationFn: async (meetingId: string) => {
+      const response = await fetch(`/api/toolbox-meetings/${meetingId}`, {
+        method: "DELETE",
+        credentials: "include",
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || "Failed to delete meeting");
+      }
+
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/toolbox-meetings"] });
+      setSelectedMeeting(null);
+      toast({ title: "Toolbox meeting deleted successfully" });
+    },
+    onError: (error: Error) => {
+      toast({ title: "Error", description: error.message, variant: "destructive" });
+    },
+  });
+
   const logDropsMutation = useMutation({
     mutationFn: async (data: DropLogFormData) => {
       const response = await fetch("/api/drops", {
@@ -727,6 +775,37 @@ export default function ManagementDashboard() {
       </header>
 
       <div className="p-4 max-w-4xl mx-auto">
+        {/* Quick Actions */}
+        <div className="mb-6">
+          <h2 className="text-sm font-semibold text-muted-foreground mb-3">Quick Actions</h2>
+          <div className="grid grid-cols-2 gap-3">
+            <Button
+              variant="outline"
+              className="h-auto flex-col gap-2 p-4"
+              onClick={() => setLocation("/harness-inspection")}
+              data-testid="button-harness-inspection"
+            >
+              <span className="material-icons text-primary">verified_user</span>
+              <div className="text-center">
+                <div className="font-semibold">Harness Inspection</div>
+                <div className="text-xs text-muted-foreground">Fill daily inspection form</div>
+              </div>
+            </Button>
+            <Button
+              variant="outline"
+              className="h-auto flex-col gap-2 p-4"
+              onClick={() => setLocation("/toolbox-meeting")}
+              data-testid="button-toolbox-meeting"
+            >
+              <span className="material-icons text-primary">group</span>
+              <div className="text-center">
+                <div className="font-semibold">Toolbox Meeting</div>
+                <div className="text-xs text-muted-foreground">Record safety meeting</div>
+              </div>
+            </Button>
+          </div>
+        </div>
+
         <Tabs value={activeTab} onValueChange={setActiveTab}>
           {/* Mobile Dropdown */}
           <div className="block sm:hidden mb-4">
