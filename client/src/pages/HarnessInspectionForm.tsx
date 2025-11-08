@@ -64,7 +64,7 @@ export default function HarnessInspectionForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Fetch projects for optional selection
-  const { data: projectsData } = useQuery({
+  const { data: projectsData } = useQuery<{ projects: any[] }>({
     queryKey: ["/api/projects"],
   });
 
