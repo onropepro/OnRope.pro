@@ -131,7 +131,7 @@ export default function ToolboxMeetingForm() {
         description: "Toolbox meeting recorded successfully",
       });
       queryClient.invalidateQueries({ queryKey: ["/api/toolbox-meetings"] });
-      navigate("/tech-dashboard");
+      navigate("/tech");
     },
     onError: (error: Error) => {
       toast({
@@ -158,7 +158,7 @@ export default function ToolboxMeetingForm() {
           <Button
             variant="ghost"
             size="icon"
-            onClick={() => navigate("/tech-dashboard")}
+            onClick={() => navigate("/tech")}
             data-testid="button-back"
           >
             <ArrowLeft className="h-5 w-5" />
