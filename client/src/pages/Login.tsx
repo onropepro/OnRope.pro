@@ -229,6 +229,16 @@ export default function Login() {
               Create Company Account
             </Button>
 
+            <Button 
+              variant="ghost" 
+              className="w-full h-10 text-sm" 
+              onClick={() => window.location.reload()}
+              data-testid="button-refresh"
+            >
+              <span className="material-icons mr-2 text-base">refresh</span>
+              Get Latest Update
+            </Button>
+
             {/* Mobile-only feature highlights */}
             <div className="md:hidden pt-4 space-y-4 border-t">
               <h3 className="text-sm font-semibold text-center">Built for All Stakeholders</h3>
