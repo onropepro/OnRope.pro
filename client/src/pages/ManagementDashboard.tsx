@@ -1143,7 +1143,8 @@ export default function ManagementDashboard() {
                           <CardContent className="p-6">
                             <div className="flex items-start justify-between mb-4">
                               <div className="flex-1">
-                                <div className="text-xl font-bold mb-1">{project.strataPlanNumber}</div>
+                                <div className="text-xl font-bold mb-1">{project.buildingName}</div>
+                                <div className="text-sm font-medium text-muted-foreground mb-1">{project.strataPlanNumber}</div>
                                 <div className="text-sm text-muted-foreground capitalize flex items-center gap-2">
                                   <span className="material-icons text-base">business</span>
                                   {project.jobType.replace(/_/g, ' ')}
