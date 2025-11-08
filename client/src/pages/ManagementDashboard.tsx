@@ -751,6 +751,12 @@ export default function ManagementDashboard() {
                     Employees
                   </div>
                 </SelectItem>
+                <SelectItem value="documents">
+                  <div className="flex items-center gap-2">
+                    <span className="material-icons text-sm">description</span>
+                    Documents
+                  </div>
+                </SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -777,6 +783,10 @@ export default function ManagementDashboard() {
               <TabsTrigger value="employees" data-testid="tab-employees" className="inline-flex items-center justify-center whitespace-nowrap rounded-full px-4 py-2 text-sm font-medium transition-all min-w-[110px] sm:min-w-0">
                 <span className="material-icons text-sm mr-2">people</span>
                 Employees
+              </TabsTrigger>
+              <TabsTrigger value="documents" data-testid="tab-documents" className="inline-flex items-center justify-center whitespace-nowrap rounded-full px-4 py-2 text-sm font-medium transition-all min-w-[110px] sm:min-w-0">
+                <span className="material-icons text-sm mr-2">description</span>
+                Documents
               </TabsTrigger>
             </TabsList>
             <ScrollBar orientation="horizontal" />
@@ -1886,6 +1896,29 @@ export default function ManagementDashboard() {
                 )}
               </div>
             </div>
+          </TabsContent>
+
+          <TabsContent value="documents">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <span className="material-icons">description</span>
+                  Harness Safety Inspections
+                </CardTitle>
+                <CardDescription>
+                  Daily harness inspection records organized by date
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="text-center py-12 text-muted-foreground">
+                  <span className="material-icons text-5xl mb-4 opacity-50">folder_open</span>
+                  <div className="text-lg mb-2">Documents Feature Coming Soon</div>
+                  <div className="text-sm">
+                    Harness inspections will be organized by Year &gt; Month &gt; Day with PDF download capability
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
           </TabsContent>
         </Tabs>
       </div>
