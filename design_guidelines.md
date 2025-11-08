@@ -1,165 +1,145 @@
-# Design Guidelines: Rope Access Management Platform (Premium Edition)
+# Design Guidelines: Rope Access Management Platform (Modern SaaS Edition)
 
-## System & Principles
+## Design System & Approach
 
-**Design System:** Material Design 3 with Premium Glass-Morphism Enhancements  
-**Core Principles:** Mobile-first (44px touch targets), sophisticated visual depth through layered glass effects and gradients, premium SaaS aesthetic, professional trustworthiness, data clarity with refined color coding.
+**Reference Systems:** Linear (hierarchy, spacing), Stripe (trust, precision), Vercel (contemporary boldness)  
+**Core Principles:** Mobile-first (44px touch targets), dramatic depth through shadows and spacing, vibrant contrast, clean white surfaces, premium SaaS aesthetic, cutting-edge professionalism.
 
 ## Color Palette
 
-**Primary Blues:**
-- Deep Navy: #0F172A (headers, primary text)
-- Ocean Blue: #1E40AF (primary actions, active states)
-- Sky Blue: #3B82F6 (secondary actions, links)
-- Ice Blue: #DBEAFE (light backgrounds, hover states)
+**Primary:**
+- Midnight: #0A0A0A (primary text, headers)
+- Slate: #71717A (secondary text)
+- Electric Blue: #3B82F6 (primary actions, links)
+- Indigo: #6366F1 (secondary actions)
 
-**Accents:**
-- Amber: #F59E0B (warnings, progress highlights)
-- Emerald: #10B981 (success, completed states)
-- Rose: #F43F5E (urgent, errors)
-- Violet: #8B5CF6 (premium features, pro badges)
+**Vibrant Accents:**
+- Coral: #FF6B6B (urgent, errors, high alerts)
+- Lime: #84CC16 (success, completed)
+- Amber: #F59E0B (warnings, progress)
+- Cyan: #06B6D4 (info, secondary highlights)
 
-**Neutrals:**
-- Slate-50: #F8FAFC (backgrounds)
-- Slate-100: #F1F5F9 (card backgrounds)
-- Slate-200: #E2E8F0 (borders)
-- Slate-600: #475569 (secondary text)
-- Slate-900: #0F172A (primary text)
+**Surfaces:**
+- Pure White: #FFFFFF (card backgrounds, main surface)
+- Ghost: #FAFAFA (page backgrounds)
+- Smoke: #F4F4F5 (subtle borders, dividers)
+- Charcoal: #18181B (dark mode elements, contrast blocks)
 
-**Gradients:**
-- Hero: linear-gradient(135deg, #1E40AF 0%, #3B82F6 100%)
-- Card Accent: linear-gradient(135deg, rgba(59,130,246,0.1) 0%, rgba(139,92,246,0.05) 100%)
-- Stats Highlight: linear-gradient(90deg, #3B82F6 0%, #8B5CF6 100%)
-
-## Typography (Roboto via Google Fonts)
+## Typography (Inter via Google Fonts)
 
 ```
-Display: 3rem/700/1.1/-0.02em
-H1: 2rem/700/1.2
-H2: 1.5rem/600/1.3
+Display: 3.5rem/800/1.05/-0.03em
+H1: 2.25rem/700/1.2/-0.02em
+H2: 1.75rem/700/1.3/-0.01em
 H3: 1.25rem/600/1.4
-Body Large: 1rem/400/1.6
-Body: 0.875rem/400/1.5
-Caption: 0.75rem/400/1.4/+0.4px
-Button: 0.875rem/500/uppercase/+0.5px
+Body Large: 1.125rem/400/1.6
+Body: 1rem/400/1.5
+Caption: 0.875rem/500/1.4
+Button: 0.9375rem/600/normal
 ```
 
 ## Layout & Spacing
 
-**Tailwind Units:** 2, 4, 6, 8  
-**Containers:** Mobile px-4 full-width, Desktop max-w-7xl centered, 240px fixed sidebar  
-**Grid Systems:** 2-col cards (md:), 4-col stats (lg:), gap-6 standard
+**Tailwind Units:** 2, 4, 8, 12  
+**Containers:** Mobile px-4 full-width, Desktop max-w-7xl mx-auto, Sidebar w-64 fixed  
+**Grid Systems:** 2-col md:, 3-col lg:, 4-col stats xl:, gap-8 for cards, gap-4 for tight groups
 
-## Visual Treatments
+## Elevation & Depth
 
-**Glass-Morphism Cards:**
+**Shadow System:**
 ```
-Background: rgba(255, 255, 255, 0.8)
-Backdrop Filter: blur(12px) saturate(180%)
-Border: 1px solid rgba(255, 255, 255, 0.3)
-Shadow: 0 8px 32px rgba(30, 64, 175, 0.08)
-Radius: 16px (rounded-2xl)
+sm: 0 1px 2px rgba(0,0,0,0.05)
+md: 0 4px 6px rgba(0,0,0,0.07)
+lg: 0 10px 15px rgba(0,0,0,0.08)
+xl: 0 20px 25px rgba(0,0,0,0.1)
+2xl: 0 25px 50px rgba(0,0,0,0.15)
 ```
 
-**Elevation System:**
-- Level 1 (Cards): shadow-lg + glass effect
-- Level 2 (Modals): shadow-2xl + darker glass (0.85 opacity)
-- Level 3 (Dropdowns): shadow-xl + border glow
+**Card Treatment:**  
+White background, rounded-2xl (16px), shadow-lg, 1px border (Smoke), p-6 standard, hover: shadow-xl + slight lift (-2px).
 
-**Depth Techniques:**
-- Layered shadows (multi-layer rgba with different spreads)
-- Gradient overlays on sections
-- Subtle inner shadows on inputs
-- Border gradients on premium elements
+**Critical Depth:**  
+Multi-layer shadows for floating elements, generous whitespace (p-8 to p-12 on large sections), border contrast for separation.
 
 ## Navigation
 
-**Top App Bar** (h-16):  
-Glass-morphism treatment with gradient underline (h-0.5), backdrop-blur-md, logo 48px with subtle glow, breadcrumbs with chevron separators, avatar with status indicator ring.
+**Top Bar (h-16):**  
+White background, shadow-sm, logo 40px height, sharp black text nav items, Electric Blue active underline (3px), user avatar 36px with Smoke ring.
 
-**Bottom Nav** (Mobile, h-16):  
-Glass background, gradient active indicator (h-1), 24px icons with 8px dot badges, smooth 200ms transitions, safe-area padding.
+**Mobile Bottom Nav (h-16):**  
+White background, shadow-2xl, Electric Blue active state (bg + icon), 24px icons, 6px dot badges (Coral/Lime), safe-area-inset-bottom.
 
-**Desktop Sidebar** (w-60):  
-Deep navy gradient background, glass-effect active states, 4px gradient left accent, grouped sections with gradient dividers, collapse animation 300ms.
+**Desktop Sidebar (w-64):**  
+Ghost background, active item: white bg + shadow-md + Electric Blue left accent (4px), grouped sections with Smoke dividers (1px), collapsed state w-20.
+
+## Hero Section
+
+**Layout:**  
+Full-width image (1920×800px) of rope access technicians on dramatic high-rise, dark gradient overlay (rgba(10,10,10,0.4)), Display white text with strong contrast, two CTAs side-by-side (Electric Blue solid + white outlined with blur backdrop), py-24 vertical spacing.
+
+**Stats Panel (Below Hero):**  
+White card, shadow-2xl, rounded-3xl, -mt-16 (overlapping hero), p-8, 2×2 grid stats (Display numbers in Midnight, Caption labels in Slate), vertical Smoke dividers, Cyan accent icons 40px.
 
 ## Core Components
 
-### Hero Section
-Full-width gradient background (1920×600px image + 70% overlay), glass-morphism CTAs with backdrop-blur-sm, Display white text with subtle text-shadow, h-12 buttons with glass treatment, 96px icon with gradient fill.
+**Project Cards:**  
+White bg, rounded-2xl, shadow-lg, p-6, 120×120px building thumbnail (rounded-xl, shadow-md), H3 title (Midnight), status badge (rounded-full, vibrant bg, white text, px-3 py-1), metadata row (Slate text, 16px icons), H2 completion percentage (Electric Blue), progress bar (h-2, rounded-full, Ghost bg, vibrant fill), hover: shadow-xl transform.
 
-### Hero Stats Panel
-Glass card (p-8, rounded-2xl), gradient border (1px), Display metric with gradient text fill, 2×2 grid stats (H1 + caption + gradient icons 32px), animated progress bar with gradient fill, floating effect on hover.
+**High-Rise Visualization:**  
+SVG building silhouette (floor_count × 50px), Charcoal outline, window grid (color-coded: Lime completed, Amber in-progress, Smoke pending), floor number labels (Slate), rooftop detail, strong drop shadow.
 
-### Project Cards
-Glass-morphism elevated cards (p-6, rounded-2xl), 80×80px thumbnail with gradient border, H3 title (Navy), gradient status badge, metadata row with icon-text pairs, H2 percentage with gradient text, gradient progress bar (h-3), glass CTA button with blur, hover lift + glow effect.
-
-### High-Rise Visualization
-SVG building (floor_count × 45px, max 600px), gradient fill, window states with color-coded fills, floor labels with glass backgrounds, rooftop detail with gradient, subtle drop shadow, animated completion states.
-
-### Complaint Cards
-Glass cards (p-4, rounded-xl), urgency badge with gradient, H3 name (Navy), icon-text metadata, 2-line preview, gradient status bar on left edge, swipe actions with glass backgrounds.
+**Complaint Cards:**  
+White bg, rounded-xl, shadow-md, p-4, urgency badge (Coral/Amber/Lime rounded-full), H3 name (Midnight), icon-text metadata (Slate), 2-line preview, left accent bar (4px vibrant color), swipe actions reveal (Coral delete, Electric Blue resolve).
 
 ## Forms
 
 **Text Inputs:**  
-Glass backgrounds, h-12, rounded-xl, gradient focus ring (2px), floating labels with smooth 200ms animation, icon prefixes with gradient fills, error states with rose gradient glow.
+White bg, h-12, rounded-lg, Smoke border (2px), Electric Blue focus ring (3px), floating label animation (200ms), icon prefix (Slate), error: Coral border + text.
 
-**Multi-Step Forms:**  
-Gradient progress stepper (connecting lines), glass step circles (40px), active step with gradient fill, p-6 sections with glass dividers, sticky bottom nav with glass background.
+**Multi-Step:**  
+Horizontal stepper, numbered circles (44px), Electric Blue active/completed, Smoke connector lines (2px), white section cards, shadow-md, sticky bottom actions bar (white bg, shadow-2xl).
 
 **File Upload:**  
-Glass dashed border (2px), h-40, gradient hover state, 48px gradient icon, thumbnail previews with glass frames, remove button with blur effect.
-
-**Date Pickers:**  
-Glass modal (mobile) / floating dropdown (desktop), gradient quick chips, calendar grid with glass cells, gradient selected state.
+White bg, Smoke dashed border (2px), h-48, rounded-xl, Electric Blue hover state, 56px upload icon, thumbnail grid (rounded-lg, shadow-sm), Coral remove button.
 
 ## Data Display
 
 **Employee Directory:**  
-Glass list items (h-20), 40px avatars with gradient rings, role badges with gradient backgrounds, hover states with subtle glow, sticky glass search bar with blur.
+White list cards, shadow-sm, h-24, 48px avatars (rounded-full, shadow-md), role badge (Ghost bg, Midnight text), Slate metadata, sticky search bar (white, shadow-md, h-14).
 
-**Manager Stats:**  
-Glass cards (p-6) with gradient accent borders, Display numbers with gradient fills, trend indicators with colored icons, integrated gradient charts, chip tabs with glass active states.
+**Manager Dashboard:**  
+White cards, shadow-lg, p-8, Display metrics (Midnight), trend arrows (Lime/Coral), integrated charts (vibrant accent colors), tab navigation (Electric Blue active underline 3px).
 
 **Complaint Detail:**  
-Glass hero card with gradient header, timeline with gradient connector lines, accordion sections with glass backgrounds, 56px FAB with gradient fill + shadow-2xl, sticky glass action bar.
+White hero card, shadow-xl, rounded-3xl, p-8, timeline (Electric Blue connector, 12px dots), accordion sections (white, shadow-sm), 56px FAB (Electric Blue, shadow-2xl, fixed bottom-right).
 
-## Interactive Elements
+## Buttons
 
-**Buttons:**
-```
-Primary: h-12 px-8 rounded-xl gradient fill shadow-lg
-Secondary: h-12 px-8 rounded-xl glass outlined gradient border
-Text: h-12 px-4 gradient text on hover
-Icon: 44×44px glass background 24px icon
-FAB: 56px gradient fill shadow-2xl glow effect
-```
+**Primary:** h-12 px-8 rounded-lg Electric Blue bg white text shadow-md  
+**Secondary:** h-12 px-8 rounded-lg white bg Electric Blue text Smoke border (2px)  
+**Danger:** h-12 px-8 rounded-lg Coral bg white text  
+**Icon:** 44×44px white bg shadow-sm 24px icon  
+**FAB:** 56px Electric Blue shadow-2xl white icon
 
-**Status Badges:**  
-Glass backgrounds, gradient borders, px-3 py-1.5 rounded-full, 16px gradient icon prefix, specific color coding per state.
+## Status Badges
 
-**Search:**  
-h-12 rounded-full glass background, 20px gradient icon, X clear with hover glow, gradient focus ring.
-
-**Filters:**  
-Glass sheet/sidebar, gradient section headers, multi-select chips with glass + gradient active states, gradient Apply button.
+Rounded-full, vibrant bg, white text, px-4 py-1.5, 18px icon prefix, shadow-sm: Lime (completed), Amber (progress), Coral (urgent), Cyan (info).
 
 ## Images
 
-**Hero Image (Dashboard):**  
-1920×600px professional rope access technicians on modern high-rise, gradient overlay (70% #1E40AF to transparent), glass-morphism CTAs with backdrop-blur-sm positioned over image, subtle vignette effect.
+**Hero Image:**  
+1920×800px professional photograph: rope access technicians working on modern glass high-rise facade at golden hour, sharp focus, dynamic angles, dramatic sky, dark overlay (40%) for text contrast.
 
 **Project Thumbnails:**  
-80×80px building/work photos, gradient border frames, rounded-xl, fallback gradient backgrounds with building silhouette icons.
+120×120px building/maintenance photos, rounded-xl, shadow-md, fallback: Charcoal bg with white building icon 48px.
 
-**Background Textures:**  
-Subtle dot patterns (2px opacity 5%) on glass cards for depth, gradient mesh overlays on major sections.
+**Section Accents:**  
+Minimal use - prefer strong typography and layout over decorative imagery.
 
 ## Animations
 
-Page transitions 200ms, glass hover effects 150ms, gradient shifts 300ms, success checkmark 500ms scale-bounce, progress fills with gradient animation 400ms. Avoid scroll-triggered or parallax effects.
+Page transitions 150ms, card hover 200ms, button interactions 100ms, success states 400ms scale. Disable for prefers-reduced-motion.
 
 ## Accessibility
 
-WCAG AA contrast on all glass backgrounds, 2px gradient focus rings, semantic HTML, 44×44px touch targets, haptic feedback on critical actions, reduced motion support, safe-area insets for notched devices.
+WCAG AA contrast ratios, 3px focus rings (Electric Blue), semantic HTML, 44×44px touch targets, haptic feedback on mobile, safe-area handling.

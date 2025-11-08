@@ -2,7 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
-/* LIGHT MODE - Premium Modern Design */
+/* LIGHT MODE - Modern Bold SaaS Design */
 :root {
   --button-outline: rgba(0,0,0, .10);
   --badge-outline: rgba(0,0,0, .05);
@@ -14,100 +14,105 @@
   --elevate-1: rgba(0,0,0, .03);
   --elevate-2: rgba(0,0,0, .08);
 
-  /* Modern sophisticated background - subtle slate instead of pure white */
-  --background: 220 9% 97%;
+  /* Ghost - Clean minimal page background */
+  --background: 0 0% 98%;
 
-  --foreground: 222 47% 11%;
+  /* Midnight - Strong contrast text */
+  --foreground: 0 0% 4%;
 
-  --border: 220 13% 88%;
+  /* Smoke - Subtle borders */
+  --border: 0 0% 91%;
 
-  /* Card with glass-morphism feel - slightly elevated from background */
+  /* Pure White - Clean card surfaces */
   --card: 0 0% 100%;
 
-  --card-foreground: 222 47% 11%;
+  --card-foreground: 0 0% 4%;
 
-  --card-border: 220 13% 91%;
+  --card-border: 0 0% 91%;
 
-  /* Sidebar with deeper tone for contrast */
-  --sidebar: 220 14% 96%;
+  /* Sidebar - Ghost background */
+  --sidebar: 0 0% 98%;
 
-  --sidebar-foreground: 222 47% 11%;
+  --sidebar-foreground: 0 0% 4%;
 
-  --sidebar-border: 220 13% 90%;
+  --sidebar-border: 0 0% 91%;
 
-  /* Ocean Blue primary - professional and trustworthy */
+  /* Electric Blue - Modern vibrant primary */
   --sidebar-primary: 217 91% 60%;
 
-  --sidebar-primary-foreground: 210 100% 98%;
+  --sidebar-primary-foreground: 0 0% 100%;
 
-  --sidebar-accent: 220 13% 91%;
+  --sidebar-accent: 0 0% 96%;
 
-  --sidebar-accent-foreground: 222 47% 20%;
+  --sidebar-accent-foreground: 0 0% 10%;
 
   --sidebar-ring: 217 91% 60%;
 
   --popover: 0 0% 100%;
 
-  --popover-foreground: 222 47% 11%;
+  --popover-foreground: 0 0% 4%;
 
-  --popover-border: 220 13% 91%;
+  --popover-border: 0 0% 91%;
 
-  /* Ocean Blue primary for actions */
+  /* Electric Blue - Primary actions */
   --primary: 217 91% 60%;
 
-  --primary-foreground: 210 100% 98%;
+  --primary-foreground: 0 0% 100%;
 
-  --secondary: 220 9% 91%;
+  /* Ghost secondary */
+  --secondary: 0 0% 96%;
 
-  --secondary-foreground: 222 47% 20%;
+  --secondary-foreground: 0 0% 10%;
 
-  --muted: 220 13% 92%;
+  /* Muted states */
+  --muted: 0 0% 96%;
 
-  --muted-foreground: 215 16% 47%;
+  --muted-foreground: 0 0% 45%;
 
-  --accent: 220 14% 91%;
+  /* Accent - slightly darker than muted */
+  --accent: 0 0% 96%;
 
-  --accent-foreground: 222 47% 20%;
+  --accent-foreground: 0 0% 10%;
 
-  /* Rose for errors/urgent items */
-  --destructive: 348 83% 58%;
+  /* Coral for errors/urgent items */
+  --destructive: 0 71% 71%;
 
   --destructive-foreground: 0 0% 100%;
 
-  /* Amber for warnings and progress */
+  /* Amber for warnings */
   --warning: 38 92% 50%;
 
-  --warning-foreground: 26 83% 14%;
+  --warning-foreground: 0 0% 100%;
 
-  /* Success green for completed states */
-  --success: 142 76% 36%;
+  /* Lime for success/completed states */
+  --success: 84 81% 44%;
 
   --success-foreground: 0 0% 100%;
 
-  --input: 220 13% 85%;
+  --input: 0 0% 91%;
   --ring: 217 91% 60%;
   
-  /* Chart colors - sophisticated palette */
+  /* Chart colors - vibrant modern palette */
   --chart-1: 217 91% 60%;
   --chart-2: 38 92% 50%;
-  --chart-3: 142 76% 36%;
-  --chart-4: 262 83% 58%;
-  --chart-5: 348 83% 58%;
+  --chart-3: 84 81% 44%;
+  --chart-4: 271 81% 66%;
+  --chart-5: 0 71% 71%;
 
-  --font-sans: Roboto, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-sans: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   --font-serif: Georgia, serif;
-  --font-mono: "Roboto Mono", Menlo, monospace;
-  --radius: .75rem; /* 12px - more modern rounded corners */
+  --font-mono: "JetBrains Mono", Menlo, monospace;
+  --radius: 1rem; /* 16px - modern rounded corners */
   
-  /* Enhanced shadow system for depth */
-  --shadow-2xs: 0px 1px 2px 0px rgba(30, 64, 175, 0.05);
-  --shadow-xs: 0px 1px 3px 0px rgba(30, 64, 175, 0.08);
-  --shadow-sm: 0px 2px 4px -1px rgba(30, 64, 175, 0.08), 0px 1px 2px -1px rgba(30, 64, 175, 0.06);
-  --shadow: 0px 4px 6px -1px rgba(30, 64, 175, 0.10), 0px 2px 4px -2px rgba(30, 64, 175, 0.06);
-  --shadow-md: 0px 6px 10px -2px rgba(30, 64, 175, 0.12), 0px 2px 4px -2px rgba(30, 64, 175, 0.08);
-  --shadow-lg: 0px 12px 20px -4px rgba(30, 64, 175, 0.15), 0px 4px 8px -4px rgba(30, 64, 175, 0.08);
-  --shadow-xl: 0px 20px 30px -6px rgba(30, 64, 175, 0.18), 0px 8px 12px -6px rgba(30, 64, 175, 0.10);
-  --shadow-2xl: 0px 25px 50px -12px rgba(30, 64, 175, 0.20);
+  /* Dramatic shadow system for strong depth */
+  --shadow-2xs: 0 1px 2px rgba(0,0,0,0.05);
+  --shadow-xs: 0 1px 3px rgba(0,0,0,0.06);
+  --shadow-sm: 0 4px 6px rgba(0,0,0,0.07);
+  --shadow: 0 6px 10px rgba(0,0,0,0.08);
+  --shadow-md: 0 8px 15px rgba(0,0,0,0.09);
+  --shadow-lg: 0 10px 20px rgba(0,0,0,0.10);
+  --shadow-xl: 0 20px 25px rgba(0,0,0,0.12);
+  --shadow-2xl: 0 25px 50px rgba(0,0,0,0.15);
   
   --tracking-normal: 0em;
   --spacing: 0.25rem;
@@ -153,89 +158,89 @@
   --elevate-1: rgba(255,255,255, .04);
   --elevate-2: rgba(255,255,255, .09);
 
-  /* Deep navy background for sophisticated dark mode */
-  --background: 222 47% 11%;
+  /* Charcoal - Deep dramatic background */
+  --background: 0 0% 9%;
 
-  --foreground: 210 40% 96%;
+  --foreground: 0 0% 98%;
 
-  --border: 215 20% 20%;
+  --border: 0 0% 20%;
 
-  /* Elevated card on dark background */
-  --card: 217 33% 17%;
+  /* Elevated dark card */
+  --card: 0 0% 13%;
 
-  --card-foreground: 210 40% 96%;
+  --card-foreground: 0 0% 98%;
 
-  --card-border: 215 20% 23%;
+  --card-border: 0 0% 20%;
 
-  --sidebar: 217 33% 14%;
+  --sidebar: 0 0% 9%;
 
-  --sidebar-foreground: 210 40% 96%;
+  --sidebar-foreground: 0 0% 98%;
 
-  --sidebar-border: 215 20% 20%;
+  --sidebar-border: 0 0% 20%;
 
-  /* Lighter blue for dark mode visibility */
-  --sidebar-primary: 217 91% 65%;
+  /* Electric Blue - vibrant on dark */
+  --sidebar-primary: 217 91% 60%;
 
-  --sidebar-primary-foreground: 222 47% 11%;
+  --sidebar-primary-foreground: 0 0% 100%;
 
-  --sidebar-accent: 215 20% 23%;
+  --sidebar-accent: 0 0% 15%;
 
-  --sidebar-accent-foreground: 210 40% 90%;
+  --sidebar-accent-foreground: 0 0% 95%;
 
-  --sidebar-ring: 217 91% 65%;
+  --sidebar-ring: 217 91% 60%;
 
-  --popover: 217 33% 17%;
+  --popover: 0 0% 13%;
 
-  --popover-foreground: 210 40% 96%;
+  --popover-foreground: 0 0% 98%;
 
-  --popover-border: 215 20% 23%;
+  --popover-border: 0 0% 20%;
 
-  --primary: 217 91% 65%;
+  --primary: 217 91% 60%;
 
-  --primary-foreground: 222 47% 11%;
+  --primary-foreground: 0 0% 100%;
 
-  --secondary: 215 20% 23%;
+  --secondary: 0 0% 15%;
 
-  --secondary-foreground: 210 40% 90%;
+  --secondary-foreground: 0 0% 95%;
 
-  --muted: 215 20% 20%;
+  --muted: 0 0% 15%;
 
-  --muted-foreground: 217 20% 65%;
+  --muted-foreground: 0 0% 60%;
 
-  --accent: 215 20% 23%;
+  --accent: 0 0% 15%;
 
-  --accent-foreground: 210 40% 90%;
+  --accent-foreground: 0 0% 95%;
 
-  --destructive: 348 83% 62%;
+  --destructive: 0 71% 71%;
 
   --destructive-foreground: 0 0% 100%;
 
   --warning: 38 92% 60%;
 
-  --warning-foreground: 26 83% 14%;
+  --warning-foreground: 0 0% 100%;
 
-  --success: 142 71% 45%;
+  --success: 84 81% 50%;
 
   --success-foreground: 0 0% 100%;
 
-  --input: 215 20% 25%;
-  --ring: 217 91% 65%;
+  --input: 0 0% 20%;
+  --ring: 217 91% 60%;
   
-  --chart-1: 217 91% 65%;
+  --chart-1: 217 91% 60%;
   --chart-2: 38 92% 60%;
-  --chart-3: 142 71% 45%;
-  --chart-4: 262 83% 65%;
-  --chart-5: 348 83% 62%;
+  --chart-3: 84 81% 50%;
+  --chart-4: 271 81% 66%;
+  --chart-5: 0 71% 71%;
 
-  /* Enhanced shadows for dark mode with blue tint */
-  --shadow-2xs: 0px 1px 2px 0px rgba(0, 0, 0, 0.40);
-  --shadow-xs: 0px 1px 3px 0px rgba(0, 0, 0, 0.45);
-  --shadow-sm: 0px 2px 4px -1px rgba(0, 0, 0, 0.40), 0px 1px 2px -1px rgba(0, 0, 0, 0.35);
-  --shadow: 0px 4px 6px -1px rgba(0, 0, 0, 0.45), 0px 2px 4px -2px rgba(0, 0, 0, 0.35);
-  --shadow-md: 0px 6px 10px -2px rgba(0, 0, 0, 0.50), 0px 2px 4px -2px rgba(0, 0, 0, 0.35);
-  --shadow-lg: 0px 12px 20px -4px rgba(0, 0, 0, 0.55), 0px 4px 8px -4px rgba(0, 0, 0, 0.40);
-  --shadow-xl: 0px 20px 30px -6px rgba(0, 0, 0, 0.60), 0px 8px 12px -6px rgba(0, 0, 0, 0.45);
-  --shadow-2xl: 0px 25px 50px -12px rgba(0, 0, 0, 0.65);
+  /* Dramatic shadows for dark mode depth */
+  --shadow-2xs: 0 1px 2px rgba(0,0,0,0.50);
+  --shadow-xs: 0 1px 3px rgba(0,0,0,0.55);
+  --shadow-sm: 0 4px 6px rgba(0,0,0,0.60);
+  --shadow: 0 6px 10px rgba(0,0,0,0.65);
+  --shadow-md: 0 8px 15px rgba(0,0,0,0.70);
+  --shadow-lg: 0 10px 20px rgba(0,0,0,0.75);
+  --shadow-xl: 0 20px 25px rgba(0,0,0,0.80);
+  --shadow-2xl: 0 25px 50px rgba(0,0,0,0.85);
 
   /* Automatically computed borders - intensity can be controlled by the user by the --opaque-button-border-intensity setting */
   
@@ -275,20 +280,6 @@
 
   body {
     @apply font-sans antialiased bg-background text-foreground;
-  }
-
-  /* Add subtle texture for depth */
-  body::before {
-    content: "";
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-image: radial-gradient(circle at 2px 2px, rgba(59, 130, 246, 0.03) 1px, transparent 1px);
-    background-size: 40px 40px;
-    pointer-events: none;
-    z-index: 0;
   }
 }
 
@@ -403,58 +394,11 @@
     inset: -1px;
   }
 
-  /* Glass-morphism effect utility */
-  .glass-card {
-    background: rgba(255, 255, 255, 0.85);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    box-shadow: 0 8px 32px rgba(30, 64, 175, 0.08);
-  }
-
-  .dark .glass-card {
-    background: rgba(31, 41, 55, 0.7);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-  }
-
-  /* Dot pattern background */
-  .dot-pattern {
-    background-image: radial-gradient(circle, rgba(30, 64, 175, 0.05) 1px, transparent 1px);
-    background-size: 20px 20px;
-  }
-
-  .dark .dot-pattern {
-    background-image: radial-gradient(circle, rgba(59, 130, 246, 0.08) 1px, transparent 1px);
-  }
-
-  /* Premium gradient backgrounds */
-  .gradient-bg {
-    background: linear-gradient(135deg, #EFF6FF 0%, #DBEAFE 50%, #BFDBFE 100%);
-  }
-
-  .dark .gradient-bg {
-    background: linear-gradient(135deg, #0F172A 0%, #1E293B 50%, #334155 100%);
-  }
-
-  .gradient-accent {
-    background: linear-gradient(135deg, rgba(59,130,246,0.1) 0%, rgba(139,92,246,0.05) 100%);
-  }
-
   /* Gradient text utility */
   .gradient-text {
     background: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--chart-4)) 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
-  }
-
-  /* Enhanced shadows */
-  .shadow-premium {
-    box-shadow: 0 12px 20px -4px rgba(30, 64, 175, 0.15), 0 4px 8px -4px rgba(30, 64, 175, 0.08);
-  }
-
-  .dark .shadow-premium {
-    box-shadow: 0 12px 20px -4px rgba(0, 0, 0, 0.4), 0 4px 8px -4px rgba(0, 0, 0, 0.2);
   }
 }
