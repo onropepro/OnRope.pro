@@ -14,8 +14,8 @@
   --elevate-1: rgba(0,0,0, .03);
   --elevate-2: rgba(0,0,0, .08);
 
-  /* Slate - Darker background for drama */
-  --background: 0 0% 93%;
+  /* Charcoal - Much darker background for maximum drama */
+  --background: 0 0% 88%;
 
   /* Midnight - Strong contrast text */
   --foreground: 0 0% 4%;
