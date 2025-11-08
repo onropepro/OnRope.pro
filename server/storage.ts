@@ -1,6 +1,6 @@
 import { db } from "./db";
-import { users, projects, dropLogs, workSessions, complaints, complaintNotes, projectPhotos } from "@shared/schema";
-import type { User, InsertUser, Project, InsertProject, DropLog, InsertDropLog, WorkSession, InsertWorkSession, Complaint, InsertComplaint, ComplaintNote, InsertComplaintNote, ProjectPhoto, InsertProjectPhoto } from "@shared/schema";
+import { users, projects, dropLogs, workSessions, complaints, complaintNotes, projectPhotos, harnessInspections } from "@shared/schema";
+import type { User, InsertUser, Project, InsertProject, DropLog, InsertDropLog, WorkSession, InsertWorkSession, Complaint, InsertComplaint, ComplaintNote, InsertComplaintNote, ProjectPhoto, InsertProjectPhoto, HarnessInspection, InsertHarnessInspection } from "@shared/schema";
 import { eq, and, desc, sql, isNull } from "drizzle-orm";
 import bcrypt from "bcrypt";
 
@@ -469,6 +469,38 @@ export class Storage {
 
   async deleteProjectPhoto(photoId: string): Promise<void> {
     await db.delete(projectPhotos).where(eq(projectPhotos.id, photoId));
+  }
+
+  // Harness inspection operations
+  async createHarnessInspection(inspection: InsertHarnessInspection): Promise<HarnessInspection> {
+    const result = await db.insert(harnessInspections).values(inspection).returning();
+    return result[0];
+  }
+
+  async getHarnessInspectionsByCompany(companyId: string): Promise<HarnessInspection[]> {
+    return db.select().from(harnessInspections)
+      .where(eq(harnessInspections.companyId, companyId))
+      .orderBy(desc(harnessInspections.inspectionDate), desc(harnessInspections.createdAt));
+  }
+
+  async getHarnessInspectionsByWorker(workerId: string): Promise<HarnessInspection[]> {
+    return db.select().from(harnessInspections)
+      .where(eq(harnessInspections.workerId, workerId))
+      .orderBy(desc(harnessInspections.inspectionDate));
+  }
+
+  async getHarnessInspectionsByProject(projectId: string): Promise<HarnessInspection[]> {
+    return db.select().from(harnessInspections)
+      .where(eq(harnessInspections.projectId, projectId))
+      .orderBy(desc(harnessInspections.inspectionDate));
+  }
+
+  async updateHarnessInspection(id: string, pdfUrl: string): Promise<HarnessInspection> {
+    const result = await db.update(harnessInspections)
+      .set({ pdfUrl })
+      .where(eq(harnessInspections.id, id))
+      .returning();
+    return result[0];
   }
 }
 
