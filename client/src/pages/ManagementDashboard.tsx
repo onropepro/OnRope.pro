@@ -802,6 +802,18 @@ export default function ManagementDashboard() {
                     </div>
                     <div className="overflow-y-auto flex-1 p-6">
                       <Form {...projectForm}>
+                        {Object.keys(projectForm.formState.errors).length > 0 && (
+                          <div className="mb-4 p-4 bg-destructive/10 border border-destructive rounded-md">
+                            <div className="font-semibold text-destructive mb-2">Form Errors:</div>
+                            <div className="text-sm space-y-1">
+                              {Object.entries(projectForm.formState.errors).map(([key, error]: [string, any]) => (
+                                <div key={key} className="text-destructive">
+                                  • {key}: {error?.message || 'Invalid'}
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        )}
                         <form onSubmit={projectForm.handleSubmit(onProjectSubmit, (errors) => {
                           console.log("Form validation errors:", errors);
                           toast({ 
