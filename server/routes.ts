@@ -1604,12 +1604,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const noteData = insertComplaintNoteSchema.parse({
         complaintId: req.params.complaintId,
         userId: req.session.userId,
-        userName: currentUser.name || currentUser.email || "Staff",
         note: req.body.note,
         visibleToResident: req.body.visibleToResident || false,
       });
       
-      const note = await storage.createComplaintNote(noteData);
+      const noteWithUserName = {
+        ...noteData,
+        userName: currentUser.name || currentUser.email || "Staff",
+      };
+      
+      const note = await storage.createComplaintNote(noteWithUserName);
       res.json({ note });
     } catch (error) {
       if (error instanceof z.ZodError) {
