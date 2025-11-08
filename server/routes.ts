@@ -1,7 +1,7 @@
 import type { Express, Request, Response, NextFunction } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { insertUserSchema, insertProjectSchema, insertDropLogSchema, insertComplaintSchema, insertComplaintNoteSchema, insertHarnessInspectionSchema, insertToolboxMeetingSchema, normalizeStrataPlan } from "@shared/schema";
+import { insertUserSchema, insertProjectSchema, insertDropLogSchema, insertComplaintSchema, insertComplaintNoteSchema, insertJobCommentSchema, insertHarnessInspectionSchema, insertToolboxMeetingSchema, normalizeStrataPlan } from "@shared/schema";
 import { z } from "zod";
 import bcrypt from "bcrypt";
 import multer from "multer";
@@ -1604,7 +1604,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const noteData = insertComplaintNoteSchema.parse({
         complaintId: req.params.complaintId,
         userId: req.session.userId,
+        userName: currentUser.name || currentUser.email || "Staff",
         note: req.body.note,
+        visibleToResident: req.body.visibleToResident || false,
       });
       
       const note = await storage.createComplaintNote(noteData);
@@ -1771,6 +1773,53 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({ message: "Toolbox meeting deleted successfully" });
     } catch (error) {
       console.error("Delete toolbox meeting error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // ==================== JOB COMMENTS ROUTES ====================
+  
+  // Create job comment
+  app.post("/api/projects/:projectId/comments", requireAuth, requireRole("rope_access_tech", "supervisor", "operations_manager", "company"), async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      const companyId = currentUser.role === "company" ? currentUser.id : currentUser.companyId;
+      
+      if (!companyId) {
+        return res.status(400).json({ message: "Unable to determine company" });
+      }
+      
+      const commentData = insertJobCommentSchema.parse({
+        projectId: req.params.projectId,
+        companyId,
+        userId: currentUser.id,
+        userName: currentUser.name || currentUser.email || "Unknown User",
+        comment: req.body.comment,
+      });
+      
+      const comment = await storage.createJobComment(commentData);
+      res.json({ comment });
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Validation error", errors: error.errors });
+      }
+      console.error("Create job comment error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+  
+  // Get job comments for a project
+  app.get("/api/projects/:projectId/comments", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const comments = await storage.getJobCommentsByProject(req.params.projectId);
+      res.json({ comments });
+    } catch (error) {
+      console.error("Get job comments error:", error);
       res.status(500).json({ message: "Internal server error" });
     }
   });

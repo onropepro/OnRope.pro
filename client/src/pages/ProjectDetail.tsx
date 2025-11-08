@@ -30,6 +30,7 @@ export default function ProjectDetail() {
   const [photoUnitNumber, setPhotoUnitNumber] = useState("");
   const [photoComment, setPhotoComment] = useState("");
   const [selectedMeeting, setSelectedMeeting] = useState<any>(null);
+  const [newComment, setNewComment] = useState("");
 
   const { data: projectData, isLoading } = useQuery({
     queryKey: ["/api/projects", id],
@@ -72,12 +73,19 @@ export default function ProjectDetail() {
     enabled: !!id,
   });
 
+  // Fetch job comments for this project
+  const { data: commentsData } = useQuery({
+    queryKey: ["/api/projects", id, "comments"],
+    enabled: !!id,
+  });
+
   const project = projectData?.project as Project | undefined;
   const workSessions = workSessionsData?.sessions || [];
   const residents = residentsData?.residents || [];
   const complaints = complaintsData?.complaints || [];
   const photos = photosData?.photos || [];
   const toolboxMeetings = toolboxMeetingsData?.meetings || [];
+  const jobComments = commentsData?.comments || [];
   
   // Only company and operations_manager can delete projects
   const canDeleteProject = currentUser?.role === "company" || currentUser?.role === "operations_manager";
@@ -105,6 +113,32 @@ export default function ProjectDetail() {
       queryClient.invalidateQueries({ queryKey: ["/api/projects"] });
       toast({ title: "Project deleted successfully" });
       setLocation("/management");
+    },
+    onError: (error: Error) => {
+      toast({ title: "Error", description: error.message, variant: "destructive" });
+    },
+  });
+
+  const createCommentMutation = useMutation({
+    mutationFn: async (comment: string) => {
+      const response = await fetch(`/api/projects/${id}/comments`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ comment }),
+        credentials: "include",
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || "Failed to post comment");
+      }
+
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/projects", id, "comments"] });
+      setNewComment("");
+      toast({ title: "Comment posted successfully" });
     },
     onError: (error: Error) => {
       toast({ title: "Error", description: error.message, variant: "destructive" });
@@ -626,6 +660,66 @@ export default function ProjectDetail() {
                       </Card>
                     );
                   })}
+                </div>
+              )}
+            </div>
+
+            <Separator />
+
+            {/* Job Comments Section */}
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <div className="text-sm text-muted-foreground">Job Comments</div>
+                <Badge variant="secondary" className="text-xs">
+                  {jobComments.length} {jobComments.length === 1 ? 'comment' : 'comments'}
+                </Badge>
+              </div>
+
+              {/* Comment Form */}
+              <div className="space-y-2">
+                <Textarea
+                  placeholder="Add a comment about this project..."
+                  value={newComment}
+                  onChange={(e) => setNewComment(e.target.value)}
+                  className="min-h-20"
+                  data-testid="input-job-comment"
+                />
+                <Button
+                  onClick={() => {
+                    if (newComment.trim()) {
+                      createCommentMutation.mutate(newComment.trim());
+                    }
+                  }}
+                  disabled={!newComment.trim() || createCommentMutation.isPending}
+                  className="w-full h-12"
+                  data-testid="button-post-comment"
+                >
+                  {createCommentMutation.isPending ? "Posting..." : "Post Comment"}
+                </Button>
+              </div>
+
+              {/* Comments List */}
+              {jobComments.length === 0 ? (
+                <div className="text-center py-6 text-muted-foreground text-sm border rounded-lg">
+                  No comments yet. Be the first to comment!
+                </div>
+              ) : (
+                <div className="space-y-2">
+                  {jobComments.map((comment: any) => (
+                    <Card key={comment.id} className="border">
+                      <CardContent className="p-3">
+                        <div className="flex items-start justify-between gap-2 mb-2">
+                          <div className="flex-1 min-w-0">
+                            <div className="text-sm font-medium">{comment.userName}</div>
+                            <div className="text-xs text-muted-foreground">
+                              {format(new Date(comment.createdAt), "MMM d, yyyy 'at' h:mm a")}
+                            </div>
+                          </div>
+                        </div>
+                        <p className="text-sm whitespace-pre-wrap">{comment.comment}</p>
+                      </CardContent>
+                    </Card>
+                  ))}
                 </div>
               )}
             </div>

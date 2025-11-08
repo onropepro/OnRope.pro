@@ -482,6 +482,7 @@ export const insertComplaintSchema = createInsertSchema(complaints).omit({
 export const insertComplaintNoteSchema = createInsertSchema(complaintNotes).omit({
   id: true,
   createdAt: true,
+  userName: true, // Set server-side
 });
 
 export const insertProjectPhotoSchema = createInsertSchema(projectPhotos).omit({
