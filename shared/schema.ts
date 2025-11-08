@@ -143,18 +143,21 @@ export const complaints = pgTable("complaints", {
   phoneNumber: varchar("phone_number").notNull(),
   unitNumber: varchar("unit_number").notNull(),
   message: text("message").notNull(),
+  photoUrl: text("photo_url"), // Optional photo uploaded by resident
   status: varchar("status").notNull().default('open'), // open | closed
   viewedAt: timestamp("viewed_at"), // When staff first viewed this complaint
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
-// Complaint notes table - techs can add notes to complaints
+// Complaint notes table - techs can add notes to complaints (internal or visible to residents)
 export const complaintNotes = pgTable("complaint_notes", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   complaintId: varchar("complaint_id").notNull().references(() => complaints.id, { onDelete: "cascade" }),
   userId: varchar("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  userName: varchar("user_name").notNull(), // Denormalized for display
   note: text("note").notNull(),
+  visibleToResident: boolean("visible_to_resident").notNull().default(false), // If true, resident can see this note
   createdAt: timestamp("created_at").defaultNow(),
 });
 
