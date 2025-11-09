@@ -132,6 +132,32 @@ export default function ProjectDetail() {
     },
   });
 
+  const completeProjectMutation = useMutation({
+    mutationFn: async (projectId: string) => {
+      const response = await fetch(`/api/projects/${projectId}/status`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status: "completed" }),
+        credentials: "include",
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || "Failed to complete project");
+      }
+
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/projects"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/projects", id] });
+      toast({ title: "Project marked as completed" });
+    },
+    onError: (error: Error) => {
+      toast({ title: "Error", description: error.message, variant: "destructive" });
+    },
+  });
+
   const createCommentMutation = useMutation({
     mutationFn: async (comment: string) => {
       const response = await fetch(`/api/projects/${id}/comments`, {
@@ -324,20 +350,6 @@ export default function ProjectDetail() {
                 {project.strataPlanNumber} - {project.jobType.replace(/_/g, ' ')}
               </p>
             </div>
-            {(currentUser?.role === "company" || currentUser?.role === "operations_manager") && (
-              <Button
-                variant="outline"
-                onClick={() => {
-                  setEditJobType(project.jobType);
-                  setShowEditDialog(true);
-                }}
-                className="h-12 gap-2"
-                data-testid="button-edit-project"
-              >
-                <span className="material-icons text-lg">edit</span>
-                Edit
-              </Button>
-            )}
           </div>
         </div>
       </div>
@@ -759,33 +771,6 @@ export default function ProjectDetail() {
           </CardContent>
         </Card>
 
-        {/* Status & Actions Card */}
-        {canDeleteProject && (
-          <Card className="glass-card border-0 shadow-premium">
-            <CardHeader>
-              <CardTitle className="text-base">Project Actions</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div>
-                <div className="text-sm text-muted-foreground mb-2">Status</div>
-                <Badge variant={project.status === "active" ? "default" : "secondary"} className="capitalize">
-                  {project.status}
-                </Badge>
-              </div>
-
-              <Button 
-                variant="destructive" 
-                onClick={() => setShowDeleteDialog(true)}
-                className="w-full h-12"
-                data-testid="button-delete-project"
-              >
-                <span className="material-icons mr-2">delete</span>
-                Delete Project
-              </Button>
-            </CardContent>
-          </Card>
-        )}
-
         {/* Analytics - Target Performance & Work Session History */}
         {(isManagement || canViewWorkHistory) && (
           <Card className="glass-card border-0 shadow-premium">
@@ -1097,6 +1082,61 @@ export default function ProjectDetail() {
                   ))}
                 </div>
               )}
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Project Actions Card - Edit, Complete, Delete */}
+        {canDeleteProject && (
+          <Card className="glass-card border-0 shadow-premium">
+            <CardHeader>
+              <CardTitle className="text-base">Project Actions</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <div>
+                <div className="text-sm text-muted-foreground mb-2">Status</div>
+                <Badge variant={project.status === "active" ? "default" : "secondary"} className="capitalize">
+                  {project.status}
+                </Badge>
+              </div>
+
+              <div className="grid grid-cols-1 gap-3">
+                <Button 
+                  variant="outline" 
+                  onClick={() => {
+                    setEditJobType(project.jobType);
+                    setShowEditDialog(true);
+                  }}
+                  className="w-full h-12"
+                  data-testid="button-edit-project-action"
+                >
+                  <span className="material-icons mr-2">edit</span>
+                  Edit Project
+                </Button>
+
+                {project.status === "active" && (
+                  <Button 
+                    variant="default" 
+                    onClick={() => completeProjectMutation.mutate(project.id)}
+                    className="w-full h-12 bg-success hover:bg-success/90 text-white"
+                    data-testid="button-complete-project"
+                    disabled={completeProjectMutation.isPending}
+                  >
+                    <span className="material-icons mr-2">check_circle</span>
+                    {completeProjectMutation.isPending ? "Completing..." : "Complete Project"}
+                  </Button>
+                )}
+
+                <Button 
+                  variant="destructive" 
+                  onClick={() => setShowDeleteDialog(true)}
+                  className="w-full h-12"
+                  data-testid="button-delete-project"
+                >
+                  <span className="material-icons mr-2">delete</span>
+                  Delete Project
+                </Button>
+              </div>
             </CardContent>
           </Card>
         )}
