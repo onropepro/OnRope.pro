@@ -71,12 +71,38 @@ export default function Payroll() {
       }
       return response.json();
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/payroll/config'] });
-      toast({
-        title: "Configuration Saved",
-        description: "Pay period configuration has been updated successfully.",
-      });
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ['/api/payroll/config'] });
+      
+      // Auto-generate pay periods after saving configuration
+      try {
+        const response = await fetch('/api/payroll/generate-periods', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify({ numberOfPeriods: 6 }),
+        });
+        
+        if (response.ok) {
+          await queryClient.invalidateQueries({ queryKey: ['/api/payroll/periods'] });
+          toast({
+            title: "Configuration Saved",
+            description: "Pay period configuration has been updated and periods have been generated.",
+          });
+        } else {
+          toast({
+            title: "Configuration Saved",
+            description: "Configuration saved but failed to generate periods. You may need to configure your settings.",
+            variant: "destructive",
+          });
+        }
+      } catch (error) {
+        toast({
+          title: "Configuration Saved",
+          description: "Configuration saved but failed to generate periods.",
+          variant: "destructive",
+        });
+      }
     },
     onError: (error: any) => {
       toast({
@@ -87,36 +113,6 @@ export default function Payroll() {
     },
   });
 
-  // Generate pay periods mutation
-  const generatePeriodsMutation = useMutation({
-    mutationFn: async () => {
-      const response = await fetch('/api/payroll/generate-periods', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify({ numberOfPeriods: 6 }),
-      });
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.message || 'Failed to generate pay periods');
-      }
-      return response.json();
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/payroll/periods'] });
-      toast({
-        title: "Pay Periods Generated",
-        description: "6 pay periods have been generated based on your configuration.",
-      });
-    },
-    onError: (error: any) => {
-      toast({
-        title: "Error",
-        description: error.message || "Failed to generate pay periods",
-        variant: "destructive",
-      });
-    },
-  });
 
   // Initialize form with existing config
   useState(() => {
@@ -157,18 +153,6 @@ export default function Payroll() {
     saveConfigMutation.mutate(config);
   };
 
-  const handleGeneratePeriods = () => {
-    if (!configData?.config) {
-      toast({
-        title: "Configuration Required",
-        description: "Please configure pay periods before generating them.",
-        variant: "destructive",
-      });
-      return;
-    }
-    generatePeriodsMutation.mutate();
-  };
-
   const dayOfWeekOptions = [
     { value: "0", label: "Sunday" },
     { value: "1", label: "Monday" },
@@ -189,18 +173,22 @@ export default function Payroll() {
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
-        <TabsList>
+        <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="hours" data-testid="tab-hours">
             <Users className="w-4 h-4 mr-2" />
             Employee Hours
           </TabsTrigger>
-          <TabsTrigger value="periods" data-testid="tab-periods">
+          <TabsTrigger value="current-periods" data-testid="tab-current-periods">
             <Calendar className="w-4 h-4 mr-2" />
-            Pay Periods
+            Current Period
+          </TabsTrigger>
+          <TabsTrigger value="past-periods" data-testid="tab-past-periods">
+            <Calendar className="w-4 h-4 mr-2" />
+            Past Periods
           </TabsTrigger>
           <TabsTrigger value="settings" data-testid="tab-settings">
             <Settings className="w-4 h-4 mr-2" />
-            Configuration
+            Settings
           </TabsTrigger>
         </TabsList>
 
@@ -230,11 +218,11 @@ export default function Payroll() {
                 </Select>
               </div>
 
-              {hoursLoading && (
+              {selectedPeriodId && hoursLoading && (
                 <div className="text-center py-8 text-muted-foreground">Loading employee hours...</div>
               )}
 
-              {hoursData && hoursData.hoursSummary.length > 0 && (
+              {selectedPeriodId && !hoursLoading && hoursData && hoursData.hoursSummary.length > 0 && (
                 <div className="space-y-4">
                   <div className="grid gap-4 md:grid-cols-3">
                     <Card>
@@ -294,7 +282,7 @@ export default function Payroll() {
                 </div>
               )}
 
-              {!hoursLoading && hoursData && hoursData.hoursSummary.length === 0 && (
+              {selectedPeriodId && !hoursLoading && (!hoursData || hoursData.hoursSummary.length === 0) && (
                 <div className="text-center py-12 space-y-2">
                   <div className="text-muted-foreground">
                     No employee hours recorded for this pay period.
@@ -305,7 +293,7 @@ export default function Payroll() {
                 </div>
               )}
 
-              {!hoursLoading && !selectedPeriodId && (
+              {!selectedPeriodId && (
                 <div className="text-center py-12 text-muted-foreground">
                   Select a pay period above to view employee hours.
                 </div>
@@ -314,54 +302,88 @@ export default function Payroll() {
           </Card>
         </TabsContent>
 
-        <TabsContent value="periods" className="space-y-4">
+        <TabsContent value="current-periods" className="space-y-4">
           <Card>
             <CardHeader>
-              <div className="flex items-center justify-between">
-                <div>
-                  <CardTitle>Pay Periods</CardTitle>
-                  <CardDescription>View and manage generated pay periods</CardDescription>
-                </div>
-                <Button 
-                  onClick={handleGeneratePeriods} 
-                  disabled={generatePeriodsMutation.isPending}
-                  data-testid="button-generate-periods"
-                >
-                  <Calendar className="w-4 h-4 mr-2" />
-                  Generate Periods
-                </Button>
-              </div>
+              <CardTitle>Current Pay Period</CardTitle>
+              <CardDescription>View the active pay period</CardDescription>
             </CardHeader>
             <CardContent>
-              {!periodsData?.periods || periodsData.periods.length === 0 ? (
+              {!periodsData?.periods || periodsData.periods.filter(p => p.status === 'current' || p.status === 'upcoming').length === 0 ? (
                 <div className="text-center py-8 text-muted-foreground">
-                  No pay periods generated yet. Configure your pay period settings and generate periods.
+                  No current pay period. Configure your pay period settings to get started.
                 </div>
               ) : (
                 <div className="space-y-2">
-                  {periodsData.periods.map((period) => (
-                    <Card key={period.id} data-testid={`card-period-${period.id}`}>
-                      <CardContent className="flex items-center justify-between p-4">
-                        <div>
-                          <div className="font-medium">
-                            {format(new Date(period.startDate), 'MMM dd, yyyy')} - {format(new Date(period.endDate), 'MMM dd, yyyy')}
+                  {periodsData.periods
+                    .filter(p => p.status === 'current' || p.status === 'upcoming')
+                    .map((period) => (
+                      <Card key={period.id} data-testid={`card-period-${period.id}`}>
+                        <CardContent className="flex items-center justify-between p-4">
+                          <div>
+                            <div className="font-medium">
+                              {format(new Date(period.startDate), 'MMM dd, yyyy')} - {format(new Date(period.endDate), 'MMM dd, yyyy')}
+                            </div>
+                            <div className="text-sm text-muted-foreground capitalize">{period.status}</div>
                           </div>
-                          <div className="text-sm text-muted-foreground capitalize">{period.status}</div>
-                        </div>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => {
-                            setSelectedPeriodId(period.id);
-                            setActiveTab("hours");
-                          }}
-                          data-testid={`button-view-hours-${period.id}`}
-                        >
-                          View Hours
-                        </Button>
-                      </CardContent>
-                    </Card>
-                  ))}
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => {
+                              setSelectedPeriodId(period.id);
+                              setActiveTab("hours");
+                            }}
+                            data-testid={`button-view-hours-${period.id}`}
+                          >
+                            View Hours
+                          </Button>
+                        </CardContent>
+                      </Card>
+                    ))}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="past-periods" className="space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle>Past Pay Periods</CardTitle>
+              <CardDescription>View historical pay periods</CardDescription>
+            </CardHeader>
+            <CardContent>
+              {!periodsData?.periods || periodsData.periods.filter(p => p.status === 'past').length === 0 ? (
+                <div className="text-center py-8 text-muted-foreground">
+                  No past pay periods yet.
+                </div>
+              ) : (
+                <div className="space-y-2">
+                  {periodsData.periods
+                    .filter(p => p.status === 'past')
+                    .map((period) => (
+                      <Card key={period.id} data-testid={`card-period-${period.id}`}>
+                        <CardContent className="flex items-center justify-between p-4">
+                          <div>
+                            <div className="font-medium">
+                              {format(new Date(period.startDate), 'MMM dd, yyyy')} - {format(new Date(period.endDate), 'MMM dd, yyyy')}
+                            </div>
+                            <div className="text-sm text-muted-foreground capitalize">{period.status}</div>
+                          </div>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => {
+                              setSelectedPeriodId(period.id);
+                              setActiveTab("hours");
+                            }}
+                            data-testid={`button-view-hours-${period.id}`}
+                          >
+                            View Hours
+                          </Button>
+                        </CardContent>
+                      </Card>
+                    ))}
                 </div>
               )}
             </CardContent>
@@ -372,7 +394,7 @@ export default function Payroll() {
           <Card>
             <CardHeader>
               <CardTitle>Pay Period Configuration</CardTitle>
-              <CardDescription>Configure how pay periods are calculated</CardDescription>
+              <CardDescription>Configure how pay periods are calculated. Periods are automatically generated when you save.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-2">
