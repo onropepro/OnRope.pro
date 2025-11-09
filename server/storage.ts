@@ -1,7 +1,7 @@
 import { db } from "./db";
 import { users, projects, dropLogs, workSessions, complaints, complaintNotes, projectPhotos, jobComments, harnessInspections, toolboxMeetings, payPeriodConfig, payPeriods, quotes } from "@shared/schema";
 import type { User, InsertUser, Project, InsertProject, DropLog, InsertDropLog, WorkSession, InsertWorkSession, Complaint, InsertComplaint, ComplaintNote, InsertComplaintNote, ProjectPhoto, InsertProjectPhoto, JobComment, InsertJobComment, HarnessInspection, InsertHarnessInspection, ToolboxMeeting, InsertToolboxMeeting, PayPeriodConfig, InsertPayPeriodConfig, PayPeriod, InsertPayPeriod, EmployeeHoursSummary, Quote, InsertQuote } from "@shared/schema";
-import { eq, and, desc, sql, isNull, gte, lte, between } from "drizzle-orm";
+import { eq, and, desc, sql, isNull, not, gte, lte, between } from "drizzle-orm";
 import bcrypt from "bcrypt";
 
 const SALT_ROUNDS = 10;
