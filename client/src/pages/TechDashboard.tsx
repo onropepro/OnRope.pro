@@ -43,9 +43,12 @@ export default function TechDashboard() {
   const [showStartDayDialog, setShowStartDayDialog] = useState(false);
   const [showEndDayDialog, setShowEndDayDialog] = useState(false);
   const [showLogoutDialog, setShowLogoutDialog] = useState(false);
+  const [showExceedsWarningDialog, setShowExceedsWarningDialog] = useState(false);
   const [activeSession, setActiveSession] = useState<any>(null);
   const [todayDrops, setTodayDrops] = useState(0);
   const [uploadingPdfForProject, setUploadingPdfForProject] = useState<string | null>(null);
+  const [pendingEndDayData, setPendingEndDayData] = useState<EndDayFormData | null>(null);
+  const [exceedsWarnings, setExceedsWarnings] = useState<string[]>([]);
   const { toast } = useToast();
   const [, setLocation] = useLocation();
 
@@ -241,7 +244,7 @@ export default function TechDashboard() {
   };
 
   const onEndDaySubmit = async (data: EndDayFormData) => {
-    if (activeSession) {
+    if (activeSession && selectedProject) {
       const totalDrops = (
         parseInt(data.dropsCompletedNorth) || 0) +
         (parseInt(data.dropsCompletedEast) || 0) +
@@ -257,11 +260,58 @@ export default function TechDashboard() {
         return;
       }
       
+      // Check if any entered drops exceed remaining drops per elevation
+      const warnings: string[] = [];
+      const dropsNorth = parseInt(data.dropsCompletedNorth) || 0;
+      const dropsEast = parseInt(data.dropsCompletedEast) || 0;
+      const dropsSouth = parseInt(data.dropsCompletedSouth) || 0;
+      const dropsWest = parseInt(data.dropsCompletedWest) || 0;
+      
+      const remainingNorth = (selectedProject.totalDropsNorth || 0) - (selectedProject.completedDropsNorth || 0);
+      const remainingEast = (selectedProject.totalDropsEast || 0) - (selectedProject.completedDropsEast || 0);
+      const remainingSouth = (selectedProject.totalDropsSouth || 0) - (selectedProject.completedDropsSouth || 0);
+      const remainingWest = (selectedProject.totalDropsWest || 0) - (selectedProject.completedDropsWest || 0);
+      
+      if (dropsNorth > remainingNorth) {
+        warnings.push(`North: ${dropsNorth} drops entered, but only ${remainingNorth} remaining`);
+      }
+      if (dropsEast > remainingEast) {
+        warnings.push(`East: ${dropsEast} drops entered, but only ${remainingEast} remaining`);
+      }
+      if (dropsSouth > remainingSouth) {
+        warnings.push(`South: ${dropsSouth} drops entered, but only ${remainingSouth} remaining`);
+      }
+      if (dropsWest > remainingWest) {
+        warnings.push(`West: ${dropsWest} drops entered, but only ${remainingWest} remaining`);
+      }
+      
+      // If there are warnings, show the warning dialog
+      if (warnings.length > 0) {
+        setPendingEndDayData(data);
+        setExceedsWarnings(warnings);
+        setShowExceedsWarningDialog(true);
+        return;
+      }
+      
+      // No warnings, proceed with ending the day
       endDayMutation.mutate({
         ...data,
         sessionId: activeSession.id,
         projectId: activeSession.projectId,
       });
+    }
+  };
+  
+  const proceedWithEndDay = () => {
+    if (pendingEndDayData && activeSession) {
+      setShowExceedsWarningDialog(false);
+      endDayMutation.mutate({
+        ...pendingEndDayData,
+        sessionId: activeSession.id,
+        projectId: activeSession.projectId,
+      });
+      setPendingEndDayData(null);
+      setExceedsWarnings([]);
     }
   };
 
@@ -698,6 +748,50 @@ export default function TechDashboard() {
             <AlertDialogCancel data-testid="button-cancel-logout">Cancel</AlertDialogCancel>
             <AlertDialogAction onClick={confirmLogout} data-testid="button-confirm-logout">
               Logout
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Exceeds Remaining Warning Dialog */}
+      <AlertDialog open={showExceedsWarningDialog} onOpenChange={setShowExceedsWarningDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle className="flex items-center gap-2 text-warning">
+              <span className="material-icons">warning</span>
+              Drops Exceed Remaining
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              The number of drops you entered exceeds what's remaining for some elevations:
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <div className="space-y-2 my-4">
+            {exceedsWarnings.map((warning, index) => (
+              <div key={index} className="flex items-start gap-2 p-3 rounded-lg bg-warning/10 border border-warning/20">
+                <span className="material-icons text-warning text-sm mt-0.5">error_outline</span>
+                <p className="text-sm">{warning}</p>
+              </div>
+            ))}
+          </div>
+          <AlertDialogDescription className="text-sm">
+            Do you want to proceed anyway?
+          </AlertDialogDescription>
+          <AlertDialogFooter>
+            <AlertDialogCancel 
+              onClick={() => {
+                setPendingEndDayData(null);
+                setExceedsWarnings([]);
+              }}
+              data-testid="button-cancel-exceeds"
+            >
+              Go Back
+            </AlertDialogCancel>
+            <AlertDialogAction 
+              onClick={proceedWithEndDay} 
+              data-testid="button-confirm-exceeds"
+              className="bg-warning hover:bg-warning/90"
+            >
+              Proceed Anyway
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
