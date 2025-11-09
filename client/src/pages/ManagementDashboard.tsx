@@ -183,6 +183,13 @@ type EndDayFormData = z.infer<typeof endDaySchema>;
 
 export default function ManagementDashboard() {
   const [activeTab, setActiveTab] = useState("projects");
+
+  // Scroll to top when changing tabs
+  const handleTabChange = (tab: string) => {
+    setActiveTab(tab);
+    // Scroll the content area into view smoothly
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
   const [showProjectDialog, setShowProjectDialog] = useState(false);
   const [showEmployeeDialog, setShowEmployeeDialog] = useState(false);
   const [showEditEmployeeDialog, setShowEditEmployeeDialog] = useState(false);
@@ -801,7 +808,7 @@ export default function ManagementDashboard() {
             <Button
               variant="outline"
               className="h-auto flex-col gap-2 p-4"
-              onClick={() => setActiveTab("projects")}
+              onClick={() => handleTabChange("projects")}
               data-testid="button-nav-projects"
             >
               <span className="material-icons text-primary">apartment</span>
@@ -813,7 +820,7 @@ export default function ManagementDashboard() {
             <Button
               variant="outline"
               className="h-auto flex-col gap-2 p-4"
-              onClick={() => setActiveTab("past-projects")}
+              onClick={() => handleTabChange("past-projects")}
               data-testid="button-nav-past-projects"
             >
               <span className="material-icons text-primary">done_all</span>
@@ -825,7 +832,7 @@ export default function ManagementDashboard() {
             <Button
               variant="outline"
               className="h-auto flex-col gap-2 p-4"
-              onClick={() => setActiveTab("employees")}
+              onClick={() => handleTabChange("employees")}
               data-testid="button-nav-employees"
             >
               <span className="material-icons text-primary">people</span>
@@ -837,7 +844,7 @@ export default function ManagementDashboard() {
             <Button
               variant="outline"
               className="h-auto flex-col gap-2 p-4"
-              onClick={() => setActiveTab("performance")}
+              onClick={() => handleTabChange("performance")}
               data-testid="button-nav-performance"
             >
               <span className="material-icons text-primary">analytics</span>
@@ -849,7 +856,7 @@ export default function ManagementDashboard() {
             <Button
               variant="outline"
               className="h-auto flex-col gap-2 p-4"
-              onClick={() => setActiveTab("complaints")}
+              onClick={() => handleTabChange("complaints")}
               data-testid="button-nav-complaints"
             >
               <span className="material-icons text-primary">feedback</span>
@@ -861,7 +868,7 @@ export default function ManagementDashboard() {
             <Button
               variant="outline"
               className="h-auto flex-col gap-2 p-4"
-              onClick={() => setActiveTab("my-drops")}
+              onClick={() => handleTabChange("my-drops")}
               data-testid="button-nav-my-drops"
             >
               <span className="material-icons text-primary">checklist</span>
@@ -921,7 +928,7 @@ export default function ManagementDashboard() {
             <Button
               variant="outline"
               className="h-auto flex-col gap-2 p-4"
-              onClick={() => setActiveTab("documents")}
+              onClick={() => handleTabChange("documents")}
               data-testid="button-nav-documents"
             >
               <span className="material-icons text-primary">description</span>
@@ -933,7 +940,7 @@ export default function ManagementDashboard() {
           </div>
         </div>
 
-        <Tabs value={activeTab} onValueChange={setActiveTab}>
+        <Tabs value={activeTab} onValueChange={handleTabChange}>
           <TabsContent value="projects">
             <div className="space-y-4">
               {/* Search and Create */}

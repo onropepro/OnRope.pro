@@ -46,6 +46,46 @@ export default function Payroll() {
     enabled: !!selectedPeriodId,
   });
 
+  // Auto-create default payroll config if none exists
+  useEffect(() => {
+    const setupDefaultPayroll = async () => {
+      // Only run if we have config data loaded (even if null)
+      if (configData !== undefined && !configData?.config && periodsData !== undefined && (!periodsData?.periods || periodsData.periods.length === 0)) {
+        try {
+          // Create default semi-monthly config
+          const response = await fetch('/api/payroll/config', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
+            body: JSON.stringify({
+              periodType: 'semi-monthly',
+              firstPayDay: 1,
+              secondPayDay: 15,
+            }),
+          });
+          
+          if (response.ok) {
+            // Generate periods
+            await fetch('/api/payroll/generate-periods', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              credentials: 'include',
+              body: JSON.stringify({ numberOfPeriods: 6 }),
+            });
+            
+            // Refresh data
+            await queryClient.invalidateQueries({ queryKey: ['/api/payroll/config'] });
+            await queryClient.invalidateQueries({ queryKey: ['/api/payroll/periods'] });
+          }
+        } catch (error) {
+          console.error('Failed to setup default payroll:', error);
+        }
+      }
+    };
+    
+    setupDefaultPayroll();
+  }, [configData, periodsData]);
+
   // Auto-select current period when periods load
   useEffect(() => {
     if (periodsData?.periods && periodsData.periods.length > 0 && !selectedPeriodId) {

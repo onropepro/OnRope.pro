@@ -59,6 +59,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Create user
       const user = await storage.createUser(validatedData);
       
+      // If this is a company user, create default payroll config and generate periods
+      if (user.role === 'company') {
+        try {
+          // Create default semi-monthly payroll config (1st and 15th)
+          await storage.savePayPeriodConfig({
+            companyId: user.id,
+            periodType: 'semi-monthly',
+            firstPayDay: 1,
+            secondPayDay: 15,
+          });
+          
+          // Generate initial 6 pay periods
+          await storage.generatePayPeriods(user.id, 6);
+        } catch (error) {
+          console.error('Error creating default payroll config:', error);
+          // Don't fail registration if payroll setup fails
+        }
+      }
+      
       // Create session
       req.session.userId = user.id;
       req.session.role = user.role;
