@@ -1,7 +1,7 @@
 import type { Express, Request, Response, NextFunction } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { insertUserSchema, insertProjectSchema, insertDropLogSchema, insertComplaintSchema, insertComplaintNoteSchema, insertJobCommentSchema, insertHarnessInspectionSchema, insertToolboxMeetingSchema, insertPayPeriodConfigSchema, normalizeStrataPlan } from "@shared/schema";
+import { insertUserSchema, insertProjectSchema, insertDropLogSchema, insertComplaintSchema, insertComplaintNoteSchema, insertJobCommentSchema, insertHarnessInspectionSchema, insertToolboxMeetingSchema, insertPayPeriodConfigSchema, insertQuoteSchema, normalizeStrataPlan } from "@shared/schema";
 import { z } from "zod";
 import bcrypt from "bcrypt";
 import multer from "multer";
@@ -2063,6 +2063,188 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({ hoursSummary });
     } catch (error) {
       console.error("Get employee hours error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // ==================== QUOTE ROUTES ====================
+  
+  // Create new quote
+  app.post("/api/quotes", requireAuth, requireRole("company", "operations_manager", "supervisor"), async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      const companyId = currentUser.role === "company" ? currentUser.id : currentUser.companyId;
+      if (!companyId) {
+        return res.status(400).json({ message: "Unable to determine company" });
+      }
+      
+      const quoteData = insertQuoteSchema.parse({
+        ...req.body,
+        companyId,
+      });
+      
+      const quote = await storage.createQuote(quoteData);
+      res.json({ quote });
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Validation error", errors: error.errors });
+      }
+      console.error("Create quote error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Get all quotes for company
+  app.get("/api/quotes", requireAuth, requireRole("company", "operations_manager", "supervisor"), async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      const companyId = currentUser.role === "company" ? currentUser.id : currentUser.companyId;
+      if (!companyId) {
+        return res.status(400).json({ message: "Unable to determine company" });
+      }
+      
+      const status = req.query.status as string | undefined;
+      const quotes = await storage.getQuotesByCompany(companyId, status);
+      res.json({ quotes });
+    } catch (error) {
+      console.error("Get quotes error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Get quote by ID
+  app.get("/api/quotes/:id", requireAuth, requireRole("company", "operations_manager", "supervisor"), async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      const companyId = currentUser.role === "company" ? currentUser.id : currentUser.companyId;
+      if (!companyId) {
+        return res.status(400).json({ message: "Unable to determine company" });
+      }
+      
+      const quote = await storage.getQuoteById(req.params.id);
+      
+      if (!quote) {
+        return res.status(404).json({ message: "Quote not found" });
+      }
+      
+      if (quote.companyId !== companyId) {
+        return res.status(403).json({ message: "Forbidden" });
+      }
+      
+      res.json({ quote });
+    } catch (error) {
+      console.error("Get quote error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Update quote
+  app.patch("/api/quotes/:id", requireAuth, requireRole("company", "operations_manager", "supervisor"), async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      const companyId = currentUser.role === "company" ? currentUser.id : currentUser.companyId;
+      if (!companyId) {
+        return res.status(400).json({ message: "Unable to determine company" });
+      }
+      
+      const quote = await storage.getQuoteById(req.params.id);
+      
+      if (!quote) {
+        return res.status(404).json({ message: "Quote not found" });
+      }
+      
+      if (quote.companyId !== companyId) {
+        return res.status(403).json({ message: "Forbidden" });
+      }
+      
+      const updatedQuote = await storage.updateQuote(req.params.id, req.body);
+      res.json({ quote: updatedQuote });
+    } catch (error) {
+      console.error("Update quote error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Delete quote
+  app.delete("/api/quotes/:id", requireAuth, requireRole("company", "operations_manager", "supervisor"), async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      const companyId = currentUser.role === "company" ? currentUser.id : currentUser.companyId;
+      if (!companyId) {
+        return res.status(400).json({ message: "Unable to determine company" });
+      }
+      
+      const quote = await storage.getQuoteById(req.params.id);
+      
+      if (!quote) {
+        return res.status(404).json({ message: "Quote not found" });
+      }
+      
+      if (quote.companyId !== companyId) {
+        return res.status(403).json({ message: "Forbidden" });
+      }
+      
+      await storage.deleteQuote(req.params.id);
+      res.json({ message: "Quote deleted successfully" });
+    } catch (error) {
+      console.error("Delete quote error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Upload quote photo
+  app.post("/api/quotes/:id/photo", requireAuth, requireRole("company", "operations_manager", "supervisor"), upload.single("photo"), async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      const companyId = currentUser.role === "company" ? currentUser.id : currentUser.companyId;
+      if (!companyId) {
+        return res.status(400).json({ message: "Unable to determine company" });
+      }
+      
+      const quote = await storage.getQuoteById(req.params.id);
+      
+      if (!quote) {
+        return res.status(404).json({ message: "Quote not found" });
+      }
+      
+      if (quote.companyId !== companyId) {
+        return res.status(403).json({ message: "Forbidden" });
+      }
+      
+      if (!req.file) {
+        return res.status(400).json({ message: "No photo file uploaded" });
+      }
+      
+      const photoUrl = await uploadToObjectStorage(req.file.buffer, req.file.originalname, req.file.mimetype);
+      const updatedQuote = await storage.updateQuote(req.params.id, { photoUrl });
+      
+      res.json({ quote: updatedQuote, photoUrl });
+    } catch (error) {
+      console.error("Upload quote photo error:", error);
       res.status(500).json({ message: "Internal server error" });
     }
   });
