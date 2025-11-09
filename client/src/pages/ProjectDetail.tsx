@@ -159,6 +159,32 @@ export default function ProjectDetail() {
     },
   });
 
+  const reopenProjectMutation = useMutation({
+    mutationFn: async (projectId: string) => {
+      const response = await fetch(`/api/projects/${projectId}/status`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status: "active" }),
+        credentials: "include",
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || "Failed to reopen project");
+      }
+
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/projects"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/projects", id] });
+      toast({ title: "Project reopened successfully" });
+    },
+    onError: (error: Error) => {
+      toast({ title: "Error", description: error.message, variant: "destructive" });
+    },
+  });
+
   const createCommentMutation = useMutation({
     mutationFn: async (comment: string) => {
       const response = await fetch(`/api/projects/${id}/comments`, {
@@ -1116,6 +1142,19 @@ export default function ProjectDetail() {
                   >
                     <span className="material-icons mr-2">check_circle</span>
                     {completeProjectMutation.isPending ? "Completing..." : "Complete Project"}
+                  </Button>
+                )}
+
+                {project.status === "completed" && (
+                  <Button 
+                    variant="default" 
+                    onClick={() => reopenProjectMutation.mutate(project.id)}
+                    className="w-full h-12"
+                    data-testid="button-reopen-project"
+                    disabled={reopenProjectMutation.isPending}
+                  >
+                    <span className="material-icons mr-2">restart_alt</span>
+                    {reopenProjectMutation.isPending ? "Reopening..." : "Reopen Project"}
                   </Button>
                 )}
 
