@@ -940,8 +940,8 @@ export default function ManagementDashboard() {
           </div>
         </div>
 
-        <Tabs value={activeTab} onValueChange={handleTabChange}>
-          <TabsContent value="projects">
+        {activeTab === "projects" && (
+          <div>
             <div className="space-y-4">
               {/* Search and Create */}
               <div className="flex gap-3">
@@ -1383,9 +1383,11 @@ export default function ManagementDashboard() {
                 </div>
               </div>
             </div>
-          </TabsContent>
+          </div>
+        )}
 
-          <TabsContent value="past-projects">
+        {activeTab === "past-projects" && (
+          <div>
             <div className="space-y-4">
               <div className="flex items-center gap-2 mb-6">
                 <div className="h-8 w-1 bg-success rounded-full"></div>
@@ -1434,9 +1436,11 @@ export default function ManagementDashboard() {
                 </div>
               )}
             </div>
-          </TabsContent>
+          </div>
+        )}
 
-          <TabsContent value="performance">
+        {activeTab === "performance" && (
+          <div>
             <div className="space-y-4">
               {completedSessions.length > 0 ? (
                 <>
@@ -1566,9 +1570,11 @@ export default function ManagementDashboard() {
                 </Card>
               )}
             </div>
-          </TabsContent>
+          </div>
+        )}
 
-          <TabsContent value="my-drops">
+        {activeTab === "my-drops" && (
+          <div>
             <div className="space-y-4">
               {/* Start/End Day Section */}
               <div>
@@ -1817,9 +1823,11 @@ export default function ManagementDashboard() {
                 </Form>
               </DialogContent>
             </Dialog>
-          </TabsContent>
+          </div>
+        )}
 
-          <TabsContent value="complaints">
+        {activeTab === "complaints" && (
+          <div>
             <div className="space-y-4">
               <Card>
                 <CardHeader>
@@ -1920,9 +1928,11 @@ export default function ManagementDashboard() {
                 </CardContent>
               </Card>
             </div>
-          </TabsContent>
+          </div>
+        )}
 
-          <TabsContent value="employees">
+        {activeTab === "employees" && (
+          <div>
             <div className="space-y-4">
               {/* Create Employee Button */}
               <Dialog open={showEmployeeDialog} onOpenChange={setShowEmployeeDialog}>
@@ -2179,9 +2189,11 @@ export default function ManagementDashboard() {
                 )}
               </div>
             </div>
-          </TabsContent>
+          </div>
+        )}
 
-          <TabsContent value="documents" className="space-y-6">
+        {activeTab === "documents" && (
+          <div className="space-y-6">
             {/* Platform Overview Document */}
             <Card>
               <CardHeader>
@@ -2335,8 +2347,8 @@ export default function ManagementDashboard() {
                 )}
               </CardContent>
             </Card>
-          </TabsContent>
-        </Tabs>
+          </div>
+        )}
       </div>
 
       {/* Edit Employee Dialog */}

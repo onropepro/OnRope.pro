@@ -689,7 +689,7 @@ export class Storage {
           eq(workSessions.companyId, companyId),
           gte(workSessions.workDate, startDate),
           lte(workSessions.workDate, endDate),
-          isNull(workSessions.endTime).not()
+          not(isNull(workSessions.endTime))
         )
       )
       .orderBy(workSessions.employeeId, workSessions.workDate);
