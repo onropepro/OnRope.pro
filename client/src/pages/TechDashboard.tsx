@@ -195,8 +195,12 @@ export default function TechDashboard() {
     }
   };
 
-  const handleStartDay = (project: any) => {
-    setSelectedProject(project);
+  const handleStartDay = (project?: any) => {
+    if (project) {
+      setSelectedProject(project);
+    } else if (projects.length > 0) {
+      setSelectedProject(projects[0]);
+    }
     setShowStartDayDialog(true);
   };
 
@@ -358,7 +362,7 @@ export default function TechDashboard() {
         <div className="mb-4">
           {!activeSession ? (
             <Button
-              onClick={handleStartDay}
+              onClick={() => handleStartDay()}
               className="w-full h-14 text-lg font-bold"
               data-testid="button-start-day"
               disabled={projects.length === 0}
@@ -367,15 +371,22 @@ export default function TechDashboard() {
               Start Day
             </Button>
           ) : (
-            <Button
-              onClick={handleEndDay}
-              variant="destructive"
-              className="w-full h-14 text-lg font-bold"
-              data-testid="button-end-day"
-            >
-              <span className="material-icons mr-2">stop_circle</span>
-              End Day
-            </Button>
+            <div className="space-y-2">
+              <Button
+                onClick={handleEndDay}
+                variant="destructive"
+                className="w-full h-14 text-lg font-bold"
+                data-testid="button-end-day"
+              >
+                <span className="material-icons mr-2">stop_circle</span>
+                End Day
+              </Button>
+              {selectedProject && (
+                <div className="text-center text-xs text-muted-foreground">
+                  Active on: {selectedProject.strataPlanNumber}
+                </div>
+              )}
+            </div>
           )}
         </div>
 
@@ -417,7 +428,12 @@ export default function TechDashboard() {
                       <CardContent className="p-4">
                         <div className="flex items-start justify-between mb-3">
                           <div className="flex-1">
-                            <div className="font-bold text-base">{project.strataPlanNumber}</div>
+                            <div className="flex items-center gap-2">
+                              <div className="font-bold text-base">{project.strataPlanNumber}</div>
+                              {activeSession?.projectId === project.id && (
+                                <Badge variant="default" className="text-xs">Active</Badge>
+                              )}
+                            </div>
                             <div className="text-sm text-muted-foreground capitalize mt-1">
                               {project.jobType.replace(/_/g, ' ')}
                             </div>
@@ -501,6 +517,23 @@ export default function TechDashboard() {
                               }
                             }}
                           />
+                          
+                          {/* Start Day button for this specific project */}
+                          {!activeSession && (
+                            <Button
+                              variant="default"
+                              size="sm"
+                              className="w-full"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleStartDay(project);
+                              }}
+                              data-testid={`button-start-day-${project.id}`}
+                            >
+                              <span className="material-icons text-sm mr-2">play_circle</span>
+                              Start Day on This Project
+                            </Button>
+                          )}
                         </div>
                       </CardContent>
                     </Card>
