@@ -1061,7 +1061,11 @@ export default function ManagementDashboard() {
                           render={({ field }) => (
                             <FormItem>
                               <FormLabel>
-                                {projectForm.watch("jobType") === "parkade_pressure_cleaning" ? "Stall Count" : "Floor Count"}
+                                {projectForm.watch("jobType") === "parkade_pressure_cleaning" 
+                                  ? "Stall Count" 
+                                  : projectForm.watch("jobType") === "in_suite_dryer_vent_cleaning"
+                                  ? "Unit Count"
+                                  : "Floor Count"}
                               </FormLabel>
                               <FormControl>
                                 <Input type="number" min="1" {...field} data-testid="input-floor-count" className="h-12" />
