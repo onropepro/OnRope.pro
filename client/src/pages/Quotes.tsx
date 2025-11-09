@@ -109,7 +109,7 @@ export default function Quotes() {
   
   // View states
   const [view, setView] = useState<"list" | "create" | "detail">("list");
-  const [createStep, setCreateStep] = useState<"building" | "services" | "configure">("building");
+  const [createStep, setCreateStep] = useState<"building" | "services" | "configure">("services");
   const [selectedQuote, setSelectedQuote] = useState<QuoteWithServices | null>(null);
   
   // Form data
