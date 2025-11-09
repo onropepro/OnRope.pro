@@ -96,10 +96,10 @@ export default function TechDashboard() {
   const endDayForm = useForm<EndDayFormData>({
     resolver: zodResolver(endDaySchema),
     defaultValues: {
-      dropsCompletedNorth: "0",
-      dropsCompletedEast: "0",
-      dropsCompletedSouth: "0",
-      dropsCompletedWest: "0",
+      dropsCompletedNorth: "",
+      dropsCompletedEast: "",
+      dropsCompletedSouth: "",
+      dropsCompletedWest: "",
       shortfallReason: "",
     },
   });
