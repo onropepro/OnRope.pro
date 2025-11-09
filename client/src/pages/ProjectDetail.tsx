@@ -793,10 +793,13 @@ export default function ProjectDetail() {
               <CardTitle>Analytics</CardTitle>
             </CardHeader>
             <CardContent>
-              <Tabs defaultValue={isManagement && completedSessions.length > 0 ? "performance" : "history"} className="w-full">
+              <Tabs defaultValue={isManagement && completedSessions.length > 0 ? "performance" : canViewFinancial && project.estimatedHours ? "budget" : "history"} className="w-full">
                 <TabsList className="w-full">
                   {isManagement && completedSessions.length > 0 && (
                     <TabsTrigger value="performance" data-testid="tab-performance">Target Performance</TabsTrigger>
+                  )}
+                  {canViewFinancial && project.estimatedHours && (
+                    <TabsTrigger value="budget" data-testid="tab-budget">Hours & Budget</TabsTrigger>
                   )}
                   {canViewWorkHistory && (
                     <TabsTrigger value="history" data-testid="tab-history">Work History</TabsTrigger>
@@ -839,6 +842,90 @@ export default function ProjectDetail() {
                         </div>
                       </div>
                     </div>
+                  </TabsContent>
+                )}
+                
+                {canViewFinancial && project.estimatedHours && (
+                  <TabsContent value="budget" className="mt-4">
+                    {(() => {
+                      // Calculate total hours worked from completed sessions
+                      const totalHoursWorked = completedSessions.reduce((sum: number, session: any) => {
+                        if (session.hoursWorked) {
+                          return sum + parseFloat(session.hoursWorked);
+                        }
+                        return sum;
+                      }, 0);
+                      
+                      const estimatedHours = project.estimatedHours || 0;
+                      const hoursRemaining = Math.max(0, estimatedHours - totalHoursWorked);
+                      
+                      // Calculate total labor cost
+                      const totalLaborCost = completedSessions.reduce((sum: number, session: any) => {
+                        if (session.laborCost) {
+                          return sum + parseFloat(session.laborCost);
+                        }
+                        return sum;
+                      }, 0);
+                      
+                      const hoursPieData = [
+                        { name: 'Hours Worked', value: parseFloat(totalHoursWorked.toFixed(2)), color: '#1976D2' },
+                        { name: 'Hours Remaining', value: parseFloat(hoursRemaining.toFixed(2)), color: '#E0E0E0' },
+                      ];
+                      
+                      return (
+                        <div className="flex flex-col items-center">
+                          <ResponsiveContainer width="100%" height={300}>
+                            <PieChart>
+                              <Pie
+                                data={hoursPieData}
+                                cx="50%"
+                                cy="50%"
+                                labelLine={false}
+                                label={({ name, value, percent }) => 
+                                  `${name}: ${value}h (${(percent * 100).toFixed(0)}%)`
+                                }
+                                outerRadius={80}
+                                fill="#8884d8"
+                                dataKey="value"
+                              >
+                                {hoursPieData.map((entry, index) => (
+                                  <Cell key={`cell-${index}`} fill={entry.color} />
+                                ))}
+                              </Pie>
+                              <Tooltip />
+                              <Legend />
+                            </PieChart>
+                          </ResponsiveContainer>
+                          
+                          <div className="grid grid-cols-2 gap-4 mt-4 w-full max-w-sm">
+                            <div className="text-center p-4 rounded-lg border bg-card">
+                              <div className="text-2xl font-bold text-primary">{totalHoursWorked.toFixed(1)}h</div>
+                              <div className="text-sm text-muted-foreground">Hours Worked</div>
+                            </div>
+                            <div className="text-center p-4 rounded-lg border bg-card">
+                              <div className="text-2xl font-bold text-muted-foreground">{hoursRemaining.toFixed(1)}h</div>
+                              <div className="text-sm text-muted-foreground">Hours Remaining</div>
+                            </div>
+                          </div>
+                          
+                          <div className="w-full max-w-sm mt-6 p-6 rounded-lg border bg-card">
+                            <div className="text-center">
+                              <div className="text-sm text-muted-foreground mb-2">Total Labor Cost</div>
+                              <div className="text-3xl font-bold text-primary">
+                                ${totalLaborCost.toFixed(2)}
+                              </div>
+                              {estimatedHours > 0 && (
+                                <div className="text-xs text-muted-foreground mt-2">
+                                  {totalHoursWorked > 0 && (
+                                    <span>Average: ${(totalLaborCost / totalHoursWorked).toFixed(2)}/hr</span>
+                                  )}
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })()}
                   </TabsContent>
                 )}
                 
