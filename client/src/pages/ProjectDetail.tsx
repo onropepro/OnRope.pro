@@ -355,9 +355,12 @@ export default function ProjectDetail() {
       </div>
 
       <div className="max-w-2xl mx-auto p-4 space-y-6">
-        {/* Building Visualization Card */}
+        {/* Progress Card */}
         <Card className="glass-card border-0 shadow-premium">
-          <CardContent className="p-6 space-y-6">
+          <CardHeader>
+            <CardTitle className="text-base">Progress</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-6">
             {/* Building Visualization */}
             <HighRiseBuilding
               floors={project.floorCount}
@@ -790,15 +793,15 @@ export default function ProjectDetail() {
             </CardHeader>
             <CardContent>
               <Tabs defaultValue={isManagement && completedSessions.length > 0 ? "performance" : canViewFinancialData && project.estimatedHours ? "budget" : "history"} className="w-full">
-                <TabsList className="w-full">
+                <TabsList className="grid grid-cols-3 w-full h-auto">
                   {isManagement && completedSessions.length > 0 && (
-                    <TabsTrigger value="performance" data-testid="tab-performance">Target Performance</TabsTrigger>
+                    <TabsTrigger value="performance" className="text-xs py-2" data-testid="tab-performance">Target Performance</TabsTrigger>
                   )}
                   {canViewFinancialData && project.estimatedHours && (
-                    <TabsTrigger value="budget" data-testid="tab-budget">Hours & Budget</TabsTrigger>
+                    <TabsTrigger value="budget" className="text-xs py-2" data-testid="tab-budget">Hours & Budget</TabsTrigger>
                   )}
                   {canViewWorkHistory && (
-                    <TabsTrigger value="history" data-testid="tab-history">Work History</TabsTrigger>
+                    <TabsTrigger value="history" className="text-xs py-2" data-testid="tab-history">Work History</TabsTrigger>
                   )}
                 </TabsList>
                 
@@ -846,8 +849,11 @@ export default function ProjectDetail() {
                     {(() => {
                       // Calculate total hours worked from completed sessions
                       const totalHoursWorked = completedSessions.reduce((sum: number, session: any) => {
-                        if (session.hoursWorked) {
-                          return sum + parseFloat(session.hoursWorked);
+                        if (session.startTime && session.endTime) {
+                          const start = new Date(session.startTime);
+                          const end = new Date(session.endTime);
+                          const hours = (end.getTime() - start.getTime()) / (1000 * 60 * 60);
+                          return sum + hours;
                         }
                         return sum;
                       }, 0);
@@ -857,8 +863,12 @@ export default function ProjectDetail() {
                       
                       // Calculate total labor cost
                       const totalLaborCost = completedSessions.reduce((sum: number, session: any) => {
-                        if (session.laborCost) {
-                          return sum + parseFloat(session.laborCost);
+                        if (session.startTime && session.endTime && session.techHourlyRate) {
+                          const start = new Date(session.startTime);
+                          const end = new Date(session.endTime);
+                          const hours = (end.getTime() - start.getTime()) / (1000 * 60 * 60);
+                          const cost = hours * parseFloat(session.techHourlyRate);
+                          return sum + cost;
                         }
                         return sum;
                       }, 0);
