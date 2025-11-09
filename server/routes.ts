@@ -766,13 +766,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(403).json({ message: "Access denied" });
       }
       
-      // Only allow updating specific fields
-      const allowedUpdates = {
+      // Build update object with all allowed fields
+      const allowedUpdates: any = {
         buildingName: req.body.buildingName,
         buildingAddress: req.body.buildingAddress,
+        strataPlanNumber: req.body.strataPlanNumber,
+        jobType: req.body.jobType,
         targetCompletionDate: req.body.targetCompletionDate || null,
         estimatedHours: req.body.estimatedHours,
       };
+      
+      // Add job-type specific fields
+      if (req.body.totalDropsNorth !== undefined) allowedUpdates.totalDropsNorth = req.body.totalDropsNorth;
+      if (req.body.totalDropsEast !== undefined) allowedUpdates.totalDropsEast = req.body.totalDropsEast;
+      if (req.body.totalDropsSouth !== undefined) allowedUpdates.totalDropsSouth = req.body.totalDropsSouth;
+      if (req.body.totalDropsWest !== undefined) allowedUpdates.totalDropsWest = req.body.totalDropsWest;
+      if (req.body.dailyDropTarget !== undefined) allowedUpdates.dailyDropTarget = req.body.dailyDropTarget;
+      if (req.body.totalFloors !== undefined) allowedUpdates.totalFloors = req.body.totalFloors;
+      if (req.body.floorsPerDay !== undefined) allowedUpdates.floorsPerDay = req.body.floorsPerDay;
+      if (req.body.totalStalls !== undefined) allowedUpdates.totalStalls = req.body.totalStalls;
+      if (req.body.stallsPerDay !== undefined) allowedUpdates.stallsPerDay = req.body.stallsPerDay;
       
       const updatedProject = await storage.updateProject(id, allowedUpdates);
       res.json({ project: updatedProject });

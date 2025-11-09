@@ -35,6 +35,7 @@ export default function ProjectDetail() {
   const [newComment, setNewComment] = useState("");
   const [selectedSession, setSelectedSession] = useState<any>(null);
   const [showEditDialog, setShowEditDialog] = useState(false);
+  const [editJobType, setEditJobType] = useState<string>("");
 
   const { data: projectData, isLoading } = useQuery({
     queryKey: ["/api/projects", id],
@@ -326,7 +327,10 @@ export default function ProjectDetail() {
             {(currentUser?.role === "company" || currentUser?.role === "operations_manager") && (
               <Button
                 variant="outline"
-                onClick={() => setShowEditDialog(true)}
+                onClick={() => {
+                  setEditJobType(project.jobType);
+                  setShowEditDialog(true);
+                }}
                 className="h-12 gap-2"
                 data-testid="button-edit-project"
               >
@@ -1225,15 +1229,43 @@ export default function ProjectDetail() {
               const formData = new FormData(e.currentTarget);
               
               try {
+                const jobType = formData.get('jobType') as string;
+                const isDropBased = !['in_suite_dryer_vent_cleaning', 'parkade_pressure_cleaning', 'ground_window_cleaning'].includes(jobType);
+                
+                const updateData: any = {
+                  buildingName: formData.get('buildingName'),
+                  buildingAddress: formData.get('buildingAddress') || undefined,
+                  strataPlanNumber: formData.get('strataPlanNumber'),
+                  jobType: formData.get('jobType'),
+                  targetCompletionDate: formData.get('targetCompletionDate') || undefined,
+                  estimatedHours: formData.get('estimatedHours') ? parseInt(formData.get('estimatedHours') as string) : undefined,
+                };
+                
+                // Add drop-based fields
+                if (isDropBased) {
+                  updateData.totalDropsNorth = formData.get('totalDropsNorth') ? parseInt(formData.get('totalDropsNorth') as string) : 0;
+                  updateData.totalDropsEast = formData.get('totalDropsEast') ? parseInt(formData.get('totalDropsEast') as string) : 0;
+                  updateData.totalDropsSouth = formData.get('totalDropsSouth') ? parseInt(formData.get('totalDropsSouth') as string) : 0;
+                  updateData.totalDropsWest = formData.get('totalDropsWest') ? parseInt(formData.get('totalDropsWest') as string) : 0;
+                  updateData.dailyDropTarget = formData.get('dailyDropTarget') ? parseInt(formData.get('dailyDropTarget') as string) : 0;
+                }
+                
+                // Add in-suite fields
+                if (jobType === 'in_suite_dryer_vent_cleaning') {
+                  updateData.totalFloors = formData.get('totalFloors') ? parseInt(formData.get('totalFloors') as string) : undefined;
+                  updateData.floorsPerDay = formData.get('floorsPerDay') ? parseInt(formData.get('floorsPerDay') as string) : undefined;
+                }
+                
+                // Add parkade fields
+                if (jobType === 'parkade_pressure_cleaning') {
+                  updateData.totalStalls = formData.get('totalStalls') ? parseInt(formData.get('totalStalls') as string) : undefined;
+                  updateData.stallsPerDay = formData.get('stallsPerDay') ? parseInt(formData.get('stallsPerDay') as string) : undefined;
+                }
+                
                 const response = await fetch(`/api/projects/${id}`, {
                   method: 'PATCH',
                   headers: { 'Content-Type': 'application/json' },
-                  body: JSON.stringify({
-                    buildingName: formData.get('buildingName'),
-                    buildingAddress: formData.get('buildingAddress') || undefined,
-                    targetCompletionDate: formData.get('targetCompletionDate') || undefined,
-                    estimatedHours: formData.get('estimatedHours') ? parseInt(formData.get('estimatedHours') as string) : undefined,
-                  }),
+                  body: JSON.stringify(updateData),
                   credentials: 'include',
                 });
                 
@@ -1271,6 +1303,170 @@ export default function ProjectDetail() {
                     data-testid="input-edit-building-address"
                   />
                 </div>
+                
+                <div>
+                  <Label htmlFor="strataPlanNumber">Strata Plan Number</Label>
+                  <Input
+                    id="strataPlanNumber"
+                    name="strataPlanNumber"
+                    defaultValue={project.strataPlanNumber}
+                    required
+                    data-testid="input-edit-strata-plan"
+                  />
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Links residents to this project
+                  </p>
+                </div>
+                
+                <div>
+                  <Label htmlFor="jobType">Job Type</Label>
+                  <select
+                    id="jobType"
+                    name="jobType"
+                    defaultValue={project.jobType}
+                    onChange={(e) => setEditJobType(e.target.value)}
+                    required
+                    className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                    data-testid="select-edit-job-type"
+                  >
+                    <option value="window_cleaning">Window Cleaning (4-Elevation)</option>
+                    <option value="pressure_washing">Pressure Washing (4-Elevation)</option>
+                    <option value="dryer_vent_cleaning">Dryer Vent Cleaning (4-Elevation)</option>
+                    <option value="in_suite_dryer_vent_cleaning">In-Suite Dryer Vent Cleaning</option>
+                    <option value="parkade_pressure_cleaning">Parkade Pressure Cleaning</option>
+                    <option value="ground_window_cleaning">Ground Level Window Cleaning</option>
+                  </select>
+                </div>
+                
+                {/* Drop-based fields (4-elevation jobs) */}
+                {(!editJobType ? !['in_suite_dryer_vent_cleaning', 'parkade_pressure_cleaning', 'ground_window_cleaning'].includes(project.jobType) : !['in_suite_dryer_vent_cleaning', 'parkade_pressure_cleaning', 'ground_window_cleaning'].includes(editJobType)) && (
+                  <>
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <Label htmlFor="totalDropsNorth">North Drops</Label>
+                        <Input
+                          id="totalDropsNorth"
+                          name="totalDropsNorth"
+                          type="number"
+                          min="0"
+                          defaultValue={project.totalDropsNorth || 0}
+                          required
+                          data-testid="input-edit-drops-north"
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="totalDropsEast">East Drops</Label>
+                        <Input
+                          id="totalDropsEast"
+                          name="totalDropsEast"
+                          type="number"
+                          min="0"
+                          defaultValue={project.totalDropsEast || 0}
+                          required
+                          data-testid="input-edit-drops-east"
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="totalDropsSouth">South Drops</Label>
+                        <Input
+                          id="totalDropsSouth"
+                          name="totalDropsSouth"
+                          type="number"
+                          min="0"
+                          defaultValue={project.totalDropsSouth || 0}
+                          required
+                          data-testid="input-edit-drops-south"
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="totalDropsWest">West Drops</Label>
+                        <Input
+                          id="totalDropsWest"
+                          name="totalDropsWest"
+                          type="number"
+                          min="0"
+                          defaultValue={project.totalDropsWest || 0}
+                          required
+                          data-testid="input-edit-drops-west"
+                        />
+                      </div>
+                    </div>
+                    
+                    <div>
+                      <Label htmlFor="dailyDropTarget">Daily Drop Target</Label>
+                      <Input
+                        id="dailyDropTarget"
+                        name="dailyDropTarget"
+                        type="number"
+                        min="1"
+                        defaultValue={project.dailyDropTarget || ""}
+                        required
+                        data-testid="input-edit-daily-target"
+                      />
+                      <p className="text-xs text-muted-foreground mt-1">
+                        Drops per technician per day
+                      </p>
+                    </div>
+                  </>
+                )}
+                
+                {/* In-suite fields */}
+                {(!editJobType ? project.jobType === 'in_suite_dryer_vent_cleaning' : editJobType === 'in_suite_dryer_vent_cleaning') && (
+                  <>
+                    <div>
+                      <Label htmlFor="totalFloors">Total Floors</Label>
+                      <Input
+                        id="totalFloors"
+                        name="totalFloors"
+                        type="number"
+                        min="1"
+                        defaultValue={project.totalFloors || ""}
+                        required
+                        data-testid="input-edit-total-floors"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="floorsPerDay">Floors Per Day Target</Label>
+                      <Input
+                        id="floorsPerDay"
+                        name="floorsPerDay"
+                        type="number"
+                        min="1"
+                        defaultValue={project.floorsPerDay || ""}
+                        data-testid="input-edit-floors-per-day"
+                      />
+                    </div>
+                  </>
+                )}
+                
+                {/* Parkade fields */}
+                {(!editJobType ? project.jobType === 'parkade_pressure_cleaning' : editJobType === 'parkade_pressure_cleaning') && (
+                  <>
+                    <div>
+                      <Label htmlFor="totalStalls">Total Stalls</Label>
+                      <Input
+                        id="totalStalls"
+                        name="totalStalls"
+                        type="number"
+                        min="1"
+                        defaultValue={project.totalStalls || ""}
+                        required
+                        data-testid="input-edit-total-stalls"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="stallsPerDay">Stalls Per Day Target</Label>
+                      <Input
+                        id="stallsPerDay"
+                        name="stallsPerDay"
+                        type="number"
+                        min="1"
+                        defaultValue={project.stallsPerDay || ""}
+                        data-testid="input-edit-stalls-per-day"
+                      />
+                    </div>
+                  </>
+                )}
                 
                 <div>
                   <Label htmlFor="targetCompletionDate">Target Completion Date (Optional)</Label>
