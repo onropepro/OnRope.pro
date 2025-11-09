@@ -1297,7 +1297,16 @@ export default function ProjectDetail() {
                       <div>
                         <div className="text-sm font-medium text-muted-foreground">Labor Cost</div>
                         <div className="text-base">
-                          <div>Hours Worked: {hoursWorked.toFixed(1)}</div>
+                          <div>
+                            Hours Worked: {(() => {
+                              const totalMinutes = Math.round(hoursWorked * 60);
+                              const hours = Math.floor(totalMinutes / 60);
+                              const minutes = totalMinutes % 60;
+                              return hours > 0 
+                                ? `${hours}h ${minutes}m`
+                                : `${minutes}m`;
+                            })()}
+                          </div>
                           <div>Hourly Rate: ${selectedSession.techHourlyRate || "Not set"}</div>
                           {laborCost > 0 ? (
                             <div className="text-lg font-medium text-primary mt-1" data-testid="text-labor-cost">
