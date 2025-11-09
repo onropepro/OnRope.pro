@@ -656,85 +656,100 @@ export default function Quotes() {
             </CardContent>
           </Card>
         ) : (
-          <div className="space-y-4">
-            <h2 className="text-xl font-semibold">Your Quotes</h2>
-            {quotes.map((quote) => (
-              <Card key={quote.id} className="hover-elevate">
-                <CardHeader>
-                  <div className="flex items-start justify-between">
-                    <div>
-                      <CardTitle>{quote.buildingName}</CardTitle>
-                      <CardDescription>
-                        {quote.strataPlanNumber} • {quote.buildingAddress}
-                      </CardDescription>
-                    </div>
-                    <div className="flex gap-2">
+          <div className="space-y-6">
+            <h2 className="text-2xl font-bold">Your Quotes</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {quotes.map((quote) => (
+                <Card 
+                  key={quote.id} 
+                  className="hover-elevate rounded-2xl shadow-lg border-2 overflow-hidden"
+                >
+                  <div className="h-2 bg-gradient-to-r from-blue-500 via-indigo-500 to-cyan-500" />
+                  <CardHeader className="pb-3">
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="flex-1 min-w-0">
+                        <CardTitle className="text-lg truncate">{quote.buildingName}</CardTitle>
+                        <CardDescription className="text-xs">
+                          {quote.strataPlanNumber}
+                        </CardDescription>
+                        <CardDescription className="text-xs line-clamp-1 mt-1">
+                          {quote.buildingAddress}
+                        </CardDescription>
+                      </div>
                       <Button
                         variant="ghost"
                         size="icon"
+                        className="shrink-0"
                         onClick={() => deleteQuoteMutation.mutate(quote.id)}
                         data-testid={`button-delete-${quote.id}`}
                       >
-                        <span className="material-icons text-destructive">delete</span>
+                        <span className="material-icons text-destructive text-xl">delete</span>
                       </Button>
                     </div>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <div className="grid grid-cols-2 gap-4 text-sm">
-                    <div>
-                      <p className="text-muted-foreground">Floors</p>
-                      <p className="font-medium">{quote.floorCount}</p>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div className="grid grid-cols-2 gap-3 text-sm">
+                      <div className="bg-muted/50 rounded-lg p-3">
+                        <p className="text-muted-foreground text-xs">Floors</p>
+                        <p className="font-semibold text-base">{quote.floorCount}</p>
+                      </div>
+                      <div className="bg-muted/50 rounded-lg p-3">
+                        <p className="text-muted-foreground text-xs">Hours</p>
+                        <p className="font-semibold text-base">{quote.totalHours}</p>
+                      </div>
                     </div>
-                    <div>
-                      <p className="text-muted-foreground">Total Hours</p>
-                      <p className="font-medium">{quote.totalHours}</p>
+                    
+                    <div className="bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-950/30 dark:to-indigo-950/30 rounded-xl p-4 border border-blue-200 dark:border-blue-800">
+                      <div className="flex items-baseline justify-between mb-2">
+                        <span className="text-sm font-medium text-blue-900 dark:text-blue-100">Total Cost</span>
+                        <span className="text-xs text-blue-700 dark:text-blue-300">${quote.pricePerHour}/hr</span>
+                      </div>
+                      <p className="text-3xl font-bold text-blue-600 dark:text-blue-400">
+                        ${parseFloat(quote.totalCost).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                      </p>
                     </div>
-                    <div>
-                      <p className="text-muted-foreground">Price/Hour</p>
-                      <p className="font-medium">${quote.pricePerHour}</p>
-                    </div>
-                    <div>
-                      <p className="text-muted-foreground">Total Cost</p>
-                      <p className="font-medium text-lg">${quote.totalCost}</p>
-                    </div>
+
                     {quote.hasParkade && (
-                      <>
-                        <div>
-                          <p className="text-muted-foreground">Parkade Stalls</p>
-                          <p className="font-medium">{quote.parkadeStalls}</p>
+                      <div className="bg-amber-50 dark:bg-amber-950/30 rounded-lg p-3 border border-amber-200 dark:border-amber-800">
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <p className="text-xs text-amber-700 dark:text-amber-300">Parkade</p>
+                            <p className="font-semibold text-amber-900 dark:text-amber-100">{quote.parkadeStalls} stalls</p>
+                          </div>
+                          <p className="text-lg font-bold text-amber-600 dark:text-amber-400">
+                            ${quote.parkadeTotal}
+                          </p>
                         </div>
-                        <div>
-                          <p className="text-muted-foreground">Parkade Total</p>
-                          <p className="font-medium">${quote.parkadeTotal}</p>
-                        </div>
-                      </>
+                      </div>
                     )}
+
                     {quote.hasGroundWindows && (
-                      <>
-                        <div>
-                          <p className="text-muted-foreground">Ground Window Hours</p>
-                          <p className="font-medium">{quote.groundWindowHours}</p>
+                      <div className="bg-cyan-50 dark:bg-cyan-950/30 rounded-lg p-3 border border-cyan-200 dark:border-cyan-800">
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <p className="text-xs text-cyan-700 dark:text-cyan-300">Ground Windows</p>
+                            <p className="font-semibold text-cyan-900 dark:text-cyan-100">{quote.groundWindowHours} hrs</p>
+                          </div>
+                          <p className="text-lg font-bold text-cyan-600 dark:text-cyan-400">
+                            ${quote.groundWindowTotal}
+                          </p>
                         </div>
-                        <div>
-                          <p className="text-muted-foreground">Ground Windows Total</p>
-                          <p className="font-medium">${quote.groundWindowTotal}</p>
-                        </div>
-                      </>
+                      </div>
                     )}
-                  </div>
-                  {quote.photoUrl && (
-                    <div className="mt-4">
-                      <img 
-                        src={quote.photoUrl} 
-                        alt="Quote attachment" 
-                        className="rounded-md max-h-64 object-cover"
-                      />
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
-            ))}
+
+                    {quote.photoUrl && (
+                      <div className="mt-3">
+                        <img 
+                          src={quote.photoUrl} 
+                          alt="Quote attachment" 
+                          className="rounded-lg w-full h-32 object-cover border-2"
+                        />
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
           </div>
         )}
       </div>
