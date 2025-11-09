@@ -144,25 +144,27 @@ export default function Quotes() {
     mutationFn: async () => {
       if (!buildingInfo) throw new Error("Building info required");
       
-      // Create quote
+      // Convert configured services Map to array
+      const services = Array.from(configuredServices.entries()).map(([serviceType, serviceData]) => ({
+        serviceType,
+        ...serviceData,
+        // For parkade, calculate total cost from stalls * price per stall
+        totalCost: serviceType === "parkade" 
+          ? (serviceData.parkadeStalls || 0) * (serviceData.pricePerStall || 0)
+          : serviceData.totalCost,
+      }));
+      
+      // Create quote with services in a single atomic request
       const quoteResponse = await apiRequest("POST", "/api/quotes", {
         buildingName: buildingInfo.buildingName,
         strataPlanNumber: buildingInfo.strataPlanNumber,
         buildingAddress: buildingInfo.buildingAddress,
         floorCount: buildingInfo.floorCount,
         status: "open",
+        services, // Include services array
       });
+      
       const { quote } = await quoteResponse.json();
-
-      // Add each service
-      for (const [serviceType, serviceData] of configuredServices) {
-        await apiRequest("POST", `/api/quotes/${quote.id}/services`, {
-          quoteId: quote.id,
-          serviceType,
-          ...serviceData,
-        });
-      }
-
       return quote;
     },
     onSuccess: () => {
@@ -272,7 +274,7 @@ export default function Quotes() {
     if (!service) return;
 
     // Calculate totals
-    let totalHours = 0;
+    let totalHours: number | undefined = 0;
     let totalCost = 0;
 
     if (service.requiresElevation) {
@@ -283,8 +285,9 @@ export default function Quotes() {
       totalHours = days * 8;
       totalCost = totalHours * (data.pricePerHour || 0);
     } else if (serviceBeingConfigured === "parkade") {
+      // Parkade uses stalls * price per stall (no hourly pricing)
       totalCost = (data.parkadeStalls || 0) * (data.pricePerStall || 0);
-      totalHours = totalCost / (data.pricePerHour || 1);
+      totalHours = undefined; // Parkade doesn't track hours
     } else if (serviceBeingConfigured === "ground_windows") {
       totalHours = data.groundWindowHours || 0;
       totalCost = totalHours * (data.pricePerHour || 0);
@@ -301,11 +304,21 @@ export default function Quotes() {
     }
 
     const newConfigured = new Map(configuredServices);
-    newConfigured.set(serviceBeingConfigured, {
-      ...data,
-      totalHours,
-      totalCost,
-    });
+    // Don't include pricePerHour for parkade
+    const configData = serviceBeingConfigured === "parkade" 
+      ? {
+          serviceType: data.serviceType,
+          parkadeStalls: data.parkadeStalls,
+          pricePerStall: data.pricePerStall,
+          totalCost,
+        }
+      : {
+          ...data,
+          totalHours,
+          totalCost,
+        };
+    
+    newConfigured.set(serviceBeingConfigured, configData as ServiceFormData);
     setConfiguredServices(newConfigured);
     setServiceBeingConfigured(null);
     setCreateStep("services");
