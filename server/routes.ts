@@ -1977,6 +1977,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       const numberOfPeriods = req.body.numberOfPeriods || 6;
+      const clearExisting = req.body.clearExisting || false;
+      
+      // Clear existing pay periods if requested (typically when changing configuration)
+      if (clearExisting) {
+        await storage.deleteAllPayPeriodsForCompany(companyId);
+      }
       
       const periods = await storage.generatePayPeriods(companyId, numberOfPeriods);
       res.json({ periods });

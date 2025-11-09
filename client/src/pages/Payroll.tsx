@@ -123,7 +123,7 @@ export default function Payroll() {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           credentials: 'include',
-          body: JSON.stringify({ numberOfPeriods: 6 }),
+          body: JSON.stringify({ numberOfPeriods: 6, clearExisting: true }),
         });
         
         if (response.ok) {

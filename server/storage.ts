@@ -666,6 +666,11 @@ export class Storage {
     return result[0];
   }
 
+  async deleteAllPayPeriodsForCompany(companyId: string): Promise<void> {
+    await db.delete(payPeriods)
+      .where(eq(payPeriods.companyId, companyId));
+  }
+
   // Get employee hours summary for a pay period
   async getEmployeeHoursForPayPeriod(companyId: string, startDate: string, endDate: string): Promise<EmployeeHoursSummary[]> {
     // Get all work sessions within the pay period
