@@ -35,6 +35,7 @@ export default function Quotes() {
   const { toast } = useToast();
   const [selectedPhoto, setSelectedPhoto] = useState<File | null>(null);
   const [showForm, setShowForm] = useState(false);
+  const [editingQuote, setEditingQuote] = useState<Quote | null>(null);
 
   // Fetch all quotes
   const { data: quotesData, isLoading } = useQuery<{ quotes: Quote[] }>({
@@ -153,6 +154,43 @@ export default function Quotes() {
     },
   });
 
+  const updateQuoteMutation = useMutation({
+    mutationFn: async ({ id, data }: { id: string; data: QuoteFormData }) => {
+      const response = await apiRequest("PATCH", `/api/quotes/${id}`, data);
+      return await response.json();
+    },
+    onSuccess: async (data) => {
+      // Upload photo if selected
+      if (selectedPhoto && data.quote.id) {
+        const formData = new FormData();
+        formData.append("photo", selectedPhoto);
+        
+        await fetch(`/api/quotes/${data.quote.id}/photo`, {
+          method: "POST",
+          body: formData,
+          credentials: "include",
+        });
+      }
+      
+      queryClient.invalidateQueries({ queryKey: ["/api/quotes"] });
+      toast({
+        title: "Quote updated",
+        description: "The quote has been updated successfully.",
+      });
+      form.reset();
+      setSelectedPhoto(null);
+      setShowForm(false);
+      setEditingQuote(null);
+    },
+    onError: (error: any) => {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: error.message || "Failed to update quote",
+      });
+    },
+  });
+
   const deleteQuoteMutation = useMutation({
     mutationFn: async (id: string) => {
       await apiRequest("DELETE", `/api/quotes/${id}`);
@@ -174,7 +212,60 @@ export default function Quotes() {
   });
 
   const onSubmit = (data: QuoteFormData) => {
-    createQuoteMutation.mutate(data);
+    if (editingQuote) {
+      updateQuoteMutation.mutate({ id: editingQuote.id, data });
+    } else {
+      createQuoteMutation.mutate(data);
+    }
+  };
+
+  const handleEditQuote = (quote: Quote) => {
+    setEditingQuote(quote);
+    setShowForm(true);
+    
+    // Populate form with quote data
+    form.reset({
+      buildingName: quote.buildingName,
+      strataPlanNumber: quote.strataPlanNumber,
+      buildingAddress: quote.buildingAddress,
+      floorCount: quote.floorCount,
+      dropsNorth: quote.dropsNorth,
+      dropsEast: quote.dropsEast,
+      dropsSouth: quote.dropsSouth,
+      dropsWest: quote.dropsWest,
+      dropsPerDay: quote.dropsPerDay,
+      pricePerHour: quote.pricePerHour.toString(),
+      totalHours: quote.totalHours.toString(),
+      totalCost: quote.totalCost.toString(),
+      hasParkade: quote.hasParkade,
+      parkadeStalls: quote.parkadeStalls || undefined,
+      pricePerStall: quote.pricePerStall?.toString() || undefined,
+      parkadeTotal: quote.parkadeTotal?.toString() || undefined,
+      hasGroundWindows: quote.hasGroundWindows,
+      groundWindowHours: quote.groundWindowHours?.toString() || undefined,
+      groundWindowTotal: quote.groundWindowTotal?.toString() || undefined,
+      status: quote.status,
+    });
+  };
+
+  const handleNewQuote = () => {
+    setEditingQuote(null);
+    form.reset({
+      buildingName: "",
+      strataPlanNumber: "",
+      buildingAddress: "",
+      floorCount: 1,
+      dropsNorth: 0,
+      dropsEast: 0,
+      dropsSouth: 0,
+      dropsWest: 0,
+      dropsPerDay: 1,
+      pricePerHour: "0",
+      hasParkade: false,
+      hasGroundWindows: false,
+      status: "draft",
+    });
+    setShowForm(true);
   };
 
   const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -198,7 +289,7 @@ export default function Quotes() {
           </div>
           <Button 
             variant="default" 
-            onClick={() => setShowForm(!showForm)}
+            onClick={handleNewQuote}
             data-testid="button-new-quote"
           >
             <span className="material-icons mr-2">add</span>
@@ -212,7 +303,7 @@ export default function Quotes() {
         {showForm && (
           <Card>
             <CardHeader>
-              <CardTitle>Create New Quote</CardTitle>
+              <CardTitle>{editingQuote ? "Edit Quote" : "Create New Quote"}</CardTitle>
               <CardDescription>Fill in the details to generate a quote for building maintenance</CardDescription>
             </CardHeader>
             <CardContent>
@@ -633,10 +724,13 @@ export default function Quotes() {
                   <Button 
                     type="submit" 
                     className="w-full" 
-                    disabled={createQuoteMutation.isPending}
+                    disabled={createQuoteMutation.isPending || updateQuoteMutation.isPending}
                     data-testid="button-submit-quote"
                   >
-                    {createQuoteMutation.isPending ? "Creating..." : "Create Quote"}
+                    {editingQuote 
+                      ? (updateQuoteMutation.isPending ? "Updating..." : "Update Quote")
+                      : (createQuoteMutation.isPending ? "Creating..." : "Create Quote")
+                    }
                   </Button>
                 </form>
               </Form>
@@ -675,16 +769,33 @@ export default function Quotes() {
                         <CardDescription className="text-xs line-clamp-1 mt-1">
                           {quote.buildingAddress}
                         </CardDescription>
+                        <CardDescription className="text-xs mt-2 flex items-center gap-1">
+                          <span className="material-icons text-[14px]">event</span>
+                          {new Date(quote.createdAt || '').toLocaleDateString('en-US', { 
+                            month: 'short', 
+                            day: 'numeric', 
+                            year: 'numeric' 
+                          })}
+                        </CardDescription>
                       </div>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="shrink-0"
-                        onClick={() => deleteQuoteMutation.mutate(quote.id)}
-                        data-testid={`button-delete-${quote.id}`}
-                      >
-                        <span className="material-icons text-destructive text-xl">delete</span>
-                      </Button>
+                      <div className="flex gap-1 shrink-0">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => handleEditQuote(quote)}
+                          data-testid={`button-edit-${quote.id}`}
+                        >
+                          <span className="material-icons text-primary text-xl">edit</span>
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => deleteQuoteMutation.mutate(quote.id)}
+                          data-testid={`button-delete-${quote.id}`}
+                        >
+                          <span className="material-icons text-destructive text-xl">delete</span>
+                        </Button>
+                      </div>
                     </div>
                   </CardHeader>
                   <CardContent className="space-y-4">
