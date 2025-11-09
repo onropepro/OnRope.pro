@@ -17,6 +17,7 @@ import Profile from "@/pages/Profile";
 import HarnessInspectionForm from "@/pages/HarnessInspectionForm";
 import ToolboxMeetingForm from "@/pages/ToolboxMeetingForm";
 import Payroll from "@/pages/Payroll";
+import Quotes from "@/pages/Quotes";
 import NotFound from "@/pages/not-found";
 import ProtectedRoute from "@/components/ProtectedRoute";
 
@@ -74,6 +75,11 @@ function Router() {
       <Route path="/payroll">
         <ProtectedRoute allowedRoles={["company", "operations_manager", "supervisor"]}>
           <Payroll />
+        </ProtectedRoute>
+      </Route>
+      <Route path="/quotes">
+        <ProtectedRoute allowedRoles={["company", "operations_manager", "supervisor"]}>
+          <Quotes />
         </ProtectedRoute>
       </Route>
       <Route component={NotFound} />

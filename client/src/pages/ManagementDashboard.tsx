@@ -835,6 +835,18 @@ export default function ManagementDashboard() {
                 <div className="text-xs text-muted-foreground">Manage employee hours</div>
               </div>
             </Button>
+            <Button
+              variant="outline"
+              className="h-auto flex-col gap-2 p-4"
+              onClick={() => setLocation("/quotes")}
+              data-testid="button-quotes"
+            >
+              <span className="material-icons text-primary">request_quote</span>
+              <div className="text-center">
+                <div className="font-semibold">Quotes</div>
+                <div className="text-xs text-muted-foreground">Create service quotes</div>
+              </div>
+            </Button>
           </div>
         </div>
 
