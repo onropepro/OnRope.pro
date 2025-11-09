@@ -22,6 +22,10 @@ export default function Payroll() {
   const [secondPayDay, setSecondPayDay] = useState<string>("15");
   const [startDayOfWeek, setStartDayOfWeek] = useState<string>("0");
   const [biWeeklyAnchorDate, setBiWeeklyAnchorDate] = useState<string>("");
+  const [monthlyStartDay, setMonthlyStartDay] = useState<string>("1");
+  const [monthlyEndDay, setMonthlyEndDay] = useState<string>("31");
+  const [customStartDate, setCustomStartDate] = useState<string>("");
+  const [customEndDate, setCustomEndDate] = useState<string>("");
 
   // Fetch pay period configuration
   const { data: configData } = useQuery<{ config: PayPeriodConfig | null }>({
@@ -109,6 +113,10 @@ export default function Payroll() {
       if (configData.config.secondPayDay) setSecondPayDay(String(configData.config.secondPayDay));
       if (configData.config.startDayOfWeek !== null) setStartDayOfWeek(String(configData.config.startDayOfWeek));
       if (configData.config.biWeeklyAnchorDate) setBiWeeklyAnchorDate(configData.config.biWeeklyAnchorDate);
+      if (configData.config.monthlyStartDay) setMonthlyStartDay(String(configData.config.monthlyStartDay));
+      if (configData.config.monthlyEndDay) setMonthlyEndDay(String(configData.config.monthlyEndDay));
+      if (configData.config.customStartDate) setCustomStartDate(configData.config.customStartDate);
+      if (configData.config.customEndDate) setCustomEndDate(configData.config.customEndDate);
     }
   });
 
@@ -120,11 +128,17 @@ export default function Payroll() {
     if (periodType === 'semi-monthly') {
       config.firstPayDay = parseInt(firstPayDay);
       config.secondPayDay = parseInt(secondPayDay);
+    } else if (periodType === 'monthly') {
+      config.monthlyStartDay = parseInt(monthlyStartDay);
+      config.monthlyEndDay = parseInt(monthlyEndDay);
     } else if (periodType === 'weekly') {
       config.startDayOfWeek = parseInt(startDayOfWeek);
     } else if (periodType === 'bi-weekly') {
       config.startDayOfWeek = parseInt(startDayOfWeek);
       config.biWeeklyAnchorDate = biWeeklyAnchorDate || new Date().toISOString().split('T')[0];
+    } else if (periodType === 'custom') {
+      config.customStartDate = customStartDate;
+      config.customEndDate = customEndDate;
     }
 
     saveConfigMutation.mutate(config);
@@ -341,9 +355,11 @@ export default function Payroll() {
                     <SelectValue placeholder="Select period type" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="semi-monthly">Semi-Monthly (1st & 15th)</SelectItem>
+                    <SelectItem value="semi-monthly">Semi-Monthly</SelectItem>
+                    <SelectItem value="monthly">Monthly</SelectItem>
                     <SelectItem value="weekly">Weekly</SelectItem>
                     <SelectItem value="bi-weekly">Bi-Weekly</SelectItem>
+                    <SelectItem value="custom">Custom Range</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -361,6 +377,7 @@ export default function Payroll() {
                       onChange={(e) => setFirstPayDay(e.target.value)}
                       data-testid="input-first-pay-day"
                     />
+                    <p className="text-sm text-muted-foreground">Day 1-28</p>
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="second-pay-day">Second Pay Day of Month</Label>
@@ -373,6 +390,38 @@ export default function Payroll() {
                       onChange={(e) => setSecondPayDay(e.target.value)}
                       data-testid="input-second-pay-day"
                     />
+                    <p className="text-sm text-muted-foreground">Day 1-28</p>
+                  </div>
+                </div>
+              )}
+
+              {periodType === 'monthly' && (
+                <div className="grid gap-4 md:grid-cols-2">
+                  <div className="space-y-2">
+                    <Label htmlFor="monthly-start-day">Period Start Day</Label>
+                    <Input
+                      id="monthly-start-day"
+                      type="number"
+                      min="1"
+                      max="28"
+                      value={monthlyStartDay}
+                      onChange={(e) => setMonthlyStartDay(e.target.value)}
+                      data-testid="input-monthly-start-day"
+                    />
+                    <p className="text-sm text-muted-foreground">Day of month when period starts (1-28)</p>
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="monthly-end-day">Period End Day</Label>
+                    <Input
+                      id="monthly-end-day"
+                      type="number"
+                      min="1"
+                      max="31"
+                      value={monthlyEndDay}
+                      onChange={(e) => setMonthlyEndDay(e.target.value)}
+                      data-testid="input-monthly-end-day"
+                    />
+                    <p className="text-sm text-muted-foreground">Day of month when period ends (1-31)</p>
                   </div>
                 </div>
               )}
@@ -423,6 +472,37 @@ export default function Payroll() {
                     />
                     <p className="text-sm text-muted-foreground">
                       First day of a pay period to use as reference
+                    </p>
+                  </div>
+                </div>
+              )}
+
+              {periodType === 'custom' && (
+                <div className="grid gap-4 md:grid-cols-2">
+                  <div className="space-y-2">
+                    <Label htmlFor="custom-start-date">Period Start Date</Label>
+                    <Input
+                      id="custom-start-date"
+                      type="date"
+                      value={customStartDate}
+                      onChange={(e) => setCustomStartDate(e.target.value)}
+                      data-testid="input-custom-start-date"
+                    />
+                    <p className="text-sm text-muted-foreground">
+                      Starting date of your custom pay period
+                    </p>
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="custom-end-date">Period End Date</Label>
+                    <Input
+                      id="custom-end-date"
+                      type="date"
+                      value={customEndDate}
+                      onChange={(e) => setCustomEndDate(e.target.value)}
+                      data-testid="input-custom-end-date"
+                    />
+                    <p className="text-sm text-muted-foreground">
+                      Ending date of your custom pay period
                     </p>
                   </div>
                 </div>

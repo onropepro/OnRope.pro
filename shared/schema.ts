@@ -303,17 +303,25 @@ export const toolboxMeetings = pgTable("toolbox_meetings", {
 export const payPeriodConfig = pgTable("pay_period_config", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   companyId: varchar("company_id").notNull().unique().references(() => users.id, { onDelete: "cascade" }),
-  periodType: varchar("period_type").notNull(), // semi-monthly | weekly | bi-weekly
+  periodType: varchar("period_type").notNull(), // semi-monthly | weekly | bi-weekly | monthly | custom
   
   // For semi-monthly: first day of period (1-28, default 1 and 15)
-  firstPayDay: integer("first_pay_day").default(1), // 1st of month
-  secondPayDay: integer("second_pay_day").default(15), // 15th of month
+  firstPayDay: integer("first_pay_day"), // First pay day of month (e.g., 1)
+  secondPayDay: integer("second_pay_day"), // Second pay day of month (e.g., 15)
+  
+  // For monthly: start and end day of month
+  monthlyStartDay: integer("monthly_start_day"), // Day of month when period starts (1-28)
+  monthlyEndDay: integer("monthly_end_day"), // Day of month when period ends (1-31)
   
   // For weekly/bi-weekly: day of week (0=Sunday, 1=Monday, ..., 6=Saturday)
   startDayOfWeek: integer("start_day_of_week"), // Day when week starts
   
   // For bi-weekly: anchor date to calculate from
   biWeeklyAnchorDate: date("bi_weekly_anchor_date"), // Starting point for bi-weekly periods
+  
+  // For custom range: specific start and end dates
+  customStartDate: date("custom_start_date"), // Custom range start date
+  customEndDate: date("custom_end_date"), // Custom range end date
   
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
