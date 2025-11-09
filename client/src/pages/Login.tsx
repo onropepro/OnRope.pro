@@ -6,6 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
+import overhaulLabsLogo from "@assets/Screenshot 2025-11-09 at 14.46.08_1762728408763.png";
 
 const loginSchema = z.object({
   identifier: z.string().min(1, "Email or company name is required"),
@@ -265,6 +266,18 @@ export default function Login() {
             <div className="pt-2 text-center text-xs text-muted-foreground space-y-1">
               <p className="font-medium">Secure, Professional, Transparent</p>
               <p>Purpose-built for rope access and building maintenance operations</p>
+            </div>
+
+            {/* Powered by Overhaul Labs */}
+            <div className="pt-6 mt-6 border-t flex items-center justify-center gap-2 opacity-60 hover:opacity-100 transition-opacity">
+              <img 
+                src={overhaulLabsLogo} 
+                alt="Overhaul Labs" 
+                className="h-8 w-8 object-contain"
+              />
+              <span className="text-xs text-muted-foreground font-medium">
+                Powered by <span className="text-foreground">Overhaul Labs</span>
+              </span>
             </div>
           </CardContent>
         </Card>

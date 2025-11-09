@@ -2094,8 +2094,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // ==================== QUOTE ROUTES ====================
   
-  // Create new quote with services
+  // Create new quote with services (atomic transaction)
   app.post("/api/quotes", requireAuth, requireRole("company", "operations_manager", "supervisor"), async (req: Request, res: Response) => {
+    let createdQuoteId: string | null = null;
+    
     try {
       const currentUser = await storage.getUserById(req.session.userId!);
       if (!currentUser) {
@@ -2109,15 +2111,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       const { services, ...quoteFields } = req.body;
       
+      // Validate that at least one service is provided
+      if (!services || !Array.isArray(services) || services.length === 0) {
+        return res.status(400).json({ message: "At least one service is required for a quote" });
+      }
+      
       const quoteData = insertQuoteSchema.parse({
         ...quoteFields,
         companyId,
       });
       
+      // Create the quote
       const quote = await storage.createQuote(quoteData);
+      createdQuoteId = quote.id;
       
-      // Create services if provided
-      if (services && Array.isArray(services)) {
+      // Create all services - if any fail, rollback the quote
+      try {
         for (const serviceData of services) {
           const service = insertQuoteServiceSchema.parse({
             ...serviceData,
@@ -2125,6 +2134,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
           });
           await storage.createQuoteService(service);
         }
+      } catch (serviceError) {
+        // Rollback: delete the quote if service creation failed
+        await storage.deleteQuote(quote.id);
+        throw new Error(`Failed to create services: ${serviceError instanceof Error ? serviceError.message : 'Unknown error'}`);
       }
       
       // Get the complete quote with services
@@ -2135,7 +2148,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Validation error", errors: error.errors });
       }
       console.error("Create quote error:", error);
-      res.status(500).json({ message: "Internal server error" });
+      res.status(500).json({ message: error instanceof Error ? error.message : "Internal server error" });
     }
   });
 
