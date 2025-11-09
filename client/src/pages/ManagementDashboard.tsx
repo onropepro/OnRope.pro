@@ -840,6 +840,12 @@ export default function ManagementDashboard() {
                     Projects
                   </div>
                 </SelectItem>
+                <SelectItem value="past-projects">
+                  <div className="flex items-center gap-2">
+                    <span className="material-icons text-sm">done_all</span>
+                    Past Projects
+                  </div>
+                </SelectItem>
                 <SelectItem value="performance">
                   <div className="flex items-center gap-2">
                     <span className="material-icons text-sm">analytics</span>
@@ -880,6 +886,10 @@ export default function ManagementDashboard() {
               <TabsTrigger value="projects" data-testid="tab-projects" className="inline-flex items-center justify-center whitespace-nowrap rounded-full px-4 py-2 text-sm font-medium transition-all min-w-[110px] sm:min-w-0">
                 <span className="material-icons text-sm mr-2">apartment</span>
                 Projects
+              </TabsTrigger>
+              <TabsTrigger value="past-projects" data-testid="tab-past-projects" className="inline-flex items-center justify-center whitespace-nowrap rounded-full px-4 py-2 text-sm font-medium transition-all min-w-[130px] sm:min-w-0">
+                <span className="material-icons text-sm mr-2">done_all</span>
+                Past Projects
               </TabsTrigger>
               <TabsTrigger value="performance" data-testid="tab-performance" className="inline-flex items-center justify-center whitespace-nowrap rounded-full px-4 py-2 text-sm font-medium transition-all min-w-[120px] sm:min-w-0">
                 <span className="material-icons text-sm mr-2">analytics</span>
@@ -1346,51 +1356,56 @@ export default function ManagementDashboard() {
                   )}
                 </div>
               </div>
+            </div>
+          </TabsContent>
 
-              {/* Completed Projects */}
-              {filteredProjects.filter((p: Project) => p.status === "completed").length > 0 && (
-                <>
-                  <Separator className="my-8" />
-                  <div>
-                    <div className="flex items-center gap-2 mb-6">
-                      <div className="h-8 w-1 bg-success rounded-full"></div>
-                      <h2 className="text-xl font-bold">Completed Projects</h2>
-                    </div>
-                    <div className="space-y-4">
-                      {filteredProjects.filter((p: Project) => p.status === "completed").map((project: Project) => (
-                        <Card 
-                          key={project.id} 
-                          className="group border-l-4 border-l-success shadow-md hover:shadow-lg transition-all duration-200 cursor-pointer bg-gradient-to-br from-background to-success/5" 
-                          data-testid={`completed-project-${project.id}`}
-                          onClick={() => setLocation(`/projects/${project.id}`)}
-                        >
-                          <CardContent className="p-5">
-                            <div className="flex items-start justify-between">
-                              <div className="flex-1">
-                                <div className="text-lg font-bold mb-1">{project.buildingName}</div>
-                                <div className="text-sm font-medium text-muted-foreground mb-1">{project.strataPlanNumber}</div>
-                                <div className="text-sm text-muted-foreground capitalize flex items-center gap-2">
-                                  <span className="material-icons text-base text-success">check_circle</span>
-                                  {project.jobType.replace(/_/g, ' ')}
-                                </div>
-                                {project.createdAt && (
-                                  <div className="text-xs text-muted-foreground mt-1 flex items-center gap-1">
-                                    <span className="material-icons text-xs">event</span>
-                                    Created {new Date(project.createdAt).toLocaleDateString()}
-                                  </div>
-                                )}
-                              </div>
-                              <Badge variant="default" className="bg-success hover:bg-success text-white">
-                                <span className="material-icons text-xs mr-1">done_all</span>
-                                Complete
-                              </Badge>
+          <TabsContent value="past-projects">
+            <div className="space-y-4">
+              <div className="flex items-center gap-2 mb-6">
+                <div className="h-8 w-1 bg-success rounded-full"></div>
+                <h2 className="text-xl font-bold">Past Projects</h2>
+              </div>
+              {filteredProjects.filter((p: Project) => p.status === "completed").length === 0 ? (
+                <Card>
+                  <CardContent className="p-8 text-center text-muted-foreground">
+                    <span className="material-icons text-4xl mb-2 opacity-50">done_all</span>
+                    <div>No completed projects yet</div>
+                  </CardContent>
+                </Card>
+              ) : (
+                <div className="space-y-4">
+                  {filteredProjects.filter((p: Project) => p.status === "completed").map((project: Project) => (
+                    <Card 
+                      key={project.id} 
+                      className="group border-l-4 border-l-success shadow-md hover:shadow-lg transition-all duration-200 cursor-pointer bg-gradient-to-br from-background to-success/5" 
+                      data-testid={`completed-project-${project.id}`}
+                      onClick={() => setLocation(`/projects/${project.id}`)}
+                    >
+                      <CardContent className="p-5">
+                        <div className="flex items-start justify-between">
+                          <div className="flex-1">
+                            <div className="text-lg font-bold mb-1">{project.buildingName}</div>
+                            <div className="text-sm font-medium text-muted-foreground mb-1">{project.strataPlanNumber}</div>
+                            <div className="text-sm text-muted-foreground capitalize flex items-center gap-2">
+                              <span className="material-icons text-base text-success">check_circle</span>
+                              {project.jobType.replace(/_/g, ' ')}
                             </div>
-                          </CardContent>
-                        </Card>
-                      ))}
-                    </div>
-                  </div>
-                </>
+                            {project.createdAt && (
+                              <div className="text-xs text-muted-foreground mt-1 flex items-center gap-1">
+                                <span className="material-icons text-xs">event</span>
+                                Created {new Date(project.createdAt).toLocaleDateString()}
+                              </div>
+                            )}
+                          </div>
+                          <Badge variant="default" className="bg-success hover:bg-success text-white">
+                            <span className="material-icons text-xs mr-1">done_all</span>
+                            Complete
+                          </Badge>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
               )}
             </div>
           </TabsContent>
