@@ -1,6 +1,6 @@
 import { db } from "./db";
-import { users, projects, dropLogs, workSessions, complaints, complaintNotes, projectPhotos, jobComments, harnessInspections, toolboxMeetings, payPeriodConfig, payPeriods } from "@shared/schema";
-import type { User, InsertUser, Project, InsertProject, DropLog, InsertDropLog, WorkSession, InsertWorkSession, Complaint, InsertComplaint, ComplaintNote, InsertComplaintNote, ProjectPhoto, InsertProjectPhoto, JobComment, InsertJobComment, HarnessInspection, InsertHarnessInspection, ToolboxMeeting, InsertToolboxMeeting, PayPeriodConfig, InsertPayPeriodConfig, PayPeriod, InsertPayPeriod, EmployeeHoursSummary } from "@shared/schema";
+import { users, projects, dropLogs, workSessions, complaints, complaintNotes, projectPhotos, jobComments, harnessInspections, toolboxMeetings, payPeriodConfig, payPeriods, quotes } from "@shared/schema";
+import type { User, InsertUser, Project, InsertProject, DropLog, InsertDropLog, WorkSession, InsertWorkSession, Complaint, InsertComplaint, ComplaintNote, InsertComplaintNote, ProjectPhoto, InsertProjectPhoto, JobComment, InsertJobComment, HarnessInspection, InsertHarnessInspection, ToolboxMeeting, InsertToolboxMeeting, PayPeriodConfig, InsertPayPeriodConfig, PayPeriod, InsertPayPeriod, EmployeeHoursSummary, Quote, InsertQuote } from "@shared/schema";
 import { eq, and, desc, sql, isNull, gte, lte, between } from "drizzle-orm";
 import bcrypt from "bcrypt";
 
@@ -828,6 +828,42 @@ export class Storage {
     }
 
     return created;
+  }
+
+  // Quote operations
+  async createQuote(quote: InsertQuote): Promise<Quote> {
+    const result = await db.insert(quotes).values(quote).returning();
+    return result[0];
+  }
+
+  async getQuoteById(id: string): Promise<Quote | undefined> {
+    const result = await db.select().from(quotes)
+      .where(eq(quotes.id, id))
+      .limit(1);
+    return result[0];
+  }
+
+  async getQuotesByCompany(companyId: string, status?: string): Promise<Quote[]> {
+    if (status) {
+      return db.select().from(quotes)
+        .where(and(eq(quotes.companyId, companyId), eq(quotes.status, status)))
+        .orderBy(desc(quotes.createdAt));
+    }
+    return db.select().from(quotes)
+      .where(eq(quotes.companyId, companyId))
+      .orderBy(desc(quotes.createdAt));
+  }
+
+  async updateQuote(id: string, updates: Partial<InsertQuote>): Promise<Quote> {
+    const result = await db.update(quotes)
+      .set({ ...updates, updatedAt: new Date() })
+      .where(eq(quotes.id, id))
+      .returning();
+    return result[0];
+  }
+
+  async deleteQuote(id: string): Promise<void> {
+    await db.delete(quotes).where(eq(quotes.id, id));
   }
 }
 
