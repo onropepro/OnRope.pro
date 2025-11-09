@@ -30,7 +30,7 @@ const projectSchema = z.object({
   strataPlanNumber: z.string().min(1, "Strata plan number is required"),
   buildingName: z.string().min(1, "Building name is required"),
   buildingAddress: z.string().optional(),
-  jobType: z.enum(["window_cleaning", "dryer_vent_cleaning", "pressure_washing", "in_suite_dryer_vent_cleaning", "parkade_pressure_cleaning", "ground_window_cleaning"]),
+  jobType: z.enum(["window_cleaning", "dryer_vent_cleaning", "pressure_washing", "general_pressure_washing", "gutter_cleaning", "in_suite_dryer_vent_cleaning", "parkade_pressure_cleaning", "ground_window_cleaning"]),
   totalDropsNorth: z.string().optional(),
   totalDropsEast: z.string().optional(),
   totalDropsSouth: z.string().optional(),
@@ -1072,8 +1072,10 @@ export default function ManagementDashboard() {
                                 </FormControl>
                                 <SelectContent>
                                   <SelectItem value="window_cleaning">Window Cleaning</SelectItem>
-                                  <SelectItem value="dryer_vent_cleaning">Dryer Vent Cleaning</SelectItem>
+                                  <SelectItem value="dryer_vent_cleaning">Exterior Dryer Vent Cleaning</SelectItem>
                                   <SelectItem value="pressure_washing">Pressure Washing</SelectItem>
+                                  <SelectItem value="general_pressure_washing">General Pressure Washing</SelectItem>
+                                  <SelectItem value="gutter_cleaning">Gutter Cleaning</SelectItem>
                                   <SelectItem value="in_suite_dryer_vent_cleaning">In-Suite Dryer Vent Cleaning</SelectItem>
                                   <SelectItem value="parkade_pressure_cleaning">Parkade Pressure Cleaning</SelectItem>
                                   <SelectItem value="ground_window_cleaning">Ground Window Cleaning</SelectItem>

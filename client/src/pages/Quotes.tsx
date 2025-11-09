@@ -9,6 +9,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { insertQuoteSchema, type QuoteWithServices } from "@shared/schema";
 import { 
@@ -22,7 +24,9 @@ import {
   Plus,
   X,
   Eye,
-  CheckCircle2
+  CheckCircle2,
+  Waves,
+  Pipette
 } from "lucide-react";
 
 // Service types configuration
@@ -36,7 +40,7 @@ const SERVICE_TYPES = [
   },
   { 
     id: "dryer_vent_cleaning", 
-    name: "Dryer Vent Cleaning", 
+    name: "Exterior Dryer Vent Cleaning", 
     icon: Wind,
     description: "Exterior dryer vent cleaning",
     requiresElevation: true
@@ -47,6 +51,20 @@ const SERVICE_TYPES = [
     icon: Droplet,
     description: "Building exterior cleaning",
     requiresElevation: true
+  },
+  { 
+    id: "general_pressure_washing", 
+    name: "General Pressure Washing", 
+    icon: Pipette,
+    description: "General pressure washing services",
+    requiresElevation: false
+  },
+  { 
+    id: "gutter_cleaning", 
+    name: "Gutter Cleaning", 
+    icon: Waves,
+    description: "Gutter cleaning and maintenance",
+    requiresElevation: false
   },
   { 
     id: "parkade", 
@@ -95,6 +113,12 @@ const serviceFormSchema = z.object({
   // In-suite fields
   suitesPerDay: z.coerce.number().optional(),
   floorsPerDay: z.coerce.number().optional(),
+  // Dryer vent pricing option
+  dryerVentPricingType: z.enum(["per_hour", "per_unit"]).default("per_hour"),
+  dryerVentUnits: z.coerce.number().min(1, "At least 1 unit required").optional(),
+  dryerVentPricePerUnit: z.coerce.number().min(0).optional(),
+  // General pressure washing / gutter cleaning fields
+  simpleServiceHours: z.coerce.number().min(0.1, "At least 0.1 hours required").optional(),
   // Common fields
   pricePerHour: z.coerce.number().min(0).optional(), // Optional for parkade (uses price per stall)
   totalHours: z.coerce.number().optional(),
@@ -258,6 +282,10 @@ export default function Quotes() {
       groundWindowHours: existingConfig?.groundWindowHours,
       suitesPerDay: existingConfig?.suitesPerDay,
       floorsPerDay: existingConfig?.floorsPerDay,
+      dryerVentPricingType: existingConfig?.dryerVentPricingType ?? "per_hour",
+      dryerVentUnits: existingConfig?.dryerVentUnits,
+      dryerVentPricePerUnit: existingConfig?.dryerVentPricePerUnit,
+      simpleServiceHours: existingConfig?.simpleServiceHours,
       pricePerHour: existingConfig?.pricePerHour ?? 0,
       totalHours: existingConfig?.totalHours,
       totalCost: existingConfig?.totalCost,
@@ -277,7 +305,21 @@ export default function Quotes() {
     let totalHours: number | undefined = 0;
     let totalCost = 0;
 
-    if (service.requiresElevation) {
+    if (serviceBeingConfigured === "dryer_vent_cleaning") {
+      // Dryer vent can be priced per hour OR per unit
+      if (data.dryerVentPricingType === "per_unit") {
+        totalCost = (data.dryerVentUnits || 0) * (data.dryerVentPricePerUnit || 0);
+        totalHours = undefined; // Not tracking hours for per-unit pricing
+      } else {
+        // Per hour pricing - uses the standard elevation drop logic
+        const totalDrops = (data.dropsNorth || 0) + (data.dropsEast || 0) + 
+                          (data.dropsSouth || 0) + (data.dropsWest || 0);
+        const dropsPerDay = data.dropsPerDay || 1;
+        const days = totalDrops / dropsPerDay;
+        totalHours = days * 8;
+        totalCost = totalHours * (data.pricePerHour || 0);
+      }
+    } else if (service.requiresElevation) {
       const totalDrops = (data.dropsNorth || 0) + (data.dropsEast || 0) + 
                         (data.dropsSouth || 0) + (data.dropsWest || 0);
       const dropsPerDay = data.dropsPerDay || 1;
@@ -290,6 +332,10 @@ export default function Quotes() {
       totalHours = undefined; // Parkade doesn't track hours
     } else if (serviceBeingConfigured === "ground_windows") {
       totalHours = data.groundWindowHours || 0;
+      totalCost = totalHours * (data.pricePerHour || 0);
+    } else if (serviceBeingConfigured === "general_pressure_washing" || serviceBeingConfigured === "gutter_cleaning") {
+      // Simple services: hours + price per hour
+      totalHours = data.simpleServiceHours || 0;
       totalCost = totalHours * (data.pricePerHour || 0);
     } else if (serviceBeingConfigured === "in_suite") {
       if (data.floorsPerDay) {
@@ -304,21 +350,43 @@ export default function Quotes() {
     }
 
     const newConfigured = new Map(configuredServices);
-    // Don't include pricePerHour for parkade
-    const configData = serviceBeingConfigured === "parkade" 
-      ? {
-          serviceType: data.serviceType,
-          parkadeStalls: data.parkadeStalls,
-          pricePerStall: data.pricePerStall,
-          totalCost,
-        }
-      : {
-          ...data,
-          totalHours,
-          totalCost,
-        };
     
-    newConfigured.set(serviceBeingConfigured, configData as ServiceFormData);
+    // Build configData based on service type
+    let configData: ServiceFormData;
+    
+    if (serviceBeingConfigured === "parkade") {
+      configData = {
+        serviceType: data.serviceType,
+        parkadeStalls: data.parkadeStalls,
+        pricePerStall: data.pricePerStall,
+        totalCost,
+      } as ServiceFormData;
+    } else if (serviceBeingConfigured === "dryer_vent_cleaning" && data.dryerVentPricingType === "per_unit") {
+      configData = {
+        serviceType: data.serviceType,
+        dryerVentPricingType: data.dryerVentPricingType,
+        dryerVentUnits: data.dryerVentUnits,
+        dryerVentPricePerUnit: data.dryerVentPricePerUnit,
+        totalCost,
+      } as ServiceFormData;
+    } else if (serviceBeingConfigured === "general_pressure_washing" || serviceBeingConfigured === "gutter_cleaning") {
+      configData = {
+        serviceType: data.serviceType,
+        simpleServiceHours: data.simpleServiceHours,
+        pricePerHour: data.pricePerHour,
+        totalHours,
+        totalCost,
+      } as ServiceFormData;
+    } else {
+      // For all other services (elevation-based, ground_windows, in_suite)
+      configData = {
+        ...data,
+        totalHours,
+        totalCost,
+      };
+    }
+    
+    newConfigured.set(serviceBeingConfigured, configData);
     setConfiguredServices(newConfigured);
     setServiceBeingConfigured(null);
     setCreateStep("services");
@@ -774,18 +842,21 @@ export default function Quotes() {
         <div className="max-w-6xl mx-auto">
           <Button
             variant="ghost"
-            onClick={() => setCreateStep("building")}
+            onClick={() => {
+              resetForm();
+              setView("list");
+            }}
             className="mb-6"
-            data-testid="button-back-to-building"
+            data-testid="button-back-to-list"
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
-            Back to Building Info
+            Back to Quotes
           </Button>
 
           <div className="mb-8">
             <h1 className="text-4xl font-bold text-[#0A0A0A] mb-2">Select Services</h1>
             <p className="text-[#71717A] text-lg">
-              Choose one or more services for {buildingInfo?.buildingName}
+              Choose one or more services for this quote
             </p>
           </div>
 
@@ -944,7 +1015,9 @@ export default function Quotes() {
             <CardContent className="p-8 pt-0">
               <Form {...serviceForm}>
                 <form onSubmit={serviceForm.handleSubmit(handleServiceFormSubmit)} className="space-y-6">
-                  {service.requiresElevation && (
+                  {service.requiresElevation && 
+                   (serviceBeingConfigured !== "dryer_vent_cleaning" || 
+                    serviceForm.watch("dryerVentPricingType") === "per_hour") && (
                     <>
                       <div className="grid grid-cols-2 gap-4">
                         <FormField
@@ -1156,8 +1229,107 @@ export default function Quotes() {
                     </>
                   )}
 
-                  {/* Price Per Hour - Not needed for parkade (uses price per stall) */}
-                  {serviceBeingConfigured !== "parkade" && (
+                  {serviceBeingConfigured === "dryer_vent_cleaning" && (
+                    <>
+                      <FormField
+                        control={serviceForm.control}
+                        name="dryerVentPricingType"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Pricing Method</FormLabel>
+                            <FormControl>
+                              <RadioGroup
+                                onValueChange={field.onChange}
+                                defaultValue={field.value || "per_hour"}
+                                className="flex gap-4"
+                              >
+                                <div className="flex items-center space-x-2">
+                                  <RadioGroupItem value="per_hour" id="per_hour" data-testid="radio-per-hour" />
+                                  <Label htmlFor="per_hour">Per Hour</Label>
+                                </div>
+                                <div className="flex items-center space-x-2">
+                                  <RadioGroupItem value="per_unit" id="per_unit" data-testid="radio-per-unit" />
+                                  <Label htmlFor="per_unit">Per Unit</Label>
+                                </div>
+                              </RadioGroup>
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      {serviceForm.watch("dryerVentPricingType") === "per_unit" && (
+                        <>
+                          <FormField
+                            control={serviceForm.control}
+                            name="dryerVentUnits"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Number of Units</FormLabel>
+                                <FormControl>
+                                  <Input
+                                    {...field}
+                                    type="number"
+                                    min="1"
+                                    className="h-12"
+                                    data-testid="input-dryer-vent-units"
+                                  />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                          <FormField
+                            control={serviceForm.control}
+                            name="dryerVentPricePerUnit"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Price Per Unit</FormLabel>
+                                <FormControl>
+                                  <Input
+                                    {...field}
+                                    type="number"
+                                    min="0"
+                                    step="0.01"
+                                    className="h-12"
+                                    data-testid="input-dryer-vent-price-per-unit"
+                                  />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                        </>
+                      )}
+                    </>
+                  )}
+
+                  {(serviceBeingConfigured === "general_pressure_washing" || serviceBeingConfigured === "gutter_cleaning") && (
+                    <FormField
+                      control={serviceForm.control}
+                      name="simpleServiceHours"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Hours Required</FormLabel>
+                          <FormControl>
+                            <Input
+                              {...field}
+                              type="number"
+                              min="0"
+                              step="0.1"
+                              className="h-12"
+                              data-testid="input-simple-service-hours"
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  )}
+
+                  {/* Price Per Hour - Not needed for parkade (uses price per stall) or dryer vent per-unit */}
+                  {serviceBeingConfigured !== "parkade" && 
+                   !(serviceBeingConfigured === "dryer_vent_cleaning" && serviceForm.watch("dryerVentPricingType") === "per_unit") && (
                     <FormField
                       control={serviceForm.control}
                       name="pricePerHour"
