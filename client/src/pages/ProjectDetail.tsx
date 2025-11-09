@@ -32,6 +32,7 @@ export default function ProjectDetail() {
   const [photoComment, setPhotoComment] = useState("");
   const [selectedMeeting, setSelectedMeeting] = useState<any>(null);
   const [newComment, setNewComment] = useState("");
+  const [selectedSession, setSelectedSession] = useState<any>(null);
 
   const { data: projectData, isLoading } = useQuery({
     queryKey: ["/api/projects", id],
@@ -947,72 +948,23 @@ export default function ProjectDetail() {
                                                                      (session.dropsCompletedSouth ?? 0) + (session.dropsCompletedWest ?? 0);
                                                 const metTarget = sessionDrops >= project.dailyDropTarget;
                                                 
-                                                let hoursWorked = 0;
-                                                let laborCost = 0;
-                                                if (isCompleted && session.startTime && session.endTime) {
-                                                  const start = new Date(session.startTime);
-                                                  const end = new Date(session.endTime);
-                                                  hoursWorked = (end.getTime() - start.getTime()) / (1000 * 60 * 60);
-                                                  
-                                                  if (session.techHourlyRate) {
-                                                    laborCost = hoursWorked * parseFloat(session.techHourlyRate);
-                                                  }
-                                                }
-                                                
                                                 return (
                                                   <div
                                                     key={session.id}
-                                                    className="flex items-center justify-between p-3 rounded-lg border bg-card"
+                                                    onClick={() => setSelectedSession(session)}
+                                                    className="flex items-center justify-between p-3 rounded-lg border bg-card cursor-pointer hover-elevate active-elevate-2"
                                                     data-testid={`session-${session.id}`}
                                                   >
-                                                    <div className="flex-1 space-y-1">
-                                                      <div className="flex items-center gap-2">
-                                                        <p className="text-sm font-medium">
-                                                          {session.techName || "Unknown"}
-                                                        </p>
-                                                        {isCompleted ? (
-                                                          <Badge variant={metTarget ? "default" : "destructive"} className="text-xs" data-testid={`badge-${metTarget ? "met" : "below"}-target`}>
-                                                            {metTarget ? "Target Met" : "Below Target"}
-                                                          </Badge>
-                                                        ) : (
-                                                          <Badge variant="outline" className="text-xs">In Progress</Badge>
-                                                        )}
-                                                      </div>
-                                                      {isCompleted && (
-                                                        <>
-                                                          <p className="text-xs text-muted-foreground">
-                                                            Drops: {sessionDrops} / {project.dailyDropTarget} target
-                                                          </p>
-                                                          {session.shortfallReason && (
-                                                            <p className="text-xs text-muted-foreground italic">
-                                                              Note: {session.shortfallReason}
-                                                            </p>
-                                                          )}
-                                                        </>
-                                                      )}
-                                                    </div>
-                                                    <div className="text-right text-xs space-y-1">
-                                                      {isCompleted && (
-                                                        <>
-                                                          <p className="text-muted-foreground">
-                                                            {format(new Date(session.startTime), "h:mm a")} -{" "}
-                                                            {format(new Date(session.endTime), "h:mm a")}
-                                                          </p>
-                                                          {canViewFinancialData && (
-                                                            <>
-                                                              <p className="text-muted-foreground">
-                                                                {hoursWorked.toFixed(1)} hrs
-                                                              </p>
-                                                              {laborCost > 0 && (
-                                                                <p className="font-medium text-primary" data-testid="text-labor-cost">
-                                                                  ${laborCost.toFixed(2)}
-                                                                </p>
-                                                              )}
-                                                            </>
-                                                          )}
-                                                        </>
-                                                      )}
-                                                    </div>
+                                                    <p className="text-sm font-medium">
+                                                      {session.techName || "Unknown"}
+                                                    </p>
+                                                    {isCompleted ? (
+                                                      <Badge variant={metTarget ? "default" : "destructive"} className="text-xs" data-testid={`badge-${metTarget ? "met" : "below"}-target`}>
+                                                        {metTarget ? "Target Met" : "Below Target"}
+                                                      </Badge>
+                                                    ) : (
+                                                      <Badge variant="outline" className="text-xs">In Progress</Badge>
+                                                    )}
                                                   </div>
                                                 );
                                               })}
@@ -1113,6 +1065,122 @@ export default function ProjectDetail() {
               Upload Photo
             </Button>
           </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Work Session Details Dialog */}
+      <Dialog open={!!selectedSession} onOpenChange={() => setSelectedSession(null)}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <span className="material-icons">work_history</span>
+              Work Session Details
+            </DialogTitle>
+          </DialogHeader>
+          {selectedSession && (() => {
+            const sessionDate = new Date(selectedSession.workDate);
+            const isCompleted = selectedSession.endTime !== null;
+            const sessionDrops = (selectedSession.dropsCompletedNorth ?? 0) + 
+                                (selectedSession.dropsCompletedEast ?? 0) + 
+                                (selectedSession.dropsCompletedSouth ?? 0) + 
+                                (selectedSession.dropsCompletedWest ?? 0);
+            const metTarget = sessionDrops >= project.dailyDropTarget;
+            
+            let hoursWorked = 0;
+            let laborCost = 0;
+            if (isCompleted && selectedSession.startTime && selectedSession.endTime) {
+              const start = new Date(selectedSession.startTime);
+              const end = new Date(selectedSession.endTime);
+              hoursWorked = (end.getTime() - start.getTime()) / (1000 * 60 * 60);
+              
+              if (selectedSession.techHourlyRate) {
+                laborCost = hoursWorked * parseFloat(selectedSession.techHourlyRate);
+              }
+            }
+            
+            return (
+              <div className="space-y-4">
+                <div>
+                  <div className="text-sm font-medium text-muted-foreground">Date</div>
+                  <div className="text-base">{format(sessionDate, "EEEE, MMMM d, yyyy")}</div>
+                </div>
+                
+                <div>
+                  <div className="text-sm font-medium text-muted-foreground">Technician</div>
+                  <div className="text-base">{selectedSession.techName || "Unknown"}</div>
+                </div>
+                
+                <div>
+                  <div className="text-sm font-medium text-muted-foreground">Status</div>
+                  {isCompleted ? (
+                    <Badge variant={metTarget ? "default" : "destructive"}>
+                      {metTarget ? "Target Met" : "Below Target"}
+                    </Badge>
+                  ) : (
+                    <Badge variant="outline">In Progress</Badge>
+                  )}
+                </div>
+                
+                {isCompleted && (
+                  <>
+                    <div>
+                      <div className="text-sm font-medium text-muted-foreground">Time</div>
+                      <div className="text-base">
+                        {format(new Date(selectedSession.startTime), "h:mm a")} - {format(new Date(selectedSession.endTime), "h:mm a")}
+                      </div>
+                    </div>
+                    
+                    <div>
+                      <div className="text-sm font-medium text-muted-foreground">Drops Completed</div>
+                      <div className="text-base">
+                        {sessionDrops} / {project.dailyDropTarget} target
+                      </div>
+                      {(selectedSession.dropsCompletedNorth ?? 0) > 0 && (
+                        <div className="text-sm text-muted-foreground">North: {selectedSession.dropsCompletedNorth}</div>
+                      )}
+                      {(selectedSession.dropsCompletedEast ?? 0) > 0 && (
+                        <div className="text-sm text-muted-foreground">East: {selectedSession.dropsCompletedEast}</div>
+                      )}
+                      {(selectedSession.dropsCompletedSouth ?? 0) > 0 && (
+                        <div className="text-sm text-muted-foreground">South: {selectedSession.dropsCompletedSouth}</div>
+                      )}
+                      {(selectedSession.dropsCompletedWest ?? 0) > 0 && (
+                        <div className="text-sm text-muted-foreground">West: {selectedSession.dropsCompletedWest}</div>
+                      )}
+                    </div>
+                    
+                    {canViewFinancialData && (
+                      <div>
+                        <div className="text-sm font-medium text-muted-foreground">Labor Cost</div>
+                        <div className="text-base">
+                          <div>Hours Worked: {hoursWorked.toFixed(1)}</div>
+                          <div>Hourly Rate: ${selectedSession.techHourlyRate || "Not set"}</div>
+                          {laborCost > 0 ? (
+                            <div className="text-lg font-medium text-primary mt-1" data-testid="text-labor-cost">
+                              Total: ${laborCost.toFixed(2)}
+                            </div>
+                          ) : (
+                            <div className="text-sm text-muted-foreground mt-1">
+                              No hourly rate set for this employee
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    )}
+                    
+                    {selectedSession.shortfallReason && (
+                      <div>
+                        <div className="text-sm font-medium text-muted-foreground">Shortfall Reason</div>
+                        <div className="text-base bg-muted p-3 rounded-md italic">
+                          {selectedSession.shortfallReason}
+                        </div>
+                      </div>
+                    )}
+                  </>
+                )}
+              </div>
+            );
+          })()}
         </DialogContent>
       </Dialog>
 
