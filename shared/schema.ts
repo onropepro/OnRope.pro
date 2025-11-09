@@ -343,7 +343,7 @@ export const payPeriods = pgTable("pay_periods", {
   index("IDX_pay_periods_status").on(table.companyId, table.status),
 ]);
 
-// Quotes table - for building maintenance service quotes
+// Quotes table - for building maintenance service quotes (main quote container)
 export const quotes = pgTable("quotes", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   companyId: varchar("company_id").notNull().references(() => users.id, { onDelete: "cascade" }),
@@ -354,32 +354,11 @@ export const quotes = pgTable("quotes", {
   buildingAddress: text("building_address").notNull(),
   floorCount: integer("floor_count").notNull(),
   
-  // Drops and work calculations - per elevation
-  dropsNorth: integer("drops_north").notNull().default(0), // Drops for North elevation
-  dropsEast: integer("drops_east").notNull().default(0), // Drops for East elevation
-  dropsSouth: integer("drops_south").notNull().default(0), // Drops for South elevation
-  dropsWest: integer("drops_west").notNull().default(0), // Drops for West elevation
-  dropsPerDay: integer("drops_per_day").notNull(), // How many drops completed per day
-  totalHours: numeric("total_hours", { precision: 10, scale: 2 }).notNull(), // Auto-calculated: (total drops ÷ drops per day) × 8
-  pricePerHour: numeric("price_per_hour", { precision: 10, scale: 2 }).notNull(),
-  totalCost: numeric("total_cost", { precision: 10, scale: 2 }).notNull(), // Auto-calculated: totalHours × pricePerHour
-  
-  // Parkade section
-  hasParkade: boolean("has_parkade").notNull().default(false),
-  parkadeStalls: integer("parkade_stalls"), // Number of parkade stalls
-  pricePerStall: numeric("price_per_stall", { precision: 10, scale: 2 }), // Price per stall
-  parkadeTotal: numeric("parkade_total", { precision: 10, scale: 2 }), // Auto-calculated: parkadeStalls × pricePerStall
-  
-  // Ground windows section
-  hasGroundWindows: boolean("has_ground_windows").notNull().default(false),
-  groundWindowHours: numeric("ground_window_hours", { precision: 10, scale: 2 }), // Hours needed for ground windows
-  groundWindowTotal: numeric("ground_window_total", { precision: 10, scale: 2 }), // Auto-calculated: groundWindowHours × pricePerHour
-  
   // Photo attachment
   photoUrl: text("photo_url"), // URL to photo in object storage
   
   // Status
-  status: varchar("status").notNull().default('draft'), // draft | sent | accepted | rejected
+  status: varchar("status").notNull().default('open'), // open | closed
   
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
@@ -387,6 +366,41 @@ export const quotes = pgTable("quotes", {
   index("IDX_quotes_company").on(table.companyId),
   index("IDX_quotes_strata").on(table.strataPlanNumber),
   index("IDX_quotes_status").on(table.companyId, table.status),
+]);
+
+// Quote services table - each quote can have multiple services
+export const quoteServices = pgTable("quote_services", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  quoteId: varchar("quote_id").notNull().references(() => quotes.id, { onDelete: "cascade" }),
+  serviceType: varchar("service_type").notNull(), // window_cleaning | dryer_vent_cleaning | pressure_washing | parkade | ground_windows | in_suite
+  
+  // Elevation-based services (window_cleaning, dryer_vent_cleaning, pressure_washing)
+  dropsNorth: integer("drops_north"),
+  dropsEast: integer("drops_east"),
+  dropsSouth: integer("drops_south"),
+  dropsWest: integer("drops_west"),
+  dropsPerDay: integer("drops_per_day"),
+  
+  // Parkade service
+  parkadeStalls: integer("parkade_stalls"),
+  pricePerStall: numeric("price_per_stall", { precision: 10, scale: 2 }),
+  
+  // Ground windows service
+  groundWindowHours: numeric("ground_window_hours", { precision: 10, scale: 2 }),
+  
+  // In-suite service
+  suitesPerDay: integer("suites_per_day"),
+  floorsPerDay: integer("floors_per_day"),
+  
+  // Pricing (common to all services)
+  pricePerHour: numeric("price_per_hour", { precision: 10, scale: 2 }),
+  totalHours: numeric("total_hours", { precision: 10, scale: 2 }),
+  totalCost: numeric("total_cost", { precision: 10, scale: 2 }),
+  
+  createdAt: timestamp("created_at").defaultNow(),
+}, (table) => [
+  index("IDX_quote_services_quote").on(table.quoteId),
+  index("IDX_quote_services_type").on(table.quoteId, table.serviceType),
 ]);
 
 // Relations
@@ -513,10 +527,18 @@ export const payPeriodsRelations = relations(payPeriods, ({ one }) => ({
   }),
 }));
 
-export const quotesRelations = relations(quotes, ({ one }) => ({
+export const quotesRelations = relations(quotes, ({ one, many }) => ({
   company: one(users, {
     fields: [quotes.companyId],
     references: [users.id],
+  }),
+  services: many(quoteServices),
+}));
+
+export const quoteServicesRelations = relations(quoteServices, ({ one }) => ({
+  quote: one(quotes, {
+    fields: [quoteServices.quoteId],
+    references: [quotes.id],
   }),
 }));
 
@@ -638,6 +660,11 @@ export const insertQuoteSchema = createInsertSchema(quotes).omit({
   updatedAt: true,
 });
 
+export const insertQuoteServiceSchema = createInsertSchema(quoteServices).omit({
+  id: true,
+  createdAt: true,
+});
+
 // Type exports
 export type User = typeof users.$inferSelect;
 export type InsertUser = z.infer<typeof insertUserSchema>;
@@ -678,7 +705,14 @@ export type InsertPayPeriod = z.infer<typeof insertPayPeriodSchema>;
 export type Quote = typeof quotes.$inferSelect;
 export type InsertQuote = z.infer<typeof insertQuoteSchema>;
 
+export type QuoteService = typeof quoteServices.$inferSelect;
+export type InsertQuoteService = z.infer<typeof insertQuoteServiceSchema>;
+
 // Extended types for frontend use with relations
+export type QuoteWithServices = Quote & {
+  services: QuoteService[];
+};
+
 export type ProjectWithProgress = Project & {
   completedDrops: number;
   progressPercentage: number;
