@@ -950,6 +950,7 @@ export default function ManagementDashboard() {
 
         {activeTab === "projects" && (
           <div>
+            <div className="mb-4 p-2 bg-green-500 text-white font-bold">DEBUG: Projects content IS rendering!</div>
             <div className="space-y-4">
               {/* Search and Create */}
               <div className="flex gap-3">
