@@ -124,26 +124,47 @@ export default function Quotes() {
       return await response.json();
     },
     onSuccess: async (data) => {
-      // Upload photo if selected
-      if (selectedPhoto && data.quote.id) {
-        const formData = new FormData();
-        formData.append("photo", selectedPhoto);
+      try {
+        // Upload photo if selected
+        if (selectedPhoto && data.quote.id) {
+          const formData = new FormData();
+          formData.append("photo", selectedPhoto);
+          
+          const photoResponse = await fetch(`/api/quotes/${data.quote.id}/photo`, {
+            method: "POST",
+            body: formData,
+            credentials: "include",
+          });
+          
+          if (!photoResponse.ok) {
+            throw new Error("Failed to upload photo");
+          }
+        }
         
-        await fetch(`/api/quotes/${data.quote.id}/photo`, {
-          method: "POST",
-          body: formData,
-          credentials: "include",
+        // Invalidate queries after everything is done
+        await queryClient.invalidateQueries({ queryKey: ["/api/quotes"] });
+        
+        toast({
+          title: "Quote created",
+          description: "The quote has been created successfully.",
         });
+        form.reset();
+        setSelectedPhoto(null);
+        setShowForm(false);
+      } catch (error) {
+        console.error("Photo upload error:", error);
+        toast({
+          variant: "destructive",
+          title: "Warning",
+          description: "Quote created but photo upload failed. Please try editing the quote to add the photo.",
+        });
+        
+        // Still invalidate queries and reset form even if photo failed
+        await queryClient.invalidateQueries({ queryKey: ["/api/quotes"] });
+        form.reset();
+        setSelectedPhoto(null);
+        setShowForm(false);
       }
-      
-      queryClient.invalidateQueries({ queryKey: ["/api/quotes"] });
-      toast({
-        title: "Quote created",
-        description: "The quote has been created successfully.",
-      });
-      form.reset();
-      setSelectedPhoto(null);
-      setShowForm(false);
     },
     onError: (error: any) => {
       toast({
@@ -160,27 +181,49 @@ export default function Quotes() {
       return await response.json();
     },
     onSuccess: async (data) => {
-      // Upload photo if selected
-      if (selectedPhoto && data.quote.id) {
-        const formData = new FormData();
-        formData.append("photo", selectedPhoto);
+      try {
+        // Upload photo if selected
+        if (selectedPhoto && data.quote.id) {
+          const formData = new FormData();
+          formData.append("photo", selectedPhoto);
+          
+          const photoResponse = await fetch(`/api/quotes/${data.quote.id}/photo`, {
+            method: "POST",
+            body: formData,
+            credentials: "include",
+          });
+          
+          if (!photoResponse.ok) {
+            throw new Error("Failed to upload photo");
+          }
+        }
         
-        await fetch(`/api/quotes/${data.quote.id}/photo`, {
-          method: "POST",
-          body: formData,
-          credentials: "include",
+        // Invalidate queries after everything is done
+        await queryClient.invalidateQueries({ queryKey: ["/api/quotes"] });
+        
+        toast({
+          title: "Quote updated",
+          description: "The quote has been updated successfully.",
         });
+        form.reset();
+        setSelectedPhoto(null);
+        setShowForm(false);
+        setEditingQuote(null);
+      } catch (error) {
+        console.error("Photo upload error:", error);
+        toast({
+          variant: "destructive",
+          title: "Warning",
+          description: "Quote updated but photo upload failed. Please try editing the quote to add the photo.",
+        });
+        
+        // Still invalidate queries and reset form even if photo failed
+        await queryClient.invalidateQueries({ queryKey: ["/api/quotes"] });
+        form.reset();
+        setSelectedPhoto(null);
+        setShowForm(false);
+        setEditingQuote(null);
       }
-      
-      queryClient.invalidateQueries({ queryKey: ["/api/quotes"] });
-      toast({
-        title: "Quote updated",
-        description: "The quote has been updated successfully.",
-      });
-      form.reset();
-      setSelectedPhoto(null);
-      setShowForm(false);
-      setEditingQuote(null);
     },
     onError: (error: any) => {
       toast({
