@@ -335,6 +335,49 @@ export const payPeriods = pgTable("pay_periods", {
   index("IDX_pay_periods_status").on(table.companyId, table.status),
 ]);
 
+// Quotes table - for building maintenance service quotes
+export const quotes = pgTable("quotes", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  companyId: varchar("company_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  
+  // Building information
+  buildingName: varchar("building_name").notNull(),
+  strataPlanNumber: varchar("strata_plan_number").notNull(),
+  buildingAddress: text("building_address").notNull(),
+  floorCount: integer("floor_count").notNull(),
+  
+  // Drops and work calculations
+  dropsPerElevation: integer("drops_per_elevation").notNull(), // Total drops per elevation
+  dropsPerDay: integer("drops_per_day").notNull(), // How many drops completed per day
+  totalHours: numeric("total_hours", { precision: 10, scale: 2 }).notNull(), // Auto-calculated: (total drops ÷ drops per day) × 8
+  pricePerHour: numeric("price_per_hour", { precision: 10, scale: 2 }).notNull(),
+  totalCost: numeric("total_cost", { precision: 10, scale: 2 }).notNull(), // Auto-calculated: totalHours × pricePerHour
+  
+  // Parkade section
+  hasParkade: boolean("has_parkade").notNull().default(false),
+  parkadeStalls: integer("parkade_stalls"), // Number of parkade stalls
+  pricePerStall: numeric("price_per_stall", { precision: 10, scale: 2 }), // Price per stall
+  parkadeTotal: numeric("parkade_total", { precision: 10, scale: 2 }), // Auto-calculated: parkadeStalls × pricePerStall
+  
+  // Ground windows section
+  hasGroundWindows: boolean("has_ground_windows").notNull().default(false),
+  groundWindowHours: numeric("ground_window_hours", { precision: 10, scale: 2 }), // Hours needed for ground windows
+  groundWindowTotal: numeric("ground_window_total", { precision: 10, scale: 2 }), // Auto-calculated: groundWindowHours × pricePerHour
+  
+  // Photo attachment
+  photoUrl: text("photo_url"), // URL to photo in object storage
+  
+  // Status
+  status: varchar("status").notNull().default('draft'), // draft | sent | accepted | rejected
+  
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+}, (table) => [
+  index("IDX_quotes_company").on(table.companyId),
+  index("IDX_quotes_strata").on(table.strataPlanNumber),
+  index("IDX_quotes_status").on(table.companyId, table.status),
+]);
+
 // Relations
 export const usersRelations = relations(users, ({ many }) => ({
   projects: many(projects), // For company role
@@ -459,6 +502,13 @@ export const payPeriodsRelations = relations(payPeriods, ({ one }) => ({
   }),
 }));
 
+export const quotesRelations = relations(quotes, ({ one }) => ({
+  company: one(users, {
+    fields: [quotes.companyId],
+    references: [users.id],
+  }),
+}));
+
 // Zod schemas for validation
 export const insertUserSchema = createInsertSchema(users).omit({
   id: true,
@@ -571,6 +621,12 @@ export const insertPayPeriodSchema = createInsertSchema(payPeriods).omit({
   createdAt: true,
 });
 
+export const insertQuoteSchema = createInsertSchema(quotes).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
 // Type exports
 export type User = typeof users.$inferSelect;
 export type InsertUser = z.infer<typeof insertUserSchema>;
@@ -607,6 +663,9 @@ export type InsertPayPeriodConfig = z.infer<typeof insertPayPeriodConfigSchema>;
 
 export type PayPeriod = typeof payPeriods.$inferSelect;
 export type InsertPayPeriod = z.infer<typeof insertPayPeriodSchema>;
+
+export type Quote = typeof quotes.$inferSelect;
+export type InsertQuote = z.infer<typeof insertQuoteSchema>;
 
 // Extended types for frontend use with relations
 export type ProjectWithProgress = Project & {
