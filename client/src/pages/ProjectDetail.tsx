@@ -36,6 +36,7 @@ export default function ProjectDetail() {
   const [selectedSession, setSelectedSession] = useState<any>(null);
   const [showEditDialog, setShowEditDialog] = useState(false);
   const [editJobType, setEditJobType] = useState<string>("");
+  const [selectedPhoto, setSelectedPhoto] = useState<any>(null);
 
   const { data: projectData, isLoading } = useQuery({
     queryKey: ["/api/projects", id],
@@ -760,7 +761,8 @@ export default function ProjectDetail() {
                     {photos.map((photo: any) => (
                       <div
                         key={photo.id}
-                        className="aspect-square rounded-lg overflow-hidden border bg-card hover-elevate group relative"
+                        onClick={() => setSelectedPhoto(photo)}
+                        className="aspect-square rounded-lg overflow-hidden border bg-card hover-elevate active-elevate-2 group relative cursor-pointer"
                       >
                         <img
                           src={photo.imageUrl}
@@ -1334,6 +1336,42 @@ export default function ProjectDetail() {
               </div>
             );
           })()}
+        </DialogContent>
+      </Dialog>
+
+      {/* Photo Viewer Dialog */}
+      <Dialog open={!!selectedPhoto} onOpenChange={() => setSelectedPhoto(null)}>
+        <DialogContent className="max-w-3xl p-0 bg-black/95 border-0">
+          {selectedPhoto && (
+            <div className="relative">
+              <button
+                onClick={() => setSelectedPhoto(null)}
+                className="absolute top-2 right-2 z-10 p-2 rounded-full bg-black/50 text-white hover:bg-black/70 transition-colors"
+                data-testid="button-close-photo"
+              >
+                <span className="material-icons">close</span>
+              </button>
+              <img
+                src={selectedPhoto.imageUrl}
+                alt={selectedPhoto.comment || "Project photo"}
+                className="w-full h-auto max-h-[80vh] object-contain"
+                data-testid="fullsize-photo"
+              />
+              {(selectedPhoto.unitNumber || selectedPhoto.comment) && (
+                <div className="bg-black/70 text-white p-4 space-y-1">
+                  {selectedPhoto.unitNumber && (
+                    <div className="font-medium">Unit {selectedPhoto.unitNumber}</div>
+                  )}
+                  {selectedPhoto.comment && (
+                    <div className="text-sm text-white/90">{selectedPhoto.comment}</div>
+                  )}
+                  <div className="text-xs text-white/70">
+                    Uploaded {format(new Date(selectedPhoto.createdAt), "MMM d, yyyy 'at' h:mm a")}
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
         </DialogContent>
       </Dialog>
 
