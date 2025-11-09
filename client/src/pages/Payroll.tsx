@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import type { PayPeriodConfig, PayPeriod, EmployeeHoursSummary } from "@shared/schema";
@@ -42,6 +42,18 @@ export default function Payroll() {
     queryKey: ['/api/payroll/periods', selectedPeriodId, 'hours'],
     enabled: !!selectedPeriodId,
   });
+
+  // Auto-select current period when periods load
+  useEffect(() => {
+    if (periodsData?.periods && periodsData.periods.length > 0 && !selectedPeriodId) {
+      const currentPeriod = periodsData.periods.find(p => p.status === 'current');
+      if (currentPeriod) {
+        setSelectedPeriodId(currentPeriod.id);
+      } else {
+        setSelectedPeriodId(periodsData.periods[0].id);
+      }
+    }
+  }, [periodsData, selectedPeriodId]);
 
   // Save configuration mutation
   const saveConfigMutation = useMutation({
@@ -281,9 +293,20 @@ export default function Payroll() {
                 </div>
               )}
 
-              {hoursData && hoursData.hoursSummary.length === 0 && (
-                <div className="text-center py-8 text-muted-foreground">
-                  No employee hours recorded for this pay period.
+              {!hoursLoading && hoursData && hoursData.hoursSummary.length === 0 && (
+                <div className="text-center py-12 space-y-2">
+                  <div className="text-muted-foreground">
+                    No employee hours recorded for this pay period.
+                  </div>
+                  <div className="text-sm text-muted-foreground">
+                    Work sessions logged during this period will appear here automatically.
+                  </div>
+                </div>
+              )}
+
+              {!hoursLoading && !selectedPeriodId && (
+                <div className="text-center py-12 text-muted-foreground">
+                  Select a pay period above to view employee hours.
                 </div>
               )}
             </CardContent>
