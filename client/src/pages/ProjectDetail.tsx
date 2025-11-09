@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Progress } from "@/components/ui/progress";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { HighRiseBuilding } from "@/components/HighRiseBuilding";
 import { useToast } from "@/hooks/use-toast";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
@@ -781,47 +782,181 @@ export default function ProjectDetail() {
           </Card>
         )}
 
-        {/* Target Performance Chart - Management Only */}
-        {isManagement && completedSessions.length > 0 && (
+        {/* Analytics - Target Performance & Work Session History */}
+        {(isManagement || canViewWorkHistory) && (
           <Card className="glass-card border-0 shadow-premium">
             <CardHeader>
-              <CardTitle>Target Performance</CardTitle>
+              <CardTitle>Analytics</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="flex flex-col items-center">
-                <ResponsiveContainer width="100%" height={300}>
-                  <PieChart>
-                    <Pie
-                      data={pieData}
-                      cx="50%"
-                      cy="50%"
-                      labelLine={false}
-                      label={({ name, value, percent }) => 
-                        `${name}: ${value} (${(percent * 100).toFixed(0)}%)`
-                      }
-                      outerRadius={80}
-                      fill="#8884d8"
-                      dataKey="value"
-                    >
-                      {pieData.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={entry.color} />
-                      ))}
-                    </Pie>
-                    <Tooltip />
-                    <Legend />
-                  </PieChart>
-                </ResponsiveContainer>
-                <div className="grid grid-cols-2 gap-4 mt-4 w-full max-w-sm">
-                  <div className="text-center">
-                    <div className="text-2xl font-bold text-primary">{targetMetCount}</div>
-                    <div className="text-sm text-muted-foreground">Target Met</div>
-                  </div>
-                  <div className="text-center">
-                    <div className="text-2xl font-bold text-destructive">{belowTargetCount}</div>
-                    <div className="text-sm text-muted-foreground">Below Target</div>
-                  </div>
-                </div>
-              </div>
+              <Tabs defaultValue={isManagement && completedSessions.length > 0 ? "performance" : "history"} className="w-full">
+                <TabsList className="w-full">
+                  {isManagement && completedSessions.length > 0 && (
+                    <TabsTrigger value="performance" data-testid="tab-performance">Target Performance</TabsTrigger>
+                  )}
+                  {canViewWorkHistory && (
+                    <TabsTrigger value="history" data-testid="tab-history">Work History</TabsTrigger>
+                  )}
+                </TabsList>
+                
+                {isManagement && completedSessions.length > 0 && (
+                  <TabsContent value="performance" className="mt-4">
+                    <div className="flex flex-col items-center">
+                      <ResponsiveContainer width="100%" height={300}>
+                        <PieChart>
+                          <Pie
+                            data={pieData}
+                            cx="50%"
+                            cy="50%"
+                            labelLine={false}
+                            label={({ name, value, percent }) => 
+                              `${name}: ${value} (${(percent * 100).toFixed(0)}%)`
+                            }
+                            outerRadius={80}
+                            fill="#8884d8"
+                            dataKey="value"
+                          >
+                            {pieData.map((entry, index) => (
+                              <Cell key={`cell-${index}`} fill={entry.color} />
+                            ))}
+                          </Pie>
+                          <Tooltip />
+                          <Legend />
+                        </PieChart>
+                      </ResponsiveContainer>
+                      <div className="grid grid-cols-2 gap-4 mt-4 w-full max-w-sm">
+                        <div className="text-center">
+                          <div className="text-2xl font-bold text-primary">{targetMetCount}</div>
+                          <div className="text-sm text-muted-foreground">Target Met</div>
+                        </div>
+                        <div className="text-center">
+                          <div className="text-2xl font-bold text-destructive">{belowTargetCount}</div>
+                          <div className="text-sm text-muted-foreground">Below Target</div>
+                        </div>
+                      </div>
+                    </div>
+                  </TabsContent>
+                )}
+                
+                {canViewWorkHistory && (
+                  <TabsContent value="history" className="mt-4">
+                    {workSessions.length === 0 ? (
+                      <p className="text-center text-muted-foreground py-8">
+                        No work sessions recorded yet
+                      </p>
+                    ) : (() => {
+                      // Organize sessions by year -> month -> day
+                      const sessionsByDate: Record<string, Record<string, Record<string, any[]>>> = {};
+                      
+                      workSessions.forEach((session: any) => {
+                        const sessionDate = new Date(session.workDate);
+                        const year = format(sessionDate, "yyyy");
+                        const month = format(sessionDate, "MMMM yyyy");
+                        const day = format(sessionDate, "EEEE, MMM d, yyyy");
+                        
+                        if (!sessionsByDate[year]) sessionsByDate[year] = {};
+                        if (!sessionsByDate[year][month]) sessionsByDate[year][month] = {};
+                        if (!sessionsByDate[year][month][day]) sessionsByDate[year][month][day] = [];
+                        
+                        sessionsByDate[year][month][day].push(session);
+                      });
+                      
+                      const years = Object.keys(sessionsByDate).sort().reverse();
+                      
+                      return (
+                        <Accordion type="single" collapsible className="space-y-2">
+                          {years.map((year) => (
+                            <AccordionItem key={year} value={year} className="border rounded-lg px-3">
+                              <AccordionTrigger className="hover:no-underline py-3">
+                                <div className="flex items-center gap-2">
+                                  <span className="material-icons text-lg">calendar_today</span>
+                                  <span className="font-medium">{year}</span>
+                                </div>
+                              </AccordionTrigger>
+                              <AccordionContent>
+                                <Accordion type="single" collapsible className="space-y-2 pl-4">
+                                  {Object.keys(sessionsByDate[year]).sort((a, b) => {
+                                    const dateA = new Date(a);
+                                    const dateB = new Date(b);
+                                    return dateB.getTime() - dateA.getTime();
+                                  }).map((month) => (
+                                    <AccordionItem key={month} value={month} className="border rounded-lg px-3">
+                                      <AccordionTrigger className="hover:no-underline py-2">
+                                        <div className="flex items-center gap-2">
+                                          <span className="material-icons text-sm">event</span>
+                                          <span className="text-sm font-medium">{month}</span>
+                                        </div>
+                                      </AccordionTrigger>
+                                      <AccordionContent>
+                                        <Accordion type="single" collapsible className="space-y-2 pl-4">
+                                          {Object.keys(sessionsByDate[year][month]).sort((a, b) => {
+                                            const dateA = new Date(a);
+                                            const dateB = new Date(b);
+                                            return dateB.getTime() - dateA.getTime();
+                                          }).map((day) => {
+                                            const daySessions = sessionsByDate[year][month][day];
+                                            const completedCount = daySessions.filter(s => s.endTime !== null).length;
+                                            
+                                            return (
+                                              <AccordionItem key={day} value={day} className="border rounded-lg px-3">
+                                                <AccordionTrigger className="hover:no-underline py-2">
+                                                  <div className="flex items-center justify-between w-full pr-3">
+                                                    <div className="flex items-center gap-2">
+                                                      <span className="material-icons text-xs">today</span>
+                                                      <span className="text-xs font-medium">{day}</span>
+                                                    </div>
+                                                    <Badge variant="secondary" className="text-xs">
+                                                      {daySessions.length} session{daySessions.length !== 1 ? 's' : ''}
+                                                    </Badge>
+                                                  </div>
+                                                </AccordionTrigger>
+                                                <AccordionContent>
+                                                  <div className="space-y-2 pl-4 pt-2">
+                                                    {daySessions.map((session: any) => {
+                                                      const isCompleted = session.endTime !== null;
+                                                      const sessionDrops = (session.dropsCompletedNorth ?? 0) + (session.dropsCompletedEast ?? 0) + 
+                                                                           (session.dropsCompletedSouth ?? 0) + (session.dropsCompletedWest ?? 0);
+                                                      const metTarget = sessionDrops >= project.dailyDropTarget;
+                                                      
+                                                      return (
+                                                        <div
+                                                          key={session.id}
+                                                          onClick={() => setSelectedSession(session)}
+                                                          className="flex items-center justify-between p-3 rounded-lg border bg-card cursor-pointer hover-elevate active-elevate-2"
+                                                          data-testid={`session-${session.id}`}
+                                                        >
+                                                          <p className="text-sm font-medium">
+                                                            {session.techName || "Unknown"}
+                                                          </p>
+                                                          {isCompleted ? (
+                                                            <Badge variant={metTarget ? "default" : "destructive"} className="text-xs" data-testid={`badge-${metTarget ? "met" : "below"}-target`}>
+                                                              {metTarget ? "Target Met" : "Below Target"}
+                                                            </Badge>
+                                                          ) : (
+                                                            <Badge variant="outline" className="text-xs">In Progress</Badge>
+                                                          )}
+                                                        </div>
+                                                      );
+                                                    })}
+                                                  </div>
+                                                </AccordionContent>
+                                              </AccordionItem>
+                                            );
+                                          })}
+                                        </Accordion>
+                                      </AccordionContent>
+                                    </AccordionItem>
+                                  ))}
+                                </Accordion>
+                              </AccordionContent>
+                            </AccordionItem>
+                          ))}
+                        </Accordion>
+                      );
+                    })()}
+                  </TabsContent>
+                )}
+              </Tabs>
             </CardContent>
           </Card>
         )}
@@ -875,130 +1010,6 @@ export default function ProjectDetail() {
           </Card>
         )}
 
-        {/* Work Sessions List */}
-        {canViewWorkHistory && (
-          <Card className="glass-card border-0 shadow-premium">
-            <CardHeader>
-              <CardTitle>Work Session History</CardTitle>
-            </CardHeader>
-            <CardContent>
-              {workSessions.length === 0 ? (
-                <p className="text-center text-muted-foreground py-8">
-                  No work sessions recorded yet
-                </p>
-              ) : (() => {
-                // Organize sessions by year -> month -> day
-                const sessionsByDate: Record<string, Record<string, Record<string, any[]>>> = {};
-                
-                workSessions.forEach((session: any) => {
-                  const sessionDate = new Date(session.workDate);
-                  const year = format(sessionDate, "yyyy");
-                  const month = format(sessionDate, "MMMM yyyy");
-                  const day = format(sessionDate, "EEEE, MMM d, yyyy");
-                  
-                  if (!sessionsByDate[year]) sessionsByDate[year] = {};
-                  if (!sessionsByDate[year][month]) sessionsByDate[year][month] = {};
-                  if (!sessionsByDate[year][month][day]) sessionsByDate[year][month][day] = [];
-                  
-                  sessionsByDate[year][month][day].push(session);
-                });
-                
-                const years = Object.keys(sessionsByDate).sort().reverse();
-                
-                return (
-                  <Accordion type="single" collapsible className="space-y-2">
-                    {years.map((year) => (
-                      <AccordionItem key={year} value={year} className="border rounded-lg px-3">
-                        <AccordionTrigger className="hover:no-underline py-3">
-                          <div className="flex items-center gap-2">
-                            <span className="material-icons text-lg">calendar_today</span>
-                            <span className="font-medium">{year}</span>
-                          </div>
-                        </AccordionTrigger>
-                        <AccordionContent>
-                          <Accordion type="single" collapsible className="space-y-2 pl-4">
-                            {Object.keys(sessionsByDate[year]).sort((a, b) => {
-                              const dateA = new Date(a);
-                              const dateB = new Date(b);
-                              return dateB.getTime() - dateA.getTime();
-                            }).map((month) => (
-                              <AccordionItem key={month} value={month} className="border rounded-lg px-3">
-                                <AccordionTrigger className="hover:no-underline py-2">
-                                  <div className="flex items-center gap-2">
-                                    <span className="material-icons text-sm">event</span>
-                                    <span className="text-sm font-medium">{month}</span>
-                                  </div>
-                                </AccordionTrigger>
-                                <AccordionContent>
-                                  <Accordion type="single" collapsible className="space-y-2 pl-4">
-                                    {Object.keys(sessionsByDate[year][month]).sort((a, b) => {
-                                      const dateA = new Date(a);
-                                      const dateB = new Date(b);
-                                      return dateB.getTime() - dateA.getTime();
-                                    }).map((day) => {
-                                      const daySessions = sessionsByDate[year][month][day];
-                                      const completedCount = daySessions.filter(s => s.endTime !== null).length;
-                                      
-                                      return (
-                                        <AccordionItem key={day} value={day} className="border rounded-lg px-3">
-                                          <AccordionTrigger className="hover:no-underline py-2">
-                                            <div className="flex items-center justify-between w-full pr-3">
-                                              <div className="flex items-center gap-2">
-                                                <span className="material-icons text-xs">today</span>
-                                                <span className="text-xs font-medium">{day}</span>
-                                              </div>
-                                              <Badge variant="secondary" className="text-xs">
-                                                {daySessions.length} session{daySessions.length !== 1 ? 's' : ''}
-                                              </Badge>
-                                            </div>
-                                          </AccordionTrigger>
-                                          <AccordionContent>
-                                            <div className="space-y-2 pl-4 pt-2">
-                                              {daySessions.map((session: any) => {
-                                                const isCompleted = session.endTime !== null;
-                                                const sessionDrops = (session.dropsCompletedNorth ?? 0) + (session.dropsCompletedEast ?? 0) + 
-                                                                     (session.dropsCompletedSouth ?? 0) + (session.dropsCompletedWest ?? 0);
-                                                const metTarget = sessionDrops >= project.dailyDropTarget;
-                                                
-                                                return (
-                                                  <div
-                                                    key={session.id}
-                                                    onClick={() => setSelectedSession(session)}
-                                                    className="flex items-center justify-between p-3 rounded-lg border bg-card cursor-pointer hover-elevate active-elevate-2"
-                                                    data-testid={`session-${session.id}`}
-                                                  >
-                                                    <p className="text-sm font-medium">
-                                                      {session.techName || "Unknown"}
-                                                    </p>
-                                                    {isCompleted ? (
-                                                      <Badge variant={metTarget ? "default" : "destructive"} className="text-xs" data-testid={`badge-${metTarget ? "met" : "below"}-target`}>
-                                                        {metTarget ? "Target Met" : "Below Target"}
-                                                      </Badge>
-                                                    ) : (
-                                                      <Badge variant="outline" className="text-xs">In Progress</Badge>
-                                                    )}
-                                                  </div>
-                                                );
-                                              })}
-                                            </div>
-                                          </AccordionContent>
-                                        </AccordionItem>
-                                      );
-                                    })}
-                                  </Accordion>
-                                </AccordionContent>
-                              </AccordionItem>
-                            ))}
-                          </Accordion>
-                        </AccordionContent>
-                      </AccordionItem>
-                    ))}
-                  </Accordion>
-                );
-              })()}
-            </CardContent>
-          </Card>
-        )}
       </div>
 
       {/* Delete Confirmation Dialog */}
