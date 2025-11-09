@@ -122,6 +122,7 @@ const AVAILABLE_PERMISSIONS = [
   { id: "view_work_sessions", label: "View Work Sessions" },
   { id: "manage_work_sessions", label: "Manage Work Sessions" },
   { id: "view_analytics", label: "View Analytics" },
+  { id: "view_financial_data", label: "View Financial Data (Labor Costs, Wages)" },
 ] as const;
 
 const employeeSchema = z.object({

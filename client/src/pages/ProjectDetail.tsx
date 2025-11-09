@@ -42,6 +42,10 @@ export default function ProjectDetail() {
   });
 
   const currentUser = userData?.user;
+  
+  // Check if user can view financial data (company owner OR has permission)
+  const canViewFinancialData = currentUser?.role === "company" || 
+                                currentUser?.permissions?.includes("view_financial_data");
 
   // Fetch work sessions for this project
   const { data: workSessionsData } = useQuery({
@@ -927,13 +931,17 @@ export default function ProjectDetail() {
                               {format(new Date(session.startTime), "h:mm a")} -{" "}
                               {format(new Date(session.endTime), "h:mm a")}
                             </p>
-                            <p className="text-muted-foreground">
-                              {hoursWorked.toFixed(1)} hours
-                            </p>
-                            {laborCost > 0 && (
-                              <p className="font-medium text-primary" data-testid="text-labor-cost">
-                                ${laborCost.toFixed(2)}
-                              </p>
+                            {canViewFinancialData && (
+                              <>
+                                <p className="text-muted-foreground">
+                                  {hoursWorked.toFixed(1)} hours
+                                </p>
+                                {laborCost > 0 && (
+                                  <p className="font-medium text-primary" data-testid="text-labor-cost">
+                                    ${laborCost.toFixed(2)}
+                                  </p>
+                                )}
+                              </>
                             )}
                           </>
                         )}
