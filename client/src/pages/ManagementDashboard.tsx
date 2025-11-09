@@ -182,27 +182,16 @@ type DropLogFormData = z.infer<typeof dropLogSchema>;
 type EndDayFormData = z.infer<typeof endDaySchema>;
 
 export default function ManagementDashboard() {
-  const [activeTab, setActiveTab] = useState("projects");
-  const [consoleLogs, setConsoleLogs] = useState<string[]>([]);
-  
-  const addLog = (message: string) => {
-    console.log(message);
-    setConsoleLogs(prev => [...prev, `${new Date().toLocaleTimeString()}: ${message}`]);
-  };
-  
-  addLog(`[RENDER] activeTab current value: ${activeTab}`);
-
-  // Log on mount
-  useEffect(() => {
-    addLog(`[COMPONENT MOUNTED] Initial activeTab: ${activeTab}`);
-  }, []);
+  const [activeTab, setActiveTab] = useState("");
 
   // Scroll to top when changing tabs
   const handleTabChange = (tab: string) => {
-    addLog(`[TAB CHANGE] Changing to: ${tab}, current: ${activeTab}`);
     setActiveTab(tab);
-    addLog(`[TAB CHANGE] setActiveTab called with: ${tab}`);
-    // Scroll the content area into view smoothly
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleBackToNav = () => {
+    setActiveTab("");
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
   const [showProjectDialog, setShowProjectDialog] = useState(false);
@@ -817,27 +806,10 @@ export default function ManagementDashboard() {
       </header>
 
       <div className="p-4 max-w-4xl mx-auto">
-        {/* DEBUG: Active Tab Indicator */}
-        <div className="mb-4 p-4 bg-primary/10 border-2 border-primary rounded-lg space-y-2">
-          <div className="text-sm font-bold">DEBUG: Active Tab = "{activeTab}"</div>
-          <div className="text-xs">Type: {typeof activeTab}</div>
-          <div className="text-xs">activeTab === "projects": {String(activeTab === "projects")}</div>
-          <div className="text-xs">Strict check: {String(activeTab === "projects" ? true : false)}</div>
-        </div>
-
-        {/* DEBUG: Console Logs */}
-        <div className="mb-4 p-4 bg-yellow-100 dark:bg-yellow-950 border-2 border-yellow-500 rounded-lg">
-          <div className="text-sm font-bold mb-2">CONSOLE LOGS (last 10):</div>
-          <div className="text-xs font-mono space-y-1 max-h-48 overflow-y-auto">
-            {consoleLogs.slice(-10).map((log, i) => (
-              <div key={i} className="text-black dark:text-yellow-100">{log}</div>
-            ))}
-          </div>
-        </div>
-
-        {/* Navigation Grid */}
-        <div className="mb-6">
-          <div className="grid grid-cols-2 gap-3">
+        {/* Navigation Grid - Only show when no tab is selected */}
+        {activeTab === "" && (
+          <div className="mb-6">
+            <div className="grid grid-cols-2 gap-3">
             <Button
               variant="outline"
               className="h-auto flex-col gap-2 p-4"
@@ -972,13 +944,27 @@ export default function ManagementDashboard() {
             </Button>
           </div>
         </div>
+        )}
+
+        {/* Back Button for all tabs */}
+        {activeTab !== "" && (
+          <div className="mb-4">
+            <Button 
+              variant="ghost" 
+              onClick={handleBackToNav}
+              data-testid="button-back-to-nav"
+              className="gap-2"
+            >
+              <span className="material-icons">arrow_back</span>
+              Back to Dashboard
+            </Button>
+          </div>
+        )}
 
         {activeTab === "projects" && (
-          <div>
-            <div className="mb-4 p-2 bg-green-500 text-white font-bold">DEBUG: Projects content IS rendering!</div>
-            <div className="space-y-4">
-              {/* Search and Create */}
-              <div className="flex gap-3">
+          <div className="space-y-4">
+            {/* Search and Create */}
+            <div className="flex gap-3">
                 <div className="relative flex-1">
                   <span className="material-icons absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground text-base">
                     search
@@ -1417,7 +1403,6 @@ export default function ManagementDashboard() {
                 </div>
               </div>
             </div>
-          </div>
         )}
 
         {activeTab === "past-projects" && (
