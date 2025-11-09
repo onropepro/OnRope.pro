@@ -793,12 +793,12 @@ export default function ProjectDetail() {
               <CardTitle>Analytics</CardTitle>
             </CardHeader>
             <CardContent>
-              <Tabs defaultValue={isManagement && completedSessions.length > 0 ? "performance" : canViewFinancial && project.estimatedHours ? "budget" : "history"} className="w-full">
+              <Tabs defaultValue={isManagement && completedSessions.length > 0 ? "performance" : canViewFinancialData && project.estimatedHours ? "budget" : "history"} className="w-full">
                 <TabsList className="w-full">
                   {isManagement && completedSessions.length > 0 && (
                     <TabsTrigger value="performance" data-testid="tab-performance">Target Performance</TabsTrigger>
                   )}
-                  {canViewFinancial && project.estimatedHours && (
+                  {canViewFinancialData && project.estimatedHours && (
                     <TabsTrigger value="budget" data-testid="tab-budget">Hours & Budget</TabsTrigger>
                   )}
                   {canViewWorkHistory && (
@@ -845,7 +845,7 @@ export default function ProjectDetail() {
                   </TabsContent>
                 )}
                 
-                {canViewFinancial && project.estimatedHours && (
+                {canViewFinancialData && project.estimatedHours && (
                   <TabsContent value="budget" className="mt-4">
                     {(() => {
                       // Calculate total hours worked from completed sessions
