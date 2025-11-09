@@ -405,36 +405,278 @@ export default function ProjectDetail() {
           </CardContent>
         </Card>
 
-        {/* Quick Actions */}
-        <div className="space-y-3">
-          <h2 className="text-sm font-semibold text-muted-foreground px-1">Quick Actions</h2>
-          <div className="grid grid-cols-2 gap-3">
-            <Button
-              variant="outline"
-              className="h-auto flex-col gap-2 p-4"
-              onClick={() => setLocation("/harness-inspection")}
-              data-testid="button-harness-inspection"
-            >
-              <span className="material-icons text-primary text-2xl">verified_user</span>
-              <div className="text-center">
-                <div className="font-semibold text-sm">Harness Inspection</div>
-                <div className="text-xs text-muted-foreground">Fill daily form</div>
-              </div>
-            </Button>
-            <Button
-              variant="outline"
-              className="h-auto flex-col gap-2 p-4"
-              onClick={() => setLocation("/toolbox-meeting")}
-              data-testid="button-toolbox-meeting"
-            >
-              <span className="material-icons text-primary text-2xl">group</span>
-              <div className="text-center">
-                <div className="font-semibold text-sm">Toolbox Meeting</div>
-                <div className="text-xs text-muted-foreground">Record safety meeting</div>
-              </div>
-            </Button>
-          </div>
-        </div>
+        {/* Analytics - Target Performance & Work Session History */}
+        {(isManagement || canViewWorkHistory) && (
+          <Card className="glass-card border-0 shadow-premium">
+            <CardHeader>
+              <CardTitle>Analytics</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <Tabs defaultValue={isManagement && completedSessions.length > 0 ? "performance" : canViewFinancialData && project.estimatedHours ? "budget" : "history"} className="w-full">
+                <TabsList className="grid grid-cols-3 w-full h-auto">
+                  {isManagement && completedSessions.length > 0 && (
+                    <TabsTrigger value="performance" className="text-xs py-2" data-testid="tab-performance">Target Performance</TabsTrigger>
+                  )}
+                  {canViewFinancialData && project.estimatedHours && (
+                    <TabsTrigger value="budget" className="text-xs py-2" data-testid="tab-budget">Hours & Budget</TabsTrigger>
+                  )}
+                  {canViewWorkHistory && (
+                    <TabsTrigger value="history" className="text-xs py-2" data-testid="tab-history">Work History</TabsTrigger>
+                  )}
+                </TabsList>
+                
+                {isManagement && completedSessions.length > 0 && (
+                  <TabsContent value="performance" className="mt-4">
+                    <div className="flex flex-col items-center">
+                      <ResponsiveContainer width="100%" height={300}>
+                        <PieChart>
+                          <Pie
+                            data={pieData}
+                            cx="50%"
+                            cy="50%"
+                            labelLine={false}
+                            label={({ name, value, percent }) => 
+                              `${name}: ${value} (${(percent * 100).toFixed(0)}%)`
+                            }
+                            outerRadius={80}
+                            fill="#8884d8"
+                            dataKey="value"
+                          >
+                            {pieData.map((entry, index) => (
+                              <Cell key={`cell-${index}`} fill={entry.color} />
+                            ))}
+                          </Pie>
+                          <Tooltip />
+                          <Legend />
+                        </PieChart>
+                      </ResponsiveContainer>
+                      <div className="grid grid-cols-2 gap-4 mt-4 w-full max-w-sm">
+                        <div className="text-center">
+                          <div className="text-2xl font-bold text-primary">{targetMetCount}</div>
+                          <div className="text-sm text-muted-foreground">Target Met</div>
+                        </div>
+                        <div className="text-center">
+                          <div className="text-2xl font-bold text-destructive">{belowTargetCount}</div>
+                          <div className="text-sm text-muted-foreground">Below Target</div>
+                        </div>
+                      </div>
+                    </div>
+                  </TabsContent>
+                )}
+                
+                {canViewFinancialData && project.estimatedHours && (
+                  <TabsContent value="budget" className="mt-4">
+                    {(() => {
+                      // Calculate total hours worked from completed sessions
+                      const totalHoursWorked = completedSessions.reduce((sum: number, session: any) => {
+                        if (session.startTime && session.endTime) {
+                          const start = new Date(session.startTime);
+                          const end = new Date(session.endTime);
+                          const hours = (end.getTime() - start.getTime()) / (1000 * 60 * 60);
+                          return sum + hours;
+                        }
+                        return sum;
+                      }, 0);
+                      
+                      const estimatedHours = project.estimatedHours || 0;
+                      const hoursRemaining = Math.max(0, estimatedHours - totalHoursWorked);
+                      
+                      // Calculate total labor cost
+                      const totalLaborCost = completedSessions.reduce((sum: number, session: any) => {
+                        if (session.startTime && session.endTime && session.techHourlyRate) {
+                          const start = new Date(session.startTime);
+                          const end = new Date(session.endTime);
+                          const hours = (end.getTime() - start.getTime()) / (1000 * 60 * 60);
+                          const cost = hours * parseFloat(session.techHourlyRate);
+                          return sum + cost;
+                        }
+                        return sum;
+                      }, 0);
+                      
+                      const hoursPieData = [
+                        { name: 'Hours Worked', value: parseFloat(totalHoursWorked.toFixed(2)), color: '#1976D2' },
+                        { name: 'Hours Remaining', value: parseFloat(hoursRemaining.toFixed(2)), color: '#E0E0E0' },
+                      ];
+                      
+                      return (
+                        <div className="flex flex-col items-center">
+                          <ResponsiveContainer width="100%" height={300}>
+                            <PieChart>
+                              <Pie
+                                data={hoursPieData}
+                                cx="50%"
+                                cy="50%"
+                                labelLine={false}
+                                label={({ name, value, percent}) => 
+                                  `${name}: ${value}h (${(percent * 100).toFixed(0)}%)`
+                                }
+                                outerRadius={80}
+                                fill="#8884d8"
+                                dataKey="value"
+                              >
+                                {hoursPieData.map((entry, index) => (
+                                  <Cell key={`cell-${index}`} fill={entry.color} />
+                                ))}
+                              </Pie>
+                              <Tooltip />
+                              <Legend />
+                            </PieChart>
+                          </ResponsiveContainer>
+                          
+                          <div className="grid grid-cols-2 gap-4 mt-4 w-full max-w-sm">
+                            <div className="text-center p-4 rounded-lg border bg-card">
+                              <div className="text-2xl font-bold text-primary">{totalHoursWorked.toFixed(1)}h</div>
+                              <div className="text-sm text-muted-foreground">Hours Worked</div>
+                            </div>
+                            <div className="text-center p-4 rounded-lg border bg-card">
+                              <div className="text-2xl font-bold text-muted-foreground">{hoursRemaining.toFixed(1)}h</div>
+                              <div className="text-sm text-muted-foreground">Hours Remaining</div>
+                            </div>
+                          </div>
+                          
+                          <div className="w-full max-w-sm mt-6 p-6 rounded-lg border bg-card">
+                            <div className="text-center">
+                              <div className="text-sm text-muted-foreground mb-2">Total Labor Cost</div>
+                              <div className="text-3xl font-bold text-primary">
+                                ${totalLaborCost.toFixed(2)}
+                              </div>
+                              {estimatedHours > 0 && (
+                                <div className="text-xs text-muted-foreground mt-2">
+                                  {totalHoursWorked > 0 && (
+                                    <span>Average: ${(totalLaborCost / totalHoursWorked).toFixed(2)}/hr</span>
+                                  )}
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })()}
+                  </TabsContent>
+                )}
+                
+                {canViewWorkHistory && (
+                  <TabsContent value="history" className="mt-4">
+                    {workSessions.length === 0 ? (
+                      <p className="text-center text-muted-foreground py-8">
+                        No work sessions recorded yet
+                      </p>
+                    ) : (() => {
+                      // Organize sessions by year -> month -> day
+                      const sessionsByDate: Record<string, Record<string, Record<string, any[]>>> = {};
+                      
+                      workSessions.forEach((session: any) => {
+                        const sessionDate = new Date(session.workDate);
+                        const year = format(sessionDate, "yyyy");
+                        const month = format(sessionDate, "MMMM yyyy");
+                        const day = format(sessionDate, "EEEE, MMM d, yyyy");
+                        
+                        if (!sessionsByDate[year]) sessionsByDate[year] = {};
+                        if (!sessionsByDate[year][month]) sessionsByDate[year][month] = {};
+                        if (!sessionsByDate[year][month][day]) sessionsByDate[year][month][day] = [];
+                        
+                        sessionsByDate[year][month][day].push(session);
+                      });
+                      
+                      const years = Object.keys(sessionsByDate).sort().reverse();
+                      
+                      return (
+                        <Accordion type="single" collapsible className="space-y-2">
+                          {years.map((year) => (
+                            <AccordionItem key={year} value={year} className="border rounded-lg px-3">
+                              <AccordionTrigger className="hover:no-underline py-3">
+                                <div className="flex items-center gap-2">
+                                  <span className="material-icons text-lg">calendar_today</span>
+                                  <span className="font-medium">{year}</span>
+                                </div>
+                              </AccordionTrigger>
+                              <AccordionContent>
+                                <Accordion type="single" collapsible className="space-y-2 pl-4">
+                                  {Object.keys(sessionsByDate[year]).sort((a, b) => {
+                                    const dateA = new Date(a);
+                                    const dateB = new Date(b);
+                                    return dateB.getTime() - dateA.getTime();
+                                  }).map((month) => (
+                                    <AccordionItem key={month} value={month} className="border rounded-lg px-3">
+                                      <AccordionTrigger className="hover:no-underline py-2">
+                                        <div className="flex items-center gap-2">
+                                          <span className="material-icons text-sm">event</span>
+                                          <span className="text-sm font-medium">{month}</span>
+                                        </div>
+                                      </AccordionTrigger>
+                                      <AccordionContent>
+                                        <Accordion type="single" collapsible className="space-y-2 pl-4">
+                                          {Object.keys(sessionsByDate[year][month]).sort((a, b) => {
+                                            const dateA = new Date(a);
+                                            const dateB = new Date(b);
+                                            return dateB.getTime() - dateA.getTime();
+                                          }).map((day) => {
+                                            const daySessions = sessionsByDate[year][month][day];
+                                            const completedCount = daySessions.filter(s => s.endTime !== null).length;
+                                            
+                                            return (
+                                              <AccordionItem key={day} value={day} className="border rounded-lg px-3">
+                                                <AccordionTrigger className="hover:no-underline py-2">
+                                                  <div className="flex items-center justify-between w-full pr-3">
+                                                    <div className="flex items-center gap-2">
+                                                      <span className="material-icons text-xs">today</span>
+                                                      <span className="text-xs font-medium">{day}</span>
+                                                    </div>
+                                                    <Badge variant="secondary" className="text-xs">
+                                                      {daySessions.length} session{daySessions.length !== 1 ? 's' : ''}
+                                                    </Badge>
+                                                  </div>
+                                                </AccordionTrigger>
+                                                <AccordionContent>
+                                                  <div className="space-y-2 pl-4 pt-2">
+                                                    {daySessions.map((session: any) => {
+                                                      const isCompleted = session.endTime !== null;
+                                                      const sessionDrops = (session.dropsCompletedNorth ?? 0) + (session.dropsCompletedEast ?? 0) + 
+                                                                           (session.dropsCompletedSouth ?? 0) + (session.dropsCompletedWest ?? 0);
+                                                      const metTarget = sessionDrops >= project.dailyDropTarget;
+                                                      
+                                                      return (
+                                                        <div
+                                                          key={session.id}
+                                                          onClick={() => setSelectedSession(session)}
+                                                          className="flex items-center justify-between p-3 rounded-lg border bg-card cursor-pointer hover-elevate active-elevate-2"
+                                                          data-testid={`session-${session.id}`}
+                                                        >
+                                                          <p className="text-sm font-medium">
+                                                            {session.techName || "Unknown"}
+                                                          </p>
+                                                          {isCompleted ? (
+                                                            <Badge variant={metTarget ? "default" : "destructive"} className="text-xs" data-testid={`badge-${metTarget ? "met" : "below"}-target`}>
+                                                              {metTarget ? "Target Met" : "Below Target"}
+                                                            </Badge>
+                                                          ) : (
+                                                            <Badge variant="outline" className="text-xs">In Progress</Badge>
+                                                          )}
+                                                        </div>
+                                                      );
+                                                    })}
+                                                  </div>
+                                                </AccordionContent>
+                                              </AccordionItem>
+                                            );
+                                          })}
+                                        </Accordion>
+                                      </AccordionContent>
+                                    </AccordionItem>
+                                  ))}
+                                </Accordion>
+                              </AccordionContent>
+                            </AccordionItem>
+                          ))}
+                        </Accordion>
+                      );
+                    })()}
+                  </TabsContent>
+                )}
+              </Tabs>
+            </CardContent>
+          </Card>
+        )}
 
         {/* Project Documents and Photos - Combined Card */}
         <Card className="glass-card border-0 shadow-premium">
@@ -784,279 +1026,6 @@ export default function ProjectDetail() {
               )}
           </CardContent>
         </Card>
-
-        {/* Analytics - Target Performance & Work Session History */}
-        {(isManagement || canViewWorkHistory) && (
-          <Card className="glass-card border-0 shadow-premium">
-            <CardHeader>
-              <CardTitle>Analytics</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <Tabs defaultValue={isManagement && completedSessions.length > 0 ? "performance" : canViewFinancialData && project.estimatedHours ? "budget" : "history"} className="w-full">
-                <TabsList className="grid grid-cols-3 w-full h-auto">
-                  {isManagement && completedSessions.length > 0 && (
-                    <TabsTrigger value="performance" className="text-xs py-2" data-testid="tab-performance">Target Performance</TabsTrigger>
-                  )}
-                  {canViewFinancialData && project.estimatedHours && (
-                    <TabsTrigger value="budget" className="text-xs py-2" data-testid="tab-budget">Hours & Budget</TabsTrigger>
-                  )}
-                  {canViewWorkHistory && (
-                    <TabsTrigger value="history" className="text-xs py-2" data-testid="tab-history">Work History</TabsTrigger>
-                  )}
-                </TabsList>
-                
-                {isManagement && completedSessions.length > 0 && (
-                  <TabsContent value="performance" className="mt-4">
-                    <div className="flex flex-col items-center">
-                      <ResponsiveContainer width="100%" height={300}>
-                        <PieChart>
-                          <Pie
-                            data={pieData}
-                            cx="50%"
-                            cy="50%"
-                            labelLine={false}
-                            label={({ name, value, percent }) => 
-                              `${name}: ${value} (${(percent * 100).toFixed(0)}%)`
-                            }
-                            outerRadius={80}
-                            fill="#8884d8"
-                            dataKey="value"
-                          >
-                            {pieData.map((entry, index) => (
-                              <Cell key={`cell-${index}`} fill={entry.color} />
-                            ))}
-                          </Pie>
-                          <Tooltip />
-                          <Legend />
-                        </PieChart>
-                      </ResponsiveContainer>
-                      <div className="grid grid-cols-2 gap-4 mt-4 w-full max-w-sm">
-                        <div className="text-center">
-                          <div className="text-2xl font-bold text-primary">{targetMetCount}</div>
-                          <div className="text-sm text-muted-foreground">Target Met</div>
-                        </div>
-                        <div className="text-center">
-                          <div className="text-2xl font-bold text-destructive">{belowTargetCount}</div>
-                          <div className="text-sm text-muted-foreground">Below Target</div>
-                        </div>
-                      </div>
-                    </div>
-                  </TabsContent>
-                )}
-                
-                {canViewFinancialData && project.estimatedHours && (
-                  <TabsContent value="budget" className="mt-4">
-                    {(() => {
-                      // Calculate total hours worked from completed sessions
-                      const totalHoursWorked = completedSessions.reduce((sum: number, session: any) => {
-                        if (session.startTime && session.endTime) {
-                          const start = new Date(session.startTime);
-                          const end = new Date(session.endTime);
-                          const hours = (end.getTime() - start.getTime()) / (1000 * 60 * 60);
-                          return sum + hours;
-                        }
-                        return sum;
-                      }, 0);
-                      
-                      const estimatedHours = project.estimatedHours || 0;
-                      const hoursRemaining = Math.max(0, estimatedHours - totalHoursWorked);
-                      
-                      // Calculate total labor cost
-                      const totalLaborCost = completedSessions.reduce((sum: number, session: any) => {
-                        if (session.startTime && session.endTime && session.techHourlyRate) {
-                          const start = new Date(session.startTime);
-                          const end = new Date(session.endTime);
-                          const hours = (end.getTime() - start.getTime()) / (1000 * 60 * 60);
-                          const cost = hours * parseFloat(session.techHourlyRate);
-                          return sum + cost;
-                        }
-                        return sum;
-                      }, 0);
-                      
-                      const hoursPieData = [
-                        { name: 'Hours Worked', value: parseFloat(totalHoursWorked.toFixed(2)), color: '#1976D2' },
-                        { name: 'Hours Remaining', value: parseFloat(hoursRemaining.toFixed(2)), color: '#E0E0E0' },
-                      ];
-                      
-                      return (
-                        <div className="flex flex-col items-center">
-                          <ResponsiveContainer width="100%" height={300}>
-                            <PieChart>
-                              <Pie
-                                data={hoursPieData}
-                                cx="50%"
-                                cy="50%"
-                                labelLine={false}
-                                label={({ name, value, percent }) => 
-                                  `${name}: ${value}h (${(percent * 100).toFixed(0)}%)`
-                                }
-                                outerRadius={80}
-                                fill="#8884d8"
-                                dataKey="value"
-                              >
-                                {hoursPieData.map((entry, index) => (
-                                  <Cell key={`cell-${index}`} fill={entry.color} />
-                                ))}
-                              </Pie>
-                              <Tooltip />
-                              <Legend />
-                            </PieChart>
-                          </ResponsiveContainer>
-                          
-                          <div className="grid grid-cols-2 gap-4 mt-4 w-full max-w-sm">
-                            <div className="text-center p-4 rounded-lg border bg-card">
-                              <div className="text-2xl font-bold text-primary">{totalHoursWorked.toFixed(1)}h</div>
-                              <div className="text-sm text-muted-foreground">Hours Worked</div>
-                            </div>
-                            <div className="text-center p-4 rounded-lg border bg-card">
-                              <div className="text-2xl font-bold text-muted-foreground">{hoursRemaining.toFixed(1)}h</div>
-                              <div className="text-sm text-muted-foreground">Hours Remaining</div>
-                            </div>
-                          </div>
-                          
-                          <div className="w-full max-w-sm mt-6 p-6 rounded-lg border bg-card">
-                            <div className="text-center">
-                              <div className="text-sm text-muted-foreground mb-2">Total Labor Cost</div>
-                              <div className="text-3xl font-bold text-primary">
-                                ${totalLaborCost.toFixed(2)}
-                              </div>
-                              {estimatedHours > 0 && (
-                                <div className="text-xs text-muted-foreground mt-2">
-                                  {totalHoursWorked > 0 && (
-                                    <span>Average: ${(totalLaborCost / totalHoursWorked).toFixed(2)}/hr</span>
-                                  )}
-                                </div>
-                              )}
-                            </div>
-                          </div>
-                        </div>
-                      );
-                    })()}
-                  </TabsContent>
-                )}
-                
-                {canViewWorkHistory && (
-                  <TabsContent value="history" className="mt-4">
-                    {workSessions.length === 0 ? (
-                      <p className="text-center text-muted-foreground py-8">
-                        No work sessions recorded yet
-                      </p>
-                    ) : (() => {
-                      // Organize sessions by year -> month -> day
-                      const sessionsByDate: Record<string, Record<string, Record<string, any[]>>> = {};
-                      
-                      workSessions.forEach((session: any) => {
-                        const sessionDate = new Date(session.workDate);
-                        const year = format(sessionDate, "yyyy");
-                        const month = format(sessionDate, "MMMM yyyy");
-                        const day = format(sessionDate, "EEEE, MMM d, yyyy");
-                        
-                        if (!sessionsByDate[year]) sessionsByDate[year] = {};
-                        if (!sessionsByDate[year][month]) sessionsByDate[year][month] = {};
-                        if (!sessionsByDate[year][month][day]) sessionsByDate[year][month][day] = [];
-                        
-                        sessionsByDate[year][month][day].push(session);
-                      });
-                      
-                      const years = Object.keys(sessionsByDate).sort().reverse();
-                      
-                      return (
-                        <Accordion type="single" collapsible className="space-y-2">
-                          {years.map((year) => (
-                            <AccordionItem key={year} value={year} className="border rounded-lg px-3">
-                              <AccordionTrigger className="hover:no-underline py-3">
-                                <div className="flex items-center gap-2">
-                                  <span className="material-icons text-lg">calendar_today</span>
-                                  <span className="font-medium">{year}</span>
-                                </div>
-                              </AccordionTrigger>
-                              <AccordionContent>
-                                <Accordion type="single" collapsible className="space-y-2 pl-4">
-                                  {Object.keys(sessionsByDate[year]).sort((a, b) => {
-                                    const dateA = new Date(a);
-                                    const dateB = new Date(b);
-                                    return dateB.getTime() - dateA.getTime();
-                                  }).map((month) => (
-                                    <AccordionItem key={month} value={month} className="border rounded-lg px-3">
-                                      <AccordionTrigger className="hover:no-underline py-2">
-                                        <div className="flex items-center gap-2">
-                                          <span className="material-icons text-sm">event</span>
-                                          <span className="text-sm font-medium">{month}</span>
-                                        </div>
-                                      </AccordionTrigger>
-                                      <AccordionContent>
-                                        <Accordion type="single" collapsible className="space-y-2 pl-4">
-                                          {Object.keys(sessionsByDate[year][month]).sort((a, b) => {
-                                            const dateA = new Date(a);
-                                            const dateB = new Date(b);
-                                            return dateB.getTime() - dateA.getTime();
-                                          }).map((day) => {
-                                            const daySessions = sessionsByDate[year][month][day];
-                                            const completedCount = daySessions.filter(s => s.endTime !== null).length;
-                                            
-                                            return (
-                                              <AccordionItem key={day} value={day} className="border rounded-lg px-3">
-                                                <AccordionTrigger className="hover:no-underline py-2">
-                                                  <div className="flex items-center justify-between w-full pr-3">
-                                                    <div className="flex items-center gap-2">
-                                                      <span className="material-icons text-xs">today</span>
-                                                      <span className="text-xs font-medium">{day}</span>
-                                                    </div>
-                                                    <Badge variant="secondary" className="text-xs">
-                                                      {daySessions.length} session{daySessions.length !== 1 ? 's' : ''}
-                                                    </Badge>
-                                                  </div>
-                                                </AccordionTrigger>
-                                                <AccordionContent>
-                                                  <div className="space-y-2 pl-4 pt-2">
-                                                    {daySessions.map((session: any) => {
-                                                      const isCompleted = session.endTime !== null;
-                                                      const sessionDrops = (session.dropsCompletedNorth ?? 0) + (session.dropsCompletedEast ?? 0) + 
-                                                                           (session.dropsCompletedSouth ?? 0) + (session.dropsCompletedWest ?? 0);
-                                                      const metTarget = sessionDrops >= project.dailyDropTarget;
-                                                      
-                                                      return (
-                                                        <div
-                                                          key={session.id}
-                                                          onClick={() => setSelectedSession(session)}
-                                                          className="flex items-center justify-between p-3 rounded-lg border bg-card cursor-pointer hover-elevate active-elevate-2"
-                                                          data-testid={`session-${session.id}`}
-                                                        >
-                                                          <p className="text-sm font-medium">
-                                                            {session.techName || "Unknown"}
-                                                          </p>
-                                                          {isCompleted ? (
-                                                            <Badge variant={metTarget ? "default" : "destructive"} className="text-xs" data-testid={`badge-${metTarget ? "met" : "below"}-target`}>
-                                                              {metTarget ? "Target Met" : "Below Target"}
-                                                            </Badge>
-                                                          ) : (
-                                                            <Badge variant="outline" className="text-xs">In Progress</Badge>
-                                                          )}
-                                                        </div>
-                                                      );
-                                                    })}
-                                                  </div>
-                                                </AccordionContent>
-                                              </AccordionItem>
-                                            );
-                                          })}
-                                        </Accordion>
-                                      </AccordionContent>
-                                    </AccordionItem>
-                                  ))}
-                                </Accordion>
-                              </AccordionContent>
-                            </AccordionItem>
-                          ))}
-                        </Accordion>
-                      );
-                    })()}
-                  </TabsContent>
-                )}
-              </Tabs>
-            </CardContent>
-          </Card>
-        )}
 
         {/* Residents List - Management Only */}
         {isManagement && (
