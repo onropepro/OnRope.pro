@@ -48,7 +48,10 @@ export default function Quotes() {
       strataPlanNumber: "",
       buildingAddress: "",
       floorCount: 1,
-      dropsPerElevation: 0,
+      dropsNorth: 0,
+      dropsEast: 0,
+      dropsSouth: 0,
+      dropsWest: 0,
       dropsPerDay: 1,
       pricePerHour: "0",
       hasParkade: false,
@@ -58,7 +61,10 @@ export default function Quotes() {
   });
 
   // Watch relevant fields for auto-calculations
-  const dropsPerElevation = form.watch("dropsPerElevation");
+  const dropsNorth = form.watch("dropsNorth");
+  const dropsEast = form.watch("dropsEast");
+  const dropsSouth = form.watch("dropsSouth");
+  const dropsWest = form.watch("dropsWest");
   const dropsPerDay = form.watch("dropsPerDay");
   const pricePerHour = form.watch("pricePerHour");
   const hasParkade = form.watch("hasParkade");
@@ -67,15 +73,15 @@ export default function Quotes() {
   const hasGroundWindows = form.watch("hasGroundWindows");
   const groundWindowHours = form.watch("groundWindowHours");
 
-  // Auto-calculate total hours: (drops per elevation * 4 elevations) ÷ drops per day × 8 hours
+  // Auto-calculate total hours: (total drops from all elevations) ÷ drops per day × 8 hours
   useEffect(() => {
-    if (dropsPerElevation > 0 && dropsPerDay > 0) {
-      const totalDrops = dropsPerElevation * 4; // 4 elevations
+    const totalDrops = (dropsNorth || 0) + (dropsEast || 0) + (dropsSouth || 0) + (dropsWest || 0);
+    if (totalDrops > 0 && dropsPerDay > 0) {
       const daysNeeded = totalDrops / dropsPerDay;
       const calculatedHours = daysNeeded * 8;
       form.setValue("totalHours", calculatedHours.toFixed(2));
     }
-  }, [dropsPerElevation, dropsPerDay, form]);
+  }, [dropsNorth, dropsEast, dropsSouth, dropsWest, dropsPerDay, form]);
 
   // Auto-calculate total cost
   useEffect(() => {
@@ -282,24 +288,83 @@ export default function Quotes() {
                   <div className="space-y-4">
                     <h3 className="text-lg font-semibold">Work Details</h3>
                     
-                    <FormField
-                      control={form.control}
-                      name="dropsPerElevation"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Drops Per Elevation</FormLabel>
-                          <FormControl>
-                            <Input 
-                              type="number" 
-                              {...field} 
-                              onChange={(e) => field.onChange(parseInt(e.target.value))}
-                              data-testid="input-drops-per-elevation"
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
+                    <div className="grid grid-cols-2 gap-4">
+                      <FormField
+                        control={form.control}
+                        name="dropsNorth"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Drops - North</FormLabel>
+                            <FormControl>
+                              <Input 
+                                type="number" 
+                                {...field} 
+                                onChange={(e) => field.onChange(parseInt(e.target.value))}
+                                data-testid="input-drops-north"
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      <FormField
+                        control={form.control}
+                        name="dropsEast"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Drops - East</FormLabel>
+                            <FormControl>
+                              <Input 
+                                type="number" 
+                                {...field} 
+                                onChange={(e) => field.onChange(parseInt(e.target.value))}
+                                data-testid="input-drops-east"
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      <FormField
+                        control={form.control}
+                        name="dropsSouth"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Drops - South</FormLabel>
+                            <FormControl>
+                              <Input 
+                                type="number" 
+                                {...field} 
+                                onChange={(e) => field.onChange(parseInt(e.target.value))}
+                                data-testid="input-drops-south"
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      <FormField
+                        control={form.control}
+                        name="dropsWest"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Drops - West</FormLabel>
+                            <FormControl>
+                              <Input 
+                                type="number" 
+                                {...field} 
+                                onChange={(e) => field.onChange(parseInt(e.target.value))}
+                                data-testid="input-drops-west"
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
 
                     <FormField
                       control={form.control}
@@ -335,7 +400,7 @@ export default function Quotes() {
                             />
                           </FormControl>
                           <FormDescription>
-                            Calculated as: (drops per elevation × 4) ÷ drops per day × 8 hours
+                            Calculated as: (total drops from all elevations) ÷ drops per day × 8 hours
                           </FormDescription>
                           <FormMessage />
                         </FormItem>

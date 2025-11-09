@@ -354,8 +354,11 @@ export const quotes = pgTable("quotes", {
   buildingAddress: text("building_address").notNull(),
   floorCount: integer("floor_count").notNull(),
   
-  // Drops and work calculations
-  dropsPerElevation: integer("drops_per_elevation").notNull(), // Total drops per elevation
+  // Drops and work calculations - per elevation
+  dropsNorth: integer("drops_north").notNull().default(0), // Drops for North elevation
+  dropsEast: integer("drops_east").notNull().default(0), // Drops for East elevation
+  dropsSouth: integer("drops_south").notNull().default(0), // Drops for South elevation
+  dropsWest: integer("drops_west").notNull().default(0), // Drops for West elevation
   dropsPerDay: integer("drops_per_day").notNull(), // How many drops completed per day
   totalHours: numeric("total_hours", { precision: 10, scale: 2 }).notNull(), // Auto-calculated: (total drops ÷ drops per day) × 8
   pricePerHour: numeric("price_per_hour", { precision: 10, scale: 2 }).notNull(),
