@@ -1,7 +1,7 @@
 import { db } from "./db";
-import { users, projects, dropLogs, workSessions, complaints, complaintNotes, projectPhotos, jobComments, harnessInspections, toolboxMeetings } from "@shared/schema";
-import type { User, InsertUser, Project, InsertProject, DropLog, InsertDropLog, WorkSession, InsertWorkSession, Complaint, InsertComplaint, ComplaintNote, InsertComplaintNote, ProjectPhoto, InsertProjectPhoto, JobComment, InsertJobComment, HarnessInspection, InsertHarnessInspection, ToolboxMeeting, InsertToolboxMeeting } from "@shared/schema";
-import { eq, and, desc, sql, isNull } from "drizzle-orm";
+import { users, projects, dropLogs, workSessions, complaints, complaintNotes, projectPhotos, jobComments, harnessInspections, toolboxMeetings, payPeriodConfig, payPeriods } from "@shared/schema";
+import type { User, InsertUser, Project, InsertProject, DropLog, InsertDropLog, WorkSession, InsertWorkSession, Complaint, InsertComplaint, ComplaintNote, InsertComplaintNote, ProjectPhoto, InsertProjectPhoto, JobComment, InsertJobComment, HarnessInspection, InsertHarnessInspection, ToolboxMeeting, InsertToolboxMeeting, PayPeriodConfig, InsertPayPeriodConfig, PayPeriod, InsertPayPeriod, EmployeeHoursSummary } from "@shared/schema";
+import { eq, and, desc, sql, isNull, gte, lte, between } from "drizzle-orm";
 import bcrypt from "bcrypt";
 
 const SALT_ROUNDS = 10;
@@ -592,6 +592,242 @@ export class Storage {
 
   async deleteToolboxMeeting(id: string): Promise<void> {
     await db.delete(toolboxMeetings).where(eq(toolboxMeetings.id, id));
+  }
+
+  // Pay period configuration operations
+  async getPayPeriodConfig(companyId: string): Promise<PayPeriodConfig | undefined> {
+    const result = await db.select().from(payPeriodConfig)
+      .where(eq(payPeriodConfig.companyId, companyId))
+      .limit(1);
+    return result[0];
+  }
+
+  async createPayPeriodConfig(config: InsertPayPeriodConfig): Promise<PayPeriodConfig> {
+    const result = await db.insert(payPeriodConfig).values(config).returning();
+    return result[0];
+  }
+
+  async updatePayPeriodConfig(companyId: string, updates: Partial<InsertPayPeriodConfig>): Promise<PayPeriodConfig> {
+    const result = await db.update(payPeriodConfig)
+      .set({ ...updates, updatedAt: new Date() })
+      .where(eq(payPeriodConfig.companyId, companyId))
+      .returning();
+    return result[0];
+  }
+
+  async upsertPayPeriodConfig(config: InsertPayPeriodConfig): Promise<PayPeriodConfig> {
+    // Check if config exists
+    const existing = await this.getPayPeriodConfig(config.companyId);
+    if (existing) {
+      return this.updatePayPeriodConfig(config.companyId, config);
+    } else {
+      return this.createPayPeriodConfig(config);
+    }
+  }
+
+  // Pay periods operations
+  async createPayPeriod(period: InsertPayPeriod): Promise<PayPeriod> {
+    const result = await db.insert(payPeriods).values(period).returning();
+    return result[0];
+  }
+
+  async getPayPeriodsByCompany(companyId: string): Promise<PayPeriod[]> {
+    return db.select().from(payPeriods)
+      .where(eq(payPeriods.companyId, companyId))
+      .orderBy(desc(payPeriods.startDate));
+  }
+
+  async getPayPeriodById(id: string): Promise<PayPeriod | undefined> {
+    const result = await db.select().from(payPeriods)
+      .where(eq(payPeriods.id, id))
+      .limit(1);
+    return result[0];
+  }
+
+  async updatePayPeriodStatus(id: string, status: string): Promise<PayPeriod> {
+    const result = await db.update(payPeriods)
+      .set({ status })
+      .where(eq(payPeriods.id, id))
+      .returning();
+    return result[0];
+  }
+
+  async getCurrentPayPeriod(companyId: string): Promise<PayPeriod | undefined> {
+    const today = new Date().toISOString().split('T')[0];
+    const result = await db.select().from(payPeriods)
+      .where(
+        and(
+          eq(payPeriods.companyId, companyId),
+          lte(payPeriods.startDate, today),
+          gte(payPeriods.endDate, today)
+        )
+      )
+      .limit(1);
+    return result[0];
+  }
+
+  // Get employee hours summary for a pay period
+  async getEmployeeHoursForPayPeriod(companyId: string, startDate: string, endDate: string): Promise<EmployeeHoursSummary[]> {
+    // Get all work sessions within the pay period
+    const sessions = await db
+      .select({
+        sessionId: workSessions.id,
+        employeeId: workSessions.employeeId,
+        projectId: workSessions.projectId,
+        startTime: workSessions.startTime,
+        endTime: workSessions.endTime,
+        workDate: workSessions.workDate,
+        employeeName: users.name,
+        hourlyRate: users.hourlyRate,
+        projectName: projects.buildingName,
+      })
+      .from(workSessions)
+      .leftJoin(users, eq(workSessions.employeeId, users.id))
+      .leftJoin(projects, eq(workSessions.projectId, projects.id))
+      .where(
+        and(
+          eq(workSessions.companyId, companyId),
+          gte(workSessions.workDate, startDate),
+          lte(workSessions.workDate, endDate),
+          isNull(workSessions.endTime).not()
+        )
+      )
+      .orderBy(workSessions.employeeId, workSessions.workDate);
+
+    // Group by employee and calculate totals
+    const employeeMap = new Map<string, EmployeeHoursSummary>();
+
+    for (const session of sessions) {
+      if (!session.employeeId || !session.employeeName || !session.startTime || !session.endTime) continue;
+
+      const hours = (new Date(session.endTime).getTime() - new Date(session.startTime).getTime()) / (1000 * 60 * 60);
+      const rate = parseFloat(session.hourlyRate || '0');
+
+      if (!employeeMap.has(session.employeeId)) {
+        employeeMap.set(session.employeeId, {
+          employeeId: session.employeeId,
+          employeeName: session.employeeName,
+          hourlyRate: session.hourlyRate || '0',
+          totalHours: 0,
+          totalPay: 0,
+          sessions: [],
+        });
+      }
+
+      const summary = employeeMap.get(session.employeeId)!;
+      summary.totalHours += hours;
+      summary.totalPay += hours * rate;
+      summary.sessions.push({
+        id: session.sessionId,
+        projectId: session.projectId,
+        employeeId: session.employeeId,
+        companyId: companyId,
+        workDate: session.workDate,
+        startTime: session.startTime,
+        endTime: session.endTime,
+        dropsCompletedNorth: 0,
+        dropsCompletedEast: 0,
+        dropsCompletedSouth: 0,
+        dropsCompletedWest: 0,
+        shortfallReason: null,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        projectName: session.projectName || 'Unknown Project',
+      } as any);
+    }
+
+    return Array.from(employeeMap.values());
+  }
+
+  // Generate pay periods for a company based on their configuration
+  async generatePayPeriods(companyId: string, numberOfPeriods: number = 6): Promise<PayPeriod[]> {
+    const config = await this.getPayPeriodConfig(companyId);
+    if (!config) {
+      throw new Error('Pay period configuration not found for company');
+    }
+
+    const periods: InsertPayPeriod[] = [];
+    const today = new Date();
+
+    if (config.periodType === 'semi-monthly') {
+      const firstDay = config.firstPayDay || 1;
+      const secondDay = config.secondPayDay || 15;
+      
+      for (let i = 0; i < numberOfPeriods; i++) {
+        const monthOffset = Math.floor(i / 2);
+        const isFirstPeriod = i % 2 === 0;
+        
+        const year = today.getFullYear();
+        const month = today.getMonth() + monthOffset;
+        
+        const startDate = new Date(year, month, isFirstPeriod ? firstDay : secondDay);
+        const endDate = new Date(year, month, isFirstPeriod ? secondDay - 1 : 0); // 0 = last day of previous month
+        if (!isFirstPeriod) {
+          endDate.setMonth(month + 1);
+          endDate.setDate(firstDay - 1);
+        }
+        
+        periods.push({
+          companyId,
+          startDate: startDate.toISOString().split('T')[0],
+          endDate: endDate.toISOString().split('T')[0],
+          status: startDate > today ? 'upcoming' : (endDate < today ? 'past' : 'current'),
+        });
+      }
+    } else if (config.periodType === 'weekly') {
+      const dayOfWeek = config.startDayOfWeek || 0; // Default to Sunday
+      
+      // Find the most recent occurrence of the start day
+      let startDate = new Date(today);
+      while (startDate.getDay() !== dayOfWeek) {
+        startDate.setDate(startDate.getDate() - 1);
+      }
+      
+      for (let i = 0; i < numberOfPeriods; i++) {
+        const periodStart = new Date(startDate);
+        periodStart.setDate(startDate.getDate() + (i * 7));
+        
+        const periodEnd = new Date(periodStart);
+        periodEnd.setDate(periodStart.getDate() + 6);
+        
+        periods.push({
+          companyId,
+          startDate: periodStart.toISOString().split('T')[0],
+          endDate: periodEnd.toISOString().split('T')[0],
+          status: periodStart > today ? 'upcoming' : (periodEnd < today ? 'past' : 'current'),
+        });
+      }
+    } else if (config.periodType === 'bi-weekly') {
+      const anchorDate = config.biWeeklyAnchorDate ? new Date(config.biWeeklyAnchorDate) : new Date();
+      
+      // Calculate weeks since anchor date
+      const weeksSinceAnchor = Math.floor((today.getTime() - anchorDate.getTime()) / (1000 * 60 * 60 * 24 * 7));
+      const periodsFromAnchor = Math.floor(weeksSinceAnchor / 2);
+      
+      for (let i = 0; i < numberOfPeriods; i++) {
+        const periodStart = new Date(anchorDate);
+        periodStart.setDate(anchorDate.getDate() + ((periodsFromAnchor + i) * 14));
+        
+        const periodEnd = new Date(periodStart);
+        periodEnd.setDate(periodStart.getDate() + 13);
+        
+        periods.push({
+          companyId,
+          startDate: periodStart.toISOString().split('T')[0],
+          endDate: periodEnd.toISOString().split('T')[0],
+          status: periodStart > today ? 'upcoming' : (periodEnd < today ? 'past' : 'current'),
+        });
+      }
+    }
+
+    // Insert all periods
+    const created: PayPeriod[] = [];
+    for (const period of periods) {
+      const result = await this.createPayPeriod(period);
+      created.push(result);
+    }
+
+    return created;
   }
 }
 
