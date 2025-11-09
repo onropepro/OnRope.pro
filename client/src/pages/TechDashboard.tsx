@@ -195,11 +195,9 @@ export default function TechDashboard() {
     }
   };
 
-  const handleStartDay = () => {
-    if (projects.length > 0) {
-      setSelectedProject(projects[0]);
-      setShowStartDayDialog(true);
-    }
+  const handleStartDay = (project: any) => {
+    setSelectedProject(project);
+    setShowStartDayDialog(true);
   };
 
   const handleEndDay = () => {
