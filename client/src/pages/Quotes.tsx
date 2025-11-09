@@ -185,7 +185,7 @@ export default function Quotes() {
       <header className="sticky top-0 z-[100] bg-card border-b shadow-md">
         <div className="px-4 h-20 flex items-center justify-between max-w-7xl mx-auto">
           <div className="flex items-center gap-3">
-            <Button variant="ghost" size="icon" className="min-w-11 min-h-11" data-testid="button-back" onClick={() => setLocation("/management-dashboard")}>
+            <Button variant="ghost" size="icon" className="min-w-11 min-h-11" data-testid="button-back" onClick={() => setLocation("/management")}>
               <span className="material-icons">arrow_back</span>
             </Button>
             <h1 className="text-2xl font-bold tracking-tight">Quotes</h1>
