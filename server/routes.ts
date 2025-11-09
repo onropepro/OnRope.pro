@@ -1,7 +1,7 @@
 import type { Express, Request, Response, NextFunction } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { insertUserSchema, insertProjectSchema, insertDropLogSchema, insertComplaintSchema, insertComplaintNoteSchema, insertJobCommentSchema, insertHarnessInspectionSchema, insertToolboxMeetingSchema, normalizeStrataPlan } from "@shared/schema";
+import { insertUserSchema, insertProjectSchema, insertDropLogSchema, insertComplaintSchema, insertComplaintNoteSchema, insertJobCommentSchema, insertHarnessInspectionSchema, insertToolboxMeetingSchema, insertPayPeriodConfigSchema, normalizeStrataPlan } from "@shared/schema";
 import { z } from "zod";
 import bcrypt from "bcrypt";
 import multer from "multer";
@@ -1888,6 +1888,119 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({ comments });
     } catch (error) {
       console.error("Get job comments error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // ==================== PAYROLL / PAY PERIOD ROUTES ====================
+  
+  // Get or create pay period configuration
+  app.get("/api/payroll/config", requireAuth, requireRole("company"), async (req: Request, res: Response) => {
+    try {
+      const companyId = req.session.userId!;
+      const config = await storage.getPayPeriodConfig(companyId);
+      res.json({ config });
+    } catch (error) {
+      console.error("Get pay period config error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Create or update pay period configuration
+  app.post("/api/payroll/config", requireAuth, requireRole("company"), async (req: Request, res: Response) => {
+    try {
+      const companyId = req.session.userId!;
+      
+      const configData = insertPayPeriodConfigSchema.parse({
+        ...req.body,
+        companyId,
+      });
+      
+      const config = await storage.upsertPayPeriodConfig(configData);
+      res.json({ config });
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Validation error", errors: error.errors });
+      }
+      console.error("Create/update pay period config error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Generate pay periods
+  app.post("/api/payroll/generate-periods", requireAuth, requireRole("company"), async (req: Request, res: Response) => {
+    try {
+      const companyId = req.session.userId!;
+      const numberOfPeriods = req.body.numberOfPeriods || 6;
+      
+      const periods = await storage.generatePayPeriods(companyId, numberOfPeriods);
+      res.json({ periods });
+    } catch (error) {
+      console.error("Generate pay periods error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Get all pay periods for company
+  app.get("/api/payroll/periods", requireAuth, requireRole("company"), async (req: Request, res: Response) => {
+    try {
+      const companyId = req.session.userId!;
+      const periods = await storage.getPayPeriodsByCompany(companyId);
+      res.json({ periods });
+    } catch (error) {
+      console.error("Get pay periods error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Get current pay period
+  app.get("/api/payroll/current-period", requireAuth, requireRole("company"), async (req: Request, res: Response) => {
+    try {
+      const companyId = req.session.userId!;
+      const period = await storage.getCurrentPayPeriod(companyId);
+      res.json({ period });
+    } catch (error) {
+      console.error("Get current pay period error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Get employee hours for a specific pay period
+  app.get("/api/payroll/periods/:periodId/hours", requireAuth, requireRole("company"), async (req: Request, res: Response) => {
+    try {
+      const companyId = req.session.userId!;
+      const period = await storage.getPayPeriodById(req.params.periodId);
+      
+      if (!period) {
+        return res.status(404).json({ message: "Pay period not found" });
+      }
+      
+      if (period.companyId !== companyId) {
+        return res.status(403).json({ message: "Forbidden" });
+      }
+      
+      const hoursSummary = await storage.getEmployeeHoursForPayPeriod(companyId, period.startDate, period.endDate);
+      res.json({ hoursSummary, period });
+    } catch (error) {
+      console.error("Get employee hours error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Get employee hours for date range
+  app.get("/api/payroll/hours", requireAuth, requireRole("company"), async (req: Request, res: Response) => {
+    try {
+      const companyId = req.session.userId!;
+      const { startDate, endDate } = req.query;
+      
+      if (!startDate || !endDate) {
+        return res.status(400).json({ message: "startDate and endDate are required" });
+      }
+      
+      const hoursSummary = await storage.getEmployeeHoursForPayPeriod(companyId, startDate as string, endDate as string);
+      res.json({ hoursSummary });
+    } catch (error) {
+      console.error("Get employee hours error:", error);
       res.status(500).json({ message: "Internal server error" });
     }
   });
