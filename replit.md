@@ -20,9 +20,10 @@ The platform is built with a **mobile-first approach** and features a modern, pr
 
 **Technical Implementations & Feature Specifications:**
 - **Role-Based Access Control:** Multi-role user system (Company, Resident, Operations Manager, Supervisor, Rope Access Tech) with distinct permissions and dashboards.
-- **Project Management:** Create and manage projects including strata plan numbers, floor counts, and rope access plans (PDF upload). Supports project deletion with cascade warnings.
+- **Project Management:** Create and manage projects including strata plan numbers, floor counts, and rope access plans (PDF upload). Supports project completion (marks as completed, removes from active list) and deletion with cascade warnings. Company owners can complete, edit, or delete projects from centralized actions card at bottom of project detail page.
+- **Project Status Tracking:** Projects have status field (active/completed). Active projects shown by default; completed projects displayed separately. Backend filters projects by status for clean separation.
 - **Employee Management:** Company-controlled onboarding, editing employee details (name, email, role, IRATA level).
-- **Progress Tracking:** Visual progress through the 4-Elevation Building System. Daily drop logging by technicians with historical entry and dynamic shortfall reason validation.
+- **Progress Tracking:** Visual progress through the 4-Elevation Building System. Daily drop logging by technicians with historical entry, dynamic shortfall reason validation, and warning when entered drops exceed remaining per elevation (allows override).
 - **Complaint Management:** Residents can submit feedback; management can track and respond with notes.
 - **Photo Gallery:** Staff can upload photos to projects from camera or library, displayed in a 3-column responsive gallery.
 - **Universal Profile Management:** All users can update personal information and change passwords. Company owners can delete their entire account with cascade.
