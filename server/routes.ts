@@ -804,22 +804,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "User not found" });
       }
       
+      // Get status filter from query params (default to 'active' for non-residents)
+      const statusFilter = req.query.status as string | undefined;
+      
       let projects;
       
       if (currentUser.role === "company") {
-        // Return only THIS company's projects
-        projects = await storage.getProjectsByCompany(currentUser.id);
+        // Return only THIS company's projects, filtered by status
+        const status = statusFilter || 'active'; // Default to active for company
+        projects = await storage.getProjectsByCompany(currentUser.id, status);
       } else if (currentUser.role === "operations_manager" || currentUser.role === "supervisor" || currentUser.role === "rope_access_tech") {
-        // Return projects for their company
+        // Return projects for their company, filtered by status
         const companyId = currentUser.companyId;
+        const status = statusFilter || 'active'; // Default to active for employees
         if (companyId) {
-          projects = await storage.getProjectsByCompany(companyId);
+          projects = await storage.getProjectsByCompany(companyId, status);
         } else {
           projects = [];
         }
       } else if (currentUser.role === "resident") {
-        // Return ALL projects (active and completed) matching resident's strata plan
-        projects = await storage.getAllProjectsByStrataPlan(currentUser.strataPlanNumber || "");
+        // Return projects matching resident's strata plan (all statuses if not specified)
+        projects = await storage.getAllProjectsByStrataPlan(currentUser.strataPlanNumber || "", statusFilter);
       } else {
         projects = [];
       }
