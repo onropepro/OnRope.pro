@@ -443,6 +443,7 @@ export default function ManagementDashboard() {
         email: data.email,
         role: data.role,
         techLevel: data.techLevel,
+        hourlyRate: data.hourlyRate,
         permissions: data.permissions,
       });
 
