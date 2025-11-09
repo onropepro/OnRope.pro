@@ -1315,6 +1315,12 @@ export default function ManagementDashboard() {
                                   <span className="material-icons text-base">business</span>
                                   {project.jobType.replace(/_/g, ' ')}
                                 </div>
+                                {project.createdAt && (
+                                  <div className="text-xs text-muted-foreground mt-1 flex items-center gap-1">
+                                    <span className="material-icons text-xs">event</span>
+                                    Created {new Date(project.createdAt).toLocaleDateString()}
+                                  </div>
+                                )}
                               </div>
                               <Badge variant="secondary" className="text-sm px-3 py-1">
                                 <span className="material-icons text-xs mr-1">layers</span>
@@ -1360,11 +1366,18 @@ export default function ManagementDashboard() {
                           <CardContent className="p-5">
                             <div className="flex items-start justify-between">
                               <div className="flex-1">
-                                <div className="text-lg font-bold mb-1">{project.strataPlanNumber}</div>
+                                <div className="text-lg font-bold mb-1">{project.buildingName}</div>
+                                <div className="text-sm font-medium text-muted-foreground mb-1">{project.strataPlanNumber}</div>
                                 <div className="text-sm text-muted-foreground capitalize flex items-center gap-2">
                                   <span className="material-icons text-base text-success">check_circle</span>
                                   {project.jobType.replace(/_/g, ' ')}
                                 </div>
+                                {project.createdAt && (
+                                  <div className="text-xs text-muted-foreground mt-1 flex items-center gap-1">
+                                    <span className="material-icons text-xs">event</span>
+                                    Created {new Date(project.createdAt).toLocaleDateString()}
+                                  </div>
+                                )}
                               </div>
                               <Badge variant="default" className="bg-success hover:bg-success text-white">
                                 <span className="material-icons text-xs mr-1">done_all</span>
