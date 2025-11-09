@@ -804,21 +804,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "User not found" });
       }
       
-      // Get status filter from query params (default to 'active' for non-residents)
+      // Get status filter from query params (return all projects if not specified)
       const statusFilter = req.query.status as string | undefined;
       
-      let projects;
+      let projects: Project[];
       
       if (currentUser.role === "company") {
-        // Return only THIS company's projects, filtered by status
-        const status = statusFilter || 'active'; // Default to active for company
-        projects = await storage.getProjectsByCompany(currentUser.id, status);
+        // Return only THIS company's projects, filtered by status (all if not specified)
+        projects = await storage.getProjectsByCompany(currentUser.id, statusFilter);
       } else if (currentUser.role === "operations_manager" || currentUser.role === "supervisor" || currentUser.role === "rope_access_tech") {
-        // Return projects for their company, filtered by status
+        // Return projects for their company, filtered by status (all if not specified)
         const companyId = currentUser.companyId;
-        const status = statusFilter || 'active'; // Default to active for employees
         if (companyId) {
-          projects = await storage.getProjectsByCompany(companyId, status);
+          projects = await storage.getProjectsByCompany(companyId, statusFilter);
         } else {
           projects = [];
         }

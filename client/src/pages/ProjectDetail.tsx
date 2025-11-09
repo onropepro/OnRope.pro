@@ -1136,7 +1136,7 @@ export default function ProjectDetail() {
                   <Button 
                     variant="default" 
                     onClick={() => completeProjectMutation.mutate(project.id)}
-                    className="w-full h-12 bg-success hover:bg-success/90 text-white"
+                    className="w-full h-12 bg-success text-success-foreground border-success"
                     data-testid="button-complete-project"
                     disabled={completeProjectMutation.isPending}
                   >
