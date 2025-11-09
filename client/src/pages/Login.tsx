@@ -269,7 +269,13 @@ export default function Login() {
             </div>
 
             {/* Powered by Overhaul Labs */}
-            <div className="pt-6 mt-6 border-t flex items-center justify-center gap-2 opacity-60 hover:opacity-100 transition-opacity">
+            <a 
+              href="https://overhaullabs.replit.app" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="pt-6 mt-6 border-t flex items-center justify-center gap-2 opacity-60 hover:opacity-100 transition-opacity cursor-pointer"
+              data-testid="link-overhaul-labs"
+            >
               <img 
                 src={overhaulLabsLogo} 
                 alt="Overhaul Labs" 
@@ -278,7 +284,7 @@ export default function Login() {
               <span className="text-xs text-muted-foreground font-medium">
                 Powered by <span className="text-foreground">Overhaul Labs</span>
               </span>
-            </div>
+            </a>
           </CardContent>
         </Card>
       </div>
