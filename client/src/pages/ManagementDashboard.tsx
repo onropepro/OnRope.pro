@@ -183,13 +183,25 @@ type EndDayFormData = z.infer<typeof endDaySchema>;
 
 export default function ManagementDashboard() {
   const [activeTab, setActiveTab] = useState("projects");
+  const [consoleLogs, setConsoleLogs] = useState<string[]>([]);
+  
+  const addLog = (message: string) => {
+    console.log(message);
+    setConsoleLogs(prev => [...prev, `${new Date().toLocaleTimeString()}: ${message}`]);
+  };
+  
+  addLog(`[RENDER] activeTab current value: ${activeTab}`);
+
+  // Log on mount
+  useEffect(() => {
+    addLog(`[COMPONENT MOUNTED] Initial activeTab: ${activeTab}`);
+  }, []);
 
   // Scroll to top when changing tabs
   const handleTabChange = (tab: string) => {
-    console.log(`[DEBUG] Changing tab to: ${tab}`);
-    console.log(`[DEBUG] Current activeTab before change: ${activeTab}`);
+    addLog(`[TAB CHANGE] Changing to: ${tab}, current: ${activeTab}`);
     setActiveTab(tab);
-    console.log(`[DEBUG] setActiveTab called with: ${tab}`);
+    addLog(`[TAB CHANGE] setActiveTab called with: ${tab}`);
     // Scroll the content area into view smoothly
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
@@ -811,6 +823,16 @@ export default function ManagementDashboard() {
           <div className="text-xs">Type: {typeof activeTab}</div>
           <div className="text-xs">activeTab === "projects": {String(activeTab === "projects")}</div>
           <div className="text-xs">Strict check: {String(activeTab === "projects" ? true : false)}</div>
+        </div>
+
+        {/* DEBUG: Console Logs */}
+        <div className="mb-4 p-4 bg-yellow-100 dark:bg-yellow-950 border-2 border-yellow-500 rounded-lg">
+          <div className="text-sm font-bold mb-2">CONSOLE LOGS (last 10):</div>
+          <div className="text-xs font-mono space-y-1 max-h-48 overflow-y-auto">
+            {consoleLogs.slice(-10).map((log, i) => (
+              <div key={i} className="text-black dark:text-yellow-100">{log}</div>
+            ))}
+          </div>
         </div>
 
         {/* Navigation Grid */}
