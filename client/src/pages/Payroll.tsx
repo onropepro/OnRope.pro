@@ -9,8 +9,9 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { useToast } from "@/hooks/use-toast";
-import { DollarSign, Calendar, Users, Settings, ArrowLeft } from "lucide-react";
+import { DollarSign, Calendar, Users, Settings, ArrowLeft, Clock } from "lucide-react";
 import { format } from "date-fns";
 
 export default function Payroll() {
@@ -302,28 +303,91 @@ export default function Payroll() {
                   </div>
 
                   <div className="space-y-2">
-                    {hoursData.hoursSummary.map((employee) => (
-                      <Card key={employee.employeeId} data-testid={`card-employee-${employee.employeeId}`}>
-                        <CardHeader>
-                          <div className="flex items-center justify-between">
-                            <CardTitle className="text-lg">{employee.employeeName}</CardTitle>
-                            <div className="text-right">
-                              <div className="text-sm text-muted-foreground">${employee.hourlyRate}/hr</div>
-                              <div className="text-lg font-bold text-primary">${employee.totalPay.toFixed(2)}</div>
+                    <Accordion type="single" collapsible className="space-y-2">
+                      {hoursData.hoursSummary.map((employee) => (
+                        <AccordionItem 
+                          key={employee.employeeId} 
+                          value={employee.employeeId}
+                          className="border rounded-lg"
+                          data-testid={`accordion-employee-${employee.employeeId}`}
+                        >
+                          <AccordionTrigger className="px-6 py-4 hover:no-underline">
+                            <div className="flex items-center justify-between w-full pr-4">
+                              <div className="flex items-center gap-4">
+                                <div>
+                                  <div className="text-lg font-semibold text-left">{employee.employeeName}</div>
+                                  <div className="text-sm text-muted-foreground mt-1">
+                                    Total Hours: <span className="font-medium">{employee.totalHours.toFixed(2)} hours</span>
+                                  </div>
+                                  <div className="text-xs text-muted-foreground mt-0.5">
+                                    {employee.sessions.length} work sessions
+                                  </div>
+                                </div>
+                              </div>
+                              <div className="text-right">
+                                <div className="text-sm text-muted-foreground">${employee.hourlyRate}/hr</div>
+                                <div className="text-lg font-bold text-primary">${employee.totalPay.toFixed(2)}</div>
+                              </div>
                             </div>
-                          </div>
-                        </CardHeader>
-                        <CardContent>
-                          <div className="flex items-center justify-between text-sm">
-                            <span className="text-muted-foreground">Total Hours:</span>
-                            <span className="font-medium">{employee.totalHours.toFixed(2)} hours</span>
-                          </div>
-                          <div className="mt-2 text-xs text-muted-foreground">
-                            {employee.sessions.length} work sessions
-                          </div>
-                        </CardContent>
-                      </Card>
-                    ))}
+                          </AccordionTrigger>
+                          <AccordionContent className="px-6 pb-4">
+                            <div className="space-y-2 mt-2">
+                              <div className="text-sm font-semibold mb-3">Work Sessions</div>
+                              {employee.sessions.map((session, index) => {
+                                const startTime = new Date(session.startTime);
+                                const endTime = session.endTime ? new Date(session.endTime) : null;
+                                const hours = endTime 
+                                  ? ((endTime.getTime() - startTime.getTime()) / (1000 * 60 * 60)).toFixed(2)
+                                  : '0.00';
+                                const totalDrops = (session.dropsCompletedNorth || 0) + 
+                                                  (session.dropsCompletedEast || 0) + 
+                                                  (session.dropsCompletedSouth || 0) + 
+                                                  (session.dropsCompletedWest || 0);
+                                
+                                return (
+                                  <Card key={session.id} className="bg-muted/30" data-testid={`session-${session.id}`}>
+                                    <CardContent className="p-4">
+                                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
+                                        <div>
+                                          <div className="flex items-center gap-2 mb-2">
+                                            <span className="material-icons text-sm">event</span>
+                                            <span className="font-medium">
+                                              {format(new Date(session.workDate), 'EEE, MMM dd, yyyy')}
+                                            </span>
+                                          </div>
+                                          <div className="flex items-center gap-2 mb-2">
+                                            <span className="material-icons text-sm">business</span>
+                                            <span className="text-muted-foreground">{session.projectName || 'Unknown Project'}</span>
+                                          </div>
+                                          {totalDrops > 0 && (
+                                            <div className="flex items-center gap-2">
+                                              <span className="material-icons text-sm">check_circle</span>
+                                              <span className="text-muted-foreground">{totalDrops} drops completed</span>
+                                            </div>
+                                          )}
+                                        </div>
+                                        <div>
+                                          <div className="flex items-center gap-2 mb-2">
+                                            <Clock className="h-4 w-4" />
+                                            <span className="text-muted-foreground">
+                                              {format(startTime, 'h:mm a')} - {endTime ? format(endTime, 'h:mm a') : 'In Progress'}
+                                            </span>
+                                          </div>
+                                          <div className="flex items-center gap-2">
+                                            <span className="material-icons text-sm">schedule</span>
+                                            <span className="font-semibold">{hours} hours</span>
+                                          </div>
+                                        </div>
+                                      </div>
+                                    </CardContent>
+                                  </Card>
+                                );
+                              })}
+                            </div>
+                          </AccordionContent>
+                        </AccordionItem>
+                      ))}
+                    </Accordion>
                   </div>
                 </div>
               )}
