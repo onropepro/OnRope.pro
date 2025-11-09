@@ -226,7 +226,7 @@ export default function Login() {
               data-testid="link-register"
             >
               <span className="material-icons mr-2">person_add</span>
-              Create Company Account
+              Create Company or Resident/Owner Account
             </Button>
 
             <Button 
