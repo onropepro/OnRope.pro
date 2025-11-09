@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Progress } from "@/components/ui/progress";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { HighRiseBuilding } from "@/components/HighRiseBuilding";
 import { useToast } from "@/hooks/use-toast";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
@@ -46,6 +47,10 @@ export default function ProjectDetail() {
   // Check if user can view financial data (company owner OR has permission)
   const canViewFinancialData = currentUser?.role === "company" || 
                                 currentUser?.permissions?.includes("view_financial_data");
+  
+  // Check if user can view work history (company owner OR has permission)
+  const canViewWorkHistory = currentUser?.role === "company" || 
+                              currentUser?.permissions?.includes("view_work_history");
 
   // Fetch work sessions for this project
   const { data: workSessionsData } = useQuery({
@@ -858,101 +863,178 @@ export default function ProjectDetail() {
         )}
 
         {/* Work Sessions List */}
-        <Card className="glass-card border-0 shadow-premium">
-          <CardHeader>
-            <CardTitle>Work Session History</CardTitle>
-          </CardHeader>
-          <CardContent>
-            {workSessions.length === 0 ? (
-              <p className="text-center text-muted-foreground py-8">
-                No work sessions recorded yet
-              </p>
-            ) : (
-              <div className="space-y-3">
-                {workSessions.map((session: any) => {
+        {canViewWorkHistory && (
+          <Card className="glass-card border-0 shadow-premium">
+            <CardHeader>
+              <CardTitle>Work Session History</CardTitle>
+            </CardHeader>
+            <CardContent>
+              {workSessions.length === 0 ? (
+                <p className="text-center text-muted-foreground py-8">
+                  No work sessions recorded yet
+                </p>
+              ) : (() => {
+                // Organize sessions by year -> month -> day
+                const sessionsByDate: Record<string, Record<string, Record<string, any[]>>> = {};
+                
+                workSessions.forEach((session: any) => {
                   const sessionDate = new Date(session.workDate);
-                  const isCompleted = session.endTime !== null;
-                  const sessionDrops = (session.dropsCompletedNorth ?? 0) + (session.dropsCompletedEast ?? 0) + 
-                                       (session.dropsCompletedSouth ?? 0) + (session.dropsCompletedWest ?? 0);
-                  const metTarget = sessionDrops >= project.dailyDropTarget;
+                  const year = format(sessionDate, "yyyy");
+                  const month = format(sessionDate, "MMMM yyyy");
+                  const day = format(sessionDate, "EEEE, MMM d, yyyy");
                   
-                  // Calculate labor cost
-                  let hoursWorked = 0;
-                  let laborCost = 0;
-                  if (isCompleted && session.startTime && session.endTime) {
-                    const start = new Date(session.startTime);
-                    const end = new Date(session.endTime);
-                    hoursWorked = (end.getTime() - start.getTime()) / (1000 * 60 * 60);
-                    
-                    if (session.techHourlyRate) {
-                      laborCost = hoursWorked * parseFloat(session.techHourlyRate);
-                    }
-                  }
-
-                  return (
-                    <div
-                      key={session.id}
-                      className="flex items-center justify-between p-4 rounded-lg border bg-card hover-elevate"
-                      data-testid={`session-${session.id}`}
-                    >
-                      <div className="flex-1 space-y-1">
-                        <div className="flex items-center gap-2">
-                          <p className="font-medium">
-                            {format(sessionDate, "EEEE, MMM d, yyyy")}
-                          </p>
-                          {isCompleted ? (
-                            <Badge variant={metTarget ? "default" : "destructive"} data-testid={`badge-${metTarget ? "met" : "below"}-target`}>
-                              {metTarget ? "Target Met" : "Below Target"}
-                            </Badge>
-                          ) : (
-                            <Badge variant="outline">In Progress</Badge>
-                          )}
-                        </div>
-                        <p className="text-sm text-muted-foreground">
-                          Tech: {session.techName || "Unknown"}
-                        </p>
-                        {isCompleted && (
-                          <>
-                            <p className="text-sm">
-                              Drops: {sessionDrops} / {project.dailyDropTarget} target
-                            </p>
-                            {session.shortfallReason && (
-                              <p className="text-sm text-muted-foreground italic">
-                                Note: {session.shortfallReason}
-                              </p>
-                            )}
-                          </>
-                        )}
-                      </div>
-                      <div className="text-right text-sm space-y-1">
-                        {isCompleted && (
-                          <>
-                            <p className="text-muted-foreground">
-                              {format(new Date(session.startTime), "h:mm a")} -{" "}
-                              {format(new Date(session.endTime), "h:mm a")}
-                            </p>
-                            {canViewFinancialData && (
-                              <>
-                                <p className="text-muted-foreground">
-                                  {hoursWorked.toFixed(1)} hours
-                                </p>
-                                {laborCost > 0 && (
-                                  <p className="font-medium text-primary" data-testid="text-labor-cost">
-                                    ${laborCost.toFixed(2)}
-                                  </p>
-                                )}
-                              </>
-                            )}
-                          </>
-                        )}
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            )}
-          </CardContent>
-        </Card>
+                  if (!sessionsByDate[year]) sessionsByDate[year] = {};
+                  if (!sessionsByDate[year][month]) sessionsByDate[year][month] = {};
+                  if (!sessionsByDate[year][month][day]) sessionsByDate[year][month][day] = [];
+                  
+                  sessionsByDate[year][month][day].push(session);
+                });
+                
+                const years = Object.keys(sessionsByDate).sort().reverse();
+                
+                return (
+                  <Accordion type="single" collapsible className="space-y-2">
+                    {years.map((year) => (
+                      <AccordionItem key={year} value={year} className="border rounded-lg px-3">
+                        <AccordionTrigger className="hover:no-underline py-3">
+                          <div className="flex items-center gap-2">
+                            <span className="material-icons text-lg">calendar_today</span>
+                            <span className="font-medium">{year}</span>
+                          </div>
+                        </AccordionTrigger>
+                        <AccordionContent>
+                          <Accordion type="single" collapsible className="space-y-2 pl-4">
+                            {Object.keys(sessionsByDate[year]).sort((a, b) => {
+                              const dateA = new Date(a);
+                              const dateB = new Date(b);
+                              return dateB.getTime() - dateA.getTime();
+                            }).map((month) => (
+                              <AccordionItem key={month} value={month} className="border rounded-lg px-3">
+                                <AccordionTrigger className="hover:no-underline py-2">
+                                  <div className="flex items-center gap-2">
+                                    <span className="material-icons text-sm">event</span>
+                                    <span className="text-sm font-medium">{month}</span>
+                                  </div>
+                                </AccordionTrigger>
+                                <AccordionContent>
+                                  <Accordion type="single" collapsible className="space-y-2 pl-4">
+                                    {Object.keys(sessionsByDate[year][month]).sort((a, b) => {
+                                      const dateA = new Date(a);
+                                      const dateB = new Date(b);
+                                      return dateB.getTime() - dateA.getTime();
+                                    }).map((day) => {
+                                      const daySessions = sessionsByDate[year][month][day];
+                                      const completedCount = daySessions.filter(s => s.endTime !== null).length;
+                                      
+                                      return (
+                                        <AccordionItem key={day} value={day} className="border rounded-lg px-3">
+                                          <AccordionTrigger className="hover:no-underline py-2">
+                                            <div className="flex items-center justify-between w-full pr-3">
+                                              <div className="flex items-center gap-2">
+                                                <span className="material-icons text-xs">today</span>
+                                                <span className="text-xs font-medium">{day}</span>
+                                              </div>
+                                              <Badge variant="secondary" className="text-xs">
+                                                {daySessions.length} session{daySessions.length !== 1 ? 's' : ''}
+                                              </Badge>
+                                            </div>
+                                          </AccordionTrigger>
+                                          <AccordionContent>
+                                            <div className="space-y-2 pl-4 pt-2">
+                                              {daySessions.map((session: any) => {
+                                                const isCompleted = session.endTime !== null;
+                                                const sessionDrops = (session.dropsCompletedNorth ?? 0) + (session.dropsCompletedEast ?? 0) + 
+                                                                     (session.dropsCompletedSouth ?? 0) + (session.dropsCompletedWest ?? 0);
+                                                const metTarget = sessionDrops >= project.dailyDropTarget;
+                                                
+                                                let hoursWorked = 0;
+                                                let laborCost = 0;
+                                                if (isCompleted && session.startTime && session.endTime) {
+                                                  const start = new Date(session.startTime);
+                                                  const end = new Date(session.endTime);
+                                                  hoursWorked = (end.getTime() - start.getTime()) / (1000 * 60 * 60);
+                                                  
+                                                  if (session.techHourlyRate) {
+                                                    laborCost = hoursWorked * parseFloat(session.techHourlyRate);
+                                                  }
+                                                }
+                                                
+                                                return (
+                                                  <div
+                                                    key={session.id}
+                                                    className="flex items-center justify-between p-3 rounded-lg border bg-card"
+                                                    data-testid={`session-${session.id}`}
+                                                  >
+                                                    <div className="flex-1 space-y-1">
+                                                      <div className="flex items-center gap-2">
+                                                        <p className="text-sm font-medium">
+                                                          {session.techName || "Unknown"}
+                                                        </p>
+                                                        {isCompleted ? (
+                                                          <Badge variant={metTarget ? "default" : "destructive"} className="text-xs" data-testid={`badge-${metTarget ? "met" : "below"}-target`}>
+                                                            {metTarget ? "Target Met" : "Below Target"}
+                                                          </Badge>
+                                                        ) : (
+                                                          <Badge variant="outline" className="text-xs">In Progress</Badge>
+                                                        )}
+                                                      </div>
+                                                      {isCompleted && (
+                                                        <>
+                                                          <p className="text-xs text-muted-foreground">
+                                                            Drops: {sessionDrops} / {project.dailyDropTarget} target
+                                                          </p>
+                                                          {session.shortfallReason && (
+                                                            <p className="text-xs text-muted-foreground italic">
+                                                              Note: {session.shortfallReason}
+                                                            </p>
+                                                          )}
+                                                        </>
+                                                      )}
+                                                    </div>
+                                                    <div className="text-right text-xs space-y-1">
+                                                      {isCompleted && (
+                                                        <>
+                                                          <p className="text-muted-foreground">
+                                                            {format(new Date(session.startTime), "h:mm a")} -{" "}
+                                                            {format(new Date(session.endTime), "h:mm a")}
+                                                          </p>
+                                                          {canViewFinancialData && (
+                                                            <>
+                                                              <p className="text-muted-foreground">
+                                                                {hoursWorked.toFixed(1)} hrs
+                                                              </p>
+                                                              {laborCost > 0 && (
+                                                                <p className="font-medium text-primary" data-testid="text-labor-cost">
+                                                                  ${laborCost.toFixed(2)}
+                                                                </p>
+                                                              )}
+                                                            </>
+                                                          )}
+                                                        </>
+                                                      )}
+                                                    </div>
+                                                  </div>
+                                                );
+                                              })}
+                                            </div>
+                                          </AccordionContent>
+                                        </AccordionItem>
+                                      );
+                                    })}
+                                  </Accordion>
+                                </AccordionContent>
+                              </AccordionItem>
+                            ))}
+                          </Accordion>
+                        </AccordionContent>
+                      </AccordionItem>
+                    ))}
+                  </Accordion>
+                );
+              })()}
+            </CardContent>
+          </Card>
+        )}
       </div>
 
       {/* Delete Confirmation Dialog */}

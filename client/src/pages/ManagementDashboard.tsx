@@ -121,6 +121,7 @@ const AVAILABLE_PERMISSIONS = [
   { id: "manage_complaints", label: "Manage Complaints" },
   { id: "view_work_sessions", label: "View Work Sessions" },
   { id: "manage_work_sessions", label: "Manage Work Sessions" },
+  { id: "view_work_history", label: "View Work History" },
   { id: "view_analytics", label: "View Analytics" },
   { id: "view_financial_data", label: "View Financial Data (Labor Costs, Wages)" },
 ] as const;
