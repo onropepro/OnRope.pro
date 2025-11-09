@@ -1,5 +1,4 @@
-import { useState, useEffect } from "react";
-import { useLocation } from "wouter";
+import { useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -7,230 +6,179 @@ import { z } from "zod";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Switch } from "@/components/ui/switch";
+import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
-import { insertQuoteSchema, type Quote } from "@shared/schema";
+import { insertQuoteSchema, type QuoteWithServices } from "@shared/schema";
+import { 
+  Building2, 
+  Droplet, 
+  Wind, 
+  Sparkles, 
+  ParkingCircle, 
+  Home, 
+  ArrowLeft, 
+  Plus,
+  X,
+  Eye,
+  CheckCircle2
+} from "lucide-react";
 
-// Form schema with auto-calculated fields optional
-const quoteFormSchema = insertQuoteSchema.omit({ 
-  companyId: true,
-  totalHours: true,
-  totalCost: true,
-  parkadeTotal: true,
-  groundWindowTotal: true,
-}).extend({
-  totalHours: z.string().optional(),
-  totalCost: z.string().optional(),
-  parkadeTotal: z.string().optional(),
-  groundWindowTotal: z.string().optional(),
+// Service types configuration
+const SERVICE_TYPES = [
+  { 
+    id: "window_cleaning", 
+    name: "Window Cleaning", 
+    icon: Building2,
+    description: "Rope access window cleaning",
+    requiresElevation: true
+  },
+  { 
+    id: "dryer_vent_cleaning", 
+    name: "Dryer Vent Cleaning", 
+    icon: Wind,
+    description: "Exterior dryer vent cleaning",
+    requiresElevation: true
+  },
+  { 
+    id: "pressure_washing", 
+    name: "Pressure Washing", 
+    icon: Droplet,
+    description: "Building exterior cleaning",
+    requiresElevation: true
+  },
+  { 
+    id: "parkade", 
+    name: "Parkade Cleaning", 
+    icon: ParkingCircle,
+    description: "Parkade pressure washing",
+    requiresElevation: false
+  },
+  { 
+    id: "ground_windows", 
+    name: "Ground Windows", 
+    icon: Home,
+    description: "Ground level window cleaning",
+    requiresElevation: false
+  },
+  { 
+    id: "in_suite", 
+    name: "In-Suite Dryer Vent", 
+    icon: Sparkles,
+    description: "In-suite dryer vent service",
+    requiresElevation: false
+  },
+];
+
+// Form schemas
+const buildingInfoSchema = z.object({
+  buildingName: z.string().min(1, "Building name is required"),
+  strataPlanNumber: z.string().min(1, "Strata plan number is required"),
+  buildingAddress: z.string().min(1, "Building address is required"),
+  floorCount: z.coerce.number().min(1, "Floor count must be at least 1"),
 });
 
-type QuoteFormData = z.infer<typeof quoteFormSchema>;
+const serviceFormSchema = z.object({
+  serviceType: z.string(),
+  // Elevation-based fields
+  dropsNorth: z.coerce.number().optional(),
+  dropsEast: z.coerce.number().optional(),
+  dropsSouth: z.coerce.number().optional(),
+  dropsWest: z.coerce.number().optional(),
+  dropsPerDay: z.coerce.number().optional(),
+  // Parkade fields
+  parkadeStalls: z.coerce.number().optional(),
+  pricePerStall: z.coerce.number().optional(),
+  // Ground windows fields
+  groundWindowHours: z.coerce.number().optional(),
+  // In-suite fields
+  suitesPerDay: z.coerce.number().optional(),
+  floorsPerDay: z.coerce.number().optional(),
+  // Common fields
+  pricePerHour: z.coerce.number().min(0, "Price per hour required"),
+  totalHours: z.coerce.number().optional(),
+  totalCost: z.coerce.number().optional(),
+});
+
+type BuildingInfoFormData = z.infer<typeof buildingInfoSchema>;
+type ServiceFormData = z.infer<typeof serviceFormSchema>;
 
 export default function Quotes() {
-  const [, setLocation] = useLocation();
   const { toast } = useToast();
-  const [selectedPhoto, setSelectedPhoto] = useState<File | null>(null);
-  const [showForm, setShowForm] = useState(false);
-  const [editingQuote, setEditingQuote] = useState<Quote | null>(null);
-  const [selectedQuote, setSelectedQuote] = useState<Quote | null>(null);
+  
+  // View states
+  const [view, setView] = useState<"list" | "create" | "detail">("list");
+  const [createStep, setCreateStep] = useState<"building" | "services" | "configure">("building");
+  const [selectedQuote, setSelectedQuote] = useState<QuoteWithServices | null>(null);
+  
+  // Form data
+  const [buildingInfo, setBuildingInfo] = useState<BuildingInfoFormData | null>(null);
+  const [selectedServices, setSelectedServices] = useState<string[]>([]);
+  const [configuredServices, setConfiguredServices] = useState<Map<string, ServiceFormData>>(new Map());
+  const [serviceBeingConfigured, setServiceBeingConfigured] = useState<string | null>(null);
 
-  // Fetch all quotes
-  const { data: quotesData, isLoading } = useQuery<{ quotes: Quote[] }>({
-    queryKey: ["/api/quotes"],
-  });
-
-  const form = useForm<QuoteFormData>({
-    resolver: zodResolver(quoteFormSchema),
+  // Building info form
+  const buildingForm = useForm<BuildingInfoFormData>({
+    resolver: zodResolver(buildingInfoSchema),
     defaultValues: {
       buildingName: "",
       strataPlanNumber: "",
       buildingAddress: "",
       floorCount: 1,
-      dropsNorth: 0,
-      dropsEast: 0,
-      dropsSouth: 0,
-      dropsWest: 0,
-      dropsPerDay: 1,
-      pricePerHour: "0",
-      hasParkade: false,
-      hasGroundWindows: false,
-      status: "draft",
     },
   });
 
-  // Watch relevant fields for auto-calculations
-  const dropsNorth = form.watch("dropsNorth");
-  const dropsEast = form.watch("dropsEast");
-  const dropsSouth = form.watch("dropsSouth");
-  const dropsWest = form.watch("dropsWest");
-  const dropsPerDay = form.watch("dropsPerDay");
-  const pricePerHour = form.watch("pricePerHour");
-  const hasParkade = form.watch("hasParkade");
-  const parkadeStalls = form.watch("parkadeStalls");
-  const pricePerStall = form.watch("pricePerStall");
-  const hasGroundWindows = form.watch("hasGroundWindows");
-  const groundWindowHours = form.watch("groundWindowHours");
+  // Service configuration form
+  const serviceForm = useForm<ServiceFormData>({
+    resolver: zodResolver(serviceFormSchema),
+  });
 
-  // Auto-calculate total hours: (total drops from all elevations) ÷ drops per day × 8 hours
-  useEffect(() => {
-    const totalDrops = (dropsNorth || 0) + (dropsEast || 0) + (dropsSouth || 0) + (dropsWest || 0);
-    if (totalDrops > 0 && dropsPerDay > 0) {
-      const daysNeeded = totalDrops / dropsPerDay;
-      const calculatedHours = daysNeeded * 8;
-      form.setValue("totalHours", calculatedHours.toFixed(2));
-    }
-  }, [dropsNorth, dropsEast, dropsSouth, dropsWest, dropsPerDay, form]);
+  // Fetch quotes
+  const { data: quotesData, isLoading } = useQuery<{ quotes: QuoteWithServices[] }>({
+    queryKey: ["/api/quotes"],
+  });
 
-  // Auto-calculate total cost
-  useEffect(() => {
-    const hours = parseFloat(form.getValues("totalHours") || "0");
-    const hourlyRate = parseFloat(pricePerHour || "0");
-    if (hours > 0 && hourlyRate > 0) {
-      const calculatedCost = hours * hourlyRate;
-      form.setValue("totalCost", calculatedCost.toFixed(2));
-    }
-  }, [form.watch("totalHours"), pricePerHour, form]);
-
-  // Auto-calculate parkade total
-  useEffect(() => {
-    if (hasParkade && parkadeStalls && pricePerStall) {
-      const stalls = parseInt(parkadeStalls.toString());
-      const priceStall = parseFloat(pricePerStall.toString());
-      const calculatedTotal = stalls * priceStall;
-      form.setValue("parkadeTotal", calculatedTotal.toFixed(2));
-    } else {
-      form.setValue("parkadeTotal", undefined);
-    }
-  }, [hasParkade, parkadeStalls, pricePerStall, form]);
-
-  // Auto-calculate ground window total
-  useEffect(() => {
-    if (hasGroundWindows && groundWindowHours) {
-      const hours = parseFloat(groundWindowHours.toString());
-      const hourlyRate = parseFloat(pricePerHour || "0");
-      const calculatedTotal = hours * hourlyRate;
-      form.setValue("groundWindowTotal", calculatedTotal.toFixed(2));
-    } else {
-      form.setValue("groundWindowTotal", undefined);
-    }
-  }, [hasGroundWindows, groundWindowHours, pricePerHour, form]);
-
+  // Create quote mutation
   const createQuoteMutation = useMutation({
-    mutationFn: async (data: QuoteFormData) => {
-      const response = await apiRequest("POST", "/api/quotes", data);
-      return await response.json();
-    },
-    onSuccess: async (data) => {
-      try {
-        // Upload photo if selected
-        if (selectedPhoto && data.quote.id) {
-          const formData = new FormData();
-          formData.append("photo", selectedPhoto);
-          
-          const photoResponse = await fetch(`/api/quotes/${data.quote.id}/photo`, {
-            method: "POST",
-            body: formData,
-            credentials: "include",
-          });
-          
-          if (!photoResponse.ok) {
-            throw new Error("Failed to upload photo");
-          }
-        }
-        
-        // Invalidate queries after everything is done
-        await queryClient.invalidateQueries({ queryKey: ["/api/quotes"] });
-        
-        toast({
-          title: "Quote created",
-          description: "The quote has been created successfully.",
+    mutationFn: async () => {
+      if (!buildingInfo) throw new Error("Building info required");
+      
+      // Create quote
+      const quoteResponse = await apiRequest("POST", "/api/quotes", {
+        buildingName: buildingInfo.buildingName,
+        strataPlanNumber: buildingInfo.strataPlanNumber,
+        buildingAddress: buildingInfo.buildingAddress,
+        floorCount: buildingInfo.floorCount,
+        status: "open",
+      });
+      const { quote } = await quoteResponse.json();
+
+      // Add each service
+      for (const [serviceType, serviceData] of configuredServices) {
+        await apiRequest("POST", `/api/quotes/${quote.id}/services`, {
+          quoteId: quote.id,
+          serviceType,
+          ...serviceData,
         });
-        form.reset();
-        setSelectedPhoto(null);
-        setShowForm(false);
-      } catch (error) {
-        console.error("Photo upload error:", error);
-        toast({
-          variant: "destructive",
-          title: "Warning",
-          description: "Quote created but photo upload failed. Please try editing the quote to add the photo.",
-        });
-        
-        // Still invalidate queries and reset form even if photo failed
-        await queryClient.invalidateQueries({ queryKey: ["/api/quotes"] });
-        form.reset();
-        setSelectedPhoto(null);
-        setShowForm(false);
       }
+
+      return quote;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/quotes"] });
+      toast({
+        title: "Quote created",
+        description: "The quote has been created successfully.",
+      });
+      resetForm();
+      setView("list");
     },
     onError: (error: any) => {
       toast({
         variant: "destructive",
         title: "Error",
         description: error.message || "Failed to create quote",
-      });
-    },
-  });
-
-  const updateQuoteMutation = useMutation({
-    mutationFn: async ({ id, data }: { id: string; data: QuoteFormData }) => {
-      const response = await apiRequest("PATCH", `/api/quotes/${id}`, data);
-      return await response.json();
-    },
-    onSuccess: async (data) => {
-      try {
-        // Upload photo if selected
-        if (selectedPhoto && data.quote.id) {
-          const formData = new FormData();
-          formData.append("photo", selectedPhoto);
-          
-          const photoResponse = await fetch(`/api/quotes/${data.quote.id}/photo`, {
-            method: "POST",
-            body: formData,
-            credentials: "include",
-          });
-          
-          if (!photoResponse.ok) {
-            throw new Error("Failed to upload photo");
-          }
-        }
-        
-        // Invalidate queries after everything is done
-        await queryClient.invalidateQueries({ queryKey: ["/api/quotes"] });
-        
-        toast({
-          title: "Quote updated",
-          description: "The quote has been updated successfully.",
-        });
-        form.reset();
-        setSelectedPhoto(null);
-        setShowForm(false);
-        setEditingQuote(null);
-      } catch (error) {
-        console.error("Photo upload error:", error);
-        toast({
-          variant: "destructive",
-          title: "Warning",
-          description: "Quote updated but photo upload failed. Please try editing the quote to add the photo.",
-        });
-        
-        // Still invalidate queries and reset form even if photo failed
-        await queryClient.invalidateQueries({ queryKey: ["/api/quotes"] });
-        form.reset();
-        setSelectedPhoto(null);
-        setShowForm(false);
-        setEditingQuote(null);
-      }
-    },
-    onError: (error: any) => {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: error.message || "Failed to update quote",
       });
     },
   });
@@ -245,20 +193,13 @@ export default function Quotes() {
         title: "Quote deleted",
         description: "The quote has been deleted successfully.",
       });
-    },
-    onError: (error: any) => {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: error.message || "Failed to delete quote",
-      });
+      setView("list");
     },
   });
 
   const closeQuoteMutation = useMutation({
     mutationFn: async (id: string) => {
-      const response = await apiRequest("PATCH", `/api/quotes/${id}`, { status: "closed" });
-      return await response.json();
+      await apiRequest("PATCH", `/api/quotes/${id}`, { status: "closed" });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/quotes"] });
@@ -267,745 +208,977 @@ export default function Quotes() {
         description: "The quote has been marked as closed.",
       });
     },
-    onError: (error: any) => {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: error.message || "Failed to close quote",
-      });
-    },
   });
 
-  const reopenQuoteMutation = useMutation({
-    mutationFn: async (id: string) => {
-      const response = await apiRequest("PATCH", `/api/quotes/${id}`, { status: "draft" });
-      return await response.json();
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/quotes"] });
-      toast({
-        title: "Quote reopened",
-        description: "The quote has been reopened.",
-      });
-    },
-    onError: (error: any) => {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: error.message || "Failed to reopen quote",
-      });
-    },
-  });
+  const resetForm = () => {
+    setBuildingInfo(null);
+    setSelectedServices([]);
+    setConfiguredServices(new Map());
+    setServiceBeingConfigured(null);
+    setCreateStep("building");
+    buildingForm.reset();
+    serviceForm.reset();
+  };
 
-  const onSubmit = (data: QuoteFormData) => {
-    if (editingQuote) {
-      updateQuoteMutation.mutate({ id: editingQuote.id, data });
+  const handleBuildingInfoSubmit = (data: BuildingInfoFormData) => {
+    setBuildingInfo(data);
+    setCreateStep("services");
+  };
+
+  const handleServiceToggle = (serviceId: string) => {
+    if (selectedServices.includes(serviceId)) {
+      // Remove service
+      setSelectedServices(selectedServices.filter(s => s !== serviceId));
+      const newConfigured = new Map(configuredServices);
+      newConfigured.delete(serviceId);
+      setConfiguredServices(newConfigured);
     } else {
-      createQuoteMutation.mutate(data);
+      // Add service
+      setSelectedServices([...selectedServices, serviceId]);
     }
   };
 
-  const handleEditQuote = (quote: Quote) => {
-    setEditingQuote(quote);
-    setShowForm(true);
+  const handleConfigureService = (serviceId: string) => {
+    const service = SERVICE_TYPES.find(s => s.id === serviceId);
+    if (!service) return;
+
+    const existingConfig = configuredServices.get(serviceId);
     
-    // Populate form with quote data
-    form.reset({
-      buildingName: quote.buildingName,
-      strataPlanNumber: quote.strataPlanNumber,
-      buildingAddress: quote.buildingAddress,
-      floorCount: quote.floorCount,
-      dropsNorth: quote.dropsNorth,
-      dropsEast: quote.dropsEast,
-      dropsSouth: quote.dropsSouth,
-      dropsWest: quote.dropsWest,
-      dropsPerDay: quote.dropsPerDay,
-      pricePerHour: quote.pricePerHour.toString(),
-      totalHours: quote.totalHours.toString(),
-      totalCost: quote.totalCost.toString(),
-      hasParkade: quote.hasParkade,
-      parkadeStalls: quote.parkadeStalls || undefined,
-      pricePerStall: quote.pricePerStall?.toString() || undefined,
-      parkadeTotal: quote.parkadeTotal?.toString() || undefined,
-      hasGroundWindows: quote.hasGroundWindows,
-      groundWindowHours: quote.groundWindowHours?.toString() || undefined,
-      groundWindowTotal: quote.groundWindowTotal?.toString() || undefined,
-      status: quote.status,
+    serviceForm.reset({
+      serviceType: serviceId,
+      dropsNorth: existingConfig?.dropsNorth ?? 0,
+      dropsEast: existingConfig?.dropsEast ?? 0,
+      dropsSouth: existingConfig?.dropsSouth ?? 0,
+      dropsWest: existingConfig?.dropsWest ?? 0,
+      dropsPerDay: existingConfig?.dropsPerDay ?? 1,
+      parkadeStalls: existingConfig?.parkadeStalls,
+      pricePerStall: existingConfig?.pricePerStall,
+      groundWindowHours: existingConfig?.groundWindowHours,
+      suitesPerDay: existingConfig?.suitesPerDay,
+      floorsPerDay: existingConfig?.floorsPerDay,
+      pricePerHour: existingConfig?.pricePerHour ?? 0,
+      totalHours: existingConfig?.totalHours,
+      totalCost: existingConfig?.totalCost,
     });
+
+    setServiceBeingConfigured(serviceId);
+    setCreateStep("configure");
   };
 
-  const handleNewQuote = () => {
-    setEditingQuote(null);
-    form.reset({
-      buildingName: "",
-      strataPlanNumber: "",
-      buildingAddress: "",
-      floorCount: 1,
-      dropsNorth: 0,
-      dropsEast: 0,
-      dropsSouth: 0,
-      dropsWest: 0,
-      dropsPerDay: 1,
-      pricePerHour: "0",
-      hasParkade: false,
-      hasGroundWindows: false,
-      status: "draft",
-    });
-    setShowForm(true);
-  };
+  const handleServiceFormSubmit = (data: ServiceFormData) => {
+    if (!serviceBeingConfigured) return;
 
-  const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      setSelectedPhoto(e.target.files[0]);
+    const service = SERVICE_TYPES.find(s => s.id === serviceBeingConfigured);
+    if (!service) return;
+
+    // Calculate totals
+    let totalHours = 0;
+    let totalCost = 0;
+
+    if (service.requiresElevation) {
+      const totalDrops = (data.dropsNorth || 0) + (data.dropsEast || 0) + 
+                        (data.dropsSouth || 0) + (data.dropsWest || 0);
+      const dropsPerDay = data.dropsPerDay || 1;
+      const days = totalDrops / dropsPerDay;
+      totalHours = days * 8;
+      totalCost = totalHours * (data.pricePerHour || 0);
+    } else if (serviceBeingConfigured === "parkade") {
+      totalCost = (data.parkadeStalls || 0) * (data.pricePerStall || 0);
+      totalHours = totalCost / (data.pricePerHour || 1);
+    } else if (serviceBeingConfigured === "ground_windows") {
+      totalHours = data.groundWindowHours || 0;
+      totalCost = totalHours * (data.pricePerHour || 0);
+    } else if (serviceBeingConfigured === "in_suite") {
+      if (data.floorsPerDay) {
+        const days = (buildingInfo?.floorCount || 1) / data.floorsPerDay;
+        totalHours = days * 8;
+      } else if (data.suitesPerDay) {
+        const estimatedSuites = (buildingInfo?.floorCount || 1) * 10;
+        const days = estimatedSuites / data.suitesPerDay;
+        totalHours = days * 8;
+      }
+      totalCost = totalHours * (data.pricePerHour || 0);
     }
+
+    const newConfigured = new Map(configuredServices);
+    newConfigured.set(serviceBeingConfigured, {
+      ...data,
+      totalHours,
+      totalCost,
+    });
+    setConfiguredServices(newConfigured);
+    setServiceBeingConfigured(null);
+    setCreateStep("services");
   };
 
-  const quotes = quotesData?.quotes || [];
-  const openQuotes = quotes.filter(q => q.status !== "closed");
-  const closedQuotes = quotes.filter(q => q.status === "closed");
-
-  const handleBackToGrid = () => {
-    setSelectedQuote(null);
-    setShowForm(false);
-    setEditingQuote(null);
+  const calculateQuoteTotal = () => {
+    let total = 0;
+    for (const [, serviceData] of configuredServices) {
+      total += serviceData.totalCost || 0;
+    }
+    return total;
   };
 
-  return (
-    <div className="min-h-screen bg-background pb-20">
-      {/* Header */}
-      <header className="sticky top-0 z-[100] bg-card border-b shadow-md">
-        <div className="px-4 h-20 flex items-center justify-between max-w-7xl mx-auto">
-          <div className="flex items-center gap-3">
-            <Button variant="ghost" size="icon" className="min-w-11 min-h-11" data-testid="button-back" onClick={() => setLocation("/management")}>
-              <span className="material-icons">arrow_back</span>
+  const canFinalize = selectedServices.length > 0 && 
+    selectedServices.every(s => configuredServices.has(s));
+
+  // Render list view
+  if (view === "list") {
+    return (
+      <div className="min-h-screen bg-[#FAFAFA] p-8">
+        <div className="max-w-7xl mx-auto">
+          <div className="flex items-center justify-between mb-8">
+            <div>
+              <h1 className="text-4xl font-bold text-[#0A0A0A] mb-2">Service Quotes</h1>
+              <p className="text-[#71717A]">Create and manage service quotes for buildings</p>
+            </div>
+            <Button
+              onClick={() => setView("create")}
+              className="bg-[#3B82F6] hover:bg-[#3B82F6]/90"
+              data-testid="button-create-quote"
+            >
+              <Plus className="w-4 h-4 mr-2" />
+              New Quote
             </Button>
-            <h1 className="text-2xl font-bold tracking-tight">Quotes</h1>
           </div>
-          <Button 
-            variant="default" 
-            onClick={handleNewQuote}
-            data-testid="button-new-quote"
-          >
-            <span className="material-icons mr-2">add</span>
-            {showForm ? "Cancel" : "New Quote"}
-          </Button>
-        </div>
-      </header>
 
-      <div className="p-4 max-w-4xl mx-auto space-y-6">
-        {/* Grid View - Show when no quote is selected and no form */}
-        {!selectedQuote && !showForm && (
-          <div className="space-y-6">
-            <div className="grid grid-cols-2 gap-4">
-              {openQuotes.map((quote) => (
+          {isLoading ? (
+            <div className="text-center py-12">
+              <p className="text-[#71717A]">Loading quotes...</p>
+            </div>
+          ) : quotesData?.quotes.length === 0 ? (
+            <Card className="rounded-2xl shadow-lg border border-[#F4F4F5]">
+              <CardContent className="p-12 text-center">
+                <Building2 className="w-12 h-12 text-[#71717A] mx-auto mb-4" />
+                <h3 className="text-xl font-semibold text-[#0A0A0A] mb-2">No quotes yet</h3>
+                <p className="text-[#71717A] mb-6">Create your first service quote to get started</p>
                 <Button
-                  key={quote.id}
-                  variant="outline"
-                  className="h-auto flex-col gap-2 p-4 text-left"
-                  onClick={() => setSelectedQuote(quote)}
-                  data-testid={`button-quote-${quote.id}`}
+                  onClick={() => setView("create")}
+                  className="bg-[#3B82F6] hover:bg-[#3B82F6]/90"
+                  data-testid="button-create-first-quote"
                 >
-                  <div className="w-full">
-                    <div className="font-semibold truncate">{quote.buildingName}</div>
-                    <div className="text-xs text-muted-foreground truncate">{quote.strataPlanNumber}</div>
-                    <div className="text-lg font-bold text-primary mt-2">
-                      ${parseFloat(quote.totalCost).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                    </div>
-                  </div>
+                  <Plus className="w-4 h-4 mr-2" />
+                  Create Quote
                 </Button>
+              </CardContent>
+            </Card>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {quotesData?.quotes.map((quote) => (
+                <Card
+                  key={quote.id}
+                  className="rounded-2xl shadow-lg border border-[#F4F4F5] hover:shadow-xl transition-shadow cursor-pointer"
+                  onClick={() => {
+                    setSelectedQuote(quote);
+                    setView("detail");
+                  }}
+                  data-testid={`card-quote-${quote.id}`}
+                >
+                  <CardHeader className="p-6">
+                    <div className="flex items-start justify-between mb-4">
+                      <div className="flex-1">
+                        <CardTitle className="text-xl font-semibold text-[#0A0A0A] mb-1">
+                          {quote.buildingName}
+                        </CardTitle>
+                        <CardDescription className="text-[#71717A]">
+                          {quote.strataPlanNumber}
+                        </CardDescription>
+                      </div>
+                      <Badge
+                        className={`rounded-full px-3 py-1 ${
+                          quote.status === "open"
+                            ? "bg-[#06B6D4] text-white"
+                            : "bg-[#84CC16] text-white"
+                        }`}
+                        data-testid={`badge-status-${quote.id}`}
+                      >
+                        {quote.status}
+                      </Badge>
+                    </div>
+                    <div className="space-y-2 text-sm text-[#71717A]">
+                      <p>{quote.buildingAddress}</p>
+                      <p>{quote.floorCount} floors</p>
+                    </div>
+                  </CardHeader>
+                  <CardContent className="p-6 pt-0">
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between text-sm">
+                        <span className="text-[#71717A]">Services:</span>
+                        <Badge variant="outline" data-testid={`badge-service-count-${quote.id}`}>
+                          {quote.services.length}
+                        </Badge>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-[#71717A]">Total:</span>
+                        <span className="text-2xl font-bold text-[#3B82F6]">
+                          ${quote.services.reduce((sum, s) => sum + Number(s.totalCost || 0), 0).toFixed(2)}
+                        </span>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
               ))}
             </div>
-            
-            {closedQuotes.length > 0 && (
-              <>
-                <h2 className="text-xl font-bold text-muted-foreground mt-8">Closed Quotes</h2>
-                <div className="grid grid-cols-2 gap-4">
-                  {closedQuotes.map((quote) => (
-                    <Button
-                      key={quote.id}
-                      variant="outline"
-                      className="h-auto flex-col gap-2 p-4 text-left opacity-60"
-                      onClick={() => setSelectedQuote(quote)}
-                      data-testid={`button-quote-${quote.id}`}
-                    >
-                      <div className="w-full">
-                        <div className="font-semibold truncate">{quote.buildingName}</div>
-                        <div className="text-xs text-muted-foreground truncate">{quote.strataPlanNumber}</div>
-                        <div className="text-lg font-bold text-muted-foreground mt-2">
-                          ${parseFloat(quote.totalCost).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                        </div>
-                      </div>
-                    </Button>
-                  ))}
-                </div>
-              </>
-            )}
-          </div>
-        )}
+          )}
+        </div>
+      </div>
+    );
+  }
 
-        {/* Back Button */}
-        {(selectedQuote || showForm) && (
-          <Button 
-            variant="ghost" 
-            onClick={handleBackToGrid}
-            className="gap-2"
-            data-testid="button-back-to-grid"
+  // Render detail view
+  if (view === "detail" && selectedQuote) {
+    return (
+      <div className="min-h-screen bg-[#FAFAFA] p-8">
+        <div className="max-w-4xl mx-auto">
+          <Button
+            variant="ghost"
+            onClick={() => {
+              setSelectedQuote(null);
+              setView("list");
+            }}
+            className="mb-6"
+            data-testid="button-back-to-list"
           >
-            <span className="material-icons">arrow_back</span>
+            <ArrowLeft className="w-4 h-4 mr-2" />
             Back to Quotes
           </Button>
-        )}
 
-        {/* Quote Form */}
-        {showForm && (
-          <Card>
-            <CardHeader>
-              <CardTitle>{editingQuote ? "Edit Quote" : "Create New Quote"}</CardTitle>
-              <CardDescription>Fill in the details to generate a quote for building maintenance</CardDescription>
+          <Card className="rounded-2xl shadow-lg border border-[#F4F4F5] mb-8">
+            <CardHeader className="p-8">
+              <div className="flex items-start justify-between mb-4">
+                <div>
+                  <CardTitle className="text-3xl font-bold text-[#0A0A0A] mb-2">
+                    {selectedQuote.buildingName}
+                  </CardTitle>
+                  <CardDescription className="text-lg text-[#71717A]">
+                    {selectedQuote.strataPlanNumber}
+                  </CardDescription>
+                </div>
+                <Badge
+                  className={`rounded-full px-4 py-2 text-base ${
+                    selectedQuote.status === "open"
+                      ? "bg-[#06B6D4] text-white"
+                      : "bg-[#84CC16] text-white"
+                  }`}
+                >
+                  {selectedQuote.status}
+                </Badge>
+              </div>
+              <div className="grid grid-cols-2 gap-4 text-[#71717A]">
+                <div>
+                  <p className="text-sm mb-1">Address</p>
+                  <p className="font-medium text-[#0A0A0A]">{selectedQuote.buildingAddress}</p>
+                </div>
+                <div>
+                  <p className="text-sm mb-1">Floor Count</p>
+                  <p className="font-medium text-[#0A0A0A]">{selectedQuote.floorCount} floors</p>
+                </div>
+              </div>
             </CardHeader>
-            <CardContent>
-              <Form {...form}>
-                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-                  {/* Building Information */}
-                  <div className="space-y-4">
-                    <h3 className="text-lg font-semibold">Building Information</h3>
-                    
-                    <FormField
-                      control={form.control}
-                      name="buildingName"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Building Name</FormLabel>
-                          <FormControl>
-                            <Input {...field} data-testid="input-building-name" />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
+          </Card>
 
-                    <FormField
-                      control={form.control}
-                      name="strataPlanNumber"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Strata Plan Number</FormLabel>
-                          <FormControl>
-                            <Input {...field} data-testid="input-strata-plan" />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
+          <h2 className="text-2xl font-bold text-[#0A0A0A] mb-6">Services</h2>
+          <div className="space-y-6 mb-8">
+            {selectedQuote.services.map((service) => {
+              const serviceConfig = SERVICE_TYPES.find(s => s.id === service.serviceType);
+              const Icon = serviceConfig?.icon || Building2;
 
-                    <FormField
-                      control={form.control}
-                      name="buildingAddress"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Address</FormLabel>
-                          <FormControl>
-                            <Textarea {...field} data-testid="input-address" />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-
-                    <FormField
-                      control={form.control}
-                      name="floorCount"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Number of Floors</FormLabel>
-                          <FormControl>
-                            <Input 
-                              type="number" 
-                              {...field} 
-                              onChange={(e) => field.onChange(parseInt(e.target.value))}
-                              data-testid="input-floor-count"
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </div>
-
-                  {/* Work Calculation */}
-                  <div className="space-y-4">
-                    <h3 className="text-lg font-semibold">Work Details</h3>
-                    
-                    <div className="grid grid-cols-2 gap-4">
-                      <FormField
-                        control={form.control}
-                        name="dropsNorth"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Drops - North</FormLabel>
-                            <FormControl>
-                              <Input 
-                                type="number" 
-                                {...field} 
-                                onChange={(e) => field.onChange(parseInt(e.target.value))}
-                                data-testid="input-drops-north"
-                              />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-
-                      <FormField
-                        control={form.control}
-                        name="dropsEast"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Drops - East</FormLabel>
-                            <FormControl>
-                              <Input 
-                                type="number" 
-                                {...field} 
-                                onChange={(e) => field.onChange(parseInt(e.target.value))}
-                                data-testid="input-drops-east"
-                              />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-
-                      <FormField
-                        control={form.control}
-                        name="dropsSouth"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Drops - South</FormLabel>
-                            <FormControl>
-                              <Input 
-                                type="number" 
-                                {...field} 
-                                onChange={(e) => field.onChange(parseInt(e.target.value))}
-                                data-testid="input-drops-south"
-                              />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-
-                      <FormField
-                        control={form.control}
-                        name="dropsWest"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Drops - West</FormLabel>
-                            <FormControl>
-                              <Input 
-                                type="number" 
-                                {...field} 
-                                onChange={(e) => field.onChange(parseInt(e.target.value))}
-                                data-testid="input-drops-west"
-                              />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
+              return (
+                <Card key={service.id} className="rounded-2xl shadow-lg border border-[#F4F4F5]">
+                  <CardHeader className="p-6">
+                    <div className="flex items-center gap-3 mb-4">
+                      <div className="w-12 h-12 rounded-lg bg-[#3B82F6]/10 flex items-center justify-center">
+                        <Icon className="w-6 h-6 text-[#3B82F6]" />
+                      </div>
+                      <div>
+                        <CardTitle className="text-xl font-semibold text-[#0A0A0A]">
+                          {serviceConfig?.name || service.serviceType}
+                        </CardTitle>
+                        <CardDescription>
+                          {serviceConfig?.description}
+                        </CardDescription>
+                      </div>
                     </div>
 
-                    <FormField
-                      control={form.control}
-                      name="dropsPerDay"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Drops Per Day</FormLabel>
-                          <FormControl>
-                            <Input 
-                              type="number" 
-                              {...field} 
-                              onChange={(e) => field.onChange(parseInt(e.target.value))}
-                              data-testid="input-drops-per-day"
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-
-                    <FormField
-                      control={form.control}
-                      name="totalHours"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Total Hours (Auto-calculated)</FormLabel>
-                          <FormControl>
-                            <Input 
-                              {...field} 
-                              readOnly 
-                              className="bg-muted"
-                              data-testid="input-total-hours"
-                            />
-                          </FormControl>
-                          <FormDescription>
-                            Calculated as: (total drops from all elevations) ÷ drops per day × 8 hours
-                          </FormDescription>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-
-                    <FormField
-                      control={form.control}
-                      name="pricePerHour"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Price Per Hour ($)</FormLabel>
-                          <FormControl>
-                            <Input 
-                              type="number" 
-                              step="0.01"
-                              {...field}
-                              data-testid="input-price-per-hour"
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-
-                    <FormField
-                      control={form.control}
-                      name="totalCost"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Total Cost (Auto-calculated)</FormLabel>
-                          <FormControl>
-                            <Input 
-                              {...field} 
-                              readOnly 
-                              className="bg-muted"
-                              data-testid="input-total-cost"
-                            />
-                          </FormControl>
-                          <FormDescription>
-                            Calculated as: total hours × price per hour
-                          </FormDescription>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </div>
-
-                  {/* Parkade Section */}
-                  <div className="space-y-4">
-                    <FormField
-                      control={form.control}
-                      name="hasParkade"
-                      render={({ field }) => (
-                        <FormItem className="flex items-center justify-between rounded-md border p-4">
-                          <div className="space-y-0.5">
-                            <FormLabel>Parkade</FormLabel>
-                            <FormDescription>
-                              Does this quote include parkade work?
-                            </FormDescription>
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                      {serviceConfig?.requiresElevation && (
+                        <>
+                          <div>
+                            <p className="text-[#71717A] mb-1">North</p>
+                            <p className="font-medium text-[#0A0A0A]">{service.dropsNorth || 0} drops</p>
                           </div>
-                          <FormControl>
-                            <Switch
-                              checked={field.value}
-                              onCheckedChange={field.onChange}
-                              data-testid="switch-parkade"
-                            />
-                          </FormControl>
-                        </FormItem>
-                      )}
-                    />
-
-                    {hasParkade && (
-                      <>
-                        <FormField
-                          control={form.control}
-                          name="parkadeStalls"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Number of Parkade Stalls</FormLabel>
-                              <FormControl>
-                                <Input 
-                                  type="number" 
-                                  {...field} 
-                                  onChange={(e) => field.onChange(parseInt(e.target.value))}
-                                  data-testid="input-parkade-stalls"
-                                />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-
-                        <FormField
-                          control={form.control}
-                          name="pricePerStall"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Price Per Stall ($)</FormLabel>
-                              <FormControl>
-                                <Input 
-                                  type="number" 
-                                  step="0.01"
-                                  {...field}
-                                  onChange={(e) => field.onChange(e.target.value)}
-                                  data-testid="input-price-per-stall"
-                                />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-
-                        <FormField
-                          control={form.control}
-                          name="parkadeTotal"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Parkade Total (Auto-calculated)</FormLabel>
-                              <FormControl>
-                                <Input 
-                                  {...field} 
-                                  readOnly 
-                                  className="bg-muted"
-                                  data-testid="input-parkade-total"
-                                />
-                              </FormControl>
-                              <FormDescription>
-                                Calculated as: number of stalls × price per stall
-                              </FormDescription>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                      </>
-                    )}
-                  </div>
-
-                  {/* Ground Windows Section */}
-                  <div className="space-y-4">
-                    <FormField
-                      control={form.control}
-                      name="hasGroundWindows"
-                      render={({ field }) => (
-                        <FormItem className="flex items-center justify-between rounded-md border p-4">
-                          <div className="space-y-0.5">
-                            <FormLabel>Ground Windows</FormLabel>
-                            <FormDescription>
-                              Does this quote include ground window cleaning?
-                            </FormDescription>
+                          <div>
+                            <p className="text-[#71717A] mb-1">East</p>
+                            <p className="font-medium text-[#0A0A0A]">{service.dropsEast || 0} drops</p>
                           </div>
-                          <FormControl>
-                            <Switch
-                              checked={field.value}
-                              onCheckedChange={field.onChange}
-                              data-testid="switch-ground-windows"
-                            />
-                          </FormControl>
-                        </FormItem>
+                          <div>
+                            <p className="text-[#71717A] mb-1">South</p>
+                            <p className="font-medium text-[#0A0A0A]">{service.dropsSouth || 0} drops</p>
+                          </div>
+                          <div>
+                            <p className="text-[#71717A] mb-1">West</p>
+                            <p className="font-medium text-[#0A0A0A]">{service.dropsWest || 0} drops</p>
+                          </div>
+                          <div>
+                            <p className="text-[#71717A] mb-1">Drops/Day</p>
+                            <p className="font-medium text-[#0A0A0A]">{service.dropsPerDay}</p>
+                          </div>
+                        </>
                       )}
-                    />
 
-                    {hasGroundWindows && (
-                      <>
-                        <FormField
-                          control={form.control}
-                          name="groundWindowHours"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Hours Required for Ground Windows</FormLabel>
-                              <FormControl>
-                                <Input 
-                                  type="number" 
-                                  step="0.01"
-                                  {...field}
-                                  onChange={(e) => field.onChange(e.target.value)}
-                                  data-testid="input-ground-window-hours"
-                                />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
+                      {service.serviceType === "parkade" && (
+                        <>
+                          <div>
+                            <p className="text-[#71717A] mb-1">Stalls</p>
+                            <p className="font-medium text-[#0A0A0A]">{service.parkadeStalls}</p>
+                          </div>
+                          <div>
+                            <p className="text-[#71717A] mb-1">Price/Stall</p>
+                            <p className="font-medium text-[#0A0A0A]">${Number(service.pricePerStall).toFixed(2)}</p>
+                          </div>
+                        </>
+                      )}
+
+                      {service.serviceType === "ground_windows" && (
+                        <div>
+                          <p className="text-[#71717A] mb-1">Hours</p>
+                          <p className="font-medium text-[#0A0A0A]">{Number(service.groundWindowHours).toFixed(1)}</p>
+                        </div>
+                      )}
+
+                      {service.serviceType === "in_suite" && (
+                        <>
+                          {service.suitesPerDay && (
+                            <div>
+                              <p className="text-[#71717A] mb-1">Suites/Day</p>
+                              <p className="font-medium text-[#0A0A0A]">{service.suitesPerDay}</p>
+                            </div>
                           )}
-                        />
-
-                        <FormField
-                          control={form.control}
-                          name="groundWindowTotal"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Ground Windows Total (Auto-calculated)</FormLabel>
-                              <FormControl>
-                                <Input 
-                                  {...field} 
-                                  readOnly 
-                                  className="bg-muted"
-                                  data-testid="input-ground-window-total"
-                                />
-                              </FormControl>
-                              <FormDescription>
-                                Calculated as: hours × hourly rate
-                              </FormDescription>
-                              <FormMessage />
-                            </FormItem>
+                          {service.floorsPerDay && (
+                            <div>
+                              <p className="text-[#71717A] mb-1">Floors/Day</p>
+                              <p className="font-medium text-[#0A0A0A]">{service.floorsPerDay}</p>
+                            </div>
                           )}
-                        />
-                      </>
-                    )}
-                  </div>
+                        </>
+                      )}
 
-                  {/* Photo Upload */}
-                  <div className="space-y-4">
-                    <h3 className="text-lg font-semibold">Attachment</h3>
-                    <div>
-                      <FormLabel>Photo (Optional)</FormLabel>
-                      <Input 
-                        type="file" 
-                        accept="image/*"
-                        onChange={handlePhotoChange}
-                        className="mt-2"
-                        data-testid="input-photo"
-                      />
-                      {selectedPhoto && (
-                        <p className="text-sm text-muted-foreground mt-2">
-                          Selected: {selectedPhoto.name}
+                      <div>
+                        <p className="text-[#71717A] mb-1">Price/Hour</p>
+                        <p className="font-medium text-[#0A0A0A]">${Number(service.pricePerHour).toFixed(2)}</p>
+                      </div>
+                      <div>
+                        <p className="text-[#71717A] mb-1">Total Hours</p>
+                        <p className="font-medium text-[#0A0A0A]">{Number(service.totalHours).toFixed(1)}</p>
+                      </div>
+                      <div>
+                        <p className="text-[#71717A] mb-1">Total Cost</p>
+                        <p className="text-xl font-bold text-[#3B82F6]">
+                          ${Number(service.totalCost).toFixed(2)}
                         </p>
-                      )}
+                      </div>
                     </div>
-                  </div>
+                  </CardHeader>
+                </Card>
+              );
+            })}
+          </div>
 
-                  <Button 
-                    type="submit" 
-                    className="w-full" 
-                    disabled={createQuoteMutation.isPending || updateQuoteMutation.isPending}
-                    data-testid="button-submit-quote"
+          <Card className="rounded-2xl shadow-lg border border-[#F4F4F5] bg-[#3B82F6]/5">
+            <CardContent className="p-8">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="text-xl font-semibold text-[#0A0A0A] mb-1">Quote Total</h3>
+                  <p className="text-[#71717A]">
+                    {selectedQuote.services.length} service{selectedQuote.services.length !== 1 ? 's' : ''}
+                  </p>
+                </div>
+                <div className="text-4xl font-bold text-[#3B82F6]">
+                  ${selectedQuote.services.reduce((sum, s) => sum + Number(s.totalCost || 0), 0).toFixed(2)}
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <div className="flex gap-4 mt-8">
+            {selectedQuote.status === "open" && (
+              <Button
+                onClick={() => closeQuoteMutation.mutate(selectedQuote.id)}
+                disabled={closeQuoteMutation.isPending}
+                className="bg-[#84CC16] hover:bg-[#84CC16]/90"
+                data-testid="button-close-quote"
+              >
+                <CheckCircle2 className="w-4 h-4 mr-2" />
+                Close Quote
+              </Button>
+            )}
+            <Button
+              variant="destructive"
+              onClick={() => {
+                if (confirm("Are you sure you want to delete this quote?")) {
+                  deleteQuoteMutation.mutate(selectedQuote.id);
+                }
+              }}
+              disabled={deleteQuoteMutation.isPending}
+              data-testid="button-delete-quote"
+            >
+              Delete Quote
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Render create view - Building info step
+  if (view === "create" && createStep === "building") {
+    return (
+      <div className="min-h-screen bg-[#FAFAFA] p-8">
+        <div className="max-w-2xl mx-auto">
+          <Button
+            variant="ghost"
+            onClick={() => {
+              resetForm();
+              setView("list");
+            }}
+            className="mb-6"
+            data-testid="button-cancel-create"
+          >
+            <ArrowLeft className="w-4 h-4 mr-2" />
+            Cancel
+          </Button>
+
+          <Card className="rounded-2xl shadow-lg border border-[#F4F4F5]">
+            <CardHeader className="p-8">
+              <CardTitle className="text-3xl font-bold text-[#0A0A0A] mb-2">
+                Building Information
+              </CardTitle>
+              <CardDescription className="text-lg">
+                Enter the building details for this quote
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="p-8 pt-0">
+              <Form {...buildingForm}>
+                <form onSubmit={buildingForm.handleSubmit(handleBuildingInfoSubmit)} className="space-y-6">
+                  <FormField
+                    control={buildingForm.control}
+                    name="buildingName"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Building Name</FormLabel>
+                        <FormControl>
+                          <Input
+                            {...field}
+                            placeholder="e.g., Oceanview Towers"
+                            className="h-12"
+                            data-testid="input-building-name"
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={buildingForm.control}
+                    name="strataPlanNumber"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Strata Plan Number</FormLabel>
+                        <FormControl>
+                          <Input
+                            {...field}
+                            placeholder="e.g., LMS1234"
+                            className="h-12"
+                            data-testid="input-strata-plan"
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={buildingForm.control}
+                    name="buildingAddress"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Building Address</FormLabel>
+                        <FormControl>
+                          <Input
+                            {...field}
+                            placeholder="e.g., 123 Main Street, Vancouver, BC"
+                            className="h-12"
+                            data-testid="input-building-address"
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={buildingForm.control}
+                    name="floorCount"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Floor Count</FormLabel>
+                        <FormControl>
+                          <Input
+                            {...field}
+                            type="number"
+                            min="1"
+                            placeholder="e.g., 20"
+                            className="h-12"
+                            data-testid="input-floor-count"
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <Button
+                    type="submit"
+                    className="w-full bg-[#3B82F6] hover:bg-[#3B82F6]/90 h-12"
+                    data-testid="button-next-to-services"
                   >
-                    {editingQuote 
-                      ? (updateQuoteMutation.isPending ? "Updating..." : "Update Quote")
-                      : (createQuoteMutation.isPending ? "Creating..." : "Create Quote")
-                    }
+                    Next: Select Services
                   </Button>
                 </form>
               </Form>
             </CardContent>
           </Card>
-        )}
+        </div>
+      </div>
+    );
+  }
 
-        {/* Quote Detail View */}
-        {selectedQuote && (
-          <Card className="hover-elevate rounded-2xl shadow-lg border-2 overflow-hidden">
-            <div className={`h-2 ${selectedQuote.status === "closed" ? "bg-gradient-to-r from-gray-400 via-gray-500 to-gray-600" : "bg-gradient-to-r from-blue-500 via-indigo-500 to-cyan-500"}`} />
-            <CardHeader className="pb-3">
-              <div className="flex items-start justify-between gap-2">
-                <div className="flex-1 min-w-0">
-                  <CardTitle className="text-lg">{selectedQuote.buildingName}</CardTitle>
-                  <CardDescription className="text-xs">{selectedQuote.strataPlanNumber}</CardDescription>
-                  <CardDescription className="text-xs line-clamp-1 mt-1">{selectedQuote.buildingAddress}</CardDescription>
-                  <CardDescription className="text-xs mt-2 flex items-center gap-1">
-                    <span className="material-icons text-[14px]">event</span>
-                    {new Date(selectedQuote.createdAt || '').toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
-                  </CardDescription>
+  // Render create view - Service selection step
+  if (view === "create" && createStep === "services") {
+    return (
+      <div className="min-h-screen bg-[#FAFAFA] p-8">
+        <div className="max-w-6xl mx-auto">
+          <Button
+            variant="ghost"
+            onClick={() => setCreateStep("building")}
+            className="mb-6"
+            data-testid="button-back-to-building"
+          >
+            <ArrowLeft className="w-4 h-4 mr-2" />
+            Back to Building Info
+          </Button>
+
+          <div className="mb-8">
+            <h1 className="text-4xl font-bold text-[#0A0A0A] mb-2">Select Services</h1>
+            <p className="text-[#71717A] text-lg">
+              Choose one or more services for {buildingInfo?.buildingName}
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-8">
+            {SERVICE_TYPES.map((service) => {
+              const Icon = service.icon;
+              const isSelected = selectedServices.includes(service.id);
+              const isConfigured = configuredServices.has(service.id);
+
+              return (
+                <Card
+                  key={service.id}
+                  className={`rounded-2xl shadow-lg border-2 cursor-pointer transition-all ${
+                    isSelected
+                      ? "border-[#3B82F6] bg-[#3B82F6]/5"
+                      : "border-[#F4F4F5] hover:border-[#3B82F6]/30"
+                  }`}
+                  data-testid={`card-service-${service.id}`}
+                >
+                  <CardHeader className="p-6">
+                    <div className="flex items-start gap-4">
+                      <div
+                        className={`w-16 h-16 rounded-xl flex items-center justify-center ${
+                          isSelected ? "bg-[#3B82F6]" : "bg-[#F4F4F5]"
+                        }`}
+                      >
+                        <Icon className={`w-8 h-8 ${isSelected ? "text-white" : "text-[#71717A]"}`} />
+                      </div>
+                      <div className="flex-1">
+                        <div className="flex items-center justify-between mb-2">
+                          <h3 className="font-semibold text-[#0A0A0A]">{service.name}</h3>
+                          {isConfigured && (
+                            <Badge className="bg-[#84CC16] text-white rounded-full">
+                              <CheckCircle2 className="w-3 h-3" />
+                            </Badge>
+                          )}
+                        </div>
+                        <p className="text-sm text-[#71717A]">{service.description}</p>
+                      </div>
+                    </div>
+                  </CardHeader>
+                  <CardContent className="p-6 pt-0">
+                    <div className="flex gap-2">
+                      <Button
+                        onClick={() => handleServiceToggle(service.id)}
+                        variant={isSelected ? "destructive" : "default"}
+                        className={`flex-1 ${
+                          !isSelected ? "bg-[#3B82F6] hover:bg-[#3B82F6]/90" : ""
+                        }`}
+                        data-testid={`button-toggle-${service.id}`}
+                      >
+                        {isSelected ? (
+                          <>
+                            <X className="w-4 h-4 mr-2" />
+                            Remove
+                          </>
+                        ) : (
+                          <>
+                            <Plus className="w-4 h-4 mr-2" />
+                            Add
+                          </>
+                        )}
+                      </Button>
+                      {isSelected && (
+                        <Button
+                          onClick={() => handleConfigureService(service.id)}
+                          variant="outline"
+                          data-testid={`button-configure-${service.id}`}
+                        >
+                          {isConfigured ? "Edit" : "Configure"}
+                        </Button>
+                      )}
+                    </div>
+                  </CardContent>
+                </Card>
+              );
+            })}
+          </div>
+
+          {selectedServices.length > 0 && (
+            <Card className="rounded-2xl shadow-lg border border-[#F4F4F5] bg-[#3B82F6]/5">
+              <CardContent className="p-8">
+                <div className="flex items-center justify-between mb-4">
+                  <div>
+                    <h3 className="text-xl font-semibold text-[#0A0A0A] mb-1">
+                      {selectedServices.length} Service{selectedServices.length !== 1 ? 's' : ''} Selected
+                    </h3>
+                    <p className="text-[#71717A]">
+                      {canFinalize
+                        ? "All services configured. Ready to create quote."
+                        : "Please configure all selected services."}
+                    </p>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-sm text-[#71717A] mb-1">Estimated Total</p>
+                    <p className="text-3xl font-bold text-[#3B82F6]">
+                      ${calculateQuoteTotal().toFixed(2)}
+                    </p>
+                  </div>
                 </div>
-                <div className="flex gap-1 shrink-0">
-                  {selectedQuote.status !== "closed" && (
-                    <Button variant="ghost" size="icon" onClick={() => { handleEditQuote(selectedQuote); setSelectedQuote(null); }} data-testid={`button-edit-${selectedQuote.id}`}>
-                      <span className="material-icons text-primary text-xl">edit</span>
-                    </Button>
-                  )}
-                  <Button variant="ghost" size="icon" onClick={() => { deleteQuoteMutation.mutate(selectedQuote.id); setSelectedQuote(null); }} data-testid={`button-delete-${selectedQuote.id}`}>
-                    <span className="material-icons text-destructive text-xl">delete</span>
-                  </Button>
+                <Button
+                  onClick={() => createQuoteMutation.mutate()}
+                  disabled={!canFinalize || createQuoteMutation.isPending}
+                  className="w-full bg-[#3B82F6] hover:bg-[#3B82F6]/90 h-12"
+                  data-testid="button-create-quote-final"
+                >
+                  {createQuoteMutation.isPending ? "Creating..." : "Create Quote"}
+                </Button>
+              </CardContent>
+            </Card>
+          )}
+        </div>
+      </div>
+    );
+  }
+
+  // Render create view - Configure service step
+  if (view === "create" && createStep === "configure" && serviceBeingConfigured) {
+    const service = SERVICE_TYPES.find(s => s.id === serviceBeingConfigured);
+    if (!service) return null;
+
+    const Icon = service.icon;
+
+    return (
+      <div className="min-h-screen bg-[#FAFAFA] p-8">
+        <div className="max-w-2xl mx-auto">
+          <Button
+            variant="ghost"
+            onClick={() => {
+              setServiceBeingConfigured(null);
+              setCreateStep("services");
+            }}
+            className="mb-6"
+            data-testid="button-back-to-service-selection"
+          >
+            <ArrowLeft className="w-4 h-4 mr-2" />
+            Back to Service Selection
+          </Button>
+
+          <Card className="rounded-2xl shadow-lg border border-[#F4F4F5]">
+            <CardHeader className="p-8">
+              <div className="flex items-center gap-4 mb-4">
+                <div className="w-16 h-16 rounded-xl bg-[#3B82F6] flex items-center justify-center">
+                  <Icon className="w-8 h-8 text-white" />
+                </div>
+                <div>
+                  <CardTitle className="text-3xl font-bold text-[#0A0A0A] mb-1">
+                    {service.name}
+                  </CardTitle>
+                  <CardDescription className="text-lg">
+                    {service.description}
+                  </CardDescription>
                 </div>
               </div>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid grid-cols-2 gap-3 text-sm">
-                <div className="bg-muted/50 rounded-lg p-3">
-                  <p className="text-muted-foreground text-xs">Floors</p>
-                  <p className="font-semibold text-base">{selectedQuote.floorCount}</p>
-                </div>
-                <div className="bg-muted/50 rounded-lg p-3">
-                  <p className="text-muted-foreground text-xs">Hours</p>
-                  <p className="font-semibold text-base">{selectedQuote.totalHours}</p>
-                </div>
-              </div>
-              
-              <div className={`${selectedQuote.status === "closed" ? "bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-950/30 dark:to-gray-900/30 border-gray-200 dark:border-gray-800" : "bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-950/30 dark:to-indigo-950/30 border-blue-200 dark:border-blue-800"} rounded-xl p-4 border`}>
-                <div className="flex items-baseline justify-between mb-2">
-                  <span className={`text-sm font-medium ${selectedQuote.status === "closed" ? "text-gray-700 dark:text-gray-300" : "text-blue-900 dark:text-blue-100"}`}>Total Cost</span>
-                  <span className={`text-xs ${selectedQuote.status === "closed" ? "text-gray-600 dark:text-gray-400" : "text-blue-700 dark:text-blue-300"}`}>${selectedQuote.pricePerHour}/hr</span>
-                </div>
-                <p className={`text-3xl font-bold ${selectedQuote.status === "closed" ? "text-gray-600 dark:text-gray-400" : "text-blue-600 dark:text-blue-400"}`}>
-                  ${parseFloat(selectedQuote.totalCost).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                </p>
-              </div>
+            <CardContent className="p-8 pt-0">
+              <Form {...serviceForm}>
+                <form onSubmit={serviceForm.handleSubmit(handleServiceFormSubmit)} className="space-y-6">
+                  {service.requiresElevation && (
+                    <>
+                      <div className="grid grid-cols-2 gap-4">
+                        <FormField
+                          control={serviceForm.control}
+                          name="dropsNorth"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Drops North</FormLabel>
+                              <FormControl>
+                                <Input
+                                  {...field}
+                                  type="number"
+                                  min="0"
+                                  className="h-12"
+                                  data-testid="input-drops-north"
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        <FormField
+                          control={serviceForm.control}
+                          name="dropsEast"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Drops East</FormLabel>
+                              <FormControl>
+                                <Input
+                                  {...field}
+                                  type="number"
+                                  min="0"
+                                  className="h-12"
+                                  data-testid="input-drops-east"
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        <FormField
+                          control={serviceForm.control}
+                          name="dropsSouth"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Drops South</FormLabel>
+                              <FormControl>
+                                <Input
+                                  {...field}
+                                  type="number"
+                                  min="0"
+                                  className="h-12"
+                                  data-testid="input-drops-south"
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        <FormField
+                          control={serviceForm.control}
+                          name="dropsWest"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Drops West</FormLabel>
+                              <FormControl>
+                                <Input
+                                  {...field}
+                                  type="number"
+                                  min="0"
+                                  className="h-12"
+                                  data-testid="input-drops-west"
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </div>
+                      <FormField
+                        control={serviceForm.control}
+                        name="dropsPerDay"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Drops Per Day</FormLabel>
+                            <FormControl>
+                              <Input
+                                {...field}
+                                type="number"
+                                min="1"
+                                className="h-12"
+                                data-testid="input-drops-per-day"
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </>
+                  )}
 
-              {selectedQuote.hasParkade && (
-                <div className="bg-amber-50 dark:bg-amber-950/30 rounded-lg p-3 border border-amber-200 dark:border-amber-800">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-xs text-amber-700 dark:text-amber-300">Parkade</p>
-                      <p className="font-semibold text-amber-900 dark:text-amber-100">{selectedQuote.parkadeStalls} stalls</p>
-                    </div>
-                    <p className="text-lg font-bold text-amber-600 dark:text-amber-400">${selectedQuote.parkadeTotal}</p>
-                  </div>
-                </div>
-              )}
+                  {serviceBeingConfigured === "parkade" && (
+                    <>
+                      <FormField
+                        control={serviceForm.control}
+                        name="parkadeStalls"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Number of Stalls</FormLabel>
+                            <FormControl>
+                              <Input
+                                {...field}
+                                type="number"
+                                min="1"
+                                className="h-12"
+                                data-testid="input-parkade-stalls"
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={serviceForm.control}
+                        name="pricePerStall"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Price Per Stall</FormLabel>
+                            <FormControl>
+                              <Input
+                                {...field}
+                                type="number"
+                                min="0"
+                                step="0.01"
+                                className="h-12"
+                                data-testid="input-price-per-stall"
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </>
+                  )}
 
-              {selectedQuote.hasGroundWindows && (
-                <div className="bg-cyan-50 dark:bg-cyan-950/30 rounded-lg p-3 border border-cyan-200 dark:border-cyan-800">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-xs text-cyan-700 dark:text-cyan-300">Ground Windows</p>
-                      <p className="font-semibold text-cyan-900 dark:text-cyan-100">{selectedQuote.groundWindowHours} hrs</p>
-                    </div>
-                    <p className="text-lg font-bold text-cyan-600 dark:text-cyan-400">${selectedQuote.groundWindowTotal}</p>
-                  </div>
-                </div>
-              )}
+                  {serviceBeingConfigured === "ground_windows" && (
+                    <FormField
+                      control={serviceForm.control}
+                      name="groundWindowHours"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Estimated Hours</FormLabel>
+                          <FormControl>
+                            <Input
+                              {...field}
+                              type="number"
+                              min="0"
+                              step="0.1"
+                              className="h-12"
+                              data-testid="input-ground-window-hours"
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  )}
 
-              {selectedQuote.photoUrl && (
-                <div className="mt-3">
-                  <img src={selectedQuote.photoUrl} alt="Quote attachment" className="rounded-lg w-full h-64 object-cover border-2" />
-                </div>
-              )}
+                  {serviceBeingConfigured === "in_suite" && (
+                    <>
+                      <FormField
+                        control={serviceForm.control}
+                        name="suitesPerDay"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Suites Per Day (Optional)</FormLabel>
+                            <FormControl>
+                              <Input
+                                {...field}
+                                type="number"
+                                min="0"
+                                className="h-12"
+                                data-testid="input-suites-per-day"
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={serviceForm.control}
+                        name="floorsPerDay"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Floors Per Day (Optional)</FormLabel>
+                            <FormControl>
+                              <Input
+                                {...field}
+                                type="number"
+                                min="0"
+                                className="h-12"
+                                data-testid="input-floors-per-day"
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </>
+                  )}
 
-              {selectedQuote.status !== "closed" ? (
-                <Button variant="outline" className="w-full mt-2" onClick={() => closeQuoteMutation.mutate(selectedQuote.id)} disabled={closeQuoteMutation.isPending} data-testid={`button-close-${selectedQuote.id}`}>
-                  <span className="material-icons mr-2 text-sm">check_circle</span>
-                  {closeQuoteMutation.isPending ? "Closing..." : "Mark as Closed"}
-                </Button>
-              ) : (
-                <Button variant="default" className="w-full mt-2" onClick={() => reopenQuoteMutation.mutate(selectedQuote.id)} disabled={reopenQuoteMutation.isPending} data-testid={`button-reopen-${selectedQuote.id}`}>
-                  <span className="material-icons mr-2 text-sm">refresh</span>
-                  {reopenQuoteMutation.isPending ? "Reopening..." : "Reopen Quote"}
-                </Button>
-              )}
+                  <FormField
+                    control={serviceForm.control}
+                    name="pricePerHour"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Price Per Hour</FormLabel>
+                        <FormControl>
+                          <Input
+                            {...field}
+                            type="number"
+                            min="0"
+                            step="0.01"
+                            className="h-12"
+                            data-testid="input-price-per-hour"
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <Button
+                    type="submit"
+                    className="w-full bg-[#3B82F6] hover:bg-[#3B82F6]/90 h-12"
+                    data-testid="button-save-service-config"
+                  >
+                    Save Configuration
+                  </Button>
+                </form>
+              </Form>
             </CardContent>
           </Card>
-        )}
-
-        {/* Empty State - Only show on grid view */}
-        {!selectedQuote && !showForm && isLoading && (
-          <div className="text-center py-8">
-            <p className="text-muted-foreground">Loading quotes...</p>
-          </div>
-        )}
-        {!selectedQuote && !showForm && !isLoading && quotes.length === 0 && (
-          <Card>
-            <CardContent className="py-8 text-center">
-              <p className="text-muted-foreground">No quotes yet. Create your first quote to get started.</p>
-            </CardContent>
-          </Card>
-        )}
+        </div>
       </div>
-    </div>
-  );
-}
+    );
+  }
 
-                    <Card 
-                      key={quote.id} 
+  return null;
+}
