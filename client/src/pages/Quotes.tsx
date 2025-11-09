@@ -1009,4 +1009,3 @@ export default function Quotes() {
 
                     <Card 
                       key={quote.id} 
-                      className="hover-elevate rounded-2xl shadow-lg border-2 overflow-hidden"
