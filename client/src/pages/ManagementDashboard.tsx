@@ -806,8 +806,11 @@ export default function ManagementDashboard() {
 
       <div className="p-4 max-w-4xl mx-auto">
         {/* DEBUG: Active Tab Indicator */}
-        <div className="mb-4 p-4 bg-primary/10 border-2 border-primary rounded-lg">
+        <div className="mb-4 p-4 bg-primary/10 border-2 border-primary rounded-lg space-y-2">
           <div className="text-sm font-bold">DEBUG: Active Tab = "{activeTab}"</div>
+          <div className="text-xs">Type: {typeof activeTab}</div>
+          <div className="text-xs">activeTab === "projects": {String(activeTab === "projects")}</div>
+          <div className="text-xs">Strict check: {String(activeTab === "projects" ? true : false)}</div>
         </div>
 
         {/* Navigation Grid */}
