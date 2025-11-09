@@ -818,6 +818,48 @@ export class Storage {
           status: periodStart > today ? 'upcoming' : (periodEnd < today ? 'past' : 'current'),
         });
       }
+    } else if (config.periodType === 'monthly') {
+      const startDay = config.monthlyStartDay || 1;
+      const endDay = config.monthlyEndDay || 31;
+      
+      for (let i = 0; i < numberOfPeriods; i++) {
+        const year = today.getFullYear();
+        const month = today.getMonth() + i;
+        
+        const startDate = new Date(year, month, startDay);
+        
+        // For end date, handle month transitions
+        let endDate: Date;
+        if (endDay < startDay) {
+          // Period spans into next month
+          endDate = new Date(year, month + 1, endDay);
+        } else {
+          // Period is within the same month
+          endDate = new Date(year, month, endDay);
+        }
+        
+        periods.push({
+          companyId,
+          startDate: startDate.toISOString().split('T')[0],
+          endDate: endDate.toISOString().split('T')[0],
+          status: startDate > today ? 'upcoming' : (endDate < today ? 'past' : 'current'),
+        });
+      }
+    } else if (config.periodType === 'custom') {
+      if (!config.customStartDate || !config.customEndDate) {
+        throw new Error('Custom range requires start and end dates');
+      }
+      
+      // For custom range, only create one period with the specified dates
+      const startDate = new Date(config.customStartDate);
+      const endDate = new Date(config.customEndDate);
+      
+      periods.push({
+        companyId,
+        startDate: config.customStartDate,
+        endDate: config.customEndDate,
+        status: startDate > today ? 'upcoming' : (endDate < today ? 'past' : 'current'),
+      });
     }
 
     // Insert all periods
