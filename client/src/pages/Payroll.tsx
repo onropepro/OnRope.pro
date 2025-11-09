@@ -15,6 +15,7 @@ import { format } from "date-fns";
 export default function Payroll() {
   const { toast } = useToast();
   const [selectedPeriodId, setSelectedPeriodId] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState<string>("hours");
 
   // State for configuration form
   const [periodType, setPeriodType] = useState<string>("");
@@ -187,7 +188,7 @@ export default function Payroll() {
         </div>
       </div>
 
-      <Tabs defaultValue="hours" className="space-y-4">
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
         <TabsList>
           <TabsTrigger value="hours" data-testid="tab-hours">
             <Users className="w-4 h-4 mr-2" />
@@ -350,7 +351,10 @@ export default function Payroll() {
                         <Button
                           variant="outline"
                           size="sm"
-                          onClick={() => setSelectedPeriodId(period.id)}
+                          onClick={() => {
+                            setSelectedPeriodId(period.id);
+                            setActiveTab("hours");
+                          }}
                           data-testid={`button-view-hours-${period.id}`}
                         >
                           View Hours
