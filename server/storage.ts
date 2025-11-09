@@ -1,6 +1,6 @@
 import { db } from "./db";
-import { users, projects, dropLogs, workSessions, complaints, complaintNotes, projectPhotos, jobComments, harnessInspections, toolboxMeetings, payPeriodConfig, payPeriods, quotes } from "@shared/schema";
-import type { User, InsertUser, Project, InsertProject, DropLog, InsertDropLog, WorkSession, InsertWorkSession, Complaint, InsertComplaint, ComplaintNote, InsertComplaintNote, ProjectPhoto, InsertProjectPhoto, JobComment, InsertJobComment, HarnessInspection, InsertHarnessInspection, ToolboxMeeting, InsertToolboxMeeting, PayPeriodConfig, InsertPayPeriodConfig, PayPeriod, InsertPayPeriod, EmployeeHoursSummary, Quote, InsertQuote } from "@shared/schema";
+import { users, projects, dropLogs, workSessions, complaints, complaintNotes, projectPhotos, jobComments, harnessInspections, toolboxMeetings, payPeriodConfig, payPeriods, quotes, quoteServices } from "@shared/schema";
+import type { User, InsertUser, Project, InsertProject, DropLog, InsertDropLog, WorkSession, InsertWorkSession, Complaint, InsertComplaint, ComplaintNote, InsertComplaintNote, ProjectPhoto, InsertProjectPhoto, JobComment, InsertJobComment, HarnessInspection, InsertHarnessInspection, ToolboxMeeting, InsertToolboxMeeting, PayPeriodConfig, InsertPayPeriodConfig, PayPeriod, InsertPayPeriod, EmployeeHoursSummary, Quote, InsertQuote, QuoteService, InsertQuoteService, QuoteWithServices } from "@shared/schema";
 import { eq, and, desc, sql, isNull, not, gte, lte, between } from "drizzle-orm";
 import bcrypt from "bcrypt";
 
@@ -883,22 +883,43 @@ export class Storage {
     return result[0];
   }
 
-  async getQuoteById(id: string): Promise<Quote | undefined> {
-    const result = await db.select().from(quotes)
+  async getQuoteById(id: string): Promise<QuoteWithServices | undefined> {
+    const quote = await db.select().from(quotes)
       .where(eq(quotes.id, id))
       .limit(1);
-    return result[0];
+    
+    if (!quote[0]) return undefined;
+    
+    const services = await db.select().from(quoteServices)
+      .where(eq(quoteServices.quoteId, id));
+    
+    return {
+      ...quote[0],
+      services,
+    };
   }
 
-  async getQuotesByCompany(companyId: string, status?: string): Promise<Quote[]> {
-    if (status) {
-      return db.select().from(quotes)
-        .where(and(eq(quotes.companyId, companyId), eq(quotes.status, status)))
-        .orderBy(desc(quotes.createdAt));
+  async getQuotesByCompany(companyId: string, status?: string): Promise<QuoteWithServices[]> {
+    const quotesResult = status
+      ? await db.select().from(quotes)
+          .where(and(eq(quotes.companyId, companyId), eq(quotes.status, status)))
+          .orderBy(desc(quotes.createdAt))
+      : await db.select().from(quotes)
+          .where(eq(quotes.companyId, companyId))
+          .orderBy(desc(quotes.createdAt));
+    
+    // Get services for each quote
+    const quotesWithServices: QuoteWithServices[] = [];
+    for (const quote of quotesResult) {
+      const services = await db.select().from(quoteServices)
+        .where(eq(quoteServices.quoteId, quote.id));
+      quotesWithServices.push({
+        ...quote,
+        services,
+      });
     }
-    return db.select().from(quotes)
-      .where(eq(quotes.companyId, companyId))
-      .orderBy(desc(quotes.createdAt));
+    
+    return quotesWithServices;
   }
 
   async updateQuote(id: string, updates: Partial<InsertQuote>): Promise<Quote> {
@@ -911,6 +932,33 @@ export class Storage {
 
   async deleteQuote(id: string): Promise<void> {
     await db.delete(quotes).where(eq(quotes.id, id));
+  }
+
+  // Quote service operations
+  async createQuoteService(service: InsertQuoteService): Promise<QuoteService> {
+    const result = await db.insert(quoteServices).values(service).returning();
+    return result[0];
+  }
+
+  async getQuoteServices(quoteId: string): Promise<QuoteService[]> {
+    return db.select().from(quoteServices)
+      .where(eq(quoteServices.quoteId, quoteId));
+  }
+
+  async updateQuoteService(id: string, updates: Partial<InsertQuoteService>): Promise<QuoteService> {
+    const result = await db.update(quoteServices)
+      .set(updates)
+      .where(eq(quoteServices.id, id))
+      .returning();
+    return result[0];
+  }
+
+  async deleteQuoteService(id: string): Promise<void> {
+    await db.delete(quoteServices).where(eq(quoteServices.id, id));
+  }
+
+  async deleteQuoteServicesByQuoteId(quoteId: string): Promise<void> {
+    await db.delete(quoteServices).where(eq(quoteServices.quoteId, quoteId));
   }
 }
 
