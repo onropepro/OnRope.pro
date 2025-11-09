@@ -37,6 +37,7 @@ const projectSchema = z.object({
   dailyDropTarget: z.string().optional(),
   floorCount: z.string().min(1, "Floor count is required"),
   targetCompletionDate: z.string().optional(),
+  estimatedHours: z.string().optional(),
   ropeAccessPlan: z.any().optional(),
   suitesPerDay: z.string().optional(),
   floorsPerDay: z.string().optional(),
@@ -285,6 +286,7 @@ export default function ManagementDashboard() {
       dailyDropTarget: "",
       floorCount: "",
       targetCompletionDate: "",
+      estimatedHours: "",
     },
   });
 
@@ -382,6 +384,7 @@ export default function ManagementDashboard() {
                      (data.totalDropsWest ? parseInt(data.totalDropsWest) : 0),
           dailyDropTarget: data.dailyDropTarget ? parseInt(data.dailyDropTarget) : undefined,
           floorCount: parseInt(data.floorCount),
+          estimatedHours: data.estimatedHours ? parseInt(data.estimatedHours) : undefined,
           ropeAccessPlanUrl: data.ropeAccessPlanUrl || undefined,
           suitesPerDay: data.suitesPerDay ? parseInt(data.suitesPerDay) : undefined,
           floorsPerDay: data.floorsPerDay ? parseInt(data.floorsPerDay) : undefined,
@@ -1192,6 +1195,23 @@ export default function ManagementDashboard() {
                               <FormControl>
                                 <Input type="date" {...field} data-testid="input-target-date" className="h-12" />
                               </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+
+                        <FormField
+                          control={projectForm.control}
+                          name="estimatedHours"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Estimated Hours (Optional)</FormLabel>
+                              <FormControl>
+                                <Input type="number" min="1" placeholder="Total estimated hours for entire building" {...field} data-testid="input-estimated-hours" className="h-12" />
+                              </FormControl>
+                              <FormDescription className="text-xs">
+                                Total hours estimated for the entire project
+                              </FormDescription>
                               <FormMessage />
                             </FormItem>
                           )}
