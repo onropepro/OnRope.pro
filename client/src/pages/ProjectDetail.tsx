@@ -413,15 +413,15 @@ export default function ProjectDetail() {
             </CardHeader>
             <CardContent>
               <Tabs defaultValue={isManagement && completedSessions.length > 0 ? "performance" : canViewFinancialData && project.estimatedHours ? "budget" : "history"} className="w-full">
-                <TabsList className="grid grid-cols-3 w-full h-auto">
+                <TabsList className="grid grid-cols-3 w-full h-auto p-1 gap-1 bg-muted/50 rounded-lg">
                   {isManagement && completedSessions.length > 0 && (
-                    <TabsTrigger value="performance" className="text-xs py-2" data-testid="tab-performance">Target Performance</TabsTrigger>
+                    <TabsTrigger value="performance" className="text-xs py-3 px-2 rounded-md" data-testid="tab-performance">Target Performance</TabsTrigger>
                   )}
                   {canViewFinancialData && project.estimatedHours && (
-                    <TabsTrigger value="budget" className="text-xs py-2" data-testid="tab-budget">Hours & Budget</TabsTrigger>
+                    <TabsTrigger value="budget" className="text-xs py-3 px-2 rounded-md" data-testid="tab-budget">Hours & Budget</TabsTrigger>
                   )}
                   {canViewWorkHistory && (
-                    <TabsTrigger value="history" className="text-xs py-2" data-testid="tab-history">Work History</TabsTrigger>
+                    <TabsTrigger value="history" className="text-xs py-3 px-2 rounded-md" data-testid="tab-history">Work History</TabsTrigger>
                   )}
                 </TabsList>
                 
