@@ -456,6 +456,14 @@ export default function ManagementDashboard() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/employees"] });
+      // Invalidate all work sessions to refresh hourly rates
+      queryClient.invalidateQueries({ 
+        predicate: (query) => 
+          Array.isArray(query.queryKey) && 
+          query.queryKey.length >= 3 && 
+          query.queryKey[0] === "/api/projects" && 
+          query.queryKey[2] === "work-sessions"
+      });
       setShowEditEmployeeDialog(false);
       setEmployeeToEdit(null);
       editEmployeeForm.reset();
