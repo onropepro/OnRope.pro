@@ -823,6 +823,18 @@ export default function ManagementDashboard() {
                 <div className="text-xs text-muted-foreground">Record safety meeting</div>
               </div>
             </Button>
+            <Button
+              variant="outline"
+              className="h-auto flex-col gap-2 p-4"
+              onClick={() => setLocation("/payroll")}
+              data-testid="button-payroll"
+            >
+              <span className="material-icons text-primary">payments</span>
+              <div className="text-center">
+                <div className="font-semibold">Payroll</div>
+                <div className="text-xs text-muted-foreground">Manage employee hours</div>
+              </div>
+            </Button>
           </div>
         </div>
 

@@ -1895,9 +1895,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // ==================== PAYROLL / PAY PERIOD ROUTES ====================
   
   // Get or create pay period configuration
-  app.get("/api/payroll/config", requireAuth, requireRole("company"), async (req: Request, res: Response) => {
+  app.get("/api/payroll/config", requireAuth, requireRole("company", "operations_manager", "supervisor"), async (req: Request, res: Response) => {
     try {
-      const companyId = req.session.userId!;
+      const currentUser = await storage.getUserById(req.session.userId!);
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      const companyId = currentUser.role === "company" ? currentUser.id : currentUser.companyId;
+      if (!companyId) {
+        return res.status(400).json({ message: "Unable to determine company" });
+      }
+      
       const config = await storage.getPayPeriodConfig(companyId);
       res.json({ config });
     } catch (error) {
@@ -1907,9 +1916,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Create or update pay period configuration
-  app.post("/api/payroll/config", requireAuth, requireRole("company"), async (req: Request, res: Response) => {
+  app.post("/api/payroll/config", requireAuth, requireRole("company", "operations_manager", "supervisor"), async (req: Request, res: Response) => {
     try {
-      const companyId = req.session.userId!;
+      const currentUser = await storage.getUserById(req.session.userId!);
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      const companyId = currentUser.role === "company" ? currentUser.id : currentUser.companyId;
+      if (!companyId) {
+        return res.status(400).json({ message: "Unable to determine company" });
+      }
       
       const configData = insertPayPeriodConfigSchema.parse({
         ...req.body,
@@ -1928,9 +1945,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Generate pay periods
-  app.post("/api/payroll/generate-periods", requireAuth, requireRole("company"), async (req: Request, res: Response) => {
+  app.post("/api/payroll/generate-periods", requireAuth, requireRole("company", "operations_manager", "supervisor"), async (req: Request, res: Response) => {
     try {
-      const companyId = req.session.userId!;
+      const currentUser = await storage.getUserById(req.session.userId!);
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      const companyId = currentUser.role === "company" ? currentUser.id : currentUser.companyId;
+      if (!companyId) {
+        return res.status(400).json({ message: "Unable to determine company" });
+      }
+      
       const numberOfPeriods = req.body.numberOfPeriods || 6;
       
       const periods = await storage.generatePayPeriods(companyId, numberOfPeriods);
@@ -1942,9 +1968,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Get all pay periods for company
-  app.get("/api/payroll/periods", requireAuth, requireRole("company"), async (req: Request, res: Response) => {
+  app.get("/api/payroll/periods", requireAuth, requireRole("company", "operations_manager", "supervisor"), async (req: Request, res: Response) => {
     try {
-      const companyId = req.session.userId!;
+      const currentUser = await storage.getUserById(req.session.userId!);
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      const companyId = currentUser.role === "company" ? currentUser.id : currentUser.companyId;
+      if (!companyId) {
+        return res.status(400).json({ message: "Unable to determine company" });
+      }
+      
       const periods = await storage.getPayPeriodsByCompany(companyId);
       res.json({ periods });
     } catch (error) {
@@ -1954,9 +1989,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Get current pay period
-  app.get("/api/payroll/current-period", requireAuth, requireRole("company"), async (req: Request, res: Response) => {
+  app.get("/api/payroll/current-period", requireAuth, requireRole("company", "operations_manager", "supervisor"), async (req: Request, res: Response) => {
     try {
-      const companyId = req.session.userId!;
+      const currentUser = await storage.getUserById(req.session.userId!);
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      const companyId = currentUser.role === "company" ? currentUser.id : currentUser.companyId;
+      if (!companyId) {
+        return res.status(400).json({ message: "Unable to determine company" });
+      }
+      
       const period = await storage.getCurrentPayPeriod(companyId);
       res.json({ period });
     } catch (error) {
@@ -1966,9 +2010,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Get employee hours for a specific pay period
-  app.get("/api/payroll/periods/:periodId/hours", requireAuth, requireRole("company"), async (req: Request, res: Response) => {
+  app.get("/api/payroll/periods/:periodId/hours", requireAuth, requireRole("company", "operations_manager", "supervisor"), async (req: Request, res: Response) => {
     try {
-      const companyId = req.session.userId!;
+      const currentUser = await storage.getUserById(req.session.userId!);
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      const companyId = currentUser.role === "company" ? currentUser.id : currentUser.companyId;
+      if (!companyId) {
+        return res.status(400).json({ message: "Unable to determine company" });
+      }
+      
       const period = await storage.getPayPeriodById(req.params.periodId);
       
       if (!period) {
@@ -1988,9 +2041,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Get employee hours for date range
-  app.get("/api/payroll/hours", requireAuth, requireRole("company"), async (req: Request, res: Response) => {
+  app.get("/api/payroll/hours", requireAuth, requireRole("company", "operations_manager", "supervisor"), async (req: Request, res: Response) => {
     try {
-      const companyId = req.session.userId!;
+      const currentUser = await storage.getUserById(req.session.userId!);
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      const companyId = currentUser.role === "company" ? currentUser.id : currentUser.companyId;
+      if (!companyId) {
+        return res.status(400).json({ message: "Unable to determine company" });
+      }
+      
       const { startDate, endDate } = req.query;
       
       if (!startDate || !endDate) {

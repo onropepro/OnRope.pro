@@ -72,7 +72,7 @@ function Router() {
         </ProtectedRoute>
       </Route>
       <Route path="/payroll">
-        <ProtectedRoute allowedRoles={["company"]}>
+        <ProtectedRoute allowedRoles={["company", "operations_manager", "supervisor"]}>
           <Payroll />
         </ProtectedRoute>
       </Route>
