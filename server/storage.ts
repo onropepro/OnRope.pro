@@ -80,7 +80,12 @@ export class Storage {
     return result[0];
   }
 
-  async getProjectsByCompany(companyId: string): Promise<Project[]> {
+  async getProjectsByCompany(companyId: string, status?: string): Promise<Project[]> {
+    if (status) {
+      return db.select().from(projects)
+        .where(and(eq(projects.companyId, companyId), eq(projects.status, status)))
+        .orderBy(desc(projects.createdAt));
+    }
     return db.select().from(projects)
       .where(eq(projects.companyId, companyId))
       .orderBy(desc(projects.createdAt));
@@ -93,7 +98,12 @@ export class Storage {
     return result[0];
   }
 
-  async getAllProjectsByStrataPlan(strataPlanNumber: string): Promise<Project[]> {
+  async getAllProjectsByStrataPlan(strataPlanNumber: string, status?: string): Promise<Project[]> {
+    if (status) {
+      return db.select().from(projects)
+        .where(and(eq(projects.strataPlanNumber, strataPlanNumber), eq(projects.status, status)))
+        .orderBy(desc(projects.createdAt));
+    }
     return db.select().from(projects)
       .where(eq(projects.strataPlanNumber, strataPlanNumber))
       .orderBy(desc(projects.createdAt));
