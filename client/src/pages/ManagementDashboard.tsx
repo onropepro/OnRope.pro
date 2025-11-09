@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
@@ -1791,43 +1792,90 @@ export default function ManagementDashboard() {
                     <div className="text-center py-8 text-muted-foreground">Loading complaints...</div>
                   ) : complaints.length === 0 ? (
                     <div className="text-center py-8 text-muted-foreground">No complaints yet</div>
-                  ) : (
-                    <div className="space-y-3">
-                      {complaints.map((complaint: any) => (
-                        <Card 
-                          key={complaint.id} 
-                          className="hover-elevate cursor-pointer"
-                          onClick={() => setLocation(`/complaints/${complaint.id}`)}
-                          data-testid={`complaint-card-${complaint.id}`}
-                        >
-                          <CardContent className="p-4">
-                            <div className="flex items-start justify-between gap-3">
-                              <div className="flex-1">
-                                <div className="flex items-center gap-2 mb-2">
-                                  <span className="font-medium">{complaint.residentName}</span>
-                                  <Badge variant={complaint.status === 'open' ? 'default' : 'secondary'} className="text-xs">
-                                    {complaint.status}
-                                  </Badge>
-                                </div>
-                                <div className="text-sm text-muted-foreground mb-1">
-                                  Unit {complaint.unitNumber} • {complaint.phoneNumber}
-                                </div>
-                                {complaint.projectId && (
-                                  <div className="text-xs text-muted-foreground mb-2">
-                                    Project-specific complaint
+                  ) : (() => {
+                    // Group complaints by strata plan number
+                    const groupedComplaints = complaints.reduce((acc: any, complaint: any) => {
+                      const key = complaint.strataPlanNumber || 'Unknown';
+                      if (!acc[key]) {
+                        acc[key] = {
+                          strataPlanNumber: key,
+                          buildingName: complaint.buildingName || 'Unknown Building',
+                          complaints: []
+                        };
+                      }
+                      acc[key].complaints.push(complaint);
+                      return acc;
+                    }, {});
+
+                    const buildings = Object.values(groupedComplaints);
+
+                    return (
+                      <Accordion type="single" collapsible className="w-full space-y-2">
+                        {buildings.map((building: any) => {
+                          const openCount = building.complaints.filter((c: any) => c.status === 'open').length;
+                          
+                          return (
+                            <AccordionItem 
+                              key={building.strataPlanNumber} 
+                              value={building.strataPlanNumber}
+                              className="border rounded-lg px-4"
+                            >
+                              <AccordionTrigger className="hover:no-underline">
+                                <div className="flex items-center justify-between w-full pr-4">
+                                  <div className="flex-1 text-left">
+                                    <div className="font-semibold text-base">{building.buildingName}</div>
+                                    <div className="text-sm text-muted-foreground">LMS {building.strataPlanNumber}</div>
                                   </div>
-                                )}
-                                <p className="text-sm line-clamp-2">{complaint.message}</p>
-                                <div className="text-xs text-muted-foreground mt-2">
-                                  {new Date(complaint.createdAt).toLocaleDateString()}
+                                  <div className="flex items-center gap-3">
+                                    {openCount > 0 && (
+                                      <Badge variant="default" className="text-xs">
+                                        {openCount} open
+                                      </Badge>
+                                    )}
+                                    <Badge variant="secondary" className="text-xs">
+                                      {building.complaints.length} total
+                                    </Badge>
+                                  </div>
                                 </div>
-                              </div>
-                            </div>
-                          </CardContent>
-                        </Card>
-                      ))}
-                    </div>
-                  )}
+                              </AccordionTrigger>
+                              <AccordionContent>
+                                <div className="space-y-3 pt-2">
+                                  {building.complaints.map((complaint: any) => (
+                                    <Card 
+                                      key={complaint.id} 
+                                      className="hover-elevate cursor-pointer"
+                                      onClick={() => setLocation(`/complaints/${complaint.id}`)}
+                                      data-testid={`complaint-card-${complaint.id}`}
+                                    >
+                                      <CardContent className="p-4">
+                                        <div className="flex items-start justify-between gap-3">
+                                          <div className="flex-1">
+                                            <div className="flex items-center gap-2 mb-2">
+                                              <span className="font-medium">{complaint.residentName}</span>
+                                              <Badge variant={complaint.status === 'open' ? 'default' : 'secondary'} className="text-xs">
+                                                {complaint.status}
+                                              </Badge>
+                                            </div>
+                                            <div className="text-sm text-muted-foreground mb-1">
+                                              Unit {complaint.unitNumber} • {complaint.phoneNumber}
+                                            </div>
+                                            <p className="text-sm line-clamp-2">{complaint.message}</p>
+                                            <div className="text-xs text-muted-foreground mt-2">
+                                              {new Date(complaint.createdAt).toLocaleDateString()}
+                                            </div>
+                                          </div>
+                                        </div>
+                                      </CardContent>
+                                    </Card>
+                                  ))}
+                                </div>
+                              </AccordionContent>
+                            </AccordionItem>
+                          );
+                        })}
+                      </Accordion>
+                    );
+                  })()}
                 </CardContent>
               </Card>
             </div>

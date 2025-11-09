@@ -262,8 +262,8 @@ export class Storage {
       .orderBy(desc(complaints.createdAt));
   }
 
-  async getComplaintsForCompany(companyId: string): Promise<Complaint[]> {
-    // Get complaints for all projects belonging to this company
+  async getComplaintsForCompany(companyId: string): Promise<any[]> {
+    // Get complaints for all projects belonging to this company, with project details
     const companyProjects = await db.select().from(projects)
       .where(eq(projects.companyId, companyId));
     
@@ -273,9 +273,20 @@ export class Storage {
       return [];
     }
     
-    return db.select().from(complaints)
-      .where(sql`${complaints.projectId} IN (${sql.join(projectIds.map(id => sql`${id}`), sql`, `)})`)
-      .orderBy(desc(complaints.createdAt));
+    const complaintsList = await db.select({
+      complaint: complaints,
+      project: projects
+    })
+    .from(complaints)
+    .leftJoin(projects, eq(complaints.projectId, projects.id))
+    .where(sql`${complaints.projectId} IN (${sql.join(projectIds.map(id => sql`${id}`), sql`, `)})`)
+    .orderBy(desc(complaints.createdAt));
+    
+    return complaintsList.map(row => ({
+      ...row.complaint,
+      strataPlanNumber: row.project?.strataPlanNumber,
+      buildingName: row.project?.buildingName
+    }));
   }
 
   async updateComplaintStatus(id: string, status: string): Promise<Complaint> {
