@@ -236,7 +236,7 @@ export default function Login() {
               data-testid="button-refresh"
             >
               <span className="material-icons mr-2 text-base">refresh</span>
-              Get Latest Update
+              Refresh To Get Latest Update
             </Button>
 
             {/* Mobile-only feature highlights */}
