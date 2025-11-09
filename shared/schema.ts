@@ -10,6 +10,7 @@ import {
   date,
   index,
   jsonb,
+  numeric,
 } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
@@ -54,6 +55,7 @@ export const users = pgTable("users", {
   
   // Employee-specific fields
   techLevel: varchar("tech_level"), // for rope_access_tech role (e.g., "Level 1", "Level 2", "Level 3")
+  hourlyRate: numeric("hourly_rate", { precision: 10, scale: 2 }), // Hourly rate for employees (e.g., 25.50)
   permissions: text("permissions").array().default(sql`ARRAY[]::text[]`), // Array of permission strings for employees
   isTempPassword: boolean("is_temp_password").default(false),
   
