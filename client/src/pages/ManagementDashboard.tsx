@@ -2156,6 +2156,34 @@ export default function ManagementDashboard() {
           </TabsContent>
 
           <TabsContent value="documents" className="space-y-6">
+            {/* Platform Overview Document */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <span className="material-icons">description</span>
+                  Platform Overview Document
+                </CardTitle>
+                <CardDescription>
+                  Comprehensive documentation covering all platform features and capabilities
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="flex flex-col gap-4">
+                  <p className="text-sm text-muted-foreground">
+                    Download a complete, detailed HTML document describing all functionalities of the Rope Access Management Platform. Perfect for publishing on your website, sharing with stakeholders, or creating marketing materials.
+                  </p>
+                  <Button 
+                    className="w-full h-12 gap-2"
+                    onClick={() => window.open('/platform-overview.html', '_blank')}
+                    data-testid="button-download-platform-overview"
+                  >
+                    <span className="material-icons">download</span>
+                    Download Platform Overview
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+
             {/* Harness Inspections */}
             <Card>
               <CardHeader>
