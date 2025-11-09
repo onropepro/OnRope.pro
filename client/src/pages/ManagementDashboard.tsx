@@ -186,7 +186,10 @@ export default function ManagementDashboard() {
 
   // Scroll to top when changing tabs
   const handleTabChange = (tab: string) => {
+    console.log(`[DEBUG] Changing tab to: ${tab}`);
+    console.log(`[DEBUG] Current activeTab before change: ${activeTab}`);
     setActiveTab(tab);
+    console.log(`[DEBUG] setActiveTab called with: ${tab}`);
     // Scroll the content area into view smoothly
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
@@ -802,6 +805,11 @@ export default function ManagementDashboard() {
       </header>
 
       <div className="p-4 max-w-4xl mx-auto">
+        {/* DEBUG: Active Tab Indicator */}
+        <div className="mb-4 p-4 bg-primary/10 border-2 border-primary rounded-lg">
+          <div className="text-sm font-bold">DEBUG: Active Tab = "{activeTab}"</div>
+        </div>
+
         {/* Navigation Grid */}
         <div className="mb-6">
           <div className="grid grid-cols-2 gap-3">
