@@ -36,6 +36,7 @@ export default function Quotes() {
   const [selectedPhoto, setSelectedPhoto] = useState<File | null>(null);
   const [showForm, setShowForm] = useState(false);
   const [editingQuote, setEditingQuote] = useState<Quote | null>(null);
+  const [selectedQuote, setSelectedQuote] = useState<Quote | null>(null);
 
   // Fetch all quotes
   const { data: quotesData, isLoading } = useQuery<{ quotes: Quote[] }>({
@@ -363,6 +364,12 @@ export default function Quotes() {
   const openQuotes = quotes.filter(q => q.status !== "closed");
   const closedQuotes = quotes.filter(q => q.status === "closed");
 
+  const handleBackToGrid = () => {
+    setSelectedQuote(null);
+    setShowForm(false);
+    setEditingQuote(null);
+  };
+
   return (
     <div className="min-h-screen bg-background pb-20">
       {/* Header */}
@@ -386,6 +393,69 @@ export default function Quotes() {
       </header>
 
       <div className="p-4 max-w-4xl mx-auto space-y-6">
+        {/* Grid View - Show when no quote is selected and no form */}
+        {!selectedQuote && !showForm && (
+          <div className="space-y-6">
+            <div className="grid grid-cols-2 gap-4">
+              {openQuotes.map((quote) => (
+                <Button
+                  key={quote.id}
+                  variant="outline"
+                  className="h-auto flex-col gap-2 p-4 text-left"
+                  onClick={() => setSelectedQuote(quote)}
+                  data-testid={`button-quote-${quote.id}`}
+                >
+                  <div className="w-full">
+                    <div className="font-semibold truncate">{quote.buildingName}</div>
+                    <div className="text-xs text-muted-foreground truncate">{quote.strataPlanNumber}</div>
+                    <div className="text-lg font-bold text-primary mt-2">
+                      ${parseFloat(quote.totalCost).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                    </div>
+                  </div>
+                </Button>
+              ))}
+            </div>
+            
+            {closedQuotes.length > 0 && (
+              <>
+                <h2 className="text-xl font-bold text-muted-foreground mt-8">Closed Quotes</h2>
+                <div className="grid grid-cols-2 gap-4">
+                  {closedQuotes.map((quote) => (
+                    <Button
+                      key={quote.id}
+                      variant="outline"
+                      className="h-auto flex-col gap-2 p-4 text-left opacity-60"
+                      onClick={() => setSelectedQuote(quote)}
+                      data-testid={`button-quote-${quote.id}`}
+                    >
+                      <div className="w-full">
+                        <div className="font-semibold truncate">{quote.buildingName}</div>
+                        <div className="text-xs text-muted-foreground truncate">{quote.strataPlanNumber}</div>
+                        <div className="text-lg font-bold text-muted-foreground mt-2">
+                          ${parseFloat(quote.totalCost).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                        </div>
+                      </div>
+                    </Button>
+                  ))}
+                </div>
+              </>
+            )}
+          </div>
+        )}
+
+        {/* Back Button */}
+        {(selectedQuote || showForm) && (
+          <Button 
+            variant="ghost" 
+            onClick={handleBackToGrid}
+            className="gap-2"
+            data-testid="button-back-to-grid"
+          >
+            <span className="material-icons">arrow_back</span>
+            Back to Quotes
+          </Button>
+        )}
+
         {/* Quote Form */}
         {showForm && (
           <Card>
@@ -825,239 +895,118 @@ export default function Quotes() {
           </Card>
         )}
 
-        {/* Quotes List */}
-        {isLoading ? (
+        {/* Quote Detail View */}
+        {selectedQuote && (
+          <Card className="hover-elevate rounded-2xl shadow-lg border-2 overflow-hidden">
+            <div className={`h-2 ${selectedQuote.status === "closed" ? "bg-gradient-to-r from-gray-400 via-gray-500 to-gray-600" : "bg-gradient-to-r from-blue-500 via-indigo-500 to-cyan-500"}`} />
+            <CardHeader className="pb-3">
+              <div className="flex items-start justify-between gap-2">
+                <div className="flex-1 min-w-0">
+                  <CardTitle className="text-lg">{selectedQuote.buildingName}</CardTitle>
+                  <CardDescription className="text-xs">{selectedQuote.strataPlanNumber}</CardDescription>
+                  <CardDescription className="text-xs line-clamp-1 mt-1">{selectedQuote.buildingAddress}</CardDescription>
+                  <CardDescription className="text-xs mt-2 flex items-center gap-1">
+                    <span className="material-icons text-[14px]">event</span>
+                    {new Date(selectedQuote.createdAt || '').toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                  </CardDescription>
+                </div>
+                <div className="flex gap-1 shrink-0">
+                  {selectedQuote.status !== "closed" && (
+                    <Button variant="ghost" size="icon" onClick={() => { handleEditQuote(selectedQuote); setSelectedQuote(null); }} data-testid={`button-edit-${selectedQuote.id}`}>
+                      <span className="material-icons text-primary text-xl">edit</span>
+                    </Button>
+                  )}
+                  <Button variant="ghost" size="icon" onClick={() => { deleteQuoteMutation.mutate(selectedQuote.id); setSelectedQuote(null); }} data-testid={`button-delete-${selectedQuote.id}`}>
+                    <span className="material-icons text-destructive text-xl">delete</span>
+                  </Button>
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid grid-cols-2 gap-3 text-sm">
+                <div className="bg-muted/50 rounded-lg p-3">
+                  <p className="text-muted-foreground text-xs">Floors</p>
+                  <p className="font-semibold text-base">{selectedQuote.floorCount}</p>
+                </div>
+                <div className="bg-muted/50 rounded-lg p-3">
+                  <p className="text-muted-foreground text-xs">Hours</p>
+                  <p className="font-semibold text-base">{selectedQuote.totalHours}</p>
+                </div>
+              </div>
+              
+              <div className={`${selectedQuote.status === "closed" ? "bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-950/30 dark:to-gray-900/30 border-gray-200 dark:border-gray-800" : "bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-950/30 dark:to-indigo-950/30 border-blue-200 dark:border-blue-800"} rounded-xl p-4 border`}>
+                <div className="flex items-baseline justify-between mb-2">
+                  <span className={`text-sm font-medium ${selectedQuote.status === "closed" ? "text-gray-700 dark:text-gray-300" : "text-blue-900 dark:text-blue-100"}`}>Total Cost</span>
+                  <span className={`text-xs ${selectedQuote.status === "closed" ? "text-gray-600 dark:text-gray-400" : "text-blue-700 dark:text-blue-300"}`}>${selectedQuote.pricePerHour}/hr</span>
+                </div>
+                <p className={`text-3xl font-bold ${selectedQuote.status === "closed" ? "text-gray-600 dark:text-gray-400" : "text-blue-600 dark:text-blue-400"}`}>
+                  ${parseFloat(selectedQuote.totalCost).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                </p>
+              </div>
+
+              {selectedQuote.hasParkade && (
+                <div className="bg-amber-50 dark:bg-amber-950/30 rounded-lg p-3 border border-amber-200 dark:border-amber-800">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-xs text-amber-700 dark:text-amber-300">Parkade</p>
+                      <p className="font-semibold text-amber-900 dark:text-amber-100">{selectedQuote.parkadeStalls} stalls</p>
+                    </div>
+                    <p className="text-lg font-bold text-amber-600 dark:text-amber-400">${selectedQuote.parkadeTotal}</p>
+                  </div>
+                </div>
+              )}
+
+              {selectedQuote.hasGroundWindows && (
+                <div className="bg-cyan-50 dark:bg-cyan-950/30 rounded-lg p-3 border border-cyan-200 dark:border-cyan-800">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-xs text-cyan-700 dark:text-cyan-300">Ground Windows</p>
+                      <p className="font-semibold text-cyan-900 dark:text-cyan-100">{selectedQuote.groundWindowHours} hrs</p>
+                    </div>
+                    <p className="text-lg font-bold text-cyan-600 dark:text-cyan-400">${selectedQuote.groundWindowTotal}</p>
+                  </div>
+                </div>
+              )}
+
+              {selectedQuote.photoUrl && (
+                <div className="mt-3">
+                  <img src={selectedQuote.photoUrl} alt="Quote attachment" className="rounded-lg w-full h-64 object-cover border-2" />
+                </div>
+              )}
+
+              {selectedQuote.status !== "closed" ? (
+                <Button variant="outline" className="w-full mt-2" onClick={() => closeQuoteMutation.mutate(selectedQuote.id)} disabled={closeQuoteMutation.isPending} data-testid={`button-close-${selectedQuote.id}`}>
+                  <span className="material-icons mr-2 text-sm">check_circle</span>
+                  {closeQuoteMutation.isPending ? "Closing..." : "Mark as Closed"}
+                </Button>
+              ) : (
+                <Button variant="default" className="w-full mt-2" onClick={() => reopenQuoteMutation.mutate(selectedQuote.id)} disabled={reopenQuoteMutation.isPending} data-testid={`button-reopen-${selectedQuote.id}`}>
+                  <span className="material-icons mr-2 text-sm">refresh</span>
+                  {reopenQuoteMutation.isPending ? "Reopening..." : "Reopen Quote"}
+                </Button>
+              )}
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Empty State - Only show on grid view */}
+        {!selectedQuote && !showForm && isLoading && (
           <div className="text-center py-8">
             <p className="text-muted-foreground">Loading quotes...</p>
           </div>
-        ) : quotes.length === 0 ? (
+        )}
+        {!selectedQuote && !showForm && !isLoading && quotes.length === 0 && (
           <Card>
             <CardContent className="py-8 text-center">
               <p className="text-muted-foreground">No quotes yet. Create your first quote to get started.</p>
             </CardContent>
           </Card>
-        ) : (
-          <div className="space-y-8">
-            {/* Open Quotes Section */}
-            {openQuotes.length > 0 && (
-              <div className="space-y-4">
-                <h2 className="text-2xl font-bold">Open Quotes</h2>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {openQuotes.map((quote) => (
-                    <Card 
-                      key={quote.id} 
-                      className="hover-elevate rounded-2xl shadow-lg border-2 overflow-hidden"
-                    >
-                  <div className="h-2 bg-gradient-to-r from-blue-500 via-indigo-500 to-cyan-500" />
-                  <CardHeader className="pb-3">
-                    <div className="flex items-start justify-between gap-2">
-                      <div className="flex-1 min-w-0">
-                        <CardTitle className="text-lg truncate">{quote.buildingName}</CardTitle>
-                        <CardDescription className="text-xs">
-                          {quote.strataPlanNumber}
-                        </CardDescription>
-                        <CardDescription className="text-xs line-clamp-1 mt-1">
-                          {quote.buildingAddress}
-                        </CardDescription>
-                        <CardDescription className="text-xs mt-2 flex items-center gap-1">
-                          <span className="material-icons text-[14px]">event</span>
-                          {new Date(quote.createdAt || '').toLocaleDateString('en-US', { 
-                            month: 'short', 
-                            day: 'numeric', 
-                            year: 'numeric' 
-                          })}
-                        </CardDescription>
-                      </div>
-                      <div className="flex gap-1 shrink-0">
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => handleEditQuote(quote)}
-                          data-testid={`button-edit-${quote.id}`}
-                        >
-                          <span className="material-icons text-primary text-xl">edit</span>
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => deleteQuoteMutation.mutate(quote.id)}
-                          data-testid={`button-delete-${quote.id}`}
-                        >
-                          <span className="material-icons text-destructive text-xl">delete</span>
-                        </Button>
-                      </div>
-                    </div>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div className="grid grid-cols-2 gap-3 text-sm">
-                      <div className="bg-muted/50 rounded-lg p-3">
-                        <p className="text-muted-foreground text-xs">Floors</p>
-                        <p className="font-semibold text-base">{quote.floorCount}</p>
-                      </div>
-                      <div className="bg-muted/50 rounded-lg p-3">
-                        <p className="text-muted-foreground text-xs">Hours</p>
-                        <p className="font-semibold text-base">{quote.totalHours}</p>
-                      </div>
-                    </div>
-                    
-                    <div className="bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-950/30 dark:to-indigo-950/30 rounded-xl p-4 border border-blue-200 dark:border-blue-800">
-                      <div className="flex items-baseline justify-between mb-2">
-                        <span className="text-sm font-medium text-blue-900 dark:text-blue-100">Total Cost</span>
-                        <span className="text-xs text-blue-700 dark:text-blue-300">${quote.pricePerHour}/hr</span>
-                      </div>
-                      <p className="text-3xl font-bold text-blue-600 dark:text-blue-400">
-                        ${parseFloat(quote.totalCost).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                      </p>
-                    </div>
-
-                    {quote.hasParkade && (
-                      <div className="bg-amber-50 dark:bg-amber-950/30 rounded-lg p-3 border border-amber-200 dark:border-amber-800">
-                        <div className="flex items-center justify-between">
-                          <div>
-                            <p className="text-xs text-amber-700 dark:text-amber-300">Parkade</p>
-                            <p className="font-semibold text-amber-900 dark:text-amber-100">{quote.parkadeStalls} stalls</p>
-                          </div>
-                          <p className="text-lg font-bold text-amber-600 dark:text-amber-400">
-                            ${quote.parkadeTotal}
-                          </p>
-                        </div>
-                      </div>
-                    )}
-
-                    {quote.hasGroundWindows && (
-                      <div className="bg-cyan-50 dark:bg-cyan-950/30 rounded-lg p-3 border border-cyan-200 dark:border-cyan-800">
-                        <div className="flex items-center justify-between">
-                          <div>
-                            <p className="text-xs text-cyan-700 dark:text-cyan-300">Ground Windows</p>
-                            <p className="font-semibold text-cyan-900 dark:text-cyan-100">{quote.groundWindowHours} hrs</p>
-                          </div>
-                          <p className="text-lg font-bold text-cyan-600 dark:text-cyan-400">
-                            ${quote.groundWindowTotal}
-                          </p>
-                        </div>
-                      </div>
-                    )}
-
-                    {quote.photoUrl && (
-                      <div className="mt-3">
-                        <img 
-                          src={quote.photoUrl} 
-                          alt="Quote attachment" 
-                          className="rounded-lg w-full h-32 object-cover border-2"
-                        />
-                      </div>
-                    )}
-
-                    <Button
-                      variant="outline"
-                      className="w-full mt-2"
-                      onClick={() => closeQuoteMutation.mutate(quote.id)}
-                      disabled={closeQuoteMutation.isPending}
-                      data-testid={`button-close-${quote.id}`}
-                    >
-                      <span className="material-icons mr-2 text-sm">check_circle</span>
-                      {closeQuoteMutation.isPending ? "Closing..." : "Mark as Closed"}
-                    </Button>
-                  </CardContent>
-                    </Card>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* Closed Quotes Section */}
-            {closedQuotes.length > 0 && (
-              <div className="space-y-4">
-                <h2 className="text-2xl font-bold text-muted-foreground">Closed Quotes</h2>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {closedQuotes.map((quote) => (
-                    <Card 
-                      key={quote.id} 
-                      className="hover-elevate rounded-2xl shadow-lg border-2 overflow-hidden opacity-75"
-                    >
-                  <div className="h-2 bg-gradient-to-r from-gray-400 via-gray-500 to-gray-600" />
-                  <CardHeader className="pb-3">
-                    <div className="flex items-start justify-between gap-2">
-                      <div className="flex-1 min-w-0">
-                        <CardTitle className="text-lg truncate">{quote.buildingName}</CardTitle>
-                        <CardDescription className="text-xs">
-                          {quote.strataPlanNumber}
-                        </CardDescription>
-                        <CardDescription className="text-xs line-clamp-1 mt-1">
-                          {quote.buildingAddress}
-                        </CardDescription>
-                        <CardDescription className="text-xs mt-2 flex items-center gap-1">
-                          <span className="material-icons text-[14px]">event</span>
-                          {new Date(quote.createdAt || '').toLocaleDateString('en-US', { 
-                            month: 'short', 
-                            day: 'numeric', 
-                            year: 'numeric' 
-                          })}
-                        </CardDescription>
-                      </div>
-                      <div className="flex gap-1 shrink-0">
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => deleteQuoteMutation.mutate(quote.id)}
-                          data-testid={`button-delete-${quote.id}`}
-                        >
-                          <span className="material-icons text-destructive text-xl">delete</span>
-                        </Button>
-                      </div>
-                    </div>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div className="grid grid-cols-2 gap-3 text-sm">
-                      <div className="bg-muted/50 rounded-lg p-3">
-                        <p className="text-muted-foreground text-xs">Floors</p>
-                        <p className="font-semibold text-base">{quote.floorCount}</p>
-                      </div>
-                      <div className="bg-muted/50 rounded-lg p-3">
-                        <p className="text-muted-foreground text-xs">Hours</p>
-                        <p className="font-semibold text-base">{quote.totalHours}</p>
-                      </div>
-                    </div>
-                    
-                    <div className="bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-950/30 dark:to-gray-900/30 rounded-xl p-4 border border-gray-200 dark:border-gray-800">
-                      <div className="flex items-baseline justify-between mb-2">
-                        <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Total Cost</span>
-                        <span className="text-xs text-gray-600 dark:text-gray-400">${quote.pricePerHour}/hr</span>
-                      </div>
-                      <p className="text-3xl font-bold text-gray-600 dark:text-gray-400">
-                        ${parseFloat(quote.totalCost).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                      </p>
-                    </div>
-
-                    {quote.photoUrl && (
-                      <div className="mt-3">
-                        <img 
-                          src={quote.photoUrl} 
-                          alt="Quote attachment" 
-                          className="rounded-lg w-full h-32 object-cover border-2"
-                        />
-                      </div>
-                    )}
-
-                    <Button
-                      variant="default"
-                      className="w-full mt-2"
-                      onClick={() => reopenQuoteMutation.mutate(quote.id)}
-                      disabled={reopenQuoteMutation.isPending}
-                      data-testid={`button-reopen-${quote.id}`}
-                    >
-                      <span className="material-icons mr-2 text-sm">refresh</span>
-                      {reopenQuoteMutation.isPending ? "Reopening..." : "Reopen Quote"}
-                    </Button>
-                  </CardContent>
-                    </Card>
-                  ))}
-                </div>
-              </div>
-            )}
-          </div>
         )}
       </div>
     </div>
   );
 }
+
+                    <Card 
+                      key={quote.id} 
+                      className="hover-elevate rounded-2xl shadow-lg border-2 overflow-hidden"
