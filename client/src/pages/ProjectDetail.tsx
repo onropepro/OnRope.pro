@@ -33,6 +33,7 @@ export default function ProjectDetail() {
   const [selectedMeeting, setSelectedMeeting] = useState<any>(null);
   const [newComment, setNewComment] = useState("");
   const [selectedSession, setSelectedSession] = useState<any>(null);
+  const [showEditDialog, setShowEditDialog] = useState(false);
 
   const { data: projectData, isLoading } = useQuery({
     queryKey: ["/api/projects", id],
@@ -321,6 +322,17 @@ export default function ProjectDetail() {
                 {project.strataPlanNumber} - {project.jobType.replace(/_/g, ' ')}
               </p>
             </div>
+            {(currentUser?.role === "company" || currentUser?.role === "operations_manager") && (
+              <Button
+                variant="outline"
+                onClick={() => setShowEditDialog(true)}
+                className="h-12 gap-2"
+                data-testid="button-edit-project"
+              >
+                <span className="material-icons text-lg">edit</span>
+                Edit
+              </Button>
+            )}
           </div>
         </div>
       </div>
@@ -1181,6 +1193,112 @@ export default function ProjectDetail() {
               </div>
             );
           })()}
+        </DialogContent>
+      </Dialog>
+
+      {/* Edit Project Dialog */}
+      <Dialog open={showEditDialog} onOpenChange={setShowEditDialog}>
+        <DialogContent className="max-w-md max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <span className="material-icons">edit</span>
+              Edit Project
+            </DialogTitle>
+            <DialogDescription>
+              Update project details
+            </DialogDescription>
+          </DialogHeader>
+          {project && (
+            <form onSubmit={async (e) => {
+              e.preventDefault();
+              const formData = new FormData(e.currentTarget);
+              
+              try {
+                const response = await fetch(`/api/projects/${id}`, {
+                  method: 'PATCH',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({
+                    buildingName: formData.get('buildingName'),
+                    buildingAddress: formData.get('buildingAddress') || undefined,
+                    targetCompletionDate: formData.get('targetCompletionDate') || undefined,
+                    estimatedHours: formData.get('estimatedHours') ? parseInt(formData.get('estimatedHours') as string) : undefined,
+                  }),
+                  credentials: 'include',
+                });
+                
+                if (!response.ok) throw new Error('Failed to update project');
+                
+                queryClient.invalidateQueries({ queryKey: ["/api/projects", id] });
+                toast({ title: "Project updated successfully" });
+                setShowEditDialog(false);
+              } catch (error) {
+                toast({ 
+                  title: "Update failed", 
+                  description: error instanceof Error ? error.message : "Failed to update project",
+                  variant: "destructive" 
+                });
+              }
+            }}>
+              <div className="space-y-4 py-4">
+                <div>
+                  <Label htmlFor="buildingName">Building Name</Label>
+                  <Input
+                    id="buildingName"
+                    name="buildingName"
+                    defaultValue={project.buildingName}
+                    required
+                    data-testid="input-edit-building-name"
+                  />
+                </div>
+                
+                <div>
+                  <Label htmlFor="buildingAddress">Building Address (Optional)</Label>
+                  <Input
+                    id="buildingAddress"
+                    name="buildingAddress"
+                    defaultValue={project.buildingAddress || ""}
+                    data-testid="input-edit-building-address"
+                  />
+                </div>
+                
+                <div>
+                  <Label htmlFor="targetCompletionDate">Target Completion Date (Optional)</Label>
+                  <Input
+                    id="targetCompletionDate"
+                    name="targetCompletionDate"
+                    type="date"
+                    defaultValue={project.targetCompletionDate || ""}
+                    data-testid="input-edit-target-date"
+                  />
+                </div>
+                
+                <div>
+                  <Label htmlFor="estimatedHours">Estimated Hours (Optional)</Label>
+                  <Input
+                    id="estimatedHours"
+                    name="estimatedHours"
+                    type="number"
+                    min="1"
+                    placeholder="Total estimated hours"
+                    defaultValue={project.estimatedHours || ""}
+                    data-testid="input-edit-estimated-hours"
+                  />
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Total hours estimated for the entire project
+                  </p>
+                </div>
+              </div>
+              
+              <DialogFooter>
+                <Button type="button" variant="outline" onClick={() => setShowEditDialog(false)}>
+                  Cancel
+                </Button>
+                <Button type="submit" data-testid="button-save-project">
+                  Save Changes
+                </Button>
+              </DialogFooter>
+            </form>
+          )}
         </DialogContent>
       </Dialog>
 

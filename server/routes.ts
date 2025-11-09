@@ -743,6 +743,45 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
+  // Update project
+  app.patch("/api/projects/:id", requireAuth, requireRole("company", "operations_manager"), async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      const { id } = req.params;
+      
+      // Get existing project to verify ownership
+      const existingProject = await storage.getProjectById(id);
+      if (!existingProject) {
+        return res.status(404).json({ message: "Project not found" });
+      }
+      
+      // Verify access
+      const companyId = currentUser.role === "company" ? currentUser.id : currentUser.companyId;
+      if (existingProject.companyId !== companyId) {
+        return res.status(403).json({ message: "Access denied" });
+      }
+      
+      // Only allow updating specific fields
+      const allowedUpdates = {
+        buildingName: req.body.buildingName,
+        buildingAddress: req.body.buildingAddress,
+        targetCompletionDate: req.body.targetCompletionDate || null,
+        estimatedHours: req.body.estimatedHours,
+      };
+      
+      const updatedProject = await storage.updateProject(id, allowedUpdates);
+      res.json({ project: updatedProject });
+    } catch (error) {
+      console.error("Update project error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+  
   // Get all projects (filtered by role)
   app.get("/api/projects", requireAuth, async (req: Request, res: Response) => {
     try {
