@@ -1,7 +1,7 @@
 import type { Express, Request, Response, NextFunction } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { insertUserSchema, insertProjectSchema, insertDropLogSchema, insertComplaintSchema, insertComplaintNoteSchema, insertJobCommentSchema, insertHarnessInspectionSchema, insertToolboxMeetingSchema, insertPayPeriodConfigSchema, insertQuoteSchema, normalizeStrataPlan } from "@shared/schema";
+import { insertUserSchema, insertProjectSchema, insertDropLogSchema, insertComplaintSchema, insertComplaintNoteSchema, insertJobCommentSchema, insertHarnessInspectionSchema, insertToolboxMeetingSchema, insertPayPeriodConfigSchema, insertQuoteSchema, insertQuoteServiceSchema, normalizeStrataPlan } from "@shared/schema";
 import { z } from "zod";
 import bcrypt from "bcrypt";
 import multer from "multer";
@@ -2094,7 +2094,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // ==================== QUOTE ROUTES ====================
   
-  // Create new quote
+  // Create new quote with services
   app.post("/api/quotes", requireAuth, requireRole("company", "operations_manager", "supervisor"), async (req: Request, res: Response) => {
     try {
       const currentUser = await storage.getUserById(req.session.userId!);
@@ -2107,13 +2107,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Unable to determine company" });
       }
       
+      const { services, ...quoteFields } = req.body;
+      
       const quoteData = insertQuoteSchema.parse({
-        ...req.body,
+        ...quoteFields,
         companyId,
       });
       
       const quote = await storage.createQuote(quoteData);
-      res.json({ quote });
+      
+      // Create services if provided
+      if (services && Array.isArray(services)) {
+        for (const serviceData of services) {
+          const service = insertQuoteServiceSchema.parse({
+            ...serviceData,
+            quoteId: quote.id,
+          });
+          await storage.createQuoteService(service);
+        }
+      }
+      
+      // Get the complete quote with services
+      const quoteWithServices = await storage.getQuoteById(quote.id);
+      res.json({ quote: quoteWithServices });
     } catch (error) {
       if (error instanceof z.ZodError) {
         return res.status(400).json({ message: "Validation error", errors: error.errors });
@@ -2270,6 +2286,78 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({ quote: updatedQuote, photoUrl });
     } catch (error) {
       console.error("Upload quote photo error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // ==================== QUOTE SERVICE ROUTES ====================
+
+  // Add service to existing quote
+  app.post("/api/quotes/:id/services", requireAuth, requireRole("company", "operations_manager", "supervisor"), async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      const companyId = currentUser.role === "company" ? currentUser.id : currentUser.companyId;
+      if (!companyId) {
+        return res.status(400).json({ message: "Unable to determine company" });
+      }
+      
+      const quote = await storage.getQuoteById(req.params.id);
+      
+      if (!quote) {
+        return res.status(404).json({ message: "Quote not found" });
+      }
+      
+      if (quote.companyId !== companyId) {
+        return res.status(403).json({ message: "Forbidden" });
+      }
+      
+      const serviceData = insertQuoteServiceSchema.parse({
+        ...req.body,
+        quoteId: req.params.id,
+      });
+      
+      const service = await storage.createQuoteService(serviceData);
+      res.json({ service });
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Validation error", errors: error.errors });
+      }
+      console.error("Create quote service error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Delete quote service
+  app.delete("/api/quotes/:id/services/:serviceId", requireAuth, requireRole("company", "operations_manager", "supervisor"), async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      const companyId = currentUser.role === "company" ? currentUser.id : currentUser.companyId;
+      if (!companyId) {
+        return res.status(400).json({ message: "Unable to determine company" });
+      }
+      
+      const quote = await storage.getQuoteById(req.params.id);
+      
+      if (!quote) {
+        return res.status(404).json({ message: "Quote not found" });
+      }
+      
+      if (quote.companyId !== companyId) {
+        return res.status(403).json({ message: "Forbidden" });
+      }
+      
+      await storage.deleteQuoteService(req.params.serviceId);
+      res.json({ message: "Service deleted successfully" });
+    } catch (error) {
+      console.error("Delete quote service error:", error);
       res.status(500).json({ message: "Internal server error" });
     }
   });
