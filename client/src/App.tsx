@@ -16,6 +16,7 @@ import ProjectDetail from "@/pages/ProjectDetail";
 import Profile from "@/pages/Profile";
 import HarnessInspectionForm from "@/pages/HarnessInspectionForm";
 import ToolboxMeetingForm from "@/pages/ToolboxMeetingForm";
+import Payroll from "@/pages/Payroll";
 import NotFound from "@/pages/not-found";
 import ProtectedRoute from "@/components/ProtectedRoute";
 
@@ -68,6 +69,11 @@ function Router() {
       <Route path="/toolbox-meeting">
         <ProtectedRoute allowedRoles={["rope_access_tech", "supervisor", "operations_manager", "company"]}>
           <ToolboxMeetingForm />
+        </ProtectedRoute>
+      </Route>
+      <Route path="/payroll">
+        <ProtectedRoute allowedRoles={["company"]}>
+          <Payroll />
         </ProtectedRoute>
       </Route>
       <Route component={NotFound} />
