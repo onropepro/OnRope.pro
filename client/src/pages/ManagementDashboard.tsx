@@ -130,6 +130,7 @@ const employeeSchema = z.object({
   password: z.string().min(6, "Password must be at least 6 characters"),
   role: z.enum(["operations_manager", "supervisor", "rope_access_tech", "manager", "ground_crew", "ground_crew_supervisor"]),
   techLevel: z.string().optional(),
+  hourlyRate: z.string().optional(),
   permissions: z.array(z.string()).default([]),
 }).refine((data) => {
   if (data.role === "rope_access_tech" && !data.techLevel) {
@@ -146,6 +147,7 @@ const editEmployeeSchema = z.object({
   email: z.string().email("Invalid email address"),
   role: z.enum(["operations_manager", "supervisor", "rope_access_tech", "manager", "ground_crew", "ground_crew_supervisor"]),
   techLevel: z.string().optional(),
+  hourlyRate: z.string().optional(),
   permissions: z.array(z.string()).default([]),
 }).refine((data) => {
   if (data.role === "rope_access_tech" && !data.techLevel) {
@@ -292,6 +294,7 @@ export default function ManagementDashboard() {
       password: "",
       role: "rope_access_tech",
       techLevel: "",
+      hourlyRate: "",
       permissions: [],
     },
   });
@@ -303,6 +306,7 @@ export default function ManagementDashboard() {
       email: "",
       role: "rope_access_tech",
       techLevel: "",
+      hourlyRate: "",
       permissions: [],
     },
   });
@@ -517,6 +521,7 @@ export default function ManagementDashboard() {
       email: employee.email || "",
       role: employee.role,
       techLevel: employee.techLevel || "",
+      hourlyRate: employee.hourlyRate || "",
       permissions: employee.permissions || [],
     });
     setShowEditEmployeeDialog(true);
@@ -1907,6 +1912,31 @@ export default function ManagementDashboard() {
 
                       <FormField
                         control={employeeForm.control}
+                        name="hourlyRate"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Hourly Rate ($/hr)</FormLabel>
+                            <FormControl>
+                              <Input 
+                                type="number" 
+                                step="0.01" 
+                                min="0" 
+                                placeholder="25.00" 
+                                {...field} 
+                                data-testid="input-employee-hourly-rate" 
+                                className="h-12" 
+                              />
+                            </FormControl>
+                            <FormDescription className="text-xs">
+                              Optional - for labor cost calculations
+                            </FormDescription>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      <FormField
+                        control={employeeForm.control}
                         name="permissions"
                         render={() => (
                           <FormItem>
@@ -2238,6 +2268,31 @@ export default function ManagementDashboard() {
                     )}
                   />
                 )}
+
+                <FormField
+                  control={editEmployeeForm.control}
+                  name="hourlyRate"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Hourly Rate ($/hr)</FormLabel>
+                      <FormControl>
+                        <Input 
+                          type="number" 
+                          step="0.01" 
+                          min="0" 
+                          placeholder="25.00" 
+                          {...field} 
+                          data-testid="input-edit-employee-hourly-rate" 
+                          className="h-12" 
+                        />
+                      </FormControl>
+                      <FormDescription className="text-xs">
+                        Optional - for labor cost calculations
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
                 <FormField
                   control={editEmployeeForm.control}
