@@ -319,7 +319,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Unable to determine company" });
       }
       
-      const { name, email, password, role, techLevel, permissions } = req.body;
+      const { name, email, password, role, techLevel, hourlyRate, permissions } = req.body;
       
       if (!password || password.length < 6) {
         return res.status(400).json({ message: "Password must be at least 6 characters" });
@@ -332,6 +332,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         email,
         role,
         techLevel: role === "rope_access_tech" ? techLevel : null,
+        hourlyRate: hourlyRate ? hourlyRate : null,
         permissions: permissions || [],
         companyId, // Link employee to this company
         passwordHash: password, // Storage will hash this
@@ -373,7 +374,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(403).json({ message: "Access denied" });
       }
       
-      const { name, email, role, techLevel, permissions } = req.body;
+      const { name, email, role, techLevel, hourlyRate, permissions } = req.body;
       
       // Update employee
       const updatedEmployee = await storage.updateUser(req.params.id, {
@@ -381,6 +382,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         email,
         role,
         techLevel: role === "rope_access_tech" ? techLevel : null,
+        hourlyRate: hourlyRate ? hourlyRate : null,
         permissions: permissions || [],
       });
       
