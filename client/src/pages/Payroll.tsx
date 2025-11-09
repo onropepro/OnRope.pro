@@ -183,14 +183,10 @@ export default function Payroll() {
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
-        <TabsList className="grid w-full grid-cols-4">
+        <TabsList className="grid w-full grid-cols-3">
           <TabsTrigger value="hours" data-testid="tab-hours">
             <Users className="w-4 h-4 mr-2" />
             Employee Hours
-          </TabsTrigger>
-          <TabsTrigger value="current-periods" data-testid="tab-current-periods">
-            <Calendar className="w-4 h-4 mr-2" />
-            Current Period
           </TabsTrigger>
           <TabsTrigger value="past-periods" data-testid="tab-past-periods">
             <Calendar className="w-4 h-4 mr-2" />
@@ -306,50 +302,6 @@ export default function Payroll() {
               {!selectedPeriodId && (
                 <div className="text-center py-12 text-muted-foreground">
                   Select a pay period above to view employee hours.
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="current-periods" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Current Pay Period</CardTitle>
-              <CardDescription>View the active pay period</CardDescription>
-            </CardHeader>
-            <CardContent>
-              {!periodsData?.periods || periodsData.periods.filter(p => p.status === 'current' || p.status === 'upcoming').length === 0 ? (
-                <div className="text-center py-8 text-muted-foreground">
-                  No current pay period. Configure your pay period settings to get started.
-                </div>
-              ) : (
-                <div className="space-y-2">
-                  {periodsData.periods
-                    .filter(p => p.status === 'current' || p.status === 'upcoming')
-                    .map((period) => (
-                      <Card key={period.id} data-testid={`card-period-${period.id}`}>
-                        <CardContent className="flex items-center justify-between p-4">
-                          <div>
-                            <div className="font-medium">
-                              {format(new Date(period.startDate), 'MMM dd, yyyy')} - {format(new Date(period.endDate), 'MMM dd, yyyy')}
-                            </div>
-                            <div className="text-sm text-muted-foreground capitalize">{period.status}</div>
-                          </div>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => {
-                              setSelectedPeriodId(period.id);
-                              setActiveTab("hours");
-                            }}
-                            data-testid={`button-view-hours-${period.id}`}
-                          >
-                            View Hours
-                          </Button>
-                        </CardContent>
-                      </Card>
-                    ))}
                 </div>
               )}
             </CardContent>
