@@ -96,7 +96,7 @@ const serviceFormSchema = z.object({
   suitesPerDay: z.coerce.number().optional(),
   floorsPerDay: z.coerce.number().optional(),
   // Common fields
-  pricePerHour: z.coerce.number().min(0, "Price per hour required"),
+  pricePerHour: z.coerce.number().min(0).optional(), // Optional for parkade (uses price per stall)
   totalHours: z.coerce.number().optional(),
   totalCost: z.coerce.number().optional(),
 });
@@ -1143,26 +1143,29 @@ export default function Quotes() {
                     </>
                   )}
 
-                  <FormField
-                    control={serviceForm.control}
-                    name="pricePerHour"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Price Per Hour</FormLabel>
-                        <FormControl>
-                          <Input
-                            {...field}
-                            type="number"
-                            min="0"
-                            step="0.01"
-                            className="h-12"
-                            data-testid="input-price-per-hour"
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+                  {/* Price Per Hour - Not needed for parkade (uses price per stall) */}
+                  {serviceBeingConfigured !== "parkade" && (
+                    <FormField
+                      control={serviceForm.control}
+                      name="pricePerHour"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Price Per Hour</FormLabel>
+                          <FormControl>
+                            <Input
+                              {...field}
+                              type="number"
+                              min="0"
+                              step="0.01"
+                              className="h-12"
+                              data-testid="input-price-per-hour"
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  )}
 
                   <Button
                     type="submit"
