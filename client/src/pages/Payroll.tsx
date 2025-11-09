@@ -42,10 +42,17 @@ export default function Payroll() {
   // Save configuration mutation
   const saveConfigMutation = useMutation({
     mutationFn: async (config: Partial<PayPeriodConfig>) => {
-      return apiRequest('/api/payroll/config', {
+      const response = await fetch('/api/payroll/config', {
         method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify(config),
       });
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || 'Failed to save configuration');
+      }
+      return response.json();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/payroll/config'] });
@@ -66,10 +73,17 @@ export default function Payroll() {
   // Generate pay periods mutation
   const generatePeriodsMutation = useMutation({
     mutationFn: async () => {
-      return apiRequest('/api/payroll/generate-periods', {
+      const response = await fetch('/api/payroll/generate-periods', {
         method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify({ numberOfPeriods: 6 }),
       });
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || 'Failed to generate pay periods');
+      }
+      return response.json();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/payroll/periods'] });
