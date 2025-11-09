@@ -409,6 +409,7 @@ export class Storage {
       createdAt: workSessions.createdAt,
       updatedAt: workSessions.updatedAt,
       techName: users.name,
+      techHourlyRate: users.hourlyRate,
     })
       .from(workSessions)
       .leftJoin(users, eq(workSessions.employeeId, users.id))

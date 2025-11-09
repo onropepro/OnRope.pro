@@ -871,6 +871,19 @@ export default function ProjectDetail() {
                   const sessionDrops = (session.dropsCompletedNorth ?? 0) + (session.dropsCompletedEast ?? 0) + 
                                        (session.dropsCompletedSouth ?? 0) + (session.dropsCompletedWest ?? 0);
                   const metTarget = sessionDrops >= project.dailyDropTarget;
+                  
+                  // Calculate labor cost
+                  let hoursWorked = 0;
+                  let laborCost = 0;
+                  if (isCompleted && session.startTime && session.endTime) {
+                    const start = new Date(session.startTime);
+                    const end = new Date(session.endTime);
+                    hoursWorked = (end.getTime() - start.getTime()) / (1000 * 60 * 60);
+                    
+                    if (session.techHourlyRate) {
+                      laborCost = hoursWorked * parseFloat(session.techHourlyRate);
+                    }
+                  }
 
                   return (
                     <div
@@ -907,12 +920,22 @@ export default function ProjectDetail() {
                           </>
                         )}
                       </div>
-                      <div className="text-right text-sm text-muted-foreground">
+                      <div className="text-right text-sm space-y-1">
                         {isCompleted && (
-                          <p>
-                            {format(new Date(session.startTime), "h:mm a")} -{" "}
-                            {format(new Date(session.endTime), "h:mm a")}
-                          </p>
+                          <>
+                            <p className="text-muted-foreground">
+                              {format(new Date(session.startTime), "h:mm a")} -{" "}
+                              {format(new Date(session.endTime), "h:mm a")}
+                            </p>
+                            <p className="text-muted-foreground">
+                              {hoursWorked.toFixed(1)} hours
+                            </p>
+                            {laborCost > 0 && (
+                              <p className="font-medium text-primary" data-testid="text-labor-cost">
+                                ${laborCost.toFixed(2)}
+                              </p>
+                            )}
+                          </>
                         )}
                       </div>
                     </div>
