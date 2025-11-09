@@ -119,8 +119,8 @@ export default function Quotes() {
 
   const createQuoteMutation = useMutation({
     mutationFn: async (data: QuoteFormData) => {
-      const response = await apiRequest<{ quote: Quote }>("/api/quotes", "POST", data);
-      return response;
+      const response = await apiRequest("POST", "/api/quotes", data);
+      return await response.json();
     },
     onSuccess: async (data) => {
       // Upload photo if selected
@@ -155,7 +155,7 @@ export default function Quotes() {
 
   const deleteQuoteMutation = useMutation({
     mutationFn: async (id: string) => {
-      await apiRequest(`/api/quotes/${id}`, "DELETE");
+      await apiRequest("DELETE", `/api/quotes/${id}`);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/quotes"] });
