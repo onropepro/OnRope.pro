@@ -433,178 +433,188 @@ export default function ProjectDetail() {
           </div>
         </div>
 
-        {/* PDF Upload/View Card */}
+        {/* Project Documents and Photos - Combined Card */}
         <Card className="glass-card border-0 shadow-premium">
           <CardHeader>
-            <CardTitle className="text-base">Fall Protection Plan</CardTitle>
+            <CardTitle className="text-base">Project Documents & Photos</CardTitle>
           </CardHeader>
-          <CardContent>
-            {project.ropeAccessPlanUrl ? (
+          <CardContent className="space-y-6">
+            
+            {/* Fall Protection Plan Section */}
+            <div className="space-y-3">
+              <div className="flex items-center gap-2">
+                <span className="material-icons text-primary">description</span>
+                <h3 className="font-medium">Fall Protection Plan</h3>
+              </div>
+              {project.ropeAccessPlanUrl ? (
+                <div className="flex gap-2">
+                  <Button
+                    variant="outline"
+                    className="flex-1 h-12 gap-2"
+                    onClick={() => window.open(project.ropeAccessPlanUrl!, '_blank')}
+                    data-testid="button-view-pdf"
+                  >
+                    <span className="material-icons text-lg">description</span>
+                    View Current PDF
+                  </Button>
+                  <Button
+                    variant="outline"
+                    className="h-12 gap-2"
+                    onClick={() => document.getElementById('pdf-upload-input')?.click()}
+                    disabled={uploadingPdf}
+                    data-testid="button-replace-pdf"
+                  >
+                    <span className="material-icons text-lg">upload</span>
+                    {uploadingPdf ? "Uploading..." : "Replace"}
+                  </Button>
+                </div>
+              ) : (
+                <Button
+                  variant="outline"
+                  className="w-full h-12 gap-2"
+                  onClick={() => document.getElementById('pdf-upload-input')?.click()}
+                  disabled={uploadingPdf}
+                  data-testid="button-upload-pdf"
+                >
+                  <span className="material-icons text-lg">upload</span>
+                  {uploadingPdf ? "Uploading..." : "Upload PDF"}
+                </Button>
+              )}
+              <input
+                id="pdf-upload-input"
+                type="file"
+                accept="application/pdf"
+                className="hidden"
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (file) {
+                    handlePdfUpload(file);
+                    e.target.value = '';
+                  }
+                }}
+              />
+            </div>
+
+            <Separator />
+
+            {/* Project Photos Section */}
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <span className="material-icons text-primary">photo_library</span>
+                  <h3 className="font-medium">Project Photos</h3>
+                </div>
+                <Badge variant="secondary" className="text-xs">
+                  {photos.length} {photos.length === 1 ? 'photo' : 'photos'}
+                </Badge>
+              </div>
+              
+              {/* Image Gallery */}
+              {photos.length > 0 && (
+                <div className="grid grid-cols-3 gap-2">
+                    {photos.map((photo: any) => (
+                      <div
+                        key={photo.id}
+                        className="aspect-square rounded-lg overflow-hidden border bg-card hover-elevate group relative"
+                      >
+                        <img
+                          src={photo.imageUrl}
+                          alt={photo.comment || `Project photo`}
+                          className="w-full h-full object-cover"
+                          data-testid={`project-image-${photo.id}`}
+                        />
+                        {(photo.unitNumber || photo.comment) && (
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-end p-2">
+                            {photo.unitNumber && (
+                              <div className="text-xs font-medium text-white">
+                                Unit {photo.unitNumber}
+                              </div>
+                            )}
+                            {photo.comment && (
+                              <div className="text-xs text-white/90 line-clamp-2">
+                                {photo.comment}
+                              </div>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              
+              {/* Upload Buttons */}
               <div className="flex gap-2">
                 <Button
                   variant="outline"
                   className="flex-1 h-12 gap-2"
-                  onClick={() => window.open(project.ropeAccessPlanUrl!, '_blank')}
-                  data-testid="button-view-pdf"
+                  onClick={() => document.getElementById('image-camera-input')?.click()}
+                  disabled={uploadingImage}
+                  data-testid="button-take-photo"
                 >
-                  <span className="material-icons text-lg">description</span>
-                  View Current PDF
+                  <span className="material-icons text-lg">photo_camera</span>
+                  {uploadingImage ? "Uploading..." : "Take Photo"}
                 </Button>
                 <Button
                   variant="outline"
-                  className="h-12 gap-2"
-                  onClick={() => document.getElementById('pdf-upload-input')?.click()}
-                  disabled={uploadingPdf}
-                  data-testid="button-replace-pdf"
+                  className="flex-1 h-12 gap-2"
+                  onClick={() => document.getElementById('image-file-input')?.click()}
+                  disabled={uploadingImage}
+                  data-testid="button-upload-from-library"
                 >
-                  <span className="material-icons text-lg">upload</span>
-                  {uploadingPdf ? "Uploading..." : "Replace"}
+                  <span className="material-icons text-lg">photo_library</span>
+                  {uploadingImage ? "Uploading..." : "From Library"}
                 </Button>
               </div>
-            ) : (
-              <Button
-                variant="outline"
-                className="w-full h-12 gap-2"
-                onClick={() => document.getElementById('pdf-upload-input')?.click()}
-                disabled={uploadingPdf}
-                data-testid="button-upload-pdf"
-              >
-                <span className="material-icons text-lg">upload</span>
-                {uploadingPdf ? "Uploading..." : "Upload PDF"}
-              </Button>
-            )}
-            <input
-              id="pdf-upload-input"
-              type="file"
-              accept="application/pdf"
-              className="hidden"
-              onChange={(e) => {
-                const file = e.target.files?.[0];
-                if (file) {
-                  handlePdfUpload(file);
-                  e.target.value = '';
-                }
-              }}
-            />
-          </CardContent>
-        </Card>
-
-        {/* Project Photos Card */}
-        <Card className="glass-card border-0 shadow-premium">
-          <CardHeader>
-            <div className="flex items-center justify-between">
-              <CardTitle className="text-base">Project Photos</CardTitle>
-              <Badge variant="secondary" className="text-xs">
-                {photos.length} {photos.length === 1 ? 'photo' : 'photos'}
-              </Badge>
+              
+              {/* Camera input (mobile-first) */}
+              <input
+                id="image-camera-input"
+                type="file"
+                accept="image/*"
+                capture="environment"
+                className="hidden"
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (file) {
+                    handleFileSelected(file);
+                    e.target.value = '';
+                  }
+                }}
+              />
+              
+              {/* File picker input */}
+              <input
+                id="image-file-input"
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (file) {
+                    handleFileSelected(file);
+                    e.target.value = '';
+                  }
+                }}
+              />
             </div>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            {/* Image Gallery */}
-            {photos.length > 0 && (
-              <div className="grid grid-cols-3 gap-2">
-                  {photos.map((photo: any) => (
-                    <div
-                      key={photo.id}
-                      className="aspect-square rounded-lg overflow-hidden border bg-card hover-elevate group relative"
-                    >
-                      <img
-                        src={photo.imageUrl}
-                        alt={photo.comment || `Project photo`}
-                        className="w-full h-full object-cover"
-                        data-testid={`project-image-${photo.id}`}
-                      />
-                      {(photo.unitNumber || photo.comment) && (
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-end p-2">
-                          {photo.unitNumber && (
-                            <div className="text-xs font-medium text-white">
-                              Unit {photo.unitNumber}
-                            </div>
-                          )}
-                          {photo.comment && (
-                            <div className="text-xs text-white/90 line-clamp-2">
-                              {photo.comment}
-                            </div>
-                          )}
-                        </div>
-                      )}
-                    </div>
-                  ))}
+
+            <Separator />
+
+            {/* Toolbox Meetings Section */}
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <span className="material-icons text-primary">assignment</span>
+                  <h3 className="font-medium">Toolbox Meetings</h3>
                 </div>
-              )}
-            
-            {/* Upload Buttons */}
-            <div className="flex gap-2">
-              <Button
-                variant="outline"
-                className="flex-1 h-12 gap-2"
-                onClick={() => document.getElementById('image-camera-input')?.click()}
-                disabled={uploadingImage}
-                data-testid="button-take-photo"
-              >
-                <span className="material-icons text-lg">photo_camera</span>
-                {uploadingImage ? "Uploading..." : "Take Photo"}
-              </Button>
-              <Button
-                variant="outline"
-                className="flex-1 h-12 gap-2"
-                onClick={() => document.getElementById('image-file-input')?.click()}
-                disabled={uploadingImage}
-                data-testid="button-upload-from-library"
-              >
-                <span className="material-icons text-lg">photo_library</span>
-                {uploadingImage ? "Uploading..." : "From Library"}
-              </Button>
-            </div>
-            
-            {/* Camera input (mobile-first) */}
-            <input
-              id="image-camera-input"
-              type="file"
-              accept="image/*"
-              capture="environment"
-              className="hidden"
-              onChange={(e) => {
-                const file = e.target.files?.[0];
-                if (file) {
-                  handleFileSelected(file);
-                  e.target.value = '';
-                }
-              }}
-            />
-            
-            {/* File picker input */}
-            <input
-              id="image-file-input"
-              type="file"
-              accept="image/*"
-              className="hidden"
-              onChange={(e) => {
-                const file = e.target.files?.[0];
-                if (file) {
-                  handleFileSelected(file);
-                  e.target.value = '';
-                }
-              }}
-            />
-          </CardContent>
-        </Card>
-
-        {/* Toolbox Meetings Card */}
-        <Card className="glass-card border-0 shadow-premium">
-          <CardHeader>
-            <div className="flex items-center justify-between">
-              <CardTitle className="text-base">Toolbox Meetings</CardTitle>
-              <Badge variant="secondary" className="text-xs">
-                {toolboxMeetings.length} {toolboxMeetings.length === 1 ? 'meeting' : 'meetings'}
-              </Badge>
-            </div>
-          </CardHeader>
-          <CardContent className="space-y-3">
+                <Badge variant="secondary" className="text-xs">
+                  {toolboxMeetings.length} {toolboxMeetings.length === 1 ? 'meeting' : 'meetings'}
+                </Badge>
+              </div>
 
               {/* Meeting List */}
               {toolboxMeetings.length > 0 && (
-                <div className="space-y-2 mb-3">
+                <div className="space-y-2">
                   {toolboxMeetings.slice(0, 3).map((meeting: any) => (
                     <Card
                       key={meeting.id}
@@ -637,16 +647,17 @@ export default function ProjectDetail() {
                 </div>
               )}
 
-            {/* Create Toolbox Meeting Button */}
-            <Button
-              variant="default"
-              className="w-full h-12 gap-2"
-              onClick={() => setLocation("/toolbox-meeting")}
-              data-testid="button-create-toolbox-meeting"
-            >
-              <span className="material-icons text-lg">assignment</span>
-              Conduct Toolbox Meeting
-            </Button>
+              {/* Create Toolbox Meeting Button */}
+              <Button
+                variant="default"
+                className="w-full h-12 gap-2"
+                onClick={() => setLocation("/toolbox-meeting")}
+                data-testid="button-create-toolbox-meeting"
+              >
+                <span className="material-icons text-lg">assignment</span>
+                Conduct Toolbox Meeting
+              </Button>
+            </div>
           </CardContent>
         </Card>
 
