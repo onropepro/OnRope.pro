@@ -299,6 +299,42 @@ export const toolboxMeetings = pgTable("toolbox_meetings", {
   index("IDX_toolbox_meetings_conductor").on(table.conductedBy, table.meetingDate),
 ]);
 
+// Pay period configuration table - one per company
+export const payPeriodConfig = pgTable("pay_period_config", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  companyId: varchar("company_id").notNull().unique().references(() => users.id, { onDelete: "cascade" }),
+  periodType: varchar("period_type").notNull(), // semi-monthly | weekly | bi-weekly
+  
+  // For semi-monthly: first day of period (1-28, default 1 and 15)
+  firstPayDay: integer("first_pay_day").default(1), // 1st of month
+  secondPayDay: integer("second_pay_day").default(15), // 15th of month
+  
+  // For weekly/bi-weekly: day of week (0=Sunday, 1=Monday, ..., 6=Saturday)
+  startDayOfWeek: integer("start_day_of_week"), // Day when week starts
+  
+  // For bi-weekly: anchor date to calculate from
+  biWeeklyAnchorDate: date("bi_weekly_anchor_date"), // Starting point for bi-weekly periods
+  
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+}, (table) => [
+  index("IDX_pay_period_config_company").on(table.companyId),
+]);
+
+// Pay periods table - generated periods based on config
+export const payPeriods = pgTable("pay_periods", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  companyId: varchar("company_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  startDate: date("start_date").notNull(),
+  endDate: date("end_date").notNull(),
+  status: varchar("status").notNull().default('upcoming'), // upcoming | current | past
+  
+  createdAt: timestamp("created_at").defaultNow(),
+}, (table) => [
+  index("IDX_pay_periods_company_dates").on(table.companyId, table.startDate, table.endDate),
+  index("IDX_pay_periods_status").on(table.companyId, table.status),
+]);
+
 // Relations
 export const usersRelations = relations(users, ({ many }) => ({
   projects: many(projects), // For company role
@@ -409,6 +445,20 @@ export const harnessInspectionsRelations = relations(harnessInspections, ({ one 
   }),
 }));
 
+export const payPeriodConfigRelations = relations(payPeriodConfig, ({ one }) => ({
+  company: one(users, {
+    fields: [payPeriodConfig.companyId],
+    references: [users.id],
+  }),
+}));
+
+export const payPeriodsRelations = relations(payPeriods, ({ one }) => ({
+  company: one(users, {
+    fields: [payPeriods.companyId],
+    references: [users.id],
+  }),
+}));
+
 // Zod schemas for validation
 export const insertUserSchema = createInsertSchema(users).omit({
   id: true,
@@ -510,6 +560,17 @@ export const insertToolboxMeetingSchema = createInsertSchema(toolboxMeetings).om
   pdfUrl: true, // Generated server-side
 });
 
+export const insertPayPeriodConfigSchema = createInsertSchema(payPeriodConfig).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const insertPayPeriodSchema = createInsertSchema(payPeriods).omit({
+  id: true,
+  createdAt: true,
+});
+
 // Type exports
 export type User = typeof users.$inferSelect;
 export type InsertUser = z.infer<typeof insertUserSchema>;
@@ -541,6 +602,12 @@ export type InsertHarnessInspection = z.infer<typeof insertHarnessInspectionSche
 export type ToolboxMeeting = typeof toolboxMeetings.$inferSelect;
 export type InsertToolboxMeeting = z.infer<typeof insertToolboxMeetingSchema>;
 
+export type PayPeriodConfig = typeof payPeriodConfig.$inferSelect;
+export type InsertPayPeriodConfig = z.infer<typeof insertPayPeriodConfigSchema>;
+
+export type PayPeriod = typeof payPeriods.$inferSelect;
+export type InsertPayPeriod = z.infer<typeof insertPayPeriodSchema>;
+
 // Extended types for frontend use with relations
 export type ProjectWithProgress = Project & {
   completedDrops: number;
@@ -549,4 +616,13 @@ export type ProjectWithProgress = Project & {
 
 export type ComplaintWithNotes = Complaint & {
   notes: (ComplaintNote & { user: User })[];
+};
+
+export type EmployeeHoursSummary = {
+  employeeId: string;
+  employeeName: string;
+  hourlyRate: string;
+  totalHours: number;
+  totalPay: number;
+  sessions: (WorkSession & { projectName: string })[];
 };
