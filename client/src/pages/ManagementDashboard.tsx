@@ -795,10 +795,81 @@ export default function ManagementDashboard() {
       </header>
 
       <div className="p-4 max-w-4xl mx-auto">
-        {/* Quick Actions */}
+        {/* Navigation Grid */}
         <div className="mb-6">
-          <h2 className="text-sm font-semibold text-muted-foreground mb-3">Quick Actions</h2>
           <div className="grid grid-cols-2 gap-3">
+            <Button
+              variant="outline"
+              className="h-auto flex-col gap-2 p-4"
+              onClick={() => setActiveTab("projects")}
+              data-testid="button-nav-projects"
+            >
+              <span className="material-icons text-primary">apartment</span>
+              <div className="text-center">
+                <div className="font-semibold">Projects</div>
+                <div className="text-xs text-muted-foreground">Active projects</div>
+              </div>
+            </Button>
+            <Button
+              variant="outline"
+              className="h-auto flex-col gap-2 p-4"
+              onClick={() => setActiveTab("past-projects")}
+              data-testid="button-nav-past-projects"
+            >
+              <span className="material-icons text-primary">done_all</span>
+              <div className="text-center">
+                <div className="font-semibold">Past Projects</div>
+                <div className="text-xs text-muted-foreground">Completed work</div>
+              </div>
+            </Button>
+            <Button
+              variant="outline"
+              className="h-auto flex-col gap-2 p-4"
+              onClick={() => setActiveTab("employees")}
+              data-testid="button-nav-employees"
+            >
+              <span className="material-icons text-primary">people</span>
+              <div className="text-center">
+                <div className="font-semibold">Employees</div>
+                <div className="text-xs text-muted-foreground">Manage team</div>
+              </div>
+            </Button>
+            <Button
+              variant="outline"
+              className="h-auto flex-col gap-2 p-4"
+              onClick={() => setActiveTab("performance")}
+              data-testid="button-nav-performance"
+            >
+              <span className="material-icons text-primary">analytics</span>
+              <div className="text-center">
+                <div className="font-semibold">Performance</div>
+                <div className="text-xs text-muted-foreground">View analytics</div>
+              </div>
+            </Button>
+            <Button
+              variant="outline"
+              className="h-auto flex-col gap-2 p-4"
+              onClick={() => setActiveTab("complaints")}
+              data-testid="button-nav-complaints"
+            >
+              <span className="material-icons text-primary">feedback</span>
+              <div className="text-center">
+                <div className="font-semibold">Complaints</div>
+                <div className="text-xs text-muted-foreground">Resident feedback</div>
+              </div>
+            </Button>
+            <Button
+              variant="outline"
+              className="h-auto flex-col gap-2 p-4"
+              onClick={() => setActiveTab("my-drops")}
+              data-testid="button-nav-my-drops"
+            >
+              <span className="material-icons text-primary">checklist</span>
+              <div className="text-center">
+                <div className="font-semibold">My Drops</div>
+                <div className="text-xs text-muted-foreground">Daily work log</div>
+              </div>
+            </Button>
             <Button
               variant="outline"
               className="h-auto flex-col gap-2 p-4"
@@ -808,7 +879,7 @@ export default function ManagementDashboard() {
               <span className="material-icons text-primary">verified_user</span>
               <div className="text-center">
                 <div className="font-semibold">Harness Inspection</div>
-                <div className="text-xs text-muted-foreground">Fill daily inspection form</div>
+                <div className="text-xs text-muted-foreground">Daily inspection</div>
               </div>
             </Button>
             <Button
@@ -820,7 +891,7 @@ export default function ManagementDashboard() {
               <span className="material-icons text-primary">group</span>
               <div className="text-center">
                 <div className="font-semibold">Toolbox Meeting</div>
-                <div className="text-xs text-muted-foreground">Record safety meeting</div>
+                <div className="text-xs text-muted-foreground">Safety meeting</div>
               </div>
             </Button>
             <Button
@@ -832,7 +903,7 @@ export default function ManagementDashboard() {
               <span className="material-icons text-primary">payments</span>
               <div className="text-center">
                 <div className="font-semibold">Payroll</div>
-                <div className="text-xs text-muted-foreground">Manage employee hours</div>
+                <div className="text-xs text-muted-foreground">Employee hours</div>
               </div>
             </Button>
             <Button
@@ -844,101 +915,25 @@ export default function ManagementDashboard() {
               <span className="material-icons text-primary">request_quote</span>
               <div className="text-center">
                 <div className="font-semibold">Quotes</div>
-                <div className="text-xs text-muted-foreground">Create service quotes</div>
+                <div className="text-xs text-muted-foreground">Service quotes</div>
+              </div>
+            </Button>
+            <Button
+              variant="outline"
+              className="h-auto flex-col gap-2 p-4"
+              onClick={() => setActiveTab("documents")}
+              data-testid="button-nav-documents"
+            >
+              <span className="material-icons text-primary">description</span>
+              <div className="text-center">
+                <div className="font-semibold">Documents</div>
+                <div className="text-xs text-muted-foreground">Project files</div>
               </div>
             </Button>
           </div>
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          {/* Mobile Dropdown */}
-          <div className="block sm:hidden mb-4">
-            <Select value={activeTab} onValueChange={setActiveTab}>
-              <SelectTrigger className="h-12 w-full" data-testid="select-tab-mobile">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="projects">
-                  <div className="flex items-center gap-2">
-                    <span className="material-icons text-sm">apartment</span>
-                    Projects
-                  </div>
-                </SelectItem>
-                <SelectItem value="past-projects">
-                  <div className="flex items-center gap-2">
-                    <span className="material-icons text-sm">done_all</span>
-                    Past Projects
-                  </div>
-                </SelectItem>
-                <SelectItem value="performance">
-                  <div className="flex items-center gap-2">
-                    <span className="material-icons text-sm">analytics</span>
-                    Performance
-                  </div>
-                </SelectItem>
-                <SelectItem value="complaints">
-                  <div className="flex items-center gap-2">
-                    <span className="material-icons text-sm">feedback</span>
-                    Complaints
-                  </div>
-                </SelectItem>
-                <SelectItem value="my-drops">
-                  <div className="flex items-center gap-2">
-                    <span className="material-icons text-sm">checklist</span>
-                    My Drops
-                  </div>
-                </SelectItem>
-                <SelectItem value="employees">
-                  <div className="flex items-center gap-2">
-                    <span className="material-icons text-sm">people</span>
-                    Employees
-                  </div>
-                </SelectItem>
-                <SelectItem value="documents">
-                  <div className="flex items-center gap-2">
-                    <span className="material-icons text-sm">description</span>
-                    Documents
-                  </div>
-                </SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          {/* Desktop Tabs */}
-          <ScrollArea className="hidden sm:block w-full mb-4">
-            <TabsList className="inline-flex h-12 items-center justify-start rounded-full bg-muted p-1 text-muted-foreground w-full sm:w-auto">
-              <TabsTrigger value="projects" data-testid="tab-projects" className="inline-flex items-center justify-center whitespace-nowrap rounded-full px-4 py-2 text-sm font-medium transition-all min-w-[110px] sm:min-w-0">
-                <span className="material-icons text-sm mr-2">apartment</span>
-                Projects
-              </TabsTrigger>
-              <TabsTrigger value="past-projects" data-testid="tab-past-projects" className="inline-flex items-center justify-center whitespace-nowrap rounded-full px-4 py-2 text-sm font-medium transition-all min-w-[130px] sm:min-w-0">
-                <span className="material-icons text-sm mr-2">done_all</span>
-                Past Projects
-              </TabsTrigger>
-              <TabsTrigger value="performance" data-testid="tab-performance" className="inline-flex items-center justify-center whitespace-nowrap rounded-full px-4 py-2 text-sm font-medium transition-all min-w-[120px] sm:min-w-0">
-                <span className="material-icons text-sm mr-2">analytics</span>
-                Performance
-              </TabsTrigger>
-              <TabsTrigger value="complaints" data-testid="tab-complaints" className="inline-flex items-center justify-center whitespace-nowrap rounded-full px-4 py-2 text-sm font-medium transition-all min-w-[120px] sm:min-w-0">
-                <span className="material-icons text-sm mr-2">feedback</span>
-                Complaints
-              </TabsTrigger>
-              <TabsTrigger value="my-drops" data-testid="tab-my-drops" className="inline-flex items-center justify-center whitespace-nowrap rounded-full px-4 py-2 text-sm font-medium transition-all min-w-[110px] sm:min-w-0">
-                <span className="material-icons text-sm mr-2">checklist</span>
-                My Drops
-              </TabsTrigger>
-              <TabsTrigger value="employees" data-testid="tab-employees" className="inline-flex items-center justify-center whitespace-nowrap rounded-full px-4 py-2 text-sm font-medium transition-all min-w-[110px] sm:min-w-0">
-                <span className="material-icons text-sm mr-2">people</span>
-                Employees
-              </TabsTrigger>
-              <TabsTrigger value="documents" data-testid="tab-documents" className="inline-flex items-center justify-center whitespace-nowrap rounded-full px-4 py-2 text-sm font-medium transition-all min-w-[110px] sm:min-w-0">
-                <span className="material-icons text-sm mr-2">description</span>
-                Documents
-              </TabsTrigger>
-            </TabsList>
-            <ScrollBar orientation="horizontal" />
-          </ScrollArea>
-
           <TabsContent value="projects">
             <div className="space-y-4">
               {/* Search and Create */}
