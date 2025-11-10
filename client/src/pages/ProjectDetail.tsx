@@ -892,6 +892,71 @@ export default function ProjectDetail() {
               />
             </div>
 
+            {/* Missed Units Section - Only for in-suite dryer vent projects */}
+            {project.jobType === 'in_suite_dryer_vent_cleaning' && (() => {
+              const missedUnitPhotos = photos.filter((photo: any) => photo.isMissedUnit);
+              return missedUnitPhotos.length > 0 ? (
+                <>
+                  <Separator />
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <span className="material-icons text-orange-600">warning</span>
+                        <h3 className="font-medium">Missed Units</h3>
+                      </div>
+                      <Badge variant="destructive" className="text-xs">
+                        {missedUnitPhotos.length} {missedUnitPhotos.length === 1 ? 'unit' : 'units'}
+                      </Badge>
+                    </div>
+                    
+                    <div className="p-3 bg-orange-50 border border-orange-200 rounded-lg">
+                      <p className="text-sm text-muted-foreground">
+                        Photos of units that were missed during the initial sweep and need to be addressed
+                      </p>
+                    </div>
+                    
+                    {/* Missed Units Grid */}
+                    <div className="grid grid-cols-2 gap-3">
+                      {missedUnitPhotos.map((photo: any) => (
+                        <div
+                          key={photo.id}
+                          className="border-2 border-orange-400 rounded-lg overflow-hidden bg-card hover-elevate active-elevate-2"
+                          data-testid={`missed-unit-${photo.id}`}
+                        >
+                          <div
+                            onClick={() => setSelectedPhoto(photo)}
+                            className="aspect-square relative cursor-pointer"
+                          >
+                            <img
+                              src={photo.imageUrl}
+                              alt={`Missed unit ${photo.missedUnitNumber}`}
+                              className="w-full h-full object-cover"
+                            />
+                            <div className="absolute top-2 right-2">
+                              <Badge variant="destructive" className="font-bold shadow-lg">
+                                Unit {photo.missedUnitNumber}
+                              </Badge>
+                            </div>
+                          </div>
+                          <div className="p-3 border-t border-orange-200 bg-orange-50">
+                            <div className="font-medium text-sm">Unit {photo.missedUnitNumber}</div>
+                            {photo.comment && (
+                              <div className="text-xs text-muted-foreground mt-1 line-clamp-2">
+                                {photo.comment}
+                              </div>
+                            )}
+                            <div className="text-xs text-muted-foreground mt-1">
+                              {format(new Date(photo.uploadedAt), "MMM d, yyyy 'at' h:mm a")}
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </>
+              ) : null;
+            })()}
+
             <Separator />
 
             {/* Toolbox Meetings Section */}
