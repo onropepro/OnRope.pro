@@ -25,6 +25,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import type { Project } from "@shared/schema";
 import { normalizeStrataPlan } from "@shared/schema";
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from "recharts";
+import { isManagement, hasFinancialAccess, canManageEmployees, canViewPerformance } from "@/lib/permissions";
 
 const projectSchema = z.object({
   strataPlanNumber: z.string().min(1, "Strata plan number is required"),
@@ -773,6 +774,112 @@ export default function ManagementDashboard() {
     p.jobType.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
+  // Get current user for permission checks
+  const currentUser = userData?.user;
+
+  // Dashboard card configuration with permission filtering
+  const dashboardCards = [
+    {
+      id: "projects",
+      label: "Projects",
+      description: "Active projects",
+      icon: "apartment",
+      onClick: () => handleTabChange("projects"),
+      testId: "button-nav-projects",
+      isVisible: () => true, // Everyone
+    },
+    {
+      id: "past-projects",
+      label: "Past Projects",
+      description: "Completed work",
+      icon: "done_all",
+      onClick: () => handleTabChange("past-projects"),
+      testId: "button-nav-past-projects",
+      isVisible: () => true, // Everyone
+    },
+    {
+      id: "employees",
+      label: "Employees",
+      description: "Manage team",
+      icon: "people",
+      onClick: () => handleTabChange("employees"),
+      testId: "button-nav-employees",
+      isVisible: (user: any) => canManageEmployees(user), // Management only
+    },
+    {
+      id: "performance",
+      label: "Performance",
+      description: "View analytics",
+      icon: "analytics",
+      onClick: () => handleTabChange("performance"),
+      testId: "button-nav-performance",
+      isVisible: (user: any) => canViewPerformance(user), // Management only
+    },
+    {
+      id: "complaints",
+      label: "Complaints",
+      description: "Resident feedback",
+      icon: "feedback",
+      onClick: () => handleTabChange("complaints"),
+      testId: "button-nav-complaints",
+      isVisible: () => true, // Everyone
+    },
+    {
+      id: "my-drops",
+      label: "My Drops",
+      description: "Daily work log",
+      icon: "checklist",
+      onClick: () => handleTabChange("my-drops"),
+      testId: "button-nav-my-drops",
+      isVisible: () => true, // Everyone
+    },
+    {
+      id: "harness-inspection",
+      label: "Harness Inspection",
+      description: "Daily inspection",
+      icon: "verified_user",
+      onClick: () => setLocation("/harness-inspection"),
+      testId: "button-harness-inspection",
+      isVisible: () => true, // Everyone
+    },
+    {
+      id: "toolbox-meeting",
+      label: "Toolbox Meeting",
+      description: "Safety meeting",
+      icon: "group",
+      onClick: () => setLocation("/toolbox-meeting"),
+      testId: "button-toolbox-meeting",
+      isVisible: () => true, // Everyone
+    },
+    {
+      id: "payroll",
+      label: "Payroll",
+      description: "Employee hours",
+      icon: "payments",
+      onClick: () => setLocation("/payroll"),
+      testId: "button-payroll",
+      isVisible: (user: any) => hasFinancialAccess(user), // Financial permission required
+    },
+    {
+      id: "quotes",
+      label: "Quotes",
+      description: "Service quotes",
+      icon: "request_quote",
+      onClick: () => setLocation("/quotes"),
+      testId: "button-quotes",
+      isVisible: () => true, // Everyone (internal filtering)
+    },
+    {
+      id: "documents",
+      label: "Documents",
+      description: "Project files",
+      icon: "folder",
+      onClick: () => handleTabChange("documents"),
+      testId: "button-documents",
+      isVisible: () => true, // Everyone
+    },
+  ].filter(card => card.isVisible(currentUser));
+
   if (projectsLoading || employeesLoading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
@@ -806,144 +913,27 @@ export default function ManagementDashboard() {
       </header>
 
       <div className="p-4 max-w-4xl mx-auto">
-        {/* Navigation Grid - Only show when no tab is selected */}
+        {/* Navigation Grid - Permission-filtered dashboard cards */}
         {activeTab === "" && (
           <div className="mb-6">
-            <div className="grid grid-cols-2 gap-3">
-            <Button
-              variant="outline"
-              className="h-auto flex-col gap-2 p-4"
-              onClick={() => handleTabChange("projects")}
-              data-testid="button-nav-projects"
-            >
-              <span className="material-icons text-primary">apartment</span>
-              <div className="text-center">
-                <div className="font-semibold">Projects</div>
-                <div className="text-xs text-muted-foreground">Active projects</div>
-              </div>
-            </Button>
-            <Button
-              variant="outline"
-              className="h-auto flex-col gap-2 p-4"
-              onClick={() => handleTabChange("past-projects")}
-              data-testid="button-nav-past-projects"
-            >
-              <span className="material-icons text-primary">done_all</span>
-              <div className="text-center">
-                <div className="font-semibold">Past Projects</div>
-                <div className="text-xs text-muted-foreground">Completed work</div>
-              </div>
-            </Button>
-            <Button
-              variant="outline"
-              className="h-auto flex-col gap-2 p-4"
-              onClick={() => handleTabChange("employees")}
-              data-testid="button-nav-employees"
-            >
-              <span className="material-icons text-primary">people</span>
-              <div className="text-center">
-                <div className="font-semibold">Employees</div>
-                <div className="text-xs text-muted-foreground">Manage team</div>
-              </div>
-            </Button>
-            <Button
-              variant="outline"
-              className="h-auto flex-col gap-2 p-4"
-              onClick={() => handleTabChange("performance")}
-              data-testid="button-nav-performance"
-            >
-              <span className="material-icons text-primary">analytics</span>
-              <div className="text-center">
-                <div className="font-semibold">Performance</div>
-                <div className="text-xs text-muted-foreground">View analytics</div>
-              </div>
-            </Button>
-            <Button
-              variant="outline"
-              className="h-auto flex-col gap-2 p-4"
-              onClick={() => handleTabChange("complaints")}
-              data-testid="button-nav-complaints"
-            >
-              <span className="material-icons text-primary">feedback</span>
-              <div className="text-center">
-                <div className="font-semibold">Complaints</div>
-                <div className="text-xs text-muted-foreground">Resident feedback</div>
-              </div>
-            </Button>
-            <Button
-              variant="outline"
-              className="h-auto flex-col gap-2 p-4"
-              onClick={() => handleTabChange("my-drops")}
-              data-testid="button-nav-my-drops"
-            >
-              <span className="material-icons text-primary">checklist</span>
-              <div className="text-center">
-                <div className="font-semibold">My Drops</div>
-                <div className="text-xs text-muted-foreground">Daily work log</div>
-              </div>
-            </Button>
-            <Button
-              variant="outline"
-              className="h-auto flex-col gap-2 p-4"
-              onClick={() => setLocation("/harness-inspection")}
-              data-testid="button-harness-inspection"
-            >
-              <span className="material-icons text-primary">verified_user</span>
-              <div className="text-center">
-                <div className="font-semibold">Harness Inspection</div>
-                <div className="text-xs text-muted-foreground">Daily inspection</div>
-              </div>
-            </Button>
-            <Button
-              variant="outline"
-              className="h-auto flex-col gap-2 p-4"
-              onClick={() => setLocation("/toolbox-meeting")}
-              data-testid="button-toolbox-meeting"
-            >
-              <span className="material-icons text-primary">group</span>
-              <div className="text-center">
-                <div className="font-semibold">Toolbox Meeting</div>
-                <div className="text-xs text-muted-foreground">Safety meeting</div>
-              </div>
-            </Button>
-            <Button
-              variant="outline"
-              className="h-auto flex-col gap-2 p-4"
-              onClick={() => setLocation("/payroll")}
-              data-testid="button-payroll"
-            >
-              <span className="material-icons text-primary">payments</span>
-              <div className="text-center">
-                <div className="font-semibold">Payroll</div>
-                <div className="text-xs text-muted-foreground">Employee hours</div>
-              </div>
-            </Button>
-            <Button
-              variant="outline"
-              className="h-auto flex-col gap-2 p-4"
-              onClick={() => setLocation("/quotes")}
-              data-testid="button-quotes"
-            >
-              <span className="material-icons text-primary">request_quote</span>
-              <div className="text-center">
-                <div className="font-semibold">Quotes</div>
-                <div className="text-xs text-muted-foreground">Service quotes</div>
-              </div>
-            </Button>
-            <Button
-              variant="outline"
-              className="h-auto flex-col gap-2 p-4"
-              onClick={() => handleTabChange("documents")}
-              data-testid="button-nav-documents"
-            >
-              <span className="material-icons text-primary">description</span>
-              <div className="text-center">
-                <div className="font-semibold">Documents</div>
-                <div className="text-xs text-muted-foreground">Project files</div>
-              </div>
-            </Button>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+              {dashboardCards.map(card => (
+                <Button
+                  key={card.id}
+                  variant="outline"
+                  className="h-auto flex-col gap-2 p-4"
+                  onClick={card.onClick}
+                  data-testid={card.testId}
+                >
+                  <span className="material-icons text-primary">{card.icon}</span>
+                  <div className="text-center">
+                    <div className="font-semibold">{card.label}</div>
+                    <div className="text-xs text-muted-foreground">{card.description}</div>
+                  </div>
+                </Button>
+              ))}
+            </div>
           </div>
-        </div>
         )}
 
         {/* Back Button for all tabs */}
