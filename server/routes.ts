@@ -2302,8 +2302,58 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(403).json({ message: "Forbidden" });
       }
       
-      const updatedQuote = await storage.updateQuote(req.params.id, req.body);
-      res.json({ quote: updatedQuote });
+      const { services, ...quoteFields } = req.body;
+      
+      // Check if user has financial permissions
+      const canViewFinancialData = currentUser.role === "company" || 
+                                    currentUser.permissions?.includes("view_financial_data");
+      
+      // If services are provided, update the whole quote with services
+      if (services && Array.isArray(services)) {
+        // Process services to strip pricing fields if user doesn't have financial permissions
+        const processedServices = services.map(serviceData => {
+          const processedServiceData = canViewFinancialData 
+            ? serviceData 
+            : {
+                ...serviceData,
+                pricePerHour: undefined,
+                pricePerStall: undefined,
+                dryerVentPricePerUnit: undefined,
+                totalHours: undefined,
+                totalCost: undefined,
+              };
+          
+          return insertQuoteServiceSchema.parse({
+            ...processedServiceData,
+            quoteId: quote.id,
+          });
+        });
+        
+        const updatedQuote = await storage.updateQuoteWithServices(
+          req.params.id, 
+          quoteFields,
+          processedServices
+        );
+        
+        // Filter pricing data from response if user doesn't have financial permissions
+        const filteredQuote = canViewFinancialData ? updatedQuote : {
+          ...updatedQuote,
+          services: updatedQuote.services.map(service => ({
+            ...service,
+            pricePerHour: null,
+            pricePerStall: null,
+            dryerVentPricePerUnit: null,
+            totalHours: null,
+            totalCost: null,
+          })),
+        };
+        
+        res.json({ quote: filteredQuote });
+      } else {
+        // If no services, just update quote metadata
+        const updatedQuote = await storage.updateQuote(req.params.id, quoteFields);
+        res.json({ quote: updatedQuote });
+      }
     } catch (error) {
       console.error("Update quote error:", error);
       res.status(500).json({ message: "Internal server error" });

@@ -930,6 +930,26 @@ export class Storage {
     return result[0];
   }
 
+  async updateQuoteWithServices(
+    id: string, 
+    quoteUpdates: Partial<InsertQuote>, 
+    services: InsertQuoteService[]
+  ): Promise<QuoteWithServices> {
+    // Update quote metadata
+    await this.updateQuote(id, quoteUpdates);
+    
+    // Delete existing services
+    await this.deleteQuoteServicesByQuoteId(id);
+    
+    // Create new services
+    for (const service of services) {
+      await this.createQuoteService({ ...service, quoteId: id });
+    }
+    
+    // Return updated quote with services
+    return this.getQuoteById(id);
+  }
+
   async deleteQuote(id: string): Promise<void> {
     await db.delete(quotes).where(eq(quotes.id, id));
   }

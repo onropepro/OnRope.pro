@@ -31,6 +31,7 @@ import {
   Edit
 } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 
 // Service types configuration
 const SERVICE_TYPES = [
@@ -139,6 +140,7 @@ export default function Quotes() {
   const [createStep, setCreateStep] = useState<"building" | "services" | "configure">("services");
   const [selectedQuote, setSelectedQuote] = useState<QuoteWithServices | null>(null);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [editingServices, setEditingServices] = useState<Map<string, ServiceFormData>>(new Map());
   
   // Form data
   const [buildingInfo, setBuildingInfo] = useState<BuildingInfoFormData | null>(null);
@@ -275,11 +277,36 @@ export default function Quotes() {
     },
   });
 
-  // Edit quote mutation (building metadata only)
+  // Edit quote mutation (building metadata and services)
   const editQuoteMutation = useMutation({
     mutationFn: async (data: BuildingInfoFormData) => {
       if (!selectedQuote) throw new Error("No quote selected");
-      const response = await apiRequest("PATCH", `/api/quotes/${selectedQuote.id}`, data);
+      
+      // Convert editingServices Map to array with string conversions for numeric fields
+      const services = Array.from(editingServices.entries()).map(([serviceType, serviceData]) => {
+        const totalCost = serviceType === "parkade" 
+          ? (serviceData.parkadeStalls || 0) * (serviceData.pricePerStall || 0)
+          : serviceData.totalCost;
+        
+        return {
+          serviceType,
+          ...serviceData,
+          // Convert numeric fields to strings for PostgreSQL numeric columns
+          pricePerHour: serviceData.pricePerHour?.toString(),
+          pricePerStall: serviceData.pricePerStall?.toString(),
+          dryerVentPricePerUnit: serviceData.dryerVentPricePerUnit?.toString(),
+          totalHours: serviceData.totalHours?.toString(),
+          totalCost: totalCost?.toString(),
+          groundWindowHours: serviceData.groundWindowHours?.toString(),
+        };
+      });
+      
+      const payload = {
+        ...data,
+        services,
+      };
+      
+      const response = await apiRequest("PATCH", `/api/quotes/${selectedQuote.id}`, payload);
       return response.json();
     },
     onSuccess: (data: any) => {
@@ -788,6 +815,31 @@ export default function Quotes() {
                     buildingAddress: selectedQuote.buildingAddress,
                     floorCount: selectedQuote.floorCount,
                   });
+                  
+                  // Populate services Map from quote
+                  const servicesMap = new Map<string, ServiceFormData>();
+                  selectedQuote.services.forEach((service) => {
+                    servicesMap.set(service.serviceType, {
+                      serviceType: service.serviceType,
+                      dropsNorth: service.dropsNorth || undefined,
+                      dropsEast: service.dropsEast || undefined,
+                      dropsSouth: service.dropsSouth || undefined,
+                      dropsWest: service.dropsWest || undefined,
+                      dropsPerDay: service.dropsPerDay || undefined,
+                      parkadeStalls: service.parkadeStalls || undefined,
+                      pricePerStall: service.pricePerStall ? Number(service.pricePerStall) : undefined,
+                      groundWindowHours: service.groundWindowHours ? Number(service.groundWindowHours) : undefined,
+                      suitesPerDay: service.suitesPerDay || undefined,
+                      floorsPerDay: service.floorsPerDay || undefined,
+                      dryerVentPricingType: service.dryerVentPricingType || undefined,
+                      dryerVentUnits: service.dryerVentUnits || undefined,
+                      dryerVentPricePerUnit: service.dryerVentPricePerUnit ? Number(service.dryerVentPricePerUnit) : undefined,
+                      pricePerHour: service.pricePerHour ? Number(service.pricePerHour) : undefined,
+                      totalHours: service.totalHours ? Number(service.totalHours) : undefined,
+                      totalCost: service.totalCost ? Number(service.totalCost) : undefined,
+                    });
+                  });
+                  setEditingServices(servicesMap);
                   setIsEditDialogOpen(true);
                 }}
                 className="bg-[#3B82F6] hover:bg-[#3B82F6]/90"
