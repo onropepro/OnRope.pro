@@ -3,6 +3,7 @@ import { useQuery, useMutation } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import { Link } from "wouter";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -241,14 +242,15 @@ export default function Quotes() {
     setSelectedServices([]);
     setConfiguredServices(new Map());
     setServiceBeingConfigured(null);
-    setCreateStep("building");
+    setCreateStep("services");
     buildingForm.reset();
     serviceForm.reset();
   };
 
   const handleBuildingInfoSubmit = (data: BuildingInfoFormData) => {
     setBuildingInfo(data);
-    setCreateStep("services");
+    // Trigger quote creation after building info is captured
+    createQuoteMutation.mutate();
   };
 
   const handleServiceToggle = (serviceId: string) => {
@@ -408,13 +410,27 @@ export default function Quotes() {
     return (
       <div className="min-h-screen bg-[#FAFAFA] p-8">
         <div className="max-w-7xl mx-auto">
+          <Link href="/dashboard">
+            <Button
+              variant="ghost"
+              className="mb-6"
+              data-testid="button-back-to-dashboard"
+            >
+              <ArrowLeft className="w-4 h-4 mr-2" />
+              Back to Dashboard
+            </Button>
+          </Link>
+
           <div className="flex items-center justify-between mb-8">
             <div>
               <h1 className="text-4xl font-bold text-[#0A0A0A] mb-2">Service Quotes</h1>
               <p className="text-[#71717A]">Create and manage service quotes for buildings</p>
             </div>
             <Button
-              onClick={() => setView("create")}
+              onClick={() => {
+                resetForm();
+                setView("create");
+              }}
               className="bg-[#3B82F6] hover:bg-[#3B82F6]/90"
               data-testid="button-create-quote"
             >
@@ -434,7 +450,10 @@ export default function Quotes() {
                 <h3 className="text-xl font-semibold text-[#0A0A0A] mb-2">No quotes yet</h3>
                 <p className="text-[#71717A] mb-6">Create your first service quote to get started</p>
                 <Button
-                  onClick={() => setView("create")}
+                  onClick={() => {
+                    resetForm();
+                    setView("create");
+                  }}
                   className="bg-[#3B82F6] hover:bg-[#3B82F6]/90"
                   data-testid="button-create-first-quote"
                 >
@@ -718,15 +737,12 @@ export default function Quotes() {
         <div className="max-w-2xl mx-auto">
           <Button
             variant="ghost"
-            onClick={() => {
-              resetForm();
-              setView("list");
-            }}
+            onClick={() => setCreateStep("services")}
             className="mb-6"
-            data-testid="button-cancel-create"
+            data-testid="button-back-to-services"
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
-            Cancel
+            Back to Services
           </Button>
 
           <Card className="rounded-2xl shadow-lg border border-[#F4F4F5]">
@@ -821,10 +837,11 @@ export default function Quotes() {
 
                   <Button
                     type="submit"
+                    disabled={createQuoteMutation.isPending}
                     className="w-full bg-[#3B82F6] hover:bg-[#3B82F6]/90 h-12"
-                    data-testid="button-next-to-services"
+                    data-testid="button-create-quote-submit"
                   >
-                    Next: Select Services
+                    {createQuoteMutation.isPending ? "Creating..." : "Create Quote"}
                   </Button>
                 </form>
               </Form>
@@ -958,12 +975,12 @@ export default function Quotes() {
                   </div>
                 </div>
                 <Button
-                  onClick={() => createQuoteMutation.mutate()}
-                  disabled={!canFinalize || createQuoteMutation.isPending}
+                  onClick={() => setCreateStep("building")}
+                  disabled={!canFinalize}
                   className="w-full bg-[#3B82F6] hover:bg-[#3B82F6]/90 h-12"
-                  data-testid="button-create-quote-final"
+                  data-testid="button-next-to-building"
                 >
-                  {createQuoteMutation.isPending ? "Creating..." : "Create Quote"}
+                  Next: Building Info
                 </Button>
               </CardContent>
             </Card>
