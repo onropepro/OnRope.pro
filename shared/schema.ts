@@ -360,8 +360,11 @@ export const quotes = pgTable("quotes", {
   // Photo attachment
   photoUrl: text("photo_url"), // URL to photo in object storage
   
+  // Tracking
+  createdBy: varchar("created_by").notNull().references(() => users.id), // User who created the quote
+  
   // Status
-  status: varchar("status").notNull().default('open'), // open | closed
+  status: varchar("status").notNull().default('draft'), // draft | open | closed
   
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
