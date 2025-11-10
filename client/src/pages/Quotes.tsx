@@ -168,15 +168,25 @@ export default function Quotes() {
     mutationFn: async () => {
       if (!buildingInfo) throw new Error("Building info required");
       
-      // Convert configured services Map to array
-      const services = Array.from(configuredServices.entries()).map(([serviceType, serviceData]) => ({
-        serviceType,
-        ...serviceData,
-        // For parkade, calculate total cost from stalls * price per stall
-        totalCost: serviceType === "parkade" 
+      // Convert configured services Map to array with string conversions for numeric fields
+      const services = Array.from(configuredServices.entries()).map(([serviceType, serviceData]) => {
+        const totalCost = serviceType === "parkade" 
           ? (serviceData.parkadeStalls || 0) * (serviceData.pricePerStall || 0)
-          : serviceData.totalCost,
-      }));
+          : serviceData.totalCost;
+        
+        return {
+          serviceType,
+          ...serviceData,
+          // Convert numeric fields to strings for PostgreSQL numeric columns
+          pricePerHour: serviceData.pricePerHour != null ? String(serviceData.pricePerHour) : undefined,
+          pricePerStall: serviceData.pricePerStall != null ? String(serviceData.pricePerStall) : undefined,
+          dryerVentPricePerUnit: serviceData.dryerVentPricePerUnit != null ? String(serviceData.dryerVentPricePerUnit) : undefined,
+          groundWindowHours: serviceData.groundWindowHours != null ? String(serviceData.groundWindowHours) : undefined,
+          simpleServiceHours: serviceData.simpleServiceHours != null ? String(serviceData.simpleServiceHours) : undefined,
+          totalHours: serviceData.totalHours != null ? String(serviceData.totalHours) : undefined,
+          totalCost: totalCost != null ? String(totalCost) : undefined,
+        };
+      });
       
       // Create quote with services in a single atomic request
       const quoteResponse = await apiRequest("POST", "/api/quotes", {
