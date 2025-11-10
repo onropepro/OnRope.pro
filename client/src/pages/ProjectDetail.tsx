@@ -16,7 +16,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { format } from "date-fns";
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from "recharts";
 import type { Project } from "@shared/schema";
@@ -79,10 +79,21 @@ export default function ProjectDetail() {
   });
 
   // Fetch photos for this project
-  const { data: photosData } = useQuery({
+  const { data: photosData, isError: photosError, error: photosErrorMsg, isLoading: photosLoading } = useQuery({
     queryKey: ["/api/projects", id, "photos"],
     enabled: !!id,
   });
+  
+  // Show error toast if photo fetch fails (only once per error)
+  useEffect(() => {
+    if (photosError) {
+      toast({
+        title: "Failed to load photos",
+        description: photosErrorMsg instanceof Error ? photosErrorMsg.message : "Could not load project photos",
+        variant: "destructive"
+      });
+    }
+  }, [photosError, photosErrorMsg]);
 
   // Fetch toolbox meetings for this project
   const { data: toolboxMeetingsData } = useQuery({

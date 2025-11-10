@@ -933,6 +933,105 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get photos for a project
+  app.get("/api/projects/:id/photos", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      // Verify access to this project
+      const hasAccess = await storage.verifyProjectAccess(
+        req.params.id,
+        currentUser.id,
+        currentUser.role,
+        currentUser.companyId
+      );
+      
+      if (!hasAccess) {
+        return res.status(403).json({ message: "Access denied" });
+      }
+      
+      let photos = await storage.getProjectPhotos(req.params.id);
+      
+      // Filter photos for residents to only show their unit
+      if (currentUser.role === "resident" && currentUser.unitNumber) {
+        photos = photos.filter(photo => photo.unitNumber === currentUser.unitNumber);
+      }
+      
+      res.json({ photos });
+    } catch (error) {
+      console.error("Get project photos error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Upload photo to a project
+  app.post("/api/projects/:id/images", requireAuth, requireRole("company", "operations_manager", "supervisor", "rope_access_tech", "manager", "ground_crew", "ground_crew_supervisor"), imageUpload.single('file'), async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      if (!req.file) {
+        return res.status(400).json({ message: "No file uploaded" });
+      }
+      
+      // Verify access to this project
+      const hasAccess = await storage.verifyProjectAccess(
+        req.params.id,
+        currentUser.id,
+        currentUser.role,
+        currentUser.companyId
+      );
+      
+      if (!hasAccess) {
+        return res.status(403).json({ message: "Access denied" });
+      }
+      
+      const project = await storage.getProjectById(req.params.id);
+      if (!project) {
+        return res.status(404).json({ message: "Project not found" });
+      }
+      
+      // Determine company ID (company owner or employee's company)
+      const companyId = currentUser.role === "company" ? currentUser.id : (currentUser.companyId ?? project.companyId);
+      
+      // Upload file to object storage
+      const objectStorage = new ObjectStorageService();
+      const fileName = `project-${req.params.id}-${Date.now()}-${req.file.originalname}`;
+      const folder = `company-${companyId}/project-${req.params.id}/photos`;
+      
+      const imageUrl = await objectStorage.uploadFile(
+        req.file.buffer,
+        fileName,
+        req.file.mimetype,
+        folder
+      );
+      
+      // Create photo record in database
+      const photo = await storage.createProjectPhoto({
+        projectId: req.params.id,
+        companyId,
+        uploadedBy: currentUser.id,
+        imageUrl,
+        unitNumber: req.body.unitNumber || null,
+        comment: req.body.comment || null,
+        isMissedUnit: req.body.isMissedUnit === 'true',
+        missedUnitNumber: req.body.isMissedUnit === 'true' ? req.body.missedUnitNumber : null,
+      });
+      
+      res.status(201).json({ photo });
+    } catch (error) {
+      console.error("Upload project photo error:", error);
+      res.status(500).json({ message: "Failed to upload photo" });
+    }
+  });
+
   // Get residents for a project
   app.get("/api/projects/:id/residents", requireAuth, async (req: Request, res: Response) => {
     try {
