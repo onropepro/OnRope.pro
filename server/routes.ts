@@ -2400,7 +2400,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Upload quote photo
-  app.post("/api/quotes/:id/photo", requireAuth, requireRole("company", "operations_manager", "supervisor"), upload.single("photo"), async (req: Request, res: Response) => {
+  app.post("/api/quotes/:id/photo", requireAuth, requireRole("company", "operations_manager", "supervisor"), imageUpload.single("photo"), async (req: Request, res: Response) => {
     try {
       const currentUser = await storage.getUserById(req.session.userId!);
       if (!currentUser) {
