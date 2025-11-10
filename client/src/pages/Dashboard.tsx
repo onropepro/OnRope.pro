@@ -843,10 +843,13 @@ export default function Dashboard() {
       return;
     }
     
+    // Get the daily target from the active session's project
+    const activeProject = projects.find(p => p.id === activeSession.projectId);
+    const sessionDailyTarget = activeProject?.dailyDropTarget || 0;
     const dropsCompleted = parseInt(data.dropsCompleted);
     
     // Validate shortfall reason is required when drops < target
-    if (dropsCompleted < dailyTarget && !data.shortfallReason?.trim()) {
+    if (dropsCompleted < sessionDailyTarget && !data.shortfallReason?.trim()) {
       endDayForm.setError("shortfallReason", {
         message: "Please explain why the daily target wasn't met"
       });
