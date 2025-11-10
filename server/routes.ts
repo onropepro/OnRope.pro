@@ -2426,15 +2426,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Submit quote - Workers submit draft quotes to management
-  app.post("/api/quotes/:id/submit", requireAuth, requireRole("rope_access_tech", "manager", "ground_crew", "ground_crew_supervisor"), async (req: Request, res: Response) => {
+  // Update quote status - Flexible endpoint for status transitions
+  app.patch("/api/quotes/:id/status", requireAuth, requireRole("company", "operations_manager", "supervisor", "rope_access_tech", "manager", "ground_crew", "ground_crew_supervisor"), async (req: Request, res: Response) => {
     try {
+      const statusSchema = z.object({
+        status: z.enum(["draft", "submitted", "open", "approved", "rejected"]),
+      });
+      
+      const { status } = statusSchema.parse(req.body);
+      
       const currentUser = await storage.getUserById(req.session.userId!);
       if (!currentUser) {
         return res.status(404).json({ message: "User not found" });
       }
       
-      const companyId = currentUser.companyId;
+      const companyId = currentUser.role === "company" ? currentUser.id : currentUser.companyId;
       if (!companyId) {
         return res.status(400).json({ message: "Unable to determine company" });
       }
@@ -2449,22 +2455,31 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(403).json({ message: "Forbidden" });
       }
       
-      // Only draft quotes can be submitted
-      if (quote.status !== "draft") {
-        return res.status(400).json({ message: "Only draft quotes can be submitted" });
+      const isManagement = ["company", "operations_manager", "supervisor"].includes(currentUser.role);
+      const isWorker = ["rope_access_tech", "manager", "ground_crew", "ground_crew_supervisor"].includes(currentUser.role);
+      
+      // Permission checks based on role and transition
+      if (status === "submitted") {
+        // Workers can only submit their own drafts
+        if (isWorker && quote.createdBy !== currentUser.id) {
+          return res.status(403).json({ message: "You can only submit quotes you created" });
+        }
+        // Only draft quotes can be submitted
+        if (quote.status !== "draft") {
+          return res.status(400).json({ message: "Only draft quotes can be submitted" });
+        }
+      } else if (status === "open" || status === "approved" || status === "rejected") {
+        // Only management can change to these statuses
+        if (!isManagement) {
+          return res.status(403).json({ message: "Only management can approve, reject, or open quotes" });
+        }
       }
       
-      // Only the creator can submit their own draft
-      if (quote.createdBy !== currentUser.id) {
-        return res.status(403).json({ message: "You can only submit quotes you created" });
-      }
+      const updatedQuote = await storage.updateQuote(req.params.id, { status });
       
-      // Change status from draft to open
-      const updatedQuote = await storage.updateQuote(req.params.id, { status: "open" });
-      
-      res.json({ quote: updatedQuote, message: "Quote submitted successfully" });
+      res.json({ quote: updatedQuote, message: `Quote status updated to ${status}` });
     } catch (error) {
-      console.error("Submit quote error:", error);
+      console.error("Update quote status error:", error);
       res.status(500).json({ message: "Internal server error" });
     }
   });

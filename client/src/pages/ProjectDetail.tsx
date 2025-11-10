@@ -79,6 +79,8 @@ export default function ProjectDetail() {
   const [showEditDialog, setShowEditDialog] = useState(false);
   const [editJobType, setEditJobType] = useState<string>("");
   const [selectedPhoto, setSelectedPhoto] = useState<any>(null);
+  const [showStartDayDialog, setShowStartDayDialog] = useState(false);
+  const [activeSession, setActiveSession] = useState<any>(null);
 
   const { data: projectData, isLoading } = useQuery({
     queryKey: ["/api/projects", id],
@@ -148,6 +150,26 @@ export default function ProjectDetail() {
     enabled: !!id,
   });
 
+  // Check for active work session on this project
+  useEffect(() => {
+    const checkActiveSession = async () => {
+      if (!id) return;
+      try {
+        const response = await fetch(`/api/projects/${id}/my-work-sessions`, {
+          credentials: 'include',
+        });
+        if (response.ok) {
+          const data = await response.json();
+          const activeSess = data.sessions?.find((s: any) => !s.endTime);
+          setActiveSession(activeSess || null);
+        }
+      } catch (error) {
+        console.error("Error checking active session:", error);
+      }
+    };
+    checkActiveSession();
+  }, [id]);
+
   // Safely extract data with error logging
   let project: Project | undefined;
   let workSessions: any[] = [];
@@ -177,6 +199,36 @@ export default function ProjectDetail() {
   const isManagement = currentUser?.role === "company" || 
                        currentUser?.role === "operations_manager" || 
                        currentUser?.role === "supervisor";
+
+  const startDayMutation = useMutation({
+    mutationFn: async (projectId: string) => {
+      const response = await fetch(`/api/projects/${projectId}/work-sessions/start`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({}),
+        credentials: "include",
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || "Failed to start work session");
+      }
+
+      return response.json();
+    },
+    onSuccess: (data) => {
+      setActiveSession(data.session);
+      setShowStartDayDialog(false);
+      queryClient.invalidateQueries({ queryKey: ["/api/projects"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/projects", id] });
+      queryClient.invalidateQueries({ queryKey: ["/api/projects", id, "work-sessions"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/my-drops-today"] });
+      toast({ title: "Work session started", description: "Good luck today!" });
+    },
+    onError: (error: Error) => {
+      toast({ title: "Error", description: error.message, variant: "destructive" });
+    },
+  });
 
   const deleteProjectMutation = useMutation({
     mutationFn: async (projectId: string) => {
@@ -465,6 +517,22 @@ export default function ProjectDetail() {
                 {project.strataPlanNumber} - {project.jobType.replace(/_/g, ' ')}
               </p>
             </div>
+            {/* Start Day Button - Only for workers when no active session exists */}
+            {!activeSession && 
+             project.status === "active" &&
+             (currentUser?.role === "rope_access_tech" || 
+              currentUser?.role === "manager" || 
+              currentUser?.role === "ground_crew" || 
+              currentUser?.role === "ground_crew_supervisor") && (
+              <Button
+                onClick={() => setShowStartDayDialog(true)}
+                className="h-10 bg-primary text-primary-foreground hover:bg-primary/90"
+                data-testid="button-start-day"
+              >
+                <span className="material-icons mr-2 text-base">play_circle</span>
+                Start Day
+              </Button>
+            )}
           </div>
         </div>
       </div>
@@ -1344,6 +1412,33 @@ export default function ProjectDetail() {
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
               Delete Project
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Start Day Confirmation Dialog */}
+      <AlertDialog open={showStartDayDialog} onOpenChange={setShowStartDayDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Start Your Work Day?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This will begin tracking your work session for {project.buildingName}. You can log drops throughout the day and end your session when finished.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel data-testid="button-cancel-start-day">Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => {
+                if (id) {
+                  startDayMutation.mutate(id);
+                }
+              }}
+              data-testid="button-confirm-start-day"
+              disabled={startDayMutation.isPending}
+              className="bg-primary text-primary-foreground hover:bg-primary/90"
+            >
+              {startDayMutation.isPending ? "Starting..." : "Start Day"}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

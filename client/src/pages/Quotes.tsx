@@ -33,6 +33,7 @@ import {
   Search
 } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
@@ -324,13 +325,15 @@ export default function Quotes() {
 
   const submitQuoteMutation = useMutation({
     mutationFn: async (id: string) => {
-      await apiRequest("POST", `/api/quotes/${id}/submit`);
+      await apiRequest("PATCH", `/api/quotes/${id}/status`, { status: "submitted" });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/quotes"] });
       setIsSubmitDialogOpen(false);
       setQuoteToSubmit(null);
-      setView("list");
+      if (selectedQuote) {
+        setSelectedQuote({ ...selectedQuote, status: "submitted" });
+      }
       toast({
         title: "Quote submitted",
         description: "The quote has been submitted to management for review.",
@@ -948,15 +951,35 @@ export default function Quotes() {
                     {selectedQuote.strataPlanNumber}
                   </CardDescription>
                 </div>
-                <Badge
-                  className={`rounded-full px-4 py-2 text-base ${
-                    selectedQuote.status === "open"
-                      ? "bg-[#06B6D4] text-white"
-                      : "bg-[#84CC16] text-white"
-                  }`}
-                >
-                  {selectedQuote.status}
-                </Badge>
+                <div className="flex flex-col gap-2 items-end">
+                  <Badge
+                    className={`rounded-full px-4 py-2 text-base ${
+                      selectedQuote.status === "draft"
+                        ? "bg-[#71717A] text-white"
+                        : selectedQuote.status === "submitted"
+                        ? "bg-[#3B82F6] text-white"
+                        : selectedQuote.status === "open"
+                        ? "bg-[#06B6D4] text-white"
+                        : "bg-[#84CC16] text-white"
+                    }`}
+                    data-testid="badge-quote-status"
+                  >
+                    {selectedQuote.status}
+                  </Badge>
+                  {selectedQuote.status === "draft" && 
+                   (canEditQuotes || selectedQuote.createdBy === currentUser?.id) && (
+                    <Button
+                      onClick={() => {
+                        setQuoteToSubmit(selectedQuote);
+                        setIsSubmitDialogOpen(true);
+                      }}
+                      className="bg-[#3B82F6] hover:bg-[#3B82F6]/90"
+                      data-testid="button-submit-quote"
+                    >
+                      Submit Quote
+                    </Button>
+                  )}
+                </div>
               </div>
               <div className="grid grid-cols-2 gap-4 text-[#71717A]">
                 <div>
@@ -1770,6 +1793,32 @@ export default function Quotes() {
             )}
           </DialogContent>
         </Dialog>
+
+        {/* Submit Quote Confirmation Dialog */}
+        <AlertDialog open={isSubmitDialogOpen} onOpenChange={setIsSubmitDialogOpen}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Submit Quote</AlertDialogTitle>
+              <AlertDialogDescription>
+                Are you sure you want to submit this quote? Once submitted, it will be sent to management for review.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel data-testid="button-cancel-submit">Cancel</AlertDialogCancel>
+              <AlertDialogAction
+                onClick={() => {
+                  if (quoteToSubmit) {
+                    submitQuoteMutation.mutate(quoteToSubmit.id);
+                  }
+                }}
+                className="bg-[#3B82F6] hover:bg-[#3B82F6]/90"
+                data-testid="button-confirm-submit"
+              >
+                Submit Quote
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
 
       </>
     );
