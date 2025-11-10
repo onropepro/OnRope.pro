@@ -2426,7 +2426,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "No photo file uploaded" });
       }
       
-      const photoUrl = await uploadToObjectStorage(req.file.buffer, req.file.originalname, req.file.mimetype);
+      const objectStorageService = new ObjectStorageService();
+      const timestamp = Date.now();
+      const filename = `quotes/${companyId}/${timestamp}-${req.file.originalname}`;
+      const photoUrl = await objectStorageService.uploadPublicFile(
+        filename,
+        req.file.buffer,
+        req.file.mimetype
+      );
       const updatedQuote = await storage.updateQuote(req.params.id, { photoUrl });
       
       res.json({ quote: updatedQuote, photoUrl });
