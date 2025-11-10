@@ -517,13 +517,8 @@ export default function ProjectDetail() {
                 {project.strataPlanNumber} - {project.jobType.replace(/_/g, ' ')}
               </p>
             </div>
-            {/* Start Day Button - Only for workers when no active session exists */}
-            {!activeSession && 
-             project.status === "active" &&
-             (currentUser?.role === "rope_access_tech" || 
-              currentUser?.role === "manager" || 
-              currentUser?.role === "ground_crew" || 
-              currentUser?.role === "ground_crew_supervisor") && (
+            {/* Start Day Button - Available to all users when no active session exists */}
+            {!activeSession && project.status === "active" && (
               <Button
                 onClick={() => setShowStartDayDialog(true)}
                 className="h-10 bg-primary text-primary-foreground hover:bg-primary/90"
