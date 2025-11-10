@@ -915,7 +915,7 @@ export default function Dashboard() {
       icon: "work_history",
       onClick: () => setLocation("/active-workers"),
       testId: "button-active-workers",
-      isVisible: (user: any) => checkIsManagement(user), // Management only
+      isVisible: (user: any) => isManagement(user), // Management only
     },
     {
       id: "complaints",

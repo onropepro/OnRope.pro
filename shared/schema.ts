@@ -157,6 +157,22 @@ export const workSessions = pgTable("work_sessions", {
   index("IDX_work_sessions_employee_project").on(table.employeeId, table.projectId),
 ]);
 
+// Non-billable work sessions table - tracks non-project work (errands, training, etc.)
+export const nonBillableWorkSessions = pgTable("non_billable_work_sessions", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  employeeId: varchar("employee_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  companyId: varchar("company_id").notNull().references(() => users.id, { onDelete: "cascade" }), // For multi-tenant isolation
+  workDate: date("work_date").notNull(), // Date of the work session
+  startTime: timestamp("start_time").notNull(),
+  endTime: timestamp("end_time"), // Null if session is still active
+  description: text("description").notNull(), // What they were doing (errands, training, etc.)
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+}, (table) => [
+  index("IDX_non_billable_sessions_company_date").on(table.companyId, table.workDate),
+  index("IDX_non_billable_sessions_employee").on(table.employeeId),
+]);
+
 // Complaints table
 export const complaints = pgTable("complaints", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
@@ -640,6 +656,12 @@ export const insertWorkSessionSchema = createInsertSchema(workSessions).omit({
   updatedAt: true,
 });
 
+export const insertNonBillableWorkSessionSchema = createInsertSchema(nonBillableWorkSessions).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
 export const insertComplaintSchema = createInsertSchema(complaints).omit({
   id: true,
   createdAt: true,
@@ -709,6 +731,9 @@ export type InsertDropLog = z.infer<typeof insertDropLogSchema>;
 
 export type WorkSession = typeof workSessions.$inferSelect;
 export type InsertWorkSession = z.infer<typeof insertWorkSessionSchema>;
+
+export type NonBillableWorkSession = typeof nonBillableWorkSessions.$inferSelect;
+export type InsertNonBillableWorkSession = z.infer<typeof insertNonBillableWorkSessionSchema>;
 
 export type Complaint = typeof complaints.$inferSelect;
 export type InsertComplaint = z.infer<typeof insertComplaintSchema>;
