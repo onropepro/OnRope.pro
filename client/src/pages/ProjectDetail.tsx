@@ -260,10 +260,19 @@ export default function ProjectDetail() {
     mutationFn: async (data: EndDayFormData) => {
       if (!activeSession) throw new Error("No active session");
       
+      // Convert string values to numbers for backend
+      const payload = {
+        dropsCompletedNorth: parseInt(data.dropsCompletedNorth || "0"),
+        dropsCompletedEast: parseInt(data.dropsCompletedEast || "0"),
+        dropsCompletedSouth: parseInt(data.dropsCompletedSouth || "0"),
+        dropsCompletedWest: parseInt(data.dropsCompletedWest || "0"),
+        shortfallReason: data.shortfallReason,
+      };
+      
       const response = await fetch(`/api/projects/${id}/work-sessions/${activeSession.id}/end`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
+        body: JSON.stringify(payload),
         credentials: "include",
       });
 
