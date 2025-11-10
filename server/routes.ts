@@ -2144,9 +2144,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const canViewFinancialData = currentUser.role === "company" || 
                                     currentUser.permissions?.includes("view_financial_data");
       
+      // Determine initial status based on user role
+      // Workers create drafts, management creates open quotes
+      const isWorker = ["rope_access_tech", "manager", "ground_crew", "ground_crew_supervisor"].includes(currentUser.role);
+      const initialStatus = isWorker ? "draft" : "open";
+      
       const quoteData = insertQuoteSchema.parse({
         ...quoteFields,
         companyId,
+        createdBy: currentUser.id,
+        status: initialStatus,
       });
       
       // Create the quote
@@ -2210,7 +2217,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
                                     currentUser.permissions?.includes("view_financial_data");
       
       const status = req.query.status as string | undefined;
-      const quotes = await storage.getQuotesByCompany(companyId, status);
+      let quotes = await storage.getQuotesByCompany(companyId, status);
+      
+      // Workers can only see their own draft quotes
+      const isWorker = ["rope_access_tech", "manager", "ground_crew", "ground_crew_supervisor"].includes(currentUser.role);
+      if (isWorker) {
+        quotes = quotes.filter(quote => quote.status === "draft" && quote.createdBy === currentUser.id);
+      }
       
       // Filter pricing data if user doesn't have financial permissions
       const filteredQuotes = canViewFinancialData ? quotes : quotes.map(quote => ({
@@ -2257,6 +2270,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       if (quote.companyId !== companyId) {
         return res.status(403).json({ message: "Forbidden" });
+      }
+      
+      // Workers can only view their own draft quotes
+      const isWorker = ["rope_access_tech", "manager", "ground_crew", "ground_crew_supervisor"].includes(currentUser.role);
+      if (isWorker && (quote.status !== "draft" || quote.createdBy !== currentUser.id)) {
+        return res.status(403).json({ message: "You can only view your own draft quotes" });
       }
       
       // Filter pricing data if user doesn't have financial permissions
@@ -2395,6 +2414,49 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({ message: "Quote deleted successfully" });
     } catch (error) {
       console.error("Delete quote error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Submit quote - Workers submit draft quotes to management
+  app.post("/api/quotes/:id/submit", requireAuth, requireRole("rope_access_tech", "manager", "ground_crew", "ground_crew_supervisor"), async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      const companyId = currentUser.companyId;
+      if (!companyId) {
+        return res.status(400).json({ message: "Unable to determine company" });
+      }
+      
+      const quote = await storage.getQuoteById(req.params.id);
+      
+      if (!quote) {
+        return res.status(404).json({ message: "Quote not found" });
+      }
+      
+      if (quote.companyId !== companyId) {
+        return res.status(403).json({ message: "Forbidden" });
+      }
+      
+      // Only draft quotes can be submitted
+      if (quote.status !== "draft") {
+        return res.status(400).json({ message: "Only draft quotes can be submitted" });
+      }
+      
+      // Only the creator can submit their own draft
+      if (quote.createdBy !== currentUser.id) {
+        return res.status(403).json({ message: "You can only submit quotes you created" });
+      }
+      
+      // Change status from draft to open
+      const updatedQuote = await storage.updateQuote(req.params.id, { status: "open" });
+      
+      res.json({ quote: updatedQuote, message: "Quote submitted successfully" });
+    } catch (error) {
+      console.error("Submit quote error:", error);
       res.status(500).json({ message: "Internal server error" });
     }
   });
