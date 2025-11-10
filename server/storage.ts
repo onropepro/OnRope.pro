@@ -777,9 +777,34 @@ export class Storage {
       )
       .orderBy(workSessions.employeeId, workSessions.workDate);
 
+    // Get all non-billable work sessions within the pay period
+    const nonBillableSessions = await db
+      .select({
+        sessionId: nonBillableWorkSessions.id,
+        employeeId: nonBillableWorkSessions.employeeId,
+        startTime: nonBillableWorkSessions.startTime,
+        endTime: nonBillableWorkSessions.endTime,
+        workDate: nonBillableWorkSessions.workDate,
+        description: nonBillableWorkSessions.description,
+        employeeName: users.name,
+        hourlyRate: users.hourlyRate,
+      })
+      .from(nonBillableWorkSessions)
+      .leftJoin(users, eq(nonBillableWorkSessions.employeeId, users.id))
+      .where(
+        and(
+          eq(nonBillableWorkSessions.companyId, companyId),
+          gte(nonBillableWorkSessions.workDate, startDate),
+          lte(nonBillableWorkSessions.workDate, endDate),
+          not(isNull(nonBillableWorkSessions.endTime))
+        )
+      )
+      .orderBy(nonBillableWorkSessions.employeeId, nonBillableWorkSessions.workDate);
+
     // Group by employee and calculate totals
     const employeeMap = new Map<string, EmployeeHoursSummary>();
 
+    // Process billable sessions
     for (const session of sessions) {
       if (!session.employeeId || !session.employeeName || !session.startTime || !session.endTime) continue;
 
@@ -816,6 +841,46 @@ export class Storage {
         createdAt: new Date(),
         updatedAt: new Date(),
         projectName: session.projectName || 'Unknown Project',
+      } as any);
+    }
+
+    // Process non-billable sessions
+    for (const session of nonBillableSessions) {
+      if (!session.employeeId || !session.employeeName || !session.startTime || !session.endTime) continue;
+
+      const hours = (new Date(session.endTime).getTime() - new Date(session.startTime).getTime()) / (1000 * 60 * 60);
+      const rate = parseFloat(session.hourlyRate || '0');
+
+      if (!employeeMap.has(session.employeeId)) {
+        employeeMap.set(session.employeeId, {
+          employeeId: session.employeeId,
+          employeeName: session.employeeName,
+          hourlyRate: session.hourlyRate || '0',
+          totalHours: 0,
+          totalPay: 0,
+          sessions: [],
+        });
+      }
+
+      const summary = employeeMap.get(session.employeeId)!;
+      summary.totalHours += hours;
+      summary.totalPay += hours * rate;
+      summary.sessions.push({
+        id: session.sessionId,
+        projectId: null,
+        employeeId: session.employeeId,
+        companyId: companyId,
+        workDate: session.workDate,
+        startTime: session.startTime,
+        endTime: session.endTime,
+        dropsCompletedNorth: 0,
+        dropsCompletedEast: 0,
+        dropsCompletedSouth: 0,
+        dropsCompletedWest: 0,
+        shortfallReason: null,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        projectName: `Non-Billable: ${session.description || 'Other'}`,
       } as any);
     }
 
