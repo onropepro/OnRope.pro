@@ -150,7 +150,6 @@ export default function Quotes() {
       buildingName: "",
       strataPlanNumber: "",
       buildingAddress: "",
-      floorCount: 1,
     },
   });
 
@@ -274,11 +273,11 @@ export default function Quotes() {
     
     serviceForm.reset({
       serviceType: serviceId,
-      dropsNorth: existingConfig?.dropsNorth ?? 0,
-      dropsEast: existingConfig?.dropsEast ?? 0,
-      dropsSouth: existingConfig?.dropsSouth ?? 0,
-      dropsWest: existingConfig?.dropsWest ?? 0,
-      dropsPerDay: existingConfig?.dropsPerDay ?? 1,
+      dropsNorth: existingConfig?.dropsNorth,
+      dropsEast: existingConfig?.dropsEast,
+      dropsSouth: existingConfig?.dropsSouth,
+      dropsWest: existingConfig?.dropsWest,
+      dropsPerDay: existingConfig?.dropsPerDay,
       parkadeStalls: existingConfig?.parkadeStalls,
       pricePerStall: existingConfig?.pricePerStall,
       groundWindowHours: existingConfig?.groundWindowHours,
@@ -288,7 +287,7 @@ export default function Quotes() {
       dryerVentUnits: existingConfig?.dryerVentUnits,
       dryerVentPricePerUnit: existingConfig?.dryerVentPricePerUnit,
       simpleServiceHours: existingConfig?.simpleServiceHours,
-      pricePerHour: existingConfig?.pricePerHour ?? 0,
+      pricePerHour: existingConfig?.pricePerHour,
       totalHours: existingConfig?.totalHours,
       totalCost: existingConfig?.totalCost,
     });
