@@ -1635,6 +1635,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "You already have an active non-billable session" });
       }
       
+      console.log("Creating non-billable session with data:", {
+        employeeId: currentUser.id,
+        companyId: currentUser.companyId || currentUser.id,
+        workDate: new Date().toISOString().split('T')[0],
+        startTime: new Date().toISOString(),
+        endTime: null,
+        description: req.body.description,
+      });
+      
       const session = await storage.createNonBillableWorkSession({
         employeeId: currentUser.id,
         companyId: currentUser.companyId || currentUser.id,
@@ -1644,9 +1653,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         description: req.body.description,
       });
       
+      console.log("Session created successfully:", session);
       res.json({ session });
     } catch (error) {
       console.error("Start non-billable session error:", error);
+      console.error("Error stack:", (error as Error).stack);
       res.status(500).json({ message: "Internal server error" });
     }
   });
