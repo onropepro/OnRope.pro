@@ -5,6 +5,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Link } from "wouter";
 import { queryClient, apiRequest } from "@/lib/queryClient";
+import { hasFinancialAccess, isManagement, hasPermission } from "@/lib/permissions";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
@@ -193,13 +194,11 @@ export default function Quotes() {
 
   const currentUser = userData?.user;
   
-  // Check if user can view financial data (company owner OR has permission)
-  const canViewFinancialData = currentUser?.role === "company" || 
-                                currentUser?.permissions?.includes("view_financial_data");
+  // Check if user can view financial data using centralized permission helper
+  const canViewFinancialData = hasFinancialAccess(currentUser);
   
-  // Check if user can edit quotes (management OR has permission)
-  const canEditQuotes = ["company", "operations_manager", "supervisor"].includes(currentUser?.role || "") ||
-                        currentUser?.permissions?.includes("edit_quotes");
+  // Check if user can edit quotes using centralized permission helpers
+  const canEditQuotes = isManagement(currentUser) || hasPermission(currentUser, 'edit_quotes');
 
   // Fetch quotes
   const { data: quotesData, isLoading } = useQuery<{ quotes: QuoteWithServices[] }>({
