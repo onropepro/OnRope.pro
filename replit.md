@@ -49,3 +49,6 @@ The platform is built with a **mobile-first approach** and features a modern, pr
 - **Shadcn:** UI component library.
 - **Tailwind CSS:** Utility-first CSS framework.
 - **Material Icons:** Icon library.
+
+## Future Features (To-Do)
+- **Employee Personal Timesheet View:** A dedicated page where employees can view their own work hours (billable + non-billable), current pay period dates, total hours for current pay period, and their hourly rate. This would be separate from the management Payroll page.
