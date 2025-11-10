@@ -200,7 +200,7 @@ export default function Quotes() {
   // Check if user can edit quotes using centralized permission helpers
   const canEditQuotes = isManagement(currentUser) || hasPermission(currentUser, 'edit_quotes');
 
-  // Fetch quotes
+  // Fetch quotes - backend filters financial data for unauthorized users
   const { data: quotesData, isLoading } = useQuery<{ quotes: QuoteWithServices[] }>({
     queryKey: ["/api/quotes"],
   });

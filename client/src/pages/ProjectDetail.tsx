@@ -83,11 +83,6 @@ export default function ProjectDetail() {
   const [showStartDayDialog, setShowStartDayDialog] = useState(false);
   const [activeSession, setActiveSession] = useState<any>(null);
 
-  const { data: projectData, isLoading } = useQuery({
-    queryKey: ["/api/projects", id],
-    enabled: !!id,
-  });
-
   const { data: userData } = useQuery({
     queryKey: ["/api/user"],
   });
@@ -96,11 +91,17 @@ export default function ProjectDetail() {
   
   // Check if user can view financial data using centralized permission helper
   const canViewFinancialData = hasFinancialAccess(currentUser);
+
+  // Fetch project details - backend filters financial data (estimatedHours) for unauthorized users
+  const { data: projectData, isLoading } = useQuery({
+    queryKey: ["/api/projects", id],
+    enabled: !!id,
+  });
   
   // Check if user can view work history using centralized permission helper
   const canViewWorkHistory = checkIsManagement(currentUser) || hasPermission(currentUser, 'view_work_history');
 
-  // Fetch work sessions for this project
+  // Fetch work sessions - backend filters financial data (techHourlyRate) for unauthorized users
   const { data: workSessionsData } = useQuery({
     queryKey: ["/api/projects", id, "work-sessions"],
     enabled: !!id,

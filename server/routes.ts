@@ -922,6 +922,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "Project not found" });
       }
       
+      // Check if user has financial permissions
+      const canViewFinancialData = currentUser.role === "company" || 
+                                    currentUser.role === "operations_manager" || 
+                                    currentUser.role === "supervisor" || 
+                                    currentUser.permissions?.includes("view_financial_data");
+      
       // Add completed drops (total and per-elevation) to the project
       const { north, east, south, west, total } = await storage.getProjectProgress(project.id);
       const projectWithProgress = {
@@ -933,8 +939,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
         completedDropsWest: west,
       };
       
+      // Filter financial data if user doesn't have financial permissions
+      const filteredProject = canViewFinancialData ? projectWithProgress : {
+        ...projectWithProgress,
+        estimatedHours: null,
+      };
+      
       res.set('Cache-Control', 'no-store, no-cache, must-revalidate, private');
-      res.json({ project: projectWithProgress });
+      res.json({ project: filteredProject });
     } catch (error) {
       console.error("Get project error:", error);
       res.status(500).json({ message: "Internal server error" });
@@ -1353,8 +1365,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(403).json({ message: "Access denied" });
       }
       
+      // Check if user has financial permissions
+      const canViewFinancialData = currentUser.role === "company" || 
+                                    currentUser.role === "operations_manager" || 
+                                    currentUser.role === "supervisor" || 
+                                    currentUser.permissions?.includes("view_financial_data");
+      
       const sessions = await storage.getWorkSessionsByProject(req.params.projectId, companyId);
-      res.json({ sessions });
+      
+      // Filter financial data if user doesn't have financial permissions
+      const filteredSessions = canViewFinancialData ? sessions : sessions.map(session => ({
+        ...session,
+        techHourlyRate: null,
+      }));
+      
+      res.json({ sessions: filteredSessions });
     } catch (error) {
       console.error("Get work sessions error:", error);
       res.status(500).json({ message: "Internal server error" });
