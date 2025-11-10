@@ -88,7 +88,8 @@ export default function ToolboxMeetingForm() {
     queryKey: ["/api/employees"],
   });
 
-  const employees = employeesData?.employees || [];
+  // Filter out terminated employees
+  const employees = (employeesData?.employees || []).filter(emp => !emp.terminationDate);
 
   const form = useForm<ToolboxMeetingFormValues>({
     resolver: zodResolver(toolboxMeetingFormSchema),
