@@ -691,6 +691,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       let photos = await storage.getProjectPhotos(projectId);
+      console.log(`[PHOTOS DEBUG] Fetched ${photos.length} photos for project ${projectId}`);
+      console.log(`[PHOTOS DEBUG] First photo:`, photos[0]);
       
       // Filter photos for residents to only show their unit
       if (currentUser.role === "resident" && currentUser.unitNumber) {
