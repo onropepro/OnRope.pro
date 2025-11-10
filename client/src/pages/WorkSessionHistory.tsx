@@ -31,9 +31,16 @@ export default function WorkSessionHistory() {
     enabled: !!projectId,
   });
 
+  // Fetch all non-billable sessions for the company (management only)
+  const { data: nonBillableData } = useQuery({
+    queryKey: ["/api/non-billable-sessions"],
+    enabled: !!userData?.user && (userData.user.role === "company" || userData.user.role === "operations_manager" || userData.user.role === "supervisor"),
+  });
+
   const user = userData?.user;
   const project = projectData?.project;
   const workSessions = workSessionsData?.sessions || [];
+  const nonBillableSessions = nonBillableData?.sessions || [];
   
   // Check if user is management (show pie chart only for management)
   const isManagement = user?.role === "company" || 
@@ -88,6 +95,29 @@ export default function WorkSessionHistory() {
   const pieData = [
     { name: "Target Met", value: targetMetCount, color: "hsl(var(--primary))" },
     { name: "Below Target", value: belowTargetCount, color: "hsl(var(--destructive))" },
+  ];
+
+  // Calculate billable vs non-billable hours
+  const billableHours = completedSessions.reduce((sum: number, session: any) => {
+    if (session.startTime && session.endTime) {
+      const hours = (new Date(session.endTime).getTime() - new Date(session.startTime).getTime()) / (1000 * 60 * 60);
+      return sum + hours;
+    }
+    return sum;
+  }, 0);
+
+  const completedNonBillable = nonBillableSessions.filter((s: any) => s.endTime !== null);
+  const nonBillableHours = completedNonBillable.reduce((sum: number, session: any) => {
+    if (session.startTime && session.endTime) {
+      const hours = (new Date(session.endTime).getTime() - new Date(session.startTime).getTime()) / (1000 * 60 * 60);
+      return sum + hours;
+    }
+    return sum;
+  }, 0);
+
+  const hoursData = [
+    { name: "Billable Hours", value: parseFloat(billableHours.toFixed(2)), color: "hsl(var(--primary))" },
+    { name: "Non-Billable Hours", value: parseFloat(nonBillableHours.toFixed(2)), color: "hsl(var(--chart-2))" },
   ];
 
   return (
@@ -183,6 +213,54 @@ export default function WorkSessionHistory() {
                     <div className="text-2xl font-bold text-destructive">{belowTargetCount}</div>
                     <div className="text-sm text-muted-foreground">Below Target</div>
                   </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Billable vs Non-Billable Hours Chart - Management Only */}
+        {isManagement && (billableHours > 0 || nonBillableHours > 0) && (
+          <Card>
+            <CardHeader>
+              <CardTitle>Hours Breakdown</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="flex flex-col items-center">
+                <ResponsiveContainer width="100%" height={300}>
+                  <PieChart>
+                    <Pie
+                      data={hoursData}
+                      cx="50%"
+                      cy="50%"
+                      labelLine={false}
+                      label={({ name, value, percent }) => 
+                        `${name}: ${value}h (${(percent * 100).toFixed(0)}%)`
+                      }
+                      outerRadius={80}
+                      fill="#8884d8"
+                      dataKey="value"
+                    >
+                      {hoursData.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={entry.color} />
+                      ))}
+                    </Pie>
+                    <Tooltip />
+                    <Legend />
+                  </PieChart>
+                </ResponsiveContainer>
+                <div className="grid grid-cols-2 gap-4 mt-4 w-full max-w-sm">
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-primary">{billableHours.toFixed(2)}h</div>
+                    <div className="text-sm text-muted-foreground">Billable Hours</div>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-2xl font-bold" style={{ color: "hsl(var(--chart-2))" }}>{nonBillableHours.toFixed(2)}h</div>
+                    <div className="text-sm text-muted-foreground">Non-Billable Hours</div>
+                  </div>
+                </div>
+                <div className="mt-4 text-center">
+                  <div className="text-lg font-semibold">Total Hours: {(billableHours + nonBillableHours).toFixed(2)}h</div>
                 </div>
               </div>
             </CardContent>
