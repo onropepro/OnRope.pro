@@ -209,6 +209,53 @@ export default function Login() {
               </form>
             </Form>
 
+            {/* Quick Test Login Buttons */}
+            <div className="space-y-2">
+              <div className="text-xs text-center text-muted-foreground font-medium">Quick Test Login</div>
+              <div className="grid grid-cols-2 gap-2">
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  className="h-9 text-xs"
+                  onClick={async () => {
+                    const response = await fetch("/api/login", {
+                      method: "POST",
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify({ identifier: "tommy@tommy.com", password: "tommy123" }),
+                      credentials: "include",
+                    });
+                    if (response.ok) {
+                      window.location.href = "/dashboard";
+                    }
+                  }}
+                  data-testid="button-quick-login-tommy"
+                >
+                  <span className="material-icons mr-1 text-sm">person</span>
+                  Tommy
+                </Button>
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  className="h-9 text-xs"
+                  onClick={async () => {
+                    const response = await fetch("/api/login", {
+                      method: "POST",
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify({ identifier: "PHS", password: "phs2025" }),
+                      credentials: "include",
+                    });
+                    if (response.ok) {
+                      window.location.href = "/dashboard";
+                    }
+                  }}
+                  data-testid="button-quick-login-management"
+                >
+                  <span className="material-icons mr-1 text-sm">business</span>
+                  Management
+                </Button>
+              </div>
+            </div>
+
             <div className="relative">
               <div className="absolute inset-0 flex items-center">
                 <span className="w-full border-t" />
