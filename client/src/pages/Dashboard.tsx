@@ -137,6 +137,21 @@ const employeeSchema = z.object({
   techLevel: z.string().optional(),
   hourlyRate: z.string().optional(),
   permissions: z.array(z.string()).default([]),
+  // New employee details
+  startDate: z.string().optional(),
+  birthday: z.string().optional(),
+  driversLicenseNumber: z.string().optional(),
+  driversLicenseProvince: z.string().optional(),
+  homeAddress: z.string().optional(),
+  employeePhoneNumber: z.string().optional(),
+  emergencyContactName: z.string().optional(),
+  emergencyContactPhone: z.string().optional(),
+  specialMedicalConditions: z.string().optional(),
+  // IRATA fields
+  irataLevel: z.string().optional(),
+  irataLicenseNumber: z.string().optional(),
+  irataIssuedDate: z.string().optional(),
+  irataExpirationDate: z.string().optional(),
 }).refine((data) => {
   if (data.role === "rope_access_tech" && !data.techLevel) {
     return false;
@@ -154,6 +169,23 @@ const editEmployeeSchema = z.object({
   techLevel: z.string().optional(),
   hourlyRate: z.string().optional(),
   permissions: z.array(z.string()).default([]),
+  // New employee details
+  startDate: z.string().optional(),
+  birthday: z.string().optional(),
+  driversLicenseNumber: z.string().optional(),
+  driversLicenseProvince: z.string().optional(),
+  homeAddress: z.string().optional(),
+  employeePhoneNumber: z.string().optional(),
+  emergencyContactName: z.string().optional(),
+  emergencyContactPhone: z.string().optional(),
+  specialMedicalConditions: z.string().optional(),
+  // IRATA fields
+  irataLevel: z.string().optional(),
+  irataLicenseNumber: z.string().optional(),
+  irataIssuedDate: z.string().optional(),
+  irataExpirationDate: z.string().optional(),
+  // Termination
+  terminatedDate: z.string().optional(),
 }).refine((data) => {
   if (data.role === "rope_access_tech" && !data.techLevel) {
     return false;
@@ -212,6 +244,9 @@ export default function Dashboard() {
   const [isUploadingPlan, setIsUploadingPlan] = useState(false);
   const [selectedInspection, setSelectedInspection] = useState<any>(null);
   const [selectedMeeting, setSelectedMeeting] = useState<any>(null);
+  const [employeeFormStep, setEmployeeFormStep] = useState<1 | 2>(1); // Track form step (1 = info, 2 = permissions)
+  const [editEmployeeFormStep, setEditEmployeeFormStep] = useState<1 | 2>(1); // Track edit form step
+  const [showTerminationConfirm, setShowTerminationConfirm] = useState(false); // Confirmation for termination
   const { toast } = useToast();
   const [, setLocation] = useLocation();
 
@@ -313,6 +348,19 @@ export default function Dashboard() {
       techLevel: "",
       hourlyRate: "",
       permissions: [],
+      startDate: "",
+      birthday: "",
+      driversLicenseNumber: "",
+      driversLicenseProvince: "",
+      homeAddress: "",
+      employeePhoneNumber: "",
+      emergencyContactName: "",
+      emergencyContactPhone: "",
+      specialMedicalConditions: "",
+      irataLevel: "",
+      irataLicenseNumber: "",
+      irataIssuedDate: "",
+      irataExpirationDate: "",
     },
   });
 
@@ -325,6 +373,20 @@ export default function Dashboard() {
       techLevel: "",
       hourlyRate: "",
       permissions: [],
+      startDate: "",
+      birthday: "",
+      driversLicenseNumber: "",
+      driversLicenseProvince: "",
+      homeAddress: "",
+      employeePhoneNumber: "",
+      emergencyContactName: "",
+      emergencyContactPhone: "",
+      specialMedicalConditions: "",
+      irataLevel: "",
+      irataLicenseNumber: "",
+      irataIssuedDate: "",
+      irataExpirationDate: "",
+      terminatedDate: "",
     },
   });
 
@@ -463,6 +525,20 @@ export default function Dashboard() {
         techLevel: data.techLevel,
         hourlyRate: data.hourlyRate,
         permissions: data.permissions,
+        startDate: data.startDate,
+        birthday: data.birthday,
+        driversLicenseNumber: data.driversLicenseNumber,
+        driversLicenseProvince: data.driversLicenseProvince,
+        homeAddress: data.homeAddress,
+        employeePhoneNumber: data.employeePhoneNumber,
+        emergencyContactName: data.emergencyContactName,
+        emergencyContactPhone: data.emergencyContactPhone,
+        specialMedicalConditions: data.specialMedicalConditions,
+        irataLevel: data.irataLevel,
+        irataLicenseNumber: data.irataLicenseNumber,
+        irataIssuedDate: data.irataIssuedDate,
+        irataExpirationDate: data.irataExpirationDate,
+        terminatedDate: data.terminatedDate,
       });
 
       return response;
@@ -550,7 +626,22 @@ export default function Dashboard() {
       techLevel: employee.techLevel || "",
       hourlyRate: employee.hourlyRate || "",
       permissions: employee.permissions || [],
+      startDate: employee.startDate || "",
+      birthday: employee.birthday || "",
+      driversLicenseNumber: employee.driversLicenseNumber || "",
+      driversLicenseProvince: employee.driversLicenseProvince || "",
+      homeAddress: employee.homeAddress || "",
+      employeePhoneNumber: employee.employeePhoneNumber || "",
+      emergencyContactName: employee.emergencyContactName || "",
+      emergencyContactPhone: employee.emergencyContactPhone || "",
+      specialMedicalConditions: employee.specialMedicalConditions || "",
+      irataLevel: employee.irataLevel || "",
+      irataLicenseNumber: employee.irataLicenseNumber || "",
+      irataIssuedDate: employee.irataIssuedDate || "",
+      irataExpirationDate: employee.irataExpirationDate || "",
+      terminatedDate: employee.terminatedDate || "",
     });
+    setEditEmployeeFormStep(1); // Reset to first step
     setShowEditEmployeeDialog(true);
   };
 

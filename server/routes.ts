@@ -338,7 +338,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Unable to determine company" });
       }
       
-      const { name, email, password, role, techLevel, hourlyRate, permissions } = req.body;
+      const { 
+        name, email, password, role, techLevel, hourlyRate, permissions,
+        startDate, birthday, driversLicenseNumber, driversLicenseProvince,
+        homeAddress, employeePhoneNumber, emergencyContactName, emergencyContactPhone,
+        specialMedicalConditions, irataLevel, irataLicenseNumber, irataIssuedDate, irataExpirationDate
+      } = req.body;
       
       if (!password || password.length < 6) {
         return res.status(400).json({ message: "Password must be at least 6 characters" });
@@ -355,6 +360,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
         permissions: permissions || [],
         companyId, // Link employee to this company
         passwordHash: password, // Storage will hash this
+        startDate: startDate || null,
+        birthday: birthday || null,
+        driversLicenseNumber: driversLicenseNumber || null,
+        driversLicenseProvince: driversLicenseProvince || null,
+        homeAddress: homeAddress || null,
+        employeePhoneNumber: employeePhoneNumber || null,
+        emergencyContactName: emergencyContactName || null,
+        emergencyContactPhone: emergencyContactPhone || null,
+        specialMedicalConditions: specialMedicalConditions || null,
+        irataLevel: irataLevel || null,
+        irataLicenseNumber: irataLicenseNumber || null,
+        irataIssuedDate: irataIssuedDate || null,
+        irataExpirationDate: irataExpirationDate || null,
       });
       
       const { passwordHash: _, ...employeeWithoutPassword } = employee;
@@ -393,7 +411,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(403).json({ message: "Access denied" });
       }
       
-      const { name, email, role, techLevel, hourlyRate, permissions } = req.body;
+      const { 
+        name, email, role, techLevel, hourlyRate, permissions,
+        startDate, birthday, driversLicenseNumber, driversLicenseProvince,
+        homeAddress, employeePhoneNumber, emergencyContactName, emergencyContactPhone,
+        specialMedicalConditions, irataLevel, irataLicenseNumber, irataIssuedDate, 
+        irataExpirationDate, terminatedDate
+      } = req.body;
       
       // Update employee
       const updatedEmployee = await storage.updateUser(req.params.id, {
@@ -403,6 +427,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
         techLevel: role === "rope_access_tech" ? techLevel : null,
         hourlyRate: hourlyRate ? hourlyRate : null,
         permissions: permissions || [],
+        startDate: startDate !== undefined ? (startDate || null) : undefined,
+        birthday: birthday !== undefined ? (birthday || null) : undefined,
+        driversLicenseNumber: driversLicenseNumber !== undefined ? (driversLicenseNumber || null) : undefined,
+        driversLicenseProvince: driversLicenseProvince !== undefined ? (driversLicenseProvince || null) : undefined,
+        homeAddress: homeAddress !== undefined ? (homeAddress || null) : undefined,
+        employeePhoneNumber: employeePhoneNumber !== undefined ? (employeePhoneNumber || null) : undefined,
+        emergencyContactName: emergencyContactName !== undefined ? (emergencyContactName || null) : undefined,
+        emergencyContactPhone: emergencyContactPhone !== undefined ? (emergencyContactPhone || null) : undefined,
+        specialMedicalConditions: specialMedicalConditions !== undefined ? (specialMedicalConditions || null) : undefined,
+        irataLevel: irataLevel !== undefined ? (irataLevel || null) : undefined,
+        irataLicenseNumber: irataLicenseNumber !== undefined ? (irataLicenseNumber || null) : undefined,
+        irataIssuedDate: irataIssuedDate !== undefined ? (irataIssuedDate || null) : undefined,
+        irataExpirationDate: irataExpirationDate !== undefined ? (irataExpirationDate || null) : undefined,
+        terminatedDate: terminatedDate !== undefined ? (terminatedDate || null) : undefined,
       });
       
       const { passwordHash: _, ...employeeWithoutPassword } = updatedEmployee;

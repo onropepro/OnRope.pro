@@ -59,6 +59,26 @@ export const users = pgTable("users", {
   permissions: text("permissions").array().default(sql`ARRAY[]::text[]`), // Array of permission strings for employees
   isTempPassword: boolean("is_temp_password").default(false),
   
+  // Additional employee details
+  startDate: date("start_date"), // Employee start date
+  birthday: date("birthday"), // Employee date of birth (optional)
+  driversLicenseNumber: varchar("drivers_license_number"), // Driver's license number (optional)
+  driversLicenseProvince: varchar("drivers_license_province"), // Province where driver's license was issued (optional)
+  homeAddress: text("home_address"), // Home address (optional)
+  employeePhoneNumber: varchar("employee_phone_number"), // Employee phone number (optional, separate from resident phoneNumber)
+  emergencyContactName: varchar("emergency_contact_name"), // Emergency contact name (optional)
+  emergencyContactPhone: varchar("emergency_contact_phone"), // Emergency contact phone (optional)
+  specialMedicalConditions: text("special_medical_conditions"), // Special medical conditions (optional)
+  
+  // IRATA certification fields (optional)
+  irataLevel: varchar("irata_level"), // IRATA level (e.g., "Level 1", "Level 2", "Level 3")
+  irataLicenseNumber: varchar("irata_license_number"), // IRATA license number
+  irataIssuedDate: date("irata_issued_date"), // IRATA certification issue date
+  irataExpirationDate: date("irata_expiration_date"), // IRATA certification expiration date
+  
+  // Employment termination
+  terminatedDate: date("terminated_date"), // Date employment was terminated (optional)
+  
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
