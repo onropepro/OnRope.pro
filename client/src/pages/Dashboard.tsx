@@ -182,7 +182,7 @@ type EditEmployeeFormData = z.infer<typeof editEmployeeSchema>;
 type DropLogFormData = z.infer<typeof dropLogSchema>;
 type EndDayFormData = z.infer<typeof endDaySchema>;
 
-export default function ManagementDashboard() {
+export default function Dashboard() {
   const [activeTab, setActiveTab] = useState("");
 
   // Scroll to top when changing tabs

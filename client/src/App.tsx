@@ -9,7 +9,7 @@ import Register from "@/pages/Register";
 import Login from "@/pages/Login";
 import ResidentDashboard from "@/pages/ResidentDashboard";
 import TechDashboard from "@/pages/TechDashboard";
-import ManagementDashboard from "@/pages/ManagementDashboard";
+import Dashboard from "@/pages/Dashboard";
 import ComplaintDetail from "@/pages/ComplaintDetail";
 import WorkSessionHistory from "@/pages/WorkSessionHistory";
 import ProjectDetail from "@/pages/ProjectDetail";
@@ -39,7 +39,7 @@ function Router() {
       </Route>
       <Route path="/management">
         <ProtectedRoute allowedRoles={["company", "operations_manager", "supervisor"]}>
-          <ManagementDashboard />
+          <Dashboard />
         </ProtectedRoute>
       </Route>
       <Route path="/complaints/:id">
