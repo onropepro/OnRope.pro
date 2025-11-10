@@ -136,7 +136,7 @@ export default function Profile() {
     } else if (user?.role === "rope_access_tech") {
       setLocation("/tech");
     } else {
-      setLocation("/management");
+      setLocation("/dashboard");
     }
   };
 

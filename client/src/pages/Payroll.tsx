@@ -250,7 +250,7 @@ export default function Payroll() {
         <Button
           variant="ghost"
           size="icon"
-          onClick={() => setLocation('/management')}
+          onClick={() => setLocation('/dashboard')}
           data-testid="button-back"
         >
           <ArrowLeft className="h-5 w-5" />

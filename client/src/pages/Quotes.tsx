@@ -622,7 +622,7 @@ export default function Quotes() {
       return (
         <div className="min-h-screen bg-[#FAFAFA] p-4 md:p-8">
           <div className="max-w-7xl mx-auto">
-            <Link href="/management">
+            <Link href="/dashboard">
               <Button
                 variant="ghost"
                 className="mb-6"
@@ -776,7 +776,7 @@ export default function Quotes() {
     return (
       <div className="min-h-screen bg-[#FAFAFA] p-4 md:p-8">
         <div className="max-w-7xl mx-auto">
-          <Link href="/management">
+          <Link href="/dashboard">
             <Button
               variant="ghost"
               className="mb-6"

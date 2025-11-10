@@ -246,7 +246,7 @@ export default function ProjectDetail() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/projects"] });
       toast({ title: "Project deleted successfully" });
-      setLocation("/management");
+      setLocation("/dashboard");
     },
     onError: (error: Error) => {
       toast({ title: "Error", description: error.message, variant: "destructive" });
@@ -503,7 +503,7 @@ export default function ProjectDetail() {
           <div className="flex items-center gap-4">
             <Button
               variant="ghost"
-              onClick={() => setLocation("/management")}
+              onClick={() => setLocation("/dashboard")}
               className="h-12 gap-2"
               data-testid="button-back"
             >
