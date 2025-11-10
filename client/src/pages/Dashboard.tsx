@@ -1041,7 +1041,14 @@ export default function Dashboard() {
       testId: "button-documents",
       isVisible: () => true, // Everyone
     },
-  ].filter(card => card.isVisible(currentUser));
+  ].filter(card => {
+    try {
+      return card.isVisible(currentUser);
+    } catch (e) {
+      console.error('Error filtering card:', card.id, e);
+      return false;
+    }
+  });
 
   if (projectsLoading || employeesLoading) {
     return (
