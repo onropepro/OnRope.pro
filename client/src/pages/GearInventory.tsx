@@ -86,13 +86,7 @@ export default function GearInventory() {
     <div className="min-h-screen bg-background pb-20">
       {/* Header */}
       <header className="sticky top-0 z-[100] bg-card border-b shadow-md">
-        <div className="px-4 h-16 flex items-center justify-between max-w-7xl mx-auto">
-          <div>
-            <h1 className="text-xl font-bold tracking-tight">Build my Kit</h1>
-            <p className="text-xs text-muted-foreground mt-0.5">
-              Manage your equipment inventory
-            </p>
-          </div>
+        <div className="px-4 h-16 flex items-center gap-3 max-w-7xl mx-auto">
           <Button
             variant="ghost"
             size="icon"
@@ -101,6 +95,12 @@ export default function GearInventory() {
           >
             <span className="material-icons text-xl">arrow_back</span>
           </Button>
+          <div className="flex-1">
+            <h1 className="text-xl font-bold tracking-tight">Build my Kit</h1>
+            <p className="text-xs text-muted-foreground mt-0.5">
+              Manage your equipment inventory
+            </p>
+          </div>
         </div>
       </header>
 

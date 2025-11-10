@@ -127,7 +127,7 @@ export default function HarnessInspectionForm() {
       });
       queryClient.invalidateQueries({ queryKey: ["/api/my-harness-inspections"] });
       queryClient.invalidateQueries({ queryKey: ["/api/harness-inspections"] });
-      setLocation("/tech");
+      setLocation("/dashboard");
     },
     onError: (error: Error) => {
       toast({ 
@@ -151,7 +151,7 @@ export default function HarnessInspectionForm() {
           <Button
             variant="ghost"
             size="icon"
-            onClick={() => setLocation("/tech")}
+            onClick={() => setLocation("/dashboard")}
             data-testid="button-back"
           >
             <ArrowLeft className="h-5 w-5" />

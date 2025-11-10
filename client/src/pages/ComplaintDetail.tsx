@@ -159,7 +159,7 @@ export default function ComplaintDetail() {
             variant="ghost" 
             size="icon" 
             className="min-w-11 min-h-11" 
-            onClick={() => window.history.back()}
+            onClick={() => setLocation("/dashboard")}
             data-testid="button-back"
           >
             <span className="material-icons">arrow_back</span>
