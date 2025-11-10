@@ -20,6 +20,7 @@ The platform is built with a **mobile-first approach** and features a modern, pr
 
 **Technical Implementations & Feature Specifications:**
 - **Role-Based Access Control:** Multi-role user system (Company, Resident, Operations Manager, Supervisor, Rope Access Tech) with distinct permissions and dashboards.
+- **Financial Permission Enforcement:** Comprehensive multi-tenant isolation with ZERO-ACCESS enforcement for employees without financial permissions. Backend permission-based filtering strips all financial data (pricing, hourly rates, estimated hours, labor costs) from API responses for unauthorized users. Frontend uses centralized permission helpers (`hasFinancialAccess`, `isManagement`, `hasPermission`) to conditionally render UI elements and disable queries. All financial routes (`/api/projects/:id`, `/api/projects/:id/work-sessions`, `/api/quotes`, `/api/quotes/:id`) check `currentUser.role === "company"` or `view_financial_data` permission before returning sensitive fields. Payroll page enforces page-level permission with redirect and query disabling (`enabled: canAccessPayroll`).
 - **Project Management:** Creation and management of projects including strata plan numbers, floor counts, and PDF rope access plan uploads. Projects can be completed, edited, or deleted with cascade warnings.
 - **Project Status Tracking:** Projects are categorized as 'active' or 'completed' with separate displays.
 - **Employee Management:** Company-controlled onboarding, editing employee details (name, email, role, IRATA level).
