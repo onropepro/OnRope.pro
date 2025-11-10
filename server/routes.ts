@@ -129,6 +129,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(401).json({ message: "Invalid credentials" });
       }
       
+      // Check if user has been terminated
+      if (user.terminationDate) {
+        return res.status(403).json({ message: "Your employment has been terminated. Please contact your administrator for more information." });
+      }
+      
       // Create session
       req.session.userId = user.id;
       req.session.role = user.role;
@@ -167,6 +172,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       if (!user) {
         return res.status(404).json({ message: "User not found" });
+      }
+      
+      // Check if user has been terminated - destroy session if so
+      if (user.terminationDate) {
+        req.session.destroy(() => {});
+        return res.status(403).json({ message: "Your employment has been terminated. Please contact your administrator for more information." });
       }
       
       const { passwordHash, ...userWithoutPassword } = user;
