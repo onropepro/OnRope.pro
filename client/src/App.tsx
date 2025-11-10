@@ -78,7 +78,7 @@ function Router() {
         </ProtectedRoute>
       </Route>
       <Route path="/quotes">
-        <ProtectedRoute allowedRoles={["company", "operations_manager", "supervisor"]}>
+        <ProtectedRoute allowedRoles={["company", "operations_manager", "supervisor", "rope_access_tech", "manager", "ground_crew", "ground_crew_supervisor"]}>
           <Quotes />
         </ProtectedRoute>
       </Route>
