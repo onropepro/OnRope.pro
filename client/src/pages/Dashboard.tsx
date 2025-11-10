@@ -506,6 +506,7 @@ export default function Dashboard() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/employees"] });
       setShowEmployeeDialog(false);
+      setEmployeeFormStep(1); // Reset to step 1
       employeeForm.reset();
       toast({
         title: "Employee created successfully",
@@ -554,6 +555,7 @@ export default function Dashboard() {
           query.queryKey[2] === "work-sessions"
       });
       setShowEditEmployeeDialog(false);
+      setEditEmployeeFormStep(1); // Reset to step 1
       setEmployeeToEdit(null);
       editEmployeeForm.reset();
       toast({
@@ -2066,7 +2068,7 @@ export default function Dashboard() {
           <div>
             <div className="space-y-4">
               {/* Create Employee Button */}
-              <Dialog open={showEmployeeDialog} onOpenChange={setShowEmployeeDialog}>
+              <Dialog open={showEmployeeDialog} onOpenChange={(open) => { setShowEmployeeDialog(open); if (!open) setEmployeeFormStep(1); }}>
                 <DialogTrigger asChild>
                   <Button className="w-full h-12 gap-2" data-testid="button-create-employee">
                     <span className="material-icons">person_add</span>
@@ -2076,15 +2078,19 @@ export default function Dashboard() {
                 <DialogContent className="max-w-md p-0 max-h-[95vh] flex flex-col">
                   <div className="p-6 border-b">
                     <DialogHeader>
-                      <DialogTitle>Create Employee Account</DialogTitle>
+                      <DialogTitle>
+                        {employeeFormStep === 1 ? "Employee Information" : "Permissions"}
+                      </DialogTitle>
                       <DialogDescription>
-                        Enter login credentials for the new employee
+                        {employeeFormStep === 1 ? "Step 1 of 2: Enter employee details" : "Step 2 of 2: Configure access permissions"}
                       </DialogDescription>
                     </DialogHeader>
                   </div>
                   <div className="overflow-y-auto flex-1 p-6">
                     <Form {...employeeForm}>
                       <form onSubmit={employeeForm.handleSubmit(onEmployeeSubmit)} className="space-y-4">
+                      {employeeFormStep === 1 && (
+                        <>
                       <FormField
                         control={employeeForm.control}
                         name="name"
@@ -2209,6 +2215,225 @@ export default function Dashboard() {
                         )}
                       />
 
+                      <div className="border-t pt-4 mt-6">
+                        <h3 className="text-sm font-medium mb-4">Personal Details (Optional)</h3>
+                        
+                        <div className="space-y-4">
+                          <FormField
+                            control={employeeForm.control}
+                            name="startDate"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Start Date</FormLabel>
+                                <FormControl>
+                                  <Input type="date" {...field} data-testid="input-employee-start-date" className="h-12" />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+
+                          <FormField
+                            control={employeeForm.control}
+                            name="birthday"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Birthday</FormLabel>
+                                <FormControl>
+                                  <Input type="date" {...field} data-testid="input-employee-birthday" className="h-12" />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+
+                          <FormField
+                            control={employeeForm.control}
+                            name="driversLicenseNumber"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Driver's License Number</FormLabel>
+                                <FormControl>
+                                  <Input placeholder="License number" {...field} data-testid="input-employee-dl-number" className="h-12" />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+
+                          <FormField
+                            control={employeeForm.control}
+                            name="driversLicenseProvince"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Driver's License Province/State</FormLabel>
+                                <FormControl>
+                                  <Input placeholder="BC, AB, etc." {...field} data-testid="input-employee-dl-province" className="h-12" />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+
+                          <FormField
+                            control={employeeForm.control}
+                            name="homeAddress"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Home Address</FormLabel>
+                                <FormControl>
+                                  <Input placeholder="Street address" {...field} data-testid="input-employee-address" className="h-12" />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+
+                          <FormField
+                            control={employeeForm.control}
+                            name="employeePhoneNumber"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Phone Number</FormLabel>
+                                <FormControl>
+                                  <Input type="tel" placeholder="(604) 555-1234" {...field} data-testid="input-employee-phone" className="h-12" />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+
+                          <FormField
+                            control={employeeForm.control}
+                            name="emergencyContactName"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Emergency Contact Name</FormLabel>
+                                <FormControl>
+                                  <Input placeholder="Contact name" {...field} data-testid="input-employee-emergency-name" className="h-12" />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+
+                          <FormField
+                            control={employeeForm.control}
+                            name="emergencyContactPhone"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Emergency Contact Phone</FormLabel>
+                                <FormControl>
+                                  <Input type="tel" placeholder="(604) 555-1234" {...field} data-testid="input-employee-emergency-phone" className="h-12" />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+
+                          <FormField
+                            control={employeeForm.control}
+                            name="specialMedicalConditions"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Special Medical Conditions</FormLabel>
+                                <FormControl>
+                                  <Input placeholder="Medical conditions to be aware of" {...field} data-testid="input-employee-medical" className="h-12" />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+
+                          <div className="border-t pt-4 mt-4">
+                            <h4 className="text-sm font-medium mb-4">IRATA Certification (Optional)</h4>
+                            <div className="space-y-4">
+                              <FormField
+                                control={employeeForm.control}
+                                name="irataLevel"
+                                render={({ field }) => (
+                                  <FormItem>
+                                    <FormLabel>IRATA Level</FormLabel>
+                                    <Select onValueChange={field.onChange} value={field.value}>
+                                      <FormControl>
+                                        <SelectTrigger className="h-12" data-testid="select-irata-level">
+                                          <SelectValue placeholder="Select level" />
+                                        </SelectTrigger>
+                                      </FormControl>
+                                      <SelectContent>
+                                        <SelectItem value="Level 1">Level 1</SelectItem>
+                                        <SelectItem value="Level 2">Level 2</SelectItem>
+                                        <SelectItem value="Level 3">Level 3</SelectItem>
+                                      </SelectContent>
+                                    </Select>
+                                    <FormMessage />
+                                  </FormItem>
+                                )}
+                              />
+
+                              {employeeForm.watch("irataLevel") && (
+                                <>
+                                  <FormField
+                                    control={employeeForm.control}
+                                    name="irataLicenseNumber"
+                                    render={({ field }) => (
+                                      <FormItem>
+                                        <FormLabel>IRATA License Number</FormLabel>
+                                        <FormControl>
+                                          <Input placeholder="License number" {...field} data-testid="input-irata-license" className="h-12" />
+                                        </FormControl>
+                                        <FormMessage />
+                                      </FormItem>
+                                    )}
+                                  />
+
+                                  <FormField
+                                    control={employeeForm.control}
+                                    name="irataIssuedDate"
+                                    render={({ field }) => (
+                                      <FormItem>
+                                        <FormLabel>IRATA Issued Date</FormLabel>
+                                        <FormControl>
+                                          <Input type="date" {...field} data-testid="input-irata-issued" className="h-12" />
+                                        </FormControl>
+                                        <FormMessage />
+                                      </FormItem>
+                                    )}
+                                  />
+
+                                  <FormField
+                                    control={employeeForm.control}
+                                    name="irataExpirationDate"
+                                    render={({ field }) => (
+                                      <FormItem>
+                                        <FormLabel>IRATA Expiration Date</FormLabel>
+                                        <FormControl>
+                                          <Input type="date" {...field} data-testid="input-irata-expiration" className="h-12" />
+                                        </FormControl>
+                                        <FormMessage />
+                                      </FormItem>
+                                    )}
+                                  />
+                                </>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      <Button 
+                        type="button" 
+                        className="w-full h-12" 
+                        onClick={() => setEmployeeFormStep(2)}
+                        data-testid="button-continue-to-permissions"
+                      >
+                        Continue to Permissions
+                      </Button>
+                      </>
+                      )}
+
+                      {employeeFormStep === 2 && (
+                        <>
                       <FormField
                         control={employeeForm.control}
                         name="permissions"
@@ -2220,7 +2445,7 @@ export default function Dashboard() {
                                 Select which features this employee can access
                               </FormDescription>
                             </div>
-                            <div className="grid grid-cols-1 gap-3">
+                            <div className="grid grid-cols-2 gap-2">
                               {AVAILABLE_PERMISSIONS.map((permission) => (
                                 <FormField
                                   key={permission.id}
@@ -2230,7 +2455,7 @@ export default function Dashboard() {
                                     return (
                                       <FormItem
                                         key={permission.id}
-                                        className="flex flex-row items-start space-x-3 space-y-0"
+                                        className="flex flex-row items-start space-x-2 space-y-0 bg-muted/30 p-2 rounded-md"
                                       >
                                         <FormControl>
                                           <Checkbox
@@ -2247,7 +2472,7 @@ export default function Dashboard() {
                                             data-testid={`checkbox-permission-${permission.id}`}
                                           />
                                         </FormControl>
-                                        <FormLabel className="text-sm font-normal">
+                                        <FormLabel className="text-xs font-normal leading-tight cursor-pointer">
                                           {permission.label}
                                         </FormLabel>
                                       </FormItem>
@@ -2261,9 +2486,22 @@ export default function Dashboard() {
                         )}
                       />
 
-                      <Button type="submit" className="w-full h-12" data-testid="button-submit-employee" disabled={createEmployeeMutation.isPending}>
-                        {createEmployeeMutation.isPending ? "Creating..." : "Create Employee"}
-                      </Button>
+                      <div className="flex gap-2">
+                        <Button 
+                          type="button" 
+                          variant="outline"
+                          className="w-full h-12" 
+                          onClick={() => setEmployeeFormStep(1)}
+                          data-testid="button-back-to-info"
+                        >
+                          Back
+                        </Button>
+                        <Button type="submit" className="w-full h-12" data-testid="button-submit-employee" disabled={createEmployeeMutation.isPending}>
+                          {createEmployeeMutation.isPending ? "Creating..." : "Create Employee"}
+                        </Button>
+                      </div>
+                      </>
+                      )}
                     </form>
                   </Form>
                   </div>
@@ -2483,17 +2721,23 @@ export default function Dashboard() {
       </div>
 
       {/* Edit Employee Dialog */}
-      <Dialog open={showEditEmployeeDialog} onOpenChange={setShowEditEmployeeDialog}>
-        <DialogContent className="max-w-md">
-          <DialogHeader>
-            <DialogTitle>Edit Employee</DialogTitle>
-            <DialogDescription>
-              Update employee information
-            </DialogDescription>
-          </DialogHeader>
-          <div className="max-h-[70vh] overflow-y-auto pr-2">
+      <Dialog open={showEditEmployeeDialog} onOpenChange={(open) => { setShowEditEmployeeDialog(open); if (!open) setEditEmployeeFormStep(1); }}>
+        <DialogContent className="max-w-md p-0 max-h-[95vh] flex flex-col">
+          <div className="p-6 border-b">
+            <DialogHeader>
+              <DialogTitle>
+                {editEmployeeFormStep === 1 ? "Employee Information" : "Permissions"}
+              </DialogTitle>
+              <DialogDescription>
+                {editEmployeeFormStep === 1 ? "Step 1 of 2: Update employee details" : "Step 2 of 2: Configure access permissions"}
+              </DialogDescription>
+            </DialogHeader>
+          </div>
+          <div className="overflow-y-auto flex-1 p-6">
             <Form {...editEmployeeForm}>
               <form onSubmit={editEmployeeForm.handleSubmit(onEditEmployeeSubmit)} className="space-y-4">
+              {editEmployeeFormStep === 1 && (
+                <>
                 <FormField
                   control={editEmployeeForm.control}
                   name="name"
@@ -2598,6 +2842,244 @@ export default function Dashboard() {
                   )}
                 />
 
+                <div className="border-t pt-4 mt-6">
+                  <h3 className="text-sm font-medium mb-4">Personal Details (Optional)</h3>
+                  
+                  <div className="space-y-4">
+                    <FormField
+                      control={editEmployeeForm.control}
+                      name="startDate"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Start Date</FormLabel>
+                          <FormControl>
+                            <Input type="date" {...field} data-testid="input-edit-employee-start-date" className="h-12" />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={editEmployeeForm.control}
+                      name="birthday"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Birthday</FormLabel>
+                          <FormControl>
+                            <Input type="date" {...field} data-testid="input-edit-employee-birthday" className="h-12" />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={editEmployeeForm.control}
+                      name="driversLicenseNumber"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Driver's License Number</FormLabel>
+                          <FormControl>
+                            <Input placeholder="License number" {...field} data-testid="input-edit-employee-dl-number" className="h-12" />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={editEmployeeForm.control}
+                      name="driversLicenseProvince"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Driver's License Province/State</FormLabel>
+                          <FormControl>
+                            <Input placeholder="BC, AB, etc." {...field} data-testid="input-edit-employee-dl-province" className="h-12" />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={editEmployeeForm.control}
+                      name="homeAddress"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Home Address</FormLabel>
+                          <FormControl>
+                            <Input placeholder="Street address" {...field} data-testid="input-edit-employee-address" className="h-12" />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={editEmployeeForm.control}
+                      name="employeePhoneNumber"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Phone Number</FormLabel>
+                          <FormControl>
+                            <Input type="tel" placeholder="(604) 555-1234" {...field} data-testid="input-edit-employee-phone" className="h-12" />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={editEmployeeForm.control}
+                      name="emergencyContactName"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Emergency Contact Name</FormLabel>
+                          <FormControl>
+                            <Input placeholder="Contact name" {...field} data-testid="input-edit-employee-emergency-name" className="h-12" />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={editEmployeeForm.control}
+                      name="emergencyContactPhone"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Emergency Contact Phone</FormLabel>
+                          <FormControl>
+                            <Input type="tel" placeholder="(604) 555-1234" {...field} data-testid="input-edit-employee-emergency-phone" className="h-12" />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={editEmployeeForm.control}
+                      name="specialMedicalConditions"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Special Medical Conditions</FormLabel>
+                          <FormControl>
+                            <Input placeholder="Medical conditions to be aware of" {...field} data-testid="input-edit-employee-medical" className="h-12" />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <div className="border-t pt-4 mt-4">
+                      <h4 className="text-sm font-medium mb-4">IRATA Certification (Optional)</h4>
+                      <div className="space-y-4">
+                        <FormField
+                          control={editEmployeeForm.control}
+                          name="irataLevel"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>IRATA Level</FormLabel>
+                              <Select onValueChange={field.onChange} value={field.value}>
+                                <FormControl>
+                                  <SelectTrigger className="h-12" data-testid="select-edit-irata-level">
+                                    <SelectValue placeholder="Select level" />
+                                  </SelectTrigger>
+                                </FormControl>
+                                <SelectContent>
+                                  <SelectItem value="Level 1">Level 1</SelectItem>
+                                  <SelectItem value="Level 2">Level 2</SelectItem>
+                                  <SelectItem value="Level 3">Level 3</SelectItem>
+                                </SelectContent>
+                              </Select>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+
+                        {editEmployeeForm.watch("irataLevel") && (
+                          <>
+                            <FormField
+                              control={editEmployeeForm.control}
+                              name="irataLicenseNumber"
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel>IRATA License Number</FormLabel>
+                                  <FormControl>
+                                    <Input placeholder="License number" {...field} data-testid="input-edit-irata-license" className="h-12" />
+                                  </FormControl>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+
+                            <FormField
+                              control={editEmployeeForm.control}
+                              name="irataIssuedDate"
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel>IRATA Issued Date</FormLabel>
+                                  <FormControl>
+                                    <Input type="date" {...field} data-testid="input-edit-irata-issued" className="h-12" />
+                                  </FormControl>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+
+                            <FormField
+                              control={editEmployeeForm.control}
+                              name="irataExpirationDate"
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel>IRATA Expiration Date</FormLabel>
+                                  <FormControl>
+                                    <Input type="date" {...field} data-testid="input-edit-irata-expiration" className="h-12" />
+                                  </FormControl>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+                          </>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="border-t pt-4 mt-4">
+                      <FormField
+                        control={editEmployeeForm.control}
+                        name="terminatedDate"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Termination Date</FormLabel>
+                            <FormControl>
+                              <Input type="date" {...field} data-testid="input-edit-employee-terminated-date" className="h-12" />
+                            </FormControl>
+                            <FormDescription className="text-xs text-destructive">
+                              Setting a termination date will move this employee to terminated status
+                            </FormDescription>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <Button 
+                  type="button" 
+                  className="w-full h-12" 
+                  onClick={() => setEditEmployeeFormStep(2)}
+                  data-testid="button-edit-continue-to-permissions"
+                >
+                  Continue to Permissions
+                </Button>
+                </>
+                )}
+
+                {editEmployeeFormStep === 2 && (
+                  <>
                 <FormField
                   control={editEmployeeForm.control}
                   name="permissions"
@@ -2609,7 +3091,7 @@ export default function Dashboard() {
                           Select which features this employee can access
                         </FormDescription>
                       </div>
-                      <div className="grid grid-cols-1 gap-3">
+                      <div className="grid grid-cols-2 gap-2">
                         {AVAILABLE_PERMISSIONS.map((permission) => (
                           <FormField
                             key={permission.id}
@@ -2619,7 +3101,7 @@ export default function Dashboard() {
                               return (
                                 <FormItem
                                   key={permission.id}
-                                  className="flex flex-row items-start space-x-3 space-y-0"
+                                  className="flex flex-row items-start space-x-2 space-y-0 bg-muted/30 p-2 rounded-md"
                                 >
                                   <FormControl>
                                     <Checkbox
@@ -2636,7 +3118,7 @@ export default function Dashboard() {
                                       data-testid={`checkbox-edit-permission-${permission.id}`}
                                     />
                                   </FormControl>
-                                  <FormLabel className="text-sm font-normal">
+                                  <FormLabel className="text-xs font-normal leading-tight cursor-pointer">
                                     {permission.label}
                                   </FormLabel>
                                 </FormItem>
@@ -2650,9 +3132,22 @@ export default function Dashboard() {
                   )}
                 />
 
-                <Button type="submit" className="w-full h-12" data-testid="button-submit-edit-employee" disabled={editEmployeeMutation.isPending}>
-                  {editEmployeeMutation.isPending ? "Updating..." : "Update Employee"}
-                </Button>
+                <div className="flex gap-2">
+                  <Button 
+                    type="button" 
+                    variant="outline"
+                    className="w-full h-12" 
+                    onClick={() => setEditEmployeeFormStep(1)}
+                    data-testid="button-edit-back-to-info"
+                  >
+                    Back
+                  </Button>
+                  <Button type="submit" className="w-full h-12" data-testid="button-submit-edit-employee" disabled={editEmployeeMutation.isPending}>
+                    {editEmployeeMutation.isPending ? "Updating..." : "Update Employee"}
+                  </Button>
+                </div>
+                </>
+                )}
               </form>
             </Form>
           </div>
