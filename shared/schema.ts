@@ -90,6 +90,7 @@ export const projects = pgTable("projects", {
   suitesPerDay: integer("suites_per_day"), // For in_suite_dryer_vent_cleaning
   floorsPerDay: integer("floors_per_day"), // Alternative for in_suite_dryer_vent_cleaning
   stallsPerDay: integer("stalls_per_day"), // For parkade_pressure_cleaning
+  buildingFloors: integer("building_floors"), // For in_suite_dryer_vent_cleaning - total floors in building (separate from unit count)
   
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),

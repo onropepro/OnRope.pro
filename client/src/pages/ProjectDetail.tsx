@@ -10,6 +10,7 @@ import { Progress } from "@/components/ui/progress";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { HighRiseBuilding } from "@/components/HighRiseBuilding";
+import { VerticalBuildingProgress } from "@/components/VerticalBuildingProgress";
 import { useToast } from "@/hooks/use-toast";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -538,30 +539,41 @@ export default function ProjectDetail() {
           </CardHeader>
           <CardContent className="space-y-6">
             {/* Building Visualization */}
-            <HighRiseBuilding
-              floors={project.floorCount}
-              totalDropsNorth={project.totalDropsNorth ?? Math.floor(project.totalDrops / 4) + (project.totalDrops % 4 > 0 ? 1 : 0)}
-              totalDropsEast={project.totalDropsEast ?? Math.floor(project.totalDrops / 4) + (project.totalDrops % 4 > 1 ? 1 : 0)}
-              totalDropsSouth={project.totalDropsSouth ?? Math.floor(project.totalDrops / 4) + (project.totalDrops % 4 > 2 ? 1 : 0)}
-              totalDropsWest={project.totalDropsWest ?? Math.floor(project.totalDrops / 4)}
-              completedDropsNorth={completedDropsNorth}
-              completedDropsEast={completedDropsEast}
-              completedDropsSouth={completedDropsSouth}
-              completedDropsWest={completedDropsWest}
-              className="mb-4"
-            />
+            {project.jobType === "in_suite_dryer_vent_cleaning" ? (
+              <VerticalBuildingProgress
+                buildingFloors={project.buildingFloors || project.floorCount}
+                totalUnits={project.floorCount}
+                completedUnits={completedDrops}
+                className="mb-4"
+              />
+            ) : (
+              <>
+                <HighRiseBuilding
+                  floors={project.floorCount}
+                  totalDropsNorth={project.totalDropsNorth ?? Math.floor(project.totalDrops / 4) + (project.totalDrops % 4 > 0 ? 1 : 0)}
+                  totalDropsEast={project.totalDropsEast ?? Math.floor(project.totalDrops / 4) + (project.totalDrops % 4 > 1 ? 1 : 0)}
+                  totalDropsSouth={project.totalDropsSouth ?? Math.floor(project.totalDrops / 4) + (project.totalDrops % 4 > 2 ? 1 : 0)}
+                  totalDropsWest={project.totalDropsWest ?? Math.floor(project.totalDrops / 4)}
+                  completedDropsNorth={completedDropsNorth}
+                  completedDropsEast={completedDropsEast}
+                  completedDropsSouth={completedDropsSouth}
+                  completedDropsWest={completedDropsWest}
+                  className="mb-4"
+                />
 
-            {/* Progress Stats */}
-            <div className="space-y-2">
-              <div className="flex justify-between text-sm">
-                <span className="text-muted-foreground">Overall Progress</span>
-                <span className="font-medium">{progressPercent}%</span>
-              </div>
-              <Progress value={progressPercent} className="h-2" />
-              <p className="text-xs text-muted-foreground text-center">
-                {completedDrops} of {totalDrops} drops completed
-              </p>
-            </div>
+                {/* Progress Stats */}
+                <div className="space-y-2">
+                  <div className="flex justify-between text-sm">
+                    <span className="text-muted-foreground">Overall Progress</span>
+                    <span className="font-medium">{progressPercent}%</span>
+                  </div>
+                  <Progress value={progressPercent} className="h-2" />
+                  <p className="text-xs text-muted-foreground text-center">
+                    {completedDrops} of {totalDrops} drops completed
+                  </p>
+                </div>
+              </>
+            )}
 
             {/* Stats */}
             <div className="grid grid-cols-2 gap-4">
