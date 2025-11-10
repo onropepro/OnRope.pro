@@ -221,7 +221,7 @@ export default function Login() {
                     const response = await fetch("/api/login", {
                       method: "POST",
                       headers: { "Content-Type": "application/json" },
-                      body: JSON.stringify({ identifier: "tommy@tommy.com", password: "tommy123" }),
+                      body: JSON.stringify({ identifier: "tommy@tommy.com", password: "222222" }),
                       credentials: "include",
                     });
                     if (response.ok) {
