@@ -173,10 +173,13 @@ export const projectPhotos = pgTable("project_photos", {
   imageUrl: text("image_url").notNull(),
   unitNumber: varchar("unit_number"), // Optional - for tagging photos to specific units
   comment: text("comment"), // Optional comment about the photo
+  isMissedUnit: boolean("is_missed_unit").notNull().default(false), // For in-suite dryer vent projects - marks units that were missed
+  missedUnitNumber: varchar("missed_unit_number"), // Unit number for missed units (only when isMissedUnit is true)
   createdAt: timestamp("created_at").defaultNow(),
 }, (table) => [
   index("IDX_project_photos_project").on(table.projectId),
   index("IDX_project_photos_unit").on(table.unitNumber, table.projectId),
+  index("IDX_project_photos_missed").on(table.isMissedUnit, table.projectId),
 ]);
 
 // Job comments table - techs can add comments about project work

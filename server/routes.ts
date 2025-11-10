@@ -592,7 +592,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       const projectId = req.params.id;
-      const { unitNumber, comment } = req.body;
+      const { unitNumber, comment, isMissedUnit, missedUnitNumber } = req.body;
       const currentUser = await storage.getUserById(req.session.userId!);
       
       if (!currentUser) {
@@ -609,6 +609,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const userCompanyId = currentUser.role === "company" ? currentUser.id : currentUser.companyId;
       if (project.companyId !== userCompanyId) {
         return res.status(403).json({ message: "Access denied" });
+      }
+      
+      // Validate missed unit fields
+      const isMissed = isMissedUnit === 'true' || isMissedUnit === true;
+      if (isMissed) {
+        // Only allow missed unit marking for in-suite dryer vent projects
+        if (project.jobType !== 'in_suite_dryer_vent_cleaning') {
+          return res.status(400).json({ message: "Missed units can only be marked for in-suite dryer vent cleaning projects" });
+        }
+        
+        // Require unit number when marking as missed
+        if (!missedUnitNumber || missedUnitNumber.trim() === '') {
+          return res.status(400).json({ message: "Unit number is required when marking a photo as a missed unit" });
+        }
       }
       
       // Generate unique filename
@@ -632,6 +646,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         imageUrl: url,
         unitNumber: unitNumber || null,
         comment: comment || null,
+        isMissedUnit: isMissed,
+        missedUnitNumber: isMissed ? missedUnitNumber : null,
       });
       
       res.json({ photo, url });
