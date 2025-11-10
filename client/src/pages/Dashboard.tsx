@@ -126,6 +126,7 @@ const AVAILABLE_PERMISSIONS = [
   { id: "manage_work_sessions", label: "Manage Work Sessions" },
   { id: "view_work_history", label: "View Work History" },
   { id: "view_analytics", label: "View Analytics" },
+  { id: "view_active_workers", label: "View Active Workers" },
   { id: "view_financial_data", label: "View Financial Data (Labor Costs, Wages)" },
 ] as const;
 
@@ -975,7 +976,7 @@ export default function Dashboard() {
       icon: "work_history",
       onClick: () => setLocation("/active-workers"),
       testId: "button-active-workers",
-      isVisible: (user: any) => isManagement(user), // Management only
+      isVisible: (user: any) => hasPermission(user, "view_active_workers"), // Permission-based
     },
     {
       id: "complaints",
@@ -984,15 +985,6 @@ export default function Dashboard() {
       icon: "feedback",
       onClick: () => handleTabChange("complaints"),
       testId: "button-nav-complaints",
-      isVisible: () => true, // Everyone
-    },
-    {
-      id: "my-drops",
-      label: "My Drops",
-      description: "Daily work log",
-      icon: "checklist",
-      onClick: () => handleTabChange("my-drops"),
-      testId: "button-nav-my-drops",
       isVisible: () => true, // Everyone
     },
     {
