@@ -25,6 +25,45 @@ export default function ProjectDetail() {
   const { id } = useParams();
   const [, setLocation] = useLocation();
   const { toast } = useToast();
+  const [renderError, setRenderError] = useState<Error | null>(null);
+
+  // Catch any render errors
+  useEffect(() => {
+    const errorHandler = (event: ErrorEvent) => {
+      console.error("Runtime error:", event.error);
+      setRenderError(event.error);
+    };
+    window.addEventListener('error', errorHandler);
+    return () => window.removeEventListener('error', errorHandler);
+  }, []);
+
+  // If there's a render error, show it
+  if (renderError) {
+    return (
+      <div className="min-h-screen bg-red-50 p-4">
+        <div className="max-w-4xl mx-auto bg-white rounded-lg shadow-lg p-6">
+          <h1 className="text-2xl font-bold text-red-600 mb-4">🚨 Error Detected</h1>
+          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+            <p className="font-bold">Error Message:</p>
+            <p className="font-mono text-sm">{renderError.message}</p>
+          </div>
+          <div className="bg-gray-100 p-4 rounded">
+            <p className="font-bold mb-2">Stack Trace:</p>
+            <pre className="text-xs overflow-auto">{renderError.stack}</pre>
+          </div>
+          <button
+            onClick={() => {
+              setRenderError(null);
+              window.location.reload();
+            }}
+            className="mt-4 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+          >
+            Reload Page
+          </button>
+        </div>
+      </div>
+    );
+  }
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [uploadingPdf, setUploadingPdf] = useState(false);
   const [uploadingImage, setUploadingImage] = useState(false);
