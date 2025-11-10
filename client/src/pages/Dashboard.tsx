@@ -945,6 +945,15 @@ export default function Dashboard() {
       isVisible: () => true, // Everyone
     },
     {
+      id: "build-my-kit",
+      label: "Build my Kit",
+      description: "Gear inventory",
+      icon: "construction",
+      onClick: () => setLocation("/gear-inventory"),
+      testId: "button-gear-inventory",
+      isVisible: () => true, // Everyone
+    },
+    {
       id: "harness-inspection",
       label: "Harness Inspection",
       description: "Daily inspection",

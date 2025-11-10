@@ -173,6 +173,28 @@ export const nonBillableWorkSessions = pgTable("non_billable_work_sessions", {
   index("IDX_non_billable_sessions_employee").on(table.employeeId),
 ]);
 
+// Gear inventory items table - tracks employee equipment
+export const gearItems = pgTable("gear_items", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  employeeId: varchar("employee_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  companyId: varchar("company_id").notNull().references(() => users.id, { onDelete: "cascade" }), // For multi-tenant isolation
+  equipmentType: varchar("equipment_type").notNull(), // harness, rope, descender, ascender, helmet, carabiner, lanyard, other
+  brand: varchar("brand"), // Optional
+  model: varchar("model"), // Optional
+  serialNumber: varchar("serial_number"), // Optional
+  dateInService: date("date_in_service"), // Optional
+  dateOutOfService: date("date_out_of_service"), // Optional
+  inService: boolean("in_service").notNull().default(true), // Checkbox for in service status
+  quantity: integer("quantity").default(1), // How many of this item
+  itemPrice: numeric("item_price", { precision: 10, scale: 2 }), // Optional - only visible to users with financial permissions
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+}, (table) => [
+  index("IDX_gear_items_employee").on(table.employeeId),
+  index("IDX_gear_items_company").on(table.companyId),
+  index("IDX_gear_items_type").on(table.equipmentType),
+]);
+
 // Complaints table
 export const complaints = pgTable("complaints", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
@@ -662,6 +684,12 @@ export const insertNonBillableWorkSessionSchema = createInsertSchema(nonBillable
   updatedAt: true,
 });
 
+export const insertGearItemSchema = createInsertSchema(gearItems).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
 export const insertComplaintSchema = createInsertSchema(complaints).omit({
   id: true,
   createdAt: true,
@@ -734,6 +762,9 @@ export type InsertWorkSession = z.infer<typeof insertWorkSessionSchema>;
 
 export type NonBillableWorkSession = typeof nonBillableWorkSessions.$inferSelect;
 export type InsertNonBillableWorkSession = z.infer<typeof insertNonBillableWorkSessionSchema>;
+
+export type GearItem = typeof gearItems.$inferSelect;
+export type InsertGearItem = z.infer<typeof insertGearItemSchema>;
 
 export type Complaint = typeof complaints.$inferSelect;
 export type InsertComplaint = z.infer<typeof insertComplaintSchema>;
