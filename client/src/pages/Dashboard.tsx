@@ -882,6 +882,15 @@ export default function Dashboard() {
       isVisible: () => true, // Everyone
     },
     {
+      id: "non-billable-hours",
+      label: "Non-Billable Hours",
+      description: "Errands & training",
+      icon: "schedule",
+      onClick: () => setLocation("/non-billable-hours"),
+      testId: "button-non-billable-hours",
+      isVisible: () => true, // Everyone
+    },
+    {
       id: "past-projects",
       label: "Past Projects",
       description: "Completed work",
@@ -933,15 +942,6 @@ export default function Dashboard() {
       icon: "checklist",
       onClick: () => handleTabChange("my-drops"),
       testId: "button-nav-my-drops",
-      isVisible: () => true, // Everyone
-    },
-    {
-      id: "non-billable-hours",
-      label: "Non-Billable Hours",
-      description: "Errands & training",
-      icon: "schedule",
-      onClick: () => setLocation("/non-billable-hours"),
-      testId: "button-non-billable-hours",
       isVisible: () => true, // Everyone
     },
     {
