@@ -110,8 +110,8 @@ export default function Register() {
         return;
       }
 
-      // Redirect to management dashboard
-      window.location.href = "/management";
+      // Redirect to dashboard
+      window.location.href = "/dashboard";
     } catch (error) {
       companyForm.setError("companyName", { message: "An error occurred. Please try again." });
     }

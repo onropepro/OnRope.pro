@@ -8,7 +8,6 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import Register from "@/pages/Register";
 import Login from "@/pages/Login";
 import ResidentDashboard from "@/pages/ResidentDashboard";
-import TechDashboard from "@/pages/TechDashboard";
 import Dashboard from "@/pages/Dashboard";
 import ComplaintDetail from "@/pages/ComplaintDetail";
 import WorkSessionHistory from "@/pages/WorkSessionHistory";
@@ -20,6 +19,7 @@ import Payroll from "@/pages/Payroll";
 import Quotes from "@/pages/Quotes";
 import NotFound from "@/pages/not-found";
 import ProtectedRoute from "@/components/ProtectedRoute";
+import { EMPLOYEE_ROLES } from "@/lib/permissions";
 
 function Router() {
   return (
@@ -32,13 +32,8 @@ function Router() {
           <ResidentDashboard />
         </ProtectedRoute>
       </Route>
-      <Route path="/tech">
-        <ProtectedRoute allowedRoles={["rope_access_tech"]}>
-          <TechDashboard />
-        </ProtectedRoute>
-      </Route>
-      <Route path="/management">
-        <ProtectedRoute allowedRoles={["company", "operations_manager", "supervisor"]}>
+      <Route path="/dashboard">
+        <ProtectedRoute allowedRoles={EMPLOYEE_ROLES}>
           <Dashboard />
         </ProtectedRoute>
       </Route>

@@ -22,10 +22,8 @@ export default function ProtectedRoute({ children, allowedRoles }: ProtectedRout
       // Redirect to appropriate dashboard based on role
       if (user.role === "resident") {
         setLocation("/resident");
-      } else if (user.role === "rope_access_tech") {
-        setLocation("/tech");
       } else {
-        setLocation("/management");
+        setLocation("/dashboard");
       }
     }
   }, [user, isLoading, allowedRoles, setLocation]);

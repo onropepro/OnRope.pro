@@ -43,10 +43,8 @@ export default function Login() {
       const user = result.user;
       if (user.role === "resident") {
         window.location.href = "/resident";
-      } else if (user.role === "rope_access_tech") {
-        window.location.href = "/tech";
       } else {
-        window.location.href = "/management";
+        window.location.href = "/dashboard";
       }
     } catch (error) {
       form.setError("identifier", { message: "An error occurred. Please try again." });
