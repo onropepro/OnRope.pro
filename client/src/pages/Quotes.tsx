@@ -158,6 +158,17 @@ export default function Quotes() {
     resolver: zodResolver(serviceFormSchema),
   });
 
+  // Fetch current user to check permissions
+  const { data: userData } = useQuery({
+    queryKey: ["/api/user"],
+  });
+
+  const currentUser = userData?.user;
+  
+  // Check if user can view financial data (company owner OR has permission)
+  const canViewFinancialData = currentUser?.role === "company" || 
+                                currentUser?.permissions?.includes("view_financial_data");
+
   // Fetch quotes
   const { data: quotesData, isLoading } = useQuery<{ quotes: QuoteWithServices[] }>({
     queryKey: ["/api/quotes"],

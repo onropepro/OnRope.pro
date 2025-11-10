@@ -2110,8 +2110,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // ==================== QUOTE ROUTES ====================
   
-  // Create new quote with services (atomic transaction)
-  app.post("/api/quotes", requireAuth, requireRole("company", "operations_manager", "supervisor"), async (req: Request, res: Response) => {
+  // Create new quote with services (atomic transaction) - All employees can create quotes
+  app.post("/api/quotes", requireAuth, requireRole("company", "operations_manager", "supervisor", "rope_access_tech"), async (req: Request, res: Response) => {
     let createdQuoteId: string | null = null;
     
     try {
