@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useLocation } from "wouter";
 import { apiRequest, queryClient } from "@/lib/queryClient";
+import { hasFinancialAccess } from "@/lib/permissions";
 import type { PayPeriodConfig, PayPeriod, EmployeeHoursSummary } from "@shared/schema";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -19,7 +20,7 @@ export default function Payroll() {
   const [, setLocation] = useLocation();
   const [selectedPeriodId, setSelectedPeriodId] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<string>("hours");
-
+  
   // State for configuration form
   const [periodType, setPeriodType] = useState<string>("");
   const [firstPayDay, setFirstPayDay] = useState<string>("1");
@@ -31,20 +32,30 @@ export default function Payroll() {
   const [customStartDate, setCustomStartDate] = useState<string>("");
   const [customEndDate, setCustomEndDate] = useState<string>("");
 
-  // Fetch pay period configuration
+  // Fetch current user to check permissions
+  const { data: userData, isLoading: userLoading } = useQuery({
+    queryKey: ["/api/user"],
+  });
+
+  const currentUser = userData?.user;
+  const canAccessPayroll = hasFinancialAccess(currentUser);
+
+  // Fetch pay period configuration (only if user has permission)
   const { data: configData } = useQuery<{ config: PayPeriodConfig | null }>({
     queryKey: ['/api/payroll/config'],
+    enabled: canAccessPayroll,
   });
 
-  // Fetch pay periods
+  // Fetch pay periods (only if user has permission)
   const { data: periodsData } = useQuery<{ periods: PayPeriod[] }>({
     queryKey: ['/api/payroll/periods'],
+    enabled: canAccessPayroll,
   });
 
-  // Fetch employee hours for selected period
+  // Fetch employee hours for selected period (only if user has permission)
   const { data: hoursData, isLoading: hoursLoading } = useQuery<{ hoursSummary: EmployeeHoursSummary[]; period: PayPeriod }>({
     queryKey: ['/api/payroll/periods', selectedPeriodId, 'hours'],
-    enabled: !!selectedPeriodId,
+    enabled: !!selectedPeriodId && canAccessPayroll,
   });
 
   // Auto-create default payroll config if none exists
@@ -156,9 +167,8 @@ export default function Payroll() {
     },
   });
 
-
   // Initialize form with existing config
-  useState(() => {
+  useEffect(() => {
     if (configData?.config) {
       setPeriodType(configData.config.periodType);
       if (configData.config.firstPayDay) setFirstPayDay(String(configData.config.firstPayDay));
@@ -170,7 +180,35 @@ export default function Payroll() {
       if (configData.config.customStartDate) setCustomStartDate(configData.config.customStartDate);
       if (configData.config.customEndDate) setCustomEndDate(configData.config.customEndDate);
     }
-  });
+  }, [configData]);
+
+  // Redirect unauthorized users to dashboard
+  useEffect(() => {
+    if (!userLoading && currentUser && !canAccessPayroll) {
+      toast({
+        title: "Access Denied",
+        description: "You don't have permission to access payroll data.",
+        variant: "destructive",
+      });
+      setLocation("/dashboard");
+    }
+  }, [currentUser, userLoading, canAccessPayroll, setLocation, toast]);
+
+  // Show loading while checking permissions
+  if (userLoading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-center">
+          <div className="text-lg font-medium">Loading...</div>
+        </div>
+      </div>
+    );
+  }
+
+  // Don't render anything if user doesn't have financial access
+  if (!currentUser || !canAccessPayroll) {
+    return null;
+  }
 
   const handleSaveConfiguration = () => {
     const config: any = {
