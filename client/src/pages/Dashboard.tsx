@@ -816,6 +816,15 @@ export default function Dashboard() {
       isVisible: (user: any) => canViewPerformance(user), // Management only
     },
     {
+      id: "active-workers",
+      label: "Active Workers",
+      description: "Who's working",
+      icon: "work_history",
+      onClick: () => setLocation("/active-workers"),
+      testId: "button-active-workers",
+      isVisible: (user: any) => checkIsManagement(user), // Management only
+    },
+    {
       id: "complaints",
       label: "Complaints",
       description: "Resident feedback",

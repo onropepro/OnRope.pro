@@ -668,6 +668,39 @@ export default function ProjectDetail() {
                 <div className="text-sm text-muted-foreground mt-1">Days Remaining</div>
               </div>
             </div>
+
+            {/* Active Workers */}
+            {(() => {
+              const activeWorkers = workSessions.filter((s: any) => !s.endTime);
+              if (activeWorkers.length === 0) return null;
+              
+              return (
+                <div className="pt-4 border-t">
+                  <div className="flex items-center gap-2 mb-3">
+                    <span className="material-icons text-sm text-primary">groups</span>
+                    <h3 className="text-sm font-medium">Currently Working</h3>
+                  </div>
+                  <div className="space-y-2">
+                    {activeWorkers.map((session: any) => (
+                      <div 
+                        key={session.id} 
+                        className="flex items-center justify-between p-3 bg-primary/5 rounded-lg border border-primary/20"
+                        data-testid={`active-worker-${session.id}`}
+                      >
+                        <div className="flex items-center gap-2">
+                          <span className="material-icons text-sm text-primary">person</span>
+                          <span className="font-medium text-sm">{session.techName || 'Unknown'}</span>
+                        </div>
+                        <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                          <span className="material-icons text-xs">schedule</span>
+                          {session.startTime && format(new Date(session.startTime), 'h:mm a')}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              );
+            })()}
           </CardContent>
         </Card>
 

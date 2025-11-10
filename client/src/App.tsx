@@ -17,6 +17,7 @@ import HarnessInspectionForm from "@/pages/HarnessInspectionForm";
 import ToolboxMeetingForm from "@/pages/ToolboxMeetingForm";
 import Payroll from "@/pages/Payroll";
 import Quotes from "@/pages/Quotes";
+import ActiveWorkers from "@/pages/ActiveWorkers";
 import NotFound from "@/pages/not-found";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import { EMPLOYEE_ROLES } from "@/lib/permissions";
@@ -75,6 +76,11 @@ function Router() {
       <Route path="/quotes">
         <ProtectedRoute allowedRoles={["company", "operations_manager", "supervisor", "rope_access_tech", "manager", "ground_crew", "ground_crew_supervisor"]}>
           <Quotes />
+        </ProtectedRoute>
+      </Route>
+      <Route path="/active-workers">
+        <ProtectedRoute allowedRoles={["company", "operations_manager", "supervisor"]}>
+          <ActiveWorkers />
         </ProtectedRoute>
       </Route>
       <Route component={NotFound} />

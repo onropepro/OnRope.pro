@@ -1427,6 +1427,55 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: "Internal server error" });
     }
   });
+
+  // Get active workers (sessions without end time) - Management only
+  app.get("/api/active-workers", requireAuth, requireRole("company", "operations_manager", "supervisor"), async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      // Determine company ID
+      const companyId = currentUser.role === "company" ? currentUser.id : currentUser.companyId;
+      
+      if (!companyId) {
+        return res.status(400).json({ message: "Unable to determine company" });
+      }
+      
+      // Get all projects for the company
+      const projects = await storage.getProjectsByCompany(companyId);
+      
+      // Collect all active work sessions (no end time)
+      const activeSessions = [];
+      for (const project of projects) {
+        const projectSessions = await storage.getWorkSessionsByProject(project.id, companyId);
+        // Filter for active sessions and add project info
+        const activeProjectSessions = projectSessions
+          .filter(session => !session.endTime)
+          .map(session => ({
+            ...session,
+            projectName: project.buildingName,
+            strataPlanNumber: project.strataPlanNumber,
+            jobType: project.jobType,
+          }));
+        activeSessions.push(...activeProjectSessions);
+      }
+      
+      // Sort by start time (oldest first)
+      activeSessions.sort((a, b) => {
+        const aTime = a.startTime ? new Date(a.startTime).getTime() : 0;
+        const bTime = b.startTime ? new Date(b.startTime).getTime() : 0;
+        return aTime - bTime;
+      });
+      
+      res.json({ sessions: activeSessions });
+    } catch (error) {
+      console.error("Failed to fetch active workers:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
   
   // Get employee's own work sessions for a project
   app.get("/api/projects/:projectId/my-work-sessions", requireAuth, async (req: Request, res: Response) => {
