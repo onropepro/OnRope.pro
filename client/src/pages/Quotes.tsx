@@ -2045,7 +2045,7 @@ export default function Quotes() {
             <Card className="rounded-2xl shadow-lg border border-[#F4F4F5] bg-[#3B82F6]/5">
               <CardContent className="p-8">
                 <div className="flex items-center justify-between mb-4">
-                  <div>
+                  <div className="flex-1">
                     <h3 className="text-xl font-semibold text-[#0A0A0A] mb-1">
                       {selectedServices.length} Service{selectedServices.length !== 1 ? 's' : ''} Selected
                     </h3>
@@ -2055,12 +2055,14 @@ export default function Quotes() {
                         : "Please configure all selected services."}
                     </p>
                   </div>
-                  <div className="text-right">
-                    <p className="text-sm text-[#71717A] mb-1">Estimated Total</p>
-                    <p className="text-3xl font-bold text-[#3B82F6]">
-                      ${calculateQuoteTotal().toFixed(2)}
-                    </p>
-                  </div>
+                  {canViewFinancialData && (
+                    <div className="text-right">
+                      <p className="text-sm text-[#71717A] mb-1">Estimated Total</p>
+                      <p className="text-3xl font-bold text-[#3B82F6]">
+                        ${calculateQuoteTotal().toFixed(2)}
+                      </p>
+                    </div>
+                  )}
                 </div>
                 <Button
                   onClick={() => setCreateStep("building")}
@@ -2353,34 +2355,36 @@ export default function Quotes() {
 
                   {serviceBeingConfigured === "dryer_vent_cleaning" && (
                     <>
-                      <FormField
-                        control={serviceForm.control}
-                        name="dryerVentPricingType"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Pricing Method</FormLabel>
-                            <FormControl>
-                              <RadioGroup
-                                onValueChange={field.onChange}
-                                defaultValue={field.value || "per_hour"}
-                                className="flex gap-4"
-                              >
-                                <div className="flex items-center space-x-2">
-                                  <RadioGroupItem value="per_hour" id="per_hour" data-testid="radio-per-hour" />
-                                  <Label htmlFor="per_hour">Per Hour</Label>
-                                </div>
-                                <div className="flex items-center space-x-2">
-                                  <RadioGroupItem value="per_unit" id="per_unit" data-testid="radio-per-unit" />
-                                  <Label htmlFor="per_unit">Per Unit</Label>
-                                </div>
-                              </RadioGroup>
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
+                      {canViewFinancialData && (
+                        <FormField
+                          control={serviceForm.control}
+                          name="dryerVentPricingType"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Pricing Method</FormLabel>
+                              <FormControl>
+                                <RadioGroup
+                                  onValueChange={field.onChange}
+                                  defaultValue={field.value || "per_hour"}
+                                  className="flex gap-4"
+                                >
+                                  <div className="flex items-center space-x-2">
+                                    <RadioGroupItem value="per_hour" id="per_hour" data-testid="radio-per-hour" />
+                                    <Label htmlFor="per_hour">Per Hour</Label>
+                                  </div>
+                                  <div className="flex items-center space-x-2">
+                                    <RadioGroupItem value="per_unit" id="per_unit" data-testid="radio-per-unit" />
+                                    <Label htmlFor="per_unit">Per Unit</Label>
+                                  </div>
+                                </RadioGroup>
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      )}
 
-                      {serviceForm.watch("dryerVentPricingType") === "per_unit" && (
+                      {canViewFinancialData && serviceForm.watch("dryerVentPricingType") === "per_unit" && (
                         <>
                           <FormField
                             control={serviceForm.control}
@@ -2401,34 +2405,26 @@ export default function Quotes() {
                               </FormItem>
                             )}
                           />
-                          {canViewFinancialData ? (
-                            <FormField
-                              control={serviceForm.control}
-                              name="dryerVentPricePerUnit"
-                              render={({ field }) => (
-                                <FormItem>
-                                  <FormLabel>Price Per Unit</FormLabel>
-                                  <FormControl>
-                                    <Input
-                                      {...field}
-                                      type="number"
-                                      min="0"
-                                      step="0.01"
-                                      className="h-12"
-                                      data-testid="input-dryer-vent-price-per-unit"
-                                    />
-                                  </FormControl>
-                                  <FormMessage />
-                                </FormItem>
-                              )}
-                            />
-                          ) : (
-                            <div className="p-3 bg-muted/50 rounded-md border border-border">
-                              <p className="text-sm text-muted-foreground">
-                                Pricing fields require financial data access. Management can add pricing later.
-                              </p>
-                            </div>
-                          )}
+                          <FormField
+                            control={serviceForm.control}
+                            name="dryerVentPricePerUnit"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Price Per Unit</FormLabel>
+                                <FormControl>
+                                  <Input
+                                    {...field}
+                                    type="number"
+                                    min="0"
+                                    step="0.01"
+                                    className="h-12"
+                                    data-testid="input-dryer-vent-price-per-unit"
+                                  />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
                         </>
                       )}
                     </>
