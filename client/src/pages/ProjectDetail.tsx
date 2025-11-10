@@ -79,7 +79,6 @@ export default function ProjectDetail() {
   const [showEditDialog, setShowEditDialog] = useState(false);
   const [editJobType, setEditJobType] = useState<string>("");
   const [selectedPhoto, setSelectedPhoto] = useState<any>(null);
-  const [showDebugConsole, setShowDebugConsole] = useState(true);
 
   const { data: projectData, isLoading } = useQuery({
     queryKey: ["/api/projects", id],
@@ -1988,114 +1987,6 @@ export default function ProjectDetail() {
           )}
         </DialogContent>
       </Dialog>
-
-      {/* Debug Console */}
-      {showDebugConsole && (
-        <div className="fixed bottom-0 left-0 right-0 bg-black text-green-400 font-mono text-xs p-4 border-t-2 border-green-500 z-50 max-h-96 overflow-y-auto">
-          <div className="flex justify-between items-center mb-2">
-            <div className="text-green-300 font-bold">🐛 DEBUG CONSOLE</div>
-            <button 
-              onClick={() => setShowDebugConsole(false)}
-              className="text-red-400 hover:text-red-300 px-2"
-              data-testid="button-close-debug"
-            >
-              ✕ CLOSE
-            </button>
-          </div>
-          
-          <div className="space-y-2">
-            <div className="border-b border-green-800 pb-1">
-              <div className="text-yellow-400">📊 QUERY STATES:</div>
-              <div className="pl-4">
-                <div>• Project: {isLoading ? '⏳ LOADING' : project ? '✅ LOADED' : '❌ NOT FOUND'}</div>
-                <div>• Photos: {photosLoading ? '⏳ LOADING' : photosError ? '❌ ERROR' : photos.length > 0 ? `✅ ${photos.length} photos` : '⚠️ No photos'}</div>
-                <div>• Work Sessions: {workSessions.length > 0 ? `✅ ${workSessions.length} sessions` : '⚠️ No sessions'}</div>
-                <div>• Complaints: {complaints.length > 0 ? `✅ ${complaints.length} complaints` : '⚠️ No complaints'}</div>
-                <div>• Residents: {residents.length > 0 ? `✅ ${residents.length} residents` : '⚠️ No residents'}</div>
-              </div>
-            </div>
-
-            {photosError && (
-              <div className="border-b border-red-800 pb-1">
-                <div className="text-red-400">🚨 PHOTO ERROR:</div>
-                <div className="pl-4 text-red-300">
-                  {photosErrorMsg instanceof Error ? photosErrorMsg.message : String(photosErrorMsg)}
-                </div>
-                <div className="pl-4 text-red-200 text-xs mt-1">
-                  Stack: {photosErrorMsg instanceof Error && photosErrorMsg.stack ? photosErrorMsg.stack.substring(0, 200) : 'No stack trace'}
-                </div>
-              </div>
-            )}
-
-            <div className="border-b border-green-800 pb-1">
-              <div className="text-yellow-400">📦 RAW DATA:</div>
-              <div className="pl-4">
-                <div>• projectData: {JSON.stringify(projectData).substring(0, 100)}...</div>
-                <div>• photosData: {JSON.stringify(photosData).substring(0, 100)}...</div>
-                <div>• userData: {JSON.stringify(userData).substring(0, 100)}...</div>
-              </div>
-            </div>
-
-            <div className="border-b border-green-800 pb-1">
-              <div className="text-yellow-400">🔍 PROJECT INFO:</div>
-              <div className="pl-4">
-                {project ? (
-                  <>
-                    <div>• ID: {project.id}</div>
-                    <div>• Name: {project.buildingName}</div>
-                    <div>• Job Type: {project.jobType}</div>
-                    <div>• Status: {project.status}</div>
-                  </>
-                ) : (
-                  <div className="text-red-400">❌ No project data available</div>
-                )}
-              </div>
-            </div>
-
-            <div className="border-b border-green-800 pb-1">
-              <div className="text-yellow-400">👤 CURRENT USER:</div>
-              <div className="pl-4">
-                {currentUser ? (
-                  <>
-                    <div>• Role: {currentUser.role}</div>
-                    <div>• ID: {currentUser.id}</div>
-                    <div>• Can View Financial: {canViewFinancialData ? 'YES' : 'NO'}</div>
-                  </>
-                ) : (
-                  <div className="text-red-400">❌ No user data</div>
-                )}
-              </div>
-            </div>
-
-            <div>
-              <div className="text-yellow-400">📸 PHOTO DETAILS:</div>
-              <div className="pl-4">
-                <div>• Total Photos: {photos.length}</div>
-                <div>• Photos Query Enabled: {!!id ? 'YES' : 'NO'}</div>
-                <div>• Photos Error State: {photosError ? 'ERROR' : 'OK'}</div>
-                {photos.length > 0 && (
-                  <div className="mt-1">
-                    <div className="text-blue-400">Recent photo:</div>
-                    <div className="pl-4 text-xs">
-                      {JSON.stringify(photos[0], null, 2).substring(0, 300)}...
-                    </div>
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {!showDebugConsole && (
-        <button
-          onClick={() => setShowDebugConsole(true)}
-          className="fixed bottom-4 right-4 bg-green-600 text-white px-4 py-2 rounded-full shadow-lg hover:bg-green-700 z-50 font-mono text-sm"
-          data-testid="button-open-debug"
-        >
-          🐛 DEBUG
-        </button>
-      )}
     </div>
   );
 }
