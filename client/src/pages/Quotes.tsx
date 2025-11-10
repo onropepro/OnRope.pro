@@ -141,6 +141,7 @@ export default function Quotes() {
   const [createStep, setCreateStep] = useState<"building" | "services" | "configure">("services");
   const [selectedQuote, setSelectedQuote] = useState<QuoteWithServices | null>(null);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [isPhotoDialogOpen, setIsPhotoDialogOpen] = useState(false);
   const [editingServices, setEditingServices] = useState<Map<string, ServiceFormData>>(new Map());
   
   // Form data
@@ -751,7 +752,8 @@ export default function Quotes() {
                     <img
                       src={selectedQuote.photoUrl}
                       alt={selectedQuote.buildingName}
-                      className="w-full max-h-96 object-cover rounded-lg"
+                      className="w-full max-h-96 object-contain rounded-lg cursor-pointer hover-elevate"
+                      onClick={() => setIsPhotoDialogOpen(true)}
                       data-testid="img-quote-photo"
                     />
                     {canEditQuotes && (
@@ -1454,7 +1456,7 @@ export default function Quotes() {
                       <img
                         src={selectedQuote.photoUrl}
                         alt={selectedQuote.buildingName}
-                        className="w-full max-h-48 object-cover rounded-lg"
+                        className="w-full max-h-48 object-contain rounded-lg"
                       />
                       <p className="text-sm text-[#71717A]">Current Photo</p>
                     </div>
@@ -1523,6 +1525,23 @@ export default function Quotes() {
                 </div>
               </form>
             </Form>
+          </DialogContent>
+        </Dialog>
+
+        {/* Photo Viewer Dialog */}
+        <Dialog open={isPhotoDialogOpen} onOpenChange={setIsPhotoDialogOpen}>
+          <DialogContent className="max-w-5xl p-2">
+            <DialogHeader className="sr-only">
+              <DialogTitle>Building Photo</DialogTitle>
+            </DialogHeader>
+            {selectedQuote?.photoUrl && (
+              <img
+                src={selectedQuote.photoUrl}
+                alt={selectedQuote.buildingName}
+                className="w-full h-auto max-h-[90vh] object-contain"
+                data-testid="img-photo-fullsize"
+              />
+            )}
           </DialogContent>
         </Dialog>
       </>
