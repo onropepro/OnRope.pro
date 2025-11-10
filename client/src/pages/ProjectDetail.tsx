@@ -9,6 +9,8 @@ import { Separator } from "@/components/ui/separator";
 import { Progress } from "@/components/ui/progress";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { HighRiseBuilding } from "@/components/HighRiseBuilding";
 import { VerticalBuildingProgress } from "@/components/VerticalBuildingProgress";
 import { useToast } from "@/hooks/use-toast";
@@ -22,6 +24,17 @@ import { useState, useEffect } from "react";
 import { format } from "date-fns";
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from "recharts";
 import type { Project } from "@shared/schema";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+
+const endDaySchema = z.object({
+  elevation: z.enum(["north", "east", "south", "west"], { required_error: "Please select an elevation" }),
+  dropsCompleted: z.string().min(1, "Number of drops is required"),
+  shortfallReason: z.string().optional(),
+});
+
+type EndDayFormData = z.infer<typeof endDaySchema>;
 
 export default function ProjectDetail() {
   const { id } = useParams();
@@ -82,7 +95,17 @@ export default function ProjectDetail() {
   const [editJobType, setEditJobType] = useState<string>("");
   const [selectedPhoto, setSelectedPhoto] = useState<any>(null);
   const [showStartDayDialog, setShowStartDayDialog] = useState(false);
+  const [showEndDayDialog, setShowEndDayDialog] = useState(false);
   const [activeSession, setActiveSession] = useState<any>(null);
+
+  const endDayForm = useForm<EndDayFormData>({
+    resolver: zodResolver(endDaySchema),
+    defaultValues: {
+      elevation: "north",
+      dropsCompleted: "",
+      shortfallReason: "",
+    },
+  });
 
   const { data: userData } = useQuery({
     queryKey: ["/api/user"],
@@ -229,6 +252,39 @@ export default function ProjectDetail() {
     },
   });
 
+  const endDayMutation = useMutation({
+    mutationFn: async (data: EndDayFormData) => {
+      if (!activeSession) throw new Error("No active session");
+      
+      const response = await fetch(`/api/projects/${id}/work-sessions/${activeSession.id}/end`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+        credentials: "include",
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || "Failed to end work session");
+      }
+
+      return response.json();
+    },
+    onSuccess: () => {
+      setActiveSession(null);
+      setShowEndDayDialog(false);
+      queryClient.invalidateQueries({ queryKey: ["/api/projects"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/projects", id] });
+      queryClient.invalidateQueries({ queryKey: ["/api/projects", id, "work-sessions"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/my-drops-today"] });
+      endDayForm.reset();
+      toast({ title: "Work session ended", description: "Great work today!" });
+    },
+    onError: (error: Error) => {
+      toast({ title: "Error", description: error.message, variant: "destructive" });
+    },
+  });
+
   const deleteProjectMutation = useMutation({
     mutationFn: async (projectId: string) => {
       const response = await fetch(`/api/projects/${projectId}`, {
@@ -330,6 +386,16 @@ export default function ProjectDetail() {
       toast({ title: "Error", description: error.message, variant: "destructive" });
     },
   });
+
+  const onEndDaySubmit = (data: EndDayFormData) => {
+    endDayMutation.mutate(data);
+  };
+
+  const confirmStartDay = () => {
+    if (id) {
+      startDayMutation.mutate(id);
+    }
+  };
 
   const handlePdfUpload = async (file: File) => {
     if (!id) return;
@@ -530,7 +596,7 @@ export default function ProjectDetail() {
             {/* End Day Button - Shown when there IS an active session */}
             {activeSession && (
               <Button
-                onClick={() => setLocation("/dashboard")}
+                onClick={() => setShowEndDayDialog(true)}
                 variant="destructive"
                 className="h-10"
                 data-testid="button-end-day"
@@ -2097,6 +2163,136 @@ export default function ProjectDetail() {
               )}
             </div>
           )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Start Day Confirmation Dialog */}
+      <AlertDialog open={showStartDayDialog} onOpenChange={setShowStartDayDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Start Your Work Day?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This will begin tracking your work session for {project.buildingName}. You can end your session later when finished.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel data-testid="button-cancel-start-day">Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={confirmStartDay}
+              data-testid="button-confirm-start-day"
+              disabled={startDayMutation.isPending}
+            >
+              {startDayMutation.isPending ? "Starting..." : "Start Day"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* End Day Dialog with Drop Count */}
+      <Dialog open={showEndDayDialog} onOpenChange={setShowEndDayDialog}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>End Your Work Day</DialogTitle>
+            <DialogDescription>
+              Enter the number of drops you completed today for {project.buildingName}.
+            </DialogDescription>
+          </DialogHeader>
+
+          <Form {...endDayForm}>
+            <form onSubmit={endDayForm.handleSubmit(onEndDaySubmit)} className="space-y-4">
+              <FormField
+                control={endDayForm.control}
+                name="elevation"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Building Elevation</FormLabel>
+                    <Select onValueChange={field.onChange} value={field.value}>
+                      <FormControl>
+                        <SelectTrigger className="h-12" data-testid="select-elevation">
+                          <SelectValue placeholder="Select elevation" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="north" data-testid="option-north">North</SelectItem>
+                        <SelectItem value="east" data-testid="option-east">East</SelectItem>
+                        <SelectItem value="south" data-testid="option-south">South</SelectItem>
+                        <SelectItem value="west" data-testid="option-west">West</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={endDayForm.control}
+                name="dropsCompleted"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Drops Completed Today</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="number"
+                        min="0"
+                        placeholder="0"
+                        {...field}
+                        data-testid="input-end-day-drops"
+                        className="h-14 text-3xl font-bold text-center"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              {endDayForm.watch("dropsCompleted") !== "" && 
+                parseInt(endDayForm.watch("dropsCompleted")) < project.dailyDropTarget && (
+                <FormField
+                  control={endDayForm.control}
+                  name="shortfallReason"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Shortfall Reason (Required)</FormLabel>
+                      <FormControl>
+                        <Textarea
+                          placeholder="Explain why the daily target wasn't met..."
+                          {...field}
+                          data-testid="input-shortfall-reason"
+                          className="min-h-24"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              )}
+
+              <div className="flex gap-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="flex-1 h-12"
+                  onClick={() => {
+                    setShowEndDayDialog(false);
+                    endDayForm.reset();
+                  }}
+                  data-testid="button-cancel-end-day"
+                >
+                  Cancel
+                </Button>
+                <Button
+                  type="submit"
+                  variant="destructive"
+                  className="flex-1 h-12"
+                  data-testid="button-confirm-end-day"
+                  disabled={endDayMutation.isPending}
+                >
+                  <span className="material-icons mr-2">stop_circle</span>
+                  {endDayMutation.isPending ? "Ending..." : "End Day"}
+                </Button>
+              </div>
+            </form>
+          </Form>
         </DialogContent>
       </Dialog>
     </div>
