@@ -1014,7 +1014,7 @@ export default function ProjectDetail() {
                               </div>
                             )}
                             <div className="text-xs text-muted-foreground mt-1">
-                              {format(new Date(photo.uploadedAt), "MMM d, yyyy 'at' h:mm a")}
+                              {format(new Date(photo.createdAt), "MMM d, yyyy 'at' h:mm a")}
                             </div>
                           </div>
                         </div>
