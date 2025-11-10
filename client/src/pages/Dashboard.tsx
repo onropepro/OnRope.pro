@@ -205,8 +205,10 @@ const dropLogSchema = z.object({
 });
 
 const endDaySchema = z.object({
-  elevation: z.enum(["north", "east", "south", "west"], { required_error: "Please select an elevation" }),
-  dropsCompleted: z.string().min(1, "Number of drops is required"),
+  dropsNorth: z.string().default("0"),
+  dropsEast: z.string().default("0"),
+  dropsSouth: z.string().default("0"),
+  dropsWest: z.string().default("0"),
   shortfallReason: z.string().optional(),
 });
 
@@ -408,8 +410,10 @@ export default function Dashboard() {
   const endDayForm = useForm<EndDayFormData>({
     resolver: zodResolver(endDaySchema),
     defaultValues: {
-      elevation: "north",
-      dropsCompleted: "",
+      dropsNorth: "0",
+      dropsEast: "0",
+      dropsSouth: "0",
+      dropsWest: "0",
       shortfallReason: "",
     },
   });
@@ -822,18 +826,11 @@ export default function Dashboard() {
 
   const endDayMutation = useMutation({
     mutationFn: async (data: EndDayFormData & { sessionId: string; projectId: string }) => {
-      const dropsCompleted = parseInt(data.dropsCompleted);
-      
-      // Map elevation to the correct field
-      const elevationFields = {
-        dropsCompletedNorth: data.elevation === "north" ? dropsCompleted : 0,
-        dropsCompletedEast: data.elevation === "east" ? dropsCompleted : 0,
-        dropsCompletedSouth: data.elevation === "south" ? dropsCompleted : 0,
-        dropsCompletedWest: data.elevation === "west" ? dropsCompleted : 0,
-      };
-      
       return apiRequest("PATCH", `/api/projects/${data.projectId}/work-sessions/${data.sessionId}/end`, {
-        ...elevationFields,
+        dropsCompletedNorth: parseInt(data.dropsNorth) || 0,
+        dropsCompletedEast: parseInt(data.dropsEast) || 0,
+        dropsCompletedSouth: parseInt(data.dropsSouth) || 0,
+        dropsCompletedWest: parseInt(data.dropsWest) || 0,
         shortfallReason: data.shortfallReason,
       });
     },
@@ -888,10 +885,16 @@ export default function Dashboard() {
     // Get the daily target from the active session's project
     const activeProject = projects.find(p => p.id === activeSession.projectId);
     const sessionDailyTarget = activeProject?.dailyDropTarget || 0;
-    const dropsForThisElevation = parseInt(data.dropsCompleted);
+    
+    // Calculate total drops from all elevations being submitted
+    const dropsNorth = parseInt(data.dropsNorth) || 0;
+    const dropsEast = parseInt(data.dropsEast) || 0;
+    const dropsSouth = parseInt(data.dropsSouth) || 0;
+    const dropsWest = parseInt(data.dropsWest) || 0;
+    const totalDropsBeingSubmitted = dropsNorth + dropsEast + dropsSouth + dropsWest;
     
     // Calculate total drops today: existing drops + new drops being submitted
-    const totalDropsToday = todayDrops + dropsForThisElevation;
+    const totalDropsToday = todayDrops + totalDropsBeingSubmitted;
     
     // Validate shortfall reason is required when TOTAL drops < target
     if (totalDropsToday < sessionDailyTarget && !data.shortfallReason?.trim()) {
@@ -3344,50 +3347,27 @@ export default function Dashboard() {
           <DialogHeader>
             <DialogTitle>End Your Work Day</DialogTitle>
             <DialogDescription>
-              Enter the total number of drops you completed today.
+              Enter the number of drops you completed today for each elevation.
             </DialogDescription>
           </DialogHeader>
 
           <Form {...endDayForm}>
             <form onSubmit={endDayForm.handleSubmit(onEndDaySubmit)} className="space-y-4">
+              {/* North Elevation */}
               <FormField
                 control={endDayForm.control}
-                name="elevation"
+                name="dropsNorth"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Building Elevation</FormLabel>
-                    <Select onValueChange={field.onChange} value={field.value}>
-                      <FormControl>
-                        <SelectTrigger className="h-12" data-testid="select-elevation">
-                          <SelectValue placeholder="Select elevation" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="north" data-testid="option-north">North</SelectItem>
-                        <SelectItem value="east" data-testid="option-east">East</SelectItem>
-                        <SelectItem value="south" data-testid="option-south">South</SelectItem>
-                        <SelectItem value="west" data-testid="option-west">West</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={endDayForm.control}
-                name="dropsCompleted"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Drops Completed Today</FormLabel>
+                    <FormLabel>North Elevation</FormLabel>
                     <FormControl>
                       <Input
                         type="number"
                         min="0"
                         placeholder="0"
                         {...field}
-                        data-testid="input-end-day-drops"
-                        className="h-14 text-3xl font-bold text-center"
+                        data-testid="input-drops-north"
+                        className="h-12 text-xl"
                       />
                     </FormControl>
                     <FormMessage />
@@ -3395,9 +3375,81 @@ export default function Dashboard() {
                 )}
               />
 
-              {activeSession && 
-                endDayForm.watch("dropsCompleted") !== "" && 
-                parseInt(endDayForm.watch("dropsCompleted")) < dailyTarget && (
+              {/* East Elevation */}
+              <FormField
+                control={endDayForm.control}
+                name="dropsEast"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>East Elevation</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="number"
+                        min="0"
+                        placeholder="0"
+                        {...field}
+                        data-testid="input-drops-east"
+                        className="h-12 text-xl"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              {/* South Elevation */}
+              <FormField
+                control={endDayForm.control}
+                name="dropsSouth"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>South Elevation</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="number"
+                        min="0"
+                        placeholder="0"
+                        {...field}
+                        data-testid="input-drops-south"
+                        className="h-12 text-xl"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              {/* West Elevation */}
+              <FormField
+                control={endDayForm.control}
+                name="dropsWest"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>West Elevation</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="number"
+                        min="0"
+                        placeholder="0"
+                        {...field}
+                        data-testid="input-drops-west"
+                        className="h-12 text-xl"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              {activeSession && (() => {
+                const dropsNorth = parseInt(endDayForm.watch("dropsNorth")) || 0;
+                const dropsEast = parseInt(endDayForm.watch("dropsEast")) || 0;
+                const dropsSouth = parseInt(endDayForm.watch("dropsSouth")) || 0;
+                const dropsWest = parseInt(endDayForm.watch("dropsWest")) || 0;
+                const totalDrops = dropsNorth + dropsEast + dropsSouth + dropsWest;
+                const totalWithExisting = todayDrops + totalDrops;
+                return totalWithExisting < dailyTarget && totalDrops > 0;
+              })() && (
                 <FormField
                   control={endDayForm.control}
                   name="shortfallReason"
