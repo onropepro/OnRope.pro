@@ -878,72 +878,363 @@ export default function Quotes() {
 
         {/* Edit Quote Dialog */}
         <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-          <DialogContent className="max-w-2xl">
+          <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle className="text-2xl font-bold">Edit Quote</DialogTitle>
             </DialogHeader>
             <Form {...editForm}>
               <form onSubmit={editForm.handleSubmit((data) => editQuoteMutation.mutate(data))} className="space-y-6">
-                <FormField
-                  control={editForm.control}
-                  name="buildingName"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Building Name</FormLabel>
-                      <FormControl>
-                        <Input {...field} className="h-12" data-testid="input-edit-building-name" />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={editForm.control}
-                  name="strataPlanNumber"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Strata Plan Number</FormLabel>
-                      <FormControl>
-                        <Input {...field} className="h-12" data-testid="input-edit-strata-plan" />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={editForm.control}
-                  name="buildingAddress"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Building Address</FormLabel>
-                      <FormControl>
-                        <Input {...field} className="h-12" data-testid="input-edit-building-address" />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={editForm.control}
-                  name="floorCount"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Number of Floors</FormLabel>
-                      <FormControl>
-                        <Input 
-                          {...field} 
-                          type="number" 
-                          min="1" 
-                          className="h-12" 
-                          data-testid="input-edit-floor-count"
-                          onChange={(e) => field.onChange(e.target.value ? parseInt(e.target.value) : undefined)}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <div className="flex gap-4 justify-end">
+                {/* Building Information */}
+                <div className="space-y-4">
+                  <h3 className="text-lg font-semibold">Building Information</h3>
+                  <div className="grid grid-cols-2 gap-4">
+                    <FormField
+                      control={editForm.control}
+                      name="buildingName"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Building Name</FormLabel>
+                          <FormControl>
+                            <Input {...field} className="h-12" data-testid="input-edit-building-name" />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={editForm.control}
+                      name="strataPlanNumber"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Strata Plan Number</FormLabel>
+                          <FormControl>
+                            <Input {...field} className="h-12" data-testid="input-edit-strata-plan" />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={editForm.control}
+                      name="buildingAddress"
+                      render={({ field }) => (
+                        <FormItem className="col-span-2">
+                          <FormLabel>Building Address</FormLabel>
+                          <FormControl>
+                            <Input {...field} className="h-12" data-testid="input-edit-building-address" />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={editForm.control}
+                      name="floorCount"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Number of Floors</FormLabel>
+                          <FormControl>
+                            <Input 
+                              {...field} 
+                              type="number" 
+                              min="1" 
+                              className="h-12" 
+                              data-testid="input-edit-floor-count"
+                              onChange={(e) => field.onChange(e.target.value ? parseInt(e.target.value) : undefined)}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                </div>
+
+                {/* Services */}
+                <div className="space-y-4">
+                  <h3 className="text-lg font-semibold">Services</h3>
+                  <Accordion type="single" collapsible className="space-y-2">
+                    {Array.from(editingServices.entries()).map(([serviceType, serviceData]) => {
+                      const serviceConfig = SERVICE_TYPES.find(s => s.id === serviceType);
+                      const Icon = serviceConfig?.icon || Building2;
+                      
+                      return (
+                        <AccordionItem key={serviceType} value={serviceType} className="border rounded-lg px-4">
+                          <AccordionTrigger className="hover:no-underline">
+                            <div className="flex items-center gap-3">
+                              <div className="w-10 h-10 rounded-lg bg-[#3B82F6]/10 flex items-center justify-center">
+                                <Icon className="w-5 h-5 text-[#3B82F6]" />
+                              </div>
+                              <span className="font-medium">{serviceConfig?.name || serviceType}</span>
+                            </div>
+                          </AccordionTrigger>
+                          <AccordionContent className="pt-4 space-y-4">
+                            {/* Elevation-based services */}
+                            {serviceConfig?.requiresElevation && (
+                              <div className="grid grid-cols-2 gap-4">
+                                <div>
+                                  <Label>North Drops</Label>
+                                  <Input
+                                    type="number"
+                                    min="0"
+                                    value={serviceData.dropsNorth || ""}
+                                    onChange={(e) => {
+                                      const newServices = new Map(editingServices);
+                                      newServices.set(serviceType, {
+                                        ...serviceData,
+                                        dropsNorth: e.target.value ? parseInt(e.target.value) : undefined
+                                      });
+                                      setEditingServices(newServices);
+                                    }}
+                                    className="h-12"
+                                  />
+                                </div>
+                                <div>
+                                  <Label>East Drops</Label>
+                                  <Input
+                                    type="number"
+                                    min="0"
+                                    value={serviceData.dropsEast || ""}
+                                    onChange={(e) => {
+                                      const newServices = new Map(editingServices);
+                                      newServices.set(serviceType, {
+                                        ...serviceData,
+                                        dropsEast: e.target.value ? parseInt(e.target.value) : undefined
+                                      });
+                                      setEditingServices(newServices);
+                                    }}
+                                    className="h-12"
+                                  />
+                                </div>
+                                <div>
+                                  <Label>South Drops</Label>
+                                  <Input
+                                    type="number"
+                                    min="0"
+                                    value={serviceData.dropsSouth || ""}
+                                    onChange={(e) => {
+                                      const newServices = new Map(editingServices);
+                                      newServices.set(serviceType, {
+                                        ...serviceData,
+                                        dropsSouth: e.target.value ? parseInt(e.target.value) : undefined
+                                      });
+                                      setEditingServices(newServices);
+                                    }}
+                                    className="h-12"
+                                  />
+                                </div>
+                                <div>
+                                  <Label>West Drops</Label>
+                                  <Input
+                                    type="number"
+                                    min="0"
+                                    value={serviceData.dropsWest || ""}
+                                    onChange={(e) => {
+                                      const newServices = new Map(editingServices);
+                                      newServices.set(serviceType, {
+                                        ...serviceData,
+                                        dropsWest: e.target.value ? parseInt(e.target.value) : undefined
+                                      });
+                                      setEditingServices(newServices);
+                                    }}
+                                    className="h-12"
+                                  />
+                                </div>
+                                <div>
+                                  <Label>Drops Per Day</Label>
+                                  <Input
+                                    type="number"
+                                    min="1"
+                                    value={serviceData.dropsPerDay || ""}
+                                    onChange={(e) => {
+                                      const newServices = new Map(editingServices);
+                                      newServices.set(serviceType, {
+                                        ...serviceData,
+                                        dropsPerDay: e.target.value ? parseInt(e.target.value) : undefined
+                                      });
+                                      setEditingServices(newServices);
+                                    }}
+                                    className="h-12"
+                                  />
+                                </div>
+                              </div>
+                            )}
+
+                            {/* Parkade service */}
+                            {serviceType === "parkade" && (
+                              <div className="grid grid-cols-2 gap-4">
+                                <div>
+                                  <Label>Parkade Stalls</Label>
+                                  <Input
+                                    type="number"
+                                    min="1"
+                                    value={serviceData.parkadeStalls || ""}
+                                    onChange={(e) => {
+                                      const newServices = new Map(editingServices);
+                                      newServices.set(serviceType, {
+                                        ...serviceData,
+                                        parkadeStalls: e.target.value ? parseInt(e.target.value) : undefined
+                                      });
+                                      setEditingServices(newServices);
+                                    }}
+                                    className="h-12"
+                                  />
+                                </div>
+                                {canViewFinancialData && (
+                                  <div>
+                                    <Label>Price Per Stall</Label>
+                                    <Input
+                                      type="number"
+                                      min="0"
+                                      step="0.01"
+                                      value={serviceData.pricePerStall || ""}
+                                      onChange={(e) => {
+                                        const newServices = new Map(editingServices);
+                                        newServices.set(serviceType, {
+                                          ...serviceData,
+                                          pricePerStall: e.target.value ? parseFloat(e.target.value) : undefined
+                                        });
+                                        setEditingServices(newServices);
+                                      }}
+                                      className="h-12"
+                                    />
+                                  </div>
+                                )}
+                              </div>
+                            )}
+
+                            {/* Ground windows service */}
+                            {serviceType === "ground_windows" && (
+                              <div>
+                                <Label>Hours</Label>
+                                <Input
+                                  type="number"
+                                  min="0"
+                                  step="0.5"
+                                  value={serviceData.groundWindowHours || ""}
+                                  onChange={(e) => {
+                                    const newServices = new Map(editingServices);
+                                    newServices.set(serviceType, {
+                                      ...serviceData,
+                                      groundWindowHours: e.target.value ? parseFloat(e.target.value) : undefined
+                                    });
+                                    setEditingServices(newServices);
+                                  }}
+                                  className="h-12"
+                                />
+                              </div>
+                            )}
+
+                            {/* In-suite dryer vent service */}
+                            {serviceType === "in_suite" && (
+                              <div className="grid grid-cols-2 gap-4">
+                                <div>
+                                  <Label>Number of Suites</Label>
+                                  <Input
+                                    type="number"
+                                    min="1"
+                                    value={serviceData.dryerVentUnits || ""}
+                                    onChange={(e) => {
+                                      const newServices = new Map(editingServices);
+                                      newServices.set(serviceType, {
+                                        ...serviceData,
+                                        dryerVentUnits: e.target.value ? parseInt(e.target.value) : undefined
+                                      });
+                                      setEditingServices(newServices);
+                                    }}
+                                    className="h-12"
+                                  />
+                                </div>
+                                {canViewFinancialData && (
+                                  <div>
+                                    <Label>Price Per Unit</Label>
+                                    <Input
+                                      type="number"
+                                      min="0"
+                                      step="0.01"
+                                      value={serviceData.dryerVentPricePerUnit || ""}
+                                      onChange={(e) => {
+                                        const newServices = new Map(editingServices);
+                                        newServices.set(serviceType, {
+                                          ...serviceData,
+                                          dryerVentPricePerUnit: e.target.value ? parseFloat(e.target.value) : undefined
+                                        });
+                                        setEditingServices(newServices);
+                                      }}
+                                      className="h-12"
+                                    />
+                                  </div>
+                                )}
+                              </div>
+                            )}
+
+                            {/* Pricing fields - common to all services */}
+                            {canViewFinancialData && (
+                              <div className="grid grid-cols-3 gap-4 pt-4 border-t">
+                                <div>
+                                  <Label>Price Per Hour</Label>
+                                  <Input
+                                    type="number"
+                                    min="0"
+                                    step="0.01"
+                                    value={serviceData.pricePerHour || ""}
+                                    onChange={(e) => {
+                                      const newServices = new Map(editingServices);
+                                      newServices.set(serviceType, {
+                                        ...serviceData,
+                                        pricePerHour: e.target.value ? parseFloat(e.target.value) : undefined
+                                      });
+                                      setEditingServices(newServices);
+                                    }}
+                                    className="h-12"
+                                  />
+                                </div>
+                                <div>
+                                  <Label>Total Hours</Label>
+                                  <Input
+                                    type="number"
+                                    min="0"
+                                    step="0.1"
+                                    value={serviceData.totalHours || ""}
+                                    onChange={(e) => {
+                                      const newServices = new Map(editingServices);
+                                      newServices.set(serviceType, {
+                                        ...serviceData,
+                                        totalHours: e.target.value ? parseFloat(e.target.value) : undefined
+                                      });
+                                      setEditingServices(newServices);
+                                    }}
+                                    className="h-12"
+                                  />
+                                </div>
+                                <div>
+                                  <Label>Total Cost</Label>
+                                  <Input
+                                    type="number"
+                                    min="0"
+                                    step="0.01"
+                                    value={serviceData.totalCost || ""}
+                                    onChange={(e) => {
+                                      const newServices = new Map(editingServices);
+                                      newServices.set(serviceType, {
+                                        ...serviceData,
+                                        totalCost: e.target.value ? parseFloat(e.target.value) : undefined
+                                      });
+                                      setEditingServices(newServices);
+                                    }}
+                                    className="h-12"
+                                  />
+                                </div>
+                              </div>
+                            )}
+                          </AccordionContent>
+                        </AccordionItem>
+                      );
+                    })}
+                  </Accordion>
+                </div>
+
+                <div className="flex gap-4 justify-end pt-4 border-t">
                   <Button
                     type="button"
                     variant="outline"
