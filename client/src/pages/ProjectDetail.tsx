@@ -1,6 +1,7 @@
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useParams, useLocation } from "wouter";
 import { queryClient } from "@/lib/queryClient";
+import { hasFinancialAccess, isManagement as checkIsManagement, hasPermission } from "@/lib/permissions";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -93,13 +94,11 @@ export default function ProjectDetail() {
 
   const currentUser = userData?.user;
   
-  // Check if user can view financial data (company owner OR has permission)
-  const canViewFinancialData = currentUser?.role === "company" || 
-                                currentUser?.permissions?.includes("view_financial_data");
+  // Check if user can view financial data using centralized permission helper
+  const canViewFinancialData = hasFinancialAccess(currentUser);
   
-  // Check if user can view work history (company owner OR has permission)
-  const canViewWorkHistory = currentUser?.role === "company" || 
-                              currentUser?.permissions?.includes("view_work_history");
+  // Check if user can view work history using centralized permission helper
+  const canViewWorkHistory = checkIsManagement(currentUser) || hasPermission(currentUser, 'view_work_history');
 
   // Fetch work sessions for this project
   const { data: workSessionsData } = useQuery({
@@ -195,10 +194,8 @@ export default function ProjectDetail() {
   // Only company and operations_manager can delete projects
   const canDeleteProject = currentUser?.role === "company" || currentUser?.role === "operations_manager";
   
-  // Check if user is management (show pie chart only for management)
-  const isManagement = currentUser?.role === "company" || 
-                       currentUser?.role === "operations_manager" || 
-                       currentUser?.role === "supervisor";
+  // Check if user is management using centralized permission helper
+  const isManagement = checkIsManagement(currentUser);
 
   const startDayMutation = useMutation({
     mutationFn: async (projectId: string) => {
