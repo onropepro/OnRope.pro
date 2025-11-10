@@ -2219,10 +2219,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const status = req.query.status as string | undefined;
       let quotes = await storage.getQuotesByCompany(companyId, status);
       
-      // Workers can only see their own draft quotes
+      // Workers can only see quotes they created
       const isWorker = ["rope_access_tech", "manager", "ground_crew", "ground_crew_supervisor"].includes(currentUser.role);
       if (isWorker) {
-        quotes = quotes.filter(quote => quote.status === "draft" && quote.createdBy === currentUser.id);
+        quotes = quotes.filter(quote => quote.createdBy === currentUser.id);
       }
       
       // Filter pricing data if user doesn't have financial permissions
@@ -2272,10 +2272,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(403).json({ message: "Forbidden" });
       }
       
-      // Workers can only view their own draft quotes
+      // Workers can only view quotes they created
       const isWorker = ["rope_access_tech", "manager", "ground_crew", "ground_crew_supervisor"].includes(currentUser.role);
-      if (isWorker && (quote.status !== "draft" || quote.createdBy !== currentUser.id)) {
-        return res.status(403).json({ message: "You can only view your own draft quotes" });
+      if (isWorker && quote.createdBy !== currentUser.id) {
+        return res.status(403).json({ message: "You can only view quotes you created" });
       }
       
       // Filter pricing data if user doesn't have financial permissions
@@ -2307,12 +2307,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       // Check if user has edit permissions
+      // Management can edit any quote, workers can edit their own quotes
       const isManagement = ["company", "operations_manager", "supervisor"].includes(currentUser.role);
       const hasEditPermission = currentUser.permissions?.includes("edit_quotes");
-      
-      if (!isManagement && !hasEditPermission) {
-        return res.status(403).json({ message: "Forbidden - You don't have permission to edit quotes" });
-      }
+      const isWorker = ["rope_access_tech", "manager", "ground_crew", "ground_crew_supervisor"].includes(currentUser.role);
       
       const companyId = currentUser.role === "company" ? currentUser.id : currentUser.companyId;
       if (!companyId) {
@@ -2327,6 +2325,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       if (quote.companyId !== companyId) {
         return res.status(403).json({ message: "Forbidden" });
+      }
+      
+      // Workers can only edit quotes they created
+      if (isWorker && quote.createdBy !== currentUser.id) {
+        return res.status(403).json({ message: "You can only edit quotes you created" });
+      }
+      
+      // Non-management without edit permission cannot edit
+      if (!isManagement && !hasEditPermission && !isWorker) {
+        return res.status(403).json({ message: "Forbidden - You don't have permission to edit quotes" });
       }
       
       const { services, ...quoteFields } = req.body;
@@ -2461,8 +2469,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Upload quote photo
-  app.post("/api/quotes/:id/photo", requireAuth, requireRole("company", "operations_manager", "supervisor"), imageUpload.single("photo"), async (req: Request, res: Response) => {
+  // Upload quote photo - All employees can upload photos
+  app.post("/api/quotes/:id/photo", requireAuth, requireRole("company", "operations_manager", "supervisor", "rope_access_tech", "manager", "ground_crew", "ground_crew_supervisor"), imageUpload.single("photo"), async (req: Request, res: Response) => {
     try {
       const currentUser = await storage.getUserById(req.session.userId!);
       if (!currentUser) {
