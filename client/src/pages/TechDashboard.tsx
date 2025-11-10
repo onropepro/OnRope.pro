@@ -78,8 +78,32 @@ export default function TechDashboard() {
     enabled: !!userData?.user?.companyId,
   });
 
+  // Fetch all photos to check for missed units
+  const inSuiteDryerVentProjects = (projectsData?.projects || []).filter(
+    (p: any) => p.jobType === 'in_suite_dryer_vent_cleaning' && p.status === 'active'
+  );
+  
+  const { data: allPhotosData } = useQuery({
+    queryKey: ["/api/all-project-photos", inSuiteDryerVentProjects.map((p: any) => p.id)],
+    enabled: inSuiteDryerVentProjects.length > 0,
+    queryFn: async () => {
+      const photosPromises = inSuiteDryerVentProjects.map(async (project: any) => {
+        const data = await apiRequest("GET", `/api/projects/${project.id}/photos`);
+        return (data.photos || []).map((photo: any) => ({ 
+          ...photo, 
+          projectId: project.id, 
+          projectStrataPlanNumber: project.strataPlanNumber 
+        }));
+      });
+      const results = await Promise.all(photosPromises);
+      return results.flat();
+    }
+  });
+
   const projects = projectsData?.projects || [];
   const complaints = complaintsData?.complaints || [];
+  const allPhotos = allPhotosData || [];
+  const missedUnitPhotos = allPhotos.filter((photo: any) => photo.isMissedUnit);
   const companyName = companyData?.company?.companyName || "";
   
   // Calculate daily progress
@@ -404,6 +428,51 @@ export default function TechDashboard() {
 
           <TabsContent value="projects">
             <div className="space-y-4">
+              {/* Missed Units Summary - Only show if there are missed units */}
+              {missedUnitPhotos.length > 0 && (
+                <Card className="border-2 border-orange-400 bg-orange-50">
+                  <CardHeader className="pb-3">
+                    <div className="flex items-center justify-between">
+                      <CardTitle className="text-base flex items-center gap-2">
+                        <span className="material-icons text-orange-600">warning</span>
+                        Missed Units Require Attention
+                      </CardTitle>
+                      <Badge variant="destructive" data-testid="badge-missed-units-count">
+                        {missedUnitPhotos.length}
+                      </Badge>
+                    </div>
+                    <CardDescription>
+                      Units that were missed during the initial sweep
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="pt-0">
+                    <div className="space-y-2">
+                      {missedUnitPhotos.map((photo: any) => (
+                        <div
+                          key={photo.id}
+                          onClick={() => setLocation(`/projects/${photo.projectId}`)}
+                          className="flex items-center justify-between p-3 bg-white rounded-lg border border-orange-200 hover-elevate cursor-pointer"
+                          data-testid={`missed-unit-item-${photo.id}`}
+                        >
+                          <div className="flex items-center gap-3">
+                            <img
+                              src={photo.imageUrl}
+                              alt={`Missed unit ${photo.missedUnitNumber}`}
+                              className="w-12 h-12 rounded object-cover border border-orange-300"
+                            />
+                            <div>
+                              <div className="font-medium text-sm">Unit {photo.missedUnitNumber}</div>
+                              <div className="text-xs text-muted-foreground">{photo.projectStrataPlanNumber}</div>
+                            </div>
+                          </div>
+                          <span className="material-icons text-muted-foreground">chevron_right</span>
+                        </div>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+              
               {projects.length === 0 ? (
                 <Card>
                   <CardContent className="p-8 text-center text-muted-foreground">

@@ -293,6 +293,7 @@ export default function ProjectDetail() {
       
       queryClient.invalidateQueries({ queryKey: ["/api/projects", id, "photos"] });
       queryClient.invalidateQueries({ queryKey: ["/api/projects", id] });
+      queryClient.invalidateQueries({ queryKey: ["/api/all-project-photos"] });
       toast({ title: isMissedUnit ? "Missed unit photo uploaded successfully" : "Photo uploaded successfully" });
       
       // Reset form
