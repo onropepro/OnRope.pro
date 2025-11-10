@@ -528,12 +528,14 @@ export default function Quotes() {
                           {quote.services.length}
                         </Badge>
                       </div>
-                      <div className="flex items-center justify-between">
-                        <span className="text-[#71717A]">Total:</span>
-                        <span className="text-2xl font-bold text-[#3B82F6]">
-                          ${quote.services.reduce((sum, s) => sum + Number(s.totalCost || 0), 0).toFixed(2)}
-                        </span>
-                      </div>
+                      {canViewFinancialData && (
+                        <div className="flex items-center justify-between">
+                          <span className="text-[#71717A]">Total:</span>
+                          <span className="text-2xl font-bold text-[#3B82F6]">
+                            ${quote.services.reduce((sum, s) => sum + Number(s.totalCost || 0), 0).toFixed(2)}
+                          </span>
+                        </div>
+                      )}
                     </div>
                   </CardContent>
                 </Card>
@@ -652,10 +654,12 @@ export default function Quotes() {
                             <p className="text-[#71717A] mb-1">Stalls</p>
                             <p className="font-medium text-[#0A0A0A]">{service.parkadeStalls}</p>
                           </div>
-                          <div>
-                            <p className="text-[#71717A] mb-1">Price/Stall</p>
-                            <p className="font-medium text-[#0A0A0A]">${Number(service.pricePerStall).toFixed(2)}</p>
-                          </div>
+                          {canViewFinancialData && (
+                            <div>
+                              <p className="text-[#71717A] mb-1">Price/Stall</p>
+                              <p className="font-medium text-[#0A0A0A]">${Number(service.pricePerStall).toFixed(2)}</p>
+                            </div>
+                          )}
                         </>
                       )}
 
@@ -683,20 +687,24 @@ export default function Quotes() {
                         </>
                       )}
 
-                      <div>
-                        <p className="text-[#71717A] mb-1">Price/Hour</p>
-                        <p className="font-medium text-[#0A0A0A]">${Number(service.pricePerHour).toFixed(2)}</p>
-                      </div>
-                      <div>
-                        <p className="text-[#71717A] mb-1">Total Hours</p>
-                        <p className="font-medium text-[#0A0A0A]">{Number(service.totalHours).toFixed(1)}</p>
-                      </div>
-                      <div>
-                        <p className="text-[#71717A] mb-1">Total Cost</p>
-                        <p className="text-xl font-bold text-[#3B82F6]">
-                          ${Number(service.totalCost).toFixed(2)}
-                        </p>
-                      </div>
+                      {canViewFinancialData && (
+                        <>
+                          <div>
+                            <p className="text-[#71717A] mb-1">Price/Hour</p>
+                            <p className="font-medium text-[#0A0A0A]">${Number(service.pricePerHour).toFixed(2)}</p>
+                          </div>
+                          <div>
+                            <p className="text-[#71717A] mb-1">Total Hours</p>
+                            <p className="font-medium text-[#0A0A0A]">{Number(service.totalHours).toFixed(1)}</p>
+                          </div>
+                          <div>
+                            <p className="text-[#71717A] mb-1">Total Cost</p>
+                            <p className="text-xl font-bold text-[#3B82F6]">
+                              ${Number(service.totalCost).toFixed(2)}
+                            </p>
+                          </div>
+                        </>
+                      )}
                     </div>
                   </CardHeader>
                 </Card>
@@ -704,21 +712,23 @@ export default function Quotes() {
             })}
           </div>
 
-          <Card className="rounded-2xl shadow-lg border border-[#F4F4F5] bg-[#3B82F6]/5">
-            <CardContent className="p-8">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h3 className="text-xl font-semibold text-[#0A0A0A] mb-1">Quote Total</h3>
-                  <p className="text-[#71717A]">
-                    {selectedQuote.services.length} service{selectedQuote.services.length !== 1 ? 's' : ''}
-                  </p>
+          {canViewFinancialData && (
+            <Card className="rounded-2xl shadow-lg border border-[#F4F4F5] bg-[#3B82F6]/5">
+              <CardContent className="p-8">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h3 className="text-xl font-semibold text-[#0A0A0A] mb-1">Quote Total</h3>
+                    <p className="text-[#71717A]">
+                      {selectedQuote.services.length} service{selectedQuote.services.length !== 1 ? 's' : ''}
+                    </p>
+                  </div>
+                  <div className="text-4xl font-bold text-[#3B82F6]">
+                    ${selectedQuote.services.reduce((sum, s) => sum + Number(s.totalCost || 0), 0).toFixed(2)}
+                  </div>
                 </div>
-                <div className="text-4xl font-bold text-[#3B82F6]">
-                  ${selectedQuote.services.reduce((sum, s) => sum + Number(s.totalCost || 0), 0).toFixed(2)}
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
+          )}
 
           <div className="flex gap-4 mt-8">
             {selectedQuote.status === "open" && (
@@ -1177,26 +1187,34 @@ export default function Quotes() {
                           </FormItem>
                         )}
                       />
-                      <FormField
-                        control={serviceForm.control}
-                        name="pricePerStall"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Price Per Stall</FormLabel>
-                            <FormControl>
-                              <Input
-                                {...field}
-                                type="number"
-                                min="0"
-                                step="0.01"
-                                className="h-12"
-                                data-testid="input-price-per-stall"
-                              />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
+                      {canViewFinancialData ? (
+                        <FormField
+                          control={serviceForm.control}
+                          name="pricePerStall"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Price Per Stall</FormLabel>
+                              <FormControl>
+                                <Input
+                                  {...field}
+                                  type="number"
+                                  min="0"
+                                  step="0.01"
+                                  className="h-12"
+                                  data-testid="input-price-per-stall"
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      ) : (
+                        <div className="p-3 bg-muted/50 rounded-md border border-border">
+                          <p className="text-sm text-muted-foreground">
+                            Pricing fields require financial data access. Management can add pricing later.
+                          </p>
+                        </div>
+                      )}
                     </>
                   )}
 
@@ -1316,26 +1334,34 @@ export default function Quotes() {
                               </FormItem>
                             )}
                           />
-                          <FormField
-                            control={serviceForm.control}
-                            name="dryerVentPricePerUnit"
-                            render={({ field }) => (
-                              <FormItem>
-                                <FormLabel>Price Per Unit</FormLabel>
-                                <FormControl>
-                                  <Input
-                                    {...field}
-                                    type="number"
-                                    min="0"
-                                    step="0.01"
-                                    className="h-12"
-                                    data-testid="input-dryer-vent-price-per-unit"
-                                  />
-                                </FormControl>
-                                <FormMessage />
-                              </FormItem>
-                            )}
-                          />
+                          {canViewFinancialData ? (
+                            <FormField
+                              control={serviceForm.control}
+                              name="dryerVentPricePerUnit"
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel>Price Per Unit</FormLabel>
+                                  <FormControl>
+                                    <Input
+                                      {...field}
+                                      type="number"
+                                      min="0"
+                                      step="0.01"
+                                      className="h-12"
+                                      data-testid="input-dryer-vent-price-per-unit"
+                                    />
+                                  </FormControl>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+                          ) : (
+                            <div className="p-3 bg-muted/50 rounded-md border border-border">
+                              <p className="text-sm text-muted-foreground">
+                                Pricing fields require financial data access. Management can add pricing later.
+                              </p>
+                            </div>
+                          )}
                         </>
                       )}
                     </>
@@ -1367,26 +1393,34 @@ export default function Quotes() {
                   {/* Price Per Hour - Not needed for parkade (uses price per stall) or dryer vent per-unit */}
                   {serviceBeingConfigured !== "parkade" && 
                    !(serviceBeingConfigured === "dryer_vent_cleaning" && serviceForm.watch("dryerVentPricingType") === "per_unit") && (
-                    <FormField
-                      control={serviceForm.control}
-                      name="pricePerHour"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Price Per Hour</FormLabel>
-                          <FormControl>
-                            <Input
-                              {...field}
-                              type="number"
-                              min="0"
-                              step="0.01"
-                              className="h-12"
-                              data-testid="input-price-per-hour"
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
+                    canViewFinancialData ? (
+                      <FormField
+                        control={serviceForm.control}
+                        name="pricePerHour"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Price Per Hour</FormLabel>
+                            <FormControl>
+                              <Input
+                                {...field}
+                                type="number"
+                                min="0"
+                                step="0.01"
+                                className="h-12"
+                                data-testid="input-price-per-hour"
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    ) : (
+                      <div className="p-3 bg-muted/50 rounded-md border border-border">
+                        <p className="text-sm text-muted-foreground">
+                          Pricing fields require financial data access. Management can add pricing later.
+                        </p>
+                      </div>
+                    )
                   )}
 
                   <Button

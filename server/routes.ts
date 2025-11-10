@@ -2111,7 +2111,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // ==================== QUOTE ROUTES ====================
   
   // Create new quote with services (atomic transaction) - All employees can create quotes
-  app.post("/api/quotes", requireAuth, requireRole("company", "operations_manager", "supervisor", "rope_access_tech"), async (req: Request, res: Response) => {
+  app.post("/api/quotes", requireAuth, requireRole("company", "operations_manager", "supervisor", "rope_access_tech", "manager", "ground_crew", "ground_crew_supervisor"), async (req: Request, res: Response) => {
     let createdQuoteId: string | null = null;
     
     try {
@@ -2132,6 +2132,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "At least one service is required for a quote" });
       }
       
+      // Check if user has financial permissions
+      const canViewFinancialData = currentUser.role === "company" || 
+                                    currentUser.permissions?.includes("view_financial_data");
+      
       const quoteData = insertQuoteSchema.parse({
         ...quoteFields,
         companyId,
@@ -2144,8 +2148,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Create all services - if any fail, rollback the quote
       try {
         for (const serviceData of services) {
+          // Strip pricing fields if user doesn't have financial permissions
+          const processedServiceData = canViewFinancialData 
+            ? serviceData 
+            : {
+                ...serviceData,
+                pricePerHour: undefined,
+                pricePerStall: undefined,
+                dryerVentPricePerUnit: undefined,
+                totalHours: undefined,
+                totalCost: undefined,
+              };
+          
           const service = insertQuoteServiceSchema.parse({
-            ...serviceData,
+            ...processedServiceData,
             quoteId: quote.id,
           });
           await storage.createQuoteService(service);
@@ -2168,8 +2184,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Get all quotes for company
-  app.get("/api/quotes", requireAuth, requireRole("company", "operations_manager", "supervisor"), async (req: Request, res: Response) => {
+  // Get all quotes for company - All employees can view
+  app.get("/api/quotes", requireAuth, requireRole("company", "operations_manager", "supervisor", "rope_access_tech", "manager", "ground_crew", "ground_crew_supervisor"), async (req: Request, res: Response) => {
     try {
       const currentUser = await storage.getUserById(req.session.userId!);
       if (!currentUser) {
@@ -2181,17 +2197,35 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Unable to determine company" });
       }
       
+      // Check if user has financial permissions
+      const canViewFinancialData = currentUser.role === "company" || 
+                                    currentUser.permissions?.includes("view_financial_data");
+      
       const status = req.query.status as string | undefined;
       const quotes = await storage.getQuotesByCompany(companyId, status);
-      res.json({ quotes });
+      
+      // Filter pricing data if user doesn't have financial permissions
+      const filteredQuotes = canViewFinancialData ? quotes : quotes.map(quote => ({
+        ...quote,
+        services: quote.services.map(service => ({
+          ...service,
+          pricePerHour: null,
+          pricePerStall: null,
+          dryerVentPricePerUnit: null,
+          totalHours: null,
+          totalCost: null,
+        })),
+      }));
+      
+      res.json({ quotes: filteredQuotes });
     } catch (error) {
       console.error("Get quotes error:", error);
       res.status(500).json({ message: "Internal server error" });
     }
   });
 
-  // Get quote by ID
-  app.get("/api/quotes/:id", requireAuth, requireRole("company", "operations_manager", "supervisor"), async (req: Request, res: Response) => {
+  // Get quote by ID - All employees can view
+  app.get("/api/quotes/:id", requireAuth, requireRole("company", "operations_manager", "supervisor", "rope_access_tech", "manager", "ground_crew", "ground_crew_supervisor"), async (req: Request, res: Response) => {
     try {
       const currentUser = await storage.getUserById(req.session.userId!);
       if (!currentUser) {
@@ -2202,6 +2236,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!companyId) {
         return res.status(400).json({ message: "Unable to determine company" });
       }
+      
+      // Check if user has financial permissions
+      const canViewFinancialData = currentUser.role === "company" || 
+                                    currentUser.permissions?.includes("view_financial_data");
       
       const quote = await storage.getQuoteById(req.params.id);
       
@@ -2213,7 +2251,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(403).json({ message: "Forbidden" });
       }
       
-      res.json({ quote });
+      // Filter pricing data if user doesn't have financial permissions
+      const filteredQuote = canViewFinancialData ? quote : {
+        ...quote,
+        services: quote.services.map(service => ({
+          ...service,
+          pricePerHour: null,
+          pricePerStall: null,
+          dryerVentPricePerUnit: null,
+          totalHours: null,
+          totalCost: null,
+        })),
+      };
+      
+      res.json({ quote: filteredQuote });
     } catch (error) {
       console.error("Get quote error:", error);
       res.status(500).json({ message: "Internal server error" });
