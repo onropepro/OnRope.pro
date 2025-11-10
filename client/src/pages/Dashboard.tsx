@@ -1024,15 +1024,6 @@ export default function Dashboard() {
       isVisible: (user: any) => hasFinancialAccess(user), // Financial permission required
     },
     {
-      id: "hours-analytics",
-      label: "Hours Analytics",
-      description: "Billable vs Non-Billable",
-      icon: "pie_chart",
-      onClick: () => setLocation("/hours-analytics"),
-      testId: "button-hours-analytics",
-      isVisible: (user: any) => isManagement(user), // Management only
-    },
-    {
       id: "quotes",
       label: "Quotes",
       description: "Service quotes",
@@ -1767,6 +1758,32 @@ export default function Dashboard() {
                       })()}
                     </div>
                   </div>
+
+                  {/* Hours Analytics Card */}
+                  <Card 
+                    className="hover-elevate active-elevate-2 cursor-pointer"
+                    onClick={() => setLocation("/hours-analytics")}
+                    data-testid="card-hours-analytics"
+                  >
+                    <CardHeader className="flex flex-row items-center justify-between gap-4 space-y-0 pb-2">
+                      <div className="flex-1 min-w-0">
+                        <CardTitle className="text-lg">Hours Analytics</CardTitle>
+                        <CardDescription className="text-sm">
+                          View billable vs non-billable hours breakdown
+                        </CardDescription>
+                      </div>
+                      <div className="flex-shrink-0">
+                        <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
+                          <span className="material-icons text-primary text-2xl">pie_chart</span>
+                        </div>
+                      </div>
+                    </CardHeader>
+                    <CardContent>
+                      <p className="text-sm text-muted-foreground">
+                        Analyze time allocation across all projects
+                      </p>
+                    </CardContent>
+                  </Card>
                 </>
               ) : (
                 <Card>
