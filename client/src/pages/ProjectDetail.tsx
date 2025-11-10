@@ -29,8 +29,10 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 
 const endDaySchema = z.object({
-  elevation: z.enum(["north", "east", "south", "west"], { required_error: "Please select an elevation" }),
-  dropsCompleted: z.string().min(1, "Number of drops is required"),
+  dropsCompletedNorth: z.string(),
+  dropsCompletedEast: z.string(),
+  dropsCompletedSouth: z.string(),
+  dropsCompletedWest: z.string(),
   shortfallReason: z.string().optional(),
 });
 
@@ -101,8 +103,10 @@ export default function ProjectDetail() {
   const endDayForm = useForm<EndDayFormData>({
     resolver: zodResolver(endDaySchema),
     defaultValues: {
-      elevation: "north",
-      dropsCompleted: "",
+      dropsCompletedNorth: "0",
+      dropsCompletedEast: "0",
+      dropsCompletedSouth: "0",
+      dropsCompletedWest: "0",
       shortfallReason: "",
     },
   });
@@ -388,6 +392,20 @@ export default function ProjectDetail() {
   });
 
   const onEndDaySubmit = (data: EndDayFormData) => {
+    const north = parseInt(data.dropsCompletedNorth || "0");
+    const east = parseInt(data.dropsCompletedEast || "0");
+    const south = parseInt(data.dropsCompletedSouth || "0");
+    const west = parseInt(data.dropsCompletedWest || "0");
+    const totalDrops = north + east + south + west;
+
+    // Check if shortfall reason is required but missing
+    if (totalDrops < project.dailyDropTarget && !data.shortfallReason?.trim()) {
+      endDayForm.setError("shortfallReason", {
+        message: "Please explain why the daily target wasn't met"
+      });
+      return;
+    }
+
     endDayMutation.mutate(data);
   };
 
@@ -2233,72 +2251,129 @@ export default function ProjectDetail() {
 
           <Form {...endDayForm}>
             <form onSubmit={endDayForm.handleSubmit(onEndDaySubmit)} className="space-y-4">
-              <FormField
-                control={endDayForm.control}
-                name="elevation"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Building Elevation</FormLabel>
-                    <Select onValueChange={field.onChange} value={field.value}>
-                      <FormControl>
-                        <SelectTrigger className="h-12" data-testid="select-elevation">
-                          <SelectValue placeholder="Select elevation" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="north" data-testid="option-north">North</SelectItem>
-                        <SelectItem value="east" data-testid="option-east">East</SelectItem>
-                        <SelectItem value="south" data-testid="option-south">South</SelectItem>
-                        <SelectItem value="west" data-testid="option-west">West</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={endDayForm.control}
-                name="dropsCompleted"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Drops Completed Today</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="number"
-                        min="0"
-                        placeholder="0"
-                        {...field}
-                        data-testid="input-end-day-drops"
-                        className="h-14 text-3xl font-bold text-center"
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              {endDayForm.watch("dropsCompleted") !== "" && 
-                parseInt(endDayForm.watch("dropsCompleted")) < project.dailyDropTarget && (
+              <div className="grid grid-cols-2 gap-3">
                 <FormField
                   control={endDayForm.control}
-                  name="shortfallReason"
+                  name="dropsCompletedNorth"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Shortfall Reason (Required)</FormLabel>
+                      <FormLabel>North</FormLabel>
                       <FormControl>
-                        <Textarea
-                          placeholder="Explain why the daily target wasn't met..."
+                        <Input
+                          type="number"
+                          min="0"
+                          placeholder="0"
                           {...field}
-                          data-testid="input-shortfall-reason"
-                          className="min-h-24"
+                          data-testid="input-drops-north"
+                          className="h-12 text-xl font-bold text-center"
                         />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
-              )}
+
+                <FormField
+                  control={endDayForm.control}
+                  name="dropsCompletedEast"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>East</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="number"
+                          min="0"
+                          placeholder="0"
+                          {...field}
+                          data-testid="input-drops-east"
+                          className="h-12 text-xl font-bold text-center"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={endDayForm.control}
+                  name="dropsCompletedSouth"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>South</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="number"
+                          min="0"
+                          placeholder="0"
+                          {...field}
+                          data-testid="input-drops-south"
+                          className="h-12 text-xl font-bold text-center"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={endDayForm.control}
+                  name="dropsCompletedWest"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>West</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="number"
+                          min="0"
+                          placeholder="0"
+                          {...field}
+                          data-testid="input-drops-west"
+                          className="h-12 text-xl font-bold text-center"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              {(() => {
+                const north = parseInt(endDayForm.watch("dropsCompletedNorth") || "0");
+                const east = parseInt(endDayForm.watch("dropsCompletedEast") || "0");
+                const south = parseInt(endDayForm.watch("dropsCompletedSouth") || "0");
+                const west = parseInt(endDayForm.watch("dropsCompletedWest") || "0");
+                const totalDrops = north + east + south + west;
+
+                return (
+                  <>
+                    <div className="p-3 bg-muted rounded-md">
+                      <div className="text-sm text-muted-foreground">Total Drops</div>
+                      <div className="text-2xl font-bold">{totalDrops}</div>
+                    </div>
+
+                    {totalDrops < project.dailyDropTarget && (
+                      <FormField
+                        control={endDayForm.control}
+                        name="shortfallReason"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Shortfall Reason (Required)</FormLabel>
+                            <FormControl>
+                              <Textarea
+                                placeholder="Explain why the daily target wasn't met..."
+                                {...field}
+                                data-testid="input-shortfall-reason"
+                                className="min-h-24"
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    )}
+                  </>
+                );
+              })()}
 
               <div className="flex gap-2">
                 <Button
