@@ -380,6 +380,15 @@ export default function TechDashboard() {
             <span className="material-icons mr-2">verified_user</span>
             Daily Harness Inspection
           </Button>
+          <Button
+            onClick={() => setLocation("/quotes")}
+            variant="outline"
+            className="w-full h-12 border-primary/20 hover-elevate"
+            data-testid="button-quotes"
+          >
+            <span className="material-icons mr-2">description</span>
+            Quotes
+          </Button>
         </div>
 
         {/* Start/End Day Section */}
