@@ -375,8 +375,9 @@ export default function Payroll() {
                                 const startTime = new Date(session.startTime);
                                 const endTime = session.endTime ? new Date(session.endTime) : null;
                                 const hours = endTime 
-                                  ? ((endTime.getTime() - startTime.getTime()) / (1000 * 60 * 60)).toFixed(2)
-                                  : '0.00';
+                                  ? ((endTime.getTime() - startTime.getTime()) / (1000 * 60 * 60))
+                                  : 0;
+                                const sessionCost = hours * parseFloat(employee.hourlyRate);
                                 const totalDrops = (session.dropsCompletedNorth || 0) + 
                                                   (session.dropsCompletedEast || 0) + 
                                                   (session.dropsCompletedSouth || 0) + 
@@ -411,9 +412,13 @@ export default function Payroll() {
                                               {format(startTime, 'h:mm a')} - {endTime ? format(endTime, 'h:mm a') : 'In Progress'}
                                             </span>
                                           </div>
-                                          <div className="flex items-center gap-2">
+                                          <div className="flex items-center gap-2 mb-2">
                                             <span className="material-icons text-sm">schedule</span>
-                                            <span className="font-semibold">{hours} hours</span>
+                                            <span className="font-semibold">{hours.toFixed(2)} hours</span>
+                                          </div>
+                                          <div className="flex items-center gap-2">
+                                            <DollarSign className="h-4 w-4" />
+                                            <span className="font-semibold text-primary">${sessionCost.toFixed(2)}</span>
                                           </div>
                                         </div>
                                       </div>
