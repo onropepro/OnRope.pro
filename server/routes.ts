@@ -427,7 +427,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         startDate, birthday, driversLicenseNumber, driversLicenseProvince,
         homeAddress, employeePhoneNumber, emergencyContactName, emergencyContactPhone,
         specialMedicalConditions, irataLevel, irataLicenseNumber, irataIssuedDate, 
-        irataExpirationDate, terminatedDate
+        irataExpirationDate, terminatedDate, terminationReason, terminationNotes
       } = req.body;
       
       // Update employee
@@ -452,6 +452,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         irataIssuedDate: irataIssuedDate !== undefined ? (irataIssuedDate || null) : undefined,
         irataExpirationDate: irataExpirationDate !== undefined ? (irataExpirationDate || null) : undefined,
         terminatedDate: terminatedDate !== undefined ? (terminatedDate || null) : undefined,
+        terminationReason: terminationReason !== undefined ? (terminationReason || null) : undefined,
+        terminationNotes: terminationNotes !== undefined ? (terminationNotes || null) : undefined,
       });
       
       const { passwordHash: _, ...employeeWithoutPassword } = updatedEmployee;
@@ -465,6 +467,43 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       res.status(500).json({ message: "Failed to update employee" });
+    }
+  });
+  
+  // Reactivate employee
+  app.post("/api/employees/:id/reactivate", requireAuth, requireRole("company"), async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      const companyId = currentUser.role === "company" ? currentUser.id : currentUser.companyId;
+      
+      if (!companyId) {
+        return res.status(400).json({ message: "Unable to determine company" });
+      }
+      
+      // Get the employee to verify they belong to this company
+      const employee = await storage.getUserById(req.params.id);
+      
+      if (!employee || employee.companyId !== companyId) {
+        return res.status(403).json({ message: "Access denied" });
+      }
+      
+      // Reactivate employee by clearing termination fields
+      const updatedEmployee = await storage.updateUser(req.params.id, {
+        terminatedDate: null,
+        terminationReason: null,
+        terminationNotes: null,
+      });
+      
+      const { passwordHash: _, ...employeeWithoutPassword } = updatedEmployee;
+      res.json({ employee: employeeWithoutPassword });
+    } catch (error) {
+      console.error("Reactivate employee error:", error);
+      res.status(500).json({ message: "Failed to reactivate employee" });
     }
   });
   

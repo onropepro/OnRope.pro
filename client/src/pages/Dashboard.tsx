@@ -186,6 +186,8 @@ const editEmployeeSchema = z.object({
   irataExpirationDate: z.string().optional(),
   // Termination
   terminatedDate: z.string().optional(),
+  terminationReason: z.string().optional(),
+  terminationNotes: z.string().optional(),
 }).refine((data) => {
   if (data.role === "rope_access_tech" && !data.techLevel) {
     return false;
@@ -247,6 +249,8 @@ export default function Dashboard() {
   const [employeeFormStep, setEmployeeFormStep] = useState<1 | 2>(1); // Track form step (1 = info, 2 = permissions)
   const [editEmployeeFormStep, setEditEmployeeFormStep] = useState<1 | 2>(1); // Track edit form step
   const [showTerminationConfirm, setShowTerminationConfirm] = useState(false); // Confirmation for termination
+  const [showTerminationDialog, setShowTerminationDialog] = useState(false); // Dialog for termination details
+  const [terminationData, setTerminationData] = useState<{ reason: string; notes: string }>({ reason: "", notes: "" });
   const { toast } = useToast();
   const [, setLocation] = useLocation();
 
@@ -387,6 +391,8 @@ export default function Dashboard() {
       irataIssuedDate: "",
       irataExpirationDate: "",
       terminatedDate: "",
+      terminationReason: "",
+      terminationNotes: "",
     },
   });
 
@@ -540,6 +546,8 @@ export default function Dashboard() {
         irataIssuedDate: data.irataIssuedDate,
         irataExpirationDate: data.irataExpirationDate,
         terminatedDate: data.terminatedDate,
+        terminationReason: data.terminationReason,
+        terminationNotes: data.terminationNotes,
       });
 
       return response;
@@ -642,10 +650,44 @@ export default function Dashboard() {
       irataIssuedDate: employee.irataIssuedDate || "",
       irataExpirationDate: employee.irataExpirationDate || "",
       terminatedDate: employee.terminatedDate || "",
+      terminationReason: employee.terminationReason || "",
+      terminationNotes: employee.terminationNotes || "",
     });
     setEditEmployeeFormStep(1); // Reset to first step
     setShowEditEmployeeDialog(true);
   };
+  
+  // Watch for termination date changes
+  const watchedTerminationDate = editEmployeeForm.watch("terminatedDate");
+  useEffect(() => {
+    // If a termination date is set and there's no termination reason yet, open dialog
+    if (watchedTerminationDate && !editEmployeeForm.getValues("terminationReason") && employeeToEdit && !employeeToEdit.terminatedDate) {
+      setShowTerminationDialog(true);
+    }
+  }, [watchedTerminationDate, employeeToEdit]);
+  
+  const handleTerminationSubmit = () => {
+    editEmployeeForm.setValue("terminationReason", terminationData.reason);
+    editEmployeeForm.setValue("terminationNotes", terminationData.notes);
+    setShowTerminationDialog(false);
+    setTerminationData({ reason: "", notes: "" });
+  };
+  
+  const reactivateEmployeeMutation = useMutation({
+    mutationFn: async (employeeId: string) => {
+      const response = await apiRequest("POST", `/api/employees/${employeeId}/reactivate`, {});
+      return response;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/employees"] });
+      toast({
+        title: "Employee reactivated successfully",
+      });
+    },
+    onError: (error: Error) => {
+      toast({ title: "Error", description: error.message, variant: "destructive" });
+    },
+  });
 
   const onEditEmployeeSubmit = async (data: EditEmployeeFormData) => {
     if (!employeeToEdit) return;
@@ -2614,6 +2656,16 @@ export default function Dashboard() {
                                     {employee.role.replace(/_/g, ' ')}
                                   </Badge>
                                   <Button
+                                    variant="default"
+                                    size="sm"
+                                    onClick={() => reactivateEmployeeMutation.mutate(employee.id)}
+                                    data-testid={`button-reactivate-employee-${employee.id}`}
+                                    className="h-9"
+                                  >
+                                    <span className="material-icons text-sm mr-1">refresh</span>
+                                    Reactivate
+                                  </Button>
+                                  <Button
                                     variant="ghost"
                                     size="icon"
                                     onClick={() => handleEditEmployee(employee)}
@@ -3566,6 +3618,68 @@ export default function Dashboard() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* Termination Details Dialog */}
+      <Dialog open={showTerminationDialog} onOpenChange={(open) => {
+        if (!open) {
+          // If closing without submitting, clear the termination date
+          editEmployeeForm.setValue("terminatedDate", "");
+          setTerminationData({ reason: "", notes: "" });
+        }
+        setShowTerminationDialog(open);
+      }}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Termination Details</DialogTitle>
+            <DialogDescription>
+              Please provide the reason for termination and any additional notes.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <label className="text-sm font-medium">Reason for Termination *</label>
+              <Input
+                value={terminationData.reason}
+                onChange={(e) => setTerminationData({ ...terminationData, reason: e.target.value })}
+                placeholder="e.g., Voluntary resignation, Performance issues, etc."
+                className="mt-1"
+                data-testid="input-termination-reason"
+              />
+            </div>
+            <div>
+              <label className="text-sm font-medium">Additional Notes</label>
+              <Textarea
+                value={terminationData.notes}
+                onChange={(e) => setTerminationData({ ...terminationData, notes: e.target.value })}
+                placeholder="Any additional information about the termination..."
+                className="mt-1"
+                rows={4}
+                data-testid="input-termination-notes"
+              />
+            </div>
+          </div>
+          <div className="flex justify-end gap-2 mt-4">
+            <Button
+              variant="outline"
+              onClick={() => {
+                editEmployeeForm.setValue("terminatedDate", "");
+                setTerminationData({ reason: "", notes: "" });
+                setShowTerminationDialog(false);
+              }}
+              data-testid="button-cancel-termination"
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={handleTerminationSubmit}
+              disabled={!terminationData.reason.trim()}
+              data-testid="button-submit-termination"
+            >
+              Continue
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

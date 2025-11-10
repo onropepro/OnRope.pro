@@ -78,6 +78,8 @@ export const users = pgTable("users", {
   
   // Employment termination
   terminatedDate: date("terminated_date"), // Date employment was terminated (optional)
+  terminationReason: text("termination_reason"), // Reason for termination (optional)
+  terminationNotes: text("termination_notes"), // Additional notes about termination (optional)
   
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
