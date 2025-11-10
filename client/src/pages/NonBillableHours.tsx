@@ -191,6 +191,7 @@ export default function NonBillableHours() {
                   onChange={(e) => setDescription(e.target.value)}
                   className="min-h-[100px]"
                   data-testid="input-description"
+                  autoComplete="off"
                 />
               </div>
 

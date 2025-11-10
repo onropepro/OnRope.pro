@@ -2275,6 +2275,7 @@ export default function ProjectDetail() {
                           {...field}
                           data-testid="input-drops-north"
                           className="h-12 text-xl font-bold text-center"
+                          autoComplete="off"
                         />
                       </FormControl>
                       <FormMessage />
@@ -2296,6 +2297,7 @@ export default function ProjectDetail() {
                           {...field}
                           data-testid="input-drops-east"
                           className="h-12 text-xl font-bold text-center"
+                          autoComplete="off"
                         />
                       </FormControl>
                       <FormMessage />
@@ -2317,6 +2319,7 @@ export default function ProjectDetail() {
                           {...field}
                           data-testid="input-drops-south"
                           className="h-12 text-xl font-bold text-center"
+                          autoComplete="off"
                         />
                       </FormControl>
                       <FormMessage />
@@ -2338,6 +2341,7 @@ export default function ProjectDetail() {
                           {...field}
                           data-testid="input-drops-west"
                           className="h-12 text-xl font-bold text-center"
+                          autoComplete="off"
                         />
                       </FormControl>
                       <FormMessage />
