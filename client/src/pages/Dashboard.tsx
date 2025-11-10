@@ -2509,53 +2509,119 @@ export default function Dashboard() {
               </Dialog>
 
               {/* Employee List */}
-              <div className="space-y-2">
-                {employees.length === 0 ? (
-                  <Card>
-                    <CardContent className="p-8 text-center text-muted-foreground">
-                      <span className="material-icons text-4xl mb-2 opacity-50">people</span>
-                      <div>No employees yet</div>
-                    </CardContent>
-                  </Card>
-                ) : (
-                  employees.map((employee: any) => (
-                    <Card key={employee.id} data-testid={`employee-card-${employee.id}`}>
-                      <CardContent className="p-4">
-                        <div className="flex items-start justify-between gap-3">
-                          <div className="flex-1">
-                            <div className="font-medium">{employee.name || employee.email}</div>
-                            {employee.techLevel && (
-                              <div className="text-xs text-muted-foreground mt-1">IRATA {employee.techLevel}</div>
-                            )}
+              <div className="space-y-6">
+                {/* Active Employees */}
+                <div className="space-y-2">
+                  <h3 className="text-lg font-medium">Active Employees</h3>
+                  {(() => {
+                    const activeEmployees = employees.filter((emp: any) => !emp.terminatedDate);
+                    
+                    if (activeEmployees.length === 0) {
+                      return (
+                        <Card>
+                          <CardContent className="p-8 text-center text-muted-foreground">
+                            <span className="material-icons text-4xl mb-2 opacity-50">people</span>
+                            <div>No active employees yet</div>
+                          </CardContent>
+                        </Card>
+                      );
+                    }
+                    
+                    return activeEmployees.map((employee: any) => (
+                      <Card key={employee.id} data-testid={`employee-card-${employee.id}`}>
+                        <CardContent className="p-4">
+                          <div className="flex items-start justify-between gap-3">
+                            <div className="flex-1">
+                              <div className="font-medium">{employee.name || employee.email}</div>
+                              {employee.techLevel && (
+                                <div className="text-xs text-muted-foreground mt-1">IRATA {employee.techLevel}</div>
+                              )}
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <Badge variant="secondary" className="text-xs capitalize">
+                                {employee.role.replace(/_/g, ' ')}
+                              </Badge>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                onClick={() => handleEditEmployee(employee)}
+                                data-testid={`button-edit-employee-${employee.id}`}
+                                className="h-9 w-9"
+                              >
+                                <span className="material-icons text-sm">edit</span>
+                              </Button>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                onClick={() => setEmployeeToDelete(employee.id)}
+                                data-testid={`button-delete-employee-${employee.id}`}
+                                className="h-9 w-9 text-destructive hover:text-destructive"
+                              >
+                                <span className="material-icons text-sm">delete</span>
+                              </Button>
+                            </div>
                           </div>
-                          <div className="flex items-center gap-2">
-                            <Badge variant="secondary" className="text-xs capitalize">
-                              {employee.role.replace(/_/g, ' ')}
-                            </Badge>
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              onClick={() => handleEditEmployee(employee)}
-                              data-testid={`button-edit-employee-${employee.id}`}
-                              className="h-9 w-9"
-                            >
-                              <span className="material-icons text-sm">edit</span>
-                            </Button>
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              onClick={() => setEmployeeToDelete(employee.id)}
-                              data-testid={`button-delete-employee-${employee.id}`}
-                              className="h-9 w-9 text-destructive hover:text-destructive"
-                            >
-                              <span className="material-icons text-sm">delete</span>
-                            </Button>
-                          </div>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  ))
-                )}
+                        </CardContent>
+                      </Card>
+                    ));
+                  })()}
+                </div>
+
+                {/* Terminated Employees */}
+                {(() => {
+                  const terminatedEmployees = employees.filter((emp: any) => emp.terminatedDate);
+                  
+                  if (terminatedEmployees.length > 0) {
+                    return (
+                      <div className="space-y-2">
+                        <h3 className="text-lg font-medium text-muted-foreground">Terminated Employees</h3>
+                        {terminatedEmployees.map((employee: any) => (
+                          <Card key={employee.id} data-testid={`terminated-employee-card-${employee.id}`} className="opacity-60">
+                            <CardContent className="p-4">
+                              <div className="flex items-start justify-between gap-3">
+                                <div className="flex-1">
+                                  <div className="font-medium">{employee.name || employee.email}</div>
+                                  {employee.techLevel && (
+                                    <div className="text-xs text-muted-foreground mt-1">IRATA {employee.techLevel}</div>
+                                  )}
+                                  {employee.terminatedDate && (
+                                    <div className="text-xs text-destructive mt-1">
+                                      Terminated: {new Date(employee.terminatedDate).toLocaleDateString()}
+                                    </div>
+                                  )}
+                                </div>
+                                <div className="flex items-center gap-2">
+                                  <Badge variant="outline" className="text-xs capitalize">
+                                    {employee.role.replace(/_/g, ' ')}
+                                  </Badge>
+                                  <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    onClick={() => handleEditEmployee(employee)}
+                                    data-testid={`button-edit-terminated-employee-${employee.id}`}
+                                    className="h-9 w-9"
+                                  >
+                                    <span className="material-icons text-sm">edit</span>
+                                  </Button>
+                                  <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    onClick={() => setEmployeeToDelete(employee.id)}
+                                    data-testid={`button-delete-terminated-employee-${employee.id}`}
+                                    className="h-9 w-9 text-destructive hover:text-destructive"
+                                  >
+                                    <span className="material-icons text-sm">delete</span>
+                                  </Button>
+                                </div>
+                              </div>
+                            </CardContent>
+                          </Card>
+                        ))}
+                      </div>
+                    );
+                  }
+                  return null;
+                })()}
               </div>
             </div>
           </div>
