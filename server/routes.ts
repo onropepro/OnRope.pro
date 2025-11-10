@@ -1440,6 +1440,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Unable to determine company" });
       }
       
+      // Check if user has financial permissions
+      const canViewFinancialData = currentUser.role === "company" || 
+                                    currentUser.role === "operations_manager" || 
+                                    currentUser.role === "supervisor" || 
+                                    currentUser.permissions?.includes("view_financial_data");
+      
       // Get all projects for the company
       const projects = await storage.getProjectsByCompany(companyId);
       
@@ -1459,7 +1465,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
         allSessions.push(...sessionsWithTarget);
       }
       
-      res.json({ sessions: allSessions });
+      // Filter financial data if user doesn't have financial permissions
+      const filteredSessions = canViewFinancialData ? allSessions : allSessions.map(session => ({
+        ...session,
+        techHourlyRate: null,
+      }));
+      
+      res.json({ sessions: filteredSessions });
     } catch (error) {
       console.error("Failed to fetch all work sessions:", error);
       res.status(500).json({ message: "Internal server error" });
@@ -1481,6 +1493,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!companyId) {
         return res.status(400).json({ message: "Unable to determine company" });
       }
+      
+      // Check if user has financial permissions
+      const canViewFinancialData = currentUser.role === "company" || 
+                                    currentUser.role === "operations_manager" || 
+                                    currentUser.role === "supervisor" || 
+                                    currentUser.permissions?.includes("view_financial_data");
       
       // Get all projects for the company
       const projects = await storage.getProjectsByCompany(companyId);
@@ -1508,7 +1526,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return aTime - bTime;
       });
       
-      res.json({ sessions: activeSessions });
+      // Filter financial data if user doesn't have financial permissions
+      const filteredSessions = canViewFinancialData ? activeSessions : activeSessions.map(session => ({
+        ...session,
+        techHourlyRate: null,
+      }));
+      
+      res.json({ sessions: filteredSessions });
     } catch (error) {
       console.error("Failed to fetch active workers:", error);
       res.status(500).json({ message: "Internal server error" });
