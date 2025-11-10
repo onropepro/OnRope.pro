@@ -29,10 +29,12 @@ import {
   Waves,
   Pipette,
   Edit,
-  Image
+  Image,
+  Search
 } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 // Service types configuration
 const SERVICE_TYPES = [
@@ -138,6 +140,8 @@ export default function Quotes() {
   
   // View states
   const [view, setView] = useState<"list" | "create" | "detail">("list");
+  const [activeTab, setActiveTab] = useState<"create" | "my-quotes">("my-quotes");
+  const [searchQuery, setSearchQuery] = useState("");
   const [createStep, setCreateStep] = useState<"building" | "services" | "configure">("services");
   const [selectedQuote, setSelectedQuote] = useState<QuoteWithServices | null>(null);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
@@ -270,20 +274,17 @@ export default function Quotes() {
       
       queryClient.invalidateQueries({ queryKey: ["/api/quotes"] });
       
-      // Check if user is a worker - show submission dialog
+      // Check if user is a worker - navigate to My Quotes tab
       const isWorker = ["rope_access_tech", "manager", "ground_crew", "ground_crew_supervisor"].includes(currentUser?.role || "");
-      if (isWorker && quote.status === "draft") {
-        setQuoteToSubmit(quote);
-        setIsSubmitDialogOpen(true);
-        resetForm();
-      } else {
-        toast({
-          title: "Quote created",
-          description: "The quote has been created successfully.",
-        });
-        resetForm();
-        setView("list");
+      toast({
+        title: "Quote created",
+        description: "The quote has been created successfully.",
+      });
+      resetForm();
+      if (isWorker) {
+        setActiveTab("my-quotes");
       }
+      setView("list");
     },
     onError: (error: any) => {
       toast({
@@ -601,10 +602,177 @@ export default function Quotes() {
   const canFinalize = selectedServices.length > 0 && 
     selectedServices.every(s => configuredServices.has(s));
 
+  // Check if user is a worker
+  const isWorker = ["rope_access_tech", "manager", "ground_crew", "ground_crew_supervisor"].includes(currentUser?.role || "");
+  
+  // Filter and sort quotes
+  const filteredQuotes = (quotesData?.quotes || [])
+    .filter(quote => 
+      quote.strataPlanNumber.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      quote.buildingName.toLowerCase().includes(searchQuery.toLowerCase())
+    )
+    .sort((a, b) => new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime());
+
   // Render list view
   if (view === "list") {
+    // If worker, show tabbed interface
+    if (isWorker) {
+      return (
+        <div className="min-h-screen bg-[#FAFAFA] p-4 md:p-8">
+          <div className="max-w-7xl mx-auto">
+            <Link href="/management">
+              <Button
+                variant="ghost"
+                className="mb-6"
+                data-testid="button-back-to-dashboard"
+              >
+                <ArrowLeft className="w-4 h-4 mr-2" />
+                Back to Dashboard
+              </Button>
+            </Link>
+
+            <div className="mb-8">
+              <h1 className="text-4xl font-bold text-[#0A0A0A] mb-2">Service Quotes</h1>
+              <p className="text-[#71717A]">Create and manage service quotes for buildings</p>
+            </div>
+
+            <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as "create" | "my-quotes")}>
+              <TabsList className="mb-6">
+                <TabsTrigger value="my-quotes" data-testid="tab-my-quotes">My Quotes</TabsTrigger>
+                <TabsTrigger value="create" data-testid="tab-create">Create Quote</TabsTrigger>
+              </TabsList>
+
+              <TabsContent value="my-quotes">
+                {/* Search bar */}
+                <div className="mb-6">
+                  <div className="relative">
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-[#71717A]" />
+                    <Input
+                      placeholder="Search by strata plan number or building name..."
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      className="pl-10"
+                      data-testid="input-search-quotes"
+                    />
+                  </div>
+                </div>
+
+                {isLoading ? (
+                  <div className="text-center py-12">
+                    <p className="text-[#71717A]">Loading quotes...</p>
+                  </div>
+                ) : filteredQuotes.length === 0 ? (
+                  <Card className="rounded-2xl shadow-lg border border-[#F4F4F5]">
+                    <CardContent className="p-12 text-center">
+                      <Building2 className="w-12 h-12 text-[#71717A] mx-auto mb-4" />
+                      <h3 className="text-xl font-semibold text-[#0A0A0A] mb-2">
+                        {searchQuery ? "No quotes found" : "No quotes yet"}
+                      </h3>
+                      <p className="text-[#71717A] mb-6">
+                        {searchQuery ? "Try a different search term" : "Create your first service quote to get started"}
+                      </p>
+                      {!searchQuery && (
+                        <Button
+                          onClick={() => setActiveTab("create")}
+                          className="bg-[#3B82F6] hover:bg-[#3B82F6]/90"
+                          data-testid="button-create-first-quote"
+                        >
+                          <Plus className="w-4 h-4 mr-2" />
+                          Create Quote
+                        </Button>
+                      )}
+                    </CardContent>
+                  </Card>
+                ) : (
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    {filteredQuotes.map((quote) => (
+                      <Card
+                        key={quote.id}
+                        className="rounded-2xl shadow-lg border border-[#F4F4F5] hover:shadow-xl transition-shadow cursor-pointer"
+                        onClick={() => {
+                          setSelectedQuote(quote);
+                          setView("detail");
+                        }}
+                        data-testid={`card-quote-${quote.id}`}
+                      >
+                        <CardHeader className="p-6">
+                          <div className="flex items-start justify-between mb-4">
+                            <div className="flex-1">
+                              <CardTitle className="text-xl font-semibold text-[#0A0A0A] mb-1">
+                                {quote.buildingName}
+                              </CardTitle>
+                              <CardDescription className="text-[#71717A]">
+                                {quote.strataPlanNumber}
+                              </CardDescription>
+                            </div>
+                            <Badge
+                              className={`rounded-full px-3 py-1 ${
+                                quote.status === "open"
+                                  ? "bg-[#06B6D4] text-white"
+                                  : quote.status === "draft"
+                                  ? "bg-[#71717A] text-white"
+                                  : "bg-[#84CC16] text-white"
+                              }`}
+                              data-testid={`badge-status-${quote.id}`}
+                            >
+                              {quote.status}
+                            </Badge>
+                          </div>
+                          <div className="space-y-2 text-sm text-[#71717A]">
+                            <p>{quote.buildingAddress}</p>
+                            <p>{quote.floorCount} floors</p>
+                            {quote.createdAt && (
+                              <p className="text-xs">
+                                {new Date(quote.createdAt).toLocaleDateString()}
+                              </p>
+                            )}
+                          </div>
+                        </CardHeader>
+                        <CardContent className="p-6 pt-0">
+                          <div className="space-y-3">
+                            <div className="flex items-center justify-between text-sm">
+                              <span className="text-[#71717A]">Services:</span>
+                              <Badge variant="outline" data-testid={`badge-service-count-${quote.id}`}>
+                                {quote.services.length}
+                              </Badge>
+                            </div>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+                )}
+              </TabsContent>
+
+              <TabsContent value="create">
+                <Card className="rounded-2xl shadow-lg border border-[#F4F4F5]">
+                  <CardContent className="p-12 text-center">
+                    <Building2 className="w-12 h-12 text-[#71717A] mx-auto mb-4" />
+                    <h3 className="text-xl font-semibold text-[#0A0A0A] mb-2">Create a new quote</h3>
+                    <p className="text-[#71717A] mb-6">Start creating a service quote for a building</p>
+                    <Button
+                      onClick={() => {
+                        resetForm();
+                        setView("create");
+                      }}
+                      className="bg-[#3B82F6] hover:bg-[#3B82F6]/90"
+                      data-testid="button-create-quote"
+                    >
+                      <Plus className="w-4 h-4 mr-2" />
+                      New Quote
+                    </Button>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+            </Tabs>
+          </div>
+        </div>
+      );
+    }
+
+    // Management view (no tabs)
     return (
-      <div className="min-h-screen bg-[#FAFAFA] p-8">
+      <div className="min-h-screen bg-[#FAFAFA] p-4 md:p-8">
         <div className="max-w-7xl mx-auto">
           <Link href="/management">
             <Button
@@ -617,7 +785,7 @@ export default function Quotes() {
             </Button>
           </Link>
 
-          <div className="flex items-center justify-between mb-8">
+          <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-8 gap-4">
             <div>
               <h1 className="text-4xl font-bold text-[#0A0A0A] mb-2">Service Quotes</h1>
               <p className="text-[#71717A]">Create and manage service quotes for buildings</p>
@@ -635,32 +803,52 @@ export default function Quotes() {
             </Button>
           </div>
 
+          {/* Search bar */}
+          <div className="mb-6">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-[#71717A]" />
+              <Input
+                placeholder="Search by strata plan number or building name..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-10"
+                data-testid="input-search-quotes"
+              />
+            </div>
+          </div>
+
           {isLoading ? (
             <div className="text-center py-12">
               <p className="text-[#71717A]">Loading quotes...</p>
             </div>
-          ) : quotesData?.quotes.length === 0 ? (
+          ) : filteredQuotes.length === 0 ? (
             <Card className="rounded-2xl shadow-lg border border-[#F4F4F5]">
               <CardContent className="p-12 text-center">
                 <Building2 className="w-12 h-12 text-[#71717A] mx-auto mb-4" />
-                <h3 className="text-xl font-semibold text-[#0A0A0A] mb-2">No quotes yet</h3>
-                <p className="text-[#71717A] mb-6">Create your first service quote to get started</p>
-                <Button
-                  onClick={() => {
-                    resetForm();
-                    setView("create");
-                  }}
-                  className="bg-[#3B82F6] hover:bg-[#3B82F6]/90"
-                  data-testid="button-create-first-quote"
-                >
-                  <Plus className="w-4 h-4 mr-2" />
-                  Create Quote
-                </Button>
+                <h3 className="text-xl font-semibold text-[#0A0A0A] mb-2">
+                  {searchQuery ? "No quotes found" : "No quotes yet"}
+                </h3>
+                <p className="text-[#71717A] mb-6">
+                  {searchQuery ? "Try a different search term" : "Create your first service quote to get started"}
+                </p>
+                {!searchQuery && (
+                  <Button
+                    onClick={() => {
+                      resetForm();
+                      setView("create");
+                    }}
+                    className="bg-[#3B82F6] hover:bg-[#3B82F6]/90"
+                    data-testid="button-create-first-quote"
+                  >
+                    <Plus className="w-4 h-4 mr-2" />
+                    Create Quote
+                  </Button>
+                )}
               </CardContent>
             </Card>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {quotesData?.quotes.map((quote) => (
+              {filteredQuotes.map((quote) => (
                 <Card
                   key={quote.id}
                   className="rounded-2xl shadow-lg border border-[#F4F4F5] hover:shadow-xl transition-shadow cursor-pointer"
@@ -684,6 +872,8 @@ export default function Quotes() {
                         className={`rounded-full px-3 py-1 ${
                           quote.status === "open"
                             ? "bg-[#06B6D4] text-white"
+                            : quote.status === "draft"
+                            ? "bg-[#71717A] text-white"
                             : "bg-[#84CC16] text-white"
                         }`}
                         data-testid={`badge-status-${quote.id}`}
@@ -694,6 +884,11 @@ export default function Quotes() {
                     <div className="space-y-2 text-sm text-[#71717A]">
                       <p>{quote.buildingAddress}</p>
                       <p>{quote.floorCount} floors</p>
+                      {quote.createdAt && (
+                        <p className="text-xs">
+                          {new Date(quote.createdAt).toLocaleDateString()}
+                        </p>
+                      )}
                     </div>
                   </CardHeader>
                   <CardContent className="p-6 pt-0">
