@@ -978,7 +978,7 @@ export default function Dashboard() {
       icon: "request_quote",
       onClick: () => setLocation("/quotes"),
       testId: "button-quotes",
-      isVisible: () => true, // Everyone (internal filtering)
+      isVisible: (user: any) => hasFinancialAccess(user), // Financial permission required
     },
     {
       id: "documents",
