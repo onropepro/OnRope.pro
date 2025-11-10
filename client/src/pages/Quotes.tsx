@@ -1771,53 +1771,6 @@ export default function Quotes() {
           </DialogContent>
         </Dialog>
 
-        {/* Submit Quote Confirmation Dialog */}
-        <Dialog open={isSubmitDialogOpen} onOpenChange={setIsSubmitDialogOpen}>
-          <DialogContent className="max-w-md">
-            <DialogHeader>
-              <DialogTitle className="text-2xl font-bold text-[#0A0A0A]">Submit Quote to Management?</DialogTitle>
-            </DialogHeader>
-            <div className="space-y-4">
-              <p className="text-[#71717A]">
-                Are you ready to submit this quote to management for review? Once submitted, you will no longer be able to view or edit it.
-              </p>
-              {quoteToSubmit && (
-                <Card className="bg-[#F4F4F5]">
-                  <CardHeader className="p-4">
-                    <CardTitle className="text-lg">{quoteToSubmit.buildingName}</CardTitle>
-                    <CardDescription>{quoteToSubmit.strataPlanNumber}</CardDescription>
-                  </CardHeader>
-                </Card>
-              )}
-              <div className="flex gap-3 pt-4">
-                <Button
-                  variant="outline"
-                  onClick={() => {
-                    setIsSubmitDialogOpen(false);
-                    setQuoteToSubmit(null);
-                    setView("list");
-                  }}
-                  className="flex-1"
-                  data-testid="button-cancel-submit"
-                >
-                  Cancel
-                </Button>
-                <Button
-                  onClick={() => {
-                    if (quoteToSubmit) {
-                      submitQuoteMutation.mutate(quoteToSubmit.id);
-                    }
-                  }}
-                  disabled={submitQuoteMutation.isPending}
-                  className="flex-1 bg-[#3B82F6] hover:bg-[#3B82F6]/90"
-                  data-testid="button-confirm-submit"
-                >
-                  {submitQuoteMutation.isPending ? "Submitting..." : "Submit to Management"}
-                </Button>
-              </div>
-            </div>
-          </DialogContent>
-        </Dialog>
       </>
     );
   }
