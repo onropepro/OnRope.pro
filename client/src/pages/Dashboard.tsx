@@ -1024,6 +1024,15 @@ export default function Dashboard() {
       isVisible: (user: any) => hasFinancialAccess(user), // Financial permission required
     },
     {
+      id: "hours-analytics",
+      label: "Hours Analytics",
+      description: "Billable vs Non-Billable",
+      icon: "pie_chart",
+      onClick: () => setLocation("/hours-analytics"),
+      testId: "button-hours-analytics",
+      isVisible: (user: any) => isManagement(user), // Management only
+    },
+    {
       id: "quotes",
       label: "Quotes",
       description: "Service quotes",

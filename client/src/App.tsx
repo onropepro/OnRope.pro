@@ -20,6 +20,7 @@ import Quotes from "@/pages/Quotes";
 import ActiveWorkers from "@/pages/ActiveWorkers";
 import NonBillableHours from "@/pages/NonBillableHours";
 import GearInventory from "@/pages/GearInventory";
+import HoursAnalytics from "@/pages/HoursAnalytics";
 import NotFound from "@/pages/not-found";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import { EMPLOYEE_ROLES } from "@/lib/permissions";
@@ -93,6 +94,11 @@ function Router() {
       <Route path="/gear-inventory">
         <ProtectedRoute allowedRoles={EMPLOYEE_ROLES}>
           <GearInventory />
+        </ProtectedRoute>
+      </Route>
+      <Route path="/hours-analytics">
+        <ProtectedRoute allowedRoles={["company", "operations_manager", "supervisor"]}>
+          <HoursAnalytics />
         </ProtectedRoute>
       </Route>
       <Route component={NotFound} />
