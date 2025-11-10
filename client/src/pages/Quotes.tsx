@@ -142,6 +142,8 @@ export default function Quotes() {
   const [selectedQuote, setSelectedQuote] = useState<QuoteWithServices | null>(null);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isPhotoDialogOpen, setIsPhotoDialogOpen] = useState(false);
+  const [isSubmitDialogOpen, setIsSubmitDialogOpen] = useState(false);
+  const [quoteToSubmit, setQuoteToSubmit] = useState<QuoteWithServices | null>(null);
   const [editingServices, setEditingServices] = useState<Map<string, ServiceFormData>>(new Map());
   
   // Form data
@@ -267,12 +269,21 @@ export default function Quotes() {
       }
       
       queryClient.invalidateQueries({ queryKey: ["/api/quotes"] });
-      toast({
-        title: "Quote created",
-        description: "The quote has been created successfully.",
-      });
-      resetForm();
-      setView("list");
+      
+      // Check if user is a worker - show submission dialog
+      const isWorker = ["rope_access_tech", "manager", "ground_crew", "ground_crew_supervisor"].includes(currentUser?.role || "");
+      if (isWorker && quote.status === "draft") {
+        setQuoteToSubmit(quote);
+        setIsSubmitDialogOpen(true);
+        resetForm();
+      } else {
+        toast({
+          title: "Quote created",
+          description: "The quote has been created successfully.",
+        });
+        resetForm();
+        setView("list");
+      }
     },
     onError: (error: any) => {
       toast({
@@ -306,6 +317,29 @@ export default function Quotes() {
       toast({
         title: "Quote closed",
         description: "The quote has been marked as closed.",
+      });
+    },
+  });
+
+  const submitQuoteMutation = useMutation({
+    mutationFn: async (id: string) => {
+      await apiRequest("POST", `/api/quotes/${id}/submit`);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/quotes"] });
+      setIsSubmitDialogOpen(false);
+      setQuoteToSubmit(null);
+      setView("list");
+      toast({
+        title: "Quote submitted",
+        description: "The quote has been submitted to management for review.",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        variant: "destructive",
+        title: "Submission failed",
+        description: error.message || "Failed to submit quote",
       });
     },
   });
@@ -1539,6 +1573,54 @@ export default function Quotes() {
                 data-testid="img-photo-fullsize"
               />
             )}
+          </DialogContent>
+        </Dialog>
+
+        {/* Submit Quote Confirmation Dialog */}
+        <Dialog open={isSubmitDialogOpen} onOpenChange={setIsSubmitDialogOpen}>
+          <DialogContent className="max-w-md">
+            <DialogHeader>
+              <DialogTitle className="text-2xl font-bold text-[#0A0A0A]">Submit Quote to Management?</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4">
+              <p className="text-[#71717A]">
+                Are you ready to submit this quote to management for review? Once submitted, you will no longer be able to view or edit it.
+              </p>
+              {quoteToSubmit && (
+                <Card className="bg-[#F4F4F5]">
+                  <CardHeader className="p-4">
+                    <CardTitle className="text-lg">{quoteToSubmit.buildingName}</CardTitle>
+                    <CardDescription>{quoteToSubmit.strataPlanNumber}</CardDescription>
+                  </CardHeader>
+                </Card>
+              )}
+              <div className="flex gap-3 pt-4">
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    setIsSubmitDialogOpen(false);
+                    setQuoteToSubmit(null);
+                    setView("list");
+                  }}
+                  className="flex-1"
+                  data-testid="button-cancel-submit"
+                >
+                  Cancel
+                </Button>
+                <Button
+                  onClick={() => {
+                    if (quoteToSubmit) {
+                      submitQuoteMutation.mutate(quoteToSubmit.id);
+                    }
+                  }}
+                  disabled={submitQuoteMutation.isPending}
+                  className="flex-1 bg-[#3B82F6] hover:bg-[#3B82F6]/90"
+                  data-testid="button-confirm-submit"
+                >
+                  {submitQuoteMutation.isPending ? "Submitting..." : "Submit to Management"}
+                </Button>
+              </div>
+            </div>
           </DialogContent>
         </Dialog>
       </>
