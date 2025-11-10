@@ -395,6 +395,11 @@ export const quoteServices = pgTable("quote_services", {
   suitesPerDay: integer("suites_per_day"),
   floorsPerDay: integer("floors_per_day"),
   
+  // Dryer vent pricing options
+  dryerVentPricingType: varchar("dryer_vent_pricing_type"), // per_hour | per_unit
+  dryerVentUnits: integer("dryer_vent_units"),
+  dryerVentPricePerUnit: numeric("dryer_vent_price_per_unit", { precision: 10, scale: 2 }),
+  
   // Pricing (common to all services)
   pricePerHour: numeric("price_per_hour", { precision: 10, scale: 2 }),
   totalHours: numeric("total_hours", { precision: 10, scale: 2 }),
