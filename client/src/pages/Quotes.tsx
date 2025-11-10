@@ -27,8 +27,10 @@ import {
   Eye,
   CheckCircle2,
   Waves,
-  Pipette
+  Pipette,
+  Edit
 } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
 // Service types configuration
 const SERVICE_TYPES = [
@@ -136,6 +138,7 @@ export default function Quotes() {
   const [view, setView] = useState<"list" | "create" | "detail">("list");
   const [createStep, setCreateStep] = useState<"building" | "services" | "configure">("services");
   const [selectedQuote, setSelectedQuote] = useState<QuoteWithServices | null>(null);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   
   // Form data
   const [buildingInfo, setBuildingInfo] = useState<BuildingInfoFormData | null>(null);
@@ -150,6 +153,17 @@ export default function Quotes() {
       buildingName: "",
       strataPlanNumber: "",
       buildingAddress: "",
+    },
+  });
+
+  // Edit form for quote metadata (separate from creation flow)
+  const editForm = useForm<BuildingInfoFormData>({
+    resolver: zodResolver(buildingInfoSchema),
+    defaultValues: {
+      buildingName: "",
+      strataPlanNumber: "",
+      buildingAddress: "",
+      floorCount: undefined,
     },
   });
 
@@ -168,6 +182,10 @@ export default function Quotes() {
   // Check if user can view financial data (company owner OR has permission)
   const canViewFinancialData = currentUser?.role === "company" || 
                                 currentUser?.permissions?.includes("view_financial_data");
+  
+  // Check if user can edit quotes (management OR has permission)
+  const canEditQuotes = ["company", "operations_manager", "supervisor"].includes(currentUser?.role || "") ||
+                        currentUser?.permissions?.includes("edit_quotes");
 
   // Fetch quotes
   const { data: quotesData, isLoading } = useQuery<{ quotes: QuoteWithServices[] }>({
@@ -253,6 +271,34 @@ export default function Quotes() {
       toast({
         title: "Quote closed",
         description: "The quote has been marked as closed.",
+      });
+    },
+  });
+
+  // Edit quote mutation (building metadata only)
+  const editQuoteMutation = useMutation({
+    mutationFn: async (data: BuildingInfoFormData) => {
+      if (!selectedQuote) throw new Error("No quote selected");
+      const response = await apiRequest("PATCH", `/api/quotes/${selectedQuote.id}`, data);
+      return response.json();
+    },
+    onSuccess: (data: any) => {
+      queryClient.invalidateQueries({ queryKey: ["/api/quotes"] });
+      // Update selected quote with new data
+      if (data.quote) {
+        setSelectedQuote(data.quote);
+      }
+      setIsEditDialogOpen(false);
+      toast({
+        title: "Quote updated",
+        description: "The quote has been updated successfully.",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to update quote",
+        variant: "destructive",
       });
     },
   });
@@ -550,7 +596,8 @@ export default function Quotes() {
   // Render detail view
   if (view === "detail" && selectedQuote) {
     return (
-      <div className="min-h-screen bg-[#FAFAFA] p-8">
+      <>
+        <div className="min-h-screen bg-[#FAFAFA] p-8">
         <div className="max-w-4xl mx-auto">
           <Button
             variant="ghost"
@@ -731,6 +778,25 @@ export default function Quotes() {
           )}
 
           <div className="flex gap-4 mt-8">
+            {canEditQuotes && (
+              <Button
+                onClick={() => {
+                  // Prefill edit form with current quote data
+                  editForm.reset({
+                    buildingName: selectedQuote.buildingName,
+                    strataPlanNumber: selectedQuote.strataPlanNumber,
+                    buildingAddress: selectedQuote.buildingAddress,
+                    floorCount: selectedQuote.floorCount,
+                  });
+                  setIsEditDialogOpen(true);
+                }}
+                className="bg-[#3B82F6] hover:bg-[#3B82F6]/90"
+                data-testid="button-edit-quote"
+              >
+                <Edit className="w-4 h-4 mr-2" />
+                Edit Quote
+              </Button>
+            )}
             {selectedQuote.status === "open" && (
               <Button
                 onClick={() => closeQuoteMutation.mutate(selectedQuote.id)}
@@ -756,7 +822,98 @@ export default function Quotes() {
             </Button>
           </div>
         </div>
-      </div>
+        </div>
+
+        {/* Edit Quote Dialog */}
+        <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+          <DialogContent className="max-w-2xl">
+            <DialogHeader>
+              <DialogTitle className="text-2xl font-bold">Edit Quote</DialogTitle>
+            </DialogHeader>
+            <Form {...editForm}>
+              <form onSubmit={editForm.handleSubmit((data) => editQuoteMutation.mutate(data))} className="space-y-6">
+                <FormField
+                  control={editForm.control}
+                  name="buildingName"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Building Name</FormLabel>
+                      <FormControl>
+                        <Input {...field} className="h-12" data-testid="input-edit-building-name" />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={editForm.control}
+                  name="strataPlanNumber"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Strata Plan Number</FormLabel>
+                      <FormControl>
+                        <Input {...field} className="h-12" data-testid="input-edit-strata-plan" />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={editForm.control}
+                  name="buildingAddress"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Building Address</FormLabel>
+                      <FormControl>
+                        <Input {...field} className="h-12" data-testid="input-edit-building-address" />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={editForm.control}
+                  name="floorCount"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Number of Floors</FormLabel>
+                      <FormControl>
+                        <Input 
+                          {...field} 
+                          type="number" 
+                          min="1" 
+                          className="h-12" 
+                          data-testid="input-edit-floor-count"
+                          onChange={(e) => field.onChange(e.target.value ? parseInt(e.target.value) : undefined)}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <div className="flex gap-4 justify-end">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => setIsEditDialogOpen(false)}
+                    data-testid="button-cancel-edit"
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    type="submit"
+                    disabled={editQuoteMutation.isPending}
+                    className="bg-[#3B82F6] hover:bg-[#3B82F6]/90"
+                    data-testid="button-submit-edit"
+                  >
+                    {editQuoteMutation.isPending ? "Saving..." : "Save Changes"}
+                  </Button>
+                </div>
+              </form>
+            </Form>
+          </DialogContent>
+        </Dialog>
+      </>
     );
   }
 
