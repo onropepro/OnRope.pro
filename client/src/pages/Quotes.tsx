@@ -742,7 +742,7 @@ export default function Quotes() {
             </CardHeader>
           </Card>
 
-          {/* Building Photo Section */}
+          {/* Building Photo Section - visible to all if photo exists, or to editors for upload */}
           {(selectedQuote.photoUrl || canEditQuotes) && (
             <Card className="rounded-2xl shadow-lg border border-[#F4F4F5] mb-8">
               <CardHeader className="p-8">
@@ -780,7 +780,6 @@ export default function Quotes() {
                                 }
                                 
                                 const uploadData = await uploadResponse.json();
-                                // Update selectedQuote with new photoUrl
                                 if (uploadData.photoUrl) {
                                   setSelectedQuote({...selectedQuote, photoUrl: uploadData.photoUrl});
                                 }
@@ -821,7 +820,6 @@ export default function Quotes() {
                     )}
                   </div>
                 ) : (
-                  canEditQuotes && (
                     <div className="border-2 border-dashed border-[#E4E4E7] rounded-lg p-8 hover:border-[#3B82F6] transition-colors">
                       <input
                         type="file"
@@ -877,7 +875,6 @@ export default function Quotes() {
                         </p>
                       </label>
                     </div>
-                  )
                 )}
               </CardHeader>
             </Card>
