@@ -147,13 +147,27 @@ export default function ProjectDetail() {
     enabled: !!id,
   });
 
-  const project = projectData?.project as Project | undefined;
-  const workSessions = workSessionsData?.sessions || [];
-  const residents = residentsData?.residents || [];
-  const complaints = complaintsData?.complaints || [];
-  const photos = photosData?.photos || [];
-  const toolboxMeetings = toolboxMeetingsData?.meetings || [];
-  const jobComments = commentsData?.comments || [];
+  // Safely extract data with error logging
+  let project: Project | undefined;
+  let workSessions: any[] = [];
+  let residents: any[] = [];
+  let complaints: any[] = [];
+  let photos: any[] = [];
+  let toolboxMeetings: any[] = [];
+  let jobComments: any[] = [];
+
+  try {
+    project = projectData?.project as Project | undefined;
+    workSessions = workSessionsData?.sessions || [];
+    residents = residentsData?.residents || [];
+    complaints = complaintsData?.complaints || [];
+    photos = photosData?.photos || [];
+    toolboxMeetings = toolboxMeetingsData?.meetings || [];
+    jobComments = commentsData?.comments || [];
+  } catch (err) {
+    console.error("Error extracting data:", err);
+    setRenderError(err as Error);
+  }
   
   // Only company and operations_manager can delete projects
   const canDeleteProject = currentUser?.role === "company" || currentUser?.role === "operations_manager";
