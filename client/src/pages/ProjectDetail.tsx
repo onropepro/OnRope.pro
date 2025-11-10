@@ -646,7 +646,7 @@ export default function ProjectDetail() {
             {/* Building Visualization */}
             {project.jobType === "in_suite_dryer_vent_cleaning" ? (
               <VerticalBuildingProgress
-                buildingFloors={project.buildingFloors || project.floorCount}
+                buildingFloors={project.buildingFloors || Math.ceil(project.floorCount / 10)}
                 totalUnits={project.floorCount}
                 completedUnits={completedDrops}
                 className="mb-4"

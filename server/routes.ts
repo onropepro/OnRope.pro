@@ -1638,8 +1638,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.log("Creating non-billable session with data:", {
         employeeId: currentUser.id,
         companyId: currentUser.companyId || currentUser.id,
-        workDate: new Date().toISOString().split('T')[0],
-        startTime: new Date().toISOString(),
+        workDate: new Date(),
+        startTime: new Date(),
         endTime: null,
         description: req.body.description,
       });
@@ -1647,8 +1647,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const session = await storage.createNonBillableWorkSession({
         employeeId: currentUser.id,
         companyId: currentUser.companyId || currentUser.id,
-        workDate: new Date().toISOString().split('T')[0],
-        startTime: new Date().toISOString(),
+        workDate: new Date(),
+        startTime: new Date(),
         endTime: null,
         description: req.body.description,
       });
