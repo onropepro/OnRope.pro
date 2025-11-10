@@ -1245,42 +1245,51 @@ export default function Quotes() {
                     <>
                       <FormField
                         control={serviceForm.control}
-                        name="suitesPerDay"
+                        name="dryerVentUnits"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Suites Per Day (Optional)</FormLabel>
+                            <FormLabel>Number of Suites</FormLabel>
                             <FormControl>
                               <Input
                                 {...field}
                                 type="number"
-                                min="0"
+                                min="1"
                                 className="h-12"
-                                data-testid="input-suites-per-day"
+                                data-testid="input-number-of-suites"
                               />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
                         )}
                       />
-                      <FormField
-                        control={serviceForm.control}
-                        name="floorsPerDay"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Floors Per Day (Optional)</FormLabel>
-                            <FormControl>
-                              <Input
-                                {...field}
-                                type="number"
-                                min="0"
-                                className="h-12"
-                                data-testid="input-floors-per-day"
-                              />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
+                      {canViewFinancialData ? (
+                        <FormField
+                          control={serviceForm.control}
+                          name="dryerVentPricePerUnit"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Price Per Unit</FormLabel>
+                              <FormControl>
+                                <Input
+                                  {...field}
+                                  type="number"
+                                  min="0"
+                                  step="0.01"
+                                  className="h-12"
+                                  data-testid="input-price-per-unit"
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      ) : (
+                        <div className="p-3 bg-muted/50 rounded-md border border-border">
+                          <p className="text-sm text-muted-foreground">
+                            Pricing fields require financial data access. Management can add pricing later.
+                          </p>
+                        </div>
+                      )}
                     </>
                   )}
 
