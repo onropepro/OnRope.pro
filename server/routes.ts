@@ -2271,12 +2271,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Update quote
-  app.patch("/api/quotes/:id", requireAuth, requireRole("company", "operations_manager", "supervisor"), async (req: Request, res: Response) => {
+  // Update quote - Management and workers with edit_quotes permission
+  app.patch("/api/quotes/:id", requireAuth, requireRole("company", "operations_manager", "supervisor", "rope_access_tech", "manager", "ground_crew", "ground_crew_supervisor"), async (req: Request, res: Response) => {
     try {
       const currentUser = await storage.getUserById(req.session.userId!);
       if (!currentUser) {
         return res.status(404).json({ message: "User not found" });
+      }
+      
+      // Check if user has edit permissions
+      const isManagement = ["company", "operations_manager", "supervisor"].includes(currentUser.role);
+      const hasEditPermission = currentUser.permissions?.includes("edit_quotes");
+      
+      if (!isManagement && !hasEditPermission) {
+        return res.status(403).json({ message: "Forbidden - You don't have permission to edit quotes" });
       }
       
       const companyId = currentUser.role === "company" ? currentUser.id : currentUser.companyId;
