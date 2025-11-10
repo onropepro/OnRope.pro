@@ -1,5 +1,5 @@
 import { db } from "./db";
-import { users, projects, dropLogs, workSessions, complaints, complaintNotes, projectPhotos, jobComments, harnessInspections, toolboxMeetings, payPeriodConfig, payPeriods, quotes, quoteServices } from "@shared/schema";
+import { users, projects, dropLogs, workSessions, nonBillableWorkSessions, complaints, complaintNotes, projectPhotos, jobComments, harnessInspections, toolboxMeetings, payPeriodConfig, payPeriods, quotes, quoteServices } from "@shared/schema";
 import type { User, InsertUser, Project, InsertProject, DropLog, InsertDropLog, WorkSession, InsertWorkSession, Complaint, InsertComplaint, ComplaintNote, InsertComplaintNote, ProjectPhoto, InsertProjectPhoto, JobComment, InsertJobComment, HarnessInspection, InsertHarnessInspection, ToolboxMeeting, InsertToolboxMeeting, PayPeriodConfig, InsertPayPeriodConfig, PayPeriod, InsertPayPeriod, EmployeeHoursSummary, Quote, InsertQuote, QuoteService, InsertQuoteService, QuoteWithServices } from "@shared/schema";
 import { eq, and, desc, sql, isNull, not, gte, lte, between } from "drizzle-orm";
 import bcrypt from "bcrypt";
@@ -453,6 +453,84 @@ export class Storage {
         )
       )
       .orderBy(desc(workSessions.workDate));
+  }
+
+  // Non-billable work session operations
+  async createNonBillableWorkSession(session: any): Promise<any> {
+    const result = await db.insert(nonBillableWorkSessions).values(session).returning();
+    return result[0];
+  }
+
+  async getActiveNonBillableSession(employeeId: string): Promise<any | undefined> {
+    const result = await db.select().from(nonBillableWorkSessions)
+      .where(
+        and(
+          eq(nonBillableWorkSessions.employeeId, employeeId),
+          isNull(nonBillableWorkSessions.endTime)
+        )
+      )
+      .limit(1);
+    return result[0];
+  }
+
+  async endNonBillableWorkSession(sessionId: string): Promise<any> {
+    const result = await db.update(nonBillableWorkSessions)
+      .set({
+        endTime: sql`NOW()`,
+        updatedAt: sql`NOW()`,
+      })
+      .where(eq(nonBillableWorkSessions.id, sessionId))
+      .returning();
+    return result[0];
+  }
+
+  async getAllNonBillableSessions(companyId: string): Promise<any[]> {
+    const result = await db.select({
+      id: nonBillableWorkSessions.id,
+      employeeId: nonBillableWorkSessions.employeeId,
+      companyId: nonBillableWorkSessions.companyId,
+      workDate: nonBillableWorkSessions.workDate,
+      startTime: nonBillableWorkSessions.startTime,
+      endTime: nonBillableWorkSessions.endTime,
+      description: nonBillableWorkSessions.description,
+      createdAt: nonBillableWorkSessions.createdAt,
+      updatedAt: nonBillableWorkSessions.updatedAt,
+      employeeName: users.name,
+      employeeHourlyRate: users.hourlyRate,
+    })
+      .from(nonBillableWorkSessions)
+      .leftJoin(users, eq(nonBillableWorkSessions.employeeId, users.id))
+      .where(eq(nonBillableWorkSessions.companyId, companyId))
+      .orderBy(desc(nonBillableWorkSessions.workDate), desc(nonBillableWorkSessions.startTime));
+    return result;
+  }
+
+  async getNonBillableSessionsByEmployee(employeeId: string): Promise<any[]> {
+    const result = await db.select({
+      id: nonBillableWorkSessions.id,
+      employeeId: nonBillableWorkSessions.employeeId,
+      companyId: nonBillableWorkSessions.companyId,
+      workDate: nonBillableWorkSessions.workDate,
+      startTime: nonBillableWorkSessions.startTime,
+      endTime: nonBillableWorkSessions.endTime,
+      description: nonBillableWorkSessions.description,
+      createdAt: nonBillableWorkSessions.createdAt,
+      updatedAt: nonBillableWorkSessions.updatedAt,
+      employeeName: users.name,
+      employeeHourlyRate: users.hourlyRate,
+    })
+      .from(nonBillableWorkSessions)
+      .leftJoin(users, eq(nonBillableWorkSessions.employeeId, users.id))
+      .where(eq(nonBillableWorkSessions.employeeId, employeeId))
+      .orderBy(desc(nonBillableWorkSessions.workDate), desc(nonBillableWorkSessions.startTime));
+    return result;
+  }
+
+  async getNonBillableSessionById(sessionId: string): Promise<any | undefined> {
+    const result = await db.select().from(nonBillableWorkSessions)
+      .where(eq(nonBillableWorkSessions.id, sessionId))
+      .limit(1);
+    return result[0];
   }
 
   async createProjectPhoto(photo: InsertProjectPhoto): Promise<ProjectPhoto> {

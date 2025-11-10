@@ -936,6 +936,15 @@ export default function Dashboard() {
       isVisible: () => true, // Everyone
     },
     {
+      id: "non-billable-hours",
+      label: "Non-Billable Hours",
+      description: "Errands & training",
+      icon: "schedule",
+      onClick: () => setLocation("/non-billable-hours"),
+      testId: "button-non-billable-hours",
+      isVisible: () => true, // Everyone
+    },
+    {
       id: "harness-inspection",
       label: "Harness Inspection",
       description: "Daily inspection",

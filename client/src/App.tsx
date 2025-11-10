@@ -18,6 +18,7 @@ import ToolboxMeetingForm from "@/pages/ToolboxMeetingForm";
 import Payroll from "@/pages/Payroll";
 import Quotes from "@/pages/Quotes";
 import ActiveWorkers from "@/pages/ActiveWorkers";
+import NonBillableHours from "@/pages/NonBillableHours";
 import NotFound from "@/pages/not-found";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import { EMPLOYEE_ROLES } from "@/lib/permissions";
@@ -81,6 +82,11 @@ function Router() {
       <Route path="/active-workers">
         <ProtectedRoute allowedRoles={["company", "operations_manager", "supervisor"]}>
           <ActiveWorkers />
+        </ProtectedRoute>
+      </Route>
+      <Route path="/non-billable-hours">
+        <ProtectedRoute allowedRoles={EMPLOYEE_ROLES}>
+          <NonBillableHours />
         </ProtectedRoute>
       </Route>
       <Route component={NotFound} />

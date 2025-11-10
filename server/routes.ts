@@ -1544,6 +1544,122 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
+  // ==================== NON-BILLABLE WORK SESSION ROUTES ====================
+  
+  // Start a non-billable work session
+  app.post("/api/non-billable-sessions", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      // Check if employee already has an active non-billable session
+      const activeSession = await storage.getActiveNonBillableSession(currentUser.id);
+      if (activeSession) {
+        return res.status(400).json({ message: "You already have an active non-billable session" });
+      }
+      
+      const session = await storage.createNonBillableWorkSession({
+        employeeId: currentUser.id,
+        companyId: currentUser.companyId || currentUser.id,
+        workDate: new Date().toISOString().split('T')[0],
+        startTime: new Date().toISOString(),
+        endTime: null,
+        description: req.body.description,
+      });
+      
+      res.json({ session });
+    } catch (error) {
+      console.error("Start non-billable session error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+  
+  // End a non-billable work session
+  app.patch("/api/non-billable-sessions/:sessionId/end", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      const session = await storage.getNonBillableSessionById(req.params.sessionId);
+      if (!session) {
+        return res.status(404).json({ message: "Session not found" });
+      }
+      
+      // Verify ownership
+      if (session.employeeId !== currentUser.id) {
+        return res.status(403).json({ message: "You can only end your own sessions" });
+      }
+      
+      if (session.endTime) {
+        return res.status(400).json({ message: "Session already ended" });
+      }
+      
+      const updatedSession = await storage.endNonBillableWorkSession(req.params.sessionId);
+      res.json({ session: updatedSession });
+    } catch (error) {
+      console.error("End non-billable session error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+  
+  // Get active non-billable session for current user
+  app.get("/api/non-billable-sessions/active", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      const session = await storage.getActiveNonBillableSession(currentUser.id);
+      res.json({ session: session || null });
+    } catch (error) {
+      console.error("Get active non-billable session error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+  
+  // Get all non-billable sessions for company (management only)
+  app.get("/api/non-billable-sessions", requireAuth, requireRole("company", "operations_manager", "supervisor"), async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      const companyId = currentUser.role === "company" ? currentUser.id : currentUser.companyId;
+      const sessions = await storage.getAllNonBillableSessions(companyId!);
+      res.json({ sessions });
+    } catch (error) {
+      console.error("Get non-billable sessions error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+  
+  // Get non-billable sessions by employee (management only)
+  app.get("/api/non-billable-sessions/employee/:employeeId", requireAuth, requireRole("company", "operations_manager", "supervisor"), async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      const sessions = await storage.getNonBillableSessionsByEmployee(req.params.employeeId);
+      res.json({ sessions });
+    } catch (error) {
+      console.error("Get non-billable sessions by employee error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+  
   // ==================== COMPLAINT ROUTES ====================
   
   // Create complaint (with optional photo upload)
