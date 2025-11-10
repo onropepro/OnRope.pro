@@ -2254,12 +2254,37 @@ export default function ProjectDetail() {
           <DialogHeader>
             <DialogTitle>End Your Work Day</DialogTitle>
             <DialogDescription>
-              Enter the number of drops you completed today for {project.buildingName}.
+              {project.jobType === "in_suite_dryer_vent_cleaning" 
+                ? `Enter the number of units you completed today for ${project.buildingName}.`
+                : `Enter the number of drops you completed today for ${project.buildingName}.`}
             </DialogDescription>
           </DialogHeader>
 
           <Form {...endDayForm}>
             <form onSubmit={endDayForm.handleSubmit(onEndDaySubmit)} className="space-y-4">
+              {project.jobType === "in_suite_dryer_vent_cleaning" ? (
+                <FormField
+                  control={endDayForm.control}
+                  name="dropsCompletedNorth"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Units Completed</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="number"
+                          min="0"
+                          placeholder="0"
+                          {...field}
+                          data-testid="input-units-completed"
+                          className="h-16 text-3xl font-bold text-center"
+                          autoComplete="off"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              ) : (
               <div className="grid grid-cols-2 gap-3">
                 <FormField
                   control={endDayForm.control}
@@ -2349,6 +2374,7 @@ export default function ProjectDetail() {
                   )}
                 />
               </div>
+              )}
 
               {(() => {
                 const north = parseInt(endDayForm.watch("dropsCompletedNorth") || "0");
@@ -2356,13 +2382,16 @@ export default function ProjectDetail() {
                 const south = parseInt(endDayForm.watch("dropsCompletedSouth") || "0");
                 const west = parseInt(endDayForm.watch("dropsCompletedWest") || "0");
                 const totalDrops = north + east + south + west;
+                const isInSuite = project.jobType === "in_suite_dryer_vent_cleaning";
 
                 return (
                   <>
-                    <div className="p-3 bg-muted rounded-md">
-                      <div className="text-sm text-muted-foreground">Total Drops</div>
-                      <div className="text-2xl font-bold">{totalDrops}</div>
-                    </div>
+                    {!isInSuite && (
+                      <div className="p-3 bg-muted rounded-md">
+                        <div className="text-sm text-muted-foreground">Total Drops</div>
+                        <div className="text-2xl font-bold">{totalDrops}</div>
+                      </div>
+                    )}
 
                     {totalDrops < project.dailyDropTarget && (
                       <FormField
