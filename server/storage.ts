@@ -1,6 +1,6 @@
 import { db } from "./db";
-import { users, projects, dropLogs, workSessions, nonBillableWorkSessions, complaints, complaintNotes, projectPhotos, jobComments, harnessInspections, toolboxMeetings, payPeriodConfig, payPeriods, quotes, quoteServices } from "@shared/schema";
-import type { User, InsertUser, Project, InsertProject, DropLog, InsertDropLog, WorkSession, InsertWorkSession, Complaint, InsertComplaint, ComplaintNote, InsertComplaintNote, ProjectPhoto, InsertProjectPhoto, JobComment, InsertJobComment, HarnessInspection, InsertHarnessInspection, ToolboxMeeting, InsertToolboxMeeting, PayPeriodConfig, InsertPayPeriodConfig, PayPeriod, InsertPayPeriod, EmployeeHoursSummary, Quote, InsertQuote, QuoteService, InsertQuoteService, QuoteWithServices } from "@shared/schema";
+import { users, projects, dropLogs, workSessions, nonBillableWorkSessions, complaints, complaintNotes, projectPhotos, jobComments, harnessInspections, toolboxMeetings, payPeriodConfig, payPeriods, quotes, quoteServices, gearItems } from "@shared/schema";
+import type { User, InsertUser, Project, InsertProject, DropLog, InsertDropLog, WorkSession, InsertWorkSession, Complaint, InsertComplaint, ComplaintNote, InsertComplaintNote, ProjectPhoto, InsertProjectPhoto, JobComment, InsertJobComment, HarnessInspection, InsertHarnessInspection, ToolboxMeeting, InsertToolboxMeeting, PayPeriodConfig, InsertPayPeriodConfig, PayPeriod, InsertPayPeriod, EmployeeHoursSummary, Quote, InsertQuote, QuoteService, InsertQuoteService, QuoteWithServices, GearItem, InsertGearItem } from "@shared/schema";
 import { eq, and, desc, sql, isNull, not, gte, lte, between } from "drizzle-orm";
 import bcrypt from "bcrypt";
 
@@ -628,6 +628,24 @@ export class Storage {
     return db.select().from(harnessInspections)
       .where(eq(harnessInspections.projectId, projectId))
       .orderBy(desc(harnessInspections.inspectionDate));
+  }
+
+  // Gear items operations
+  async createGearItem(item: InsertGearItem): Promise<GearItem> {
+    const result = await db.insert(gearItems).values(item).returning();
+    return result[0];
+  }
+
+  async getGearItemsByCompany(companyId: string): Promise<GearItem[]> {
+    return db.select().from(gearItems)
+      .where(eq(gearItems.companyId, companyId))
+      .orderBy(desc(gearItems.createdAt));
+  }
+
+  async getGearItemsByEmployee(employeeId: string): Promise<GearItem[]> {
+    return db.select().from(gearItems)
+      .where(eq(gearItems.employeeId, employeeId))
+      .orderBy(desc(gearItems.createdAt));
   }
 
   async updateHarnessInspection(id: string, pdfUrl: string): Promise<HarnessInspection> {

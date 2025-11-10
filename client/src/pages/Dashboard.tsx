@@ -997,6 +997,15 @@ export default function Dashboard() {
       isVisible: () => true, // Everyone
     },
     {
+      id: "inventory",
+      label: "Inventory",
+      description: "Manage gear",
+      icon: "inventory_2",
+      onClick: () => setLocation("/inventory"),
+      testId: "button-inventory",
+      isVisible: (user: any) => isManagement(user) || hasPermission(user, "manage_inventory"), // Management or manage_inventory permission
+    },
+    {
       id: "harness-inspection",
       label: "Harness Inspection",
       description: "Daily inspection",

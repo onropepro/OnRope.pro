@@ -1,7 +1,7 @@
 import type { Express, Request, Response, NextFunction } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { insertUserSchema, insertProjectSchema, insertDropLogSchema, insertComplaintSchema, insertComplaintNoteSchema, insertJobCommentSchema, insertHarnessInspectionSchema, insertToolboxMeetingSchema, insertPayPeriodConfigSchema, insertQuoteSchema, insertQuoteServiceSchema, normalizeStrataPlan } from "@shared/schema";
+import { insertUserSchema, insertProjectSchema, insertDropLogSchema, insertComplaintSchema, insertComplaintNoteSchema, insertJobCommentSchema, insertHarnessInspectionSchema, insertToolboxMeetingSchema, insertPayPeriodConfigSchema, insertQuoteSchema, insertQuoteServiceSchema, insertGearItemSchema, normalizeStrataPlan } from "@shared/schema";
 import { z } from "zod";
 import bcrypt from "bcrypt";
 import multer from "multer";
@@ -2040,6 +2040,87 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Validation error", errors: error.errors });
       }
       console.error("Create complaint note error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Gear items routes
+  app.get("/api/gear-items", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      const companyId = currentUser.role === "company" ? currentUser.id : currentUser.companyId;
+      
+      if (!companyId) {
+        return res.status(400).json({ message: "Unable to determine company" });
+      }
+      
+      const items = await storage.getGearItemsByCompany(companyId);
+      
+      // Filter out financial data if user doesn't have permission
+      const hasFinancialPermission = currentUser.role === "company" || 
+        (currentUser.permissions && currentUser.permissions.includes("view_financial_data"));
+      
+      const filteredItems = items.map(item => {
+        if (!hasFinancialPermission) {
+          const { itemPrice, ...rest } = item;
+          return rest;
+        }
+        return item;
+      });
+      
+      res.json({ items: filteredItems });
+    } catch (error) {
+      console.error("Get gear items error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.post("/api/gear-items", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      const companyId = currentUser.role === "company" ? currentUser.id : currentUser.companyId;
+      
+      if (!companyId) {
+        return res.status(400).json({ message: "Unable to determine company" });
+      }
+      
+      // Clean empty strings to undefined for optional fields
+      const cleanedBody = {
+        ...req.body,
+        equipmentType: req.body.equipmentType || undefined,
+        brand: req.body.brand || undefined,
+        model: req.body.model || undefined,
+        itemPrice: req.body.itemPrice || undefined,
+        possessionOf: req.body.possessionOf || undefined,
+        notes: req.body.notes || undefined,
+        serialNumber: req.body.serialNumber || undefined,
+        dateInService: req.body.dateInService || undefined,
+        dateOutOfService: req.body.dateOutOfService || undefined,
+      };
+      
+      const itemData = insertGearItemSchema.parse({
+        ...cleanedBody,
+        companyId,
+        employeeId: req.session.userId,
+      });
+      
+      const item = await storage.createGearItem(itemData);
+      res.json({ item });
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Validation error", errors: error.errors });
+      }
+      console.error("Create gear item error:", error);
       res.status(500).json({ message: "Internal server error" });
     }
   });
