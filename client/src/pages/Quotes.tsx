@@ -410,7 +410,7 @@ export default function Quotes() {
     return (
       <div className="min-h-screen bg-[#FAFAFA] p-8">
         <div className="max-w-7xl mx-auto">
-          <Link href="/dashboard">
+          <Link href="/management">
             <Button
               variant="ghost"
               className="mb-6"
