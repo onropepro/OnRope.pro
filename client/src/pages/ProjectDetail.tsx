@@ -15,6 +15,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { Checkbox } from "@/components/ui/checkbox";
 import { useState } from "react";
 import { format } from "date-fns";
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from "recharts";
@@ -31,6 +32,8 @@ export default function ProjectDetail() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [photoUnitNumber, setPhotoUnitNumber] = useState("");
   const [photoComment, setPhotoComment] = useState("");
+  const [isMissedUnit, setIsMissedUnit] = useState(false);
+  const [missedUnitNumber, setMissedUnitNumber] = useState("");
   const [selectedMeeting, setSelectedMeeting] = useState<any>(null);
   const [newComment, setNewComment] = useState("");
   const [selectedSession, setSelectedSession] = useState<any>(null);
@@ -253,6 +256,16 @@ export default function ProjectDetail() {
   const handlePhotoDialogSubmit = async () => {
     if (!id || !selectedFile) return;
     
+    // Validate missed unit fields
+    if (isMissedUnit && !missedUnitNumber.trim()) {
+      toast({
+        title: "Missing unit number",
+        description: "Please enter a unit number for the missed unit",
+        variant: "destructive"
+      });
+      return;
+    }
+    
     setUploadingImage(true);
     setShowPhotoDialog(false);
     
@@ -261,6 +274,10 @@ export default function ProjectDetail() {
       formData.append('file', selectedFile);
       formData.append('unitNumber', photoUnitNumber);
       formData.append('comment', photoComment);
+      formData.append('isMissedUnit', String(isMissedUnit));
+      if (isMissedUnit) {
+        formData.append('missedUnitNumber', missedUnitNumber);
+      }
       
       const response = await fetch(`/api/projects/${id}/images`, {
         method: 'POST',
@@ -276,12 +293,14 @@ export default function ProjectDetail() {
       
       queryClient.invalidateQueries({ queryKey: ["/api/projects", id, "photos"] });
       queryClient.invalidateQueries({ queryKey: ["/api/projects", id] });
-      toast({ title: "Photo uploaded successfully" });
+      toast({ title: isMissedUnit ? "Missed unit photo uploaded successfully" : "Photo uploaded successfully" });
       
       // Reset form
       setSelectedFile(null);
       setPhotoUnitNumber("");
       setPhotoComment("");
+      setIsMissedUnit(false);
+      setMissedUnitNumber("");
     } catch (error) {
       toast({ 
         title: "Upload failed", 
@@ -298,6 +317,8 @@ export default function ProjectDetail() {
     setSelectedFile(null);
     setPhotoUnitNumber("");
     setPhotoComment("");
+    setIsMissedUnit(false);
+    setMissedUnitNumber("");
   };
 
   if (isLoading) {
@@ -1206,6 +1227,44 @@ export default function ProjectDetail() {
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4 py-4">
+            {project.jobType === 'in_suite_dryer_vent_cleaning' && (
+              <div className="flex items-start space-x-3 p-3 rounded-lg bg-orange-50 border border-orange-200">
+                <Checkbox
+                  id="missedUnit"
+                  checked={isMissedUnit}
+                  onCheckedChange={(checked) => setIsMissedUnit(checked as boolean)}
+                  data-testid="checkbox-missed-unit"
+                />
+                <div className="space-y-1 flex-1">
+                  <Label 
+                    htmlFor="missedUnit"
+                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
+                  >
+                    Mark as Missed Unit
+                  </Label>
+                  <p className="text-xs text-muted-foreground">
+                    Check this if the photo shows a unit that was missed during the initial sweep
+                  </p>
+                </div>
+              </div>
+            )}
+            
+            {isMissedUnit && project.jobType === 'in_suite_dryer_vent_cleaning' && (
+              <div className="space-y-2 p-3 rounded-lg bg-orange-50 border border-orange-200">
+                <Label htmlFor="missedUnitNumber">Missed Unit Number *</Label>
+                <Input
+                  id="missedUnitNumber"
+                  placeholder="e.g., 301, 1205"
+                  value={missedUnitNumber}
+                  onChange={(e) => setMissedUnitNumber(e.target.value)}
+                  data-testid="input-missed-unit-number"
+                />
+                <p className="text-xs text-muted-foreground">
+                  Enter the unit number for the missed unit
+                </p>
+              </div>
+            )}
+            
             <div className="space-y-2">
               <Label htmlFor="unitNumber">Unit Number (Optional)</Label>
               <Input
