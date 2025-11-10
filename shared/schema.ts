@@ -180,15 +180,17 @@ export const gearItems = pgTable("gear_items", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   employeeId: varchar("employee_id").notNull().references(() => users.id, { onDelete: "cascade" }),
   companyId: varchar("company_id").notNull().references(() => users.id, { onDelete: "cascade" }), // For multi-tenant isolation
-  equipmentType: varchar("equipment_type").notNull(), // harness, rope, descender, ascender, helmet, carabiner, lanyard, other
+  equipmentType: varchar("equipment_type"), // harness, rope, descender, ascender, helmet, carabiner, lanyard, other - Optional
   brand: varchar("brand"), // Optional
   model: varchar("model"), // Optional
+  itemPrice: numeric("item_price", { precision: 10, scale: 2 }), // Optional - only visible to users with financial permissions
+  possessionOf: varchar("possession_of"), // Optional - who has possession of this item
+  notes: text("notes"), // Optional - additional notes about the item
   serialNumber: varchar("serial_number"), // Optional
   dateInService: date("date_in_service"), // Optional
   dateOutOfService: date("date_out_of_service"), // Optional
   inService: boolean("in_service").notNull().default(true), // Checkbox for in service status
   quantity: integer("quantity").default(1), // How many of this item
-  itemPrice: numeric("item_price", { precision: 10, scale: 2 }), // Optional - only visible to users with financial permissions
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 }, (table) => [
