@@ -896,7 +896,9 @@ export default function Dashboard() {
       <header className="sticky top-0 z-[100] bg-card border-b shadow-md">
         <div className="px-4 h-20 flex items-center justify-between max-w-7xl mx-auto">
           <div>
-            <h1 className="text-2xl font-bold tracking-tight">Dashboard</h1>
+            <h1 className="text-2xl font-bold tracking-tight">
+              {currentUser?.name ? `${currentUser.name}'s Dashboard` : 'Dashboard'}
+            </h1>
             {companyName && (
               <p className="text-sm text-muted-foreground mt-0.5">{companyName}</p>
             )}
