@@ -1014,21 +1014,19 @@ export default function Dashboard() {
     <div className="min-h-screen bg-background pb-20">
       {/* Header */}
       <header className="sticky top-0 z-[100] bg-card border-b shadow-md">
-        <div className="px-4 h-20 flex items-center justify-between max-w-7xl mx-auto">
+        <div className="px-4 h-16 flex items-center justify-between max-w-7xl mx-auto">
           <div>
-            <h1 className="text-2xl font-bold tracking-tight">
-              {currentUser?.name ? `${currentUser.name}'s Dashboard` : 'Dashboard'}
-            </h1>
+            <h1 className="text-xl font-bold tracking-tight">Dashboard</h1>
             {companyName && (
-              <p className="text-sm text-muted-foreground mt-0.5">{companyName}</p>
+              <p className="text-xs text-muted-foreground mt-0.5">{companyName}</p>
             )}
           </div>
           <div className="flex items-center gap-2">
-            <Button variant="ghost" size="icon" className="min-w-11 min-h-11" data-testid="button-profile" onClick={() => setLocation("/profile")}>
-              <span className="material-icons">person</span>
+            <Button variant="ghost" size="icon" data-testid="button-profile" onClick={() => setLocation("/profile")}>
+              <span className="material-icons text-xl">person</span>
             </Button>
-            <Button variant="ghost" size="icon" className="min-w-11 min-h-11" data-testid="button-logout" onClick={() => setShowLogoutDialog(true)}>
-              <span className="material-icons">logout</span>
+            <Button variant="ghost" size="icon" data-testid="button-logout" onClick={() => setShowLogoutDialog(true)}>
+              <span className="material-icons text-xl">logout</span>
             </Button>
           </div>
         </div>

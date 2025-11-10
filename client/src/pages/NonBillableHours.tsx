@@ -110,8 +110,8 @@ export default function NonBillableHours() {
   return (
     <div className="min-h-screen bg-background pb-20">
       {/* Header */}
-      <div className="bg-gradient-to-br from-primary to-primary/80 text-primary-foreground p-6 shadow-lg">
-        <div className="flex items-center gap-3 mb-4">
+      <div className="bg-gradient-to-br from-primary to-primary/80 text-primary-foreground p-4 shadow-lg">
+        <div className="flex items-center gap-3">
           <Button
             variant="ghost"
             size="icon"
@@ -119,11 +119,11 @@ export default function NonBillableHours() {
             className="text-primary-foreground hover:bg-primary-foreground/20"
             data-testid="button-back"
           >
-            <span className="material-icons">arrow_back</span>
+            <span className="material-icons text-xl">arrow_back</span>
           </Button>
           <div className="flex-1">
-            <h1 className="text-2xl font-bold">Non-Billable Hours</h1>
-            <p className="text-sm text-primary-foreground/90">
+            <h1 className="text-xl font-bold">Non-Billable Hours</h1>
+            <p className="text-xs text-primary-foreground/90">
               Track errands, training, and other non-project work
             </p>
           </div>

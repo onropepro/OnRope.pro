@@ -168,21 +168,19 @@ export default function Profile() {
               variant="ghost"
               size="icon"
               onClick={handleBack}
-              className="min-w-11 min-h-11"
               data-testid="button-back"
             >
-              <span className="material-icons">arrow_back</span>
+              <span className="material-icons text-xl">arrow_back</span>
             </Button>
-            <h1 className="text-lg font-bold">Profile Settings</h1>
+            <h1 className="text-lg font-bold">Profile</h1>
           </div>
           <Button
             variant="ghost"
             size="icon"
-            className="min-w-11 min-h-11"
             data-testid="button-logout"
             onClick={() => setShowLogoutDialog(true)}
           >
-            <span className="material-icons">logout</span>
+            <span className="material-icons text-xl">logout</span>
           </Button>
         </div>
       </header>

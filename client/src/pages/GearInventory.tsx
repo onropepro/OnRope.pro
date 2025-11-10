@@ -86,21 +86,20 @@ export default function GearInventory() {
     <div className="min-h-screen bg-background pb-20">
       {/* Header */}
       <header className="sticky top-0 z-[100] bg-card border-b shadow-md">
-        <div className="px-4 h-20 flex items-center justify-between max-w-7xl mx-auto">
+        <div className="px-4 h-16 flex items-center justify-between max-w-7xl mx-auto">
           <div>
-            <h1 className="text-2xl font-bold tracking-tight">Build my Kit</h1>
-            <p className="text-sm text-muted-foreground mt-0.5">
+            <h1 className="text-xl font-bold tracking-tight">Build my Kit</h1>
+            <p className="text-xs text-muted-foreground mt-0.5">
               Manage your equipment inventory
             </p>
           </div>
           <Button
             variant="ghost"
             size="icon"
-            className="min-w-11 min-h-11"
             onClick={() => setLocation("/dashboard")}
             data-testid="button-back"
           >
-            <span className="material-icons">arrow_back</span>
+            <span className="material-icons text-xl">arrow_back</span>
           </Button>
         </div>
       </header>

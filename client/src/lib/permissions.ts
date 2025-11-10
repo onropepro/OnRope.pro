@@ -33,8 +33,8 @@ export function isWorker(user: User | null | undefined): boolean {
 export function hasFinancialAccess(user: User | null | undefined): boolean {
   if (!user) return false;
   
-  // Management always has financial access
-  if (isManagement(user)) return true;
+  // Company role always has financial access
+  if (user.role === 'company') return true;
   
   // Check explicit permission flag
   if (user.viewFinancialData === true) return true;
@@ -49,10 +49,10 @@ export function hasFinancialAccess(user: User | null | undefined): boolean {
 export function canManageEmployees(user: User | null | undefined): boolean {
   if (!user) return false;
   
-  // Management roles always have access
-  if (MANAGEMENT_ROLES.includes(user.role)) return true;
+  // Company role always has access
+  if (user.role === 'company') return true;
   
-  // Check granular permissions for non-management roles
+  // Check granular permissions - role does NOT automatically grant permissions
   return user.permissions?.includes('view_employees') || false;
 }
 
@@ -60,10 +60,10 @@ export function canManageEmployees(user: User | null | undefined): boolean {
 export function canViewPerformance(user: User | null | undefined): boolean {
   if (!user) return false;
   
-  // Management roles always have access
-  if (MANAGEMENT_ROLES.includes(user.role)) return true;
+  // Company role always has access
+  if (user.role === 'company') return true;
   
-  // Check granular permissions for non-management roles
+  // Check granular permissions - role does NOT automatically grant permissions
   return user.permissions?.includes('view_analytics') || false;
 }
 
@@ -76,9 +76,9 @@ export function canAccessPayroll(user: User | null | undefined): boolean {
 export function hasPermission(user: User | null | undefined, permission: string): boolean {
   if (!user) return false;
   
-  // Management has all permissions
-  if (isManagement(user)) return true;
+  // Company role has all permissions
+  if (user.role === 'company') return true;
   
-  // Check permissions array
+  // Check permissions array - role does NOT automatically grant permissions
   return user.permissions?.includes(permission) || false;
 }
