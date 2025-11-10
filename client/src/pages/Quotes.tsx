@@ -28,7 +28,8 @@ import {
   CheckCircle2,
   Waves,
   Pipette,
-  Edit
+  Edit,
+  Image
 } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
@@ -147,6 +148,9 @@ export default function Quotes() {
   const [selectedServices, setSelectedServices] = useState<string[]>([]);
   const [configuredServices, setConfiguredServices] = useState<Map<string, ServiceFormData>>(new Map());
   const [serviceBeingConfigured, setServiceBeingConfigured] = useState<string | null>(null);
+  const [selectedPhotoFile, setSelectedPhotoFile] = useState<File | null>(null);
+  const [editPhotoFile, setEditPhotoFile] = useState<File | null>(null);
+  const [uploadingPhoto, setUploadingPhoto] = useState(false);
 
   // Building info form
   const buildingForm = useForm<BuildingInfoFormData>({
@@ -232,7 +236,35 @@ export default function Quotes() {
       const { quote } = await quoteResponse.json();
       return quote;
     },
-    onSuccess: () => {
+    onSuccess: async (quote) => {
+      // Upload photo if one was selected
+      if (selectedPhotoFile) {
+        try {
+          setUploadingPhoto(true);
+          const formData = new FormData();
+          formData.append('photo', selectedPhotoFile);
+          
+          const uploadResponse = await fetch(`/api/quotes/${quote.id}/photo`, {
+            method: 'POST',
+            body: formData,
+            credentials: 'include',
+          });
+          
+          if (!uploadResponse.ok) {
+            throw new Error('Failed to upload photo');
+          }
+        } catch (error) {
+          console.error('Photo upload error:', error);
+          toast({
+            variant: "destructive",
+            title: "Photo upload failed",
+            description: "Quote was created but photo upload failed.",
+          });
+        } finally {
+          setUploadingPhoto(false);
+        }
+      }
+      
       queryClient.invalidateQueries({ queryKey: ["/api/quotes"] });
       toast({
         title: "Quote created",
@@ -309,7 +341,42 @@ export default function Quotes() {
       const response = await apiRequest("PATCH", `/api/quotes/${selectedQuote.id}`, payload);
       return response.json();
     },
-    onSuccess: (data: any) => {
+    onSuccess: async (data: any) => {
+      // Upload photo if one was selected
+      if (editPhotoFile && selectedQuote) {
+        try {
+          setUploadingPhoto(true);
+          const formData = new FormData();
+          formData.append('photo', editPhotoFile);
+          
+          const uploadResponse = await fetch(`/api/quotes/${selectedQuote.id}/photo`, {
+            method: 'POST',
+            body: formData,
+            credentials: 'include',
+          });
+          
+          if (!uploadResponse.ok) {
+            throw new Error('Failed to upload photo');
+          }
+          
+          const uploadData = await uploadResponse.json();
+          // Update selectedQuote with new photoUrl
+          if (uploadData.photoUrl && data.quote) {
+            data.quote.photoUrl = uploadData.photoUrl;
+          }
+        } catch (error) {
+          console.error('Photo upload error:', error);
+          toast({
+            variant: "destructive",
+            title: "Photo upload failed",
+            description: "Quote was updated but photo upload failed.",
+          });
+        } finally {
+          setUploadingPhoto(false);
+          setEditPhotoFile(null);
+        }
+      }
+      
       queryClient.invalidateQueries({ queryKey: ["/api/quotes"] });
       // Update selected quote with new data
       if (data.quote) {
@@ -335,6 +402,7 @@ export default function Quotes() {
     setSelectedServices([]);
     setConfiguredServices(new Map());
     setServiceBeingConfigured(null);
+    setSelectedPhotoFile(null);
     setCreateStep("services");
     buildingForm.reset();
     serviceForm.reset();
@@ -672,6 +740,146 @@ export default function Quotes() {
               </div>
             </CardHeader>
           </Card>
+
+          {/* Building Photo Section */}
+          {(selectedQuote.photoUrl || canEditQuotes) && (
+            <Card className="rounded-2xl shadow-lg border border-[#F4F4F5] mb-8">
+              <CardHeader className="p-8">
+                <CardTitle className="text-xl font-bold text-[#0A0A0A] mb-4">Building Photo</CardTitle>
+                {selectedQuote.photoUrl ? (
+                  <div className="space-y-4">
+                    <img
+                      src={selectedQuote.photoUrl}
+                      alt={selectedQuote.buildingName}
+                      className="w-full max-h-96 object-cover rounded-lg"
+                      data-testid="img-quote-photo"
+                    />
+                    {canEditQuotes && (
+                      <div className="flex gap-2">
+                        <input
+                          type="file"
+                          accept="image/*"
+                          onChange={async (e) => {
+                            const file = e.target.files?.[0];
+                            if (file && selectedQuote) {
+                              try {
+                                setUploadingPhoto(true);
+                                const formData = new FormData();
+                                formData.append('photo', file);
+                                
+                                const uploadResponse = await fetch(`/api/quotes/${selectedQuote.id}/photo`, {
+                                  method: 'POST',
+                                  body: formData,
+                                  credentials: 'include',
+                                });
+                                
+                                if (!uploadResponse.ok) {
+                                  throw new Error('Failed to upload photo');
+                                }
+                                
+                                const uploadData = await uploadResponse.json();
+                                // Update selectedQuote with new photoUrl
+                                if (uploadData.photoUrl) {
+                                  setSelectedQuote({...selectedQuote, photoUrl: uploadData.photoUrl});
+                                }
+                                
+                                queryClient.invalidateQueries({ queryKey: ["/api/quotes"] });
+                                toast({
+                                  title: "Photo updated",
+                                  description: "The building photo has been updated.",
+                                });
+                              } catch (error) {
+                                toast({
+                                  variant: "destructive",
+                                  title: "Upload failed",
+                                  description: "Failed to upload photo.",
+                                });
+                              } finally {
+                                setUploadingPhoto(false);
+                              }
+                            }
+                          }}
+                          className="hidden"
+                          id="quote-photo-replace"
+                          data-testid="input-replace-photo"
+                        />
+                        <label htmlFor="quote-photo-replace">
+                          <Button
+                            type="button"
+                            variant="outline"
+                            disabled={uploadingPhoto}
+                            asChild
+                          >
+                            <span className="cursor-pointer">
+                              {uploadingPhoto ? "Uploading..." : "Replace Photo"}
+                            </span>
+                          </Button>
+                        </label>
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  canEditQuotes && (
+                    <div className="border-2 border-dashed border-[#E4E4E7] rounded-lg p-8 hover:border-[#3B82F6] transition-colors">
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={async (e) => {
+                          const file = e.target.files?.[0];
+                          if (file && selectedQuote) {
+                            try {
+                              setUploadingPhoto(true);
+                              const formData = new FormData();
+                              formData.append('photo', file);
+                              
+                              const uploadResponse = await fetch(`/api/quotes/${selectedQuote.id}/photo`, {
+                                method: 'POST',
+                                body: formData,
+                                credentials: 'include',
+                              });
+                              
+                              if (!uploadResponse.ok) {
+                                throw new Error('Failed to upload photo');
+                              }
+                              
+                              const uploadData = await uploadResponse.json();
+                              // Update selectedQuote with new photoUrl
+                              if (uploadData.photoUrl) {
+                                setSelectedQuote({...selectedQuote, photoUrl: uploadData.photoUrl});
+                              }
+                              
+                              queryClient.invalidateQueries({ queryKey: ["/api/quotes"] });
+                              toast({
+                                title: "Photo uploaded",
+                                description: "The building photo has been uploaded.",
+                              });
+                            } catch (error) {
+                              toast({
+                                variant: "destructive",
+                                title: "Upload failed",
+                                description: "Failed to upload photo.",
+                              });
+                            } finally {
+                              setUploadingPhoto(false);
+                            }
+                          }
+                        }}
+                        className="hidden"
+                        id="quote-photo-add"
+                        data-testid="input-add-photo"
+                      />
+                      <label htmlFor="quote-photo-add" className="flex flex-col items-center cursor-pointer">
+                        <Image className="w-16 h-16 text-[#71717A] mb-3" />
+                        <p className="text-lg text-[#71717A] text-center">
+                          {uploadingPhoto ? "Uploading..." : "Click to upload building photo"}
+                        </p>
+                      </label>
+                    </div>
+                  )
+                )}
+              </CardHeader>
+            </Card>
+          )}
 
           <h2 className="text-2xl font-bold text-[#0A0A0A] mb-6">Services</h2>
           <div className="space-y-6 mb-8">
@@ -1238,11 +1446,68 @@ export default function Quotes() {
                   </Accordion>
                 </div>
 
+                {/* Photo Upload Section */}
+                <div className="space-y-4">
+                  <h3 className="text-lg font-semibold">Building Photo</h3>
+                  {selectedQuote.photoUrl && (
+                    <div className="space-y-2">
+                      <img
+                        src={selectedQuote.photoUrl}
+                        alt={selectedQuote.buildingName}
+                        className="w-full max-h-48 object-cover rounded-lg"
+                      />
+                      <p className="text-sm text-[#71717A]">Current Photo</p>
+                    </div>
+                  )}
+                  <div className="border-2 border-dashed border-[#E4E4E7] rounded-lg p-6 hover:border-[#3B82F6] transition-colors">
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) {
+                          setEditPhotoFile(file);
+                        }
+                      }}
+                      className="hidden"
+                      id="edit-quote-photo"
+                      data-testid="input-edit-quote-photo"
+                    />
+                    <label
+                      htmlFor="edit-quote-photo"
+                      className="flex flex-col items-center cursor-pointer"
+                    >
+                      <Image className="w-12 h-12 text-[#71717A] mb-2" />
+                      <p className="text-sm text-[#71717A] text-center">
+                        {editPhotoFile ? editPhotoFile.name : selectedQuote.photoUrl ? "Click to replace photo" : "Click to upload building photo"}
+                      </p>
+                      {editPhotoFile && (
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          className="mt-2"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            setEditPhotoFile(null);
+                          }}
+                          data-testid="button-remove-edit-photo"
+                        >
+                          Remove Selected Photo
+                        </Button>
+                      )}
+                    </label>
+                  </div>
+                </div>
+
                 <div className="flex gap-4 justify-end pt-4 border-t">
                   <Button
                     type="button"
                     variant="outline"
-                    onClick={() => setIsEditDialogOpen(false)}
+                    onClick={() => {
+                      setIsEditDialogOpen(false);
+                      setEditPhotoFile(null);
+                    }}
                     data-testid="button-cancel-edit"
                   >
                     Cancel
@@ -1368,6 +1633,49 @@ export default function Quotes() {
                       </FormItem>
                     )}
                   />
+
+                  <div className="space-y-2">
+                    <Label>Building Photo (Optional)</Label>
+                    <div className="border-2 border-dashed border-[#E4E4E7] rounded-lg p-6 hover:border-[#3B82F6] transition-colors">
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (file) {
+                            setSelectedPhotoFile(file);
+                          }
+                        }}
+                        className="hidden"
+                        id="quote-photo-upload"
+                        data-testid="input-quote-photo"
+                      />
+                      <label
+                        htmlFor="quote-photo-upload"
+                        className="flex flex-col items-center cursor-pointer"
+                      >
+                        <Image className="w-12 h-12 text-[#71717A] mb-2" />
+                        <p className="text-sm text-[#71717A] text-center">
+                          {selectedPhotoFile ? selectedPhotoFile.name : "Click to upload building photo"}
+                        </p>
+                        {selectedPhotoFile && (
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            className="mt-2"
+                            onClick={(e) => {
+                              e.preventDefault();
+                              setSelectedPhotoFile(null);
+                            }}
+                            data-testid="button-remove-photo"
+                          >
+                            Remove Photo
+                          </Button>
+                        )}
+                      </label>
+                    </div>
+                  </div>
 
                   <Button
                     type="submit"
