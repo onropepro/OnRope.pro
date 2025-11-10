@@ -693,7 +693,7 @@ export default function Quotes() {
   if (view === "detail" && selectedQuote) {
     return (
       <>
-        <div className="min-h-screen bg-[#FAFAFA] p-8">
+        <div className="min-h-screen bg-[#FAFAFA] p-4 md:p-8">
         <div className="max-w-4xl mx-auto">
           <Button
             variant="ghost"
@@ -709,7 +709,7 @@ export default function Quotes() {
           </Button>
 
           <Card className="rounded-2xl shadow-lg border border-[#F4F4F5] mb-8">
-            <CardHeader className="p-8">
+            <CardHeader className="p-4 md:p-8">
               <div className="flex items-start justify-between mb-4">
                 <div>
                   <CardTitle className="text-3xl font-bold text-[#0A0A0A] mb-2">
@@ -745,7 +745,7 @@ export default function Quotes() {
           {/* Building Photo Section - visible to all if photo exists, or to editors for upload */}
           {(selectedQuote.photoUrl || canEditQuotes) && (
             <Card className="rounded-2xl shadow-lg border border-[#F4F4F5] mb-8">
-              <CardHeader className="p-8">
+              <CardHeader className="p-4 md:p-8">
                 <CardTitle className="text-xl font-bold text-[#0A0A0A] mb-4">Building Photo</CardTitle>
                 {selectedQuote.photoUrl ? (
                   <div className="space-y-4">
