@@ -1180,9 +1180,14 @@ export default function Quotes() {
                                     value={serviceData.pricePerHour || ""}
                                     onChange={(e) => {
                                       const newServices = new Map(editingServices);
+                                      const newPricePerHour = e.target.value ? parseFloat(e.target.value) : undefined;
+                                      const totalHours = serviceData.totalHours;
+                                      const totalCost = newPricePerHour !== undefined && totalHours !== undefined ? newPricePerHour * totalHours : undefined;
+                                      
                                       newServices.set(serviceType, {
                                         ...serviceData,
-                                        pricePerHour: e.target.value ? parseFloat(e.target.value) : undefined
+                                        pricePerHour: newPricePerHour,
+                                        totalCost
                                       });
                                       setEditingServices(newServices);
                                     }}
@@ -1198,9 +1203,14 @@ export default function Quotes() {
                                     value={serviceData.totalHours || ""}
                                     onChange={(e) => {
                                       const newServices = new Map(editingServices);
+                                      const newTotalHours = e.target.value ? parseFloat(e.target.value) : undefined;
+                                      const pricePerHour = serviceData.pricePerHour;
+                                      const totalCost = pricePerHour !== undefined && newTotalHours !== undefined ? pricePerHour * newTotalHours : undefined;
+                                      
                                       newServices.set(serviceType, {
                                         ...serviceData,
-                                        totalHours: e.target.value ? parseFloat(e.target.value) : undefined
+                                        totalHours: newTotalHours,
+                                        totalCost
                                       });
                                       setEditingServices(newServices);
                                     }}
@@ -1208,21 +1218,15 @@ export default function Quotes() {
                                   />
                                 </div>
                                 <div>
-                                  <Label>Total Cost</Label>
+                                  <Label>Total Cost (calculated)</Label>
                                   <Input
                                     type="number"
                                     min="0"
                                     step="0.01"
                                     value={serviceData.totalCost || ""}
-                                    onChange={(e) => {
-                                      const newServices = new Map(editingServices);
-                                      newServices.set(serviceType, {
-                                        ...serviceData,
-                                        totalCost: e.target.value ? parseFloat(e.target.value) : undefined
-                                      });
-                                      setEditingServices(newServices);
-                                    }}
-                                    className="h-12"
+                                    readOnly
+                                    disabled
+                                    className="h-12 bg-muted"
                                   />
                                 </div>
                               </div>
