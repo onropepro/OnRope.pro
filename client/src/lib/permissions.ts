@@ -48,13 +48,23 @@ export function hasFinancialAccess(user: User | null | undefined): boolean {
 // Check if user can manage employees
 export function canManageEmployees(user: User | null | undefined): boolean {
   if (!user) return false;
-  return MANAGEMENT_ROLES.includes(user.role);
+  
+  // Management roles always have access
+  if (MANAGEMENT_ROLES.includes(user.role)) return true;
+  
+  // Check granular permissions for non-management roles
+  return user.permissions?.includes('view_employees') || false;
 }
 
 // Check if user can view performance analytics
 export function canViewPerformance(user: User | null | undefined): boolean {
   if (!user) return false;
-  return MANAGEMENT_ROLES.includes(user.role);
+  
+  // Management roles always have access
+  if (MANAGEMENT_ROLES.includes(user.role)) return true;
+  
+  // Check granular permissions for non-management roles
+  return user.permissions?.includes('view_analytics') || false;
 }
 
 // Check if user can access payroll
