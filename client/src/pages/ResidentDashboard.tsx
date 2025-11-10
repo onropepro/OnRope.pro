@@ -14,6 +14,7 @@ import { z } from "zod";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 
 const complaintSchema = z.object({
@@ -21,6 +22,7 @@ const complaintSchema = z.object({
   phoneNumber: z.string().min(10, "Valid phone number is required"),
   unitNumber: z.string().min(1, "Unit number is required"),
   message: z.string().min(10, "Please provide details about your concern"),
+  projectId: z.string().optional(),
 });
 
 type ComplaintFormData = z.infer<typeof complaintSchema>;
@@ -101,17 +103,27 @@ export default function ResidentDashboard() {
       phoneNumber: "",
       unitNumber: "",
       message: "",
+      projectId: "",
     },
   });
 
-  // Update form values when user data loads
+  // Update form values when user data loads or when active/completed projects change
   useEffect(() => {
     if (currentUser) {
       form.setValue("residentName", currentUser.name || "");
       form.setValue("unitNumber", currentUser.unitNumber || "");
       form.setValue("phoneNumber", currentUser.phoneNumber || "");
     }
-  }, [currentUser, form]);
+    
+    // Auto-select project if there's only one project (active or completed)
+    if (!form.getValues("projectId")) {
+      if (activeProjects.length === 1) {
+        form.setValue("projectId", activeProjects[0].id.toString());
+      } else if (activeProjects.length === 0 && completedProjects.length === 1) {
+        form.setValue("projectId", completedProjects[0].id.toString());
+      }
+    }
+  }, [currentUser, form, activeProjects, completedProjects]);
 
   const submitComplaintMutation = useMutation({
     mutationFn: async (data: ComplaintFormData) => {
@@ -120,7 +132,11 @@ export default function ResidentDashboard() {
       formData.append("phoneNumber", data.phoneNumber);
       formData.append("unitNumber", data.unitNumber);
       formData.append("message", data.message);
-      formData.append("projectId", activeProject?.id || "");
+      
+      // Only append projectId if it's provided
+      if (data.projectId) {
+        formData.append("projectId", data.projectId);
+      }
       
       if (selectedPhoto) {
         formData.append("photo", selectedPhoto);
@@ -397,6 +413,33 @@ export default function ResidentDashboard() {
                     )}
                   />
 
+                  {completedProjects.length > 1 && (
+                    <FormField
+                      control={form.control}
+                      name="projectId"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Which Project? *</FormLabel>
+                          <Select onValueChange={field.onChange} value={field.value}>
+                            <FormControl>
+                              <SelectTrigger data-testid="select-project" className="h-12">
+                                <SelectValue placeholder="Select the project this is about" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              {completedProjects.map((project: any) => (
+                                <SelectItem key={project.id} value={project.id.toString()}>
+                                  {project.buildingName || `${project.strataPlanNumber}`} - {project.jobType?.replace(/_/g, ' ')}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  )}
+
                   <FormField
                     control={form.control}
                     name="message"
@@ -658,6 +701,33 @@ export default function ResidentDashboard() {
                         </FormItem>
                       )}
                     />
+
+                    {activeProjects.length > 1 && (
+                      <FormField
+                        control={form.control}
+                        name="projectId"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Which Project? *</FormLabel>
+                            <Select onValueChange={field.onChange} value={field.value}>
+                              <FormControl>
+                                <SelectTrigger data-testid="select-project" className="h-12">
+                                  <SelectValue placeholder="Select the project this is about" />
+                                </SelectTrigger>
+                              </FormControl>
+                              <SelectContent>
+                                {activeProjects.map((project: any) => (
+                                  <SelectItem key={project.id} value={project.id.toString()}>
+                                    {project.buildingName || `${project.strataPlanNumber}`} - {project.jobType?.replace(/_/g, ' ')}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    )}
 
                     <FormField
                       control={form.control}
