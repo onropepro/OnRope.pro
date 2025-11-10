@@ -527,6 +527,18 @@ export default function ProjectDetail() {
                 Start Day
               </Button>
             )}
+            {/* End Day Button - Shown when there IS an active session */}
+            {activeSession && (
+              <Button
+                onClick={() => setLocation("/dashboard")}
+                variant="destructive"
+                className="h-10"
+                data-testid="button-end-day"
+              >
+                <span className="material-icons mr-2 text-base">stop_circle</span>
+                End Day
+              </Button>
+            )}
           </div>
         </div>
       </div>
