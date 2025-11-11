@@ -78,7 +78,7 @@ export default function Inventory() {
       itemPrice: undefined,
       assignedTo: "Not in use",
       notes: undefined,
-      quantity: 1,
+      quantity: 0,
       serialNumbers: undefined,
       dateInService: undefined,
       dateOutOfService: undefined,
@@ -248,7 +248,7 @@ export default function Inventory() {
       itemPrice: "",
       assignedTo: "Not in use",
       notes: "",
-      quantity: 1,
+      quantity: 0,
       serialNumbers: [],
       dateInService: "",
       dateOutOfService: "",
@@ -568,13 +568,13 @@ export default function Inventory() {
                     <FormControl>
                       <Input
                         type="number"
-                        min="1"
-                        placeholder="1"
+                        min="0"
+                        placeholder="0"
                         {...field}
                         value={field.value !== undefined && field.value !== null ? field.value : ""}
                         onChange={(e) => {
-                          const val = e.target.value === "" ? 1 : parseInt(e.target.value, 10);
-                          field.onChange(isNaN(val) ? 1 : val);
+                          const val = e.target.value === "" ? 0 : parseInt(e.target.value, 10);
+                          field.onChange(isNaN(val) ? 0 : val);
                         }}
                         data-testid="input-quantity"
                       />
@@ -806,13 +806,13 @@ export default function Inventory() {
                     <FormControl>
                       <Input
                         type="number"
-                        min="1"
-                        placeholder="1"
+                        min="0"
+                        placeholder="0"
                         {...field}
                         value={field.value !== undefined && field.value !== null ? field.value : ""}
                         onChange={(e) => {
-                          const val = e.target.value === "" ? 1 : parseInt(e.target.value, 10);
-                          field.onChange(isNaN(val) ? 1 : val);
+                          const val = e.target.value === "" ? 0 : parseInt(e.target.value, 10);
+                          field.onChange(isNaN(val) ? 0 : val);
                         }}
                         data-testid="input-quantity-edit"
                       />
