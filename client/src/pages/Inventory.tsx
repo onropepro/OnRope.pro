@@ -24,6 +24,7 @@ const gearTypes = [
   { name: "Ascender", icon: TrendingUp },
   { name: "Helmet", icon: HardHat },
   { name: "Gloves", icon: Hand },
+  { name: "Work positioning device", icon: Shield },
   { name: "Gas powered equipment", icon: Fuel },
   { name: "Squeegee rubbers", icon: Scissors },
   { name: "Applicators", icon: PaintBucket },
