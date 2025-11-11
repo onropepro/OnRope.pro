@@ -30,6 +30,38 @@ export function requireRole(...roles: string[]) {
   };
 }
 
+// Read-only mode enforcement middleware
+// Blocks all mutations for unverified company users
+export async function requireVerifiedCompanyForMutations(req: Request, res: Response, next: NextFunction) {
+  // Only enforce on company role users
+  if (req.session.role !== 'company') {
+    return next(); // Employees not affected
+  }
+  
+  try {
+    // Fetch current user to check verification status
+    const user = await storage.getUserById(req.session.userId!);
+    
+    if (!user) {
+      return res.status(401).json({ message: "User not found" });
+    }
+    
+    // Block mutations if company is not verified
+    if (user.licenseVerified !== true) {
+      console.log('[Read-Only Mode] Blocked mutation attempt from unverified company:', user.companyName);
+      return res.status(403).json({ 
+        message: "Read-only mode: Please verify your license to make changes",
+        readOnlyMode: true 
+      });
+    }
+    
+    next();
+  } catch (error) {
+    console.error('[Read-Only Mode] Error checking license status:', error);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+}
+
 // License verification helper - re-verifies license keys with Overhaul Labs API
 // Returns: { success: boolean, valid: boolean | null }
 // - success=false means API failure (keep existing licenseVerified state)
@@ -80,6 +112,26 @@ async function reverifyLicenseKey(licenseKey: string): Promise<{ success: boolea
 }
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // ==================== GLOBAL MUTATION GUARD ====================
+  // Automatically enforces read-only mode for unverified companies on all mutations
+  app.use((req: Request, res: Response, next: NextFunction) => {
+    const mutationMethods = ['POST', 'PUT', 'PATCH', 'DELETE'];
+    const whitelistedPaths = ['/api/login', '/api/register', '/api/logout', '/api/verify-license'];
+    
+    // Only check mutations
+    if (!mutationMethods.includes(req.method)) {
+      return next();
+    }
+    
+    // Skip whitelisted auth/license endpoints
+    if (whitelistedPaths.includes(req.path)) {
+      return next();
+    }
+    
+    // Apply read-only mode check for all other mutations
+    return requireVerifiedCompanyForMutations(req, res, next);
+  });
+  
   // ==================== AUTH ROUTES ====================
   
   // Registration endpoint
