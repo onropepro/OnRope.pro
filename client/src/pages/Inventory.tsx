@@ -204,11 +204,9 @@ export default function Inventory() {
                                 Possession of: {item.possessionOf}
                               </div>
                             )}
-                            {item.quantity && item.quantity > 1 && (
-                              <div className="text-sm text-muted-foreground">
-                                Quantity: {item.quantity}
-                              </div>
-                            )}
+                            <div className="text-sm font-medium text-foreground">
+                              In Stock: {item.quantity || 1}
+                            </div>
                           </div>
                           <div>
                             {canViewFinancials && item.itemPrice && (
@@ -342,6 +340,28 @@ export default function Inventory() {
 
               <FormField
                 control={form.control}
+                name="quantity"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Quantity in Stock</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="number"
+                        min="1"
+                        placeholder="1"
+                        {...field}
+                        value={field.value || 1}
+                        onChange={(e) => field.onChange(parseInt(e.target.value) || 1)}
+                        data-testid="input-quantity"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
                 name="notes"
                 render={({ field }) => (
                   <FormItem>
@@ -465,6 +485,28 @@ export default function Inventory() {
                     <FormLabel>Possession of</FormLabel>
                     <FormControl>
                       <Input placeholder="Who has this item?" {...field} value={field.value || ""} data-testid="input-possession-edit" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="quantity"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Quantity in Stock</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="number"
+                        min="1"
+                        placeholder="1"
+                        {...field}
+                        value={field.value || 1}
+                        onChange={(e) => field.onChange(parseInt(e.target.value) || 1)}
+                        data-testid="input-quantity-edit"
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
