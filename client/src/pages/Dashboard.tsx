@@ -932,6 +932,7 @@ export default function Dashboard() {
       onClick: () => handleTabChange("projects"),
       testId: "button-nav-projects",
       isVisible: () => true, // Everyone
+      borderColor: "border-l-blue-500",
     },
     {
       id: "non-billable-hours",
@@ -941,6 +942,7 @@ export default function Dashboard() {
       onClick: () => setLocation("/non-billable-hours"),
       testId: "button-non-billable-hours",
       isVisible: () => true, // Everyone
+      borderColor: "border-l-cyan-500",
     },
     {
       id: "past-projects",
@@ -950,6 +952,7 @@ export default function Dashboard() {
       onClick: () => handleTabChange("past-projects"),
       testId: "button-nav-past-projects",
       isVisible: () => true, // Everyone
+      borderColor: "border-l-blue-400",
     },
     {
       id: "employees",
@@ -959,6 +962,7 @@ export default function Dashboard() {
       onClick: () => handleTabChange("employees"),
       testId: "button-nav-employees",
       isVisible: (user: any) => canManageEmployees(user), // Management only
+      borderColor: "border-l-purple-500",
     },
     {
       id: "performance",
@@ -968,6 +972,7 @@ export default function Dashboard() {
       onClick: () => handleTabChange("performance"),
       testId: "button-nav-performance",
       isVisible: (user: any) => canViewPerformance(user), // Management only
+      borderColor: "border-l-orange-500",
     },
     {
       id: "active-workers",
@@ -977,6 +982,7 @@ export default function Dashboard() {
       onClick: () => setLocation("/active-workers"),
       testId: "button-active-workers",
       isVisible: (user: any) => hasPermission(user, "view_active_workers"), // Permission-based
+      borderColor: "border-l-indigo-500",
     },
     {
       id: "complaints",
@@ -986,6 +992,7 @@ export default function Dashboard() {
       onClick: () => handleTabChange("complaints"),
       testId: "button-nav-complaints",
       isVisible: () => true, // Everyone
+      borderColor: "border-l-pink-500",
     },
     {
       id: "build-my-kit",
@@ -995,6 +1002,7 @@ export default function Dashboard() {
       onClick: () => setLocation("/gear-inventory"),
       testId: "button-gear-inventory",
       isVisible: () => true, // Everyone
+      borderColor: "border-l-amber-500",
     },
     {
       id: "inventory",
@@ -1004,6 +1012,7 @@ export default function Dashboard() {
       onClick: () => setLocation("/inventory"),
       testId: "button-inventory",
       isVisible: (user: any) => isManagement(user) || hasPermission(user, "manage_inventory"), // Management or manage_inventory permission
+      borderColor: "border-l-amber-600",
     },
     {
       id: "harness-inspection",
@@ -1013,6 +1022,7 @@ export default function Dashboard() {
       onClick: () => setLocation("/harness-inspection"),
       testId: "button-harness-inspection",
       isVisible: () => true, // Everyone
+      borderColor: "border-l-red-500",
     },
     {
       id: "toolbox-meeting",
@@ -1022,6 +1032,7 @@ export default function Dashboard() {
       onClick: () => setLocation("/toolbox-meeting"),
       testId: "button-toolbox-meeting",
       isVisible: () => true, // Everyone
+      borderColor: "border-l-red-400",
     },
     {
       id: "payroll",
@@ -1031,6 +1042,7 @@ export default function Dashboard() {
       onClick: () => setLocation("/payroll"),
       testId: "button-payroll",
       isVisible: (user: any) => hasFinancialAccess(user), // Financial permission required
+      borderColor: "border-l-green-500",
     },
     {
       id: "quotes",
@@ -1040,6 +1052,7 @@ export default function Dashboard() {
       onClick: () => setLocation("/quotes"),
       testId: "button-quotes",
       isVisible: (user: any) => hasFinancialAccess(user), // Financial permission required
+      borderColor: "border-l-green-600",
     },
     {
       id: "documents",
@@ -1049,6 +1062,7 @@ export default function Dashboard() {
       onClick: () => handleTabChange("documents"),
       testId: "button-documents",
       isVisible: () => true, // Everyone
+      borderColor: "border-l-teal-500",
     },
   ].filter(card => {
     try {
@@ -1100,7 +1114,7 @@ export default function Dashboard() {
                 <Button
                   key={card.id}
                   variant="outline"
-                  className="h-auto flex-col gap-2 p-4"
+                  className={`h-auto flex-col gap-2 p-4 border-l-4 ${card.borderColor}`}
                   onClick={card.onClick}
                   data-testid={card.testId}
                 >
