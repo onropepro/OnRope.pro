@@ -130,7 +130,15 @@ export default function LicenseVerification() {
               <AlertCircle className="h-4 w-4" />
               <AlertTitle>Where to find your license key</AlertTitle>
               <AlertDescription>
-                Your license key was provided when you purchased access to this platform from the Overhaul Labs Marketplace.
+                Your license key was provided when you purchased access to this platform from the{" "}
+                <a 
+                  href="https://overhaullabs.replit.app" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="text-primary hover-elevate underline font-medium"
+                >
+                  Overhaul Labs Marketplace
+                </a>.
               </AlertDescription>
             </Alert>
 
