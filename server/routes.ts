@@ -2102,7 +2102,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         itemPrice: req.body.itemPrice || null,
         possessionOf: req.body.possessionOf || null,
         notes: req.body.notes || null,
-        serialNumber: req.body.serialNumber || null,
+        serialNumbers: req.body.serialNumbers || null,
         dateInService: req.body.dateInService || null,
         dateOutOfService: req.body.dateOutOfService || null,
         inService: req.body.inService !== undefined ? req.body.inService : true,
@@ -2148,7 +2148,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (req.body.itemPrice !== undefined) cleanedBody.itemPrice = req.body.itemPrice || null;
       if (req.body.possessionOf !== undefined) cleanedBody.possessionOf = req.body.possessionOf || null;
       if (req.body.notes !== undefined) cleanedBody.notes = req.body.notes || null;
-      if (req.body.serialNumber !== undefined) cleanedBody.serialNumber = req.body.serialNumber || null;
+      if (req.body.serialNumbers !== undefined) cleanedBody.serialNumbers = req.body.serialNumbers || null;
       if (req.body.dateInService !== undefined) cleanedBody.dateInService = req.body.dateInService || null;
       if (req.body.dateOutOfService !== undefined) cleanedBody.dateOutOfService = req.body.dateOutOfService || null;
       if (req.body.inService !== undefined) cleanedBody.inService = req.body.inService;

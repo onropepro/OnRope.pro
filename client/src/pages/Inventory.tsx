@@ -55,7 +55,7 @@ export default function Inventory() {
       itemPrice: undefined,
       possessionOf: undefined,
       notes: undefined,
-      serialNumber: undefined,
+      serialNumbers: undefined,
       dateInService: undefined,
       dateOutOfService: undefined,
       inService: true,
@@ -127,7 +127,7 @@ export default function Inventory() {
       itemPrice: item.itemPrice || undefined,
       possessionOf: item.possessionOf || undefined,
       notes: item.notes || undefined,
-      serialNumber: item.serialNumber || undefined,
+      serialNumbers: item.serialNumbers || undefined,
       dateInService: item.dateInService || undefined,
       dateOutOfService: item.dateOutOfService || undefined,
       inService: item.inService,
@@ -199,8 +199,10 @@ export default function Inventory() {
                             {item.model && (
                               <div className="text-sm text-muted-foreground">Model: {item.model}</div>
                             )}
-                            {item.serialNumber && (
-                              <div className="text-sm text-muted-foreground">S/N: {item.serialNumber}</div>
+                            {item.serialNumbers && item.serialNumbers.length > 0 && (
+                              <div className="text-sm text-muted-foreground">
+                                S/N: {item.serialNumbers.length === 1 ? item.serialNumbers[0] : `${item.serialNumbers.length} serial numbers`}
+                              </div>
                             )}
                             {item.possessionOf && (
                               <div className="text-sm text-muted-foreground">
@@ -306,12 +308,22 @@ export default function Inventory() {
 
               <FormField
                 control={form.control}
-                name="serialNumber"
+                name="serialNumbers"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Serial Number</FormLabel>
+                    <FormLabel>Serial Numbers (one per line)</FormLabel>
                     <FormControl>
-                      <Input placeholder="e.g., 12345ABC" {...field} value={field.value || ""} data-testid="input-serial" />
+                      <Textarea 
+                        placeholder="Enter serial numbers, one per line&#10;e.g.,&#10;SN001&#10;SN002&#10;SN003" 
+                        {...field} 
+                        value={Array.isArray(field.value) ? field.value.join('\n') : (field.value || "")}
+                        onChange={(e) => {
+                          const lines = e.target.value.split('\n').filter(line => line.trim());
+                          field.onChange(lines.length > 0 ? lines : undefined);
+                        }}
+                        data-testid="textarea-serial-numbers" 
+                        rows={4}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -473,12 +485,22 @@ export default function Inventory() {
 
               <FormField
                 control={form.control}
-                name="serialNumber"
+                name="serialNumbers"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Serial Number</FormLabel>
+                    <FormLabel>Serial Numbers (one per line)</FormLabel>
                     <FormControl>
-                      <Input placeholder="e.g., 12345ABC" {...field} value={field.value || ""} data-testid="input-serial-edit" />
+                      <Textarea 
+                        placeholder="Enter serial numbers, one per line&#10;e.g.,&#10;SN001&#10;SN002&#10;SN003" 
+                        {...field} 
+                        value={Array.isArray(field.value) ? field.value.join('\n') : (field.value || "")}
+                        onChange={(e) => {
+                          const lines = e.target.value.split('\n').filter(line => line.trim());
+                          field.onChange(lines.length > 0 ? lines : undefined);
+                        }}
+                        data-testid="textarea-serial-numbers-edit" 
+                        rows={4}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
