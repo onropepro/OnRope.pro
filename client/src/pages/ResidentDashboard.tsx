@@ -31,6 +31,7 @@ export default function ResidentDashboard() {
   const [activeTab, setActiveTab] = useState("building");
   const [showLogoutDialog, setShowLogoutDialog] = useState(false);
   const [selectedPhoto, setSelectedPhoto] = useState<File | null>(null);
+  const [selectedProjectId, setSelectedProjectId] = useState<string | null>(null);
   const { toast } = useToast();
   const [, setLocation] = useLocation();
 
@@ -52,7 +53,18 @@ export default function ResidentDashboard() {
   const allProjects = projectsData?.projects || [];
   const activeProjects = allProjects.filter((p: any) => p.status === 'active');
   const completedProjects = allProjects.filter((p: any) => p.status === 'completed');
-  const activeProject = activeProjects[0];
+  
+  // Select active project: use selectedProjectId if set, otherwise first active project
+  const activeProject = selectedProjectId 
+    ? activeProjects.find((p: any) => p.id.toString() === selectedProjectId) 
+    : activeProjects[0];
+  
+  // Auto-select first project on load if not already selected
+  useEffect(() => {
+    if (!selectedProjectId && activeProjects.length > 0) {
+      setSelectedProjectId(activeProjects[0].id.toString());
+    }
+  }, [activeProjects, selectedProjectId]);
   
   const { data: progressData } = useQuery({
     queryKey: ["/api/projects", activeProject?.id, "progress"],
@@ -516,7 +528,9 @@ export default function ResidentDashboard() {
             <div className="flex items-center gap-3">
               <Badge variant="secondary" className="text-base px-4 py-2">
                 <span className="material-icons text-sm mr-1.5">layers</span>
-                {projectData.floorCount} Floors
+                {activeProject?.jobType === 'in_suite_dryer_vent_cleaning' 
+                  ? `${projectData.floorCount} Units`
+                  : `${projectData.floorCount} Floors`}
               </Badge>
               <Button variant="ghost" size="icon" className="min-w-11 min-h-11" data-testid="button-profile" onClick={() => setLocation("/profile")}>
                 <span className="material-icons">person</span>
@@ -531,6 +545,32 @@ export default function ResidentDashboard() {
 
       {/* Main Content - Full Width */}
       <div className="flex-1 container max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Project Selector - Show if multiple active projects */}
+        {activeProjects.length > 1 && (
+          <Card className="mb-6 shadow-lg">
+            <CardContent className="pt-6">
+              <div className="flex items-center gap-4">
+                <span className="material-icons text-primary">apartment</span>
+                <div className="flex-1">
+                  <label className="text-sm font-medium mb-2 block">Select Project to View</label>
+                  <Select value={selectedProjectId || ''} onValueChange={setSelectedProjectId}>
+                    <SelectTrigger className="h-12">
+                      <SelectValue placeholder="Select a project" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {activeProjects.map((project: any) => (
+                        <SelectItem key={project.id} value={project.id.toString()}>
+                          {project.buildingName || project.strataPlanNumber} - {project.jobType?.replace(/_/g, ' ')}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <TabsList className="grid w-full grid-cols-4 mb-4">
             <TabsTrigger value="building" data-testid="tab-building">Progress</TabsTrigger>
@@ -541,18 +581,44 @@ export default function ResidentDashboard() {
 
           <TabsContent value="building" className="mt-6">
             <div className="bg-card/60 backdrop-blur-sm rounded-2xl border border-border/50 shadow-xl p-6 sm:p-8">
-              <HighRiseBuilding
-                floors={projectData.floorCount}
-                totalDropsNorth={projectData.totalDropsNorth ?? Math.floor(projectData.totalDrops / 4) + (projectData.totalDrops % 4 > 0 ? 1 : 0)}
-                totalDropsEast={projectData.totalDropsEast ?? Math.floor(projectData.totalDrops / 4) + (projectData.totalDrops % 4 > 1 ? 1 : 0)}
-                totalDropsSouth={projectData.totalDropsSouth ?? Math.floor(projectData.totalDrops / 4) + (projectData.totalDrops % 4 > 2 ? 1 : 0)}
-                totalDropsWest={projectData.totalDropsWest ?? Math.floor(projectData.totalDrops / 4)}
-                completedDropsNorth={projectData.completedDropsNorth ?? Math.floor(projectData.completedDrops / 4) + (projectData.completedDrops % 4 > 0 ? 1 : 0)}
-                completedDropsEast={projectData.completedDropsEast ?? Math.floor(projectData.completedDrops / 4) + (projectData.completedDrops % 4 > 1 ? 1 : 0)}
-                completedDropsSouth={projectData.completedDropsSouth ?? Math.floor(projectData.completedDrops / 4) + (projectData.completedDrops % 4 > 2 ? 1 : 0)}
-                completedDropsWest={projectData.completedDropsWest ?? Math.floor(projectData.completedDrops / 4)}
-                className="mb-8"
-              />
+              {activeProject?.jobType === 'in_suite_dryer_vent_cleaning' ? (
+                /* Floor/Unit Progress View for In-Suite Dryer Vent Cleaning */
+                <div className="space-y-6">
+                  <div className="text-center mb-8">
+                    <h3 className="text-5xl font-bold text-primary mb-2">
+                      {Math.round(projectData.progressPercentage)}%
+                    </h3>
+                    <p className="text-muted-foreground">
+                      {projectData.completedDrops} / {projectData.totalDrops} Units Completed
+                    </p>
+                  </div>
+                  
+                  {/* Progress Bar */}
+                  <div className="relative h-8 bg-muted rounded-full overflow-hidden">
+                    <div 
+                      className="absolute inset-y-0 left-0 bg-gradient-to-r from-primary to-primary/80 transition-all duration-500 ease-out"
+                      style={{ width: `${projectData.progressPercentage}%` }}
+                    />
+                    <div className="absolute inset-0 flex items-center justify-center text-sm font-medium">
+                      {projectData.completedDrops} of {projectData.totalDrops} units
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                /* 4-Elevation Building View for other job types */
+                <HighRiseBuilding
+                  floors={projectData.floorCount}
+                  totalDropsNorth={projectData.totalDropsNorth ?? Math.floor(projectData.totalDrops / 4) + (projectData.totalDrops % 4 > 0 ? 1 : 0)}
+                  totalDropsEast={projectData.totalDropsEast ?? Math.floor(projectData.totalDrops / 4) + (projectData.totalDrops % 4 > 1 ? 1 : 0)}
+                  totalDropsSouth={projectData.totalDropsSouth ?? Math.floor(projectData.totalDrops / 4) + (projectData.totalDrops % 4 > 2 ? 1 : 0)}
+                  totalDropsWest={projectData.totalDropsWest ?? Math.floor(projectData.totalDrops / 4)}
+                  completedDropsNorth={projectData.completedDropsNorth ?? Math.floor(projectData.completedDrops / 4) + (projectData.completedDrops % 4 > 0 ? 1 : 0)}
+                  completedDropsEast={projectData.completedDropsEast ?? Math.floor(projectData.completedDrops / 4) + (projectData.completedDrops % 4 > 1 ? 1 : 0)}
+                  completedDropsSouth={projectData.completedDropsSouth ?? Math.floor(projectData.completedDrops / 4) + (projectData.completedDrops % 4 > 2 ? 1 : 0)}
+                  completedDropsWest={projectData.completedDropsWest ?? Math.floor(projectData.completedDrops / 4)}
+                  className="mb-8"
+                />
+              )}
 
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-8">
                 <div className="text-center p-6 bg-gradient-to-br from-primary/10 to-primary/5 rounded-xl border border-primary/20">
