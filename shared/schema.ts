@@ -401,6 +401,12 @@ export const payPeriodConfig = pgTable("pay_period_config", {
   overtimeMultiplier: numeric("overtime_multiplier", { precision: 4, scale: 2 }).default('1.5'), // e.g., 1.5 for time-and-a-half
   doubleTimeMultiplier: numeric("double_time_multiplier", { precision: 4, scale: 2 }).default('2.0'), // e.g., 2.0 for double time
   
+  // Overtime and double time trigger thresholds
+  overtimeTriggerType: varchar("overtime_trigger_type").default('daily'), // 'daily' | 'weekly'
+  overtimeHoursThreshold: numeric("overtime_hours_threshold", { precision: 5, scale: 2 }).default('8'), // e.g., 8 hours/day or 40 hours/week
+  doubleTimeTriggerType: varchar("double_time_trigger_type").default('daily'), // 'daily' | 'weekly'
+  doubleTimeHoursThreshold: numeric("double_time_hours_threshold", { precision: 5, scale: 2 }).default('12'), // e.g., 12 hours/day or 60 hours/week
+  
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 }, (table) => [

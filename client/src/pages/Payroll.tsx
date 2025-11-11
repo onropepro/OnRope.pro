@@ -33,6 +33,10 @@ export default function Payroll() {
   const [customEndDate, setCustomEndDate] = useState<string>("");
   const [overtimeMultiplier, setOvertimeMultiplier] = useState<string>("1.5");
   const [doubleTimeMultiplier, setDoubleTimeMultiplier] = useState<string>("2.0");
+  const [overtimeTriggerType, setOvertimeTriggerType] = useState<string>("daily");
+  const [overtimeHoursThreshold, setOvertimeHoursThreshold] = useState<string>("8");
+  const [doubleTimeTriggerType, setDoubleTimeTriggerType] = useState<string>("daily");
+  const [doubleTimeHoursThreshold, setDoubleTimeHoursThreshold] = useState<string>("12");
 
   // Fetch current user to check permissions
   const { data: userData, isLoading: userLoading } = useQuery({
@@ -183,6 +187,10 @@ export default function Payroll() {
       if (configData.config.customEndDate) setCustomEndDate(configData.config.customEndDate);
       if (configData.config.overtimeMultiplier) setOvertimeMultiplier(String(configData.config.overtimeMultiplier));
       if (configData.config.doubleTimeMultiplier) setDoubleTimeMultiplier(String(configData.config.doubleTimeMultiplier));
+      if (configData.config.overtimeTriggerType) setOvertimeTriggerType(configData.config.overtimeTriggerType);
+      if (configData.config.overtimeHoursThreshold) setOvertimeHoursThreshold(String(configData.config.overtimeHoursThreshold));
+      if (configData.config.doubleTimeTriggerType) setDoubleTimeTriggerType(configData.config.doubleTimeTriggerType);
+      if (configData.config.doubleTimeHoursThreshold) setDoubleTimeHoursThreshold(String(configData.config.doubleTimeHoursThreshold));
     }
   }, [configData]);
 
@@ -219,6 +227,10 @@ export default function Payroll() {
       periodType,
       overtimeMultiplier: parseFloat(overtimeMultiplier),
       doubleTimeMultiplier: parseFloat(doubleTimeMultiplier),
+      overtimeTriggerType,
+      overtimeHoursThreshold: parseFloat(overtimeHoursThreshold),
+      doubleTimeTriggerType,
+      doubleTimeHoursThreshold: parseFloat(doubleTimeHoursThreshold),
     };
 
     if (periodType === 'semi-monthly') {
@@ -678,38 +690,110 @@ export default function Payroll() {
                   <Clock className="w-5 h-5" />
                   Overtime & Double Time Pay
                 </h3>
-                <div className="grid gap-4 md:grid-cols-2">
-                  <div className="space-y-2">
-                    <Label htmlFor="overtime-multiplier">Overtime Pay Multiplier</Label>
-                    <Input
-                      id="overtime-multiplier"
-                      type="number"
-                      min="0"
-                      max="10"
-                      step="0.1"
-                      value={overtimeMultiplier}
-                      onChange={(e) => setOvertimeMultiplier(e.target.value)}
-                      data-testid="input-overtime-multiplier"
-                    />
-                    <p className="text-sm text-muted-foreground">
-                      e.g., 1.5 for time-and-a-half
-                    </p>
+                
+                {/* Overtime Settings */}
+                <div className="space-y-4 mb-6">
+                  <h4 className="font-medium text-sm text-muted-foreground">Overtime Configuration</h4>
+                  <div className="grid gap-4 md:grid-cols-3">
+                    <div className="space-y-2">
+                      <Label htmlFor="overtime-trigger-type">Overtime Trigger</Label>
+                      <Select value={overtimeTriggerType} onValueChange={setOvertimeTriggerType}>
+                        <SelectTrigger id="overtime-trigger-type" data-testid="select-overtime-trigger-type">
+                          <SelectValue placeholder="Select trigger type" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="daily">Per Day</SelectItem>
+                          <SelectItem value="weekly">Per Week</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="overtime-hours-threshold">
+                        {overtimeTriggerType === 'daily' ? 'Hours per Day' : 'Hours per Week'}
+                      </Label>
+                      <Input
+                        id="overtime-hours-threshold"
+                        type="number"
+                        min="0"
+                        max="168"
+                        step="0.5"
+                        value={overtimeHoursThreshold}
+                        onChange={(e) => setOvertimeHoursThreshold(e.target.value)}
+                        data-testid="input-overtime-hours-threshold"
+                      />
+                      <p className="text-sm text-muted-foreground">
+                        {overtimeTriggerType === 'daily' ? 'e.g., 8 hours/day' : 'e.g., 40 hours/week'}
+                      </p>
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="overtime-multiplier">Pay Multiplier</Label>
+                      <Input
+                        id="overtime-multiplier"
+                        type="number"
+                        min="0"
+                        max="10"
+                        step="0.1"
+                        value={overtimeMultiplier}
+                        onChange={(e) => setOvertimeMultiplier(e.target.value)}
+                        data-testid="input-overtime-multiplier"
+                      />
+                      <p className="text-sm text-muted-foreground">
+                        e.g., 1.5 for time-and-a-half
+                      </p>
+                    </div>
                   </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="double-time-multiplier">Double Time Pay Multiplier</Label>
-                    <Input
-                      id="double-time-multiplier"
-                      type="number"
-                      min="0"
-                      max="10"
-                      step="0.1"
-                      value={doubleTimeMultiplier}
-                      onChange={(e) => setDoubleTimeMultiplier(e.target.value)}
-                      data-testid="input-double-time-multiplier"
-                    />
-                    <p className="text-sm text-muted-foreground">
-                      e.g., 2.0 for double time
-                    </p>
+                </div>
+
+                {/* Double Time Settings */}
+                <div className="space-y-4">
+                  <h4 className="font-medium text-sm text-muted-foreground">Double Time Configuration</h4>
+                  <div className="grid gap-4 md:grid-cols-3">
+                    <div className="space-y-2">
+                      <Label htmlFor="double-time-trigger-type">Double Time Trigger</Label>
+                      <Select value={doubleTimeTriggerType} onValueChange={setDoubleTimeTriggerType}>
+                        <SelectTrigger id="double-time-trigger-type" data-testid="select-double-time-trigger-type">
+                          <SelectValue placeholder="Select trigger type" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="daily">Per Day</SelectItem>
+                          <SelectItem value="weekly">Per Week</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="double-time-hours-threshold">
+                        {doubleTimeTriggerType === 'daily' ? 'Hours per Day' : 'Hours per Week'}
+                      </Label>
+                      <Input
+                        id="double-time-hours-threshold"
+                        type="number"
+                        min="0"
+                        max="168"
+                        step="0.5"
+                        value={doubleTimeHoursThreshold}
+                        onChange={(e) => setDoubleTimeHoursThreshold(e.target.value)}
+                        data-testid="input-double-time-hours-threshold"
+                      />
+                      <p className="text-sm text-muted-foreground">
+                        {doubleTimeTriggerType === 'daily' ? 'e.g., 12 hours/day' : 'e.g., 60 hours/week'}
+                      </p>
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="double-time-multiplier">Pay Multiplier</Label>
+                      <Input
+                        id="double-time-multiplier"
+                        type="number"
+                        min="0"
+                        max="10"
+                        step="0.1"
+                        value={doubleTimeMultiplier}
+                        onChange={(e) => setDoubleTimeMultiplier(e.target.value)}
+                        data-testid="input-double-time-multiplier"
+                      />
+                      <p className="text-sm text-muted-foreground">
+                        e.g., 2.0 for double time
+                      </p>
+                    </div>
                   </div>
                 </div>
               </div>
