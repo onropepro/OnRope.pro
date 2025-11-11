@@ -38,6 +38,7 @@ export default function Inventory() {
   const [currentAssignedTo, setCurrentAssignedTo] = useState("Not in use");
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [itemToDelete, setItemToDelete] = useState<GearItem | null>(null);
+  const [customType, setCustomType] = useState("");
 
   // Fetch current user
   const { data: userData } = useQuery({
@@ -245,6 +246,7 @@ export default function Inventory() {
     setSerialNumbers([]);
     setCurrentSerialNumber("");
     setCurrentAssignedTo("Not in use");
+    setCustomType("");
     setShowAddDialog(true);
   };
 
@@ -266,6 +268,13 @@ export default function Inventory() {
     setSerialNumbers(item.serialNumbers || []);
     setCurrentSerialNumber("");
     setCurrentAssignedTo("Not in use");
+    // Check if type is a custom type (not in predefined list)
+    if (item.equipmentType && !gearTypes.includes(item.equipmentType)) {
+      setCustomType(item.equipmentType);
+      form.setValue("equipmentType", "Other");
+    } else {
+      setCustomType("");
+    }
     setShowEditDialog(true);
   };
 
@@ -421,7 +430,15 @@ export default function Inventory() {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Type</FormLabel>
-                    <Select onValueChange={field.onChange} value={field.value || ""}>
+                    <Select 
+                      onValueChange={(value) => {
+                        field.onChange(value);
+                        if (value !== "Other") {
+                          setCustomType("");
+                        }
+                      }} 
+                      value={field.value || ""}
+                    >
                       <FormControl>
                         <SelectTrigger data-testid="select-item-type">
                           <SelectValue placeholder="Select gear type" />
@@ -439,6 +456,21 @@ export default function Inventory() {
                   </FormItem>
                 )}
               />
+
+              {form.watch("equipmentType") === "Other" && (
+                <div className="space-y-2">
+                  <FormLabel>Custom Type Name</FormLabel>
+                  <Input
+                    placeholder="Enter custom gear type"
+                    value={customType}
+                    onChange={(e) => {
+                      setCustomType(e.target.value);
+                      form.setValue("equipmentType", e.target.value);
+                    }}
+                    data-testid="input-custom-type"
+                  />
+                </div>
+              )}
 
               <FormField
                 control={form.control}
@@ -634,7 +666,15 @@ export default function Inventory() {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Type</FormLabel>
-                    <Select onValueChange={field.onChange} value={field.value || ""}>
+                    <Select 
+                      onValueChange={(value) => {
+                        field.onChange(value);
+                        if (value !== "Other") {
+                          setCustomType("");
+                        }
+                      }} 
+                      value={field.value || ""}
+                    >
                       <FormControl>
                         <SelectTrigger data-testid="select-item-type-edit">
                           <SelectValue placeholder="Select gear type" />
@@ -652,6 +692,21 @@ export default function Inventory() {
                   </FormItem>
                 )}
               />
+
+              {form.watch("equipmentType") === "Other" && (
+                <div className="space-y-2">
+                  <FormLabel>Custom Type Name</FormLabel>
+                  <Input
+                    placeholder="Enter custom gear type"
+                    value={customType}
+                    onChange={(e) => {
+                      setCustomType(e.target.value);
+                      form.setValue("equipmentType", e.target.value);
+                    }}
+                    data-testid="input-custom-type-edit"
+                  />
+                </div>
+              )}
 
               <FormField
                 control={form.control}
