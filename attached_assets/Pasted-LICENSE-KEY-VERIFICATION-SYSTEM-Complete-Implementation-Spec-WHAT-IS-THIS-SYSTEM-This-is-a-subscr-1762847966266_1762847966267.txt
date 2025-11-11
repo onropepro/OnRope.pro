@@ -1,0 +1,464 @@
+LICENSE KEY VERIFICATION SYSTEM - Complete Implementation Spec
+WHAT IS THIS SYSTEM?
+This is a subscription-based license verification system that integrates with the Overhaul Labs Marketplace. It allows you to sell your application as a paid product on the marketplace, where customers purchase license keys that grant them access to your app.
+
+Think of it like this:
+
+🏪 Overhaul Labs Marketplace = App Store where customers buy your app
+🔑 License Key = Proof of purchase (like a product key for Microsoft Office)
+✅ License Verification = Checking if the customer's subscription is active and valid
+🚫 Access Control = Blocking users who haven't purchased or whose subscription expired
+WHY DO YOU NEED THIS?
+Problem: You want to sell your application, but you need a way to:
+
+✅ Verify customers actually paid for your app
+🔄 Check subscription status in real-time (detect cancelled/expired subscriptions)
+🚫 Revoke access immediately when subscriptions end
+🛡️ Prevent unauthorized users from accessing paid features
+💰 Integrate with Overhaul Labs' payment/subscription infrastructure
+Solution: This license verification system acts as a "gatekeeper" that:
+
+Validates license keys with Overhaul Labs on first use
+Automatically re-checks subscription status on every login
+Enforces access control throughout your app
+Handles edge cases gracefully (API outages, network errors)
+HOW DOES IT WORK? (User Journey)
+For New Customers:
+
+Customer buys your app on Overhaul Labs Marketplace → receives license key
+Customer registers account in your app (companyName + password)
+App prompts: "Enter your license key to activate"
+Customer enters license key → your app calls Overhaul Labs API to verify
+✅ Valid key → Customer gets full access to your app
+❌ Invalid key → Customer sees error, cannot access app
+For Returning Customers:
+
+Customer logs in with companyName + password
+Your app automatically re-verifies their stored license key with Overhaul Labs
+✅ Subscription still active → Customer logs in normally
+❌ Subscription expired/cancelled → Access revoked immediately, must re-purchase
+Security Benefits:
+
+🔐 License keys stored server-side only (never exposed to client/browser)
+🎯 Only a simple licenseVerified: true/false flag is sent to frontend
+🛡️ Prevents customers from inspecting browser to steal/share license keys
+📡 Real-time subscription status checking (expired subs lose access instantly)
+CRITICAL DESIGN DECISION: Graceful Failure Handling
+What happens if Overhaul Labs API is down?
+
+❌ Bad Approach: Assume license is invalid → lock out ALL paying customers during outages
+
+✅ Good Approach (what this system does):
+
+Network errors → Keep existing licenseVerified status (don't punish paying customers)
+Parse errors → Keep existing status (API might be returning maintenance page)
+Only definitive responses (valid: true or valid: false) update the database
+Why: This prevents locking out legitimate customers during temporary Overhaul Labs downtime, while still revoking access for genuinely expired subscriptions.
+
+TECHNICAL IMPLEMENTATION
+Build a secure, server-side license key verification system that integrates with Overhaul Labs marketplace API. The system verifies license keys during registration, automatically re-verifies on every login, and enforces access control throughout the application.
+
+1. DATABASE SCHEMA CHANGES
+Add two fields to your companies/users table (whatever represents accounts in your app):
+
+// In shared/schema.ts (companies table)
+export const companies = pgTable("companies", {
+  // ... existing fields ...
+  licenseKey: text("license_key"),                        // Stores license key SERVER-SIDE ONLY
+  licenseVerified: boolean("license_verified").default(false),  // Public flag - safe to expose to client
+  // ... existing fields ...
+});
+
+Critical Security Rule: Create a CompanyPublic type that EXCLUDES sensitive fields:
+
+// At bottom of shared/schema.ts
+export type Company = typeof companies.$inferSelect;
+export type CompanyPublic = Omit<Company, "password" | "securityAnswer" | "licenseKey">;
+
+Why: licenseKey must NEVER be sent to the client. Only licenseVerified boolean flag is exposed.
+
+2. OVERHAUL LABS API INTEGRATION
+API Endpoint: https://OverhaulLabs.replit.app/api/verify-license
+
+Request Format:
+
+POST /api/verify-license
+Content-Type: application/json
+{
+  "licenseKey": "user-entered-license-key-string"
+}
+
+Response Format:
+
+{
+  "valid": true,      // or false
+  "message": "License is active and valid"
+}
+
+Success Criteria: response.ok === true AND response.valid === true
+
+3. BACKEND IMPLEMENTATION
+3A. Create Re-Verification Helper Function (in server/auth.ts)
+// Helper function to re-verify license key with Overhaul Labs API
+// Returns: { success: boolean, valid: boolean | null }
+// - success=false means API failure (keep existing licenseVerified state)
+// - success=true, valid=true/false means definitive response (update licenseVerified)
+async function reverifyLicenseKey(licenseKey: string): Promise<{ success: boolean; valid: boolean | null }> {
+  try {
+    const externalApiUrl = 'https://OverhaulLabs.replit.app/api/verify-license';
+    
+    console.log('[License Re-verification] Calling external API:', externalApiUrl);
+    console.log('[License Re-verification] Request payload:', { licenseKey: licenseKey.substring(0, 5) + '...' });
+    const verificationResponse = await fetch(externalApiUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ licenseKey })
+    });
+    const responseText = await verificationResponse.text();
+    console.log('[License Re-verification] Response status:', verificationResponse.status);
+    console.log('[License Re-verification] Response body (raw):', responseText);
+    // Try to parse as JSON
+    let verificationResult;
+    try {
+      verificationResult = JSON.parse(responseText);
+    } catch (parseError) {
+      console.error('[License Re-verification] Failed to parse response as JSON - API may be down');
+      console.warn('[License Re-verification] Keeping existing license status due to parse error');
+      return { success: false, valid: null }; // API failure - don't revoke access
+    }
+    // Check if we got a definitive response
+    if (verificationResponse.ok && typeof verificationResult.valid === 'boolean') {
+      const isValid = verificationResult.valid;
+      console.log(`[License Re-verification] License is ${isValid ? 'valid' : 'invalid'}`);
+      return { success: true, valid: isValid };
+    } else {
+      // API returned error or unexpected format
+      console.warn('[License Re-verification] API returned non-OK status or unexpected format');
+      console.warn('[License Re-verification] Keeping existing license status due to API error');
+      return { success: false, valid: null }; // API failure - don't revoke access
+    }
+  } catch (error: any) {
+    console.error('[License Re-verification] Network error:', error.message);
+    console.warn('[License Re-verification] Keeping existing license status due to network error');
+    return { success: false, valid: null }; // Network failure - don't revoke access
+  }
+}
+
+Critical Design Decision: API failures (network errors, Overhaul Labs downtime, parse errors) preserve existing license status instead of revoking access. This prevents locking out paying customers during temporary outages.
+
+3B. Update Login Handler (in server/auth.ts)
+Add automatic re-verification BEFORE returning user data on login:
+
+app.post("/api/login", passport.authenticate("local"), async (req, res) => {
+  try {
+    const company = await storage.getCompany(req.user!.id);
+    if (!company) {
+      return res.status(404).send("Company not found");
+    }
+    // RE-VERIFY LICENSE ON EVERY LOGIN
+    if (company.licenseKey) {
+      console.log('[Login] Re-verifying stored license key...');
+      const verificationResult = await reverifyLicenseKey(company.licenseKey);
+      
+      let finalLicenseStatus = company.licenseVerified; // Default to existing status
+      
+      if (verificationResult.success && verificationResult.valid !== null) {
+        // API responded definitively - update status
+        finalLicenseStatus = verificationResult.valid;
+        await storage.updateCompany(company.id, { licenseVerified: finalLicenseStatus });
+        console.log(`[Login] License status updated to: ${finalLicenseStatus}`);
+      } else {
+        // API failed - keep existing status (don't lock out paying customers)
+        console.warn('[Login] API failure - preserving existing license status:', finalLicenseStatus);
+        console.warn('[Login] User will continue with existing access level (licenseVerified:', finalLicenseStatus, ')');
+      }
+      
+      // Return updated user data with fresh license status
+      const { password: _, securityAnswer: __, licenseKey: ___, ...companyWithoutSensitiveData } = company;
+      const updatedUser = { ...companyWithoutSensitiveData, licenseVerified: finalLicenseStatus };
+      return res.json(updatedUser);
+    }
+    // No license key stored - return user as-is
+    const { password: _, securityAnswer: __, licenseKey: ___, ...companyWithoutSensitiveData } = company;
+    res.json(companyWithoutSensitiveData);
+  } catch (error) {
+    console.error('[Login] Error during re-verification:', error);
+    res.status(500).send("Internal server error");
+  }
+});
+
+3C. Strip Sensitive Data from ALL Auth Responses
+Critical: EVERY authentication endpoint must strip licenseKey, password, and securityAnswer:
+
+// In passport LocalStrategy callback:
+const { password: _, securityAnswer: __, licenseKey: ___, ...companyWithoutSensitiveData } = company;
+return done(null, companyWithoutSensitiveData as CompanyPublic);
+// In passport.deserializeUser:
+const { password: _, securityAnswer: __, licenseKey: ___, ...companyWithoutSensitiveData } = company;
+done(null, companyWithoutSensitiveData as CompanyPublic);
+// In /api/register endpoint:
+const { password: _, securityAnswer: __, licenseKey: ___, ...companyWithoutSensitiveData } = company;
+req.login(companyWithoutSensitiveData as CompanyPublic, (err) => { ... });
+// In /api/login endpoint (see section 3B above)
+
+3D. Create Manual Verification Endpoint (in server/routes.ts)
+This allows users to enter license keys post-registration:
+
+app.post("/api/verify-license", requireAuth, async (req, res) => {
+  try {
+    const { licenseKey } = req.body;
+    
+    if (!licenseKey) {
+      return res.status(400).json({ 
+        success: false, 
+        message: "License key is required" 
+      });
+    }
+    // Overhaul Labs marketplace API URL
+    const externalApiUrl = 'https://OverhaulLabs.replit.app/api/verify-license';
+    
+    console.log('[License Verification] Calling external API:', externalApiUrl);
+    console.log('[License Verification] Request payload:', { licenseKey: licenseKey.substring(0, 5) + '...' });
+    // Call Overhaul Labs marketplace API to verify license
+    const verificationResponse = await fetch(externalApiUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ licenseKey })
+    });
+    const responseText = await verificationResponse.text();
+    console.log('[License Verification] Response status:', verificationResponse.status);
+    console.log('[License Verification] Response body (raw):', responseText);
+    let verificationResult;
+    try {
+      verificationResult = JSON.parse(responseText);
+    } catch (parseError) {
+      console.error('[License Verification] Failed to parse response as JSON:', parseError);
+      return res.status(502).json({
+        success: false,
+        message: "License verification service is temporarily unavailable"
+      });
+    }
+    console.log('[License Verification] Parsed result:', verificationResult);
+    if (verificationResponse.ok && verificationResult.valid === true) {
+      // License is valid - save to database
+      await storage.updateCompany(req.user!.id, { 
+        licenseKey,
+        licenseVerified: true 
+      });
+      return res.json({
+        success: true,
+        message: verificationResult.message || "License verified successfully"
+      });
+    } else {
+      // License is invalid
+      return res.status(400).json({
+        success: false,
+        message: verificationResult.message || "Invalid license key"
+      });
+    }
+  } catch (error: any) {
+    console.error('[License Verification] Error:', error);
+    return res.status(500).json({
+      success: false,
+      message: "An error occurred during verification"
+    });
+  }
+});
+
+4. FRONTEND IMPLEMENTATION
+4A. Create License Verification Page (e.g., client/src/pages/license-verification.tsx)
+import { useState } from "react";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Shield, AlertCircle, CheckCircle } from "lucide-react";
+import { apiRequest, queryClient } from "@/lib/queryClient";
+import { useLocation } from "wouter";
+export default function LicenseVerification() {
+  const [licenseKey, setLicenseKey] = useState("");
+  const [isVerifying, setIsVerifying] = useState(false);
+  const [error, setError] = useState("");
+  const [, setLocation] = useLocation();
+  const handleVerify = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError("");
+    setIsVerifying(true);
+    try {
+      const requestBody = { licenseKey: licenseKey.trim() };
+      
+      const response = await apiRequest("POST", "/api/verify-license", requestBody);
+      const result = await response.json();
+      if (result.success) {
+        // Invalidate user query to refresh user data with licenseVerified=true
+        await queryClient.invalidateQueries({ queryKey: ["/api/user"] });
+        
+        // Redirect to main app
+        setLocation("/");
+      } else {
+        setError(result.message || "Invalid license key");
+      }
+    } catch (err: any) {
+      setError(err.message || "Verification failed");
+    } finally {
+      setIsVerifying(false);
+    }
+  };
+  return (
+    <div className="min-h-screen bg-background flex items-center justify-center p-4">
+      <Card className="w-full max-w-md">
+        <CardHeader>
+          <div className="flex items-center gap-2">
+            <Shield className="w-6 h-6 text-primary" />
+            <CardTitle>License Verification Required</CardTitle>
+          </div>
+          <CardDescription>
+            Please enter your license key to continue
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <form onSubmit={handleVerify} className="space-y-4">
+            <div>
+              <Label htmlFor="licenseKey">License Key</Label>
+              <Input
+                id="licenseKey"
+                type="text"
+                value={licenseKey}
+                onChange={(e) => setLicenseKey(e.target.value)}
+                placeholder="Enter your license key"
+                required
+                data-testid="input-license-key"
+              />
+            </div>
+            {error && (
+              <div className="flex items-center gap-2 text-destructive text-sm">
+                <AlertCircle className="w-4 h-4" />
+                <span>{error}</span>
+              </div>
+            )}
+            <Button
+              type="submit"
+              className="w-full"
+              disabled={isVerifying || !licenseKey.trim()}
+              data-testid="button-verify-license"
+            >
+              {isVerifying ? "Verifying..." : "Verify License"}
+            </Button>
+          </form>
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
+
+4B. Update Protected Route Component (e.g., client/src/lib/protected-route.tsx)
+import { useAuth } from "@/hooks/use-auth";
+import { Redirect } from "wouter";
+import type { ReactNode } from "react";
+interface ProtectedRouteProps {
+  children: ReactNode;
+  requireLicense?: boolean;  // Allow bypassing license check for certain routes
+}
+export function ProtectedRoute({ children, requireLicense = true }: ProtectedRouteProps) {
+  const { user, isLoading } = useAuth();
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center p-4">
+        <div className="text-center">
+          <p className="text-sm sm:text-base text-muted-foreground">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+  // Not logged in - redirect to auth
+  if (!user) {
+    return <Redirect to="/auth" />;
+  }
+  // Check if license verification is required and user license is not verified
+  if (requireLicense && !user.licenseVerified) {
+    return <Redirect to="/license-verification" />;
+  }
+  return <>{children}</>;
+}
+
+4C. Update Router (in client/src/App.tsx)
+import { Route, Switch } from "wouter";
+import { ProtectedRoute } from "@/lib/protected-route";
+import LicenseVerification from "@/pages/license-verification";
+// ... other imports
+function App() {
+  return (
+    <Switch>
+      <Route path="/auth" component={AuthPage} />
+      
+      {/* License verification page - DOES NOT require license (avoid redirect loop) */}
+      <Route path="/license-verification">
+        <ProtectedRoute requireLicense={false}>
+          <LicenseVerification />
+        </ProtectedRoute>
+      </Route>
+      
+      {/* All other routes require license verification */}
+      <Route path="/">
+        <ProtectedRoute requireLicense={true}>
+          <HomePage />
+        </ProtectedRoute>
+      </Route>
+      
+      {/* ... more routes with ProtectedRoute wrapper ... */}
+    </Switch>
+  );
+}
+
+5. STORAGE LAYER
+Add these methods to your storage interface:
+
+// In server/storage.ts interface
+export interface IStorage {
+  updateCompany(id: number, data: Partial<Company>): Promise<Company | undefined>;
+  // ... existing methods
+}
+// Implementation
+async updateCompany(id: number, data: Partial<Company>): Promise<Company | undefined> {
+  const [company] = await db
+    .update(companies)
+    .set(data)
+    .where(eq(companies.id, id))
+    .returning();
+  return company;
+}
+
+6. KEY SECURITY PRINCIPLES
+Server-Side Only: License keys are NEVER sent to the client
+CompanyPublic Type: Always use this type when sending user data to frontend
+Graceful API Failures: Network/parse errors preserve existing license status
+Definitive Responses Only: Only response.ok === true AND response.valid === boolean update the database
+Automatic Re-Verification: Every login checks current subscription status with Overhaul Labs
+Client-Side Flag: Only licenseVerified boolean is exposed to frontend for access control
+7. TESTING CHECKLIST
+ Register new company → licenseVerified defaults to false
+ Enter valid license key → licenseVerified becomes true
+ Login with verified license → Auto re-verification succeeds, access granted
+ Simulate API failure (network error) → Existing licenseVerified status preserved
+ Enter invalid license key → Error message shown, licenseVerified stays false
+ Verify licenseKey is never in frontend network responses
+ ProtectedRoute redirects to /license-verification when licenseVerified === false
+ License verification page bypasses license check (no redirect loop)
+8. CRITICAL IMPLEMENTATION NOTES
+For Multi-Tenant Apps: Make sure storage.updateCompany() verifies company ownership before updating.
+
+For Single-Tenant Apps: Replace "company" with "user" throughout the spec.
+
+Logging Strategy:
+
+Always log license key as licenseKey.substring(0, 5) + '...' (first 5 chars only)
+Log API failures clearly to distinguish from invalid keys
+Use [License Verification] prefix for all verification logs
+Error Messages:
+
+API down/network error: "License verification service is temporarily unavailable"
+Invalid key: "Invalid license key"
+Success: "License verified successfully"
+This specification contains everything needed to build a production-ready license verification system for apps sold on Overhaul Labs Marketplace! 🎯
