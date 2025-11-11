@@ -182,6 +182,16 @@ export default function Inventory() {
       return;
     }
     
+    // Check for duplicate serial number
+    if (serialNumbers.includes(currentSerialNumber.trim())) {
+      toast({
+        title: "Duplicate Serial Number",
+        description: "This serial number has already been added.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
     if (maxSerials === 0) {
       toast({
         title: "No Stock",
