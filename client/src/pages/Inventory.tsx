@@ -228,17 +228,18 @@ export default function Inventory() {
   };
 
   const openAddDialog = () => {
+    setEditingItem(null);
     form.reset({
-      equipmentType: undefined,
-      brand: undefined,
-      model: undefined,
-      itemPrice: undefined,
-      assignedTo: undefined,
-      notes: undefined,
+      equipmentType: "",
+      brand: "",
+      model: "",
+      itemPrice: "",
+      assignedTo: "Not in use",
+      notes: "",
       quantity: 1,
-      serialNumbers: undefined,
-      dateInService: undefined,
-      dateOutOfService: undefined,
+      serialNumbers: [],
+      dateInService: "",
+      dateOutOfService: "",
       inService: true,
     });
     setSerialNumbers([]);
