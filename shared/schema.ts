@@ -44,6 +44,10 @@ export const users = pgTable("users", {
   // Company-specific fields
   companyName: varchar("company_name"), // for company role
   companyId: varchar("company_id").references(() => users.id, { onDelete: "cascade" }), // for employees - links to their company
+  streetAddress: text("street_address"), // for company role - street address
+  province: varchar("province"), // for company role - province/state
+  country: varchar("country"), // for company role - country
+  zipCode: varchar("zip_code"), // for company role - postal/zip code
   
   // Shared fields
   name: varchar("name"), // for resident and employee roles

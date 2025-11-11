@@ -23,6 +23,10 @@ const residentSchema = z.object({
 
 const companySchema = z.object({
   companyName: z.string().min(2, "Company name must be at least 2 characters"),
+  streetAddress: z.string().min(1, "Street address is required"),
+  province: z.string().min(1, "Province is required"),
+  country: z.string().min(1, "Country is required"),
+  zipCode: z.string().min(1, "Zip/postal code is required"),
   password: z.string().min(6, "Password must be at least 6 characters"),
   confirmPassword: z.string().min(1, "Please confirm your password"),
 }).refine((data) => data.password === data.confirmPassword, {
@@ -53,6 +57,10 @@ export default function Register() {
     resolver: zodResolver(companySchema),
     defaultValues: {
       companyName: "",
+      streetAddress: "",
+      province: "",
+      country: "",
+      zipCode: "",
       password: "",
       confirmPassword: "",
     },
@@ -250,6 +258,64 @@ export default function Register() {
                         <FormLabel>Company Name</FormLabel>
                         <FormControl>
                           <Input placeholder="Acme Rope Access Ltd" {...field} data-testid="input-company-name" className="h-12" />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={companyForm.control}
+                    name="streetAddress"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Street Address</FormLabel>
+                        <FormControl>
+                          <Input placeholder="123 Main Street" {...field} data-testid="input-street-address" className="h-12" />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <FormField
+                      control={companyForm.control}
+                      name="province"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Province</FormLabel>
+                          <FormControl>
+                            <Input placeholder="BC" {...field} data-testid="input-province" className="h-12" />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={companyForm.control}
+                      name="zipCode"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Zip Code</FormLabel>
+                          <FormControl>
+                            <Input placeholder="V6B 4Y8" {...field} data-testid="input-zip-code" className="h-12" />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+
+                  <FormField
+                    control={companyForm.control}
+                    name="country"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Country</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Canada" {...field} data-testid="input-country" className="h-12" />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
