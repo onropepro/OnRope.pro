@@ -489,14 +489,13 @@ export default function Inventory() {
                   
                   <Button
                     type="button"
-                    size="sm"
-                    variant="outline"
+                    variant="default"
                     onClick={handleAddSerialNumber}
                     disabled={serialNumbers.length >= (form.watch("quantity") || 1)}
                     data-testid="button-add-serial"
                     className="w-full"
                   >
-                    <Plus className="h-4 w-4 mr-1" />
+                    <Plus className="h-5 w-5 mr-2" />
                     Add Serial Number ({serialNumbers.length}/{form.watch("quantity") || 1})
                   </Button>
                 </div>
@@ -703,14 +702,13 @@ export default function Inventory() {
                   
                   <Button
                     type="button"
-                    size="sm"
-                    variant="outline"
+                    variant="default"
                     onClick={handleAddSerialNumber}
                     disabled={serialNumbers.length >= (form.watch("quantity") || 1)}
                     data-testid="button-add-serial-edit"
                     className="w-full"
                   >
-                    <Plus className="h-4 w-4 mr-1" />
+                    <Plus className="h-5 w-5 mr-2" />
                     Add Serial Number ({serialNumbers.length}/{form.watch("quantity") || 1})
                   </Button>
                 </div>
