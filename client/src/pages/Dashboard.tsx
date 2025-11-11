@@ -2304,10 +2304,26 @@ export default function Dashboard() {
                         render={() => (
                           <FormItem>
                             <div className="mb-4">
-                              <FormLabel className="text-base">Permissions</FormLabel>
-                              <FormDescription className="text-xs">
-                                Select which features this employee can access
-                              </FormDescription>
+                              <div className="flex items-center justify-between">
+                                <div>
+                                  <FormLabel className="text-base">Permissions</FormLabel>
+                                  <FormDescription className="text-xs">
+                                    Select which features this employee can access
+                                  </FormDescription>
+                                </div>
+                                <Button
+                                  type="button"
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={() => {
+                                    const allPermissionIds = AVAILABLE_PERMISSIONS.map(p => p.id);
+                                    employeeForm.setValue("permissions", allPermissionIds);
+                                  }}
+                                  data-testid="button-select-all-permissions"
+                                >
+                                  Select All
+                                </Button>
+                              </div>
                             </div>
                             <div className="grid grid-cols-2 gap-2">
                               {AVAILABLE_PERMISSIONS.map((permission) => (
@@ -3026,10 +3042,26 @@ export default function Dashboard() {
                   render={() => (
                     <FormItem>
                       <div className="mb-4">
-                        <FormLabel className="text-base">Permissions</FormLabel>
-                        <FormDescription className="text-xs">
-                          Select which features this employee can access
-                        </FormDescription>
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <FormLabel className="text-base">Permissions</FormLabel>
+                            <FormDescription className="text-xs">
+                              Select which features this employee can access
+                            </FormDescription>
+                          </div>
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            onClick={() => {
+                              const allPermissionIds = AVAILABLE_PERMISSIONS.map(p => p.id);
+                              editEmployeeForm.setValue("permissions", allPermissionIds);
+                            }}
+                            data-testid="button-edit-select-all-permissions"
+                          >
+                            Select All
+                          </Button>
+                        </div>
                       </div>
                       <div className="grid grid-cols-2 gap-2">
                         {AVAILABLE_PERMISSIONS.map((permission) => (
