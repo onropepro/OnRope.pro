@@ -489,8 +489,8 @@ export default function Inventory() {
                       <SelectContent>
                         <SelectItem value="Not in use">Not in use</SelectItem>
                         {activeEmployees.map((emp: any) => (
-                          <SelectItem key={emp.id} value={emp.fullName}>
-                            {emp.fullName}
+                          <SelectItem key={emp.id} value={emp.name}>
+                            {emp.name}
                           </SelectItem>
                         ))}
                       </SelectContent>
@@ -702,8 +702,8 @@ export default function Inventory() {
                       <SelectContent>
                         <SelectItem value="Not in use">Not in use</SelectItem>
                         {activeEmployees.map((emp: any) => (
-                          <SelectItem key={emp.id} value={emp.fullName}>
-                            {emp.fullName}
+                          <SelectItem key={emp.id} value={emp.name}>
+                            {emp.name}
                           </SelectItem>
                         ))}
                       </SelectContent>
