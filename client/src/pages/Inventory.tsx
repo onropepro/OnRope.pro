@@ -199,6 +199,9 @@ export default function Inventory() {
                             {item.model && (
                               <div className="text-sm text-muted-foreground">Model: {item.model}</div>
                             )}
+                            {item.serialNumber && (
+                              <div className="text-sm text-muted-foreground">S/N: {item.serialNumber}</div>
+                            )}
                             {item.possessionOf && (
                               <div className="text-sm text-muted-foreground">
                                 Possession of: {item.possessionOf}
@@ -295,6 +298,20 @@ export default function Inventory() {
                     <FormLabel>Model</FormLabel>
                     <FormControl>
                       <Input placeholder="e.g., I'D S" {...field} value={field.value || ""} data-testid="input-model" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="serialNumber"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Serial Number</FormLabel>
+                    <FormControl>
+                      <Input placeholder="e.g., 12345ABC" {...field} value={field.value || ""} data-testid="input-serial" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -448,6 +465,20 @@ export default function Inventory() {
                     <FormLabel>Model</FormLabel>
                     <FormControl>
                       <Input placeholder="e.g., I'D S" {...field} value={field.value || ""} data-testid="input-model-edit" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="serialNumber"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Serial Number</FormLabel>
+                    <FormControl>
+                      <Input placeholder="e.g., 12345ABC" {...field} value={field.value || ""} data-testid="input-serial-edit" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
