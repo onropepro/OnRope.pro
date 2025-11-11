@@ -589,7 +589,7 @@ export default function ResidentDashboard() {
                       {Math.round(projectData.progressPercentage)}%
                     </h3>
                     <p className="text-muted-foreground">
-                      {projectData.completedDrops} / {projectData.totalDrops} Units Completed
+                      Work in Progress
                     </p>
                   </div>
                   
@@ -599,9 +599,6 @@ export default function ResidentDashboard() {
                       className="absolute inset-y-0 left-0 bg-gradient-to-r from-primary to-primary/80 transition-all duration-500 ease-out"
                       style={{ width: `${projectData.progressPercentage}%` }}
                     />
-                    <div className="absolute inset-0 flex items-center justify-center text-sm font-medium">
-                      {projectData.completedDrops} of {projectData.totalDrops} units
-                    </div>
                   </div>
                 </div>
               ) : (
