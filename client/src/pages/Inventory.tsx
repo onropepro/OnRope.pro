@@ -132,13 +132,24 @@ export default function Inventory() {
   };
 
   const addSerialNumberField = () => {
-    const quantity = form.getValues("quantity") || 1;
-    if (serialNumbers.length < quantity) {
+    const quantity = form.getValues("quantity");
+    const maxSerials = quantity !== undefined ? quantity : 1;
+    
+    if (maxSerials === 0) {
+      toast({
+        title: "No Stock",
+        description: "Quantity is 0. Cannot add serial numbers.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    if (serialNumbers.length < maxSerials) {
       setSerialNumbers([...serialNumbers, ""]);
     } else {
       toast({
         title: "Limit Reached",
-        description: `Cannot add more than ${quantity} serial numbers.`,
+        description: `Cannot add more than ${maxSerials} serial numbers.`,
         variant: "destructive",
       });
     }
@@ -357,11 +368,14 @@ export default function Inventory() {
                     <FormControl>
                       <Input
                         type="number"
-                        min="1"
+                        min="0"
                         placeholder="1"
                         {...field}
-                        value={field.value || 1}
-                        onChange={(e) => field.onChange(parseInt(e.target.value) || 1)}
+                        value={field.value !== undefined ? field.value : 1}
+                        onChange={(e) => {
+                          const val = parseInt(e.target.value);
+                          field.onChange(isNaN(val) ? 0 : val);
+                        }}
                         data-testid="input-quantity"
                       />
                     </FormControl>
@@ -551,11 +565,14 @@ export default function Inventory() {
                     <FormControl>
                       <Input
                         type="number"
-                        min="1"
+                        min="0"
                         placeholder="1"
                         {...field}
-                        value={field.value || 1}
-                        onChange={(e) => field.onChange(parseInt(e.target.value) || 1)}
+                        value={field.value !== undefined ? field.value : 1}
+                        onChange={(e) => {
+                          const val = parseInt(e.target.value);
+                          field.onChange(isNaN(val) ? 0 : val);
+                        }}
                         data-testid="input-quantity-edit"
                       />
                     </FormControl>

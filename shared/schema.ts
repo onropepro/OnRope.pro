@@ -186,7 +186,7 @@ export const gearItems = pgTable("gear_items", {
   itemPrice: numeric("item_price", { precision: 10, scale: 2 }), // Optional - only visible to users with financial permissions
   possessionOf: varchar("possession_of"), // Optional - who has possession of this item
   notes: text("notes"), // Optional - additional notes about the item
-  quantity: integer("quantity").default(1), // Total quantity of this item
+  quantity: integer("quantity").default(1).notNull(), // Total quantity of this item (0 = out of stock)
   serialNumbers: text("serial_numbers").array(), // Optional array of serial numbers for individual items
   dateInService: date("date_in_service"), // Optional
   dateOutOfService: date("date_out_of_service"), // Optional
