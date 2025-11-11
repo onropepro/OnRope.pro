@@ -2140,17 +2140,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Unable to determine company" });
       }
       
-      // Handle adding a serial number to the array
-      if (req.body.serialNumber && typeof req.body.serialNumber === 'string') {
-        const currentItem = await storage.getGearItemById(req.params.id);
-        if (currentItem) {
-          const existingSerials = currentItem.serialNumbers || [];
-          const updatedSerials = [...existingSerials, req.body.serialNumber];
-          const item = await storage.updateGearItem(req.params.id, { serialNumbers: updatedSerials });
-          return res.json({ item });
-        }
-      }
-      
       // Clean empty strings to null for optional fields
       const cleanedBody: Partial<InsertGearItem> = {};
       if (req.body.equipmentType !== undefined) cleanedBody.equipmentType = req.body.equipmentType || null;
