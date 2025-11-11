@@ -33,11 +33,6 @@ export function requireRole(...roles: string[]) {
 // Read-only mode enforcement middleware
 // Blocks all mutations for unverified company users
 export async function requireVerifiedCompanyForMutations(req: Request, res: Response, next: NextFunction) {
-  // Only enforce on company role users
-  if (req.session.role !== 'company') {
-    return next(); // Employees not affected
-  }
-  
   try {
     // Fetch current user to check verification status
     const user = await storage.getUserById(req.session.userId!);
@@ -46,11 +41,27 @@ export async function requireVerifiedCompanyForMutations(req: Request, res: Resp
       return res.status(401).json({ message: "User not found" });
     }
     
+    // Determine which company to check:
+    // - For company role: check their own license
+    // - For employees: check their parent company's license
+    let companyToCheck = user;
+    
+    if (user.role !== 'company' && user.companyId) {
+      // This is an employee - lookup the parent company
+      const parentCompany = await storage.getUserById(user.companyId);
+      if (!parentCompany) {
+        return res.status(500).json({ message: "Parent company not found" });
+      }
+      companyToCheck = parentCompany;
+    }
+    
     // Block mutations if company is not verified
-    if (user.licenseVerified !== true) {
-      console.log('[Read-Only Mode] Blocked mutation attempt from unverified company:', user.companyName);
+    if (companyToCheck.licenseVerified !== true) {
+      const companyName = companyToCheck.companyName || 'Unknown Company';
+      const userRole = user.role === 'company' ? 'owner' : user.role;
+      console.log(`[Read-Only Mode] Blocked mutation from ${userRole} of unverified company:`, companyName);
       return res.status(403).json({ 
-        message: "Read-only mode: Please verify your license to make changes",
+        message: "Read-only mode: Your company must verify its license to make changes",
         readOnlyMode: true 
       });
     }
@@ -391,9 +402,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(403).json({ message: "Your employment has been terminated. Please contact your administrator for more information." });
       }
       
+      // For employees: include parent company's license verification status
+      let companyLicenseVerified: boolean | undefined = undefined;
+      if (user.role !== 'company' && user.companyId) {
+        const parentCompany = await storage.getUserById(user.companyId);
+        if (parentCompany) {
+          companyLicenseVerified = parentCompany.licenseVerified;
+        }
+      }
+      
       // Strip sensitive fields (passwordHash and licenseKey)
       const { passwordHash, licenseKey, ...userWithoutSensitiveData } = user;
-      res.json({ user: userWithoutSensitiveData });
+      res.json({ 
+        user: {
+          ...userWithoutSensitiveData,
+          ...(companyLicenseVerified !== undefined && { companyLicenseVerified })
+        }
+      });
     } catch (error) {
       console.error("Get user error:", error);
       res.status(500).json({ message: "Internal server error" });

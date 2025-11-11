@@ -7,6 +7,7 @@ export interface User {
   viewFinancialData?: boolean;
   companyId?: string;
   licenseVerified?: boolean;
+  companyLicenseVerified?: boolean; // For employees: parent company's verification status
 }
 
 // Management roles that have elevated privileges
@@ -84,13 +85,18 @@ export function hasPermission(user: User | null | undefined, permission: string)
   return user.permissions?.includes(permission) || false;
 }
 
-// Check if user is in read-only mode (company role without verified license)
+// Check if user is in read-only mode
+// - For company role: check their own license verification
+// - For employees: check their parent company's license verification
 export function isReadOnly(user: User | null | undefined): boolean {
   if (!user) return false;
   
-  // Only company role can be read-only
-  if (user.role !== 'company') return false;
+  // For company role: check their own license
+  if (user.role === 'company') {
+    return user.licenseVerified !== true;
+  }
   
-  // Read-only if license is NOT verified
-  return user.licenseVerified !== true;
+  // For employees: check parent company's license
+  // If companyLicenseVerified is undefined, assume verified (no restriction)
+  return user.companyLicenseVerified === false;
 }
