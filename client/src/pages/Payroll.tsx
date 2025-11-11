@@ -149,7 +149,7 @@ export default function Payroll() {
         ? '/api/payroll/add-work-session' 
         : '/api/payroll/add-non-billable-session';
       
-      const response = await apiRequest(endpoint, 'POST', data);
+      const response = await apiRequest('POST', endpoint, data);
       return response;
     },
     onSuccess: () => {
