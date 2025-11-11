@@ -318,29 +318,6 @@ export default function Inventory() {
                 )}
               />
 
-              {canViewFinancials && (
-                <FormField
-                  control={form.control}
-                  name="itemPrice"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Price</FormLabel>
-                      <FormControl>
-                        <Input
-                          type="number"
-                          step="0.01"
-                          placeholder="0.00"
-                          {...field}
-                          value={field.value || ""}
-                          data-testid="input-price"
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              )}
-
               <FormField
                 control={form.control}
                 name="possessionOf"
@@ -390,6 +367,29 @@ export default function Inventory() {
                   </FormItem>
                 )}
               />
+
+              {canViewFinancials && (
+                <FormField
+                  control={form.control}
+                  name="itemPrice"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Price</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="number"
+                          step="0.01"
+                          placeholder="0.00"
+                          {...field}
+                          value={field.value || ""}
+                          data-testid="input-price"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              )}
 
               <DialogFooter>
                 <Button
@@ -485,29 +485,6 @@ export default function Inventory() {
                 )}
               />
 
-              {canViewFinancials && (
-                <FormField
-                  control={form.control}
-                  name="itemPrice"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Price</FormLabel>
-                      <FormControl>
-                        <Input
-                          type="number"
-                          step="0.01"
-                          placeholder="0.00"
-                          {...field}
-                          value={field.value || ""}
-                          data-testid="input-price-edit"
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              )}
-
               <FormField
                 control={form.control}
                 name="possessionOf"
@@ -557,6 +534,29 @@ export default function Inventory() {
                   </FormItem>
                 )}
               />
+
+              {canViewFinancials && (
+                <FormField
+                  control={form.control}
+                  name="itemPrice"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Price</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="number"
+                          step="0.01"
+                          placeholder="0.00"
+                          {...field}
+                          value={field.value || ""}
+                          data-testid="input-price-edit"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              )}
 
               <DialogFooter>
                 <Button
