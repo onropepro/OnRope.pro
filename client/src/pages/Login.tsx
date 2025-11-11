@@ -6,6 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
+import { useToast } from "@/hooks/use-toast";
 import overhaulLabsLogo from "@assets/Screenshot 2025-11-09 at 14.46.08_1762728408763.png";
 
 const loginSchema = z.object({
@@ -16,6 +17,7 @@ const loginSchema = z.object({
 type LoginFormData = z.infer<typeof loginSchema>;
 
 export default function Login() {
+  const { toast } = useToast();
   const form = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
@@ -270,20 +272,34 @@ export default function Login() {
                 variant="secondary" 
                 className="h-10 text-xs" 
                 onClick={async () => {
-                  const response = await fetch("/api/login", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ identifier: "testcom", password: "test123" }),
-                    credentials: "include",
-                  });
-                  if (response.ok) {
+                  try {
+                    const response = await fetch("/api/login", {
+                      method: "POST",
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify({ identifier: "testcom", password: "test123" }),
+                      credentials: "include",
+                    });
                     const result = await response.json();
-                    const user = result.user;
-                    if (user.role === "resident") {
-                      window.location.href = "/resident";
+                    if (response.ok) {
+                      const user = result.user;
+                      if (user.role === "resident") {
+                        window.location.href = "/resident";
+                      } else {
+                        window.location.href = "/dashboard";
+                      }
                     } else {
-                      window.location.href = "/dashboard";
+                      toast({
+                        title: "Quick Login Failed",
+                        description: result.message || "Test account not found in production database",
+                        variant: "destructive",
+                      });
                     }
+                  } catch (error) {
+                    toast({
+                      title: "Login Error",
+                      description: "Network error. Please try manual login.",
+                      variant: "destructive",
+                    });
                   }
                 }}
                 data-testid="button-quick-login-testcom"
@@ -296,20 +312,34 @@ export default function Login() {
                 variant="secondary" 
                 className="h-10 text-xs" 
                 onClick={async () => {
-                  const response = await fetch("/api/login", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ identifier: "tommy@tommy.com", password: "tommy123" }),
-                    credentials: "include",
-                  });
-                  if (response.ok) {
+                  try {
+                    const response = await fetch("/api/login", {
+                      method: "POST",
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify({ identifier: "tommy@tommy.com", password: "tommy123" }),
+                      credentials: "include",
+                    });
                     const result = await response.json();
-                    const user = result.user;
-                    if (user.role === "resident") {
-                      window.location.href = "/resident";
+                    if (response.ok) {
+                      const user = result.user;
+                      if (user.role === "resident") {
+                        window.location.href = "/resident";
+                      } else {
+                        window.location.href = "/dashboard";
+                      }
                     } else {
-                      window.location.href = "/dashboard";
+                      toast({
+                        title: "Quick Login Failed",
+                        description: result.message || "Test account not found in production database",
+                        variant: "destructive",
+                      });
                     }
+                  } catch (error) {
+                    toast({
+                      title: "Login Error",
+                      description: "Network error. Please try manual login.",
+                      variant: "destructive",
+                    });
                   }
                 }}
                 data-testid="button-quick-login-tommy"
@@ -322,20 +352,34 @@ export default function Login() {
                 variant="secondary" 
                 className="h-10 text-xs" 
                 onClick={async () => {
-                  const response = await fetch("/api/login", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ identifier: "phs", password: "phs2025" }),
-                    credentials: "include",
-                  });
-                  if (response.ok) {
+                  try {
+                    const response = await fetch("/api/login", {
+                      method: "POST",
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify({ identifier: "phs", password: "phs2025" }),
+                      credentials: "include",
+                    });
                     const result = await response.json();
-                    const user = result.user;
-                    if (user.role === "resident") {
-                      window.location.href = "/resident";
+                    if (response.ok) {
+                      const user = result.user;
+                      if (user.role === "resident") {
+                        window.location.href = "/resident";
+                      } else {
+                        window.location.href = "/dashboard";
+                      }
                     } else {
-                      window.location.href = "/dashboard";
+                      toast({
+                        title: "Quick Login Failed",
+                        description: result.message || "Test account not found in production database",
+                        variant: "destructive",
+                      });
                     }
+                  } catch (error) {
+                    toast({
+                      title: "Login Error",
+                      description: "Network error. Please try manual login.",
+                      variant: "destructive",
+                    });
                   }
                 }}
                 data-testid="button-quick-login-phs"
