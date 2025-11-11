@@ -81,6 +81,10 @@ export const users = pgTable("users", {
   terminationReason: text("termination_reason"), // Reason for termination (optional)
   terminationNotes: text("termination_notes"), // Additional notes about termination (optional)
   
+  // License verification (company role only)
+  licenseKey: text("license_key"), // Stored server-side only, never sent to client
+  licenseVerified: boolean("license_verified").default(false), // Public flag - safe to expose
+  
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
@@ -754,6 +758,9 @@ export const insertQuoteServiceSchema = createInsertSchema(quoteServices).omit({
 // Type exports
 export type User = typeof users.$inferSelect;
 export type InsertUser = z.infer<typeof insertUserSchema>;
+
+// Public user type that excludes sensitive fields (never send these to client)
+export type UserPublic = Omit<User, "passwordHash" | "licenseKey">;
 
 export type Project = typeof projects.$inferSelect;
 export type InsertProject = z.infer<typeof insertProjectSchema>;
