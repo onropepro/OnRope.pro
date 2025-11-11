@@ -43,7 +43,6 @@ export default function Inventory() {
   const [editingItem, setEditingItem] = useState<GearItem | null>(null);
   const [serialNumbers, setSerialNumbers] = useState<string[]>([]);
   const [currentSerialNumber, setCurrentSerialNumber] = useState("");
-  const [currentAssignedTo, setCurrentAssignedTo] = useState("Not in use");
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [itemToDelete, setItemToDelete] = useState<GearItem | null>(null);
   const [customType, setCustomType] = useState("");
@@ -100,7 +99,6 @@ export default function Inventory() {
       form.reset();
       setSerialNumbers([]);
       setCurrentSerialNumber("");
-      setCurrentAssignedTo("Not in use");
     },
     onError: (error: any) => {
       toast({
@@ -126,7 +124,6 @@ export default function Inventory() {
       form.reset();
       setSerialNumbers([]);
       setCurrentSerialNumber("");
-      setCurrentAssignedTo("Not in use");
     },
     onError: (error: any) => {
       toast({
@@ -225,9 +222,8 @@ export default function Inventory() {
     // Add the serial number to the list
     setSerialNumbers([...serialNumbers, currentSerialNumber.trim()]);
     
-    // Clear the fields for next entry
+    // Clear the field for next entry
     setCurrentSerialNumber("");
-    setCurrentAssignedTo("Not in use");
     
     toast({
       title: "Serial Number Added",
@@ -256,7 +252,6 @@ export default function Inventory() {
     });
     setSerialNumbers([]);
     setCurrentSerialNumber("");
-    setCurrentAssignedTo("Not in use");
     setCustomType("");
     setAddItemStep(1);
     setShowAddDialog(true);
@@ -279,7 +274,6 @@ export default function Inventory() {
     });
     setSerialNumbers(item.serialNumbers || []);
     setCurrentSerialNumber("");
-    setCurrentAssignedTo("Not in use");
     // Check if type is a custom type (not in predefined list)
     const gearTypeNames = gearTypes.map(t => t.name);
     if (item.equipmentType && !gearTypeNames.includes(item.equipmentType)) {
@@ -584,30 +578,19 @@ export default function Inventory() {
                 )}
               />
 
-              {/* Serial Number Entry */}
-              <div className="space-y-3">
-                <FormLabel>Serial Numbers (Optional)</FormLabel>
-                
-                {/* Current Serial Number Input */}
-                <div className="space-y-2">
-                  <div>
-                    <FormLabel className="text-sm">Serial Number</FormLabel>
-                    <Input
-                      placeholder="Enter serial number"
-                      value={currentSerialNumber}
-                      onChange={(e) => setCurrentSerialNumber(e.target.value)}
-                      data-testid="input-current-serial"
-                      className="mt-1"
-                    />
-                  </div>
-                  
-                  {/* Assigned To Dropdown */}
-                  <div>
-                    <FormLabel className="text-sm">Assigned To</FormLabel>
-                    <Select value={currentAssignedTo} onValueChange={setCurrentAssignedTo}>
-                      <SelectTrigger data-testid="select-assigned-to" className="mt-1">
-                        <SelectValue placeholder="Select employee or Not in use" />
-                      </SelectTrigger>
+              {/* Assigned To Field */}
+              <FormField
+                control={form.control}
+                name="assignedTo"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Assigned To</FormLabel>
+                    <Select onValueChange={field.onChange} value={field.value || "Not in use"}>
+                      <FormControl>
+                        <SelectTrigger data-testid="select-assigned-to">
+                          <SelectValue placeholder="Select employee or Not in use" />
+                        </SelectTrigger>
+                      </FormControl>
                       <SelectContent>
                         <SelectItem value="Not in use">Not in use</SelectItem>
                         {activeEmployees.map((emp: any) => (
@@ -617,7 +600,23 @@ export default function Inventory() {
                         ))}
                       </SelectContent>
                     </Select>
-                  </div>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              {/* Serial Number Entry */}
+              <div className="space-y-3">
+                <FormLabel>Serial Numbers (Optional)</FormLabel>
+                
+                {/* Current Serial Number Input */}
+                <div className="space-y-2">
+                  <Input
+                    placeholder="Enter serial number"
+                    value={currentSerialNumber}
+                    onChange={(e) => setCurrentSerialNumber(e.target.value)}
+                    data-testid="input-current-serial"
+                  />
                   
                   <Button
                     type="button"
@@ -822,30 +821,19 @@ export default function Inventory() {
                 )}
               />
 
-              {/* Serial Number Entry */}
-              <div className="space-y-3">
-                <FormLabel>Serial Numbers (Optional)</FormLabel>
-                
-                {/* Current Serial Number Input */}
-                <div className="space-y-2">
-                  <div>
-                    <FormLabel className="text-sm">Serial Number</FormLabel>
-                    <Input
-                      placeholder="Enter serial number"
-                      value={currentSerialNumber}
-                      onChange={(e) => setCurrentSerialNumber(e.target.value)}
-                      data-testid="input-current-serial-edit"
-                      className="mt-1"
-                    />
-                  </div>
-                  
-                  {/* Assigned To Dropdown */}
-                  <div>
-                    <FormLabel className="text-sm">Assigned To</FormLabel>
-                    <Select value={currentAssignedTo} onValueChange={setCurrentAssignedTo}>
-                      <SelectTrigger data-testid="select-assigned-to-edit" className="mt-1">
-                        <SelectValue placeholder="Select employee or Not in use" />
-                      </SelectTrigger>
+              {/* Assigned To Field */}
+              <FormField
+                control={form.control}
+                name="assignedTo"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Assigned To</FormLabel>
+                    <Select onValueChange={field.onChange} value={field.value || "Not in use"}>
+                      <FormControl>
+                        <SelectTrigger data-testid="select-assigned-to-edit">
+                          <SelectValue placeholder="Select employee or Not in use" />
+                        </SelectTrigger>
+                      </FormControl>
                       <SelectContent>
                         <SelectItem value="Not in use">Not in use</SelectItem>
                         {activeEmployees.map((emp: any) => (
@@ -855,7 +843,23 @@ export default function Inventory() {
                         ))}
                       </SelectContent>
                     </Select>
-                  </div>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              {/* Serial Number Entry */}
+              <div className="space-y-3">
+                <FormLabel>Serial Numbers (Optional)</FormLabel>
+                
+                {/* Current Serial Number Input */}
+                <div className="space-y-2">
+                  <Input
+                    placeholder="Enter serial number"
+                    value={currentSerialNumber}
+                    onChange={(e) => setCurrentSerialNumber(e.target.value)}
+                    data-testid="input-current-serial-edit"
+                  />
                   
                   <Button
                     type="button"
