@@ -16,14 +16,15 @@ export function VerticalBuildingProgress({
   // Calculate progress percentage
   const progressPercent = totalUnits > 0 ? Math.min(100, (completedUnits / totalUnits) * 100) : 0;
   
-  // Calculate how many floors are "filled" based on progress
+  // Calculate how many floors are "filled" based on progress (from top down)
   const filledFloors = Math.floor((progressPercent / 100) * buildingFloors);
   
   // Building floors array (top to bottom)
   const floors = useMemo(() => {
     return Array.from({ length: buildingFloors }, (_, index) => {
       const floorNumber = buildingFloors - index; // Top to bottom (floor 25, 24, 23...)
-      const isFilled = floorNumber <= filledFloors;
+      // Fill from top down: if we have 3 filled floors, fill floors 25, 24, 23 (highest numbers first)
+      const isFilled = floorNumber > (buildingFloors - filledFloors);
       return { floorNumber, isFilled };
     });
   }, [buildingFloors, filledFloors]);
@@ -75,9 +76,9 @@ export function VerticalBuildingProgress({
             ))}
           </div>
 
-          {/* Progress Fill (from bottom to top) */}
+          {/* Progress Fill (from top to bottom) */}
           <div 
-            className="absolute bottom-0 left-0 right-0 bg-primary/10 transition-all duration-500 ease-out pointer-events-none"
+            className="absolute top-0 left-0 right-0 bg-primary/10 transition-all duration-500 ease-out pointer-events-none"
             style={{ 
               height: `${progressPercent}%`,
             }}
