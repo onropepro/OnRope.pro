@@ -64,10 +64,7 @@ export default function Inventory() {
 
   const addItemMutation = useMutation({
     mutationFn: async (data: InsertGearItem) => {
-      return apiRequest("/api/gear-items", {
-        method: "POST",
-        body: JSON.stringify(data),
-      });
+      return apiRequest("POST", "/api/gear-items", data);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/gear-items"] });
