@@ -2162,6 +2162,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.delete("/api/gear-items/:id", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      await storage.deleteGearItem(req.params.id);
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Delete gear item error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
   // Harness inspection routes
   app.post("/api/harness-inspections", requireAuth, requireRole("rope_access_tech", "supervisor", "operations_manager", "company"), async (req: Request, res: Response) => {
     try {

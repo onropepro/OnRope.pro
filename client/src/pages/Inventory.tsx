@@ -13,7 +13,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { insertGearItemSchema, type InsertGearItem, type GearItem } from "@shared/schema";
-import { ArrowLeft, Plus, Pencil, X } from "lucide-react";
+import { ArrowLeft, Plus, Pencil, X, Trash2 } from "lucide-react";
 import { hasFinancialAccess } from "@/lib/permissions";
 
 const gearTypes = [
@@ -36,6 +36,8 @@ export default function Inventory() {
   const [serialNumbers, setSerialNumbers] = useState<string[]>([]);
   const [currentSerialNumber, setCurrentSerialNumber] = useState("");
   const [currentAssignedTo, setCurrentAssignedTo] = useState("Not in use");
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [itemToDelete, setItemToDelete] = useState<GearItem | null>(null);
 
   // Fetch current user
   const { data: userData } = useQuery({
@@ -117,6 +119,28 @@ export default function Inventory() {
       toast({
         title: "Error",
         description: error.message || "Failed to update item",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const deleteItemMutation = useMutation({
+    mutationFn: async (id: string) => {
+      return apiRequest("DELETE", `/api/gear-items/${id}`, {});
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/gear-items"] });
+      toast({
+        title: "Item Deleted",
+        description: "The gear item has been removed from inventory.",
+      });
+      setShowDeleteDialog(false);
+      setItemToDelete(null);
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to delete item",
         variant: "destructive",
       });
     },
@@ -211,6 +235,17 @@ export default function Inventory() {
     setShowEditDialog(true);
   };
 
+  const openDeleteDialog = (item: GearItem) => {
+    setItemToDelete(item);
+    setShowDeleteDialog(true);
+  };
+
+  const handleDeleteItem = () => {
+    if (itemToDelete) {
+      deleteItemMutation.mutate(itemToDelete.id);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-background pb-20">
       {/* Header */}
@@ -302,14 +337,24 @@ export default function Inventory() {
                             )}
                           </div>
                         </div>
-                        <Button
-                          size="icon"
-                          variant="ghost"
-                          onClick={() => openEditDialog(item)}
-                          data-testid={`button-edit-${item.id}`}
-                        >
-                          <Pencil className="h-4 w-4" />
-                        </Button>
+                        <div className="flex gap-2">
+                          <Button
+                            size="icon"
+                            variant="ghost"
+                            onClick={() => openEditDialog(item)}
+                            data-testid={`button-edit-${item.id}`}
+                          >
+                            <Pencil className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            size="icon"
+                            variant="ghost"
+                            onClick={() => openDeleteDialog(item)}
+                            data-testid={`button-delete-${item.id}`}
+                          >
+                            <Trash2 className="h-4 w-4 text-destructive" />
+                          </Button>
+                        </div>
                       </div>
                     </CardContent>
                   </Card>
@@ -735,6 +780,49 @@ export default function Inventory() {
               </DialogFooter>
             </form>
           </Form>
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete Confirmation Dialog */}
+      <Dialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+        <DialogContent data-testid="dialog-delete-item">
+          <DialogHeader>
+            <DialogTitle>Delete Item</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to delete this item from inventory? This action cannot be undone.
+            </DialogDescription>
+          </DialogHeader>
+          {itemToDelete && (
+            <div className="py-4">
+              <div className="space-y-1">
+                <div className="font-medium">{itemToDelete.equipmentType || "Gear Item"}</div>
+                {itemToDelete.brand && <div className="text-sm text-muted-foreground">Brand: {itemToDelete.brand}</div>}
+                {itemToDelete.model && <div className="text-sm text-muted-foreground">Model: {itemToDelete.model}</div>}
+                <div className="text-sm text-muted-foreground">Quantity: {itemToDelete.quantity || 1}</div>
+              </div>
+            </div>
+          )}
+          <DialogFooter>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => {
+                setShowDeleteDialog(false);
+                setItemToDelete(null);
+              }}
+              data-testid="button-cancel-delete"
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={handleDeleteItem}
+              disabled={deleteItemMutation.isPending}
+              data-testid="button-confirm-delete"
+            >
+              {deleteItemMutation.isPending ? "Deleting..." : "Delete Item"}
+            </Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
     </div>
