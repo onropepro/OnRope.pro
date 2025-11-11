@@ -942,6 +942,7 @@ export default function Dashboard() {
 
   // Get current user for permission checks
   const currentUser = userData?.user;
+  const userIsReadOnly = isReadOnly(currentUser);
 
   // Dashboard card configuration with permission filtering
   const dashboardCards = [
@@ -1191,7 +1192,11 @@ export default function Dashboard() {
                 </div>
                 <Dialog open={showProjectDialog} onOpenChange={setShowProjectDialog}>
                   <DialogTrigger asChild>
-                    <Button className="h-14 px-6 gap-2 shadow-md hover:shadow-lg text-base font-semibold" data-testid="button-create-project">
+                    <Button 
+                      className="h-14 px-6 gap-2 shadow-md hover:shadow-lg text-base font-semibold" 
+                      data-testid="button-create-project"
+                      disabled={userIsReadOnly}
+                    >
                       <span className="material-icons text-xl">add_circle</span>
                       <span className="hidden sm:inline">New Project</span>
                     </Button>
@@ -1962,7 +1967,11 @@ export default function Dashboard() {
               {/* Create Employee Button */}
               <Dialog open={showEmployeeDialog} onOpenChange={(open) => { setShowEmployeeDialog(open); if (!open) setEmployeeFormStep(1); }}>
                 <DialogTrigger asChild>
-                  <Button className="w-full h-12 gap-2" data-testid="button-create-employee">
+                  <Button 
+                    className="w-full h-12 gap-2" 
+                    data-testid="button-create-employee"
+                    disabled={userIsReadOnly}
+                  >
                     <span className="material-icons">person_add</span>
                     Add New Employee
                   </Button>
@@ -2455,6 +2464,7 @@ export default function Dashboard() {
                                 onClick={() => handleEditEmployee(employee)}
                                 data-testid={`button-edit-employee-${employee.id}`}
                                 className="h-9 w-9"
+                                disabled={userIsReadOnly}
                               >
                                 <span className="material-icons text-sm">edit</span>
                               </Button>
@@ -2464,6 +2474,7 @@ export default function Dashboard() {
                                 onClick={() => setEmployeeToDelete(employee.id)}
                                 data-testid={`button-delete-employee-${employee.id}`}
                                 className="h-9 w-9 text-destructive hover:text-destructive"
+                                disabled={userIsReadOnly}
                               >
                                 <span className="material-icons text-sm">delete</span>
                               </Button>
@@ -2508,6 +2519,7 @@ export default function Dashboard() {
                                     onClick={() => reactivateEmployeeMutation.mutate(employee.id)}
                                     data-testid={`button-reactivate-employee-${employee.id}`}
                                     className="h-9"
+                                    disabled={userIsReadOnly}
                                   >
                                     <span className="material-icons text-sm mr-1">refresh</span>
                                     Reactivate
@@ -2518,6 +2530,7 @@ export default function Dashboard() {
                                     onClick={() => handleEditEmployee(employee)}
                                     data-testid={`button-edit-terminated-employee-${employee.id}`}
                                     className="h-9 w-9"
+                                    disabled={userIsReadOnly}
                                   >
                                     <span className="material-icons text-sm">edit</span>
                                   </Button>
@@ -2527,6 +2540,7 @@ export default function Dashboard() {
                                     onClick={() => setEmployeeToDelete(employee.id)}
                                     data-testid={`button-delete-terminated-employee-${employee.id}`}
                                     className="h-9 w-9 text-destructive hover:text-destructive"
+                                    disabled={userIsReadOnly}
                                   >
                                     <span className="material-icons text-sm">delete</span>
                                   </Button>
