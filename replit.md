@@ -27,7 +27,7 @@ The platform is built with a **mobile-first approach** and features a modern, pr
 - **Progress Tracking:** Visual progress via the 4-Elevation Building System. Daily drop logging by technicians includes historical entry, dynamic shortfall reason validation, and warnings for exceeding remaining work with an override option.
 - **Complaint Management:** Residents submit feedback, and management tracks and responds with notes.
 - **Photo Gallery:** Staff upload project photos from mobile devices, displayed in a 3-column responsive gallery.
-- **Personal Gear Inventory:** All employees can view their assigned gear items via "My Gear" page showing equipment type, quantity, serial numbers, and service dates. Financial data (item prices, total value) is conditionally displayed only for users with financial permissions.
+- **Personal Gear Inventory:** All employees can view their assigned gear items via the "My Gear" tab within the Inventory page, showing equipment type, quantity, serial numbers, and service dates. The Inventory page uses tabs to provide both "My Gear" (read-only view for all employees) and "Manage Gear" (full CRUD operations for management). Financial data (item prices, total value) is conditionally displayed only for users with financial permissions.
 - **Universal Profile Management:** Users manage personal information; company owners can delete their accounts with cascade warnings.
 - **Authentication:** Custom Express.js authentication with session storage.
 

@@ -99,13 +99,8 @@ function Router() {
         </ProtectedRoute>
       </Route>
       <Route path="/inventory">
-        <ProtectedRoute allowedRoles={["company", "operations_manager", "supervisor"]}>
-          <Inventory />
-        </ProtectedRoute>
-      </Route>
-      <Route path="/my-gear">
         <ProtectedRoute allowedRoles={EMPLOYEE_ROLES}>
-          <MyGear />
+          <Inventory />
         </ProtectedRoute>
       </Route>
       <Route path="/hours-analytics">

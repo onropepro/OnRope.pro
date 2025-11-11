@@ -25,7 +25,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import type { Project } from "@shared/schema";
 import { normalizeStrataPlan } from "@shared/schema";
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from "recharts";
-import { isManagement, hasFinancialAccess, canManageEmployees, canViewPerformance } from "@/lib/permissions";
+import { isManagement, hasFinancialAccess, canManageEmployees, canViewPerformance, hasPermission } from "@/lib/permissions";
 
 const projectSchema = z.object({
   strataPlanNumber: z.string().min(1, "Strata plan number is required"),
@@ -995,16 +995,6 @@ export default function Dashboard() {
       borderColor: "#ec4899",
     },
     {
-      id: "my-gear",
-      label: "My Gear",
-      description: "My assigned equipment",
-      icon: "work_outline",
-      onClick: () => setLocation("/my-gear"),
-      testId: "button-my-gear",
-      isVisible: () => true, // Everyone
-      borderColor: "#8b5cf6",
-    },
-    {
       id: "build-my-kit",
       label: "Build my Kit",
       description: "Gear inventory",
@@ -1021,7 +1011,7 @@ export default function Dashboard() {
       icon: "inventory_2",
       onClick: () => setLocation("/inventory"),
       testId: "button-inventory",
-      isVisible: (user: any) => isManagement(user) || hasPermission(user, "manage_inventory"), // Management or manage_inventory permission
+      isVisible: () => true, // Everyone can access (tabs handle different views)
       borderColor: "#d97706",
     },
     {

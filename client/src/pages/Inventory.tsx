@@ -9,6 +9,8 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -49,7 +51,7 @@ export default function Inventory() {
   const [addItemStep, setAddItemStep] = useState(1);
 
   // Fetch current user
-  const { data: userData } = useQuery({
+  const { data: userData } = useQuery<{ user: any }>({
     queryKey: ["/api/user"],
   });
 
@@ -296,6 +298,35 @@ export default function Inventory() {
     }
   };
 
+  const allGearItems = gearData?.items || [];
+  const myGear = allGearItems.filter((item: GearItem) => item.assignedTo === currentUser?.name);
+
+  const totalMyItems = myGear.reduce((sum: number, item: any) => sum + (item.quantity || 0), 0);
+  const totalMyValue = myGear.reduce((sum: number, item: any) => {
+    const price = parseFloat(item.itemPrice || "0");
+    const qty = item.quantity || 0;
+    return sum + (price * qty);
+  }, 0);
+
+  const EQUIPMENT_ICONS: Record<string, string> = {
+    Harness: "security",
+    Rope: "architecture",
+    Carabiner: "link",
+    Descender: "arrow_downward",
+    Ascender: "arrow_upward",
+    Helmet: "sports_mma",
+    Gloves: "back_hand",
+    "Gas powered equipment": "power",
+    "Squeegee rubbers": "cleaning_services",
+    Applicators: "brush",
+    Soap: "soap",
+    "Suction cup": "panorama_fish_eye",
+    "Back up device": "shield",
+    Lanyard: "cable",
+    "Work positioning device": "swap_vert",
+    Other: "category",
+  };
+
   return (
     <div className="min-h-screen bg-background pb-20">
       {/* Header */}
@@ -310,34 +341,186 @@ export default function Inventory() {
             >
               <ArrowLeft className="h-5 w-5" />
             </Button>
-            <h1 className="text-xl font-bold tracking-tight">Inventory Management</h1>
+            <h1 className="text-xl font-bold tracking-tight">Inventory</h1>
           </div>
         </div>
       </header>
 
-      <div className="p-4 max-w-4xl mx-auto space-y-4">
-        {/* Add Item Card */}
-        <Card className="hover-elevate active-elevate-2 cursor-pointer" onClick={openAddDialog} data-testid="card-add-item">
-          <CardHeader>
-            <div className="flex items-center gap-3">
-              <div className="h-12 w-12 rounded-lg bg-primary/10 flex items-center justify-center">
-                <Plus className="h-6 w-6 text-primary" />
-              </div>
-              <div>
-                <CardTitle>Add Inventory Item</CardTitle>
-                <CardDescription>Add new gear to the inventory system</CardDescription>
-              </div>
-            </div>
-          </CardHeader>
-        </Card>
+      <div className="p-4 max-w-4xl mx-auto">
+        <Tabs defaultValue="my-gear" className="w-full">
+          <TabsList className="grid w-full grid-cols-2 mb-4">
+            <TabsTrigger value="my-gear" data-testid="tab-my-gear">My Gear</TabsTrigger>
+            <TabsTrigger value="manage" data-testid="tab-manage-gear">Manage Gear</TabsTrigger>
+          </TabsList>
 
-        {/* View Inventory Section */}
-        <Card>
-          <CardHeader>
-            <CardTitle>All Inventory Items</CardTitle>
-            <CardDescription>View all gear items in the system</CardDescription>
-          </CardHeader>
-          <CardContent>
+          {/* My Gear Tab */}
+          <TabsContent value="my-gear" className="space-y-4">
+            {/* Summary Cards */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <Card>
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
+                    <span className="material-icons text-lg">inventory_2</span>
+                    Total Items
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-3xl font-bold">{totalMyItems}</div>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Across {myGear.length} {myGear.length === 1 ? 'category' : 'categories'}
+                  </p>
+                </CardContent>
+              </Card>
+
+              {canViewFinancials && (
+                <Card>
+                  <CardHeader className="pb-3">
+                    <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
+                      <span className="material-icons text-lg">attach_money</span>
+                      Total Value
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-3xl font-bold">${totalMyValue.toFixed(2)}</div>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      Equipment value
+                    </p>
+                  </CardContent>
+                </Card>
+              )}
+            </div>
+
+            {myGear.length === 0 ? (
+              <Card>
+                <CardContent className="py-12 text-center">
+                  <div className="flex flex-col items-center gap-3">
+                    <span className="material-icons text-5xl text-muted-foreground">inventory_2</span>
+                    <div>
+                      <div className="font-semibold text-lg">No Gear Assigned</div>
+                      <p className="text-sm text-muted-foreground mt-1">
+                        You don't have any equipment assigned yet.
+                      </p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            ) : (
+              <div className="space-y-4">
+                {myGear.map((item: any) => (
+                  <Card key={item.id} className="overflow-hidden">
+                    <CardContent className="p-4">
+                      <div className="flex items-start gap-4">
+                        {/* Icon */}
+                        <div className="h-12 w-12 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
+                          <span className="material-icons text-primary text-2xl">
+                            {EQUIPMENT_ICONS[item.equipmentType] || "category"}
+                          </span>
+                        </div>
+
+                        {/* Content */}
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-start justify-between gap-3 mb-2">
+                            <div>
+                              <div className="font-semibold text-base flex items-center gap-2">
+                                {item.equipmentType}
+                                {item.inService === false && (
+                                  <Badge variant="destructive" className="text-xs">
+                                    Out of Service
+                                  </Badge>
+                                )}
+                              </div>
+                              {(item.brand || item.model) && (
+                                <div className="text-sm text-muted-foreground mt-0.5">
+                                  {[item.brand, item.model].filter(Boolean).join(" - ")}
+                                </div>
+                              )}
+                            </div>
+                            <div className="text-right">
+                              <div className="font-semibold text-lg">
+                                {item.quantity} {item.quantity === 1 ? 'item' : 'items'}
+                              </div>
+                              {canViewFinancials && item.itemPrice && (
+                                <div className="text-sm text-muted-foreground">
+                                  ${parseFloat(item.itemPrice).toFixed(2)} each
+                                </div>
+                              )}
+                            </div>
+                          </div>
+
+                          {/* Details Grid */}
+                          <div className="grid grid-cols-2 gap-3 text-sm">
+                            {item.dateInService && (
+                              <div>
+                                <span className="text-muted-foreground">In Service:</span>
+                                <div className="font-medium mt-0.5">
+                                  {new Date(item.dateInService).toLocaleDateString()}
+                                </div>
+                              </div>
+                            )}
+                            {item.dateOutOfService && (
+                              <div>
+                                <span className="text-muted-foreground">Out of Service:</span>
+                                <div className="font-medium mt-0.5">
+                                  {new Date(item.dateOutOfService).toLocaleDateString()}
+                                </div>
+                              </div>
+                            )}
+                          </div>
+
+                          {/* Serial Numbers */}
+                          {item.serialNumbers && item.serialNumbers.length > 0 && (
+                            <div className="mt-3 pt-3 border-t">
+                              <div className="text-xs text-muted-foreground mb-2">Serial Numbers:</div>
+                              <div className="flex flex-wrap gap-2">
+                                {item.serialNumbers.map((serial: string, idx: number) => (
+                                  <Badge key={idx} variant="secondary" className="text-xs font-mono">
+                                    {serial}
+                                  </Badge>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+
+                          {/* Notes */}
+                          {item.notes && (
+                            <div className="mt-3 pt-3 border-t">
+                              <div className="text-xs text-muted-foreground mb-1">Notes:</div>
+                              <div className="text-sm">{item.notes}</div>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            )}
+          </TabsContent>
+
+          {/* Manage Gear Tab */}
+          <TabsContent value="manage" className="space-y-4">
+            {/* Add Item Card */}
+            <Card className="hover-elevate active-elevate-2 cursor-pointer" onClick={openAddDialog} data-testid="card-add-item">
+              <CardHeader>
+                <div className="flex items-center gap-3">
+                  <div className="h-12 w-12 rounded-lg bg-primary/10 flex items-center justify-center">
+                    <Plus className="h-6 w-6 text-primary" />
+                  </div>
+                  <div>
+                    <CardTitle>Add Inventory Item</CardTitle>
+                    <CardDescription>Add new gear to the inventory system</CardDescription>
+                  </div>
+                </div>
+              </CardHeader>
+            </Card>
+
+            {/* View Inventory Section */}
+            <Card>
+              <CardHeader>
+                <CardTitle>All Inventory Items</CardTitle>
+                <CardDescription>View all gear items in the system</CardDescription>
+              </CardHeader>
+              <CardContent>
             {isLoading ? (
               <div className="text-center py-8 text-muted-foreground">Loading inventory...</div>
             ) : !gearData?.items || gearData.items.length === 0 ? (
@@ -417,9 +600,11 @@ export default function Inventory() {
                   </Card>
                 ))}
               </div>
-            )}
-          </CardContent>
-        </Card>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+        </Tabs>
       </div>
 
       {/* Add Item Dialog */}
