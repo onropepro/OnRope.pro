@@ -1095,7 +1095,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       // Job types that don't use drop-based tracking
-      const nonDropJobTypes = ['in_suite_dryer_vent_cleaning', 'parkade_pressure_cleaning', 'ground_window_cleaning'];
+      const nonDropJobTypes = ['in_suite_dryer_vent_cleaning', 'parkade_pressure_cleaning', 'ground_window_cleaning', 'general_pressure_washing'];
       const isNonDropJob = nonDropJobTypes.includes(req.body.jobType);
       
       const projectData = insertProjectSchema.parse({
