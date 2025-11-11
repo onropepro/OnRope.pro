@@ -162,6 +162,7 @@ export default function Inventory() {
   const handleAddItem = (data: Partial<InsertGearItem>) => {
     const finalData = {
       ...data,
+      equipmentType: customType || data.equipmentType, // Use custom type if provided
       assignedTo: data.assignedTo?.trim() || "Not in use",
       serialNumbers: serialNumbers.length > 0 ? serialNumbers : undefined,
     };
@@ -172,6 +173,7 @@ export default function Inventory() {
     if (editingItem) {
       const finalData = {
         ...data,
+        equipmentType: customType || data.equipmentType, // Use custom type if provided
         assignedTo: data.assignedTo?.trim() || "Not in use",
         serialNumbers: serialNumbers.length > 0 ? serialNumbers : undefined,
       };
@@ -479,7 +481,7 @@ export default function Inventory() {
                     )}
                   />
 
-                  {form.watch("equipmentType") === "Other" && (
+                  {(form.watch("equipmentType") === "Other" || customType) && (
                     <div className="space-y-2">
                       <FormLabel>Custom Type Name</FormLabel>
                       <Input
@@ -487,7 +489,6 @@ export default function Inventory() {
                         value={customType}
                         onChange={(e) => {
                           setCustomType(e.target.value);
-                          form.setValue("equipmentType", e.target.value);
                         }}
                         data-testid="input-custom-type"
                       />
@@ -761,7 +762,7 @@ export default function Inventory() {
                 )}
               />
 
-              {form.watch("equipmentType") === "Other" && (
+              {(form.watch("equipmentType") === "Other" || customType) && (
                 <div className="space-y-2">
                   <FormLabel>Custom Type Name</FormLabel>
                   <Input
@@ -769,7 +770,6 @@ export default function Inventory() {
                     value={customType}
                     onChange={(e) => {
                       setCustomType(e.target.value);
-                      form.setValue("equipmentType", e.target.value);
                     }}
                     data-testid="input-custom-type-edit"
                   />
