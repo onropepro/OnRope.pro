@@ -648,6 +648,14 @@ export class Storage {
       .orderBy(desc(gearItems.createdAt));
   }
 
+  async updateGearItem(id: string, updates: Partial<InsertGearItem>): Promise<GearItem> {
+    const result = await db.update(gearItems)
+      .set({ ...updates, updatedAt: new Date() })
+      .where(eq(gearItems.id, id))
+      .returning();
+    return result[0];
+  }
+
   async updateHarnessInspection(id: string, pdfUrl: string): Promise<HarnessInspection> {
     const result = await db.update(harnessInspections)
       .set({ pdfUrl })

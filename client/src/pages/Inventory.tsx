@@ -13,7 +13,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { insertGearItemSchema, type InsertGearItem, type GearItem } from "@shared/schema";
-import { ArrowLeft, Plus } from "lucide-react";
+import { ArrowLeft, Plus, Pencil } from "lucide-react";
 import { hasFinancialAccess } from "@/lib/permissions";
 
 const gearTypes = [
@@ -31,6 +31,8 @@ export default function Inventory() {
   const { toast } = useToast();
   const [, setLocation] = useLocation();
   const [showAddDialog, setShowAddDialog] = useState(false);
+  const [showEditDialog, setShowEditDialog] = useState(false);
+  const [editingItem, setEditingItem] = useState<GearItem | null>(null);
 
   // Fetch current user
   const { data: userData } = useQuery({
@@ -45,25 +47,24 @@ export default function Inventory() {
     queryKey: ["/api/gear-items"],
   });
 
-  const form = useForm<InsertGearItem>({
-    resolver: zodResolver(insertGearItemSchema.omit({ id: true, employeeId: true, companyId: true, createdAt: true, updatedAt: true })),
+  const form = useForm<Partial<InsertGearItem>>({
     defaultValues: {
-      equipmentType: "",
-      brand: "",
-      model: "",
-      itemPrice: "",
-      possessionOf: "",
-      notes: "",
-      serialNumber: "",
-      dateInService: "",
-      dateOutOfService: "",
+      equipmentType: undefined,
+      brand: undefined,
+      model: undefined,
+      itemPrice: undefined,
+      possessionOf: undefined,
+      notes: undefined,
+      serialNumber: undefined,
+      dateInService: undefined,
+      dateOutOfService: undefined,
       inService: true,
       quantity: 1,
     },
   });
 
   const addItemMutation = useMutation({
-    mutationFn: async (data: InsertGearItem) => {
+    mutationFn: async (data: Partial<InsertGearItem>) => {
       return apiRequest("POST", "/api/gear-items", data);
     },
     onSuccess: () => {
@@ -84,8 +85,55 @@ export default function Inventory() {
     },
   });
 
-  const handleAddItem = (data: InsertGearItem) => {
+  const updateItemMutation = useMutation({
+    mutationFn: async ({ id, data }: { id: string; data: Partial<InsertGearItem> }) => {
+      return apiRequest("PATCH", `/api/gear-items/${id}`, data);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/gear-items"] });
+      toast({
+        title: "Item Updated",
+        description: "The gear item has been updated.",
+      });
+      setShowEditDialog(false);
+      setEditingItem(null);
+      form.reset();
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to update item",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const handleAddItem = (data: Partial<InsertGearItem>) => {
     addItemMutation.mutate(data);
+  };
+
+  const handleEditItem = (data: Partial<InsertGearItem>) => {
+    if (editingItem) {
+      updateItemMutation.mutate({ id: editingItem.id, data });
+    }
+  };
+
+  const openEditDialog = (item: GearItem) => {
+    setEditingItem(item);
+    form.reset({
+      equipmentType: item.equipmentType || undefined,
+      brand: item.brand || undefined,
+      model: item.model || undefined,
+      itemPrice: item.itemPrice || undefined,
+      possessionOf: item.possessionOf || undefined,
+      notes: item.notes || undefined,
+      serialNumber: item.serialNumber || undefined,
+      dateInService: item.dateInService || undefined,
+      dateOutOfService: item.dateOutOfService || undefined,
+      inService: item.inService,
+      quantity: item.quantity || 1,
+    });
+    setShowEditDialog(true);
   };
 
   return (
@@ -141,38 +189,48 @@ export default function Inventory() {
                 {gearData.items.map((item) => (
                   <Card key={item.id} className="bg-muted/30" data-testid={`item-${item.id}`}>
                     <CardContent className="p-4">
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                        <div>
-                          <div className="font-semibold mb-1">{item.equipmentType || "Gear Item"}</div>
-                          {item.brand && (
-                            <div className="text-sm text-muted-foreground">Brand: {item.brand}</div>
-                          )}
-                          {item.model && (
-                            <div className="text-sm text-muted-foreground">Model: {item.model}</div>
-                          )}
-                          {item.possessionOf && (
-                            <div className="text-sm text-muted-foreground">
-                              Possession of: {item.possessionOf}
-                            </div>
-                          )}
-                          {item.quantity && item.quantity > 1 && (
-                            <div className="text-sm text-muted-foreground">
-                              Quantity: {item.quantity}
-                            </div>
-                          )}
+                      <div className="flex items-start justify-between gap-4">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 flex-1">
+                          <div>
+                            <div className="font-semibold mb-1">{item.equipmentType || "Gear Item"}</div>
+                            {item.brand && (
+                              <div className="text-sm text-muted-foreground">Brand: {item.brand}</div>
+                            )}
+                            {item.model && (
+                              <div className="text-sm text-muted-foreground">Model: {item.model}</div>
+                            )}
+                            {item.possessionOf && (
+                              <div className="text-sm text-muted-foreground">
+                                Possession of: {item.possessionOf}
+                              </div>
+                            )}
+                            {item.quantity && item.quantity > 1 && (
+                              <div className="text-sm text-muted-foreground">
+                                Quantity: {item.quantity}
+                              </div>
+                            )}
+                          </div>
+                          <div>
+                            {canViewFinancials && item.itemPrice && (
+                              <div className="text-sm font-semibold text-primary mb-1">
+                                ${parseFloat(item.itemPrice).toFixed(2)}
+                              </div>
+                            )}
+                            {item.notes && (
+                              <div className="text-sm text-muted-foreground">
+                                Notes: {item.notes}
+                              </div>
+                            )}
+                          </div>
                         </div>
-                        <div>
-                          {canViewFinancials && item.itemPrice && (
-                            <div className="text-sm font-semibold text-primary mb-1">
-                              ${parseFloat(item.itemPrice).toFixed(2)}
-                            </div>
-                          )}
-                          {item.notes && (
-                            <div className="text-sm text-muted-foreground">
-                              Notes: {item.notes}
-                            </div>
-                          )}
-                        </div>
+                        <Button
+                          size="icon"
+                          variant="ghost"
+                          onClick={() => openEditDialog(item)}
+                          data-testid={`button-edit-${item.id}`}
+                        >
+                          <Pencil className="h-4 w-4" />
+                        </Button>
                       </div>
                     </CardContent>
                   </Card>
@@ -191,14 +249,14 @@ export default function Inventory() {
             <DialogDescription>All fields are optional. Fill in what you know.</DialogDescription>
           </DialogHeader>
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(handleAddItem)} className="space-y-4">
+            <form onSubmit={form.handleSubmit(handleAddItem)} className="space-y-4 max-h-[70vh] overflow-y-auto px-1">
               <FormField
                 control={form.control}
                 name="equipmentType"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Type</FormLabel>
-                    <Select onValueChange={field.onChange} value={field.value}>
+                    <Select onValueChange={field.onChange} value={field.value || ""}>
                       <FormControl>
                         <SelectTrigger data-testid="select-item-type">
                           <SelectValue placeholder="Select gear type" />
@@ -224,7 +282,7 @@ export default function Inventory() {
                   <FormItem>
                     <FormLabel>Brand</FormLabel>
                     <FormControl>
-                      <Input placeholder="e.g., Petzl" {...field} data-testid="input-brand" />
+                      <Input placeholder="e.g., Petzl" {...field} value={field.value || ""} data-testid="input-brand" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -238,7 +296,7 @@ export default function Inventory() {
                   <FormItem>
                     <FormLabel>Model</FormLabel>
                     <FormControl>
-                      <Input placeholder="e.g., I'D S" {...field} data-testid="input-model" />
+                      <Input placeholder="e.g., I'D S" {...field} value={field.value || ""} data-testid="input-model" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -258,6 +316,7 @@ export default function Inventory() {
                           step="0.01"
                           placeholder="0.00"
                           {...field}
+                          value={field.value || ""}
                           data-testid="input-price"
                         />
                       </FormControl>
@@ -274,7 +333,7 @@ export default function Inventory() {
                   <FormItem>
                     <FormLabel>Possession of</FormLabel>
                     <FormControl>
-                      <Input placeholder="Who has this item?" {...field} data-testid="input-possession" />
+                      <Input placeholder="Who has this item?" {...field} value={field.value || ""} data-testid="input-possession" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -288,7 +347,7 @@ export default function Inventory() {
                   <FormItem>
                     <FormLabel>Notes</FormLabel>
                     <FormControl>
-                      <Textarea placeholder="Additional information..." {...field} data-testid="textarea-notes" />
+                      <Textarea placeholder="Additional information..." {...field} value={field.value || ""} data-testid="textarea-notes" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -306,6 +365,141 @@ export default function Inventory() {
                 </Button>
                 <Button type="submit" disabled={addItemMutation.isPending} data-testid="button-submit">
                   {addItemMutation.isPending ? "Adding..." : "Add Item"}
+                </Button>
+              </DialogFooter>
+            </form>
+          </Form>
+        </DialogContent>
+      </Dialog>
+
+      {/* Edit Item Dialog */}
+      <Dialog open={showEditDialog} onOpenChange={setShowEditDialog}>
+        <DialogContent data-testid="dialog-edit-item">
+          <DialogHeader>
+            <DialogTitle>Edit Inventory Item</DialogTitle>
+            <DialogDescription>Update the item details.</DialogDescription>
+          </DialogHeader>
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(handleEditItem)} className="space-y-4 max-h-[70vh] overflow-y-auto px-1">
+              <FormField
+                control={form.control}
+                name="equipmentType"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Type</FormLabel>
+                    <Select onValueChange={field.onChange} value={field.value || ""}>
+                      <FormControl>
+                        <SelectTrigger data-testid="select-item-type-edit">
+                          <SelectValue placeholder="Select gear type" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {gearTypes.map((type) => (
+                          <SelectItem key={type} value={type}>
+                            {type}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="brand"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Brand</FormLabel>
+                    <FormControl>
+                      <Input placeholder="e.g., Petzl" {...field} value={field.value || ""} data-testid="input-brand-edit" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="model"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Model</FormLabel>
+                    <FormControl>
+                      <Input placeholder="e.g., I'D S" {...field} value={field.value || ""} data-testid="input-model-edit" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              {canViewFinancials && (
+                <FormField
+                  control={form.control}
+                  name="itemPrice"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Price</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="number"
+                          step="0.01"
+                          placeholder="0.00"
+                          {...field}
+                          value={field.value || ""}
+                          data-testid="input-price-edit"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              )}
+
+              <FormField
+                control={form.control}
+                name="possessionOf"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Possession of</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Who has this item?" {...field} value={field.value || ""} data-testid="input-possession-edit" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="notes"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Notes</FormLabel>
+                    <FormControl>
+                      <Textarea placeholder="Additional information..." {...field} value={field.value || ""} data-testid="textarea-notes-edit" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <DialogFooter>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => {
+                    setShowEditDialog(false);
+                    setEditingItem(null);
+                    form.reset();
+                  }}
+                  data-testid="button-cancel-edit"
+                >
+                  Cancel
+                </Button>
+                <Button type="submit" disabled={updateItemMutation.isPending} data-testid="button-submit-edit">
+                  {updateItemMutation.isPending ? "Updating..." : "Update Item"}
                 </Button>
               </DialogFooter>
             </form>

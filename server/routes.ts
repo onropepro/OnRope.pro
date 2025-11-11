@@ -1,7 +1,7 @@
 import type { Express, Request, Response, NextFunction } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { insertUserSchema, insertProjectSchema, insertDropLogSchema, insertComplaintSchema, insertComplaintNoteSchema, insertJobCommentSchema, insertHarnessInspectionSchema, insertToolboxMeetingSchema, insertPayPeriodConfigSchema, insertQuoteSchema, insertQuoteServiceSchema, insertGearItemSchema, normalizeStrataPlan } from "@shared/schema";
+import { insertUserSchema, insertProjectSchema, insertDropLogSchema, insertComplaintSchema, insertComplaintNoteSchema, insertJobCommentSchema, insertHarnessInspectionSchema, insertToolboxMeetingSchema, insertPayPeriodConfigSchema, insertQuoteSchema, insertQuoteServiceSchema, insertGearItemSchema, normalizeStrataPlan, type InsertGearItem } from "@shared/schema";
 import { z } from "zod";
 import bcrypt from "bcrypt";
 import multer from "multer";
@@ -2082,8 +2082,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/gear-items", requireAuth, async (req: Request, res: Response) => {
     try {
-      console.log("POST /api/gear-items - req.body:", req.body);
-      
       const currentUser = await storage.getUserById(req.session.userId!);
       
       if (!currentUser) {
@@ -2111,27 +2109,56 @@ export async function registerRoutes(app: Express): Promise<Server> {
         quantity: req.body.quantity || 1,
       };
       
-      console.log("Cleaned body:", cleanedBody);
-      
       const itemData = insertGearItemSchema.parse({
         ...cleanedBody,
         companyId,
         employeeId: req.session.userId,
       });
       
-      console.log("Parsed item data:", itemData);
-      
       const item = await storage.createGearItem(itemData);
-      console.log("Created item:", item);
       res.json({ item });
     } catch (error) {
       if (error instanceof z.ZodError) {
-        console.error("Zod validation error:", JSON.stringify(error.errors, null, 2));
         return res.status(400).json({ message: "Validation error", errors: error.errors });
       }
       console.error("Create gear item error:", error);
-      console.error("Error stack:", error instanceof Error ? error.stack : "No stack trace");
-      res.status(500).json({ message: "Internal server error", error: error instanceof Error ? error.message : "Unknown error" });
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.patch("/api/gear-items/:id", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      const companyId = currentUser.role === "company" ? currentUser.id : currentUser.companyId;
+      
+      if (!companyId) {
+        return res.status(400).json({ message: "Unable to determine company" });
+      }
+      
+      // Clean empty strings to null for optional fields
+      const cleanedBody: Partial<InsertGearItem> = {};
+      if (req.body.equipmentType !== undefined) cleanedBody.equipmentType = req.body.equipmentType || null;
+      if (req.body.brand !== undefined) cleanedBody.brand = req.body.brand || null;
+      if (req.body.model !== undefined) cleanedBody.model = req.body.model || null;
+      if (req.body.itemPrice !== undefined) cleanedBody.itemPrice = req.body.itemPrice || null;
+      if (req.body.possessionOf !== undefined) cleanedBody.possessionOf = req.body.possessionOf || null;
+      if (req.body.notes !== undefined) cleanedBody.notes = req.body.notes || null;
+      if (req.body.serialNumber !== undefined) cleanedBody.serialNumber = req.body.serialNumber || null;
+      if (req.body.dateInService !== undefined) cleanedBody.dateInService = req.body.dateInService || null;
+      if (req.body.dateOutOfService !== undefined) cleanedBody.dateOutOfService = req.body.dateOutOfService || null;
+      if (req.body.inService !== undefined) cleanedBody.inService = req.body.inService;
+      if (req.body.quantity !== undefined) cleanedBody.quantity = req.body.quantity;
+      
+      const item = await storage.updateGearItem(req.params.id, cleanedBody);
+      res.json({ item });
+    } catch (error) {
+      console.error("Update gear item error:", error);
+      res.status(500).json({ message: "Internal server error" });
     }
   });
 
