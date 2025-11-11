@@ -238,31 +238,85 @@ export default function Login() {
               Refresh To Get Latest Update
             </Button>
 
-            <Button 
-              variant="secondary" 
-              className="w-full h-10 text-sm" 
-              onClick={async () => {
-                const response = await fetch("/api/login", {
-                  method: "POST",
-                  headers: { "Content-Type": "application/json" },
-                  body: JSON.stringify({ identifier: "testcom", password: "test123" }),
-                  credentials: "include",
-                });
-                if (response.ok) {
-                  const result = await response.json();
-                  const user = result.user;
-                  if (user.role === "resident") {
-                    window.location.href = "/resident";
-                  } else {
-                    window.location.href = "/dashboard";
+            <div className="grid grid-cols-3 gap-2">
+              <Button 
+                variant="secondary" 
+                className="h-10 text-xs" 
+                onClick={async () => {
+                  const response = await fetch("/api/login", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ identifier: "testcom", password: "test123" }),
+                    credentials: "include",
+                  });
+                  if (response.ok) {
+                    const result = await response.json();
+                    const user = result.user;
+                    if (user.role === "resident") {
+                      window.location.href = "/resident";
+                    } else {
+                      window.location.href = "/dashboard";
+                    }
                   }
-                }
-              }}
-              data-testid="button-quick-login"
-            >
-              <span className="material-icons mr-2 text-base">flash_on</span>
-              Quick Login (testcom)
-            </Button>
+                }}
+                data-testid="button-quick-login-testcom"
+              >
+                <span className="material-icons mr-1 text-base">flash_on</span>
+                testcom
+              </Button>
+
+              <Button 
+                variant="secondary" 
+                className="h-10 text-xs" 
+                onClick={async () => {
+                  const response = await fetch("/api/login", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ identifier: "toomy2tommy.com", password: "tommy123" }),
+                    credentials: "include",
+                  });
+                  if (response.ok) {
+                    const result = await response.json();
+                    const user = result.user;
+                    if (user.role === "resident") {
+                      window.location.href = "/resident";
+                    } else {
+                      window.location.href = "/dashboard";
+                    }
+                  }
+                }}
+                data-testid="button-quick-login-tommy"
+              >
+                <span className="material-icons mr-1 text-base">flash_on</span>
+                tommy
+              </Button>
+
+              <Button 
+                variant="secondary" 
+                className="h-10 text-xs" 
+                onClick={async () => {
+                  const response = await fetch("/api/login", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ identifier: "phs", password: "phs2025" }),
+                    credentials: "include",
+                  });
+                  if (response.ok) {
+                    const result = await response.json();
+                    const user = result.user;
+                    if (user.role === "resident") {
+                      window.location.href = "/resident";
+                    } else {
+                      window.location.href = "/dashboard";
+                    }
+                  }
+                }}
+                data-testid="button-quick-login-phs"
+              >
+                <span className="material-icons mr-1 text-base">flash_on</span>
+                phs
+              </Button>
+            </div>
 
             {/* Mobile-only feature highlights */}
             <div className="md:hidden pt-4 space-y-4 border-t">
