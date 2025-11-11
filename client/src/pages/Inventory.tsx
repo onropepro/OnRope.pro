@@ -458,27 +458,34 @@ export default function Inventory() {
                 
                 {/* Current Serial Number Input */}
                 <div className="space-y-2">
-                  <Input
-                    placeholder="Enter serial number"
-                    value={currentSerialNumber}
-                    onChange={(e) => setCurrentSerialNumber(e.target.value)}
-                    data-testid="input-current-serial"
-                  />
+                  <div>
+                    <FormLabel className="text-sm">Serial Number</FormLabel>
+                    <Input
+                      placeholder="Enter serial number"
+                      value={currentSerialNumber}
+                      onChange={(e) => setCurrentSerialNumber(e.target.value)}
+                      data-testid="input-current-serial"
+                      className="mt-1"
+                    />
+                  </div>
                   
                   {/* Assigned To Dropdown */}
-                  <Select value={currentAssignedTo} onValueChange={setCurrentAssignedTo}>
-                    <SelectTrigger data-testid="select-assigned-to">
-                      <SelectValue placeholder="Assigned to" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="Not in use">Not in use</SelectItem>
-                      {employeesData?.employees?.map((emp) => (
-                        <SelectItem key={emp.id} value={emp.fullName}>
-                          {emp.fullName}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  <div>
+                    <FormLabel className="text-sm">Assigned To</FormLabel>
+                    <Select value={currentAssignedTo} onValueChange={setCurrentAssignedTo}>
+                      <SelectTrigger data-testid="select-assigned-to" className="mt-1">
+                        <SelectValue placeholder="Select employee or Not in use" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="Not in use">Not in use</SelectItem>
+                        {employeesData?.employees?.map((emp) => (
+                          <SelectItem key={emp.id} value={emp.fullName}>
+                            {emp.fullName}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
                   
                   <Button
                     type="button"
@@ -665,27 +672,34 @@ export default function Inventory() {
                 
                 {/* Current Serial Number Input */}
                 <div className="space-y-2">
-                  <Input
-                    placeholder="Enter serial number"
-                    value={currentSerialNumber}
-                    onChange={(e) => setCurrentSerialNumber(e.target.value)}
-                    data-testid="input-current-serial-edit"
-                  />
+                  <div>
+                    <FormLabel className="text-sm">Serial Number</FormLabel>
+                    <Input
+                      placeholder="Enter serial number"
+                      value={currentSerialNumber}
+                      onChange={(e) => setCurrentSerialNumber(e.target.value)}
+                      data-testid="input-current-serial-edit"
+                      className="mt-1"
+                    />
+                  </div>
                   
                   {/* Assigned To Dropdown */}
-                  <Select value={currentAssignedTo} onValueChange={setCurrentAssignedTo}>
-                    <SelectTrigger data-testid="select-assigned-to-edit">
-                      <SelectValue placeholder="Assigned to" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="Not in use">Not in use</SelectItem>
-                      {employeesData?.employees?.map((emp) => (
-                        <SelectItem key={emp.id} value={emp.fullName}>
-                          {emp.fullName}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  <div>
+                    <FormLabel className="text-sm">Assigned To</FormLabel>
+                    <Select value={currentAssignedTo} onValueChange={setCurrentAssignedTo}>
+                      <SelectTrigger data-testid="select-assigned-to-edit" className="mt-1">
+                        <SelectValue placeholder="Select employee or Not in use" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="Not in use">Not in use</SelectItem>
+                        {employeesData?.employees?.map((emp) => (
+                          <SelectItem key={emp.id} value={emp.fullName}>
+                            {emp.fullName}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
                   
                   <Button
                     type="button"
