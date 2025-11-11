@@ -1119,7 +1119,7 @@ export default function Dashboard() {
                   onClick={card.onClick}
                   data-testid={card.testId}
                 >
-                  <span className="material-icons text-primary">{card.icon}</span>
+                  <span className="material-icons text-primary text-5xl">{card.icon}</span>
                   <div className="text-center">
                     <div className="font-semibold">{card.label}</div>
                     <div className="text-xs text-muted-foreground">{card.description}</div>
