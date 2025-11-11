@@ -377,6 +377,11 @@ export class Storage {
     return result[0];
   }
 
+  async createWorkSession(session: InsertWorkSession): Promise<WorkSession> {
+    const result = await db.insert(workSessions).values(session).returning();
+    return result[0];
+  }
+
   async getActiveWorkSession(employeeId: string, projectId: string): Promise<WorkSession | undefined> {
     const result = await db.select().from(workSessions)
       .where(
