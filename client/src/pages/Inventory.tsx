@@ -13,25 +13,25 @@ import { useToast } from "@/hooks/use-toast";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { insertGearItemSchema, type InsertGearItem, type GearItem } from "@shared/schema";
-import { ArrowLeft, Plus, Pencil, X, Trash2 } from "lucide-react";
+import { ArrowLeft, Plus, Pencil, X, Trash2, Shield, Cable, Link2, Gauge, TrendingUp, HardHat, Hand, Fuel, Scissors, PaintBucket, Droplets, CircleDot, Lock, Anchor, MoreHorizontal } from "lucide-react";
 import { hasFinancialAccess } from "@/lib/permissions";
 
 const gearTypes = [
-  "Harness",
-  "Rope",
-  "Carabiner",
-  "Descender",
-  "Ascender",
-  "Helmet",
-  "Gloves",
-  "Gas powered equipment",
-  "Squeegee rubbers",
-  "Applicators",
-  "Soap",
-  "Suction cup",
-  "Back up device",
-  "Lanyard",
-  "Other"
+  { name: "Harness", icon: Shield },
+  { name: "Rope", icon: Cable },
+  { name: "Carabiner", icon: Link2 },
+  { name: "Descender", icon: Gauge },
+  { name: "Ascender", icon: TrendingUp },
+  { name: "Helmet", icon: HardHat },
+  { name: "Gloves", icon: Hand },
+  { name: "Gas powered equipment", icon: Fuel },
+  { name: "Squeegee rubbers", icon: Scissors },
+  { name: "Applicators", icon: PaintBucket },
+  { name: "Soap", icon: Droplets },
+  { name: "Suction cup", icon: CircleDot },
+  { name: "Back up device", icon: Lock },
+  { name: "Lanyard", icon: Anchor },
+  { name: "Other", icon: MoreHorizontal }
 ];
 
 export default function Inventory() {
@@ -46,6 +46,7 @@ export default function Inventory() {
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [itemToDelete, setItemToDelete] = useState<GearItem | null>(null);
   const [customType, setCustomType] = useState("");
+  const [addItemStep, setAddItemStep] = useState(1);
 
   // Fetch current user
   const { data: userData } = useQuery({
@@ -254,6 +255,7 @@ export default function Inventory() {
     setCurrentSerialNumber("");
     setCurrentAssignedTo("Not in use");
     setCustomType("");
+    setAddItemStep(1);
     setShowAddDialog(true);
   };
 
@@ -276,7 +278,8 @@ export default function Inventory() {
     setCurrentSerialNumber("");
     setCurrentAssignedTo("Not in use");
     // Check if type is a custom type (not in predefined list)
-    if (item.equipmentType && !gearTypes.includes(item.equipmentType)) {
+    const gearTypeNames = gearTypes.map(t => t.name);
+    if (item.equipmentType && !gearTypeNames.includes(item.equipmentType)) {
       setCustomType(item.equipmentType);
       form.setValue("equipmentType", "Other");
     } else {
@@ -424,59 +427,107 @@ export default function Inventory() {
 
       {/* Add Item Dialog */}
       <Dialog open={showAddDialog} onOpenChange={setShowAddDialog}>
-        <DialogContent data-testid="dialog-add-item">
+        <DialogContent data-testid="dialog-add-item" className="max-w-2xl">
           <DialogHeader>
-            <DialogTitle>Add Item to Inventory</DialogTitle>
-            <DialogDescription>All fields are optional. Fill in what you know.</DialogDescription>
+            <DialogTitle>{addItemStep === 1 ? "Select Item Type" : "Add Item Details"}</DialogTitle>
+            <DialogDescription>
+              {addItemStep === 1 ? "Choose the type of gear you're adding" : "Fill in the item information"}
+            </DialogDescription>
           </DialogHeader>
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(handleAddItem)} className="space-y-4 max-h-[70vh] overflow-y-auto px-1">
-              <FormField
-                control={form.control}
-                name="equipmentType"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Type</FormLabel>
-                    <div className="grid grid-cols-3 gap-2 mt-2">
-                      {gearTypes.map((type) => (
-                        <Card
-                          key={type}
-                          className={`cursor-pointer hover-elevate active-elevate-2 transition-colors ${
-                            field.value === type ? "bg-primary/10 border-primary" : ""
-                          }`}
-                          onClick={() => {
-                            field.onChange(type);
-                            if (type !== "Other") {
-                              setCustomType("");
-                            }
-                          }}
-                          data-testid={`card-type-${type.toLowerCase().replace(/\s+/g, "-")}`}
-                        >
-                          <CardContent className="p-3">
-                            <div className="text-xs text-center font-medium leading-tight">{type}</div>
-                          </CardContent>
-                        </Card>
-                      ))}
-                    </div>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              {form.watch("equipmentType") === "Other" && (
-                <div className="space-y-2">
-                  <FormLabel>Custom Type Name</FormLabel>
-                  <Input
-                    placeholder="Enter custom gear type"
-                    value={customType}
-                    onChange={(e) => {
-                      setCustomType(e.target.value);
-                      form.setValue("equipmentType", e.target.value);
-                    }}
-                    data-testid="input-custom-type"
+            <form onSubmit={form.handleSubmit(handleAddItem)} className="space-y-4">
+              
+              {addItemStep === 1 && (
+                <>
+                  <FormField
+                    control={form.control}
+                    name="equipmentType"
+                    render={({ field }) => (
+                      <FormItem>
+                        <div className="grid grid-cols-3 gap-3 max-h-[60vh] overflow-y-auto p-1">
+                          {gearTypes.map((type) => {
+                            const IconComponent = type.icon;
+                            return (
+                              <Card
+                                key={type.name}
+                                className={`cursor-pointer hover-elevate active-elevate-2 transition-all ${
+                                  field.value === type.name ? "bg-primary/10 border-primary border-2" : ""
+                                }`}
+                                onClick={() => {
+                                  field.onChange(type.name);
+                                  if (type.name !== "Other") {
+                                    setCustomType("");
+                                  }
+                                }}
+                                data-testid={`card-type-${type.name.toLowerCase().replace(/\s+/g, "-")}`}
+                              >
+                                <CardContent className="p-4 flex flex-col items-center gap-2">
+                                  <div className={`h-10 w-10 rounded-lg flex items-center justify-center ${
+                                    field.value === type.name ? "bg-primary text-primary-foreground" : "bg-muted"
+                                  }`}>
+                                    <IconComponent className="h-5 w-5" />
+                                  </div>
+                                  <div className="text-xs text-center font-medium leading-tight">{type.name}</div>
+                                </CardContent>
+                              </Card>
+                            );
+                          })}
+                        </div>
+                        <FormMessage />
+                      </FormItem>
+                    )}
                   />
-                </div>
+
+                  {form.watch("equipmentType") === "Other" && (
+                    <div className="space-y-2">
+                      <FormLabel>Custom Type Name</FormLabel>
+                      <Input
+                        placeholder="Enter custom gear type"
+                        value={customType}
+                        onChange={(e) => {
+                          setCustomType(e.target.value);
+                          form.setValue("equipmentType", e.target.value);
+                        }}
+                        data-testid="input-custom-type"
+                      />
+                    </div>
+                  )}
+
+                  <div className="flex gap-2 pt-4">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => setShowAddDialog(false)}
+                      className="flex-1"
+                      data-testid="button-cancel-step1"
+                    >
+                      Cancel
+                    </Button>
+                    <Button
+                      type="button"
+                      onClick={() => {
+                        if (!form.getValues("equipmentType")) {
+                          toast({
+                            title: "Type Required",
+                            description: "Please select a gear type to continue.",
+                            variant: "destructive",
+                          });
+                          return;
+                        }
+                        setAddItemStep(2);
+                      }}
+                      className="flex-1"
+                      data-testid="button-continue-step1"
+                    >
+                      Continue
+                    </Button>
+                  </div>
+                </>
               )}
+
+              {addItemStep === 2 && (
+                <>
+                  <div className="max-h-[60vh] overflow-y-auto px-1 space-y-4">
 
               <FormField
                 control={form.control}
@@ -638,20 +689,23 @@ export default function Inventory() {
                   )}
                 />
               )}
+                  </div>
 
-              <DialogFooter>
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => setShowAddDialog(false)}
-                  data-testid="button-cancel"
-                >
-                  Cancel
-                </Button>
-                <Button type="submit" disabled={addItemMutation.isPending} data-testid="button-submit">
-                  {addItemMutation.isPending ? "Adding..." : "Add Item"}
-                </Button>
-              </DialogFooter>
+                  <div className="flex gap-2 pt-4">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => setAddItemStep(1)}
+                      data-testid="button-back-step2"
+                    >
+                      Back
+                    </Button>
+                    <Button type="submit" disabled={addItemMutation.isPending} data-testid="button-submit" className="flex-1">
+                      {addItemMutation.isPending ? "Adding..." : "Add Item"}
+                    </Button>
+                  </div>
+                </>
+              )}
             </form>
           </Form>
         </DialogContent>
@@ -672,26 +726,34 @@ export default function Inventory() {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Type</FormLabel>
-                    <div className="grid grid-cols-3 gap-2 mt-2">
-                      {gearTypes.map((type) => (
-                        <Card
-                          key={type}
-                          className={`cursor-pointer hover-elevate active-elevate-2 transition-colors ${
-                            field.value === type ? "bg-primary/10 border-primary" : ""
-                          }`}
-                          onClick={() => {
-                            field.onChange(type);
-                            if (type !== "Other") {
-                              setCustomType("");
-                            }
-                          }}
-                          data-testid={`card-type-edit-${type.toLowerCase().replace(/\s+/g, "-")}`}
-                        >
-                          <CardContent className="p-3">
-                            <div className="text-xs text-center font-medium leading-tight">{type}</div>
-                          </CardContent>
-                        </Card>
-                      ))}
+                    <div className="grid grid-cols-3 gap-3 mt-2">
+                      {gearTypes.map((type) => {
+                        const IconComponent = type.icon;
+                        return (
+                          <Card
+                            key={type.name}
+                            className={`cursor-pointer hover-elevate active-elevate-2 transition-all ${
+                              field.value === type.name ? "bg-primary/10 border-primary border-2" : ""
+                            }`}
+                            onClick={() => {
+                              field.onChange(type.name);
+                              if (type.name !== "Other") {
+                                setCustomType("");
+                              }
+                            }}
+                            data-testid={`card-type-edit-${type.name.toLowerCase().replace(/\s+/g, "-")}`}
+                          >
+                            <CardContent className="p-4 flex flex-col items-center gap-2">
+                              <div className={`h-10 w-10 rounded-lg flex items-center justify-center ${
+                                field.value === type.name ? "bg-primary text-primary-foreground" : "bg-muted"
+                              }`}>
+                                <IconComponent className="h-5 w-5" />
+                              </div>
+                              <div className="text-xs text-center font-medium leading-tight">{type.name}</div>
+                            </CardContent>
+                          </Card>
+                        );
+                      })}
                     </div>
                     <FormMessage />
                   </FormItem>
