@@ -309,6 +309,14 @@ export default function Inventory() {
     return sum + (price * qty);
   }, 0);
 
+  // Calculate total value of ALL inventory items
+  const totalAllItems = allGearItems.reduce((sum: number, item: any) => sum + (item.quantity || 0), 0);
+  const totalAllValue = allGearItems.reduce((sum: number, item: any) => {
+    const price = parseFloat(item.itemPrice || "0");
+    const qty = item.quantity || 0;
+    return sum + (price * qty);
+  }, 0);
+
   const EQUIPMENT_ICONS: Record<string, string> = {
     Harness: "security",
     Rope: "architecture",
@@ -484,6 +492,40 @@ export default function Inventory() {
 
           {/* Manage Gear Tab */}
           <TabsContent value="manage" className="space-y-4">
+            {/* Total Inventory Value Card - Only visible to users with financial permissions */}
+            {canViewFinancials && (
+              <div className="grid grid-cols-2 gap-4">
+                <Card>
+                  <CardHeader className="pb-3">
+                    <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
+                      <span className="material-icons text-lg">inventory_2</span>
+                      Total Items
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-3xl font-bold">{totalAllItems}</div>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      Items in inventory
+                    </p>
+                  </CardContent>
+                </Card>
+                <Card>
+                  <CardHeader className="pb-3">
+                    <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
+                      <span className="material-icons text-lg">attach_money</span>
+                      Total Value
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-3xl font-bold">${totalAllValue.toFixed(2)}</div>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      All inventory value
+                    </p>
+                  </CardContent>
+                </Card>
+              </div>
+            )}
+
             {/* Add Item Card */}
             <Card className="hover-elevate active-elevate-2 cursor-pointer" onClick={openAddDialog} data-testid="card-add-item">
               <CardHeader>
