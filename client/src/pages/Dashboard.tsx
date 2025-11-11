@@ -1114,7 +1114,7 @@ export default function Dashboard() {
                 <Button
                   key={card.id}
                   variant="outline"
-                  className={`h-auto flex-col gap-2 p-4 border-l-4 ${card.borderColor}`}
+                  className={`h-auto flex-col gap-2 p-4 border-l-[6px] ${card.borderColor}`}
                   onClick={card.onClick}
                   data-testid={card.testId}
                 >
