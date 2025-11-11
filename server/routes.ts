@@ -2102,7 +2102,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         itemPrice: req.body.itemPrice || null,
         possessionOf: req.body.possessionOf || null,
         notes: req.body.notes || null,
-        serialNumber: req.body.serialNumber || null,
+        quantity: req.body.quantity || 1,
+        serialNumbers: req.body.serialNumbers || null,
         dateInService: req.body.dateInService || null,
         dateOutOfService: req.body.dateOutOfService || null,
         inService: req.body.inService !== undefined ? req.body.inService : true,
@@ -2139,6 +2140,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Unable to determine company" });
       }
       
+      // Handle adding a serial number to the array
+      if (req.body.serialNumber && typeof req.body.serialNumber === 'string') {
+        const currentItem = await storage.getGearItemById(req.params.id);
+        if (currentItem) {
+          const existingSerials = currentItem.serialNumbers || [];
+          const updatedSerials = [...existingSerials, req.body.serialNumber];
+          const item = await storage.updateGearItem(req.params.id, { serialNumbers: updatedSerials });
+          return res.json({ item });
+        }
+      }
+      
       // Clean empty strings to null for optional fields
       const cleanedBody: Partial<InsertGearItem> = {};
       if (req.body.equipmentType !== undefined) cleanedBody.equipmentType = req.body.equipmentType || null;
@@ -2147,7 +2159,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (req.body.itemPrice !== undefined) cleanedBody.itemPrice = req.body.itemPrice || null;
       if (req.body.possessionOf !== undefined) cleanedBody.possessionOf = req.body.possessionOf || null;
       if (req.body.notes !== undefined) cleanedBody.notes = req.body.notes || null;
-      if (req.body.serialNumber !== undefined) cleanedBody.serialNumber = req.body.serialNumber || null;
+      if (req.body.quantity !== undefined) cleanedBody.quantity = req.body.quantity;
+      if (req.body.serialNumbers !== undefined) cleanedBody.serialNumbers = req.body.serialNumbers || null;
       if (req.body.dateInService !== undefined) cleanedBody.dateInService = req.body.dateInService || null;
       if (req.body.dateOutOfService !== undefined) cleanedBody.dateOutOfService = req.body.dateOutOfService || null;
       if (req.body.inService !== undefined) cleanedBody.inService = req.body.inService;

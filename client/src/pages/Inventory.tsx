@@ -13,7 +13,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { insertGearItemSchema, type InsertGearItem, type GearItem } from "@shared/schema";
-import { ArrowLeft, Plus, Pencil } from "lucide-react";
+import { ArrowLeft, Plus, Pencil, Hash } from "lucide-react";
 import { hasFinancialAccess } from "@/lib/permissions";
 
 const gearTypes = [
@@ -32,7 +32,9 @@ export default function Inventory() {
   const [, setLocation] = useLocation();
   const [showAddDialog, setShowAddDialog] = useState(false);
   const [showEditDialog, setShowEditDialog] = useState(false);
+  const [showAddSerialDialog, setShowAddSerialDialog] = useState(false);
   const [editingItem, setEditingItem] = useState<GearItem | null>(null);
+  const [serialNumberInput, setSerialNumberInput] = useState("");
 
   // Fetch current user
   const { data: userData } = useQuery({
@@ -55,7 +57,8 @@ export default function Inventory() {
       itemPrice: undefined,
       possessionOf: undefined,
       notes: undefined,
-      serialNumber: undefined,
+      quantity: 1,
+      serialNumbers: undefined,
       dateInService: undefined,
       dateOutOfService: undefined,
       inService: true,
@@ -126,12 +129,45 @@ export default function Inventory() {
       itemPrice: item.itemPrice || undefined,
       possessionOf: item.possessionOf || undefined,
       notes: item.notes || undefined,
-      serialNumber: item.serialNumber || undefined,
+      quantity: item.quantity || 1,
+      serialNumbers: item.serialNumbers || undefined,
       dateInService: item.dateInService || undefined,
       dateOutOfService: item.dateOutOfService || undefined,
       inService: item.inService,
     });
     setShowEditDialog(true);
+  };
+
+  const addSerialNumberMutation = useMutation({
+    mutationFn: async ({ id, serialNumber }: { id: string; serialNumber: string }) => {
+      return apiRequest("PATCH", `/api/gear-items/${id}`, { serialNumber });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/gear-items"] });
+      toast({
+        title: "Serial Number Added",
+        description: "The serial number has been added to this item.",
+      });
+      setShowAddSerialDialog(false);
+      setSerialNumberInput("");
+      setEditingItem(null);
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to add serial number",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const handleAddSerial = () => {
+    if (editingItem && serialNumberInput.trim()) {
+      addSerialNumberMutation.mutate({
+        id: editingItem.id,
+        serialNumber: serialNumberInput.trim(),
+      });
+    }
   };
 
   return (
@@ -162,8 +198,8 @@ export default function Inventory() {
                 <Plus className="h-6 w-6 text-primary" />
               </div>
               <div>
-                <CardTitle>Add Serial Number</CardTitle>
-                <CardDescription>Add a new item with its serial number</CardDescription>
+                <CardTitle>Add Inventory Item</CardTitle>
+                <CardDescription>Add new gear to the inventory system</CardDescription>
               </div>
             </div>
           </CardHeader>
@@ -197,8 +233,13 @@ export default function Inventory() {
                             {item.model && (
                               <div className="text-sm text-muted-foreground">Model: {item.model}</div>
                             )}
-                            {item.serialNumber && (
-                              <div className="text-sm text-muted-foreground">S/N: {item.serialNumber}</div>
+                            <div className="text-sm font-medium text-foreground mt-1">
+                              Quantity: {item.quantity || 1}
+                            </div>
+                            {item.serialNumbers && item.serialNumbers.length > 0 && (
+                              <div className="text-sm text-muted-foreground">
+                                Serial #s: {item.serialNumbers.length} assigned
+                              </div>
                             )}
                             {item.possessionOf && (
                               <div className="text-sm text-muted-foreground">
@@ -219,14 +260,28 @@ export default function Inventory() {
                             )}
                           </div>
                         </div>
-                        <Button
-                          size="icon"
-                          variant="ghost"
-                          onClick={() => openEditDialog(item)}
-                          data-testid={`button-edit-${item.id}`}
-                        >
-                          <Pencil className="h-4 w-4" />
-                        </Button>
+                        <div className="flex flex-col gap-2">
+                          <Button
+                            size="icon"
+                            variant="ghost"
+                            onClick={() => openEditDialog(item)}
+                            data-testid={`button-edit-${item.id}`}
+                          >
+                            <Pencil className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            size="icon"
+                            variant="outline"
+                            onClick={() => {
+                              setEditingItem(item);
+                              setShowAddSerialDialog(true);
+                            }}
+                            data-testid={`button-add-serial-${item.id}`}
+                            title="Add Serial Number"
+                          >
+                            <Hash className="h-4 w-4" />
+                          </Button>
+                        </div>
                       </div>
                     </CardContent>
                   </Card>
@@ -301,12 +356,20 @@ export default function Inventory() {
 
               <FormField
                 control={form.control}
-                name="serialNumber"
+                name="quantity"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Serial Number</FormLabel>
+                    <FormLabel>Quantity</FormLabel>
                     <FormControl>
-                      <Input placeholder="e.g., SN12345ABC" {...field} value={field.value || ""} data-testid="input-serial-number" />
+                      <Input
+                        type="number"
+                        min="1"
+                        placeholder="1"
+                        {...field}
+                        value={field.value || 1}
+                        onChange={(e) => field.onChange(parseInt(e.target.value) || 1)}
+                        data-testid="input-quantity"
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -446,12 +509,20 @@ export default function Inventory() {
 
               <FormField
                 control={form.control}
-                name="serialNumber"
+                name="quantity"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Serial Number</FormLabel>
+                    <FormLabel>Quantity</FormLabel>
                     <FormControl>
-                      <Input placeholder="e.g., SN12345ABC" {...field} value={field.value || ""} data-testid="input-serial-number-edit" />
+                      <Input
+                        type="number"
+                        min="1"
+                        placeholder="1"
+                        {...field}
+                        value={field.value || 1}
+                        onChange={(e) => field.onChange(parseInt(e.target.value) || 1)}
+                        data-testid="input-quantity-edit"
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -528,6 +599,50 @@ export default function Inventory() {
               </DialogFooter>
             </form>
           </Form>
+        </DialogContent>
+      </Dialog>
+
+      {/* Add Serial Number Dialog */}
+      <Dialog open={showAddSerialDialog} onOpenChange={setShowAddSerialDialog}>
+        <DialogContent data-testid="dialog-add-serial">
+          <DialogHeader>
+            <DialogTitle>Add Serial Number</DialogTitle>
+            <DialogDescription>
+              Add a serial number to one item from this batch ({editingItem?.equipmentType || "item"})
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Serial Number</label>
+              <Input
+                placeholder="e.g., SN12345ABC"
+                value={serialNumberInput}
+                onChange={(e) => setSerialNumberInput(e.target.value)}
+                data-testid="input-add-serial"
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => {
+                setShowAddSerialDialog(false);
+                setSerialNumberInput("");
+                setEditingItem(null);
+              }}
+              data-testid="button-cancel-serial"
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={handleAddSerial}
+              disabled={!serialNumberInput.trim() || addSerialNumberMutation.isPending}
+              data-testid="button-submit-serial"
+            >
+              {addSerialNumberMutation.isPending ? "Adding..." : "Add Serial Number"}
+            </Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
     </div>
