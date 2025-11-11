@@ -55,11 +55,10 @@ export default function Inventory() {
       itemPrice: undefined,
       possessionOf: undefined,
       notes: undefined,
-      serialNumbers: undefined,
+      serialNumber: undefined,
       dateInService: undefined,
       dateOutOfService: undefined,
       inService: true,
-      quantity: 1,
     },
   });
 
@@ -127,11 +126,10 @@ export default function Inventory() {
       itemPrice: item.itemPrice || undefined,
       possessionOf: item.possessionOf || undefined,
       notes: item.notes || undefined,
-      serialNumbers: item.serialNumbers || undefined,
+      serialNumber: item.serialNumber || undefined,
       dateInService: item.dateInService || undefined,
       dateOutOfService: item.dateOutOfService || undefined,
       inService: item.inService,
-      quantity: item.quantity || 1,
     });
     setShowEditDialog(true);
   };
@@ -164,8 +162,8 @@ export default function Inventory() {
                 <Plus className="h-6 w-6 text-primary" />
               </div>
               <div>
-                <CardTitle>Add Item to Inventory</CardTitle>
-                <CardDescription>Add new gear to the inventory system</CardDescription>
+                <CardTitle>Add Serial Number</CardTitle>
+                <CardDescription>Add a new item with its serial number</CardDescription>
               </div>
             </div>
           </CardHeader>
@@ -199,19 +197,14 @@ export default function Inventory() {
                             {item.model && (
                               <div className="text-sm text-muted-foreground">Model: {item.model}</div>
                             )}
-                            {item.serialNumbers && item.serialNumbers.length > 0 && (
-                              <div className="text-sm text-muted-foreground">
-                                S/N: {item.serialNumbers.length === 1 ? item.serialNumbers[0] : `${item.serialNumbers.length} serial numbers`}
-                              </div>
+                            {item.serialNumber && (
+                              <div className="text-sm text-muted-foreground">S/N: {item.serialNumber}</div>
                             )}
                             {item.possessionOf && (
                               <div className="text-sm text-muted-foreground">
                                 Possession of: {item.possessionOf}
                               </div>
                             )}
-                            <div className="text-sm font-medium text-foreground">
-                              In Stock: {item.quantity || 1}
-                            </div>
                           </div>
                           <div>
                             {canViewFinancials && item.itemPrice && (
@@ -308,22 +301,12 @@ export default function Inventory() {
 
               <FormField
                 control={form.control}
-                name="serialNumbers"
+                name="serialNumber"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Serial Numbers (one per line)</FormLabel>
+                    <FormLabel>Serial Number</FormLabel>
                     <FormControl>
-                      <Textarea 
-                        placeholder="Enter serial numbers, one per line&#10;e.g.,&#10;SN001&#10;SN002&#10;SN003" 
-                        {...field} 
-                        value={Array.isArray(field.value) ? field.value.join('\n') : (field.value || "")}
-                        onChange={(e) => {
-                          const lines = e.target.value.split('\n').filter(line => line.trim());
-                          field.onChange(lines.length > 0 ? lines : undefined);
-                        }}
-                        data-testid="textarea-serial-numbers" 
-                        rows={4}
-                      />
+                      <Input placeholder="e.g., SN12345ABC" {...field} value={field.value || ""} data-testid="input-serial-number" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -338,28 +321,6 @@ export default function Inventory() {
                     <FormLabel>Possession of</FormLabel>
                     <FormControl>
                       <Input placeholder="Who has this item?" {...field} value={field.value || ""} data-testid="input-possession" />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="quantity"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Quantity in Stock</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="number"
-                        min="1"
-                        placeholder="1"
-                        {...field}
-                        value={field.value || 1}
-                        onChange={(e) => field.onChange(parseInt(e.target.value) || 1)}
-                        data-testid="input-quantity"
-                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -485,22 +446,12 @@ export default function Inventory() {
 
               <FormField
                 control={form.control}
-                name="serialNumbers"
+                name="serialNumber"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Serial Numbers (one per line)</FormLabel>
+                    <FormLabel>Serial Number</FormLabel>
                     <FormControl>
-                      <Textarea 
-                        placeholder="Enter serial numbers, one per line&#10;e.g.,&#10;SN001&#10;SN002&#10;SN003" 
-                        {...field} 
-                        value={Array.isArray(field.value) ? field.value.join('\n') : (field.value || "")}
-                        onChange={(e) => {
-                          const lines = e.target.value.split('\n').filter(line => line.trim());
-                          field.onChange(lines.length > 0 ? lines : undefined);
-                        }}
-                        data-testid="textarea-serial-numbers-edit" 
-                        rows={4}
-                      />
+                      <Input placeholder="e.g., SN12345ABC" {...field} value={field.value || ""} data-testid="input-serial-number-edit" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -515,28 +466,6 @@ export default function Inventory() {
                     <FormLabel>Possession of</FormLabel>
                     <FormControl>
                       <Input placeholder="Who has this item?" {...field} value={field.value || ""} data-testid="input-possession-edit" />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="quantity"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Quantity in Stock</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="number"
-                        min="1"
-                        placeholder="1"
-                        {...field}
-                        value={field.value || 1}
-                        onChange={(e) => field.onChange(parseInt(e.target.value) || 1)}
-                        data-testid="input-quantity-edit"
-                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
