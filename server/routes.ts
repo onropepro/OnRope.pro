@@ -235,6 +235,90 @@ export async function registerRoutes(app: Express): Promise<Server> {
     });
   });
   
+  // Manual license verification endpoint
+  app.post("/api/verify-license", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const { licenseKey, bypass } = req.body;
+      
+      // BYPASS MODE (for development/testing)
+      if (bypass === true) {
+        console.log('[License Verification] BYPASS activated - setting license as verified without API call');
+        await storage.updateUser(req.session.userId!, { 
+          licenseKey: 'BYPASSED',
+          licenseVerified: true 
+        });
+        return res.json({
+          success: true,
+          message: "License verification bypassed (development mode)"
+        });
+      }
+      
+      if (!licenseKey) {
+        return res.status(400).json({ 
+          success: false, 
+          message: "License key is required" 
+        });
+      }
+      
+      // Overhaul Labs marketplace API URL
+      const externalApiUrl = 'https://OverhaulLabs.replit.app/api/verify-license';
+      
+      console.log('[License Verification] Calling external API:', externalApiUrl);
+      console.log('[License Verification] Request payload:', { licenseKey: licenseKey.substring(0, 5) + '...' });
+      
+      // Call Overhaul Labs marketplace API to verify license
+      const verificationResponse = await fetch(externalApiUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ licenseKey })
+      });
+      
+      const responseText = await verificationResponse.text();
+      console.log('[License Verification] Response status:', verificationResponse.status);
+      console.log('[License Verification] Response body (raw):', responseText);
+      
+      let verificationResult;
+      try {
+        verificationResult = JSON.parse(responseText);
+      } catch (parseError) {
+        console.error('[License Verification] Failed to parse response as JSON:', parseError);
+        return res.status(502).json({
+          success: false,
+          message: "License verification service is temporarily unavailable"
+        });
+      }
+      
+      console.log('[License Verification] Parsed result:', verificationResult);
+      
+      if (verificationResponse.ok && verificationResult.valid === true) {
+        // License is valid - save to database
+        await storage.updateUser(req.session.userId!, { 
+          licenseKey,
+          licenseVerified: true 
+        });
+        
+        return res.json({
+          success: true,
+          message: verificationResult.message || "License verified successfully"
+        });
+      } else {
+        // License is invalid
+        return res.status(400).json({
+          success: false,
+          message: verificationResult.message || "Invalid license key"
+        });
+      }
+    } catch (error: any) {
+      console.error('[License Verification] Error:', error);
+      return res.status(500).json({
+        success: false,
+        message: "An error occurred during verification"
+      });
+    }
+  });
+  
   // Get current user
   app.get("/api/user", requireAuth, async (req: Request, res: Response) => {
     try {
