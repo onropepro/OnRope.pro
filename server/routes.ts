@@ -2082,6 +2082,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/gear-items", requireAuth, async (req: Request, res: Response) => {
     try {
+      console.log("POST /api/gear-items - req.body:", req.body);
+      
       const currentUser = await storage.getUserById(req.session.userId!);
       
       if (!currentUser) {
@@ -2094,19 +2096,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Unable to determine company" });
       }
       
-      // Clean empty strings to undefined for optional fields
+      // Clean empty strings to undefined/null for optional fields
       const cleanedBody = {
-        ...req.body,
-        equipmentType: req.body.equipmentType || undefined,
-        brand: req.body.brand || undefined,
-        model: req.body.model || undefined,
-        itemPrice: req.body.itemPrice || undefined,
-        possessionOf: req.body.possessionOf || undefined,
-        notes: req.body.notes || undefined,
-        serialNumber: req.body.serialNumber || undefined,
-        dateInService: req.body.dateInService || undefined,
-        dateOutOfService: req.body.dateOutOfService || undefined,
+        equipmentType: req.body.equipmentType || null,
+        brand: req.body.brand || null,
+        model: req.body.model || null,
+        itemPrice: req.body.itemPrice || null,
+        possessionOf: req.body.possessionOf || null,
+        notes: req.body.notes || null,
+        serialNumber: req.body.serialNumber || null,
+        dateInService: req.body.dateInService || null,
+        dateOutOfService: req.body.dateOutOfService || null,
+        inService: req.body.inService !== undefined ? req.body.inService : true,
+        quantity: req.body.quantity || 1,
       };
+      
+      console.log("Cleaned body:", cleanedBody);
       
       const itemData = insertGearItemSchema.parse({
         ...cleanedBody,
@@ -2114,14 +2119,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
         employeeId: req.session.userId,
       });
       
+      console.log("Parsed item data:", itemData);
+      
       const item = await storage.createGearItem(itemData);
+      console.log("Created item:", item);
       res.json({ item });
     } catch (error) {
       if (error instanceof z.ZodError) {
+        console.error("Zod validation error:", JSON.stringify(error.errors, null, 2));
         return res.status(400).json({ message: "Validation error", errors: error.errors });
       }
       console.error("Create gear item error:", error);
-      res.status(500).json({ message: "Internal server error" });
+      console.error("Error stack:", error instanceof Error ? error.stack : "No stack trace");
+      res.status(500).json({ message: "Internal server error", error: error instanceof Error ? error.message : "Unknown error" });
     }
   });
 
