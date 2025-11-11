@@ -31,6 +31,8 @@ export default function Payroll() {
   const [monthlyEndDay, setMonthlyEndDay] = useState<string>("31");
   const [customStartDate, setCustomStartDate] = useState<string>("");
   const [customEndDate, setCustomEndDate] = useState<string>("");
+  const [overtimeMultiplier, setOvertimeMultiplier] = useState<string>("1.5");
+  const [doubleTimeMultiplier, setDoubleTimeMultiplier] = useState<string>("2.0");
 
   // Fetch current user to check permissions
   const { data: userData, isLoading: userLoading } = useQuery({
@@ -179,6 +181,8 @@ export default function Payroll() {
       if (configData.config.monthlyEndDay) setMonthlyEndDay(String(configData.config.monthlyEndDay));
       if (configData.config.customStartDate) setCustomStartDate(configData.config.customStartDate);
       if (configData.config.customEndDate) setCustomEndDate(configData.config.customEndDate);
+      if (configData.config.overtimeMultiplier) setOvertimeMultiplier(String(configData.config.overtimeMultiplier));
+      if (configData.config.doubleTimeMultiplier) setDoubleTimeMultiplier(String(configData.config.doubleTimeMultiplier));
     }
   }, [configData]);
 
@@ -213,6 +217,8 @@ export default function Payroll() {
   const handleSaveConfiguration = () => {
     const config: any = {
       periodType,
+      overtimeMultiplier: parseFloat(overtimeMultiplier),
+      doubleTimeMultiplier: parseFloat(doubleTimeMultiplier),
     };
 
     if (periodType === 'semi-monthly') {
@@ -665,6 +671,48 @@ export default function Payroll() {
                   </div>
                 </div>
               )}
+
+              {/* Overtime and Double Time Pay Settings */}
+              <div className="border-t pt-4 mt-4">
+                <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+                  <Clock className="w-5 h-5" />
+                  Overtime & Double Time Pay
+                </h3>
+                <div className="grid gap-4 md:grid-cols-2">
+                  <div className="space-y-2">
+                    <Label htmlFor="overtime-multiplier">Overtime Pay Multiplier</Label>
+                    <Input
+                      id="overtime-multiplier"
+                      type="number"
+                      min="0"
+                      max="10"
+                      step="0.1"
+                      value={overtimeMultiplier}
+                      onChange={(e) => setOvertimeMultiplier(e.target.value)}
+                      data-testid="input-overtime-multiplier"
+                    />
+                    <p className="text-sm text-muted-foreground">
+                      e.g., 1.5 for time-and-a-half
+                    </p>
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="double-time-multiplier">Double Time Pay Multiplier</Label>
+                    <Input
+                      id="double-time-multiplier"
+                      type="number"
+                      min="0"
+                      max="10"
+                      step="0.1"
+                      value={doubleTimeMultiplier}
+                      onChange={(e) => setDoubleTimeMultiplier(e.target.value)}
+                      data-testid="input-double-time-multiplier"
+                    />
+                    <p className="text-sm text-muted-foreground">
+                      e.g., 2.0 for double time
+                    </p>
+                  </div>
+                </div>
+              </div>
 
               <Button
                 onClick={handleSaveConfiguration}

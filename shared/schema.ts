@@ -397,6 +397,10 @@ export const payPeriodConfig = pgTable("pay_period_config", {
   customStartDate: date("custom_start_date"), // Custom range start date
   customEndDate: date("custom_end_date"), // Custom range end date
   
+  // Overtime and double time pay multipliers
+  overtimeMultiplier: numeric("overtime_multiplier", { precision: 4, scale: 2 }).default('1.5'), // e.g., 1.5 for time-and-a-half
+  doubleTimeMultiplier: numeric("double_time_multiplier", { precision: 4, scale: 2 }).default('2.0'), // e.g., 2.0 for double time
+  
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 }, (table) => [
