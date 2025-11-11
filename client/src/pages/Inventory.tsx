@@ -54,7 +54,7 @@ export default function Inventory() {
       brand: undefined,
       model: undefined,
       itemPrice: undefined,
-      possessionOf: undefined,
+      assignedTo: "Not in use",
       notes: undefined,
       quantity: 1,
       serialNumbers: undefined,
@@ -115,6 +115,7 @@ export default function Inventory() {
     const filteredSerials = serialNumbers.filter(sn => sn.trim() !== "");
     const finalData = {
       ...data,
+      assignedTo: data.assignedTo?.trim() || "Not in use",
       serialNumbers: filteredSerials.length > 0 ? filteredSerials : undefined,
     };
     addItemMutation.mutate(finalData);
@@ -125,6 +126,7 @@ export default function Inventory() {
       const filteredSerials = serialNumbers.filter(sn => sn.trim() !== "");
       const finalData = {
         ...data,
+        assignedTo: data.assignedTo?.trim() || "Not in use",
         serialNumbers: filteredSerials.length > 0 ? filteredSerials : undefined,
       };
       updateItemMutation.mutate({ id: editingItem.id, data: finalData });
@@ -174,7 +176,7 @@ export default function Inventory() {
       brand: item.brand || undefined,
       model: item.model || undefined,
       itemPrice: item.itemPrice || undefined,
-      possessionOf: item.possessionOf || undefined,
+      assignedTo: item.assignedTo || "Not in use",
       notes: item.notes || undefined,
       quantity: item.quantity || 1,
       serialNumbers: item.serialNumbers || undefined,
@@ -260,11 +262,9 @@ export default function Inventory() {
                                 ))}
                               </div>
                             )}
-                            {item.possessionOf && (
-                              <div className="text-sm text-muted-foreground">
-                                Possession of: {item.possessionOf}
-                              </div>
-                            )}
+                            <div className="text-sm text-muted-foreground">
+                              Assigned to: {item.assignedTo || "Not in use"}
+                            </div>
                           </div>
                           <div>
                             {canViewFinancials && item.itemPrice && (
@@ -427,12 +427,12 @@ export default function Inventory() {
 
               <FormField
                 control={form.control}
-                name="possessionOf"
+                name="assignedTo"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Possession of</FormLabel>
+                    <FormLabel>Assigned To</FormLabel>
                     <FormControl>
-                      <Input placeholder="Who has this item?" {...field} value={field.value || ""} data-testid="input-possession" />
+                      <Input placeholder="Enter name or leave blank for 'Not in use'" {...field} value={field.value || ""} data-testid="input-assigned-to" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -624,12 +624,12 @@ export default function Inventory() {
 
               <FormField
                 control={form.control}
-                name="possessionOf"
+                name="assignedTo"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Possession of</FormLabel>
+                    <FormLabel>Assigned To</FormLabel>
                     <FormControl>
-                      <Input placeholder="Who has this item?" {...field} value={field.value || ""} data-testid="input-possession-edit" />
+                      <Input placeholder="Enter name or leave blank for 'Not in use'" {...field} value={field.value || ""} data-testid="input-assigned-to-edit" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>

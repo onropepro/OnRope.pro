@@ -2100,7 +2100,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         brand: req.body.brand || null,
         model: req.body.model || null,
         itemPrice: req.body.itemPrice || null,
-        possessionOf: req.body.possessionOf || null,
+        assignedTo: req.body.assignedTo?.trim() || "Not in use",
         notes: req.body.notes || null,
         quantity: req.body.quantity || 1,
         serialNumbers: req.body.serialNumbers || null,
@@ -2146,7 +2146,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (req.body.brand !== undefined) cleanedBody.brand = req.body.brand || null;
       if (req.body.model !== undefined) cleanedBody.model = req.body.model || null;
       if (req.body.itemPrice !== undefined) cleanedBody.itemPrice = req.body.itemPrice || null;
-      if (req.body.possessionOf !== undefined) cleanedBody.possessionOf = req.body.possessionOf || null;
+      if (req.body.assignedTo !== undefined) cleanedBody.assignedTo = req.body.assignedTo?.trim() || "Not in use";
       if (req.body.notes !== undefined) cleanedBody.notes = req.body.notes || null;
       if (req.body.quantity !== undefined) cleanedBody.quantity = req.body.quantity;
       if (req.body.serialNumbers !== undefined) cleanedBody.serialNumbers = req.body.serialNumbers || null;
