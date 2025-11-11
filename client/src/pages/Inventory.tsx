@@ -54,8 +54,11 @@ export default function Inventory() {
 
   // Fetch active employees for dropdown
   const { data: employeesData } = useQuery<{ employees: any[] }>({
-    queryKey: ["/api/employees/active"],
+    queryKey: ["/api/employees"],
   });
+  
+  // Filter for active employees only
+  const activeEmployees = (employeesData?.employees || []).filter((emp: any) => !emp.terminatedDate);
 
   const form = useForm<Partial<InsertGearItem>>({
     defaultValues: {
@@ -485,7 +488,7 @@ export default function Inventory() {
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="Not in use">Not in use</SelectItem>
-                        {employeesData?.employees?.map((emp) => (
+                        {activeEmployees.map((emp: any) => (
                           <SelectItem key={emp.id} value={emp.fullName}>
                             {emp.fullName}
                           </SelectItem>
@@ -698,7 +701,7 @@ export default function Inventory() {
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="Not in use">Not in use</SelectItem>
-                        {employeesData?.employees?.map((emp) => (
+                        {activeEmployees.map((emp: any) => (
                           <SelectItem key={emp.id} value={emp.fullName}>
                             {emp.fullName}
                           </SelectItem>
