@@ -568,13 +568,13 @@ export default function Inventory() {
                     <FormControl>
                       <Input
                         type="number"
-                        min="0"
+                        min="1"
                         placeholder="1"
                         {...field}
-                        value={field.value !== undefined ? field.value : 1}
+                        value={field.value !== undefined && field.value !== null ? field.value : ""}
                         onChange={(e) => {
-                          const val = parseInt(e.target.value);
-                          field.onChange(isNaN(val) ? 0 : val);
+                          const val = e.target.value === "" ? 1 : parseInt(e.target.value, 10);
+                          field.onChange(isNaN(val) ? 1 : val);
                         }}
                         data-testid="input-quantity"
                       />
@@ -728,35 +728,28 @@ export default function Inventory() {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Type</FormLabel>
-                    <div className="grid grid-cols-3 gap-3 mt-2">
-                      {gearTypes.map((type) => {
-                        const IconComponent = type.icon;
-                        return (
-                          <Card
-                            key={type.name}
-                            className={`cursor-pointer hover-elevate active-elevate-2 transition-all ${
-                              field.value === type.name ? "bg-primary/10 border-primary border-2" : ""
-                            }`}
-                            onClick={() => {
-                              field.onChange(type.name);
-                              if (type.name !== "Other") {
-                                setCustomType("");
-                              }
-                            }}
-                            data-testid={`card-type-edit-${type.name.toLowerCase().replace(/\s+/g, "-")}`}
-                          >
-                            <CardContent className="p-4 flex flex-col items-center gap-2">
-                              <div className={`h-10 w-10 rounded-lg flex items-center justify-center ${
-                                field.value === type.name ? "bg-primary text-primary-foreground" : "bg-muted"
-                              }`}>
-                                <IconComponent className="h-5 w-5" />
-                              </div>
-                              <div className="text-xs text-center font-medium leading-tight">{type.name}</div>
-                            </CardContent>
-                          </Card>
-                        );
-                      })}
-                    </div>
+                    <Select 
+                      onValueChange={(value) => {
+                        field.onChange(value);
+                        if (value !== "Other") {
+                          setCustomType("");
+                        }
+                      }} 
+                      value={field.value || ""}
+                    >
+                      <FormControl>
+                        <SelectTrigger data-testid="select-item-type-edit">
+                          <SelectValue placeholder="Select gear type" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {gearTypes.map((type) => (
+                          <SelectItem key={type.name} value={type.name}>
+                            {type.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -813,13 +806,13 @@ export default function Inventory() {
                     <FormControl>
                       <Input
                         type="number"
-                        min="0"
+                        min="1"
                         placeholder="1"
                         {...field}
-                        value={field.value !== undefined ? field.value : 1}
+                        value={field.value !== undefined && field.value !== null ? field.value : ""}
                         onChange={(e) => {
-                          const val = parseInt(e.target.value);
-                          field.onChange(isNaN(val) ? 0 : val);
+                          const val = e.target.value === "" ? 1 : parseInt(e.target.value, 10);
+                          field.onChange(isNaN(val) ? 1 : val);
                         }}
                         data-testid="input-quantity-edit"
                       />
