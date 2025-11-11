@@ -30,6 +30,55 @@ export function requireRole(...roles: string[]) {
   };
 }
 
+// License verification helper - re-verifies license keys with Overhaul Labs API
+// Returns: { success: boolean, valid: boolean | null }
+// - success=false means API failure (keep existing licenseVerified state)
+// - success=true, valid=true/false means definitive response (update licenseVerified)
+async function reverifyLicenseKey(licenseKey: string): Promise<{ success: boolean; valid: boolean | null }> {
+  try {
+    const externalApiUrl = 'https://OverhaulLabs.replit.app/api/verify-license';
+    
+    console.log('[License Re-verification] Calling external API:', externalApiUrl);
+    console.log('[License Re-verification] Request payload:', { licenseKey: licenseKey.substring(0, 5) + '...' });
+    
+    const verificationResponse = await fetch(externalApiUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ licenseKey })
+    });
+    
+    const responseText = await verificationResponse.text();
+    console.log('[License Re-verification] Response status:', verificationResponse.status);
+    console.log('[License Re-verification] Response body (raw):', responseText);
+    
+    // Try to parse as JSON
+    let verificationResult;
+    try {
+      verificationResult = JSON.parse(responseText);
+    } catch (parseError) {
+      console.error('[License Re-verification] Failed to parse response as JSON - API may be down');
+      console.warn('[License Re-verification] Keeping existing license status due to parse error');
+      return { success: false, valid: null }; // API failure - don't revoke access
+    }
+    
+    // Check if we got a definitive response
+    if (verificationResponse.ok && typeof verificationResult.valid === 'boolean') {
+      const isValid = verificationResult.valid;
+      console.log(`[License Re-verification] License is ${isValid ? 'valid' : 'invalid'}`);
+      return { success: true, valid: isValid };
+    } else {
+      // API returned error or unexpected format
+      console.warn('[License Re-verification] API returned non-OK status or unexpected format');
+      console.warn('[License Re-verification] Keeping existing license status due to API error');
+      return { success: false, valid: null }; // API failure - don't revoke access
+    }
+  } catch (error: any) {
+    console.error('[License Re-verification] Network error:', error.message);
+    console.warn('[License Re-verification] Keeping existing license status due to network error');
+    return { success: false, valid: null }; // Network failure - don't revoke access
+  }
+}
+
 export async function registerRoutes(app: Express): Promise<Server> {
   // ==================== AUTH ROUTES ====================
   
@@ -134,6 +183,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(403).json({ message: "Your employment has been terminated. Please contact your administrator for more information." });
       }
       
+      // RE-VERIFY LICENSE ON EVERY LOGIN (company role only)
+      if (user.role === 'company' && user.licenseKey) {
+        console.log('[Login] Re-verifying stored license key for company user...');
+        const verificationResult = await reverifyLicenseKey(user.licenseKey);
+        
+        let finalLicenseStatus = user.licenseVerified; // Default to existing status
+        
+        if (verificationResult.success && verificationResult.valid !== null) {
+          // API responded definitively - update status
+          finalLicenseStatus = verificationResult.valid;
+          await storage.updateUser(user.id, { licenseVerified: finalLicenseStatus });
+          console.log(`[Login] License status updated to: ${finalLicenseStatus}`);
+          // Update user object with new status
+          user.licenseVerified = finalLicenseStatus;
+        } else {
+          // API failed - keep existing status (don't lock out paying customers)
+          console.warn('[Login] API failure - preserving existing license status:', finalLicenseStatus);
+          console.warn('[Login] User will continue with existing access level (licenseVerified:', finalLicenseStatus, ')');
+        }
+      }
+      
       // Create session
       req.session.userId = user.id;
       req.session.role = user.role;
@@ -146,9 +216,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       });
       
-      // Return user without password
-      const { passwordHash, ...userWithoutPassword } = user;
-      res.json({ user: userWithoutPassword });
+      // Return user without sensitive fields (passwordHash and licenseKey)
+      const { passwordHash, licenseKey, ...userWithoutSensitiveData } = user;
+      res.json({ user: userWithoutSensitiveData });
     } catch (error) {
       console.error("Login error:", error);
       res.status(500).json({ message: "Internal server error" });
