@@ -405,9 +405,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // For employees: include parent company's license verification status
       let companyLicenseVerified: boolean | undefined = undefined;
       if (user.role !== 'company' && user.companyId) {
-        const parentCompany = await storage.getUserById(user.companyId);
-        if (parentCompany) {
-          companyLicenseVerified = parentCompany.licenseVerified;
+        try {
+          const parentCompany = await storage.getUserById(user.companyId);
+          if (parentCompany) {
+            companyLicenseVerified = parentCompany.licenseVerified;
+          } else {
+            console.warn(`[/api/user] Parent company not found for employee ${user.id}, companyId: ${user.companyId}`);
+          }
+        } catch (parentError) {
+          console.error(`[/api/user] Error fetching parent company for employee ${user.id}:`, parentError);
+          // Continue without parent company verification status
         }
       }
       

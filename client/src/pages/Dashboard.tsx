@@ -1121,16 +1121,21 @@ export default function Dashboard() {
       {currentUser && isReadOnly(currentUser) && (
         <Alert className="mx-4 mt-4 border-yellow-500/50 bg-yellow-500/10">
           <AlertCircle className="h-4 w-4 text-yellow-600 dark:text-yellow-500" />
-          <AlertTitle className="text-yellow-700 dark:text-yellow-400">Read-Only Mode</AlertTitle>
-          <AlertDescription className="text-yellow-600 dark:text-yellow-500">
-            You are currently in read-only mode. To make changes, please{" "}
-            <button
+          <div className="flex-1">
+            <AlertTitle className="text-yellow-700 dark:text-yellow-400">Read-Only Mode</AlertTitle>
+            <AlertDescription className="text-yellow-600 dark:text-yellow-500 mb-3">
+              Your account is in read-only mode. Verify your license to create, edit, or delete data.
+            </AlertDescription>
+            <Button
               onClick={() => setLocation("/license-verification")}
-              className="underline font-medium hover:text-yellow-700 dark:hover:text-yellow-400"
+              className="bg-yellow-600 hover:bg-yellow-700 text-white"
+              size="sm"
+              data-testid="button-verify-license"
             >
-              verify your license
-            </button>.
-          </AlertDescription>
+              <span className="material-icons text-sm mr-1">verified_user</span>
+              Verify License Key
+            </Button>
+          </div>
         </Alert>
       )}
 
