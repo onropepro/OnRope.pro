@@ -356,39 +356,22 @@ export default function Inventory() {
           {/* My Gear Tab */}
           <TabsContent value="my-gear" className="space-y-4">
             {/* Summary Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {canViewFinancials && (
               <Card>
                 <CardHeader className="pb-3">
                   <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
-                    <span className="material-icons text-lg">inventory_2</span>
-                    Total Items
+                    <span className="material-icons text-lg">attach_money</span>
+                    Total Value
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-3xl font-bold">{totalMyItems}</div>
+                  <div className="text-3xl font-bold">${totalMyValue.toFixed(2)}</div>
                   <p className="text-xs text-muted-foreground mt-1">
-                    Across {myGear.length} {myGear.length === 1 ? 'category' : 'categories'}
+                    Equipment value
                   </p>
                 </CardContent>
               </Card>
-
-              {canViewFinancials && (
-                <Card>
-                  <CardHeader className="pb-3">
-                    <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
-                      <span className="material-icons text-lg">attach_money</span>
-                      Total Value
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="text-3xl font-bold">${totalMyValue.toFixed(2)}</div>
-                    <p className="text-xs text-muted-foreground mt-1">
-                      Equipment value
-                    </p>
-                  </CardContent>
-                </Card>
-              )}
-            </div>
+            )}
 
             {myGear.length === 0 ? (
               <Card>
