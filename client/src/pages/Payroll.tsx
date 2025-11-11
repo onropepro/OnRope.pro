@@ -38,6 +38,20 @@ export default function Payroll() {
   const [doubleTimeTriggerType, setDoubleTimeTriggerType] = useState<string>("daily");
   const [doubleTimeHoursThreshold, setDoubleTimeHoursThreshold] = useState<string>("12");
 
+  // State for add hours form
+  const [selectedEmployeeId, setSelectedEmployeeId] = useState<string>("");
+  const [sessionType, setSessionType] = useState<string>("billable");
+  const [selectedProjectId, setSelectedProjectId] = useState<string>("");
+  const [workDate, setWorkDate] = useState<string>(new Date().toISOString().split('T')[0]);
+  const [startTime, setStartTime] = useState<string>("08:00");
+  const [endTime, setEndTime] = useState<string>("16:00");
+  const [description, setDescription] = useState<string>("");
+  const [dropsNorth, setDropsNorth] = useState<string>("0");
+  const [dropsEast, setDropsEast] = useState<string>("0");
+  const [dropsSouth, setDropsSouth] = useState<string>("0");
+  const [dropsWest, setDropsWest] = useState<string>("0");
+  const [shortfallReason, setShortfallReason] = useState<string>("");
+
   // Fetch current user to check permissions
   const { data: userData, isLoading: userLoading } = useQuery({
     queryKey: ["/api/user"],
@@ -62,6 +76,18 @@ export default function Payroll() {
   const { data: hoursData, isLoading: hoursLoading } = useQuery<{ hoursSummary: EmployeeHoursSummary[]; period: PayPeriod }>({
     queryKey: ['/api/payroll/periods', selectedPeriodId, 'hours'],
     enabled: !!selectedPeriodId && canAccessPayroll,
+  });
+
+  // Fetch employees for add hours form
+  const { data: employeesData } = useQuery<{ employees: any[] }>({
+    queryKey: ['/api/employees'],
+    enabled: canAccessPayroll,
+  });
+
+  // Fetch projects for add hours form
+  const { data: projectsData } = useQuery<{ projects: any[] }>({
+    queryKey: ['/api/projects'],
+    enabled: canAccessPayroll,
   });
 
   // Auto-create default payroll config if none exists
@@ -115,6 +141,48 @@ export default function Payroll() {
       }
     }
   }, [periodsData, selectedPeriodId]);
+
+  // Add work session mutation
+  const addWorkSessionMutation = useMutation({
+    mutationFn: async (data: any) => {
+      const endpoint = sessionType === 'billable' 
+        ? '/api/payroll/add-work-session' 
+        : '/api/payroll/add-non-billable-session';
+      
+      const response = await apiRequest(endpoint, 'POST', data);
+      return response;
+    },
+    onSuccess: () => {
+      toast({
+        title: "Success",
+        description: "Work session added successfully",
+      });
+      
+      // Reset form
+      setSelectedEmployeeId("");
+      setSelectedProjectId("");
+      setDescription("");
+      setDropsNorth("0");
+      setDropsEast("0");
+      setDropsSouth("0");
+      setDropsWest("0");
+      setShortfallReason("");
+      
+      // Invalidate queries to refresh data
+      queryClient.invalidateQueries({ queryKey: ['/api/payroll/periods'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/projects'] });
+      if (selectedPeriodId) {
+        queryClient.invalidateQueries({ queryKey: ['/api/payroll/periods', selectedPeriodId, 'hours'] });
+      }
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to add work session",
+        variant: "destructive",
+      });
+    },
+  });
 
   // Save configuration mutation
   const saveConfigMutation = useMutation({
@@ -252,6 +320,63 @@ export default function Payroll() {
     saveConfigMutation.mutate(config);
   };
 
+  const handleAddWorkSession = () => {
+    // Validate required fields
+    if (!selectedEmployeeId || !workDate || !startTime || !endTime) {
+      toast({
+        title: "Validation Error",
+        description: "Please fill in all required fields",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Validate session type specific requirements
+    if (sessionType === 'billable' && !selectedProjectId) {
+      toast({
+        title: "Validation Error",
+        description: "Please select a project for billable hours",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (sessionType === 'non-billable' && !description.trim()) {
+      toast({
+        title: "Validation Error",
+        description: "Please provide a description for non-billable hours",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Combine date and time into timestamps
+    const startDateTime = `${workDate}T${startTime}:00`;
+    const endDateTime = `${workDate}T${endTime}:00`;
+
+    const payload: any = {
+      employeeId: selectedEmployeeId,
+      workDate,
+      startTime: startDateTime,
+      endTime: endDateTime,
+    };
+
+    if (sessionType === 'billable') {
+      payload.projectId = selectedProjectId;
+      payload.dropsCompletedNorth = parseInt(dropsNorth) || 0;
+      payload.dropsCompletedEast = parseInt(dropsEast) || 0;
+      payload.dropsCompletedSouth = parseInt(dropsSouth) || 0;
+      payload.dropsCompletedWest = parseInt(dropsWest) || 0;
+      if (shortfallReason.trim()) {
+        payload.shortfallReason = shortfallReason;
+      }
+    } else {
+      payload.description = description;
+    }
+
+    addWorkSessionMutation.mutate(payload);
+  };
+
   const dayOfWeekOptions = [
     { value: "0", label: "Sunday" },
     { value: "1", label: "Monday" },
@@ -280,10 +405,14 @@ export default function Payroll() {
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
-        <TabsList className="grid w-full grid-cols-3">
+        <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="hours" data-testid="tab-hours">
             <Users className="w-4 h-4 mr-2" />
             Employee Hours
+          </TabsTrigger>
+          <TabsTrigger value="add-hours" data-testid="tab-add-hours">
+            <Clock className="w-4 h-4 mr-2" />
+            Add Hours
           </TabsTrigger>
           <TabsTrigger value="past-periods" data-testid="tab-past-periods">
             <Calendar className="w-4 h-4 mr-2" />
@@ -469,6 +598,190 @@ export default function Payroll() {
                   Select a pay period above to view employee hours.
                 </div>
               )}
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="add-hours" className="space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle>Add Work Hours</CardTitle>
+              <CardDescription>Manually add work hours for employees (e.g., when they forgot to clock in)</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid gap-4 md:grid-cols-2">
+                <div className="space-y-2">
+                  <Label htmlFor="employee-select">Employee *</Label>
+                  <Select value={selectedEmployeeId} onValueChange={setSelectedEmployeeId}>
+                    <SelectTrigger id="employee-select" data-testid="select-employee">
+                      <SelectValue placeholder="Select employee" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {employeesData?.employees.map((emp) => (
+                        <SelectItem key={emp.id} value={emp.id}>
+                          {emp.name} ({emp.email})
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="session-type">Session Type *</Label>
+                  <Select value={sessionType} onValueChange={setSessionType}>
+                    <SelectTrigger id="session-type" data-testid="select-session-type">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="billable">Billable (Project Work)</SelectItem>
+                      <SelectItem value="non-billable">Non-Billable (Errands, Training)</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+
+              {sessionType === 'billable' && (
+                <div className="space-y-2">
+                  <Label htmlFor="project-select">Project *</Label>
+                  <Select value={selectedProjectId} onValueChange={setSelectedProjectId}>
+                    <SelectTrigger id="project-select" data-testid="select-project">
+                      <SelectValue placeholder="Select project" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {projectsData?.projects.filter((p) => p.status === 'active').map((proj) => (
+                        <SelectItem key={proj.id} value={proj.id}>
+                          {proj.buildingName} - {proj.strataPlanNumber}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
+
+              {sessionType === 'non-billable' && (
+                <div className="space-y-2">
+                  <Label htmlFor="description">Description *</Label>
+                  <Input
+                    id="description"
+                    type="text"
+                    value={description}
+                    onChange={(e) => setDescription(e.target.value)}
+                    placeholder="e.g., Errands, Training, Equipment Maintenance"
+                    data-testid="input-description"
+                  />
+                </div>
+              )}
+
+              <div className="grid gap-4 md:grid-cols-3">
+                <div className="space-y-2">
+                  <Label htmlFor="work-date">Work Date *</Label>
+                  <Input
+                    id="work-date"
+                    type="date"
+                    value={workDate}
+                    onChange={(e) => setWorkDate(e.target.value)}
+                    data-testid="input-work-date"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="start-time">Start Time *</Label>
+                  <Input
+                    id="start-time"
+                    type="time"
+                    value={startTime}
+                    onChange={(e) => setStartTime(e.target.value)}
+                    data-testid="input-start-time"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="end-time">End Time *</Label>
+                  <Input
+                    id="end-time"
+                    type="time"
+                    value={endTime}
+                    onChange={(e) => setEndTime(e.target.value)}
+                    data-testid="input-end-time"
+                  />
+                </div>
+              </div>
+
+              {sessionType === 'billable' && (
+                <>
+                  <div className="border-t pt-4">
+                    <h4 className="font-medium mb-3">Drops Completed (Optional)</h4>
+                    <div className="grid gap-4 md:grid-cols-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="drops-north">North</Label>
+                        <Input
+                          id="drops-north"
+                          type="number"
+                          min="0"
+                          value={dropsNorth}
+                          onChange={(e) => setDropsNorth(e.target.value)}
+                          data-testid="input-drops-north"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="drops-east">East</Label>
+                        <Input
+                          id="drops-east"
+                          type="number"
+                          min="0"
+                          value={dropsEast}
+                          onChange={(e) => setDropsEast(e.target.value)}
+                          data-testid="input-drops-east"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="drops-south">South</Label>
+                        <Input
+                          id="drops-south"
+                          type="number"
+                          min="0"
+                          value={dropsSouth}
+                          onChange={(e) => setDropsSouth(e.target.value)}
+                          data-testid="input-drops-south"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="drops-west">West</Label>
+                        <Input
+                          id="drops-west"
+                          type="number"
+                          min="0"
+                          value={dropsWest}
+                          onChange={(e) => setDropsWest(e.target.value)}
+                          data-testid="input-drops-west"
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="shortfall-reason">Shortfall Reason (if drops below target)</Label>
+                    <Input
+                      id="shortfall-reason"
+                      type="text"
+                      value={shortfallReason}
+                      onChange={(e) => setShortfallReason(e.target.value)}
+                      placeholder="e.g., Weather delay, Equipment issue"
+                      data-testid="input-shortfall-reason"
+                    />
+                  </div>
+                </>
+              )}
+
+              <Button
+                onClick={handleAddWorkSession}
+                disabled={addWorkSessionMutation.isPending}
+                className="w-full"
+                data-testid="button-add-work-session"
+              >
+                <Clock className="w-4 h-4 mr-2" />
+                {addWorkSessionMutation.isPending ? "Adding..." : "Add Work Hours"}
+              </Button>
             </CardContent>
           </Card>
         </TabsContent>

@@ -2678,6 +2678,127 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Manually add work session (for when employees forget to clock in)
+  app.post("/api/payroll/add-work-session", requireAuth, requireRole("company", "operations_manager", "supervisor"), async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      const companyId = currentUser.role === "company" ? currentUser.id : currentUser.companyId;
+      if (!companyId) {
+        return res.status(400).json({ message: "Unable to determine company" });
+      }
+
+      // Check if user has financial permissions
+      const hasFinancialAccess = currentUser.role === "company" || currentUser.permissions?.includes("view_financial_data");
+      if (!hasFinancialAccess) {
+        return res.status(403).json({ message: "You don't have permission to add work sessions" });
+      }
+
+      const { employeeId, projectId, workDate, startTime, endTime, dropsCompletedNorth, dropsCompletedEast, dropsCompletedSouth, dropsCompletedWest, shortfallReason } = req.body;
+
+      // Validate required fields
+      if (!employeeId || !projectId || !workDate || !startTime || !endTime) {
+        return res.status(400).json({ message: "Missing required fields" });
+      }
+
+      // Verify employee belongs to company
+      const employee = await storage.getUserById(employeeId);
+      if (!employee || employee.companyId !== companyId) {
+        return res.status(400).json({ message: "Invalid employee" });
+      }
+
+      // Verify project belongs to company
+      const project = await storage.getProjectById(projectId);
+      if (!project || project.companyId !== companyId) {
+        return res.status(400).json({ message: "Invalid project" });
+      }
+
+      // Validate drops
+      const north = typeof dropsCompletedNorth === 'number' ? dropsCompletedNorth : 0;
+      const east = typeof dropsCompletedEast === 'number' ? dropsCompletedEast : 0;
+      const south = typeof dropsCompletedSouth === 'number' ? dropsCompletedSouth : 0;
+      const west = typeof dropsCompletedWest === 'number' ? dropsCompletedWest : 0;
+
+      if (north < 0 || east < 0 || south < 0 || west < 0) {
+        return res.status(400).json({ message: "Invalid drops completed value" });
+      }
+
+      const totalDropsCompleted = north + east + south + west;
+
+      // Create complete work session
+      const session = await storage.createWorkSession({
+        projectId,
+        employeeId,
+        companyId,
+        workDate,
+        startTime: new Date(startTime),
+        endTime: new Date(endTime),
+        dropsCompletedNorth: north,
+        dropsCompletedEast: east,
+        dropsCompletedSouth: south,
+        dropsCompletedWest: west,
+        shortfallReason: totalDropsCompleted < project.dailyDropTarget ? shortfallReason : undefined,
+      });
+
+      res.json({ session });
+    } catch (error) {
+      console.error("Add work session error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Manually add non-billable work session
+  app.post("/api/payroll/add-non-billable-session", requireAuth, requireRole("company", "operations_manager", "supervisor"), async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      const companyId = currentUser.role === "company" ? currentUser.id : currentUser.companyId;
+      if (!companyId) {
+        return res.status(400).json({ message: "Unable to determine company" });
+      }
+
+      // Check if user has financial permissions
+      const hasFinancialAccess = currentUser.role === "company" || currentUser.permissions?.includes("view_financial_data");
+      if (!hasFinancialAccess) {
+        return res.status(403).json({ message: "You don't have permission to add work sessions" });
+      }
+
+      const { employeeId, workDate, startTime, endTime, description } = req.body;
+
+      // Validate required fields
+      if (!employeeId || !workDate || !startTime || !endTime || !description) {
+        return res.status(400).json({ message: "Missing required fields" });
+      }
+
+      // Verify employee belongs to company
+      const employee = await storage.getUserById(employeeId);
+      if (!employee || employee.companyId !== companyId) {
+        return res.status(400).json({ message: "Invalid employee" });
+      }
+
+      // Create complete non-billable work session
+      const session = await storage.createNonBillableWorkSession({
+        employeeId,
+        companyId,
+        workDate,
+        startTime: new Date(startTime),
+        endTime: new Date(endTime),
+        description,
+      });
+
+      res.json({ session });
+    } catch (error) {
+      console.error("Add non-billable session error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
   // Generate pay periods
   app.post("/api/payroll/generate-periods", requireAuth, requireRole("company", "operations_manager", "supervisor"), async (req: Request, res: Response) => {
     try {
