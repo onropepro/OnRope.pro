@@ -21,6 +21,7 @@ import ActiveWorkers from "@/pages/ActiveWorkers";
 import NonBillableHours from "@/pages/NonBillableHours";
 import Inventory from "@/pages/Inventory";
 import HoursAnalytics from "@/pages/HoursAnalytics";
+import LicenseVerification from "@/pages/LicenseVerification";
 import NotFound from "@/pages/not-found";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import { EMPLOYEE_ROLES } from "@/lib/permissions";
@@ -31,6 +32,11 @@ function Router() {
       <Route path="/" component={Login} />
       <Route path="/register" component={Register} />
       <Route path="/login" component={Login} />
+      <Route path="/license-verification">
+        <ProtectedRoute allowedRoles={["company"]}>
+          <LicenseVerification />
+        </ProtectedRoute>
+      </Route>
       <Route path="/resident">
         <ProtectedRoute allowedRoles={["resident"]}>
           <ResidentDashboard />

@@ -25,7 +25,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import type { Project } from "@shared/schema";
 import { normalizeStrataPlan } from "@shared/schema";
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from "recharts";
-import { isManagement, hasFinancialAccess, canManageEmployees, canViewPerformance, hasPermission } from "@/lib/permissions";
+import { isManagement, hasFinancialAccess, canManageEmployees, canViewPerformance, hasPermission, isReadOnly } from "@/lib/permissions";
 
 const projectSchema = z.object({
   strataPlanNumber: z.string().min(1, "Strata plan number is required"),
@@ -278,6 +278,18 @@ export default function Dashboard() {
   const { data: userData } = useQuery({
     queryKey: ["/api/user"],
   });
+
+  // License verification gate - redirect unverified company owners
+  useEffect(() => {
+    if (userData?.user) {
+      const user = userData.user;
+      // Only check company role users
+      if (user.role === 'company' && user.licenseVerified !== true) {
+        console.log('[License Gate] Redirecting unverified company user to license verification page');
+        setLocation("/license-verification");
+      }
+    }
+  }, [userData, setLocation]);
 
   // Fetch company information
   const { data: companyData } = useQuery({

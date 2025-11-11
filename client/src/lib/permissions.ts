@@ -6,6 +6,7 @@ export interface User {
   permissions?: string[];
   viewFinancialData?: boolean;
   companyId?: string;
+  licenseVerified?: boolean;
 }
 
 // Management roles that have elevated privileges
@@ -81,4 +82,15 @@ export function hasPermission(user: User | null | undefined, permission: string)
   
   // Check permissions array - role does NOT automatically grant permissions
   return user.permissions?.includes(permission) || false;
+}
+
+// Check if user is in read-only mode (company role without verified license)
+export function isReadOnly(user: User | null | undefined): boolean {
+  if (!user) return false;
+  
+  // Only company role can be read-only
+  if (user.role !== 'company') return false;
+  
+  // Read-only if license is NOT verified
+  return user.licenseVerified !== true;
 }
