@@ -995,6 +995,16 @@ export default function Dashboard() {
       borderColor: "#ec4899",
     },
     {
+      id: "my-gear",
+      label: "My Gear",
+      description: "My assigned equipment",
+      icon: "work_outline",
+      onClick: () => setLocation("/my-gear"),
+      testId: "button-my-gear",
+      isVisible: () => true, // Everyone
+      borderColor: "#8b5cf6",
+    },
+    {
       id: "build-my-kit",
       label: "Build my Kit",
       description: "Gear inventory",
