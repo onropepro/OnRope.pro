@@ -24,6 +24,13 @@ const gearTypes = [
   "Ascender",
   "Helmet",
   "Gloves",
+  "Gas powered equipment",
+  "Squeegee rubbers",
+  "Applicators",
+  "Soap",
+  "Suction cup",
+  "Back up device",
+  "Lanyard",
   "Other"
 ];
 
@@ -430,28 +437,27 @@ export default function Inventory() {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Type</FormLabel>
-                    <Select 
-                      onValueChange={(value) => {
-                        field.onChange(value);
-                        if (value !== "Other") {
-                          setCustomType("");
-                        }
-                      }} 
-                      value={field.value || ""}
-                    >
-                      <FormControl>
-                        <SelectTrigger data-testid="select-item-type">
-                          <SelectValue placeholder="Select gear type" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {gearTypes.map((type) => (
-                          <SelectItem key={type} value={type}>
-                            {type}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                    <div className="grid grid-cols-3 gap-2 mt-2">
+                      {gearTypes.map((type) => (
+                        <Card
+                          key={type}
+                          className={`cursor-pointer hover-elevate active-elevate-2 transition-colors ${
+                            field.value === type ? "bg-primary/10 border-primary" : ""
+                          }`}
+                          onClick={() => {
+                            field.onChange(type);
+                            if (type !== "Other") {
+                              setCustomType("");
+                            }
+                          }}
+                          data-testid={`card-type-${type.toLowerCase().replace(/\s+/g, "-")}`}
+                        >
+                          <CardContent className="p-3">
+                            <div className="text-xs text-center font-medium leading-tight">{type}</div>
+                          </CardContent>
+                        </Card>
+                      ))}
+                    </div>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -666,28 +672,27 @@ export default function Inventory() {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Type</FormLabel>
-                    <Select 
-                      onValueChange={(value) => {
-                        field.onChange(value);
-                        if (value !== "Other") {
-                          setCustomType("");
-                        }
-                      }} 
-                      value={field.value || ""}
-                    >
-                      <FormControl>
-                        <SelectTrigger data-testid="select-item-type-edit">
-                          <SelectValue placeholder="Select gear type" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {gearTypes.map((type) => (
-                          <SelectItem key={type} value={type}>
-                            {type}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                    <div className="grid grid-cols-3 gap-2 mt-2">
+                      {gearTypes.map((type) => (
+                        <Card
+                          key={type}
+                          className={`cursor-pointer hover-elevate active-elevate-2 transition-colors ${
+                            field.value === type ? "bg-primary/10 border-primary" : ""
+                          }`}
+                          onClick={() => {
+                            field.onChange(type);
+                            if (type !== "Other") {
+                              setCustomType("");
+                            }
+                          }}
+                          data-testid={`card-type-edit-${type.toLowerCase().replace(/\s+/g, "-")}`}
+                        >
+                          <CardContent className="p-3">
+                            <div className="text-xs text-center font-medium leading-tight">{type}</div>
+                          </CardContent>
+                        </Card>
+                      ))}
+                    </div>
                     <FormMessage />
                   </FormItem>
                 )}
