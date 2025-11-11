@@ -19,9 +19,7 @@ import Payroll from "@/pages/Payroll";
 import Quotes from "@/pages/Quotes";
 import ActiveWorkers from "@/pages/ActiveWorkers";
 import NonBillableHours from "@/pages/NonBillableHours";
-import GearInventory from "@/pages/GearInventory";
 import Inventory from "@/pages/Inventory";
-import MyGear from "@/pages/MyGear";
 import HoursAnalytics from "@/pages/HoursAnalytics";
 import NotFound from "@/pages/not-found";
 import ProtectedRoute from "@/components/ProtectedRoute";
@@ -91,11 +89,6 @@ function Router() {
       <Route path="/non-billable-hours">
         <ProtectedRoute allowedRoles={EMPLOYEE_ROLES}>
           <NonBillableHours />
-        </ProtectedRoute>
-      </Route>
-      <Route path="/gear-inventory">
-        <ProtectedRoute allowedRoles={EMPLOYEE_ROLES}>
-          <GearInventory />
         </ProtectedRoute>
       </Route>
       <Route path="/inventory">
