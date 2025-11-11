@@ -74,7 +74,7 @@ export default function Login() {
           
           {/* Key Features */}
           <div className="space-y-4">
-            <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">Platform Features</h3>
+            <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">Comprehensive Platform Features</h3>
             <div className="grid gap-3">
               <div className="flex items-start gap-3">
                 <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
@@ -82,34 +82,61 @@ export default function Login() {
                 </div>
                 <div>
                   <div className="font-semibold text-sm">4-Elevation Building Visualization</div>
-                  <div className="text-sm text-muted-foreground">Track progress across all building sides (North, East, South, West) with real-time completion metrics</div>
+                  <div className="text-sm text-muted-foreground">Track progress across all building sides with real-time completion metrics and visual progress bars</div>
                 </div>
               </div>
               <div className="flex items-start gap-3">
                 <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
-                  <span className="material-icons text-primary">assignment</span>
+                  <span className="material-icons text-primary">badge</span>
                 </div>
                 <div>
-                  <div className="font-semibold text-sm">Daily Drop Logging & Work Sessions</div>
-                  <div className="text-sm text-muted-foreground">Log work progress, track performance analytics, and maintain detailed session history</div>
+                  <div className="font-semibold text-sm">Employee Management & Payroll</div>
+                  <div className="text-sm text-muted-foreground">Manage IRATA certifications, hourly rates, work sessions, and automated payroll across 5 pay period types</div>
                 </div>
               </div>
               <div className="flex items-start gap-3">
                 <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
-                  <span className="material-icons text-primary">people</span>
+                  <span className="material-icons text-primary">inventory_2</span>
                 </div>
                 <div>
-                  <div className="font-semibold text-sm">Multi-Role Access Control</div>
-                  <div className="text-sm text-muted-foreground">Customized dashboards for companies, managers, technicians, and residents</div>
+                  <div className="font-semibold text-sm">Gear Inventory System</div>
+                  <div className="text-sm text-muted-foreground">Track personal safety equipment with serial numbers, employee assignments, and service dates</div>
                 </div>
               </div>
               <div className="flex items-start gap-3">
                 <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
-                  <span className="material-icons text-primary">photo_library</span>
+                  <span className="material-icons text-primary">request_quote</span>
                 </div>
                 <div>
-                  <div className="font-semibold text-sm">Photo Documentation & Complaints</div>
-                  <div className="text-sm text-muted-foreground">Upload progress photos, manage resident feedback, and maintain project documentation</div>
+                  <div className="font-semibold text-sm">Multi-Service Quoting</div>
+                  <div className="text-sm text-muted-foreground">Create detailed quotes with photo attachments, cost breakdowns, and service-specific pricing</div>
+                </div>
+              </div>
+              <div className="flex items-start gap-3">
+                <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
+                  <span className="material-icons text-primary">schedule</span>
+                </div>
+                <div>
+                  <div className="font-semibold text-sm">Real-Time Worker Tracking</div>
+                  <div className="text-sm text-muted-foreground">Monitor active workers, billable/non-billable hours, and performance analytics with live dashboards</div>
+                </div>
+              </div>
+              <div className="flex items-start gap-3">
+                <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
+                  <span className="material-icons text-primary">verified_user</span>
+                </div>
+                <div>
+                  <div className="font-semibold text-sm">Safety Compliance</div>
+                  <div className="text-sm text-muted-foreground">Digital safety forms, PDF rope access plans, and comprehensive safety documentation management</div>
+                </div>
+              </div>
+              <div className="flex items-start gap-3">
+                <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
+                  <span className="material-icons text-primary">home</span>
+                </div>
+                <div>
+                  <div className="font-semibold text-sm">Resident Portal</div>
+                  <div className="text-sm text-muted-foreground">Transparent project tracking, complaint submission, and real-time progress updates for building residents</div>
                 </div>
               </div>
             </div>
