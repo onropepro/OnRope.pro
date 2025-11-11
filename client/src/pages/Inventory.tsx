@@ -227,6 +227,26 @@ export default function Inventory() {
     setSerialNumbers(serialNumbers.filter((_, i) => i !== index));
   };
 
+  const openAddDialog = () => {
+    form.reset({
+      equipmentType: undefined,
+      brand: undefined,
+      model: undefined,
+      itemPrice: undefined,
+      assignedTo: undefined,
+      notes: undefined,
+      quantity: 1,
+      serialNumbers: undefined,
+      dateInService: undefined,
+      dateOutOfService: undefined,
+      inService: true,
+    });
+    setSerialNumbers([]);
+    setCurrentSerialNumber("");
+    setCurrentAssignedTo("Not in use");
+    setShowAddDialog(true);
+  };
+
   const openEditDialog = (item: GearItem) => {
     setEditingItem(item);
     form.reset({
@@ -280,7 +300,7 @@ export default function Inventory() {
 
       <div className="p-4 max-w-4xl mx-auto space-y-4">
         {/* Add Item Card */}
-        <Card className="hover-elevate active-elevate-2 cursor-pointer" onClick={() => setShowAddDialog(true)} data-testid="card-add-item">
+        <Card className="hover-elevate active-elevate-2 cursor-pointer" onClick={openAddDialog} data-testid="card-add-item">
           <CardHeader>
             <div className="flex items-center gap-3">
               <div className="h-12 w-12 rounded-lg bg-primary/10 flex items-center justify-center">
