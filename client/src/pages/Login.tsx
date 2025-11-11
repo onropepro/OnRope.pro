@@ -238,6 +238,32 @@ export default function Login() {
               Refresh To Get Latest Update
             </Button>
 
+            <Button 
+              variant="secondary" 
+              className="w-full h-10 text-sm" 
+              onClick={async () => {
+                const response = await fetch("/api/login", {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({ identifier: "testcom", password: "test123" }),
+                  credentials: "include",
+                });
+                if (response.ok) {
+                  const result = await response.json();
+                  const user = result.user;
+                  if (user.role === "resident") {
+                    window.location.href = "/resident";
+                  } else {
+                    window.location.href = "/dashboard";
+                  }
+                }
+              }}
+              data-testid="button-quick-login"
+            >
+              <span className="material-icons mr-2 text-base">flash_on</span>
+              Quick Login (testcom)
+            </Button>
+
             {/* Mobile-only feature highlights */}
             <div className="md:hidden pt-4 space-y-4 border-t">
               <h3 className="text-sm font-semibold text-center">Built for All Stakeholders</h3>
