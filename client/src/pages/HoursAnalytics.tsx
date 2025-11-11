@@ -25,8 +25,8 @@ export default function HoursAnalytics() {
   });
 
   const user = userData?.user;
-  const workSessions = workSessionsData?.sessions || [];
-  const nonBillableSessions = nonBillableData?.sessions || [];
+  const allWorkSessions = workSessionsData?.sessions || [];
+  const allNonBillableSessions = nonBillableData?.sessions || [];
 
   const isLoading = isLoadingWork || isLoadingNonBillable;
 
@@ -35,12 +35,21 @@ export default function HoursAnalytics() {
                        user?.role === "operations_manager" || 
                        user?.role === "supervisor";
 
-  if (!user || !isManagement) {
+  // Filter sessions to show only employee's own data if they're not management
+  const workSessions = isManagement 
+    ? allWorkSessions 
+    : allWorkSessions.filter((s: any) => s.employeeId === user?.id);
+  
+  const nonBillableSessions = isManagement 
+    ? allNonBillableSessions 
+    : allNonBillableSessions.filter((s: any) => s.employeeId === user?.id);
+
+  if (!user) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 flex items-center justify-center">
         <Card>
           <CardContent className="pt-6">
-            <p className="text-muted-foreground">Access denied. This page is only available to management.</p>
+            <p className="text-muted-foreground">Loading...</p>
           </CardContent>
         </Card>
       </div>
@@ -122,8 +131,10 @@ export default function HoursAnalytics() {
             <ArrowLeft className="h-5 w-5" />
           </Button>
           <div className="flex-1">
-            <h1 className="text-2xl font-bold">Hours Analytics</h1>
-            <p className="text-sm text-muted-foreground">Billable vs Non-Billable Hours Breakdown</p>
+            <h1 className="text-2xl font-bold">{isManagement ? "Hours Analytics" : "My Hours"}</h1>
+            <p className="text-sm text-muted-foreground">
+              {isManagement ? "Billable vs Non-Billable Hours Breakdown" : "View your work hours and session history"}
+            </p>
           </div>
         </div>
 
