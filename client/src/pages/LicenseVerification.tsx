@@ -7,7 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
-import { AlertCircle, CheckCircle2, Key } from "lucide-react";
+import { AlertCircle, CheckCircle2, Key, Eye } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 const licenseSchema = z.object({
@@ -106,6 +106,19 @@ export default function LicenseVerification() {
     }
   };
 
+  const handleReadOnlyMode = () => {
+    // Set read-only flag in localStorage
+    localStorage.setItem("allowReadOnlyMode", "true");
+    
+    toast({
+      title: "Read-Only Mode",
+      description: "You can view data but cannot make changes until you verify your license.",
+    });
+    
+    // Redirect to dashboard
+    window.location.href = "/dashboard";
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary/5 via-background to-primary/10 flex items-center justify-center p-4">
       <div className="w-full max-w-md">
@@ -182,6 +195,20 @@ export default function LicenseVerification() {
                         Verify License
                       </>
                     )}
+                  </Button>
+
+                  {/* Read-Only Mode Button */}
+                  <Button 
+                    type="button"
+                    variant="secondary"
+                    className="w-full" 
+                    size="lg"
+                    onClick={handleReadOnlyMode}
+                    disabled={isVerifying || isBypassing}
+                    data-testid="button-readonly-mode"
+                  >
+                    <Eye className="mr-2 h-5 w-5" />
+                    Continue in Read-Only Mode
                   </Button>
 
                   {/* Bypass Button */}

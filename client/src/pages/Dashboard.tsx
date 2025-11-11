@@ -19,6 +19,8 @@ import { Progress } from "@/components/ui/progress";
 import { HighRiseBuilding } from "@/components/HighRiseBuilding";
 import { useToast } from "@/hooks/use-toast";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { AlertCircle } from "lucide-react";
 import { useLocation } from "wouter";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -285,8 +287,15 @@ export default function Dashboard() {
       const user = userData.user;
       // Only check company role users
       if (user.role === 'company' && user.licenseVerified !== true) {
-        console.log('[License Gate] Redirecting unverified company user to license verification page');
-        setLocation("/license-verification");
+        // Check if user explicitly chose read-only mode
+        const allowReadOnly = localStorage.getItem("allowReadOnlyMode");
+        
+        if (allowReadOnly !== "true") {
+          console.log('[License Gate] Redirecting unverified company user to license verification page');
+          setLocation("/license-verification");
+        } else {
+          console.log('[License Gate] User in read-only mode - allowing access with restrictions');
+        }
       }
     }
   }, [userData, setLocation]);
@@ -1106,6 +1115,23 @@ export default function Dashboard() {
           </div>
         </div>
       </header>
+
+      {/* Read-Only Mode Banner */}
+      {currentUser && isReadOnly(currentUser) && (
+        <Alert className="mx-4 mt-4 border-yellow-500/50 bg-yellow-500/10">
+          <AlertCircle className="h-4 w-4 text-yellow-600 dark:text-yellow-500" />
+          <AlertTitle className="text-yellow-700 dark:text-yellow-400">Read-Only Mode</AlertTitle>
+          <AlertDescription className="text-yellow-600 dark:text-yellow-500">
+            You are currently in read-only mode. To make changes, please{" "}
+            <button
+              onClick={() => setLocation("/license-verification")}
+              className="underline font-medium hover:text-yellow-700 dark:hover:text-yellow-400"
+            >
+              verify your license
+            </button>.
+          </AlertDescription>
+        </Alert>
+      )}
 
       <div className="p-4 max-w-4xl mx-auto">
         {/* Navigation Grid - Permission-filtered dashboard cards */}
