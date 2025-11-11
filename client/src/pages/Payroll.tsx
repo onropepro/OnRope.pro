@@ -709,7 +709,7 @@ export default function Payroll() {
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="overtime-hours-threshold">
-                        {overtimeTriggerType === 'daily' ? 'Hours per Day' : 'Hours per Week'}
+                        {overtimeTriggerType === 'daily' ? 'Triggers After (Hours/Day)' : 'Triggers After (Hours/Week)'}
                       </Label>
                       <Input
                         id="overtime-hours-threshold"
@@ -722,7 +722,7 @@ export default function Payroll() {
                         data-testid="input-overtime-hours-threshold"
                       />
                       <p className="text-sm text-muted-foreground">
-                        {overtimeTriggerType === 'daily' ? 'e.g., 8 hours/day' : 'e.g., 40 hours/week'}
+                        {overtimeTriggerType === 'daily' ? 'e.g., after 8 hours/day' : 'e.g., after 40 hours/week'}
                       </p>
                     </div>
                     <div className="space-y-2">
@@ -762,7 +762,7 @@ export default function Payroll() {
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="double-time-hours-threshold">
-                        {doubleTimeTriggerType === 'daily' ? 'Hours per Day' : 'Hours per Week'}
+                        {doubleTimeTriggerType === 'daily' ? 'Triggers After (Hours/Day)' : 'Triggers After (Hours/Week)'}
                       </Label>
                       <Input
                         id="double-time-hours-threshold"
@@ -775,7 +775,7 @@ export default function Payroll() {
                         data-testid="input-double-time-hours-threshold"
                       />
                       <p className="text-sm text-muted-foreground">
-                        {doubleTimeTriggerType === 'daily' ? 'e.g., 12 hours/day' : 'e.g., 60 hours/week'}
+                        {doubleTimeTriggerType === 'daily' ? 'e.g., after 12 hours/day' : 'e.g., after 60 hours/week'}
                       </p>
                     </div>
                     <div className="space-y-2">
