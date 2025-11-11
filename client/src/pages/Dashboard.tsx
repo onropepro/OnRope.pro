@@ -1018,23 +1018,13 @@ export default function Dashboard() {
     },
     {
       id: "inventory",
-      label: "Inventory",
-      description: "Manage gear",
+      label: "Inventory & Inspections",
+      description: "Gear & safety checks",
       icon: "inventory_2",
       onClick: () => setLocation("/inventory"),
       testId: "button-inventory",
       isVisible: () => true, // Everyone can access (tabs handle different views)
       borderColor: "#d97706",
-    },
-    {
-      id: "harness-inspection",
-      label: "Harness Inspection",
-      description: "Daily inspection",
-      icon: "verified_user",
-      onClick: () => setLocation("/harness-inspection"),
-      testId: "button-harness-inspection",
-      isVisible: () => true, // Everyone
-      borderColor: "#ef4444",
     },
     {
       id: "toolbox-meeting",

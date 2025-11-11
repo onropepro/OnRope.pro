@@ -17,6 +17,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { insertGearItemSchema, type InsertGearItem, type GearItem } from "@shared/schema";
 import { ArrowLeft, Plus, Pencil, X, Trash2, Shield, Cable, Link2, Gauge, TrendingUp, HardHat, Hand, Fuel, Scissors, PaintBucket, Droplets, CircleDot, Lock, Anchor, MoreHorizontal } from "lucide-react";
 import { hasFinancialAccess } from "@/lib/permissions";
+import HarnessInspectionForm from "./HarnessInspectionForm";
 
 const gearTypes = [
   { name: "Harness", icon: Shield },
@@ -341,16 +342,17 @@ export default function Inventory() {
             >
               <ArrowLeft className="h-5 w-5" />
             </Button>
-            <h1 className="text-xl font-bold tracking-tight">Inventory</h1>
+            <h1 className="text-xl font-bold tracking-tight">Inventory & Inspections</h1>
           </div>
         </div>
       </header>
 
       <div className="p-4 max-w-4xl mx-auto">
         <Tabs defaultValue="my-gear" className="w-full">
-          <TabsList className="grid w-full grid-cols-2 mb-4">
+          <TabsList className="grid w-full grid-cols-3 mb-4">
             <TabsTrigger value="my-gear" data-testid="tab-my-gear">My Gear</TabsTrigger>
             <TabsTrigger value="manage" data-testid="tab-manage-gear">Manage Gear</TabsTrigger>
+            <TabsTrigger value="inspections" data-testid="tab-inspections">Inspections</TabsTrigger>
           </TabsList>
 
           {/* My Gear Tab */}
@@ -586,6 +588,11 @@ export default function Inventory() {
                 )}
               </CardContent>
             </Card>
+          </TabsContent>
+
+          {/* Harness Inspections Tab */}
+          <TabsContent value="inspections" className="space-y-4">
+            <HarnessInspectionForm />
           </TabsContent>
         </Tabs>
       </div>
