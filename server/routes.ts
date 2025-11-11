@@ -185,22 +185,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // RE-VERIFY LICENSE ON EVERY LOGIN (company role only)
       if (user.role === 'company' && user.licenseKey) {
-        console.log('[Login] Re-verifying stored license key for company user...');
-        const verificationResult = await reverifyLicenseKey(user.licenseKey);
-        
-        let finalLicenseStatus = user.licenseVerified; // Default to existing status
-        
-        if (verificationResult.success && verificationResult.valid !== null) {
-          // API responded definitively - update status
-          finalLicenseStatus = verificationResult.valid;
-          await storage.updateUser(user.id, { licenseVerified: finalLicenseStatus });
-          console.log(`[Login] License status updated to: ${finalLicenseStatus}`);
-          // Update user object with new status
-          user.licenseVerified = finalLicenseStatus;
+        // Skip re-verification for bypass mode (development)
+        if (user.licenseKey === 'BYPASSED') {
+          console.log('[Login] Bypass mode detected - skipping re-verification');
         } else {
-          // API failed - keep existing status (don't lock out paying customers)
-          console.warn('[Login] API failure - preserving existing license status:', finalLicenseStatus);
-          console.warn('[Login] User will continue with existing access level (licenseVerified:', finalLicenseStatus, ')');
+          console.log('[Login] Re-verifying stored license key for company user...');
+          const verificationResult = await reverifyLicenseKey(user.licenseKey);
+          
+          let finalLicenseStatus = user.licenseVerified; // Default to existing status
+          
+          if (verificationResult.success && verificationResult.valid !== null) {
+            // API responded definitively - update status
+            finalLicenseStatus = verificationResult.valid;
+            await storage.updateUser(user.id, { licenseVerified: finalLicenseStatus });
+            console.log(`[Login] License status updated to: ${finalLicenseStatus}`);
+            // Update user object with new status
+            user.licenseVerified = finalLicenseStatus;
+          } else {
+            // API failed - keep existing status (don't lock out paying customers)
+            console.warn('[Login] API failure - preserving existing license status:', finalLicenseStatus);
+            console.warn('[Login] User will continue with existing access level (licenseVerified:', finalLicenseStatus, ')');
+          }
         }
       }
       
@@ -334,8 +339,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(403).json({ message: "Your employment has been terminated. Please contact your administrator for more information." });
       }
       
-      const { passwordHash, ...userWithoutPassword } = user;
-      res.json({ user: userWithoutPassword });
+      // Strip sensitive fields (passwordHash and licenseKey)
+      const { passwordHash, licenseKey, ...userWithoutSensitiveData } = user;
+      res.json({ user: userWithoutSensitiveData });
     } catch (error) {
       console.error("Get user error:", error);
       res.status(500).json({ message: "Internal server error" });
