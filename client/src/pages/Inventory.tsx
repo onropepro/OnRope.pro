@@ -33,7 +33,9 @@ export default function Inventory() {
   const [showAddDialog, setShowAddDialog] = useState(false);
   const [showEditDialog, setShowEditDialog] = useState(false);
   const [editingItem, setEditingItem] = useState<GearItem | null>(null);
-  const [serialNumbers, setSerialNumbers] = useState<string[]>([""]);
+  const [serialNumbers, setSerialNumbers] = useState<string[]>([]);
+  const [currentSerialNumber, setCurrentSerialNumber] = useState("");
+  const [currentAssignedTo, setCurrentAssignedTo] = useState("Not in use");
 
   // Fetch current user
   const { data: userData } = useQuery({
@@ -46,6 +48,11 @@ export default function Inventory() {
   // Fetch all gear items
   const { data: gearData, isLoading } = useQuery<{ items: GearItem[] }>({
     queryKey: ["/api/gear-items"],
+  });
+
+  // Fetch active employees for dropdown
+  const { data: employeesData } = useQuery<{ employees: any[] }>({
+    queryKey: ["/api/employees/active"],
   });
 
   const form = useForm<Partial<InsertGearItem>>({
@@ -76,7 +83,9 @@ export default function Inventory() {
       });
       setShowAddDialog(false);
       form.reset();
-      setSerialNumbers([""]);
+      setSerialNumbers([]);
+      setCurrentSerialNumber("");
+      setCurrentAssignedTo("Not in use");
     },
     onError: (error: any) => {
       toast({
@@ -100,7 +109,9 @@ export default function Inventory() {
       setShowEditDialog(false);
       setEditingItem(null);
       form.reset();
-      setSerialNumbers([""]);
+      setSerialNumbers([]);
+      setCurrentSerialNumber("");
+      setCurrentAssignedTo("Not in use");
     },
     onError: (error: any) => {
       toast({
@@ -112,30 +123,37 @@ export default function Inventory() {
   });
 
   const handleAddItem = (data: Partial<InsertGearItem>) => {
-    const filteredSerials = serialNumbers.filter(sn => sn.trim() !== "");
     const finalData = {
       ...data,
       assignedTo: data.assignedTo?.trim() || "Not in use",
-      serialNumbers: filteredSerials.length > 0 ? filteredSerials : undefined,
+      serialNumbers: serialNumbers.length > 0 ? serialNumbers : undefined,
     };
     addItemMutation.mutate(finalData);
   };
 
   const handleEditItem = (data: Partial<InsertGearItem>) => {
     if (editingItem) {
-      const filteredSerials = serialNumbers.filter(sn => sn.trim() !== "");
       const finalData = {
         ...data,
         assignedTo: data.assignedTo?.trim() || "Not in use",
-        serialNumbers: filteredSerials.length > 0 ? filteredSerials : undefined,
+        serialNumbers: serialNumbers.length > 0 ? serialNumbers : undefined,
       };
       updateItemMutation.mutate({ id: editingItem.id, data: finalData });
     }
   };
 
-  const addSerialNumberField = () => {
+  const handleAddSerialNumber = () => {
     const quantity = form.getValues("quantity");
     const maxSerials = quantity !== undefined ? quantity : 1;
+    
+    if (!currentSerialNumber.trim()) {
+      toast({
+        title: "Empty Serial Number",
+        description: "Please enter a serial number before adding.",
+        variant: "destructive",
+      });
+      return;
+    }
     
     if (maxSerials === 0) {
       toast({
@@ -146,27 +164,30 @@ export default function Inventory() {
       return;
     }
     
-    if (serialNumbers.length < maxSerials) {
-      setSerialNumbers([...serialNumbers, ""]);
-    } else {
+    if (serialNumbers.length >= maxSerials) {
       toast({
         title: "Limit Reached",
         description: `Cannot add more than ${maxSerials} serial numbers.`,
         variant: "destructive",
       });
+      return;
     }
+    
+    // Add the serial number to the list
+    setSerialNumbers([...serialNumbers, currentSerialNumber.trim()]);
+    
+    // Clear the fields for next entry
+    setCurrentSerialNumber("");
+    setCurrentAssignedTo("Not in use");
+    
+    toast({
+      title: "Serial Number Added",
+      description: `Added: ${currentSerialNumber.trim()}. Enter another or save the item.`,
+    });
   };
 
-  const removeSerialNumberField = (index: number) => {
-    if (serialNumbers.length > 1) {
-      setSerialNumbers(serialNumbers.filter((_, i) => i !== index));
-    }
-  };
-
-  const updateSerialNumber = (index: number, value: string) => {
-    const updated = [...serialNumbers];
-    updated[index] = value;
-    setSerialNumbers(updated);
+  const removeSerialNumber = (index: number) => {
+    setSerialNumbers(serialNumbers.filter((_, i) => i !== index));
   };
 
   const openEditDialog = (item: GearItem) => {
@@ -184,7 +205,9 @@ export default function Inventory() {
       dateOutOfService: item.dateOutOfService || undefined,
       inService: item.inService,
     });
-    setSerialNumbers(item.serialNumbers && item.serialNumbers.length > 0 ? item.serialNumbers : [""]);
+    setSerialNumbers(item.serialNumbers || []);
+    setCurrentSerialNumber("");
+    setCurrentAssignedTo("Not in use");
     setShowEditDialog(true);
   };
 
@@ -384,60 +407,70 @@ export default function Inventory() {
                 )}
               />
 
-              {/* Serial Numbers Section */}
-              <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <FormLabel>Serial Numbers (Optional)</FormLabel>
+              {/* Serial Number Entry */}
+              <div className="space-y-3">
+                <FormLabel>Serial Numbers (Optional)</FormLabel>
+                
+                {/* Current Serial Number Input */}
+                <div className="space-y-2">
+                  <Input
+                    placeholder="Enter serial number"
+                    value={currentSerialNumber}
+                    onChange={(e) => setCurrentSerialNumber(e.target.value)}
+                    data-testid="input-current-serial"
+                  />
+                  
+                  {/* Assigned To Dropdown */}
+                  <Select value={currentAssignedTo} onValueChange={setCurrentAssignedTo}>
+                    <SelectTrigger data-testid="select-assigned-to">
+                      <SelectValue placeholder="Assigned to" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Not in use">Not in use</SelectItem>
+                      {employeesData?.employees?.map((emp) => (
+                        <SelectItem key={emp.id} value={emp.fullName}>
+                          {emp.fullName}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  
                   <Button
                     type="button"
                     size="sm"
                     variant="outline"
-                    onClick={addSerialNumberField}
+                    onClick={handleAddSerialNumber}
                     disabled={serialNumbers.length >= (form.watch("quantity") || 1)}
-                    data-testid="button-add-serial-field"
+                    data-testid="button-add-serial"
+                    className="w-full"
                   >
                     <Plus className="h-4 w-4 mr-1" />
-                    Add Serial #
+                    Add Serial Number ({serialNumbers.length}/{form.watch("quantity") || 1})
                   </Button>
                 </div>
-                <div className="space-y-2">
-                  {serialNumbers.map((sn, index) => (
-                    <div key={index} className="flex items-center gap-2">
-                      <Input
-                        placeholder={`Serial number ${index + 1}`}
-                        value={sn}
-                        onChange={(e) => updateSerialNumber(index, e.target.value)}
-                        data-testid={`input-serial-${index}`}
-                      />
-                      {serialNumbers.length > 1 && (
+
+                {/* Added Serial Numbers List */}
+                {serialNumbers.length > 0 && (
+                  <div className="space-y-1 bg-muted/30 p-3 rounded-md">
+                    <div className="text-sm font-medium">Added Serial Numbers:</div>
+                    {serialNumbers.map((sn, index) => (
+                      <div key={index} className="flex items-center justify-between text-sm">
+                        <span>• {sn}</span>
                         <Button
                           type="button"
                           size="icon"
                           variant="ghost"
-                          onClick={() => removeSerialNumberField(index)}
+                          onClick={() => removeSerialNumber(index)}
                           data-testid={`button-remove-serial-${index}`}
+                          className="h-6 w-6"
                         >
-                          <X className="h-4 w-4" />
+                          <X className="h-3 w-3" />
                         </Button>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              <FormField
-                control={form.control}
-                name="assignedTo"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Assigned To</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Enter name or leave blank for 'Not in use'" {...field} value={field.value || ""} data-testid="input-assigned-to" />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
+                      </div>
+                    ))}
+                  </div>
                 )}
-              />
+              </div>
 
               <FormField
                 control={form.control}
@@ -581,60 +614,70 @@ export default function Inventory() {
                 )}
               />
 
-              {/* Serial Numbers Section */}
-              <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <FormLabel>Serial Numbers (Optional)</FormLabel>
+              {/* Serial Number Entry */}
+              <div className="space-y-3">
+                <FormLabel>Serial Numbers (Optional)</FormLabel>
+                
+                {/* Current Serial Number Input */}
+                <div className="space-y-2">
+                  <Input
+                    placeholder="Enter serial number"
+                    value={currentSerialNumber}
+                    onChange={(e) => setCurrentSerialNumber(e.target.value)}
+                    data-testid="input-current-serial-edit"
+                  />
+                  
+                  {/* Assigned To Dropdown */}
+                  <Select value={currentAssignedTo} onValueChange={setCurrentAssignedTo}>
+                    <SelectTrigger data-testid="select-assigned-to-edit">
+                      <SelectValue placeholder="Assigned to" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Not in use">Not in use</SelectItem>
+                      {employeesData?.employees?.map((emp) => (
+                        <SelectItem key={emp.id} value={emp.fullName}>
+                          {emp.fullName}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  
                   <Button
                     type="button"
                     size="sm"
                     variant="outline"
-                    onClick={addSerialNumberField}
+                    onClick={handleAddSerialNumber}
                     disabled={serialNumbers.length >= (form.watch("quantity") || 1)}
-                    data-testid="button-add-serial-field-edit"
+                    data-testid="button-add-serial-edit"
+                    className="w-full"
                   >
                     <Plus className="h-4 w-4 mr-1" />
-                    Add Serial #
+                    Add Serial Number ({serialNumbers.length}/{form.watch("quantity") || 1})
                   </Button>
                 </div>
-                <div className="space-y-2">
-                  {serialNumbers.map((sn, index) => (
-                    <div key={index} className="flex items-center gap-2">
-                      <Input
-                        placeholder={`Serial number ${index + 1}`}
-                        value={sn}
-                        onChange={(e) => updateSerialNumber(index, e.target.value)}
-                        data-testid={`input-serial-edit-${index}`}
-                      />
-                      {serialNumbers.length > 1 && (
+
+                {/* Added Serial Numbers List */}
+                {serialNumbers.length > 0 && (
+                  <div className="space-y-1 bg-muted/30 p-3 rounded-md">
+                    <div className="text-sm font-medium">Added Serial Numbers:</div>
+                    {serialNumbers.map((sn, index) => (
+                      <div key={index} className="flex items-center justify-between text-sm">
+                        <span>• {sn}</span>
                         <Button
                           type="button"
                           size="icon"
                           variant="ghost"
-                          onClick={() => removeSerialNumberField(index)}
+                          onClick={() => removeSerialNumber(index)}
                           data-testid={`button-remove-serial-edit-${index}`}
+                          className="h-6 w-6"
                         >
-                          <X className="h-4 w-4" />
+                          <X className="h-3 w-3" />
                         </Button>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              <FormField
-                control={form.control}
-                name="assignedTo"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Assigned To</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Enter name or leave blank for 'Not in use'" {...field} value={field.value || ""} data-testid="input-assigned-to-edit" />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
+                      </div>
+                    ))}
+                  </div>
                 )}
-              />
+              </div>
 
               <FormField
                 control={form.control}
