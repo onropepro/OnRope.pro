@@ -78,7 +78,7 @@ export default function Inventory() {
       itemPrice: undefined,
       assignedTo: "Not in use",
       notes: undefined,
-      quantity: 0,
+      quantity: undefined,
       serialNumbers: undefined,
       dateInService: undefined,
       dateOutOfService: undefined,
@@ -248,7 +248,7 @@ export default function Inventory() {
       itemPrice: "",
       assignedTo: "Not in use",
       notes: "",
-      quantity: 0,
+      quantity: undefined,
       serialNumbers: [],
       dateInService: "",
       dateOutOfService: "",
@@ -569,12 +569,12 @@ export default function Inventory() {
                       <Input
                         type="number"
                         min="0"
-                        placeholder="0"
+                        placeholder="Enter quantity"
                         {...field}
                         value={field.value !== undefined && field.value !== null ? field.value : ""}
                         onChange={(e) => {
-                          const val = e.target.value === "" ? 0 : parseInt(e.target.value, 10);
-                          field.onChange(isNaN(val) ? 0 : val);
+                          const val = e.target.value === "" ? undefined : parseInt(e.target.value, 10);
+                          field.onChange(val === undefined || isNaN(val) ? undefined : val);
                         }}
                         data-testid="input-quantity"
                       />
