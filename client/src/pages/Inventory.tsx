@@ -326,8 +326,15 @@ export default function Inventory() {
                           </div>
                           <div>
                             {canViewFinancials && item.itemPrice && (
-                              <div className="text-sm font-semibold text-primary mb-1">
-                                ${parseFloat(item.itemPrice).toFixed(2)}
+                              <div className="space-y-0.5 mb-1">
+                                <div className="text-sm font-semibold text-primary">
+                                  ${parseFloat(item.itemPrice).toFixed(2)} each
+                                </div>
+                                {item.quantity && item.quantity > 1 && (
+                                  <div className="text-sm font-medium text-primary/80">
+                                    Total: ${(parseFloat(item.itemPrice) * item.quantity).toFixed(2)}
+                                  </div>
+                                )}
                               </div>
                             )}
                             {item.notes && (
