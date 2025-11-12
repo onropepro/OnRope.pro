@@ -26,7 +26,6 @@ import LicenseVerification from "@/pages/LicenseVerification";
 import NotFound from "@/pages/not-found";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import { EMPLOYEE_ROLES } from "@/lib/permissions";
-import { MobileBottomNav } from "@/components/MobileBottomNav";
 
 function Router() {
   return (
@@ -126,10 +125,9 @@ function App() {
         <div className="fixed top-0 left-0 right-0 z-[9999] bg-red-600 text-white text-center py-0.5 text-[10px] font-medium leading-tight">
           Free Beta Access - Subscription Service Coming Soon - Do Not Distribute
         </div>
-        <div className="pt-4 pb-20">
+        <div className="pt-4">
           <Router />
         </div>
-        <MobileBottomNav />
         <Toaster />
       </TooltipProvider>
     </QueryClientProvider>
