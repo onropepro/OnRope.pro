@@ -40,14 +40,14 @@ export default function Profile() {
   const [showLogoutDialog, setShowLogoutDialog] = useState(false);
   const [deletePassword, setDeletePassword] = useState("");
 
-  const { data: userData, isLoading } = useQuery({
+  const { data: userData, isLoading } = useQuery<{ user: any }>({
     queryKey: ["/api/user"],
   });
 
   const user = userData?.user;
 
   // Fetch projects to determine if active project is parkade
-  const { data: projectsData } = useQuery({
+  const { data: projectsData } = useQuery<{ projects: any[] }>({
     queryKey: ["/api/projects"],
     enabled: user?.role === "resident",
   });
