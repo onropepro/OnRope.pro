@@ -144,6 +144,31 @@ export class ObjectStorageService {
     // Return the public URL path
     return `/public-objects/${fileName}`;
   }
+
+  // Upload a file buffer to private storage
+  async uploadPrivateFile(fileName: string, fileBuffer: Buffer, contentType: string): Promise<string> {
+    const privateDir = this.getPrivateObjectDir();
+    if (!privateDir) {
+      throw new Error("No private object directory configured");
+    }
+
+    const fullPath = `${privateDir}/${fileName}`;
+    
+    const { bucketName, objectName } = parseObjectPath(fullPath);
+    const bucket = objectStorageClient.bucket(bucketName);
+    const file = bucket.file(objectName);
+
+    // Upload the file (resumable: false for better performance on small files)
+    await file.save(fileBuffer, {
+      metadata: {
+        contentType,
+      },
+      resumable: false,
+    });
+
+    // Return the full path to the private file
+    return fullPath;
+  }
 }
 
 function parseObjectPath(path: string): {
