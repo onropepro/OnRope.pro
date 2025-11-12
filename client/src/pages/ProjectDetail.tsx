@@ -13,6 +13,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { HighRiseBuilding } from "@/components/HighRiseBuilding";
 import { VerticalBuildingProgress } from "@/components/VerticalBuildingProgress";
+import { ParkadeView } from "@/components/ParkadeView";
 import { useToast } from "@/hooks/use-toast";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -670,6 +671,12 @@ export default function ProjectDetail() {
                 buildingFloors={project.buildingFloors || Math.ceil(project.floorCount / 10)}
                 totalUnits={project.floorCount}
                 completedUnits={completedDrops}
+                className="mb-4"
+              />
+            ) : project.jobType === "parkade_pressure_cleaning" ? (
+              <ParkadeView
+                totalStalls={project.floorCount}
+                completedStalls={completedDrops}
                 className="mb-4"
               />
             ) : (
