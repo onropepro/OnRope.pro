@@ -749,6 +749,274 @@ export default function HoursAnalytics() {
             </Card>
           </>
         )}
+
+        {/* Detail Modals */}
+        <Dialog open={modalOpen === 'activeProjects'} onOpenChange={() => setModalOpen(null)}>
+          <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2">
+                <span className="material-icons text-blue-600">assignment</span>
+                Active Projects
+              </DialogTitle>
+              <DialogDescription>Currently in-progress projects</DialogDescription>
+            </DialogHeader>
+            <ScrollArea className="max-h-[60vh]">
+              {projects.filter((p: any) => p.status === 'active').length === 0 ? (
+                <p className="text-center text-muted-foreground py-8">No active projects</p>
+              ) : (
+                <div className="space-y-3">
+                  {projects.filter((p: any) => p.status === 'active').map((project: any) => (
+                    <Card key={project.id} className="p-4">
+                      <div className="font-semibold">{project.buildingName}</div>
+                      <div className="text-sm text-muted-foreground">{project.strataPlanNumber}</div>
+                      <div className="text-sm text-muted-foreground mt-1">{project.jobType.replace(/_/g, ' ')}</div>
+                      {project.targetCompletionDate && (
+                        <div className="text-xs text-muted-foreground mt-2">
+                          Target: {new Date(project.targetCompletionDate).toLocaleDateString()}
+                        </div>
+                      )}
+                    </Card>
+                  ))}
+                </div>
+              )}
+            </ScrollArea>
+          </DialogContent>
+        </Dialog>
+
+        <Dialog open={modalOpen === 'completedProjects'} onOpenChange={() => setModalOpen(null)}>
+          <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2">
+                <span className="material-icons text-emerald-600">check_circle</span>
+                Completed Projects
+              </DialogTitle>
+              <DialogDescription>All-time completed projects</DialogDescription>
+            </DialogHeader>
+            <ScrollArea className="max-h-[60vh]">
+              {projects.filter((p: any) => p.status === 'completed').length === 0 ? (
+                <p className="text-center text-muted-foreground py-8">No completed projects</p>
+              ) : (
+                <div className="space-y-3">
+                  {projects.filter((p: any) => p.status === 'completed').map((project: any) => (
+                    <Card key={project.id} className="p-4">
+                      <div className="font-semibold">{project.buildingName}</div>
+                      <div className="text-sm text-muted-foreground">{project.strataPlanNumber}</div>
+                      <div className="text-sm text-muted-foreground mt-1">{project.jobType.replace(/_/g, ' ')}</div>
+                    </Card>
+                  ))}
+                </div>
+              )}
+            </ScrollArea>
+          </DialogContent>
+        </Dialog>
+
+        <Dialog open={modalOpen === 'totalEmployees'} onOpenChange={() => setModalOpen(null)}>
+          <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2">
+                <span className="material-icons text-blue-600">group</span>
+                All Employees
+              </DialogTitle>
+              <DialogDescription>{totalEmployees} total employees company-wide</DialogDescription>
+            </DialogHeader>
+            <ScrollArea className="max-h-[60vh]">
+              {employees.length === 0 ? (
+                <p className="text-center text-muted-foreground py-8">No employees</p>
+              ) : (
+                <div className="space-y-3">
+                  {employees.map((employee: any) => (
+                    <Card key={employee.id} className="p-4">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <div className="font-semibold">{employee.name}</div>
+                          <div className="text-sm text-muted-foreground capitalize">{employee.role?.replace(/_/g, ' ')}</div>
+                        </div>
+                        {employee.techLevel && (
+                          <Badge variant="outline">{employee.techLevel}</Badge>
+                        )}
+                      </div>
+                    </Card>
+                  ))}
+                </div>
+              )}
+            </ScrollArea>
+          </DialogContent>
+        </Dialog>
+
+        <Dialog open={modalOpen === 'activeEmployees'} onOpenChange={() => setModalOpen(null)}>
+          <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2">
+                <span className="material-icons text-blue-600">people</span>
+                Active Employees This Month
+              </DialogTitle>
+              <DialogDescription>{uniqueEmployeesThisMonth} employees worked this month</DialogDescription>
+            </DialogHeader>
+            <ScrollArea className="max-h-[60vh]">
+              {monthSessions.length === 0 ? (
+                <p className="text-center text-muted-foreground py-8">No active employees this month</p>
+              ) : (
+                <div className="space-y-3">
+                  {Array.from(new Set(monthSessions.map((s: any) => s.employeeId))).map((empId: any) => {
+                    const empSessions = monthSessions.filter((s: any) => s.employeeId === empId);
+                    const empName = empSessions[0]?.employeeName || 'Unknown';
+                    const empHours = empSessions.reduce((sum: number, s: any) => {
+                      if (s.startTime && s.endTime) {
+                        return sum + (new Date(s.endTime).getTime() - new Date(s.startTime).getTime()) / (1000 * 60 * 60);
+                      }
+                      return sum;
+                    }, 0);
+                    
+                    return (
+                      <Card key={empId} className="p-4">
+                        <div className="flex items-center justify-between">
+                          <div className="font-semibold">{empName}</div>
+                          <div className="text-lg font-bold text-primary">{empHours.toFixed(1)}h</div>
+                        </div>
+                        <div className="text-sm text-muted-foreground mt-1">{empSessions.length} sessions</div>
+                      </Card>
+                    );
+                  })}
+                </div>
+              )}
+            </ScrollArea>
+          </DialogContent>
+        </Dialog>
+
+        <Dialog open={modalOpen === 'workSessions'} onOpenChange={() => setModalOpen(null)}>
+          <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2">
+                <span className="material-icons text-purple-600">calendar_month</span>
+                Work Sessions This Month
+              </DialogTitle>
+              <DialogDescription>{totalSessionsThisMonth} total sessions completed</DialogDescription>
+            </DialogHeader>
+            <ScrollArea className="max-h-[60vh]">
+              {monthSessions.length === 0 ? (
+                <p className="text-center text-muted-foreground py-8">No work sessions this month</p>
+              ) : (
+                <div className="space-y-3">
+                  {monthSessions.slice(0, 20).map((session: any) => {
+                    const duration = session.startTime && session.endTime 
+                      ? ((new Date(session.endTime).getTime() - new Date(session.startTime).getTime()) / (1000 * 60 * 60)).toFixed(1)
+                      : '0.0';
+                    
+                    return (
+                      <Card key={session.id} className="p-4">
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <div className="font-semibold">{session.employeeName || 'Unknown'}</div>
+                            <div className="text-sm text-muted-foreground">
+                              {session.workDate || session.date}
+                            </div>
+                          </div>
+                          <div className="text-right">
+                            <div className="font-bold text-primary">{duration}h</div>
+                            <div className="text-xs text-muted-foreground">
+                              {session.description || 'Billable work'}
+                            </div>
+                          </div>
+                        </div>
+                      </Card>
+                    );
+                  })}
+                  {monthSessions.length > 20 && (
+                    <p className="text-center text-muted-foreground text-sm py-2">
+                      Showing 20 of {monthSessions.length} sessions
+                    </p>
+                  )}
+                </div>
+              )}
+            </ScrollArea>
+          </DialogContent>
+        </Dialog>
+
+        <Dialog open={modalOpen === 'avgDuration'} onOpenChange={() => setModalOpen(null)}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2">
+                <span className="material-icons text-blue-600">schedule</span>
+                Average Session Duration
+              </DialogTitle>
+              <DialogDescription>Insights into typical work session length</DialogDescription>
+            </DialogHeader>
+            <div className="space-y-4">
+              <div className="text-center py-6">
+                <div className="text-6xl font-bold text-primary">{avgSessionDuration}h</div>
+                <div className="text-muted-foreground mt-2">Average Duration</div>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="text-center p-4 bg-muted rounded-lg">
+                  <div className="text-2xl font-bold">{completedSessions.length}</div>
+                  <div className="text-sm text-muted-foreground">Total Sessions</div>
+                </div>
+                <div className="text-center p-4 bg-muted rounded-lg">
+                  <div className="text-2xl font-bold">
+                    {completedSessions.length > 0 
+                      ? ((completedSessions.reduce((sum: number, s: any) => {
+                          if (s.startTime && s.endTime) {
+                            return sum + (new Date(s.endTime).getTime() - new Date(s.startTime).getTime()) / (1000 * 60 * 60);
+                          }
+                          return sum;
+                        }, 0)).toFixed(1))
+                      : '0.0'}h
+                  </div>
+                  <div className="text-sm text-muted-foreground">Total Hours</div>
+                </div>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
+
+        <Dialog open={modalOpen === 'totalDrops'} onOpenChange={() => setModalOpen(null)}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2">
+                <span className="material-icons text-orange-600">arrow_downward</span>
+                Total Drops This Month
+              </DialogTitle>
+              <DialogDescription>Drops completed across all elevations</DialogDescription>
+            </DialogHeader>
+            <div className="space-y-4">
+              <div className="text-center py-6">
+                <div className="text-6xl font-bold text-orange-600">{totalDropsThisMonth}</div>
+                <div className="text-muted-foreground mt-2">Total Drops</div>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="text-center p-4 bg-muted rounded-lg">
+                  <div className="text-2xl font-bold">{sessionsWithDrops.length}</div>
+                  <div className="text-sm text-muted-foreground">Sessions with Drops</div>
+                </div>
+                <div className="text-center p-4 bg-muted rounded-lg">
+                  <div className="text-2xl font-bold">{avgDropsPerSession}</div>
+                  <div className="text-sm text-muted-foreground">Avg per Session</div>
+                </div>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
+
+        <Dialog open={modalOpen === 'avgDrops'} onOpenChange={() => setModalOpen(null)}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2">
+                <span className="material-icons text-blue-600">speed</span>
+                Average Drops Per Session
+              </DialogTitle>
+              <DialogDescription>Productivity metric for rope access work</DialogDescription>
+            </DialogHeader>
+            <div className="space-y-4">
+              <div className="text-center py-6">
+                <div className="text-6xl font-bold text-primary">{avgDropsPerSession}</div>
+                <div className="text-muted-foreground mt-2">Drops per Session</div>
+              </div>
+              <div className="p-4 bg-muted rounded-lg">
+                <div className="text-sm text-muted-foreground">This shows the average number of drops completed in each work session, indicating team productivity and efficiency.</div>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
       </div>
     </div>
   );
