@@ -46,6 +46,17 @@ export default function Profile() {
 
   const user = userData?.user;
 
+  // Fetch projects to determine if active project is parkade
+  const { data: projectsData } = useQuery({
+    queryKey: ["/api/projects"],
+    enabled: user?.role === "resident",
+  });
+
+  const allProjects = projectsData?.projects || [];
+  const activeProjects = allProjects.filter((p: any) => p.status === 'active');
+  const activeProject = activeProjects[0];
+  const isParkadeProject = activeProject?.jobType === 'parkade_pressure_cleaning';
+
   const profileForm = useForm<ProfileFormData>({
     resolver: zodResolver(profileSchema),
     values: {
@@ -241,10 +252,10 @@ export default function Profile() {
                     name="unitNumber"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Unit Number</FormLabel>
+                        <FormLabel>{isParkadeProject ? "Stall Number" : "Unit Number"}</FormLabel>
                         <FormControl>
                           <Input
-                            placeholder="e.g., 101"
+                            placeholder={isParkadeProject ? "e.g., 42, A-5" : "e.g., 101"}
                             {...field}
                             data-testid="input-unit-number"
                             className="h-12"
