@@ -387,6 +387,46 @@ export default function Login() {
                 <span className="material-icons mr-1 text-base">flash_on</span>
                 phs
               </Button>
+
+              <Button 
+                variant="secondary" 
+                className="h-10 text-xs" 
+                onClick={async () => {
+                  try {
+                    const response = await fetch("/api/login", {
+                      method: "POST",
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify({ identifier: "res@res.com", password: "res123" }),
+                      credentials: "include",
+                    });
+                    const result = await response.json();
+                    if (response.ok) {
+                      const user = result.user;
+                      if (user.role === "resident") {
+                        window.location.href = "/resident";
+                      } else {
+                        window.location.href = "/dashboard";
+                      }
+                    } else {
+                      toast({
+                        title: "Quick Login Failed",
+                        description: result.message || "Test account not found in production database",
+                        variant: "destructive",
+                      });
+                    }
+                  } catch (error) {
+                    toast({
+                      title: "Login Error",
+                      description: "Network error. Please try manual login.",
+                      variant: "destructive",
+                    });
+                  }
+                }}
+                data-testid="button-quick-login-resident"
+              >
+                <span className="material-icons mr-1 text-base">flash_on</span>
+                resident
+              </Button>
             </div>
 
             {/* Mobile-only feature highlights */}
