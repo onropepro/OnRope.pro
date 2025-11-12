@@ -1686,7 +1686,9 @@ export default function ProjectDetail() {
           <DialogHeader>
             <DialogTitle>Upload Photo</DialogTitle>
             <DialogDescription>
-              Add unit number and comment to help residents identify their work.
+              {project.jobType === 'parkade_pressure_cleaning' 
+                ? 'Add parking stall number and comment to help residents identify their work.'
+                : 'Add unit number and comment to help residents identify their work.'}
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4 py-4">
@@ -1766,19 +1768,25 @@ export default function ProjectDetail() {
               </div>
             )}
             
-            <div className="space-y-2">
-              <Label htmlFor="unitNumber">Unit Number (Optional)</Label>
-              <Input
-                id="unitNumber"
-                placeholder="e.g., 301, 1205"
-                value={photoUnitNumber}
-                onChange={(e) => setPhotoUnitNumber(e.target.value)}
-                data-testid="input-unit-number"
-              />
-              <p className="text-xs text-muted-foreground">
-                Enter the unit number if this photo is specific to a resident's suite.
-              </p>
-            </div>
+            {!isMissedUnit && !isMissedStall && (
+              <div className="space-y-2">
+                <Label htmlFor="unitNumber">
+                  {project.jobType === 'parkade_pressure_cleaning' ? 'Parking Stall Number (Optional)' : 'Unit Number (Optional)'}
+                </Label>
+                <Input
+                  id="unitNumber"
+                  placeholder={project.jobType === 'parkade_pressure_cleaning' ? 'e.g., 42, A-5, P1-23' : 'e.g., 301, 1205'}
+                  value={photoUnitNumber}
+                  onChange={(e) => setPhotoUnitNumber(e.target.value)}
+                  data-testid="input-unit-number"
+                />
+                <p className="text-xs text-muted-foreground">
+                  {project.jobType === 'parkade_pressure_cleaning' 
+                    ? 'Enter the parking stall number if this photo is specific to a resident\'s stall.'
+                    : 'Enter the unit number if this photo is specific to a resident\'s suite.'}
+                </p>
+              </div>
+            )}
             <div className="space-y-2">
               <Label htmlFor="comment">Comment (Optional)</Label>
               <Textarea

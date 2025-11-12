@@ -591,7 +591,18 @@ export class Storage {
     return result;
   }
 
-  async getPhotosByUnitAndStrataPlan(unitNumber: string, strataPlanNumber: string): Promise<any[]> {
+  async getPhotosByUnitAndStrataPlan(unitNumber: string, strataPlanNumber: string, parkingStallNumber?: string): Promise<any[]> {
+    const conditions = [
+      eq(projectPhotos.unitNumber, unitNumber),
+      eq(projectPhotos.missedUnitNumber, unitNumber),
+      eq(projectPhotos.missedStallNumber, unitNumber)
+    ];
+    
+    if (parkingStallNumber) {
+      conditions.push(eq(projectPhotos.unitNumber, parkingStallNumber));
+      conditions.push(eq(projectPhotos.missedStallNumber, parkingStallNumber));
+    }
+    
     const result = await db.select({
       id: projectPhotos.id,
       projectId: projectPhotos.projectId,
@@ -610,11 +621,7 @@ export class Storage {
       .leftJoin(projects, eq(projectPhotos.projectId, projects.id))
       .where(
         and(
-          or(
-            eq(projectPhotos.unitNumber, unitNumber),
-            eq(projectPhotos.missedUnitNumber, unitNumber),
-            eq(projectPhotos.missedStallNumber, unitNumber)
-          ),
+          or(...conditions),
           eq(projects.strataPlanNumber, strataPlanNumber)
         )
       )

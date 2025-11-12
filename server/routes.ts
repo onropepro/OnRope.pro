@@ -1055,19 +1055,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Get photos for resident's unit
+  // Get photos for resident's unit or parking stall
   app.get("/api/my-unit-photos", requireAuth, requireRole("resident"), async (req: Request, res: Response) => {
     try {
       const currentUser = await storage.getUserById(req.session.userId!);
       
-      if (!currentUser || !currentUser.unitNumber || !currentUser.strataPlanNumber) {
-        return res.status(400).json({ message: "Unit number or strata plan number not found" });
+      if (!currentUser || !currentUser.strataPlanNumber) {
+        return res.status(400).json({ message: "Strata plan number not found" });
       }
       
-      // Get photos by unit number and strata plan number (works across all companies)
+      // Get photos by unit number OR parking stall number and strata plan number (works across all companies)
+      // Match on either unitNumber or parkingStallNumber fields
+      const unitNumber = currentUser.unitNumber || '';
+      const parkingStallNumber = currentUser.parkingStallNumber || '';
+      
       const photos = await storage.getPhotosByUnitAndStrataPlan(
-        currentUser.unitNumber, 
-        currentUser.strataPlanNumber
+        unitNumber, 
+        currentUser.strataPlanNumber,
+        parkingStallNumber
       );
       
       res.json({ photos });
