@@ -789,6 +789,7 @@ export const scheduledJobs = pgTable("scheduled_jobs", {
   
   status: varchar("status").notNull().default('upcoming'), // upcoming | in_progress | completed | cancelled
   location: text("location"), // Job site address
+  color: varchar("color").default('#3b82f6'), // Custom color for calendar display
   
   estimatedHours: integer("estimated_hours"),
   actualHours: integer("actual_hours"),

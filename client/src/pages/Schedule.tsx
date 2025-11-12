@@ -47,14 +47,7 @@ export default function Schedule() {
 
   // Transform jobs into FullCalendar events
   const events: EventInput[] = jobs.map((job) => {
-    let color = "#3b82f6"; // Blue for upcoming
-    if (job.status === "in_progress") {
-      color = "#10b981"; // Green for in progress
-    } else if (job.status === "completed") {
-      color = "#6b7280"; // Gray for completed
-    } else if (job.status === "cancelled") {
-      color = "#ef4444"; // Red for cancelled
-    }
+    const color = job.color || "#3b82f6";
 
     return {
       id: job.id,
@@ -268,6 +261,7 @@ function CreateJobDialog({
     notes: "",
     startDate: "",
     endDate: "",
+    color: "#3b82f6",
     employeeIds: [] as string[],
   });
 
@@ -312,6 +306,7 @@ function CreateJobDialog({
       notes: "",
       startDate: "",
       endDate: "",
+      color: "#3b82f6",
       employeeIds: [],
     });
   };
@@ -331,6 +326,7 @@ function CreateJobDialog({
       notes: formData.notes,
       startDate,
       endDate,
+      color: formData.color,
       status: "upcoming",
     });
 
@@ -417,6 +413,21 @@ function CreateJobDialog({
               placeholder="Job site address"
               data-testid="input-location"
             />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="color">Calendar Color</Label>
+            <div className="flex items-center gap-3">
+              <Input
+                id="color"
+                type="color"
+                value={formData.color}
+                onChange={(e) => setFormData({ ...formData, color: e.target.value })}
+                className="w-20 h-10 cursor-pointer"
+                data-testid="input-color"
+              />
+              <span className="text-sm text-muted-foreground">{formData.color}</span>
+            </div>
           </div>
 
           <div className="space-y-2">
@@ -639,6 +650,7 @@ function EditJobDialog({
     startDate: "",
     endDate: "",
     status: "",
+    color: "#3b82f6",
     employeeIds: [] as string[],
   });
 
@@ -655,6 +667,7 @@ function EditJobDialog({
         startDate: job.startDate ? new Date(job.startDate).toISOString().slice(0, 16) : "",
         endDate: job.endDate ? new Date(job.endDate).toISOString().slice(0, 16) : "",
         status: job.status || "upcoming",
+        color: job.color || "#3b82f6",
         employeeIds: job.assignedEmployees?.map(e => e.id) || [],
       });
     }
@@ -698,6 +711,7 @@ function EditJobDialog({
       startDate,
       endDate,
       status: formData.status,
+      color: formData.color,
     });
   };
 
@@ -793,6 +807,21 @@ function EditJobDialog({
               onChange={(e) => setFormData({ ...formData, location: e.target.value })}
               data-testid="input-edit-location"
             />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="edit-color">Calendar Color</Label>
+            <div className="flex items-center gap-3">
+              <Input
+                id="edit-color"
+                type="color"
+                value={formData.color}
+                onChange={(e) => setFormData({ ...formData, color: e.target.value })}
+                className="w-20 h-10 cursor-pointer"
+                data-testid="input-edit-color"
+              />
+              <span className="text-sm text-muted-foreground">{formData.color}</span>
+            </div>
           </div>
 
           <div className="space-y-2">
