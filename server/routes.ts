@@ -1786,10 +1786,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const allSessions = [];
       for (const project of projects) {
         const projectSessions = await storage.getWorkSessionsByProject(project.id, companyId);
+        
+        // Determine the correct target field based on job type
+        let dailyTarget = project.dailyDropTarget || 0;
+        if (project.jobType === 'parkade_pressure_cleaning') {
+          dailyTarget = project.stallsPerDay || 0;
+        } else if (project.jobType === 'in_suite_dryer_vent_cleaning') {
+          dailyTarget = project.floorsPerDay || project.suitesPerDay || 0;
+        }
+        
         // Add dailyDropTarget and calculate total dropsCompleted from elevation fields
         const sessionsWithTarget = projectSessions.map(session => ({
           ...session,
-          dailyDropTarget: project.dailyDropTarget,
+          dailyDropTarget: dailyTarget,
           dropsCompleted: (session.dropsCompletedNorth || 0) + 
                          (session.dropsCompletedEast || 0) + 
                          (session.dropsCompletedSouth || 0) + 

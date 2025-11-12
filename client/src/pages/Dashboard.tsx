@@ -343,7 +343,7 @@ export default function Dashboard() {
     s.endTime !== null && // Session is completed
     s.dailyDropTarget != null && // Has a drop target (excludes non-drop-based work)
     s.dailyDropTarget > 0 && // Target is meaningful
-    s.techName != null // Has a valid employee name
+    s.techName // Has a valid employee name (checking truthiness instead of != null)
   );
   const targetMetCount = completedSessions.filter((s: any) => s.dropsCompleted >= s.dailyDropTarget).length;
   const belowTargetCount = completedSessions.filter((s: any) => s.dropsCompleted < s.dailyDropTarget).length;
