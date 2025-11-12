@@ -3,11 +3,15 @@ import { useQuery } from "@tanstack/react-query";
 import { useLocation } from "wouter";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { Badge } from "@/components/ui/badge";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from "recharts";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Clock, Users, TrendingUp, Award } from "lucide-react";
 
 export default function HoursAnalytics() {
   const [, setLocation] = useLocation();
+  const [modalOpen, setModalOpen] = useState<string | null>(null);
 
   // Fetch current user
   const { data: userData } = useQuery({
@@ -408,7 +412,7 @@ export default function HoursAnalytics() {
 
             {/* Key Statistics Grid - Row 1 */}
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 mt-6">
-              <Card className="shadow-lg rounded-2xl border-0 hover:shadow-xl transition-shadow">
+              <Card className="shadow-lg rounded-2xl border-0 hover-elevate active-elevate-2 cursor-pointer transition-all" onClick={() => setModalOpen('activeProjects')} data-testid="card-active-projects">
                 <CardContent className="pt-6 text-center">
                   <div className="w-12 h-12 mx-auto mb-3 rounded-xl bg-blue-100 flex items-center justify-center">
                     <span className="material-icons text-blue-600">assignment</span>
@@ -419,7 +423,7 @@ export default function HoursAnalytics() {
                 </CardContent>
               </Card>
 
-              <Card className="shadow-lg rounded-2xl border-0 hover:shadow-xl transition-shadow">
+              <Card className="shadow-lg rounded-2xl border-0 hover-elevate active-elevate-2 cursor-pointer transition-all" onClick={() => setModalOpen('completedProjects')} data-testid="card-completed-projects">
                 <CardContent className="pt-6 text-center">
                   <div className="w-12 h-12 mx-auto mb-3 rounded-xl bg-emerald-100 flex items-center justify-center">
                     <span className="material-icons text-emerald-600">check_circle</span>
@@ -430,7 +434,7 @@ export default function HoursAnalytics() {
                 </CardContent>
               </Card>
 
-              <Card className="shadow-lg rounded-2xl border-0 hover:shadow-xl transition-shadow">
+              <Card className="shadow-lg rounded-2xl border-0 hover-elevate active-elevate-2 cursor-pointer transition-all" onClick={() => setModalOpen('totalEmployees')} data-testid="card-total-employees">
                 <CardContent className="pt-6 text-center">
                   <div className="w-12 h-12 mx-auto mb-3 rounded-xl bg-blue-100 flex items-center justify-center">
                     <span className="material-icons text-blue-600">group</span>
@@ -441,7 +445,7 @@ export default function HoursAnalytics() {
                 </CardContent>
               </Card>
 
-              <Card className="shadow-lg rounded-2xl border-0 hover:shadow-xl transition-shadow">
+              <Card className="shadow-lg rounded-2xl border-0 hover-elevate active-elevate-2 cursor-pointer transition-all" onClick={() => setModalOpen('activeEmployees')} data-testid="card-active-employees">
                 <CardContent className="pt-6 text-center">
                   <div className="w-12 h-12 mx-auto mb-3 rounded-xl bg-blue-100 flex items-center justify-center">
                     <span className="material-icons text-blue-600">people</span>
