@@ -804,6 +804,9 @@ export const insertScheduledJobSchema = createInsertSchema(scheduledJobs).omit({
   id: true,
   createdAt: true,
   updatedAt: true,
+}).extend({
+  startDate: z.coerce.date(),
+  endDate: z.coerce.date(),
 });
 
 // Job Employee Assignments - Many-to-many relationship
