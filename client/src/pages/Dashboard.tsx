@@ -1125,20 +1125,26 @@ export default function Dashboard() {
           <div className="mb-6">
             <div className="grid grid-cols-2 lg:grid-cols-3 gap-3">
               {dashboardCards.map(card => (
-                <Button
+                <div
                   key={card.id}
-                  variant="outline"
-                  className="h-auto flex-col gap-2 p-4"
+                  className="bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer overflow-hidden group hover-scale"
                   style={{ borderLeft: `6px solid ${card.borderColor}` }}
                   onClick={card.onClick}
                   data-testid={card.testId}
                 >
-                  <span className="material-icons text-primary text-5xl">{card.icon}</span>
-                  <div className="text-center">
-                    <div className="font-semibold">{card.label}</div>
-                    <div className="text-xs text-muted-foreground">{card.description}</div>
+                  <div className="p-8 flex flex-col items-center gap-4">
+                    <div 
+                      className="w-20 h-20 rounded-2xl flex items-center justify-center text-5xl transition-transform duration-300 group-hover:scale-110"
+                      style={{ backgroundColor: `${card.borderColor}20`, color: card.borderColor }}
+                    >
+                      <span className="material-icons text-5xl">{card.icon}</span>
+                    </div>
+                    <div className="text-center">
+                      <div className="text-lg font-bold text-foreground mb-1">{card.label}</div>
+                      <div className="text-sm text-muted-foreground">{card.description}</div>
+                    </div>
                   </div>
-                </Button>
+                </div>
               ))}
             </div>
           </div>
