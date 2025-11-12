@@ -51,65 +51,61 @@ export function HighRiseBuilding({
   ];
 
   return (
-    <div className={`flex flex-col items-center ${className}`} data-testid="highrise-building">
-      {/* Overall Progress - Premium Style */}
+    <div className={`w-full ${className}`} data-testid="highrise-building">
+      {/* Header */}
       <div className="text-center mb-8">
-        <div className="text-5xl font-bold gradient-text mb-2" data-testid="progress-percentage">
-          {Math.round(overallProgress)}%
-        </div>
-        <div className="text-sm font-medium text-muted-foreground" data-testid="drops-progress">
+        <div className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-2">
           {completedDrops} of {totalDrops} Total Drops Complete
         </div>
       </div>
 
-      {/* Four Elevations Side-by-Side - Premium Cards */}
-      <div className="flex gap-4 md:gap-6 overflow-x-auto pb-2">
+      {/* Four Elevations - Minimalist Premium Design */}
+      <div className="flex justify-center gap-8 overflow-x-auto pb-4 px-4">
         {elevations.map((elevation) => (
-          <div key={elevation.name} className="flex flex-col items-center">
-            {/* Elevation Label - Premium Badge */}
-            <div className="mb-3 px-3 py-1 bg-primary/10 rounded-full">
-              <span className="text-xs font-semibold text-primary uppercase tracking-wide">
+          <div key={elevation.name} className="flex flex-col items-center min-w-[120px]">
+            {/* Elevation Label - Soft Pill */}
+            <div className="mb-6 px-6 py-2 bg-primary/10 rounded-full">
+              <span className="text-sm font-bold text-primary uppercase tracking-wide">
                 {elevation.name}
               </span>
             </div>
             
-            {/* Building Structure - Premium Card with Shadow */}
-            <div className="relative">
-              <div className="w-20 bg-gradient-to-b from-card to-background border border-border/50 rounded-t-xl shadow-premium transition-premium hover:shadow-premium-lg">
-                {/* Roof - Premium Gradient */}
-                <div className="h-3 bg-gradient-to-r from-primary/20 to-primary/10 border-b border-border/30 rounded-t-xl"></div>
-                
-                {/* Floors - Refined Styling */}
-                <div className="relative flex flex-col">
-                  {buildingFloors.map(({ floorNumber }) => (
-                    <div
-                      key={floorNumber}
-                      className="relative border-b border-border/20 last:border-b-0 bg-card"
-                      style={{ height: '14px' }}
-                      data-testid={`${elevation.name.toLowerCase()}-floor-${floorNumber}`}
-                    >
-                      {/* Horizontal Progress Fill - Premium Gradient */}
-                      <div 
-                        className="absolute left-0 top-0 bottom-0 bg-gradient-to-r from-primary to-primary/80 transition-all duration-500 ease-out"
-                        style={{ width: `${elevation.progress}%` }}
-                        data-testid={`${elevation.name.toLowerCase()}-progress-${floorNumber}`}
-                      />
-                    </div>
-                  ))}
-                </div>
-
-                {/* Base - Premium Foundation */}
-                <div className="h-3 bg-gradient-to-r from-muted to-muted/50 border-t border-border/30 rounded-b-xl"></div>
+            {/* Building Visualization - Clean Minimal Style */}
+            <div className="relative w-24 h-96 bg-gradient-to-b from-gray-50 to-gray-100 rounded-3xl shadow-xl border border-gray-200/50 overflow-hidden">
+              {/* Progress Fill from Bottom */}
+              <div 
+                className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-primary/90 via-primary/70 to-primary/50 transition-all duration-700 ease-out rounded-3xl"
+                style={{ height: `${elevation.progress}%` }}
+                data-testid={`${elevation.name.toLowerCase()}-progress-fill`}
+              >
+                {/* Subtle shine effect */}
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"></div>
+              </div>
+              
+              {/* Floor Lines */}
+              {buildingFloors.slice(0, 15).map(({ floorNumber }, index) => (
+                <div
+                  key={floorNumber}
+                  className="absolute left-0 right-0 border-t border-gray-300/30"
+                  style={{ top: `${(index / 15) * 100}%` }}
+                />
+              ))}
+              
+              {/* Windows Pattern */}
+              <div className="absolute inset-4 grid grid-cols-2 gap-2 opacity-20">
+                {Array.from({ length: 30 }).map((_, i) => (
+                  <div key={i} className="h-3 bg-gray-400 rounded-sm"></div>
+                ))}
               </div>
             </div>
             
-            {/* Elevation Progress - Premium Typography */}
-            <div className="mt-3 text-center">
-              <div className="text-lg font-bold text-foreground mb-0.5">
+            {/* Stats Below */}
+            <div className="mt-6 text-center">
+              <div className="text-3xl font-bold gradient-text mb-1">
                 {Math.round(elevation.progress)}%
               </div>
-              <div className="text-xs font-medium text-muted-foreground">
-                {elevation.completed} / {elevation.total} drops
+              <div className="text-sm text-muted-foreground font-medium">
+                {elevation.completed} / {elevation.total}
               </div>
             </div>
           </div>
