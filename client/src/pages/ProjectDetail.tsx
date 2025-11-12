@@ -1438,6 +1438,15 @@ export default function ProjectDetail() {
                             {statusBadge}
                           </div>
                           <p className="text-sm line-clamp-2 mb-2">{complaint.message}</p>
+                          {complaint.photoUrl && (
+                            <div className="mb-2">
+                              <img 
+                                src={complaint.photoUrl} 
+                                alt="Complaint photo" 
+                                className="w-full max-w-xs rounded-lg border"
+                              />
+                            </div>
+                          )}
                           <div className="text-xs text-muted-foreground">
                             {new Date(complaint.createdAt).toLocaleDateString()}
                           </div>
