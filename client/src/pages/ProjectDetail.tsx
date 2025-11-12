@@ -2377,6 +2377,62 @@ export default function ProjectDetail() {
         <DialogContent className="max-w-md">
           <DialogHeader>
             <DialogTitle>End Your Work Day</DialogTitle>
+            <DialogDescription>
+              {project.jobType === "in_suite_dryer_vent_cleaning" 
+                ? `Enter the number of units you completed today for ${project.buildingName}.`
+                : project.jobType === "parkade_pressure_cleaning"
+                ? `Enter the number of stalls you cleaned today for ${project.buildingName}.`
+                : `Enter the number of drops you completed today for ${project.buildingName}.`}
+            </DialogDescription>
+          </DialogHeader>
+
+          <Form {...endDayForm}>
+            <form onSubmit={endDayForm.handleSubmit(onEndDaySubmit)} className="space-y-4">
+              {project.jobType === "in_suite_dryer_vent_cleaning" ? (
+                <FormField
+                  control={endDayForm.control}
+                  name="dropsCompletedNorth"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Units Completed</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="number"
+                          min="0"
+                          placeholder="0"
+                          {...field}
+                          data-testid="input-units-completed"
+                          className="h-16 text-3xl font-bold text-center"
+                          autoComplete="off"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              ) : project.jobType === "parkade_pressure_cleaning" ? (
+                <FormField
+                  control={endDayForm.control}
+                  name="dropsCompletedNorth"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Stalls Completed</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="number"
+                          min="0"
+                          placeholder="0"
+                          {...field}
+                          data-testid="input-stalls-completed"
+                          className="h-16 text-3xl font-bold text-center"
+                          autoComplete="off"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              ) : (
               <div className="grid grid-cols-2 gap-3">
                 <FormField
                   control={endDayForm.control}
