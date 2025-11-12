@@ -247,11 +247,14 @@ export const projectPhotos = pgTable("project_photos", {
   comment: text("comment"), // Optional comment about the photo
   isMissedUnit: boolean("is_missed_unit").notNull().default(false), // For in-suite dryer vent projects - marks units that were missed
   missedUnitNumber: varchar("missed_unit_number"), // Unit number for missed units (only when isMissedUnit is true)
+  isMissedStall: boolean("is_missed_stall").notNull().default(false), // For parkade projects - marks stalls that were missed
+  missedStallNumber: varchar("missed_stall_number"), // Stall number for missed stalls (only when isMissedStall is true)
   createdAt: timestamp("created_at").defaultNow(),
 }, (table) => [
   index("IDX_project_photos_project").on(table.projectId),
   index("IDX_project_photos_unit").on(table.unitNumber, table.projectId),
   index("IDX_project_photos_missed").on(table.isMissedUnit, table.projectId),
+  index("IDX_project_photos_missed_stall").on(table.isMissedStall, table.projectId),
 ]);
 
 // Job comments table - techs can add comments about project work

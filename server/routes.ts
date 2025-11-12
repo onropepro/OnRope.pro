@@ -924,7 +924,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       const projectId = req.params.id;
-      const { unitNumber, comment, isMissedUnit, missedUnitNumber } = req.body;
+      const { unitNumber, comment, isMissedUnit, missedUnitNumber, isMissedStall, missedStallNumber } = req.body;
       const currentUser = await storage.getUserById(req.session.userId!);
       
       if (!currentUser) {
@@ -957,6 +957,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       }
       
+      // Validate missed stall fields
+      const isMissedStallBool = isMissedStall === 'true' || isMissedStall === true;
+      if (isMissedStallBool) {
+        // Only allow missed stall marking for parkade projects
+        if (project.jobType !== 'parkade_pressure_cleaning') {
+          return res.status(400).json({ message: "Missed stalls can only be marked for parkade pressure cleaning projects" });
+        }
+        
+        // Require stall number when marking as missed
+        if (!missedStallNumber || missedStallNumber.trim() === '') {
+          return res.status(400).json({ message: "Stall number is required when marking a photo as a missed stall" });
+        }
+      }
+      
       // Generate unique filename
       const timestamp = Date.now();
       const ext = req.file.mimetype.split('/')[1];
@@ -980,6 +994,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         comment: comment || null,
         isMissedUnit: isMissed,
         missedUnitNumber: isMissed ? missedUnitNumber : null,
+        isMissedStall: isMissedStallBool,
+        missedStallNumber: isMissedStallBool ? missedStallNumber : null,
       });
       
       res.json({ photo, url });

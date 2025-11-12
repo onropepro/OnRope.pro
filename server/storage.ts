@@ -600,6 +600,8 @@ export class Storage {
       comment: projectPhotos.comment,
       isMissedUnit: projectPhotos.isMissedUnit,
       missedUnitNumber: projectPhotos.missedUnitNumber,
+      isMissedStall: projectPhotos.isMissedStall,
+      missedStallNumber: projectPhotos.missedStallNumber,
       createdAt: projectPhotos.createdAt,
       buildingName: projects.buildingName,
       buildingAddress: projects.buildingAddress,
@@ -610,7 +612,8 @@ export class Storage {
         and(
           or(
             eq(projectPhotos.unitNumber, unitNumber),
-            eq(projectPhotos.missedUnitNumber, unitNumber)
+            eq(projectPhotos.missedUnitNumber, unitNumber),
+            eq(projectPhotos.missedStallNumber, unitNumber)
           ),
           eq(projects.strataPlanNumber, strataPlanNumber)
         )

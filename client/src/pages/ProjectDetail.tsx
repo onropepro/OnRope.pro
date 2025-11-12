@@ -90,6 +90,8 @@ export default function ProjectDetail() {
   const [photoComment, setPhotoComment] = useState("");
   const [isMissedUnit, setIsMissedUnit] = useState(false);
   const [missedUnitNumber, setMissedUnitNumber] = useState("");
+  const [isMissedStall, setIsMissedStall] = useState(false);
+  const [missedStallNumber, setMissedStallNumber] = useState("");
   const [selectedMeeting, setSelectedMeeting] = useState<any>(null);
   const [newComment, setNewComment] = useState("");
   const [selectedSession, setSelectedSession] = useState<any>(null);
@@ -476,6 +478,16 @@ export default function ProjectDetail() {
       return;
     }
     
+    // Validate missed stall fields
+    if (isMissedStall && !missedStallNumber.trim()) {
+      toast({
+        title: "Missing stall number",
+        description: "Please enter a stall number for the missed stall",
+        variant: "destructive"
+      });
+      return;
+    }
+    
     setUploadingImage(true);
     setShowPhotoDialog(false);
     
@@ -487,6 +499,10 @@ export default function ProjectDetail() {
       formData.append('isMissedUnit', String(isMissedUnit));
       if (isMissedUnit) {
         formData.append('missedUnitNumber', missedUnitNumber);
+      }
+      formData.append('isMissedStall', String(isMissedStall));
+      if (isMissedStall) {
+        formData.append('missedStallNumber', missedStallNumber);
       }
       
       const response = await fetch(`/api/projects/${id}/images`, {
@@ -504,7 +520,10 @@ export default function ProjectDetail() {
       queryClient.invalidateQueries({ queryKey: ["/api/projects", id, "photos"] });
       queryClient.invalidateQueries({ queryKey: ["/api/projects", id] });
       queryClient.invalidateQueries({ queryKey: ["/api/all-project-photos"] });
-      toast({ title: isMissedUnit ? "Missed unit photo uploaded successfully" : "Photo uploaded successfully" });
+      const successMessage = isMissedUnit ? "Missed unit photo uploaded successfully" : 
+                            isMissedStall ? "Missed stall photo uploaded successfully" : 
+                            "Photo uploaded successfully";
+      toast({ title: successMessage });
       
       // Reset form
       setSelectedFile(null);
@@ -512,6 +531,8 @@ export default function ProjectDetail() {
       setPhotoComment("");
       setIsMissedUnit(false);
       setMissedUnitNumber("");
+      setIsMissedStall(false);
+      setMissedStallNumber("");
     } catch (error) {
       toast({ 
         title: "Upload failed", 
@@ -1235,6 +1256,71 @@ export default function ProjectDetail() {
               ) : null;
             })()}
 
+            {/* Missed Stalls Section - Only for parkade projects */}
+            {project.jobType === 'parkade_pressure_cleaning' && (() => {
+              const missedStallPhotos = photos.filter((photo: any) => photo.isMissedStall);
+              return missedStallPhotos.length > 0 ? (
+                <>
+                  <Separator />
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <span className="material-icons text-orange-600">warning</span>
+                        <h3 className="font-medium">Missed Stalls</h3>
+                      </div>
+                      <Badge variant="destructive" className="text-xs">
+                        {missedStallPhotos.length} {missedStallPhotos.length === 1 ? 'stall' : 'stalls'}
+                      </Badge>
+                    </div>
+                    
+                    <div className="p-3 bg-orange-50 border border-orange-200 rounded-lg">
+                      <p className="text-sm text-muted-foreground">
+                        Photos of parking stalls that were missed during the initial sweep and need to be addressed
+                      </p>
+                    </div>
+                    
+                    {/* Missed Stalls Grid */}
+                    <div className="grid grid-cols-2 gap-3">
+                      {missedStallPhotos.map((photo: any) => (
+                        <div
+                          key={photo.id}
+                          className="border-2 border-orange-400 rounded-lg overflow-hidden bg-card hover-elevate active-elevate-2"
+                          data-testid={`missed-stall-${photo.id}`}
+                        >
+                          <div
+                            onClick={() => setSelectedPhoto(photo)}
+                            className="aspect-square relative cursor-pointer"
+                          >
+                            <img
+                              src={photo.imageUrl}
+                              alt={`Missed stall ${photo.missedStallNumber}`}
+                              className="w-full h-full object-cover"
+                            />
+                            <div className="absolute top-2 right-2">
+                              <Badge variant="destructive" className="font-bold shadow-lg">
+                                Stall {photo.missedStallNumber}
+                              </Badge>
+                            </div>
+                          </div>
+                          <div className="p-3 border-t border-orange-200 bg-orange-50">
+                            <div className="font-medium text-sm">Stall {photo.missedStallNumber}</div>
+                            {photo.comment && (
+                              <div className="text-xs text-muted-foreground mt-1 line-clamp-2">
+                                {photo.comment}
+                              </div>
+                            )}
+                            <div className="text-xs text-muted-foreground mt-1">
+                              {format(new Date(photo.createdAt), "MMM d, yyyy 'at' h:mm a")}
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </>
+              ) : null;
+            })()}
+
             <Separator />
 
             {/* Toolbox Meetings Section */}
@@ -1631,6 +1717,44 @@ export default function ProjectDetail() {
                 />
                 <p className="text-xs text-muted-foreground">
                   Enter the unit number for the missed unit
+                </p>
+              </div>
+            )}
+
+            {project.jobType === 'parkade_pressure_cleaning' && (
+              <div className="flex items-start space-x-3 p-3 rounded-lg bg-orange-50 border border-orange-200">
+                <Checkbox
+                  id="missedStall"
+                  checked={isMissedStall}
+                  onCheckedChange={(checked) => setIsMissedStall(checked as boolean)}
+                  data-testid="checkbox-missed-stall"
+                />
+                <div className="space-y-1 flex-1">
+                  <Label 
+                    htmlFor="missedStall"
+                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
+                  >
+                    Mark as Missed Stall
+                  </Label>
+                  <p className="text-xs text-muted-foreground">
+                    Check this if the photo shows a stall that was missed during the initial sweep
+                  </p>
+                </div>
+              </div>
+            )}
+            
+            {isMissedStall && project.jobType === 'parkade_pressure_cleaning' && (
+              <div className="space-y-2 p-3 rounded-lg bg-orange-50 border border-orange-200">
+                <Label htmlFor="missedStallNumber">Missed Stall Number *</Label>
+                <Input
+                  id="missedStallNumber"
+                  placeholder="e.g., 42, 101, A-5"
+                  value={missedStallNumber}
+                  onChange={(e) => setMissedStallNumber(e.target.value)}
+                  data-testid="input-missed-stall-number"
+                />
+                <p className="text-xs text-muted-foreground">
+                  Enter the stall number for the missed parking stall
                 </p>
               </div>
             )}
