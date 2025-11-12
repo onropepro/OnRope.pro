@@ -1433,7 +1433,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
                         (project.totalDropsEast ?? 0) + 
                         (project.totalDropsSouth ?? 0) + 
                         (project.totalDropsWest ?? 0);
-      const progressPercentage = totalDrops > 0 ? (total / totalDrops) * 100 : 0;
+      
+      // For in-suite dryer vent cleaning, use floorCount as total units instead of totalDrops
+      const isInSuite = project.jobType === 'in_suite_dryer_vent_cleaning';
+      const totalUnits = isInSuite ? (project.floorCount ?? 0) : totalDrops;
+      const progressPercentage = totalUnits > 0 ? (total / totalUnits) * 100 : 0;
       
       res.json({
         completedDrops: total,
@@ -1441,7 +1445,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         completedDropsEast: east,
         completedDropsSouth: south,
         completedDropsWest: west,
-        totalDrops,
+        totalDrops: isInSuite ? (project.floorCount ?? 0) : totalDrops,
         totalDropsNorth: project.totalDropsNorth ?? 0,
         totalDropsEast: project.totalDropsEast ?? 0,
         totalDropsSouth: project.totalDropsSouth ?? 0,
