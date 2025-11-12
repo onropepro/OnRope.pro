@@ -179,11 +179,11 @@ export default function HoursAnalytics() {
                 </div>
               </div>
 
-              {/* Center Column - Project Progress Donut */}
+              {/* Center Column - Hours Breakdown Donut */}
               <div className="lg:col-span-1">
                 <Card className="shadow-xl h-full rounded-3xl border-0">
                   <CardHeader className="pb-2">
-                    <CardTitle className="text-base font-semibold text-muted-foreground">Project Progress</CardTitle>
+                    <CardTitle className="text-base font-semibold text-muted-foreground">Hours Breakdown</CardTitle>
                   </CardHeader>
                   <CardContent className="flex flex-col items-center justify-center">
                     <ResponsiveContainer width="100%" height={200}>
@@ -209,7 +209,7 @@ export default function HoursAnalytics() {
                       <div className="text-4xl font-bold text-primary">
                         {((monthBillable / (monthBillable + monthNonBillable || 1)) * 100).toFixed(0)}%
                       </div>
-                      <div className="text-sm text-muted-foreground mt-1">Q4 Initiative</div>
+                      <div className="text-sm text-muted-foreground mt-1">Billable Rate</div>
                     </div>
                   </CardContent>
                 </Card>
@@ -219,19 +219,19 @@ export default function HoursAnalytics() {
               <div className="lg:col-span-1 grid gap-6">
                 <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-blue-600 to-blue-700 p-6 shadow-xl">
                   <div className="relative z-10">
-                    <div className="text-sm font-semibold text-white/80 mb-2">Project Progress</div>
+                    <div className="text-sm font-semibold text-white/80 mb-2">Year Efficiency</div>
                     <div className="text-4xl font-bold text-white mb-1">{((yearBillable / (yearBillable + yearNonBillable || 1)) * 100).toFixed(0)}%</div>
                     <div className="text-white/70 text-sm">Completion</div>
-                    <div className="text-white/70 text-xs mt-2">181,58% Outpund</div>
+                    <div className="text-white/70 text-xs mt-2">{yearBillable.toFixed(1)}h billable</div>
                   </div>
                 </div>
                 
                 <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-blue-600 to-blue-700 p-6 shadow-xl">
                   <div className="relative z-10">
-                    <div className="text-sm font-semibold text-white/80 mb-2">Average Task Completion Time</div>
+                    <div className="text-sm font-semibold text-white/80 mb-2">Today's Hours</div>
                     <div className="text-4xl font-bold text-white mb-1">{(dayBillable + dayNonBillable).toFixed(1).replace('.', ',')}</div>
-                    <div className="text-white/70 text-sm">Previous periods</div>
-                    <div className="text-white/70 text-xs mt-2">223,80% Asduund</div>
+                    <div className="text-white/70 text-sm">{dayBillable.toFixed(1)}h billable</div>
+                    <div className="text-white/70 text-xs mt-2">{dayNonBillable.toFixed(1)}h non-billable</div>
                   </div>
                 </div>
               </div>
