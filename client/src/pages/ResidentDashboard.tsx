@@ -32,6 +32,10 @@ export default function ResidentDashboard() {
   const [showLogoutDialog, setShowLogoutDialog] = useState(false);
   const [selectedPhoto, setSelectedPhoto] = useState<File | null>(null);
   const [selectedProjectId, setSelectedProjectId] = useState<string | null>(null);
+  const [lastPhotoViewTime, setLastPhotoViewTime] = useState<number>(() => {
+    const stored = localStorage.getItem('lastPhotoViewTime');
+    return stored ? parseInt(stored) : 0;
+  });
   const { toast } = useToast();
   const [, setLocation] = useLocation();
 
@@ -88,6 +92,19 @@ export default function ResidentDashboard() {
     queryKey: ["/api/my-unit-photos"],
     enabled: !!currentUser?.unitNumber,
   });
+
+  // Calculate new photos count
+  const newPhotosCount = unitPhotosData?.photos?.filter((photo: any) => {
+    const photoTime = new Date(photo.createdAt).getTime();
+    return photoTime > lastPhotoViewTime;
+  }).length || 0;
+
+  // Mark photos as viewed when user opens the tab
+  const handlePhotoTabOpen = () => {
+    const now = Date.now();
+    setLastPhotoViewTime(now);
+    localStorage.setItem('lastPhotoViewTime', now.toString());
+  };
 
 
   const projectData = {
@@ -574,7 +591,28 @@ export default function ResidentDashboard() {
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <TabsList className="grid w-full grid-cols-4 mb-4">
             <TabsTrigger value="building" data-testid="tab-building">Progress</TabsTrigger>
-            <TabsTrigger value="photos" data-testid="tab-photos">My Photos</TabsTrigger>
+            <TabsTrigger 
+              value="photos" 
+              data-testid="tab-photos"
+              onClick={() => {
+                if (activeTab !== "photos") {
+                  handlePhotoTabOpen();
+                }
+              }}
+            >
+              <span className="relative">
+                My Photos
+                {newPhotosCount > 0 && (
+                  <Badge 
+                    variant="destructive" 
+                    className="absolute -top-2 -right-6 h-5 min-w-[20px] flex items-center justify-center px-1.5 text-xs font-bold"
+                    data-testid="badge-new-photos"
+                  >
+                    {newPhotosCount}
+                  </Badge>
+                )}
+              </span>
+            </TabsTrigger>
             <TabsTrigger value="submit" data-testid="tab-submit">Submit</TabsTrigger>
             <TabsTrigger value="history" data-testid="tab-history">Complaints</TabsTrigger>
           </TabsList>
@@ -690,7 +728,7 @@ export default function ResidentDashboard() {
                               )}
                             </div>
                             <Badge variant="secondary" className="text-xs shrink-0">
-                              Unit {photo.unitNumber}
+                              Unit {photo.unitNumber || photo.missedUnitNumber}
                             </Badge>
                           </div>
                           {photo.comment && (
