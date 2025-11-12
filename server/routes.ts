@@ -32,6 +32,7 @@ export function requireRole(...roles: string[]) {
 
 // Read-only mode enforcement middleware
 // Blocks all mutations for unverified company users
+// Residents are NEVER blocked
 export async function requireVerifiedCompanyForMutations(req: Request, res: Response, next: NextFunction) {
   try {
     // Fetch current user to check verification status
@@ -39,6 +40,11 @@ export async function requireVerifiedCompanyForMutations(req: Request, res: Resp
     
     if (!user) {
       return res.status(401).json({ message: "User not found" });
+    }
+    
+    // Residents are NEVER in read-only mode - they can always submit feedback
+    if (user.role === 'resident') {
+      return next();
     }
     
     // Determine which company to check:
