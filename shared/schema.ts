@@ -774,6 +774,53 @@ export const insertQuoteServiceSchema = createInsertSchema(quoteServices).omit({
   createdAt: true,
 });
 
+// Scheduled Jobs table - Calendar-based job scheduling
+export const scheduledJobs = pgTable("scheduled_jobs", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  companyId: varchar("company_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  projectId: varchar("project_id").references(() => projects.id, { onDelete: "set null" }), // Optional link to existing project
+  
+  title: varchar("title").notNull(),
+  description: text("description"),
+  jobType: varchar("job_type").notNull(), // window_cleaning | dryer_vent_cleaning | pressure_washing | in_suite | parkade | ground_window | custom
+  
+  startDate: timestamp("start_date").notNull(),
+  endDate: timestamp("end_date").notNull(),
+  
+  status: varchar("status").notNull().default('upcoming'), // upcoming | in_progress | completed | cancelled
+  location: text("location"), // Job site address
+  
+  estimatedHours: integer("estimated_hours"),
+  actualHours: integer("actual_hours"),
+  
+  notes: text("notes"),
+  
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+  createdBy: varchar("created_by").references(() => users.id),
+});
+
+export const insertScheduledJobSchema = createInsertSchema(scheduledJobs).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+// Job Employee Assignments - Many-to-many relationship
+export const jobAssignments = pgTable("job_assignments", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  jobId: varchar("job_id").notNull().references(() => scheduledJobs.id, { onDelete: "cascade" }),
+  employeeId: varchar("employee_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  
+  assignedAt: timestamp("assigned_at").defaultNow(),
+  assignedBy: varchar("assigned_by").references(() => users.id),
+});
+
+export const insertJobAssignmentSchema = createInsertSchema(jobAssignments).omit({
+  id: true,
+  assignedAt: true,
+});
+
 // Type exports
 export type User = typeof users.$inferSelect;
 export type InsertUser = z.infer<typeof insertUserSchema>;
@@ -826,6 +873,12 @@ export type InsertQuote = z.infer<typeof insertQuoteSchema>;
 export type QuoteService = typeof quoteServices.$inferSelect;
 export type InsertQuoteService = z.infer<typeof insertQuoteServiceSchema>;
 
+export type ScheduledJob = typeof scheduledJobs.$inferSelect;
+export type InsertScheduledJob = z.infer<typeof insertScheduledJobSchema>;
+
+export type JobAssignment = typeof jobAssignments.$inferSelect;
+export type InsertJobAssignment = z.infer<typeof insertJobAssignmentSchema>;
+
 // Extended types for frontend use with relations
 export type QuoteWithServices = Quote & {
   services: QuoteService[];
@@ -847,4 +900,8 @@ export type EmployeeHoursSummary = {
   totalHours: number;
   totalPay: number;
   sessions: (WorkSession & { projectName: string })[];
+};
+
+export type ScheduledJobWithAssignments = ScheduledJob & {
+  assignedEmployees: User[];
 };
