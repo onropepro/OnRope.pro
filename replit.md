@@ -25,9 +25,10 @@ The platform is built with a **mobile-first approach** and features a modern, pr
 - **Project Management:** Creation and management of projects including strata plan numbers, floor counts, and PDF rope access plan uploads. Projects can be completed, edited, or deleted with cascade warnings.
 - **Project Status Tracking:** Projects are categorized as 'active' or 'completed' with separate displays.
 - **Employee Management:** Company-controlled onboarding, editing employee details (name, email, role, IRATA level).
-- **Progress Tracking:** Visual progress via the 4-Elevation Building System. Daily drop logging by technicians includes historical entry, dynamic shortfall reason validation, and warnings for exceeding remaining work with an override option.
-- **Complaint Management:** Residents submit feedback, and management tracks and responds with notes.
-- **Photo Gallery:** Staff upload project photos from mobile devices, displayed in a 3-column responsive gallery.
+- **Progress Tracking:** Visual progress via the 4-Elevation Building System for traditional rope access jobs. Parkade projects display a visual grid of parking stalls that auto-scales based on total count. In-suite projects show simple percentage progress. Daily drop logging by technicians includes historical entry, dynamic shortfall reason validation, and warnings for exceeding remaining work with an override option.
+- **Complaint Management:** Residents submit feedback, and management tracks and responds with notes. Notes can be marked as "visible to resident" for two-way communication.
+- **Photo Gallery:** Staff upload project photos from mobile devices, displayed in a 3-column responsive gallery. Residents can view photos tagged for their unit number.
+- **Notification Badge System:** Residents receive iPhone-style red notification badges on dashboard tabs: (1) "My Photos" tab shows count of new photos added since last view, (2) "Complaints" tab shows count of complaints with new worker responses since last view. Uses localStorage to track view times and auto-clears when tabs are opened.
 - **Personal Gear Inventory:** All employees can view their assigned gear items via the "My Gear" tab within the Inventory page, showing equipment type, quantity, serial numbers, and service dates. The Inventory page uses tabs to provide both "My Gear" (read-only view for all employees) and "Manage Gear" (full CRUD operations for management). Financial data (item prices, total value) is conditionally displayed only for users with financial permissions.
 - **Universal Profile Management:** Users manage personal information; company owners can delete their accounts with cascade warnings.
 - **Authentication:** Custom Express.js authentication with session storage.

@@ -255,11 +255,30 @@ export class Storage {
     return db.select().from(complaints).orderBy(desc(complaints.createdAt));
   }
 
-  async getComplaintsForResident(residentId: string): Promise<Complaint[]> {
+  async getComplaintsForResident(residentId: string): Promise<any[]> {
     // Get complaints submitted by this resident
-    return db.select().from(complaints)
+    const residentComplaints = await db.select().from(complaints)
       .where(eq(complaints.residentId, residentId))
       .orderBy(desc(complaints.createdAt));
+    
+    // Fetch notes for each complaint (only visible-to-resident notes)
+    const complaintsWithNotes = await Promise.all(
+      residentComplaints.map(async (complaint) => {
+        const notes = await db.select().from(complaintNotes)
+          .where(and(
+            eq(complaintNotes.complaintId, complaint.id),
+            eq(complaintNotes.visibleToResident, true)
+          ))
+          .orderBy(desc(complaintNotes.createdAt));
+        
+        return {
+          ...complaint,
+          notes
+        };
+      })
+    );
+    
+    return complaintsWithNotes;
   }
 
   async getComplaintsForCompany(companyId: string): Promise<any[]> {

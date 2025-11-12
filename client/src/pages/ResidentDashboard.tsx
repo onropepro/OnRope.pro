@@ -37,6 +37,10 @@ export default function ResidentDashboard() {
     const stored = localStorage.getItem('lastPhotoViewTime');
     return stored ? parseInt(stored) : 0;
   });
+  const [lastComplaintsViewTime, setLastComplaintsViewTime] = useState<number>(() => {
+    const stored = localStorage.getItem('lastComplaintsViewTime');
+    return stored ? parseInt(stored) : 0;
+  });
   const { toast } = useToast();
   const [, setLocation] = useLocation();
 
@@ -100,11 +104,31 @@ export default function ResidentDashboard() {
     return photoTime > lastPhotoViewTime;
   }).length || 0;
 
+  // Calculate complaints with new responses (notes visible to resident created after last view)
+  const newResponsesCount = complaintsData?.complaints?.filter((complaint: any) => {
+    // Check if complaint has any notes visible to resident
+    if (!complaint.notes || complaint.notes.length === 0) return false;
+    
+    // Check if any visible-to-resident notes were created after last view time
+    return complaint.notes.some((note: any) => {
+      if (!note.visibleToResident) return false;
+      const noteTime = new Date(note.createdAt).getTime();
+      return noteTime > lastComplaintsViewTime;
+    });
+  }).length || 0;
+
   // Mark photos as viewed when user opens the tab
   const handlePhotoTabOpen = () => {
     const now = Date.now();
     setLastPhotoViewTime(now);
     localStorage.setItem('lastPhotoViewTime', now.toString());
+  };
+
+  // Mark complaints as viewed when user opens the tab
+  const handleComplaintsTabOpen = () => {
+    const now = Date.now();
+    setLastComplaintsViewTime(now);
+    localStorage.setItem('lastComplaintsViewTime', now.toString());
   };
 
 
@@ -602,22 +626,41 @@ export default function ResidentDashboard() {
                   handlePhotoTabOpen();
                 }
               }}
+              className="relative"
             >
-              <span className="relative">
-                My Photos
-                {newPhotosCount > 0 && (
-                  <Badge 
-                    variant="destructive" 
-                    className="absolute -top-2 -right-6 h-5 min-w-[20px] flex items-center justify-center px-1.5 text-xs font-bold"
-                    data-testid="badge-new-photos"
-                  >
-                    {newPhotosCount}
-                  </Badge>
-                )}
-              </span>
+              My Photos
+              {newPhotosCount > 0 && (
+                <Badge 
+                  variant="destructive" 
+                  className="absolute -top-1 -right-1 h-4 min-w-[16px] flex items-center justify-center px-1 text-[10px] font-bold"
+                  data-testid="badge-new-photos"
+                >
+                  {newPhotosCount}
+                </Badge>
+              )}
             </TabsTrigger>
             <TabsTrigger value="submit" data-testid="tab-submit">Submit</TabsTrigger>
-            <TabsTrigger value="history" data-testid="tab-history">Complaints</TabsTrigger>
+            <TabsTrigger 
+              value="history" 
+              data-testid="tab-history"
+              onClick={() => {
+                if (activeTab !== "history") {
+                  handleComplaintsTabOpen();
+                }
+              }}
+              className="relative"
+            >
+              Complaints
+              {newResponsesCount > 0 && (
+                <Badge 
+                  variant="destructive" 
+                  className="absolute -top-1 -right-1 h-4 min-w-[16px] flex items-center justify-center px-1 text-[10px] font-bold"
+                  data-testid="badge-new-responses"
+                >
+                  {newResponsesCount}
+                </Badge>
+              )}
+            </TabsTrigger>
           </TabsList>
 
           <TabsContent value="building" className="mt-6">
