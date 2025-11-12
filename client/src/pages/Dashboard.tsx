@@ -2394,40 +2394,122 @@ export default function Dashboard() {
                     }
                     
                     return activeEmployees.map((employee: any) => (
-                      <Card key={employee.id} data-testid={`employee-card-${employee.id}`}>
+                      <Card key={employee.id} data-testid={`employee-card-${employee.id}`} className="hover-elevate">
                         <CardContent className="p-4">
-                          <div className="flex items-start justify-between gap-3">
-                            <div className="flex-1">
-                              <div className="font-medium">{employee.name || employee.email}</div>
-                              {employee.techLevel && (
-                                <div className="text-xs text-muted-foreground mt-1">IRATA {employee.techLevel}</div>
+                          <div className="space-y-3">
+                            {/* Header - Name and Actions */}
+                            <div className="flex items-start justify-between gap-3">
+                              <div className="flex-1">
+                                <div className="font-medium text-lg">{employee.name || employee.email}</div>
+                                <Badge variant="secondary" className="text-xs capitalize mt-1">
+                                  {employee.role.replace(/_/g, ' ')}
+                                </Badge>
+                              </div>
+                              <div className="flex items-center gap-2">
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  onClick={() => handleEditEmployee(employee)}
+                                  data-testid={`button-edit-employee-${employee.id}`}
+                                  className="h-9 w-9"
+                                  disabled={userIsReadOnly}
+                                >
+                                  <span className="material-icons text-sm">edit</span>
+                                </Button>
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  onClick={() => setEmployeeToDelete(employee.id)}
+                                  data-testid={`button-delete-employee-${employee.id}`}
+                                  className="h-9 w-9 text-destructive hover:text-destructive"
+                                  disabled={userIsReadOnly}
+                                >
+                                  <span className="material-icons text-sm">delete</span>
+                                </Button>
+                              </div>
+                            </div>
+
+                            {/* Contact Info */}
+                            <div className="space-y-1">
+                              <div className="text-sm text-muted-foreground flex items-center gap-2">
+                                <span className="material-icons text-base">email</span>
+                                {employee.email}
+                              </div>
+                              {employee.employeePhoneNumber && (
+                                <div className="text-sm text-muted-foreground flex items-center gap-2">
+                                  <span className="material-icons text-base">phone</span>
+                                  {employee.employeePhoneNumber}
+                                </div>
                               )}
                             </div>
-                            <div className="flex items-center gap-2">
-                              <Badge variant="secondary" className="text-xs capitalize">
-                                {employee.role.replace(/_/g, ' ')}
-                              </Badge>
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                onClick={() => handleEditEmployee(employee)}
-                                data-testid={`button-edit-employee-${employee.id}`}
-                                className="h-9 w-9"
-                                disabled={userIsReadOnly}
-                              >
-                                <span className="material-icons text-sm">edit</span>
-                              </Button>
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                onClick={() => setEmployeeToDelete(employee.id)}
-                                data-testid={`button-delete-employee-${employee.id}`}
-                                className="h-9 w-9 text-destructive hover:text-destructive"
-                                disabled={userIsReadOnly}
-                              >
-                                <span className="material-icons text-sm">delete</span>
-                              </Button>
+
+                            {/* Employment Details */}
+                            <div className="flex flex-wrap gap-2">
+                              {employee.startDate && (
+                                <Badge variant="outline" className="text-xs">
+                                  Started: {new Date(employee.startDate).toLocaleDateString()}
+                                </Badge>
+                              )}
+                              {employee.hourlyRate && hasFinancialAccess(user) && (
+                                <Badge variant="outline" className="text-xs">
+                                  ${employee.hourlyRate}/hr
+                                </Badge>
+                              )}
+                              {employee.techLevel && (
+                                <Badge variant="outline" className="text-xs">
+                                  IRATA {employee.techLevel}
+                                </Badge>
+                              )}
                             </div>
+
+                            {/* IRATA Details */}
+                            {employee.irataLevel && (
+                              <div className="text-xs text-muted-foreground space-y-1 pt-2 border-t">
+                                <div className="flex items-center gap-2">
+                                  <span className="material-icons text-sm">workspace_premium</span>
+                                  <span>IRATA Level {employee.irataLevel}</span>
+                                </div>
+                                {employee.irataLicenseNumber && (
+                                  <div className="ml-6">License: {employee.irataLicenseNumber}</div>
+                                )}
+                                {employee.irataExpirationDate && (
+                                  <div className="ml-6">
+                                    Expires: {new Date(employee.irataExpirationDate).toLocaleDateString()}
+                                  </div>
+                                )}
+                              </div>
+                            )}
+
+                            {/* Driver's License */}
+                            {(employee.driversLicenseNumber || employee.driversLicenseProvince) && (
+                              <div className="text-xs text-muted-foreground space-y-1 pt-2 border-t">
+                                <div className="flex items-center gap-2">
+                                  <span className="material-icons text-sm">badge</span>
+                                  <span>
+                                    Driver's License: {employee.driversLicenseNumber || 'N/A'}
+                                    {employee.driversLicenseProvince && ` (${employee.driversLicenseProvince})`}
+                                  </span>
+                                </div>
+                                {employee.driversLicenseDocuments && employee.driversLicenseDocuments.length > 0 && (
+                                  <div className="ml-6">
+                                    {employee.driversLicenseDocuments.length} document(s) on file
+                                  </div>
+                                )}
+                              </div>
+                            )}
+
+                            {/* Emergency Contact */}
+                            {employee.emergencyContactName && (
+                              <div className="text-xs text-muted-foreground space-y-1 pt-2 border-t">
+                                <div className="flex items-center gap-2">
+                                  <span className="material-icons text-sm">contact_emergency</span>
+                                  <span>Emergency: {employee.emergencyContactName}</span>
+                                </div>
+                                {employee.emergencyContactPhone && (
+                                  <div className="ml-6">{employee.emergencyContactPhone}</div>
+                                )}
+                              </div>
+                            )}
                           </div>
                         </CardContent>
                       </Card>
@@ -2446,53 +2528,96 @@ export default function Dashboard() {
                         {terminatedEmployees.map((employee: any) => (
                           <Card key={employee.id} data-testid={`terminated-employee-card-${employee.id}`} className="opacity-60">
                             <CardContent className="p-4">
-                              <div className="flex items-start justify-between gap-3">
-                                <div className="flex-1">
-                                  <div className="font-medium">{employee.name || employee.email}</div>
-                                  {employee.techLevel && (
-                                    <div className="text-xs text-muted-foreground mt-1">IRATA {employee.techLevel}</div>
-                                  )}
-                                  {employee.terminatedDate && (
-                                    <div className="text-xs text-destructive mt-1">
-                                      Terminated: {new Date(employee.terminatedDate).toLocaleDateString()}
+                              <div className="space-y-3">
+                                {/* Header - Name and Actions */}
+                                <div className="flex items-start justify-between gap-3">
+                                  <div className="flex-1">
+                                    <div className="font-medium text-lg">{employee.name || employee.email}</div>
+                                    <Badge variant="outline" className="text-xs capitalize mt-1">
+                                      {employee.role.replace(/_/g, ' ')}
+                                    </Badge>
+                                    {employee.terminatedDate && (
+                                      <div className="text-xs text-destructive mt-2">
+                                        Terminated: {new Date(employee.terminatedDate).toLocaleDateString()}
+                                      </div>
+                                    )}
+                                  </div>
+                                  <div className="flex items-center gap-2">
+                                    <Button
+                                      variant="default"
+                                      size="sm"
+                                      onClick={() => reactivateEmployeeMutation.mutate(employee.id)}
+                                      data-testid={`button-reactivate-employee-${employee.id}`}
+                                      className="h-9"
+                                      disabled={userIsReadOnly}
+                                    >
+                                      <span className="material-icons text-sm mr-1">refresh</span>
+                                      Reactivate
+                                    </Button>
+                                    <Button
+                                      variant="ghost"
+                                      size="icon"
+                                      onClick={() => handleEditEmployee(employee)}
+                                      data-testid={`button-edit-terminated-employee-${employee.id}`}
+                                      className="h-9 w-9"
+                                      disabled={userIsReadOnly}
+                                    >
+                                      <span className="material-icons text-sm">edit</span>
+                                    </Button>
+                                    <Button
+                                      variant="ghost"
+                                      size="icon"
+                                      onClick={() => setEmployeeToDelete(employee.id)}
+                                      data-testid={`button-delete-terminated-employee-${employee.id}`}
+                                      className="h-9 w-9 text-destructive hover:text-destructive"
+                                      disabled={userIsReadOnly}
+                                    >
+                                      <span className="material-icons text-sm">delete</span>
+                                    </Button>
+                                  </div>
+                                </div>
+
+                                {/* Termination Details */}
+                                {employee.terminationReason && (
+                                  <div className="text-xs text-muted-foreground pt-2 border-t">
+                                    <div className="font-medium">Termination Reason: {employee.terminationReason}</div>
+                                    {employee.terminationNotes && (
+                                      <div className="mt-1">{employee.terminationNotes}</div>
+                                    )}
+                                  </div>
+                                )}
+
+                                {/* Contact Info */}
+                                <div className="space-y-1">
+                                  <div className="text-sm text-muted-foreground flex items-center gap-2">
+                                    <span className="material-icons text-base">email</span>
+                                    {employee.email}
+                                  </div>
+                                  {employee.employeePhoneNumber && (
+                                    <div className="text-sm text-muted-foreground flex items-center gap-2">
+                                      <span className="material-icons text-base">phone</span>
+                                      {employee.employeePhoneNumber}
                                     </div>
                                   )}
                                 </div>
-                                <div className="flex items-center gap-2">
-                                  <Badge variant="outline" className="text-xs capitalize">
-                                    {employee.role.replace(/_/g, ' ')}
-                                  </Badge>
-                                  <Button
-                                    variant="default"
-                                    size="sm"
-                                    onClick={() => reactivateEmployeeMutation.mutate(employee.id)}
-                                    data-testid={`button-reactivate-employee-${employee.id}`}
-                                    className="h-9"
-                                    disabled={userIsReadOnly}
-                                  >
-                                    <span className="material-icons text-sm mr-1">refresh</span>
-                                    Reactivate
-                                  </Button>
-                                  <Button
-                                    variant="ghost"
-                                    size="icon"
-                                    onClick={() => handleEditEmployee(employee)}
-                                    data-testid={`button-edit-terminated-employee-${employee.id}`}
-                                    className="h-9 w-9"
-                                    disabled={userIsReadOnly}
-                                  >
-                                    <span className="material-icons text-sm">edit</span>
-                                  </Button>
-                                  <Button
-                                    variant="ghost"
-                                    size="icon"
-                                    onClick={() => setEmployeeToDelete(employee.id)}
-                                    data-testid={`button-delete-terminated-employee-${employee.id}`}
-                                    className="h-9 w-9 text-destructive hover:text-destructive"
-                                    disabled={userIsReadOnly}
-                                  >
-                                    <span className="material-icons text-sm">delete</span>
-                                  </Button>
+
+                                {/* Employment Details */}
+                                <div className="flex flex-wrap gap-2">
+                                  {employee.startDate && (
+                                    <Badge variant="outline" className="text-xs">
+                                      Started: {new Date(employee.startDate).toLocaleDateString()}
+                                    </Badge>
+                                  )}
+                                  {employee.hourlyRate && hasFinancialAccess(user) && (
+                                    <Badge variant="outline" className="text-xs">
+                                      ${employee.hourlyRate}/hr
+                                    </Badge>
+                                  )}
+                                  {employee.techLevel && (
+                                    <Badge variant="outline" className="text-xs">
+                                      IRATA {employee.techLevel}
+                                    </Badge>
+                                  )}
                                 </div>
                               </div>
                             </CardContent>
