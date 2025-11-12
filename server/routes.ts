@@ -1462,7 +1462,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const totalUnits = isInSuite 
         ? (project.floorCount ?? 0) 
         : isParkade 
-        ? (project.totalStalls ?? 0)
+        ? (project.floorCount ?? 0)  // For parkade, floorCount stores total stalls
         : totalDrops;
       const progressPercentage = totalUnits > 0 ? (total / totalUnits) * 100 : 0;
       
@@ -1472,12 +1472,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         completedDropsEast: east,
         completedDropsSouth: south,
         completedDropsWest: west,
-        totalDrops: isInSuite ? (project.floorCount ?? 0) : isParkade ? (project.totalStalls ?? 0) : totalDrops,
+        totalDrops: isInSuite ? (project.floorCount ?? 0) : isParkade ? (project.floorCount ?? 0) : totalDrops,
         totalDropsNorth: project.totalDropsNorth ?? 0,
         totalDropsEast: project.totalDropsEast ?? 0,
         totalDropsSouth: project.totalDropsSouth ?? 0,
         totalDropsWest: project.totalDropsWest ?? 0,
-        totalStalls: isParkade ? (project.totalStalls ?? 0) : undefined,
+        totalStalls: isParkade ? (project.floorCount ?? 0) : undefined,
         completedStalls: isParkade ? total : undefined,
         progressPercentage: Math.round(progressPercentage),
       });
