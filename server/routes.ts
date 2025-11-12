@@ -601,7 +601,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       const { 
         name, email, password, role, techLevel, hourlyRate, permissions,
-        startDate, birthday, driversLicenseNumber, driversLicenseProvince,
+        startDate, birthday, driversLicenseNumber, driversLicenseProvince, driversLicenseDocuments,
         homeAddress, employeePhoneNumber, emergencyContactName, emergencyContactPhone,
         specialMedicalConditions, irataLevel, irataLicenseNumber, irataIssuedDate, irataExpirationDate
       } = req.body;
@@ -625,6 +625,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         birthday: birthday || null,
         driversLicenseNumber: driversLicenseNumber || null,
         driversLicenseProvince: driversLicenseProvince || null,
+        driversLicenseDocuments: driversLicenseDocuments || [],
         homeAddress: homeAddress || null,
         employeePhoneNumber: employeePhoneNumber || null,
         emergencyContactName: emergencyContactName || null,
@@ -674,7 +675,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       const { 
         name, email, role, techLevel, hourlyRate, permissions,
-        startDate, birthday, driversLicenseNumber, driversLicenseProvince,
+        startDate, birthday, driversLicenseNumber, driversLicenseProvince, driversLicenseDocuments,
         homeAddress, employeePhoneNumber, emergencyContactName, emergencyContactPhone,
         specialMedicalConditions, irataLevel, irataLicenseNumber, irataIssuedDate, 
         irataExpirationDate, terminatedDate, terminationReason, terminationNotes
@@ -692,6 +693,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         birthday: birthday !== undefined ? (birthday || null) : undefined,
         driversLicenseNumber: driversLicenseNumber !== undefined ? (driversLicenseNumber || null) : undefined,
         driversLicenseProvince: driversLicenseProvince !== undefined ? (driversLicenseProvince || null) : undefined,
+        driversLicenseDocuments: driversLicenseDocuments !== undefined ? (driversLicenseDocuments || []) : undefined,
         homeAddress: homeAddress !== undefined ? (homeAddress || null) : undefined,
         employeePhoneNumber: employeePhoneNumber !== undefined ? (employeePhoneNumber || null) : undefined,
         emergencyContactName: emergencyContactName !== undefined ? (emergencyContactName || null) : undefined,
@@ -844,6 +846,47 @@ export async function registerRoutes(app: Express): Promise<Server> {
       } else {
         cb(new Error('Only image files are allowed'));
       }
+    }
+  });
+
+  // Upload employee documents (images or PDFs)
+  const documentUpload = multer({
+    storage: multer.memoryStorage(),
+    limits: { fileSize: 10 * 1024 * 1024 }, // 10MB max
+    fileFilter: (req, file, cb) => {
+      if (file.mimetype.startsWith('image/') || file.mimetype === 'application/pdf') {
+        cb(null, true);
+      } else {
+        cb(new Error('Only image or PDF files are allowed'));
+      }
+    }
+  });
+
+  // Upload employee document (driver's license, abstract, etc.)
+  app.post("/api/upload-employee-document", requireAuth, requireRole("company", "operations_manager", "supervisor"), documentUpload.single('document'), async (req: Request, res: Response) => {
+    try {
+      if (!req.file) {
+        return res.status(400).json({ message: "No file uploaded" });
+      }
+
+      // Generate unique filename
+      const timestamp = Date.now();
+      const extension = req.file.mimetype === 'application/pdf' ? 'pdf' : req.file.mimetype.split('/')[1];
+      const filename = `employee-document-${timestamp}.${extension}`;
+
+      // Upload to private object storage
+      const objectStorageService = new ObjectStorageService();
+      const url = await objectStorageService.uploadPrivateFile(
+        filename,
+        req.file.buffer,
+        req.file.mimetype
+      );
+
+      res.json({ url });
+    } catch (error) {
+      console.error("Employee document upload error:", error);
+      const errorMessage = error instanceof Error ? error.message : "Failed to upload document";
+      res.status(500).json({ message: `Upload failed: ${errorMessage}` });
     }
   });
   

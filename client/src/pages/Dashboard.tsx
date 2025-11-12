@@ -28,6 +28,7 @@ import type { Project } from "@shared/schema";
 import { normalizeStrataPlan } from "@shared/schema";
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from "recharts";
 import { isManagement, hasFinancialAccess, canManageEmployees, canViewPerformance, hasPermission, isReadOnly } from "@/lib/permissions";
+import { DocumentUploader } from "@/components/DocumentUploader";
 
 const projectSchema = z.object({
   strataPlanNumber: z.string().min(1, "Strata plan number is required"),
@@ -144,6 +145,7 @@ const employeeSchema = z.object({
   birthday: z.string().optional(),
   driversLicenseNumber: z.string().optional(),
   driversLicenseProvince: z.string().optional(),
+  driversLicenseDocuments: z.array(z.string()).default([]),
   homeAddress: z.string().optional(),
   employeePhoneNumber: z.string().optional(),
   emergencyContactName: z.string().optional(),
@@ -167,6 +169,7 @@ const editEmployeeSchema = z.object({
   birthday: z.string().optional(),
   driversLicenseNumber: z.string().optional(),
   driversLicenseProvince: z.string().optional(),
+  driversLicenseDocuments: z.array(z.string()).default([]),
   homeAddress: z.string().optional(),
   employeePhoneNumber: z.string().optional(),
   emergencyContactName: z.string().optional(),
@@ -366,6 +369,7 @@ export default function Dashboard() {
       birthday: "",
       driversLicenseNumber: "",
       driversLicenseProvince: "",
+      driversLicenseDocuments: [],
       homeAddress: "",
       employeePhoneNumber: "",
       emergencyContactName: "",
@@ -390,6 +394,7 @@ export default function Dashboard() {
       birthday: "",
       driversLicenseNumber: "",
       driversLicenseProvince: "",
+      driversLicenseDocuments: [],
       homeAddress: "",
       employeePhoneNumber: "",
       emergencyContactName: "",
@@ -546,6 +551,7 @@ export default function Dashboard() {
         birthday: data.birthday,
         driversLicenseNumber: data.driversLicenseNumber,
         driversLicenseProvince: data.driversLicenseProvince,
+        driversLicenseDocuments: data.driversLicenseDocuments,
         homeAddress: data.homeAddress,
         employeePhoneNumber: data.employeePhoneNumber,
         emergencyContactName: data.emergencyContactName,
@@ -649,6 +655,7 @@ export default function Dashboard() {
       birthday: employee.birthday || "",
       driversLicenseNumber: employee.driversLicenseNumber || "",
       driversLicenseProvince: employee.driversLicenseProvince || "",
+      driversLicenseDocuments: employee.driversLicenseDocuments || [],
       homeAddress: employee.homeAddress || "",
       employeePhoneNumber: employee.employeePhoneNumber || "",
       emergencyContactName: employee.emergencyContactName || "",
@@ -2110,6 +2117,14 @@ export default function Dashboard() {
                             )}
                           />
 
+                          <DocumentUploader
+                            documents={employeeForm.watch("driversLicenseDocuments") || []}
+                            onDocumentsChange={(docs) => employeeForm.setValue("driversLicenseDocuments", docs)}
+                            maxDocuments={5}
+                            label="Driver's License Documents"
+                            description="Upload driver's license photos, abstracts, or related documents"
+                          />
+
                           <FormField
                             control={employeeForm.control}
                             name="homeAddress"
@@ -2832,6 +2847,14 @@ export default function Dashboard() {
                           <FormMessage />
                         </FormItem>
                       )}
+                    />
+
+                    <DocumentUploader
+                      documents={editEmployeeForm.watch("driversLicenseDocuments") || []}
+                      onDocumentsChange={(docs) => editEmployeeForm.setValue("driversLicenseDocuments", docs)}
+                      maxDocuments={5}
+                      label="Driver's License Documents"
+                      description="Upload driver's license photos, abstracts, or related documents"
                     />
 
                     <FormField

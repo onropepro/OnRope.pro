@@ -69,6 +69,7 @@ export const users = pgTable("users", {
   birthday: date("birthday"), // Employee date of birth (optional)
   driversLicenseNumber: varchar("drivers_license_number"), // Driver's license number (optional)
   driversLicenseProvince: varchar("drivers_license_province"), // Province where driver's license was issued (optional)
+  driversLicenseDocuments: text("drivers_license_documents").array().default(sql`ARRAY[]::text[]`), // Array of document URLs (driver's license photos, abstracts, etc.)
   homeAddress: text("home_address"), // Home address (optional)
   employeePhoneNumber: varchar("employee_phone_number"), // Employee phone number (optional, separate from resident phoneNumber)
   emergencyContactName: varchar("emergency_contact_name"), // Emergency contact name (optional)
