@@ -497,6 +497,21 @@ export class Storage {
     return result[0];
   }
 
+  async updateWorkSession(sessionId: string, updates: Partial<InsertWorkSession>): Promise<WorkSession> {
+    const result = await db.update(workSessions)
+      .set({
+        ...updates,
+        updatedAt: sql`NOW()`,
+      })
+      .where(eq(workSessions.id, sessionId))
+      .returning();
+    return result[0];
+  }
+
+  async deleteWorkSession(sessionId: string): Promise<void> {
+    await db.delete(workSessions).where(eq(workSessions.id, sessionId));
+  }
+
   async endNonBillableWorkSession(sessionId: string): Promise<any> {
     const result = await db.update(nonBillableWorkSessions)
       .set({
@@ -506,6 +521,21 @@ export class Storage {
       .where(eq(nonBillableWorkSessions.id, sessionId))
       .returning();
     return result[0];
+  }
+
+  async updateNonBillableWorkSession(sessionId: string, updates: any): Promise<any> {
+    const result = await db.update(nonBillableWorkSessions)
+      .set({
+        ...updates,
+        updatedAt: sql`NOW()`,
+      })
+      .where(eq(nonBillableWorkSessions.id, sessionId))
+      .returning();
+    return result[0];
+  }
+
+  async deleteNonBillableWorkSession(sessionId: string): Promise<void> {
+    await db.delete(nonBillableWorkSessions).where(eq(nonBillableWorkSessions.id, sessionId));
   }
 
   async getAllNonBillableSessions(companyId: string): Promise<any[]> {

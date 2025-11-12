@@ -11,8 +11,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { useToast } from "@/hooks/use-toast";
-import { DollarSign, Calendar, Users, Settings, ArrowLeft, Clock } from "lucide-react";
+import { DollarSign, Calendar, Users, Settings, ArrowLeft, Clock, Pencil, Trash2 } from "lucide-react";
 import { format } from "date-fns";
 
 export default function Payroll() {
@@ -51,6 +53,12 @@ export default function Payroll() {
   const [dropsSouth, setDropsSouth] = useState<string>("0");
   const [dropsWest, setDropsWest] = useState<string>("0");
   const [shortfallReason, setShortfallReason] = useState<string>("");
+
+  // State for editing sessions
+  const [editingSession, setEditingSession] = useState<any | null>(null);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [deleteSessionId, setDeleteSessionId] = useState<string | null>(null);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
   // Fetch current user to check permissions
   const { data: userData, isLoading: userLoading } = useQuery({
@@ -183,6 +191,74 @@ export default function Payroll() {
       toast({
         title: "Error",
         description: error.message || "Failed to add work session",
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Update work session mutation
+  const updateWorkSessionMutation = useMutation({
+    mutationFn: async ({ sessionId, data, isNonBillable }: { sessionId: string; data: any; isNonBillable: boolean }) => {
+      const endpoint = isNonBillable 
+        ? `/api/payroll/non-billable-sessions/${sessionId}` 
+        : `/api/payroll/work-sessions/${sessionId}`;
+      
+      const response = await apiRequest('PATCH', endpoint, data);
+      return response;
+    },
+    onSuccess: () => {
+      toast({
+        title: "Success",
+        description: "Work session updated successfully",
+      });
+      
+      setIsEditDialogOpen(false);
+      setEditingSession(null);
+      
+      // Invalidate queries to refresh data
+      queryClient.invalidateQueries({ queryKey: ['/api/payroll/periods'] });
+      if (selectedPeriodId) {
+        queryClient.invalidateQueries({ queryKey: ['/api/payroll/periods', selectedPeriodId, 'hours'] });
+      }
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to update work session",
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Delete work session mutation
+  const deleteWorkSessionMutation = useMutation({
+    mutationFn: async ({ sessionId, isNonBillable }: { sessionId: string; isNonBillable: boolean }) => {
+      const endpoint = isNonBillable 
+        ? `/api/payroll/non-billable-sessions/${sessionId}` 
+        : `/api/payroll/work-sessions/${sessionId}`;
+      
+      const response = await apiRequest('DELETE', endpoint, {});
+      return response;
+    },
+    onSuccess: () => {
+      toast({
+        title: "Success",
+        description: "Work session deleted successfully",
+      });
+      
+      setIsDeleteDialogOpen(false);
+      setDeleteSessionId(null);
+      
+      // Invalidate queries to refresh data
+      queryClient.invalidateQueries({ queryKey: ['/api/payroll/periods'] });
+      if (selectedPeriodId) {
+        queryClient.invalidateQueries({ queryKey: ['/api/payroll/periods', selectedPeriodId, 'hours'] });
+      }
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to delete work session",
         variant: "destructive",
       });
     },
@@ -537,40 +613,66 @@ export default function Payroll() {
                                 return (
                                   <Card key={session.id} className="bg-muted/30" data-testid={`session-${session.id}`}>
                                     <CardContent className="p-4">
-                                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
-                                        <div>
-                                          <div className="flex items-center gap-2 mb-2">
-                                            <span className="material-icons text-sm">event</span>
-                                            <span className="font-medium">
-                                              {format(new Date(session.workDate), 'EEE, MMM dd, yyyy')}
-                                            </span>
-                                          </div>
-                                          <div className="flex items-center gap-2 mb-2">
-                                            <span className="material-icons text-sm">business</span>
-                                            <span className="text-muted-foreground">{session.projectName || 'Unknown Project'}</span>
-                                          </div>
-                                          {totalDrops > 0 && (
-                                            <div className="flex items-center gap-2">
-                                              <span className="material-icons text-sm">check_circle</span>
-                                              <span className="text-muted-foreground">{totalDrops} drops completed</span>
+                                      <div className="flex justify-between gap-4">
+                                        <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
+                                          <div>
+                                            <div className="flex items-center gap-2 mb-2">
+                                              <span className="material-icons text-sm">event</span>
+                                              <span className="font-medium">
+                                                {format(new Date(session.workDate), 'EEE, MMM dd, yyyy')}
+                                              </span>
                                             </div>
-                                          )}
+                                            <div className="flex items-center gap-2 mb-2">
+                                              <span className="material-icons text-sm">business</span>
+                                              <span className="text-muted-foreground">{session.projectName || session.description || 'Non-Billable: ' + session.description}</span>
+                                            </div>
+                                            {totalDrops > 0 && (
+                                              <div className="flex items-center gap-2">
+                                                <span className="material-icons text-sm">check_circle</span>
+                                                <span className="text-muted-foreground">{totalDrops} drops completed</span>
+                                              </div>
+                                            )}
+                                          </div>
+                                          <div>
+                                            <div className="flex items-center gap-2 mb-2">
+                                              <Clock className="h-4 w-4" />
+                                              <span className="text-muted-foreground">
+                                                {format(startTime, 'h:mm a')} - {endTime ? format(endTime, 'h:mm a') : 'In Progress'}
+                                              </span>
+                                            </div>
+                                            <div className="flex items-center gap-2 mb-2">
+                                              <span className="material-icons text-sm">schedule</span>
+                                              <span className="font-semibold">{hours.toFixed(2)} hours</span>
+                                            </div>
+                                            <div className="flex items-center gap-2">
+                                              <DollarSign className="h-4 w-4" />
+                                              <span className="font-semibold text-primary">${sessionCost.toFixed(2)}</span>
+                                            </div>
+                                          </div>
                                         </div>
-                                        <div>
-                                          <div className="flex items-center gap-2 mb-2">
-                                            <Clock className="h-4 w-4" />
-                                            <span className="text-muted-foreground">
-                                              {format(startTime, 'h:mm a')} - {endTime ? format(endTime, 'h:mm a') : 'In Progress'}
-                                            </span>
-                                          </div>
-                                          <div className="flex items-center gap-2 mb-2">
-                                            <span className="material-icons text-sm">schedule</span>
-                                            <span className="font-semibold">{hours.toFixed(2)} hours</span>
-                                          </div>
-                                          <div className="flex items-center gap-2">
-                                            <DollarSign className="h-4 w-4" />
-                                            <span className="font-semibold text-primary">${sessionCost.toFixed(2)}</span>
-                                          </div>
+                                        <div className="flex flex-col gap-2">
+                                          <Button
+                                            size="icon"
+                                            variant="ghost"
+                                            onClick={() => {
+                                              setEditingSession(session);
+                                              setIsEditDialogOpen(true);
+                                            }}
+                                            data-testid={`button-edit-session-${session.id}`}
+                                          >
+                                            <Pencil className="h-4 w-4" />
+                                          </Button>
+                                          <Button
+                                            size="icon"
+                                            variant="ghost"
+                                            onClick={() => {
+                                              setDeleteSessionId(session.id);
+                                              setIsDeleteDialogOpen(true);
+                                            }}
+                                            data-testid={`button-delete-session-${session.id}`}
+                                          >
+                                            <Trash2 className="h-4 w-4 text-destructive" />
+                                          </Button>
                                         </div>
                                       </div>
                                     </CardContent>
@@ -1177,6 +1279,266 @@ export default function Payroll() {
           </Card>
         </TabsContent>
       </Tabs>
+
+      {/* Edit Work Session Dialog */}
+      <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Edit Work Session</DialogTitle>
+            <DialogDescription>
+              Update the work session details
+            </DialogDescription>
+          </DialogHeader>
+          {editingSession && (
+            <EditSessionForm
+              session={editingSession}
+              onSave={(data) => {
+                const isNonBillable = !editingSession.projectId;
+                updateWorkSessionMutation.mutate({
+                  sessionId: editingSession.id,
+                  data,
+                  isNonBillable
+                });
+              }}
+              onCancel={() => {
+                setIsEditDialogOpen(false);
+                setEditingSession(null);
+              }}
+              isPending={updateWorkSessionMutation.isPending}
+              projects={projectsData?.projects || []}
+            />
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Work Session?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. This will permanently delete the work session.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => {
+                if (deleteSessionId) {
+                  const session = hoursData?.hoursSummary
+                    .flatMap(e => e.sessions)
+                    .find(s => s.id === deleteSessionId);
+                  const isNonBillable = session && !session.projectId;
+                  deleteWorkSessionMutation.mutate({
+                    sessionId: deleteSessionId,
+                    isNonBillable: !!isNonBillable
+                  });
+                }
+              }}
+              className="bg-destructive hover:bg-destructive/90"
+            >
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </div>
+  );
+}
+
+// Edit Session Form Component
+function EditSessionForm({ session, onSave, onCancel, isPending, projects }: {
+  session: any;
+  onSave: (data: any) => void;
+  onCancel: () => void;
+  isPending: boolean;
+  projects: any[];
+}) {
+  const [workDate, setWorkDate] = useState(session.workDate.split('T')[0]);
+  const [startTime, setStartTime] = useState(format(new Date(session.startTime), 'HH:mm'));
+  const [endTime, setEndTime] = useState(format(new Date(session.endTime), 'HH:mm'));
+  const [dropsNorth, setDropsNorth] = useState(String(session.dropsCompletedNorth || 0));
+  const [dropsEast, setDropsEast] = useState(String(session.dropsCompletedEast || 0));
+  const [dropsSouth, setDropsSouth] = useState(String(session.dropsCompletedSouth || 0));
+  const [dropsWest, setDropsWest] = useState(String(session.dropsCompletedWest || 0));
+  const [shortfallReason, setShortfallReason] = useState(session.shortfallReason || "");
+  const [description, setDescription] = useState(session.description || "");
+
+  const isNonBillable = !session.projectId;
+  const project = projects.find(p => p.id === session.projectId);
+  const jobType = project?.jobType || '4_elevation_system';
+
+  const handleSubmit = () => {
+    const startDateTime = new Date(`${workDate}T${startTime}`);
+    const endDateTime = new Date(`${workDate}T${endTime}`);
+
+    if (isNonBillable) {
+      onSave({
+        workDate,
+        startTime: startDateTime.toISOString(),
+        endTime: endDateTime.toISOString(),
+        description,
+      });
+    } else {
+      onSave({
+        workDate,
+        startTime: startDateTime.toISOString(),
+        endTime: endDateTime.toISOString(),
+        dropsCompletedNorth: parseInt(dropsNorth) || 0,
+        dropsCompletedEast: parseInt(dropsEast) || 0,
+        dropsCompletedSouth: parseInt(dropsSouth) || 0,
+        dropsCompletedWest: parseInt(dropsWest) || 0,
+        shortfallReason: shortfallReason.trim() || null,
+      });
+    }
+  };
+
+  return (
+    <div className="space-y-4">
+      <div className="grid gap-4 md:grid-cols-3">
+        <div className="space-y-2">
+          <Label htmlFor="edit-work-date">Work Date *</Label>
+          <Input
+            id="edit-work-date"
+            type="date"
+            value={workDate}
+            onChange={(e) => setWorkDate(e.target.value)}
+            data-testid="input-edit-work-date"
+          />
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="edit-start-time">Start Time *</Label>
+          <Input
+            id="edit-start-time"
+            type="time"
+            value={startTime}
+            onChange={(e) => setStartTime(e.target.value)}
+            data-testid="input-edit-start-time"
+          />
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="edit-end-time">End Time *</Label>
+          <Input
+            id="edit-end-time"
+            type="time"
+            value={endTime}
+            onChange={(e) => setEndTime(e.target.value)}
+            data-testid="input-edit-end-time"
+          />
+        </div>
+      </div>
+
+      {isNonBillable ? (
+        <div className="space-y-2">
+          <Label htmlFor="edit-description">Description *</Label>
+          <Input
+            id="edit-description"
+            type="text"
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            placeholder="e.g., Training, Errands"
+            data-testid="input-edit-description"
+          />
+        </div>
+      ) : (
+        <>
+          <div className="border-t pt-4">
+            {jobType === 'parkade_pressure_cleaning' ? (
+              <div className="space-y-2">
+                <Label htmlFor="edit-stalls">Stalls Completed</Label>
+                <Input
+                  id="edit-stalls"
+                  type="number"
+                  min="0"
+                  value={dropsNorth}
+                  onChange={(e) => setDropsNorth(e.target.value)}
+                  data-testid="input-edit-stalls"
+                />
+              </div>
+            ) : jobType === 'in_suite_dryer_vent_cleaning' ? (
+              <div className="space-y-2">
+                <Label htmlFor="edit-floors">Floors Completed</Label>
+                <Input
+                  id="edit-floors"
+                  type="number"
+                  min="0"
+                  value={dropsNorth}
+                  onChange={(e) => setDropsNorth(e.target.value)}
+                  data-testid="input-edit-floors"
+                />
+              </div>
+            ) : (
+              <div className="grid gap-4 md:grid-cols-4">
+                <div className="space-y-2">
+                  <Label htmlFor="edit-drops-north">North</Label>
+                  <Input
+                    id="edit-drops-north"
+                    type="number"
+                    min="0"
+                    value={dropsNorth}
+                    onChange={(e) => setDropsNorth(e.target.value)}
+                    data-testid="input-edit-drops-north"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="edit-drops-east">East</Label>
+                  <Input
+                    id="edit-drops-east"
+                    type="number"
+                    min="0"
+                    value={dropsEast}
+                    onChange={(e) => setDropsEast(e.target.value)}
+                    data-testid="input-edit-drops-east"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="edit-drops-south">South</Label>
+                  <Input
+                    id="edit-drops-south"
+                    type="number"
+                    min="0"
+                    value={dropsSouth}
+                    onChange={(e) => setDropsSouth(e.target.value)}
+                    data-testid="input-edit-drops-south"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="edit-drops-west">West</Label>
+                  <Input
+                    id="edit-drops-west"
+                    type="number"
+                    min="0"
+                    value={dropsWest}
+                    onChange={(e) => setDropsWest(e.target.value)}
+                    data-testid="input-edit-drops-west"
+                  />
+                </div>
+              </div>
+            )}
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="edit-shortfall-reason">Shortfall Reason</Label>
+            <Input
+              id="edit-shortfall-reason"
+              type="text"
+              value={shortfallReason}
+              onChange={(e) => setShortfallReason(e.target.value)}
+              placeholder="e.g., Weather delay, Equipment issue"
+              data-testid="input-edit-shortfall-reason"
+            />
+          </div>
+        </>
+      )}
+
+      <div className="flex gap-2 justify-end pt-4">
+        <Button variant="outline" onClick={onCancel} disabled={isPending}>
+          Cancel
+        </Button>
+        <Button onClick={handleSubmit} disabled={isPending}>
+          {isPending ? "Saving..." : "Save Changes"}
+        </Button>
+      </div>
     </div>
   );
 }

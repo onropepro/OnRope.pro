@@ -2838,6 +2838,136 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Update billable work session
+  app.patch("/api/payroll/work-sessions/:id", requireAuth, requireRole("company", "operations_manager", "supervisor"), async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      const companyId = currentUser.role === "company" ? currentUser.id : currentUser.companyId;
+      if (!companyId) {
+        return res.status(400).json({ message: "Unable to determine company" });
+      }
+
+      // Check if user has financial permissions
+      const hasFinancialAccess = currentUser.role === "company" || currentUser.permissions?.includes("view_financial_data");
+      if (!hasFinancialAccess) {
+        return res.status(403).json({ message: "You don't have permission to update work sessions" });
+      }
+
+      const { workDate, startTime, endTime, dropsCompletedNorth, dropsCompletedEast, dropsCompletedSouth, dropsCompletedWest, shortfallReason } = req.body;
+
+      const updatedSession = await storage.updateWorkSession(req.params.id, {
+        workDate,
+        startTime: new Date(startTime),
+        endTime: new Date(endTime),
+        dropsCompletedNorth: dropsCompletedNorth || 0,
+        dropsCompletedEast: dropsCompletedEast || 0,
+        dropsCompletedSouth: dropsCompletedSouth || 0,
+        dropsCompletedWest: dropsCompletedWest || 0,
+        shortfallReason,
+      });
+
+      res.json({ session: updatedSession });
+    } catch (error) {
+      console.error("Update work session error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Delete billable work session
+  app.delete("/api/payroll/work-sessions/:id", requireAuth, requireRole("company", "operations_manager", "supervisor"), async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      const companyId = currentUser.role === "company" ? currentUser.id : currentUser.companyId;
+      if (!companyId) {
+        return res.status(400).json({ message: "Unable to determine company" });
+      }
+
+      // Check if user has financial permissions
+      const hasFinancialAccess = currentUser.role === "company" || currentUser.permissions?.includes("view_financial_data");
+      if (!hasFinancialAccess) {
+        return res.status(403).json({ message: "You don't have permission to delete work sessions" });
+      }
+
+      await storage.deleteWorkSession(req.params.id);
+
+      res.json({ message: "Work session deleted successfully" });
+    } catch (error) {
+      console.error("Delete work session error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Update non-billable work session
+  app.patch("/api/payroll/non-billable-sessions/:id", requireAuth, requireRole("company", "operations_manager", "supervisor"), async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      const companyId = currentUser.role === "company" ? currentUser.id : currentUser.companyId;
+      if (!companyId) {
+        return res.status(400).json({ message: "Unable to determine company" });
+      }
+
+      // Check if user has financial permissions
+      const hasFinancialAccess = currentUser.role === "company" || currentUser.permissions?.includes("view_financial_data");
+      if (!hasFinancialAccess) {
+        return res.status(403).json({ message: "You don't have permission to update work sessions" });
+      }
+
+      const { workDate, startTime, endTime, description } = req.body;
+
+      const updatedSession = await storage.updateNonBillableWorkSession(req.params.id, {
+        workDate,
+        startTime: new Date(startTime),
+        endTime: new Date(endTime),
+        description,
+      });
+
+      res.json({ session: updatedSession });
+    } catch (error) {
+      console.error("Update non-billable session error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Delete non-billable work session
+  app.delete("/api/payroll/non-billable-sessions/:id", requireAuth, requireRole("company", "operations_manager", "supervisor"), async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      const companyId = currentUser.role === "company" ? currentUser.id : currentUser.companyId;
+      if (!companyId) {
+        return res.status(400).json({ message: "Unable to determine company" });
+      }
+
+      // Check if user has financial permissions
+      const hasFinancialAccess = currentUser.role === "company" || currentUser.permissions?.includes("view_financial_data");
+      if (!hasFinancialAccess) {
+        return res.status(403).json({ message: "You don't have permission to delete work sessions" });
+      }
+
+      await storage.deleteNonBillableWorkSession(req.params.id);
+
+      res.json({ message: "Non-billable work session deleted successfully" });
+    } catch (error) {
+      console.error("Delete non-billable session error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
   // Generate pay periods
   app.post("/api/payroll/generate-periods", requireAuth, requireRole("company", "operations_manager", "supervisor"), async (req: Request, res: Response) => {
     try {
