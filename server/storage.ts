@@ -1,7 +1,7 @@
 import { db } from "./db";
 import { users, projects, dropLogs, workSessions, nonBillableWorkSessions, complaints, complaintNotes, projectPhotos, jobComments, harnessInspections, toolboxMeetings, payPeriodConfig, payPeriods, quotes, quoteServices, gearItems } from "@shared/schema";
 import type { User, InsertUser, Project, InsertProject, DropLog, InsertDropLog, WorkSession, InsertWorkSession, Complaint, InsertComplaint, ComplaintNote, InsertComplaintNote, ProjectPhoto, InsertProjectPhoto, JobComment, InsertJobComment, HarnessInspection, InsertHarnessInspection, ToolboxMeeting, InsertToolboxMeeting, PayPeriodConfig, InsertPayPeriodConfig, PayPeriod, InsertPayPeriod, EmployeeHoursSummary, Quote, InsertQuote, QuoteService, InsertQuoteService, QuoteWithServices, GearItem, InsertGearItem } from "@shared/schema";
-import { eq, and, desc, sql, isNull, not, gte, lte, between } from "drizzle-orm";
+import { eq, and, or, desc, sql, isNull, not, gte, lte, between } from "drizzle-orm";
 import bcrypt from "bcrypt";
 
 const SALT_ROUNDS = 10;
@@ -579,6 +579,8 @@ export class Storage {
       imageUrl: projectPhotos.imageUrl,
       unitNumber: projectPhotos.unitNumber,
       comment: projectPhotos.comment,
+      isMissedUnit: projectPhotos.isMissedUnit,
+      missedUnitNumber: projectPhotos.missedUnitNumber,
       createdAt: projectPhotos.createdAt,
       buildingName: projects.buildingName,
       buildingAddress: projects.buildingAddress,
@@ -587,7 +589,10 @@ export class Storage {
       .leftJoin(projects, eq(projectPhotos.projectId, projects.id))
       .where(
         and(
-          eq(projectPhotos.unitNumber, unitNumber),
+          or(
+            eq(projectPhotos.unitNumber, unitNumber),
+            eq(projectPhotos.missedUnitNumber, unitNumber)
+          ),
           eq(projects.strataPlanNumber, strataPlanNumber)
         )
       )
