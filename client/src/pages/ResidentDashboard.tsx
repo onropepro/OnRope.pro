@@ -25,7 +25,7 @@ const complaintSchema = z.object({
   residentName: z.string().min(1, "Name is required"),
   phoneNumber: z.string().min(10, "Valid phone number is required"),
   unitNumber: z.string().min(1, "Unit number is required"),
-  message: z.string().min(10, "Please provide details about your concern"),
+  message: z.string().min(1, "Message is required"),
   projectId: z.string().optional(),
 });
 
