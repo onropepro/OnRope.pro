@@ -1214,7 +1214,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           endDate,
           status: "upcoming",
           location: null,
-          color: "#3b82f6",
+          color: project.calendarColor || "#3b82f6",
           estimatedHours: null,
           actualHours: null,
           notes: null,

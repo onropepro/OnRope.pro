@@ -43,6 +43,7 @@ const projectSchema = z.object({
   floorCount: z.string().min(1, "Floor count is required"),
   targetCompletionDate: z.string().optional(),
   estimatedHours: z.string().optional(),
+  calendarColor: z.string().default("#3b82f6"),
   ropeAccessPlan: z.any().optional(),
   suitesPerDay: z.string().optional(),
   floorsPerDay: z.string().optional(),
@@ -355,6 +356,7 @@ export default function Dashboard() {
       floorCount: "",
       targetCompletionDate: "",
       estimatedHours: "",
+      calendarColor: "#3b82f6",
     },
   });
 
@@ -1498,6 +1500,31 @@ export default function Dashboard() {
                               </FormControl>
                               <FormDescription className="text-xs">
                                 Total hours estimated for the entire project
+                              </FormDescription>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+
+                        <FormField
+                          control={projectForm.control}
+                          name="calendarColor"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Calendar Color</FormLabel>
+                              <FormControl>
+                                <div className="flex items-center gap-3">
+                                  <Input 
+                                    type="color" 
+                                    {...field} 
+                                    data-testid="input-calendar-color"
+                                    className="h-12 w-20 cursor-pointer"
+                                  />
+                                  <span className="text-sm text-muted-foreground">{field.value}</span>
+                                </div>
+                              </FormControl>
+                              <FormDescription className="text-xs">
+                                Choose the color this project appears on the calendar
                               </FormDescription>
                               <FormMessage />
                             </FormItem>
