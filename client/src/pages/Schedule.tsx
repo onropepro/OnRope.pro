@@ -294,6 +294,7 @@ function CreateJobDialog({
     title: "",
     description: "",
     jobType: "window_cleaning",
+    customJobType: "",
     location: "",
     estimatedHours: "",
     notes: "",
@@ -339,6 +340,7 @@ function CreateJobDialog({
       title: "",
       description: "",
       jobType: "window_cleaning",
+      customJobType: "",
       location: "",
       estimatedHours: "",
       notes: "",
@@ -359,6 +361,7 @@ function CreateJobDialog({
       title: formData.title,
       description: formData.description,
       jobType: formData.jobType,
+      customJobType: formData.jobType === "custom" ? formData.customJobType : null,
       location: formData.location,
       estimatedHours: formData.estimatedHours ? parseInt(formData.estimatedHours) : null,
       notes: formData.notes,
@@ -441,6 +444,20 @@ function CreateJobDialog({
               </SelectContent>
             </Select>
           </div>
+
+          {formData.jobType === "custom" && (
+            <div className="space-y-2">
+              <Label htmlFor="customJobType">Custom Job Type *</Label>
+              <Input
+                id="customJobType"
+                value={formData.customJobType}
+                onChange={(e) => setFormData({ ...formData, customJobType: e.target.value })}
+                placeholder="e.g., Gutter Cleaning, Sidewalk Repair"
+                required
+                data-testid="input-custom-job-type"
+              />
+            </div>
+          )}
 
           <div className="space-y-2">
             <Label htmlFor="location">Location</Label>
@@ -682,6 +699,7 @@ function EditJobDialog({
     title: "",
     description: "",
     jobType: "",
+    customJobType: "",
     location: "",
     estimatedHours: "",
     notes: "",
@@ -699,6 +717,7 @@ function EditJobDialog({
         title: job.title || "",
         description: job.description || "",
         jobType: job.jobType || "window_cleaning",
+        customJobType: job.customJobType || "",
         location: job.location || "",
         estimatedHours: job.estimatedHours?.toString() || "",
         notes: job.notes || "",
@@ -743,6 +762,7 @@ function EditJobDialog({
       title: formData.title,
       description: formData.description,
       jobType: formData.jobType,
+      customJobType: formData.jobType === "custom" ? formData.customJobType : null,
       location: formData.location,
       estimatedHours: formData.estimatedHours ? parseInt(formData.estimatedHours) : null,
       notes: formData.notes,
@@ -836,6 +856,20 @@ function EditJobDialog({
               </SelectContent>
             </Select>
           </div>
+
+          {formData.jobType === "custom" && (
+            <div className="space-y-2">
+              <Label htmlFor="edit-customJobType">Custom Job Type *</Label>
+              <Input
+                id="edit-customJobType"
+                value={formData.customJobType}
+                onChange={(e) => setFormData({ ...formData, customJobType: e.target.value })}
+                placeholder="e.g., Gutter Cleaning, Sidewalk Repair"
+                required
+                data-testid="input-edit-custom-job-type"
+              />
+            </div>
+          )}
 
           <div className="space-y-2">
             <Label htmlFor="edit-location">Location</Label>

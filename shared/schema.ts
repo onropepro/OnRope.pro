@@ -783,6 +783,7 @@ export const scheduledJobs = pgTable("scheduled_jobs", {
   title: varchar("title").notNull(),
   description: text("description"),
   jobType: varchar("job_type").notNull(), // window_cleaning | dryer_vent_cleaning | pressure_washing | in_suite | parkade | ground_window | custom
+  customJobType: varchar("custom_job_type"), // Used when jobType is "custom"
   
   startDate: timestamp("start_date").notNull(),
   endDate: timestamp("end_date").notNull(),
