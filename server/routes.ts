@@ -1048,11 +1048,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Unit number or strata plan number not found" });
       }
       
+      console.log(`[MY-UNIT-PHOTOS] Resident unit: ${currentUser.unitNumber}, strata: ${currentUser.strataPlanNumber}`);
+      
       // Get photos by unit number and strata plan number (works across all companies)
       const photos = await storage.getPhotosByUnitAndStrataPlan(
         currentUser.unitNumber, 
         currentUser.strataPlanNumber
       );
+      
+      console.log(`[MY-UNIT-PHOTOS] Found ${photos.length} photos:`, photos.map(p => ({
+        id: p.id, 
+        unitNumber: p.unitNumber, 
+        missedUnitNumber: p.missedUnitNumber, 
+        isMissedUnit: p.isMissedUnit
+      })));
       
       res.json({ photos });
     } catch (error) {
