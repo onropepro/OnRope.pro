@@ -1049,6 +1049,16 @@ export default function Dashboard() {
       borderColor: "#16a34a",
     },
     {
+      id: "schedule",
+      label: "Job Schedule",
+      description: "Team assignments",
+      icon: "event",
+      onClick: () => setLocation("/schedule"),
+      testId: "button-schedule",
+      isVisible: (user: any) => isManagement(user), // Management only
+      borderColor: "#0ea5e9",
+    },
+    {
       id: "documents",
       label: "Documents",
       description: "Project files",
