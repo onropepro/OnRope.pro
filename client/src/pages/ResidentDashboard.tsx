@@ -25,7 +25,7 @@ const complaintSchema = z.object({
   residentName: z.string().min(1, "Name is required"),
   phoneNumber: z.string().min(10, "Valid phone number is required"),
   unitNumber: z.string().min(1, "Unit number is required"),
-  message: z.string().min(1, "Message is required"),
+  message: z.string().optional(),
   projectId: z.string().optional(),
 });
 
@@ -348,7 +348,7 @@ export default function ResidentDashboard() {
                     name="message"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Message *</FormLabel>
+                        <FormLabel>Message</FormLabel>
                         <FormControl>
                           <Textarea 
                             {...field} 
@@ -504,7 +504,7 @@ export default function ResidentDashboard() {
                     name="message"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Message *</FormLabel>
+                        <FormLabel>Message</FormLabel>
                         <FormControl>
                           <Textarea 
                             {...field} 
