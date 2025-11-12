@@ -14,31 +14,31 @@
   --elevate-1: rgba(0,0,0, .03);
   --elevate-2: rgba(0,0,0, .08);
 
-  /* Charcoal - Much darker background for maximum drama */
-  --background: 0 0% 88%;
+  /* Cloud - Premium light background */
+  --background: 218 27% 98%;
 
   /* Midnight - Strong contrast text */
-  --foreground: 0 0% 4%;
+  --foreground: 222 47% 11%;
 
-  /* Visible borders for definition */
-  --border: 0 0% 82%;
+  /* Mist - Subtle refined borders */
+  --border: 214 32% 91%;
 
   /* Pure White - Clean card surfaces */
   --card: 0 0% 100%;
 
-  --card-foreground: 0 0% 4%;
+  --card-foreground: 222 47% 11%;
 
-  --card-border: 0 0% 85%;
+  --card-border: 214 32% 91%;
 
-  /* Sidebar - Ghost background */
-  --sidebar: 0 0% 98%;
+  /* Sidebar - Cloud background */
+  --sidebar: 218 27% 97%;
 
-  --sidebar-foreground: 0 0% 4%;
+  --sidebar-foreground: 222 47% 11%;
 
-  --sidebar-border: 0 0% 91%;
+  --sidebar-border: 214 32% 91%;
 
-  /* Electric Blue - Modern vibrant primary */
-  --sidebar-primary: 217 91% 60%;
+  /* Ocean Blue - Premium primary */
+  --sidebar-primary: 199 89% 48%;
 
   --sidebar-primary-foreground: 0 0% 100%;
 
@@ -46,16 +46,16 @@
 
   --sidebar-accent-foreground: 0 0% 10%;
 
-  --sidebar-ring: 217 91% 60%;
+  --sidebar-ring: 199 89% 48%;
 
   --popover: 0 0% 100%;
 
-  --popover-foreground: 0 0% 4%;
+  --popover-foreground: 222 47% 11%;
 
-  --popover-border: 0 0% 91%;
+  --popover-border: 214 32% 91%;
 
-  /* Electric Blue - Primary actions */
-  --primary: 217 91% 60%;
+  /* Ocean Blue - Premium primary actions */
+  --primary: 199 89% 48%;
 
   --primary-foreground: 0 0% 100%;
 
@@ -67,15 +67,15 @@
   /* Muted states */
   --muted: 0 0% 96%;
 
-  --muted-foreground: 0 0% 45%;
+  --muted-foreground: 215 16% 47%;
 
   /* Accent - slightly darker than muted */
   --accent: 0 0% 96%;
 
   --accent-foreground: 0 0% 10%;
 
-  /* Coral for errors/urgent items */
-  --destructive: 0 71% 71%;
+  /* Rose for errors/urgent items */
+  --destructive: 347 77% 60%;
 
   --destructive-foreground: 0 0% 100%;
 
@@ -84,35 +84,35 @@
 
   --warning-foreground: 0 0% 100%;
 
-  /* Lime for success/completed states */
-  --success: 84 81% 44%;
+  /* Emerald for success/completed states */
+  --success: 160 84% 39%;
 
   --success-foreground: 0 0% 100%;
 
-  --input: 0 0% 82%;
-  --ring: 217 91% 60%;
+  --input: 214 32% 91%;
+  --ring: 199 89% 48%;
   
-  /* Chart colors - vibrant modern palette */
-  --chart-1: 217 91% 60%;
-  --chart-2: 38 92% 50%;
-  --chart-3: 84 81% 44%;
-  --chart-4: 271 81% 66%;
-  --chart-5: 0 71% 71%;
+  /* Chart colors - premium palette */
+  --chart-1: 199 89% 48%;
+  --chart-2: 262 83% 58%;
+  --chart-3: 160 84% 39%;
+  --chart-4: 347 77% 60%;
+  --chart-5: 38 92% 50%;
 
   --font-sans: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   --font-serif: Georgia, serif;
   --font-mono: "JetBrains Mono", Menlo, monospace;
-  --radius: 1rem; /* 16px - modern rounded corners */
+  --radius: 0.75rem; /* 12px - refined rounded corners */
   
-  /* Dramatic shadow system for strong depth */
-  --shadow-2xs: 0 1px 2px rgba(0,0,0,0.05);
-  --shadow-xs: 0 1px 3px rgba(0,0,0,0.06);
-  --shadow-sm: 0 4px 6px rgba(0,0,0,0.07);
-  --shadow: 0 6px 10px rgba(0,0,0,0.08);
-  --shadow-md: 0 8px 15px rgba(0,0,0,0.09);
-  --shadow-lg: 0 10px 20px rgba(0,0,0,0.10);
-  --shadow-xl: 0 20px 25px rgba(0,0,0,0.12);
-  --shadow-2xl: 0 25px 50px rgba(0,0,0,0.15);
+  /* Premium shadow system - subtle and refined */
+  --shadow-2xs: 0 1px 2px rgba(15,23,42,0.04);
+  --shadow-xs: 0 1px 3px rgba(15,23,42,0.05);
+  --shadow-sm: 0 2px 8px rgba(15,23,42,0.06);
+  --shadow: 0 4px 12px rgba(15,23,42,0.07);
+  --shadow-md: 0 4px 16px rgba(15,23,42,0.08);
+  --shadow-lg: 0 8px 24px rgba(15,23,42,0.10);
+  --shadow-xl: 0 16px 48px rgba(15,23,42,0.12);
+  --shadow-2xl: 0 24px 64px rgba(15,23,42,0.16);
   
   --tracking-normal: 0em;
   --spacing: 0.25rem;
@@ -158,60 +158,60 @@
   --elevate-1: rgba(255,255,255, .04);
   --elevate-2: rgba(255,255,255, .09);
 
-  /* Charcoal - Deep dramatic background */
-  --background: 0 0% 9%;
+  /* Midnight - Deep sophisticated background */
+  --background: 222 47% 11%;
 
   --foreground: 0 0% 98%;
 
-  --border: 0 0% 20%;
+  --border: 217 33% 17%;
 
   /* Elevated dark card */
-  --card: 0 0% 13%;
+  --card: 215 28% 17%;
 
   --card-foreground: 0 0% 98%;
 
-  --card-border: 0 0% 20%;
+  --card-border: 217 33% 17%;
 
-  --sidebar: 0 0% 9%;
+  --sidebar: 222 47% 11%;
 
   --sidebar-foreground: 0 0% 98%;
 
-  --sidebar-border: 0 0% 20%;
+  --sidebar-border: 217 33% 17%;
 
-  /* Electric Blue - vibrant on dark */
-  --sidebar-primary: 217 91% 60%;
+  /* Ocean Blue - vibrant on dark */
+  --sidebar-primary: 199 89% 48%;
 
   --sidebar-primary-foreground: 0 0% 100%;
 
-  --sidebar-accent: 0 0% 15%;
+  --sidebar-accent: 217 33% 17%;
 
   --sidebar-accent-foreground: 0 0% 95%;
 
-  --sidebar-ring: 217 91% 60%;
+  --sidebar-ring: 199 89% 48%;
 
-  --popover: 0 0% 13%;
+  --popover: 215 28% 17%;
 
   --popover-foreground: 0 0% 98%;
 
-  --popover-border: 0 0% 20%;
+  --popover-border: 217 33% 17%;
 
-  --primary: 217 91% 60%;
+  --primary: 199 89% 48%;
 
   --primary-foreground: 0 0% 100%;
 
-  --secondary: 0 0% 15%;
+  --secondary: 217 33% 17%;
 
   --secondary-foreground: 0 0% 95%;
 
-  --muted: 0 0% 15%;
+  --muted: 217 33% 17%;
 
-  --muted-foreground: 0 0% 60%;
+  --muted-foreground: 215 20% 65%;
 
-  --accent: 0 0% 15%;
+  --accent: 217 33% 17%;
 
   --accent-foreground: 0 0% 95%;
 
-  --destructive: 0 71% 71%;
+  --destructive: 347 77% 60%;
 
   --destructive-foreground: 0 0% 100%;
 
@@ -219,18 +219,18 @@
 
   --warning-foreground: 0 0% 100%;
 
-  --success: 84 81% 50%;
+  --success: 160 84% 39%;
 
   --success-foreground: 0 0% 100%;
 
-  --input: 0 0% 20%;
-  --ring: 217 91% 60%;
+  --input: 217 33% 17%;
+  --ring: 199 89% 48%;
   
-  --chart-1: 217 91% 60%;
-  --chart-2: 38 92% 60%;
-  --chart-3: 84 81% 50%;
-  --chart-4: 271 81% 66%;
-  --chart-5: 0 71% 71%;
+  --chart-1: 199 89% 48%;
+  --chart-2: 262 83% 58%;
+  --chart-3: 160 84% 39%;
+  --chart-4: 347 77% 60%;
+  --chart-5: 38 92% 60%;
 
   /* Dramatic shadows for dark mode depth */
   --shadow-2xs: 0 1px 2px rgba(0,0,0,0.50);
