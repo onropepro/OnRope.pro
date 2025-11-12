@@ -24,9 +24,21 @@ export default function HoursAnalytics() {
     queryKey: ["/api/non-billable-sessions"],
   });
 
+  // Fetch projects for stats
+  const { data: projectsData } = useQuery({
+    queryKey: ["/api/projects"],
+  });
+
+  // Fetch employees for stats
+  const { data: employeesData } = useQuery({
+    queryKey: ["/api/employees"],
+  });
+
   const user = userData?.user;
   const allWorkSessions = workSessionsData?.sessions || [];
   const allNonBillableSessions = nonBillableData?.sessions || [];
+  const projects = projectsData?.projects || [];
+  const employees = employeesData?.employees || [];
 
   const isLoading = isLoadingWork || isLoadingNonBillable;
 
@@ -123,6 +135,28 @@ export default function HoursAnalytics() {
   ];
 
   const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+
+  // Calculate real statistics
+  const activeProjects = projects.filter((p: any) => p.status === 'active').length;
+  const totalEmployees = employees.length;
+  
+  // Get unique employees who worked this month
+  const monthSessions = [...workSessions, ...nonBillableSessions].filter((s: any) => {
+    if (!s.endTime) return false;
+    const dateStr = s.workDate || s.date;
+    if (!dateStr) return false;
+    const parts = dateStr.split('T')[0].split('-');
+    const sessionDate = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
+    return sessionDate >= monthStart && sessionDate <= monthEnd;
+  });
+  
+  const uniqueEmployeesThisMonth = new Set(monthSessions.map((s: any) => s.employeeId)).size;
+  const totalSessionsThisMonth = monthSessions.length;
+  
+  // Calculate average hours per employee
+  const avgHoursPerEmployee = totalEmployees > 0 
+    ? ((monthBillable + monthNonBillable) / totalEmployees).toFixed(1)
+    : '0.0';
 
   return (
     <div className="min-h-screen page-gradient">
@@ -282,20 +316,20 @@ export default function HoursAnalytics() {
                   <div className="w-12 h-12 mx-auto mb-3 rounded-xl bg-blue-100 flex items-center justify-center">
                     <span className="material-icons text-blue-600">assignment</span>
                   </div>
-                  <div className="text-2xl font-bold mb-1">{Math.round(yearBillable + yearNonBillable)}</div>
+                  <div className="text-2xl font-bold mb-1">{activeProjects}</div>
                   <div className="text-sm text-muted-foreground">Active Projects</div>
-                  <div className="text-xs text-muted-foreground mt-1">Pending</div>
+                  <div className="text-xs text-muted-foreground mt-1">In Progress</div>
                 </CardContent>
               </Card>
 
               <Card className="shadow-lg rounded-2xl border-0 hover:shadow-xl transition-shadow">
                 <CardContent className="pt-6 text-center">
                   <div className="w-12 h-12 mx-auto mb-3 rounded-xl bg-blue-100 flex items-center justify-center">
-                    <span className="material-icons text-blue-600">pending_actions</span>
+                    <span className="material-icons text-blue-600">group</span>
                   </div>
-                  <div className="text-2xl font-bold mb-1">{Math.round(monthBillable)}</div>
-                  <div className="text-sm text-muted-foreground">Pending Tasks</div>
-                  <div className="text-xs text-muted-foreground mt-1">Pending</div>
+                  <div className="text-2xl font-bold mb-1">{totalEmployees}</div>
+                  <div className="text-sm text-muted-foreground">Total Employees</div>
+                  <div className="text-xs text-muted-foreground mt-1">Company Wide</div>
                 </CardContent>
               </Card>
 
@@ -304,20 +338,20 @@ export default function HoursAnalytics() {
                   <div className="w-12 h-12 mx-auto mb-3 rounded-xl bg-blue-100 flex items-center justify-center">
                     <span className="material-icons text-blue-600">people</span>
                   </div>
-                  <div className="text-2xl font-bold mb-1">85%</div>
-                  <div className="text-sm text-muted-foreground">Team Utilization</div>
-                  <div className="text-xs text-muted-foreground mt-1">Rate</div>
+                  <div className="text-2xl font-bold mb-1">{uniqueEmployeesThisMonth}</div>
+                  <div className="text-sm text-muted-foreground">Active This Month</div>
+                  <div className="text-xs text-muted-foreground mt-1">Employees</div>
                 </CardContent>
               </Card>
 
               <Card className="shadow-lg rounded-2xl border-0 hover:shadow-xl transition-shadow">
                 <CardContent className="pt-6 text-center">
                   <div className="w-12 h-12 mx-auto mb-3 rounded-xl bg-blue-100 flex items-center justify-center">
-                    <span className="material-icons text-blue-600">leaderboard</span>
+                    <span className="material-icons text-blue-600">trending_up</span>
                   </div>
-                  <div className="text-2xl font-bold mb-1">92%</div>
-                  <div className="text-sm text-muted-foreground">Team Utilization</div>
-                  <div className="text-xs text-muted-foreground mt-1">Rate</div>
+                  <div className="text-2xl font-bold mb-1">{avgHoursPerEmployee}h</div>
+                  <div className="text-sm text-muted-foreground">Avg Hours/Employee</div>
+                  <div className="text-xs text-muted-foreground mt-1">This Month</div>
                 </CardContent>
               </Card>
             </div>
