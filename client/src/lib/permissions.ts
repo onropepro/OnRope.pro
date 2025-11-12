@@ -88,8 +88,14 @@ export function hasPermission(user: User | null | undefined, permission: string)
 // Check if user is in read-only mode
 // - For company role: check their own license verification
 // - For employees: check their parent company's license verification
+// - Residents are NEVER in read-only mode
 export function isReadOnly(user: User | null | undefined): boolean {
   if (!user) return false;
+  
+  // Residents are never in read-only mode
+  if (user.role === 'resident') {
+    return false;
+  }
   
   // For company role: check their own license
   if (user.role === 'company') {

@@ -17,6 +17,9 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { AlertCircle } from "lucide-react";
+import { isReadOnly } from "@/lib/permissions";
 
 const complaintSchema = z.object({
   residentName: z.string().min(1, "Name is required"),
@@ -586,6 +589,19 @@ export default function ResidentDashboard() {
           </div>
         </div>
       </header>
+
+      {/* Read-Only Mode Banner */}
+      {currentUser && isReadOnly(currentUser) && (
+        <Alert className="mx-4 mt-4 border-yellow-500/50 bg-yellow-500/10">
+          <AlertCircle className="h-4 w-4 text-yellow-600 dark:text-yellow-500" />
+          <div className="flex-1">
+            <AlertTitle className="text-yellow-700 dark:text-yellow-400">Read-Only Mode</AlertTitle>
+            <AlertDescription className="text-yellow-600 dark:text-yellow-500">
+              Your company is in read-only mode and must verify its license to submit feedback or make changes.
+            </AlertDescription>
+          </div>
+        </Alert>
+      )}
 
       {/* Main Content - Full Width */}
       <div className="flex-1 container max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
