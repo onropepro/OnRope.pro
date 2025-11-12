@@ -25,49 +25,61 @@ export function ProjectCard({
   className = ""
 }: ProjectCardProps) {
   return (
-    <Card 
-      className={`hover-elevate transition-all duration-200 cursor-pointer border-border/50 ${className}`}
+    <div 
+      className={`premium-card hover-scale cursor-pointer ${className}`}
       onClick={onClick}
     >
-      <CardHeader className="pb-4">
+      <div className="space-y-5">
         <div className="flex items-start justify-between gap-4">
           <div className="flex-1 min-w-0">
-            <CardTitle className="text-lg font-semibold truncate">{title}</CardTitle>
+            <h3 className="text-xl font-bold text-foreground truncate mb-2">{title}</h3>
             {subtitle && (
-              <CardDescription className="text-sm mt-1">{subtitle}</CardDescription>
+              <p className="text-sm font-medium text-muted-foreground flex items-center gap-1.5">
+                <span className="material-icons text-base text-primary">business</span>
+                {subtitle}
+              </p>
             )}
           </div>
           <div className="flex items-center gap-2 flex-shrink-0">
             {status && (
-              <Badge 
-                variant={status === "completed" ? "default" : "secondary"}
-                className={status === "completed" ? "bg-success hover:bg-success" : "bg-warning hover:bg-warning"}
+              <div 
+                className={`px-4 py-1.5 rounded-full font-semibold text-sm shadow-md text-white ${
+                  status === "completed" ? "bg-success" : "bg-primary"
+                }`}
               >
-                {status === "completed" ? "Completed" : "Active"}
-              </Badge>
+                {status === "completed" ? "✓ Completed" : "• Active"}
+              </div>
             )}
             {icon && (
-              <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
-                {icon}
+              <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary/20 to-chart-2/20 flex items-center justify-center shadow-lg">
+                <div className="text-primary text-2xl">
+                  {icon}
+                </div>
               </div>
             )}
           </div>
         </div>
-      </CardHeader>
-      {(progress !== undefined || children) && (
-        <CardContent className="pt-0">
-          {progress !== undefined && (
-            <div className="space-y-2">
-              <div className="flex items-center justify-between text-sm">
-                <span className="text-muted-foreground">Progress</span>
-                <span className="font-semibold">{progress}%</span>
+        
+        {(progress !== undefined || children) && (
+          <div className="space-y-4">
+            {progress !== undefined && (
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <span className="text-sm font-semibold text-muted-foreground">Progress</span>
+                  <span className="text-2xl font-bold gradient-text">{progress}%</span>
+                </div>
+                <div className="h-3 bg-muted rounded-full overflow-hidden shadow-inner">
+                  <div 
+                    className="h-full bg-gradient-to-r from-primary to-chart-2 transition-all duration-500 rounded-full shadow-sm"
+                    style={{ width: `${progress}%` }}
+                  />
+                </div>
               </div>
-              <Progress value={progress} className="h-2" />
-            </div>
-          )}
-          {children}
-        </CardContent>
-      )}
-    </Card>
+            )}
+            {children}
+          </div>
+        )}
+      </div>
+    </div>
   );
 }
