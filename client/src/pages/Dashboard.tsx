@@ -29,6 +29,21 @@ import { normalizeStrataPlan } from "@shared/schema";
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from "recharts";
 import { isManagement, hasFinancialAccess, canManageEmployees, canViewPerformance, hasPermission, isReadOnly } from "@/lib/permissions";
 import { DocumentUploader } from "@/components/DocumentUploader";
+import {
+  DndContext,
+  closestCenter,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent,
+} from '@dnd-kit/core';
+import {
+  arrayMove,
+  SortableContext,
+  rectSortingStrategy,
+  useSortable,
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 
 const projectSchema = z.object({
   strataPlanNumber: z.string().min(1, "Strata plan number is required"),
@@ -207,6 +222,58 @@ type EditEmployeeFormData = z.infer<typeof editEmployeeSchema>;
 type DropLogFormData = z.infer<typeof dropLogSchema>;
 type EndDayFormData = z.infer<typeof endDaySchema>;
 
+// Sortable Card Component
+function SortableCard({ card }: { card: any }) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: card.id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+    borderLeft: `6px solid ${card.borderColor}`,
+  };
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      className="bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer overflow-hidden group hover-scale"
+      onClick={card.onClick}
+      data-testid={card.testId}
+      {...attributes}
+    >
+      <div className="p-8 flex flex-col items-center gap-4">
+        {/* Drag Handle */}
+        <div
+          {...listeners}
+          className="absolute top-2 right-2 p-1 opacity-0 group-hover:opacity-100 transition-opacity cursor-grab active:cursor-grabbing"
+          onClick={(e) => e.stopPropagation()}
+        >
+          <span className="material-icons text-muted-foreground text-lg">drag_indicator</span>
+        </div>
+        
+        <div 
+          className="w-20 h-20 rounded-2xl flex items-center justify-center text-5xl transition-transform duration-300 group-hover:scale-110"
+          style={{ backgroundColor: `${card.borderColor}20`, color: card.borderColor }}
+        >
+          <span className="material-icons text-5xl">{card.icon}</span>
+        </div>
+        <div className="text-center">
+          <div className="text-lg font-bold text-foreground mb-1">{card.label}</div>
+          <div className="text-sm text-muted-foreground">{card.description}</div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function Dashboard() {
   const [activeTab, setActiveTab] = useState("");
 
@@ -242,8 +309,18 @@ export default function Dashboard() {
   const [showTerminationConfirm, setShowTerminationConfirm] = useState(false); // Confirmation for termination
   const [showTerminationDialog, setShowTerminationDialog] = useState(false); // Dialog for termination details
   const [terminationData, setTerminationData] = useState<{ reason: string; notes: string }>({ reason: "", notes: "" });
+  const [cardOrder, setCardOrder] = useState<string[]>([]);
   const { toast } = useToast();
   const [, setLocation] = useLocation();
+  
+  // Drag-and-drop sensors
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 8,
+      },
+    })
+  );
 
   // Fetch projects with auto-refresh to show real-time progress
   const { data: projectsData, isLoading: projectsLoading } = useQuery({
@@ -1079,6 +1156,53 @@ export default function Dashboard() {
     }
   });
 
+  // Load saved card order from localStorage
+  useEffect(() => {
+    const savedOrder = localStorage.getItem('dashboardCardOrder');
+    if (savedOrder) {
+      try {
+        const orderArray = JSON.parse(savedOrder);
+        setCardOrder(orderArray);
+      } catch (e) {
+        console.error('Error loading card order:', e);
+        setCardOrder(dashboardCards.map(c => c.id));
+      }
+    } else {
+      setCardOrder(dashboardCards.map(c => c.id));
+    }
+  }, [currentUser]); // Re-run when user changes (different permissions = different cards)
+
+  // Sort cards based on saved order
+  const sortedDashboardCards = [...dashboardCards].sort((a, b) => {
+    const aIndex = cardOrder.indexOf(a.id);
+    const bIndex = cardOrder.indexOf(b.id);
+    if (aIndex === -1) return 1;
+    if (bIndex === -1) return -1;
+    return aIndex - bIndex;
+  });
+
+  // Handle drag end
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+    
+    if (over && active.id !== over.id) {
+      const oldIndex = sortedDashboardCards.findIndex(c => c.id === active.id);
+      const newIndex = sortedDashboardCards.findIndex(c => c.id === over.id);
+      
+      const newOrder = arrayMove(sortedDashboardCards, oldIndex, newIndex).map(c => c.id);
+      setCardOrder(newOrder);
+      localStorage.setItem('dashboardCardOrder', JSON.stringify(newOrder));
+    }
+  };
+
+  // Reset card order to default
+  const resetCardOrder = () => {
+    const defaultOrder = dashboardCards.map(c => c.id);
+    setCardOrder(defaultOrder);
+    localStorage.removeItem('dashboardCardOrder');
+    toast({ title: "Layout reset", description: "Dashboard cards restored to default order" });
+  };
+
   if (projectsLoading || employeesLoading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
@@ -1137,31 +1261,35 @@ export default function Dashboard() {
         {/* Navigation Grid - Permission-filtered dashboard cards */}
         {activeTab === "" && (
           <div className="mb-8">
-            <h2 className="text-3xl font-bold gradient-text mb-6">Quick Actions</h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {dashboardCards.map(card => (
-                <div
-                  key={card.id}
-                  className="bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer overflow-hidden group hover-scale"
-                  style={{ borderLeft: `6px solid ${card.borderColor}` }}
-                  onClick={card.onClick}
-                  data-testid={card.testId}
-                >
-                  <div className="p-8 flex flex-col items-center gap-4">
-                    <div 
-                      className="w-20 h-20 rounded-2xl flex items-center justify-center text-5xl transition-transform duration-300 group-hover:scale-110"
-                      style={{ backgroundColor: `${card.borderColor}20`, color: card.borderColor }}
-                    >
-                      <span className="material-icons text-5xl">{card.icon}</span>
-                    </div>
-                    <div className="text-center">
-                      <div className="text-lg font-bold text-foreground mb-1">{card.label}</div>
-                      <div className="text-sm text-muted-foreground">{card.description}</div>
-                    </div>
-                  </div>
-                </div>
-              ))}
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-3xl font-bold gradient-text">Quick Actions</h2>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={resetCardOrder}
+                className="gap-2"
+                data-testid="button-reset-layout"
+              >
+                <span className="material-icons text-base">restart_alt</span>
+                Reset Layout
+              </Button>
             </div>
+            <DndContext
+              sensors={sensors}
+              collisionDetection={closestCenter}
+              onDragEnd={handleDragEnd}
+            >
+              <SortableContext
+                items={sortedDashboardCards.map(c => c.id)}
+                strategy={rectSortingStrategy}
+              >
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {sortedDashboardCards.map(card => (
+                    <SortableCard key={card.id} card={card} />
+                  ))}
+                </div>
+              </SortableContext>
+            </DndContext>
           </div>
         )}
 
