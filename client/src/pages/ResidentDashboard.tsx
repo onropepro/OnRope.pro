@@ -615,17 +615,20 @@ export default function ResidentDashboard() {
           </Card>
         )}
 
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+        <Tabs value={activeTab} onValueChange={(value) => {
+          setActiveTab(value);
+          if (value === "photos") {
+            handlePhotoTabOpen();
+          }
+          if (value === "history") {
+            handleComplaintsTabOpen();
+          }
+        }} className="w-full">
           <TabsList className="grid w-full grid-cols-4 mb-4">
             <TabsTrigger value="building" data-testid="tab-building">Progress</TabsTrigger>
             <TabsTrigger 
               value="photos" 
               data-testid="tab-photos"
-              onClick={() => {
-                if (activeTab !== "photos") {
-                  handlePhotoTabOpen();
-                }
-              }}
               className="relative"
             >
               My Photos
@@ -643,11 +646,6 @@ export default function ResidentDashboard() {
             <TabsTrigger 
               value="history" 
               data-testid="tab-history"
-              onClick={() => {
-                if (activeTab !== "history") {
-                  handleComplaintsTabOpen();
-                }
-              }}
               className="relative"
             >
               Complaints
