@@ -3,6 +3,8 @@
 ## Overview
 The Rope Access Management Platform is a mobile-first web application designed to streamline high-rise building maintenance operations for rope access companies. It centralizes project management, real-time work tracking, safety compliance, and communication, replacing disparate tools with a unified system. The platform serves company owners, operations managers, supervisors, rope access technicians, and building residents, aiming to enhance efficiency, safety, and transparency in high-rise maintenance. Key capabilities include multi-job-type project management (e.g., 4-elevation, parkade, in-suite), real-time work session and hours tracking for payroll, visual progress tracking, daily drop logging, resident complaint management, and digital safety forms.
 
+**Current Development Status**: Premium design system upgrade in progress - implementing professional SaaS aesthetic with refined Ocean Blue color palette, glass-morphism effects, premium shadows, and polished component library to match enterprise subscription pricing ($100s/month).
+
 ## User Preferences
 I prefer simple language and clear, concise explanations. I want an iterative development approach where I can provide feedback frequently. Please ask before making any major architectural changes or deleting significant portions of code. I prefer a collaborative interaction style.
 
@@ -10,11 +12,13 @@ I prefer simple language and clear, concise explanations. I want an iterative de
 The platform is built with a **mobile-first approach** and features a modern, premium aesthetic.
 
 **UI/UX Decisions:**
-- **Design System:** Material Design 3 aesthetic using Shadcn components.
-- **Colors:** Premium Ocean Blue primary, sophisticated slate backgrounds, blue-tinted shadows, and deep navy for dark mode.
-- **Visual Style:** Modern premium with glass-morphism effects, gradient accents, enhanced shadows, and a subtle dot pattern texture overlay.
-- **Typography:** Roboto font family with Material Icons.
-- **Interactivity:** 44px minimum touch targets and 0.75rem (12px) border radius.
+- **Design System:** Premium SaaS aesthetic inspired by Linear, Notion, and Monday.com, built with Shadcn components.
+- **Colors:** Ocean Blue primary (#0EA5E9 - 199 89% 48%), Cloud backgrounds (218 27% 98%), Emerald success (160 84% 39%), Rose destructive (347 77% 60%), Violet analytics (262 83% 58%), refined shadows with subtle blue tinting.
+- **Visual Style:** Modern premium with glass-morphism effects (backdrop-blur-xl), gradient accents, refined shadows (0.75rem border radius), premium card treatments with subtle borders and enhanced depth.
+- **Typography:** Inter font family (fallback to system fonts), Material Icons for UI elements.
+- **Premium Components:** Reusable StatsCard and ProjectCard components with hover-elevate interactions, transition-premium animations, and shadow-premium treatments.
+- **Utilities:** Glass morphism (.glass, .glass-dark), gradient backgrounds (.gradient-primary, .gradient-accent), premium shadows, smooth transitions.
+- **Interactivity:** 44px minimum touch targets, 0.75rem (12px) refined border radius, hover-elevate and active-elevate-2 interactions.
 - **Layout:** Single column layouts, bottom navigation, and full-width forms for mobile responsiveness.
 - **Key Visual Component:** A signature "4-Elevation Building System" displays four buildings side-by-side (North, East, South, West) with independent, horizontal progress bars filling based on completed drops, dynamic floor counts, and percentage displays.
 
