@@ -125,8 +125,8 @@ export default function HoursAnalytics() {
   const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8 space-y-8">
+    <div className="min-h-screen page-gradient">
+      <div className="max-w-7xl mx-auto p-6 sm:p-8 lg:p-10 space-y-8">
         {/* Header - Premium Style */}
         <div className="flex items-center gap-4 mb-2">
           <Button

@@ -1076,22 +1076,22 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-background pb-20">
-      {/* Header */}
-      <header className="sticky top-0 z-[100] bg-card border-b shadow-md">
-        <div className="px-4 h-16 flex items-center justify-between max-w-7xl mx-auto">
+    <div className="min-h-screen page-gradient pb-20">
+      {/* Header - Premium Glass Effect */}
+      <header className="sticky top-0 z-[100] glass backdrop-blur-xl border-b border-border/50 shadow-premium">
+        <div className="px-6 h-20 flex items-center justify-between max-w-7xl mx-auto">
           <div>
-            <h1 className="text-xl font-bold tracking-tight">Dashboard</h1>
+            <h1 className="text-2xl font-bold gradient-text">Dashboard</h1>
             {companyName && (
-              <p className="text-xs text-muted-foreground mt-0.5">{companyName}</p>
+              <p className="text-sm text-muted-foreground mt-1 font-medium">{companyName}</p>
             )}
           </div>
-          <div className="flex items-center gap-2">
-            <Button variant="ghost" size="icon" data-testid="button-profile" onClick={() => setLocation("/profile")}>
-              <span className="material-icons text-xl">person</span>
+          <div className="flex items-center gap-3">
+            <Button variant="ghost" size="icon" data-testid="button-profile" onClick={() => setLocation("/profile")} className="hover-elevate w-12 h-12">
+              <span className="material-icons text-2xl">person</span>
             </Button>
-            <Button variant="ghost" size="icon" data-testid="button-logout" onClick={() => setShowLogoutDialog(true)}>
-              <span className="material-icons text-xl">logout</span>
+            <Button variant="ghost" size="icon" data-testid="button-logout" onClick={() => setShowLogoutDialog(true)} className="hover-elevate w-12 h-12">
+              <span className="material-icons text-2xl">logout</span>
             </Button>
           </div>
         </div>
@@ -1119,11 +1119,12 @@ export default function Dashboard() {
         </Alert>
       )}
 
-      <div className="p-4 max-w-4xl mx-auto">
+      <div className="p-6 sm:p-8 max-w-7xl mx-auto">
         {/* Navigation Grid - Permission-filtered dashboard cards */}
         {activeTab === "" && (
-          <div className="mb-6">
-            <div className="grid grid-cols-2 lg:grid-cols-3 gap-3">
+          <div className="mb-8">
+            <h2 className="text-3xl font-bold gradient-text mb-6">Quick Actions</h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {dashboardCards.map(card => (
                 <div
                   key={card.id}
