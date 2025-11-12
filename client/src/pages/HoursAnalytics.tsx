@@ -136,8 +136,9 @@ export default function HoursAnalytics() {
 
   const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 
-  // Calculate real statistics
+  // Calculate comprehensive statistics
   const activeProjects = projects.filter((p: any) => p.status === 'active').length;
+  const completedProjects = projects.filter((p: any) => p.status === 'completed').length;
   const totalEmployees = employees.length;
   
   // Get unique employees who worked this month
@@ -156,6 +157,58 @@ export default function HoursAnalytics() {
   // Calculate average hours per employee
   const avgHoursPerEmployee = totalEmployees > 0 
     ? ((monthBillable + monthNonBillable) / totalEmployees).toFixed(1)
+    : '0.0';
+  
+  // Calculate total drops completed this month
+  const totalDropsThisMonth = workSessions
+    .filter((s: any) => {
+      if (!s.endTime) return false;
+      const dateStr = s.workDate;
+      if (!dateStr) return false;
+      const parts = dateStr.split('T')[0].split('-');
+      const sessionDate = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
+      return sessionDate >= monthStart && sessionDate <= monthEnd;
+    })
+    .reduce((sum: number, s: any) => {
+      return sum + (s.dropsCompletedNorth || 0) + (s.dropsCompletedEast || 0) + 
+             (s.dropsCompletedSouth || 0) + (s.dropsCompletedWest || 0);
+    }, 0);
+  
+  // Calculate average session duration (in hours)
+  const completedSessions = [...workSessions, ...nonBillableSessions].filter((s: any) => s.endTime && s.startTime);
+  const avgSessionDuration = completedSessions.length > 0
+    ? (completedSessions.reduce((sum: number, s: any) => {
+        const hours = (new Date(s.endTime).getTime() - new Date(s.startTime).getTime()) / (1000 * 60 * 60);
+        return sum + hours;
+      }, 0) / completedSessions.length).toFixed(1)
+    : '0.0';
+  
+  // Calculate billable percentage
+  const billablePercentage = (monthBillable + monthNonBillable) > 0
+    ? ((monthBillable / (monthBillable + monthNonBillable)) * 100).toFixed(0)
+    : '0';
+  
+  // Find most productive employee this month (by hours)
+  const employeeHours = new Map();
+  monthSessions.forEach((s: any) => {
+    if (s.startTime && s.endTime) {
+      const hours = (new Date(s.endTime).getTime() - new Date(s.startTime).getTime()) / (1000 * 60 * 60);
+      const current = employeeHours.get(s.employeeId) || { hours: 0, name: s.employeeName || 'Unknown' };
+      employeeHours.set(s.employeeId, { hours: current.hours + hours, name: s.employeeName || current.name });
+    }
+  });
+  
+  let topEmployee = { name: 'N/A', hours: 0 };
+  employeeHours.forEach((data) => {
+    if (data.hours > topEmployee.hours) {
+      topEmployee = data;
+    }
+  });
+  
+  // Calculate average drops per work session
+  const sessionsWithDrops = workSessions.filter((s: any) => s.endTime);
+  const avgDropsPerSession = sessionsWithDrops.length > 0
+    ? (totalDropsThisMonth / sessionsWithDrops.length).toFixed(1)
     : '0.0';
 
   return (
@@ -275,41 +328,85 @@ export default function HoursAnalytics() {
             <Card className="shadow-xl rounded-3xl border-0 mt-6">
               <CardHeader>
                 <CardTitle className="text-lg font-bold">Team Performance</CardTitle>
-                <p className="text-sm text-muted-foreground">Hours Logged</p>
+                <p className="text-sm text-muted-foreground">Hours Logged This Month</p>
               </CardHeader>
               <CardContent>
-                <div className="h-64 flex items-end gap-8 justify-center">
-                  {[
-                    { name: 'Sorin', billable: 3.2, nonBillable: 1.8 },
-                    { name: 'Mona', billable: 4.5, nonBillable: 0.8 },
-                    { name: 'Mon', billable: 5.1, nonBillable: 1.2 },
-                    { name: 'Span', billable: 2.8, nonBillable: 1.5 },
-                    { name: 'Sont', billable: 4.2, nonBillable: 0.9 },
-                  ].map((person, idx) => (
-                    <div key={idx} className="flex flex-col items-center gap-2 flex-1 max-w-[80px]">
-                      <div className="flex flex-col gap-1 w-full">
-                        {/* Billable bar */}
-                        <div 
-                          className="w-full bg-gradient-to-t from-blue-500 to-blue-400 rounded-t-lg transition-all hover:opacity-80"
-                          style={{ height: `${person.billable * 30}px` }}
-                        ></div>
-                        {/* Non-billable bar */}
-                        <div 
-                          className="w-full bg-gradient-to-t from-blue-300 to-blue-200 rounded-b-lg transition-all hover:opacity-80"
-                          style={{ height: `${person.nonBillable * 30}px` }}
-                        ></div>
-                      </div>
-                      <div className="text-xs font-medium text-muted-foreground text-center">{person.name}</div>
-                      <div className="w-8 h-8 rounded-full bg-gradient-to-br from-gray-300 to-gray-400 flex items-center justify-center text-xs font-bold text-white">
-                        {person.name[0]}
-                      </div>
-                    </div>
-                  ))}
-                </div>
+                {employees.length === 0 ? (
+                  <p className="text-center text-muted-foreground py-12">No employees to display</p>
+                ) : (
+                  <div className="h-64 flex items-end gap-4 justify-center overflow-x-auto pb-2">
+                    {employees.slice(0, 10).map((employee: any) => {
+                      const empBillable = workSessions
+                        .filter((s: any) => {
+                          if (s.employeeId !== employee.id || !s.endTime) return false;
+                          const dateStr = s.workDate;
+                          if (!dateStr) return false;
+                          const parts = dateStr.split('T')[0].split('-');
+                          const sessionDate = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
+                          return sessionDate >= monthStart && sessionDate <= monthEnd;
+                        })
+                        .reduce((sum: number, s: any) => {
+                          if (s.startTime && s.endTime) {
+                            const hours = (new Date(s.endTime).getTime() - new Date(s.startTime).getTime()) / (1000 * 60 * 60);
+                            return sum + hours;
+                          }
+                          return sum;
+                        }, 0);
+                      
+                      const empNonBillable = nonBillableSessions
+                        .filter((s: any) => {
+                          if (s.employeeId !== employee.id || !s.endTime) return false;
+                          const dateStr = s.workDate || s.date;
+                          if (!dateStr) return false;
+                          const parts = dateStr.split('T')[0].split('-');
+                          const sessionDate = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
+                          return sessionDate >= monthStart && sessionDate <= monthEnd;
+                        })
+                        .reduce((sum: number, s: any) => {
+                          if (s.startTime && s.endTime) {
+                            const hours = (new Date(s.endTime).getTime() - new Date(s.startTime).getTime()) / (1000 * 60 * 60);
+                            return sum + hours;
+                          }
+                          return sum;
+                        }, 0);
+
+                      const totalHours = empBillable + empNonBillable;
+                      const displayName = employee.name?.split(' ')[0] || 'Unknown';
+
+                      return (
+                        <div key={employee.id} className="flex flex-col items-center gap-2 flex-1 min-w-[60px] max-w-[100px]">
+                          <div className="flex flex-col gap-1 w-full">
+                            {/* Billable bar */}
+                            <div 
+                              className="w-full bg-gradient-to-t from-blue-500 to-blue-400 rounded-t-lg transition-all hover:opacity-80"
+                              style={{ height: `${Math.max(empBillable * 20, 2)}px` }}
+                              title={`${empBillable.toFixed(1)}h billable`}
+                            ></div>
+                            {/* Non-billable bar */}
+                            <div 
+                              className="w-full bg-gradient-to-t from-blue-300 to-blue-200 rounded-b-lg transition-all hover:opacity-80"
+                              style={{ height: `${Math.max(empNonBillable * 20, 2)}px` }}
+                              title={`${empNonBillable.toFixed(1)}h non-billable`}
+                            ></div>
+                          </div>
+                          <div className="text-xs font-medium text-muted-foreground text-center truncate w-full px-1">
+                            {displayName}
+                          </div>
+                          <div className="text-xs text-muted-foreground">
+                            {totalHours.toFixed(1)}h
+                          </div>
+                          <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-400 to-blue-500 flex items-center justify-center text-xs font-bold text-white">
+                            {displayName[0]?.toUpperCase() || '?'}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
               </CardContent>
             </Card>
 
-            {/* Key Statistics Grid */}
+            {/* Key Statistics Grid - Row 1 */}
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 mt-6">
               <Card className="shadow-lg rounded-2xl border-0 hover:shadow-xl transition-shadow">
                 <CardContent className="pt-6 text-center">
@@ -319,6 +416,17 @@ export default function HoursAnalytics() {
                   <div className="text-2xl font-bold mb-1">{activeProjects}</div>
                   <div className="text-sm text-muted-foreground">Active Projects</div>
                   <div className="text-xs text-muted-foreground mt-1">In Progress</div>
+                </CardContent>
+              </Card>
+
+              <Card className="shadow-lg rounded-2xl border-0 hover:shadow-xl transition-shadow">
+                <CardContent className="pt-6 text-center">
+                  <div className="w-12 h-12 mx-auto mb-3 rounded-xl bg-emerald-100 flex items-center justify-center">
+                    <span className="material-icons text-emerald-600">check_circle</span>
+                  </div>
+                  <div className="text-2xl font-bold mb-1">{completedProjects}</div>
+                  <div className="text-sm text-muted-foreground">Completed Projects</div>
+                  <div className="text-xs text-muted-foreground mt-1">All Time</div>
                 </CardContent>
               </Card>
 
@@ -343,6 +451,67 @@ export default function HoursAnalytics() {
                   <div className="text-xs text-muted-foreground mt-1">Employees</div>
                 </CardContent>
               </Card>
+            </div>
+
+            {/* Key Statistics Grid - Row 2 */}
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 mt-6">
+              <Card className="shadow-lg rounded-2xl border-0 hover:shadow-xl transition-shadow">
+                <CardContent className="pt-6 text-center">
+                  <div className="w-12 h-12 mx-auto mb-3 rounded-xl bg-purple-100 flex items-center justify-center">
+                    <span className="material-icons text-purple-600">calendar_month</span>
+                  </div>
+                  <div className="text-2xl font-bold mb-1">{totalSessionsThisMonth}</div>
+                  <div className="text-sm text-muted-foreground">Work Sessions</div>
+                  <div className="text-xs text-muted-foreground mt-1">This Month</div>
+                </CardContent>
+              </Card>
+
+              <Card className="shadow-lg rounded-2xl border-0 hover:shadow-xl transition-shadow">
+                <CardContent className="pt-6 text-center">
+                  <div className="w-12 h-12 mx-auto mb-3 rounded-xl bg-blue-100 flex items-center justify-center">
+                    <span className="material-icons text-blue-600">schedule</span>
+                  </div>
+                  <div className="text-2xl font-bold mb-1">{avgSessionDuration}h</div>
+                  <div className="text-sm text-muted-foreground">Avg Session Duration</div>
+                  <div className="text-xs text-muted-foreground mt-1">Per Session</div>
+                </CardContent>
+              </Card>
+
+              <Card className="shadow-lg rounded-2xl border-0 hover:shadow-xl transition-shadow">
+                <CardContent className="pt-6 text-center">
+                  <div className="w-12 h-12 mx-auto mb-3 rounded-xl bg-orange-100 flex items-center justify-center">
+                    <span className="material-icons text-orange-600">arrow_downward</span>
+                  </div>
+                  <div className="text-2xl font-bold mb-1">{totalDropsThisMonth}</div>
+                  <div className="text-sm text-muted-foreground">Total Drops</div>
+                  <div className="text-xs text-muted-foreground mt-1">This Month</div>
+                </CardContent>
+              </Card>
+
+              <Card className="shadow-lg rounded-2xl border-0 hover:shadow-xl transition-shadow">
+                <CardContent className="pt-6 text-center">
+                  <div className="w-12 h-12 mx-auto mb-3 rounded-xl bg-blue-100 flex items-center justify-center">
+                    <span className="material-icons text-blue-600">speed</span>
+                  </div>
+                  <div className="text-2xl font-bold mb-1">{avgDropsPerSession}</div>
+                  <div className="text-sm text-muted-foreground">Avg Drops/Session</div>
+                  <div className="text-xs text-muted-foreground mt-1">Productivity</div>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Key Statistics Grid - Row 3 */}
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 mt-6">
+              <Card className="shadow-lg rounded-2xl border-0 hover:shadow-xl transition-shadow">
+                <CardContent className="pt-6 text-center">
+                  <div className="w-12 h-12 mx-auto mb-3 rounded-xl bg-emerald-100 flex items-center justify-center">
+                    <span className="material-icons text-emerald-600">percent</span>
+                  </div>
+                  <div className="text-2xl font-bold mb-1">{billablePercentage}%</div>
+                  <div className="text-sm text-muted-foreground">Billable Rate</div>
+                  <div className="text-xs text-muted-foreground mt-1">This Month</div>
+                </CardContent>
+              </Card>
 
               <Card className="shadow-lg rounded-2xl border-0 hover:shadow-xl transition-shadow">
                 <CardContent className="pt-6 text-center">
@@ -352,6 +521,28 @@ export default function HoursAnalytics() {
                   <div className="text-2xl font-bold mb-1">{avgHoursPerEmployee}h</div>
                   <div className="text-sm text-muted-foreground">Avg Hours/Employee</div>
                   <div className="text-xs text-muted-foreground mt-1">This Month</div>
+                </CardContent>
+              </Card>
+
+              <Card className="shadow-lg rounded-2xl border-0 hover:shadow-xl transition-shadow">
+                <CardContent className="pt-6 text-center">
+                  <div className="w-12 h-12 mx-auto mb-3 rounded-xl bg-yellow-100 flex items-center justify-center">
+                    <span className="material-icons text-yellow-600">star</span>
+                  </div>
+                  <div className="text-2xl font-bold mb-1">{topEmployee.hours > 0 ? topEmployee.hours.toFixed(0) : '0'}h</div>
+                  <div className="text-sm text-muted-foreground">Top Performer</div>
+                  <div className="text-xs text-muted-foreground mt-1 truncate px-2">{topEmployee.name}</div>
+                </CardContent>
+              </Card>
+
+              <Card className="shadow-lg rounded-2xl border-0 hover:shadow-xl transition-shadow">
+                <CardContent className="pt-6 text-center">
+                  <div className="w-12 h-12 mx-auto mb-3 rounded-xl bg-blue-100 flex items-center justify-center">
+                    <span className="material-icons text-blue-600">today</span>
+                  </div>
+                  <div className="text-2xl font-bold mb-1">{(dayBillable + dayNonBillable).toFixed(1)}h</div>
+                  <div className="text-sm text-muted-foreground">Today's Hours</div>
+                  <div className="text-xs text-muted-foreground mt-1">{dayBillable.toFixed(1)}h billable</div>
                 </CardContent>
               </Card>
             </div>
