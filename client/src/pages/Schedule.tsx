@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { queryClient, apiRequest } from "@/lib/queryClient";
+import { useLocation } from "wouter";
 import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import timeGridPlugin from "@fullcalendar/timegrid";
@@ -13,12 +14,13 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
-import { Calendar, Plus, Edit2, Trash2, Users } from "lucide-react";
+import { Calendar, Plus, Edit2, Trash2, Users, ArrowLeft } from "lucide-react";
 import type { ScheduledJobWithAssignments, User } from "@shared/schema";
 import { Badge } from "@/components/ui/badge";
 
 export default function Schedule() {
   const { toast } = useToast();
+  const [, setLocation] = useLocation();
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [detailDialogOpen, setDetailDialogOpen] = useState(false);
@@ -86,6 +88,17 @@ export default function Schedule() {
 
   return (
     <div className="p-4 md:p-6 space-y-6">
+      {/* Back Button */}
+      <Button
+        variant="ghost"
+        onClick={() => setLocation("/dashboard")}
+        data-testid="button-back"
+        className="mb-2"
+      >
+        <ArrowLeft className="w-4 h-4 mr-2" />
+        Back to Dashboard
+      </Button>
+
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
@@ -110,31 +123,95 @@ export default function Schedule() {
       </div>
 
       {/* Calendar */}
-      <div className="bg-card rounded-lg shadow-premium p-4">
+      <div className="bg-card rounded-lg shadow-premium p-6">
         {isLoading ? (
           <div className="flex items-center justify-center h-96">
             <div className="text-muted-foreground">Loading calendar...</div>
           </div>
         ) : (
-          <FullCalendar
-            plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
-            initialView="dayGridMonth"
-            headerToolbar={{
-              left: "prev,next today",
-              center: "title",
-              right: "dayGridMonth,timeGridWeek,timeGridDay",
-            }}
-            editable={true}
-            selectable={true}
-            selectMirror={true}
-            dayMaxEvents={true}
-            weekends={true}
-            events={events}
-            select={handleDateSelect}
-            eventClick={handleEventClick}
-            height="auto"
-            data-testid="calendar"
-          />
+          <div className="schedule-calendar-wrapper">
+            <style>{`
+              .schedule-calendar-wrapper .fc {
+                --fc-border-color: hsl(var(--border));
+                --fc-button-bg-color: hsl(var(--primary));
+                --fc-button-border-color: hsl(var(--primary));
+                --fc-button-hover-bg-color: hsl(var(--primary) / 0.9);
+                --fc-button-active-bg-color: hsl(var(--primary) / 0.8);
+                --fc-today-bg-color: hsl(var(--primary) / 0.05);
+              }
+              
+              .schedule-calendar-wrapper .fc-theme-standard td,
+              .schedule-calendar-wrapper .fc-theme-standard th {
+                border-color: hsl(var(--border) / 0.3);
+              }
+              
+              .schedule-calendar-wrapper .fc-col-header-cell {
+                background: hsl(var(--muted));
+                font-weight: 600;
+                padding: 12px 8px;
+                text-transform: uppercase;
+                font-size: 0.75rem;
+                letter-spacing: 0.05em;
+              }
+              
+              .schedule-calendar-wrapper .fc-timegrid-slot {
+                height: 3em;
+              }
+              
+              .schedule-calendar-wrapper .fc-event {
+                border-radius: 6px;
+                border: none;
+                padding: 4px 8px;
+                font-size: 0.875rem;
+                box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+              }
+              
+              .schedule-calendar-wrapper .fc-event-title {
+                font-weight: 500;
+              }
+              
+              .schedule-calendar-wrapper .fc-toolbar-title {
+                font-size: 1.5rem;
+                font-weight: 700;
+              }
+              
+              .schedule-calendar-wrapper .fc-button {
+                border-radius: 6px;
+                text-transform: capitalize;
+                font-weight: 500;
+                padding: 0.5rem 1rem;
+              }
+              
+              .schedule-calendar-wrapper .fc-daygrid-day-number {
+                padding: 8px;
+                font-size: 0.875rem;
+              }
+            `}</style>
+            <FullCalendar
+              plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
+              initialView="timeGridWeek"
+              headerToolbar={{
+                left: "prev,next today",
+                center: "title",
+                right: "timeGridWeek,dayGridMonth",
+              }}
+              editable={true}
+              selectable={true}
+              selectMirror={true}
+              dayMaxEvents={3}
+              weekends={true}
+              events={events}
+              select={handleDateSelect}
+              eventClick={handleEventClick}
+              height="700px"
+              slotMinTime="06:00:00"
+              slotMaxTime="20:00:00"
+              allDaySlot={true}
+              slotDuration="01:00:00"
+              eventMaxStack={2}
+              data-testid="calendar"
+            />
+          </div>
         )}
       </div>
 
