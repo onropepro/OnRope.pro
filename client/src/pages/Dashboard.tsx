@@ -1464,25 +1464,6 @@ export default function Dashboard() {
                           </>
                         )}
 
-                        {projectForm.watch("jobType") === "parkade_pressure_cleaning" && (
-                          <FormField
-                            control={projectForm.control}
-                            name="dailyDropTarget"
-                            render={({ field }) => (
-                              <FormItem>
-                                <FormLabel>Daily Stall Cleaning Target</FormLabel>
-                                <FormControl>
-                                  <Input type="number" min="1" {...field} data-testid="input-daily-stall-target" className="h-12" />
-                                </FormControl>
-                                <FormDescription className="text-xs">
-                                  Visible to rope access techs
-                                </FormDescription>
-                                <FormMessage />
-                              </FormItem>
-                            )}
-                          />
-                        )}
-
                         <FormField
                           control={projectForm.control}
                           name="targetCompletionDate"
