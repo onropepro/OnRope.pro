@@ -52,6 +52,10 @@ export default function Payroll() {
   const [dropsWest, setDropsWest] = useState<string>("0");
   const [shortfallReason, setShortfallReason] = useState<string>("");
 
+  // Get selected project details
+  const selectedProject = projectsData?.projects.find(p => p.id === selectedProjectId);
+  const selectedJobType = selectedProject?.jobType || '4_elevation_system';
+
   // Fetch current user to check permissions
   const { data: userData, isLoading: userLoading } = useQuery({
     queryKey: ["/api/user"],
@@ -707,60 +711,109 @@ export default function Payroll() {
                 </div>
               </div>
 
-              {sessionType === 'billable' && (
+              {sessionType === 'billable' && selectedProjectId && (
                 <>
                   <div className="border-t pt-4">
-                    <h4 className="font-medium mb-3">Drops Completed (Optional)</h4>
-                    <div className="grid gap-4 md:grid-cols-4">
-                      <div className="space-y-2">
-                        <Label htmlFor="drops-north">North</Label>
-                        <Input
-                          id="drops-north"
-                          type="number"
-                          min="0"
-                          value={dropsNorth}
-                          onChange={(e) => setDropsNorth(e.target.value)}
-                          data-testid="input-drops-north"
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="drops-east">East</Label>
-                        <Input
-                          id="drops-east"
-                          type="number"
-                          min="0"
-                          value={dropsEast}
-                          onChange={(e) => setDropsEast(e.target.value)}
-                          data-testid="input-drops-east"
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="drops-south">South</Label>
-                        <Input
-                          id="drops-south"
-                          type="number"
-                          min="0"
-                          value={dropsSouth}
-                          onChange={(e) => setDropsSouth(e.target.value)}
-                          data-testid="input-drops-south"
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="drops-west">West</Label>
-                        <Input
-                          id="drops-west"
-                          type="number"
-                          min="0"
-                          value={dropsWest}
-                          onChange={(e) => setDropsWest(e.target.value)}
-                          data-testid="input-drops-west"
-                        />
-                      </div>
-                    </div>
+                    {selectedJobType === 'parkade_pressure_cleaning' ? (
+                      <>
+                        <h4 className="font-medium mb-3">Stalls Completed (Optional)</h4>
+                        <div className="space-y-2">
+                          <Label htmlFor="stalls-completed">Number of Stalls</Label>
+                          <Input
+                            id="stalls-completed"
+                            type="number"
+                            min="0"
+                            value={dropsNorth}
+                            onChange={(e) => setDropsNorth(e.target.value)}
+                            data-testid="input-stalls-completed"
+                          />
+                        </div>
+                      </>
+                    ) : selectedJobType === 'in_suite_dryer_vent_cleaning' ? (
+                      <>
+                        <h4 className="font-medium mb-3">Floors Completed (Optional)</h4>
+                        <div className="space-y-2">
+                          <Label htmlFor="floors-completed">Number of Floors</Label>
+                          <Input
+                            id="floors-completed"
+                            type="number"
+                            min="0"
+                            value={dropsNorth}
+                            onChange={(e) => setDropsNorth(e.target.value)}
+                            data-testid="input-floors-completed"
+                          />
+                        </div>
+                      </>
+                    ) : selectedJobType === 'ground_window_cleaning' || selectedJobType === 'general_pressure_washing' ? (
+                      <>
+                        <h4 className="font-medium mb-3">Work Completed (Optional)</h4>
+                        <div className="space-y-2">
+                          <Label htmlFor="work-completed">Amount Completed</Label>
+                          <Input
+                            id="work-completed"
+                            type="number"
+                            min="0"
+                            value={dropsNorth}
+                            onChange={(e) => setDropsNorth(e.target.value)}
+                            data-testid="input-work-completed"
+                          />
+                        </div>
+                      </>
+                    ) : (
+                      <>
+                        <h4 className="font-medium mb-3">Drops Completed (Optional)</h4>
+                        <div className="grid gap-4 md:grid-cols-4">
+                          <div className="space-y-2">
+                            <Label htmlFor="drops-north">North</Label>
+                            <Input
+                              id="drops-north"
+                              type="number"
+                              min="0"
+                              value={dropsNorth}
+                              onChange={(e) => setDropsNorth(e.target.value)}
+                              data-testid="input-drops-north"
+                            />
+                          </div>
+                          <div className="space-y-2">
+                            <Label htmlFor="drops-east">East</Label>
+                            <Input
+                              id="drops-east"
+                              type="number"
+                              min="0"
+                              value={dropsEast}
+                              onChange={(e) => setDropsEast(e.target.value)}
+                              data-testid="input-drops-east"
+                            />
+                          </div>
+                          <div className="space-y-2">
+                            <Label htmlFor="drops-south">South</Label>
+                            <Input
+                              id="drops-south"
+                              type="number"
+                              min="0"
+                              value={dropsSouth}
+                              onChange={(e) => setDropsSouth(e.target.value)}
+                              data-testid="input-drops-south"
+                            />
+                          </div>
+                          <div className="space-y-2">
+                            <Label htmlFor="drops-west">West</Label>
+                            <Input
+                              id="drops-west"
+                              type="number"
+                              min="0"
+                              value={dropsWest}
+                              onChange={(e) => setDropsWest(e.target.value)}
+                              data-testid="input-drops-west"
+                            />
+                          </div>
+                        </div>
+                      </>
+                    )}
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="shortfall-reason">Shortfall Reason (if drops below target)</Label>
+                    <Label htmlFor="shortfall-reason">Shortfall Reason (if work below target)</Label>
                     <Input
                       id="shortfall-reason"
                       type="text"
