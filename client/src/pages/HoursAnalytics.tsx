@@ -154,61 +154,62 @@ export default function HoursAnalytics() {
           </Card>
         ) : (
           <>
-            {/* Analytics Grid - Premium Layout */}
+            {/* Analytics Grid - Beautiful Blue Cards like mockup */}
             <div className="grid gap-6 md:grid-cols-3">
-              {/* Total Year Hours Card */}
-              <Card className="shadow-premium transition-premium hover:shadow-premium-lg border-border/50">
-                <CardHeader className="pb-3">
-                  <CardTitle className="text-sm font-medium text-muted-foreground">Total Hours {currentYear}</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-3xl font-bold gradient-text">
-                    {(yearBillable + yearNonBillable).toFixed(1)}h
+              {/* Total Year Hours Card - Blue Background */}
+              <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-blue-500 to-blue-600 p-6 shadow-xl transition-all duration-300 hover:shadow-2xl hover:scale-[1.02]">
+                <div className="relative z-10">
+                  <div className="flex items-center gap-2 mb-4">
+                    <span className="material-icons text-white/90 text-xl">calendar_today</span>
+                    <div className="text-sm font-semibold text-white/90 uppercase tracking-wide">Total Hours {currentYear}</div>
                   </div>
-                  <div className="flex gap-4 mt-4 text-sm">
-                    <div className="flex items-center gap-2">
-                      <div className="w-3 h-3 rounded-full bg-primary"></div>
-                      <span className="text-muted-foreground">{yearBillable.toFixed(1)}h billable</span>
-                    </div>
+                  <div className="text-5xl font-bold text-white mb-3">
+                    {(yearBillable + yearNonBillable).toFixed(1)}
                   </div>
-                </CardContent>
-              </Card>
+                  <div className="flex items-center gap-2 text-white/80 text-sm">
+                    <span className="material-icons text-sm">trending_up</span>
+                    <span>{yearBillable.toFixed(1)}h billable</span>
+                  </div>
+                </div>
+                {/* Decorative gradient overlay */}
+                <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -translate-y-16 translate-x-16"></div>
+              </div>
 
-              {/* Total Month Hours Card */}
-              <Card className="shadow-premium transition-premium hover:shadow-premium-lg border-border/50">
-                <CardHeader className="pb-3">
-                  <CardTitle className="text-sm font-medium text-muted-foreground">{monthNames[currentMonth]}</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-3xl font-bold gradient-text">
-                    {(monthBillable + monthNonBillable).toFixed(1)}h
+              {/* Total Month Hours Card - Blue Background */}
+              <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-blue-600 to-blue-700 p-6 shadow-xl transition-all duration-300 hover:shadow-2xl hover:scale-[1.02]">
+                <div className="relative z-10">
+                  <div className="flex items-center gap-2 mb-4">
+                    <span className="material-icons text-white/90 text-xl">event</span>
+                    <div className="text-sm font-semibold text-white/90 uppercase tracking-wide">{monthNames[currentMonth]}</div>
                   </div>
-                  <div className="flex gap-4 mt-4 text-sm">
-                    <div className="flex items-center gap-2">
-                      <div className="w-3 h-3 rounded-full bg-primary"></div>
-                      <span className="text-muted-foreground">{monthBillable.toFixed(1)}h billable</span>
-                    </div>
+                  <div className="text-5xl font-bold text-white mb-3">
+                    {(monthBillable + monthNonBillable).toFixed(1)}
                   </div>
-                </CardContent>
-              </Card>
+                  <div className="flex items-center gap-2 text-white/80 text-sm">
+                    <span className="material-icons text-sm">schedule</span>
+                    <span>{monthBillable.toFixed(1)}h billable</span>
+                  </div>
+                </div>
+                <div className="absolute bottom-0 left-0 w-32 h-32 bg-white/10 rounded-full translate-y-16 -translate-x-16"></div>
+              </div>
 
-              {/* Total Day Hours Card */}
-              <Card className="shadow-premium transition-premium hover:shadow-premium-lg border-border/50">
-                <CardHeader className="pb-3">
-                  <CardTitle className="text-sm font-medium text-muted-foreground">Today</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-3xl font-bold gradient-text">
-                    {(dayBillable + dayNonBillable).toFixed(1)}h
+              {/* Total Day Hours Card - Blue Background */}
+              <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-blue-700 to-blue-800 p-6 shadow-xl transition-all duration-300 hover:shadow-2xl hover:scale-[1.02]">
+                <div className="relative z-10">
+                  <div className="flex items-center gap-2 mb-4">
+                    <span className="material-icons text-white/90 text-xl">today</span>
+                    <div className="text-sm font-semibold text-white/90 uppercase tracking-wide">Today</div>
                   </div>
-                  <div className="flex gap-4 mt-4 text-sm">
-                    <div className="flex items-center gap-2">
-                      <div className="w-3 h-3 rounded-full bg-primary"></div>
-                      <span className="text-muted-foreground">{dayBillable.toFixed(1)}h billable</span>
-                    </div>
+                  <div className="text-5xl font-bold text-white mb-3">
+                    {(dayBillable + dayNonBillable).toFixed(1)}
                   </div>
-                </CardContent>
-              </Card>
+                  <div className="flex items-center gap-2 text-white/80 text-sm">
+                    <span className="material-icons text-sm">access_time</span>
+                    <span>{dayBillable.toFixed(1)}h billable</span>
+                  </div>
+                </div>
+                <div className="absolute top-0 left-0 w-40 h-40 bg-white/10 rounded-full -translate-y-20 -translate-x-20"></div>
+              </div>
             </div>
 
             {/* Current Year - Premium Chart */}
