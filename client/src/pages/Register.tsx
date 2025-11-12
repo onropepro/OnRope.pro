@@ -18,6 +18,7 @@ const residentSchema = z.object({
   confirmPassword: z.string().min(1, "Please confirm your password"),
   strataPlanNumber: z.string().min(1, "Strata plan number is required"),
   unitNumber: z.string().min(1, "Unit number is required"),
+  parkingStallNumber: z.string().optional(),
 }).refine((data) => data.password === data.confirmPassword, {
   message: "Passwords do not match",
   path: ["confirmPassword"],
@@ -52,6 +53,7 @@ export default function Register() {
       confirmPassword: "",
       strataPlanNumber: "",
       unitNumber: "",
+      parkingStallNumber: "",
     },
   });
 
@@ -215,6 +217,20 @@ export default function Register() {
                         <FormLabel>Unit Number</FormLabel>
                         <FormControl>
                           <Input placeholder="1205" {...field} data-testid="input-unit-number" className="h-12" />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={residentForm.control}
+                    name="parkingStallNumber"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Parking Stall Number (Optional)</FormLabel>
+                        <FormControl>
+                          <Input placeholder="P-42" {...field} data-testid="input-parking-stall" className="h-12" />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
