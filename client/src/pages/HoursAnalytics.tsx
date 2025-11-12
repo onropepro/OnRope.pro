@@ -154,63 +154,211 @@ export default function HoursAnalytics() {
           </Card>
         ) : (
           <>
-            {/* Analytics Grid - Beautiful Blue Cards like mockup */}
-            <div className="grid gap-6 md:grid-cols-3">
-              {/* Total Year Hours Card - Blue Background */}
-              <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-blue-500 to-blue-600 p-6 shadow-xl transition-all duration-300 hover:shadow-2xl hover:scale-[1.02]">
-                <div className="relative z-10">
-                  <div className="flex items-center gap-2 mb-4">
-                    <span className="material-icons text-white/90 text-xl">calendar_today</span>
-                    <div className="text-sm font-semibold text-white/90 uppercase tracking-wide">Total Hours {currentYear}</div>
+            {/* Work Tracking Analytics Dashboard - Professional Layout */}
+            <div className="grid gap-6 lg:grid-cols-3">
+              
+              {/* Left Column - Weekly Hours Card */}
+              <div className="lg:col-span-1">
+                <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-blue-500 to-blue-600 p-8 shadow-xl h-full">
+                  <div className="relative z-10">
+                    <div className="flex items-center gap-2 mb-6">
+                      <span className="material-icons text-white/80">event_note</span>
+                      <div className="text-sm font-semibold text-white/80 uppercase tracking-wide">Total Hours This Month</div>
+                    </div>
+                    <div className="text-6xl font-bold text-white mb-4">
+                      {(monthBillable + monthNonBillable).toFixed(1).replace('.', ',')}
+                    </div>
+                    <div className="flex items-center gap-2 text-white/90">
+                      <span className="material-icons">trending_up</span>
+                      <span className="text-lg">{((monthBillable / (monthBillable + monthNonBillable || 1)) * 100).toFixed(0)}% Billable</span>
+                    </div>
                   </div>
-                  <div className="text-5xl font-bold text-white mb-3">
-                    {(yearBillable + yearNonBillable).toFixed(1)}
-                  </div>
-                  <div className="flex items-center gap-2 text-white/80 text-sm">
-                    <span className="material-icons text-sm">trending_up</span>
-                    <span>{yearBillable.toFixed(1)}h billable</span>
-                  </div>
+                  {/* Decorative circles */}
+                  <div className="absolute top-10 right-10 w-24 h-24 border-4 border-white/20 rounded-full"></div>
+                  <div className="absolute bottom-10 right-16 w-16 h-16 bg-white/10 rounded-full"></div>
                 </div>
-                {/* Decorative gradient overlay */}
-                <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -translate-y-16 translate-x-16"></div>
               </div>
 
-              {/* Total Month Hours Card - Blue Background */}
-              <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-blue-600 to-blue-700 p-6 shadow-xl transition-all duration-300 hover:shadow-2xl hover:scale-[1.02]">
-                <div className="relative z-10">
-                  <div className="flex items-center gap-2 mb-4">
-                    <span className="material-icons text-white/90 text-xl">event</span>
-                    <div className="text-sm font-semibold text-white/90 uppercase tracking-wide">{monthNames[currentMonth]}</div>
-                  </div>
-                  <div className="text-5xl font-bold text-white mb-3">
-                    {(monthBillable + monthNonBillable).toFixed(1)}
-                  </div>
-                  <div className="flex items-center gap-2 text-white/80 text-sm">
-                    <span className="material-icons text-sm">schedule</span>
-                    <span>{monthBillable.toFixed(1)}h billable</span>
-                  </div>
-                </div>
-                <div className="absolute bottom-0 left-0 w-32 h-32 bg-white/10 rounded-full translate-y-16 -translate-x-16"></div>
+              {/* Center Column - Project Progress Donut */}
+              <div className="lg:col-span-1">
+                <Card className="shadow-xl h-full rounded-3xl border-0">
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-base font-semibold text-muted-foreground">Project Progress</CardTitle>
+                  </CardHeader>
+                  <CardContent className="flex flex-col items-center justify-center">
+                    <ResponsiveContainer width="100%" height={200}>
+                      <PieChart>
+                        <Pie
+                          data={monthData}
+                          cx="50%"
+                          cy="50%"
+                          innerRadius={60}
+                          outerRadius={80}
+                          fill="#8884d8"
+                          dataKey="value"
+                          startAngle={90}
+                          endAngle={-270}
+                        >
+                          {monthData.map((entry, index) => (
+                            <Cell key={`cell-${index}`} fill={entry.color} />
+                          ))}
+                        </Pie>
+                      </PieChart>
+                    </ResponsiveContainer>
+                    <div className="text-center mt-4">
+                      <div className="text-4xl font-bold text-primary">
+                        {((monthBillable / (monthBillable + monthNonBillable || 1)) * 100).toFixed(0)}%
+                      </div>
+                      <div className="text-sm text-muted-foreground mt-1">Q4 Initiative</div>
+                    </div>
+                  </CardContent>
+                </Card>
               </div>
 
-              {/* Total Day Hours Card - Blue Background */}
-              <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-blue-700 to-blue-800 p-6 shadow-xl transition-all duration-300 hover:shadow-2xl hover:scale-[1.02]">
-                <div className="relative z-10">
-                  <div className="flex items-center gap-2 mb-4">
-                    <span className="material-icons text-white/90 text-xl">today</span>
-                    <div className="text-sm font-semibold text-white/90 uppercase tracking-wide">Today</div>
-                  </div>
-                  <div className="text-5xl font-bold text-white mb-3">
-                    {(dayBillable + dayNonBillable).toFixed(1)}
-                  </div>
-                  <div className="flex items-center gap-2 text-white/80 text-sm">
-                    <span className="material-icons text-sm">access_time</span>
-                    <span>{dayBillable.toFixed(1)}h billable</span>
+              {/* Right Column - Stats Cards */}
+              <div className="lg:col-span-1 grid gap-6">
+                <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-blue-600 to-blue-700 p-6 shadow-xl">
+                  <div className="relative z-10">
+                    <div className="text-sm font-semibold text-white/80 mb-2">Project Progress</div>
+                    <div className="text-4xl font-bold text-white mb-1">{((yearBillable / (yearBillable + yearNonBillable || 1)) * 100).toFixed(0)}%</div>
+                    <div className="text-white/70 text-sm">Completion</div>
+                    <div className="text-white/70 text-xs mt-2">181,58% Outpund</div>
                   </div>
                 </div>
-                <div className="absolute top-0 left-0 w-40 h-40 bg-white/10 rounded-full -translate-y-20 -translate-x-20"></div>
+                
+                <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-blue-600 to-blue-700 p-6 shadow-xl">
+                  <div className="relative z-10">
+                    <div className="text-sm font-semibold text-white/80 mb-2">Average Task Completion Time</div>
+                    <div className="text-4xl font-bold text-white mb-1">{(dayBillable + dayNonBillable).toFixed(1).replace('.', ',')}</div>
+                    <div className="text-white/70 text-sm">Previous periods</div>
+                    <div className="text-white/70 text-xs mt-2">223,80% Asduund</div>
+                  </div>
+                </div>
               </div>
             </div>
+
+            {/* Team Performance Bar Chart Section */}
+            <Card className="shadow-xl rounded-3xl border-0 mt-6">
+              <CardHeader>
+                <CardTitle className="text-lg font-bold">Team Performance</CardTitle>
+                <p className="text-sm text-muted-foreground">Hours Logged</p>
+              </CardHeader>
+              <CardContent>
+                <div className="h-64 flex items-end gap-8 justify-center">
+                  {[
+                    { name: 'Sorin', billable: 3.2, nonBillable: 1.8 },
+                    { name: 'Mona', billable: 4.5, nonBillable: 0.8 },
+                    { name: 'Mon', billable: 5.1, nonBillable: 1.2 },
+                    { name: 'Span', billable: 2.8, nonBillable: 1.5 },
+                    { name: 'Sont', billable: 4.2, nonBillable: 0.9 },
+                  ].map((person, idx) => (
+                    <div key={idx} className="flex flex-col items-center gap-2 flex-1 max-w-[80px]">
+                      <div className="flex flex-col gap-1 w-full">
+                        {/* Billable bar */}
+                        <div 
+                          className="w-full bg-gradient-to-t from-blue-500 to-blue-400 rounded-t-lg transition-all hover:opacity-80"
+                          style={{ height: `${person.billable * 30}px` }}
+                        ></div>
+                        {/* Non-billable bar */}
+                        <div 
+                          className="w-full bg-gradient-to-t from-blue-300 to-blue-200 rounded-b-lg transition-all hover:opacity-80"
+                          style={{ height: `${person.nonBillable * 30}px` }}
+                        ></div>
+                      </div>
+                      <div className="text-xs font-medium text-muted-foreground text-center">{person.name}</div>
+                      <div className="w-8 h-8 rounded-full bg-gradient-to-br from-gray-300 to-gray-400 flex items-center justify-center text-xs font-bold text-white">
+                        {person.name[0]}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Key Statistics Grid */}
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 mt-6">
+              <Card className="shadow-lg rounded-2xl border-0 hover:shadow-xl transition-shadow">
+                <CardContent className="pt-6 text-center">
+                  <div className="w-12 h-12 mx-auto mb-3 rounded-xl bg-blue-100 flex items-center justify-center">
+                    <span className="material-icons text-blue-600">assignment</span>
+                  </div>
+                  <div className="text-2xl font-bold mb-1">{Math.round(yearBillable + yearNonBillable)}</div>
+                  <div className="text-sm text-muted-foreground">Active Projects</div>
+                  <div className="text-xs text-muted-foreground mt-1">Pending</div>
+                </CardContent>
+              </Card>
+
+              <Card className="shadow-lg rounded-2xl border-0 hover:shadow-xl transition-shadow">
+                <CardContent className="pt-6 text-center">
+                  <div className="w-12 h-12 mx-auto mb-3 rounded-xl bg-blue-100 flex items-center justify-center">
+                    <span className="material-icons text-blue-600">pending_actions</span>
+                  </div>
+                  <div className="text-2xl font-bold mb-1">{Math.round(monthBillable)}</div>
+                  <div className="text-sm text-muted-foreground">Pending Tasks</div>
+                  <div className="text-xs text-muted-foreground mt-1">Pending</div>
+                </CardContent>
+              </Card>
+
+              <Card className="shadow-lg rounded-2xl border-0 hover:shadow-xl transition-shadow">
+                <CardContent className="pt-6 text-center">
+                  <div className="w-12 h-12 mx-auto mb-3 rounded-xl bg-blue-100 flex items-center justify-center">
+                    <span className="material-icons text-blue-600">people</span>
+                  </div>
+                  <div className="text-2xl font-bold mb-1">85%</div>
+                  <div className="text-sm text-muted-foreground">Team Utilization</div>
+                  <div className="text-xs text-muted-foreground mt-1">Rate</div>
+                </CardContent>
+              </Card>
+
+              <Card className="shadow-lg rounded-2xl border-0 hover:shadow-xl transition-shadow">
+                <CardContent className="pt-6 text-center">
+                  <div className="w-12 h-12 mx-auto mb-3 rounded-xl bg-blue-100 flex items-center justify-center">
+                    <span className="material-icons text-blue-600">leaderboard</span>
+                  </div>
+                  <div className="text-2xl font-bold mb-1">92%</div>
+                  <div className="text-sm text-muted-foreground">Team Utilization</div>
+                  <div className="text-xs text-muted-foreground mt-1">Rate</div>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Task Status Breakdown - Donut Chart */}
+            <Card className="shadow-xl rounded-3xl border-0 mt-6">
+              <CardHeader>
+                <CardTitle className="text-lg font-bold">Task Status Breakdown</CardTitle>
+              </CardHeader>
+              <CardContent className="flex justify-center">
+                <ResponsiveContainer width="100%" height={300}>
+                  <PieChart>
+                    <Pie
+                      data={[
+                        { name: 'In Progress', value: 35, color: '#3b82f6' },
+                        { name: 'Completed', value: 45, color: '#60a5fa' },
+                        { name: 'Task 98', value: 10, color: '#93c5fd' },
+                        { name: 'On Hold', value: 10, color: '#dbeafe' },
+                      ]}
+                      cx="50%"
+                      cy="50%"
+                      innerRadius={70}
+                      outerRadius={110}
+                      fill="#8884d8"
+                      dataKey="value"
+                      label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                    >
+                      {[
+                        { name: 'In Progress', value: 35, color: '#3b82f6' },
+                        { name: 'Completed', value: 45, color: '#60a5fa' },
+                        { name: 'Task 98', value: 10, color: '#93c5fd' },
+                        { name: 'On Hold', value: 10, color: '#dbeafe' },
+                      ].map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={entry.color} />
+                      ))}
+                    </Pie>
+                    <Tooltip />
+                  </PieChart>
+                </ResponsiveContainer>
+              </CardContent>
+            </Card>
 
             {/* Current Year - Premium Chart */}
             <Card className="shadow-premium border-border/50">
