@@ -1,6 +1,6 @@
 import { db } from "./db";
-import { users, projects, dropLogs, workSessions, nonBillableWorkSessions, complaints, complaintNotes, projectPhotos, jobComments, harnessInspections, toolboxMeetings, payPeriodConfig, payPeriods, quotes, quoteServices, gearItems } from "@shared/schema";
-import type { User, InsertUser, Project, InsertProject, DropLog, InsertDropLog, WorkSession, InsertWorkSession, Complaint, InsertComplaint, ComplaintNote, InsertComplaintNote, ProjectPhoto, InsertProjectPhoto, JobComment, InsertJobComment, HarnessInspection, InsertHarnessInspection, ToolboxMeeting, InsertToolboxMeeting, PayPeriodConfig, InsertPayPeriodConfig, PayPeriod, InsertPayPeriod, EmployeeHoursSummary, Quote, InsertQuote, QuoteService, InsertQuoteService, QuoteWithServices, GearItem, InsertGearItem } from "@shared/schema";
+import { users, projects, dropLogs, workSessions, nonBillableWorkSessions, complaints, complaintNotes, projectPhotos, jobComments, harnessInspections, toolboxMeetings, payPeriodConfig, payPeriods, quotes, quoteServices, gearItems, scheduledJobs, jobAssignments } from "@shared/schema";
+import type { User, InsertUser, Project, InsertProject, DropLog, InsertDropLog, WorkSession, InsertWorkSession, Complaint, InsertComplaint, ComplaintNote, InsertComplaintNote, ProjectPhoto, InsertProjectPhoto, JobComment, InsertJobComment, HarnessInspection, InsertHarnessInspection, ToolboxMeeting, InsertToolboxMeeting, PayPeriodConfig, InsertPayPeriodConfig, PayPeriod, InsertPayPeriod, EmployeeHoursSummary, Quote, InsertQuote, QuoteService, InsertQuoteService, QuoteWithServices, GearItem, InsertGearItem, ScheduledJob, InsertScheduledJob, JobAssignment, InsertJobAssignment, ScheduledJobWithAssignments } from "@shared/schema";
 import { eq, and, or, desc, sql, isNull, not, gte, lte, between } from "drizzle-orm";
 import bcrypt from "bcrypt";
 
@@ -1226,6 +1226,211 @@ export class Storage {
 
   async deleteQuoteServicesByQuoteId(quoteId: string): Promise<void> {
     await db.delete(quoteServices).where(eq(quoteServices.quoteId, quoteId));
+  }
+
+  // Scheduled Jobs operations
+  async createScheduledJob(job: InsertScheduledJob): Promise<ScheduledJob> {
+    const result = await db.insert(scheduledJobs).values(job).returning();
+    return result[0];
+  }
+
+  async getScheduledJobsByCompany(companyId: string): Promise<ScheduledJobWithAssignments[]> {
+    const jobs = await db.select().from(scheduledJobs)
+      .where(eq(scheduledJobs.companyId, companyId))
+      .orderBy(desc(scheduledJobs.startDate));
+    
+    // Fetch assignments for each job
+    const jobsWithAssignments = await Promise.all(
+      jobs.map(async (job) => {
+        const assignments = await this.getJobAssignments(job.id);
+        const employeeIds = assignments.map(a => a.employeeId);
+        const assignedEmployees = employeeIds.length > 0
+          ? await db.select().from(users).where(
+              and(
+                eq(users.companyId, companyId),
+                sql`${users.id} = ANY(${employeeIds})`
+              )
+            )
+          : [];
+        
+        return {
+          ...job,
+          assignedEmployees,
+        };
+      })
+    );
+    
+    return jobsWithAssignments;
+  }
+
+  async getScheduledJobsByEmployee(employeeId: string): Promise<ScheduledJobWithAssignments[]> {
+    const assignments = await db.select().from(jobAssignments)
+      .where(eq(jobAssignments.employeeId, employeeId));
+    
+    const jobIds = assignments.map(a => a.jobId);
+    
+    if (jobIds.length === 0) {
+      return [];
+    }
+    
+    const jobs = await db.select().from(scheduledJobs)
+      .where(sql`${scheduledJobs.id} = ANY(${jobIds})`)
+      .orderBy(desc(scheduledJobs.startDate));
+    
+    // Fetch all assignments for these jobs
+    const jobsWithAssignments = await Promise.all(
+      jobs.map(async (job) => {
+        const jobAssignmentList = await this.getJobAssignments(job.id);
+        const employeeIds = jobAssignmentList.map(a => a.employeeId);
+        const assignedEmployees = employeeIds.length > 0
+          ? await db.select().from(users).where(
+              sql`${users.id} = ANY(${employeeIds})`
+            )
+          : [];
+        
+        return {
+          ...job,
+          assignedEmployees,
+        };
+      })
+    );
+    
+    return jobsWithAssignments;
+  }
+
+  async getScheduledJobById(id: string): Promise<ScheduledJob | undefined> {
+    const result = await db.select().from(scheduledJobs).where(eq(scheduledJobs.id, id)).limit(1);
+    return result[0];
+  }
+
+  async getScheduledJobWithAssignments(id: string): Promise<ScheduledJobWithAssignments | undefined> {
+    const job = await this.getScheduledJobById(id);
+    
+    if (!job) {
+      return undefined;
+    }
+    
+    const assignments = await this.getJobAssignments(id);
+    const employeeIds = assignments.map(a => a.employeeId);
+    const assignedEmployees = employeeIds.length > 0
+      ? await db.select().from(users).where(
+          sql`${users.id} = ANY(${employeeIds})`
+        )
+      : [];
+    
+    return {
+      ...job,
+      assignedEmployees,
+    };
+  }
+
+  async updateScheduledJob(id: string, updates: Partial<InsertScheduledJob>): Promise<ScheduledJob> {
+    const result = await db.update(scheduledJobs)
+      .set({ ...updates, updatedAt: new Date() })
+      .where(eq(scheduledJobs.id, id))
+      .returning();
+    return result[0];
+  }
+
+  async deleteScheduledJob(id: string): Promise<void> {
+    await db.delete(scheduledJobs).where(eq(scheduledJobs.id, id));
+  }
+
+  // Job Assignment operations
+  async createJobAssignment(assignment: InsertJobAssignment): Promise<JobAssignment> {
+    const result = await db.insert(jobAssignments).values(assignment).returning();
+    return result[0];
+  }
+
+  async getJobAssignments(jobId: string): Promise<JobAssignment[]> {
+    return db.select().from(jobAssignments)
+      .where(eq(jobAssignments.jobId, jobId));
+  }
+
+  async deleteJobAssignment(id: string): Promise<void> {
+    await db.delete(jobAssignments).where(eq(jobAssignments.id, id));
+  }
+
+  async deleteJobAssignmentsByJobId(jobId: string): Promise<void> {
+    await db.delete(jobAssignments).where(eq(jobAssignments.jobId, jobId));
+  }
+
+  async replaceJobAssignments(jobId: string, employeeIds: string[], assignedBy: string): Promise<void> {
+    // Delete existing assignments
+    await this.deleteJobAssignmentsByJobId(jobId);
+    
+    // Create new assignments
+    for (const employeeId of employeeIds) {
+      await this.createJobAssignment({
+        jobId,
+        employeeId,
+        assignedBy,
+      });
+    }
+  }
+
+  async checkEmployeeConflicts(
+    employeeIds: string[], 
+    startDate: Date, 
+    endDate: Date,
+    excludeJobId?: string
+  ): Promise<Array<{ employeeId: string; employeeName: string; conflictingJobTitle: string }>> {
+    const conflicts: Array<{ employeeId: string; employeeName: string; conflictingJobTitle: string }> = [];
+    
+    for (const employeeId of employeeIds) {
+      // Get all assignments for this employee
+      const assignments = await db.select().from(jobAssignments)
+        .where(eq(jobAssignments.employeeId, employeeId));
+      
+      const jobIds = assignments.map(a => a.jobId);
+      
+      if (jobIds.length === 0) {
+        continue;
+      }
+      
+      // Check if any of their assigned jobs overlap with the new time range
+      let query = db.select().from(scheduledJobs)
+        .where(
+          and(
+            sql`${scheduledJobs.id} = ANY(${jobIds})`,
+            or(
+              // New job starts during existing job
+              and(
+                lte(scheduledJobs.startDate, startDate),
+                gte(scheduledJobs.endDate, startDate)
+              ),
+              // New job ends during existing job
+              and(
+                lte(scheduledJobs.startDate, endDate),
+                gte(scheduledJobs.endDate, endDate)
+              ),
+              // New job completely contains existing job
+              and(
+                gte(scheduledJobs.startDate, startDate),
+                lte(scheduledJobs.endDate, endDate)
+              )
+            )
+          )
+        );
+      
+      // Exclude the job being edited (if any)
+      if (excludeJobId) {
+        query = query.where(not(eq(scheduledJobs.id, excludeJobId)));
+      }
+      
+      const conflictingJobs = await query;
+      
+      if (conflictingJobs.length > 0) {
+        const employee = await this.getUserById(employeeId);
+        conflicts.push({
+          employeeId,
+          employeeName: employee?.name || 'Unknown',
+          conflictingJobTitle: conflictingJobs[0].title,
+        });
+      }
+    }
+    
+    return conflicts;
   }
 }
 

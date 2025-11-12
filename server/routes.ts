@@ -1,7 +1,7 @@
 import type { Express, Request, Response, NextFunction } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { insertUserSchema, insertProjectSchema, insertDropLogSchema, insertComplaintSchema, insertComplaintNoteSchema, insertJobCommentSchema, insertHarnessInspectionSchema, insertToolboxMeetingSchema, insertPayPeriodConfigSchema, insertQuoteSchema, insertQuoteServiceSchema, insertGearItemSchema, normalizeStrataPlan, type InsertGearItem } from "@shared/schema";
+import { insertUserSchema, insertProjectSchema, insertDropLogSchema, insertComplaintSchema, insertComplaintNoteSchema, insertJobCommentSchema, insertHarnessInspectionSchema, insertToolboxMeetingSchema, insertPayPeriodConfigSchema, insertQuoteSchema, insertQuoteServiceSchema, insertGearItemSchema, insertScheduledJobSchema, insertJobAssignmentSchema, normalizeStrataPlan, type InsertGearItem } from "@shared/schema";
 import { z } from "zod";
 import bcrypt from "bcrypt";
 import multer from "multer";
@@ -3645,6 +3645,231 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({ message: "Service deleted successfully" });
     } catch (error) {
       console.error("Delete quote service error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // ==================== SCHEDULING ROUTES ====================
+
+  // Get all scheduled jobs for the company
+  app.get("/api/schedule", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      const companyId = currentUser.role === "company" ? currentUser.id : currentUser.companyId;
+      if (!companyId) {
+        return res.status(400).json({ message: "Unable to determine company" });
+      }
+      
+      const jobs = await storage.getScheduledJobsByCompany(companyId);
+      res.json({ jobs });
+    } catch (error) {
+      console.error("Get scheduled jobs error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Get scheduled jobs assigned to current employee
+  app.get("/api/schedule/my-jobs", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      // Only employees should call this endpoint
+      if (currentUser.role === "company" || currentUser.role === "resident") {
+        return res.status(400).json({ message: "Invalid endpoint for this role" });
+      }
+      
+      const jobs = await storage.getScheduledJobsByEmployee(currentUser.id);
+      res.json({ jobs });
+    } catch (error) {
+      console.error("Get employee scheduled jobs error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Create new scheduled job
+  app.post("/api/schedule", requireAuth, requireVerifiedCompanyForMutations, async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      const companyId = currentUser.role === "company" ? currentUser.id : currentUser.companyId;
+      if (!companyId) {
+        return res.status(400).json({ message: "Unable to determine company" });
+      }
+      
+      const jobData = insertScheduledJobSchema.parse({
+        ...req.body,
+        companyId,
+        createdBy: currentUser.id,
+      });
+      
+      const job = await storage.createScheduledJob(jobData);
+      res.json({ job });
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Validation error", errors: error.errors });
+      }
+      console.error("Create scheduled job error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Update scheduled job
+  app.put("/api/schedule/:id", requireAuth, requireVerifiedCompanyForMutations, async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      const companyId = currentUser.role === "company" ? currentUser.id : currentUser.companyId;
+      if (!companyId) {
+        return res.status(400).json({ message: "Unable to determine company" });
+      }
+      
+      const job = await storage.getScheduledJobById(req.params.id);
+      
+      if (!job) {
+        return res.status(404).json({ message: "Job not found" });
+      }
+      
+      if (job.companyId !== companyId) {
+        return res.status(403).json({ message: "Forbidden" });
+      }
+      
+      const updateData = insertScheduledJobSchema.partial().parse(req.body);
+      const updatedJob = await storage.updateScheduledJob(req.params.id, updateData);
+      res.json({ job: updatedJob });
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Validation error", errors: error.errors });
+      }
+      console.error("Update scheduled job error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Delete scheduled job
+  app.delete("/api/schedule/:id", requireAuth, requireVerifiedCompanyForMutations, async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      const companyId = currentUser.role === "company" ? currentUser.id : currentUser.companyId;
+      if (!companyId) {
+        return res.status(400).json({ message: "Unable to determine company" });
+      }
+      
+      const job = await storage.getScheduledJobById(req.params.id);
+      
+      if (!job) {
+        return res.status(404).json({ message: "Job not found" });
+      }
+      
+      if (job.companyId !== companyId) {
+        return res.status(403).json({ message: "Forbidden" });
+      }
+      
+      await storage.deleteScheduledJob(req.params.id);
+      res.json({ message: "Job deleted successfully" });
+    } catch (error) {
+      console.error("Delete scheduled job error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Assign employees to a job
+  app.post("/api/schedule/:id/assign", requireAuth, requireVerifiedCompanyForMutations, async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      const companyId = currentUser.role === "company" ? currentUser.id : currentUser.companyId;
+      if (!companyId) {
+        return res.status(400).json({ message: "Unable to determine company" });
+      }
+      
+      const job = await storage.getScheduledJobById(req.params.id);
+      
+      if (!job) {
+        return res.status(404).json({ message: "Job not found" });
+      }
+      
+      if (job.companyId !== companyId) {
+        return res.status(403).json({ message: "Forbidden" });
+      }
+      
+      const { employeeIds } = req.body;
+      
+      if (!Array.isArray(employeeIds)) {
+        return res.status(400).json({ message: "employeeIds must be an array" });
+      }
+      
+      // Check for double-booking conflicts
+      const conflicts = await storage.checkEmployeeConflicts(employeeIds, job.startDate, job.endDate, req.params.id);
+      
+      if (conflicts.length > 0) {
+        return res.status(409).json({ 
+          message: "Schedule conflict detected",
+          conflicts: conflicts.map(c => ({
+            employeeId: c.employeeId,
+            employeeName: c.employeeName,
+            conflictingJob: c.conflictingJobTitle,
+          }))
+        });
+      }
+      
+      // Remove existing assignments and add new ones
+      await storage.replaceJobAssignments(req.params.id, employeeIds, currentUser.id);
+      
+      const updatedJob = await storage.getScheduledJobWithAssignments(req.params.id);
+      res.json({ job: updatedJob });
+    } catch (error) {
+      console.error("Assign employees error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Get assignments for a specific job
+  app.get("/api/schedule/:id/assignments", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      const companyId = currentUser.role === "company" ? currentUser.id : currentUser.companyId;
+      if (!companyId) {
+        return res.status(400).json({ message: "Unable to determine company" });
+      }
+      
+      const job = await storage.getScheduledJobById(req.params.id);
+      
+      if (!job) {
+        return res.status(404).json({ message: "Job not found" });
+      }
+      
+      if (job.companyId !== companyId) {
+        return res.status(403).json({ message: "Forbidden" });
+      }
+      
+      const assignments = await storage.getJobAssignments(req.params.id);
+      res.json({ assignments });
+    } catch (error) {
+      console.error("Get job assignments error:", error);
       res.status(500).json({ message: "Internal server error" });
     }
   });
