@@ -166,8 +166,29 @@ export class ObjectStorageService {
       resumable: false,
     });
 
-    // Return the full path to the private file
-    return fullPath;
+    // Return the API URL path to access this private file
+    return `/api/private-documents/${fileName}`;
+  }
+
+  // Get a private file for authenticated download
+  async getPrivateFile(fileName: string): Promise<File | null> {
+    const privateDir = this.getPrivateObjectDir();
+    if (!privateDir) {
+      throw new Error("No private object directory configured");
+    }
+
+    const fullPath = `${privateDir}/${fileName}`;
+    const { bucketName, objectName } = parseObjectPath(fullPath);
+    const bucket = objectStorageClient.bucket(bucketName);
+    const file = bucket.file(objectName);
+
+    // Check if file exists
+    const [exists] = await file.exists();
+    if (!exists) {
+      return null;
+    }
+
+    return file;
   }
 }
 

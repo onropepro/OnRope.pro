@@ -1147,6 +1147,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
       return res.status(500).json({ error: "Internal server error" });
     }
   });
+
+  // Serve private documents (authenticated users only)
+  app.get("/api/private-documents/:fileName(*)", requireAuth, async (req: Request, res: Response) => {
+    const fileName = req.params.fileName;
+    const objectStorageService = new ObjectStorageService();
+    try {
+      const file = await objectStorageService.getPrivateFile(fileName);
+      if (!file) {
+        return res.status(404).json({ error: "Document not found" });
+      }
+      objectStorageService.downloadObject(file, res);
+    } catch (error) {
+      console.error("Error retrieving private document:", error);
+      return res.status(500).json({ error: "Internal server error" });
+    }
+  });
   
   // Create project
   app.post("/api/projects", requireAuth, requireRole("company", "operations_manager"), async (req: Request, res: Response) => {
