@@ -66,7 +66,14 @@ export default function HoursAnalytics() {
     return sessions
       .filter((s: any) => s.endTime !== null)
       .filter((s: any) => {
-        const sessionDate = new Date(s.workDate || s.date);
+        // Parse workDate correctly regardless of format
+        const dateStr = s.workDate || s.date;
+        if (!dateStr) return false;
+        
+        // Create date object in local timezone by parsing as YYYY-MM-DD
+        const parts = dateStr.split('T')[0].split('-');
+        const sessionDate = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
+        
         return sessionDate >= startDate && sessionDate <= endDate;
       })
       .reduce((sum: number, session: any) => {
