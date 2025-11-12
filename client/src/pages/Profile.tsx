@@ -18,6 +18,7 @@ const profileSchema = z.object({
   name: z.string().min(1, "Name is required"),
   email: z.string().email("Invalid email address").optional(),
   unitNumber: z.string().optional(),
+  parkingStallNumber: z.string().optional(),
   companyName: z.string().optional(),
 });
 
@@ -63,6 +64,7 @@ export default function Profile() {
       name: user?.name || "",
       email: user?.email || "",
       unitNumber: user?.unitNumber || "",
+      parkingStallNumber: user?.parkingStallNumber || "",
       companyName: user?.companyName || "",
     },
   });
@@ -247,24 +249,44 @@ export default function Profile() {
                 )}
 
                 {user?.role === "resident" && (
-                  <FormField
-                    control={profileForm.control}
-                    name="unitNumber"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>{isParkadeProject ? "Stall Number" : "Unit Number"}</FormLabel>
-                        <FormControl>
-                          <Input
-                            placeholder={isParkadeProject ? "e.g., 42, A-5" : "e.g., 101"}
-                            {...field}
-                            data-testid="input-unit-number"
-                            className="h-12"
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+                  <>
+                    <FormField
+                      control={profileForm.control}
+                      name="unitNumber"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Unit Number</FormLabel>
+                          <FormControl>
+                            <Input
+                              placeholder="e.g., 101, 1205"
+                              {...field}
+                              data-testid="input-unit-number"
+                              className="h-12"
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={profileForm.control}
+                      name="parkingStallNumber"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Parking Stall Number</FormLabel>
+                          <FormControl>
+                            <Input
+                              placeholder="e.g., 42, A-5, P1-23"
+                              {...field}
+                              data-testid="input-parking-stall"
+                              className="h-12"
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </>
                 )}
 
                 {user?.role === "company" && (
