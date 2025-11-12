@@ -46,20 +46,50 @@ export default function Schedule() {
   const employees = employeesData?.employees || [];
 
   // Transform jobs into FullCalendar events
-  const events: EventInput[] = jobs.map((job) => {
+  // Create separate event blocks for each day in multi-day jobs
+  const events: EventInput[] = jobs.flatMap((job) => {
     const color = job.color || "#3b82f6";
-
-    return {
-      id: job.id,
-      title: job.title,
-      start: job.startDate,
-      end: job.endDate,
-      backgroundColor: color,
-      borderColor: color,
-      extendedProps: {
-        job,
-      },
-    };
+    const start = new Date(job.startDate);
+    const end = new Date(job.endDate);
+    
+    // If same day, return single event
+    const startDay = new Date(start.getFullYear(), start.getMonth(), start.getDate());
+    const endDay = new Date(end.getFullYear(), end.getMonth(), end.getDate());
+    
+    if (startDay.getTime() === endDay.getTime()) {
+      return [{
+        id: job.id,
+        title: job.title,
+        start: job.startDate,
+        end: job.endDate,
+        backgroundColor: color,
+        borderColor: color,
+        extendedProps: {
+          job,
+        },
+      }];
+    }
+    
+    // Multi-day: create separate all-day events for each day
+    const dayEvents = [];
+    const currentDate = new Date(startDay);
+    
+    while (currentDate <= endDay) {
+      dayEvents.push({
+        id: `${job.id}-${currentDate.toISOString().split('T')[0]}`,
+        title: job.title,
+        start: new Date(currentDate),
+        allDay: true,
+        backgroundColor: color,
+        borderColor: color,
+        extendedProps: {
+          job,
+        },
+      });
+      currentDate.setDate(currentDate.getDate() + 1);
+    }
+    
+    return dayEvents;
   });
 
   // Handle date selection for creating new job
@@ -202,6 +232,9 @@ export default function Schedule() {
               allDaySlot={true}
               slotDuration="01:00:00"
               eventMaxStack={2}
+              displayEventTime={false}
+              displayEventEnd={false}
+              eventDisplay="block"
               data-testid="calendar"
             />
           </div>
