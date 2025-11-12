@@ -137,7 +137,6 @@ const employeeSchema = z.object({
   email: z.string().email("Invalid email address"),
   password: z.string().min(6, "Password must be at least 6 characters"),
   role: z.enum(["operations_manager", "supervisor", "rope_access_tech", "manager", "ground_crew", "ground_crew_supervisor"]),
-  techLevel: z.string().optional(),
   hourlyRate: z.string().optional(),
   permissions: z.array(z.string()).default([]),
   // New employee details
@@ -155,21 +154,12 @@ const employeeSchema = z.object({
   irataLicenseNumber: z.string().optional(),
   irataIssuedDate: z.string().optional(),
   irataExpirationDate: z.string().optional(),
-}).refine((data) => {
-  if (data.role === "rope_access_tech" && !data.techLevel) {
-    return false;
-  }
-  return true;
-}, {
-  message: "IRATA level is required for rope access technicians",
-  path: ["techLevel"],
 });
 
 const editEmployeeSchema = z.object({
   name: z.string().min(1, "Name is required"),
   email: z.string().email("Invalid email address"),
   role: z.enum(["operations_manager", "supervisor", "rope_access_tech", "manager", "ground_crew", "ground_crew_supervisor"]),
-  techLevel: z.string().optional(),
   hourlyRate: z.string().optional(),
   permissions: z.array(z.string()).default([]),
   // New employee details
@@ -191,14 +181,6 @@ const editEmployeeSchema = z.object({
   terminatedDate: z.string().optional(),
   terminationReason: z.string().optional(),
   terminationNotes: z.string().optional(),
-}).refine((data) => {
-  if (data.role === "rope_access_tech" && !data.techLevel) {
-    return false;
-  }
-  return true;
-}, {
-  message: "IRATA level is required for rope access technicians",
-  path: ["techLevel"],
 });
 
 const dropLogSchema = z.object({
@@ -378,7 +360,6 @@ export default function Dashboard() {
       email: "",
       password: "",
       role: "rope_access_tech",
-      techLevel: "",
       hourlyRate: "",
       permissions: [],
       startDate: "",
@@ -403,7 +384,6 @@ export default function Dashboard() {
       name: "",
       email: "",
       role: "rope_access_tech",
-      techLevel: "",
       hourlyRate: "",
       permissions: [],
       startDate: "",
@@ -560,7 +540,6 @@ export default function Dashboard() {
         name: data.name,
         email: data.email,
         role: data.role,
-        techLevel: data.techLevel,
         hourlyRate: data.hourlyRate,
         permissions: data.permissions,
         startDate: data.startDate,
@@ -664,7 +643,6 @@ export default function Dashboard() {
       name: employee.name || "",
       email: employee.email || "",
       role: employee.role,
-      techLevel: employee.techLevel || "",
       hourlyRate: employee.hourlyRate || "",
       permissions: employee.permissions || [],
       startDate: employee.startDate || "",
@@ -2046,31 +2024,6 @@ export default function Dashboard() {
                           </FormItem>
                         )}
                       />
-
-                      {selectedRole === "rope_access_tech" && (
-                        <FormField
-                          control={employeeForm.control}
-                          name="techLevel"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>IRATA Level</FormLabel>
-                              <Select onValueChange={field.onChange} value={field.value}>
-                                <FormControl>
-                                  <SelectTrigger className="h-12" data-testid="select-tech-level">
-                                    <SelectValue placeholder="Select IRATA level" />
-                                  </SelectTrigger>
-                                </FormControl>
-                                <SelectContent>
-                                  <SelectItem value="Level 1">Level 1</SelectItem>
-                                  <SelectItem value="Level 2">Level 2</SelectItem>
-                                  <SelectItem value="Level 3">Level 3</SelectItem>
-                                </SelectContent>
-                              </Select>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                      )}
 
                       <FormField
                         control={employeeForm.control}
