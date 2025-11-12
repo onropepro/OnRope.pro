@@ -459,7 +459,7 @@ export default function HoursAnalytics() {
 
             {/* Key Statistics Grid - Row 2 */}
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 mt-6">
-              <Card className="shadow-lg rounded-2xl border-0 hover:shadow-xl transition-shadow">
+              <Card className="shadow-lg rounded-2xl border-0 hover-elevate active-elevate-2 cursor-pointer transition-all" onClick={() => setModalOpen('workSessions')} data-testid="card-work-sessions">
                 <CardContent className="pt-6 text-center">
                   <div className="w-12 h-12 mx-auto mb-3 rounded-xl bg-purple-100 flex items-center justify-center">
                     <span className="material-icons text-purple-600">calendar_month</span>
@@ -470,7 +470,7 @@ export default function HoursAnalytics() {
                 </CardContent>
               </Card>
 
-              <Card className="shadow-lg rounded-2xl border-0 hover:shadow-xl transition-shadow">
+              <Card className="shadow-lg rounded-2xl border-0 hover-elevate active-elevate-2 cursor-pointer transition-all" onClick={() => setModalOpen('avgDuration')} data-testid="card-avg-duration">
                 <CardContent className="pt-6 text-center">
                   <div className="w-12 h-12 mx-auto mb-3 rounded-xl bg-blue-100 flex items-center justify-center">
                     <span className="material-icons text-blue-600">schedule</span>
@@ -481,7 +481,7 @@ export default function HoursAnalytics() {
                 </CardContent>
               </Card>
 
-              <Card className="shadow-lg rounded-2xl border-0 hover:shadow-xl transition-shadow">
+              <Card className="shadow-lg rounded-2xl border-0 hover-elevate active-elevate-2 cursor-pointer transition-all" onClick={() => setModalOpen('totalDrops')} data-testid="card-total-drops">
                 <CardContent className="pt-6 text-center">
                   <div className="w-12 h-12 mx-auto mb-3 rounded-xl bg-orange-100 flex items-center justify-center">
                     <span className="material-icons text-orange-600">arrow_downward</span>
@@ -492,7 +492,7 @@ export default function HoursAnalytics() {
                 </CardContent>
               </Card>
 
-              <Card className="shadow-lg rounded-2xl border-0 hover:shadow-xl transition-shadow">
+              <Card className="shadow-lg rounded-2xl border-0 hover-elevate active-elevate-2 cursor-pointer transition-all" onClick={() => setModalOpen('avgDrops')} data-testid="card-avg-drops">
                 <CardContent className="pt-6 text-center">
                   <div className="w-12 h-12 mx-auto mb-3 rounded-xl bg-blue-100 flex items-center justify-center">
                     <span className="material-icons text-blue-600">speed</span>

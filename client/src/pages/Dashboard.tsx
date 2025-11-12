@@ -266,10 +266,12 @@ export default function Dashboard() {
     queryKey: ["/api/user"],
   });
 
+  // Extract user from userData for use throughout component
+  const user = userData?.user;
+
   // License verification gate - redirect unverified company owners
   useEffect(() => {
-    if (userData?.user) {
-      const user = userData.user;
+    if (user) {
       // Only check company role users
       if (user.role === 'company' && user.licenseVerified !== true) {
         // Check if user explicitly chose read-only mode

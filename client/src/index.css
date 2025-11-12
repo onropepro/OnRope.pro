@@ -2,11 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-/* FullCalendar imports */
-@import '@fullcalendar/core/main.css';
-@import '@fullcalendar/daygrid/main.css';
-@import '@fullcalendar/timegrid/main.css';
-
 /* LIGHT MODE - Modern Bold SaaS Design */
 :root {
   --button-outline: rgba(0,0,0, .10);
