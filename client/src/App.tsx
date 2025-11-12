@@ -21,6 +21,7 @@ import ActiveWorkers from "@/pages/ActiveWorkers";
 import NonBillableHours from "@/pages/NonBillableHours";
 import Inventory from "@/pages/Inventory";
 import HoursAnalytics from "@/pages/HoursAnalytics";
+import Schedule from "@/pages/Schedule";
 import LicenseVerification from "@/pages/LicenseVerification";
 import NotFound from "@/pages/not-found";
 import ProtectedRoute from "@/components/ProtectedRoute";
@@ -105,6 +106,11 @@ function Router() {
       <Route path="/hours-analytics">
         <ProtectedRoute allowedRoles={["company", "operations_manager", "supervisor"]}>
           <HoursAnalytics />
+        </ProtectedRoute>
+      </Route>
+      <Route path="/schedule">
+        <ProtectedRoute allowedRoles={["company", "operations_manager", "supervisor"]}>
+          <Schedule />
         </ProtectedRoute>
       </Route>
       <Route component={NotFound} />
