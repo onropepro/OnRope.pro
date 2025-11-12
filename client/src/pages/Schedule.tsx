@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { useLocation } from "wouter";
@@ -75,10 +75,15 @@ export default function Schedule() {
     const currentDate = new Date(startDay);
     
     while (currentDate <= endDay) {
+      const eventStart = new Date(currentDate);
+      const eventEnd = new Date(currentDate);
+      eventEnd.setDate(eventEnd.getDate() + 1);
+      
       dayEvents.push({
         id: `${job.id}-${currentDate.toISOString().split('T')[0]}`,
         title: job.title,
-        start: new Date(currentDate),
+        start: eventStart,
+        end: eventEnd,
         allDay: true,
         backgroundColor: color,
         borderColor: color,
@@ -688,7 +693,7 @@ function EditJobDialog({
   });
 
   // Update form when job changes
-  useState(() => {
+  useEffect(() => {
     if (job) {
       setFormData({
         title: job.title || "",
@@ -704,7 +709,7 @@ function EditJobDialog({
         employeeIds: job.assignedEmployees?.map(e => e.id) || [],
       });
     }
-  });
+  }, [job]);
 
   const updateJobMutation = useMutation({
     mutationFn: async (data: any) => {
