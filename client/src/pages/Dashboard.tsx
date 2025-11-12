@@ -339,7 +339,12 @@ export default function Dashboard() {
 
   // Calculate overall target met statistics across all projects
   const allWorkSessions = allWorkSessionsData?.sessions || [];
-  const completedSessions = allWorkSessions.filter((s: any) => s.endTime !== null);
+  const completedSessions = allWorkSessions.filter((s: any) => 
+    s.endTime !== null && // Session is completed
+    s.dailyDropTarget != null && // Has a drop target (excludes non-drop-based work)
+    s.dailyDropTarget > 0 && // Target is meaningful
+    s.techName != null // Has a valid employee name
+  );
   const targetMetCount = completedSessions.filter((s: any) => s.dropsCompleted >= s.dailyDropTarget).length;
   const belowTargetCount = completedSessions.filter((s: any) => s.dropsCompleted < s.dailyDropTarget).length;
   
