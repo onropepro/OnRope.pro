@@ -52,10 +52,6 @@ export default function Payroll() {
   const [dropsWest, setDropsWest] = useState<string>("0");
   const [shortfallReason, setShortfallReason] = useState<string>("");
 
-  // Get selected project details
-  const selectedProject = projectsData?.projects.find(p => p.id === selectedProjectId);
-  const selectedJobType = selectedProject?.jobType || '4_elevation_system';
-
   // Fetch current user to check permissions
   const { data: userData, isLoading: userLoading } = useQuery({
     queryKey: ["/api/user"],
@@ -93,6 +89,10 @@ export default function Payroll() {
     queryKey: ['/api/projects'],
     enabled: canAccessPayroll,
   });
+
+  // Get selected project details
+  const selectedProject = projectsData?.projects.find(p => p.id === selectedProjectId);
+  const selectedJobType = selectedProject?.jobType || '4_elevation_system';
 
   // Auto-create default payroll config if none exists
   useEffect(() => {
