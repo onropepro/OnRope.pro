@@ -1194,6 +1194,34 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
       
       const project = await storage.createProject(projectData);
+      
+      // Automatically create a scheduled job for this project
+      if (project.targetCompletionDate) {
+        const endDate = new Date(project.targetCompletionDate);
+        const startDate = new Date();
+        
+        // Create job title based on strata plan number
+        const jobTitle = `${normalizeStrataPlan(project.strataPlanNumber)} - ${project.jobType.replace(/_/g, ' ')}`;
+        
+        await storage.createScheduledJob({
+          companyId,
+          projectId: project.id,
+          title: jobTitle,
+          description: `Auto-scheduled from project creation`,
+          jobType: project.jobType,
+          customJobType: null,
+          startDate,
+          endDate,
+          status: "upcoming",
+          location: null,
+          color: "#3b82f6",
+          estimatedHours: null,
+          actualHours: null,
+          notes: null,
+          createdBy: currentUser.id,
+        });
+      }
+      
       res.json({ project });
     } catch (error) {
       if (error instanceof z.ZodError) {
