@@ -125,45 +125,106 @@ export default function HoursAnalytics() {
   const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
-      <div className="max-w-7xl mx-auto p-4 space-y-6">
-        {/* Header */}
-        <div className="flex items-center gap-4">
+    <div className="min-h-screen bg-background">
+      <div className="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8 space-y-8">
+        {/* Header - Premium Style */}
+        <div className="flex items-center gap-4 mb-2">
           <Button
             variant="ghost"
             size="icon"
             onClick={() => setLocation("/dashboard")}
             data-testid="button-back"
+            className="hover-elevate"
           >
             <ArrowLeft className="h-5 w-5" />
           </Button>
           <div className="flex-1">
-            <h1 className="text-2xl font-bold">{isManagement ? "Hours Analytics" : "My Hours"}</h1>
-            <p className="text-sm text-muted-foreground">
+            <h1 className="text-3xl font-bold gradient-text">{isManagement ? "Hours Analytics" : "My Hours"}</h1>
+            <p className="text-sm text-muted-foreground mt-1">
               {isManagement ? "Billable vs Non-Billable Hours Breakdown" : "View your work hours and session history"}
             </p>
           </div>
         </div>
 
         {isLoading ? (
-          <Card>
+          <Card className="shadow-premium">
             <CardContent className="pt-6">
               <p className="text-center text-muted-foreground">Loading analytics...</p>
             </CardContent>
           </Card>
         ) : (
           <>
-            {/* Current Year */}
-            <Card>
+            {/* Analytics Grid - Premium Layout */}
+            <div className="grid gap-6 md:grid-cols-3">
+              {/* Total Year Hours Card */}
+              <Card className="shadow-premium transition-premium hover:shadow-premium-lg border-border/50">
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-sm font-medium text-muted-foreground">Total Hours {currentYear}</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-3xl font-bold gradient-text">
+                    {(yearBillable + yearNonBillable).toFixed(1)}h
+                  </div>
+                  <div className="flex gap-4 mt-4 text-sm">
+                    <div className="flex items-center gap-2">
+                      <div className="w-3 h-3 rounded-full bg-primary"></div>
+                      <span className="text-muted-foreground">{yearBillable.toFixed(1)}h billable</span>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Total Month Hours Card */}
+              <Card className="shadow-premium transition-premium hover:shadow-premium-lg border-border/50">
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-sm font-medium text-muted-foreground">{monthNames[currentMonth]}</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-3xl font-bold gradient-text">
+                    {(monthBillable + monthNonBillable).toFixed(1)}h
+                  </div>
+                  <div className="flex gap-4 mt-4 text-sm">
+                    <div className="flex items-center gap-2">
+                      <div className="w-3 h-3 rounded-full bg-primary"></div>
+                      <span className="text-muted-foreground">{monthBillable.toFixed(1)}h billable</span>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Total Day Hours Card */}
+              <Card className="shadow-premium transition-premium hover:shadow-premium-lg border-border/50">
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-sm font-medium text-muted-foreground">Today</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-3xl font-bold gradient-text">
+                    {(dayBillable + dayNonBillable).toFixed(1)}h
+                  </div>
+                  <div className="flex gap-4 mt-4 text-sm">
+                    <div className="flex items-center gap-2">
+                      <div className="w-3 h-3 rounded-full bg-primary"></div>
+                      <span className="text-muted-foreground">{dayBillable.toFixed(1)}h billable</span>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Current Year - Premium Chart */}
+            <Card className="shadow-premium border-border/50">
               <CardHeader>
-                <CardTitle>Current Year - {currentYear}</CardTitle>
+                <CardTitle className="flex items-center gap-2">
+                  <span className="material-icons text-primary">calendar_today</span>
+                  Current Year - {currentYear}
+                </CardTitle>
               </CardHeader>
               <CardContent>
                 {yearBillable + yearNonBillable === 0 ? (
-                  <p className="text-center text-muted-foreground py-8">No hours recorded this year</p>
+                  <p className="text-center text-muted-foreground py-12">No hours recorded this year</p>
                 ) : (
                   <div className="flex flex-col items-center">
-                    <ResponsiveContainer width="100%" height={300}>
+                    <ResponsiveContainer width="100%" height={350}>
                       <PieChart>
                         <Pie
                           data={yearData}
@@ -203,17 +264,20 @@ export default function HoursAnalytics() {
               </CardContent>
             </Card>
 
-            {/* Current Month */}
-            <Card>
+            {/* Current Month - Premium Chart */}
+            <Card className="shadow-premium border-border/50">
               <CardHeader>
-                <CardTitle>Current Month - {monthNames[currentMonth]} {currentYear}</CardTitle>
+                <CardTitle className="flex items-center gap-2">
+                  <span className="material-icons text-primary">event</span>
+                  Current Month - {monthNames[currentMonth]} {currentYear}
+                </CardTitle>
               </CardHeader>
               <CardContent>
                 {monthBillable + monthNonBillable === 0 ? (
-                  <p className="text-center text-muted-foreground py-8">No hours recorded this month</p>
+                  <p className="text-center text-muted-foreground py-12">No hours recorded this month</p>
                 ) : (
                   <div className="flex flex-col items-center">
-                    <ResponsiveContainer width="100%" height={300}>
+                    <ResponsiveContainer width="100%" height={350}>
                       <PieChart>
                         <Pie
                           data={monthData}
@@ -253,17 +317,20 @@ export default function HoursAnalytics() {
               </CardContent>
             </Card>
 
-            {/* Current Day */}
-            <Card>
+            {/* Current Day - Premium Chart */}
+            <Card className="shadow-premium border-border/50">
               <CardHeader>
-                <CardTitle>Today - {now.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })}</CardTitle>
+                <CardTitle className="flex items-center gap-2">
+                  <span className="material-icons text-primary">today</span>
+                  Today - {now.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })}
+                </CardTitle>
               </CardHeader>
               <CardContent>
                 {dayBillable + dayNonBillable === 0 ? (
-                  <p className="text-center text-muted-foreground py-8">No hours recorded today</p>
+                  <p className="text-center text-muted-foreground py-12">No hours recorded today</p>
                 ) : (
                   <div className="flex flex-col items-center">
-                    <ResponsiveContainer width="100%" height={300}>
+                    <ResponsiveContainer width="100%" height={350}>
                       <PieChart>
                         <Pie
                           data={dayData}

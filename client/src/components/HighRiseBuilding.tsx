@@ -52,43 +52,45 @@ export function HighRiseBuilding({
 
   return (
     <div className={`flex flex-col items-center ${className}`} data-testid="highrise-building">
-      {/* Overall Progress */}
-      <div className="text-center mb-4">
-        <div className="text-3xl font-bold text-foreground" data-testid="progress-percentage">
+      {/* Overall Progress - Premium Style */}
+      <div className="text-center mb-8">
+        <div className="text-5xl font-bold gradient-text mb-2" data-testid="progress-percentage">
           {Math.round(overallProgress)}%
         </div>
-        <div className="text-sm text-muted-foreground mt-1" data-testid="drops-progress">
-          {completedDrops} / {totalDrops} Total Drops
+        <div className="text-sm font-medium text-muted-foreground" data-testid="drops-progress">
+          {completedDrops} of {totalDrops} Total Drops Complete
         </div>
       </div>
 
-      {/* Four Elevations Side-by-Side */}
-      <div className="flex gap-2 md:gap-4 overflow-x-auto">
+      {/* Four Elevations Side-by-Side - Premium Cards */}
+      <div className="flex gap-4 md:gap-6 overflow-x-auto pb-2">
         {elevations.map((elevation) => (
           <div key={elevation.name} className="flex flex-col items-center">
-            {/* Elevation Label */}
-            <div className="text-xs font-bold text-muted-foreground mb-2">
-              {elevation.name}
+            {/* Elevation Label - Premium Badge */}
+            <div className="mb-3 px-3 py-1 bg-primary/10 rounded-full">
+              <span className="text-xs font-semibold text-primary uppercase tracking-wide">
+                {elevation.name}
+              </span>
             </div>
             
-            {/* Building Structure */}
+            {/* Building Structure - Premium Card with Shadow */}
             <div className="relative">
-              <div className="w-16 bg-card border-2 border-card-border rounded-t-sm shadow-md">
-                {/* Roof */}
-                <div className="h-2 bg-muted border-b border-card-border"></div>
+              <div className="w-20 bg-gradient-to-b from-card to-background border border-border/50 rounded-t-xl shadow-premium transition-premium hover:shadow-premium-lg">
+                {/* Roof - Premium Gradient */}
+                <div className="h-3 bg-gradient-to-r from-primary/20 to-primary/10 border-b border-border/30 rounded-t-xl"></div>
                 
-                {/* Floors */}
+                {/* Floors - Refined Styling */}
                 <div className="relative flex flex-col">
                   {buildingFloors.map(({ floorNumber }) => (
                     <div
                       key={floorNumber}
-                      className="relative border-b border-card-border last:border-b-0 bg-muted/10"
-                      style={{ height: '12px' }}
+                      className="relative border-b border-border/20 last:border-b-0 bg-card"
+                      style={{ height: '14px' }}
                       data-testid={`${elevation.name.toLowerCase()}-floor-${floorNumber}`}
                     >
-                      {/* Horizontal Progress Fill */}
+                      {/* Horizontal Progress Fill - Premium Gradient */}
                       <div 
-                        className="absolute left-0 top-0 bottom-0 bg-warning/90 transition-all duration-500"
+                        className="absolute left-0 top-0 bottom-0 bg-gradient-to-r from-primary to-primary/80 transition-all duration-500 ease-out"
                         style={{ width: `${elevation.progress}%` }}
                         data-testid={`${elevation.name.toLowerCase()}-progress-${floorNumber}`}
                       />
@@ -96,18 +98,18 @@ export function HighRiseBuilding({
                   ))}
                 </div>
 
-                {/* Base */}
-                <div className="h-2 bg-muted border-t-2 border-card-border"></div>
+                {/* Base - Premium Foundation */}
+                <div className="h-3 bg-gradient-to-r from-muted to-muted/50 border-t border-border/30 rounded-b-xl"></div>
               </div>
             </div>
             
-            {/* Elevation Progress */}
-            <div className="mt-2 text-center">
-              <div className="text-xs font-bold text-foreground">
+            {/* Elevation Progress - Premium Typography */}
+            <div className="mt-3 text-center">
+              <div className="text-lg font-bold text-foreground mb-0.5">
                 {Math.round(elevation.progress)}%
               </div>
-              <div className="text-xs text-muted-foreground">
-                {elevation.completed}/{elevation.total}
+              <div className="text-xs font-medium text-muted-foreground">
+                {elevation.completed} / {elevation.total} drops
               </div>
             </div>
           </div>

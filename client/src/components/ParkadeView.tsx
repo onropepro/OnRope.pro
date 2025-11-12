@@ -19,30 +19,32 @@ export function ParkadeView({ totalStalls, completedStalls, className = "" }: Pa
 
   return (
     <div className={`space-y-6 ${className}`}>
-      {/* Header with progress */}
-      <div className="text-center mb-6">
-        <h3 className="text-4xl font-bold text-primary mb-2">
+      {/* Header with progress - Premium Style */}
+      <div className="text-center mb-8">
+        <h3 className="text-5xl font-bold gradient-text mb-2">
           {progressPercentage}%
         </h3>
-        <p className="text-muted-foreground">
-          Parkade Progress
+        <p className="text-base font-medium text-foreground">
+          Parkade Cleaning Progress
         </p>
         <p className="text-sm text-muted-foreground mt-1">
-          {completedStalls} of {totalStalls} stalls cleaned
+          {completedStalls} of {totalStalls} stalls completed
         </p>
       </div>
 
-      {/* Parkade visualization */}
-      <div className="bg-muted/30 rounded-2xl p-4 sm:p-6 border-2 border-border/50">
-        {/* Parkade entrance header */}
-        <div className="flex items-center justify-center gap-2 mb-4 pb-3 border-b-2 border-dashed border-border">
-          <span className="material-icons text-primary text-2xl">local_parking</span>
-          <h4 className="text-lg font-semibold text-muted-foreground">Parking Level</h4>
+      {/* Parkade visualization - Premium Card */}
+      <div className="bg-gradient-to-br from-card to-background rounded-2xl p-6 border border-border/50 shadow-premium">
+        {/* Parkade entrance header - Premium Badge */}
+        <div className="flex items-center justify-center gap-3 mb-6 pb-4 border-b border-border/30">
+          <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
+            <span className="material-icons text-primary text-xl">local_parking</span>
+          </div>
+          <h4 className="text-lg font-semibold text-foreground">Parking Level</h4>
         </div>
 
-        {/* Parking stalls grid */}
+        {/* Parking stalls grid - Premium Styling */}
         <div 
-          className="grid gap-2 max-h-[500px] overflow-y-auto pr-2"
+          className="grid gap-2.5 max-h-[500px] overflow-y-auto pr-2"
           style={{ gridTemplateColumns: `repeat(${config.columns}, minmax(0, 1fr))` }}
         >
           {Array.from({ length: totalStalls }, (_, index) => {
@@ -53,18 +55,18 @@ export function ParkadeView({ totalStalls, completedStalls, className = "" }: Pa
                 className={`
                   ${config.stallHeight}
                   flex flex-col items-center justify-center
-                  rounded-lg border-2 transition-all duration-300
+                  rounded-xl border transition-premium
                   ${isCompleted 
-                    ? 'bg-green-500/20 border-green-500 dark:bg-green-500/30' 
-                    : 'bg-card border-border hover-elevate'
+                    ? 'bg-success/10 border-success/30 shadow-sm' 
+                    : 'bg-card border-border/50 hover-elevate'
                   }
                 `}
                 data-testid={`stall-${index + 1}`}
               >
-                <span className={`material-icons ${config.iconSize} ${isCompleted ? 'text-green-600 dark:text-green-400' : 'text-muted-foreground/50'}`}>
+                <span className={`material-icons ${config.iconSize} ${isCompleted ? 'text-success' : 'text-muted-foreground/40'}`}>
                   {isCompleted ? 'check_circle' : 'local_parking'}
                 </span>
-                <span className={`text-xs font-medium mt-0.5 ${isCompleted ? 'text-green-600 dark:text-green-400' : 'text-muted-foreground/70'}`}>
+                <span className={`text-xs font-semibold mt-0.5 ${isCompleted ? 'text-success' : 'text-muted-foreground/60'}`}>
                   {index + 1}
                 </span>
               </div>
@@ -72,31 +74,38 @@ export function ParkadeView({ totalStalls, completedStalls, className = "" }: Pa
           })}
         </div>
 
-        {/* Legend */}
-        <div className="flex items-center justify-center gap-6 mt-4 pt-3 border-t border-border/50">
-          <div className="flex items-center gap-2">
-            <div className="w-4 h-4 rounded bg-green-500/20 border-2 border-green-500"></div>
-            <span className="text-sm text-muted-foreground">Completed</span>
+        {/* Legend - Premium Pills */}
+        <div className="flex items-center justify-center gap-6 mt-6 pt-4 border-t border-border/30">
+          <div className="flex items-center gap-2 px-3 py-1.5 bg-success/10 rounded-full">
+            <div className="w-3 h-3 rounded-full bg-success"></div>
+            <span className="text-xs font-semibold text-success">Completed</span>
           </div>
-          <div className="flex items-center gap-2">
-            <div className="w-4 h-4 rounded bg-card border-2 border-border"></div>
-            <span className="text-sm text-muted-foreground">Pending</span>
+          <div className="flex items-center gap-2 px-3 py-1.5 bg-muted rounded-full">
+            <div className="w-3 h-3 rounded-full bg-muted-foreground/40 border border-border"></div>
+            <span className="text-xs font-semibold text-muted-foreground">Remaining</span>
           </div>
         </div>
       </div>
 
-      {/* Progress bar */}
-      <div className="relative h-8 bg-muted rounded-full overflow-hidden">
+      {/* Progress bar - Premium Gradient */}
+      <div className="relative h-10 bg-muted/50 rounded-xl overflow-hidden border border-border/30 shadow-sm">
         <div 
-          className="absolute inset-y-0 left-0 bg-gradient-to-r from-green-500 to-green-400 transition-all duration-500 ease-out flex items-center justify-end pr-3"
+          className="absolute inset-y-0 left-0 bg-gradient-to-r from-success to-success/80 transition-all duration-500 ease-out flex items-center justify-end pr-4"
           style={{ width: `${progressPercentage}%` }}
         >
-          {progressPercentage > 10 && (
-            <span className="text-xs font-bold text-white">
+          {progressPercentage > 15 && (
+            <span className="text-sm font-bold text-white drop-shadow">
               {progressPercentage}%
             </span>
           )}
         </div>
+        {progressPercentage <= 15 && progressPercentage > 0 && (
+          <div className="absolute inset-0 flex items-center justify-center">
+            <span className="text-sm font-bold text-muted-foreground">
+              {progressPercentage}%
+            </span>
+          </div>
+        )}
       </div>
     </div>
   );
