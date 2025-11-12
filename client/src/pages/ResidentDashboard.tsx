@@ -4,6 +4,7 @@ import { queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { useLocation, Link } from "wouter";
 import { HighRiseBuilding } from "@/components/HighRiseBuilding";
+import { ParkadeView } from "@/components/ParkadeView";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -121,8 +122,10 @@ export default function ResidentDashboard() {
     completedDropsEast: progressData?.completedDropsEast,
     completedDropsSouth: progressData?.completedDropsSouth,
     completedDropsWest: progressData?.completedDropsWest,
-    dailyDropTarget: activeProject?.dailyDropTarget || 20,
+    dailyDropTarget: activeProject?.dailyDropTarget || activeProject?.stallsPerDay || 20,
     progressPercentage: progressData?.progressPercentage || 0,
+    totalStalls: progressData?.totalStalls || activeProject?.totalStalls || 0,
+    completedStalls: progressData?.completedStalls || 0,
   };
 
   const form = useForm<ComplaintFormData>({
@@ -619,7 +622,14 @@ export default function ResidentDashboard() {
 
           <TabsContent value="building" className="mt-6">
             <div className="bg-card/60 backdrop-blur-sm rounded-2xl border border-border/50 shadow-xl p-6 sm:p-8">
-              {activeProject?.jobType === 'in_suite_dryer_vent_cleaning' ? (
+              {activeProject?.jobType === 'parkade_pressure_cleaning' ? (
+                /* Parkade View for Parking Stall Cleaning */
+                <ParkadeView
+                  totalStalls={projectData.totalStalls}
+                  completedStalls={projectData.completedStalls}
+                  className="mb-8"
+                />
+              ) : activeProject?.jobType === 'in_suite_dryer_vent_cleaning' ? (
                 /* Floor/Unit Progress View for In-Suite Dryer Vent Cleaning */
                 <div className="space-y-6">
                   <div className="text-center mb-8">
@@ -655,26 +665,28 @@ export default function ResidentDashboard() {
                 />
               )}
 
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-8">
-                <div className="text-center p-6 bg-gradient-to-br from-primary/10 to-primary/5 rounded-xl border border-primary/20">
-                  <div className="text-3xl font-bold text-primary mb-1">{projectData.dailyDropTarget}</div>
-                  <div className="text-sm text-muted-foreground">Daily Target</div>
-                </div>
-                <div className="text-center p-6 bg-gradient-to-br from-blue-500/10 to-blue-500/5 rounded-xl border border-blue-500/20">
-                  <div className="text-3xl font-bold text-blue-600 dark:text-blue-400 mb-1">
-                    {projectData.completedDrops > 0 ? Math.ceil((projectData.totalDrops - projectData.completedDrops) / projectData.dailyDropTarget) : "N/A"}
+              {activeProject?.jobType !== 'parkade_pressure_cleaning' && (
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-8">
+                  <div className="text-center p-6 bg-gradient-to-br from-primary/10 to-primary/5 rounded-xl border border-primary/20">
+                    <div className="text-3xl font-bold text-primary mb-1">{projectData.dailyDropTarget}</div>
+                    <div className="text-sm text-muted-foreground">Daily Target</div>
                   </div>
-                  <div className="text-sm text-muted-foreground">Days Remaining</div>
+                  <div className="text-center p-6 bg-gradient-to-br from-blue-500/10 to-blue-500/5 rounded-xl border border-blue-500/20">
+                    <div className="text-3xl font-bold text-blue-600 dark:text-blue-400 mb-1">
+                      {projectData.completedDrops > 0 ? Math.ceil((projectData.totalDrops - projectData.completedDrops) / projectData.dailyDropTarget) : "N/A"}
+                    </div>
+                    <div className="text-sm text-muted-foreground">Days Remaining</div>
+                  </div>
+                  <div className="text-center p-6 bg-gradient-to-br from-green-500/10 to-green-500/5 rounded-xl border border-green-500/20">
+                    <div className="text-3xl font-bold text-green-600 dark:text-green-400 mb-1">{projectData.completedDrops}</div>
+                    <div className="text-sm text-muted-foreground">Completed</div>
+                  </div>
+                  <div className="text-center p-6 bg-gradient-to-br from-orange-500/10 to-orange-500/5 rounded-xl border border-orange-500/20">
+                    <div className="text-3xl font-bold text-orange-600 dark:text-orange-400 mb-1">{projectData.totalDrops - projectData.completedDrops}</div>
+                    <div className="text-sm text-muted-foreground">Remaining</div>
+                  </div>
                 </div>
-                <div className="text-center p-6 bg-gradient-to-br from-green-500/10 to-green-500/5 rounded-xl border border-green-500/20">
-                  <div className="text-3xl font-bold text-green-600 dark:text-green-400 mb-1">{projectData.completedDrops}</div>
-                  <div className="text-sm text-muted-foreground">Completed</div>
-                </div>
-                <div className="text-center p-6 bg-gradient-to-br from-orange-500/10 to-orange-500/5 rounded-xl border border-orange-500/20">
-                  <div className="text-3xl font-bold text-orange-600 dark:text-orange-400 mb-1">{projectData.totalDrops - projectData.completedDrops}</div>
-                  <div className="text-sm text-muted-foreground">Remaining</div>
-                </div>
-              </div>
+              )}
             </div>
           </TabsContent>
 

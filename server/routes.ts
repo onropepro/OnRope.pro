@@ -1048,20 +1048,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Unit number or strata plan number not found" });
       }
       
-      console.log(`[MY-UNIT-PHOTOS] Resident unit: ${currentUser.unitNumber}, strata: ${currentUser.strataPlanNumber}`);
-      
       // Get photos by unit number and strata plan number (works across all companies)
       const photos = await storage.getPhotosByUnitAndStrataPlan(
         currentUser.unitNumber, 
         currentUser.strataPlanNumber
       );
-      
-      console.log(`[MY-UNIT-PHOTOS] Found ${photos.length} photos:`, photos.map(p => ({
-        id: p.id, 
-        unitNumber: p.unitNumber, 
-        missedUnitNumber: p.missedUnitNumber, 
-        isMissedUnit: p.isMissedUnit
-      })));
       
       res.json({ photos });
     } catch (error) {
@@ -1445,7 +1436,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // For in-suite dryer vent cleaning, use floorCount as total units instead of totalDrops
       const isInSuite = project.jobType === 'in_suite_dryer_vent_cleaning';
-      const totalUnits = isInSuite ? (project.floorCount ?? 0) : totalDrops;
+      const isParkade = project.jobType === 'parkade_pressure_cleaning';
+      
+      const totalUnits = isInSuite 
+        ? (project.floorCount ?? 0) 
+        : isParkade 
+        ? (project.totalStalls ?? 0)
+        : totalDrops;
       const progressPercentage = totalUnits > 0 ? (total / totalUnits) * 100 : 0;
       
       res.json({
@@ -1454,11 +1451,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
         completedDropsEast: east,
         completedDropsSouth: south,
         completedDropsWest: west,
-        totalDrops: isInSuite ? (project.floorCount ?? 0) : totalDrops,
+        totalDrops: isInSuite ? (project.floorCount ?? 0) : isParkade ? (project.totalStalls ?? 0) : totalDrops,
         totalDropsNorth: project.totalDropsNorth ?? 0,
         totalDropsEast: project.totalDropsEast ?? 0,
         totalDropsSouth: project.totalDropsSouth ?? 0,
         totalDropsWest: project.totalDropsWest ?? 0,
+        totalStalls: isParkade ? (project.totalStalls ?? 0) : undefined,
+        completedStalls: isParkade ? total : undefined,
         progressPercentage: Math.round(progressPercentage),
       });
     } catch (error) {
