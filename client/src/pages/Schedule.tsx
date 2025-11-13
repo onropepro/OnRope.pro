@@ -234,6 +234,10 @@ export default function Schedule() {
   }, [activeEmployeeId]);
 
   return (
+    <DndContext 
+      onDragEnd={handleDragEnd} 
+      onDragStart={(event) => setActiveEmployeeId(event.active.id as string)}
+    >
     <div className="p-4 md:p-6 space-y-6">
       {/* Back Button */}
       <Button
@@ -295,15 +299,12 @@ export default function Schedule() {
                     );
                     const isActive = activeEmployeeId === employee.id;
                     return (
-                      <div 
+                      <DraggableEmployeeCard
                         key={employee.id}
+                        employee={employee}
+                        isActive={isActive}
                         onClick={() => setActiveEmployeeId(isActive ? null : employee.id)}
-                        className={`p-1.5 bg-green-50 dark:bg-green-950/30 border ${isActive ? 'border-primary border-2 scale-105' : 'border-green-200 dark:border-green-800'} rounded cursor-pointer hover:scale-105 transition-all`}
                       >
-                        <div className="font-bold text-foreground truncate text-xs flex items-center gap-1">
-                          {isActive && <span className="text-primary">→</span>}
-                          {employee.name}
-                        </div>
                         <div className="flex flex-wrap gap-0.5 mt-0.5">
                           {employeeJobs.map(job => (
                             <Badge 
@@ -322,7 +323,7 @@ export default function Schedule() {
                             </Badge>
                           ))}
                         </div>
-                      </div>
+                      </DraggableEmployeeCard>
                     );
                   })}
                 </div>
@@ -342,19 +343,17 @@ export default function Schedule() {
                   {availableEmployees.map(employee => {
                     const isActive = activeEmployeeId === employee.id;
                     return (
-                      <div
+                      <DraggableEmployeeCard
                         key={employee.id}
+                        employee={employee}
+                        isActive={isActive}
                         onClick={() => setActiveEmployeeId(isActive ? null : employee.id)}
-                        className={`p-1.5 bg-blue-50 dark:bg-blue-950/30 border ${isActive ? 'border-primary border-2 scale-105' : 'border-blue-200 dark:border-blue-800'} rounded cursor-pointer hover:scale-105 transition-all`}
+                        type="available"
                       >
-                        <div className="font-bold text-foreground truncate text-xs flex items-center gap-1">
-                          {isActive && <span className="text-primary">→</span>}
-                          {employee.name}
-                        </div>
                         <Badge variant="default" className="mt-0.5 text-[9px] h-4 px-1.5 py-0 bg-blue-600 hover:bg-blue-700">
                           Ready
                         </Badge>
-                      </div>
+                      </DraggableEmployeeCard>
                     );
                   })}
                 </div>
@@ -381,6 +380,7 @@ export default function Schedule() {
             <div className="text-muted-foreground">Loading calendar...</div>
           </div>
         ) : (
+          <DroppableCalendar jobs={jobs}>
           <div className="schedule-calendar-wrapper">
             <style>{`
               .schedule-calendar-wrapper .fc {
@@ -520,6 +520,7 @@ export default function Schedule() {
               }}
             />
           </div>
+          </DroppableCalendar>
         )}
       </div>
 
@@ -552,7 +553,96 @@ export default function Schedule() {
         employees={employees}
       />
 
+      <DragOverlay>
+        {activeEmployee ? (
+          <div className="p-1.5 bg-primary/90 border-2 border-primary rounded shadow-lg">
+            <div className="font-bold text-primary-foreground text-xs">{activeEmployee.name}</div>
+          </div>
+        ) : null}
+      </DragOverlay>
     </div>
+    </DndContext>
+  );
+}
+
+// Draggable Employee Card Component
+function DraggableEmployeeCard({ 
+  employee, 
+  isActive, 
+  onClick, 
+  children,
+  type = 'assigned'
+}: { 
+  employee: User; 
+  isActive: boolean; 
+  onClick: () => void; 
+  children: React.ReactNode;
+  type?: 'assigned' | 'available';
+}) {
+  const { attributes, listeners, setNodeRef, isDragging } = useDraggable({
+    id: employee.id,
+  });
+
+  const bgColor = type === 'assigned' 
+    ? 'bg-green-50 dark:bg-green-950/30' 
+    : 'bg-blue-50 dark:bg-blue-950/30';
+  
+  const borderColor = isActive 
+    ? 'border-primary border-2' 
+    : type === 'assigned'
+      ? 'border-green-200 dark:border-green-800'
+      : 'border-blue-200 dark:border-blue-800';
+
+  return (
+    <div
+      ref={setNodeRef}
+      {...listeners}
+      {...attributes}
+      onClick={onClick}
+      className={`p-1.5 ${bgColor} border ${borderColor} rounded cursor-grab active:cursor-grabbing hover:scale-105 transition-all ${isDragging ? 'opacity-50' : ''} ${isActive ? 'scale-105' : ''}`}
+    >
+      <div className="font-bold text-foreground truncate text-xs flex items-center gap-1">
+        {isActive && <span className="text-primary">→</span>}
+        {employee.name}
+      </div>
+      {children}
+    </div>
+  );
+}
+
+// Droppable Calendar Wrapper
+function DroppableCalendar({ jobs, children }: { jobs: ScheduledJobWithAssignments[]; children: React.ReactNode }) {
+  const { setNodeRef } = useDroppable({
+    id: 'calendar-drop-zone',
+    data: { jobs },
+  });
+
+  return (
+    <div ref={setNodeRef} className="relative">
+      {/* Create droppable overlay zones for each job */}
+      {jobs.map(job => (
+        <DroppableJobZone key={job.id} job={job} />
+      ))}
+      {children}
+    </div>
+  );
+}
+
+// Individual droppable zone for each job
+function DroppableJobZone({ job }: { job: ScheduledJobWithAssignments }) {
+  const { setNodeRef } = useDroppable({
+    id: job.id,
+  });
+
+  return (
+    <div 
+      ref={setNodeRef}
+      style={{
+        position: 'absolute',
+        pointerEvents: 'none',
+        zIndex: 1,
+      }}
+    />
   );
 }
 
