@@ -327,9 +327,11 @@ export default function Dashboard() {
   const [employeeToEdit, setEmployeeToEdit] = useState<any | null>(null);
   const [showClientDialog, setShowClientDialog] = useState(false);
   const [showEditClientDialog, setShowEditClientDialog] = useState(false);
+  const [showDeleteClientDialog, setShowDeleteClientDialog] = useState(false);
+  const [clientToDelete, setClientToDelete] = useState<Client | null>(null);
   const [clientToEdit, setClientToEdit] = useState<Client | null>(null);
-  const [lmsNumbers, setLmsNumbers] = useState<Array<{ number: string; address: string }>>([{ number: "", address: "" }]);
-  const [editLmsNumbers, setEditLmsNumbers] = useState<Array<{ number: string; address: string }>>([{ number: "", address: "" }]);
+  const [lmsNumbers, setLmsNumbers] = useState<Array<{ number: string; address: string; stories?: number; units?: number; parkingStalls?: number }>>([{ number: "", address: "" }]);
+  const [editLmsNumbers, setEditLmsNumbers] = useState<Array<{ number: string; address: string; stories?: number; units?: number; parkingStalls?: number }>>([{ number: "", address: "" }]);
   const [sameAsAddress, setSameAsAddress] = useState(false);
   const [editSameAsAddress, setEditSameAsAddress] = useState(false);
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
@@ -984,12 +986,25 @@ export default function Dashboard() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/clients"] });
+      setShowDeleteClientDialog(false);
+      setClientToDelete(null);
       toast({ title: "Client deleted successfully" });
     },
     onError: (error: Error) => {
       toast({ title: "Error", description: error.message, variant: "destructive" });
     },
   });
+
+  const handleDeleteClient = (client: Client) => {
+    setClientToDelete(client);
+    setShowDeleteClientDialog(true);
+  };
+
+  const confirmDeleteClient = () => {
+    if (clientToDelete) {
+      deleteClientMutation.mutate(clientToDelete.id);
+    }
+  };
 
   const onClientSubmit = async (data: ClientFormData) => {
     createClientMutation.mutate(data);
@@ -3641,7 +3656,7 @@ export default function Dashboard() {
                                   <Button
                                     variant="ghost"
                                     size="icon"
-                                    onClick={() => deleteClientMutation.mutate(client.id)}
+                                    onClick={() => handleDeleteClient(client)}
                                     data-testid={`button-delete-client-${client.id}`}
                                   >
                                     <span className="material-icons text-destructive">delete</span>
@@ -3913,6 +3928,28 @@ export default function Dashboard() {
           </Form>
         </DialogContent>
       </Dialog>
+
+      {/* Delete Client Confirmation Dialog */}
+      <AlertDialog open={showDeleteClientDialog} onOpenChange={setShowDeleteClientDialog}>
+        <AlertDialogContent data-testid="dialog-delete-client">
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Client</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete {clientToDelete?.firstName} {clientToDelete?.lastName}? This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel data-testid="button-cancel-delete-client">Cancel</AlertDialogCancel>
+            <AlertDialogAction 
+              onClick={confirmDeleteClient}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              data-testid="button-confirm-delete-client"
+            >
+              {deleteClientMutation.isPending ? "Deleting..." : "Delete"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
       {/* Edit Employee Dialog */}
       <Dialog open={showEditEmployeeDialog} onOpenChange={(open) => { setShowEditEmployeeDialog(open); if (!open) setEditEmployeeFormStep(1); }}>
