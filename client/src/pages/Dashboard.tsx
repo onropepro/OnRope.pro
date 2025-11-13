@@ -3565,99 +3565,166 @@ export default function Dashboard() {
           <DialogHeader>
             <DialogTitle>End Your Work Day</DialogTitle>
             <DialogDescription>
-              Enter the number of drops you completed today for each elevation.
+              {(() => {
+                const activeProject = projects.find(p => p.id === activeSession?.projectId);
+                if (activeProject?.jobType === "parkade_pressure_cleaning") {
+                  return "Enter the number of parking stalls you completed today.";
+                } else if (activeProject?.jobType === "in_suite_dryer_vent_cleaning") {
+                  return "Enter the number of suites you completed today.";
+                } else {
+                  return "Enter the number of drops you completed today for each elevation.";
+                }
+              })()}
             </DialogDescription>
           </DialogHeader>
 
           <Form {...endDayForm}>
             <form onSubmit={endDayForm.handleSubmit(onEndDaySubmit)} className="space-y-4">
-              {/* North Elevation */}
-              <FormField
-                control={endDayForm.control}
-                name="dropsNorth"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>North Elevation</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="number"
-                        min="0"
-                        placeholder="0"
-                        {...field}
-                        data-testid="input-drops-north"
-                        className="h-12 text-xl"
+              {(() => {
+                const activeProject = projects.find(p => p.id === activeSession?.projectId);
+                const isParkade = activeProject?.jobType === "parkade_pressure_cleaning";
+                const isInSuite = activeProject?.jobType === "in_suite_dryer_vent_cleaning";
+                
+                if (isParkade) {
+                  return (
+                    <FormField
+                      control={endDayForm.control}
+                      name="dropsNorth"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Parking Stalls Completed</FormLabel>
+                          <FormControl>
+                            <Input
+                              type="number"
+                              min="0"
+                              placeholder="0"
+                              {...field}
+                              data-testid="input-stalls-completed"
+                              className="h-12 text-xl"
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  );
+                } else if (isInSuite) {
+                  return (
+                    <FormField
+                      control={endDayForm.control}
+                      name="dropsNorth"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Suites Completed</FormLabel>
+                          <FormControl>
+                            <Input
+                              type="number"
+                              min="0"
+                              placeholder="0"
+                              {...field}
+                              data-testid="input-suites-completed"
+                              className="h-12 text-xl"
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  );
+                } else {
+                  return (
+                    <>
+                      {/* North Elevation */}
+                      <FormField
+                        control={endDayForm.control}
+                        name="dropsNorth"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>North Elevation</FormLabel>
+                            <FormControl>
+                              <Input
+                                type="number"
+                                min="0"
+                                placeholder="0"
+                                {...field}
+                                data-testid="input-drops-north"
+                                className="h-12 text-xl"
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
                       />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
 
-              {/* East Elevation */}
-              <FormField
-                control={endDayForm.control}
-                name="dropsEast"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>East Elevation</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="number"
-                        min="0"
-                        placeholder="0"
-                        {...field}
-                        data-testid="input-drops-east"
-                        className="h-12 text-xl"
+                      {/* East Elevation */}
+                      <FormField
+                        control={endDayForm.control}
+                        name="dropsEast"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>East Elevation</FormLabel>
+                            <FormControl>
+                              <Input
+                                type="number"
+                                min="0"
+                                placeholder="0"
+                                {...field}
+                                data-testid="input-drops-east"
+                                className="h-12 text-xl"
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
                       />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
 
-              {/* South Elevation */}
-              <FormField
-                control={endDayForm.control}
-                name="dropsSouth"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>South Elevation</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="number"
-                        min="0"
-                        placeholder="0"
-                        {...field}
-                        data-testid="input-drops-south"
-                        className="h-12 text-xl"
+                      {/* South Elevation */}
+                      <FormField
+                        control={endDayForm.control}
+                        name="dropsSouth"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>South Elevation</FormLabel>
+                            <FormControl>
+                              <Input
+                                type="number"
+                                min="0"
+                                placeholder="0"
+                                {...field}
+                                data-testid="input-drops-south"
+                                className="h-12 text-xl"
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
                       />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
 
-              {/* West Elevation */}
-              <FormField
-                control={endDayForm.control}
-                name="dropsWest"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>West Elevation</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="number"
-                        min="0"
-                        placeholder="0"
-                        {...field}
-                        data-testid="input-drops-west"
-                        className="h-12 text-xl"
+                      {/* West Elevation */}
+                      <FormField
+                        control={endDayForm.control}
+                        name="dropsWest"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>West Elevation</FormLabel>
+                            <FormControl>
+                              <Input
+                                type="number"
+                                min="0"
+                                placeholder="0"
+                                {...field}
+                                data-testid="input-drops-west"
+                                className="h-12 text-xl"
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
                       />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+                    </>
+                  );
+                }
+              })()}
 
               {activeSession && (() => {
                 const dropsNorth = parseInt(endDayForm.watch("dropsNorth")) || 0;
