@@ -45,13 +45,18 @@ export default function Schedule() {
   });
 
   // Fetch current user
-  const { data: currentUserData } = useQuery({
+  const { data: currentUserData, isLoading: isLoadingUser } = useQuery({
     queryKey: ["/api/user"],
   });
   const currentUser = currentUserData as User | undefined;
 
   // Check schedule permission
   const hasSchedulePermission = canViewSchedule(currentUser);
+
+  // If still loading user, show nothing (prevent flash of access denied)
+  if (isLoadingUser) {
+    return null;
+  }
 
   // If no permission, show access denied
   if (currentUser && !hasSchedulePermission) {
