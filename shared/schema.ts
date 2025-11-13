@@ -130,6 +130,8 @@ export const projects = pgTable("projects", {
   floorCount: integer("floor_count"),
   targetCompletionDate: date("target_completion_date"), // Optional target completion date
   estimatedHours: integer("estimated_hours"), // Estimated total hours for the entire building
+  startDate: date("start_date"), // Schedule start date
+  endDate: date("end_date"), // Schedule end date
   ropeAccessPlanUrl: text("rope_access_plan_url"), // URL to PDF in object storage
   imageUrls: text("image_urls").array().default(sql`ARRAY[]::text[]`), // Array of image URLs from object storage
   status: varchar("status").notNull().default('active'), // active | completed

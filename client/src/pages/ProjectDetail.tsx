@@ -2019,6 +2019,8 @@ export default function ProjectDetail() {
                   jobType: formData.get('jobType'),
                   targetCompletionDate: formData.get('targetCompletionDate') || undefined,
                   estimatedHours: formData.get('estimatedHours') ? parseInt(formData.get('estimatedHours') as string) : undefined,
+                  startDate: formData.get('startDate') || undefined,
+                  endDate: formData.get('endDate') || undefined,
                 };
                 
                 // Add drop-based fields
@@ -2075,7 +2077,7 @@ export default function ProjectDetail() {
                 </div>
                 
                 <div>
-                  <Label htmlFor="buildingAddress">Building Address (Optional)</Label>
+                  <Label htmlFor="buildingAddress">Building Address</Label>
                   <Input
                     id="buildingAddress"
                     name="buildingAddress"
@@ -2249,7 +2251,7 @@ export default function ProjectDetail() {
                 )}
                 
                 <div>
-                  <Label htmlFor="targetCompletionDate">Target Completion Date (Optional)</Label>
+                  <Label htmlFor="targetCompletionDate">Target Completion Date</Label>
                   <Input
                     id="targetCompletionDate"
                     name="targetCompletionDate"
@@ -2260,7 +2262,7 @@ export default function ProjectDetail() {
                 </div>
                 
                 <div>
-                  <Label htmlFor="estimatedHours">Estimated Hours (Optional)</Label>
+                  <Label htmlFor="estimatedHours">Estimated Hours</Label>
                   <Input
                     id="estimatedHours"
                     name="estimatedHours"
@@ -2273,6 +2275,29 @@ export default function ProjectDetail() {
                   <p className="text-xs text-muted-foreground mt-1">
                     Total hours estimated for the entire project
                   </p>
+                </div>
+                
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <Label htmlFor="startDate">Start Date</Label>
+                    <Input
+                      id="startDate"
+                      name="startDate"
+                      type="date"
+                      defaultValue={project.startDate || ""}
+                      data-testid="input-edit-start-date"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="endDate">End Date</Label>
+                    <Input
+                      id="endDate"
+                      name="endDate"
+                      type="date"
+                      defaultValue={project.endDate || ""}
+                      data-testid="input-edit-end-date"
+                    />
+                  </div>
                 </div>
               </div>
               
