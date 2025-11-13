@@ -26,7 +26,7 @@ import { AlertCircle } from "lucide-react";
 import { useLocation } from "wouter";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
-import type { Project } from "@shared/schema";
+import type { Project, Client, InsertClient } from "@shared/schema";
 import { normalizeStrataPlan } from "@shared/schema";
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from "recharts";
 import { isManagement, hasFinancialAccess, canManageEmployees, canViewPerformance, hasPermission, isReadOnly, canViewSchedule } from "@/lib/permissions";
@@ -236,11 +236,23 @@ const endDaySchema = z.object({
   shortfallReason: z.string().optional(),
 });
 
+const clientSchema = z.object({
+  firstName: z.string().min(1, "First name is required"),
+  lastName: z.string().min(1, "Last name is required"),
+  company: z.string().optional(),
+  address: z.string().optional(),
+  phoneNumber: z.string().optional(),
+  lmsNumbers: z.array(z.string()).default([]),
+  billingAddress: z.string().optional(),
+  sameAsAddress: z.boolean().optional(),
+});
+
 type ProjectFormData = z.infer<typeof projectSchema>;
 type EmployeeFormData = z.infer<typeof employeeSchema>;
 type EditEmployeeFormData = z.infer<typeof editEmployeeSchema>;
 type DropLogFormData = z.infer<typeof dropLogSchema>;
 type EndDayFormData = z.infer<typeof endDaySchema>;
+type ClientFormData = z.infer<typeof clientSchema>;
 
 // Sortable Card Component
 function SortableCard({ card, isRearranging }: { card: any; isRearranging: boolean }) {
