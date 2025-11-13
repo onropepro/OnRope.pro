@@ -711,23 +711,26 @@ export default function Dashboard() {
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ["/api/projects"] });
       
+      // Check if manual entry BEFORE closing dialog (which clears state)
+      const wasManualEntry = selectedStrataForProject === "manual";
+      
       // Store project data BEFORE resetting
       const formData = projectForm.getValues();
       
-      // TEMPORARILY ALWAYS SHOW DIALOG TO TEST
-      setProjectDataForClient(formData);
-      
-      // Now close dialog and reset
+      // Close dialog and reset
       setShowProjectDialog(false);
       projectForm.reset();
       setUploadedPlanFile(null);
       
       toast({ title: "Project created successfully" });
       
-      // Show dialog with slight delay to ensure project dialog is closed
-      setTimeout(() => {
-        setShowSaveAsClientDialog(true);
-      }, 100);
+      // If manual entry, show save dialog after a brief delay
+      if (wasManualEntry) {
+        setProjectDataForClient(formData);
+        setTimeout(() => {
+          setShowSaveAsClientDialog(true);
+        }, 100);
+      }
     },
     onError: (error: Error) => {
       toast({ title: "Error", description: error.message, variant: "destructive" });
@@ -1752,10 +1755,6 @@ export default function Dashboard() {
 
         {activeTab === "projects" && (
           <div className="space-y-4">
-            {/* TEST BUTTON - REMOVE AFTER TESTING */}
-            <Button onClick={() => setShowSaveAsClientDialog(true)} className="bg-red-500">
-              TEST: Show Save Dialog
-            </Button>
             {/* Search and Create */}
             <div className="flex gap-3">
                 <div className="relative flex-1">
