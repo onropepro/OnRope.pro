@@ -215,6 +215,40 @@ export default function Schedule() {
     },
   });
 
+  // Mutation to unassign employee from all jobs
+  const unassignFromAllJobsMutation = useMutation({
+    mutationFn: async ({ employeeId }: { employeeId: string }) => {
+      // Find all jobs this employee is assigned to
+      const assignedJobs = jobs.filter(job => 
+        job.assignedEmployees?.some(e => e.id === employeeId)
+      );
+      
+      // Remove employee from each job
+      await Promise.all(
+        assignedJobs.map(job => {
+          const newAssignments = job.assignedEmployees
+            ?.filter(e => e.id !== employeeId)
+            .map(e => e.id) || [];
+          return apiRequest("PUT", `/api/schedule/${job.id}`, { employeeIds: newAssignments });
+        })
+      );
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/schedule"] });
+      toast({
+        title: "Employee unassigned",
+        description: "Removed from all scheduled jobs",
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: "Failed to unassign employee",
+        variant: "destructive",
+      });
+    },
+  });
+
   const [dropTargetJobId, setDropTargetJobId] = useState<string | null>(null);
   const [dragPosition, setDragPosition] = useState<{ x: number; y: number } | null>(null);
 
@@ -244,9 +278,9 @@ export default function Schedule() {
   }, [activeEmployeeId]);
 
   const handleDragEnd = (event: DragEndEvent) => {
-    const { active } = event;
+    const { active, over } = event;
     
-    if (!active.id || !dropTargetJobId) {
+    if (!active.id) {
       setActiveEmployeeId(null);
       setDropTargetJobId(null);
       setDragPosition(null);
@@ -254,6 +288,24 @@ export default function Schedule() {
     }
 
     const employeeId = active.id as string;
+
+    // Check if dropped on "Available" zone - unassign from all jobs
+    if (over?.id === 'available-zone') {
+      unassignFromAllJobsMutation.mutate({ employeeId });
+      setActiveEmployeeId(null);
+      setDropTargetJobId(null);
+      setDragPosition(null);
+      return;
+    }
+
+    // Otherwise, check if dropped on a job
+    if (!dropTargetJobId) {
+      setActiveEmployeeId(null);
+      setDropTargetJobId(null);
+      setDragPosition(null);
+      return;
+    }
+
     const jobId = dropTargetJobId;
 
     // Find the job
@@ -405,34 +457,36 @@ export default function Schedule() {
             </div>
 
             {/* Available Employees */}
-            <div className="bg-card rounded p-1.5 border-l-4 border-l-blue-600 shadow-sm">
-              <div className="flex items-center gap-1 mb-1">
-                <UserX className="w-3.5 h-3.5 text-blue-600" />
-                <h3 className="font-bold text-xs text-blue-700">Available ({availableEmployees.length})</h3>
-              </div>
-              {availableEmployees.length === 0 ? (
-                <p className="text-xs text-muted-foreground">All employees assigned</p>
-              ) : (
-                <div className="space-y-0.5 max-h-24 overflow-y-auto pr-1">
-                  {availableEmployees.map(employee => {
-                    const isActive = activeEmployeeId === employee.id;
-                    return (
-                      <DraggableEmployeeCard
-                        key={employee.id}
-                        employee={employee}
-                        isActive={isActive}
-                        onClick={() => setActiveEmployeeId(isActive ? null : employee.id)}
-                        type="available"
-                      >
-                        <Badge variant="default" className="mt-0.5 text-[9px] h-4 px-1.5 py-0 bg-blue-600 hover:bg-blue-700">
-                          Ready
-                        </Badge>
-                      </DraggableEmployeeCard>
-                    );
-                  })}
+            <DroppableAvailableZone isDragging={activeEmployeeId !== null}>
+              <div className="bg-card rounded p-1.5 border-l-4 border-l-blue-600 shadow-sm">
+                <div className="flex items-center gap-1 mb-1">
+                  <UserX className="w-3.5 h-3.5 text-blue-600" />
+                  <h3 className="font-bold text-xs text-blue-700">Available ({availableEmployees.length})</h3>
                 </div>
-              )}
-            </div>
+                {availableEmployees.length === 0 ? (
+                  <p className="text-xs text-muted-foreground">All employees assigned</p>
+                ) : (
+                  <div className="space-y-0.5 max-h-24 overflow-y-auto pr-1">
+                    {availableEmployees.map(employee => {
+                      const isActive = activeEmployeeId === employee.id;
+                      return (
+                        <DraggableEmployeeCard
+                          key={employee.id}
+                          employee={employee}
+                          isActive={isActive}
+                          onClick={() => setActiveEmployeeId(isActive ? null : employee.id)}
+                          type="available"
+                        >
+                          <Badge variant="default" className="mt-0.5 text-[9px] h-4 px-1.5 py-0 bg-blue-600 hover:bg-blue-700">
+                            Ready
+                          </Badge>
+                        </DraggableEmployeeCard>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            </DroppableAvailableZone>
           </div>
         </CardContent>
       </Card>
@@ -690,6 +744,29 @@ function DraggableEmployeeCard({
   );
 }
 
+// Droppable Available Zone Component
+function DroppableAvailableZone({ isDragging, children }: { isDragging: boolean; children: React.ReactNode }) {
+  const { setNodeRef, isOver } = useDroppable({
+    id: 'available-zone',
+  });
+
+  return (
+    <div 
+      ref={setNodeRef} 
+      className={`relative ${isOver ? 'ring-2 ring-blue-500 ring-offset-2 rounded-lg' : ''}`}
+      style={{
+        backgroundColor: isOver ? 'rgba(59, 130, 246, 0.1)' : undefined,
+      }}
+    >
+      {isOver && (
+        <div className="absolute inset-0 flex items-center justify-center bg-blue-500/10 rounded-lg z-10 pointer-events-none">
+          <p className="text-sm font-bold text-blue-600">Drop to unassign from all jobs</p>
+        </div>
+      )}
+      {children}
+    </div>
+  );
+}
 
 // Create Job Dialog Component
 function CreateJobDialog({
