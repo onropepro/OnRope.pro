@@ -223,7 +223,7 @@ type DropLogFormData = z.infer<typeof dropLogSchema>;
 type EndDayFormData = z.infer<typeof endDaySchema>;
 
 // Sortable Card Component
-function SortableCard({ card }: { card: any }) {
+function SortableCard({ card, isRearranging }: { card: any; isRearranging: boolean }) {
   const {
     attributes,
     listeners,
@@ -231,7 +231,7 @@ function SortableCard({ card }: { card: any }) {
     transform,
     transition,
     isDragging,
-  } = useSortable({ id: card.id });
+  } = useSortable({ id: card.id, disabled: !isRearranging });
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -244,20 +244,22 @@ function SortableCard({ card }: { card: any }) {
     <div
       ref={setNodeRef}
       style={style}
-      className="bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer overflow-hidden group hover-scale"
-      onClick={card.onClick}
+      className="bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer overflow-hidden group hover-scale relative"
+      onClick={isRearranging ? undefined : card.onClick}
       data-testid={card.testId}
       {...attributes}
     >
       <div className="p-8 flex flex-col items-center gap-4">
-        {/* Drag Handle */}
-        <div
-          {...listeners}
-          className="absolute top-2 right-2 p-1 opacity-0 group-hover:opacity-100 transition-opacity cursor-grab active:cursor-grabbing"
-          onClick={(e) => e.stopPropagation()}
-        >
-          <span className="material-icons text-muted-foreground text-lg">drag_indicator</span>
-        </div>
+        {/* Drag Handle - only visible when rearranging */}
+        {isRearranging && (
+          <div
+            {...listeners}
+            className="absolute top-2 right-2 p-2 bg-background/80 rounded-lg cursor-grab active:cursor-grabbing shadow-lg"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <span className="material-icons text-muted-foreground text-lg">drag_indicator</span>
+          </div>
+        )}
         
         <div 
           className="w-20 h-20 rounded-2xl flex items-center justify-center text-5xl transition-transform duration-300 group-hover:scale-110"
@@ -310,6 +312,7 @@ export default function Dashboard() {
   const [showTerminationDialog, setShowTerminationDialog] = useState(false); // Dialog for termination details
   const [terminationData, setTerminationData] = useState<{ reason: string; notes: string }>({ reason: "", notes: "" });
   const [cardOrder, setCardOrder] = useState<string[]>([]);
+  const [isRearranging, setIsRearranging] = useState(false);
   const { toast } = useToast();
   const [, setLocation] = useLocation();
   
@@ -1263,16 +1266,32 @@ export default function Dashboard() {
           <div className="mb-8">
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-3xl font-bold gradient-text">Quick Actions</h2>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={resetCardOrder}
-                className="gap-2"
-                data-testid="button-reset-layout"
-              >
-                <span className="material-icons text-base">restart_alt</span>
-                Reset Layout
-              </Button>
+              <div className="flex gap-2">
+                <Button
+                  variant={isRearranging ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => setIsRearranging(!isRearranging)}
+                  className="gap-2"
+                  data-testid="button-rearrange-cards"
+                >
+                  <span className="material-icons text-base">
+                    {isRearranging ? "check" : "swap_vert"}
+                  </span>
+                  {isRearranging ? "Done" : "Rearrange Cards"}
+                </Button>
+                {isRearranging && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={resetCardOrder}
+                    className="gap-2"
+                    data-testid="button-reset-layout"
+                  >
+                    <span className="material-icons text-base">restart_alt</span>
+                    Reset
+                  </Button>
+                )}
+              </div>
             </div>
             <DndContext
               sensors={sensors}
@@ -1285,7 +1304,7 @@ export default function Dashboard() {
               >
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                   {sortedDashboardCards.map(card => (
-                    <SortableCard key={card.id} card={card} />
+                    <SortableCard key={card.id} card={card} isRearranging={isRearranging} />
                   ))}
                 </div>
               </SortableContext>

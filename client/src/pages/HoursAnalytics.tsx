@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useLocation } from "wouter";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -8,10 +8,93 @@ import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from "recharts";
 import { ArrowLeft, Clock, Users, TrendingUp, Award } from "lucide-react";
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+} from '@dnd-kit/core';
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  useSortable,
+  rectSortingStrategy,
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
+
+// Sortable Stats Card Component
+function SortableStatsCard({ card, isRearranging }: { card: any; isRearranging: boolean }) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: card.id, disabled: !isRearranging });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+  };
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      className="relative"
+      {...attributes}
+    >
+      <Card
+        className="shadow-lg rounded-2xl border-0 hover-elevate active-elevate-2 cursor-pointer transition-all h-full"
+        onClick={isRearranging ? undefined : card.onClick}
+        data-testid={card.testId}
+      >
+        <CardContent className="pt-6 text-center">
+          {/* Drag Handle - only visible when rearranging */}
+          {isRearranging && (
+            <div
+              {...listeners}
+              className="absolute top-2 right-2 p-2 bg-background/80 rounded-lg cursor-grab active:cursor-grabbing shadow-lg z-10"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <span className="material-icons text-muted-foreground text-lg">drag_indicator</span>
+            </div>
+          )}
+          
+          <div className={`w-12 h-12 mx-auto mb-3 rounded-xl ${card.bgColor} flex items-center justify-center`}>
+            <span className={`material-icons ${card.iconColor}`}>{card.icon}</span>
+          </div>
+          <div className="text-2xl font-bold mb-1">{card.value}</div>
+          <div className="text-sm text-muted-foreground">{card.label}</div>
+          <div className="text-xs text-muted-foreground mt-1">{card.subtitle}</div>
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
 
 export default function HoursAnalytics() {
   const [, setLocation] = useLocation();
   const [modalOpen, setModalOpen] = useState<string | null>(null);
+  const [statsCardOrder, setStatsCardOrder] = useState<string[]>([]);
+  const [isRearranging, setIsRearranging] = useState(false);
+  
+  // Drag-and-drop sensors
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 8,
+      },
+    }),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
 
   // Fetch current user
   const { data: userData } = useQuery({
@@ -215,6 +298,186 @@ export default function HoursAnalytics() {
     ? (totalDropsThisMonth / sessionsWithDrops.length).toFixed(1)
     : '0.0';
 
+  // Stats cards configuration
+  const defaultStatsCards = [
+    {
+      id: 'activeProjects',
+      icon: 'assignment',
+      bgColor: 'bg-blue-100',
+      iconColor: 'text-blue-600',
+      value: activeProjects,
+      label: 'Active Projects',
+      subtitle: 'In Progress',
+      onClick: () => setModalOpen('activeProjects'),
+      testId: 'card-active-projects'
+    },
+    {
+      id: 'completedProjects',
+      icon: 'check_circle',
+      bgColor: 'bg-emerald-100',
+      iconColor: 'text-emerald-600',
+      value: completedProjects,
+      label: 'Completed Projects',
+      subtitle: 'All Time',
+      onClick: () => setModalOpen('completedProjects'),
+      testId: 'card-completed-projects'
+    },
+    {
+      id: 'totalEmployees',
+      icon: 'group',
+      bgColor: 'bg-blue-100',
+      iconColor: 'text-blue-600',
+      value: totalEmployees,
+      label: 'Total Employees',
+      subtitle: 'Company Wide',
+      onClick: () => setModalOpen('totalEmployees'),
+      testId: 'card-total-employees'
+    },
+    {
+      id: 'activeEmployees',
+      icon: 'people',
+      bgColor: 'bg-blue-100',
+      iconColor: 'text-blue-600',
+      value: uniqueEmployeesThisMonth,
+      label: 'Active This Month',
+      subtitle: 'Employees',
+      onClick: () => setModalOpen('activeEmployees'),
+      testId: 'card-active-employees'
+    },
+    {
+      id: 'workSessions',
+      icon: 'calendar_month',
+      bgColor: 'bg-purple-100',
+      iconColor: 'text-purple-600',
+      value: totalSessionsThisMonth,
+      label: 'Work Sessions',
+      subtitle: 'This Month',
+      onClick: () => setModalOpen('workSessions'),
+      testId: 'card-work-sessions'
+    },
+    {
+      id: 'avgDuration',
+      icon: 'schedule',
+      bgColor: 'bg-blue-100',
+      iconColor: 'text-blue-600',
+      value: `${avgSessionDuration}h`,
+      label: 'Avg Session Duration',
+      subtitle: 'Per Session',
+      onClick: () => setModalOpen('avgDuration'),
+      testId: 'card-avg-duration'
+    },
+    {
+      id: 'totalDrops',
+      icon: 'arrow_downward',
+      bgColor: 'bg-orange-100',
+      iconColor: 'text-orange-600',
+      value: totalDropsThisMonth,
+      label: 'Total Drops',
+      subtitle: 'This Month',
+      onClick: () => setModalOpen('totalDrops'),
+      testId: 'card-total-drops'
+    },
+    {
+      id: 'avgDrops',
+      icon: 'speed',
+      bgColor: 'bg-blue-100',
+      iconColor: 'text-blue-600',
+      value: avgDropsPerSession,
+      label: 'Avg Drops/Session',
+      subtitle: 'Productivity',
+      onClick: () => setModalOpen('avgDrops'),
+      testId: 'card-avg-drops'
+    },
+    {
+      id: 'billablePercentage',
+      icon: 'percent',
+      bgColor: 'bg-emerald-100',
+      iconColor: 'text-emerald-600',
+      value: `${billablePercentage}%`,
+      label: 'Billable Rate',
+      subtitle: 'This Month',
+      onClick: () => {},
+      testId: 'card-billable-rate'
+    },
+    {
+      id: 'avgHoursPerEmployee',
+      icon: 'trending_up',
+      bgColor: 'bg-blue-100',
+      iconColor: 'text-blue-600',
+      value: `${avgHoursPerEmployee}h`,
+      label: 'Avg Hours/Employee',
+      subtitle: 'This Month',
+      onClick: () => {},
+      testId: 'card-avg-hours-employee'
+    },
+    {
+      id: 'topEmployee',
+      icon: 'star',
+      bgColor: 'bg-yellow-100',
+      iconColor: 'text-yellow-600',
+      value: topEmployee.hours > 0 ? `${topEmployee.hours.toFixed(0)}h` : '0h',
+      label: 'Top Performer',
+      subtitle: topEmployee.name,
+      onClick: () => {},
+      testId: 'card-top-performer'
+    },
+    {
+      id: 'todaysHours',
+      icon: 'today',
+      bgColor: 'bg-blue-100',
+      iconColor: 'text-blue-600',
+      value: `${(dayBillable + dayNonBillable).toFixed(1)}h`,
+      label: "Today's Hours",
+      subtitle: `${dayBillable.toFixed(1)}h billable`,
+      onClick: () => {},
+      testId: 'card-todays-hours'
+    },
+  ];
+
+  // Load saved card order from localStorage
+  useEffect(() => {
+    const savedOrder = localStorage.getItem('hoursAnalyticsCardOrder');
+    if (savedOrder) {
+      setStatsCardOrder(JSON.parse(savedOrder));
+    } else {
+      setStatsCardOrder(defaultStatsCards.map(c => c.id));
+    }
+  }, []);
+
+  // Save card order to localStorage whenever it changes
+  useEffect(() => {
+    if (statsCardOrder.length > 0) {
+      localStorage.setItem('hoursAnalyticsCardOrder', JSON.stringify(statsCardOrder));
+    }
+  }, [statsCardOrder]);
+
+  // Sort stats cards based on saved order
+  const sortedStatsCards = statsCardOrder.length > 0
+    ? statsCardOrder
+        .map(id => defaultStatsCards.find(c => c.id === id))
+        .filter(Boolean)
+    : defaultStatsCards;
+
+  // Handle drag end
+  const handleDragEnd = (event: any) => {
+    const { active, over } = event;
+    
+    if (active.id !== over.id) {
+      setStatsCardOrder((items) => {
+        const oldIndex = items.indexOf(active.id);
+        const newIndex = items.indexOf(over.id);
+        return arrayMove(items, oldIndex, newIndex);
+      });
+    }
+  };
+
+  // Reset card order
+  const resetCardOrder = () => {
+    const defaultOrder = defaultStatsCards.map(c => c.id);
+    setStatsCardOrder(defaultOrder);
+    localStorage.setItem('hoursAnalyticsCardOrder', JSON.stringify(defaultOrder));
+  };
+
   return (
     <div className="min-h-screen page-gradient">
       <div className="max-w-7xl mx-auto p-6 sm:p-8 lg:p-10 space-y-8">
@@ -234,6 +497,32 @@ export default function HoursAnalytics() {
             <p className="text-sm text-muted-foreground mt-1">
               {isManagement ? "Billable vs Non-Billable Hours Breakdown" : "View your work hours and session history"}
             </p>
+          </div>
+          <div className="flex gap-2">
+            <Button
+              variant={isRearranging ? "default" : "outline"}
+              size="sm"
+              onClick={() => setIsRearranging(!isRearranging)}
+              className="gap-2"
+              data-testid="button-rearrange-cards"
+            >
+              <span className="material-icons text-base">
+                {isRearranging ? "check" : "swap_vert"}
+              </span>
+              {isRearranging ? "Done" : "Rearrange Cards"}
+            </Button>
+            {isRearranging && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={resetCardOrder}
+                className="gap-2"
+                data-testid="button-reset-layout"
+              >
+                <span className="material-icons text-base">restart_alt</span>
+                Reset
+              </Button>
+            )}
           </div>
         </div>
 
@@ -410,146 +699,23 @@ export default function HoursAnalytics() {
               </CardContent>
             </Card>
 
-            {/* Key Statistics Grid - Row 1 */}
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 mt-6">
-              <Card className="shadow-lg rounded-2xl border-0 hover-elevate active-elevate-2 cursor-pointer transition-all" onClick={() => setModalOpen('activeProjects')} data-testid="card-active-projects">
-                <CardContent className="pt-6 text-center">
-                  <div className="w-12 h-12 mx-auto mb-3 rounded-xl bg-blue-100 flex items-center justify-center">
-                    <span className="material-icons text-blue-600">assignment</span>
-                  </div>
-                  <div className="text-2xl font-bold mb-1">{activeProjects}</div>
-                  <div className="text-sm text-muted-foreground">Active Projects</div>
-                  <div className="text-xs text-muted-foreground mt-1">In Progress</div>
-                </CardContent>
-              </Card>
-
-              <Card className="shadow-lg rounded-2xl border-0 hover-elevate active-elevate-2 cursor-pointer transition-all" onClick={() => setModalOpen('completedProjects')} data-testid="card-completed-projects">
-                <CardContent className="pt-6 text-center">
-                  <div className="w-12 h-12 mx-auto mb-3 rounded-xl bg-emerald-100 flex items-center justify-center">
-                    <span className="material-icons text-emerald-600">check_circle</span>
-                  </div>
-                  <div className="text-2xl font-bold mb-1">{completedProjects}</div>
-                  <div className="text-sm text-muted-foreground">Completed Projects</div>
-                  <div className="text-xs text-muted-foreground mt-1">All Time</div>
-                </CardContent>
-              </Card>
-
-              <Card className="shadow-lg rounded-2xl border-0 hover-elevate active-elevate-2 cursor-pointer transition-all" onClick={() => setModalOpen('totalEmployees')} data-testid="card-total-employees">
-                <CardContent className="pt-6 text-center">
-                  <div className="w-12 h-12 mx-auto mb-3 rounded-xl bg-blue-100 flex items-center justify-center">
-                    <span className="material-icons text-blue-600">group</span>
-                  </div>
-                  <div className="text-2xl font-bold mb-1">{totalEmployees}</div>
-                  <div className="text-sm text-muted-foreground">Total Employees</div>
-                  <div className="text-xs text-muted-foreground mt-1">Company Wide</div>
-                </CardContent>
-              </Card>
-
-              <Card className="shadow-lg rounded-2xl border-0 hover-elevate active-elevate-2 cursor-pointer transition-all" onClick={() => setModalOpen('activeEmployees')} data-testid="card-active-employees">
-                <CardContent className="pt-6 text-center">
-                  <div className="w-12 h-12 mx-auto mb-3 rounded-xl bg-blue-100 flex items-center justify-center">
-                    <span className="material-icons text-blue-600">people</span>
-                  </div>
-                  <div className="text-2xl font-bold mb-1">{uniqueEmployeesThisMonth}</div>
-                  <div className="text-sm text-muted-foreground">Active This Month</div>
-                  <div className="text-xs text-muted-foreground mt-1">Employees</div>
-                </CardContent>
-              </Card>
-            </div>
-
-            {/* Key Statistics Grid - Row 2 */}
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 mt-6">
-              <Card className="shadow-lg rounded-2xl border-0 hover-elevate active-elevate-2 cursor-pointer transition-all" onClick={() => setModalOpen('workSessions')} data-testid="card-work-sessions">
-                <CardContent className="pt-6 text-center">
-                  <div className="w-12 h-12 mx-auto mb-3 rounded-xl bg-purple-100 flex items-center justify-center">
-                    <span className="material-icons text-purple-600">calendar_month</span>
-                  </div>
-                  <div className="text-2xl font-bold mb-1">{totalSessionsThisMonth}</div>
-                  <div className="text-sm text-muted-foreground">Work Sessions</div>
-                  <div className="text-xs text-muted-foreground mt-1">This Month</div>
-                </CardContent>
-              </Card>
-
-              <Card className="shadow-lg rounded-2xl border-0 hover-elevate active-elevate-2 cursor-pointer transition-all" onClick={() => setModalOpen('avgDuration')} data-testid="card-avg-duration">
-                <CardContent className="pt-6 text-center">
-                  <div className="w-12 h-12 mx-auto mb-3 rounded-xl bg-blue-100 flex items-center justify-center">
-                    <span className="material-icons text-blue-600">schedule</span>
-                  </div>
-                  <div className="text-2xl font-bold mb-1">{avgSessionDuration}h</div>
-                  <div className="text-sm text-muted-foreground">Avg Session Duration</div>
-                  <div className="text-xs text-muted-foreground mt-1">Per Session</div>
-                </CardContent>
-              </Card>
-
-              <Card className="shadow-lg rounded-2xl border-0 hover-elevate active-elevate-2 cursor-pointer transition-all" onClick={() => setModalOpen('totalDrops')} data-testid="card-total-drops">
-                <CardContent className="pt-6 text-center">
-                  <div className="w-12 h-12 mx-auto mb-3 rounded-xl bg-orange-100 flex items-center justify-center">
-                    <span className="material-icons text-orange-600">arrow_downward</span>
-                  </div>
-                  <div className="text-2xl font-bold mb-1">{totalDropsThisMonth}</div>
-                  <div className="text-sm text-muted-foreground">Total Drops</div>
-                  <div className="text-xs text-muted-foreground mt-1">This Month</div>
-                </CardContent>
-              </Card>
-
-              <Card className="shadow-lg rounded-2xl border-0 hover-elevate active-elevate-2 cursor-pointer transition-all" onClick={() => setModalOpen('avgDrops')} data-testid="card-avg-drops">
-                <CardContent className="pt-6 text-center">
-                  <div className="w-12 h-12 mx-auto mb-3 rounded-xl bg-blue-100 flex items-center justify-center">
-                    <span className="material-icons text-blue-600">speed</span>
-                  </div>
-                  <div className="text-2xl font-bold mb-1">{avgDropsPerSession}</div>
-                  <div className="text-sm text-muted-foreground">Avg Drops/Session</div>
-                  <div className="text-xs text-muted-foreground mt-1">Productivity</div>
-                </CardContent>
-              </Card>
-            </div>
-
-            {/* Key Statistics Grid - Row 3 */}
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 mt-6">
-              <Card className="shadow-lg rounded-2xl border-0 hover:shadow-xl transition-shadow">
-                <CardContent className="pt-6 text-center">
-                  <div className="w-12 h-12 mx-auto mb-3 rounded-xl bg-emerald-100 flex items-center justify-center">
-                    <span className="material-icons text-emerald-600">percent</span>
-                  </div>
-                  <div className="text-2xl font-bold mb-1">{billablePercentage}%</div>
-                  <div className="text-sm text-muted-foreground">Billable Rate</div>
-                  <div className="text-xs text-muted-foreground mt-1">This Month</div>
-                </CardContent>
-              </Card>
-
-              <Card className="shadow-lg rounded-2xl border-0 hover:shadow-xl transition-shadow">
-                <CardContent className="pt-6 text-center">
-                  <div className="w-12 h-12 mx-auto mb-3 rounded-xl bg-blue-100 flex items-center justify-center">
-                    <span className="material-icons text-blue-600">trending_up</span>
-                  </div>
-                  <div className="text-2xl font-bold mb-1">{avgHoursPerEmployee}h</div>
-                  <div className="text-sm text-muted-foreground">Avg Hours/Employee</div>
-                  <div className="text-xs text-muted-foreground mt-1">This Month</div>
-                </CardContent>
-              </Card>
-
-              <Card className="shadow-lg rounded-2xl border-0 hover:shadow-xl transition-shadow">
-                <CardContent className="pt-6 text-center">
-                  <div className="w-12 h-12 mx-auto mb-3 rounded-xl bg-yellow-100 flex items-center justify-center">
-                    <span className="material-icons text-yellow-600">star</span>
-                  </div>
-                  <div className="text-2xl font-bold mb-1">{topEmployee.hours > 0 ? topEmployee.hours.toFixed(0) : '0'}h</div>
-                  <div className="text-sm text-muted-foreground">Top Performer</div>
-                  <div className="text-xs text-muted-foreground mt-1 truncate px-2">{topEmployee.name}</div>
-                </CardContent>
-              </Card>
-
-              <Card className="shadow-lg rounded-2xl border-0 hover:shadow-xl transition-shadow">
-                <CardContent className="pt-6 text-center">
-                  <div className="w-12 h-12 mx-auto mb-3 rounded-xl bg-blue-100 flex items-center justify-center">
-                    <span className="material-icons text-blue-600">today</span>
-                  </div>
-                  <div className="text-2xl font-bold mb-1">{(dayBillable + dayNonBillable).toFixed(1)}h</div>
-                  <div className="text-sm text-muted-foreground">Today's Hours</div>
-                  <div className="text-xs text-muted-foreground mt-1">{dayBillable.toFixed(1)}h billable</div>
-                </CardContent>
-              </Card>
-            </div>
+            {/* Key Statistics Grid - Sortable */}
+            <DndContext
+              sensors={sensors}
+              collisionDetection={closestCenter}
+              onDragEnd={handleDragEnd}
+            >
+              <SortableContext
+                items={sortedStatsCards.map((c: any) => c.id)}
+                strategy={rectSortingStrategy}
+              >
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 mt-6">
+                  {sortedStatsCards.map((card: any) => (
+                    <SortableStatsCard key={card.id} card={card} isRearranging={isRearranging} />
+                  ))}
+                </div>
+              </SortableContext>
+            </DndContext>
 
             {/* Task Status Breakdown - Donut Chart */}
             <Card className="shadow-xl rounded-3xl border-0 mt-6">
