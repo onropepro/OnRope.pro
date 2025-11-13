@@ -123,9 +123,29 @@ export default function Schedule() {
     selectInfo.view.calendar.unselect();
   };
 
-  // Handle event click for viewing details
+  // Handle event click for viewing details or quick assignment
   const handleEventClick = (clickInfo: EventClickArg) => {
     const job = clickInfo.event.extendedProps.job as ScheduledJobWithAssignments;
+    
+    // If dragging an employee, assign/unassign them
+    if (activeEmployeeId) {
+      const currentAssignments = job.assignedEmployees?.map(e => e.id) || [];
+      const isAssigned = currentAssignments.includes(activeEmployeeId);
+      
+      let newAssignments: string[];
+      if (isAssigned) {
+        newAssignments = currentAssignments.filter(id => id !== activeEmployeeId);
+      } else {
+        newAssignments = [...currentAssignments, activeEmployeeId];
+      }
+      
+      quickAssignMutation.mutate({ jobId: job.id, employeeIds: newAssignments });
+      setActiveEmployeeId(null);
+      setDropTargetJobId(null);
+      return;
+    }
+    
+    // Otherwise, show job details
     setSelectedJob(job);
     setDetailDialogOpen(true);
   };
@@ -200,16 +220,20 @@ export default function Schedule() {
 
   const activeEmployee = employees.find(e => e.id === activeEmployeeId);
 
+  // Handle escape key to cancel assignment
+  useEffect(() => {
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && activeEmployeeId) {
+        setActiveEmployeeId(null);
+        setDropTargetJobId(null);
+      }
+    };
+    
+    window.addEventListener('keydown', handleEscape);
+    return () => window.removeEventListener('keydown', handleEscape);
+  }, [activeEmployeeId]);
+
   return (
-    <DndContext 
-      onDragEnd={handleDragEnd} 
-      onDragStart={(event) => setActiveEmployeeId(event.active.id as string)}
-      onDragOver={(event) => {
-        if (event.over) {
-          setDropTargetJobId(event.over.id as string);
-        }
-      }}
-    >
     <div className="p-4 md:p-6 space-y-6">
       {/* Back Button */}
       <Button
@@ -269,8 +293,17 @@ export default function Schedule() {
                     const employeeJobs = jobs.filter(job => 
                       job.assignedEmployees?.some(e => e.id === employee.id)
                     );
+                    const isActive = activeEmployeeId === employee.id;
                     return (
-                      <DraggableEmployee key={employee.id} employee={employee} type="assigned">
+                      <div 
+                        key={employee.id}
+                        onClick={() => setActiveEmployeeId(isActive ? null : employee.id)}
+                        className={`p-1.5 bg-green-50 dark:bg-green-950/30 border ${isActive ? 'border-primary border-2 scale-105' : 'border-green-200 dark:border-green-800'} rounded cursor-pointer hover:scale-105 transition-all`}
+                      >
+                        <div className="font-bold text-foreground truncate text-xs flex items-center gap-1">
+                          {isActive && <span className="text-primary">→</span>}
+                          {employee.name}
+                        </div>
                         <div className="flex flex-wrap gap-0.5 mt-0.5">
                           {employeeJobs.map(job => (
                             <Badge key={job.id} variant="default" className="text-[9px] h-4 px-1.5 py-0 bg-green-600 hover:bg-green-700">
@@ -278,7 +311,7 @@ export default function Schedule() {
                             </Badge>
                           ))}
                         </div>
-                      </DraggableEmployee>
+                      </div>
                     );
                   })}
                 </div>
@@ -295,13 +328,24 @@ export default function Schedule() {
                 <p className="text-xs text-muted-foreground">All employees assigned</p>
               ) : (
                 <div className="space-y-0.5 max-h-24 overflow-y-auto pr-1">
-                  {availableEmployees.map(employee => (
-                    <DraggableEmployee key={employee.id} employee={employee} type="available">
-                      <Badge variant="default" className="mt-0.5 text-[9px] h-4 px-1.5 py-0 bg-blue-600 hover:bg-blue-700">
-                        Ready
-                      </Badge>
-                    </DraggableEmployee>
-                  ))}
+                  {availableEmployees.map(employee => {
+                    const isActive = activeEmployeeId === employee.id;
+                    return (
+                      <div
+                        key={employee.id}
+                        onClick={() => setActiveEmployeeId(isActive ? null : employee.id)}
+                        className={`p-1.5 bg-blue-50 dark:bg-blue-950/30 border ${isActive ? 'border-primary border-2 scale-105' : 'border-blue-200 dark:border-blue-800'} rounded cursor-pointer hover:scale-105 transition-all`}
+                      >
+                        <div className="font-bold text-foreground truncate text-xs flex items-center gap-1">
+                          {isActive && <span className="text-primary">→</span>}
+                          {employee.name}
+                        </div>
+                        <Badge variant="default" className="mt-0.5 text-[9px] h-4 px-1.5 py-0 bg-blue-600 hover:bg-blue-700">
+                          Ready
+                        </Badge>
+                      </div>
+                    );
+                  })}
                 </div>
               )}
             </div>
@@ -311,12 +355,21 @@ export default function Schedule() {
 
       {/* Calendar */}
       <div className="bg-card rounded-lg shadow-premium p-6">
+        {activeEmployeeId && (
+          <div className="mb-4 p-3 bg-primary/10 border-2 border-primary rounded-lg">
+            <p className="text-sm font-semibold text-primary">
+              🎯 Assigning: {activeEmployee?.name}
+            </p>
+            <p className="text-xs text-muted-foreground mt-1">
+              Click on any job to assign this employee. Green = assign, Red = remove. Press Escape to cancel.
+            </p>
+          </div>
+        )}
         {isLoading ? (
           <div className="flex items-center justify-center h-96">
             <div className="text-muted-foreground">Loading calendar...</div>
           </div>
         ) : (
-          <DroppableCalendar jobs={jobs}>
           <div className="schedule-calendar-wrapper">
             <style>{`
               .schedule-calendar-wrapper .fc {
@@ -398,7 +451,8 @@ export default function Schedule() {
               data-testid="calendar"
               eventContent={(eventInfo) => {
                 const job = eventInfo.event.extendedProps.job as ScheduledJobWithAssignments;
-                const isDropTarget = dropTargetJobId === job.id;
+                const isHighlighted = activeEmployeeId !== null;
+                const currentlyAssigned = job.assignedEmployees?.some(e => e.id === activeEmployeeId);
                 
                 return (
                   <div 
@@ -406,9 +460,12 @@ export default function Schedule() {
                     style={{ 
                       padding: '2px 4px', 
                       overflow: 'hidden',
-                      backgroundColor: isDropTarget ? 'rgba(14, 165, 233, 0.3)' : undefined,
-                      outline: isDropTarget ? '2px dashed rgba(14, 165, 233, 1)' : undefined,
+                      backgroundColor: isHighlighted 
+                        ? (currentlyAssigned ? 'rgba(239, 68, 68, 0.2)' : 'rgba(34, 197, 94, 0.2)')
+                        : undefined,
+                      outline: isHighlighted ? '2px dashed rgba(14, 165, 233, 1)' : undefined,
                       outlineOffset: '-2px',
+                      cursor: isHighlighted ? 'pointer' : 'pointer',
                     }}
                   >
                     <div className="fc-event-title-container">
@@ -436,13 +493,22 @@ export default function Schedule() {
                           ))}
                         </div>
                       )}
+                      {isHighlighted && (
+                        <div style={{ 
+                          fontSize: '0.65rem', 
+                          marginTop: '3px', 
+                          fontWeight: 600,
+                          color: currentlyAssigned ? '#ef4444' : '#22c55e'
+                        }}>
+                          Click to {currentlyAssigned ? 'remove' : 'assign'}
+                        </div>
+                      )}
                     </div>
                   </div>
                 );
               }}
             />
           </div>
-          </DroppableCalendar>
         )}
       </div>
 
@@ -475,74 +541,7 @@ export default function Schedule() {
         employees={employees}
       />
 
-      <DragOverlay>
-        {activeEmployee ? (
-          <div className="p-1.5 bg-primary/90 border-2 border-primary rounded shadow-lg">
-            <div className="font-bold text-primary-foreground text-xs">{activeEmployee.name}</div>
-          </div>
-        ) : null}
-      </DragOverlay>
     </div>
-    </DndContext>
-  );
-}
-
-// Draggable Employee Component
-function DraggableEmployee({ employee, type, children }: { employee: User; type: 'assigned' | 'available'; children: React.ReactNode }) {
-  const { attributes, listeners, setNodeRef, isDragging } = useDraggable({
-    id: employee.id,
-  });
-
-  const bgColor = type === 'assigned' 
-    ? 'bg-green-50 dark:bg-green-950/30 border-green-200 dark:border-green-800' 
-    : 'bg-blue-50 dark:bg-blue-950/30 border-blue-200 dark:border-blue-800';
-
-  return (
-    <div
-      ref={setNodeRef}
-      {...listeners}
-      {...attributes}
-      className={`p-1.5 ${bgColor} border rounded cursor-grab active:cursor-grabbing ${isDragging ? 'opacity-50' : ''}`}
-    >
-      <div className="font-bold text-foreground truncate text-xs">{employee.name}</div>
-      {children}
-    </div>
-  );
-}
-
-// Droppable Calendar Wrapper
-function DroppableCalendar({ jobs, children }: { jobs: ScheduledJobWithAssignments[]; children: React.ReactNode }) {
-  const { setNodeRef } = useDroppable({
-    id: 'calendar-drop-zone',
-    data: { jobs },
-  });
-
-  return (
-    <div ref={setNodeRef} className="relative">
-      {/* Create droppable overlay zones for each job */}
-      {jobs.map(job => (
-        <DroppableJobZone key={job.id} job={job} />
-      ))}
-      {children}
-    </div>
-  );
-}
-
-// Individual droppable zone for each job
-function DroppableJobZone({ job }: { job: ScheduledJobWithAssignments }) {
-  const { setNodeRef } = useDroppable({
-    id: job.id,
-  });
-
-  return (
-    <div 
-      ref={setNodeRef}
-      style={{
-        position: 'absolute',
-        pointerEvents: 'none',
-        zIndex: 1,
-      }}
-    />
   );
 }
 
