@@ -29,7 +29,6 @@ import { normalizeStrataPlan } from "@shared/schema";
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from "recharts";
 import { isManagement, hasFinancialAccess, canManageEmployees, canViewPerformance, hasPermission, isReadOnly } from "@/lib/permissions";
 import { DocumentUploader } from "@/components/DocumentUploader";
-import { DebugConsole } from "@/components/DebugConsole";
 import {
   DndContext,
   closestCenter,
@@ -278,7 +277,6 @@ function SortableCard({ card, isRearranging }: { card: any; isRearranging: boole
 }
 
 export default function Dashboard() {
-  console.log("[Dashboard] Component mounted/rendered");
   const [activeTab, setActiveTab] = useState("");
 
   // Scroll to top when changing tabs
@@ -1170,15 +1168,10 @@ export default function Dashboard() {
   // Load saved card order from localStorage
   // Load saved card order from backend preferences
   useEffect(() => {
-    console.log("[Dashboard] Loading preferences:", preferencesData);
     if (preferencesData?.preferences?.dashboardCardOrder) {
-      console.log("[Dashboard] Found saved card order:", preferencesData.preferences.dashboardCardOrder);
       setCardOrder(preferencesData.preferences.dashboardCardOrder);
     } else {
-      console.log("[Dashboard] No saved order, using default");
-      const defaultOrder = dashboardCards.map(c => c.id);
-      console.log("[Dashboard] Default order:", defaultOrder);
-      setCardOrder(defaultOrder);
+      setCardOrder(dashboardCards.map(c => c.id));
     }
   }, [preferencesData, dashboardCards]); // Re-run when preferences or available cards change
 
@@ -1195,40 +1188,24 @@ export default function Dashboard() {
   // Mutation to save preferences
   const updatePreferencesMutation = useMutation({
     mutationFn: async (updates: { dashboardCardOrder?: string[], hoursAnalyticsCardOrder?: string[] }) => {
-      console.log("[Dashboard] Mutation called with:", updates);
       const response = await apiRequest("POST", "/api/user-preferences", updates);
-      const result = await response.json();
-      console.log("[Dashboard] Mutation result:", result);
-      return result;
+      return await response.json();
     },
     onSuccess: () => {
-      console.log("[Dashboard] Mutation success, invalidating cache");
       queryClient.invalidateQueries({ queryKey: ["/api/user-preferences"] });
-    },
-    onError: (error) => {
-      console.error("[Dashboard] Mutation error:", error);
     },
   });
 
   const handleDragEnd = (event: DragEndEvent) => {
-    console.log("[Dashboard] handleDragEnd called!", { active: event.active?.id, over: event.over?.id });
     const { active, over } = event;
     
     if (over && active.id !== over.id) {
-      console.log("[Dashboard] Cards swapped, updating order");
       const oldIndex = sortedDashboardCards.findIndex(c => c.id === active.id);
       const newIndex = sortedDashboardCards.findIndex(c => c.id === over.id);
       
       const newOrder = arrayMove(sortedDashboardCards, oldIndex, newIndex).map(c => c.id);
-      console.log("[Dashboard] New card order:", newOrder);
       setCardOrder(newOrder);
-      
-      // Save to backend
-      console.log("[Dashboard] About to call mutation...");
       updatePreferencesMutation.mutate({ dashboardCardOrder: newOrder });
-      console.log("[Dashboard] Mutation called!");
-    } else {
-      console.log("[Dashboard] No swap needed or no over target");
     }
   };
 
@@ -1255,7 +1232,6 @@ export default function Dashboard() {
 
   return (
     <div className="min-h-screen page-gradient">
-      <DebugConsole />
       {/* Header - Premium Glass Effect */}
       <header className="sticky top-0 z-[100] glass backdrop-blur-xl border-b border-border/50 shadow-premium">
         <div className="px-6 h-20 flex items-center justify-between max-w-7xl mx-auto">
@@ -1308,11 +1284,7 @@ export default function Dashboard() {
                 <Button
                   variant={isRearranging ? "default" : "outline"}
                   size="sm"
-                  onClick={() => {
-                    console.log("[Dashboard] Rearrange button clicked! Current state:", isRearranging);
-                    setIsRearranging(!isRearranging);
-                    console.log("[Dashboard] State toggled to:", !isRearranging);
-                  }}
+                  onClick={() => setIsRearranging(!isRearranging)}
                   className="gap-2"
                   data-testid="button-rearrange-cards"
                 >

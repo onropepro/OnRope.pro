@@ -460,18 +460,11 @@ export default function HoursAnalytics() {
   // Mutation to save preferences
   const updatePreferencesMutation = useMutation({
     mutationFn: async (updates: { dashboardCardOrder?: string[], hoursAnalyticsCardOrder?: string[] }) => {
-      console.log("[HoursAnalytics] Mutation called with:", updates);
       const response = await apiRequest("POST", "/api/user-preferences", updates);
-      const result = await response.json();
-      console.log("[HoursAnalytics] Mutation result:", result);
-      return result;
+      return await response.json();
     },
     onSuccess: () => {
-      console.log("[HoursAnalytics] Mutation success, invalidating cache");
       queryClient.invalidateQueries({ queryKey: ["/api/user-preferences"] });
-    },
-    onError: (error) => {
-      console.error("[HoursAnalytics] Mutation error:", error);
     },
   });
 
@@ -484,12 +477,7 @@ export default function HoursAnalytics() {
         const oldIndex = items.indexOf(active.id);
         const newIndex = items.indexOf(over.id);
         const newOrder = arrayMove(items, oldIndex, newIndex);
-        
-        console.log("[HoursAnalytics] Saving card order:", newOrder);
-        
-        // Save to backend
         updatePreferencesMutation.mutate({ hoursAnalyticsCardOrder: newOrder });
-        
         return newOrder;
       });
     }
