@@ -250,17 +250,20 @@ export default function Schedule() {
               data-testid="calendar"
               eventContent={(eventInfo) => {
                 const job = eventInfo.event.extendedProps.job as ScheduledJobWithAssignments;
-                const employeeNames = job.assignedEmployees?.map(e => e.name).join(", ");
                 
                 return (
                   <div className="fc-event-main-frame" style={{ padding: '2px 4px', overflow: 'hidden' }}>
                     <div className="fc-event-title-container">
-                      <div className="fc-event-title" style={{ fontWeight: 500, fontSize: '0.875rem' }}>
+                      <div className="fc-event-title" style={{ fontWeight: 600, fontSize: '0.875rem', marginBottom: '2px' }}>
                         {job.title}
                       </div>
-                      {employeeNames && (
-                        <div style={{ fontSize: '0.7rem', opacity: 0.95, marginTop: '1px', whiteSpace: 'normal', lineHeight: 1.2 }}>
-                          👥 {employeeNames}
+                      {job.assignedEmployees && job.assignedEmployees.length > 0 && (
+                        <div style={{ fontSize: '0.7rem', opacity: 1, whiteSpace: 'normal', lineHeight: 1.3 }}>
+                          {job.assignedEmployees.map((employee, idx) => (
+                            <div key={idx} style={{ fontWeight: 600, color: 'rgba(255,255,255,0.95)' }}>
+                              👤 {employee.name}
+                            </div>
+                          ))}
                         </div>
                       )}
                     </div>
