@@ -6,6 +6,7 @@ import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import timeGridPlugin from "@fullcalendar/timegrid";
 import interactionPlugin from "@fullcalendar/interaction";
+import resourceTimeGridPlugin from "@fullcalendar/resource-timegrid";
 import type { EventInput, DateSelectArg, EventClickArg } from "@fullcalendar/core";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
@@ -15,6 +16,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import { Calendar, Plus, Edit2, Trash2, Users, ArrowLeft, UserCheck, UserX } from "lucide-react";
 import type { ScheduledJobWithAssignments, User } from "@shared/schema";
@@ -604,18 +606,29 @@ export default function Schedule() {
         </CardContent>
       </Card>
 
-      {/* Calendar */}
-      <div className="bg-card rounded-lg shadow-premium p-6">
-        {activeEmployeeId && (
-          <div className="mb-4 p-3 bg-primary/10 border-2 border-primary rounded-lg">
-            <p className="text-sm font-semibold text-primary">
-              🎯 Assigning: {activeEmployee?.name}
-            </p>
-            <p className="text-xs text-muted-foreground mt-1">
-              Click on any job to assign this employee. Green = assign, Red = remove. Press Escape to cancel.
-            </p>
-          </div>
-        )}
+      {/* Calendar Tabs */}
+      <Tabs defaultValue="job-schedule" className="w-full">
+        <TabsList className="grid w-full max-w-md grid-cols-2">
+          <TabsTrigger value="job-schedule" data-testid="tab-job-schedule">
+            Job Schedule
+          </TabsTrigger>
+          <TabsTrigger value="employee-schedule" data-testid="tab-employee-schedule">
+            Employee Schedule
+          </TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="job-schedule" className="mt-4">
+          <div className="bg-card rounded-lg shadow-premium p-6">
+            {activeEmployeeId && (
+              <div className="mb-4 p-3 bg-primary/10 border-2 border-primary rounded-lg">
+                <p className="text-sm font-semibold text-primary">
+                  🎯 Assigning: {activeEmployee?.name}
+                </p>
+                <p className="text-xs text-muted-foreground mt-1">
+                  Click on any job to assign this employee. Green = assign, Red = remove. Press Escape to cancel.
+                </p>
+              </div>
+            )}
         {isLoading ? (
           <div className="flex items-center justify-center h-96">
             <div className="text-muted-foreground">Loading calendar...</div>
@@ -770,7 +783,35 @@ export default function Schedule() {
             />
           </div>
         )}
-      </div>
+          </div>
+        </TabsContent>
+
+        <TabsContent value="employee-schedule" className="mt-4">
+          <div className="bg-card rounded-lg shadow-premium p-6">
+            <div className="schedule-calendar-wrapper">
+              <FullCalendar
+                plugins={[resourceTimeGridPlugin, interactionPlugin]}
+                initialView="resourceTimeGridWeek"
+                headerToolbar={{
+                  left: "prev,next today",
+                  center: "title",
+                  right: "resourceTimeGridDay,resourceTimeGridWeek",
+                }}
+                resources={employees.map(emp => ({
+                  id: emp.id,
+                  title: emp.name,
+                }))}
+                events={[]}
+                height="700px"
+                slotMinTime="07:00:00"
+                slotMaxTime="19:00:00"
+                allDaySlot={false}
+                data-testid="employee-calendar"
+              />
+            </div>
+          </div>
+        </TabsContent>
+      </Tabs>
 
       {/* Create Job Dialog */}
       <CreateJobDialog
