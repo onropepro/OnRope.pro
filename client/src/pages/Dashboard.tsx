@@ -1189,10 +1189,17 @@ export default function Dashboard() {
   // Mutation to save preferences
   const updatePreferencesMutation = useMutation({
     mutationFn: async (updates: { dashboardCardOrder?: string[], hoursAnalyticsCardOrder?: string[] }) => {
-      return apiRequest("/api/user-preferences", "POST", updates);
+      console.log("[Dashboard] Mutation called with:", updates);
+      const result = await apiRequest("/api/user-preferences", "POST", updates);
+      console.log("[Dashboard] Mutation result:", result);
+      return result;
     },
     onSuccess: () => {
+      console.log("[Dashboard] Mutation success, invalidating cache");
       queryClient.invalidateQueries({ queryKey: ["/api/user-preferences"] });
+    },
+    onError: (error) => {
+      console.error("[Dashboard] Mutation error:", error);
     },
   });
 
@@ -1204,6 +1211,7 @@ export default function Dashboard() {
       const newIndex = sortedDashboardCards.findIndex(c => c.id === over.id);
       
       const newOrder = arrayMove(sortedDashboardCards, oldIndex, newIndex).map(c => c.id);
+      console.log("[Dashboard] Saving card order:", newOrder);
       setCardOrder(newOrder);
       
       // Save to backend
