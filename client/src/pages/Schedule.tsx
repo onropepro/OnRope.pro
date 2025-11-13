@@ -172,24 +172,52 @@ export default function Schedule() {
   });
 
   const [dropTargetJobId, setDropTargetJobId] = useState<string | null>(null);
+  const [dragPosition, setDragPosition] = useState<{ x: number; y: number } | null>(null);
+
+  // Track mouse position during drag to determine which job we're over
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      if (activeEmployeeId) {
+        setDragPosition({ x: e.clientX, y: e.clientY });
+        
+        // Find which calendar event element we're hovering over
+        const elements = document.elementsFromPoint(e.clientX, e.clientY);
+        const eventElement = elements.find(el => el.hasAttribute && el.hasAttribute('data-job-id'));
+        
+        if (eventElement) {
+          const jobId = eventElement.getAttribute('data-job-id');
+          setDropTargetJobId(jobId);
+        } else {
+          setDropTargetJobId(null);
+        }
+      }
+    };
+
+    if (activeEmployeeId) {
+      window.addEventListener('mousemove', handleMouseMove);
+      return () => window.removeEventListener('mousemove', handleMouseMove);
+    }
+  }, [activeEmployeeId]);
 
   const handleDragEnd = (event: DragEndEvent) => {
-    const { active, over } = event;
+    const { active } = event;
     
-    setActiveEmployeeId(null);
-    
-    if (!over || !active.id) {
+    if (!active.id || !dropTargetJobId) {
+      setActiveEmployeeId(null);
       setDropTargetJobId(null);
+      setDragPosition(null);
       return;
     }
 
     const employeeId = active.id as string;
-    const jobId = over.id as string;
+    const jobId = dropTargetJobId;
 
     // Find the job
     const job = jobs.find(j => j.id === jobId);
     if (!job) {
+      setActiveEmployeeId(null);
       setDropTargetJobId(null);
+      setDragPosition(null);
       return;
     }
 
@@ -207,7 +235,9 @@ export default function Schedule() {
     }
 
     quickAssignMutation.mutate({ jobId, employeeIds: newAssignments });
+    setActiveEmployeeId(null);
     setDropTargetJobId(null);
+    setDragPosition(null);
   };
 
   // Get assigned employee IDs from jobs
@@ -380,7 +410,6 @@ export default function Schedule() {
             <div className="text-muted-foreground">Loading calendar...</div>
           </div>
         ) : (
-          <DroppableCalendar jobs={jobs}>
           <div className="schedule-calendar-wrapper">
             <style>{`
               .schedule-calendar-wrapper .fc {
@@ -460,10 +489,15 @@ export default function Schedule() {
               displayEventEnd={false}
               eventDisplay="block"
               data-testid="calendar"
+              eventDidMount={(info) => {
+                const job = info.event.extendedProps.job as ScheduledJobWithAssignments;
+                info.el.setAttribute('data-job-id', job.id);
+              }}
               eventContent={(eventInfo) => {
                 const job = eventInfo.event.extendedProps.job as ScheduledJobWithAssignments;
                 const isHighlighted = activeEmployeeId !== null;
                 const currentlyAssigned = job.assignedEmployees?.some(e => e.id === activeEmployeeId);
+                const isDropTarget = dropTargetJobId === job.id;
                 
                 return (
                   <div 
@@ -471,10 +505,12 @@ export default function Schedule() {
                     style={{ 
                       padding: '2px 4px', 
                       overflow: 'hidden',
-                      backgroundColor: isHighlighted 
-                        ? (currentlyAssigned ? 'rgba(239, 68, 68, 0.2)' : 'rgba(34, 197, 94, 0.2)')
-                        : undefined,
-                      outline: isHighlighted ? '2px dashed rgba(14, 165, 233, 1)' : undefined,
+                      backgroundColor: isDropTarget 
+                        ? (currentlyAssigned ? 'rgba(239, 68, 68, 0.3)' : 'rgba(34, 197, 94, 0.3)')
+                        : isHighlighted 
+                          ? (currentlyAssigned ? 'rgba(239, 68, 68, 0.1)' : 'rgba(34, 197, 94, 0.1)')
+                          : undefined,
+                      outline: isDropTarget ? '3px solid rgba(14, 165, 233, 1)' : isHighlighted ? '2px dashed rgba(14, 165, 233, 0.5)' : undefined,
                       outlineOffset: '-2px',
                       cursor: isHighlighted ? 'pointer' : 'pointer',
                     }}
@@ -520,7 +556,6 @@ export default function Schedule() {
               }}
             />
           </div>
-          </DroppableCalendar>
         )}
       </div>
 
@@ -610,41 +645,6 @@ function DraggableEmployeeCard({
   );
 }
 
-// Droppable Calendar Wrapper
-function DroppableCalendar({ jobs, children }: { jobs: ScheduledJobWithAssignments[]; children: React.ReactNode }) {
-  const { setNodeRef } = useDroppable({
-    id: 'calendar-drop-zone',
-    data: { jobs },
-  });
-
-  return (
-    <div ref={setNodeRef} className="relative">
-      {/* Create droppable overlay zones for each job */}
-      {jobs.map(job => (
-        <DroppableJobZone key={job.id} job={job} />
-      ))}
-      {children}
-    </div>
-  );
-}
-
-// Individual droppable zone for each job
-function DroppableJobZone({ job }: { job: ScheduledJobWithAssignments }) {
-  const { setNodeRef } = useDroppable({
-    id: job.id,
-  });
-
-  return (
-    <div 
-      ref={setNodeRef}
-      style={{
-        position: 'absolute',
-        pointerEvents: 'none',
-        zIndex: 1,
-      }}
-    />
-  );
-}
 
 // Create Job Dialog Component
 function CreateJobDialog({
