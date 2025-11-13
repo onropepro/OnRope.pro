@@ -834,6 +834,11 @@ export default function Dashboard() {
           projectForm.setValue("floorCount", String(strata.stories));
         }
         
+        // Populate Daily Drop Target if available
+        if (strata.dailyDropTarget !== undefined && strata.dailyDropTarget !== null) {
+          projectForm.setValue("dailyDropTarget", String(strata.dailyDropTarget));
+        }
+        
         // Populate Total Drops per Elevation if available
         if (strata.totalDropsNorth !== undefined && strata.totalDropsNorth !== null) {
           projectForm.setValue("totalDropsNorth", String(strata.totalDropsNorth));
