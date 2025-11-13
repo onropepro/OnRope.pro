@@ -3742,14 +3742,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Unable to determine company" });
       }
       
+      const { employeeIds, ...jobFields } = req.body;
+      
       const jobData = insertScheduledJobSchema.parse({
-        ...req.body,
+        ...jobFields,
         companyId,
         createdBy: currentUser.id,
       });
       
       const job = await storage.createScheduledJob(jobData);
-      res.json({ job });
+      
+      // Assign employees if provided
+      if (employeeIds && Array.isArray(employeeIds) && employeeIds.length > 0) {
+        await storage.replaceJobAssignments(job.id, employeeIds, currentUser.id);
+      }
+      
+      // Return job with assignments
+      const jobWithAssignments = await storage.getScheduledJobWithAssignments(job.id);
+      res.json({ job: jobWithAssignments });
     } catch (error) {
       if (error instanceof z.ZodError) {
         return res.status(400).json({ message: "Validation error", errors: error.errors });
@@ -3782,9 +3792,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(403).json({ message: "Forbidden" });
       }
       
-      const updateData = insertScheduledJobSchema.partial().parse(req.body);
+      const { employeeIds, ...jobFields } = req.body;
+      
+      const updateData = insertScheduledJobSchema.partial().parse(jobFields);
       const updatedJob = await storage.updateScheduledJob(req.params.id, updateData);
-      res.json({ job: updatedJob });
+      
+      // Update employee assignments if provided
+      if (employeeIds !== undefined && Array.isArray(employeeIds)) {
+        await storage.replaceJobAssignments(req.params.id, employeeIds, currentUser.id);
+      }
+      
+      // Return job with assignments
+      const jobWithAssignments = await storage.getScheduledJobWithAssignments(req.params.id);
+      res.json({ job: jobWithAssignments });
     } catch (error) {
       if (error instanceof z.ZodError) {
         return res.status(400).json({ message: "Validation error", errors: error.errors });

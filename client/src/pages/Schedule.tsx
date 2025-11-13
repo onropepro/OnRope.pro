@@ -57,9 +57,14 @@ export default function Schedule() {
     const endDay = new Date(end.getFullYear(), end.getMonth(), end.getDate());
     
     if (startDay.getTime() === endDay.getTime()) {
+      const employeeCount = job.assignedEmployees?.length || 0;
+      const displayTitle = employeeCount > 0 
+        ? `${job.title} (${employeeCount} ${employeeCount === 1 ? 'person' : 'people'})`
+        : job.title;
+      
       return [{
         id: job.id,
-        title: job.title,
+        title: displayTitle,
         start: job.startDate,
         end: job.endDate,
         backgroundColor: color,
@@ -79,9 +84,14 @@ export default function Schedule() {
       const eventEnd = new Date(currentDate);
       eventEnd.setDate(eventEnd.getDate() + 1);
       
+      const employeeCount = job.assignedEmployees?.length || 0;
+      const displayTitle = employeeCount > 0 
+        ? `${job.title} (${employeeCount} ${employeeCount === 1 ? 'person' : 'people'})`
+        : job.title;
+      
       dayEvents.push({
         id: `${job.id}-${currentDate.toISOString().split('T')[0]}`,
-        title: job.title,
+        title: displayTitle,
         start: eventStart,
         end: eventEnd,
         allDay: true,
@@ -357,7 +367,7 @@ function CreateJobDialog({
     const startDate = new Date(formData.startDate);
     const endDate = new Date(formData.endDate);
 
-    await createJobMutation.mutateAsync({
+    const result = await createJobMutation.mutateAsync({
       title: formData.title,
       description: formData.description,
       jobType: formData.jobType,
@@ -369,12 +379,8 @@ function CreateJobDialog({
       endDate,
       color: formData.color,
       status: "upcoming",
+      employeeIds: formData.employeeIds,
     });
-
-    // Assign employees if any selected
-    if (formData.employeeIds.length > 0) {
-      // We'll implement this after the job is created
-    }
   };
 
   return (
@@ -519,6 +525,52 @@ function CreateJobDialog({
               rows={2}
               data-testid="input-notes"
             />
+          </div>
+
+          {/* Employee Assignment */}
+          <div className="space-y-2">
+            <Label>Assign Team Members</Label>
+            <div className="border rounded-md p-4 max-h-48 overflow-y-auto space-y-2">
+              {employees.length === 0 ? (
+                <p className="text-sm text-muted-foreground">No employees available</p>
+              ) : (
+                employees.map((employee) => (
+                  <div key={employee.id} className="flex items-center space-x-2">
+                    <input
+                      type="checkbox"
+                      id={`employee-${employee.id}`}
+                      checked={formData.employeeIds.includes(employee.id)}
+                      onChange={(e) => {
+                        if (e.target.checked) {
+                          setFormData({
+                            ...formData,
+                            employeeIds: [...formData.employeeIds, employee.id],
+                          });
+                        } else {
+                          setFormData({
+                            ...formData,
+                            employeeIds: formData.employeeIds.filter(id => id !== employee.id),
+                          });
+                        }
+                      }}
+                      className="rounded border-gray-300"
+                      data-testid={`checkbox-employee-${employee.id}`}
+                    />
+                    <label
+                      htmlFor={`employee-${employee.id}`}
+                      className="text-sm flex-1 cursor-pointer"
+                    >
+                      {employee.name} {employee.role && `(${employee.role.replace(/_/g, ' ')})`}
+                    </label>
+                  </div>
+                ))
+              )}
+            </div>
+            {formData.employeeIds.length > 0 && (
+              <p className="text-sm text-muted-foreground">
+                {formData.employeeIds.length} team member(s) selected
+              </p>
+            )}
           </div>
 
           <DialogFooter>
@@ -770,6 +822,7 @@ function EditJobDialog({
       endDate,
       status: formData.status,
       color: formData.color,
+      employeeIds: formData.employeeIds,
     });
   };
 
@@ -927,6 +980,52 @@ function EditJobDialog({
               rows={2}
               data-testid="input-edit-notes"
             />
+          </div>
+
+          {/* Employee Assignment */}
+          <div className="space-y-2">
+            <Label>Assigned Team Members</Label>
+            <div className="border rounded-md p-4 max-h-48 overflow-y-auto space-y-2">
+              {employees.length === 0 ? (
+                <p className="text-sm text-muted-foreground">No employees available</p>
+              ) : (
+                employees.map((employee) => (
+                  <div key={employee.id} className="flex items-center space-x-2">
+                    <input
+                      type="checkbox"
+                      id={`edit-employee-${employee.id}`}
+                      checked={formData.employeeIds.includes(employee.id)}
+                      onChange={(e) => {
+                        if (e.target.checked) {
+                          setFormData({
+                            ...formData,
+                            employeeIds: [...formData.employeeIds, employee.id],
+                          });
+                        } else {
+                          setFormData({
+                            ...formData,
+                            employeeIds: formData.employeeIds.filter(id => id !== employee.id),
+                          });
+                        }
+                      }}
+                      className="rounded border-gray-300"
+                      data-testid={`checkbox-edit-employee-${employee.id}`}
+                    />
+                    <label
+                      htmlFor={`edit-employee-${employee.id}`}
+                      className="text-sm flex-1 cursor-pointer"
+                    >
+                      {employee.name} {employee.role && `(${employee.role.replace(/_/g, ' ')})`}
+                    </label>
+                  </div>
+                ))
+              )}
+            </div>
+            {formData.employeeIds.length > 0 && (
+              <p className="text-sm text-muted-foreground">
+                {formData.employeeIds.length} team member(s) selected
+              </p>
+            )}
           </div>
 
           <DialogFooter>
