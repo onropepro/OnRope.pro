@@ -810,8 +810,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Get all employees for this company (including terminated)
       const employees = await storage.getAllEmployees(currentUser.id);
       
+      // Get the company owner as well (currentUser is the company owner)
+      const companyOwner = currentUser;
+      
+      // Combine company owner and employees
+      const allUsers = [companyOwner, ...employees];
+      
       // Remove passwords from response
-      const employeesWithoutPasswords = employees.map(emp => {
+      const employeesWithoutPasswords = allUsers.map(emp => {
         const { passwordHash, ...empWithoutPassword } = emp;
         return empWithoutPassword;
       });
