@@ -675,20 +675,6 @@ function JobDetailDialog({
             </div>
           </div>
 
-          {job.location && (
-            <div>
-              <h3 className="font-medium text-sm mb-1">Location</h3>
-              <p className="text-sm text-muted-foreground">{job.location}</p>
-            </div>
-          )}
-
-          {job.estimatedHours && (
-            <div>
-              <h3 className="font-medium text-sm mb-1">Estimated Hours</h3>
-              <p className="text-sm text-muted-foreground">{job.estimatedHours} hours</p>
-            </div>
-          )}
-
           {job.assignedEmployees && job.assignedEmployees.length > 0 && (
             <div>
               <h3 className="font-medium text-sm mb-2">Assigned Team Members</h3>
@@ -700,6 +686,20 @@ function JobDetailDialog({
                   </Badge>
                 ))}
               </div>
+            </div>
+          )}
+
+          {job.location && (
+            <div>
+              <h3 className="font-medium text-sm mb-1">Location</h3>
+              <p className="text-sm text-muted-foreground">{job.location}</p>
+            </div>
+          )}
+
+          {job.estimatedHours && (
+            <div>
+              <h3 className="font-medium text-sm mb-1">Estimated Hours</h3>
+              <p className="text-sm text-muted-foreground">{job.estimatedHours} hours</p>
             </div>
           )}
 
