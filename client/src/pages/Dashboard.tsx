@@ -154,7 +154,7 @@ const employeeSchema = z.object({
   name: z.string().min(1, "Name is required"),
   email: z.string().email("Invalid email address"),
   password: z.string().min(6, "Password must be at least 6 characters"),
-  role: z.enum(["owner_ceo", "operations_manager", "human_resources", "account_manager", "general_supervisor", "rope_access_supervisor", "manager", "rope_access_tech", "ground_crew_supervisor", "ground_crew"]),
+  role: z.enum(["owner_ceo", "operations_manager", "human_resources", "accounting", "account_manager", "general_supervisor", "rope_access_supervisor", "manager", "rope_access_tech", "ground_crew_supervisor", "ground_crew"]),
   hourlyRate: z.string().optional(),
   permissions: z.array(z.string()).default([]),
   // New employee details
@@ -178,7 +178,7 @@ const employeeSchema = z.object({
 const editEmployeeSchema = z.object({
   name: z.string().min(1, "Name is required"),
   email: z.string().email("Invalid email address"),
-  role: z.enum(["owner_ceo", "operations_manager", "human_resources", "account_manager", "general_supervisor", "rope_access_supervisor", "manager", "rope_access_tech", "ground_crew_supervisor", "ground_crew"]),
+  role: z.enum(["owner_ceo", "operations_manager", "human_resources", "accounting", "account_manager", "general_supervisor", "rope_access_supervisor", "manager", "rope_access_tech", "ground_crew_supervisor", "ground_crew"]),
   hourlyRate: z.string().optional(),
   permissions: z.array(z.string()).default([]),
   // New employee details
@@ -2345,6 +2345,7 @@ export default function Dashboard() {
                                 <SelectItem value="owner_ceo">Owner/CEO</SelectItem>
                                 <SelectItem value="operations_manager">Operations Manager</SelectItem>
                                 <SelectItem value="human_resources">Human Resources</SelectItem>
+                                <SelectItem value="accounting">Accounting</SelectItem>
                                 <SelectItem value="account_manager">Account Manager</SelectItem>
                                 <SelectItem value="general_supervisor">General Supervisor</SelectItem>
                                 <SelectItem value="rope_access_supervisor">Rope Access Supervisor</SelectItem>
@@ -3183,6 +3184,7 @@ export default function Dashboard() {
                           <SelectItem value="owner_ceo">Owner/CEO</SelectItem>
                           <SelectItem value="operations_manager">Operations Manager</SelectItem>
                           <SelectItem value="human_resources">Human Resources</SelectItem>
+                          <SelectItem value="accounting">Accounting</SelectItem>
                           <SelectItem value="account_manager">Account Manager</SelectItem>
                           <SelectItem value="general_supervisor">General Supervisor</SelectItem>
                           <SelectItem value="rope_access_supervisor">Rope Access Supervisor</SelectItem>
