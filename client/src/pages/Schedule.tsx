@@ -73,19 +73,19 @@ export default function Schedule() {
     if (startDay.getTime() === endDay.getTime()) {
       // For single-day jobs, filter employees by their assignment date range
       const dayDateStr = startDay.toISOString().split('T')[0];
-      const employeesForThisDay = job.assignedEmployees?.filter(emp => {
+      const employeesForThisDay = job.employeeAssignments?.filter((assignment: any) => {
         // Include employee if they're assigned for this specific day
-        if (!emp.startDate && !emp.endDate) return true; // No date range = full job duration
+        if (!assignment.startDate && !assignment.endDate) return true; // No date range = full job duration
         
-        const empStart = emp.startDate ? new Date(emp.startDate).toISOString().split('T')[0] : dayDateStr;
-        const empEnd = emp.endDate ? new Date(emp.endDate).toISOString().split('T')[0] : dayDateStr;
+        const empStart = assignment.startDate ? new Date(assignment.startDate).toISOString().split('T')[0] : dayDateStr;
+        const empEnd = assignment.endDate ? new Date(assignment.endDate).toISOString().split('T')[0] : dayDateStr;
         
         return dayDateStr >= empStart && dayDateStr <= empEnd;
       }) || [];
       
       let displayTitle = job.title;
       if (employeesForThisDay.length > 0) {
-        const employeeNames = employeesForThisDay.map(e => e.name).join(", ");
+        const employeeNames = employeesForThisDay.map((a: any) => a.employee.name).join(", ");
         displayTitle = `${job.title}\n👥 ${employeeNames}`;
       }
       
@@ -113,19 +113,19 @@ export default function Schedule() {
       
       // Filter employees by their assignment date range for THIS specific day
       const dayDateStr = currentDate.toISOString().split('T')[0];
-      const employeesForThisDay = job.assignedEmployees?.filter(emp => {
+      const employeesForThisDay = job.employeeAssignments?.filter((assignment: any) => {
         // Include employee if they're assigned for this specific day
-        if (!emp.startDate && !emp.endDate) return true; // No date range = full job duration
+        if (!assignment.startDate && !assignment.endDate) return true; // No date range = full job duration
         
-        const empStart = emp.startDate ? new Date(emp.startDate).toISOString().split('T')[0] : dayDateStr;
-        const empEnd = emp.endDate ? new Date(emp.endDate).toISOString().split('T')[0] : dayDateStr;
+        const empStart = assignment.startDate ? new Date(assignment.startDate).toISOString().split('T')[0] : dayDateStr;
+        const empEnd = assignment.endDate ? new Date(assignment.endDate).toISOString().split('T')[0] : dayDateStr;
         
         return dayDateStr >= empStart && dayDateStr <= empEnd;
       }) || [];
       
       let displayTitle = job.title;
       if (employeesForThisDay.length > 0) {
-        const employeeNames = employeesForThisDay.map(e => e.name).join(", ");
+        const employeeNames = employeesForThisDay.map((a: any) => a.employee.name).join(", ");
         displayTitle = `${job.title}\n👥 ${employeeNames}`;
       }
       
