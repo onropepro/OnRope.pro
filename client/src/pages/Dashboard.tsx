@@ -2606,7 +2606,9 @@ export default function Dashboard() {
                                   type="button"
                                   variant="outline"
                                   size="sm"
-                                  onClick={() => {
+                                  onClick={(e) => {
+                                    e.preventDefault();
+                                    e.stopPropagation();
                                     const allPermissionIds = AVAILABLE_PERMISSIONS.map(p => p.id);
                                     employeeForm.setValue("permissions", allPermissionIds);
                                   }}
@@ -3486,7 +3488,9 @@ export default function Dashboard() {
                             type="button"
                             variant="outline"
                             size="sm"
-                            onClick={() => {
+                            onClick={(e) => {
+                              e.preventDefault();
+                              e.stopPropagation();
                               const allPermissionIds = AVAILABLE_PERMISSIONS.map(p => p.id);
                               editEmployeeForm.setValue("permissions", allPermissionIds);
                             }}
