@@ -1791,7 +1791,22 @@ export default function Dashboard() {
                               <Command>
                                 <CommandInput placeholder="Search by client, strata, or address..." />
                                 <CommandList>
-                                  <CommandEmpty>No clients found.</CommandEmpty>
+                                  <CommandEmpty>
+                                    <div className="py-6 text-center">
+                                      <p className="text-sm text-muted-foreground mb-2">No clients found.</p>
+                                      <Button
+                                        variant="outline"
+                                        size="sm"
+                                        onClick={() => {
+                                          handleClientStrataSelection("manual");
+                                          setClientDropdownOpen(false);
+                                        }}
+                                        data-testid="button-manual-entry-empty"
+                                      >
+                                        Enter Details Manually
+                                      </Button>
+                                    </div>
+                                  </CommandEmpty>
                                   <CommandGroup>
                                     <CommandItem
                                       value="manual"
