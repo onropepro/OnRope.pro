@@ -45,10 +45,10 @@ export default function Schedule() {
   });
 
   // Fetch current user
-  const { data: currentUserData, isLoading: isLoadingUser } = useQuery({
+  const { data: currentUserData, isLoading: isLoadingUser } = useQuery<{ user: User }>({
     queryKey: ["/api/user"],
   });
-  const currentUser = currentUserData as User | undefined;
+  const currentUser = currentUserData?.user;
 
   // Check schedule permission
   const hasSchedulePermission = canViewSchedule(currentUser);
