@@ -89,7 +89,7 @@ export default function ToolboxMeetingForm() {
   });
 
   // Filter out terminated employees
-  const employees = (employeesData?.employees || []).filter(emp => !emp.terminationDate);
+  const employees = (employeesData?.employees || []);
 
   const form = useForm<ToolboxMeetingFormValues>({
     resolver: zodResolver(toolboxMeetingFormSchema),

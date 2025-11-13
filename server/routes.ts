@@ -409,7 +409,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       // Check if user has been terminated - destroy session if so
-      if (user.terminationDate) {
+      if (user.terminatedDate) {
         req.session.destroy(() => {});
         return res.status(403).json({ message: "Your employment has been terminated. Please contact your administrator for more information." });
       }
@@ -814,13 +814,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Get employees for this company only
       const employees = await storage.getAllEmployees(companyId);
       
-      // Remove passwords from response
-      const employeesWithoutPasswords = employees.map(emp => {
-        const { passwordHash, ...empWithoutPassword } = emp;
-        return empWithoutPassword;
-      });
+      // Filter out terminated employees and remove passwords from response
+      const activeEmployees = employees
+        .filter(emp => !emp.terminatedDate)
+        .map(emp => {
+          const { passwordHash, ...empWithoutPassword } = emp;
+          return empWithoutPassword;
+        });
       
-      res.json({ employees: employeesWithoutPasswords });
+      res.json({ employees: activeEmployees });
     } catch (error) {
       console.error("Get employees error:", error);
       res.status(500).json({ message: "Internal server error" });
