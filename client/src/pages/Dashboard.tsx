@@ -28,7 +28,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import type { Project } from "@shared/schema";
 import { normalizeStrataPlan } from "@shared/schema";
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from "recharts";
-import { isManagement, hasFinancialAccess, canManageEmployees, canViewPerformance, hasPermission, isReadOnly } from "@/lib/permissions";
+import { isManagement, hasFinancialAccess, canManageEmployees, canViewPerformance, hasPermission, isReadOnly, canViewSchedule } from "@/lib/permissions";
 import { DocumentUploader } from "@/components/DocumentUploader";
 import {
   DndContext,
@@ -2081,31 +2081,33 @@ export default function Dashboard() {
                     </CardContent>
                   </Card>
 
-                  {/* Job Schedule Card */}
-                  <Card 
-                    className="hover-elevate active-elevate-2 cursor-pointer"
-                    onClick={() => setLocation("/schedule")}
-                    data-testid="card-schedule"
-                  >
-                    <CardHeader className="flex flex-row items-center justify-between gap-4 space-y-0 pb-2">
-                      <div className="flex-1 min-w-0">
-                        <CardTitle className="text-lg">Job Schedule</CardTitle>
-                        <CardDescription className="text-sm">
-                          Manage team assignments and job scheduling
-                        </CardDescription>
-                      </div>
-                      <div className="flex-shrink-0">
-                        <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
-                          <span className="material-icons text-primary text-2xl">event</span>
+                  {/* Job Schedule Card - Only visible with permission */}
+                  {canViewSchedule(user) && (
+                    <Card 
+                      className="hover-elevate active-elevate-2 cursor-pointer"
+                      onClick={() => setLocation("/schedule")}
+                      data-testid="card-schedule"
+                    >
+                      <CardHeader className="flex flex-row items-center justify-between gap-4 space-y-0 pb-2">
+                        <div className="flex-1 min-w-0">
+                          <CardTitle className="text-lg">Job Schedule</CardTitle>
+                          <CardDescription className="text-sm">
+                            Manage team assignments and job scheduling
+                          </CardDescription>
                         </div>
-                      </div>
-                    </CardHeader>
-                    <CardContent>
-                      <p className="text-sm text-muted-foreground">
-                        Schedule jobs and assign employees to tasks
-                      </p>
-                    </CardContent>
-                  </Card>
+                        <div className="flex-shrink-0">
+                          <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
+                            <span className="material-icons text-primary text-2xl">event</span>
+                          </div>
+                        </div>
+                      </CardHeader>
+                      <CardContent>
+                        <p className="text-sm text-muted-foreground">
+                          Schedule jobs and assign employees to tasks
+                        </p>
+                      </CardContent>
+                    </Card>
+                  )}
                 </>
               ) : (
                 <Card>

@@ -74,6 +74,17 @@ export function canAccessPayroll(user: User | null | undefined): boolean {
   return hasFinancialAccess(user);
 }
 
+// Check if user can view/manage job schedule
+export function canViewSchedule(user: User | null | undefined): boolean {
+  if (!user) return false;
+  
+  // Company role always has access
+  if (user.role === 'company') return true;
+  
+  // Check granular permissions - role does NOT automatically grant permissions
+  return user.permissions?.includes('view_schedule') || false;
+}
+
 // Check if user has specific permission
 export function hasPermission(user: User | null | undefined, permission: string): boolean {
   if (!user) return false;

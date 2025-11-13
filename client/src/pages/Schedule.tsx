@@ -18,11 +18,12 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
-import { Calendar, Plus, Edit2, Trash2, Users, ArrowLeft, UserCheck, UserX } from "lucide-react";
+import { Calendar, Plus, Edit2, Trash2, Users, ArrowLeft, UserCheck, UserX, Lock } from "lucide-react";
 import type { ScheduledJobWithAssignments, User } from "@shared/schema";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { DndContext, DragOverlay, useDraggable, useDroppable, closestCenter, DragEndEvent } from '@dnd-kit/core';
+import { canViewSchedule } from "@/lib/permissions";
 
 export default function Schedule() {
   const { toast } = useToast();
@@ -48,6 +49,45 @@ export default function Schedule() {
     queryKey: ["/api/user"],
   });
   const currentUser = currentUserData as User | undefined;
+
+  // Check schedule permission
+  const hasSchedulePermission = canViewSchedule(currentUser);
+
+  // If no permission, show access denied
+  if (currentUser && !hasSchedulePermission) {
+    return (
+      <div className="p-4 md:p-6 space-y-6">
+        <Button
+          variant="ghost"
+          onClick={() => setLocation("/dashboard")}
+          data-testid="button-back"
+          className="mb-2"
+        >
+          <ArrowLeft className="w-4 h-4 mr-2" />
+          Back to Dashboard
+        </Button>
+
+        <Card className="border-2 border-destructive/50">
+          <CardContent className="pt-6">
+            <div className="flex flex-col items-center justify-center text-center space-y-4 py-8">
+              <div className="rounded-full bg-destructive/10 p-4">
+                <Lock className="w-12 h-12 text-destructive" />
+              </div>
+              <div className="space-y-2">
+                <h2 className="text-2xl font-bold">Access Denied</h2>
+                <p className="text-muted-foreground max-w-md">
+                  You don't have permission to view the Job Schedule. Please contact your administrator to request access.
+                </p>
+              </div>
+              <Button onClick={() => setLocation("/dashboard")} data-testid="button-return-dashboard">
+                Return to Dashboard
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   // Fetch scheduled jobs
   const { data: jobsData, isLoading } = useQuery<{ jobs: ScheduledJobWithAssignments[] }>({
