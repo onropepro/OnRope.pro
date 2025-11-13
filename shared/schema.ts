@@ -946,7 +946,15 @@ export type EmployeeHoursSummary = {
   sessions: (WorkSession & { projectName: string })[];
 };
 
+export type EmployeeAssignment = {
+  assignmentId: string;
+  employee: User;
+  startDate?: Date | null;
+  endDate?: Date | null;
+};
+
 export type ScheduledJobWithAssignments = ScheduledJob & {
-  assignedEmployees: User[];
+  assignedEmployees: User[]; // Kept for backward compatibility
+  employeeAssignments?: EmployeeAssignment[]; // New: includes date ranges
   project?: Project | null;
 };

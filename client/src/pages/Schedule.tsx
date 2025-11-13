@@ -1093,8 +1093,13 @@ function JobDetailDialog({
 }) {
   const { toast } = useToast();
   const [showAssignEmployees, setShowAssignEmployees] = useState(false);
-  const [selectedEmployeeIds, setSelectedEmployeeIds] = useState<string[]>([]);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [assignDialogOpen, setAssignDialogOpen] = useState(false);
+  const [selectedEmployee, setSelectedEmployee] = useState<User | null>(null);
+  const [assignmentDates, setAssignmentDates] = useState<{ startDate: string; endDate: string }>({
+    startDate: "",
+    endDate: "",
+  });
 
   const deleteJobMutation = useMutation({
     mutationFn: async (jobId: string) => {
@@ -1117,35 +1122,77 @@ function JobDetailDialog({
     },
   });
 
-  const assignEmployeesMutation = useMutation({
-    mutationFn: async ({ jobId, employeeIds }: { jobId: string; employeeIds: string[] }) => {
-      await apiRequest("PUT", `/api/schedule/${jobId}`, { employeeIds });
+  const assignEmployeeMutation = useMutation({
+    mutationFn: async ({ jobId, employeeId, startDate, endDate }: { 
+      jobId: string; 
+      employeeId: string; 
+      startDate?: string; 
+      endDate?: string; 
+    }) => {
+      await apiRequest("POST", `/api/schedule/${jobId}/assign-employee`, { 
+        employeeId, 
+        startDate, 
+        endDate 
+      });
     },
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ["/api/schedule"] });
-      await queryClient.refetchQueries({ queryKey: ["/api/schedule"] });
       toast({
-        title: "Employees assigned",
-        description: "Team members have been assigned to this job",
+        title: "Employee assigned",
+        description: "Team member has been assigned to this job",
       });
+      setAssignDialogOpen(false);
+      setSelectedEmployee(null);
       setShowAssignEmployees(false);
     },
     onError: (error: Error) => {
-      console.error("Assignment error:", error);
       toast({
         title: "Error",
-        description: error.message || "Failed to assign employees",
+        description: error.message || "Failed to assign employee",
         variant: "destructive",
       });
     },
   });
 
-  // Initialize selected employees when job changes
-  useEffect(() => {
-    if (job) {
-      setSelectedEmployeeIds(job.assignedEmployees?.map(e => e.id) || []);
-    }
-  }, [job]);
+  const unassignEmployeeMutation = useMutation({
+    mutationFn: async ({ jobId, assignmentId }: { jobId: string; assignmentId: string }) => {
+      await apiRequest("DELETE", `/api/schedule/${jobId}/assignments/${assignmentId}`);
+    },
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ["/api/schedule"] });
+      toast({
+        title: "Employee unassigned",
+        description: "Team member has been removed from this job",
+      });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to unassign employee",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const handleAssignEmployee = (employee: User) => {
+    if (!job) return;
+    setSelectedEmployee(employee);
+    // Set default dates to job's date range
+    const startDate = new Date(job.startDate).toISOString().slice(0, 10);
+    const endDate = new Date(job.endDate).toISOString().slice(0, 10);
+    setAssignmentDates({ startDate, endDate });
+    setAssignDialogOpen(true);
+  };
+
+  const handleSaveAssignment = () => {
+    if (!job || !selectedEmployee) return;
+    assignEmployeeMutation.mutate({
+      jobId: job.id,
+      employeeId: selectedEmployee.id,
+      startDate: assignmentDates.startDate,
+      endDate: assignmentDates.endDate,
+    });
+  };
 
   if (!job) return null;
 
@@ -1209,53 +1256,77 @@ function JobDetailDialog({
             
             {showAssignEmployees ? (
               <div className="space-y-3">
-                <div className="border rounded-md p-4 max-h-48 overflow-y-auto space-y-2">
+                <div className="border rounded-md p-4 max-h-64 overflow-y-auto">
                   {employees.length === 0 ? (
                     <p className="text-sm text-muted-foreground">No employees available</p>
                   ) : (
-                    employees.map((employee) => (
-                      <div key={employee.id} className="flex items-center space-x-2">
-                        <input
-                          type="checkbox"
-                          id={`detail-employee-${employee.id}`}
-                          checked={selectedEmployeeIds.includes(employee.id)}
-                          onChange={(e) => {
-                            if (e.target.checked) {
-                              setSelectedEmployeeIds([...selectedEmployeeIds, employee.id]);
-                            } else {
-                              setSelectedEmployeeIds(selectedEmployeeIds.filter(id => id !== employee.id));
-                            }
-                          }}
-                          className="rounded border-gray-300"
-                        />
-                        <label
-                          htmlFor={`detail-employee-${employee.id}`}
-                          className="text-sm flex-1 cursor-pointer"
+                    <div className="grid grid-cols-1 gap-2">
+                      {employees.filter(emp => !job.assignedEmployees?.some(assigned => assigned.id === emp.id)).map((employee) => (
+                        <Button
+                          key={employee.id}
+                          variant="outline"
+                          className="w-full justify-start"
+                          onClick={() => handleAssignEmployee(employee)}
+                          data-testid={`button-assign-${employee.id}`}
                         >
+                          <UserCheck className="w-4 h-4 mr-2" />
                           {employee.name} {employee.role && `(${employee.role.replace(/_/g, ' ')})`}
-                        </label>
-                      </div>
-                    ))
+                        </Button>
+                      ))}
+                    </div>
                   )}
                 </div>
-                <Button
-                  onClick={() => assignEmployeesMutation.mutate({ jobId: job.id, employeeIds: selectedEmployeeIds })}
-                  disabled={assignEmployeesMutation.isPending}
-                  className="w-full"
-                  data-testid="button-save-assignments"
-                >
-                  {assignEmployeesMutation.isPending ? "Saving..." : "Save Assignments"}
-                </Button>
               </div>
             ) : (
               <>
-                {job.assignedEmployees && job.assignedEmployees.length > 0 ? (
-                  <div className="flex flex-wrap gap-2">
-                    {job.assignedEmployees.map((employee) => (
-                      <Badge key={employee.id} variant="secondary">
-                        <Users className="w-3 h-3 mr-1" />
-                        {employee.name}
-                      </Badge>
+                {job.employeeAssignments && job.employeeAssignments.length > 0 ? (
+                  <div className="space-y-2">
+                    {job.employeeAssignments.map((assignment) => (
+                      <div key={assignment.assignmentId} className="flex items-center justify-between border rounded-md p-3">
+                        <div className="flex-1">
+                          <div className="font-medium text-sm">{assignment.employee.name}</div>
+                          <div className="text-xs text-muted-foreground">
+                            {assignment.startDate && assignment.endDate ? (
+                              <>
+                                {new Date(assignment.startDate).toLocaleDateString()} - {new Date(assignment.endDate).toLocaleDateString()}
+                              </>
+                            ) : (
+                              <span>Entire job duration</span>
+                            )}
+                          </div>
+                        </div>
+                        <div className="flex gap-2">
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            onClick={() => {
+                              setSelectedEmployee(assignment.employee);
+                              const startDate = assignment.startDate 
+                                ? new Date(assignment.startDate).toISOString().slice(0, 10)
+                                : new Date(job.startDate).toISOString().slice(0, 10);
+                              const endDate = assignment.endDate
+                                ? new Date(assignment.endDate).toISOString().slice(0, 10)
+                                : new Date(job.endDate).toISOString().slice(0, 10);
+                              setAssignmentDates({ startDate, endDate });
+                              setAssignDialogOpen(true);
+                            }}
+                            data-testid={`button-edit-assignment-${assignment.employee.id}`}
+                          >
+                            <Edit2 className="w-3 h-3" />
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            onClick={() => unassignEmployeeMutation.mutate({ 
+                              jobId: job.id, 
+                              assignmentId: assignment.assignmentId 
+                            })}
+                            data-testid={`button-remove-assignment-${assignment.employee.id}`}
+                          >
+                            <UserX className="w-3 h-3" />
+                          </Button>
+                        </div>
+                      </div>
                     ))}
                   </div>
                 ) : (
@@ -1333,6 +1404,61 @@ function JobDetailDialog({
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>
+
+    <Dialog open={assignDialogOpen} onOpenChange={setAssignDialogOpen}>
+      <DialogContent className="max-w-md">
+        <DialogHeader>
+          <DialogTitle>Assign Employee to Job</DialogTitle>
+          <DialogDescription>
+            Specify the date range when {selectedEmployee?.name} will work on this job
+          </DialogDescription>
+        </DialogHeader>
+        
+        <div className="space-y-4">
+          <div>
+            <Label htmlFor="assign-start-date">Start Date</Label>
+            <Input
+              id="assign-start-date"
+              type="date"
+              value={assignmentDates.startDate}
+              onChange={(e) => setAssignmentDates({ ...assignmentDates, startDate: e.target.value })}
+              min={new Date(job.startDate).toISOString().slice(0, 10)}
+              max={new Date(job.endDate).toISOString().slice(0, 10)}
+              data-testid="input-assignment-start-date"
+            />
+          </div>
+          <div>
+            <Label htmlFor="assign-end-date">End Date</Label>
+            <Input
+              id="assign-end-date"
+              type="date"
+              value={assignmentDates.endDate}
+              onChange={(e) => setAssignmentDates({ ...assignmentDates, endDate: e.target.value })}
+              min={assignmentDates.startDate || new Date(job.startDate).toISOString().slice(0, 10)}
+              max={new Date(job.endDate).toISOString().slice(0, 10)}
+              data-testid="input-assignment-end-date"
+            />
+          </div>
+        </div>
+        
+        <DialogFooter>
+          <Button
+            variant="outline"
+            onClick={() => setAssignDialogOpen(false)}
+            data-testid="button-cancel-assignment"
+          >
+            Cancel
+          </Button>
+          <Button
+            onClick={handleSaveAssignment}
+            disabled={assignEmployeeMutation.isPending}
+            data-testid="button-save-assignment"
+          >
+            {assignEmployeeMutation.isPending ? "Assigning..." : "Assign Employee"}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   </>
   );
 }

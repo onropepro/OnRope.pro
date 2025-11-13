@@ -1332,9 +1332,23 @@ export class Storage {
         )
       : [];
     
+    // Map assignments with their metadata
+    const employeeAssignments = assignments.map(assignment => {
+      const employee = assignedEmployees.find(e => e.id === assignment.employeeId);
+      if (!employee) return null;
+      
+      return {
+        assignmentId: assignment.id,
+        employee,
+        startDate: assignment.startDate,
+        endDate: assignment.endDate,
+      };
+    }).filter(Boolean);
+    
     return {
       ...job,
-      assignedEmployees,
+      assignedEmployees, // Keep for backward compatibility
+      employeeAssignments: employeeAssignments as any,
     };
   }
 
