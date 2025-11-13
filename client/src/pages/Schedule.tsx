@@ -8,6 +8,7 @@ import timeGridPlugin from "@fullcalendar/timegrid";
 import interactionPlugin from "@fullcalendar/interaction";
 import type { EventInput, DateSelectArg, EventClickArg } from "@fullcalendar/core";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -743,6 +744,7 @@ function JobDetailDialog({
   const { toast } = useToast();
   const [showAssignEmployees, setShowAssignEmployees] = useState(false);
   const [selectedEmployeeIds, setSelectedEmployeeIds] = useState<string[]>([]);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   const deleteJobMutation = useMutation({
     mutationFn: async (jobId: string) => {
@@ -805,6 +807,7 @@ function JobDetailDialog({
   };
 
   return (
+    <>
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-2xl">
         <DialogHeader>
@@ -939,8 +942,7 @@ function JobDetailDialog({
         <DialogFooter className="gap-2">
           <Button
             variant="destructive"
-            onClick={() => deleteJobMutation.mutate(job.id)}
-            disabled={deleteJobMutation.isPending}
+            onClick={() => setShowDeleteConfirm(true)}
             data-testid="button-delete-job"
           >
             <Trash2 className="w-4 h-4 mr-2" />
@@ -956,6 +958,32 @@ function JobDetailDialog({
         </DialogFooter>
       </DialogContent>
     </Dialog>
+
+    <AlertDialog open={showDeleteConfirm} onOpenChange={setShowDeleteConfirm}>
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>Delete Job?</AlertDialogTitle>
+          <AlertDialogDescription>
+            Are you sure you want to delete "{job?.title}"? This action cannot be undone and will remove all assignments for this job.
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel>Cancel</AlertDialogCancel>
+          <AlertDialogAction
+            onClick={() => {
+              if (job) {
+                deleteJobMutation.mutate(job.id);
+                setShowDeleteConfirm(false);
+              }
+            }}
+            className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+          >
+            Delete Job
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
+  </>
   );
 }
 
