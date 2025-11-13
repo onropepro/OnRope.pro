@@ -1815,7 +1815,7 @@ export default function Dashboard() {
                                         handleClientStrataSelection("manual");
                                         setClientDropdownOpen(false);
                                       }}
-                                      className="!bg-primary !text-primary-foreground font-medium hover:!bg-primary/90"
+                                      className="!bg-primary !text-primary-foreground font-medium hover:!bg-primary/90 rounded-xl mx-2 my-1"
                                     >
                                       <span className="material-icons mr-2 text-sm">edit</span>
                                       Enter Details Manually
