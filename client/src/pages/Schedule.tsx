@@ -197,11 +197,11 @@ export default function Schedule() {
                       job.assignedEmployees?.some(e => e.id === employee.id)
                     );
                     return (
-                      <div key={employee.id} className="p-1 bg-muted/40 rounded text-[11px]">
-                        <div className="font-semibold">{employee.name}</div>
+                      <div key={employee.id} className="p-1.5 bg-green-50 dark:bg-green-950/30 border border-green-200 dark:border-green-800 rounded text-[11px]">
+                        <div className="font-bold text-foreground">{employee.name}</div>
                         <div className="flex flex-wrap gap-0.5 mt-0.5">
                           {employeeJobs.map(job => (
-                            <Badge key={job.id} variant="secondary" className="text-[9px] h-3.5 px-1 py-0">
+                            <Badge key={job.id} variant="default" className="text-[9px] h-4 px-1.5 py-0 bg-green-600 hover:bg-green-700">
                               {job.project?.buildingName || job.title}
                             </Badge>
                           ))}
@@ -224,9 +224,9 @@ export default function Schedule() {
               ) : (
                 <div className="space-y-1">
                   {availableEmployees.map(employee => (
-                    <div key={employee.id} className="p-1 bg-muted/40 rounded text-[11px]">
-                      <div className="font-semibold">{employee.name}</div>
-                      <Badge variant="outline" className="mt-0.5 text-[9px] h-3.5 px-1 py-0">
+                    <div key={employee.id} className="p-1.5 bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800 rounded text-[11px]">
+                      <div className="font-bold text-foreground">{employee.name}</div>
+                      <Badge variant="default" className="mt-0.5 text-[9px] h-4 px-1.5 py-0 bg-blue-600 hover:bg-blue-700">
                         Ready
                       </Badge>
                     </div>
