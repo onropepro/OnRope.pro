@@ -328,8 +328,8 @@ export default function Dashboard() {
   const [showClientDialog, setShowClientDialog] = useState(false);
   const [showEditClientDialog, setShowEditClientDialog] = useState(false);
   const [clientToEdit, setClientToEdit] = useState<Client | null>(null);
-  const [lmsNumbers, setLmsNumbers] = useState<string[]>([""]);
-  const [editLmsNumbers, setEditLmsNumbers] = useState<string[]>([""]);
+  const [lmsNumbers, setLmsNumbers] = useState<Array<{ number: string; address: string }>>([{ number: "", address: "" }]);
+  const [editLmsNumbers, setEditLmsNumbers] = useState<Array<{ number: string; address: string }>>([{ number: "", address: "" }]);
   const [sameAsAddress, setSameAsAddress] = useState(false);
   const [editSameAsAddress, setEditSameAsAddress] = useState(false);
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
@@ -940,14 +940,14 @@ export default function Dashboard() {
       return await apiRequest("POST", "/api/clients", {
         ...clientData,
         companyId: currentUser?.id,
-        lmsNumbers: lmsNumbers.filter(num => num.trim() !== ""),
+        lmsNumbers: lmsNumbers.filter(lms => lms.number.trim() !== ""),
       });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/clients"] });
       setShowClientDialog(false);
       clientForm.reset();
-      setLmsNumbers([""]);
+      setLmsNumbers([{ number: "", address: "" }]);
       setSameAsAddress(false);
       toast({ title: "Client created successfully" });
     },
@@ -961,7 +961,7 @@ export default function Dashboard() {
       const { id, sameAsAddress, ...clientData } = data;
       return await apiRequest("PATCH", `/api/clients/${id}`, {
         ...clientData,
-        lmsNumbers: editLmsNumbers.filter(num => num.trim() !== ""),
+        lmsNumbers: editLmsNumbers.filter(lms => lms.number.trim() !== ""),
       });
     },
     onSuccess: () => {
@@ -969,7 +969,7 @@ export default function Dashboard() {
       setShowEditClientDialog(false);
       setClientToEdit(null);
       editClientForm.reset();
-      setEditLmsNumbers([""]);
+      setEditLmsNumbers([{ number: "", address: "" }]);
       setEditSameAsAddress(false);
       toast({ title: "Client updated successfully" });
     },
@@ -1011,7 +1011,7 @@ export default function Dashboard() {
       billingAddress: client.billingAddress || "",
       sameAsAddress: false,
     });
-    setEditLmsNumbers(client.lmsNumbers && client.lmsNumbers.length > 0 ? client.lmsNumbers : [""]);
+    setEditLmsNumbers(client.lmsNumbers && client.lmsNumbers.length > 0 ? client.lmsNumbers : [{ number: "", address: "" }]);
     setEditSameAsAddress(client.address === client.billingAddress);
     setShowEditClientDialog(true);
   };
@@ -3415,42 +3415,64 @@ export default function Dashboard() {
                         )}
                       />
 
-                      <div className="space-y-2">
-                        <label className="text-sm font-medium">LMS/Strata Plan Numbers</label>
-                        {lmsNumbers.map((lmsNum, index) => (
-                          <div key={index} className="flex gap-2">
-                            <Input
-                              placeholder="LMS1234 or VR5678"
-                              value={lmsNum}
-                              onChange={(e) => {
-                                const newLmsNumbers = [...lmsNumbers];
-                                newLmsNumbers[index] = e.target.value;
-                                setLmsNumbers(newLmsNumbers);
-                              }}
-                              className="h-12"
-                              data-testid={`input-client-lms-${index}`}
-                            />
-                            {lmsNumbers.length > 1 && (
-                              <Button
-                                type="button"
-                                variant="outline"
-                                size="icon"
-                                onClick={() => {
-                                  const newLmsNumbers = lmsNumbers.filter((_, i) => i !== index);
-                                  setLmsNumbers(newLmsNumbers);
-                                }}
-                                data-testid={`button-remove-lms-${index}`}
-                              >
-                                <span className="material-icons">delete</span>
-                              </Button>
-                            )}
-                          </div>
+                      <div className="space-y-3">
+                        <label className="text-sm font-medium">LMS/Strata Plan Numbers & Addresses</label>
+                        {lmsNumbers.map((lms, index) => (
+                          <Card key={index} className="p-3">
+                            <div className="space-y-3">
+                              <div className="flex gap-2 items-start">
+                                <div className="flex-1">
+                                  <label className="text-xs text-muted-foreground mb-1 block">LMS Number</label>
+                                  <Input
+                                    placeholder="LMS1234 or VR5678"
+                                    value={lms.number}
+                                    onChange={(e) => {
+                                      const newLmsNumbers = [...lmsNumbers];
+                                      newLmsNumbers[index] = { ...lms, number: e.target.value };
+                                      setLmsNumbers(newLmsNumbers);
+                                    }}
+                                    className="h-12"
+                                    data-testid={`input-client-lms-number-${index}`}
+                                  />
+                                </div>
+                                {lmsNumbers.length > 1 && (
+                                  <Button
+                                    type="button"
+                                    variant="outline"
+                                    size="icon"
+                                    className="mt-5"
+                                    onClick={() => {
+                                      const newLmsNumbers = lmsNumbers.filter((_, i) => i !== index);
+                                      setLmsNumbers(newLmsNumbers);
+                                    }}
+                                    data-testid={`button-remove-lms-${index}`}
+                                  >
+                                    <span className="material-icons">delete</span>
+                                  </Button>
+                                )}
+                              </div>
+                              <div>
+                                <label className="text-xs text-muted-foreground mb-1 block">Building Address</label>
+                                <Textarea
+                                  placeholder="123 Main St, Vancouver, BC"
+                                  value={lms.address}
+                                  onChange={(e) => {
+                                    const newLmsNumbers = [...lmsNumbers];
+                                    newLmsNumbers[index] = { ...lms, address: e.target.value };
+                                    setLmsNumbers(newLmsNumbers);
+                                  }}
+                                  rows={2}
+                                  data-testid={`input-client-lms-address-${index}`}
+                                />
+                              </div>
+                            </div>
+                          </Card>
                         ))}
                         <Button
                           type="button"
                           variant="outline"
                           size="sm"
-                          onClick={() => setLmsNumbers([...lmsNumbers, ""])}
+                          onClick={() => setLmsNumbers([...lmsNumbers, { number: "", address: "" }])}
                           className="w-full"
                           data-testid="button-add-lms"
                         >
@@ -3545,11 +3567,16 @@ export default function Dashboard() {
                                   </div>
                                 )}
                                 {client.lmsNumbers && client.lmsNumbers.length > 0 && (
-                                  <div className="flex flex-wrap gap-1 mt-2">
+                                  <div className="space-y-2 mt-2">
                                     {client.lmsNumbers.map((lms, idx) => (
-                                      <Badge key={idx} variant="secondary" className="text-xs">
-                                        {lms}
-                                      </Badge>
+                                      <div key={idx} className="text-sm">
+                                        <Badge variant="secondary" className="text-xs mr-2">
+                                          {lms.number}
+                                        </Badge>
+                                        {lms.address && (
+                                          <span className="text-muted-foreground text-xs">{lms.address}</span>
+                                        )}
+                                      </div>
                                     ))}
                                   </div>
                                 )}
@@ -3676,42 +3703,64 @@ export default function Dashboard() {
                 )}
               />
 
-              <div className="space-y-2">
-                <label className="text-sm font-medium">LMS/Strata Plan Numbers</label>
-                {editLmsNumbers.map((lmsNum, index) => (
-                  <div key={index} className="flex gap-2">
-                    <Input
-                      placeholder="LMS1234 or VR5678"
-                      value={lmsNum}
-                      onChange={(e) => {
-                        const newLmsNumbers = [...editLmsNumbers];
-                        newLmsNumbers[index] = e.target.value;
-                        setEditLmsNumbers(newLmsNumbers);
-                      }}
-                      className="h-12"
-                      data-testid={`input-edit-client-lms-${index}`}
-                    />
-                    {editLmsNumbers.length > 1 && (
-                      <Button
-                        type="button"
-                        variant="outline"
-                        size="icon"
-                        onClick={() => {
-                          const newLmsNumbers = editLmsNumbers.filter((_, i) => i !== index);
-                          setEditLmsNumbers(newLmsNumbers);
-                        }}
-                        data-testid={`button-edit-remove-lms-${index}`}
-                      >
-                        <span className="material-icons">delete</span>
-                      </Button>
-                    )}
-                  </div>
+              <div className="space-y-3">
+                <label className="text-sm font-medium">LMS/Strata Plan Numbers & Addresses</label>
+                {editLmsNumbers.map((lms, index) => (
+                  <Card key={index} className="p-3">
+                    <div className="space-y-3">
+                      <div className="flex gap-2 items-start">
+                        <div className="flex-1">
+                          <label className="text-xs text-muted-foreground mb-1 block">LMS Number</label>
+                          <Input
+                            placeholder="LMS1234 or VR5678"
+                            value={lms.number}
+                            onChange={(e) => {
+                              const newLmsNumbers = [...editLmsNumbers];
+                              newLmsNumbers[index] = { ...lms, number: e.target.value };
+                              setEditLmsNumbers(newLmsNumbers);
+                            }}
+                            className="h-12"
+                            data-testid={`input-edit-client-lms-number-${index}`}
+                          />
+                        </div>
+                        {editLmsNumbers.length > 1 && (
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="icon"
+                            className="mt-5"
+                            onClick={() => {
+                              const newLmsNumbers = editLmsNumbers.filter((_, i) => i !== index);
+                              setEditLmsNumbers(newLmsNumbers);
+                            }}
+                            data-testid={`button-edit-remove-lms-${index}`}
+                          >
+                            <span className="material-icons">delete</span>
+                          </Button>
+                        )}
+                      </div>
+                      <div>
+                        <label className="text-xs text-muted-foreground mb-1 block">Building Address</label>
+                        <Textarea
+                          placeholder="123 Main St, Vancouver, BC"
+                          value={lms.address}
+                          onChange={(e) => {
+                            const newLmsNumbers = [...editLmsNumbers];
+                            newLmsNumbers[index] = { ...lms, address: e.target.value };
+                            setEditLmsNumbers(newLmsNumbers);
+                          }}
+                          rows={2}
+                          data-testid={`input-edit-client-lms-address-${index}`}
+                        />
+                      </div>
+                    </div>
+                  </Card>
                 ))}
                 <Button
                   type="button"
                   variant="outline"
                   size="sm"
-                  onClick={() => setEditLmsNumbers([...editLmsNumbers, ""])}
+                  onClick={() => setEditLmsNumbers([...editLmsNumbers, { number: "", address: "" }])}
                   className="w-full"
                   data-testid="button-edit-add-lms"
                 >
