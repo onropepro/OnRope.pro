@@ -1403,10 +1403,16 @@ export class Storage {
       };
     }).filter(Boolean);
     
+    // Fetch project if exists
+    const project = job.projectId 
+      ? await this.getProjectById(job.projectId)
+      : null;
+    
     return {
       ...job,
       assignedEmployees, // Keep for backward compatibility
       employeeAssignments: employeeAssignments as any,
+      project,
     };
   }
 
