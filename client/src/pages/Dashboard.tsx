@@ -912,10 +912,15 @@ export default function Dashboard() {
       billingAddress: "",
     });
     
-    // Close the save dialog and open the client dialog
+    // Close the save dialog
     setShowSaveAsClientDialog(false);
     setProjectDataForClient(null);
-    setShowClientDialog(true);
+    
+    // Switch to Clients tab and open the client dialog
+    setActiveTab("clients");
+    setTimeout(() => {
+      setShowClientDialog(true);
+    }, 100);
   };
 
   const onProjectSubmit = async (data: ProjectFormData) => {
