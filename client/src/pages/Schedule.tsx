@@ -959,6 +959,8 @@ export default function Schedule() {
                   resourceAreaWidth="120px"
                   resourceAreaHeaderContent="Team"
                   slotDuration="01:00:00"
+                  scrollTime={new Date().toTimeString().slice(0, 8)}
+                  nowIndicator={true}
                   data-testid="employee-calendar"
                 />
               </div>
