@@ -277,6 +277,7 @@ function SortableCard({ card, isRearranging }: { card: any; isRearranging: boole
 }
 
 export default function Dashboard() {
+  console.log("[Dashboard] Component mounted/rendered");
   const [activeTab, setActiveTab] = useState("");
 
   // Scroll to top when changing tabs
@@ -1304,7 +1305,11 @@ export default function Dashboard() {
                 <Button
                   variant={isRearranging ? "default" : "outline"}
                   size="sm"
-                  onClick={() => setIsRearranging(!isRearranging)}
+                  onClick={() => {
+                    console.log("[Dashboard] Rearrange button clicked! Current state:", isRearranging);
+                    setIsRearranging(!isRearranging);
+                    console.log("[Dashboard] State toggled to:", !isRearranging);
+                  }}
                   className="gap-2"
                   data-testid="button-rearrange-cards"
                 >
