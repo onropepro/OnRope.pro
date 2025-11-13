@@ -1794,6 +1794,10 @@ export default function Dashboard() {
                       </DialogHeader>
                     </div>
                     <div className="overflow-y-auto flex-1 p-6">
+                      {/* DEBUG */}
+                      <div className="bg-yellow-200 p-2 text-sm font-mono mb-4">
+                        selectedStrataForProject = "{selectedStrataForProject}"
+                      </div>
                       <Form {...projectForm}>
                         {Object.keys(projectForm.formState.errors).length > 0 && (
                           <div className="mb-4 p-4 bg-destructive/10 border border-destructive rounded-md">
