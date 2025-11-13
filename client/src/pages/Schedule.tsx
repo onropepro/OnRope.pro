@@ -640,8 +640,9 @@ function JobDetailDialog({
     mutationFn: async ({ jobId, employeeIds }: { jobId: string; employeeIds: string[] }) => {
       await apiRequest("PUT", `/api/schedule/${jobId}`, { employeeIds });
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/schedule"] });
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ["/api/schedule"] });
+      await queryClient.refetchQueries({ queryKey: ["/api/schedule"] });
       toast({
         title: "Employees assigned",
         description: "Team members have been assigned to this job",
