@@ -26,6 +26,10 @@ const residentSchema = z.object({
 
 const companySchema = z.object({
   companyName: z.string().min(2, "Company name must be at least 2 characters"),
+  name: z.string().min(2, "Owner name must be at least 2 characters"),
+  hourlyRate: z.string().min(1, "Hourly rate is required").refine((val) => !isNaN(parseFloat(val)) && parseFloat(val) >= 0, {
+    message: "Hourly rate must be a valid number",
+  }),
   streetAddress: z.string().min(1, "Street address is required"),
   province: z.string().min(1, "Province is required"),
   country: z.string().min(1, "Country is required"),
@@ -61,6 +65,8 @@ export default function Register() {
     resolver: zodResolver(companySchema),
     defaultValues: {
       companyName: "",
+      name: "",
+      hourlyRate: "",
       streetAddress: "",
       province: "",
       country: "",
@@ -111,6 +117,7 @@ export default function Register() {
           role: "company",
           email: null,
           passwordHash: data.password,
+          hourlyRate: parseFloat(data.hourlyRate),
         }),
         credentials: "include",
       });
@@ -283,6 +290,34 @@ export default function Register() {
                         <FormLabel>Company Name</FormLabel>
                         <FormControl>
                           <Input placeholder="Acme Rope Access Ltd" {...field} data-testid="input-company-name" className="h-12" />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={companyForm.control}
+                    name="name"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Owner Name</FormLabel>
+                        <FormControl>
+                          <Input placeholder="John Smith" {...field} data-testid="input-owner-name" className="h-12" />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={companyForm.control}
+                    name="hourlyRate"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Owner Hourly Rate</FormLabel>
+                        <FormControl>
+                          <Input type="number" step="0.01" placeholder="45.00" {...field} data-testid="input-hourly-rate" className="h-12" />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
