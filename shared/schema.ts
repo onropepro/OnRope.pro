@@ -683,6 +683,14 @@ export const insertClientSchema = createInsertSchema(clients).omit({
   lmsNumbers: z.array(z.object({
     number: z.string(),
     address: z.string(),
+    stories: z.number().optional(),
+    units: z.number().optional(),
+    parkingStalls: z.number().optional(),
+    dailyDropTarget: z.number().optional(),
+    totalDropsNorth: z.number().optional(),
+    totalDropsEast: z.number().optional(),
+    totalDropsSouth: z.number().optional(),
+    totalDropsWest: z.number().optional(),
   })).optional(),
 });
 
