@@ -1795,7 +1795,7 @@ export default function Dashboard() {
                                     <div className="py-6 text-center">
                                       <p className="text-sm text-muted-foreground mb-3">No clients found.</p>
                                       <Button
-                                        variant="default"
+                                        className="bg-primary text-primary-foreground hover:bg-primary/90"
                                         size="default"
                                         onClick={() => {
                                           handleClientStrataSelection("manual");
