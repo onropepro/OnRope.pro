@@ -19,6 +19,7 @@ import { Calendar, Plus, Edit2, Trash2, Users, ArrowLeft, UserCheck, UserX } fro
 import type { ScheduledJobWithAssignments, User } from "@shared/schema";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { DndContext, DragOverlay, useDraggable, useDroppable, closestCenter, DragEndEvent } from '@dnd-kit/core';
 
 export default function Schedule() {
   const { toast } = useToast();
@@ -28,6 +29,7 @@ export default function Schedule() {
   const [detailDialogOpen, setDetailDialogOpen] = useState(false);
   const [selectedJob, setSelectedJob] = useState<ScheduledJobWithAssignments | null>(null);
   const [selectedDates, setSelectedDates] = useState<{ start: Date; end: Date } | null>(null);
+  const [activeEmployeeId, setActiveEmployeeId] = useState<string | null>(null);
 
   // Fetch current user
   const { data: currentUserData } = useQuery({
@@ -128,6 +130,62 @@ export default function Schedule() {
     setDetailDialogOpen(true);
   };
 
+  // Mutation to assign/unassign employees via drag and drop
+  const quickAssignMutation = useMutation({
+    mutationFn: async ({ jobId, employeeIds }: { jobId: string; employeeIds: string[] }) => {
+      await apiRequest("PUT", `/api/schedule/${jobId}`, { employeeIds });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/schedule"] });
+      toast({
+        title: "Assignment updated",
+        description: "Employee assignment has been updated",
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: "Failed to update assignment",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+    
+    if (!over || !active.id) {
+      setActiveEmployeeId(null);
+      return;
+    }
+
+    const employeeId = active.id as string;
+    const jobId = over.id as string;
+
+    // Find the job
+    const job = jobs.find(j => j.id === jobId);
+    if (!job) {
+      setActiveEmployeeId(null);
+      return;
+    }
+
+    // Check if employee is already assigned
+    const currentAssignments = job.assignedEmployees?.map(e => e.id) || [];
+    const isAssigned = currentAssignments.includes(employeeId);
+
+    let newAssignments: string[];
+    if (isAssigned) {
+      // Unassign
+      newAssignments = currentAssignments.filter(id => id !== employeeId);
+    } else {
+      // Assign
+      newAssignments = [...currentAssignments, employeeId];
+    }
+
+    quickAssignMutation.mutate({ jobId, employeeIds: newAssignments });
+    setActiveEmployeeId(null);
+  };
+
   // Get assigned employee IDs from jobs
   const assignedEmployeeIds = new Set(
     jobs.flatMap(job => job.assignedEmployees?.map(e => e.id) || [])
@@ -136,7 +194,10 @@ export default function Schedule() {
   const assignedEmployees = employees.filter(e => assignedEmployeeIds.has(e.id));
   const availableEmployees = employees.filter(e => !assignedEmployeeIds.has(e.id));
 
+  const activeEmployee = employees.find(e => e.id === activeEmployeeId);
+
   return (
+    <DndContext onDragEnd={handleDragEnd} onDragStart={(event) => setActiveEmployeeId(event.active.id as string)}>
     <div className="p-4 md:p-6 space-y-6">
       {/* Back Button */}
       <Button
@@ -197,8 +258,7 @@ export default function Schedule() {
                       job.assignedEmployees?.some(e => e.id === employee.id)
                     );
                     return (
-                      <div key={employee.id} className="p-1.5 bg-green-50 dark:bg-green-950/30 border border-green-200 dark:border-green-800 rounded">
-                        <div className="font-bold text-foreground truncate text-xs">{employee.name}</div>
+                      <DraggableEmployee key={employee.id} employee={employee} type="assigned">
                         <div className="flex flex-wrap gap-0.5 mt-0.5">
                           {employeeJobs.map(job => (
                             <Badge key={job.id} variant="default" className="text-[9px] h-4 px-1.5 py-0 bg-green-600 hover:bg-green-700">
@@ -206,7 +266,7 @@ export default function Schedule() {
                             </Badge>
                           ))}
                         </div>
-                      </div>
+                      </DraggableEmployee>
                     );
                   })}
                 </div>
@@ -224,12 +284,11 @@ export default function Schedule() {
               ) : (
                 <div className="space-y-0.5 max-h-24 overflow-y-auto pr-1">
                   {availableEmployees.map(employee => (
-                    <div key={employee.id} className="p-1.5 bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800 rounded">
-                      <div className="font-bold text-foreground truncate text-xs">{employee.name}</div>
+                    <DraggableEmployee key={employee.id} employee={employee} type="available">
                       <Badge variant="default" className="mt-0.5 text-[9px] h-4 px-1.5 py-0 bg-blue-600 hover:bg-blue-700">
                         Ready
                       </Badge>
-                    </div>
+                    </DraggableEmployee>
                   ))}
                 </div>
               )}
@@ -327,36 +386,7 @@ export default function Schedule() {
               eventContent={(eventInfo) => {
                 const job = eventInfo.event.extendedProps.job as ScheduledJobWithAssignments;
                 
-                return (
-                  <div className="fc-event-main-frame" style={{ padding: '2px 4px', overflow: 'hidden' }}>
-                    <div className="fc-event-title-container">
-                      {job.project?.buildingName && (
-                        <div className="fc-event-title" style={{ fontWeight: 600, fontSize: '0.875rem' }}>
-                          {job.project.buildingName}
-                        </div>
-                      )}
-                      <div style={{ fontSize: '0.75rem', opacity: 0.9, marginTop: '1px' }}>
-                        {job.project?.strataPlanNumber || job.title}
-                      </div>
-                      {job.assignedEmployees && job.assignedEmployees.length > 0 && (
-                        <div style={{ fontSize: '0.7rem', opacity: 1, whiteSpace: 'normal', lineHeight: 1.3, marginTop: '3px' }}>
-                          {job.assignedEmployees.map((employee, idx) => (
-                            <div key={idx} style={{ 
-                              fontWeight: 700, 
-                              backgroundColor: 'rgba(255,255,255,0.25)',
-                              padding: '1px 4px',
-                              borderRadius: '3px',
-                              marginTop: '2px',
-                              display: 'inline-block'
-                            }}>
-                              👤 {employee.name}
-                            </div>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                );
+                return <DroppableCalendarEvent job={job} />;
               }}
             />
           </div>
@@ -391,6 +421,85 @@ export default function Schedule() {
         job={selectedJob}
         employees={employees}
       />
+
+      <DragOverlay>
+        {activeEmployee ? (
+          <div className="p-1.5 bg-primary/90 border-2 border-primary rounded shadow-lg">
+            <div className="font-bold text-primary-foreground text-xs">{activeEmployee.name}</div>
+          </div>
+        ) : null}
+      </DragOverlay>
+    </div>
+    </DndContext>
+  );
+}
+
+// Draggable Employee Component
+function DraggableEmployee({ employee, type, children }: { employee: User; type: 'assigned' | 'available'; children: React.ReactNode }) {
+  const { attributes, listeners, setNodeRef, isDragging } = useDraggable({
+    id: employee.id,
+  });
+
+  const bgColor = type === 'assigned' 
+    ? 'bg-green-50 dark:bg-green-950/30 border-green-200 dark:border-green-800' 
+    : 'bg-blue-50 dark:bg-blue-950/30 border-blue-200 dark:border-blue-800';
+
+  return (
+    <div
+      ref={setNodeRef}
+      {...listeners}
+      {...attributes}
+      className={`p-1.5 ${bgColor} border rounded cursor-grab active:cursor-grabbing ${isDragging ? 'opacity-50' : ''}`}
+    >
+      <div className="font-bold text-foreground truncate text-xs">{employee.name}</div>
+      {children}
+    </div>
+  );
+}
+
+// Droppable Calendar Event Component
+function DroppableCalendarEvent({ job }: { job: ScheduledJobWithAssignments }) {
+  const { setNodeRef, isOver } = useDroppable({
+    id: job.id,
+  });
+
+  return (
+    <div 
+      ref={setNodeRef}
+      className="fc-event-main-frame" 
+      style={{ 
+        padding: '2px 4px', 
+        overflow: 'hidden',
+        backgroundColor: isOver ? 'rgba(14, 165, 233, 0.2)' : undefined,
+        border: isOver ? '2px dashed rgba(14, 165, 233, 0.8)' : undefined,
+      }}
+    >
+      <div className="fc-event-title-container">
+        {job.project?.buildingName && (
+          <div className="fc-event-title" style={{ fontWeight: 600, fontSize: '0.875rem' }}>
+            {job.project.buildingName}
+          </div>
+        )}
+        <div style={{ fontSize: '0.75rem', opacity: 0.9, marginTop: '1px' }}>
+          {job.project?.strataPlanNumber || job.title}
+        </div>
+        {job.assignedEmployees && job.assignedEmployees.length > 0 && (
+          <div style={{ fontSize: '0.7rem', opacity: 1, whiteSpace: 'normal', lineHeight: 1.3, marginTop: '3px' }}>
+            {job.assignedEmployees.map((employee, idx) => (
+              <div key={idx} style={{ 
+                fontWeight: 700, 
+                backgroundColor: 'rgba(255,255,255,0.25)',
+                padding: '1px 4px',
+                borderRadius: '3px',
+                marginTop: '2px',
+                display: 'inline-block'
+              }}>
+                👤 {employee.name}
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   );
 }
