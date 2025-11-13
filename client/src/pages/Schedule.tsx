@@ -61,6 +61,32 @@ export default function Schedule() {
   });
   const employees = employeesData?.employees || [];
 
+  // Transform jobs into employee timeline events for Employee Schedule view
+  const employeeTimelineEvents: EventInput[] = jobs.flatMap((job) => {
+    if (!job.employeeAssignments || job.employeeAssignments.length === 0) {
+      return [];
+    }
+
+    return job.employeeAssignments.map((assignment: any) => {
+      const startDate = assignment.startDate || job.startDate;
+      const endDate = assignment.endDate || job.endDate;
+      
+      return {
+        id: `${job.id}-${assignment.employee.id}`,
+        resourceId: assignment.employee.id,
+        title: job.project?.buildingName || job.title,
+        start: startDate,
+        end: endDate,
+        backgroundColor: job.color || "#0EA5E9",
+        borderColor: job.color || "#0EA5E9",
+        extendedProps: {
+          job,
+          employee: assignment.employee,
+        },
+      };
+    });
+  });
+
   // Transform jobs into FullCalendar events [UPDATED: Testing date filtering]
   // Create separate event blocks for each day in multi-day jobs
   const events: EventInput[] = jobs.flatMap((job) => {
@@ -883,7 +909,7 @@ export default function Schedule() {
                     id: emp.id,
                     title: emp.name,
                   }))}
-                  events={[]}
+                  events={employeeTimelineEvents}
                   height="700px"
                   slotMinTime="07:00:00"
                   slotMaxTime="19:00:00"
