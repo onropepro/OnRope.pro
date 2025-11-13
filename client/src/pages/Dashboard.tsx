@@ -1190,6 +1190,16 @@ export default function Dashboard() {
       borderColor: "#a855f7",
     },
     {
+      id: "clients",
+      label: "Clients",
+      description: "Property managers",
+      icon: "business",
+      onClick: () => handleTabChange("clients"),
+      testId: "button-nav-clients",
+      isVisible: (user: any) => hasPermission(user, "view_clients"), // Permission-based
+      borderColor: "#10b981",
+    },
+    {
       id: "performance",
       label: "Performance",
       description: "View analytics",
@@ -3166,6 +3176,49 @@ export default function Dashboard() {
                 )}
               </CardContent>
             </Card>
+          </div>
+        )}
+
+        {activeTab === "clients" && (
+          <div>
+            <div className="space-y-4">
+              {/* Add Client Button */}
+              <Dialog>
+                <DialogTrigger asChild>
+                  <Button 
+                    className="w-full h-12 gap-2" 
+                    data-testid="button-create-client"
+                    disabled={userIsReadOnly || !hasPermission(currentUser, "manage_clients")}
+                  >
+                    <span className="material-icons">business</span>
+                    Add New Client
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto">
+                  <DialogHeader>
+                    <DialogTitle>Add New Client</DialogTitle>
+                    <DialogDescription>Enter property manager or building owner details</DialogDescription>
+                  </DialogHeader>
+                  <div className="space-y-4">
+                    <p className="text-sm text-muted-foreground">Client form will be implemented here</p>
+                  </div>
+                </DialogContent>
+              </Dialog>
+
+              {/* Clients List */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <span className="material-icons text-primary">business</span>
+                    Client Database
+                  </CardTitle>
+                  <CardDescription>Property managers and building contacts</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-sm text-muted-foreground">Loading clients...</p>
+                </CardContent>
+              </Card>
+            </div>
           </div>
         )}
       </div>
