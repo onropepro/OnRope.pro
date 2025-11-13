@@ -18,7 +18,6 @@ import { useToast } from "@/hooks/use-toast";
 import { Calendar, Plus, Edit2, Trash2, Users, ArrowLeft, UserCheck, UserX } from "lucide-react";
 import type { ScheduledJobWithAssignments, User } from "@shared/schema";
 import { Badge } from "@/components/ui/badge";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 export default function Schedule() {
@@ -173,21 +172,77 @@ export default function Schedule() {
         </Button>
       </div>
 
-      {/* Tabs */}
-      <Tabs defaultValue="calendar" className="w-full">
-        <TabsList className="grid w-full grid-cols-2 max-w-2xl h-12 bg-muted/50">
-          <TabsTrigger value="calendar" className="text-base font-semibold data-[state=active]:bg-card data-[state=active]:shadow-md">
-            <Calendar className="w-4 h-4 mr-2" />
-            Calendar
-          </TabsTrigger>
-          <TabsTrigger value="employees" className="text-base font-semibold data-[state=active]:bg-card data-[state=active]:shadow-md">
-            <Users className="w-4 h-4 mr-2" />
-            Employee Availability
-          </TabsTrigger>
-        </TabsList>
+      {/* Employee Availability */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-lg font-semibold">Employee Availability</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid md:grid-cols-2 gap-4">
+            {/* Assigned Employees */}
+            <div>
+              <div className="flex items-center gap-2 mb-3">
+                <UserCheck className="w-4 h-4 text-green-600" />
+                <h3 className="font-medium">Assigned ({assignedEmployees.length})</h3>
+              </div>
+              {assignedEmployees.length === 0 ? (
+                <p className="text-sm text-muted-foreground">No employees currently assigned</p>
+              ) : (
+                <div className="space-y-2">
+                  {assignedEmployees.map(employee => {
+                    const employeeJobs = jobs.filter(job => 
+                      job.assignedEmployees?.some(e => e.id === employee.id)
+                    );
+                    return (
+                      <div key={employee.id} className="p-2 bg-muted/50 rounded-md">
+                        <div className="font-medium text-sm">{employee.name}</div>
+                        <div className="text-xs text-muted-foreground">
+                          {employee.role && employee.role.replace(/_/g, ' ')}
+                        </div>
+                        <div className="mt-1 flex flex-wrap gap-1">
+                          {employeeJobs.map(job => (
+                            <Badge key={job.id} variant="secondary" className="text-xs">
+                              {job.project?.buildingName || job.title}
+                            </Badge>
+                          ))}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
 
-        <TabsContent value="calendar" className="mt-6">
-          <div className="bg-card rounded-lg shadow-premium p-6">
+            {/* Available Employees */}
+            <div>
+              <div className="flex items-center gap-2 mb-3">
+                <UserX className="w-4 h-4 text-blue-600" />
+                <h3 className="font-medium">Available ({availableEmployees.length})</h3>
+              </div>
+              {availableEmployees.length === 0 ? (
+                <p className="text-sm text-muted-foreground">All employees are assigned</p>
+              ) : (
+                <div className="space-y-2">
+                  {availableEmployees.map(employee => (
+                    <div key={employee.id} className="p-2 bg-muted/50 rounded-md">
+                      <div className="font-medium text-sm">{employee.name}</div>
+                      <div className="text-xs text-muted-foreground">
+                        {employee.role && employee.role.replace(/_/g, ' ')}
+                      </div>
+                      <Badge variant="outline" className="mt-1 text-xs">
+                        Ready for assignment
+                      </Badge>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Calendar */}
+      <div className="bg-card rounded-lg shadow-premium p-6">
         {isLoading ? (
           <div className="flex items-center justify-center h-96">
             <div className="text-muted-foreground">Loading calendar...</div>
@@ -309,82 +364,7 @@ export default function Schedule() {
             />
           </div>
         )}
-          </div>
-        </TabsContent>
-
-        <TabsContent value="employees" className="mt-6">
-          <div className="grid md:grid-cols-2 gap-6">
-            {/* Assigned Employees */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <UserCheck className="w-5 h-5 text-green-600" />
-                  Assigned ({assignedEmployees.length})
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                {assignedEmployees.length === 0 ? (
-                  <p className="text-sm text-muted-foreground">No employees currently assigned</p>
-                ) : (
-                  <div className="space-y-3">
-                    {assignedEmployees.map(employee => {
-                      const employeeJobs = jobs.filter(job => 
-                        job.assignedEmployees?.some(e => e.id === employee.id)
-                      );
-                      return (
-                        <div key={employee.id} className="p-3 bg-muted/50 rounded-lg">
-                          <div className="font-medium">{employee.name}</div>
-                          <div className="text-xs text-muted-foreground mt-1">
-                            {employee.role && employee.role.replace(/_/g, ' ')}
-                          </div>
-                          <div className="mt-2 space-y-1">
-                            {employeeJobs.map(job => (
-                              <div key={job.id} className="text-xs flex items-center gap-1">
-                                <Badge variant="secondary" className="text-xs">
-                                  {job.project?.buildingName || job.title}
-                                </Badge>
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-
-            {/* Available Employees */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <UserX className="w-5 h-5 text-blue-600" />
-                  Available ({availableEmployees.length})
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                {availableEmployees.length === 0 ? (
-                  <p className="text-sm text-muted-foreground">All employees are assigned</p>
-                ) : (
-                  <div className="space-y-3">
-                    {availableEmployees.map(employee => (
-                      <div key={employee.id} className="p-3 bg-muted/50 rounded-lg">
-                        <div className="font-medium">{employee.name}</div>
-                        <div className="text-xs text-muted-foreground mt-1">
-                          {employee.role && employee.role.replace(/_/g, ' ')}
-                        </div>
-                        <Badge variant="outline" className="mt-2 text-xs">
-                          Ready for assignment
-                        </Badge>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          </div>
-        </TabsContent>
-      </Tabs>
+      </div>
 
       {/* Create Job Dialog */}
       <CreateJobDialog
