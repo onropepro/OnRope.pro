@@ -885,6 +885,25 @@ export type InsertScheduledJob = z.infer<typeof insertScheduledJobSchema>;
 export type JobAssignment = typeof jobAssignments.$inferSelect;
 export type InsertJobAssignment = z.infer<typeof insertJobAssignmentSchema>;
 
+// User preferences table
+export const userPreferences = pgTable("user_preferences", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  dashboardCardOrder: text("dashboard_card_order").array(), // Array of card IDs for dashboard
+  hoursAnalyticsCardOrder: text("hours_analytics_card_order").array(), // Array of card IDs for hours analytics page
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const insertUserPreferencesSchema = createInsertSchema(userPreferences).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type UserPreferences = typeof userPreferences.$inferSelect;
+export type InsertUserPreferences = z.infer<typeof insertUserPreferencesSchema>;
+
 // Extended types for frontend use with relations
 export type QuoteWithServices = Quote & {
   services: QuoteService[];
