@@ -1314,7 +1314,7 @@ export class Storage {
     const employeeIds = assignments.map(a => a.employeeId);
     const assignedEmployees = employeeIds.length > 0
       ? await db.select().from(users).where(
-          sql`${users.id} = ANY(${employeeIds})`
+          inArray(users.id, employeeIds)
         )
       : [];
     
