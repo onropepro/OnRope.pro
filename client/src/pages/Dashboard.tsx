@@ -712,14 +712,12 @@ export default function Dashboard() {
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ["/api/projects"] });
       
-      // DEBUG: Show both values
-      alert(`DEBUG:\nState = "${selectedStrataForProject}"\nRef = ${isManualEntryRef.current}`);
-      
-      // Check if manual entry using the ref
-      const wasManualEntry = isManualEntryRef.current;
-      
       // Store project data BEFORE resetting
       const formData = projectForm.getValues();
+      
+      // Check if this project was created from client database or manually
+      // If selectedClientForProject is empty, it means manual entry
+      const wasManualEntry = !selectedClientForProject;
       
       // Close dialog and reset everything
       setShowProjectDialog(false);
@@ -727,7 +725,7 @@ export default function Dashboard() {
       setUploadedPlanFile(null);
       setSelectedClientForProject("");
       setSelectedStrataForProject("");
-      isManualEntryRef.current = false; // Reset the ref
+      isManualEntryRef.current = false;
       
       toast({ title: "Project created successfully" });
       
@@ -1767,10 +1765,6 @@ export default function Dashboard() {
 
         {activeTab === "projects" && (
           <div className="space-y-4">
-            {/* DEBUG: Show current state */}
-            <div className="bg-yellow-200 p-2 text-sm font-mono">
-              DEBUG: selectedStrataForProject = "{selectedStrataForProject}"
-            </div>
             {/* Search and Create */}
             <div className="flex gap-3">
                 <div className="relative flex-1">
@@ -1804,10 +1798,6 @@ export default function Dashboard() {
                       </DialogHeader>
                     </div>
                     <div className="overflow-y-auto flex-1 p-6">
-                      {/* DEBUG */}
-                      <div className="bg-yellow-200 p-2 text-sm font-mono mb-4">
-                        selectedStrataForProject = "{selectedStrataForProject}"
-                      </div>
                       <Form {...projectForm}>
                         {Object.keys(projectForm.formState.errors).length > 0 && (
                           <div className="mb-4 p-4 bg-destructive/10 border border-destructive rounded-md">
