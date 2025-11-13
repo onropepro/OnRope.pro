@@ -3734,6 +3734,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       const jobs = await storage.getScheduledJobsByCompany(companyId);
+      
+      // DEBUG: Log what we're returning for Dryer vent job
+      const dryerJob = jobs.find(j => j.title?.includes("Dryer"));
+      if (dryerJob) {
+        console.log("=== SERVER DEBUG: Dryer vent job ===");
+        console.log("Title:", dryerJob.title);
+        console.log("Start:", dryerJob.startDate, "End:", dryerJob.endDate);
+        console.log("employeeAssignments count:", dryerJob.employeeAssignments?.length);
+        console.log("employeeAssignments:", JSON.stringify(dryerJob.employeeAssignments, null, 2));
+      }
+      
       res.json({ jobs });
     } catch (error) {
       console.error("Get scheduled jobs error:", error);

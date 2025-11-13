@@ -59,15 +59,22 @@ export default function Schedule() {
   });
   const employees = employeesData?.employees || [];
 
-  // Transform jobs into FullCalendar events
+  // Transform jobs into FullCalendar events [UPDATED: Testing date filtering]
   // Create separate event blocks for each day in multi-day jobs
   const events: EventInput[] = jobs.flatMap((job) => {
     // DEBUG: Log the job data to see what we're getting
-    if (job.title.includes("Dryer")) {
-      console.log("=== DEBUG: Dryer vent job ===");
-      console.log("Job:", job);
-      console.log("assignedEmployees:", job.assignedEmployees);
-      console.log("employeeAssignments:", job.employeeAssignments);
+    if (job.title?.includes("Dryer")) {
+      console.log("=== FRONTEND DEBUG: Dryer vent job ===");
+      console.log("employeeAssignments exists?", !!job.employeeAssignments);
+      console.log("employeeAssignments length:", job.employeeAssignments?.length);
+      if (job.employeeAssignments && job.employeeAssignments.length > 0) {
+        const first = job.employeeAssignments[0] as any;
+        console.log("First assignment:", {
+          name: first.employee?.name,
+          startDate: first.startDate,
+          endDate: first.endDate
+        });
+      }
     }
     
     const color = job.color || "#3b82f6";
@@ -106,6 +113,7 @@ export default function Schedule() {
         borderColor: color,
         extendedProps: {
           job,
+          employeesForThisDay, // Pass filtered employees for this day
         },
       }];
     }
@@ -154,6 +162,7 @@ export default function Schedule() {
         borderColor: color,
         extendedProps: {
           job,
+          employeesForThisDay, // Pass filtered employees for this specific day
         },
       });
       currentDate.setDate(currentDate.getDate() + 1);
@@ -698,6 +707,7 @@ export default function Schedule() {
               }}
               eventContent={(eventInfo) => {
                 const job = eventInfo.event.extendedProps.job as ScheduledJobWithAssignments;
+                const employeesForThisDay = eventInfo.event.extendedProps.employeesForThisDay || [];
                 const isHighlighted = activeEmployeeId !== null;
                 const currentlyAssigned = job.assignedEmployees?.some(e => e.id === activeEmployeeId);
                 const isDropTarget = dropTargetJobId === job.id;
@@ -727,9 +737,9 @@ export default function Schedule() {
                       <div style={{ fontSize: '0.75rem', opacity: 0.9, marginTop: '1px' }}>
                         {job.project?.strataPlanNumber || job.title}
                       </div>
-                      {job.assignedEmployees && job.assignedEmployees.length > 0 && (
+                      {employeesForThisDay && employeesForThisDay.length > 0 && (
                         <div style={{ fontSize: '0.7rem', opacity: 1, whiteSpace: 'normal', lineHeight: 1.3, marginTop: '3px' }}>
-                          {job.assignedEmployees.map((employee, idx) => (
+                          {employeesForThisDay.map((assignment: any, idx: number) => (
                             <div key={idx} style={{ 
                               fontWeight: 700, 
                               backgroundColor: 'rgba(255,255,255,0.25)',
@@ -738,7 +748,7 @@ export default function Schedule() {
                               marginTop: '2px',
                               display: 'inline-block'
                             }}>
-                              👤 {employee.name}
+                              👤 {assignment.employee.name}
                             </div>
                           ))}
                         </div>
