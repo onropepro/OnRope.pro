@@ -1158,7 +1158,15 @@ function CreateJobDialog({
   employees: User[];
 }) {
   const { toast } = useToast();
+  
+  // Fetch projects for dropdown
+  const { data: projectsData } = useQuery<{ projects: any[] }>({
+    queryKey: ["/api/projects"],
+  });
+  const projects = projectsData?.projects || [];
+  
   const [formData, setFormData] = useState({
+    projectId: "",
     title: "",
     description: "",
     jobType: "window_cleaning",
@@ -1205,6 +1213,7 @@ function CreateJobDialog({
 
   const resetForm = () => {
     setFormData({
+      projectId: "",
       title: "",
       description: "",
       jobType: "window_cleaning",
@@ -1226,6 +1235,7 @@ function CreateJobDialog({
     const endDate = new Date(formData.endDate);
 
     const result = await createJobMutation.mutateAsync({
+      projectId: formData.projectId || null,
       title: formData.title,
       description: formData.description,
       jobType: formData.jobType,
@@ -1252,15 +1262,38 @@ function CreateJobDialog({
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="title">Job Title *</Label>
+            <Label htmlFor="project">Select Project (Optional)</Label>
+            <Select
+              value={formData.projectId}
+              onValueChange={(value) => setFormData({ ...formData, projectId: value })}
+            >
+              <SelectTrigger data-testid="select-project">
+                <SelectValue placeholder="Choose a project or leave blank for custom job" />
+              </SelectTrigger>
+              <SelectContent>
+                {projects.map((project: any) => (
+                  <SelectItem key={project.id} value={project.id}>
+                    {project.buildingName} - {project.strataPlanNumber}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          
+          <div className="space-y-2">
+            <Label htmlFor="title">Job Title {!formData.projectId && '*'}</Label>
             <Input
               id="title"
               value={formData.title}
               onChange={(e) => setFormData({ ...formData, title: e.target.value })}
               placeholder="e.g., Window Cleaning - North Tower"
-              required
+              required={!formData.projectId}
+              disabled={!!formData.projectId}
               data-testid="input-job-title"
             />
+            {formData.projectId && (
+              <p className="text-xs text-muted-foreground">Project name will be used automatically</p>
+            )}
           </div>
 
           <div className="grid grid-cols-2 gap-4">
