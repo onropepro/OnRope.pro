@@ -1757,6 +1757,10 @@ export default function Dashboard() {
 
         {activeTab === "projects" && (
           <div className="space-y-4">
+            {/* DEBUG: Show current state */}
+            <div className="bg-yellow-200 p-2 text-sm font-mono">
+              DEBUG: selectedStrataForProject = "{selectedStrataForProject}"
+            </div>
             {/* Search and Create */}
             <div className="flex gap-3">
                 <div className="relative flex-1">
