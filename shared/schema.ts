@@ -831,6 +831,9 @@ export const jobAssignments = pgTable("job_assignments", {
   jobId: varchar("job_id").notNull().references(() => scheduledJobs.id, { onDelete: "cascade" }),
   employeeId: varchar("employee_id").notNull().references(() => users.id, { onDelete: "cascade" }),
   
+  startDate: timestamp("start_date"), // Optional: when this employee starts on this job
+  endDate: timestamp("end_date"), // Optional: when this employee ends on this job
+  
   assignedAt: timestamp("assigned_at").defaultNow(),
   assignedBy: varchar("assigned_by").references(() => users.id),
 });
@@ -838,6 +841,9 @@ export const jobAssignments = pgTable("job_assignments", {
 export const insertJobAssignmentSchema = createInsertSchema(jobAssignments).omit({
   id: true,
   assignedAt: true,
+}).extend({
+  startDate: z.coerce.date().optional(),
+  endDate: z.coerce.date().optional(),
 });
 
 // Type exports
