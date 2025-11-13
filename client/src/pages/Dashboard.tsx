@@ -333,8 +333,8 @@ export default function Dashboard() {
   const [showDeleteClientDialog, setShowDeleteClientDialog] = useState(false);
   const [clientToDelete, setClientToDelete] = useState<Client | null>(null);
   const [clientToEdit, setClientToEdit] = useState<Client | null>(null);
-  const [lmsNumbers, setLmsNumbers] = useState<Array<{ number: string; address: string; stories?: number; units?: number; parkingStalls?: number; dailyDropTarget?: number }>>([{ number: "", address: "" }]);
-  const [editLmsNumbers, setEditLmsNumbers] = useState<Array<{ number: string; address: string; stories?: number; units?: number; parkingStalls?: number; dailyDropTarget?: number }>>([{ number: "", address: "" }]);
+  const [lmsNumbers, setLmsNumbers] = useState<Array<{ number: string; address: string; stories?: number; units?: number; parkingStalls?: number; dailyDropTarget?: number; totalDropsNorth?: number; totalDropsEast?: number; totalDropsSouth?: number; totalDropsWest?: number }>>([{ number: "", address: "" }]);
+  const [editLmsNumbers, setEditLmsNumbers] = useState<Array<{ number: string; address: string; stories?: number; units?: number; parkingStalls?: number; dailyDropTarget?: number; totalDropsNorth?: number; totalDropsEast?: number; totalDropsSouth?: number; totalDropsWest?: number }>>([{ number: "", address: "" }]);
   const [sameAsAddress, setSameAsAddress] = useState(false);
   const [editSameAsAddress, setEditSameAsAddress] = useState(false);
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
@@ -840,6 +840,20 @@ export default function Dashboard() {
         
         if (strata.parkingStalls) {
           projectForm.setValue("totalParkingStalls", strata.parkingStalls);
+        }
+        
+        // Populate Total Drops per Elevation if available
+        if (strata.totalDropsNorth !== undefined) {
+          projectForm.setValue("totalDropsNorth", strata.totalDropsNorth);
+        }
+        if (strata.totalDropsEast !== undefined) {
+          projectForm.setValue("totalDropsEast", strata.totalDropsEast);
+        }
+        if (strata.totalDropsSouth !== undefined) {
+          projectForm.setValue("totalDropsSouth", strata.totalDropsSouth);
+        }
+        if (strata.totalDropsWest !== undefined) {
+          projectForm.setValue("totalDropsWest", strata.totalDropsWest);
         }
       }
     }
@@ -3687,6 +3701,71 @@ export default function Dashboard() {
                                     className="h-12"
                                     data-testid={`input-client-lms-daily-drop-target-${index}`}
                                   />
+                                </div>
+                              </div>
+                              <div className="mt-3">
+                                <label className="text-xs text-muted-foreground mb-2 block">Total Drops per Elevation</label>
+                                <div className="grid grid-cols-2 gap-2">
+                                  <div>
+                                    <label className="text-xs text-muted-foreground mb-1 block">North</label>
+                                    <Input
+                                      type="number"
+                                      placeholder="0"
+                                      value={lms.totalDropsNorth || ""}
+                                      onChange={(e) => {
+                                        const newLmsNumbers = [...lmsNumbers];
+                                        newLmsNumbers[index] = { ...lms, totalDropsNorth: e.target.value ? parseInt(e.target.value) : undefined };
+                                        setLmsNumbers(newLmsNumbers);
+                                      }}
+                                      className="h-12"
+                                      data-testid={`input-client-lms-drops-north-${index}`}
+                                    />
+                                  </div>
+                                  <div>
+                                    <label className="text-xs text-muted-foreground mb-1 block">East</label>
+                                    <Input
+                                      type="number"
+                                      placeholder="0"
+                                      value={lms.totalDropsEast || ""}
+                                      onChange={(e) => {
+                                        const newLmsNumbers = [...lmsNumbers];
+                                        newLmsNumbers[index] = { ...lms, totalDropsEast: e.target.value ? parseInt(e.target.value) : undefined };
+                                        setLmsNumbers(newLmsNumbers);
+                                      }}
+                                      className="h-12"
+                                      data-testid={`input-client-lms-drops-east-${index}`}
+                                    />
+                                  </div>
+                                  <div>
+                                    <label className="text-xs text-muted-foreground mb-1 block">South</label>
+                                    <Input
+                                      type="number"
+                                      placeholder="0"
+                                      value={lms.totalDropsSouth || ""}
+                                      onChange={(e) => {
+                                        const newLmsNumbers = [...lmsNumbers];
+                                        newLmsNumbers[index] = { ...lms, totalDropsSouth: e.target.value ? parseInt(e.target.value) : undefined };
+                                        setLmsNumbers(newLmsNumbers);
+                                      }}
+                                      className="h-12"
+                                      data-testid={`input-client-lms-drops-south-${index}`}
+                                    />
+                                  </div>
+                                  <div>
+                                    <label className="text-xs text-muted-foreground mb-1 block">West</label>
+                                    <Input
+                                      type="number"
+                                      placeholder="0"
+                                      value={lms.totalDropsWest || ""}
+                                      onChange={(e) => {
+                                        const newLmsNumbers = [...lmsNumbers];
+                                        newLmsNumbers[index] = { ...lms, totalDropsWest: e.target.value ? parseInt(e.target.value) : undefined };
+                                        setLmsNumbers(newLmsNumbers);
+                                      }}
+                                      className="h-12"
+                                      data-testid={`input-client-lms-drops-west-${index}`}
+                                    />
+                                  </div>
                                 </div>
                               </div>
                             </div>
