@@ -711,16 +711,18 @@ export default function Dashboard() {
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ["/api/projects"] });
       
-      // Check if manual entry BEFORE closing dialog (which clears state)
+      // Check if manual entry
       const wasManualEntry = selectedStrataForProject === "manual";
       
       // Store project data BEFORE resetting
       const formData = projectForm.getValues();
       
-      // Close dialog and reset
+      // Close dialog and reset everything
       setShowProjectDialog(false);
       projectForm.reset();
       setUploadedPlanFile(null);
+      setSelectedClientForProject("");
+      setSelectedStrataForProject("");
       
       toast({ title: "Project created successfully" });
       
@@ -1769,13 +1771,7 @@ export default function Dashboard() {
                     data-testid="input-search-projects"
                   />
                 </div>
-                <Dialog open={showProjectDialog} onOpenChange={(open) => {
-                  setShowProjectDialog(open);
-                  if (!open) {
-                    setSelectedClientForProject("");
-                    setSelectedStrataForProject("");
-                  }
-                }}>
+                <Dialog open={showProjectDialog} onOpenChange={setShowProjectDialog}>
                   <DialogTrigger asChild>
                     <Button 
                       className="h-14 px-6 gap-2 shadow-md hover:shadow-lg text-base font-semibold" 
