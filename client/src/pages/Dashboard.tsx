@@ -1731,10 +1731,9 @@ export default function Dashboard() {
                             </SelectTrigger>
                             <SelectContent>
                               <SelectItem value="manual">Enter Details Manually</SelectItem>
-                              {clientsData && clientsData.length > 0 && (
-                                <>
-                                  {clientsData.map((client) => (
-                                    client.lmsNumbers && client.lmsNumbers.length > 0 && client.lmsNumbers.map((strata, idx) => (
+                              {clientsData && clientsData.length > 0 && clientsData.flatMap((client) => 
+                                client.lmsNumbers && client.lmsNumbers.length > 0 
+                                  ? client.lmsNumbers.map((strata, idx) => (
                                       <SelectItem 
                                         key={`${client.id}-${idx}`} 
                                         value={`${client.id}|${idx}`}
@@ -1742,8 +1741,7 @@ export default function Dashboard() {
                                         {strata.number} - {client.firstName} {client.lastName} {strata.address && `(${strata.address.substring(0, 30)}...)`}
                                       </SelectItem>
                                     ))
-                                  ))}
-                                </>
+                                  : []
                               )}
                             </SelectContent>
                           </Select>
@@ -3585,7 +3583,7 @@ export default function Dashboard() {
                                   />
                                 </div>
                                 <div>
-                                  <label className="text-xs text-muted-foreground mb-1 block">Stalls</label>
+                                  <label className="text-xs text-muted-foreground mb-1 block">Parking Stalls</label>
                                   <Input
                                     type="number"
                                     placeholder="80"
@@ -3920,7 +3918,7 @@ export default function Dashboard() {
                           />
                         </div>
                         <div>
-                          <label className="text-xs text-muted-foreground mb-1 block">Stalls</label>
+                          <label className="text-xs text-muted-foreground mb-1 block">Parking Stalls</label>
                           <Input
                             type="number"
                             placeholder="80"
