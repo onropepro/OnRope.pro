@@ -830,21 +830,21 @@ export default function Dashboard() {
         
         // Always populate all available building details
         // The form will show/hide fields based on selected job type
-        if (strata.stories) {
+        if (strata.stories !== undefined && strata.stories !== null) {
           projectForm.setValue("floorCount", String(strata.stories));
         }
         
         // Populate Total Drops per Elevation if available
-        if (strata.totalDropsNorth !== undefined) {
+        if (strata.totalDropsNorth !== undefined && strata.totalDropsNorth !== null) {
           projectForm.setValue("totalDropsNorth", String(strata.totalDropsNorth));
         }
-        if (strata.totalDropsEast !== undefined) {
+        if (strata.totalDropsEast !== undefined && strata.totalDropsEast !== null) {
           projectForm.setValue("totalDropsEast", String(strata.totalDropsEast));
         }
-        if (strata.totalDropsSouth !== undefined) {
+        if (strata.totalDropsSouth !== undefined && strata.totalDropsSouth !== null) {
           projectForm.setValue("totalDropsSouth", String(strata.totalDropsSouth));
         }
-        if (strata.totalDropsWest !== undefined) {
+        if (strata.totalDropsWest !== undefined && strata.totalDropsWest !== null) {
           projectForm.setValue("totalDropsWest", String(strata.totalDropsWest));
         }
       }
