@@ -154,7 +154,7 @@ const employeeSchema = z.object({
   name: z.string().min(1, "Name is required"),
   email: z.string().email("Invalid email address"),
   password: z.string().min(6, "Password must be at least 6 characters"),
-  role: z.enum(["owner_ceo", "human_resources", "operations_manager", "general_supervisor", "rope_access_supervisor", "account_manager", "rope_access_tech", "manager", "ground_crew", "ground_crew_supervisor"]),
+  role: z.enum(["owner_ceo", "operations_manager", "human_resources", "account_manager", "general_supervisor", "rope_access_supervisor", "manager", "rope_access_tech", "ground_crew_supervisor", "ground_crew"]),
   hourlyRate: z.string().optional(),
   permissions: z.array(z.string()).default([]),
   // New employee details
@@ -178,7 +178,7 @@ const employeeSchema = z.object({
 const editEmployeeSchema = z.object({
   name: z.string().min(1, "Name is required"),
   email: z.string().email("Invalid email address"),
-  role: z.enum(["owner_ceo", "human_resources", "operations_manager", "general_supervisor", "rope_access_supervisor", "account_manager", "rope_access_tech", "manager", "ground_crew", "ground_crew_supervisor"]),
+  role: z.enum(["owner_ceo", "operations_manager", "human_resources", "account_manager", "general_supervisor", "rope_access_supervisor", "manager", "rope_access_tech", "ground_crew_supervisor", "ground_crew"]),
   hourlyRate: z.string().optional(),
   permissions: z.array(z.string()).default([]),
   // New employee details
@@ -2321,15 +2321,15 @@ export default function Dashboard() {
                               </FormControl>
                               <SelectContent>
                                 <SelectItem value="owner_ceo">Owner/CEO</SelectItem>
-                                <SelectItem value="human_resources">Human Resources</SelectItem>
                                 <SelectItem value="operations_manager">Operations Manager</SelectItem>
+                                <SelectItem value="human_resources">Human Resources</SelectItem>
+                                <SelectItem value="account_manager">Account Manager</SelectItem>
                                 <SelectItem value="general_supervisor">General Supervisor</SelectItem>
                                 <SelectItem value="rope_access_supervisor">Rope Access Supervisor</SelectItem>
-                                <SelectItem value="account_manager">Account Manager</SelectItem>
-                                <SelectItem value="rope_access_tech">Rope Access Technician</SelectItem>
                                 <SelectItem value="manager">Manager</SelectItem>
-                                <SelectItem value="ground_crew">Ground Crew</SelectItem>
+                                <SelectItem value="rope_access_tech">Rope Access Technician</SelectItem>
                                 <SelectItem value="ground_crew_supervisor">Ground Crew Supervisor</SelectItem>
+                                <SelectItem value="ground_crew">Ground Crew</SelectItem>
                               </SelectContent>
                             </Select>
                             <FormMessage />
@@ -3157,15 +3157,15 @@ export default function Dashboard() {
                         </FormControl>
                         <SelectContent>
                           <SelectItem value="owner_ceo">Owner/CEO</SelectItem>
-                          <SelectItem value="human_resources">Human Resources</SelectItem>
                           <SelectItem value="operations_manager">Operations Manager</SelectItem>
+                          <SelectItem value="human_resources">Human Resources</SelectItem>
+                          <SelectItem value="account_manager">Account Manager</SelectItem>
                           <SelectItem value="general_supervisor">General Supervisor</SelectItem>
                           <SelectItem value="rope_access_supervisor">Rope Access Supervisor</SelectItem>
-                          <SelectItem value="account_manager">Account Manager</SelectItem>
-                          <SelectItem value="rope_access_tech">Rope Access Tech</SelectItem>
                           <SelectItem value="manager">Manager</SelectItem>
-                          <SelectItem value="ground_crew">Ground Crew</SelectItem>
+                          <SelectItem value="rope_access_tech">Rope Access Tech</SelectItem>
                           <SelectItem value="ground_crew_supervisor">Ground Crew Supervisor</SelectItem>
+                          <SelectItem value="ground_crew">Ground Crew</SelectItem>
                         </SelectContent>
                       </Select>
                       <FormMessage />
