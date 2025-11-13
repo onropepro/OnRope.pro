@@ -956,6 +956,7 @@ export default function Dashboard() {
 
   const startDayMutation = useMutation({
     mutationFn: async (projectId: string) => {
+      alert("🚨 NEW CODE RUNNING - GPS VERSION 2.0");
       const location = await getCurrentLocation();
       console.log("Starting work session with location:", location);
       return apiRequest("POST", `/api/projects/${projectId}/work-sessions/start`, {
