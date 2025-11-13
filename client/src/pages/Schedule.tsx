@@ -608,18 +608,18 @@ export default function Schedule() {
 
       {/* Calendar Tabs */}
       <Tabs defaultValue="job-schedule" className="w-full">
-        <TabsList className="grid w-full max-w-2xl grid-cols-2 h-14 p-1 bg-muted/50 backdrop-blur-sm">
+        <TabsList className="grid w-full max-w-2xl grid-cols-2 h-14 p-1.5 bg-card border-2 border-border shadow-md">
           <TabsTrigger 
             value="job-schedule" 
             data-testid="tab-job-schedule"
-            className="text-base font-bold data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-lg transition-all"
+            className="text-base font-bold bg-background border border-border data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:border-primary data-[state=active]:shadow-lg transition-all"
           >
             Job Schedule
           </TabsTrigger>
           <TabsTrigger 
             value="employee-schedule" 
             data-testid="tab-employee-schedule"
-            className="text-base font-bold data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-lg transition-all"
+            className="text-base font-bold bg-background border border-border data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:border-primary data-[state=active]:shadow-lg transition-all"
           >
             Employee Schedule
           </TabsTrigger>
