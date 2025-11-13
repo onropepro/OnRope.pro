@@ -1815,10 +1815,9 @@ export default function Dashboard() {
                                         handleClientStrataSelection("manual");
                                         setClientDropdownOpen(false);
                                       }}
+                                      className="bg-primary text-primary-foreground font-medium aria-selected:bg-primary/90 aria-selected:text-primary-foreground"
                                     >
-                                      <Check
-                                        className={`mr-2 h-4 w-4 ${selectedStrataForProject === "manual" ? "opacity-100" : "opacity-0"}`}
-                                      />
+                                      <span className="material-icons mr-2 text-sm">edit</span>
                                       Enter Details Manually
                                     </CommandItem>
                                     {clientsData && clientsData.length > 0 && clientsData.flatMap((client) =>
