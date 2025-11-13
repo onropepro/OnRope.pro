@@ -114,20 +114,20 @@ export const clients = pgTable("clients", {
 export const projects = pgTable("projects", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   companyId: varchar("company_id").notNull().references(() => users.id, { onDelete: "cascade" }), // Foreign key to company
-  buildingName: varchar("building_name").notNull(), // Building name for display
-  strataPlanNumber: varchar("strata_plan_number").notNull(),
+  buildingName: varchar("building_name"), // Building name for display
+  strataPlanNumber: varchar("strata_plan_number"),
   buildingAddress: text("building_address"), // Building address visible to all employees
   jobType: varchar("job_type").notNull(), // window_cleaning | dryer_vent_cleaning | pressure_washing | in_suite_dryer_vent_cleaning | parkade_pressure_cleaning | ground_window_cleaning | other
   customJobType: varchar("custom_job_type"), // Custom job type when jobType is "other"
   
   // Elevation-specific drop totals
-  totalDropsNorth: integer("total_drops_north").notNull().default(0),
-  totalDropsEast: integer("total_drops_east").notNull().default(0),
-  totalDropsSouth: integer("total_drops_south").notNull().default(0),
-  totalDropsWest: integer("total_drops_west").notNull().default(0),
+  totalDropsNorth: integer("total_drops_north").default(0),
+  totalDropsEast: integer("total_drops_east").default(0),
+  totalDropsSouth: integer("total_drops_south").default(0),
+  totalDropsWest: integer("total_drops_west").default(0),
   
-  dailyDropTarget: integer("daily_drop_target").notNull(),
-  floorCount: integer("floor_count").notNull(),
+  dailyDropTarget: integer("daily_drop_target"),
+  floorCount: integer("floor_count"),
   targetCompletionDate: date("target_completion_date"), // Optional target completion date
   estimatedHours: integer("estimated_hours"), // Estimated total hours for the entire building
   ropeAccessPlanUrl: text("rope_access_plan_url"), // URL to PDF in object storage
