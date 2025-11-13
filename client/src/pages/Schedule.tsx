@@ -171,6 +171,50 @@ export default function Schedule() {
     },
   });
 
+  // Handle event drag/drop to reschedule jobs
+  const handleEventDrop = (dropInfo: any) => {
+    const job = dropInfo.event.extendedProps.job as ScheduledJobWithAssignments;
+    const daysDelta = dropInfo.delta.days;
+    
+    // Calculate new start and end dates
+    const oldStart = new Date(job.startDate);
+    const oldEnd = new Date(job.endDate);
+    
+    const newStart = new Date(oldStart);
+    newStart.setDate(newStart.getDate() + daysDelta);
+    
+    const newEnd = new Date(oldEnd);
+    newEnd.setDate(newEnd.getDate() + daysDelta);
+    
+    // Update the job with new dates
+    updateJobDatesMutation.mutate({
+      jobId: job.id,
+      startDate: newStart.toISOString().split('T')[0],
+      endDate: newEnd.toISOString().split('T')[0],
+    });
+  };
+
+  // Mutation to update job dates
+  const updateJobDatesMutation = useMutation({
+    mutationFn: async ({ jobId, startDate, endDate }: { jobId: string; startDate: string; endDate: string }) => {
+      await apiRequest("PUT", `/api/schedule/${jobId}`, { startDate, endDate });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/schedule"] });
+      toast({
+        title: "Job rescheduled",
+        description: "All days of the job have been moved",
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: "Failed to reschedule job",
+        variant: "destructive",
+      });
+    },
+  });
+
   const [dropTargetJobId, setDropTargetJobId] = useState<string | null>(null);
   const [dragPosition, setDragPosition] = useState<{ x: number; y: number } | null>(null);
 
@@ -484,6 +528,7 @@ export default function Schedule() {
               events={events}
               select={handleDateSelect}
               eventClick={handleEventClick}
+              eventDrop={handleEventDrop}
               height="700px"
               displayEventTime={false}
               displayEventEnd={false}
