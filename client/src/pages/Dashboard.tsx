@@ -2701,7 +2701,7 @@ export default function Dashboard() {
                             {/* Header - Name and Actions */}
                             <div className="flex items-start justify-between gap-3">
                               <div className="flex-1">
-                                <div className="font-medium text-lg">{employee.name || employee.email}</div>
+                                <div className="font-medium text-lg">{employee.name || employee.companyName || employee.email}</div>
                                 <Badge variant="secondary" className="text-xs capitalize mt-1">
                                   {employee.role.replace(/_/g, ' ')}
                                 </Badge>
@@ -2833,7 +2833,7 @@ export default function Dashboard() {
                                 {/* Header - Name and Actions */}
                                 <div className="flex items-start justify-between gap-3">
                                   <div className="flex-1">
-                                    <div className="font-medium text-lg">{employee.name || employee.email}</div>
+                                    <div className="font-medium text-lg">{employee.name || employee.companyName || employee.email}</div>
                                     <Badge variant="outline" className="text-xs capitalize mt-1">
                                       {employee.role.replace(/_/g, ' ')}
                                     </Badge>
