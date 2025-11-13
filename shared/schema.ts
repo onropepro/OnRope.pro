@@ -104,7 +104,7 @@ export const clients = pgTable("clients", {
   company: varchar("company"),
   address: text("address"),
   phoneNumber: varchar("phone_number"),
-  lmsNumbers: jsonb("lms_numbers").$type<Array<{ number: string; address: string; stories?: number; units?: number; parkingStalls?: number }>>().default(sql`'[]'::jsonb`), // Array of objects with strata number, address, and building details
+  lmsNumbers: jsonb("lms_numbers").$type<Array<{ number: string; address: string; stories?: number; units?: number; parkingStalls?: number; dailyDropTarget?: number }>>().default(sql`'[]'::jsonb`), // Array of objects with strata number, address, building details, and daily drop target
   billingAddress: text("billing_address"),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),

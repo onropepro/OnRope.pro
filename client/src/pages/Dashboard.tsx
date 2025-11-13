@@ -333,8 +333,8 @@ export default function Dashboard() {
   const [showDeleteClientDialog, setShowDeleteClientDialog] = useState(false);
   const [clientToDelete, setClientToDelete] = useState<Client | null>(null);
   const [clientToEdit, setClientToEdit] = useState<Client | null>(null);
-  const [lmsNumbers, setLmsNumbers] = useState<Array<{ number: string; address: string; stories?: number; units?: number; parkingStalls?: number }>>([{ number: "", address: "" }]);
-  const [editLmsNumbers, setEditLmsNumbers] = useState<Array<{ number: string; address: string; stories?: number; units?: number; parkingStalls?: number }>>([{ number: "", address: "" }]);
+  const [lmsNumbers, setLmsNumbers] = useState<Array<{ number: string; address: string; stories?: number; units?: number; parkingStalls?: number; dailyDropTarget?: number }>>([{ number: "", address: "" }]);
+  const [editLmsNumbers, setEditLmsNumbers] = useState<Array<{ number: string; address: string; stories?: number; units?: number; parkingStalls?: number; dailyDropTarget?: number }>>([{ number: "", address: "" }]);
   const [sameAsAddress, setSameAsAddress] = useState(false);
   const [editSameAsAddress, setEditSameAsAddress] = useState(false);
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
@@ -828,21 +828,17 @@ export default function Dashboard() {
         // Optionally set building name from client company or generate from strata
         projectForm.setValue("buildingName", `${strata.number} Building`);
         
-        // Autofill job-type specific fields based on building details
-        const currentJobType = projectForm.getValues("jobType");
-        
-        // For rope access jobs (window cleaning, etc.) - populate floor count
-        if (strata.stories && currentJobType !== "in_suite_dryer_vent_cleaning" && currentJobType !== "parkade_pressure_cleaning") {
+        // Always populate all available building details
+        // The form will show/hide fields based on selected job type
+        if (strata.stories) {
           projectForm.setValue("floorCount", strata.stories);
         }
         
-        // For in-suite dryer vent cleaning - populate total units
-        if (currentJobType === "in_suite_dryer_vent_cleaning" && strata.units) {
+        if (strata.units) {
           projectForm.setValue("totalUnits", strata.units);
         }
         
-        // For parkade pressure cleaning - populate total parking stalls
-        if (currentJobType === "parkade_pressure_cleaning" && strata.parkingStalls) {
+        if (strata.parkingStalls) {
           projectForm.setValue("totalParkingStalls", strata.parkingStalls);
         }
       }
@@ -3631,7 +3627,7 @@ export default function Dashboard() {
                                   data-testid={`input-client-lms-address-${index}`}
                                 />
                               </div>
-                              <div className="grid grid-cols-3 gap-2">
+                              <div className="grid grid-cols-2 gap-2">
                                 <div>
                                   <label className="text-xs text-muted-foreground mb-1 block">Stories</label>
                                   <Input
@@ -3675,6 +3671,21 @@ export default function Dashboard() {
                                     }}
                                     className="h-12"
                                     data-testid={`input-client-lms-parking-${index}`}
+                                  />
+                                </div>
+                                <div>
+                                  <label className="text-xs text-muted-foreground mb-1 block">Daily Drop Target</label>
+                                  <Input
+                                    type="number"
+                                    placeholder="40"
+                                    value={lms.dailyDropTarget || ""}
+                                    onChange={(e) => {
+                                      const newLmsNumbers = [...lmsNumbers];
+                                      newLmsNumbers[index] = { ...lms, dailyDropTarget: e.target.value ? parseInt(e.target.value) : undefined };
+                                      setLmsNumbers(newLmsNumbers);
+                                    }}
+                                    className="h-12"
+                                    data-testid={`input-client-lms-daily-drop-target-${index}`}
                                   />
                                 </div>
                               </div>
