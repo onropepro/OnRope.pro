@@ -174,10 +174,10 @@ export default function Schedule() {
         return dayDateStr >= empStart && dayDateStr <= empEnd;
       }) || [];
       
-      let displayTitle = job.title;
+      let displayTitle = job.project?.buildingName || job.title;
       if (employeesForThisDay.length > 0) {
         const employeeNames = employeesForThisDay.map((a: any) => `${a.employee.name} (${a.employee.role?.replace(/_/g, ' ') || 'Staff'})`).join(", ");
-        displayTitle = `${job.title}\n👥 ${employeeNames}`;
+        displayTitle = `${job.project?.buildingName || job.title}\n👥 ${employeeNames}`;
       }
       
       return [{
@@ -222,10 +222,10 @@ export default function Schedule() {
         return isInRange;
       }) || [];
       
-      let displayTitle = job.title;
+      let displayTitle = job.project?.buildingName || job.title;
       if (employeesForThisDay.length > 0) {
         const employeeNames = employeesForThisDay.map((a: any) => `${a.employee.name} (${a.employee.role?.replace(/_/g, ' ') || 'Staff'})`).join(", ");
-        displayTitle = `${job.title}\n👥 ${employeeNames}`;
+        displayTitle = `${job.project?.buildingName || job.title}\n👥 ${employeeNames}`;
       }
       
       dayEvents.push({
