@@ -51,8 +51,8 @@ import {
 import { CSS } from '@dnd-kit/utilities';
 
 const projectSchema = z.object({
-  strataPlanNumber: z.string().min(1, "Strata plan number is required"),
-  buildingName: z.string().min(1, "Building name is required"),
+  strataPlanNumber: z.string().optional(),
+  buildingName: z.string().optional(),
   buildingAddress: z.string().optional(),
   jobType: z.enum(["window_cleaning", "dryer_vent_cleaning", "pressure_washing", "general_pressure_washing", "gutter_cleaning", "in_suite_dryer_vent_cleaning", "parkade_pressure_cleaning", "ground_window_cleaning", "other"]),
   customJobType: z.string().optional(),
@@ -61,7 +61,7 @@ const projectSchema = z.object({
   totalDropsSouth: z.string().optional(),
   totalDropsWest: z.string().optional(),
   dailyDropTarget: z.string().optional(),
-  floorCount: z.string().min(1, "Floor count is required"),
+  floorCount: z.string().optional(),
   targetCompletionDate: z.string().optional(),
   estimatedHours: z.string().optional(),
   calendarColor: z.string().default("#3b82f6"),
@@ -69,78 +69,6 @@ const projectSchema = z.object({
   suitesPerDay: z.string().optional(),
   floorsPerDay: z.string().optional(),
   stallsPerDay: z.string().optional(),
-}).superRefine((data, ctx) => {
-  // Validate custom job type is required when "other" is selected
-  if (data.jobType === "other" && (!data.customJobType || data.customJobType.trim() === "")) {
-    ctx.addIssue({
-      code: z.ZodIssueCode.custom,
-      message: "Custom job type is required when 'Other' is selected",
-      path: ["customJobType"],
-    });
-  }
-  
-  // Job types that use drop-based tracking
-  const dropBasedJobTypes = ["window_cleaning", "dryer_vent_cleaning", "pressure_washing"];
-  
-  if (dropBasedJobTypes.includes(data.jobType)) {
-    // For drop-based jobs, dailyDropTarget is required
-    if (!data.dailyDropTarget || data.dailyDropTarget.trim() === "") {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: "Daily drop target is required",
-        path: ["dailyDropTarget"],
-      });
-    }
-    
-    // Elevation fields are also required for drop-based jobs
-    if (!data.totalDropsNorth || data.totalDropsNorth.trim() === "") {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: "Total drops (North) is required",
-        path: ["totalDropsNorth"],
-      });
-    }
-    if (!data.totalDropsEast || data.totalDropsEast.trim() === "") {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: "Total drops (East) is required",
-        path: ["totalDropsEast"],
-      });
-    }
-    if (!data.totalDropsSouth || data.totalDropsSouth.trim() === "") {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: "Total drops (South) is required",
-        path: ["totalDropsSouth"],
-      });
-    }
-    if (!data.totalDropsWest || data.totalDropsWest.trim() === "") {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: "Total drops (West) is required",
-        path: ["totalDropsWest"],
-      });
-    }
-  }
-  
-  if (data.jobType === "in_suite_dryer_vent_cleaning") {
-    if (!data.suitesPerDay && !data.floorsPerDay) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: "Either suites per day or floors per day is required for in-suite dryer vent cleaning",
-        path: ["suitesPerDay"],
-      });
-    }
-  }
-  if (data.jobType === "parkade_pressure_cleaning") {
-    if (!data.stallsPerDay) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: "Stalls per day is required for parkade pressure cleaning",
-        path: ["stallsPerDay"],
-      });
-    }
-  }
 });
 
 // Role definitions with icons
@@ -1958,7 +1886,7 @@ export default function Dashboard() {
                           name="buildingAddress"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>Building Address (Optional)</FormLabel>
+                              <FormLabel>Building Address</FormLabel>
                               <FormControl>
                                 <Input placeholder="123 Main St, Vancouver, BC" {...field} data-testid="input-building-address" className="h-12" />
                               </FormControl>
@@ -2191,7 +2119,7 @@ export default function Dashboard() {
                           name="targetCompletionDate"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>Target Completion Date (Optional)</FormLabel>
+                              <FormLabel>Target Completion Date</FormLabel>
                               <FormControl>
                                 <Input type="date" {...field} data-testid="input-target-date" className="h-12" />
                               </FormControl>
@@ -2205,7 +2133,7 @@ export default function Dashboard() {
                           name="estimatedHours"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>Estimated Hours (Optional)</FormLabel>
+                              <FormLabel>Estimated Hours</FormLabel>
                               <FormControl>
                                 <Input type="number" min="1" placeholder="Total estimated hours for entire building" {...field} data-testid="input-estimated-hours" className="h-12" />
                               </FormControl>
