@@ -3988,6 +3988,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       const { employeeId, startDate, endDate } = req.body;
       
+      console.log("[ASSIGN EMPLOYEE] Received request body:", req.body);
+      console.log("[ASSIGN EMPLOYEE] employeeId:", employeeId);
+      console.log("[ASSIGN EMPLOYEE] startDate:", startDate);
+      console.log("[ASSIGN EMPLOYEE] endDate:", endDate);
+      
       if (!employeeId) {
         return res.status(400).json({ message: "employeeId is required" });
       }

@@ -1130,11 +1130,14 @@ function JobDetailDialog({
       startDate?: string; 
       endDate?: string; 
     }) => {
-      await apiRequest("POST", `/api/schedule/${jobId}/assign-employee`, { 
+      console.log("assignEmployeeMutation executing with:", { jobId, employeeId, startDate, endDate });
+      const result = await apiRequest("POST", `/api/schedule/${jobId}/assign-employee`, { 
         employeeId, 
         startDate, 
         endDate 
       });
+      console.log("assignEmployeeMutation result:", result);
+      return result;
     },
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ["/api/schedule"] });
@@ -1192,13 +1195,25 @@ function JobDetailDialog({
   };
 
   const handleSaveAssignment = () => {
-    if (!job || !selectedEmployee) return;
-    assignEmployeeMutation.mutate({
+    console.log("handleSaveAssignment called");
+    console.log("job:", job);
+    console.log("selectedEmployee:", selectedEmployee);
+    console.log("assignmentDates:", assignmentDates);
+    
+    if (!job || !selectedEmployee) {
+      console.log("Missing job or selectedEmployee");
+      return;
+    }
+    
+    const payload = {
       jobId: job.id,
       employeeId: selectedEmployee.id,
       startDate: assignmentDates.startDate,
       endDate: assignmentDates.endDate,
-    });
+    };
+    
+    console.log("Calling mutation with payload:", payload);
+    assignEmployeeMutation.mutate(payload);
   };
 
   if (!job) return null;
