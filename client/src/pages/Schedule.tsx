@@ -229,11 +229,11 @@ export default function Schedule() {
             `}</style>
             <FullCalendar
               plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
-              initialView="timeGridWeek"
+              initialView="dayGridMonth"
               headerToolbar={{
                 left: "prev,next today",
                 center: "title",
-                right: "timeGridWeek,dayGridMonth",
+                right: "dayGridWeek,dayGridMonth",
               }}
               editable={true}
               selectable={true}
@@ -244,15 +244,29 @@ export default function Schedule() {
               select={handleDateSelect}
               eventClick={handleEventClick}
               height="700px"
-              slotMinTime="06:00:00"
-              slotMaxTime="20:00:00"
-              allDaySlot={true}
-              slotDuration="01:00:00"
-              eventMaxStack={2}
               displayEventTime={false}
               displayEventEnd={false}
               eventDisplay="block"
               data-testid="calendar"
+              eventContent={(eventInfo) => {
+                const job = eventInfo.event.extendedProps.job as ScheduledJobWithAssignments;
+                const employeeNames = job.assignedEmployees?.map(e => e.name).join(", ");
+                
+                return (
+                  <div className="fc-event-main-frame" style={{ padding: '2px 4px', overflow: 'hidden' }}>
+                    <div className="fc-event-title-container">
+                      <div className="fc-event-title" style={{ fontWeight: 500, fontSize: '0.875rem' }}>
+                        {job.title}
+                      </div>
+                      {employeeNames && (
+                        <div style={{ fontSize: '0.7rem', opacity: 0.95, marginTop: '1px', whiteSpace: 'normal', lineHeight: 1.2 }}>
+                          👥 {employeeNames}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                );
+              }}
             />
           </div>
         )}
