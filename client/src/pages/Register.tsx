@@ -4,7 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage, FormDescription } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ArrowLeft } from "lucide-react";
@@ -27,7 +27,7 @@ const residentSchema = z.object({
 const companySchema = z.object({
   companyName: z.string().min(2, "Company name must be at least 2 characters"),
   name: z.string().min(2, "Owner name must be at least 2 characters"),
-  hourlyRate: z.string().min(1, "Hourly rate is required").refine((val) => !isNaN(parseFloat(val)) && parseFloat(val) >= 0, {
+  hourlyRate: z.string().optional().refine((val) => !val || (!isNaN(parseFloat(val)) && parseFloat(val) >= 0), {
     message: "Hourly rate must be a valid number",
   }),
   streetAddress: z.string().min(1, "Street address is required"),
@@ -315,10 +315,13 @@ export default function Register() {
                     name="hourlyRate"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Owner Hourly Rate</FormLabel>
+                        <FormLabel>Owner Hourly Rate (Optional)</FormLabel>
                         <FormControl>
                           <Input type="number" step="0.01" placeholder="45.00" {...field} data-testid="input-hourly-rate" className="h-12" />
                         </FormControl>
+                        <FormDescription className="text-muted-foreground text-sm">
+                          Used for financial analytics if you work on jobs alongside your team
+                        </FormDescription>
                         <FormMessage />
                       </FormItem>
                     )}
