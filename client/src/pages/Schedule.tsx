@@ -1261,7 +1261,12 @@ function JobDetailDialog({
                     <p className="text-sm text-muted-foreground">No employees available</p>
                   ) : (
                     <div className="grid grid-cols-1 gap-2">
-                      {employees.filter(emp => !job.assignedEmployees?.some(assigned => assigned.id === emp.id)).map((employee) => (
+                      {employees.filter(emp => {
+                        // Check if employee is already assigned using the new structure
+                        const isAssigned = job.employeeAssignments?.some(assignment => assignment.employee.id === emp.id) ||
+                                          job.assignedEmployees?.some(assigned => assigned.id === emp.id);
+                        return !isAssigned;
+                      }).map((employee) => (
                         <Button
                           key={employee.id}
                           variant="outline"
