@@ -57,10 +57,11 @@ export default function Schedule() {
     const endDay = new Date(end.getFullYear(), end.getMonth(), end.getDate());
     
     if (startDay.getTime() === endDay.getTime()) {
-      const employeeCount = job.assignedEmployees?.length || 0;
-      const displayTitle = employeeCount > 0 
-        ? `${job.title} (${employeeCount} ${employeeCount === 1 ? 'person' : 'people'})`
-        : job.title;
+      let displayTitle = job.title;
+      if (job.assignedEmployees && job.assignedEmployees.length > 0) {
+        const employeeNames = job.assignedEmployees.map(e => e.name).join(", ");
+        displayTitle = `${job.title}\n👥 ${employeeNames}`;
+      }
       
       return [{
         id: job.id,
@@ -84,10 +85,11 @@ export default function Schedule() {
       const eventEnd = new Date(currentDate);
       eventEnd.setDate(eventEnd.getDate() + 1);
       
-      const employeeCount = job.assignedEmployees?.length || 0;
-      const displayTitle = employeeCount > 0 
-        ? `${job.title} (${employeeCount} ${employeeCount === 1 ? 'person' : 'people'})`
-        : job.title;
+      let displayTitle = job.title;
+      if (job.assignedEmployees && job.assignedEmployees.length > 0) {
+        const employeeNames = job.assignedEmployees.map(e => e.name).join(", ");
+        displayTitle = `${job.title}\n👥 ${employeeNames}`;
+      }
       
       dayEvents.push({
         id: `${job.id}-${currentDate.toISOString().split('T')[0]}`,
