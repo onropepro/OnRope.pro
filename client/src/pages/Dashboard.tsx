@@ -54,7 +54,8 @@ const projectSchema = z.object({
   strataPlanNumber: z.string().min(1, "Strata plan number is required"),
   buildingName: z.string().min(1, "Building name is required"),
   buildingAddress: z.string().optional(),
-  jobType: z.enum(["window_cleaning", "dryer_vent_cleaning", "pressure_washing", "general_pressure_washing", "gutter_cleaning", "in_suite_dryer_vent_cleaning", "parkade_pressure_cleaning", "ground_window_cleaning"]),
+  jobType: z.enum(["window_cleaning", "dryer_vent_cleaning", "pressure_washing", "general_pressure_washing", "gutter_cleaning", "in_suite_dryer_vent_cleaning", "parkade_pressure_cleaning", "ground_window_cleaning", "other"]),
+  customJobType: z.string().optional(),
   totalDropsNorth: z.string().optional(),
   totalDropsEast: z.string().optional(),
   totalDropsSouth: z.string().optional(),
@@ -69,6 +70,15 @@ const projectSchema = z.object({
   floorsPerDay: z.string().optional(),
   stallsPerDay: z.string().optional(),
 }).superRefine((data, ctx) => {
+  // Validate custom job type is required when "other" is selected
+  if (data.jobType === "other" && (!data.customJobType || data.customJobType.trim() === "")) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: "Custom job type is required when 'Other' is selected",
+      path: ["customJobType"],
+    });
+  }
+  
   // Job types that use drop-based tracking
   const dropBasedJobTypes = ["window_cleaning", "dryer_vent_cleaning", "pressure_washing"];
   
@@ -490,6 +500,7 @@ export default function Dashboard() {
       buildingName: "",
       buildingAddress: "",
       jobType: "window_cleaning",
+      customJobType: "",
       totalDropsNorth: "",
       totalDropsEast: "",
       totalDropsSouth: "",
@@ -1980,12 +1991,34 @@ export default function Dashboard() {
                                   <SelectItem value="in_suite_dryer_vent_cleaning">In-Suite Dryer Vent Cleaning</SelectItem>
                                   <SelectItem value="parkade_pressure_cleaning">Parkade Pressure Cleaning</SelectItem>
                                   <SelectItem value="ground_window_cleaning">Ground Window Cleaning</SelectItem>
+                                  <SelectItem value="other">Other</SelectItem>
                                 </SelectContent>
                               </Select>
                               <FormMessage />
                             </FormItem>
                           )}
                         />
+
+                        {projectForm.watch("jobType") === "other" && (
+                          <FormField
+                            control={projectForm.control}
+                            name="customJobType"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Custom Job Type</FormLabel>
+                                <FormControl>
+                                  <Input 
+                                    placeholder="Enter custom job type" 
+                                    {...field} 
+                                    className="h-12" 
+                                    data-testid="input-custom-job-type" 
+                                  />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                        )}
 
                         {projectForm.watch("jobType") === "in_suite_dryer_vent_cleaning" && (
                           <>
