@@ -151,11 +151,15 @@ export default function Schedule() {
     },
   });
 
+  const [dropTargetJobId, setDropTargetJobId] = useState<string | null>(null);
+
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
     
+    setActiveEmployeeId(null);
+    
     if (!over || !active.id) {
-      setActiveEmployeeId(null);
+      setDropTargetJobId(null);
       return;
     }
 
@@ -165,7 +169,7 @@ export default function Schedule() {
     // Find the job
     const job = jobs.find(j => j.id === jobId);
     if (!job) {
-      setActiveEmployeeId(null);
+      setDropTargetJobId(null);
       return;
     }
 
@@ -183,7 +187,7 @@ export default function Schedule() {
     }
 
     quickAssignMutation.mutate({ jobId, employeeIds: newAssignments });
-    setActiveEmployeeId(null);
+    setDropTargetJobId(null);
   };
 
   // Get assigned employee IDs from jobs
@@ -197,7 +201,15 @@ export default function Schedule() {
   const activeEmployee = employees.find(e => e.id === activeEmployeeId);
 
   return (
-    <DndContext onDragEnd={handleDragEnd} onDragStart={(event) => setActiveEmployeeId(event.active.id as string)}>
+    <DndContext 
+      onDragEnd={handleDragEnd} 
+      onDragStart={(event) => setActiveEmployeeId(event.active.id as string)}
+      onDragOver={(event) => {
+        if (event.over) {
+          setDropTargetJobId(event.over.id as string);
+        }
+      }}
+    >
     <div className="p-4 md:p-6 space-y-6">
       {/* Back Button */}
       <Button
@@ -304,6 +316,7 @@ export default function Schedule() {
             <div className="text-muted-foreground">Loading calendar...</div>
           </div>
         ) : (
+          <DroppableCalendar jobs={jobs}>
           <div className="schedule-calendar-wrapper">
             <style>{`
               .schedule-calendar-wrapper .fc {
@@ -385,11 +398,51 @@ export default function Schedule() {
               data-testid="calendar"
               eventContent={(eventInfo) => {
                 const job = eventInfo.event.extendedProps.job as ScheduledJobWithAssignments;
+                const isDropTarget = dropTargetJobId === job.id;
                 
-                return <DroppableCalendarEvent job={job} />;
+                return (
+                  <div 
+                    className="fc-event-main-frame" 
+                    style={{ 
+                      padding: '2px 4px', 
+                      overflow: 'hidden',
+                      backgroundColor: isDropTarget ? 'rgba(14, 165, 233, 0.3)' : undefined,
+                      outline: isDropTarget ? '2px dashed rgba(14, 165, 233, 1)' : undefined,
+                      outlineOffset: '-2px',
+                    }}
+                  >
+                    <div className="fc-event-title-container">
+                      {job.project?.buildingName && (
+                        <div className="fc-event-title" style={{ fontWeight: 600, fontSize: '0.875rem' }}>
+                          {job.project.buildingName}
+                        </div>
+                      )}
+                      <div style={{ fontSize: '0.75rem', opacity: 0.9, marginTop: '1px' }}>
+                        {job.project?.strataPlanNumber || job.title}
+                      </div>
+                      {job.assignedEmployees && job.assignedEmployees.length > 0 && (
+                        <div style={{ fontSize: '0.7rem', opacity: 1, whiteSpace: 'normal', lineHeight: 1.3, marginTop: '3px' }}>
+                          {job.assignedEmployees.map((employee, idx) => (
+                            <div key={idx} style={{ 
+                              fontWeight: 700, 
+                              backgroundColor: 'rgba(255,255,255,0.25)',
+                              padding: '1px 4px',
+                              borderRadius: '3px',
+                              marginTop: '2px',
+                              display: 'inline-block'
+                            }}>
+                              👤 {employee.name}
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                );
               }}
             />
           </div>
+          </DroppableCalendar>
         )}
       </div>
 
@@ -457,50 +510,39 @@ function DraggableEmployee({ employee, type, children }: { employee: User; type:
   );
 }
 
-// Droppable Calendar Event Component
-function DroppableCalendarEvent({ job }: { job: ScheduledJobWithAssignments }) {
-  const { setNodeRef, isOver } = useDroppable({
+// Droppable Calendar Wrapper
+function DroppableCalendar({ jobs, children }: { jobs: ScheduledJobWithAssignments[]; children: React.ReactNode }) {
+  const { setNodeRef } = useDroppable({
+    id: 'calendar-drop-zone',
+    data: { jobs },
+  });
+
+  return (
+    <div ref={setNodeRef} className="relative">
+      {/* Create droppable overlay zones for each job */}
+      {jobs.map(job => (
+        <DroppableJobZone key={job.id} job={job} />
+      ))}
+      {children}
+    </div>
+  );
+}
+
+// Individual droppable zone for each job
+function DroppableJobZone({ job }: { job: ScheduledJobWithAssignments }) {
+  const { setNodeRef } = useDroppable({
     id: job.id,
   });
 
   return (
     <div 
       ref={setNodeRef}
-      className="fc-event-main-frame" 
-      style={{ 
-        padding: '2px 4px', 
-        overflow: 'hidden',
-        backgroundColor: isOver ? 'rgba(14, 165, 233, 0.2)' : undefined,
-        border: isOver ? '2px dashed rgba(14, 165, 233, 0.8)' : undefined,
+      style={{
+        position: 'absolute',
+        pointerEvents: 'none',
+        zIndex: 1,
       }}
-    >
-      <div className="fc-event-title-container">
-        {job.project?.buildingName && (
-          <div className="fc-event-title" style={{ fontWeight: 600, fontSize: '0.875rem' }}>
-            {job.project.buildingName}
-          </div>
-        )}
-        <div style={{ fontSize: '0.75rem', opacity: 0.9, marginTop: '1px' }}>
-          {job.project?.strataPlanNumber || job.title}
-        </div>
-        {job.assignedEmployees && job.assignedEmployees.length > 0 && (
-          <div style={{ fontSize: '0.7rem', opacity: 1, whiteSpace: 'normal', lineHeight: 1.3, marginTop: '3px' }}>
-            {job.assignedEmployees.map((employee, idx) => (
-              <div key={idx} style={{ 
-                fontWeight: 700, 
-                backgroundColor: 'rgba(255,255,255,0.25)',
-                padding: '1px 4px',
-                borderRadius: '3px',
-                marginTop: '2px',
-                display: 'inline-block'
-              }}>
-                👤 {employee.name}
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
-    </div>
+    />
   );
 }
 
