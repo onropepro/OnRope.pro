@@ -174,9 +174,15 @@ export default function Schedule() {
 
       {/* Tabs */}
       <Tabs defaultValue="calendar" className="w-full">
-        <TabsList className="grid w-full grid-cols-2 max-w-md">
-          <TabsTrigger value="calendar">Calendar</TabsTrigger>
-          <TabsTrigger value="employees">Employee Availability</TabsTrigger>
+        <TabsList className="grid w-full grid-cols-2 max-w-2xl h-12 bg-muted/50">
+          <TabsTrigger value="calendar" className="text-base font-semibold data-[state=active]:bg-card data-[state=active]:shadow-md">
+            <Calendar className="w-4 h-4 mr-2" />
+            Calendar
+          </TabsTrigger>
+          <TabsTrigger value="employees" className="text-base font-semibold data-[state=active]:bg-card data-[state=active]:shadow-md">
+            <Users className="w-4 h-4 mr-2" />
+            Employee Availability
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="calendar" className="mt-6">
