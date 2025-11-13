@@ -269,6 +269,7 @@ export default function Schedule() {
         open={detailDialogOpen}
         onOpenChange={setDetailDialogOpen}
         job={selectedJob}
+        employees={employees}
         onEdit={() => {
           setDetailDialogOpen(false);
           setSelectedJob(selectedJob);
@@ -602,13 +603,17 @@ function JobDetailDialog({
   onOpenChange,
   job,
   onEdit,
+  employees,
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   job: ScheduledJobWithAssignments | null;
   onEdit: () => void;
+  employees: User[];
 }) {
   const { toast } = useToast();
+  const [showAssignEmployees, setShowAssignEmployees] = useState(false);
+  const [selectedEmployeeIds, setSelectedEmployeeIds] = useState<string[]>([]);
 
   const deleteJobMutation = useMutation({
     mutationFn: async (jobId: string) => {
@@ -630,6 +635,35 @@ function JobDetailDialog({
       });
     },
   });
+
+  const assignEmployeesMutation = useMutation({
+    mutationFn: async ({ jobId, employeeIds }: { jobId: string; employeeIds: string[] }) => {
+      const response = await apiRequest("PUT", `/api/schedule/${jobId}`, { employeeIds });
+      return await response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/schedule"] });
+      toast({
+        title: "Employees assigned",
+        description: "Team members have been assigned to this job",
+      });
+      setShowAssignEmployees(false);
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: "Failed to assign employees",
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Initialize selected employees when job changes
+  useEffect(() => {
+    if (job) {
+      setSelectedEmployeeIds(job.assignedEmployees?.map(e => e.id) || []);
+    }
+  }, [job]);
 
   if (!job) return null;
 
@@ -676,20 +710,76 @@ function JobDetailDialog({
           </div>
 
           <div>
-            <h3 className="font-medium text-sm mb-2">Assigned Team Members</h3>
-            {job.assignedEmployees && job.assignedEmployees.length > 0 ? (
-              <div className="flex flex-wrap gap-2">
-                {job.assignedEmployees.map((employee) => (
-                  <Badge key={employee.id} variant="secondary">
-                    <Users className="w-3 h-3 mr-1" />
-                    {employee.name}
-                  </Badge>
-                ))}
+            <div className="flex items-center justify-between mb-2">
+              <h3 className="font-medium text-sm">Assigned Team Members</h3>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setShowAssignEmployees(!showAssignEmployees)}
+                data-testid="button-assign-employees"
+              >
+                <Users className="w-4 h-4 mr-1" />
+                {showAssignEmployees ? "Cancel" : "Assign Employees"}
+              </Button>
+            </div>
+            
+            {showAssignEmployees ? (
+              <div className="space-y-3">
+                <div className="border rounded-md p-4 max-h-48 overflow-y-auto space-y-2">
+                  {employees.length === 0 ? (
+                    <p className="text-sm text-muted-foreground">No employees available</p>
+                  ) : (
+                    employees.map((employee) => (
+                      <div key={employee.id} className="flex items-center space-x-2">
+                        <input
+                          type="checkbox"
+                          id={`detail-employee-${employee.id}`}
+                          checked={selectedEmployeeIds.includes(employee.id)}
+                          onChange={(e) => {
+                            if (e.target.checked) {
+                              setSelectedEmployeeIds([...selectedEmployeeIds, employee.id]);
+                            } else {
+                              setSelectedEmployeeIds(selectedEmployeeIds.filter(id => id !== employee.id));
+                            }
+                          }}
+                          className="rounded border-gray-300"
+                        />
+                        <label
+                          htmlFor={`detail-employee-${employee.id}`}
+                          className="text-sm flex-1 cursor-pointer"
+                        >
+                          {employee.name} {employee.role && `(${employee.role.replace(/_/g, ' ')})`}
+                        </label>
+                      </div>
+                    ))
+                  )}
+                </div>
+                <Button
+                  onClick={() => assignEmployeesMutation.mutate({ jobId: job.id, employeeIds: selectedEmployeeIds })}
+                  disabled={assignEmployeesMutation.isPending}
+                  className="w-full"
+                  data-testid="button-save-assignments"
+                >
+                  {assignEmployeesMutation.isPending ? "Saving..." : "Save Assignments"}
+                </Button>
               </div>
             ) : (
-              <p className="text-sm text-muted-foreground">
-                No team members assigned. Click Edit to assign employees.
-              </p>
+              <>
+                {job.assignedEmployees && job.assignedEmployees.length > 0 ? (
+                  <div className="flex flex-wrap gap-2">
+                    {job.assignedEmployees.map((employee) => (
+                      <Badge key={employee.id} variant="secondary">
+                        <Users className="w-3 h-3 mr-1" />
+                        {employee.name}
+                      </Badge>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-sm text-muted-foreground">
+                    No team members assigned yet
+                  </p>
+                )}
+              </>
             )}
           </div>
 
