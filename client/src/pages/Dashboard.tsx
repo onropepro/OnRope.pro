@@ -4121,6 +4121,86 @@ export default function Dashboard() {
                           />
                         </div>
                       </div>
+                      <div>
+                        <label className="text-xs text-muted-foreground mb-1 block">Daily Drop Target</label>
+                        <Input
+                          type="number"
+                          placeholder="40"
+                          value={lms.dailyDropTarget || ""}
+                          onChange={(e) => {
+                            const newLmsNumbers = [...editLmsNumbers];
+                            newLmsNumbers[index] = { ...lms, dailyDropTarget: e.target.value ? parseInt(e.target.value) : undefined };
+                            setEditLmsNumbers(newLmsNumbers);
+                          }}
+                          className="h-12"
+                          data-testid={`input-edit-client-lms-daily-drop-target-${index}`}
+                        />
+                      </div>
+                      <div className="mt-3">
+                        <label className="text-xs text-muted-foreground mb-2 block">Total Drops per Elevation</label>
+                        <div className="grid grid-cols-2 gap-2">
+                          <div>
+                            <label className="text-xs text-muted-foreground mb-1 block">North</label>
+                            <Input
+                              type="number"
+                              placeholder="0"
+                              value={lms.totalDropsNorth || ""}
+                              onChange={(e) => {
+                                const newLmsNumbers = [...editLmsNumbers];
+                                newLmsNumbers[index] = { ...lms, totalDropsNorth: e.target.value ? parseInt(e.target.value) : undefined };
+                                setEditLmsNumbers(newLmsNumbers);
+                              }}
+                              className="h-12"
+                              data-testid={`input-edit-client-lms-drops-north-${index}`}
+                            />
+                          </div>
+                          <div>
+                            <label className="text-xs text-muted-foreground mb-1 block">East</label>
+                            <Input
+                              type="number"
+                              placeholder="0"
+                              value={lms.totalDropsEast || ""}
+                              onChange={(e) => {
+                                const newLmsNumbers = [...editLmsNumbers];
+                                newLmsNumbers[index] = { ...lms, totalDropsEast: e.target.value ? parseInt(e.target.value) : undefined };
+                                setEditLmsNumbers(newLmsNumbers);
+                              }}
+                              className="h-12"
+                              data-testid={`input-edit-client-lms-drops-east-${index}`}
+                            />
+                          </div>
+                          <div>
+                            <label className="text-xs text-muted-foreground mb-1 block">South</label>
+                            <Input
+                              type="number"
+                              placeholder="0"
+                              value={lms.totalDropsSouth || ""}
+                              onChange={(e) => {
+                                const newLmsNumbers = [...editLmsNumbers];
+                                newLmsNumbers[index] = { ...lms, totalDropsSouth: e.target.value ? parseInt(e.target.value) : undefined };
+                                setEditLmsNumbers(newLmsNumbers);
+                              }}
+                              className="h-12"
+                              data-testid={`input-edit-client-lms-drops-south-${index}`}
+                            />
+                          </div>
+                          <div>
+                            <label className="text-xs text-muted-foreground mb-1 block">West</label>
+                            <Input
+                              type="number"
+                              placeholder="0"
+                              value={lms.totalDropsWest || ""}
+                              onChange={(e) => {
+                                const newLmsNumbers = [...editLmsNumbers];
+                                newLmsNumbers[index] = { ...lms, totalDropsWest: e.target.value ? parseInt(e.target.value) : undefined };
+                                setEditLmsNumbers(newLmsNumbers);
+                              }}
+                              className="h-12"
+                              data-testid={`input-edit-client-lms-drops-west-${index}`}
+                            />
+                          </div>
+                        </div>
+                      </div>
                     </div>
                   </Card>
                 ))}
