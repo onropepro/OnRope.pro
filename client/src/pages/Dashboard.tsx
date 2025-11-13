@@ -1752,6 +1752,10 @@ export default function Dashboard() {
 
         {activeTab === "projects" && (
           <div className="space-y-4">
+            {/* TEST BUTTON - REMOVE AFTER TESTING */}
+            <Button onClick={() => setShowSaveAsClientDialog(true)} className="bg-red-500">
+              TEST: Show Save Dialog
+            </Button>
             {/* Search and Create */}
             <div className="flex gap-3">
                 <div className="relative flex-1">
