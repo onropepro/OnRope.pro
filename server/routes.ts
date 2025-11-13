@@ -3902,6 +3902,34 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get user preferences
+  app.get("/api/user-preferences", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const preferences = await storage.getUserPreferences(req.session.userId!);
+      res.json({ preferences });
+    } catch (error) {
+      console.error("Get user preferences error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Update user preferences
+  app.post("/api/user-preferences", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const { dashboardCardOrder, hoursAnalyticsCardOrder } = req.body;
+      
+      const preferences = await storage.updateUserPreferences(req.session.userId!, {
+        dashboardCardOrder,
+        hoursAnalyticsCardOrder,
+      });
+      
+      res.json({ preferences });
+    } catch (error) {
+      console.error("Update user preferences error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }

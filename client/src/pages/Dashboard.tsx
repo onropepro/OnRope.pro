@@ -347,6 +347,12 @@ export default function Dashboard() {
     queryKey: ["/api/user"],
   });
 
+  // Fetch user preferences
+  const { data: preferencesData } = useQuery({
+    queryKey: ["/api/user-preferences"],
+    enabled: !!userData?.user,
+  });
+
   // Extract user from userData for use throughout component
   const user = userData?.user;
 
@@ -1160,20 +1166,15 @@ export default function Dashboard() {
   });
 
   // Load saved card order from localStorage
+  // Load saved card order from backend preferences
   useEffect(() => {
-    const savedOrder = localStorage.getItem('dashboardCardOrder');
-    if (savedOrder) {
-      try {
-        const orderArray = JSON.parse(savedOrder);
-        setCardOrder(orderArray);
-      } catch (e) {
-        console.error('Error loading card order:', e);
-        setCardOrder(dashboardCards.map(c => c.id));
-      }
+    if (preferencesData?.preferences?.dashboardCardOrder) {
+      setCardOrder(preferencesData.preferences.dashboardCardOrder);
     } else {
+      // Default order
       setCardOrder(dashboardCards.map(c => c.id));
     }
-  }, [currentUser]); // Re-run when user changes (different permissions = different cards)
+  }, [preferencesData, currentUser]); // Re-run when preferences or user changes
 
   // Sort cards based on saved order
   const sortedDashboardCards = [...dashboardCards].sort((a, b) => {
@@ -1185,6 +1186,16 @@ export default function Dashboard() {
   });
 
   // Handle drag end
+  // Mutation to save preferences
+  const updatePreferencesMutation = useMutation({
+    mutationFn: async (updates: { dashboardCardOrder?: string[], hoursAnalyticsCardOrder?: string[] }) => {
+      return apiRequest("/api/user-preferences", "POST", updates);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/user-preferences"] });
+    },
+  });
+
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
     
@@ -1194,7 +1205,9 @@ export default function Dashboard() {
       
       const newOrder = arrayMove(sortedDashboardCards, oldIndex, newIndex).map(c => c.id);
       setCardOrder(newOrder);
-      localStorage.setItem('dashboardCardOrder', JSON.stringify(newOrder));
+      
+      // Save to backend
+      updatePreferencesMutation.mutate({ dashboardCardOrder: newOrder });
     }
   };
 
@@ -1202,7 +1215,10 @@ export default function Dashboard() {
   const resetCardOrder = () => {
     const defaultOrder = dashboardCards.map(c => c.id);
     setCardOrder(defaultOrder);
-    localStorage.removeItem('dashboardCardOrder');
+    
+    // Save to backend
+    updatePreferencesMutation.mutate({ dashboardCardOrder: defaultOrder });
+    
     toast({ title: "Layout reset", description: "Dashboard cards restored to default order" });
   };
 

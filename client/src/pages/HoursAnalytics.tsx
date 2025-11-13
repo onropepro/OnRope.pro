@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation } from "@tanstack/react-query";
+import { queryClient, apiRequest } from "@/lib/queryClient";
 import { useLocation } from "wouter";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -99,6 +100,12 @@ export default function HoursAnalytics() {
   // Fetch current user
   const { data: userData } = useQuery({
     queryKey: ["/api/user"],
+  });
+
+  // Fetch user preferences
+  const { data: preferencesData } = useQuery({
+    queryKey: ["/api/user-preferences"],
+    enabled: !!userData?.user,
   });
 
   // Fetch all work sessions for the company (billable hours)
@@ -434,22 +441,14 @@ export default function HoursAnalytics() {
     },
   ];
 
-  // Load saved card order from localStorage
+  // Load saved card order from backend preferences
   useEffect(() => {
-    const savedOrder = localStorage.getItem('hoursAnalyticsCardOrder');
-    if (savedOrder) {
-      setStatsCardOrder(JSON.parse(savedOrder));
+    if (preferencesData?.preferences?.hoursAnalyticsCardOrder) {
+      setStatsCardOrder(preferencesData.preferences.hoursAnalyticsCardOrder);
     } else {
       setStatsCardOrder(defaultStatsCards.map(c => c.id));
     }
-  }, []);
-
-  // Save card order to localStorage whenever it changes
-  useEffect(() => {
-    if (statsCardOrder.length > 0) {
-      localStorage.setItem('hoursAnalyticsCardOrder', JSON.stringify(statsCardOrder));
-    }
-  }, [statsCardOrder]);
+  }, [preferencesData]);
 
   // Sort stats cards based on saved order
   const sortedStatsCards = statsCardOrder.length > 0
@@ -457,6 +456,16 @@ export default function HoursAnalytics() {
         .map(id => defaultStatsCards.find(c => c.id === id))
         .filter(Boolean)
     : defaultStatsCards;
+
+  // Mutation to save preferences
+  const updatePreferencesMutation = useMutation({
+    mutationFn: async (updates: { dashboardCardOrder?: string[], hoursAnalyticsCardOrder?: string[] }) => {
+      return apiRequest("/api/user-preferences", "POST", updates);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/user-preferences"] });
+    },
+  });
 
   // Handle drag end
   const handleDragEnd = (event: any) => {
@@ -466,7 +475,12 @@ export default function HoursAnalytics() {
       setStatsCardOrder((items) => {
         const oldIndex = items.indexOf(active.id);
         const newIndex = items.indexOf(over.id);
-        return arrayMove(items, oldIndex, newIndex);
+        const newOrder = arrayMove(items, oldIndex, newIndex);
+        
+        // Save to backend
+        updatePreferencesMutation.mutate({ hoursAnalyticsCardOrder: newOrder });
+        
+        return newOrder;
       });
     }
   };
@@ -475,7 +489,9 @@ export default function HoursAnalytics() {
   const resetCardOrder = () => {
     const defaultOrder = defaultStatsCards.map(c => c.id);
     setStatsCardOrder(defaultOrder);
-    localStorage.setItem('hoursAnalyticsCardOrder', JSON.stringify(defaultOrder));
+    
+    // Save to backend
+    updatePreferencesMutation.mutate({ hoursAnalyticsCardOrder: defaultOrder });
   };
 
   return (
