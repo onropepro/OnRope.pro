@@ -306,8 +306,19 @@ export default function Schedule() {
                         </div>
                         <div className="flex flex-wrap gap-0.5 mt-0.5">
                           {employeeJobs.map(job => (
-                            <Badge key={job.id} variant="default" className="text-[9px] h-4 px-1.5 py-0 bg-green-600 hover:bg-green-700">
-                              {job.project?.buildingName || job.title}
+                            <Badge 
+                              key={job.id} 
+                              variant="default" 
+                              className="text-[9px] h-4 px-1.5 py-0 bg-green-600 hover:bg-red-600 cursor-pointer transition-colors"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                const currentAssignments = job.assignedEmployees?.map(e => e.id) || [];
+                                const newAssignments = currentAssignments.filter(id => id !== employee.id);
+                                quickAssignMutation.mutate({ jobId: job.id, employeeIds: newAssignments });
+                              }}
+                              title="Click to remove from this job"
+                            >
+                              {job.project?.buildingName || job.title} ✕
                             </Badge>
                           ))}
                         </div>
