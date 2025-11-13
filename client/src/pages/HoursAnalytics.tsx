@@ -9,6 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from "recharts";
 import { ArrowLeft, Clock, Users, TrendingUp, Award } from "lucide-react";
+import { SessionDetailsDialog } from "@/components/SessionDetailsDialog";
 import {
   DndContext,
   closestCenter,
@@ -84,6 +85,8 @@ export default function HoursAnalytics() {
   const [modalOpen, setModalOpen] = useState<string | null>(null);
   const [statsCardOrder, setStatsCardOrder] = useState<string[]>([]);
   const [isRearranging, setIsRearranging] = useState(false);
+  const [selectedSession, setSelectedSession] = useState<any>(null);
+  const [sessionDetailsOpen, setSessionDetailsOpen] = useState(false);
   
   // Drag-and-drop sensors
   const sensors = useSensors(
@@ -1083,7 +1086,15 @@ export default function HoursAnalytics() {
                       : '0.0';
                     
                     return (
-                      <Card key={session.id} className="p-4">
+                      <Card 
+                        key={session.id} 
+                        className="p-4 cursor-pointer hover-elevate active-elevate-2"
+                        onClick={() => {
+                          setSelectedSession(session);
+                          setSessionDetailsOpen(true);
+                        }}
+                        data-testid={`session-${session.id}`}
+                      >
                         <div className="flex items-center justify-between">
                           <div>
                             <div className="font-semibold">{session.employeeName || 'Unknown'}</div>
@@ -1197,6 +1208,15 @@ export default function HoursAnalytics() {
             </div>
           </DialogContent>
         </Dialog>
+
+        {/* Session Details Dialog with Map */}
+        <SessionDetailsDialog
+          open={sessionDetailsOpen}
+          onOpenChange={setSessionDetailsOpen}
+          session={selectedSession}
+          employeeName={selectedSession?.employeeName}
+          projectName={selectedSession?.projectName || selectedSession?.project?.buildingName}
+        />
       </div>
     </div>
   );

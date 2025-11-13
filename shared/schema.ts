@@ -156,6 +156,12 @@ export const workSessions = pgTable("work_sessions", {
   startTime: timestamp("start_time").notNull(),
   endTime: timestamp("end_time"), // Null if session is still active
   
+  // Location tracking for session start/end
+  startLatitude: numeric("start_latitude", { precision: 10, scale: 7 }), // GPS latitude at session start
+  startLongitude: numeric("start_longitude", { precision: 10, scale: 7 }), // GPS longitude at session start
+  endLatitude: numeric("end_latitude", { precision: 10, scale: 7 }), // GPS latitude at session end
+  endLongitude: numeric("end_longitude", { precision: 10, scale: 7 }), // GPS longitude at session end
+  
   // Elevation-specific drops completed
   dropsCompletedNorth: integer("drops_completed_north").default(0),
   dropsCompletedEast: integer("drops_completed_east").default(0),
@@ -179,6 +185,13 @@ export const nonBillableWorkSessions = pgTable("non_billable_work_sessions", {
   startTime: timestamp("start_time").notNull(),
   endTime: timestamp("end_time"), // Null if session is still active
   description: text("description").notNull(), // What they were doing (errands, training, etc.)
+  
+  // Location tracking for session start/end
+  startLatitude: numeric("start_latitude", { precision: 10, scale: 7 }), // GPS latitude at session start
+  startLongitude: numeric("start_longitude", { precision: 10, scale: 7 }), // GPS longitude at session start
+  endLatitude: numeric("end_latitude", { precision: 10, scale: 7 }), // GPS latitude at session end
+  endLongitude: numeric("end_longitude", { precision: 10, scale: 7 }), // GPS longitude at session end
+  
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 }, (table) => [
