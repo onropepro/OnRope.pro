@@ -14,7 +14,7 @@ export interface User {
 export const MANAGEMENT_ROLES = ['company', 'owner_ceo', 'human_resources', 'accounting', 'operations_manager', 'general_supervisor', 'rope_access_supervisor', 'account_manager'];
 
 // Worker roles
-export const WORKER_ROLES = ['rope_access_tech', 'manager', 'ground_crew', 'ground_crew_supervisor'];
+export const WORKER_ROLES = ['rope_access_tech', 'manager', 'ground_crew', 'ground_crew_supervisor', 'labourer'];
 
 // All employee roles (management + workers) that should access the dashboard
 export const EMPLOYEE_ROLES = [...MANAGEMENT_ROLES, ...WORKER_ROLES];
