@@ -31,6 +31,15 @@ export default function Schedule() {
   const [selectedJob, setSelectedJob] = useState<ScheduledJobWithAssignments | null>(null);
   const [selectedDates, setSelectedDates] = useState<{ start: Date; end: Date } | null>(null);
   const [activeEmployeeId, setActiveEmployeeId] = useState<string | null>(null);
+  
+  // Shared assignment dialog state (used by both drag-drop and job detail button)
+  const [assignmentDialogOpen, setAssignmentDialogOpen] = useState(false);
+  const [selectedEmployeeForAssignment, setSelectedEmployeeForAssignment] = useState<User | null>(null);
+  const [jobForAssignment, setJobForAssignment] = useState<ScheduledJobWithAssignments | null>(null);
+  const [assignmentDates, setAssignmentDates] = useState<{ startDate: string; endDate: string }>({
+    startDate: "",
+    endDate: "",
+  });
 
   // Fetch current user
   const { data: currentUserData } = useQuery({
@@ -151,7 +160,41 @@ export default function Schedule() {
     setDetailDialogOpen(true);
   };
 
-  // Mutation to assign/unassign employees via drag and drop
+  // Shared mutation for assigning employee with date range
+  const assignEmployeeMutation = useMutation({
+    mutationFn: async ({ jobId, employeeId, startDate, endDate }: { 
+      jobId: string; 
+      employeeId: string; 
+      startDate?: string; 
+      endDate?: string; 
+    }) => {
+      return await apiRequest("POST", `/api/schedule/${jobId}/assign-employee`, { 
+        employeeId, 
+        startDate, 
+        endDate 
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/schedule"] });
+      toast({
+        title: "Employee assigned",
+        description: "Team member has been assigned with specified dates",
+      });
+      setAssignmentDialogOpen(false);
+      setSelectedEmployeeForAssignment(null);
+      setJobForAssignment(null);
+      setAssignmentDates({ startDate: "", endDate: "" });
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: "Failed to assign employee",
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Mutation to assign/unassign employees via drag and drop (legacy quick assign)
   const quickAssignMutation = useMutation({
     mutationFn: async ({ jobId, employeeIds }: { jobId: string; employeeIds: string[] }) => {
       await apiRequest("PUT", `/api/schedule/${jobId}`, { employeeIds });
@@ -318,23 +361,44 @@ export default function Schedule() {
       return;
     }
 
+    // Find the employee
+    const employee = employees.find(e => e.id === employeeId);
+    if (!employee) {
+      setActiveEmployeeId(null);
+      setDropTargetJobId(null);
+      setDragPosition(null);
+      return;
+    }
+
     // Check if employee is already assigned
     const currentAssignments = job.assignedEmployees?.map(e => e.id) || [];
     const isAssigned = currentAssignments.includes(employeeId);
 
-    let newAssignments: string[];
     if (isAssigned) {
-      // Unassign
-      newAssignments = currentAssignments.filter(id => id !== employeeId);
+      // If already assigned, unassign directly
+      const newAssignments = currentAssignments.filter(id => id !== employeeId);
+      quickAssignMutation.mutate({ jobId, employeeIds: newAssignments });
+      setActiveEmployeeId(null);
+      setDropTargetJobId(null);
+      setDragPosition(null);
     } else {
-      // Assign
-      newAssignments = [...currentAssignments, employeeId];
+      // If not assigned, open date picker dialog
+      setJobForAssignment(job);
+      setSelectedEmployeeForAssignment(employee);
+      
+      // Initialize dates with job's full range
+      const jobStartDate = new Date(job.startDate).toISOString().slice(0, 10);
+      const jobEndDate = new Date(job.endDate).toISOString().slice(0, 10);
+      setAssignmentDates({ startDate: jobStartDate, endDate: jobEndDate });
+      
+      // Open the assignment dialog
+      setAssignmentDialogOpen(true);
+      
+      // Clear drag state
+      setActiveEmployeeId(null);
+      setDropTargetJobId(null);
+      setDragPosition(null);
     }
-
-    quickAssignMutation.mutate({ jobId, employeeIds: newAssignments });
-    setActiveEmployeeId(null);
-    setDropTargetJobId(null);
-    setDragPosition(null);
   };
 
   // Get assigned employee IDs from jobs
@@ -687,6 +751,71 @@ export default function Schedule() {
         job={selectedJob}
         employees={employees}
       />
+
+      {/* Shared Assignment Dialog (used by drag-drop and job detail button) */}
+      {jobForAssignment && selectedEmployeeForAssignment && (
+        <Sheet open={assignmentDialogOpen} onOpenChange={setAssignmentDialogOpen}>
+          <SheetContent>
+            <SheetHeader>
+              <SheetTitle>Assign Employee to Job</SheetTitle>
+              <SheetDescription>
+                Specify the date range when {selectedEmployeeForAssignment.name} will work on this job
+              </SheetDescription>
+            </SheetHeader>
+            
+            <div className="space-y-4 mt-6">
+              <div>
+                <Label htmlFor="assign-start-date">Start Date</Label>
+                <Input
+                  id="assign-start-date"
+                  type="date"
+                  value={assignmentDates.startDate}
+                  onChange={(e) => setAssignmentDates({ ...assignmentDates, startDate: e.target.value })}
+                  min={new Date(jobForAssignment.startDate).toISOString().slice(0, 10)}
+                  max={new Date(jobForAssignment.endDate).toISOString().slice(0, 10)}
+                  data-testid="input-assignment-start-date"
+                />
+              </div>
+              <div>
+                <Label htmlFor="assign-end-date">End Date</Label>
+                <Input
+                  id="assign-end-date"
+                  type="date"
+                  value={assignmentDates.endDate}
+                  onChange={(e) => setAssignmentDates({ ...assignmentDates, endDate: e.target.value })}
+                  min={assignmentDates.startDate || new Date(jobForAssignment.startDate).toISOString().slice(0, 10)}
+                  max={new Date(jobForAssignment.endDate).toISOString().slice(0, 10)}
+                  data-testid="input-assignment-end-date"
+                />
+              </div>
+            </div>
+            
+            <SheetFooter className="mt-6">
+              <Button
+                variant="outline"
+                onClick={() => setAssignmentDialogOpen(false)}
+                data-testid="button-cancel-assignment"
+              >
+                Cancel
+              </Button>
+              <Button
+                onClick={() => {
+                  assignEmployeeMutation.mutate({
+                    jobId: jobForAssignment.id,
+                    employeeId: selectedEmployeeForAssignment.id,
+                    startDate: assignmentDates.startDate,
+                    endDate: assignmentDates.endDate,
+                  });
+                }}
+                disabled={assignEmployeeMutation.isPending}
+                data-testid="button-save-assignment"
+              >
+                {assignEmployeeMutation.isPending ? "Assigning..." : "Assign Employee"}
+              </Button>
+            </SheetFooter>
+          </SheetContent>
+        </Sheet>
+      )}
 
       <DragOverlay>
         {activeEmployee ? (
