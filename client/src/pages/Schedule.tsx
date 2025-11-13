@@ -154,8 +154,11 @@ export default function Schedule() {
     }
     
     const color = job.color || "#3b82f6";
-    const start = new Date(job.startDate);
-    const end = new Date(job.endDate);
+    // Use project dates if job is linked to a project, otherwise use job dates
+    const startDate = job.project?.startDate || job.startDate;
+    const endDate = job.project?.endDate || job.endDate;
+    const start = new Date(startDate);
+    const end = new Date(endDate);
     
     // If same day, return single event
     const startDay = new Date(start.getFullYear(), start.getMonth(), start.getDate());
@@ -183,8 +186,8 @@ export default function Schedule() {
       return [{
         id: job.id,
         title: displayTitle,
-        start: job.startDate,
-        end: job.endDate,
+        start: startDate,
+        end: endDate,
         backgroundColor: color,
         borderColor: color,
         extendedProps: {
