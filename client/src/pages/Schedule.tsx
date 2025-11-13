@@ -710,15 +710,16 @@ function JobDetailDialog({
           </div>
 
           <div>
-            <div className="flex items-center justify-between mb-2">
+            <div className="flex items-center justify-between mb-3">
               <h3 className="font-medium text-sm">Assigned Team Members</h3>
               <Button
-                variant="outline"
-                size="sm"
+                variant={showAssignEmployees ? "outline" : "default"}
+                size="default"
                 onClick={() => setShowAssignEmployees(!showAssignEmployees)}
                 data-testid="button-assign-employees"
+                className="gap-2"
               >
-                <Users className="w-4 h-4 mr-1" />
+                <Users className="w-4 h-4" />
                 {showAssignEmployees ? "Cancel" : "Assign Employees"}
               </Button>
             </div>
