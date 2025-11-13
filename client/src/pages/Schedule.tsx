@@ -175,8 +175,8 @@ export default function Schedule() {
       {/* Employee Availability */}
       <Card className="border-2 border-primary bg-gradient-to-r from-primary/10 to-primary/5 shadow-lg">
         <CardHeader className="pb-1 pt-2">
-          <CardTitle className="text-xs font-bold flex items-center gap-1.5 text-primary">
-            <Users className="w-3.5 h-3.5" />
+          <CardTitle className="text-sm font-bold flex items-center gap-1.5 text-primary">
+            <Users className="w-4 h-4" />
             EMPLOYEE AVAILABILITY
           </CardTitle>
         </CardHeader>
@@ -185,11 +185,11 @@ export default function Schedule() {
             {/* Assigned Employees */}
             <div className="bg-card rounded p-1.5 border-l-4 border-l-green-600 shadow-sm">
               <div className="flex items-center gap-1 mb-1">
-                <UserCheck className="w-3 h-3 text-green-600" />
-                <h3 className="font-bold text-[10px] text-green-700">Assigned ({assignedEmployees.length})</h3>
+                <UserCheck className="w-3.5 h-3.5 text-green-600" />
+                <h3 className="font-bold text-xs text-green-700">Assigned ({assignedEmployees.length})</h3>
               </div>
               {assignedEmployees.length === 0 ? (
-                <p className="text-[10px] text-muted-foreground">No employees assigned</p>
+                <p className="text-xs text-muted-foreground">No employees assigned</p>
               ) : (
                 <div className="space-y-0.5 max-h-24 overflow-y-auto pr-1">
                   {assignedEmployees.map(employee => {
@@ -197,11 +197,11 @@ export default function Schedule() {
                       job.assignedEmployees?.some(e => e.id === employee.id)
                     );
                     return (
-                      <div key={employee.id} className="p-1 bg-green-50 dark:bg-green-950/30 border border-green-200 dark:border-green-800 rounded text-[10px]">
-                        <div className="font-bold text-foreground truncate">{employee.name}</div>
+                      <div key={employee.id} className="p-1.5 bg-green-50 dark:bg-green-950/30 border border-green-200 dark:border-green-800 rounded">
+                        <div className="font-bold text-foreground truncate text-xs">{employee.name}</div>
                         <div className="flex flex-wrap gap-0.5 mt-0.5">
                           {employeeJobs.map(job => (
-                            <Badge key={job.id} variant="default" className="text-[8px] h-3.5 px-1 py-0 bg-green-600 hover:bg-green-700">
+                            <Badge key={job.id} variant="default" className="text-[9px] h-4 px-1.5 py-0 bg-green-600 hover:bg-green-700">
                               {job.project?.buildingName || job.title}
                             </Badge>
                           ))}
@@ -216,17 +216,17 @@ export default function Schedule() {
             {/* Available Employees */}
             <div className="bg-card rounded p-1.5 border-l-4 border-l-blue-600 shadow-sm">
               <div className="flex items-center gap-1 mb-1">
-                <UserX className="w-3 h-3 text-blue-600" />
-                <h3 className="font-bold text-[10px] text-blue-700">Available ({availableEmployees.length})</h3>
+                <UserX className="w-3.5 h-3.5 text-blue-600" />
+                <h3 className="font-bold text-xs text-blue-700">Available ({availableEmployees.length})</h3>
               </div>
               {availableEmployees.length === 0 ? (
-                <p className="text-[10px] text-muted-foreground">All employees assigned</p>
+                <p className="text-xs text-muted-foreground">All employees assigned</p>
               ) : (
                 <div className="space-y-0.5 max-h-24 overflow-y-auto pr-1">
                   {availableEmployees.map(employee => (
-                    <div key={employee.id} className="p-1 bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800 rounded text-[10px]">
-                      <div className="font-bold text-foreground truncate">{employee.name}</div>
-                      <Badge variant="default" className="mt-0.5 text-[8px] h-3.5 px-1 py-0 bg-blue-600 hover:bg-blue-700">
+                    <div key={employee.id} className="p-1.5 bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800 rounded">
+                      <div className="font-bold text-foreground truncate text-xs">{employee.name}</div>
+                      <Badge variant="default" className="mt-0.5 text-[9px] h-4 px-1.5 py-0 bg-blue-600 hover:bg-blue-700">
                         Ready
                       </Badge>
                     </div>
