@@ -713,10 +713,13 @@ export default function Dashboard() {
       setShowProjectDialog(false);
       
       // Check if this was manual entry
+      console.log("DEBUG: selectedStrataForProject =", selectedStrataForProject);
       const wasManualEntry = selectedStrataForProject === "manual";
+      console.log("DEBUG: wasManualEntry =", wasManualEntry);
       
       // Store project data and reset form
       const formData = projectForm.getValues();
+      console.log("DEBUG: formData =", formData);
       projectForm.reset();
       setUploadedPlanFile(null);
       setSelectedStrataForProject("");
@@ -725,8 +728,11 @@ export default function Dashboard() {
       
       // If manual entry, ask if they want to save as client
       if (wasManualEntry) {
+        console.log("DEBUG: Opening save as client dialog");
         setProjectDataForClient(formData);
         setShowSaveAsClientDialog(true);
+      } else {
+        console.log("DEBUG: NOT opening dialog - was not manual entry");
       }
     },
     onError: (error: Error) => {
