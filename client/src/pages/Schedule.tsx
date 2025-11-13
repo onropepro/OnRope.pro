@@ -234,7 +234,7 @@ export default function Schedule() {
       </div>
 
       {/* Employee Availability */}
-      <Card className="border-2 border-primary bg-gradient-to-r from-primary/10 to-primary/5 shadow-lg">
+      <Card className="sticky top-0 z-10 border-2 border-primary bg-gradient-to-r from-primary/10 to-primary/5 shadow-lg backdrop-blur-sm">
         <CardHeader className="pb-1 pt-2">
           <CardTitle className="text-sm font-bold flex items-center gap-1.5 text-primary">
             <Users className="w-4 h-4" />
