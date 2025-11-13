@@ -15,6 +15,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage, FormDescription } from "@/components/ui/form";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Separator } from "@/components/ui/separator";
 import { Progress } from "@/components/ui/progress";
 import { HighRiseBuilding } from "@/components/HighRiseBuilding";
@@ -128,6 +129,22 @@ const projectSchema = z.object({
     }
   }
 });
+
+// Role definitions with icons
+const ROLE_OPTIONS = [
+  { value: "owner_ceo", label: "Owner/CEO", icon: "business_center", category: "management" },
+  { value: "operations_manager", label: "Operations Manager", icon: "engineering", category: "management" },
+  { value: "human_resources", label: "Human Resources", icon: "badge", category: "management" },
+  { value: "accounting", label: "Accounting", icon: "account_balance", category: "management" },
+  { value: "account_manager", label: "Account Manager", icon: "person_search", category: "management" },
+  { value: "general_supervisor", label: "General Supervisor", icon: "admin_panel_settings", category: "management" },
+  { value: "rope_access_supervisor", label: "Rope Access Supervisor", icon: "height", category: "management" },
+  { value: "manager", label: "Manager", icon: "manage_accounts", category: "management" },
+  { value: "rope_access_tech", label: "Rope Access Technician", icon: "construction", category: "worker" },
+  { value: "ground_crew_supervisor", label: "Ground Crew Supervisor", icon: "groups", category: "worker" },
+  { value: "ground_crew", label: "Ground Crew", icon: "engineering", category: "worker" },
+  { value: "labourer", label: "Labourer", icon: "handyman", category: "worker" },
+] as const;
 
 // Available permissions for employees
 const AVAILABLE_PERMISSIONS = [
@@ -2349,29 +2366,41 @@ export default function Dashboard() {
                         control={employeeForm.control}
                         name="role"
                         render={({ field }) => (
-                          <FormItem>
+                          <FormItem className="space-y-3">
                             <FormLabel>Role</FormLabel>
-                            <Select onValueChange={field.onChange} defaultValue={field.value}>
-                              <FormControl>
-                                <SelectTrigger className="h-12" data-testid="select-employee-role">
-                                  <SelectValue />
-                                </SelectTrigger>
-                              </FormControl>
-                              <SelectContent>
-                                <SelectItem value="owner_ceo">Owner/CEO</SelectItem>
-                                <SelectItem value="operations_manager">Operations Manager</SelectItem>
-                                <SelectItem value="human_resources">Human Resources</SelectItem>
-                                <SelectItem value="accounting">Accounting</SelectItem>
-                                <SelectItem value="account_manager">Account Manager</SelectItem>
-                                <SelectItem value="general_supervisor">General Supervisor</SelectItem>
-                                <SelectItem value="rope_access_supervisor">Rope Access Supervisor</SelectItem>
-                                <SelectItem value="manager">Manager</SelectItem>
-                                <SelectItem value="rope_access_tech">Rope Access Technician</SelectItem>
-                                <SelectItem value="ground_crew_supervisor">Ground Crew Supervisor</SelectItem>
-                                <SelectItem value="ground_crew">Ground Crew</SelectItem>
-                                <SelectItem value="labourer">Labourer</SelectItem>
-                              </SelectContent>
-                            </Select>
+                            <FormControl>
+                              <RadioGroup
+                                onValueChange={field.onChange}
+                                defaultValue={field.value}
+                                className="grid grid-cols-2 gap-3"
+                              >
+                                {ROLE_OPTIONS.map((role) => (
+                                  <FormItem key={role.value}>
+                                    <FormControl>
+                                      <div className="relative">
+                                        <RadioGroupItem
+                                          value={role.value}
+                                          id={`role-${role.value}`}
+                                          className="peer sr-only"
+                                          data-testid={`radio-role-${role.value}`}
+                                        />
+                                        <FormLabel
+                                          htmlFor={`role-${role.value}`}
+                                          className="flex flex-col items-center justify-center gap-2 rounded-lg border-2 border-muted bg-background p-3 hover-elevate active-elevate-2 peer-data-[state=checked]:border-primary peer-data-[state=checked]:bg-primary/5 cursor-pointer transition-all"
+                                        >
+                                          <span className="material-icons text-2xl text-primary">
+                                            {role.icon}
+                                          </span>
+                                          <span className="text-xs font-medium text-center leading-tight">
+                                            {role.label}
+                                          </span>
+                                        </FormLabel>
+                                      </div>
+                                    </FormControl>
+                                  </FormItem>
+                                ))}
+                              </RadioGroup>
+                            </FormControl>
                             <FormMessage />
                           </FormItem>
                         )}
@@ -3189,29 +3218,41 @@ export default function Dashboard() {
                   control={editEmployeeForm.control}
                   name="role"
                   render={({ field }) => (
-                    <FormItem>
+                    <FormItem className="space-y-3">
                       <FormLabel>Role</FormLabel>
-                      <Select onValueChange={field.onChange} value={field.value}>
-                        <FormControl>
-                          <SelectTrigger className="h-12" data-testid="select-edit-employee-role">
-                            <SelectValue placeholder="Select role" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          <SelectItem value="owner_ceo">Owner/CEO</SelectItem>
-                          <SelectItem value="operations_manager">Operations Manager</SelectItem>
-                          <SelectItem value="human_resources">Human Resources</SelectItem>
-                          <SelectItem value="accounting">Accounting</SelectItem>
-                          <SelectItem value="account_manager">Account Manager</SelectItem>
-                          <SelectItem value="general_supervisor">General Supervisor</SelectItem>
-                          <SelectItem value="rope_access_supervisor">Rope Access Supervisor</SelectItem>
-                          <SelectItem value="manager">Manager</SelectItem>
-                          <SelectItem value="rope_access_tech">Rope Access Tech</SelectItem>
-                          <SelectItem value="ground_crew_supervisor">Ground Crew Supervisor</SelectItem>
-                          <SelectItem value="ground_crew">Ground Crew</SelectItem>
-                          <SelectItem value="labourer">Labourer</SelectItem>
-                        </SelectContent>
-                      </Select>
+                      <FormControl>
+                        <RadioGroup
+                          onValueChange={field.onChange}
+                          value={field.value}
+                          className="grid grid-cols-2 gap-3"
+                        >
+                          {ROLE_OPTIONS.map((role) => (
+                            <FormItem key={role.value}>
+                              <FormControl>
+                                <div className="relative">
+                                  <RadioGroupItem
+                                    value={role.value}
+                                    id={`edit-role-${role.value}`}
+                                    className="peer sr-only"
+                                    data-testid={`radio-edit-role-${role.value}`}
+                                  />
+                                  <FormLabel
+                                    htmlFor={`edit-role-${role.value}`}
+                                    className="flex flex-col items-center justify-center gap-2 rounded-lg border-2 border-muted bg-background p-3 hover-elevate active-elevate-2 peer-data-[state=checked]:border-primary peer-data-[state=checked]:bg-primary/5 cursor-pointer transition-all"
+                                  >
+                                    <span className="material-icons text-2xl text-primary">
+                                      {role.icon}
+                                    </span>
+                                    <span className="text-xs font-medium text-center leading-tight">
+                                      {role.label}
+                                    </span>
+                                  </FormLabel>
+                                </div>
+                              </FormControl>
+                            </FormItem>
+                          ))}
+                        </RadioGroup>
+                      </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
