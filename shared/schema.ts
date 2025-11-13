@@ -139,7 +139,9 @@ export const projects = pgTable("projects", {
   
   // Service-specific expectation fields
   suitesPerDay: integer("suites_per_day"), // For in_suite_dryer_vent_cleaning
+  totalFloors: integer("total_floors"), // For in_suite_dryer_vent_cleaning - total floors to clean
   floorsPerDay: integer("floors_per_day"), // Alternative for in_suite_dryer_vent_cleaning
+  totalStalls: integer("total_stalls"), // For parkade_pressure_cleaning - total parking stalls
   stallsPerDay: integer("stalls_per_day"), // For parkade_pressure_cleaning
   buildingFloors: integer("building_floors"), // For in_suite_dryer_vent_cleaning - total floors in building (separate from unit count)
   
