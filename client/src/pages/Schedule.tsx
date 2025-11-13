@@ -2015,6 +2015,7 @@ function EditJobDialog({
     const endDate = new Date(formData.endDate);
 
     await updateJobMutation.mutateAsync({
+      projectId: formData.projectId || null,
       title: formData.title,
       description: formData.description,
       jobType: formData.jobType,
@@ -2040,14 +2041,37 @@ function EditJobDialog({
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="edit-title">Job Title *</Label>
+            <Label htmlFor="edit-project">Select Project (Optional)</Label>
+            <Select
+              value={formData.projectId}
+              onValueChange={(value) => setFormData({ ...formData, projectId: value })}
+            >
+              <SelectTrigger data-testid="select-edit-project">
+                <SelectValue placeholder="Choose a project or leave blank for custom job" />
+              </SelectTrigger>
+              <SelectContent>
+                {projects.map((project: any) => (
+                  <SelectItem key={project.id} value={project.id}>
+                    {project.buildingName} - {project.strataPlanNumber}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          
+          <div className="space-y-2">
+            <Label htmlFor="edit-title">Job Title {!formData.projectId && '*'}</Label>
             <Input
               id="edit-title"
               value={formData.title}
               onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-              required
+              required={!formData.projectId}
+              disabled={!!formData.projectId}
               data-testid="input-edit-title"
             />
+            {formData.projectId && (
+              <p className="text-xs text-muted-foreground">Project name will be used automatically</p>
+            )}
           </div>
 
           <div className="grid grid-cols-2 gap-4">
