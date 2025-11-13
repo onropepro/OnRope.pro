@@ -133,7 +133,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Automatically enforces read-only mode for unverified companies on all mutations
   app.use((req: Request, res: Response, next: NextFunction) => {
     const mutationMethods = ['POST', 'PUT', 'PATCH', 'DELETE'];
-    const whitelistedPaths = ['/api/login', '/api/register', '/api/logout', '/api/verify-license'];
+    const whitelistedPaths = [
+      '/api/login', 
+      '/api/register', 
+      '/api/logout', 
+      '/api/verify-license',
+      '/api/user-preferences' // Allow UI preferences even in read-only mode
+    ];
     
     // Only check mutations
     if (!mutationMethods.includes(req.method)) {

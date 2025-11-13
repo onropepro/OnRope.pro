@@ -888,7 +888,7 @@ export type InsertJobAssignment = z.infer<typeof insertJobAssignmentSchema>;
 // User preferences table
 export const userPreferences = pgTable("user_preferences", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
-  userId: varchar("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  userId: varchar("user_id").notNull().unique().references(() => users.id, { onDelete: "cascade" }),
   dashboardCardOrder: text("dashboard_card_order").array(), // Array of card IDs for dashboard
   hoursAnalyticsCardOrder: text("hours_analytics_card_order").array(), // Array of card IDs for hours analytics page
   createdAt: timestamp("created_at").defaultNow(),
