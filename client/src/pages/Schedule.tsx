@@ -250,12 +250,13 @@ export default function Schedule() {
               data-testid="calendar"
               eventContent={(eventInfo) => {
                 const job = eventInfo.event.extendedProps.job as ScheduledJobWithAssignments;
+                const displayName = job.project?.buildingName || job.title;
                 
                 return (
                   <div className="fc-event-main-frame" style={{ padding: '2px 4px', overflow: 'hidden' }}>
                     <div className="fc-event-title-container">
                       <div className="fc-event-title" style={{ fontWeight: 600, fontSize: '0.875rem', marginBottom: '2px' }}>
-                        {job.title}
+                        {displayName}
                       </div>
                       {job.assignedEmployees && job.assignedEmployees.length > 0 && (
                         <div style={{ fontSize: '0.7rem', opacity: 1, whiteSpace: 'normal', lineHeight: 1.3 }}>

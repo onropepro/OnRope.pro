@@ -1253,9 +1253,15 @@ export class Storage {
             )
           : [];
         
+        // Fetch project if exists
+        const project = job.projectId 
+          ? await this.getProjectById(job.projectId)
+          : null;
+        
         return {
           ...job,
           assignedEmployees,
+          project,
         };
       })
     );

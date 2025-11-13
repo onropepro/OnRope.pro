@@ -929,4 +929,5 @@ export type EmployeeHoursSummary = {
 
 export type ScheduledJobWithAssignments = ScheduledJob & {
   assignedEmployees: User[];
+  project?: Project | null;
 };
