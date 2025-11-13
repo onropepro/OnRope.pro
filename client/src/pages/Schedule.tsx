@@ -735,7 +735,7 @@ export default function Schedule() {
               headerToolbar={{
                 left: "prev,next today",
                 center: "title",
-                right: "dayGridWeek,dayGridMonth",
+                right: "dayGridDay,dayGridWeek,dayGridMonth",
               }}
               editable={true}
               selectable={true}
@@ -906,7 +906,7 @@ export default function Schedule() {
                   headerToolbar={{
                     left: "prev,next today",
                     center: "title",
-                    right: "resourceTimelineDay,resourceTimelineWeek",
+                    right: "resourceTimelineDay,resourceTimelineWeek,resourceTimelineMonth",
                   }}
                   resources={employees.map(emp => ({
                     id: emp.id,
