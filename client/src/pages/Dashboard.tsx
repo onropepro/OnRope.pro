@@ -29,6 +29,7 @@ import { normalizeStrataPlan } from "@shared/schema";
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from "recharts";
 import { isManagement, hasFinancialAccess, canManageEmployees, canViewPerformance, hasPermission, isReadOnly } from "@/lib/permissions";
 import { DocumentUploader } from "@/components/DocumentUploader";
+import { DebugConsole } from "@/components/DebugConsole";
 import {
   DndContext,
   closestCenter,
@@ -1253,6 +1254,7 @@ export default function Dashboard() {
 
   return (
     <div className="min-h-screen page-gradient">
+      <DebugConsole />
       {/* Header - Premium Glass Effect */}
       <header className="sticky top-0 z-[100] glass backdrop-blur-xl border-b border-border/50 shadow-premium">
         <div className="px-6 h-20 flex items-center justify-between max-w-7xl mx-auto">
