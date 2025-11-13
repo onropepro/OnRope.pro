@@ -914,12 +914,20 @@ export default function Dashboard() {
     return new Promise((resolve) => {
       if (!navigator.geolocation) {
         console.warn("Geolocation is not supported by this browser");
+        toast({ 
+          title: "Location Not Available", 
+          description: "Your browser doesn't support location tracking",
+          variant: "destructive" 
+        });
         resolve(null);
         return;
       }
 
+      console.log("Requesting location permission...");
+      
       navigator.geolocation.getCurrentPosition(
         (position) => {
+          console.log("Location captured:", position.coords.latitude, position.coords.longitude);
           resolve({
             latitude: position.coords.latitude,
             longitude: position.coords.longitude,
@@ -927,6 +935,17 @@ export default function Dashboard() {
         },
         (error) => {
           console.warn("Failed to get location:", error.message);
+          if (error.code === error.PERMISSION_DENIED) {
+            toast({ 
+              title: "Location Permission Denied", 
+              description: "Location tracking is optional but helps verify work site attendance",
+            });
+          } else if (error.code === error.TIMEOUT) {
+            toast({ 
+              title: "Location Timeout", 
+              description: "Could not determine location in time. Session will continue without location data.",
+            });
+          }
           resolve(null);
         },
         { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
@@ -937,6 +956,7 @@ export default function Dashboard() {
   const startDayMutation = useMutation({
     mutationFn: async (projectId: string) => {
       const location = await getCurrentLocation();
+      console.log("Starting work session with location:", location);
       return apiRequest("POST", `/api/projects/${projectId}/work-sessions/start`, {
         startLatitude: location?.latitude,
         startLongitude: location?.longitude,
@@ -948,7 +968,13 @@ export default function Dashboard() {
       setShowStartDayDialog(false);
       queryClient.invalidateQueries({ queryKey: ["/api/projects"] });
       queryClient.invalidateQueries({ queryKey: ["/api/my-drops-today"] });
-      toast({ title: "Work session started", description: "Good luck today! Location recorded." });
+      const hasLocation = data.session?.startLatitude && data.session?.startLongitude;
+      toast({ 
+        title: "Work session started", 
+        description: hasLocation 
+          ? "Good luck today! Location recorded." 
+          : "Good luck today! (Location not recorded)"
+      });
     },
     onError: (error: Error) => {
       toast({ title: "Error", description: error.message, variant: "destructive" });
@@ -958,6 +984,7 @@ export default function Dashboard() {
   const endDayMutation = useMutation({
     mutationFn: async (data: EndDayFormData & { sessionId: string; projectId: string }) => {
       const location = await getCurrentLocation();
+      console.log("Ending work session with location:", location);
       return apiRequest("PATCH", `/api/projects/${data.projectId}/work-sessions/${data.sessionId}/end`, {
         dropsCompletedNorth: parseInt(data.dropsNorth) || 0,
         dropsCompletedEast: parseInt(data.dropsEast) || 0,
@@ -968,13 +995,19 @@ export default function Dashboard() {
         endLongitude: location?.longitude,
       });
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
       setActiveSession(null);
       setShowEndDayDialog(false);
       queryClient.invalidateQueries({ queryKey: ["/api/projects"] });
       queryClient.invalidateQueries({ queryKey: ["/api/my-drops-today"] });
       endDayForm.reset();
-      toast({ title: "Work session ended", description: "Great work today! Location recorded." });
+      const hasLocation = data?.session?.endLatitude && data?.session?.endLongitude;
+      toast({ 
+        title: "Work session ended", 
+        description: hasLocation 
+          ? "Great work today! Location recorded." 
+          : "Great work today! (Location not recorded)"
+      });
     },
     onError: (error: Error) => {
       toast({ title: "Error", description: error.message, variant: "destructive" });
