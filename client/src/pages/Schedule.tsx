@@ -9,6 +9,7 @@ import interactionPlugin from "@fullcalendar/interaction";
 import type { EventInput, DateSelectArg, EventClickArg } from "@fullcalendar/core";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription, SheetFooter } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -1445,19 +1446,16 @@ function JobDetailDialog({
     </AlertDialog>
 
     {job && (
-      <Dialog open={assignDialogOpen} onOpenChange={(open) => {
-        console.log("Dialog open changed to:", open);
-        setAssignDialogOpen(open);
-      }}>
-        <DialogContent className="max-w-md">
-          <DialogHeader>
-            <DialogTitle>Assign Employee to Job</DialogTitle>
-            <DialogDescription>
+      <Sheet open={assignDialogOpen} onOpenChange={setAssignDialogOpen}>
+        <SheetContent>
+          <SheetHeader>
+            <SheetTitle>Assign Employee to Job</SheetTitle>
+            <SheetDescription>
               Specify the date range when {selectedEmployee?.name} will work on this job
-            </DialogDescription>
-          </DialogHeader>
+            </SheetDescription>
+          </SheetHeader>
           
-          <div className="space-y-4">
+          <div className="space-y-4 mt-6">
             <div>
               <Label htmlFor="assign-start-date">Start Date</Label>
               <Input
@@ -1484,7 +1482,7 @@ function JobDetailDialog({
             </div>
           </div>
           
-          <DialogFooter>
+          <SheetFooter className="mt-6">
             <Button
               variant="outline"
               onClick={() => setAssignDialogOpen(false)}
@@ -1499,9 +1497,9 @@ function JobDetailDialog({
             >
               {assignEmployeeMutation.isPending ? "Assigning..." : "Assign Employee"}
             </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+          </SheetFooter>
+        </SheetContent>
+      </Sheet>
     )}
   </>
   );
