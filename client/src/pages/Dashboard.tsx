@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { Button } from "@/components/ui/button";
@@ -1025,7 +1025,7 @@ export default function Dashboard() {
   const userIsReadOnly = isReadOnly(currentUser);
 
   // Dashboard card configuration with permission filtering
-  const dashboardCards = [
+  const dashboardCards = useMemo(() => [
     {
       id: "projects",
       label: "Projects",
@@ -1163,18 +1163,22 @@ export default function Dashboard() {
       console.error('Error filtering card:', card.id, e);
       return false;
     }
-  });
+  }), [currentUser]); // useMemo dependency - only recreate when currentUser changes
 
   // Load saved card order from localStorage
   // Load saved card order from backend preferences
   useEffect(() => {
+    console.log("[Dashboard] Loading preferences:", preferencesData);
     if (preferencesData?.preferences?.dashboardCardOrder) {
+      console.log("[Dashboard] Found saved card order:", preferencesData.preferences.dashboardCardOrder);
       setCardOrder(preferencesData.preferences.dashboardCardOrder);
     } else {
-      // Default order
-      setCardOrder(dashboardCards.map(c => c.id));
+      console.log("[Dashboard] No saved order, using default");
+      const defaultOrder = dashboardCards.map(c => c.id);
+      console.log("[Dashboard] Default order:", defaultOrder);
+      setCardOrder(defaultOrder);
     }
-  }, [preferencesData, currentUser]); // Re-run when preferences or user changes
+  }, [preferencesData, dashboardCards]); // Re-run when preferences or available cards change
 
   // Sort cards based on saved order
   const sortedDashboardCards = [...dashboardCards].sort((a, b) => {
@@ -1204,18 +1208,24 @@ export default function Dashboard() {
   });
 
   const handleDragEnd = (event: DragEndEvent) => {
+    console.log("[Dashboard] handleDragEnd called!", { active: event.active?.id, over: event.over?.id });
     const { active, over } = event;
     
     if (over && active.id !== over.id) {
+      console.log("[Dashboard] Cards swapped, updating order");
       const oldIndex = sortedDashboardCards.findIndex(c => c.id === active.id);
       const newIndex = sortedDashboardCards.findIndex(c => c.id === over.id);
       
       const newOrder = arrayMove(sortedDashboardCards, oldIndex, newIndex).map(c => c.id);
-      console.log("[Dashboard] Saving card order:", newOrder);
+      console.log("[Dashboard] New card order:", newOrder);
       setCardOrder(newOrder);
       
       // Save to backend
+      console.log("[Dashboard] About to call mutation...");
       updatePreferencesMutation.mutate({ dashboardCardOrder: newOrder });
+      console.log("[Dashboard] Mutation called!");
+    } else {
+      console.log("[Dashboard] No swap needed or no over target");
     }
   };
 
