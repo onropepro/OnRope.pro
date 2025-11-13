@@ -1261,6 +1261,19 @@ export class Storage {
             )
           : [];
         
+        // Map assignments with their metadata
+        const employeeAssignments = assignments.map(assignment => {
+          const employee = assignedEmployees.find(e => e.id === assignment.employeeId);
+          if (!employee) return null;
+          
+          return {
+            assignmentId: assignment.id,
+            employee,
+            startDate: assignment.startDate,
+            endDate: assignment.endDate,
+          };
+        }).filter(Boolean);
+        
         // Fetch project if exists
         const project = job.projectId 
           ? await this.getProjectById(job.projectId)
@@ -1269,6 +1282,7 @@ export class Storage {
         return {
           ...job,
           assignedEmployees,
+          employeeAssignments: employeeAssignments as any,
           project,
         };
       })
@@ -1302,9 +1316,23 @@ export class Storage {
             )
           : [];
         
+        // Map assignments with their metadata
+        const employeeAssignments = jobAssignmentList.map(assignment => {
+          const employee = assignedEmployees.find(e => e.id === assignment.employeeId);
+          if (!employee) return null;
+          
+          return {
+            assignmentId: assignment.id,
+            employee,
+            startDate: assignment.startDate,
+            endDate: assignment.endDate,
+          };
+        }).filter(Boolean);
+        
         return {
           ...job,
           assignedEmployees,
+          employeeAssignments: employeeAssignments as any,
         };
       })
     );
