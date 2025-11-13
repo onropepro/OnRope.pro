@@ -711,6 +711,9 @@ export default function Dashboard() {
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ["/api/projects"] });
       
+      // DEBUG: Show the value we're checking
+      alert(`DEBUG: selectedStrataForProject = "${selectedStrataForProject}"`);
+      
       // Check if manual entry
       const wasManualEntry = selectedStrataForProject === "manual";
       
