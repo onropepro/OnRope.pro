@@ -789,25 +789,54 @@ export default function Schedule() {
         <TabsContent value="employee-schedule" className="mt-4">
           <div className="bg-card rounded-lg shadow-premium p-6">
             <div className="schedule-calendar-wrapper">
-              <FullCalendar
-                plugins={[resourceTimeGridPlugin, interactionPlugin]}
-                initialView="resourceTimeGridWeek"
-                headerToolbar={{
-                  left: "prev,next today",
-                  center: "title",
-                  right: "resourceTimeGridDay,resourceTimeGridWeek",
-                }}
-                resources={employees.map(emp => ({
-                  id: emp.id,
-                  title: emp.name,
-                }))}
-                events={[]}
-                height="700px"
-                slotMinTime="07:00:00"
-                slotMaxTime="19:00:00"
-                allDaySlot={false}
-                data-testid="employee-calendar"
-              />
+              <style>{`
+                .employee-schedule-calendar .fc-resource-timeline-divider {
+                  width: 3px;
+                }
+                .employee-schedule-calendar .fc-col-header-cell {
+                  font-size: 0.7rem !important;
+                  padding: 4px 2px !important;
+                  white-space: nowrap;
+                  overflow: hidden;
+                  text-overflow: ellipsis;
+                }
+                .employee-schedule-calendar .fc-timegrid-axis-cushion {
+                  font-size: 0.75rem;
+                }
+                .employee-schedule-calendar .fc-col-header {
+                  font-weight: 600;
+                }
+                .employee-schedule-calendar .fc-scrollgrid {
+                  border-color: hsl(var(--border)) !important;
+                }
+                .employee-schedule-calendar .fc-resource-timeline-lane {
+                  background: hsl(var(--background));
+                }
+              `}</style>
+              <div className="employee-schedule-calendar">
+                <FullCalendar
+                  plugins={[resourceTimeGridPlugin, interactionPlugin]}
+                  initialView="resourceTimeGridDay"
+                  headerToolbar={{
+                    left: "prev,next today",
+                    center: "title",
+                    right: "resourceTimeGridDay",
+                  }}
+                  resources={employees.map(emp => ({
+                    id: emp.id,
+                    title: emp.name,
+                  }))}
+                  events={[]}
+                  height="700px"
+                  slotMinTime="07:00:00"
+                  slotMaxTime="19:00:00"
+                  allDaySlot={false}
+                  resourceAreaWidth="25%"
+                  resourceAreaHeaderContent="Employees"
+                  slotDuration="01:00:00"
+                  data-testid="employee-calendar"
+                />
+              </div>
             </div>
           </div>
         </TabsContent>
