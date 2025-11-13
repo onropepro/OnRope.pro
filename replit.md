@@ -8,6 +8,8 @@ The Rope Access Management Platform is a mobile-first web application designed t
 ## User Preferences
 I prefer simple language and clear, concise explanations. I want an iterative development approach where I can provide feedback frequently. Please ask before making any major architectural changes or deleting significant portions of code. I prefer a collaborative interaction style.
 
+**UI/Button Design Preference:** ALWAYS make buttons obvious and prominent. Use primary/default variants with icons rather than subtle outline variants. Users should immediately see and understand actionable buttons.
+
 ## System Architecture
 The platform is built with a **mobile-first approach** and features a modern, premium aesthetic.
 

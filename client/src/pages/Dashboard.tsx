@@ -1793,16 +1793,17 @@ export default function Dashboard() {
                                 <CommandList>
                                   <CommandEmpty>
                                     <div className="py-6 text-center">
-                                      <p className="text-sm text-muted-foreground mb-2">No clients found.</p>
+                                      <p className="text-sm text-muted-foreground mb-3">No clients found.</p>
                                       <Button
-                                        variant="outline"
-                                        size="sm"
+                                        variant="default"
+                                        size="default"
                                         onClick={() => {
                                           handleClientStrataSelection("manual");
                                           setClientDropdownOpen(false);
                                         }}
                                         data-testid="button-manual-entry-empty"
                                       >
+                                        <span className="material-icons mr-2">edit</span>
                                         Enter Details Manually
                                       </Button>
                                     </div>
