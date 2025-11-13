@@ -830,7 +830,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Get active employees (excludes terminated) - for general use
-  app.get("/api/employees", requireAuth, requireRole("company", "operations_manager", "supervisor", "rope_access_tech"), async (req: Request, res: Response) => {
+  app.get("/api/employees", requireAuth, requireRole("company", "owner_ceo", "human_resources", "operations_manager", "general_supervisor", "rope_access_supervisor", "account_manager", "supervisor", "rope_access_tech"), async (req: Request, res: Response) => {
     try {
       const currentUser = await storage.getUserById(req.session.userId!);
       
@@ -911,7 +911,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Upload employee document (driver's license, abstract, etc.)
-  app.post("/api/upload-employee-document", requireAuth, requireRole("company", "operations_manager", "supervisor"), documentUpload.single('document'), async (req: Request, res: Response) => {
+  app.post("/api/upload-employee-document", requireAuth, requireRole("company", "owner_ceo", "human_resources", "operations_manager", "general_supervisor", "rope_access_supervisor", "account_manager", "supervisor"), documentUpload.single('document'), async (req: Request, res: Response) => {
     try {
       if (!req.file) {
         return res.status(400).json({ message: "No file uploaded" });
@@ -1014,7 +1014,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // Upload image to project with optional unit number and comment
-  app.post("/api/projects/:id/images", requireAuth, requireRole("company", "operations_manager", "supervisor", "rope_access_tech", "manager", "ground_crew", "ground_crew_supervisor"), imageUpload.single('file'), async (req: Request, res: Response) => {
+  app.post("/api/projects/:id/images", requireAuth, requireRole("company", "owner_ceo", "human_resources", "operations_manager", "general_supervisor", "rope_access_supervisor", "account_manager", "supervisor", "rope_access_tech", "manager", "ground_crew", "ground_crew_supervisor"), imageUpload.single('file'), async (req: Request, res: Response) => {
     try {
       if (!req.file) {
         return res.status(400).json({ message: "No file uploaded" });
@@ -1349,7 +1349,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (currentUser.role === "company") {
         // Return only THIS company's projects, filtered by status (all if not specified)
         projects = await storage.getProjectsByCompany(currentUser.id, statusFilter);
-      } else if (currentUser.role === "operations_manager" || currentUser.role === "supervisor" || currentUser.role === "rope_access_tech") {
+      } else if (currentUser.role === "operations_manager" || currentUser.role === "supervisor" || role === "general_supervisor" || role === "rope_access_supervisor" || currentUser.role === "rope_access_tech") {
         // Return projects for their company, filtered by status (all if not specified)
         const companyId = currentUser.companyId;
         if (companyId) {
@@ -1419,7 +1419,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Check if user has financial permissions
       const canViewFinancialData = currentUser.role === "company" || 
                                     currentUser.role === "operations_manager" || 
-                                    currentUser.role === "supervisor" || 
+                                    currentUser.role === "supervisor" || role === "general_supervisor" || role === "rope_access_supervisor" || 
                                     currentUser.permissions?.includes("view_financial_data");
       
       // Add completed drops (total and per-elevation) to the project
@@ -1457,7 +1457,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       // Only company and management roles can view residents
-      if (!["company", "operations_manager", "supervisor"].includes(currentUser.role)) {
+      if (!["company", "operations_manager", "general_supervisor", "rope_access_supervisor", "supervisor"].includes(currentUser.role)) {
         return res.status(403).json({ message: "Access denied" });
       }
       
@@ -1631,7 +1631,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // ==================== DROP LOG ROUTES ====================
   
   // Create or update drop log - allow all employee roles to log drops
-  app.post("/api/drops", requireAuth, requireRole("rope_access_tech", "operations_manager", "supervisor", "company"), async (req: Request, res: Response) => {
+  app.post("/api/drops", requireAuth, requireRole("rope_access_tech", "operations_manager", "general_supervisor", "rope_access_supervisor", "supervisor", "company"), async (req: Request, res: Response) => {
     try {
       const currentUser = await storage.getUserById(req.session.userId!);
       
@@ -1849,7 +1849,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // Get work sessions for a project (management and tech view)
-  app.get("/api/projects/:projectId/work-sessions", requireAuth, requireRole("company", "operations_manager", "supervisor", "rope_access_tech"), async (req: Request, res: Response) => {
+  app.get("/api/projects/:projectId/work-sessions", requireAuth, requireRole("company", "owner_ceo", "human_resources", "operations_manager", "general_supervisor", "rope_access_supervisor", "account_manager", "supervisor", "rope_access_tech"), async (req: Request, res: Response) => {
     try {
       const currentUser = await storage.getUserById(req.session.userId!);
       
@@ -1879,7 +1879,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Check if user has financial permissions
       const canViewFinancialData = currentUser.role === "company" || 
                                     currentUser.role === "operations_manager" || 
-                                    currentUser.role === "supervisor" || 
+                                    currentUser.role === "supervisor" || role === "general_supervisor" || role === "rope_access_supervisor" || 
                                     currentUser.permissions?.includes("view_financial_data");
       
       const sessions = await storage.getWorkSessionsByProject(req.params.projectId, companyId);
@@ -1916,7 +1916,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Check if user has financial permissions
       const canViewFinancialData = currentUser.role === "company" || 
                                     currentUser.role === "operations_manager" || 
-                                    currentUser.role === "supervisor" || 
+                                    currentUser.role === "supervisor" || role === "general_supervisor" || role === "rope_access_supervisor" || 
                                     currentUser.permissions?.includes("view_financial_data");
       
       // Get all projects for the company
@@ -1961,7 +1961,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Get active workers (sessions without end time) - Management only
-  app.get("/api/active-workers", requireAuth, requireRole("company", "operations_manager", "supervisor"), async (req: Request, res: Response) => {
+  app.get("/api/active-workers", requireAuth, requireRole("company", "owner_ceo", "human_resources", "operations_manager", "general_supervisor", "rope_access_supervisor", "account_manager", "supervisor"), async (req: Request, res: Response) => {
     try {
       const currentUser = await storage.getUserById(req.session.userId!);
       
@@ -1979,7 +1979,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Check if user has financial permissions
       const canViewFinancialData = currentUser.role === "company" || 
                                     currentUser.role === "operations_manager" || 
-                                    currentUser.role === "supervisor" || 
+                                    currentUser.role === "supervisor" || role === "general_supervisor" || role === "rope_access_supervisor" || 
                                     currentUser.permissions?.includes("view_financial_data");
       
       // Get all projects for the company
@@ -2143,7 +2143,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // Get all non-billable sessions for company (management only)
-  app.get("/api/non-billable-sessions", requireAuth, requireRole("company", "operations_manager", "supervisor"), async (req: Request, res: Response) => {
+  app.get("/api/non-billable-sessions", requireAuth, requireRole("company", "owner_ceo", "human_resources", "operations_manager", "general_supervisor", "rope_access_supervisor", "account_manager", "supervisor"), async (req: Request, res: Response) => {
     try {
       const currentUser = await storage.getUserById(req.session.userId!);
       
@@ -2161,7 +2161,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // Get non-billable sessions by employee (management only)
-  app.get("/api/non-billable-sessions/employee/:employeeId", requireAuth, requireRole("company", "operations_manager", "supervisor"), async (req: Request, res: Response) => {
+  app.get("/api/non-billable-sessions/employee/:employeeId", requireAuth, requireRole("company", "owner_ceo", "human_resources", "operations_manager", "general_supervisor", "rope_access_supervisor", "account_manager", "supervisor"), async (req: Request, res: Response) => {
     try {
       const currentUser = await storage.getUserById(req.session.userId!);
       
@@ -2257,7 +2257,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       } else if (currentUser.role === "company") {
         // Company sees all complaints for their projects
         complaints = await storage.getComplaintsForCompany(currentUser.id);
-      } else if (currentUser.role === "operations_manager" || currentUser.role === "supervisor" || currentUser.role === "rope_access_tech") {
+      } else if (currentUser.role === "operations_manager" || currentUser.role === "supervisor" || role === "general_supervisor" || role === "rope_access_supervisor" || currentUser.role === "rope_access_tech") {
         // Staff sees complaints for their company's projects
         const companyId = currentUser.companyId;
         if (companyId) {
@@ -2298,7 +2298,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         if (project.companyId !== currentUser.id) {
           return res.status(403).json({ message: "Access denied" });
         }
-      } else if (currentUser.role === "operations_manager" || currentUser.role === "supervisor" || currentUser.role === "rope_access_tech") {
+      } else if (currentUser.role === "operations_manager" || currentUser.role === "supervisor" || role === "general_supervisor" || role === "rope_access_supervisor" || currentUser.role === "rope_access_tech") {
         if (project.companyId !== currentUser.companyId) {
           return res.status(403).json({ message: "Access denied" });
         }
@@ -2433,7 +2433,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // Add complaint note
-  app.post("/api/complaints/:complaintId/notes", requireAuth, requireRole("rope_access_tech", "supervisor", "operations_manager", "company"), async (req: Request, res: Response) => {
+  app.post("/api/complaints/:complaintId/notes", requireAuth, requireRole("rope_access_tech", "general_supervisor", "rope_access_supervisor", "supervisor", "operations_manager", "company"), async (req: Request, res: Response) => {
     try {
       const currentUser = await storage.getUserById(req.session.userId!);
       
@@ -2611,7 +2611,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Harness inspection routes
-  app.post("/api/harness-inspections", requireAuth, requireRole("rope_access_tech", "supervisor", "operations_manager", "company"), async (req: Request, res: Response) => {
+  app.post("/api/harness-inspections", requireAuth, requireRole("rope_access_tech", "general_supervisor", "rope_access_supervisor", "supervisor", "operations_manager", "company"), async (req: Request, res: Response) => {
     try {
       const currentUser = await storage.getUserById(req.session.userId!);
       
@@ -2649,7 +2649,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/harness-inspections", requireAuth, requireRole("operations_manager", "supervisor", "company"), async (req: Request, res: Response) => {
+  app.get("/api/harness-inspections", requireAuth, requireRole("operations_manager", "general_supervisor", "rope_access_supervisor", "supervisor", "company"), async (req: Request, res: Response) => {
     try {
       const currentUser = await storage.getUserById(req.session.userId!);
       
@@ -2681,7 +2681,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete("/api/harness-inspections/:id", requireAuth, requireRole("operations_manager", "supervisor", "company"), async (req: Request, res: Response) => {
+  app.delete("/api/harness-inspections/:id", requireAuth, requireRole("operations_manager", "general_supervisor", "rope_access_supervisor", "supervisor", "company"), async (req: Request, res: Response) => {
     try {
       const { id } = req.params;
       await storage.deleteHarnessInspection(id);
@@ -2693,7 +2693,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Toolbox meeting routes
-  app.post("/api/toolbox-meetings", requireAuth, requireRole("rope_access_tech", "supervisor", "operations_manager", "company"), async (req: Request, res: Response) => {
+  app.post("/api/toolbox-meetings", requireAuth, requireRole("rope_access_tech", "general_supervisor", "rope_access_supervisor", "supervisor", "operations_manager", "company"), async (req: Request, res: Response) => {
     try {
       const currentUser = await storage.getUserById(req.session.userId!);
       
@@ -2724,7 +2724,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/toolbox-meetings", requireAuth, requireRole("operations_manager", "supervisor", "company"), async (req: Request, res: Response) => {
+  app.get("/api/toolbox-meetings", requireAuth, requireRole("operations_manager", "general_supervisor", "rope_access_supervisor", "supervisor", "company"), async (req: Request, res: Response) => {
     try {
       const currentUser = await storage.getUserById(req.session.userId!);
       
@@ -2756,7 +2756,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete("/api/toolbox-meetings/:id", requireAuth, requireRole("operations_manager", "supervisor", "company"), async (req: Request, res: Response) => {
+  app.delete("/api/toolbox-meetings/:id", requireAuth, requireRole("operations_manager", "general_supervisor", "rope_access_supervisor", "supervisor", "company"), async (req: Request, res: Response) => {
     try {
       const { id } = req.params;
       await storage.deleteToolboxMeeting(id);
@@ -2770,7 +2770,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // ==================== JOB COMMENTS ROUTES ====================
   
   // Create job comment
-  app.post("/api/projects/:projectId/comments", requireAuth, requireRole("rope_access_tech", "supervisor", "operations_manager", "company"), async (req: Request, res: Response) => {
+  app.post("/api/projects/:projectId/comments", requireAuth, requireRole("rope_access_tech", "general_supervisor", "rope_access_supervisor", "supervisor", "operations_manager", "company"), async (req: Request, res: Response) => {
     try {
       const currentUser = await storage.getUserById(req.session.userId!);
       
@@ -2817,7 +2817,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // ==================== PAYROLL / PAY PERIOD ROUTES ====================
   
   // Get or create pay period configuration
-  app.get("/api/payroll/config", requireAuth, requireRole("company", "operations_manager", "supervisor"), async (req: Request, res: Response) => {
+  app.get("/api/payroll/config", requireAuth, requireRole("company", "owner_ceo", "human_resources", "operations_manager", "general_supervisor", "rope_access_supervisor", "account_manager", "supervisor"), async (req: Request, res: Response) => {
     try {
       const currentUser = await storage.getUserById(req.session.userId!);
       if (!currentUser) {
@@ -2838,7 +2838,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Create or update pay period configuration
-  app.post("/api/payroll/config", requireAuth, requireRole("company", "operations_manager", "supervisor"), async (req: Request, res: Response) => {
+  app.post("/api/payroll/config", requireAuth, requireRole("company", "owner_ceo", "human_resources", "operations_manager", "general_supervisor", "rope_access_supervisor", "account_manager", "supervisor"), async (req: Request, res: Response) => {
     try {
       const currentUser = await storage.getUserById(req.session.userId!);
       if (!currentUser) {
@@ -2867,7 +2867,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Manually add work session (for when employees forget to clock in)
-  app.post("/api/payroll/add-work-session", requireAuth, requireRole("company", "operations_manager", "supervisor"), async (req: Request, res: Response) => {
+  app.post("/api/payroll/add-work-session", requireAuth, requireRole("company", "owner_ceo", "human_resources", "operations_manager", "general_supervisor", "rope_access_supervisor", "account_manager", "supervisor"), async (req: Request, res: Response) => {
     try {
       const currentUser = await storage.getUserById(req.session.userId!);
       if (!currentUser) {
@@ -2939,7 +2939,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Manually add non-billable work session
-  app.post("/api/payroll/add-non-billable-session", requireAuth, requireRole("company", "operations_manager", "supervisor"), async (req: Request, res: Response) => {
+  app.post("/api/payroll/add-non-billable-session", requireAuth, requireRole("company", "owner_ceo", "human_resources", "operations_manager", "general_supervisor", "rope_access_supervisor", "account_manager", "supervisor"), async (req: Request, res: Response) => {
     try {
       const currentUser = await storage.getUserById(req.session.userId!);
       if (!currentUser) {
@@ -2988,7 +2988,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Update billable work session
-  app.patch("/api/payroll/work-sessions/:id", requireAuth, requireRole("company", "operations_manager", "supervisor"), async (req: Request, res: Response) => {
+  app.patch("/api/payroll/work-sessions/:id", requireAuth, requireRole("company", "owner_ceo", "human_resources", "operations_manager", "general_supervisor", "rope_access_supervisor", "account_manager", "supervisor"), async (req: Request, res: Response) => {
     try {
       const currentUser = await storage.getUserById(req.session.userId!);
       if (!currentUser) {
@@ -3027,7 +3027,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Delete billable work session
-  app.delete("/api/payroll/work-sessions/:id", requireAuth, requireRole("company", "operations_manager", "supervisor"), async (req: Request, res: Response) => {
+  app.delete("/api/payroll/work-sessions/:id", requireAuth, requireRole("company", "owner_ceo", "human_resources", "operations_manager", "general_supervisor", "rope_access_supervisor", "account_manager", "supervisor"), async (req: Request, res: Response) => {
     try {
       const currentUser = await storage.getUserById(req.session.userId!);
       if (!currentUser) {
@@ -3055,7 +3055,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Update non-billable work session
-  app.patch("/api/payroll/non-billable-sessions/:id", requireAuth, requireRole("company", "operations_manager", "supervisor"), async (req: Request, res: Response) => {
+  app.patch("/api/payroll/non-billable-sessions/:id", requireAuth, requireRole("company", "owner_ceo", "human_resources", "operations_manager", "general_supervisor", "rope_access_supervisor", "account_manager", "supervisor"), async (req: Request, res: Response) => {
     try {
       const currentUser = await storage.getUserById(req.session.userId!);
       if (!currentUser) {
@@ -3090,7 +3090,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Delete non-billable work session
-  app.delete("/api/payroll/non-billable-sessions/:id", requireAuth, requireRole("company", "operations_manager", "supervisor"), async (req: Request, res: Response) => {
+  app.delete("/api/payroll/non-billable-sessions/:id", requireAuth, requireRole("company", "owner_ceo", "human_resources", "operations_manager", "general_supervisor", "rope_access_supervisor", "account_manager", "supervisor"), async (req: Request, res: Response) => {
     try {
       const currentUser = await storage.getUserById(req.session.userId!);
       if (!currentUser) {
@@ -3118,7 +3118,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Generate pay periods
-  app.post("/api/payroll/generate-periods", requireAuth, requireRole("company", "operations_manager", "supervisor"), async (req: Request, res: Response) => {
+  app.post("/api/payroll/generate-periods", requireAuth, requireRole("company", "owner_ceo", "human_resources", "operations_manager", "general_supervisor", "rope_access_supervisor", "account_manager", "supervisor"), async (req: Request, res: Response) => {
     try {
       const currentUser = await storage.getUserById(req.session.userId!);
       if (!currentUser) {
@@ -3147,7 +3147,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Get all pay periods for company
-  app.get("/api/payroll/periods", requireAuth, requireRole("company", "operations_manager", "supervisor"), async (req: Request, res: Response) => {
+  app.get("/api/payroll/periods", requireAuth, requireRole("company", "owner_ceo", "human_resources", "operations_manager", "general_supervisor", "rope_access_supervisor", "account_manager", "supervisor"), async (req: Request, res: Response) => {
     try {
       const currentUser = await storage.getUserById(req.session.userId!);
       if (!currentUser) {
@@ -3168,7 +3168,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Get current pay period
-  app.get("/api/payroll/current-period", requireAuth, requireRole("company", "operations_manager", "supervisor"), async (req: Request, res: Response) => {
+  app.get("/api/payroll/current-period", requireAuth, requireRole("company", "owner_ceo", "human_resources", "operations_manager", "general_supervisor", "rope_access_supervisor", "account_manager", "supervisor"), async (req: Request, res: Response) => {
     try {
       const currentUser = await storage.getUserById(req.session.userId!);
       if (!currentUser) {
@@ -3189,7 +3189,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Get employee hours for a specific pay period
-  app.get("/api/payroll/periods/:periodId/hours", requireAuth, requireRole("company", "operations_manager", "supervisor"), async (req: Request, res: Response) => {
+  app.get("/api/payroll/periods/:periodId/hours", requireAuth, requireRole("company", "owner_ceo", "human_resources", "operations_manager", "general_supervisor", "rope_access_supervisor", "account_manager", "supervisor"), async (req: Request, res: Response) => {
     try {
       const currentUser = await storage.getUserById(req.session.userId!);
       if (!currentUser) {
@@ -3220,7 +3220,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Get employee hours for date range
-  app.get("/api/payroll/hours", requireAuth, requireRole("company", "operations_manager", "supervisor"), async (req: Request, res: Response) => {
+  app.get("/api/payroll/hours", requireAuth, requireRole("company", "owner_ceo", "human_resources", "operations_manager", "general_supervisor", "rope_access_supervisor", "account_manager", "supervisor"), async (req: Request, res: Response) => {
     try {
       const currentUser = await storage.getUserById(req.session.userId!);
       if (!currentUser) {
@@ -3249,7 +3249,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // ==================== QUOTE ROUTES ====================
   
   // Create new quote with services (atomic transaction) - All employees can create quotes
-  app.post("/api/quotes", requireAuth, requireRole("company", "operations_manager", "supervisor", "rope_access_tech", "manager", "ground_crew", "ground_crew_supervisor"), async (req: Request, res: Response) => {
+  app.post("/api/quotes", requireAuth, requireRole("company", "owner_ceo", "human_resources", "operations_manager", "general_supervisor", "rope_access_supervisor", "account_manager", "supervisor", "rope_access_tech", "manager", "ground_crew", "ground_crew_supervisor"), async (req: Request, res: Response) => {
     let createdQuoteId: string | null = null;
     
     try {
@@ -3330,7 +3330,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Get all quotes for company - All employees can view
-  app.get("/api/quotes", requireAuth, requireRole("company", "operations_manager", "supervisor", "rope_access_tech", "manager", "ground_crew", "ground_crew_supervisor"), async (req: Request, res: Response) => {
+  app.get("/api/quotes", requireAuth, requireRole("company", "owner_ceo", "human_resources", "operations_manager", "general_supervisor", "rope_access_supervisor", "account_manager", "supervisor", "rope_access_tech", "manager", "ground_crew", "ground_crew_supervisor"), async (req: Request, res: Response) => {
     try {
       const currentUser = await storage.getUserById(req.session.userId!);
       if (!currentUser) {
@@ -3376,7 +3376,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Get quote by ID - All employees can view
-  app.get("/api/quotes/:id", requireAuth, requireRole("company", "operations_manager", "supervisor", "rope_access_tech", "manager", "ground_crew", "ground_crew_supervisor"), async (req: Request, res: Response) => {
+  app.get("/api/quotes/:id", requireAuth, requireRole("company", "owner_ceo", "human_resources", "operations_manager", "general_supervisor", "rope_access_supervisor", "account_manager", "supervisor", "rope_access_tech", "manager", "ground_crew", "ground_crew_supervisor"), async (req: Request, res: Response) => {
     try {
       const currentUser = await storage.getUserById(req.session.userId!);
       if (!currentUser) {
@@ -3429,7 +3429,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Update quote - Management and workers with edit_quotes permission
-  app.patch("/api/quotes/:id", requireAuth, requireRole("company", "operations_manager", "supervisor", "rope_access_tech", "manager", "ground_crew", "ground_crew_supervisor"), async (req: Request, res: Response) => {
+  app.patch("/api/quotes/:id", requireAuth, requireRole("company", "owner_ceo", "human_resources", "operations_manager", "general_supervisor", "rope_access_supervisor", "account_manager", "supervisor", "rope_access_tech", "manager", "ground_crew", "ground_crew_supervisor"), async (req: Request, res: Response) => {
     try {
       const currentUser = await storage.getUserById(req.session.userId!);
       if (!currentUser) {
@@ -3438,7 +3438,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Check if user has edit permissions
       // Management can edit any quote, workers can edit their own quotes
-      const isManagement = ["company", "operations_manager", "supervisor"].includes(currentUser.role);
+      const isManagement = ["company", "operations_manager", "general_supervisor", "rope_access_supervisor", "supervisor"].includes(currentUser.role);
       const hasEditPermission = currentUser.permissions?.includes("edit_quotes");
       const isWorker = ["rope_access_tech", "manager", "ground_crew", "ground_crew_supervisor"].includes(currentUser.role);
       
@@ -3526,7 +3526,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Delete quote
-  app.delete("/api/quotes/:id", requireAuth, requireRole("company", "operations_manager", "supervisor"), async (req: Request, res: Response) => {
+  app.delete("/api/quotes/:id", requireAuth, requireRole("company", "owner_ceo", "human_resources", "operations_manager", "general_supervisor", "rope_access_supervisor", "account_manager", "supervisor"), async (req: Request, res: Response) => {
     try {
       const currentUser = await storage.getUserById(req.session.userId!);
       if (!currentUser) {
@@ -3557,7 +3557,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Update quote status - Flexible endpoint for status transitions
-  app.patch("/api/quotes/:id/status", requireAuth, requireRole("company", "operations_manager", "supervisor", "rope_access_tech", "manager", "ground_crew", "ground_crew_supervisor"), async (req: Request, res: Response) => {
+  app.patch("/api/quotes/:id/status", requireAuth, requireRole("company", "owner_ceo", "human_resources", "operations_manager", "general_supervisor", "rope_access_supervisor", "account_manager", "supervisor", "rope_access_tech", "manager", "ground_crew", "ground_crew_supervisor"), async (req: Request, res: Response) => {
     try {
       const statusSchema = z.object({
         status: z.enum(["draft", "submitted", "open", "approved", "rejected"]),
@@ -3585,7 +3585,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(403).json({ message: "Forbidden" });
       }
       
-      const isManagement = ["company", "operations_manager", "supervisor"].includes(currentUser.role);
+      const isManagement = ["company", "operations_manager", "general_supervisor", "rope_access_supervisor", "supervisor"].includes(currentUser.role);
       const isWorker = ["rope_access_tech", "manager", "ground_crew", "ground_crew_supervisor"].includes(currentUser.role);
       
       // Permission checks based on role and transition
@@ -3615,7 +3615,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Upload quote photo - All employees can upload photos
-  app.post("/api/quotes/:id/photo", requireAuth, requireRole("company", "operations_manager", "supervisor", "rope_access_tech", "manager", "ground_crew", "ground_crew_supervisor"), imageUpload.single("photo"), async (req: Request, res: Response) => {
+  app.post("/api/quotes/:id/photo", requireAuth, requireRole("company", "owner_ceo", "human_resources", "operations_manager", "general_supervisor", "rope_access_supervisor", "account_manager", "supervisor", "rope_access_tech", "manager", "ground_crew", "ground_crew_supervisor"), imageUpload.single("photo"), async (req: Request, res: Response) => {
     try {
       const currentUser = await storage.getUserById(req.session.userId!);
       if (!currentUser) {
@@ -3661,7 +3661,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // ==================== QUOTE SERVICE ROUTES ====================
 
   // Add service to existing quote
-  app.post("/api/quotes/:id/services", requireAuth, requireRole("company", "operations_manager", "supervisor"), async (req: Request, res: Response) => {
+  app.post("/api/quotes/:id/services", requireAuth, requireRole("company", "owner_ceo", "human_resources", "operations_manager", "general_supervisor", "rope_access_supervisor", "account_manager", "supervisor"), async (req: Request, res: Response) => {
     try {
       const currentUser = await storage.getUserById(req.session.userId!);
       if (!currentUser) {
@@ -3700,7 +3700,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Delete quote service
-  app.delete("/api/quotes/:id/services/:serviceId", requireAuth, requireRole("company", "operations_manager", "supervisor"), async (req: Request, res: Response) => {
+  app.delete("/api/quotes/:id/services/:serviceId", requireAuth, requireRole("company", "owner_ceo", "human_resources", "operations_manager", "general_supervisor", "rope_access_supervisor", "account_manager", "supervisor"), async (req: Request, res: Response) => {
     try {
       const currentUser = await storage.getUserById(req.session.userId!);
       if (!currentUser) {

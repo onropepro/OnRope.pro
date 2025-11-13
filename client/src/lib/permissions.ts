@@ -11,7 +11,7 @@ export interface User {
 }
 
 // Management roles that have elevated privileges
-export const MANAGEMENT_ROLES = ['company', 'operations_manager', 'supervisor'];
+export const MANAGEMENT_ROLES = ['company', 'owner_ceo', 'human_resources', 'operations_manager', 'general_supervisor', 'rope_access_supervisor', 'account_manager'];
 
 // Worker roles
 export const WORKER_ROLES = ['rope_access_tech', 'manager', 'ground_crew', 'ground_crew_supervisor'];
