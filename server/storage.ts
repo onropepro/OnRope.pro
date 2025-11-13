@@ -462,6 +462,7 @@ export class Storage {
       createdAt: workSessions.createdAt,
       updatedAt: workSessions.updatedAt,
       techName: users.name,
+      techRole: users.role,
       techHourlyRate: users.hourlyRate,
     })
       .from(workSessions)

@@ -744,7 +744,7 @@ export default function ProjectDetail() {
                       >
                         <div className="flex items-center gap-2">
                           <span className="material-icons text-sm text-primary">person</span>
-                          <span className="font-medium text-sm">{session.techName || 'Unknown'}</span>
+                          <span className="font-medium text-sm">{session.techName || 'Unknown'} {session.techRole && `(${session.techRole.replace(/_/g, ' ')})`}</span>
                         </div>
                         <div className="flex items-center gap-1 text-xs text-muted-foreground">
                           <span className="material-icons text-xs">schedule</span>
@@ -997,7 +997,7 @@ export default function ProjectDetail() {
                                                           data-testid={`session-${session.id}`}
                                                         >
                                                           <p className="text-sm font-medium">
-                                                            {session.techName || "Unknown"}
+                                                            {session.techName || "Unknown"} {session.techRole && `(${session.techRole.replace(/_/g, ' ')})`}
                                                           </p>
                                                           {isCompleted ? (
                                                             <Badge variant={metTarget ? "default" : "destructive"} className="text-xs" data-testid={`badge-${metTarget ? "met" : "below"}-target`}>
