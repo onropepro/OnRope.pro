@@ -244,32 +244,32 @@ function SortableCard({ card, isRearranging }: { card: any; isRearranging: boole
     <div
       ref={setNodeRef}
       style={style}
-      className="bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer overflow-hidden group hover-scale relative"
+      className="bg-white dark:bg-card rounded-xl border-2 border-border shadow-md hover:shadow-lg transition-all duration-300 cursor-pointer overflow-hidden group hover-scale relative"
       onClick={isRearranging ? undefined : card.onClick}
       data-testid={card.testId}
       {...attributes}
     >
-      <div className="p-8 flex flex-col items-center gap-4">
+      <div className="p-4 flex flex-col items-center gap-3">
         {/* Drag Handle - only visible when rearranging */}
         {isRearranging && (
           <div
             {...listeners}
-            className="absolute top-2 right-2 p-2 bg-background/80 rounded-lg cursor-grab active:cursor-grabbing shadow-lg"
+            className="absolute top-1 right-1 p-1.5 bg-background/80 rounded-lg cursor-grab active:cursor-grabbing shadow-md"
             onClick={(e) => e.stopPropagation()}
           >
-            <span className="material-icons text-muted-foreground text-lg">drag_indicator</span>
+            <span className="material-icons text-muted-foreground text-base">drag_indicator</span>
           </div>
         )}
         
         <div 
-          className="w-20 h-20 rounded-2xl flex items-center justify-center text-5xl transition-transform duration-300 group-hover:scale-110"
-          style={{ backgroundColor: `${card.borderColor}20`, color: card.borderColor }}
+          className="w-14 h-14 rounded-xl flex items-center justify-center transition-transform duration-300 group-hover:scale-110 border-2"
+          style={{ backgroundColor: `${card.borderColor}15`, color: card.borderColor, borderColor: `${card.borderColor}40` }}
         >
-          <span className="material-icons text-5xl">{card.icon}</span>
+          <span className="material-icons text-4xl">{card.icon}</span>
         </div>
         <div className="text-center">
-          <div className="text-lg font-bold text-foreground mb-1">{card.label}</div>
-          <div className="text-sm text-muted-foreground">{card.description}</div>
+          <div className="text-base font-bold text-foreground mb-0.5">{card.label}</div>
+          <div className="text-xs text-muted-foreground">{card.description}</div>
         </div>
       </div>
     </div>
