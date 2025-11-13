@@ -14,9 +14,11 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
-import { Calendar, Plus, Edit2, Trash2, Users, ArrowLeft } from "lucide-react";
+import { Calendar, Plus, Edit2, Trash2, Users, ArrowLeft, UserCheck, UserX } from "lucide-react";
 import type { ScheduledJobWithAssignments, User } from "@shared/schema";
 import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 export default function Schedule() {
   const { toast } = useToast();
@@ -126,6 +128,14 @@ export default function Schedule() {
     setDetailDialogOpen(true);
   };
 
+  // Get assigned employee IDs from jobs
+  const assignedEmployeeIds = new Set(
+    jobs.flatMap(job => job.assignedEmployees?.map(e => e.id) || [])
+  );
+
+  const assignedEmployees = employees.filter(e => assignedEmployeeIds.has(e.id));
+  const availableEmployees = employees.filter(e => !assignedEmployeeIds.has(e.id));
+
   return (
     <div className="p-4 md:p-6 space-y-6">
       {/* Back Button */}
@@ -162,8 +172,15 @@ export default function Schedule() {
         </Button>
       </div>
 
-      {/* Calendar */}
-      <div className="bg-card rounded-lg shadow-premium p-6">
+      {/* Tabs */}
+      <Tabs defaultValue="calendar" className="w-full">
+        <TabsList className="grid w-full grid-cols-2 max-w-md">
+          <TabsTrigger value="calendar">Calendar</TabsTrigger>
+          <TabsTrigger value="employees">Employee Availability</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="calendar" className="mt-6">
+          <div className="bg-card rounded-lg shadow-premium p-6">
         {isLoading ? (
           <div className="flex items-center justify-center h-96">
             <div className="text-muted-foreground">Loading calendar...</div>
@@ -285,7 +302,82 @@ export default function Schedule() {
             />
           </div>
         )}
-      </div>
+          </div>
+        </TabsContent>
+
+        <TabsContent value="employees" className="mt-6">
+          <div className="grid md:grid-cols-2 gap-6">
+            {/* Assigned Employees */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <UserCheck className="w-5 h-5 text-green-600" />
+                  Assigned ({assignedEmployees.length})
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                {assignedEmployees.length === 0 ? (
+                  <p className="text-sm text-muted-foreground">No employees currently assigned</p>
+                ) : (
+                  <div className="space-y-3">
+                    {assignedEmployees.map(employee => {
+                      const employeeJobs = jobs.filter(job => 
+                        job.assignedEmployees?.some(e => e.id === employee.id)
+                      );
+                      return (
+                        <div key={employee.id} className="p-3 bg-muted/50 rounded-lg">
+                          <div className="font-medium">{employee.name}</div>
+                          <div className="text-xs text-muted-foreground mt-1">
+                            {employee.role && employee.role.replace(/_/g, ' ')}
+                          </div>
+                          <div className="mt-2 space-y-1">
+                            {employeeJobs.map(job => (
+                              <div key={job.id} className="text-xs flex items-center gap-1">
+                                <Badge variant="secondary" className="text-xs">
+                                  {job.project?.buildingName || job.title}
+                                </Badge>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+
+            {/* Available Employees */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <UserX className="w-5 h-5 text-blue-600" />
+                  Available ({availableEmployees.length})
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                {availableEmployees.length === 0 ? (
+                  <p className="text-sm text-muted-foreground">All employees are assigned</p>
+                ) : (
+                  <div className="space-y-3">
+                    {availableEmployees.map(employee => (
+                      <div key={employee.id} className="p-3 bg-muted/50 rounded-lg">
+                        <div className="font-medium">{employee.name}</div>
+                        <div className="text-xs text-muted-foreground mt-1">
+                          {employee.role && employee.role.replace(/_/g, ' ')}
+                        </div>
+                        <Badge variant="outline" className="mt-2 text-xs">
+                          Ready for assignment
+                        </Badge>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </div>
+        </TabsContent>
+      </Tabs>
 
       {/* Create Job Dialog */}
       <CreateJobDialog
