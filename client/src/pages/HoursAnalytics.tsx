@@ -461,7 +461,7 @@ export default function HoursAnalytics() {
   const updatePreferencesMutation = useMutation({
     mutationFn: async (updates: { dashboardCardOrder?: string[], hoursAnalyticsCardOrder?: string[] }) => {
       console.log("[HoursAnalytics] Mutation called with:", updates);
-      const result = await apiRequest("/api/user-preferences", "POST", updates);
+      const result = await apiRequest("POST", "/api/user-preferences", updates);
       console.log("[HoursAnalytics] Mutation result:", result);
       return result;
     },

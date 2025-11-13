@@ -1196,7 +1196,7 @@ export default function Dashboard() {
   const updatePreferencesMutation = useMutation({
     mutationFn: async (updates: { dashboardCardOrder?: string[], hoursAnalyticsCardOrder?: string[] }) => {
       console.log("[Dashboard] Mutation called with:", updates);
-      const result = await apiRequest("/api/user-preferences", "POST", updates);
+      const result = await apiRequest("POST", "/api/user-preferences", updates);
       console.log("[Dashboard] Mutation result:", result);
       return result;
     },
