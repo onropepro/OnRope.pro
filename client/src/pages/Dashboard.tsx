@@ -921,6 +921,7 @@ export default function Dashboard() {
       const { sameAsAddress, ...clientData } = data;
       return await apiRequest("POST", "/api/clients", {
         ...clientData,
+        companyId: currentUser?.id,
         lmsNumbers: lmsNumbers.filter(num => num.trim() !== ""),
       });
     },
