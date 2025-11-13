@@ -712,10 +712,13 @@ export default function Dashboard() {
       queryClient.invalidateQueries({ queryKey: ["/api/projects"] });
       
       // Check if this was manual entry BEFORE closing dialog (which clears the state)
+      console.log("🔍 selectedStrataForProject:", selectedStrataForProject);
       const wasManualEntry = selectedStrataForProject === "manual";
+      console.log("🔍 wasManualEntry:", wasManualEntry);
       
       // Store project data BEFORE resetting
       const formData = projectForm.getValues();
+      console.log("🔍 formData:", formData);
       
       // Now close dialog and reset
       setShowProjectDialog(false);
@@ -726,8 +729,12 @@ export default function Dashboard() {
       
       // If manual entry, ask if they want to save as client
       if (wasManualEntry) {
+        console.log("✅ Setting showSaveAsClientDialog to TRUE");
         setProjectDataForClient(formData);
         setShowSaveAsClientDialog(true);
+        console.log("✅ Dialog state should be true now");
+      } else {
+        console.log("❌ NOT manual entry - dialog will NOT show");
       }
     },
     onError: (error: Error) => {
