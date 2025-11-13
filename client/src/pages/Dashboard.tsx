@@ -333,8 +333,8 @@ export default function Dashboard() {
   const [showDeleteClientDialog, setShowDeleteClientDialog] = useState(false);
   const [clientToDelete, setClientToDelete] = useState<Client | null>(null);
   const [clientToEdit, setClientToEdit] = useState<Client | null>(null);
-  const [lmsNumbers, setLmsNumbers] = useState<Array<{ number: string; address: string; stories?: number; units?: number; parkingStalls?: number; dailyDropTarget?: number; totalDropsNorth?: number; totalDropsEast?: number; totalDropsSouth?: number; totalDropsWest?: number }>>([{ number: "", address: "" }]);
-  const [editLmsNumbers, setEditLmsNumbers] = useState<Array<{ number: string; address: string; stories?: number; units?: number; parkingStalls?: number; dailyDropTarget?: number; totalDropsNorth?: number; totalDropsEast?: number; totalDropsSouth?: number; totalDropsWest?: number }>>([{ number: "", address: "" }]);
+  const [lmsNumbers, setLmsNumbers] = useState<Array<{ number: string; buildingName?: string; address: string; stories?: number; units?: number; parkingStalls?: number; dailyDropTarget?: number; totalDropsNorth?: number; totalDropsEast?: number; totalDropsSouth?: number; totalDropsWest?: number }>>([{ number: "", address: "" }]);
+  const [editLmsNumbers, setEditLmsNumbers] = useState<Array<{ number: string; buildingName?: string; address: string; stories?: number; units?: number; parkingStalls?: number; dailyDropTarget?: number; totalDropsNorth?: number; totalDropsEast?: number; totalDropsSouth?: number; totalDropsWest?: number }>>([{ number: "", address: "" }]);
   const [sameAsAddress, setSameAsAddress] = useState(false);
   const [editSameAsAddress, setEditSameAsAddress] = useState(false);
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
@@ -891,6 +891,7 @@ export default function Dashboard() {
     // Pre-fill the client form with building details from the project
     const lmsData = [{
       number: projectDataForClient.strataPlanNumber || "",
+      buildingName: projectDataForClient.buildingName || "",
       address: projectDataForClient.buildingAddress || "",
       stories: projectDataForClient.floorCount ? parseInt(projectDataForClient.floorCount) : undefined,
       dailyDropTarget: projectDataForClient.dailyDropTarget ? parseInt(projectDataForClient.dailyDropTarget) : undefined,
@@ -3701,6 +3702,20 @@ export default function Dashboard() {
                                 )}
                               </div>
                               <div>
+                                <label className="text-xs text-muted-foreground mb-1 block">Building Name (Optional)</label>
+                                <Input
+                                  placeholder="Harbour View Towers"
+                                  value={lms.buildingName || ""}
+                                  onChange={(e) => {
+                                    const newLmsNumbers = [...lmsNumbers];
+                                    newLmsNumbers[index] = { ...lms, buildingName: e.target.value };
+                                    setLmsNumbers(newLmsNumbers);
+                                  }}
+                                  className="h-12"
+                                  data-testid={`input-client-lms-building-name-${index}`}
+                                />
+                              </div>
+                              <div>
                                 <label className="text-xs text-muted-foreground mb-1 block">Building Address</label>
                                 <Textarea
                                   placeholder="123 Main St, Vancouver, BC"
@@ -3972,6 +3987,9 @@ export default function Dashboard() {
                                   <div className="space-y-2 mt-2">
                                     {client.lmsNumbers.map((lms, idx) => (
                                       <div key={idx} className="text-sm">
+                                        {lms.buildingName && (
+                                          <div className="text-xs font-medium mb-1">{lms.buildingName}</div>
+                                        )}
                                         <Badge variant="secondary" className="text-xs mr-2">
                                           {lms.number}
                                         </Badge>
@@ -4140,6 +4158,20 @@ export default function Dashboard() {
                             <span className="material-icons">delete</span>
                           </Button>
                         )}
+                      </div>
+                      <div>
+                        <label className="text-xs text-muted-foreground mb-1 block">Building Name (Optional)</label>
+                        <Input
+                          placeholder="Harbour View Towers"
+                          value={lms.buildingName || ""}
+                          onChange={(e) => {
+                            const newLmsNumbers = [...editLmsNumbers];
+                            newLmsNumbers[index] = { ...lms, buildingName: e.target.value };
+                            setEditLmsNumbers(newLmsNumbers);
+                          }}
+                          className="h-12"
+                          data-testid={`input-edit-client-lms-building-name-${index}`}
+                        />
                       </div>
                       <div>
                         <label className="text-xs text-muted-foreground mb-1 block">Building Address</label>
