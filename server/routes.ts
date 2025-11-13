@@ -3997,25 +3997,34 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "employeeId is required" });
       }
       
+      // Parse dates properly - handle empty strings
+      const parsedStartDate = startDate && startDate.trim() !== '' ? new Date(startDate) : null;
+      const parsedEndDate = endDate && endDate.trim() !== '' ? new Date(endDate) : null;
+      
+      console.log("[ASSIGN EMPLOYEE] Parsed startDate:", parsedStartDate);
+      console.log("[ASSIGN EMPLOYEE] Parsed endDate:", parsedEndDate);
+      
       // Check if assignment already exists
       const existingAssignments = await storage.getJobAssignments(req.params.jobId);
       const existingAssignment = existingAssignments.find(a => a.employeeId === employeeId);
       
       if (existingAssignment) {
         // Update existing assignment
+        console.log("[ASSIGN EMPLOYEE] Updating existing assignment:", existingAssignment.id);
         await db.update(jobAssignments)
           .set({
-            startDate: startDate ? new Date(startDate) : null,
-            endDate: endDate ? new Date(endDate) : null,
+            startDate: parsedStartDate,
+            endDate: parsedEndDate,
           })
           .where(eq(jobAssignments.id, existingAssignment.id));
       } else {
         // Create new assignment
+        console.log("[ASSIGN EMPLOYEE] Creating new assignment");
         await storage.createJobAssignment({
           jobId: req.params.jobId,
           employeeId,
-          startDate: startDate ? new Date(startDate) : undefined,
-          endDate: endDate ? new Date(endDate) : undefined,
+          startDate: parsedStartDate as any,
+          endDate: parsedEndDate as any,
           assignedBy: currentUser.id,
         });
       }
