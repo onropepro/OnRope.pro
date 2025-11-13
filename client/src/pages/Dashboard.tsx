@@ -326,8 +326,12 @@ export default function Dashboard() {
   const [showEditEmployeeDialog, setShowEditEmployeeDialog] = useState(false);
   const [employeeToEdit, setEmployeeToEdit] = useState<any | null>(null);
   const [showClientDialog, setShowClientDialog] = useState(false);
+  const [showEditClientDialog, setShowEditClientDialog] = useState(false);
+  const [clientToEdit, setClientToEdit] = useState<Client | null>(null);
   const [lmsNumbers, setLmsNumbers] = useState<string[]>([""]);
+  const [editLmsNumbers, setEditLmsNumbers] = useState<string[]>([""]);
   const [sameAsAddress, setSameAsAddress] = useState(false);
+  const [editSameAsAddress, setEditSameAsAddress] = useState(false);
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [employeeToDelete, setEmployeeToDelete] = useState<string | null>(null);
@@ -561,6 +565,20 @@ export default function Dashboard() {
   });
 
   const clientForm = useForm<ClientFormData>({
+    resolver: zodResolver(clientSchema),
+    defaultValues: {
+      firstName: "",
+      lastName: "",
+      company: "",
+      address: "",
+      phoneNumber: "",
+      lmsNumbers: [""],
+      billingAddress: "",
+      sameAsAddress: false,
+    },
+  });
+
+  const editClientForm = useForm<ClientFormData>({
     resolver: zodResolver(clientSchema),
     defaultValues: {
       firstName: "",
@@ -938,6 +956,28 @@ export default function Dashboard() {
     },
   });
 
+  const editClientMutation = useMutation({
+    mutationFn: async (data: { id: string } & ClientFormData) => {
+      const { id, sameAsAddress, ...clientData } = data;
+      return await apiRequest("PATCH", `/api/clients/${id}`, {
+        ...clientData,
+        lmsNumbers: editLmsNumbers.filter(num => num.trim() !== ""),
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/clients"] });
+      setShowEditClientDialog(false);
+      setClientToEdit(null);
+      editClientForm.reset();
+      setEditLmsNumbers([""]);
+      setEditSameAsAddress(false);
+      toast({ title: "Client updated successfully" });
+    },
+    onError: (error: Error) => {
+      toast({ title: "Error", description: error.message, variant: "destructive" });
+    },
+  });
+
   const deleteClientMutation = useMutation({
     mutationFn: async (clientId: string) => {
       return await apiRequest("DELETE", `/api/clients/${clientId}`, {});
@@ -953,6 +993,27 @@ export default function Dashboard() {
 
   const onClientSubmit = async (data: ClientFormData) => {
     createClientMutation.mutate(data);
+  };
+
+  const onEditClientSubmit = async (data: ClientFormData) => {
+    if (!clientToEdit) return;
+    editClientMutation.mutate({ ...data, id: clientToEdit.id });
+  };
+
+  const handleEditClient = (client: Client) => {
+    setClientToEdit(client);
+    editClientForm.reset({
+      firstName: client.firstName,
+      lastName: client.lastName,
+      company: client.company || "",
+      address: client.address || "",
+      phoneNumber: client.phoneNumber || "",
+      billingAddress: client.billingAddress || "",
+      sameAsAddress: false,
+    });
+    setEditLmsNumbers(client.lmsNumbers && client.lmsNumbers.length > 0 ? client.lmsNumbers : [""]);
+    setEditSameAsAddress(client.address === client.billingAddress);
+    setShowEditClientDialog(true);
   };
 
   const deleteInspectionMutation = useMutation({
@@ -3268,7 +3329,7 @@ export default function Dashboard() {
                   </Button>
                 </DialogTrigger>
                 <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto">
-                  <DialogHeader>
+                  <DialogHeader className="pb-4">
                     <DialogTitle>Add New Client</DialogTitle>
                     <DialogDescription>Enter property manager or building owner details</DialogDescription>
                   </DialogHeader>
@@ -3494,14 +3555,24 @@ export default function Dashboard() {
                                 )}
                               </div>
                               {hasPermission(currentUser, "manage_clients") && !userIsReadOnly && (
-                                <Button
-                                  variant="ghost"
-                                  size="icon"
-                                  onClick={() => deleteClientMutation.mutate(client.id)}
-                                  data-testid={`button-delete-client-${client.id}`}
-                                >
-                                  <span className="material-icons text-destructive">delete</span>
-                                </Button>
+                                <div className="flex gap-1">
+                                  <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    onClick={() => handleEditClient(client)}
+                                    data-testid={`button-edit-client-${client.id}`}
+                                  >
+                                    <span className="material-icons">edit</span>
+                                  </Button>
+                                  <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    onClick={() => deleteClientMutation.mutate(client.id)}
+                                    data-testid={`button-delete-client-${client.id}`}
+                                  >
+                                    <span className="material-icons text-destructive">delete</span>
+                                  </Button>
+                                </div>
                               )}
                             </div>
                           </CardContent>
@@ -3515,6 +3586,190 @@ export default function Dashboard() {
           </div>
         )}
       </div>
+
+      {/* Edit Client Dialog */}
+      <Dialog open={showEditClientDialog} onOpenChange={setShowEditClientDialog}>
+        <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto">
+          <DialogHeader className="pb-4">
+            <DialogTitle>Edit Client</DialogTitle>
+            <DialogDescription>Update property manager or building owner details</DialogDescription>
+          </DialogHeader>
+          <Form {...editClientForm}>
+            <form onSubmit={editClientForm.handleSubmit(onEditClientSubmit)} className="space-y-4">
+              <FormField
+                control={editClientForm.control}
+                name="firstName"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>First Name</FormLabel>
+                    <FormControl>
+                      <Input placeholder="John" {...field} className="h-12" data-testid="input-edit-client-firstname" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={editClientForm.control}
+                name="lastName"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Last Name</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Smith" {...field} className="h-12" data-testid="input-edit-client-lastname" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={editClientForm.control}
+                name="company"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Company (Optional)</FormLabel>
+                    <FormControl>
+                      <Input placeholder="ABC Property Management" {...field} className="h-12" data-testid="input-edit-client-company" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={editClientForm.control}
+                name="phoneNumber"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Phone Number (Optional)</FormLabel>
+                    <FormControl>
+                      <Input placeholder="(604) 555-1234" {...field} className="h-12" data-testid="input-edit-client-phone" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={editClientForm.control}
+                name="address"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Address (Optional)</FormLabel>
+                    <FormControl>
+                      <Textarea 
+                        placeholder="123 Main St, Vancouver, BC" 
+                        {...field} 
+                        data-testid="input-edit-client-address"
+                        onChange={(e) => {
+                          field.onChange(e);
+                          if (editSameAsAddress) {
+                            editClientForm.setValue("billingAddress", e.target.value);
+                          }
+                        }}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <div className="space-y-2">
+                <label className="text-sm font-medium">LMS/Strata Plan Numbers</label>
+                {editLmsNumbers.map((lmsNum, index) => (
+                  <div key={index} className="flex gap-2">
+                    <Input
+                      placeholder="LMS1234 or VR5678"
+                      value={lmsNum}
+                      onChange={(e) => {
+                        const newLmsNumbers = [...editLmsNumbers];
+                        newLmsNumbers[index] = e.target.value;
+                        setEditLmsNumbers(newLmsNumbers);
+                      }}
+                      className="h-12"
+                      data-testid={`input-edit-client-lms-${index}`}
+                    />
+                    {editLmsNumbers.length > 1 && (
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="icon"
+                        onClick={() => {
+                          const newLmsNumbers = editLmsNumbers.filter((_, i) => i !== index);
+                          setEditLmsNumbers(newLmsNumbers);
+                        }}
+                        data-testid={`button-edit-remove-lms-${index}`}
+                      >
+                        <span className="material-icons">delete</span>
+                      </Button>
+                    )}
+                  </div>
+                ))}
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setEditLmsNumbers([...editLmsNumbers, ""])}
+                  className="w-full"
+                  data-testid="button-edit-add-lms"
+                >
+                  <span className="material-icons text-sm mr-1">add</span>
+                  Add Another LMS Number
+                </Button>
+              </div>
+
+              <div className="space-y-2">
+                <div className="flex items-center space-x-2">
+                  <Checkbox
+                    id="editSameAsAddress"
+                    checked={editSameAsAddress}
+                    onCheckedChange={(checked) => {
+                      setEditSameAsAddress(checked as boolean);
+                      if (checked) {
+                        editClientForm.setValue("billingAddress", editClientForm.getValues("address") || "");
+                      } else {
+                        editClientForm.setValue("billingAddress", "");
+                      }
+                    }}
+                    data-testid="checkbox-edit-same-as-address"
+                  />
+                  <label
+                    htmlFor="editSameAsAddress"
+                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                  >
+                    Billing address same as address
+                  </label>
+                </div>
+
+                <FormField
+                  control={editClientForm.control}
+                  name="billingAddress"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Billing Address (Optional)</FormLabel>
+                      <FormControl>
+                        <Textarea 
+                          placeholder="456 Billing Ave, Vancouver, BC" 
+                          {...field} 
+                          disabled={editSameAsAddress}
+                          data-testid="input-edit-client-billing-address"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              <Button type="submit" className="w-full h-12" disabled={editClientMutation.isPending} data-testid="button-submit-edit-client">
+                {editClientMutation.isPending ? "Updating..." : "Update Client"}
+              </Button>
+            </form>
+          </Form>
+        </DialogContent>
+      </Dialog>
 
       {/* Edit Employee Dialog */}
       <Dialog open={showEditEmployeeDialog} onOpenChange={(open) => { setShowEditEmployeeDialog(open); if (!open) setEditEmployeeFormStep(1); }}>
