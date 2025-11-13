@@ -1540,6 +1540,21 @@ export default function Dashboard() {
     toast({ title: "Layout reset", description: "Dashboard cards restored to default order" });
   };
 
+  // Get page title based on active tab
+  const getPageTitle = () => {
+    switch (activeTab) {
+      case "": return "Dashboard";
+      case "projects": return "Projects";
+      case "past-projects": return "Past Projects";
+      case "performance": return "Performance";
+      case "complaints": return "Complaints";
+      case "employees": return "Employees";
+      case "documents": return "Documents";
+      case "clients": return "Clients";
+      default: return "Dashboard";
+    }
+  };
+
   if (projectsLoading || employeesLoading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
@@ -1556,7 +1571,7 @@ export default function Dashboard() {
       <header className="sticky top-0 z-[100] glass backdrop-blur-xl border-b border-border/50 shadow-premium">
         <div className="px-6 h-20 flex items-center justify-between max-w-7xl mx-auto">
           <div>
-            <h1 className="text-2xl font-bold gradient-text">Dashboard</h1>
+            <h1 className="text-2xl font-bold gradient-text">{getPageTitle()}</h1>
             {companyName && (
               <p className="text-sm text-muted-foreground mt-1 font-medium">{companyName}</p>
             )}
