@@ -909,9 +909,38 @@ export default function Dashboard() {
     },
   });
 
+  // Helper function to get current GPS location
+  const getCurrentLocation = (): Promise<{ latitude: number; longitude: number } | null> => {
+    return new Promise((resolve) => {
+      if (!navigator.geolocation) {
+        console.warn("Geolocation is not supported by this browser");
+        resolve(null);
+        return;
+      }
+
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          resolve({
+            latitude: position.coords.latitude,
+            longitude: position.coords.longitude,
+          });
+        },
+        (error) => {
+          console.warn("Failed to get location:", error.message);
+          resolve(null);
+        },
+        { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+      );
+    });
+  };
+
   const startDayMutation = useMutation({
     mutationFn: async (projectId: string) => {
-      return apiRequest("POST", `/api/projects/${projectId}/work-sessions/start`, {});
+      const location = await getCurrentLocation();
+      return apiRequest("POST", `/api/projects/${projectId}/work-sessions/start`, {
+        startLatitude: location?.latitude,
+        startLongitude: location?.longitude,
+      });
     },
     onSuccess: (data) => {
       console.log("Start day response:", data);
@@ -919,7 +948,7 @@ export default function Dashboard() {
       setShowStartDayDialog(false);
       queryClient.invalidateQueries({ queryKey: ["/api/projects"] });
       queryClient.invalidateQueries({ queryKey: ["/api/my-drops-today"] });
-      toast({ title: "Work session started", description: "Good luck today!" });
+      toast({ title: "Work session started", description: "Good luck today! Location recorded." });
     },
     onError: (error: Error) => {
       toast({ title: "Error", description: error.message, variant: "destructive" });
@@ -928,12 +957,15 @@ export default function Dashboard() {
 
   const endDayMutation = useMutation({
     mutationFn: async (data: EndDayFormData & { sessionId: string; projectId: string }) => {
+      const location = await getCurrentLocation();
       return apiRequest("PATCH", `/api/projects/${data.projectId}/work-sessions/${data.sessionId}/end`, {
         dropsCompletedNorth: parseInt(data.dropsNorth) || 0,
         dropsCompletedEast: parseInt(data.dropsEast) || 0,
         dropsCompletedSouth: parseInt(data.dropsSouth) || 0,
         dropsCompletedWest: parseInt(data.dropsWest) || 0,
         shortfallReason: data.shortfallReason,
+        endLatitude: location?.latitude,
+        endLongitude: location?.longitude,
       });
     },
     onSuccess: () => {
@@ -942,7 +974,7 @@ export default function Dashboard() {
       queryClient.invalidateQueries({ queryKey: ["/api/projects"] });
       queryClient.invalidateQueries({ queryKey: ["/api/my-drops-today"] });
       endDayForm.reset();
-      toast({ title: "Work session ended", description: "Great work today!" });
+      toast({ title: "Work session ended", description: "Great work today! Location recorded." });
     },
     onError: (error: Error) => {
       toast({ title: "Error", description: error.message, variant: "destructive" });

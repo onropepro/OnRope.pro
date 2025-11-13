@@ -1727,6 +1727,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       const { projectId } = req.params;
+      const { startLatitude, startLongitude } = req.body;
       
       // Verify employee has access to this project
       const hasAccess = await storage.verifyProjectAccess(
@@ -1761,6 +1762,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         companyId: project.companyId,
         workDate: now,
         startTime: now,
+        startLatitude: startLatitude || null,
+        startLongitude: startLongitude || null,
       });
       
       res.json({ session });
@@ -1780,7 +1783,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       const { sessionId } = req.params;
-      const { dropsCompletedNorth, dropsCompletedEast, dropsCompletedSouth, dropsCompletedWest, shortfallReason } = req.body;
+      const { dropsCompletedNorth, dropsCompletedEast, dropsCompletedSouth, dropsCompletedWest, shortfallReason, endLatitude, endLongitude } = req.body;
       
       // Get the session to verify ownership
       const activeSession = await storage.getActiveWorkSession(currentUser.id, req.params.projectId);
@@ -1819,7 +1822,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         east,
         south,
         west,
-        totalDropsCompleted < project.dailyDropTarget ? shortfallReason : undefined
+        totalDropsCompleted < project.dailyDropTarget ? shortfallReason : undefined,
+        endLatitude || null,
+        endLongitude || null
       );
       
       res.json({ session });

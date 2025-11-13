@@ -420,7 +420,9 @@ export class Storage {
     dropsCompletedEast: number,
     dropsCompletedSouth: number,
     dropsCompletedWest: number,
-    shortfallReason?: string
+    shortfallReason?: string,
+    endLatitude?: number | null,
+    endLongitude?: number | null
   ): Promise<WorkSession> {
     const result = await db.update(workSessions)
       .set({
@@ -430,6 +432,8 @@ export class Storage {
         dropsCompletedSouth,
         dropsCompletedWest,
         shortfallReason,
+        endLatitude: endLatitude !== null && endLatitude !== undefined ? endLatitude.toString() : null,
+        endLongitude: endLongitude !== null && endLongitude !== undefined ? endLongitude.toString() : null,
         updatedAt: sql`NOW()`,
       })
       .where(eq(workSessions.id, sessionId))
@@ -451,6 +455,10 @@ export class Storage {
       dropsCompletedSouth: workSessions.dropsCompletedSouth,
       dropsCompletedWest: workSessions.dropsCompletedWest,
       shortfallReason: workSessions.shortfallReason,
+      startLatitude: workSessions.startLatitude,
+      startLongitude: workSessions.startLongitude,
+      endLatitude: workSessions.endLatitude,
+      endLongitude: workSessions.endLongitude,
       createdAt: workSessions.createdAt,
       updatedAt: workSessions.updatedAt,
       techName: users.name,
