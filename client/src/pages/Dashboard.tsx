@@ -3416,13 +3416,13 @@ export default function Dashboard() {
                       />
 
                       <div className="space-y-3">
-                        <label className="text-sm font-medium">LMS/Strata Plan Numbers & Addresses</label>
+                        <label className="text-sm font-medium">Strata Plan Numbers & Addresses</label>
                         {lmsNumbers.map((lms, index) => (
                           <Card key={index} className="p-3">
                             <div className="space-y-3">
                               <div className="flex gap-2 items-start">
                                 <div className="flex-1">
-                                  <label className="text-xs text-muted-foreground mb-1 block">LMS Number</label>
+                                  <label className="text-xs text-muted-foreground mb-1 block">Strata Number</label>
                                   <Input
                                     placeholder="LMS1234 or VR5678"
                                     value={lms.number}
@@ -3477,7 +3477,7 @@ export default function Dashboard() {
                           data-testid="button-add-lms"
                         >
                           <span className="material-icons text-sm mr-1">add</span>
-                          Add Another LMS Number
+                          Add Another Strata Number
                         </Button>
                       </div>
 
@@ -3704,13 +3704,13 @@ export default function Dashboard() {
               />
 
               <div className="space-y-3">
-                <label className="text-sm font-medium">LMS/Strata Plan Numbers & Addresses</label>
+                <label className="text-sm font-medium">Strata Plan Numbers & Addresses</label>
                 {editLmsNumbers.map((lms, index) => (
                   <Card key={index} className="p-3">
                     <div className="space-y-3">
                       <div className="flex gap-2 items-start">
                         <div className="flex-1">
-                          <label className="text-xs text-muted-foreground mb-1 block">LMS Number</label>
+                          <label className="text-xs text-muted-foreground mb-1 block">Strata Number</label>
                           <Input
                             placeholder="LMS1234 or VR5678"
                             value={lms.number}
@@ -3765,7 +3765,7 @@ export default function Dashboard() {
                   data-testid="button-edit-add-lms"
                 >
                   <span className="material-icons text-sm mr-1">add</span>
-                  Add Another LMS Number
+                  Add Another Strata Number
                 </Button>
               </div>
 
