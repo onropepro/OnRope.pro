@@ -521,6 +521,28 @@ export default function Dashboard() {
     },
   });
 
+  // Auto-select all permissions for Owner/CEO role when creating employee
+  useEffect(() => {
+    const subscription = employeeForm.watch((value, { name }) => {
+      if (name === "role" && value.role === "owner_ceo") {
+        const allPermissionIds = AVAILABLE_PERMISSIONS.map(p => p.id);
+        employeeForm.setValue("permissions", allPermissionIds);
+      }
+    });
+    return () => subscription.unsubscribe();
+  }, [employeeForm]);
+
+  // Auto-select all permissions for Owner/CEO role when editing employee
+  useEffect(() => {
+    const subscription = editEmployeeForm.watch((value, { name }) => {
+      if (name === "role" && value.role === "owner_ceo") {
+        const allPermissionIds = AVAILABLE_PERMISSIONS.map(p => p.id);
+        editEmployeeForm.setValue("permissions", allPermissionIds);
+      }
+    });
+    return () => subscription.unsubscribe();
+  }, [editEmployeeForm]);
+
   // Check for active session on component mount - only run once
   useEffect(() => {
     const checkActiveSession = async () => {
