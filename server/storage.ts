@@ -1,7 +1,7 @@
 import { db } from "./db";
 import { users, projects, dropLogs, workSessions, nonBillableWorkSessions, complaints, complaintNotes, projectPhotos, jobComments, harnessInspections, toolboxMeetings, payPeriodConfig, payPeriods, quotes, quoteServices, gearItems, scheduledJobs, jobAssignments, userPreferences } from "@shared/schema";
 import type { User, InsertUser, Project, InsertProject, DropLog, InsertDropLog, WorkSession, InsertWorkSession, Complaint, InsertComplaint, ComplaintNote, InsertComplaintNote, ProjectPhoto, InsertProjectPhoto, JobComment, InsertJobComment, HarnessInspection, InsertHarnessInspection, ToolboxMeeting, InsertToolboxMeeting, PayPeriodConfig, InsertPayPeriodConfig, PayPeriod, InsertPayPeriod, EmployeeHoursSummary, Quote, InsertQuote, QuoteService, InsertQuoteService, QuoteWithServices, GearItem, InsertGearItem, ScheduledJob, InsertScheduledJob, JobAssignment, InsertJobAssignment, ScheduledJobWithAssignments, UserPreferences, InsertUserPreferences } from "@shared/schema";
-import { eq, and, or, desc, sql, isNull, not, gte, lte, between } from "drizzle-orm";
+import { eq, and, or, desc, sql, isNull, not, gte, lte, between, inArray } from "drizzle-orm";
 import bcrypt from "bcrypt";
 
 const SALT_ROUNDS = 10;
@@ -1248,7 +1248,7 @@ export class Storage {
           ? await db.select().from(users).where(
               and(
                 eq(users.companyId, companyId),
-                sql`${users.id} = ANY(${employeeIds})`
+                inArray(users.id, employeeIds)
               )
             )
           : [];
@@ -1274,7 +1274,7 @@ export class Storage {
     }
     
     const jobs = await db.select().from(scheduledJobs)
-      .where(sql`${scheduledJobs.id} = ANY(${jobIds})`)
+      .where(inArray(scheduledJobs.id, jobIds))
       .orderBy(desc(scheduledJobs.startDate));
     
     // Fetch all assignments for these jobs
@@ -1284,7 +1284,7 @@ export class Storage {
         const employeeIds = jobAssignmentList.map(a => a.employeeId);
         const assignedEmployees = employeeIds.length > 0
           ? await db.select().from(users).where(
-              sql`${users.id} = ANY(${employeeIds})`
+              inArray(users.id, employeeIds)
             )
           : [];
         
