@@ -1942,7 +1942,15 @@ function EditJobDialog({
   employees: User[];
 }) {
   const { toast } = useToast();
+  
+  // Fetch projects for dropdown
+  const { data: projectsData } = useQuery<{ projects: any[] }>({
+    queryKey: ["/api/projects"],
+  });
+  const projects = projectsData?.projects || [];
+  
   const [formData, setFormData] = useState({
+    projectId: "",
     title: "",
     description: "",
     jobType: "",
@@ -1961,6 +1969,7 @@ function EditJobDialog({
   useEffect(() => {
     if (job) {
       setFormData({
+        projectId: job.projectId || "",
         title: job.title || "",
         description: job.description || "",
         jobType: job.jobType || "window_cleaning",
