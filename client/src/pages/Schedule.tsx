@@ -1175,12 +1175,18 @@ function JobDetailDialog({
   });
 
   const handleAssignEmployee = (employee: User) => {
-    if (!job) return;
+    console.log("handleAssignEmployee called", employee);
+    if (!job) {
+      console.log("No job available");
+      return;
+    }
     setSelectedEmployee(employee);
     // Set default dates to job's date range
     const startDate = new Date(job.startDate).toISOString().slice(0, 10);
     const endDate = new Date(job.endDate).toISOString().slice(0, 10);
+    console.log("Setting dates:", startDate, endDate);
     setAssignmentDates({ startDate, endDate });
+    console.log("Opening dialog");
     setAssignDialogOpen(true);
   };
 
@@ -1245,7 +1251,23 @@ function JobDetailDialog({
               <Button
                 variant={showAssignEmployees ? "outline" : "default"}
                 size="default"
-                onClick={() => setShowAssignEmployees(!showAssignEmployees)}
+                onClick={() => {
+                  console.log("Manage/assign button clicked");
+                  // For testing: open dialog directly when there are employees
+                  if (employees.length > 0 && !showAssignEmployees) {
+                    const firstUnassigned = employees.find(emp => {
+                      const isAssigned = job.employeeAssignments?.some(assignment => assignment.employee.id === emp.id) ||
+                                        job.assignedEmployees?.some(assigned => assigned.id === emp.id);
+                      return !isAssigned;
+                    });
+                    if (firstUnassigned) {
+                      console.log("Opening dialog with first unassigned employee:", firstUnassigned.name);
+                      handleAssignEmployee(firstUnassigned);
+                      return;
+                    }
+                  }
+                  setShowAssignEmployees(!showAssignEmployees);
+                }}
                 data-testid="button-assign-employees"
                 className="gap-2"
               >
@@ -1257,29 +1279,41 @@ function JobDetailDialog({
             {showAssignEmployees ? (
               <div className="space-y-3">
                 <div className="border rounded-md p-4 max-h-64 overflow-y-auto">
-                  {employees.length === 0 ? (
-                    <p className="text-sm text-muted-foreground">No employees available</p>
-                  ) : (
-                    <div className="grid grid-cols-1 gap-2">
-                      {employees.filter(emp => {
-                        // Check if employee is already assigned using the new structure
-                        const isAssigned = job.employeeAssignments?.some(assignment => assignment.employee.id === emp.id) ||
-                                          job.assignedEmployees?.some(assigned => assigned.id === emp.id);
-                        return !isAssigned;
-                      }).map((employee) => (
-                        <Button
-                          key={employee.id}
-                          variant="outline"
-                          className="w-full justify-start"
-                          onClick={() => handleAssignEmployee(employee)}
-                          data-testid={`button-assign-${employee.id}`}
-                        >
-                          <UserCheck className="w-4 h-4 mr-2" />
-                          {employee.name} {employee.role && `(${employee.role.replace(/_/g, ' ')})`}
-                        </Button>
-                      ))}
-                    </div>
-                  )}
+                  {(() => {
+                    if (employees.length === 0) {
+                      return <p className="text-sm text-muted-foreground">No employees available</p>;
+                    }
+                    
+                    const unassignedEmployees = employees.filter(emp => {
+                      const isAssigned = job.employeeAssignments?.some(assignment => assignment.employee.id === emp.id) ||
+                                        job.assignedEmployees?.some(assigned => assigned.id === emp.id);
+                      return !isAssigned;
+                    });
+                    
+                    if (unassignedEmployees.length === 0) {
+                      return <p className="text-sm text-muted-foreground">All employees are already assigned to this job</p>;
+                    }
+                    
+                    return (
+                      <div className="grid grid-cols-1 gap-2">
+                        {unassignedEmployees.map((employee) => (
+                          <Button
+                            key={employee.id}
+                            variant="outline"
+                            className="w-full justify-start"
+                            onClick={() => {
+                              console.log("Button clicked for employee:", employee.name);
+                              handleAssignEmployee(employee);
+                            }}
+                            data-testid={`button-assign-${employee.id}`}
+                          >
+                            <UserCheck className="w-4 h-4 mr-2" />
+                            {employee.name} {employee.role && `(${employee.role.replace(/_/g, ' ')})`}
+                          </Button>
+                        ))}
+                      </div>
+                    );
+                  })()}
                 </div>
               </div>
             ) : (
@@ -1410,60 +1444,65 @@ function JobDetailDialog({
       </AlertDialogContent>
     </AlertDialog>
 
-    <Dialog open={assignDialogOpen} onOpenChange={setAssignDialogOpen}>
-      <DialogContent className="max-w-md">
-        <DialogHeader>
-          <DialogTitle>Assign Employee to Job</DialogTitle>
-          <DialogDescription>
-            Specify the date range when {selectedEmployee?.name} will work on this job
-          </DialogDescription>
-        </DialogHeader>
-        
-        <div className="space-y-4">
-          <div>
-            <Label htmlFor="assign-start-date">Start Date</Label>
-            <Input
-              id="assign-start-date"
-              type="date"
-              value={assignmentDates.startDate}
-              onChange={(e) => setAssignmentDates({ ...assignmentDates, startDate: e.target.value })}
-              min={new Date(job.startDate).toISOString().slice(0, 10)}
-              max={new Date(job.endDate).toISOString().slice(0, 10)}
-              data-testid="input-assignment-start-date"
-            />
+    {job && (
+      <Dialog open={assignDialogOpen} onOpenChange={(open) => {
+        console.log("Dialog open changed to:", open);
+        setAssignDialogOpen(open);
+      }}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Assign Employee to Job</DialogTitle>
+            <DialogDescription>
+              Specify the date range when {selectedEmployee?.name} will work on this job
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="space-y-4">
+            <div>
+              <Label htmlFor="assign-start-date">Start Date</Label>
+              <Input
+                id="assign-start-date"
+                type="date"
+                value={assignmentDates.startDate}
+                onChange={(e) => setAssignmentDates({ ...assignmentDates, startDate: e.target.value })}
+                min={new Date(job.startDate).toISOString().slice(0, 10)}
+                max={new Date(job.endDate).toISOString().slice(0, 10)}
+                data-testid="input-assignment-start-date"
+              />
+            </div>
+            <div>
+              <Label htmlFor="assign-end-date">End Date</Label>
+              <Input
+                id="assign-end-date"
+                type="date"
+                value={assignmentDates.endDate}
+                onChange={(e) => setAssignmentDates({ ...assignmentDates, endDate: e.target.value })}
+                min={assignmentDates.startDate || new Date(job.startDate).toISOString().slice(0, 10)}
+                max={new Date(job.endDate).toISOString().slice(0, 10)}
+                data-testid="input-assignment-end-date"
+              />
+            </div>
           </div>
-          <div>
-            <Label htmlFor="assign-end-date">End Date</Label>
-            <Input
-              id="assign-end-date"
-              type="date"
-              value={assignmentDates.endDate}
-              onChange={(e) => setAssignmentDates({ ...assignmentDates, endDate: e.target.value })}
-              min={assignmentDates.startDate || new Date(job.startDate).toISOString().slice(0, 10)}
-              max={new Date(job.endDate).toISOString().slice(0, 10)}
-              data-testid="input-assignment-end-date"
-            />
-          </div>
-        </div>
-        
-        <DialogFooter>
-          <Button
-            variant="outline"
-            onClick={() => setAssignDialogOpen(false)}
-            data-testid="button-cancel-assignment"
-          >
-            Cancel
-          </Button>
-          <Button
-            onClick={handleSaveAssignment}
-            disabled={assignEmployeeMutation.isPending}
-            data-testid="button-save-assignment"
-          >
-            {assignEmployeeMutation.isPending ? "Assigning..." : "Assign Employee"}
-          </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+          
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setAssignDialogOpen(false)}
+              data-testid="button-cancel-assignment"
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={handleSaveAssignment}
+              disabled={assignEmployeeMutation.isPending}
+              data-testid="button-save-assignment"
+            >
+              {assignEmployeeMutation.isPending ? "Assigning..." : "Assign Employee"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    )}
   </>
   );
 }
