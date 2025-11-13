@@ -325,6 +325,9 @@ export default function Dashboard() {
   const [showEmployeeDialog, setShowEmployeeDialog] = useState(false);
   const [showEditEmployeeDialog, setShowEditEmployeeDialog] = useState(false);
   const [employeeToEdit, setEmployeeToEdit] = useState<any | null>(null);
+  const [showClientDialog, setShowClientDialog] = useState(false);
+  const [lmsNumbers, setLmsNumbers] = useState<string[]>([""]);
+  const [sameAsAddress, setSameAsAddress] = useState(false);
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [employeeToDelete, setEmployeeToDelete] = useState<string | null>(null);
@@ -367,6 +370,11 @@ export default function Dashboard() {
   // Fetch all employees (including terminated) for management
   const { data: employeesData, isLoading: employeesLoading } = useQuery({
     queryKey: ["/api/employees/all"],
+  });
+
+  // Fetch all clients
+  const { data: clientsData, isLoading: clientsLoading } = useQuery<Client[]>({
+    queryKey: ["/api/clients"],
   });
 
   // Fetch today's drops for daily target
@@ -549,6 +557,20 @@ export default function Dashboard() {
       dropsSouth: "0",
       dropsWest: "0",
       shortfallReason: "",
+    },
+  });
+
+  const clientForm = useForm<ClientFormData>({
+    resolver: zodResolver(clientSchema),
+    defaultValues: {
+      firstName: "",
+      lastName: "",
+      company: "",
+      address: "",
+      phoneNumber: "",
+      lmsNumbers: [""],
+      billingAddress: "",
+      sameAsAddress: false,
     },
   });
 
@@ -893,6 +915,44 @@ export default function Dashboard() {
       toast({ title: "Error", description: error.message, variant: "destructive" });
     },
   });
+
+  const createClientMutation = useMutation({
+    mutationFn: async (data: ClientFormData) => {
+      const { sameAsAddress, ...clientData } = data;
+      return await apiRequest("POST", "/api/clients", {
+        ...clientData,
+        lmsNumbers: lmsNumbers.filter(num => num.trim() !== ""),
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/clients"] });
+      setShowClientDialog(false);
+      clientForm.reset();
+      setLmsNumbers([""]);
+      setSameAsAddress(false);
+      toast({ title: "Client created successfully" });
+    },
+    onError: (error: Error) => {
+      toast({ title: "Error", description: error.message, variant: "destructive" });
+    },
+  });
+
+  const deleteClientMutation = useMutation({
+    mutationFn: async (clientId: string) => {
+      return await apiRequest("DELETE", `/api/clients/${clientId}`, {});
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/clients"] });
+      toast({ title: "Client deleted successfully" });
+    },
+    onError: (error: Error) => {
+      toast({ title: "Error", description: error.message, variant: "destructive" });
+    },
+  });
+
+  const onClientSubmit = async (data: ClientFormData) => {
+    createClientMutation.mutate(data);
+  };
 
   const deleteInspectionMutation = useMutation({
     mutationFn: async (inspectionId: string) => {
@@ -3195,7 +3255,7 @@ export default function Dashboard() {
           <div>
             <div className="space-y-4">
               {/* Add Client Button */}
-              <Dialog>
+              <Dialog open={showClientDialog} onOpenChange={setShowClientDialog}>
                 <DialogTrigger asChild>
                   <Button 
                     className="w-full h-12 gap-2" 
@@ -3211,9 +3271,180 @@ export default function Dashboard() {
                     <DialogTitle>Add New Client</DialogTitle>
                     <DialogDescription>Enter property manager or building owner details</DialogDescription>
                   </DialogHeader>
-                  <div className="space-y-4">
-                    <p className="text-sm text-muted-foreground">Client form will be implemented here</p>
-                  </div>
+                  <Form {...clientForm}>
+                    <form onSubmit={clientForm.handleSubmit(onClientSubmit)} className="space-y-4">
+                      <FormField
+                        control={clientForm.control}
+                        name="firstName"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>First Name</FormLabel>
+                            <FormControl>
+                              <Input placeholder="John" {...field} className="h-12" data-testid="input-client-firstname" />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      <FormField
+                        control={clientForm.control}
+                        name="lastName"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Last Name</FormLabel>
+                            <FormControl>
+                              <Input placeholder="Smith" {...field} className="h-12" data-testid="input-client-lastname" />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      <FormField
+                        control={clientForm.control}
+                        name="company"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Company (Optional)</FormLabel>
+                            <FormControl>
+                              <Input placeholder="ABC Property Management" {...field} className="h-12" data-testid="input-client-company" />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      <FormField
+                        control={clientForm.control}
+                        name="phoneNumber"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Phone Number (Optional)</FormLabel>
+                            <FormControl>
+                              <Input placeholder="(604) 555-1234" {...field} className="h-12" data-testid="input-client-phone" />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      <FormField
+                        control={clientForm.control}
+                        name="address"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Address (Optional)</FormLabel>
+                            <FormControl>
+                              <Textarea 
+                                placeholder="123 Main St, Vancouver, BC" 
+                                {...field} 
+                                data-testid="input-client-address"
+                                onChange={(e) => {
+                                  field.onChange(e);
+                                  if (sameAsAddress) {
+                                    clientForm.setValue("billingAddress", e.target.value);
+                                  }
+                                }}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium">LMS/Strata Plan Numbers</label>
+                        {lmsNumbers.map((lmsNum, index) => (
+                          <div key={index} className="flex gap-2">
+                            <Input
+                              placeholder="LMS1234 or VR5678"
+                              value={lmsNum}
+                              onChange={(e) => {
+                                const newLmsNumbers = [...lmsNumbers];
+                                newLmsNumbers[index] = e.target.value;
+                                setLmsNumbers(newLmsNumbers);
+                              }}
+                              className="h-12"
+                              data-testid={`input-client-lms-${index}`}
+                            />
+                            {lmsNumbers.length > 1 && (
+                              <Button
+                                type="button"
+                                variant="outline"
+                                size="icon"
+                                onClick={() => {
+                                  const newLmsNumbers = lmsNumbers.filter((_, i) => i !== index);
+                                  setLmsNumbers(newLmsNumbers);
+                                }}
+                                data-testid={`button-remove-lms-${index}`}
+                              >
+                                <span className="material-icons">delete</span>
+                              </Button>
+                            )}
+                          </div>
+                        ))}
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={() => setLmsNumbers([...lmsNumbers, ""])}
+                          className="w-full"
+                          data-testid="button-add-lms"
+                        >
+                          <span className="material-icons text-sm mr-1">add</span>
+                          Add Another LMS Number
+                        </Button>
+                      </div>
+
+                      <div className="space-y-2">
+                        <div className="flex items-center space-x-2">
+                          <Checkbox
+                            id="sameAsAddress"
+                            checked={sameAsAddress}
+                            onCheckedChange={(checked) => {
+                              setSameAsAddress(checked as boolean);
+                              if (checked) {
+                                clientForm.setValue("billingAddress", clientForm.getValues("address") || "");
+                              } else {
+                                clientForm.setValue("billingAddress", "");
+                              }
+                            }}
+                            data-testid="checkbox-same-as-address"
+                          />
+                          <label
+                            htmlFor="sameAsAddress"
+                            className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                          >
+                            Billing address same as address
+                          </label>
+                        </div>
+
+                        <FormField
+                          control={clientForm.control}
+                          name="billingAddress"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Billing Address (Optional)</FormLabel>
+                              <FormControl>
+                                <Textarea 
+                                  placeholder="456 Billing Ave, Vancouver, BC" 
+                                  {...field} 
+                                  disabled={sameAsAddress}
+                                  data-testid="input-client-billing-address"
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </div>
+
+                      <Button type="submit" className="w-full h-12" disabled={createClientMutation.isPending} data-testid="button-submit-client">
+                        {createClientMutation.isPending ? "Creating..." : "Create Client"}
+                      </Button>
+                    </form>
+                  </Form>
                 </DialogContent>
               </Dialog>
 
@@ -3227,7 +3458,56 @@ export default function Dashboard() {
                   <CardDescription>Property managers and building contacts</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-sm text-muted-foreground">Loading clients...</p>
+                  {clientsLoading ? (
+                    <p className="text-sm text-muted-foreground">Loading clients...</p>
+                  ) : !clientsData || clientsData.length === 0 ? (
+                    <p className="text-sm text-muted-foreground">No clients yet. Add your first client to get started.</p>
+                  ) : (
+                    <div className="space-y-3">
+                      {clientsData.map((client) => (
+                        <Card key={client.id} className="hover-elevate" data-testid={`client-card-${client.id}`}>
+                          <CardContent className="p-4">
+                            <div className="flex items-start justify-between">
+                              <div className="flex-1">
+                                <div className="font-medium text-base mb-1">
+                                  {client.firstName} {client.lastName}
+                                </div>
+                                {client.company && (
+                                  <div className="text-sm text-muted-foreground mb-1">
+                                    {client.company}
+                                  </div>
+                                )}
+                                {client.phoneNumber && (
+                                  <div className="text-sm text-muted-foreground mb-1">
+                                    {client.phoneNumber}
+                                  </div>
+                                )}
+                                {client.lmsNumbers && client.lmsNumbers.length > 0 && (
+                                  <div className="flex flex-wrap gap-1 mt-2">
+                                    {client.lmsNumbers.map((lms, idx) => (
+                                      <Badge key={idx} variant="secondary" className="text-xs">
+                                        {lms}
+                                      </Badge>
+                                    ))}
+                                  </div>
+                                )}
+                              </div>
+                              {hasPermission(currentUser, "manage_clients") && !userIsReadOnly && (
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  onClick={() => deleteClientMutation.mutate(client.id)}
+                                  data-testid={`button-delete-client-${client.id}`}
+                                >
+                                  <span className="material-icons text-destructive">delete</span>
+                                </Button>
+                              )}
+                            </div>
+                          </CardContent>
+                        </Card>
+                      ))}
+                    </div>
+                  )}
                 </CardContent>
               </Card>
             </div>
