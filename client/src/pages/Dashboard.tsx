@@ -1,3 +1,4 @@
+// GPS Location Tracking - v2.0 - CACHE BUST
 import { useState, useEffect, useMemo } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { queryClient, apiRequest } from "@/lib/queryClient";
