@@ -341,6 +341,7 @@ export default function Dashboard() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedClientForProject, setSelectedClientForProject] = useState<string>("");
   const [selectedStrataForProject, setSelectedStrataForProject] = useState<string>("");
+  const isManualEntryRef = useRef(false);
   const [clientDropdownOpen, setClientDropdownOpen] = useState(false);
   const [clientSearchQuery, setClientSearchQuery] = useState("");
   const [employeeToDelete, setEmployeeToDelete] = useState<string | null>(null);
@@ -711,11 +712,11 @@ export default function Dashboard() {
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ["/api/projects"] });
       
-      // DEBUG: Show the value we're checking
-      alert(`DEBUG: selectedStrataForProject = "${selectedStrataForProject}"`);
+      // DEBUG: Show both values
+      alert(`DEBUG:\nState = "${selectedStrataForProject}"\nRef = ${isManualEntryRef.current}`);
       
-      // Check if manual entry
-      const wasManualEntry = selectedStrataForProject === "manual";
+      // Check if manual entry using the ref
+      const wasManualEntry = isManualEntryRef.current;
       
       // Store project data BEFORE resetting
       const formData = projectForm.getValues();
@@ -726,6 +727,7 @@ export default function Dashboard() {
       setUploadedPlanFile(null);
       setSelectedClientForProject("");
       setSelectedStrataForProject("");
+      isManualEntryRef.current = false; // Reset the ref
       
       toast({ title: "Project created successfully" });
       
@@ -828,11 +830,16 @@ export default function Dashboard() {
     setSelectedStrataForProject(value);
     
     if (value === "manual") {
+      // Set the ref to track manual entry
+      isManualEntryRef.current = true;
       // Clear all form fields
       projectForm.reset();
       setSelectedClientForProject("");
       return;
     }
+    
+    // Not manual entry
+    isManualEntryRef.current = false;
 
     // Parse the value (format: "clientId|strataNumber")
     const [clientId, strataIndex] = value.split("|");
