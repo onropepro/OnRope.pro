@@ -49,6 +49,7 @@ interface SessionDetailsDialogProps {
   session: any;
   employeeName?: string;
   projectName?: string;
+  jobType?: string;
 }
 
 export function SessionDetailsDialog({
@@ -57,8 +58,12 @@ export function SessionDetailsDialog({
   session,
   employeeName,
   projectName,
+  jobType,
 }: SessionDetailsDialogProps) {
   if (!session) return null;
+  
+  const isParkade = jobType === "parkade_pressure_cleaning";
+  const isInSuite = jobType === "in_suite_dryer_vent_cleaning";
 
   const hasStartLocation = session.startLatitude && session.startLongitude;
   const hasEndLocation = session.endLatitude && session.endLongitude;
@@ -256,24 +261,37 @@ export function SessionDetailsDialog({
             </div>
           )}
 
-          {/* Drop Logs (if applicable) */}
+          {/* Work Completed (if applicable) */}
           {session.dropsCompletedNorth !== undefined && (
             <div className="space-y-2">
-              <h3 className="font-semibold">Drops Completed</h3>
-              <div className="grid grid-cols-4 gap-2">
-                <Badge variant="outline" className="justify-center py-2">
-                  North: {session.dropsCompletedNorth || 0}
-                </Badge>
-                <Badge variant="outline" className="justify-center py-2">
-                  East: {session.dropsCompletedEast || 0}
-                </Badge>
-                <Badge variant="outline" className="justify-center py-2">
-                  South: {session.dropsCompletedSouth || 0}
-                </Badge>
-                <Badge variant="outline" className="justify-center py-2">
-                  West: {session.dropsCompletedWest || 0}
-                </Badge>
-              </div>
+              <h3 className="font-semibold">
+                {isParkade ? "Parking Stalls Completed" : isInSuite ? "Suites Completed" : "Drops Completed"}
+              </h3>
+              {isParkade || isInSuite ? (
+                <div className="p-4 bg-muted rounded-lg text-center">
+                  <div className="text-3xl font-bold text-primary">
+                    {session.dropsCompletedNorth || 0}
+                  </div>
+                  <div className="text-sm text-muted-foreground mt-1">
+                    {isParkade ? "stalls" : "suites"}
+                  </div>
+                </div>
+              ) : (
+                <div className="grid grid-cols-4 gap-2">
+                  <Badge variant="outline" className="justify-center py-2">
+                    North: {session.dropsCompletedNorth || 0}
+                  </Badge>
+                  <Badge variant="outline" className="justify-center py-2">
+                    East: {session.dropsCompletedEast || 0}
+                  </Badge>
+                  <Badge variant="outline" className="justify-center py-2">
+                    South: {session.dropsCompletedSouth || 0}
+                  </Badge>
+                  <Badge variant="outline" className="justify-center py-2">
+                    West: {session.dropsCompletedWest || 0}
+                  </Badge>
+                </div>
+              )}
             </div>
           )}
 

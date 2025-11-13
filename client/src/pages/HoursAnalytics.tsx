@@ -1216,6 +1216,7 @@ export default function HoursAnalytics() {
           session={selectedSession}
           employeeName={selectedSession?.employeeName}
           projectName={selectedSession?.projectName || selectedSession?.project?.buildingName}
+          jobType={selectedSession?.project?.jobType || selectedSession?.jobType}
         />
       </div>
     </div>
