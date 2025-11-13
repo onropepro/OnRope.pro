@@ -1,7 +1,9 @@
 import type { Express, Request, Response, NextFunction } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { insertUserSchema, insertProjectSchema, insertDropLogSchema, insertComplaintSchema, insertComplaintNoteSchema, insertJobCommentSchema, insertHarnessInspectionSchema, insertToolboxMeetingSchema, insertPayPeriodConfigSchema, insertQuoteSchema, insertQuoteServiceSchema, insertGearItemSchema, insertScheduledJobSchema, insertJobAssignmentSchema, normalizeStrataPlan, type InsertGearItem } from "@shared/schema";
+import { db } from "./db";
+import { insertUserSchema, insertProjectSchema, insertDropLogSchema, insertComplaintSchema, insertComplaintNoteSchema, insertJobCommentSchema, insertHarnessInspectionSchema, insertToolboxMeetingSchema, insertPayPeriodConfigSchema, insertQuoteSchema, insertQuoteServiceSchema, insertGearItemSchema, insertScheduledJobSchema, insertJobAssignmentSchema, normalizeStrataPlan, type InsertGearItem, jobAssignments } from "@shared/schema";
+import { eq } from "drizzle-orm";
 import { z } from "zod";
 import bcrypt from "bcrypt";
 import multer from "multer";
@@ -3957,6 +3959,99 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({ assignments });
     } catch (error) {
       console.error("Get job assignments error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Create or update individual assignment with date range
+  app.post("/api/schedule/:jobId/assign-employee", requireAuth, requireVerifiedCompanyForMutations, async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      const companyId = currentUser.role === "company" ? currentUser.id : currentUser.companyId;
+      if (!companyId) {
+        return res.status(400).json({ message: "Unable to determine company" });
+      }
+      
+      const job = await storage.getScheduledJobById(req.params.jobId);
+      
+      if (!job) {
+        return res.status(404).json({ message: "Job not found" });
+      }
+      
+      if (job.companyId !== companyId) {
+        return res.status(403).json({ message: "Forbidden" });
+      }
+      
+      const { employeeId, startDate, endDate } = req.body;
+      
+      if (!employeeId) {
+        return res.status(400).json({ message: "employeeId is required" });
+      }
+      
+      // Check if assignment already exists
+      const existingAssignments = await storage.getJobAssignments(req.params.jobId);
+      const existingAssignment = existingAssignments.find(a => a.employeeId === employeeId);
+      
+      if (existingAssignment) {
+        // Update existing assignment
+        await db.update(jobAssignments)
+          .set({
+            startDate: startDate ? new Date(startDate) : null,
+            endDate: endDate ? new Date(endDate) : null,
+          })
+          .where(eq(jobAssignments.id, existingAssignment.id));
+      } else {
+        // Create new assignment
+        await storage.createJobAssignment({
+          jobId: req.params.jobId,
+          employeeId,
+          startDate: startDate ? new Date(startDate) : undefined,
+          endDate: endDate ? new Date(endDate) : undefined,
+          assignedBy: currentUser.id,
+        });
+      }
+      
+      const updatedJob = await storage.getScheduledJobWithAssignments(req.params.jobId);
+      res.json({ job: updatedJob });
+    } catch (error) {
+      console.error("Assign employee error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Delete specific assignment
+  app.delete("/api/schedule/:jobId/assignments/:assignmentId", requireAuth, requireVerifiedCompanyForMutations, async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      const companyId = currentUser.role === "company" ? currentUser.id : currentUser.companyId;
+      if (!companyId) {
+        return res.status(400).json({ message: "Unable to determine company" });
+      }
+      
+      const job = await storage.getScheduledJobById(req.params.jobId);
+      
+      if (!job) {
+        return res.status(404).json({ message: "Job not found" });
+      }
+      
+      if (job.companyId !== companyId) {
+        return res.status(403).json({ message: "Forbidden" });
+      }
+      
+      await storage.deleteJobAssignment(req.params.assignmentId);
+      
+      const updatedJob = await storage.getScheduledJobWithAssignments(req.params.jobId);
+      res.json({ job: updatedJob });
+    } catch (error) {
+      console.error("Delete assignment error:", error);
       res.status(500).json({ message: "Internal server error" });
     }
   });
