@@ -735,9 +735,9 @@ function DraggableEmployeeCard({
       onClick={onClick}
       className={`p-1.5 ${bgColor} border ${borderColor} rounded cursor-grab active:cursor-grabbing hover:scale-105 transition-all ${isDragging ? 'opacity-50' : ''} ${isActive ? 'scale-105' : ''}`}
     >
-      <div className="font-bold text-foreground truncate text-xs flex items-center gap-1">
-        {isActive && <span className="text-primary">→</span>}
-        {employee.name}
+      <div className="font-bold text-foreground text-xs flex items-center gap-1 overflow-hidden">
+        {isActive && <span className="text-primary flex-shrink-0">→</span>}
+        <span className="truncate">{employee.name}</span>
       </div>
       {children}
     </div>
