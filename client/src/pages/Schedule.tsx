@@ -173,35 +173,38 @@ export default function Schedule() {
       </div>
 
       {/* Employee Availability */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-lg font-semibold">Employee Availability</CardTitle>
+      <Card className="border-2 border-primary/20 bg-primary/5">
+        <CardHeader className="pb-3">
+          <CardTitle className="text-base font-bold flex items-center gap-2">
+            <Users className="w-5 h-5 text-primary" />
+            Employee Availability
+          </CardTitle>
         </CardHeader>
-        <CardContent>
-          <div className="grid md:grid-cols-2 gap-4">
+        <CardContent className="pt-0">
+          <div className="grid md:grid-cols-2 gap-3">
             {/* Assigned Employees */}
-            <div>
-              <div className="flex items-center gap-2 mb-3">
+            <div className="bg-card rounded-md p-3 border">
+              <div className="flex items-center gap-2 mb-2 pb-2 border-b">
                 <UserCheck className="w-4 h-4 text-green-600" />
-                <h3 className="font-medium">Assigned ({assignedEmployees.length})</h3>
+                <h3 className="font-semibold text-sm">Assigned ({assignedEmployees.length})</h3>
               </div>
               {assignedEmployees.length === 0 ? (
-                <p className="text-sm text-muted-foreground">No employees currently assigned</p>
+                <p className="text-xs text-muted-foreground">No employees assigned</p>
               ) : (
-                <div className="space-y-2">
+                <div className="space-y-1.5">
                   {assignedEmployees.map(employee => {
                     const employeeJobs = jobs.filter(job => 
                       job.assignedEmployees?.some(e => e.id === employee.id)
                     );
                     return (
-                      <div key={employee.id} className="p-2 bg-muted/50 rounded-md">
-                        <div className="font-medium text-sm">{employee.name}</div>
-                        <div className="text-xs text-muted-foreground">
+                      <div key={employee.id} className="p-1.5 bg-muted/30 rounded text-xs">
+                        <div className="font-medium">{employee.name}</div>
+                        <div className="text-[10px] text-muted-foreground">
                           {employee.role && employee.role.replace(/_/g, ' ')}
                         </div>
                         <div className="mt-1 flex flex-wrap gap-1">
                           {employeeJobs.map(job => (
-                            <Badge key={job.id} variant="secondary" className="text-xs">
+                            <Badge key={job.id} variant="secondary" className="text-[10px] h-4 px-1">
                               {job.project?.buildingName || job.title}
                             </Badge>
                           ))}
@@ -214,23 +217,23 @@ export default function Schedule() {
             </div>
 
             {/* Available Employees */}
-            <div>
-              <div className="flex items-center gap-2 mb-3">
+            <div className="bg-card rounded-md p-3 border">
+              <div className="flex items-center gap-2 mb-2 pb-2 border-b">
                 <UserX className="w-4 h-4 text-blue-600" />
-                <h3 className="font-medium">Available ({availableEmployees.length})</h3>
+                <h3 className="font-semibold text-sm">Available ({availableEmployees.length})</h3>
               </div>
               {availableEmployees.length === 0 ? (
-                <p className="text-sm text-muted-foreground">All employees are assigned</p>
+                <p className="text-xs text-muted-foreground">All employees assigned</p>
               ) : (
-                <div className="space-y-2">
+                <div className="space-y-1.5">
                   {availableEmployees.map(employee => (
-                    <div key={employee.id} className="p-2 bg-muted/50 rounded-md">
-                      <div className="font-medium text-sm">{employee.name}</div>
-                      <div className="text-xs text-muted-foreground">
+                    <div key={employee.id} className="p-1.5 bg-muted/30 rounded text-xs">
+                      <div className="font-medium">{employee.name}</div>
+                      <div className="text-[10px] text-muted-foreground">
                         {employee.role && employee.role.replace(/_/g, ' ')}
                       </div>
-                      <Badge variant="outline" className="mt-1 text-xs">
-                        Ready for assignment
+                      <Badge variant="outline" className="mt-1 text-[10px] h-4 px-1">
+                        Ready
                       </Badge>
                     </div>
                   ))}
