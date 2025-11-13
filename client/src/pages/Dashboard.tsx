@@ -332,9 +332,9 @@ export default function Dashboard() {
     refetchOnWindowFocus: true,
   });
 
-  // Fetch employees
+  // Fetch all employees (including terminated) for management
   const { data: employeesData, isLoading: employeesLoading } = useQuery({
-    queryKey: ["/api/employees"],
+    queryKey: ["/api/employees/all"],
   });
 
   // Fetch today's drops for daily target
@@ -616,7 +616,7 @@ export default function Dashboard() {
       return response.json();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/employees"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/employees/all"] });
       setShowEmployeeDialog(false);
       setEmployeeFormStep(1); // Reset to step 1
       employeeForm.reset();
@@ -659,7 +659,7 @@ export default function Dashboard() {
       return response;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/employees"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/employees/all"] });
       // Invalidate all work sessions to refresh hourly rates
       queryClient.invalidateQueries({ 
         predicate: (query) => 
@@ -785,7 +785,7 @@ export default function Dashboard() {
       return response;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/employees"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/employees/all"] });
       toast({
         title: "Employee reactivated successfully",
       });
@@ -815,7 +815,7 @@ export default function Dashboard() {
       return response.json();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/employees"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/employees/all"] });
       setEmployeeToDelete(null);
       toast({ title: "Employee deleted successfully" });
     },

@@ -70,7 +70,7 @@ export default function Inventory() {
   });
   
   // Filter for active employees only
-  const activeEmployees = (employeesData?.employees || []).filter((emp: any) => !emp.terminatedDate);
+  const activeEmployees = (employeesData?.employees || []);
 
   const form = useForm<Partial<InsertGearItem>>({
     defaultValues: {

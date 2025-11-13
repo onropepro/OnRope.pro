@@ -796,6 +796,32 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // Get all employees
+  // Get all employees including terminated (company only)
+  app.get("/api/employees/all", requireAuth, requireRole("company"), async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      // Get all employees for this company (including terminated)
+      const employees = await storage.getAllEmployees(currentUser.id);
+      
+      // Remove passwords from response
+      const employeesWithoutPasswords = employees.map(emp => {
+        const { passwordHash, ...empWithoutPassword } = emp;
+        return empWithoutPassword;
+      });
+      
+      res.json({ employees: employeesWithoutPasswords });
+    } catch (error) {
+      console.error("Get all employees error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Get active employees (excludes terminated) - for general use
   app.get("/api/employees", requireAuth, requireRole("company", "operations_manager", "supervisor", "rope_access_tech"), async (req: Request, res: Response) => {
     try {
       const currentUser = await storage.getUserById(req.session.userId!);
