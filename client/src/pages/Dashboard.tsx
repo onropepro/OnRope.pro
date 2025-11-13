@@ -16,6 +16,9 @@ import { z } from "zod";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage, FormDescription } from "@/components/ui/form";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Check, ChevronsUpDown } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { Progress } from "@/components/ui/progress";
 import { HighRiseBuilding } from "@/components/HighRiseBuilding";
@@ -338,6 +341,8 @@ export default function Dashboard() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedClientForProject, setSelectedClientForProject] = useState<string>("");
   const [selectedStrataForProject, setSelectedStrataForProject] = useState<string>("");
+  const [clientDropdownOpen, setClientDropdownOpen] = useState(false);
+  const [clientSearchQuery, setClientSearchQuery] = useState("");
   const [employeeToDelete, setEmployeeToDelete] = useState<string | null>(null);
   const [showDropDialog, setShowDropDialog] = useState(false);
   const [dropProject, setDropProject] = useState<any>(null);
@@ -820,13 +825,26 @@ export default function Dashboard() {
         projectForm.setValue("strataPlanNumber", strata.number);
         projectForm.setValue("buildingAddress", strata.address || "");
         
-        // If there are units, we can use that for floor count estimation
-        if (strata.stories) {
+        // Optionally set building name from client company or generate from strata
+        projectForm.setValue("buildingName", `${strata.number} Building`);
+        
+        // Autofill job-type specific fields based on building details
+        const currentJobType = projectForm.getValues("jobType");
+        
+        // For rope access jobs (window cleaning, etc.) - populate floor count
+        if (strata.stories && currentJobType !== "in_suite_dryer_vent_cleaning" && currentJobType !== "parkade_pressure_cleaning") {
           projectForm.setValue("floorCount", strata.stories);
         }
         
-        // Optionally set building name from client company or generate from strata
-        projectForm.setValue("buildingName", `${strata.number} Building`);
+        // For in-suite dryer vent cleaning - populate total units
+        if (currentJobType === "in_suite_dryer_vent_cleaning" && strata.units) {
+          projectForm.setValue("totalUnits", strata.units);
+        }
+        
+        // For parkade pressure cleaning - populate total parking stalls
+        if (currentJobType === "parkade_pressure_cleaning" && strata.parkingStalls) {
+          projectForm.setValue("totalParkingStalls", strata.parkingStalls);
+        }
       }
     }
   };
@@ -1740,28 +1758,75 @@ export default function Dashboard() {
                         })} className="space-y-4">
                         <div className="mb-4">
                           <label className="text-sm font-medium mb-2 block">Quick Fill from Client Database</label>
-                          <Select value={selectedStrataForProject} onValueChange={handleClientStrataSelection}>
-                            <SelectTrigger className="h-12" data-testid="select-client-strata">
-                              <SelectValue placeholder="Select a client's building or enter manually" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="manual">Enter Details Manually</SelectItem>
-                              {clientsData && clientsData.length > 0 && clientsData.flatMap((client) => 
-                                client.lmsNumbers && client.lmsNumbers.length > 0 
-                                  ? client.lmsNumbers.map((strata, idx) => (
-                                      <SelectItem 
-                                        key={`${client.id}-${idx}`} 
-                                        value={`${client.id}|${idx}`}
-                                      >
-                                        {strata.number} - {client.firstName} {client.lastName} {strata.address && `(${strata.address.substring(0, 30)}...)`}
-                                      </SelectItem>
-                                    ))
-                                  : []
-                              )}
-                            </SelectContent>
-                          </Select>
+                          <Popover open={clientDropdownOpen} onOpenChange={setClientDropdownOpen}>
+                            <PopoverTrigger asChild>
+                              <Button
+                                variant="outline"
+                                role="combobox"
+                                aria-expanded={clientDropdownOpen}
+                                className="w-full h-12 justify-between"
+                                data-testid="button-client-strata-search"
+                              >
+                                {selectedStrataForProject && selectedStrataForProject !== "manual"
+                                  ? (() => {
+                                      const [clientId, strataIdx] = selectedStrataForProject.split("|");
+                                      const client = clientsData?.find(c => c.id === clientId);
+                                      const strata = client?.lmsNumbers?.[parseInt(strataIdx)];
+                                      return strata ? `${strata.number} - ${client.firstName} ${client.lastName}` : "Select a building...";
+                                    })()
+                                  : selectedStrataForProject === "manual"
+                                  ? "Enter Details Manually"
+                                  : "Select a building..."}
+                                <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                              </Button>
+                            </PopoverTrigger>
+                            <PopoverContent className="w-[400px] p-0">
+                              <Command>
+                                <CommandInput placeholder="Search by client, strata, or address..." />
+                                <CommandList>
+                                  <CommandEmpty>No clients found.</CommandEmpty>
+                                  <CommandGroup>
+                                    <CommandItem
+                                      value="manual"
+                                      onSelect={() => {
+                                        handleClientStrataSelection("manual");
+                                        setClientDropdownOpen(false);
+                                      }}
+                                    >
+                                      <Check
+                                        className={`mr-2 h-4 w-4 ${selectedStrataForProject === "manual" ? "opacity-100" : "opacity-0"}`}
+                                      />
+                                      Enter Details Manually
+                                    </CommandItem>
+                                    {clientsData && clientsData.length > 0 && clientsData.flatMap((client) =>
+                                      client.lmsNumbers && client.lmsNumbers.length > 0
+                                        ? client.lmsNumbers.map((strata, idx) => (
+                                            <CommandItem
+                                              key={`${client.id}-${idx}`}
+                                              value={`${strata.number} ${client.firstName} ${client.lastName} ${strata.address || ""}`}
+                                              onSelect={() => {
+                                                handleClientStrataSelection(`${client.id}|${idx}`);
+                                                setClientDropdownOpen(false);
+                                              }}
+                                            >
+                                              <Check
+                                                className={`mr-2 h-4 w-4 ${selectedStrataForProject === `${client.id}|${idx}` ? "opacity-100" : "opacity-0"}`}
+                                              />
+                                              <div className="flex flex-col">
+                                                <span className="font-medium">{strata.number} - {client.firstName} {client.lastName}</span>
+                                                {strata.address && <span className="text-xs text-muted-foreground">{strata.address}</span>}
+                                              </div>
+                                            </CommandItem>
+                                          ))
+                                        : []
+                                    )}
+                                  </CommandGroup>
+                                </CommandList>
+                              </Command>
+                            </PopoverContent>
+                          </Popover>
                           <p className="text-xs text-muted-foreground mt-1">
-                            Select a building from your client database to auto-fill details, or choose "Enter Details Manually"
+                            Search and select a building from your client database to auto-fill details
                           </p>
                         </div>
 
@@ -3688,6 +3753,18 @@ export default function Dashboard() {
                     Client Database
                   </CardTitle>
                   <CardDescription>Property managers and building contacts</CardDescription>
+                  <div className="mt-4 relative">
+                    <span className="material-icons absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">
+                      search
+                    </span>
+                    <Input
+                      placeholder="Search by name, company, strata number, or address..."
+                      value={clientSearchQuery}
+                      onChange={(e) => setClientSearchQuery(e.target.value)}
+                      className="h-10 pl-10"
+                      data-testid="input-search-clients"
+                    />
+                  </div>
                 </CardHeader>
                 <CardContent>
                   {clientsLoading ? (
@@ -3696,7 +3773,21 @@ export default function Dashboard() {
                     <p className="text-sm text-muted-foreground">No clients yet. Add your first client to get started.</p>
                   ) : (
                     <div className="space-y-3">
-                      {clientsData.map((client) => (
+                      {clientsData
+                        .filter(client => {
+                          if (!clientSearchQuery) return true;
+                          const query = clientSearchQuery.toLowerCase();
+                          return (
+                            client.firstName.toLowerCase().includes(query) ||
+                            client.lastName.toLowerCase().includes(query) ||
+                            client.company?.toLowerCase().includes(query) ||
+                            client.lmsNumbers?.some(lms => 
+                              lms.number.toLowerCase().includes(query) ||
+                              lms.address?.toLowerCase().includes(query)
+                            )
+                          );
+                        })
+                        .map((client) => (
                         <Card key={client.id} className="hover-elevate" data-testid={`client-card-${client.id}`}>
                           <CardContent className="p-4">
                             <div className="flex items-start justify-between">
