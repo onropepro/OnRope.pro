@@ -361,6 +361,8 @@ export default function Dashboard() {
   const [terminationData, setTerminationData] = useState<{ reason: string; notes: string }>({ reason: "", notes: "" });
   const [cardOrder, setCardOrder] = useState<string[]>([]);
   const [isRearranging, setIsRearranging] = useState(false);
+  const [showSaveAsClientDialog, setShowSaveAsClientDialog] = useState(false);
+  const [projectDataForClient, setProjectDataForClient] = useState<any>(null);
   const { toast } = useToast();
   const [, setLocation] = useLocation();
   
@@ -706,12 +708,26 @@ export default function Dashboard() {
 
       return response.json();
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ["/api/projects"] });
       setShowProjectDialog(false);
+      
+      // Check if this was manual entry
+      const wasManualEntry = selectedStrataForProject === "manual";
+      
+      // Store project data and reset form
+      const formData = projectForm.getValues();
       projectForm.reset();
       setUploadedPlanFile(null);
+      setSelectedStrataForProject("");
+      
       toast({ title: "Project created successfully" });
+      
+      // If manual entry, ask if they want to save as client
+      if (wasManualEntry) {
+        setProjectDataForClient(formData);
+        setShowSaveAsClientDialog(true);
+      }
     },
     onError: (error: Error) => {
       toast({ title: "Error", description: error.message, variant: "destructive" });
@@ -854,6 +870,39 @@ export default function Dashboard() {
         }
       }
     }
+  };
+
+  const handleSaveProjectAsClient = () => {
+    if (!projectDataForClient) return;
+    
+    // Pre-fill the client form with building details from the project
+    const lmsData = [{
+      number: projectDataForClient.strataPlanNumber || "",
+      address: projectDataForClient.buildingAddress || "",
+      stories: projectDataForClient.floorCount ? parseInt(projectDataForClient.floorCount) : undefined,
+      dailyDropTarget: projectDataForClient.dailyDropTarget ? parseInt(projectDataForClient.dailyDropTarget) : undefined,
+      totalDropsNorth: projectDataForClient.totalDropsNorth ? parseInt(projectDataForClient.totalDropsNorth) : undefined,
+      totalDropsEast: projectDataForClient.totalDropsEast ? parseInt(projectDataForClient.totalDropsEast) : undefined,
+      totalDropsSouth: projectDataForClient.totalDropsSouth ? parseInt(projectDataForClient.totalDropsSouth) : undefined,
+      totalDropsWest: projectDataForClient.totalDropsWest ? parseInt(projectDataForClient.totalDropsWest) : undefined,
+    }];
+    
+    setLmsNumbers(lmsData);
+    
+    // Reset the client form with empty contact info
+    clientForm.reset({
+      firstName: "",
+      lastName: "",
+      company: "",
+      address: "",
+      phoneNumber: "",
+      billingAddress: "",
+    });
+    
+    // Close the save dialog and open the client dialog
+    setShowSaveAsClientDialog(false);
+    setProjectDataForClient(null);
+    setShowClientDialog(true);
   };
 
   const onProjectSubmit = async (data: ProjectFormData) => {
@@ -5293,6 +5342,37 @@ export default function Dashboard() {
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Save Project as Client Dialog */}
+      <AlertDialog open={showSaveAsClientDialog} onOpenChange={setShowSaveAsClientDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Save Building as Client?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Would you like to save this building information in your client database? This will make it easier to create future projects for this property.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel 
+              onClick={() => {
+                setShowSaveAsClientDialog(false);
+                setProjectDataForClient(null);
+              }}
+              data-testid="button-cancel-save-client"
+            >
+              No, Thanks
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleSaveProjectAsClient}
+              className="bg-primary text-primary-foreground hover:bg-primary/90"
+              data-testid="button-confirm-save-client"
+            >
+              <span className="material-icons mr-2 text-sm">person_add</span>
+              Yes, Add to Clients
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
