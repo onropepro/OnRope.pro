@@ -6,7 +6,7 @@ import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import timeGridPlugin from "@fullcalendar/timegrid";
 import interactionPlugin from "@fullcalendar/interaction";
-import resourceTimeGridPlugin from "@fullcalendar/resource-timegrid";
+import resourceTimelinePlugin from "@fullcalendar/resource-timeline";
 import type { EventInput, DateSelectArg, EventClickArg } from "@fullcalendar/core";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
@@ -791,36 +791,85 @@ export default function Schedule() {
             <div className="schedule-calendar-wrapper">
               <style>{`
                 .employee-schedule-calendar .fc-resource-timeline-divider {
-                  width: 3px;
+                  width: 2px;
+                  background: hsl(var(--border));
                 }
                 .employee-schedule-calendar .fc-col-header-cell {
-                  font-size: 0.7rem !important;
-                  padding: 4px 2px !important;
-                  white-space: nowrap;
-                  overflow: hidden;
-                  text-overflow: ellipsis;
-                }
-                .employee-schedule-calendar .fc-timegrid-axis-cushion {
-                  font-size: 0.75rem;
-                }
-                .employee-schedule-calendar .fc-col-header {
+                  background: hsl(var(--muted));
                   font-weight: 600;
+                  padding: 6px 4px;
+                  text-transform: uppercase;
+                  font-size: 0.65rem;
+                  letter-spacing: 0.03em;
+                  line-height: 1.2;
+                }
+                .employee-schedule-calendar .fc-timeline-slot-cushion {
+                  font-size: 0.7rem;
+                  padding: 2px 4px;
                 }
                 .employee-schedule-calendar .fc-scrollgrid {
                   border-color: hsl(var(--border)) !important;
                 }
                 .employee-schedule-calendar .fc-resource-timeline-lane {
                   background: hsl(var(--background));
+                  min-height: 50px;
+                }
+                .employee-schedule-calendar .fc-datagrid-cell-frame {
+                  padding: 6px 8px;
+                  font-weight: 500;
+                  font-size: 0.85rem;
+                }
+                .employee-schedule-calendar .fc-datagrid-header-cell {
+                  background: hsl(var(--muted));
+                  font-weight: 700;
+                  text-transform: uppercase;
+                  font-size: 0.7rem;
+                  letter-spacing: 0.05em;
+                  padding: 8px;
+                }
+                .employee-schedule-calendar .fc-toolbar-title {
+                  font-size: 1.1rem !important;
+                  font-weight: 700;
+                }
+                .employee-schedule-calendar .fc-button {
+                  padding: 0.4rem 0.75rem !important;
+                  font-size: 0.8rem !important;
+                }
+                
+                /* Mobile optimizations */
+                @media (max-width: 768px) {
+                  .employee-schedule-calendar .fc-datagrid-cell-frame {
+                    padding: 4px 6px;
+                    font-size: 0.75rem;
+                  }
+                  .employee-schedule-calendar .fc-col-header-cell {
+                    font-size: 0.6rem;
+                    padding: 4px 2px;
+                  }
+                  .employee-schedule-calendar .fc-timeline-slot-cushion {
+                    font-size: 0.65rem;
+                    padding: 2px;
+                  }
+                  .employee-schedule-calendar .fc-toolbar-title {
+                    font-size: 0.9rem !important;
+                  }
+                  .employee-schedule-calendar .fc-button {
+                    padding: 0.3rem 0.5rem !important;
+                    font-size: 0.7rem !important;
+                  }
+                  .employee-schedule-calendar .fc-resource-timeline-lane {
+                    min-height: 40px;
+                  }
                 }
               `}</style>
               <div className="employee-schedule-calendar">
                 <FullCalendar
-                  plugins={[resourceTimeGridPlugin, interactionPlugin]}
-                  initialView="resourceTimeGridDay"
+                  plugins={[resourceTimelinePlugin, interactionPlugin]}
+                  initialView="resourceTimelineWeek"
                   headerToolbar={{
                     left: "prev,next today",
                     center: "title",
-                    right: "resourceTimeGridDay",
+                    right: "resourceTimelineDay,resourceTimelineWeek",
                   }}
                   resources={employees.map(emp => ({
                     id: emp.id,
@@ -830,9 +879,8 @@ export default function Schedule() {
                   height="700px"
                   slotMinTime="07:00:00"
                   slotMaxTime="19:00:00"
-                  allDaySlot={false}
-                  resourceAreaWidth="25%"
-                  resourceAreaHeaderContent="Employees"
+                  resourceAreaWidth="120px"
+                  resourceAreaHeaderContent="Team"
                   slotDuration="01:00:00"
                   data-testid="employee-calendar"
                 />
