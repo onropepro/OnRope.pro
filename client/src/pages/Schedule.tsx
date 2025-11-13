@@ -260,7 +260,14 @@ export default function Schedule() {
                       {job.assignedEmployees && job.assignedEmployees.length > 0 && (
                         <div style={{ fontSize: '0.7rem', opacity: 1, whiteSpace: 'normal', lineHeight: 1.3 }}>
                           {job.assignedEmployees.map((employee, idx) => (
-                            <div key={idx} style={{ fontWeight: 600, color: 'rgba(255,255,255,0.95)' }}>
+                            <div key={idx} style={{ 
+                              fontWeight: 700, 
+                              backgroundColor: 'rgba(255,255,255,0.25)',
+                              padding: '1px 4px',
+                              borderRadius: '3px',
+                              marginTop: '2px',
+                              display: 'inline-block'
+                            }}>
                               👤 {employee.name}
                             </div>
                           ))}
