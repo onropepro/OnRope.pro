@@ -336,6 +336,8 @@ export default function Dashboard() {
   const [editSameAsAddress, setEditSameAsAddress] = useState(false);
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
+  const [selectedClientForProject, setSelectedClientForProject] = useState<string>("");
+  const [selectedStrataForProject, setSelectedStrataForProject] = useState<string>("");
   const [employeeToDelete, setEmployeeToDelete] = useState<string | null>(null);
   const [showDropDialog, setShowDropDialog] = useState(false);
   const [dropProject, setDropProject] = useState<any>(null);
@@ -792,6 +794,42 @@ export default function Dashboard() {
       toast({ title: "Error", description: error.message, variant: "destructive" });
     },
   });
+
+  const handleClientStrataSelection = (value: string) => {
+    setSelectedStrataForProject(value);
+    
+    if (value === "manual") {
+      // Clear all form fields
+      projectForm.reset();
+      setSelectedClientForProject("");
+      return;
+    }
+
+    // Parse the value (format: "clientId|strataNumber")
+    const [clientId, strataIndex] = value.split("|");
+    setSelectedClientForProject(clientId);
+    
+    // Find the client and strata details
+    const client = clientsData?.find(c => c.id === clientId);
+    if (client && client.lmsNumbers && client.lmsNumbers.length > 0) {
+      const strataIdx = parseInt(strataIndex);
+      const strata = client.lmsNumbers[strataIdx];
+      
+      if (strata) {
+        // Autofill the form
+        projectForm.setValue("strataPlanNumber", strata.number);
+        projectForm.setValue("buildingAddress", strata.address || "");
+        
+        // If there are units, we can use that for floor count estimation
+        if (strata.stories) {
+          projectForm.setValue("floorCount", strata.stories);
+        }
+        
+        // Optionally set building name from client company or generate from strata
+        projectForm.setValue("buildingName", `${strata.number} Building`);
+      }
+    }
+  };
 
   const onProjectSubmit = async (data: ProjectFormData) => {
     // Normalize strata plan number (remove spaces, uppercase)
@@ -1639,7 +1677,13 @@ export default function Dashboard() {
                     data-testid="input-search-projects"
                   />
                 </div>
-                <Dialog open={showProjectDialog} onOpenChange={setShowProjectDialog}>
+                <Dialog open={showProjectDialog} onOpenChange={(open) => {
+                  setShowProjectDialog(open);
+                  if (!open) {
+                    setSelectedClientForProject("");
+                    setSelectedStrataForProject("");
+                  }
+                }}>
                   <DialogTrigger asChild>
                     <Button 
                       className="h-14 px-6 gap-2 shadow-md hover:shadow-lg text-base font-semibold" 
@@ -1679,6 +1723,35 @@ export default function Dashboard() {
                             variant: "destructive" 
                           });
                         })} className="space-y-4">
+                        <div className="mb-4">
+                          <label className="text-sm font-medium mb-2 block">Quick Fill from Client Database</label>
+                          <Select value={selectedStrataForProject} onValueChange={handleClientStrataSelection}>
+                            <SelectTrigger className="h-12" data-testid="select-client-strata">
+                              <SelectValue placeholder="Select a client's building or enter manually" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="manual">Enter Details Manually</SelectItem>
+                              {clientsData && clientsData.length > 0 && (
+                                <>
+                                  {clientsData.map((client) => (
+                                    client.lmsNumbers && client.lmsNumbers.length > 0 && client.lmsNumbers.map((strata, idx) => (
+                                      <SelectItem 
+                                        key={`${client.id}-${idx}`} 
+                                        value={`${client.id}|${idx}`}
+                                      >
+                                        {strata.number} - {client.firstName} {client.lastName} {strata.address && `(${strata.address.substring(0, 30)}...)`}
+                                      </SelectItem>
+                                    ))
+                                  ))}
+                                </>
+                              )}
+                            </SelectContent>
+                          </Select>
+                          <p className="text-xs text-muted-foreground mt-1">
+                            Select a building from your client database to auto-fill details, or choose "Enter Details Manually"
+                          </p>
+                        </div>
+
                         <FormField
                           control={projectForm.control}
                           name="strataPlanNumber"
