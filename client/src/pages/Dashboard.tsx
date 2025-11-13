@@ -3465,6 +3465,53 @@ export default function Dashboard() {
                                   data-testid={`input-client-lms-address-${index}`}
                                 />
                               </div>
+                              <div className="grid grid-cols-3 gap-2">
+                                <div>
+                                  <label className="text-xs text-muted-foreground mb-1 block">Stories</label>
+                                  <Input
+                                    type="number"
+                                    placeholder="20"
+                                    value={lms.stories || ""}
+                                    onChange={(e) => {
+                                      const newLmsNumbers = [...lmsNumbers];
+                                      newLmsNumbers[index] = { ...lms, stories: e.target.value ? parseInt(e.target.value) : undefined };
+                                      setLmsNumbers(newLmsNumbers);
+                                    }}
+                                    className="h-12"
+                                    data-testid={`input-client-lms-stories-${index}`}
+                                  />
+                                </div>
+                                <div>
+                                  <label className="text-xs text-muted-foreground mb-1 block">Units</label>
+                                  <Input
+                                    type="number"
+                                    placeholder="150"
+                                    value={lms.units || ""}
+                                    onChange={(e) => {
+                                      const newLmsNumbers = [...lmsNumbers];
+                                      newLmsNumbers[index] = { ...lms, units: e.target.value ? parseInt(e.target.value) : undefined };
+                                      setLmsNumbers(newLmsNumbers);
+                                    }}
+                                    className="h-12"
+                                    data-testid={`input-client-lms-units-${index}`}
+                                  />
+                                </div>
+                                <div>
+                                  <label className="text-xs text-muted-foreground mb-1 block">Stalls</label>
+                                  <Input
+                                    type="number"
+                                    placeholder="80"
+                                    value={lms.parkingStalls || ""}
+                                    onChange={(e) => {
+                                      const newLmsNumbers = [...lmsNumbers];
+                                      newLmsNumbers[index] = { ...lms, parkingStalls: e.target.value ? parseInt(e.target.value) : undefined };
+                                      setLmsNumbers(newLmsNumbers);
+                                    }}
+                                    className="h-12"
+                                    data-testid={`input-client-lms-parking-${index}`}
+                                  />
+                                </div>
+                              </div>
                             </div>
                           </Card>
                         ))}
@@ -3752,6 +3799,53 @@ export default function Dashboard() {
                           rows={2}
                           data-testid={`input-edit-client-lms-address-${index}`}
                         />
+                      </div>
+                      <div className="grid grid-cols-3 gap-2">
+                        <div>
+                          <label className="text-xs text-muted-foreground mb-1 block">Stories</label>
+                          <Input
+                            type="number"
+                            placeholder="20"
+                            value={lms.stories || ""}
+                            onChange={(e) => {
+                              const newLmsNumbers = [...editLmsNumbers];
+                              newLmsNumbers[index] = { ...lms, stories: e.target.value ? parseInt(e.target.value) : undefined };
+                              setEditLmsNumbers(newLmsNumbers);
+                            }}
+                            className="h-12"
+                            data-testid={`input-edit-client-lms-stories-${index}`}
+                          />
+                        </div>
+                        <div>
+                          <label className="text-xs text-muted-foreground mb-1 block">Units</label>
+                          <Input
+                            type="number"
+                            placeholder="150"
+                            value={lms.units || ""}
+                            onChange={(e) => {
+                              const newLmsNumbers = [...editLmsNumbers];
+                              newLmsNumbers[index] = { ...lms, units: e.target.value ? parseInt(e.target.value) : undefined };
+                              setEditLmsNumbers(newLmsNumbers);
+                            }}
+                            className="h-12"
+                            data-testid={`input-edit-client-lms-units-${index}`}
+                          />
+                        </div>
+                        <div>
+                          <label className="text-xs text-muted-foreground mb-1 block">Stalls</label>
+                          <Input
+                            type="number"
+                            placeholder="80"
+                            value={lms.parkingStalls || ""}
+                            onChange={(e) => {
+                              const newLmsNumbers = [...editLmsNumbers];
+                              newLmsNumbers[index] = { ...lms, parkingStalls: e.target.value ? parseInt(e.target.value) : undefined };
+                              setEditLmsNumbers(newLmsNumbers);
+                            }}
+                            className="h-12"
+                            data-testid={`input-edit-client-lms-parking-${index}`}
+                          />
+                        </div>
                       </div>
                     </div>
                   </Card>
