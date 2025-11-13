@@ -638,8 +638,7 @@ function JobDetailDialog({
 
   const assignEmployeesMutation = useMutation({
     mutationFn: async ({ jobId, employeeIds }: { jobId: string; employeeIds: string[] }) => {
-      const response = await apiRequest("PUT", `/api/schedule/${jobId}`, { employeeIds });
-      return await response.json();
+      await apiRequest("PUT", `/api/schedule/${jobId}`, { employeeIds });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/schedule"] });
@@ -649,10 +648,11 @@ function JobDetailDialog({
       });
       setShowAssignEmployees(false);
     },
-    onError: () => {
+    onError: (error: Error) => {
+      console.error("Assignment error:", error);
       toast({
         title: "Error",
-        description: "Failed to assign employees",
+        description: error.message || "Failed to assign employees",
         variant: "destructive",
       });
     },
