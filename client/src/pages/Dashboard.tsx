@@ -156,6 +156,8 @@ const AVAILABLE_PERMISSIONS = [
   { id: "create_employees", label: "Create Employees" },
   { id: "edit_employees", label: "Edit Employees" },
   { id: "delete_employees", label: "Delete Employees" },
+  { id: "view_clients", label: "View Clients" },
+  { id: "manage_clients", label: "Manage Clients (Create/Edit/Delete)" },
   { id: "log_drops", label: "Log Drops" },
   { id: "view_complaints", label: "View Complaints" },
   { id: "manage_complaints", label: "Manage Complaints" },

@@ -95,6 +95,21 @@ export const users = pgTable("users", {
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
+// Clients table - for managing property managers and building owners
+export const clients = pgTable("clients", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  companyId: varchar("company_id").notNull().references(() => users.id, { onDelete: "cascade" }), // Foreign key to company
+  firstName: varchar("first_name").notNull(),
+  lastName: varchar("last_name").notNull(),
+  company: varchar("company"),
+  address: text("address"),
+  phoneNumber: varchar("phone_number"),
+  lmsNumbers: text("lms_numbers").array().default(sql`ARRAY[]::text[]`), // Array of LMS/Strata plan numbers
+  billingAddress: text("billing_address"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
 // Projects table
 export const projects = pgTable("projects", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
@@ -659,6 +674,15 @@ export const insertUserSchema = createInsertSchema(users).omit({
   createdAt: true,
   updatedAt: true,
 });
+
+export const insertClientSchema = createInsertSchema(clients).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type InsertClient = z.infer<typeof insertClientSchema>;
+export type Client = typeof clients.$inferSelect;
 
 export const insertProjectSchema = createInsertSchema(projects)
   .omit({
