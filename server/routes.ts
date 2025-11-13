@@ -842,8 +842,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Get employees for this company only
       const employees = await storage.getAllEmployees(companyId);
       
+      // Get the company owner as well
+      const companyOwner = await storage.getUserById(companyId);
+      
+      // Combine employees and company owner
+      const allUsers = companyOwner ? [companyOwner, ...employees] : employees;
+      
       // Filter out terminated employees and remove passwords from response
-      const activeEmployees = employees
+      const activeEmployees = allUsers
         .filter(emp => !emp.terminatedDate)
         .map(emp => {
           const { passwordHash, ...empWithoutPassword } = emp;
