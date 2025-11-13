@@ -721,7 +721,7 @@ function JobDetailDialog({
                 className="gap-2"
               >
                 <Users className="w-4 h-4" />
-                {showAssignEmployees ? "Cancel" : "Assign Employees"}
+                {showAssignEmployees ? "Cancel" : "Manage/assign employee to job"}
               </Button>
             </div>
             
