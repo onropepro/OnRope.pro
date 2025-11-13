@@ -675,9 +675,9 @@ function JobDetailDialog({
             </div>
           </div>
 
-          {job.assignedEmployees && job.assignedEmployees.length > 0 && (
-            <div>
-              <h3 className="font-medium text-sm mb-2">Assigned Team Members</h3>
+          <div>
+            <h3 className="font-medium text-sm mb-2">Assigned Team Members</h3>
+            {job.assignedEmployees && job.assignedEmployees.length > 0 ? (
               <div className="flex flex-wrap gap-2">
                 {job.assignedEmployees.map((employee) => (
                   <Badge key={employee.id} variant="secondary">
@@ -686,8 +686,12 @@ function JobDetailDialog({
                   </Badge>
                 ))}
               </div>
-            </div>
-          )}
+            ) : (
+              <p className="text-sm text-muted-foreground">
+                No team members assigned. Click Edit to assign employees.
+              </p>
+            )}
+          </div>
 
           {job.location && (
             <div>
