@@ -522,22 +522,38 @@ export default function Dashboard() {
   });
 
   // Auto-select all permissions for Owner/CEO role when creating employee
+  // Auto-select financial permissions for Accounting role when creating employee
   useEffect(() => {
     const subscription = employeeForm.watch((value, { name }) => {
-      if (name === "role" && value.role === "owner_ceo") {
-        const allPermissionIds = AVAILABLE_PERMISSIONS.map(p => p.id);
-        employeeForm.setValue("permissions", allPermissionIds);
+      if (name === "role") {
+        if (value.role === "owner_ceo") {
+          const allPermissionIds = AVAILABLE_PERMISSIONS.map(p => p.id);
+          employeeForm.setValue("permissions", allPermissionIds);
+        } else if (value.role === "accounting") {
+          const currentPermissions = employeeForm.getValues("permissions") || [];
+          if (!currentPermissions.includes("view_financial_data")) {
+            employeeForm.setValue("permissions", [...currentPermissions, "view_financial_data"]);
+          }
+        }
       }
     });
     return () => subscription.unsubscribe();
   }, [employeeForm]);
 
   // Auto-select all permissions for Owner/CEO role when editing employee
+  // Auto-select financial permissions for Accounting role when editing employee
   useEffect(() => {
     const subscription = editEmployeeForm.watch((value, { name }) => {
-      if (name === "role" && value.role === "owner_ceo") {
-        const allPermissionIds = AVAILABLE_PERMISSIONS.map(p => p.id);
-        editEmployeeForm.setValue("permissions", allPermissionIds);
+      if (name === "role") {
+        if (value.role === "owner_ceo") {
+          const allPermissionIds = AVAILABLE_PERMISSIONS.map(p => p.id);
+          editEmployeeForm.setValue("permissions", allPermissionIds);
+        } else if (value.role === "accounting") {
+          const currentPermissions = editEmployeeForm.getValues("permissions") || [];
+          if (!currentPermissions.includes("view_financial_data")) {
+            editEmployeeForm.setValue("permissions", [...currentPermissions, "view_financial_data"]);
+          }
+        }
       }
     });
     return () => subscription.unsubscribe();
