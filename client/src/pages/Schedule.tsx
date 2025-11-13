@@ -62,6 +62,14 @@ export default function Schedule() {
   // Transform jobs into FullCalendar events
   // Create separate event blocks for each day in multi-day jobs
   const events: EventInput[] = jobs.flatMap((job) => {
+    // DEBUG: Log the job data to see what we're getting
+    if (job.title.includes("Dryer")) {
+      console.log("=== DEBUG: Dryer vent job ===");
+      console.log("Job:", job);
+      console.log("assignedEmployees:", job.assignedEmployees);
+      console.log("employeeAssignments:", job.employeeAssignments);
+    }
+    
     const color = job.color || "#3b82f6";
     const start = new Date(job.startDate);
     const end = new Date(job.endDate);
@@ -120,7 +128,14 @@ export default function Schedule() {
         const empStart = assignment.startDate ? new Date(assignment.startDate).toISOString().split('T')[0] : dayDateStr;
         const empEnd = assignment.endDate ? new Date(assignment.endDate).toISOString().split('T')[0] : dayDateStr;
         
-        return dayDateStr >= empStart && dayDateStr <= empEnd;
+        const isInRange = dayDateStr >= empStart && dayDateStr <= empEnd;
+        
+        // DEBUG
+        if (job.title.includes("Dryer")) {
+          console.log(`Day ${dayDateStr}: employee ${assignment.employee?.name}, range ${empStart} to ${empEnd}, inRange: ${isInRange}`);
+        }
+        
+        return isInRange;
       }) || [];
       
       let displayTitle = job.title;
