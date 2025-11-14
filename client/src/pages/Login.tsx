@@ -267,7 +267,7 @@ export default function Login() {
               Refresh To Get Latest Update
             </Button>
 
-            <div className="grid grid-cols-3 gap-2">
+            <div className="grid grid-cols-4 gap-2">
               <Button 
                 variant="secondary" 
                 className="h-10 text-xs" 
@@ -426,6 +426,41 @@ export default function Login() {
               >
                 <span className="material-icons mr-1 text-base">flash_on</span>
                 resident
+              </Button>
+
+              <Button 
+                variant="destructive" 
+                className="h-10 text-xs" 
+                onClick={async () => {
+                  try {
+                    const response = await fetch("/api/login", {
+                      method: "POST",
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify({ identifier: "SuperUser", password: "Mhlqt419!" }),
+                      credentials: "include",
+                    });
+                    const result = await response.json();
+                    if (response.ok) {
+                      window.location.href = "/superuser";
+                    } else {
+                      toast({
+                        title: "SuperUser Login Failed",
+                        description: result.message || "SuperUser access denied",
+                        variant: "destructive",
+                      });
+                    }
+                  } catch (error) {
+                    toast({
+                      title: "Login Error",
+                      description: "Network error. Please try manual login.",
+                      variant: "destructive",
+                    });
+                  }
+                }}
+                data-testid="button-quick-login-superuser"
+              >
+                <span className="material-icons mr-1 text-base">shield</span>
+                SuperUser
               </Button>
             </div>
 
