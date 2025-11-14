@@ -746,7 +746,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Get the employee to verify they belong to this company
       const employee = await storage.getUserById(req.params.id);
       
-      if (!employee || employee.companyId !== companyId) {
+      // Allow if: employee belongs to company OR user is editing themselves
+      const isOwnProfile = req.params.id === currentUser.id;
+      const belongsToCompany = employee?.companyId === companyId;
+      
+      if (!employee || (!belongsToCompany && !isOwnProfile)) {
         return res.status(403).json({ message: "Access denied" });
       }
       
