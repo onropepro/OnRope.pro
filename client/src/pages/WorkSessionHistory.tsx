@@ -6,13 +6,19 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { HighRiseBuilding } from "@/components/HighRiseBuilding";
 import { ArrowLeft } from "lucide-react";
-import { format } from "date-fns";
+import { format, getYear, getMonth } from "date-fns";
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from "recharts";
+import { useState, useMemo } from "react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 export default function WorkSessionHistory() {
   const [, params] = useRoute("/projects/:id/work-sessions");
   const [, setLocation] = useLocation();
   const projectId = params?.id;
+  
+  // Filter state
+  const [selectedYear, setSelectedYear] = useState<string>("all");
+  const [selectedMonth, setSelectedMonth] = useState<string>("all");
 
   // Fetch current user to check role
   const { data: userData } = useQuery({
@@ -39,13 +45,63 @@ export default function WorkSessionHistory() {
 
   const user = userData?.user;
   const project = projectData?.project;
-  const workSessions = workSessionsData?.sessions || [];
+  const allWorkSessions = workSessionsData?.sessions || [];
   const nonBillableSessions = nonBillableData?.sessions || [];
   
   // Check if user is management (show pie chart only for management)
   const isManagement = user?.role === "company" || 
                        user?.role === "operations_manager" || 
                        user?.role === "supervisor";
+  
+  // Get unique years and months from sessions
+  const availableYears = useMemo(() => {
+    const years = new Set<number>();
+    allWorkSessions.forEach((session: any) => {
+      const year = getYear(new Date(session.workDate));
+      years.add(year);
+    });
+    return Array.from(years).sort((a, b) => b - a);
+  }, [allWorkSessions]);
+  
+  const availableMonths = useMemo(() => {
+    if (selectedYear === "all") return [];
+    const months = new Set<number>();
+    allWorkSessions.forEach((session: any) => {
+      const sessionDate = new Date(session.workDate);
+      if (getYear(sessionDate) === parseInt(selectedYear)) {
+        months.add(getMonth(sessionDate));
+      }
+    });
+    return Array.from(months).sort((a, b) => a - b);
+  }, [allWorkSessions, selectedYear]);
+  
+  // Filter work sessions based on selected year and month
+  const workSessions = useMemo(() => {
+    return allWorkSessions.filter((session: any) => {
+      const sessionDate = new Date(session.workDate);
+      
+      if (selectedYear !== "all") {
+        if (getYear(sessionDate) !== parseInt(selectedYear)) {
+          return false;
+        }
+      }
+      
+      if (selectedMonth !== "all") {
+        if (getMonth(sessionDate) !== parseInt(selectedMonth)) {
+          return false;
+        }
+      }
+      
+      return true;
+    });
+  }, [allWorkSessions, selectedYear, selectedMonth]);
+  
+  // Reset month when year changes to "all"
+  useMemo(() => {
+    if (selectedYear === "all") {
+      setSelectedMonth("all");
+    }
+  }, [selectedYear]);
 
   if (!project) {
     return (
@@ -269,16 +325,87 @@ export default function WorkSessionHistory() {
 
         {/* Work Sessions List */}
         <Card>
-          <CardHeader>
+          <CardHeader className="space-y-4">
             <CardTitle>Session History</CardTitle>
+            {allWorkSessions.length > 0 && (
+              <div className="flex flex-col sm:flex-row gap-3">
+                <div className="flex-1">
+                  <label className="text-sm font-medium mb-1.5 block">Year</label>
+                  <Select value={selectedYear} onValueChange={setSelectedYear}>
+                    <SelectTrigger data-testid="select-year">
+                      <SelectValue placeholder="All Years" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All Years</SelectItem>
+                      {availableYears.map((year) => (
+                        <SelectItem key={year} value={year.toString()}>
+                          {year}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="flex-1">
+                  <label className="text-sm font-medium mb-1.5 block">Month</label>
+                  <Select 
+                    value={selectedMonth} 
+                    onValueChange={setSelectedMonth}
+                    disabled={selectedYear === "all"}
+                  >
+                    <SelectTrigger data-testid="select-month">
+                      <SelectValue placeholder={selectedYear === "all" ? "Select Year First" : "All Months"} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All Months</SelectItem>
+                      {availableMonths.map((month) => (
+                        <SelectItem key={month} value={month.toString()}>
+                          {format(new Date(2024, month, 1), "MMMM")}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                {(selectedYear !== "all" || selectedMonth !== "all") && (
+                  <div className="flex items-end">
+                    <Button 
+                      variant="outline" 
+                      onClick={() => {
+                        setSelectedYear("all");
+                        setSelectedMonth("all");
+                      }}
+                      data-testid="button-clear-filters"
+                    >
+                      <span className="material-icons mr-2">clear</span>
+                      Clear
+                    </Button>
+                  </div>
+                )}
+              </div>
+            )}
           </CardHeader>
           <CardContent>
-            {workSessions.length === 0 ? (
+            {allWorkSessions.length === 0 ? (
               <p className="text-center text-muted-foreground py-8">
                 No work sessions recorded yet
               </p>
+            ) : workSessions.length === 0 ? (
+              <div className="text-center py-8 space-y-2">
+                <p className="text-muted-foreground">No work sessions found for the selected period</p>
+                <Button 
+                  variant="outline" 
+                  onClick={() => {
+                    setSelectedYear("all");
+                    setSelectedMonth("all");
+                  }}
+                >
+                  Clear Filters
+                </Button>
+              </div>
             ) : (
               <div className="space-y-3">
+                <p className="text-sm text-muted-foreground">
+                  Showing {workSessions.length} of {allWorkSessions.length} work session{allWorkSessions.length !== 1 ? "s" : ""}
+                </p>
                 {workSessions.map((session: any) => {
                   const sessionDate = new Date(session.workDate);
                   const isCompleted = session.endTime !== null;
