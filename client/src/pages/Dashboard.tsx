@@ -398,6 +398,7 @@ export default function Dashboard() {
   const [isRearranging, setIsRearranging] = useState(false);
   const [showSaveAsClientDialog, setShowSaveAsClientDialog] = useState(false);
   const [projectDataForClient, setProjectDataForClient] = useState<any>(null);
+  const [showOtherElevationFields, setShowOtherElevationFields] = useState(false);
   const { toast } = useToast();
   const [, setLocation] = useLocation();
   
@@ -536,6 +537,16 @@ export default function Dashboard() {
       calendarColor: "#3b82f6",
     },
   });
+
+  // Reset elevation fields flag when job type changes from "other" to something else
+  useEffect(() => {
+    const subscription = projectForm.watch((value, { name }) => {
+      if (name === "jobType" && value.jobType !== "other") {
+        setShowOtherElevationFields(false);
+      }
+    });
+    return () => subscription.unsubscribe();
+  }, [projectForm]);
 
   const employeeForm = useForm<EmployeeFormData>({
     resolver: zodResolver(employeeSchema),
@@ -762,6 +773,7 @@ export default function Dashboard() {
       setUploadedPlanFile(null);
       setSelectedClientForProject("");
       setSelectedStrataForProject("");
+      setShowOtherElevationFields(false);
       isManualEntryRef.current = false;
       
       toast({ title: "Project created successfully" });
@@ -2026,24 +2038,39 @@ export default function Dashboard() {
                         />
 
                         {projectForm.watch("jobType") === "other" && (
-                          <FormField
-                            control={projectForm.control}
-                            name="customJobType"
-                            render={({ field }) => (
-                              <FormItem>
-                                <FormLabel>Custom Job Type</FormLabel>
-                                <FormControl>
-                                  <Input 
-                                    placeholder="Enter custom job type" 
-                                    {...field} 
-                                    className="h-12" 
-                                    data-testid="input-custom-job-type" 
-                                  />
-                                </FormControl>
-                                <FormMessage />
-                              </FormItem>
+                          <>
+                            <FormField
+                              control={projectForm.control}
+                              name="customJobType"
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel>Custom Job Type</FormLabel>
+                                  <FormControl>
+                                    <Input 
+                                      placeholder="Enter custom job type" 
+                                      {...field} 
+                                      className="h-12" 
+                                      data-testid="input-custom-job-type" 
+                                    />
+                                  </FormControl>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+                            
+                            {!showOtherElevationFields && (
+                              <Button
+                                type="button"
+                                variant="outline"
+                                onClick={() => setShowOtherElevationFields(true)}
+                                className="w-full h-12"
+                                data-testid="button-enter-elevation"
+                              >
+                                <span className="material-icons mr-2">apartment</span>
+                                Enter Elevation
+                              </Button>
                             )}
-                          />
+                          </>
                         )}
 
                         {projectForm.watch("jobType") === "in_suite_dryer_vent_cleaning" && (
@@ -2133,7 +2160,8 @@ export default function Dashboard() {
 
                         {(projectForm.watch("jobType") === "window_cleaning" || 
                           projectForm.watch("jobType") === "pressure_washing" || 
-                          projectForm.watch("jobType") === "dryer_vent_cleaning") && (
+                          projectForm.watch("jobType") === "dryer_vent_cleaning" ||
+                          (projectForm.watch("jobType") === "other" && showOtherElevationFields)) && (
                           <>
                             <div className="space-y-2">
                               <label className="text-sm font-medium">Total Drops per Elevation</label>
