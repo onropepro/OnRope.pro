@@ -1097,12 +1097,7 @@ export default function Dashboard() {
   });
 
   const onEditEmployeeSubmit = async (data: EditEmployeeFormData) => {
-    console.log("🔵 onEditEmployeeSubmit called - validation passed!", data);
-    if (!employeeToEdit) {
-      console.log("🔴 No employee to edit!");
-      return;
-    }
-    console.log("🔵 Calling mutation with employee ID:", employeeToEdit.id);
+    if (!employeeToEdit) return;
     editEmployeeMutation.mutate({ ...data, id: employeeToEdit.id });
   };
 
@@ -4613,7 +4608,7 @@ export default function Dashboard() {
 
       {/* Edit Employee Dialog */}
       <Dialog open={showEditEmployeeDialog} onOpenChange={(open) => { setShowEditEmployeeDialog(open); if (!open) setEditEmployeeFormStep(1); }}>
-        <DialogContent forceMount className="max-w-md p-0 max-h-[95vh] flex flex-col">
+        <DialogContent className="max-w-md p-0 max-h-[95vh] flex flex-col">
           <div className="p-6 border-b">
             <DialogHeader>
               <DialogTitle>
@@ -4627,7 +4622,7 @@ export default function Dashboard() {
           <div className="overflow-y-auto flex-1 p-6">
             <Form {...editEmployeeForm}>
               <form id="edit-employee-form" onSubmit={editEmployeeForm.handleSubmit(onEditEmployeeSubmit)} className="space-y-4">
-              <div className={editEmployeeFormStep === 1 ? "" : "hidden"}>
+              <div className={editEmployeeFormStep === 1 ? "block" : "hidden pointer-events-none"}>
                 <FormField
                   control={editEmployeeForm.control}
                   name="name"
@@ -4993,7 +4988,7 @@ export default function Dashboard() {
                 </Button>
                 </div>
 
-                <div className={editEmployeeFormStep === 2 ? "" : "hidden"}>
+                <div className={editEmployeeFormStep === 2 ? "block" : "hidden pointer-events-none"}>
                 <FormField
                   control={editEmployeeForm.control}
                   name="permissions"
@@ -5080,18 +5075,9 @@ export default function Dashboard() {
                     data-testid="button-submit-edit-employee" 
                     disabled={editEmployeeMutation.isPending}
                     onClick={async () => {
-                      console.log("🟢 Button clicked!");
                       const isValid = await editEmployeeForm.trigger();
-                      console.log("🟢 Form valid?", isValid);
-                      console.log("🟢 Form errors:", editEmployeeForm.formState.errors);
-                      
-                      if (!isValid) {
-                        console.log("🔴 Validation failed!");
-                        return;
-                      }
-                      
+                      if (!isValid) return;
                       const data = editEmployeeForm.getValues();
-                      console.log("🟢 Calling mutation with data:", data);
                       onEditEmployeeSubmit(data);
                     }}
                   >
