@@ -1504,6 +1504,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         jobType: req.body.jobType,
         targetCompletionDate: req.body.targetCompletionDate || null,
         estimatedHours: req.body.estimatedHours,
+        startDate: req.body.startDate || null,
+        endDate: req.body.endDate || null,
       };
       
       // Add job-type specific fields
