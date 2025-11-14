@@ -5072,7 +5072,7 @@ export default function Dashboard() {
                   >
                     Back
                   </Button>
-                  <Button type="submit" form="edit-employee-form" className="w-full h-12" data-testid="button-submit-edit-employee" disabled={editEmployeeMutation.isPending}>
+                  <Button type="submit" className="w-full h-12" data-testid="button-submit-edit-employee" disabled={editEmployeeMutation.isPending}>
                     {editEmployeeMutation.isPending ? "Updating..." : "Update Employee"}
                   </Button>
                 </div>
