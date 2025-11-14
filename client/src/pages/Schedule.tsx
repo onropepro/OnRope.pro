@@ -23,8 +23,7 @@ import type { ScheduledJobWithAssignments, User } from "@shared/schema";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { DndContext, DragOverlay, useDraggable, useDroppable, closestCenter, DragEndEvent } from '@dnd-kit/core';
-import { canViewSchedule } from "@/lib/permissions";
-import { getRoleLabel } from "@/pages/Dashboard";
+import { canViewSchedule, getRoleLabel } from "@/lib/permissions";
 
 export default function Schedule() {
   const { toast } = useToast();

@@ -93,13 +93,6 @@ const ROLE_OPTIONS = [
   { value: "labourer", label: "Labourer", icon: "handyman", category: "worker" },
 ] as const;
 
-// Helper function to get role label
-export const getRoleLabel = (role: string | undefined | null): string => {
-  if (!role) return "Staff";
-  const roleOption = ROLE_OPTIONS.find(r => r.value === role);
-  return roleOption?.label || role.replace(/_/g, ' ');
-};
-
 // Available permissions for employees
 const AVAILABLE_PERMISSIONS = [
   { id: "view_projects", label: "View Projects" },
