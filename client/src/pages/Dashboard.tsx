@@ -73,6 +73,7 @@ const projectSchema = z.object({
   floorsPerDay: z.string().optional(),
   totalStalls: z.string().optional(),
   stallsPerDay: z.string().optional(),
+  assignedEmployees: z.array(z.string()).optional(),
 });
 
 // Role definitions with icons
@@ -539,6 +540,7 @@ export default function Dashboard() {
       targetCompletionDate: "",
       estimatedHours: "",
       calendarColor: "#3b82f6",
+      assignedEmployees: [],
     },
   });
 
@@ -752,6 +754,7 @@ export default function Dashboard() {
           floorsPerDay: data.floorsPerDay ? parseInt(data.floorsPerDay) : undefined,
           totalStalls: data.totalStalls ? parseInt(data.totalStalls) : undefined,
           stallsPerDay: data.stallsPerDay ? parseInt(data.stallsPerDay) : undefined,
+          assignedEmployees: data.assignedEmployees || [],
         }),
         credentials: "include",
       });
@@ -2246,33 +2249,38 @@ export default function Dashboard() {
                           </>
                         )}
 
-                        <div className="grid grid-cols-2 gap-4">
-                          <FormField
-                            control={projectForm.control}
-                            name="startDate"
-                            render={({ field }) => (
-                              <FormItem>
-                                <FormLabel>Start Date</FormLabel>
-                                <FormControl>
-                                  <Input type="date" {...field} data-testid="input-start-date" className="h-12" />
-                                </FormControl>
-                                <FormMessage />
-                              </FormItem>
-                            )}
-                          />
-                          <FormField
-                            control={projectForm.control}
-                            name="endDate"
-                            render={({ field }) => (
-                              <FormItem>
-                                <FormLabel>End Date</FormLabel>
-                                <FormControl>
-                                  <Input type="date" {...field} data-testid="input-end-date" className="h-12" />
-                                </FormControl>
-                                <FormMessage />
-                              </FormItem>
-                            )}
-                          />
+                        <div className="space-y-2">
+                          <div className="grid grid-cols-2 gap-4">
+                            <FormField
+                              control={projectForm.control}
+                              name="startDate"
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel>Start Date</FormLabel>
+                                  <FormControl>
+                                    <Input type="date" {...field} data-testid="input-start-date" className="h-12" />
+                                  </FormControl>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+                            <FormField
+                              control={projectForm.control}
+                              name="endDate"
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel>End Date</FormLabel>
+                                  <FormControl>
+                                    <Input type="date" {...field} data-testid="input-end-date" className="h-12" />
+                                  </FormControl>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+                          </div>
+                          <p className="text-xs text-muted-foreground">
+                            Add dates to display this project on the calendar
+                          </p>
                         </div>
 
                         <FormField
@@ -2326,6 +2334,60 @@ export default function Dashboard() {
                               <FormDescription className="text-xs">
                                 Choose the color this project appears on the calendar
                               </FormDescription>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+
+                        <FormField
+                          control={projectForm.control}
+                          name="assignedEmployees"
+                          render={() => (
+                            <FormItem>
+                              <FormLabel>Assign Employees</FormLabel>
+                              <FormDescription className="text-xs mb-3">
+                                Select employees to assign to this project for calendar display
+                              </FormDescription>
+                              <div className="space-y-2 max-h-40 overflow-y-auto border rounded-md p-3">
+                                {employees.length === 0 ? (
+                                  <p className="text-sm text-muted-foreground">No employees available</p>
+                                ) : (
+                                  employees.map((employee: any) => (
+                                    <FormField
+                                      key={employee.id}
+                                      control={projectForm.control}
+                                      name="assignedEmployees"
+                                      render={({ field }) => {
+                                        return (
+                                          <FormItem
+                                            key={employee.id}
+                                            className="flex flex-row items-start space-x-3 space-y-0"
+                                          >
+                                            <FormControl>
+                                              <Checkbox
+                                                checked={field.value?.includes(employee.id)}
+                                                onCheckedChange={(checked) => {
+                                                  return checked
+                                                    ? field.onChange([...(field.value || []), employee.id])
+                                                    : field.onChange(
+                                                        field.value?.filter(
+                                                          (value: string) => value !== employee.id
+                                                        )
+                                                      )
+                                                }}
+                                                data-testid={`checkbox-assign-employee-${employee.id}`}
+                                              />
+                                            </FormControl>
+                                            <FormLabel className="font-normal cursor-pointer">
+                                              {employee.name}
+                                            </FormLabel>
+                                          </FormItem>
+                                        )
+                                      }}
+                                    />
+                                  ))
+                                )}
+                              </div>
                               <FormMessage />
                             </FormItem>
                           )}

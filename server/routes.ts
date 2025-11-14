@@ -1436,31 +1436,36 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       const project = await storage.createProject(projectData);
       
-      // Automatically create a scheduled job for this project
-      if (project.targetCompletionDate) {
-        const endDate = new Date(project.targetCompletionDate);
-        const startDate = new Date();
+      // Automatically create a scheduled job for this project if start/end dates are provided
+      if (project.startDate && project.endDate) {
+        const startDate = new Date(project.startDate);
+        const endDate = new Date(project.endDate);
         
-        // Create job title based on strata plan number
-        const jobTitle = `${normalizeStrataPlan(project.strataPlanNumber)} - ${project.jobType.replace(/_/g, ' ')}`;
+        // Create job title based on building name or strata plan number
+        const jobTitle = project.buildingName || `${normalizeStrataPlan(project.strataPlanNumber)} - ${project.jobType.replace(/_/g, ' ')}`;
         
-        await storage.createScheduledJob({
+        const job = await storage.createScheduledJob({
           companyId,
           projectId: project.id,
           title: jobTitle,
           description: `Auto-scheduled from project creation`,
           jobType: project.jobType,
-          customJobType: null,
+          customJobType: project.customJobType,
           startDate,
           endDate,
           status: "upcoming",
-          location: null,
+          location: project.buildingAddress || null,
           color: project.calendarColor || "#3b82f6",
-          estimatedHours: null,
+          estimatedHours: project.estimatedHours || null,
           actualHours: null,
           notes: null,
           createdBy: currentUser.id,
         });
+        
+        // Assign employees to the job if any were selected
+        if (project.assignedEmployees && project.assignedEmployees.length > 0) {
+          await storage.replaceJobAssignments(job.id, project.assignedEmployees, currentUser.id);
+        }
       }
       
       res.json({ project });
