@@ -4524,7 +4524,7 @@ export default function Dashboard() {
           </div>
           <div className="overflow-y-auto flex-1 p-6">
             <Form {...editEmployeeForm}>
-              <form onSubmit={editEmployeeForm.handleSubmit(onEditEmployeeSubmit)} className="space-y-4">
+              <form id="edit-employee-form" onSubmit={editEmployeeForm.handleSubmit(onEditEmployeeSubmit)} className="space-y-4">
               {editEmployeeFormStep === 1 && (
                 <>
                 <FormField
@@ -4975,7 +4975,7 @@ export default function Dashboard() {
                   >
                     Back
                   </Button>
-                  <Button type="submit" className="w-full h-12" data-testid="button-submit-edit-employee" disabled={editEmployeeMutation.isPending}>
+                  <Button type="submit" form="edit-employee-form" className="w-full h-12" data-testid="button-submit-edit-employee" disabled={editEmployeeMutation.isPending}>
                     {editEmployeeMutation.isPending ? "Updating..." : "Update Employee"}
                   </Button>
                 </div>
