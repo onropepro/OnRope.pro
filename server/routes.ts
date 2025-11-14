@@ -1934,6 +1934,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(403).json({ message: "Access denied - you cannot log drops for this project" });
       }
       
+      // Get project and employee data for snapshot fields
+      const project = await storage.getProjectById(dropData.projectId);
+      if (!project) {
+        return res.status(404).json({ message: "Project not found" });
+      }
+      
       // Check if drop log already exists for this project/user/date
       const existingLog = await storage.getDropLogByProjectAndDate(
         dropData.projectId,
@@ -1946,8 +1952,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         // Update existing log
         dropLog = await storage.updateDropLog(existingLog.id, dropData.dropsCompleted);
       } else {
-        // Create new log
-        dropLog = await storage.createDropLog(dropData);
+        // Create new log with snapshot data for historical preservation
+        dropLog = await storage.createDropLog({
+          ...dropData,
+          projectName: project.buildingName ?? undefined,
+          employeeName: currentUser.name,
+        });
       }
       
       res.json({ dropLog });
@@ -2046,12 +2056,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "Project not found" });
       }
       
-      // Create new work session
+      // Create new work session with snapshot data for historical preservation
       const now = new Date();
       const session = await storage.startWorkSession({
         projectId,
         employeeId: currentUser.id,
         companyId: project.companyId,
+        // Snapshot fields to preserve historical data even if project/employee is deleted
+        projectName: project.buildingName ?? undefined,
+        projectBuildingAddress: project.buildingAddress ?? undefined,
+        projectStrataPlanNumber: project.strataPlanNumber ?? undefined,
+        employeeName: currentUser.name,
+        employeeRole: currentUser.role ?? undefined,
+        employeeHourlyRate: currentUser.hourlyRate ? currentUser.hourlyRate.toString() : undefined,
         workDate: now,
         startTime: now,
         startLatitude: startLatitude || null,
@@ -3194,11 +3211,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       const totalDropsCompleted = north + east + south + west;
 
-      // Create complete work session
+      // Create complete work session with snapshot data for historical preservation
       const session = await storage.createWorkSession({
         projectId,
         employeeId,
         companyId,
+        // Snapshot fields to preserve historical data even if project/employee is deleted
+        projectName: project.buildingName ?? undefined,
+        projectBuildingAddress: project.buildingAddress ?? undefined,
+        projectStrataPlanNumber: project.strataPlanNumber ?? undefined,
+        employeeName: employee.name,
+        employeeRole: employee.role ?? undefined,
+        employeeHourlyRate: employee.hourlyRate ? employee.hourlyRate.toString() : undefined,
         workDate,
         startTime: new Date(startTime),
         endTime: new Date(endTime),
@@ -3248,10 +3272,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Invalid employee" });
       }
 
-      // Create complete non-billable work session
+      // Create complete non-billable work session with snapshot data for historical preservation
       const session = await storage.createNonBillableWorkSession({
         employeeId,
         companyId,
+        // Snapshot fields to preserve historical data even if employee is deleted
+        employeeName: employee.name,
+        employeeRole: employee.role ?? undefined,
+        employeeHourlyRate: employee.hourlyRate ? employee.hourlyRate.toString() : undefined,
         workDate,
         startTime: new Date(startTime),
         endTime: new Date(endTime),
