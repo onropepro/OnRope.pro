@@ -5074,9 +5074,7 @@ export default function Dashboard() {
                     className="w-full h-12" 
                     data-testid="button-submit-edit-employee" 
                     disabled={editEmployeeMutation.isPending}
-                    onClick={async () => {
-                      const isValid = await editEmployeeForm.trigger();
-                      if (!isValid) return;
+                    onClick={() => {
                       const data = editEmployeeForm.getValues();
                       onEditEmployeeSubmit(data);
                     }}
