@@ -136,6 +136,7 @@ export const projects = pgTable("projects", {
   imageUrls: text("image_urls").array().default(sql`ARRAY[]::text[]`), // Array of image URLs from object storage
   status: varchar("status").notNull().default('active'), // active | completed
   deleted: boolean("deleted").notNull().default(false), // Soft delete flag
+  deletedAt: timestamp("deleted_at"), // When project was deleted
   calendarColor: varchar("calendar_color").default('#3b82f6'), // Color for calendar display
   
   // Service-specific expectation fields
