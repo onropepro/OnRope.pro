@@ -23,6 +23,7 @@ import Inventory from "@/pages/Inventory";
 import HoursAnalytics from "@/pages/HoursAnalytics";
 import Schedule from "@/pages/Schedule";
 import LicenseVerification from "@/pages/LicenseVerification";
+import SuperUser from "@/pages/SuperUser";
 import NotFound from "@/pages/not-found";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import { EMPLOYEE_ROLES } from "@/lib/permissions";
@@ -33,6 +34,11 @@ function Router() {
       <Route path="/" component={Login} />
       <Route path="/register" component={Register} />
       <Route path="/login" component={Login} />
+      <Route path="/superuser">
+        <ProtectedRoute allowedRoles={["superuser"]}>
+          <SuperUser />
+        </ProtectedRoute>
+      </Route>
       <Route path="/license-verification">
         <ProtectedRoute allowedRoles={["company"]}>
           <LicenseVerification />

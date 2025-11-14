@@ -237,6 +237,38 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Identifier and password are required" });
       }
       
+      // SUPERUSER CHECK - Short-circuit before database lookup
+      const superuserUsername = process.env.SUPERUSER_USERNAME || 'SuperUser';
+      const superuserPasswordHash = process.env.SUPERUSER_PASSWORD_HASH;
+      
+      if (identifier === superuserUsername && superuserPasswordHash) {
+        const isValidSuperuserPassword = await bcrypt.compare(password, superuserPasswordHash);
+        
+        if (isValidSuperuserPassword) {
+          // Create superuser session
+          req.session.userId = 'superuser';
+          req.session.role = 'superuser';
+          
+          await new Promise<void>((resolve, reject) => {
+            req.session.save((err) => {
+              if (err) reject(err);
+              else resolve();
+            });
+          });
+          
+          // Return superuser payload
+          return res.json({
+            user: {
+              id: 'superuser',
+              name: 'Super User',
+              email: 'superuser@system',
+              role: 'superuser',
+              companyName: 'System Admin',
+            }
+          });
+        }
+      }
+      
       // Try to find user by email or company name
       let user = await storage.getUserByEmail(identifier);
       
