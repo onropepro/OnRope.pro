@@ -436,6 +436,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get current user
   app.get("/api/user", requireAuth, async (req: Request, res: Response) => {
     try {
+      // Handle SuperUser session
+      if (req.session.userId === 'superuser') {
+        return res.json({
+          user: {
+            id: 'superuser',
+            name: 'Super User',
+            email: 'superuser@system',
+            role: 'superuser',
+            companyName: 'System Admin',
+          }
+        });
+      }
+      
       const user = await storage.getUserById(req.session.userId!);
       
       if (!user) {
