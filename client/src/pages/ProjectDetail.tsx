@@ -675,7 +675,7 @@ export default function ProjectDetail() {
               />
             ) : project.jobType === "parkade_pressure_cleaning" ? (
               <ParkadeView
-                totalStalls={project.floorCount}
+                totalStalls={project.totalStalls || 0}
                 completedStalls={completedDrops}
                 className="mb-4"
               />
