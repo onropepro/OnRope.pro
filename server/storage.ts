@@ -112,12 +112,28 @@ export class Storage {
   async getProjectsByCompany(companyId: string, status?: string): Promise<Project[]> {
     if (status) {
       return db.select().from(projects)
-        .where(and(eq(projects.companyId, companyId), eq(projects.status, status)))
+        .where(and(
+          eq(projects.companyId, companyId), 
+          eq(projects.status, status),
+          eq(projects.deleted, false)
+        ))
         .orderBy(desc(projects.createdAt));
     }
     return db.select().from(projects)
-      .where(eq(projects.companyId, companyId))
+      .where(and(
+        eq(projects.companyId, companyId),
+        eq(projects.deleted, false)
+      ))
       .orderBy(desc(projects.createdAt));
+  }
+
+  async getDeletedProjects(companyId: string): Promise<Project[]> {
+    return db.select().from(projects)
+      .where(and(
+        eq(projects.companyId, companyId),
+        eq(projects.deleted, true)
+      ))
+      .orderBy(desc(projects.updatedAt));
   }
 
   async getProjectByStrataPlan(strataPlanNumber: string): Promise<Project | undefined> {
@@ -159,6 +175,21 @@ export class Storage {
   }
 
   async deleteProject(id: string): Promise<void> {
+    // Soft delete - set deleted flag to true
+    await db.update(projects)
+      .set({ deleted: true, updatedAt: new Date() })
+      .where(eq(projects.id, id));
+  }
+
+  async restoreProject(id: string): Promise<Project> {
+    const result = await db.update(projects)
+      .set({ deleted: false, updatedAt: new Date() })
+      .where(eq(projects.id, id))
+      .returning();
+    return result[0];
+  }
+
+  async permanentlyDeleteProject(id: string): Promise<void> {
     await db.delete(projects).where(eq(projects.id, id));
   }
 

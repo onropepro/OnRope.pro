@@ -249,6 +249,104 @@ function SortableCard({ card, isRearranging }: { card: any; isRearranging: boole
   );
 }
 
+// Deleted Projects Tab Component
+function DeletedProjectsTab() {
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+  
+  const { data: deletedProjectsData, isLoading } = useQuery<{ projects: Project[] }>({
+    queryKey: ["/api/projects/deleted/list"],
+  });
+  
+  const deletedProjects = deletedProjectsData?.projects || [];
+  
+  const restoreMutation = useMutation({
+    mutationFn: async (projectId: string) => {
+      const response = await apiRequest("POST", `/api/projects/${projectId}/restore`, {});
+      return await response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/projects/deleted/list"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/projects"] });
+      toast({ title: "Project restored successfully" });
+    },
+    onError: () => {
+      toast({ title: "Failed to restore project", variant: "destructive" });
+    },
+  });
+  
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center py-8">
+        <div className="text-muted-foreground">Loading...</div>
+      </div>
+    );
+  }
+  
+  return (
+    <div className="space-y-4">
+      <div className="flex items-center gap-2 mb-6">
+        <div className="h-8 w-1 bg-destructive rounded-full"></div>
+        <h2 className="text-xl font-bold">Deleted Projects</h2>
+      </div>
+      {deletedProjects.length === 0 ? (
+        <Card>
+          <CardContent className="p-8 text-center text-muted-foreground">
+            <span className="material-icons text-4xl mb-2 opacity-50">delete</span>
+            <div>No deleted projects</div>
+          </CardContent>
+        </Card>
+      ) : (
+        <div className="space-y-4">
+          {deletedProjects.map((project: Project) => (
+            <Card 
+              key={project.id} 
+              className="group border-l-4 border-l-destructive shadow-md hover:shadow-lg transition-all duration-200 bg-gradient-to-br from-background to-destructive/5" 
+              data-testid={`deleted-project-${project.id}`}
+            >
+              <CardContent className="p-5">
+                <div className="flex items-start justify-between">
+                  <div className="flex-1">
+                    <div className="text-lg font-bold mb-1">{project.buildingName}</div>
+                    <div className="text-sm font-medium text-muted-foreground mb-1">{project.strataPlanNumber}</div>
+                    <div className="text-sm text-muted-foreground capitalize flex items-center gap-2">
+                      <span className="material-icons text-base text-destructive">delete</span>
+                      {project.jobType.replace(/_/g, ' ')}
+                    </div>
+                    {project.updatedAt && (
+                      <div className="text-xs text-muted-foreground mt-1 flex items-center gap-1">
+                        <span className="material-icons text-xs">event</span>
+                        Deleted {new Date(project.updatedAt).toLocaleDateString()}
+                      </div>
+                    )}
+                  </div>
+                  <div className="flex flex-col gap-2">
+                    <Badge variant="destructive" className="flex items-center gap-1">
+                      <span className="material-icons text-xs">delete</span>
+                      Deleted
+                    </Badge>
+                    <Button
+                      size="sm"
+                      variant="default"
+                      onClick={() => restoreMutation.mutate(project.id)}
+                      disabled={restoreMutation.isPending}
+                      data-testid={`button-restore-${project.id}`}
+                      className="w-full"
+                    >
+                      <span className="material-icons text-sm mr-1">restore</span>
+                      Restore
+                    </Button>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
 export default function Dashboard() {
   const [activeTab, setActiveTab] = useState("");
 
@@ -1399,6 +1497,16 @@ export default function Dashboard() {
       borderColor: "#60a5fa",
     },
     {
+      id: "deleted-projects",
+      label: "Deleted Projects",
+      description: "Recently deleted",
+      icon: "delete",
+      onClick: () => handleTabChange("deleted-projects"),
+      testId: "button-nav-deleted-projects",
+      isVisible: (user: any) => canManageEmployees(user), // Management only
+      borderColor: "#ef4444",
+    },
+    {
       id: "employees",
       label: "Employees",
       description: "Manage team",
@@ -1578,6 +1686,7 @@ export default function Dashboard() {
       case "": return "Dashboard";
       case "projects": return "Projects";
       case "past-projects": return "Past Projects";
+      case "deleted-projects": return "Deleted Projects";
       case "performance": return "Performance";
       case "complaints": return "Complaints";
       case "employees": return "Employees";
@@ -2292,6 +2401,8 @@ export default function Dashboard() {
               </div>
             </div>
         )}
+
+        {activeTab === "deleted-projects" && <DeletedProjectsTab />}
 
         {activeTab === "past-projects" && (
           <div>

@@ -1710,6 +1710,56 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: "Internal server error" });
     }
   });
+
+  // Get deleted projects
+  app.get("/api/projects/deleted/list", requireAuth, requireRole("company", "operations_manager"), async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      const companyId = currentUser.role === "company" ? currentUser.id : currentUser.companyId;
+      if (!companyId) {
+        return res.status(400).json({ message: "Unable to determine company" });
+      }
+      
+      const deletedProjects = await storage.getDeletedProjects(companyId);
+      res.json({ projects: deletedProjects });
+    } catch (error) {
+      console.error("Get deleted projects error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Restore deleted project
+  app.post("/api/projects/:id/restore", requireAuth, requireRole("company", "operations_manager"), async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      const hasAccess = await storage.verifyProjectAccess(
+        req.params.id,
+        currentUser.id,
+        currentUser.role,
+        currentUser.companyId
+      );
+      
+      if (!hasAccess) {
+        return res.status(403).json({ message: "Access denied" });
+      }
+      
+      const restoredProject = await storage.restoreProject(req.params.id);
+      res.json({ project: restoredProject });
+    } catch (error) {
+      console.error("Restore project error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
   
   // Get project progress
   app.get("/api/projects/:id/progress", requireAuth, async (req: Request, res: Response) => {

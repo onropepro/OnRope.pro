@@ -135,6 +135,7 @@ export const projects = pgTable("projects", {
   ropeAccessPlanUrl: text("rope_access_plan_url"), // URL to PDF in object storage
   imageUrls: text("image_urls").array().default(sql`ARRAY[]::text[]`), // Array of image URLs from object storage
   status: varchar("status").notNull().default('active'), // active | completed
+  deleted: boolean("deleted").notNull().default(false), // Soft delete flag
   calendarColor: varchar("calendar_color").default('#3b82f6'), // Color for calendar display
   
   // Service-specific expectation fields
