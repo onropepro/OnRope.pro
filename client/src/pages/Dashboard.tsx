@@ -4613,7 +4613,7 @@ export default function Dashboard() {
 
       {/* Edit Employee Dialog */}
       <Dialog open={showEditEmployeeDialog} onOpenChange={(open) => { setShowEditEmployeeDialog(open); if (!open) setEditEmployeeFormStep(1); }}>
-        <DialogContent className="max-w-md p-0 max-h-[95vh] flex flex-col">
+        <DialogContent forceMount className="max-w-md p-0 max-h-[95vh] flex flex-col">
           <div className="p-6 border-b">
             <DialogHeader>
               <DialogTitle>
@@ -4627,8 +4627,7 @@ export default function Dashboard() {
           <div className="overflow-y-auto flex-1 p-6">
             <Form {...editEmployeeForm}>
               <form id="edit-employee-form" onSubmit={editEmployeeForm.handleSubmit(onEditEmployeeSubmit)} className="space-y-4">
-              {editEmployeeFormStep === 1 && (
-                <>
+              <div className={editEmployeeFormStep === 1 ? "" : "hidden"}>
                 <FormField
                   control={editEmployeeForm.control}
                   name="name"
@@ -4992,11 +4991,9 @@ export default function Dashboard() {
                 >
                   Continue to Permissions
                 </Button>
-                </>
-                )}
+                </div>
 
-                {editEmployeeFormStep === 2 && (
-                  <>
+                <div className={editEmployeeFormStep === 2 ? "" : "hidden"}>
                 <FormField
                   control={editEmployeeForm.control}
                   name="permissions"
@@ -5092,8 +5089,7 @@ export default function Dashboard() {
                     {editEmployeeMutation.isPending ? "Updating..." : "Update Employee"}
                   </Button>
                 </div>
-                </>
-                )}
+                </div>
               </form>
             </Form>
           </div>
