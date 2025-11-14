@@ -1097,7 +1097,12 @@ export default function Dashboard() {
   });
 
   const onEditEmployeeSubmit = async (data: EditEmployeeFormData) => {
-    if (!employeeToEdit) return;
+    console.log("🔵 onEditEmployeeSubmit called - validation passed!", data);
+    if (!employeeToEdit) {
+      console.log("🔴 No employee to edit!");
+      return;
+    }
+    console.log("🔵 Calling mutation with employee ID:", employeeToEdit.id);
     editEmployeeMutation.mutate({ ...data, id: employeeToEdit.id });
   };
 
@@ -5072,7 +5077,18 @@ export default function Dashboard() {
                   >
                     Back
                   </Button>
-                  <Button type="submit" className="w-full h-12" data-testid="button-submit-edit-employee" disabled={editEmployeeMutation.isPending}>
+                  <Button 
+                    type="submit" 
+                    className="w-full h-12" 
+                    data-testid="button-submit-edit-employee" 
+                    disabled={editEmployeeMutation.isPending}
+                    onClick={(e) => {
+                      console.log("🟢 Update Employee button clicked!");
+                      console.log("🟢 Form errors:", editEmployeeForm.formState.errors);
+                      console.log("🟢 Form values:", editEmployeeForm.getValues());
+                      console.log("🟢 Employee to edit:", employeeToEdit);
+                    }}
+                  >
                     {editEmployeeMutation.isPending ? "Updating..." : "Update Employee"}
                   </Button>
                 </div>
