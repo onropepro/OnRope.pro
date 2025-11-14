@@ -24,6 +24,7 @@ import HoursAnalytics from "@/pages/HoursAnalytics";
 import Schedule from "@/pages/Schedule";
 import LicenseVerification from "@/pages/LicenseVerification";
 import SuperUser from "@/pages/SuperUser";
+import AllCompanies from "@/pages/AllCompanies";
 import NotFound from "@/pages/not-found";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import { EMPLOYEE_ROLES } from "@/lib/permissions";
@@ -37,6 +38,11 @@ function Router() {
       <Route path="/superuser">
         <ProtectedRoute allowedRoles={["superuser"]}>
           <SuperUser />
+        </ProtectedRoute>
+      </Route>
+      <Route path="/superuser/companies">
+        <ProtectedRoute allowedRoles={["superuser"]}>
+          <AllCompanies />
         </ProtectedRoute>
       </Route>
       <Route path="/license-verification">

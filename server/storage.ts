@@ -46,6 +46,13 @@ export class Storage {
       .orderBy(desc(users.createdAt));
   }
 
+  async getAllCompanies(): Promise<User[]> {
+    // Get all users with company role
+    return db.select().from(users)
+      .where(eq(users.role, "company"))
+      .orderBy(desc(users.createdAt));
+  }
+
   async deleteUser(userId: string): Promise<void> {
     await db.delete(users).where(eq(users.id, userId));
   }

@@ -491,6 +491,30 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // SuperUser: Get all companies
+  app.get("/api/superuser/companies", requireAuth, async (req: Request, res: Response) => {
+    try {
+      // Only allow superuser to access this endpoint
+      if (req.session.userId !== 'superuser') {
+        return res.status(403).json({ message: "Access denied. SuperUser only." });
+      }
+
+      // Fetch all users with company role
+      const companies = await storage.getAllCompanies();
+      
+      // Return companies without sensitive password hashes
+      const companiesWithoutPasswords = companies.map(company => {
+        const { passwordHash, licenseKey, ...companyData } = company;
+        return companyData;
+      });
+
+      res.json({ companies: companiesWithoutPasswords });
+    } catch (error) {
+      console.error("Get all companies error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
   // Update user profile
   app.patch("/api/user/profile", requireAuth, async (req: Request, res: Response) => {
     try {
