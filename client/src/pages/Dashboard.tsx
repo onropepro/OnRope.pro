@@ -2463,9 +2463,11 @@ export default function Dashboard() {
                     </Card>
                   ) : (
                     filteredProjects.filter((p: Project) => p.status === "active").map((project: Project) => {
-                      const completedDrops = project.completedDrops || 0;
-                      const totalDrops = project.totalDrops || 0;
-                      const progressPercent = totalDrops > 0 ? (completedDrops / totalDrops) * 100 : 0;
+                      const isInSuite = project.jobType === "in_suite";
+                      const completed = isInSuite ? (project.completedUnits || 0) : (project.completedDrops || 0);
+                      const total = isInSuite ? (project.totalUnits || 0) : (project.totalDrops || 0);
+                      const progressPercent = total > 0 ? (completed / total) * 100 : 0;
+                      const unitLabel = isInSuite ? "units" : "drops";
 
                       return (
                         <Card 
@@ -2502,7 +2504,7 @@ export default function Dashboard() {
                               </div>
                               <Progress value={progressPercent} className="h-3" />
                               <div className="flex items-center justify-between text-sm">
-                                <span className="text-muted-foreground">{completedDrops} / {totalDrops} drops</span>
+                                <span className="text-muted-foreground">{completed} / {total} {unitLabel}</span>
                                 <span className="material-icons text-primary group-hover:translate-x-1 transition-transform">arrow_forward</span>
                               </div>
                             </div>
