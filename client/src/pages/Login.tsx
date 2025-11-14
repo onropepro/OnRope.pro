@@ -238,35 +238,6 @@ export default function Login() {
               </form>
             </Form>
 
-            <div className="relative">
-              <div className="absolute inset-0 flex items-center">
-                <span className="w-full border-t" />
-              </div>
-              <div className="relative flex justify-center text-xs uppercase">
-                <span className="bg-card px-2 text-muted-foreground">New to the platform?</span>
-              </div>
-            </div>
-
-            <Button 
-              variant="outline" 
-              className="w-full h-12 text-base font-medium" 
-              onClick={() => window.location.href = "/register"}
-              data-testid="link-register"
-            >
-              <span className="material-icons mr-2">person_add</span>
-              Create Company or Resident/Owner Account
-            </Button>
-
-            <Button 
-              variant="ghost" 
-              className="w-full h-10 text-sm" 
-              onClick={() => window.location.reload()}
-              data-testid="button-refresh"
-            >
-              <span className="material-icons mr-2 text-base">refresh</span>
-              Refresh To Get Latest Update
-            </Button>
-
             <div className="grid grid-cols-4 gap-2">
               <Button 
                 variant="secondary" 
@@ -430,7 +401,7 @@ export default function Login() {
 
               <Button 
                 variant="destructive" 
-                className="h-10 text-xs" 
+                className="h-10 text-xs col-span-4" 
                 onClick={async () => {
                   try {
                     const response = await fetch("/api/login", {
@@ -463,6 +434,35 @@ export default function Login() {
                 SuperUser
               </Button>
             </div>
+
+            <div className="relative">
+              <div className="absolute inset-0 flex items-center">
+                <span className="w-full border-t" />
+              </div>
+              <div className="relative flex justify-center text-xs uppercase">
+                <span className="bg-card px-2 text-muted-foreground">New to the platform?</span>
+              </div>
+            </div>
+
+            <Button 
+              variant="outline" 
+              className="w-full h-12 text-base font-medium" 
+              onClick={() => window.location.href = "/register"}
+              data-testid="link-register"
+            >
+              <span className="material-icons mr-2">person_add</span>
+              Create Company or Resident/Owner Account
+            </Button>
+
+            <Button 
+              variant="ghost" 
+              className="w-full h-10 text-sm" 
+              onClick={() => window.location.reload()}
+              data-testid="button-refresh"
+            >
+              <span className="material-icons mr-2 text-base">refresh</span>
+              Refresh To Get Latest Update
+            </Button>
 
             {/* Mobile-only feature highlights */}
             <div className="md:hidden pt-4 space-y-4 border-t">
