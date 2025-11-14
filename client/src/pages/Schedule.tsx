@@ -97,9 +97,6 @@ export default function Schedule() {
   // Fetch scheduled jobs
   const { data: jobsData, isLoading } = useQuery<{ jobs: ScheduledJobWithAssignments[] }>({
     queryKey: ["/api/schedule"],
-    refetchOnMount: true,
-    refetchOnWindowFocus: true,
-    staleTime: 0,
   });
   const jobs = jobsData?.jobs || [];
 

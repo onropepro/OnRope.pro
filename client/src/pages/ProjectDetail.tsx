@@ -155,7 +155,6 @@ export default function ProjectDetail() {
     queryKey: ["/api/projects", id, "photos"],
     enabled: !!id,
     retry: false, // Don't retry on error
-    staleTime: 0, // Always fetch fresh data
   });
   
   // Show error toast if photo fetch fails (only once per error)
