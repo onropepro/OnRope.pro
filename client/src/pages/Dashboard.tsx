@@ -2023,24 +2023,41 @@ export default function Dashboard() {
                           render={({ field }) => (
                             <FormItem>
                               <FormLabel>Job Type</FormLabel>
-                              <Select onValueChange={field.onChange} defaultValue={field.value}>
-                                <FormControl>
-                                  <SelectTrigger className="h-12" data-testid="select-job-type">
-                                    <SelectValue />
-                                  </SelectTrigger>
-                                </FormControl>
-                                <SelectContent>
-                                  <SelectItem value="window_cleaning">Window Cleaning</SelectItem>
-                                  <SelectItem value="dryer_vent_cleaning">Exterior Dryer Vent Cleaning</SelectItem>
-                                  <SelectItem value="pressure_washing">Pressure Washing</SelectItem>
-                                  <SelectItem value="general_pressure_washing">General Pressure Washing</SelectItem>
-                                  <SelectItem value="gutter_cleaning">Gutter Cleaning</SelectItem>
-                                  <SelectItem value="in_suite_dryer_vent_cleaning">In-Suite Dryer Vent Cleaning</SelectItem>
-                                  <SelectItem value="parkade_pressure_cleaning">Parkade Pressure Cleaning</SelectItem>
-                                  <SelectItem value="ground_window_cleaning">Ground Window Cleaning</SelectItem>
-                                  <SelectItem value="other">Other</SelectItem>
-                                </SelectContent>
-                              </Select>
+                              <FormControl>
+                                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                                  {[
+                                    { value: "window_cleaning", label: "Window Cleaning", icon: "window" },
+                                    { value: "dryer_vent_cleaning", label: "Exterior Dryer Vent", icon: "air" },
+                                    { value: "pressure_washing", label: "Pressure Washing", icon: "water_drop" },
+                                    { value: "general_pressure_washing", label: "General Pressure Washing", icon: "cleaning_services" },
+                                    { value: "gutter_cleaning", label: "Gutter Cleaning", icon: "home_repair_service" },
+                                    { value: "in_suite_dryer_vent_cleaning", label: "In-Suite Dryer Vent", icon: "meeting_room" },
+                                    { value: "parkade_pressure_cleaning", label: "Parkade Pressure", icon: "local_parking" },
+                                    { value: "ground_window_cleaning", label: "Ground Window", icon: "storefront" },
+                                    { value: "painting", label: "Painting", icon: "format_paint" },
+                                    { value: "inspection", label: "Inspection", icon: "fact_check" },
+                                    { value: "training", label: "Training", icon: "school" },
+                                    { value: "other", label: "Other", icon: "more_horiz" },
+                                  ].map((jobType) => (
+                                    <button
+                                      key={jobType.value}
+                                      type="button"
+                                      onClick={() => field.onChange(jobType.value)}
+                                      data-testid={`button-job-type-${jobType.value}`}
+                                      className={`
+                                        flex flex-col items-center justify-center gap-2 p-4 rounded-xl border-2 transition-all
+                                        ${field.value === jobType.value 
+                                          ? 'border-primary bg-primary/10 shadow-lg' 
+                                          : 'border-border bg-card hover:border-primary/50 hover:bg-muted'
+                                        }
+                                      `}
+                                    >
+                                      <span className="material-icons text-3xl">{jobType.icon}</span>
+                                      <span className="text-xs font-medium text-center leading-tight">{jobType.label}</span>
+                                    </button>
+                                  ))}
+                                </div>
+                              </FormControl>
                               <FormMessage />
                             </FormItem>
                           )}
