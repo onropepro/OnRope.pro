@@ -11,6 +11,7 @@ export default function ActiveWorkers() {
   // Fetch all active work sessions
   const { data: activeWorkersData, isLoading } = useQuery({
     queryKey: ["/api/active-workers"],
+    refetchInterval: 10000, // Refresh every 10 seconds
   });
 
   const activeWorkers = activeWorkersData?.sessions || [];

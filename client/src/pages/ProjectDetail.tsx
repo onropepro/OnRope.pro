@@ -21,7 +21,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect } from "react";
 import { format } from "date-fns";
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from "recharts";
 import type { Project } from "@shared/schema";
@@ -155,6 +155,7 @@ export default function ProjectDetail() {
     queryKey: ["/api/projects", id, "photos"],
     enabled: !!id,
     retry: false, // Don't retry on error
+    staleTime: 0, // Always fetch fresh data
   });
   
   // Show error toast if photo fetch fails (only once per error)
@@ -227,26 +228,6 @@ export default function ProjectDetail() {
   
   // Check if user is management using centralized permission helper
   const isManagement = checkIsManagement(currentUser);
-
-  // Memoize expensive work session grouping calculation to prevent re-renders
-  const sessionsByDate = useMemo(() => {
-    const grouped: Record<string, Record<string, Record<string, any[]>>> = {};
-    
-    workSessions.forEach((session: any) => {
-      const sessionDate = new Date(session.workDate);
-      const year = format(sessionDate, "yyyy");
-      const month = format(sessionDate, "MMMM yyyy");
-      const day = format(sessionDate, "EEEE, MMM d, yyyy");
-      
-      if (!grouped[year]) grouped[year] = {};
-      if (!grouped[year][month]) grouped[year][month] = {};
-      if (!grouped[year][month][day]) grouped[year][month][day] = [];
-      
-      grouped[year][month][day].push(session);
-    });
-    
-    return grouped;
-  }, [workSessions]);
 
   const startDayMutation = useMutation({
     mutationFn: async (projectId: string) => {
@@ -934,9 +915,28 @@ export default function ProjectDetail() {
                       <p className="text-center text-muted-foreground py-8">
                         No work sessions recorded yet
                       </p>
-                    ) : (
-                      <Accordion type="single" collapsible className="space-y-2">
-                          {Object.keys(sessionsByDate).sort().reverse().map((year) => (
+                    ) : (() => {
+                      // Organize sessions by year -> month -> day
+                      const sessionsByDate: Record<string, Record<string, Record<string, any[]>>> = {};
+                      
+                      workSessions.forEach((session: any) => {
+                        const sessionDate = new Date(session.workDate);
+                        const year = format(sessionDate, "yyyy");
+                        const month = format(sessionDate, "MMMM yyyy");
+                        const day = format(sessionDate, "EEEE, MMM d, yyyy");
+                        
+                        if (!sessionsByDate[year]) sessionsByDate[year] = {};
+                        if (!sessionsByDate[year][month]) sessionsByDate[year][month] = {};
+                        if (!sessionsByDate[year][month][day]) sessionsByDate[year][month][day] = [];
+                        
+                        sessionsByDate[year][month][day].push(session);
+                      });
+                      
+                      const years = Object.keys(sessionsByDate).sort().reverse();
+                      
+                      return (
+                        <Accordion type="single" collapsible className="space-y-2">
+                          {years.map((year) => (
                             <AccordionItem key={year} value={year} className="border rounded-lg px-3">
                               <AccordionTrigger className="hover:no-underline py-3">
                                 <div className="flex items-center gap-2">
@@ -1023,7 +1023,8 @@ export default function ProjectDetail() {
                             </AccordionItem>
                           ))}
                         </Accordion>
-                    )}
+                      );
+                    })()}
                   </TabsContent>
                 )}
               </Tabs>

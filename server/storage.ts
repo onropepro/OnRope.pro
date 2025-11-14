@@ -182,15 +182,15 @@ export class Storage {
   }
 
   async deleteProject(id: string): Promise<void> {
-    // Soft delete - set deleted flag to true and record deletion time
+    // Soft delete - set deleted flag to true
     await db.update(projects)
-      .set({ deleted: true, deletedAt: new Date(), updatedAt: new Date() })
+      .set({ deleted: true, updatedAt: new Date() })
       .where(eq(projects.id, id));
   }
 
   async restoreProject(id: string): Promise<Project> {
     const result = await db.update(projects)
-      .set({ deleted: false, deletedAt: null, updatedAt: new Date() })
+      .set({ deleted: false, updatedAt: new Date() })
       .where(eq(projects.id, id))
       .returning();
     return result[0];

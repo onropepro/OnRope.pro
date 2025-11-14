@@ -117,26 +117,3 @@ export function isReadOnly(user: User | null | undefined): boolean {
   // If companyLicenseVerified is undefined, assume verified (no restriction)
   return user.companyLicenseVerified === false;
 }
-
-// Role label mapping
-const ROLE_LABELS: Record<string, string> = {
-  company: "Owner/CEO",
-  owner_ceo: "Owner/CEO",
-  operations_manager: "Operations Manager",
-  human_resources: "Human Resources",
-  accounting: "Accounting",
-  account_manager: "Account Manager",
-  general_supervisor: "General Supervisor",
-  rope_access_supervisor: "Rope Access Supervisor",
-  manager: "Manager",
-  rope_access_tech: "Rope Access Technician",
-  ground_crew_supervisor: "Ground Crew Supervisor",
-  ground_crew: "Ground Crew",
-  labourer: "Labourer",
-};
-
-// Helper function to get role label
-export function getRoleLabel(role: string | undefined | null): string {
-  if (!role) return "Staff";
-  return ROLE_LABELS[role] || role.replace(/_/g, ' ');
-}

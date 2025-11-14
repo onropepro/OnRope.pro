@@ -502,9 +502,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Fetch all users with company role
       const companies = await storage.getAllCompanies();
       
-      // Return companies without sensitive password hashes (but include licenseKey for SuperUser)
+      // Return companies without sensitive password hashes
       const companiesWithoutPasswords = companies.map(company => {
-        const { passwordHash, ...companyData } = company;
+        const { passwordHash, licenseKey, ...companyData } = company;
         return companyData;
       });
 
@@ -1577,7 +1577,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (currentUser.role === "company") {
         // Return only THIS company's projects, filtered by status (all if not specified)
         projects = await storage.getProjectsByCompany(currentUser.id, statusFilter);
-      } else if (currentUser.role === "operations_manager" || currentUser.role === "supervisor" || currentUser.role === "general_supervisor" || currentUser.role === "rope_access_supervisor" || currentUser.role === "rope_access_tech") {
+      } else if (currentUser.role === "operations_manager" || currentUser.role === "supervisor" || role === "general_supervisor" || role === "rope_access_supervisor" || currentUser.role === "rope_access_tech") {
         // Return projects for their company, filtered by status (all if not specified)
         const companyId = currentUser.companyId;
         if (companyId) {
@@ -1934,12 +1934,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(403).json({ message: "Access denied - you cannot log drops for this project" });
       }
       
-      // Get project and employee data for snapshot fields
-      const project = await storage.getProjectById(dropData.projectId);
-      if (!project) {
-        return res.status(404).json({ message: "Project not found" });
-      }
-      
       // Check if drop log already exists for this project/user/date
       const existingLog = await storage.getDropLogByProjectAndDate(
         dropData.projectId,
@@ -1952,12 +1946,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         // Update existing log
         dropLog = await storage.updateDropLog(existingLog.id, dropData.dropsCompleted);
       } else {
-        // Create new log with snapshot data for historical preservation
-        dropLog = await storage.createDropLog({
-          ...dropData,
-          projectName: project.buildingName ?? undefined,
-          employeeName: currentUser.name,
-        });
+        // Create new log
+        dropLog = await storage.createDropLog(dropData);
       }
       
       res.json({ dropLog });
@@ -2056,19 +2046,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "Project not found" });
       }
       
-      // Create new work session with snapshot data for historical preservation
+      // Create new work session
       const now = new Date();
       const session = await storage.startWorkSession({
         projectId,
         employeeId: currentUser.id,
         companyId: project.companyId,
-        // Snapshot fields to preserve historical data even if project/employee is deleted
-        projectName: project.buildingName ?? undefined,
-        projectBuildingAddress: project.buildingAddress ?? undefined,
-        projectStrataPlanNumber: project.strataPlanNumber ?? undefined,
-        employeeName: currentUser.name,
-        employeeRole: currentUser.role ?? undefined,
-        employeeHourlyRate: currentUser.hourlyRate ? currentUser.hourlyRate.toString() : undefined,
         workDate: now,
         startTime: now,
         startLatitude: startLatitude || null,
@@ -2552,7 +2535,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       } else if (currentUser.role === "company") {
         // Company sees all complaints for their projects
         complaints = await storage.getComplaintsForCompany(currentUser.id);
-      } else if (currentUser.role === "operations_manager" || currentUser.role === "supervisor" || currentUser.role === "general_supervisor" || currentUser.role === "rope_access_supervisor" || currentUser.role === "rope_access_tech") {
+      } else if (currentUser.role === "operations_manager" || currentUser.role === "supervisor" || role === "general_supervisor" || role === "rope_access_supervisor" || currentUser.role === "rope_access_tech") {
         // Staff sees complaints for their company's projects
         const companyId = currentUser.companyId;
         if (companyId) {
@@ -2593,7 +2576,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         if (project.companyId !== currentUser.id) {
           return res.status(403).json({ message: "Access denied" });
         }
-      } else if (currentUser.role === "operations_manager" || currentUser.role === "supervisor" || currentUser.role === "general_supervisor" || currentUser.role === "rope_access_supervisor" || currentUser.role === "rope_access_tech") {
+      } else if (currentUser.role === "operations_manager" || currentUser.role === "supervisor" || role === "general_supervisor" || role === "rope_access_supervisor" || currentUser.role === "rope_access_tech") {
         if (project.companyId !== currentUser.companyId) {
           return res.status(403).json({ message: "Access denied" });
         }
@@ -3211,18 +3194,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       const totalDropsCompleted = north + east + south + west;
 
-      // Create complete work session with snapshot data for historical preservation
+      // Create complete work session
       const session = await storage.createWorkSession({
         projectId,
         employeeId,
         companyId,
-        // Snapshot fields to preserve historical data even if project/employee is deleted
-        projectName: project.buildingName ?? undefined,
-        projectBuildingAddress: project.buildingAddress ?? undefined,
-        projectStrataPlanNumber: project.strataPlanNumber ?? undefined,
-        employeeName: employee.name,
-        employeeRole: employee.role ?? undefined,
-        employeeHourlyRate: employee.hourlyRate ? employee.hourlyRate.toString() : undefined,
         workDate,
         startTime: new Date(startTime),
         endTime: new Date(endTime),
@@ -3272,14 +3248,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Invalid employee" });
       }
 
-      // Create complete non-billable work session with snapshot data for historical preservation
+      // Create complete non-billable work session
       const session = await storage.createNonBillableWorkSession({
         employeeId,
         companyId,
-        // Snapshot fields to preserve historical data even if employee is deleted
-        employeeName: employee.name,
-        employeeRole: employee.role ?? undefined,
-        employeeHourlyRate: employee.hourlyRate ? employee.hourlyRate.toString() : undefined,
         workDate,
         startTime: new Date(startTime),
         endTime: new Date(endTime),

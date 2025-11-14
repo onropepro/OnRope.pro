@@ -78,7 +78,6 @@ const projectSchema = z.object({
 
 // Role definitions with icons
 const ROLE_OPTIONS = [
-  { value: "company", label: "Owner/CEO", icon: "business_center", category: "management" },
   { value: "owner_ceo", label: "Owner/CEO", icon: "business_center", category: "management" },
   { value: "operations_manager", label: "Operations Manager", icon: "engineering", category: "management" },
   { value: "human_resources", label: "Human Resources", icon: "badge", category: "management" },
@@ -415,9 +414,11 @@ export default function Dashboard() {
     })
   );
 
-  // Fetch projects
+  // Fetch projects with auto-refresh to show real-time progress
   const { data: projectsData, isLoading: projectsLoading } = useQuery({
     queryKey: ["/api/projects"],
+    refetchInterval: 10000, // Refetch every 10 seconds
+    refetchOnWindowFocus: true,
   });
 
   // Fetch all employees (including terminated) for management
