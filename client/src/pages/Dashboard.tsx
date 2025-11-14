@@ -67,7 +67,9 @@ const projectSchema = z.object({
   calendarColor: z.string().default("#3b82f6"),
   ropeAccessPlan: z.any().optional(),
   suitesPerDay: z.string().optional(),
+  totalFloors: z.string().optional(),
   floorsPerDay: z.string().optional(),
+  totalStalls: z.string().optional(),
   stallsPerDay: z.string().optional(),
 });
 
@@ -729,7 +731,9 @@ export default function Dashboard() {
           estimatedHours: data.estimatedHours ? parseInt(data.estimatedHours) : undefined,
           ropeAccessPlanUrl: data.ropeAccessPlanUrl || undefined,
           suitesPerDay: data.suitesPerDay ? parseInt(data.suitesPerDay) : undefined,
+          totalFloors: data.totalFloors ? parseInt(data.totalFloors) : undefined,
           floorsPerDay: data.floorsPerDay ? parseInt(data.floorsPerDay) : undefined,
+          totalStalls: data.totalStalls ? parseInt(data.totalStalls) : undefined,
           stallsPerDay: data.stallsPerDay ? parseInt(data.stallsPerDay) : undefined,
         }),
         credentials: "include",
