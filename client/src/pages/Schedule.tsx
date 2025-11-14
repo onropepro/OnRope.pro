@@ -1183,6 +1183,30 @@ function CreateJobDialog({
     employeeIds: [] as string[],
   });
 
+  // Auto-populate dates when project is selected
+  useEffect(() => {
+    if (formData.projectId) {
+      const selectedProject = projects.find((p: any) => p.id === formData.projectId);
+      if (selectedProject) {
+        // Only set dates if project has them and form dates are empty
+        if (selectedProject.startDate && !formData.startDate) {
+          const projectStart = new Date(selectedProject.startDate);
+          setFormData(prev => ({
+            ...prev,
+            startDate: projectStart.toISOString().slice(0, 16),
+          }));
+        }
+        if (selectedProject.endDate && !formData.endDate) {
+          const projectEnd = new Date(selectedProject.endDate);
+          setFormData(prev => ({
+            ...prev,
+            endDate: projectEnd.toISOString().slice(0, 16),
+          }));
+        }
+      }
+    }
+  }, [formData.projectId, projects]);
+
   const createJobMutation = useMutation({
     mutationFn: async (data: any) => {
       const response = await apiRequest("POST", "/api/schedule", data);
@@ -1988,6 +2012,28 @@ function EditJobDialog({
       });
     }
   }, [job]);
+
+  // Auto-populate dates when project is selected (after initial load)
+  const [initialLoad, setInitialLoad] = useState(true);
+  useEffect(() => {
+    if (job && initialLoad) {
+      setInitialLoad(false);
+      return;
+    }
+    
+    if (formData.projectId && !initialLoad) {
+      const selectedProject = projects.find((p: any) => p.id === formData.projectId);
+      if (selectedProject && selectedProject.startDate && selectedProject.endDate) {
+        const projectStart = new Date(selectedProject.startDate);
+        const projectEnd = new Date(selectedProject.endDate);
+        setFormData(prev => ({
+          ...prev,
+          startDate: projectStart.toISOString().slice(0, 16),
+          endDate: projectEnd.toISOString().slice(0, 16),
+        }));
+      }
+    }
+  }, [formData.projectId, projects, initialLoad, job]);
 
   const updateJobMutation = useMutation({
     mutationFn: async (data: any) => {
