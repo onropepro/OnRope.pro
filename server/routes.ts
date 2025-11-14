@@ -502,9 +502,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Fetch all users with company role
       const companies = await storage.getAllCompanies();
       
-      // Return companies without sensitive password hashes
+      // Return companies without sensitive password hashes (but include licenseKey for SuperUser)
       const companiesWithoutPasswords = companies.map(company => {
-        const { passwordHash, licenseKey, ...companyData } = company;
+        const { passwordHash, ...companyData } = company;
         return companyData;
       });
 
