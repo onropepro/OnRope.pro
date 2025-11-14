@@ -59,7 +59,12 @@ export default function AllCompanies() {
             </Card>
           ) : (
             companies.map((company: any) => (
-              <Card key={company.id} className="hover-elevate" data-testid={`card-company-${company.id}`}>
+              <Card 
+                key={company.id} 
+                className="hover-elevate active-elevate-2 cursor-pointer transition-all" 
+                onClick={() => setLocation(`/superuser/companies/${company.id}`)}
+                data-testid={`card-company-${company.id}`}
+              >
                 <CardHeader>
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
