@@ -285,10 +285,6 @@ function DeletedProjectsTab() {
   
   return (
     <div className="space-y-4">
-      <div className="flex items-center gap-2 mb-6">
-        <div className="h-8 w-1 bg-destructive rounded-full"></div>
-        <h2 className="text-xl font-bold">Deleted Projects</h2>
-      </div>
       {deletedProjects.length === 0 ? (
         <Card>
           <CardContent className="p-8 text-center text-muted-foreground">
@@ -1497,16 +1493,6 @@ export default function Dashboard() {
       borderColor: "#60a5fa",
     },
     {
-      id: "deleted-projects",
-      label: "Deleted Projects",
-      description: "Recently deleted",
-      icon: "delete",
-      onClick: () => handleTabChange("deleted-projects"),
-      testId: "button-nav-deleted-projects",
-      isVisible: (user: any) => canManageEmployees(user), // Management only
-      borderColor: "#ef4444",
-    },
-    {
       id: "employees",
       label: "Employees",
       description: "Manage team",
@@ -1686,7 +1672,6 @@ export default function Dashboard() {
       case "": return "Dashboard";
       case "projects": return "Projects";
       case "past-projects": return "Past Projects";
-      case "deleted-projects": return "Deleted Projects";
       case "performance": return "Performance";
       case "complaints": return "Complaints";
       case "employees": return "Employees";
@@ -2402,15 +2387,27 @@ export default function Dashboard() {
             </div>
         )}
 
-        {activeTab === "deleted-projects" && <DeletedProjectsTab />}
-
         {activeTab === "past-projects" && (
           <div>
-            <div className="space-y-4">
-              <div className="flex items-center gap-2 mb-6">
-                <div className="h-8 w-1 bg-success rounded-full"></div>
-                <h2 className="text-xl font-bold">Past Projects</h2>
+            <Tabs defaultValue="completed" className="space-y-4">
+              <div className="flex items-center justify-between mb-6">
+                <div className="flex items-center gap-2">
+                  <div className="h-8 w-1 bg-success rounded-full"></div>
+                  <h2 className="text-xl font-bold">Past Projects</h2>
+                </div>
+                <TabsList>
+                  <TabsTrigger value="completed" data-testid="tab-completed-projects">
+                    <span className="material-icons text-sm mr-1">done_all</span>
+                    Completed
+                  </TabsTrigger>
+                  <TabsTrigger value="deleted" data-testid="tab-deleted-projects">
+                    <span className="material-icons text-sm mr-1">delete</span>
+                    Deleted
+                  </TabsTrigger>
+                </TabsList>
               </div>
+
+              <TabsContent value="completed" className="space-y-4">
               {filteredProjects.filter((p: Project) => p.status === "completed").length === 0 ? (
                 <Card>
                   <CardContent className="p-8 text-center text-muted-foreground">
@@ -2453,7 +2450,12 @@ export default function Dashboard() {
                   ))}
                 </div>
               )}
-            </div>
+              </TabsContent>
+
+              <TabsContent value="deleted">
+                <DeletedProjectsTab />
+              </TabsContent>
+            </Tabs>
           </div>
         )}
 
