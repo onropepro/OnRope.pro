@@ -62,6 +62,8 @@ const projectSchema = z.object({
   totalDropsWest: z.string().optional(),
   dailyDropTarget: z.string().optional(),
   floorCount: z.string().optional(),
+  startDate: z.string().optional(),
+  endDate: z.string().optional(),
   targetCompletionDate: z.string().optional(),
   estimatedHours: z.string().optional(),
   calendarColor: z.string().default("#3b82f6"),
@@ -532,6 +534,8 @@ export default function Dashboard() {
       totalDropsWest: "",
       dailyDropTarget: "",
       floorCount: "",
+      startDate: "",
+      endDate: "",
       targetCompletionDate: "",
       estimatedHours: "",
       calendarColor: "#3b82f6",
@@ -739,6 +743,8 @@ export default function Dashboard() {
                      (data.totalDropsWest ? parseInt(data.totalDropsWest) : 0),
           dailyDropTarget: data.dailyDropTarget ? parseInt(data.dailyDropTarget) : undefined,
           floorCount: parseInt(data.floorCount),
+          startDate: data.startDate || undefined,
+          endDate: data.endDate || undefined,
           estimatedHours: data.estimatedHours ? parseInt(data.estimatedHours) : undefined,
           ropeAccessPlanUrl: data.ropeAccessPlanUrl || undefined,
           suitesPerDay: data.suitesPerDay ? parseInt(data.suitesPerDay) : undefined,
@@ -2239,6 +2245,35 @@ export default function Dashboard() {
                             />
                           </>
                         )}
+
+                        <div className="grid grid-cols-2 gap-4">
+                          <FormField
+                            control={projectForm.control}
+                            name="startDate"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Start Date</FormLabel>
+                                <FormControl>
+                                  <Input type="date" {...field} data-testid="input-start-date" className="h-12" />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                          <FormField
+                            control={projectForm.control}
+                            name="endDate"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>End Date</FormLabel>
+                                <FormControl>
+                                  <Input type="date" {...field} data-testid="input-end-date" className="h-12" />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                        </div>
 
                         <FormField
                           control={projectForm.control}
