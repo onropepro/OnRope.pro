@@ -154,8 +154,13 @@ export const projects = pgTable("projects", {
 // Drop logs table - tracks daily drops per project per tech per elevation
 export const dropLogs = pgTable("drop_logs", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
-  projectId: varchar("project_id").notNull().references(() => projects.id, { onDelete: "cascade" }),
-  userId: varchar("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  projectId: varchar("project_id").references(() => projects.id, { onDelete: "set null" }), // Nullable to preserve historical data
+  userId: varchar("user_id").references(() => users.id, { onDelete: "set null" }), // Nullable to preserve historical data
+  
+  // Denormalized snapshot fields for historical records
+  projectName: varchar("project_name"), // Project building name at time of log
+  employeeName: varchar("employee_name"), // Employee name at time of log
+  
   date: date("date").notNull(),
   
   // Elevation-specific drops completed
@@ -171,9 +176,18 @@ export const dropLogs = pgTable("drop_logs", {
 // Work sessions table - tracks daily work sessions with start/end times per elevation
 export const workSessions = pgTable("work_sessions", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
-  projectId: varchar("project_id").notNull().references(() => projects.id, { onDelete: "cascade" }),
-  employeeId: varchar("employee_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  projectId: varchar("project_id").references(() => projects.id, { onDelete: "set null" }), // Nullable to preserve historical data
+  employeeId: varchar("employee_id").references(() => users.id, { onDelete: "set null" }), // Nullable to preserve historical data
   companyId: varchar("company_id").notNull().references(() => users.id, { onDelete: "cascade" }), // For multi-tenant isolation
+  
+  // Denormalized snapshot fields for historical records (immutable at session creation time)
+  projectName: varchar("project_name"), // Project building name
+  projectBuildingAddress: text("project_building_address"), // Building address
+  projectStrataPlanNumber: varchar("project_strata_plan_number"), // Strata plan number
+  employeeName: varchar("employee_name"), // Employee full name
+  employeeRole: varchar("employee_role"), // Employee role at time of session
+  employeeHourlyRate: numeric("employee_hourly_rate", { precision: 10, scale: 2 }), // Hourly rate at time of session
+  
   workDate: date("work_date").notNull(), // Date of the work session
   startTime: timestamp("start_time").notNull(),
   endTime: timestamp("end_time"), // Null if session is still active
@@ -193,16 +207,19 @@ export const workSessions = pgTable("work_sessions", {
   shortfallReason: text("shortfall_reason"), // Required if total drops < dailyDropTarget
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
-}, (table) => [
-  index("IDX_work_sessions_company_project_date").on(table.companyId, table.projectId, table.workDate),
-  index("IDX_work_sessions_employee_project").on(table.employeeId, table.projectId),
-]);
+});
 
 // Non-billable work sessions table - tracks non-project work (errands, training, etc.)
 export const nonBillableWorkSessions = pgTable("non_billable_work_sessions", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
-  employeeId: varchar("employee_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  employeeId: varchar("employee_id").references(() => users.id, { onDelete: "set null" }), // Nullable to preserve historical data
   companyId: varchar("company_id").notNull().references(() => users.id, { onDelete: "cascade" }), // For multi-tenant isolation
+  
+  // Denormalized snapshot fields for historical records
+  employeeName: varchar("employee_name"), // Employee name at time of session
+  employeeRole: varchar("employee_role"), // Employee role at time of session
+  employeeHourlyRate: numeric("employee_hourly_rate", { precision: 10, scale: 2 }), // Hourly rate at time of session
+  
   workDate: date("work_date").notNull(), // Date of the work session
   startTime: timestamp("start_time").notNull(),
   endTime: timestamp("end_time"), // Null if session is still active
@@ -216,10 +233,7 @@ export const nonBillableWorkSessions = pgTable("non_billable_work_sessions", {
   
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
-}, (table) => [
-  index("IDX_non_billable_sessions_company_date").on(table.companyId, table.workDate),
-  index("IDX_non_billable_sessions_employee").on(table.employeeId),
-]);
+});
 
 // Gear inventory items table - tracks employee equipment (quantity with optional serial numbers)
 export const gearItems = pgTable("gear_items", {
