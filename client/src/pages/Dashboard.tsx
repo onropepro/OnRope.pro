@@ -78,6 +78,7 @@ const projectSchema = z.object({
 
 // Role definitions with icons
 const ROLE_OPTIONS = [
+  { value: "company", label: "Owner/CEO", icon: "business_center", category: "management" },
   { value: "owner_ceo", label: "Owner/CEO", icon: "business_center", category: "management" },
   { value: "operations_manager", label: "Operations Manager", icon: "engineering", category: "management" },
   { value: "human_resources", label: "Human Resources", icon: "badge", category: "management" },
@@ -91,6 +92,13 @@ const ROLE_OPTIONS = [
   { value: "ground_crew", label: "Ground Crew", icon: "engineering", category: "worker" },
   { value: "labourer", label: "Labourer", icon: "handyman", category: "worker" },
 ] as const;
+
+// Helper function to get role label
+export const getRoleLabel = (role: string | undefined | null): string => {
+  if (!role) return "Staff";
+  const roleOption = ROLE_OPTIONS.find(r => r.value === role);
+  return roleOption?.label || role.replace(/_/g, ' ');
+};
 
 // Available permissions for employees
 const AVAILABLE_PERMISSIONS = [

@@ -24,6 +24,7 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { DndContext, DragOverlay, useDraggable, useDroppable, closestCenter, DragEndEvent } from '@dnd-kit/core';
 import { canViewSchedule } from "@/lib/permissions";
+import { getRoleLabel } from "@/pages/Dashboard";
 
 export default function Schedule() {
   const { toast } = useToast();
@@ -179,7 +180,7 @@ export default function Schedule() {
       
       let displayTitle = job.project?.buildingName || job.title;
       if (employeesForThisDay.length > 0) {
-        const employeeNames = employeesForThisDay.map((a: any) => `${a.employee.name} (${a.employee.role?.replace(/_/g, ' ') || 'Staff'})`).join(", ");
+        const employeeNames = employeesForThisDay.map((a: any) => `${a.employee.name} (${getRoleLabel(a.employee.role)})`).join(", ");
         displayTitle = `${job.project?.buildingName || job.title}\n👥 ${employeeNames}`;
       }
       
@@ -227,7 +228,7 @@ export default function Schedule() {
       
       let displayTitle = job.project?.buildingName || job.title;
       if (employeesForThisDay.length > 0) {
-        const employeeNames = employeesForThisDay.map((a: any) => `${a.employee.name} (${a.employee.role?.replace(/_/g, ' ') || 'Staff'})`).join(", ");
+        const employeeNames = employeesForThisDay.map((a: any) => `${a.employee.name} (${getRoleLabel(a.employee.role)})`).join(", ");
         displayTitle = `${job.project?.buildingName || job.title}\n👥 ${employeeNames}`;
       }
       
@@ -846,7 +847,7 @@ export default function Schedule() {
                               marginTop: '2px',
                               display: 'inline-block'
                             }}>
-                              👤 {assignment.employee.name} {assignment.employee.role && `(${assignment.employee.role.replace(/_/g, ' ')})`}
+                              👤 {assignment.employee.name} ({getRoleLabel(assignment.employee.role)})
                             </div>
                           ))}
                         </div>
@@ -1117,7 +1118,7 @@ function DraggableEmployeeCard({
     >
       <div className="font-bold text-foreground text-xs flex items-center gap-1 overflow-hidden">
         {isActive && <span className="text-primary flex-shrink-0">→</span>}
-        <span className="truncate">{employee.name} {employee.role && `(${employee.role.replace(/_/g, ' ')})`}</span>
+        <span className="truncate">{employee.name} ({getRoleLabel(employee.role)})</span>
       </div>
       {children}
     </div>
@@ -1478,7 +1479,7 @@ function CreateJobDialog({
                       htmlFor={`employee-${employee.id}`}
                       className="text-sm flex-1 cursor-pointer"
                     >
-                      {employee.name} {employee.role && `(${employee.role.replace(/_/g, ' ')})`}
+                      {employee.name} ({getRoleLabel(employee.role)})
                     </label>
                   </div>
                 ))
@@ -1760,7 +1761,7 @@ function JobDetailDialog({
                             data-testid={`button-assign-${employee.id}`}
                           >
                             <UserCheck className="w-4 h-4 mr-2" />
-                            {employee.name} {employee.role && `(${employee.role.replace(/_/g, ' ')})`}
+                            {employee.name} ({getRoleLabel(employee.role)})
                           </Button>
                         ))}
                       </div>
@@ -1775,7 +1776,7 @@ function JobDetailDialog({
                     {job.employeeAssignments.map((assignment) => (
                       <div key={assignment.assignmentId} className="flex items-center justify-between border rounded-md p-3">
                         <div className="flex-1">
-                          <div className="font-medium text-sm">{assignment.employee.name} {assignment.employee.role && `(${assignment.employee.role.replace(/_/g, ' ')})`}</div>
+                          <div className="font-medium text-sm">{assignment.employee.name} ({getRoleLabel(assignment.employee.role)})</div>
                           <div className="text-xs text-muted-foreground">
                             {assignment.startDate && assignment.endDate ? (
                               <>
@@ -2292,7 +2293,7 @@ function EditJobDialog({
                       htmlFor={`edit-employee-${employee.id}`}
                       className="text-sm flex-1 cursor-pointer"
                     >
-                      {employee.name} {employee.role && `(${employee.role.replace(/_/g, ' ')})`}
+                      {employee.name} ({getRoleLabel(employee.role)})
                     </label>
                   </div>
                 ))
