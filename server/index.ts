@@ -1,12 +1,9 @@
 import express, { type Request, Response, NextFunction } from "express";
 import session from "express-session";
 import connectPg from "connect-pg-simple";
-import { pool, db } from "./db";
+import { pool } from "./db";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
-import { migrate } from "drizzle-orm/neon-serverless/migrator";
-import path from "path";
-import { fileURLToPath } from "url";
 
 const app = express();
 
@@ -81,36 +78,7 @@ app.use((req, res, next) => {
   next();
 });
 
-async function runMigrations() {
-  if (process.env.SKIP_MIGRATIONS === "true") {
-    log("Skipping migrations (SKIP_MIGRATIONS=true)");
-    return;
-  }
-
-  const startTime = Date.now();
-  log("Running database migrations...");
-  
-  try {
-    const migrationsFolder = path.resolve(
-      path.dirname(fileURLToPath(import.meta.url)),
-      "../migrations"
-    );
-    
-    await migrate(db, { migrationsFolder });
-    
-    const duration = Date.now() - startTime;
-    log(`Migrations completed successfully in ${duration}ms`);
-  } catch (error) {
-    console.error("Migration failed:", error);
-    process.exit(1);
-  }
-}
-
 (async () => {
-  if (process.env.NODE_ENV === "production") {
-    await runMigrations();
-  }
-  
   const server = await registerRoutes(app);
 
   app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
