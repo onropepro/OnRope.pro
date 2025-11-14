@@ -5075,15 +5075,24 @@ export default function Dashboard() {
                     Back
                   </Button>
                   <Button 
-                    type="submit" 
+                    type="button" 
                     className="w-full h-12" 
                     data-testid="button-submit-edit-employee" 
                     disabled={editEmployeeMutation.isPending}
-                    onClick={(e) => {
-                      console.log("🟢 Update Employee button clicked!");
+                    onClick={async () => {
+                      console.log("🟢 Button clicked!");
+                      const isValid = await editEmployeeForm.trigger();
+                      console.log("🟢 Form valid?", isValid);
                       console.log("🟢 Form errors:", editEmployeeForm.formState.errors);
-                      console.log("🟢 Form values:", editEmployeeForm.getValues());
-                      console.log("🟢 Employee to edit:", employeeToEdit);
+                      
+                      if (!isValid) {
+                        console.log("🔴 Validation failed!");
+                        return;
+                      }
+                      
+                      const data = editEmployeeForm.getValues();
+                      console.log("🟢 Calling mutation with data:", data);
+                      onEditEmployeeSubmit(data);
                     }}
                   >
                     {editEmployeeMutation.isPending ? "Updating..." : "Update Employee"}
