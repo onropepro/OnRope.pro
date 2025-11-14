@@ -1097,7 +1097,13 @@ export default function Dashboard() {
   });
 
   const onEditEmployeeSubmit = async (data: EditEmployeeFormData) => {
-    if (!employeeToEdit) return;
+    console.log("onEditEmployeeSubmit called", data);
+    console.log("employeeToEdit:", employeeToEdit);
+    console.log("Form errors:", editEmployeeForm.formState.errors);
+    if (!employeeToEdit) {
+      console.error("No employeeToEdit found!");
+      return;
+    }
     editEmployeeMutation.mutate({ ...data, id: employeeToEdit.id });
   };
 
