@@ -1,0 +1,754 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rope Access Management Platform - Feature Overview</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      background: linear-gradient(135deg, #0EA5E9 0%, #06b6d4 100%);
+      min-height: 100vh;
+      color: #1e293b;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    .header {
+      text-align: center;
+      padding: 60px 20px;
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      border-radius: 16px;
+      margin-bottom: 40px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+    }
+
+    .header h1 {
+      font-size: 3rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, #0EA5E9, #06b6d4);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 20px;
+    }
+
+    .header p {
+      font-size: 1.25rem;
+      color: #64748b;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    .presentation {
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+      overflow: hidden;
+    }
+
+    .slide {
+      display: none;
+      padding: 60px;
+      min-height: 600px;
+    }
+
+    .slide.active {
+      display: block;
+      animation: fadeIn 0.5s ease-in;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .slide-header {
+      margin-bottom: 30px;
+    }
+
+    .slide-number {
+      font-size: 0.875rem;
+      color: #0EA5E9;
+      font-weight: 600;
+      margin-bottom: 10px;
+    }
+
+    .slide h2 {
+      font-size: 2.5rem;
+      color: #0f172a;
+      margin-bottom: 20px;
+    }
+
+    .slide p {
+      font-size: 1.125rem;
+      color: #64748b;
+      line-height: 1.7;
+      margin-bottom: 30px;
+    }
+
+    .screenshot-placeholder {
+      background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+      border: 2px dashed #cbd5e1;
+      border-radius: 12px;
+      min-height: 300px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 30px 0;
+      position: relative;
+    }
+
+    .screenshot-placeholder::before {
+      content: '📸 Screenshot Placeholder';
+      font-size: 1.25rem;
+      color: #94a3b8;
+    }
+
+    .screenshot-placeholder img {
+      width: 100%;
+      height: auto;
+      border-radius: 12px;
+    }
+
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px;
+      margin: 30px 0;
+    }
+
+    .feature-item {
+      background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+      padding: 20px;
+      border-radius: 12px;
+      border-left: 4px solid #0EA5E9;
+    }
+
+    .feature-item h4 {
+      color: #0EA5E9;
+      margin-bottom: 8px;
+      font-size: 1rem;
+    }
+
+    .feature-item p {
+      color: #475569;
+      font-size: 0.875rem;
+      margin: 0;
+      line-height: 1.5;
+    }
+
+    .features-list {
+      background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+      border-radius: 12px;
+      padding: 30px;
+      margin: 30px 0;
+    }
+
+    .features-list h3 {
+      color: #0EA5E9;
+      margin-bottom: 20px;
+      font-size: 1.25rem;
+    }
+
+    .features-list ul {
+      list-style: none;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 15px;
+    }
+
+    .features-list li {
+      color: #475569;
+      padding-left: 30px;
+      position: relative;
+      line-height: 1.6;
+    }
+
+    .features-list li::before {
+      content: '✓';
+      position: absolute;
+      left: 0;
+      color: #0EA5E9;
+      font-weight: bold;
+      font-size: 1.25rem;
+    }
+
+    .controls {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 30px 60px;
+      background: #f8fafc;
+      border-top: 1px solid #e2e8f0;
+    }
+
+    .btn {
+      padding: 12px 24px;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #0EA5E9, #06b6d4);
+      color: white;
+    }
+
+    .btn-primary:not(:disabled):hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 30px rgba(14, 165, 233, 0.3);
+    }
+
+    .btn-secondary {
+      background: white;
+      color: #0EA5E9;
+      border: 2px solid #0EA5E9;
+    }
+
+    .btn-secondary:not(:disabled):hover {
+      background: #f0f9ff;
+    }
+
+    .indicators {
+      display: flex;
+      gap: 8px;
+    }
+
+    .indicator {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #cbd5e1;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .indicator.active {
+      background: #0EA5E9;
+      width: 30px;
+      border-radius: 5px;
+    }
+
+    .indicator:hover {
+      background: #64748b;
+    }
+
+    @media (max-width: 768px) {
+      .header h1 {
+        font-size: 2rem;
+      }
+
+      .slide {
+        padding: 30px;
+      }
+
+      .slide h2 {
+        font-size: 1.75rem;
+      }
+
+      .controls {
+        padding: 20px 30px;
+      }
+
+      .features-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>Rope Access Management Platform</h1>
+      <p>Complete enterprise solution for managing high-rise building maintenance operations with precision, safety, and efficiency</p>
+    </div>
+
+    <div class="presentation">
+      <!-- Slide 1: Welcome -->
+      <div class="slide active" data-slide="1">
+        <div class="slide-header">
+          <div class="slide-number">SLIDE 1 OF 16</div>
+          <h2>Welcome to the Future of Rope Access Management</h2>
+          <p>A comprehensive platform designed specifically for rope access companies to streamline operations, ensure safety compliance, and maximize profitability.</p>
+        </div>
+        <div class="screenshot-placeholder">
+          <!-- Replace this div with: <img src="screenshots/dashboard.png" alt="Dashboard Overview"> -->
+        </div>
+        <div class="features-list">
+          <h3>Core Capabilities</h3>
+          <ul>
+            <li>Multi-tenant role-based access control</li>
+            <li>Real-time GPS workforce tracking</li>
+            <li>IRATA-compliant safety inspections</li>
+            <li>Intelligent project management</li>
+            <li>Client relationship management</li>
+            <li>Financial controls and quoting</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Slide 2: Dashboard -->
+      <div class="slide" data-slide="2">
+        <div class="slide-header">
+          <div class="slide-number">SLIDE 2 OF 16</div>
+          <h2>Centralized Command Center</h2>
+          <p>Your dashboard provides real-time insights into all operations, active projects, and workforce status at a glance.</p>
+        </div>
+        <div class="screenshot-placeholder">
+          <!-- Replace with actual dashboard screenshot -->
+        </div>
+        <div class="features-list">
+          <h3>Dashboard Features</h3>
+          <ul>
+            <li>Quick access to all major features</li>
+            <li>Active project tracking</li>
+            <li>Recent inspections overview</li>
+            <li>Employee status monitoring</li>
+            <li>Role-based customization</li>
+            <li>Real-time notifications</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Slide 3: Project Management -->
+      <div class="slide" data-slide="3">
+        <div class="slide-header">
+          <div class="slide-number">SLIDE 3 OF 16</div>
+          <h2>Comprehensive Project Management</h2>
+          <p>Manage diverse job types including window cleaning, pressure washing, painting, and inspections with visual selection and detailed tracking systems.</p>
+        </div>
+        <div class="screenshot-placeholder">
+          <!-- Replace with project management screenshot -->
+        </div>
+        <div class="features-list">
+          <h3>Project Features</h3>
+          <ul>
+            <li>Visual job type selection grid</li>
+            <li>4-Elevation progress tracking</li>
+            <li>Parkade grid system</li>
+            <li>In-suite progress tracking</li>
+            <li>Daily drop logging</li>
+            <li>GPS location integration</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Slide 4: Scheduling -->
+      <div class="slide" data-slide="4">
+        <div class="slide-header">
+          <div class="slide-number">SLIDE 4 OF 16</div>
+          <h2>Advanced Job Scheduling</h2>
+          <p>Dual-calendar system with drag-and-drop assignment, color-coding, and intelligent conflict detection for optimal resource allocation.</p>
+        </div>
+        <div class="screenshot-placeholder">
+          <!-- Replace with scheduling screenshot -->
+        </div>
+        <div class="features-list">
+          <h3>Scheduling Capabilities</h3>
+          <ul>
+            <li>Job Schedule view (project-centric)</li>
+            <li>Employee Schedule view (worker-centric)</li>
+            <li>Color-coded job types</li>
+            <li>Drag-and-drop assignment</li>
+            <li>Conflict detection</li>
+            <li>Resource optimization</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Slide 5: GPS Tracking -->
+      <div class="slide" data-slide="5">
+        <div class="slide-header">
+          <div class="slide-number">SLIDE 5 OF 16</div>
+          <h2>Real-Time GPS Tracking</h2>
+          <p>Live location tracking shows exactly where your team members are working with interactive map visualization and session monitoring.</p>
+        </div>
+        <div class="screenshot-placeholder">
+          <!-- Replace with GPS tracking map screenshot -->
+        </div>
+        <div class="features-list">
+          <h3>Tracking Features</h3>
+          <ul>
+            <li>Real-time location updates</li>
+            <li>Interactive Leaflet maps</li>
+            <li>Worker status indicators</li>
+            <li>Project assignment visibility</li>
+            <li>Session duration monitoring</li>
+            <li>GPS-verified clock in/out</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Slide 6: Safety & Inspections -->
+      <div class="slide" data-slide="6">
+        <div class="slide-header">
+          <div class="slide-number">SLIDE 6 OF 16</div>
+          <h2>IRATA-Compliant Safety System</h2>
+          <p>Digital rope access equipment inspection covering 11 categories with comprehensive documentation and PDF report generation.</p>
+        </div>
+        <div class="screenshot-placeholder">
+          <!-- Replace with inspection form screenshot -->
+        </div>
+        <div class="features-list">
+          <h3>Safety & Compliance</h3>
+          <ul>
+            <li>11 inspection categories</li>
+            <li>Daily pre-work safety workflow</li>
+            <li>Detailed findings documentation</li>
+            <li>Professional PDF reports</li>
+            <li>Inspection history tracking</li>
+            <li>Gear autofill from inventory</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Slide 7: Inventory Management -->
+      <div class="slide" data-slide="7">
+        <div class="slide-header">
+          <div class="slide-number">SLIDE 7 OF 16</div>
+          <h2>Equipment & Gear Management</h2>
+          <p>Track all rope access equipment with assignment tracking, serial numbers, and seamless integration with inspection workflows.</p>
+        </div>
+        <div class="screenshot-placeholder">
+          <!-- Replace with inventory screenshot -->
+        </div>
+        <div class="features-list">
+          <h3>Inventory Features</h3>
+          <ul>
+            <li>Complete equipment tracking</li>
+            <li>Gear assignment to employees</li>
+            <li>Serial number management</li>
+            <li>Date in service tracking</li>
+            <li>My Gear employee view</li>
+            <li>Autofill for inspections</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Slide 8: Time Tracking -->
+      <div class="slide" data-slide="8">
+        <div class="slide-header">
+          <div class="slide-number">SLIDE 8 OF 16</div>
+          <h2>Workforce & Time Management</h2>
+          <p>Complete employee management with GPS-verified time tracking, certification monitoring, and payroll-ready reporting.</p>
+        </div>
+        <div class="screenshot-placeholder">
+          <!-- Replace with time tracking screenshot -->
+        </div>
+        <div class="features-list">
+          <h3>Time Tracking Features</h3>
+          <ul>
+            <li>GPS-verified clock in/out</li>
+            <li>Billable vs non-billable hours</li>
+            <li>Certification tracking</li>
+            <li>Pay rate management</li>
+            <li>Payroll-ready exports</li>
+            <li>Session history & analytics</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Slide 9: Client Management -->
+      <div class="slide" data-slide="9">
+        <div class="slide-header">
+          <div class="slide-number">SLIDE 9 OF 16</div>
+          <h2>Client & Building Database</h2>
+          <p>Comprehensive CRM with intelligent autofill functionality that streamlines project creation by reusing client and building data.</p>
+        </div>
+        <div class="screenshot-placeholder">
+          <!-- Replace with client management screenshot -->
+        </div>
+        <div class="features-list">
+          <h3>CRM Capabilities</h3>
+          <ul>
+            <li>Client record management</li>
+            <li>Building database</li>
+            <li>Intelligent autofill</li>
+            <li>Contact information</li>
+            <li>Project history per client</li>
+            <li>Smart data reuse</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Slide 10: Financial Controls -->
+      <div class="slide" data-slide="10">
+        <div class="slide-header">
+          <div class="slide-number">SLIDE 10 OF 16</div>
+          <h2>Financial Controls & Quoting</h2>
+          <p>Generate accurate quotes with automated labor cost calculations and maintain strict permission-based access to financial data.</p>
+        </div>
+        <div class="screenshot-placeholder">
+          <!-- Replace with quoting screenshot -->
+        </div>
+        <div class="features-list">
+          <h3>Financial Features</h3>
+          <ul>
+            <li>Professional quote generation</li>
+            <li>Labor cost calculations</li>
+            <li>Tax computation</li>
+            <li>Permission-based access</li>
+            <li>Project budgeting</li>
+            <li>Cost tracking per job</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Slide 11: Analytics -->
+      <div class="slide" data-slide="11">
+        <div class="slide-header">
+          <div class="slide-number">SLIDE 11 OF 16</div>
+          <h2>Comprehensive Analytics & Reporting</h2>
+          <p>Deep insights into operations, productivity, and financial performance across all projects with customizable date ranges.</p>
+        </div>
+        <div class="screenshot-placeholder">
+          <!-- Replace with analytics screenshot -->
+        </div>
+        <div class="features-list">
+          <h3>Analytics Features</h3>
+          <ul>
+            <li>Billable vs non-billable analysis</li>
+            <li>Employee productivity metrics</li>
+            <li>Project labor cost tracking</li>
+            <li>Active worker counts</li>
+            <li>Custom date range reports</li>
+            <li>Visual data presentations</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Slide 12: Resident Portal -->
+      <div class="slide" data-slide="12">
+        <div class="slide-header">
+          <div class="slide-number">SLIDE 12 OF 16</div>
+          <h2>Resident Communication Portal</h2>
+          <p>Two-way communication system with complaint management and photo galleries to keep building residents informed and engaged.</p>
+        </div>
+        <div class="screenshot-placeholder">
+          <!-- Replace with resident portal screenshot -->
+        </div>
+        <div class="features-list">
+          <h3>Portal Features</h3>
+          <ul>
+            <li>Complaint submission & tracking</li>
+            <li>Two-way messaging</li>
+            <li>Photo gallery with tagging</li>
+            <li>Notification badges</li>
+            <li>Service request management</li>
+            <li>Progress updates</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Slide 13: Role-Based Access -->
+      <div class="slide" data-slide="13">
+        <div class="slide-header">
+          <div class="slide-number">SLIDE 13 OF 16</div>
+          <h2>Granular Permission Control</h2>
+          <p>Multi-tenant architecture with role-based access ensuring each user sees only what they need with complete data isolation.</p>
+        </div>
+        <div class="screenshot-placeholder">
+          <!-- Replace with permissions screenshot -->
+        </div>
+        <div class="features-grid">
+          <div class="feature-item">
+            <h4>Company Owner</h4>
+            <p>Full system access and control</p>
+          </div>
+          <div class="feature-item">
+            <h4>Operations Manager</h4>
+            <p>Operational oversight & analytics</p>
+          </div>
+          <div class="feature-item">
+            <h4>Site Supervisor</h4>
+            <p>Project management & scheduling</p>
+          </div>
+          <div class="feature-item">
+            <h4>Rope Access Tech</h4>
+            <p>Field operations & inspections</p>
+          </div>
+          <div class="feature-item">
+            <h4>Resident</h4>
+            <p>Portal access & communication</p>
+          </div>
+          <div class="feature-item">
+            <h4>SuperUser</h4>
+            <p>Multi-company administration</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Slide 14: SuperUser -->
+      <div class="slide" data-slide="14">
+        <div class="slide-header">
+          <div class="slide-number">SLIDE 14 OF 16</div>
+          <h2>SuperUser Administration</h2>
+          <p>Centralized oversight for managing multiple companies with license verification and system-wide analytics.</p>
+        </div>
+        <div class="screenshot-placeholder">
+          <!-- Replace with superuser dashboard screenshot -->
+        </div>
+        <div class="features-list">
+          <h3>Admin Features</h3>
+          <ul>
+            <li>Multi-company dashboard</li>
+            <li>License status monitoring</li>
+            <li>Detailed company views</li>
+            <li>Cross-company analytics</li>
+            <li>System-wide reporting</li>
+            <li>Company management</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Slide 15: Mobile Design -->
+      <div class="slide" data-slide="15">
+        <div class="slide-header">
+          <div class="slide-number">SLIDE 15 OF 16</div>
+          <h2>Mobile-First Enterprise Design</h2>
+          <p>Premium SaaS aesthetic with glass-morphism effects, responsive layouts, and accessible design standards for all devices.</p>
+        </div>
+        <div class="screenshot-placeholder">
+          <!-- Replace with mobile view screenshots -->
+        </div>
+        <div class="features-list">
+          <h3>Design Features</h3>
+          <ul>
+            <li>Mobile-optimized interface</li>
+            <li>44px touch targets</li>
+            <li>Responsive layouts</li>
+            <li>Ocean Blue color palette</li>
+            <li>Professional polish</li>
+            <li>WCAG accessibility standards</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Slide 16: Get Started -->
+      <div class="slide" data-slide="16">
+        <div class="slide-header">
+          <div class="slide-number">SLIDE 16 OF 16</div>
+          <h2>Ready to Transform Your Operations?</h2>
+          <p>Join leading rope access companies who have streamlined their operations, improved safety compliance, and increased profitability with our comprehensive management platform.</p>
+        </div>
+        <div class="features-grid">
+          <div class="feature-item">
+            <h4>🚀 Quick Setup</h4>
+            <p>Get started in minutes with intuitive onboarding</p>
+          </div>
+          <div class="feature-item">
+            <h4>📱 Mobile Ready</h4>
+            <p>Access from any device, anywhere</p>
+          </div>
+          <div class="feature-item">
+            <h4>🔒 Secure & Compliant</h4>
+            <p>IRATA-compliant with enterprise security</p>
+          </div>
+          <div class="feature-item">
+            <h4>📊 Data-Driven</h4>
+            <p>Make informed decisions with real-time analytics</p>
+          </div>
+          <div class="feature-item">
+            <h4>⏱️ Time Savings</h4>
+            <p>Reduce administrative overhead by 50%</p>
+          </div>
+          <div class="feature-item">
+            <h4>💰 ROI Focused</h4>
+            <p>See returns within the first month</p>
+          </div>
+        </div>
+        <div style="text-align: center; margin-top: 50px;">
+          <a href="mailto:contact@example.com" class="btn btn-primary" style="text-decoration: none; font-size: 1.25rem; padding: 16px 32px;">
+            Request a Demo →
+          </a>
+        </div>
+      </div>
+
+      <!-- Navigation Controls -->
+      <div class="controls">
+        <button class="btn btn-secondary" id="prevBtn" onclick="changeSlide(-1)">
+          ← Previous
+        </button>
+        <div class="indicators" id="indicators"></div>
+        <button class="btn btn-primary" id="nextBtn" onclick="changeSlide(1)">
+          Next →
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let currentSlide = 1;
+    const totalSlides = 16;
+
+    function showSlide(n) {
+      const slides = document.querySelectorAll('.slide');
+      const indicators = document.querySelectorAll('.indicator');
+      const prevBtn = document.getElementById('prevBtn');
+      const nextBtn = document.getElementById('nextBtn');
+
+      if (n > totalSlides) currentSlide = totalSlides;
+      if (n < 1) currentSlide = 1;
+      else currentSlide = n;
+
+      slides.forEach(slide => slide.classList.remove('active'));
+      indicators.forEach(ind => ind.classList.remove('active'));
+
+      slides[currentSlide - 1].classList.add('active');
+      indicators[currentSlide - 1].classList.add('active');
+
+      prevBtn.disabled = currentSlide === 1;
+      nextBtn.disabled = currentSlide === totalSlides;
+    }
+
+    function changeSlide(direction) {
+      showSlide(currentSlide + direction);
+    }
+
+    function goToSlide(n) {
+      showSlide(n);
+    }
+
+    // Initialize indicators
+    const indicatorsContainer = document.getElementById('indicators');
+    for (let i = 1; i <= totalSlides; i++) {
+      const indicator = document.createElement('div');
+      indicator.className = 'indicator';
+      if (i === 1) indicator.classList.add('active');
+      indicator.onclick = () => goToSlide(i);
+      indicatorsContainer.appendChild(indicator);
+    }
+
+    // Keyboard navigation
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowLeft') changeSlide(-1);
+      if (e.key === 'ArrowRight') changeSlide(1);
+    });
+
+    // Initialize
+    showSlide(1);
+  </script>
+</body>
+</html>

@@ -26,7 +26,6 @@ import LicenseVerification from "@/pages/LicenseVerification";
 import SuperUser from "@/pages/SuperUser";
 import AllCompanies from "@/pages/AllCompanies";
 import CompanyDetail from "@/pages/CompanyDetail";
-import FeaturePresentation from "@/pages/FeaturePresentation";
 import NotFound from "@/pages/not-found";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import { EMPLOYEE_ROLES } from "@/lib/permissions";
@@ -130,11 +129,6 @@ function Router() {
       <Route path="/schedule">
         <ProtectedRoute allowedRoles={["company", "operations_manager", "supervisor"]}>
           <Schedule />
-        </ProtectedRoute>
-      </Route>
-      <Route path="/features">
-        <ProtectedRoute allowedRoles={[...EMPLOYEE_ROLES, "resident", "superuser"]}>
-          <FeaturePresentation />
         </ProtectedRoute>
       </Route>
       <Route component={NotFound} />
