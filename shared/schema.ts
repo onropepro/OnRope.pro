@@ -308,7 +308,130 @@ export const jobComments = pgTable("job_comments", {
   index("IDX_job_comments_company").on(table.companyId),
 ]);
 
-// Harness inspections table - daily safety inspections before work
+// Rope Access Equipment Categories and Inspection Items
+export const ROPE_ACCESS_EQUIPMENT_CATEGORIES = {
+  harness: "Harness & Seat System",
+  ropes: "Work Positioning & Backup Ropes",
+  descenders: "Descenders",
+  ascenders: "Ascenders",
+  backupDevices: "Backup Devices & Fall Arrest",
+  cowstails: "Cowstails & Positioning Lanyards",
+  connectors: "Connectors & Karabiners",
+  anchorsRigging: "Anchors & Rigging Hardware",
+  helmet: "Helmet & Head Protection",
+  edgeProtection: "Edge & Rope Protection",
+  rescueKit: "Rescue Kit"
+} as const;
+
+export type RopeAccessEquipmentCategory = keyof typeof ROPE_ACCESS_EQUIPMENT_CATEGORIES;
+
+// Inspection result for each item
+export type InspectionResult = "pass" | "fail" | "not_applicable";
+
+// Equipment findings structure
+export type EquipmentFindings = {
+  [K in RopeAccessEquipmentCategory]?: {
+    status: InspectionResult;
+    items: {
+      [itemKey: string]: {
+        result: InspectionResult;
+        notes?: string;
+      };
+    };
+    sectionNotes?: string;
+  };
+};
+
+// Pre-defined inspection items for each category
+export const ROPE_ACCESS_INSPECTION_ITEMS: Record<RopeAccessEquipmentCategory, Array<{ key: string; label: string }>> = {
+  harness: [
+    { key: "webbing_cuts_abrasion", label: "Webbing - Cuts, fraying, or abrasion" },
+    { key: "stitching_intact", label: "Stitching - Intact and secure" },
+    { key: "attachment_points_damage", label: "Attachment points - No damage or deformation" },
+    { key: "buckles_function", label: "Buckles - Function correctly and lock" },
+    { key: "labels_legible", label: "Labels and markings - Legible" },
+    { key: "chemical_contamination", label: "Free from chemical contamination" },
+  ],
+  ropes: [
+    { key: "sheath_condition", label: "Sheath - No glazing, cuts, or excessive wear" },
+    { key: "core_exposure", label: "Core - Not exposed or damaged" },
+    { key: "end_terminations", label: "End terminations - Secure and undamaged" },
+    { key: "rope_tags_legible", label: "Rope tags and markings - Legible" },
+    { key: "contamination", label: "Free from contamination or chemical damage" },
+    { key: "diameter_consistency", label: "Diameter - Consistent along length" },
+  ],
+  descenders: [
+    { key: "friction_surfaces", label: "Friction surfaces - No excessive wear or damage" },
+    { key: "cam_function", label: "Cam - Functions smoothly" },
+    { key: "anti_panic_function", label: "Anti-panic function - Operates correctly" },
+    { key: "locking_screws", label: "Locking screws - Secure and undamaged" },
+    { key: "body_cracks", label: "Body - No cracks or deformation" },
+    { key: "markings_legible", label: "Markings - Legible" },
+  ],
+  ascenders: [
+    { key: "cam_teeth", label: "Cam teeth - No excessive wear" },
+    { key: "cam_spring", label: "Cam spring - Functions correctly" },
+    { key: "safety_catch", label: "Safety catch - Operates properly" },
+    { key: "body_cracks", label: "Body - No cracks or deformation" },
+    { key: "attachment_hole", label: "Attachment hole - No wear or deformation" },
+    { key: "markings_legible", label: "Markings - Legible" },
+  ],
+  backupDevices: [
+    { key: "locking_action", label: "Locking action - Functions correctly on rope" },
+    { key: "rope_compatibility", label: "Compatible with rope diameter" },
+    { key: "energy_absorber", label: "Energy absorber - Not deployed or damaged" },
+    { key: "lanyard_terminations", label: "Lanyard terminations - Secure" },
+    { key: "body_damage", label: "Body - No cracks or damage" },
+    { key: "markings_legible", label: "Markings - Legible" },
+  ],
+  cowstails: [
+    { key: "rope_condition", label: "Rope - No cuts, abrasion, or glazing" },
+    { key: "knots_swages", label: "Knots/swages - Properly formed and secure" },
+    { key: "connector_function", label: "Connectors - Gate and locking function correctly" },
+    { key: "abrasion_protection", label: "Abrasion protection - Intact if present" },
+    { key: "length_appropriate", label: "Length - Appropriate for use" },
+  ],
+  connectors: [
+    { key: "gate_closes", label: "Gate - Auto-closes fully" },
+    { key: "locking_sleeve", label: "Locking sleeve - Functions and locks correctly" },
+    { key: "hinge_wear", label: "Hinge - No excessive wear" },
+    { key: "markings_legible", label: "Markings and rating - Legible" },
+    { key: "corrosion", label: "Free from corrosion" },
+    { key: "deformation", label: "No bending or deformation" },
+  ],
+  anchorsRigging: [
+    { key: "anchor_points_secure", label: "Anchor points - Secure and load-rated" },
+    { key: "anchor_slings_condition", label: "Anchor slings - No cuts, abrasion, or UV damage" },
+    { key: "rigging_plates_damage", label: "Rigging plates - No cracks or deformation" },
+    { key: "shackles_pins", label: "Shackles - Pins secure and undamaged" },
+    { key: "anchor_markings", label: "Anchor equipment markings - Legible" },
+    { key: "anchor_compatibility", label: "Anchor setup - Compatible with planned loads" },
+  ],
+  helmet: [
+    { key: "shell_cracks", label: "Shell - No cracks, dents, or damage" },
+    { key: "suspension_system", label: "Suspension system - Intact and adjustable" },
+    { key: "chin_strap_secure", label: "Chin strap - Secure and undamaged" },
+    { key: "helmet_markings", label: "Certification markings - Legible" },
+    { key: "visor_condition", label: "Visor/face shield - No cracks or scratches (if present)" },
+    { key: "helmet_fit", label: "Helmet - Fits correctly and sits level" },
+  ],
+  edgeProtection: [
+    { key: "roller_condition", label: "Rollers - Rotate freely, no damage" },
+    { key: "rope_protectors", label: "Rope protectors - No tears or excessive wear" },
+    { key: "edge_padding", label: "Edge padding - Intact and properly positioned" },
+    { key: "protection_secure", label: "Protection devices - Securely positioned" },
+  ],
+  rescueKit: [
+    { key: "rescue_descender", label: "Rescue descender - Functions correctly" },
+    { key: "hauling_device", label: "Hauling device - Operates smoothly" },
+    { key: "casualty_attachment", label: "Casualty attachment - Secure and undamaged" },
+    { key: "knife_sharp", label: "Knife - Sharp and accessible" },
+    { key: "kit_complete", label: "Kit - All components present" },
+    { key: "rescue_plan", label: "Rescue plan - Reviewed and understood" },
+  ],
+};
+
+// Rope access inspections table - daily pre-work equipment inspections
 export const harnessInspections = pgTable("harness_inspections", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   companyId: varchar("company_id").notNull().references(() => users.id, { onDelete: "cascade" }),
@@ -318,39 +441,46 @@ export const harnessInspections = pgTable("harness_inspections", {
   
   // Basic information
   inspectorName: varchar("inspector_name").notNull(),
-  manufacturer: varchar("manufacturer"),
-  personalHarnessId: varchar("personal_harness_id"),
-  lanyardType: varchar("lanyard_type"), // not_specified | shock_absorber | etc
+  manufacturer: varchar("manufacturer"), // Primary equipment manufacturer
+  personalHarnessId: varchar("personal_harness_id"), // Legacy field - kept for backward compatibility
+  equipmentId: varchar("equipment_id"), // Serial/ID number of primary equipment (new field)
+  lanyardType: varchar("lanyard_type"), // Legacy field - kept for backward compatibility
   
-  // Harness & Lanyard Components (NO = pass, YES = fail for most)
-  frayedEdges: boolean("frayed_edges").notNull(),
-  brokenFibers: boolean("broken_fibers").notNull(),
-  pulledStitching: boolean("pulled_stitching").notNull(),
-  cutsWear: boolean("cuts_wear").notNull(),
-  dRingsChemicalDamage: boolean("d_rings_chemical_damage").notNull(),
-  dRingsPadsExcessiveWear: boolean("d_rings_pads_excessive_wear").notNull(),
-  dRingsBentDistorted: boolean("d_rings_bent_distorted").notNull(),
-  dRingsCracksBreaks: boolean("d_rings_cracks_breaks").notNull(),
-  buckleMechanism: boolean("buckle_mechanism").notNull(),
-  tongueBucklesBentDistorted: boolean("tongue_buckles_bent_distorted").notNull(),
-  tongueBucklesSharpEdges: boolean("tongue_buckles_sharp_edges").notNull(),
-  tongueBucklesMoveFreely: boolean("tongue_buckles_move_freely").notNull(),
-  connectorsExcessiveWear: boolean("connectors_excessive_wear").notNull(),
-  connectorsLoose: boolean("connectors_loose").notNull(),
-  connectorsBrokenDistorted: boolean("connectors_broken_distorted").notNull(),
-  connectorsCracksHoles: boolean("connectors_cracks_holes").notNull(),
-  sharpRoughEdges: boolean("sharp_rough_edges").notNull(),
+  // NEW: Structured equipment findings (JSONB) - preferred method
+  equipmentFindings: jsonb("equipment_findings").$type<EquipmentFindings>().default(sql`'{}'::jsonb`),
   
-  // Lanyard Inspection (YES = pass for these)
-  burnsTearsCracks: boolean("burns_tears_cracks").notNull(),
-  chemicalDamage: boolean("chemical_damage").notNull(),
-  excessiveSoiling: boolean("excessive_soiling").notNull(),
-  connectorsHooksWork: boolean("connectors_hooks_work").notNull(),
-  lockingMechanismsWork: boolean("locking_mechanisms_work").notNull(),
-  shockAbsorberIntact: boolean("shock_absorber_intact").notNull(),
-  excessiveWearSigns: boolean("excessive_wear_signs").notNull(),
+  // NEW: Overall inspection result
+  overallStatus: varchar("overall_status").notNull().default("pass"), // pass | fail
   
-  // Service date and comments
+  // LEGACY: Harness & Lanyard Components (kept for backward compatibility - deprecated)
+  frayedEdges: boolean("frayed_edges"),
+  brokenFibers: boolean("broken_fibers"),
+  pulledStitching: boolean("pulled_stitching"),
+  cutsWear: boolean("cuts_wear"),
+  dRingsChemicalDamage: boolean("d_rings_chemical_damage"),
+  dRingsPadsExcessiveWear: boolean("d_rings_pads_excessive_wear"),
+  dRingsBentDistorted: boolean("d_rings_bent_distorted"),
+  dRingsCracksBreaks: boolean("d_rings_cracks_breaks"),
+  buckleMechanism: boolean("buckle_mechanism"),
+  tongueBucklesBentDistorted: boolean("tongue_buckles_bent_distorted"),
+  tongueBucklesSharpEdges: boolean("tongue_buckles_sharp_edges"),
+  tongueBucklesMoveFreely: boolean("tongue_buckles_move_freely"),
+  connectorsExcessiveWear: boolean("connectors_excessive_wear"),
+  connectorsLoose: boolean("connectors_loose"),
+  connectorsBrokenDistorted: boolean("connectors_broken_distorted"),
+  connectorsCracksHoles: boolean("connectors_cracks_holes"),
+  sharpRoughEdges: boolean("sharp_rough_edges"),
+  
+  // LEGACY: Lanyard Inspection (kept for backward compatibility - deprecated)
+  burnsTearsCracks: boolean("burns_tears_cracks"),
+  chemicalDamage: boolean("chemical_damage"),
+  excessiveSoiling: boolean("excessive_soiling"),
+  connectorsHooksWork: boolean("connectors_hooks_work"),
+  lockingMechanismsWork: boolean("locking_mechanisms_work"),
+  shockAbsorberIntact: boolean("shock_absorber_intact"),
+  excessiveWearSigns: boolean("excessive_wear_signs"),
+  
+  // Service date and general comments
   dateInService: date("date_in_service"),
   comments: text("comments"),
   

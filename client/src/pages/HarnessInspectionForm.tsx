@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
@@ -8,60 +8,52 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage, FormDescription } from "@/components/ui/form";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { Switch } from "@/components/ui/switch";
-import { ArrowLeft, CheckCircle2, XCircle, ClipboardCheck } from "lucide-react";
-import { Separator } from "@/components/ui/separator";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { ArrowLeft, ClipboardCheck, AlertTriangle, CheckCircle2 } from "lucide-react";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { ROPE_ACCESS_EQUIPMENT_CATEGORIES, ROPE_ACCESS_INSPECTION_ITEMS, type RopeAccessEquipmentCategory, type EquipmentFindings, type InspectionResult } from "@shared/schema";
 
-const harnessInspectionSchema = z.object({
+const inspectionFormSchema = z.object({
   inspectionDate: z.string().min(1, "Inspection date is required"),
   inspectorName: z.string().min(1, "Inspector name is required"),
   manufacturer: z.string().optional(),
-  personalHarnessId: z.string().optional(),
-  lanyardType: z.string().optional(),
+  equipmentId: z.string().optional(),
   projectId: z.string().optional(),
-  
-  // Harness & Lanyard Components (false = NO/pass, true = YES/fail)
-  frayedEdges: z.boolean(),
-  brokenFibers: z.boolean(),
-  pulledStitching: z.boolean(),
-  cutsWear: z.boolean(),
-  dRingsChemicalDamage: z.boolean(),
-  dRingsPadsExcessiveWear: z.boolean(),
-  dRingsBentDistorted: z.boolean(),
-  dRingsCracksBreaks: z.boolean(),
-  buckleMechanism: z.boolean(),
-  tongueBucklesBentDistorted: z.boolean(),
-  tongueBucklesSharpEdges: z.boolean(),
-  tongueBucklesMoveFreely: z.boolean(),
-  connectorsExcessiveWear: z.boolean(),
-  connectorsLoose: z.boolean(),
-  connectorsBrokenDistorted: z.boolean(),
-  connectorsCracksHoles: z.boolean(),
-  sharpRoughEdges: z.boolean(),
-  
-  // Lanyard Inspection (true = YES/pass)
-  burnsTearsCracks: z.boolean(),
-  chemicalDamage: z.boolean(),
-  excessiveSoiling: z.boolean(),
-  connectorsHooksWork: z.boolean(),
-  lockingMechanismsWork: z.boolean(),
-  shockAbsorberIntact: z.boolean(),
-  excessiveWearSigns: z.boolean(),
-  
   dateInService: z.string().optional(),
   comments: z.string().optional(),
+  equipmentFindings: z.record(z.any()).default({}),
 });
 
-type HarnessInspectionFormData = z.infer<typeof harnessInspectionSchema>;
+type InspectionFormData = z.infer<typeof inspectionFormSchema>;
 
 export default function HarnessInspectionForm() {
   const { toast } = useToast();
   const [, setLocation] = useLocation();
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Initialize all equipment findings with default "pass" values
+  const initializeFindings = (): EquipmentFindings => {
+    const initialized: EquipmentFindings = {};
+    (Object.keys(ROPE_ACCESS_EQUIPMENT_CATEGORIES) as RopeAccessEquipmentCategory[]).forEach((categoryKey) => {
+      const items: Record<string, { result: InspectionResult; notes?: string }> = {};
+      ROPE_ACCESS_INSPECTION_ITEMS[categoryKey].forEach((item) => {
+        items[item.key] = { result: "pass" };
+      });
+      initialized[categoryKey] = {
+        status: "pass",
+        items,
+      };
+    });
+    return initialized;
+  };
+
+  // State to manage inspection results for each category and item
+  const [findings, setFindings] = useState<EquipmentFindings>(initializeFindings());
 
   // Fetch projects for optional selection
   const { data: projectsData } = useQuery<{ projects: any[] }>({
@@ -73,57 +65,114 @@ export default function HarnessInspectionForm() {
   // Get today's date as default
   const today = new Date().toISOString().split('T')[0];
 
-  const form = useForm<HarnessInspectionFormData>({
-    resolver: zodResolver(harnessInspectionSchema),
+  const form = useForm<InspectionFormData>({
+    resolver: zodResolver(inspectionFormSchema),
     defaultValues: {
       inspectionDate: today,
       inspectorName: "",
       manufacturer: "",
-      personalHarnessId: "",
-      lanyardType: "not_specified",
+      equipmentId: "",
       projectId: "",
-      
-      // Default all harness components to false (NO = pass)
-      frayedEdges: false,
-      brokenFibers: false,
-      pulledStitching: false,
-      cutsWear: false,
-      dRingsChemicalDamage: false,
-      dRingsPadsExcessiveWear: false,
-      dRingsBentDistorted: false,
-      dRingsCracksBreaks: false,
-      buckleMechanism: false,
-      tongueBucklesBentDistorted: false,
-      tongueBucklesSharpEdges: false,
-      tongueBucklesMoveFreely: true,
-      connectorsExcessiveWear: false,
-      connectorsLoose: false,
-      connectorsBrokenDistorted: false,
-      connectorsCracksHoles: false,
-      sharpRoughEdges: false,
-      
-      // Default all lanyard checks to true (YES = pass)
-      burnsTearsCracks: true,
-      chemicalDamage: true,
-      excessiveSoiling: true,
-      connectorsHooksWork: true,
-      lockingMechanismsWork: true,
-      shockAbsorberIntact: true,
-      excessiveWearSigns: true,
-      
       dateInService: "",
       comments: "",
+      equipmentFindings: {},
     },
   });
 
+  // Calculate overall status and failure summary
+  const { overallStatus, failedCategories, failedItems } = useMemo(() => {
+    const failed: Array<{ category: string; items: string[] }> = [];
+    let hasFailures = false;
+
+    Object.entries(findings).forEach(([categoryKey, categoryData]) => {
+      if (categoryData) {
+        const failedItemsInCategory: string[] = [];
+        
+        Object.entries(categoryData.items || {}).forEach(([itemKey, itemData]) => {
+          if (itemData.result === "fail") {
+            const itemLabel = ROPE_ACCESS_INSPECTION_ITEMS[categoryKey as RopeAccessEquipmentCategory]
+              ?.find(item => item.key === itemKey)?.label || itemKey;
+            failedItemsInCategory.push(itemLabel);
+            hasFailures = true;
+          }
+        });
+
+        if (failedItemsInCategory.length > 0) {
+          failed.push({
+            category: ROPE_ACCESS_EQUIPMENT_CATEGORIES[categoryKey as RopeAccessEquipmentCategory],
+            items: failedItemsInCategory,
+          });
+        }
+      }
+    });
+
+    return {
+      overallStatus: hasFailures ? "fail" : "pass",
+      failedCategories: failed,
+      failedItems: failed.reduce((sum, cat) => sum + cat.items.length, 0),
+    };
+  }, [findings]);
+
+  // Set item result
+  const setItemResult = (category: RopeAccessEquipmentCategory, itemKey: string, result: InspectionResult) => {
+    setFindings(prev => {
+      const categoryData = prev[category] || { status: "pass", items: {} };
+      const newCategoryData = {
+        ...categoryData,
+        items: {
+          ...categoryData.items,
+          [itemKey]: {
+            ...categoryData.items[itemKey],
+            result,
+          },
+        },
+      };
+
+      // Update category status based on items
+      const hasFailures = Object.values(newCategoryData.items).some(item => item.result === "fail");
+      newCategoryData.status = hasFailures ? "fail" : "pass";
+
+      return {
+        ...prev,
+        [category]: newCategoryData,
+      };
+    });
+  };
+
+  // Set item notes
+  const setItemNotes = (category: RopeAccessEquipmentCategory, itemKey: string, notes: string) => {
+    setFindings(prev => {
+      const categoryData = prev[category] || { status: "pass", items: {} };
+      return {
+        ...prev,
+        [category]: {
+          ...categoryData,
+          items: {
+            ...categoryData.items,
+            [itemKey]: {
+              ...categoryData.items[itemKey],
+              result: categoryData.items[itemKey]?.result || "pass",
+              notes,
+            },
+          },
+        },
+      };
+    });
+  };
+
   const submitInspection = useMutation({
-    mutationFn: async (data: HarnessInspectionFormData) => {
-      return apiRequest("POST", "/api/harness-inspections", data);
+    mutationFn: async (data: InspectionFormData) => {
+      const payload = {
+        ...data,
+        equipmentFindings: findings,
+        overallStatus,
+      };
+      return apiRequest("POST", "/api/harness-inspections", payload);
     },
     onSuccess: () => {
       toast({ 
         title: "Inspection submitted", 
-        description: "Your harness inspection has been recorded successfully." 
+        description: "Your rope access equipment inspection has been recorded successfully." 
       });
       queryClient.invalidateQueries({ queryKey: ["/api/my-harness-inspections"] });
       queryClient.invalidateQueries({ queryKey: ["/api/harness-inspections"] });
@@ -139,7 +188,7 @@ export default function HarnessInspectionForm() {
     },
   });
 
-  const onSubmit = async (data: HarnessInspectionFormData) => {
+  const onSubmit = async (data: InspectionFormData) => {
     setIsSubmitting(true);
     submitInspection.mutate(data);
   };
@@ -159,11 +208,30 @@ export default function HarnessInspectionForm() {
           <div className="flex items-center gap-3">
             <ClipboardCheck className="h-8 w-8 text-primary" />
             <div>
-              <h1 className="text-2xl font-semibold">Pre-Use Safety Harness Inspection</h1>
-              <p className="text-sm text-muted-foreground">Daily safety equipment inspection form</p>
+              <h1 className="text-2xl font-semibold">Rope Access Equipment Inspection</h1>
+              <p className="text-sm text-muted-foreground">Daily pre-work safety inspection</p>
             </div>
           </div>
         </div>
+
+        {/* Failure Summary Banner */}
+        {failedItems > 0 && (
+          <Alert variant="destructive" className="mb-6">
+            <AlertTriangle className="h-5 w-5" />
+            <AlertDescription>
+              <div className="font-semibold mb-2">
+                {failedItems} failed item{failedItems !== 1 ? 's' : ''} detected across {failedCategories.length} categor{failedCategories.length !== 1 ? 'ies' : 'y'}
+              </div>
+              <ul className="text-sm space-y-1">
+                {failedCategories.map((cat, idx) => (
+                  <li key={idx}>
+                    <strong>{cat.category}:</strong> {cat.items.join(", ")}
+                  </li>
+                ))}
+              </ul>
+            </AlertDescription>
+          </Alert>
+        )}
 
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
@@ -209,9 +277,9 @@ export default function HarnessInspectionForm() {
                     name="manufacturer"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Manufacturer</FormLabel>
+                        <FormLabel>Primary Manufacturer</FormLabel>
                         <FormControl>
-                          <Input {...field} placeholder="e.g., Petzl" data-testid="input-manufacturer" />
+                          <Input {...field} placeholder="e.g., Petzl, Kong, CMC" data-testid="input-manufacturer" />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -220,12 +288,12 @@ export default function HarnessInspectionForm() {
                   
                   <FormField
                     control={form.control}
-                    name="personalHarnessId"
+                    name="equipmentId"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Personal Harness ID</FormLabel>
+                        <FormLabel>Equipment ID / Serial Number</FormLabel>
                         <FormControl>
-                          <Input {...field} placeholder="Harness serial/ID number" data-testid="input-harness-id" />
+                          <Input {...field} placeholder="Serial or ID number" data-testid="input-equipment-id" />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -234,32 +302,6 @@ export default function HarnessInspectionForm() {
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <FormField
-                    control={form.control}
-                    name="lanyardType"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Type of Lanyard</FormLabel>
-                        <Select onValueChange={field.onChange} value={field.value}>
-                          <FormControl>
-                            <SelectTrigger data-testid="select-lanyard-type">
-                              <SelectValue placeholder="Select lanyard type" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            <SelectItem value="not_specified">Not specified</SelectItem>
-                            <SelectItem value="shock_absorber">Shock Absorber</SelectItem>
-                            <SelectItem value="energy_absorber">Energy Absorber</SelectItem>
-                            <SelectItem value="positioning">Positioning</SelectItem>
-                            <SelectItem value="twin_tail">Twin Tail</SelectItem>
-                            <SelectItem value="single_leg">Single Leg</SelectItem>
-                          </SelectContent>
-                        </Select>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
                   <FormField
                     control={form.control}
                     name="projectId"
@@ -273,7 +315,7 @@ export default function HarnessInspectionForm() {
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                            <SelectItem value="none">No project</SelectItem>
+                            <SelectItem value="">No project</SelectItem>
                             {projects.map((project: any) => (
                               <SelectItem key={project.id} value={project.id}>
                                 {project.buildingName}
@@ -285,160 +327,113 @@ export default function HarnessInspectionForm() {
                       </FormItem>
                     )}
                   />
+
+                  <FormField
+                    control={form.control}
+                    name="dateInService"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Date Placed in Service</FormLabel>
+                        <FormControl>
+                          <Input type="date" {...field} data-testid="input-date-in-service" />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
                 </div>
-
-                <FormField
-                  control={form.control}
-                  name="dateInService"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Date Harness/Lanyard Placed in Service</FormLabel>
-                      <FormControl>
-                        <Input type="date" {...field} data-testid="input-date-in-service" />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
               </CardContent>
             </Card>
 
+            {/* Equipment Categories */}
             <Card>
               <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <XCircle className="h-5 w-5 text-destructive" />
-                  Harness, Lanyard & Components
-                </CardTitle>
+                <CardTitle>Equipment Inspection</CardTitle>
                 <CardDescription>
-                  Check each item. Toggle ON if issue is present (NO = Pass, YES = Fail)
+                  Inspect each equipment category. Mark items as Pass, Fail, or Not Applicable.
                 </CardDescription>
               </CardHeader>
-              <CardContent className="space-y-3">
-                {[
-                  { name: "frayedEdges", label: "Frayed Edges" },
-                  { name: "brokenFibers", label: "Broken Fibers" },
-                  { name: "pulledStitching", label: "Pulled Stitching" },
-                  { name: "cutsWear", label: "Cuts / Wear" },
-                  { name: "dRingsChemicalDamage", label: "D-Rings - Chemical Damage" },
-                  { name: "dRingsPadsExcessiveWear", label: "D-Rings / Pads - Excessive Wear" },
-                  { name: "dRingsBentDistorted", label: "D-Rings - Bent or Distorted" },
-                  { name: "dRingsCracksBreaks", label: "D-Rings - Cracks / Breaks" },
-                  { name: "buckleMechanism", label: "Buckle Mechanism Issues" },
-                  { name: "tongueBucklesBentDistorted", label: "Tongue Buckles - Bent or Distorted" },
-                  { name: "tongueBucklesSharpEdges", label: "Tongue Buckles - Sharp Edges" },
-                  { name: "connectorsExcessiveWear", label: "Connectors - Excessive Wear" },
-                  { name: "connectorsLoose", label: "Connectors - Loose" },
-                  { name: "connectorsBrokenDistorted", label: "Connectors - Broken or Distorted" },
-                  { name: "connectorsCracksHoles", label: "Connectors - Cracks / Holes" },
-                  { name: "sharpRoughEdges", label: "Sharp / Rough Edges" },
-                ].map((item) => (
-                  <FormField
-                    key={item.name}
-                    control={form.control}
-                    name={item.name as any}
-                    render={({ field }) => (
-                      <FormItem className="flex items-center justify-between rounded-md border p-3 hover-elevate">
-                        <div className="space-y-0.5">
-                          <FormLabel className="text-base">{item.label}</FormLabel>
-                        </div>
-                        <FormControl>
-                          <div className="flex items-center gap-2">
-                            <span className={`text-sm font-medium ${field.value ? 'text-destructive' : 'text-muted-foreground'}`}>
-                              {field.value ? 'YES' : 'NO'}
-                            </span>
-                            <Switch
-                              checked={field.value}
-                              onCheckedChange={field.onChange}
-                              data-testid={`switch-${item.name}`}
-                            />
+              <CardContent>
+                <Accordion type="multiple" className="w-full">
+                  {(Object.keys(ROPE_ACCESS_EQUIPMENT_CATEGORIES) as RopeAccessEquipmentCategory[]).map((categoryKey) => {
+                    const categoryName = ROPE_ACCESS_EQUIPMENT_CATEGORIES[categoryKey];
+                    const items = ROPE_ACCESS_INSPECTION_ITEMS[categoryKey];
+                    const categoryData = findings[categoryKey];
+                    const categoryStatus = categoryData?.status || "pass";
+
+                    return (
+                      <AccordionItem key={categoryKey} value={categoryKey} data-testid={`accordion-${categoryKey}`}>
+                        <AccordionTrigger className="hover-elevate px-4">
+                          <div className="flex items-center gap-3 w-full">
+                            {categoryStatus === "fail" ? (
+                              <AlertTriangle className="h-5 w-5 text-destructive flex-shrink-0" />
+                            ) : (
+                              <CheckCircle2 className="h-5 w-5 text-success flex-shrink-0" />
+                            )}
+                            <span className="text-left flex-1">{categoryName}</span>
                           </div>
-                        </FormControl>
-                      </FormItem>
-                    )}
-                  />
-                ))}
+                        </AccordionTrigger>
+                        <AccordionContent className="px-4 pt-4 space-y-4">
+                          {items.map((item) => {
+                            const itemData = categoryData?.items[item.key];
+                            const result = itemData?.result || "pass";
+                            const notes = itemData?.notes || "";
 
-                <Separator className="my-4" />
+                            return (
+                              <div key={item.key} className="border rounded-md p-4 space-y-3 hover-elevate">
+                                <div className="font-medium">{item.label}</div>
+                                
+                                <RadioGroup
+                                  value={result}
+                                  onValueChange={(value) => setItemResult(categoryKey, item.key, value as InspectionResult)}
+                                  data-testid={`radio-group-${categoryKey}-${item.key}`}
+                                >
+                                  <div className="flex gap-4">
+                                    <div className="flex items-center space-x-2">
+                                      <RadioGroupItem value="pass" id={`${categoryKey}-${item.key}-pass`} data-testid={`radio-${categoryKey}-${item.key}-pass`} />
+                                      <label htmlFor={`${categoryKey}-${item.key}-pass`} className="text-sm font-medium cursor-pointer">
+                                        Pass
+                                      </label>
+                                    </div>
+                                    <div className="flex items-center space-x-2">
+                                      <RadioGroupItem value="fail" id={`${categoryKey}-${item.key}-fail`} data-testid={`radio-${categoryKey}-${item.key}-fail`} />
+                                      <label htmlFor={`${categoryKey}-${item.key}-fail`} className="text-sm font-medium cursor-pointer text-destructive">
+                                        Fail
+                                      </label>
+                                    </div>
+                                    <div className="flex items-center space-x-2">
+                                      <RadioGroupItem value="not_applicable" id={`${categoryKey}-${item.key}-na`} data-testid={`radio-${categoryKey}-${item.key}-na`} />
+                                      <label htmlFor={`${categoryKey}-${item.key}-na`} className="text-sm font-medium cursor-pointer text-muted-foreground">
+                                        N/A
+                                      </label>
+                                    </div>
+                                  </div>
+                                </RadioGroup>
 
-                <FormField
-                  control={form.control}
-                  name="tongueBucklesMoveFreely"
-                  render={({ field }) => (
-                    <FormItem className="flex items-center justify-between rounded-md border p-3 hover-elevate bg-muted/30">
-                      <div className="space-y-0.5">
-                        <FormLabel className="text-base">Tongue Buckles - Move Freely</FormLabel>
-                        <FormDescription className="text-xs">This should normally be YES (ON)</FormDescription>
-                      </div>
-                      <FormControl>
-                        <div className="flex items-center gap-2">
-                          <span className={`text-sm font-medium ${field.value ? 'text-success' : 'text-muted-foreground'}`}>
-                            {field.value ? 'YES' : 'NO'}
-                          </span>
-                          <Switch
-                            checked={field.value}
-                            onCheckedChange={field.onChange}
-                            data-testid="switch-tongueBucklesMoveFreely"
-                          />
-                        </div>
-                      </FormControl>
-                    </FormItem>
-                  )}
-                />
+                                {result === "fail" && (
+                                  <Textarea
+                                    placeholder="Describe the issue..."
+                                    value={notes}
+                                    onChange={(e) => setItemNotes(categoryKey, item.key, e.target.value)}
+                                    className="min-h-20"
+                                    data-testid={`textarea-${categoryKey}-${item.key}-notes`}
+                                  />
+                                )}
+                              </div>
+                            );
+                          })}
+                        </AccordionContent>
+                      </AccordionItem>
+                    );
+                  })}
+                </Accordion>
               </CardContent>
             </Card>
 
             <Card>
               <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <CheckCircle2 className="h-5 w-5 text-success" />
-                  Lanyard Inspection
-                </CardTitle>
-                <CardDescription>
-                  Check each item. Toggle OFF if issue is present (YES = Pass, NO = Fail)
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                {[
-                  { name: "burnsTearsCracks", label: "Free from Burns, Tears, Rips, Cracks" },
-                  { name: "chemicalDamage", label: "Free from Chemical Damage" },
-                  { name: "excessiveSoiling", label: "Free from Excessive Soiling" },
-                  { name: "connectorsHooksWork", label: "Connectors / Hooks Work Properly" },
-                  { name: "lockingMechanismsWork", label: "Locking Mechanisms Work Properly" },
-                  { name: "shockAbsorberIntact", label: "Shock Absorber Pack Intact" },
-                  { name: "excessiveWearSigns", label: "Free from Signs of Excessive Wear" },
-                ].map((item) => (
-                  <FormField
-                    key={item.name}
-                    control={form.control}
-                    name={item.name as any}
-                    render={({ field }) => (
-                      <FormItem className="flex items-center justify-between rounded-md border p-3 hover-elevate">
-                        <div className="space-y-0.5">
-                          <FormLabel className="text-base">{item.label}</FormLabel>
-                        </div>
-                        <FormControl>
-                          <div className="flex items-center gap-2">
-                            <span className={`text-sm font-medium ${field.value ? 'text-success' : 'text-destructive'}`}>
-                              {field.value ? 'YES' : 'NO'}
-                            </span>
-                            <Switch
-                              checked={field.value}
-                              onCheckedChange={field.onChange}
-                              data-testid={`switch-${item.name}`}
-                            />
-                          </div>
-                        </FormControl>
-                      </FormItem>
-                    )}
-                  />
-                ))}
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle>Additional Comments</CardTitle>
-                <CardDescription>Any additional notes or observations</CardDescription>
+                <CardTitle>General Comments</CardTitle>
+                <CardDescription>Any additional notes or observations about the inspection</CardDescription>
               </CardHeader>
               <CardContent>
                 <FormField
@@ -449,7 +444,7 @@ export default function HarnessInspectionForm() {
                       <FormControl>
                         <Textarea
                           {...field}
-                          placeholder="Enter any additional comments or notes about the inspection..."
+                          placeholder="Enter any additional comments or notes..."
                           className="min-h-24"
                           data-testid="textarea-comments"
                         />
@@ -465,7 +460,7 @@ export default function HarnessInspectionForm() {
               <Button
                 type="button"
                 variant="outline"
-                onClick={() => setLocation("/tech")}
+                onClick={() => setLocation("/dashboard")}
                 className="flex-1"
                 data-testid="button-cancel"
               >
