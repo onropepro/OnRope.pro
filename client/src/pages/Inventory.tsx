@@ -810,7 +810,7 @@ export default function Inventory() {
                       </FormControl>
                       <SelectContent>
                         <SelectItem value="Not in use">Not in use</SelectItem>
-                        {activeEmployees.map((emp: any) => (
+                        {activeEmployees.filter((emp: any) => emp.name && emp.name.trim() !== "").map((emp: any) => (
                           <SelectItem key={emp.id} value={emp.name}>
                             {emp.name}
                           </SelectItem>
@@ -959,7 +959,7 @@ export default function Inventory() {
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        {gearTypes.map((type) => (
+                        {gearTypes.filter((type) => type.name && type.name.trim() !== "").map((type) => (
                           <SelectItem key={type.name} value={type.name}>
                             {type.name}
                           </SelectItem>
@@ -1053,7 +1053,7 @@ export default function Inventory() {
                       </FormControl>
                       <SelectContent>
                         <SelectItem value="Not in use">Not in use</SelectItem>
-                        {activeEmployees.map((emp: any) => (
+                        {activeEmployees.filter((emp: any) => emp.name && emp.name.trim() !== "").map((emp: any) => (
                           <SelectItem key={emp.id} value={emp.name}>
                             {emp.name}
                           </SelectItem>
