@@ -553,6 +553,16 @@ export default function Dashboard() {
     return () => subscription.unsubscribe();
   }, [projectForm]);
 
+  // Auto-set target completion date when end date is selected
+  useEffect(() => {
+    const subscription = projectForm.watch((value, { name }) => {
+      if (name === "endDate" && value.endDate) {
+        projectForm.setValue("targetCompletionDate", value.endDate);
+      }
+    });
+    return () => subscription.unsubscribe();
+  }, [projectForm]);
+
   const employeeForm = useForm<EmployeeFormData>({
     resolver: zodResolver(employeeSchema),
     defaultValues: {
