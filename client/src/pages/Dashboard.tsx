@@ -5792,10 +5792,10 @@ export default function Dashboard() {
       </div>
     `).join('') : '<p>No inspection data available.</p>'}
     
-    ${selectedInspection.notes ? `
+    ${selectedInspection.comments ? `
       <div class="notes-section">
         <div class="notes-title">Additional Notes</div>
-        <div class="notes-content">${selectedInspection.notes}</div>
+        <div class="notes-content">${selectedInspection.comments}</div>
       </div>
     ` : ''}
     
@@ -5913,11 +5913,11 @@ export default function Dashboard() {
                 </div>
               )}
               
-              {selectedInspection.notes && (
+              {selectedInspection.comments && (
                 <div className="mt-4">
                   <div className="text-sm font-medium text-muted-foreground mb-2">Additional Notes</div>
                   <div className="text-base bg-muted p-4 rounded-md whitespace-pre-wrap">
-                    {selectedInspection.notes}
+                    {selectedInspection.comments}
                   </div>
                 </div>
               )}
