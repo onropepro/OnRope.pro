@@ -975,6 +975,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         company: {
           id: company.id,
           companyName: company.companyName,
+          residentCode: company.residentCode,
         }
       });
     } catch (error) {
