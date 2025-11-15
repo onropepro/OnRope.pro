@@ -1777,6 +1777,16 @@ export default function Dashboard() {
               <h2 className="text-3xl font-bold gradient-text">Quick Actions</h2>
               <div className="flex gap-2">
                 <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setLocation("/features")}
+                  className="gap-2"
+                  data-testid="button-view-features"
+                >
+                  <span className="material-icons text-base">slideshow</span>
+                  Platform Features
+                </Button>
+                <Button
                   variant={isRearranging ? "default" : "outline"}
                   size="sm"
                   onClick={() => setIsRearranging(!isRearranging)}
