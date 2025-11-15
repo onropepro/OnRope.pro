@@ -320,13 +320,14 @@ export default function Login() {
               </Button>
 
               <Button 
-                className="h-10 text-xs bg-yellow-500 hover:bg-yellow-600 text-black" 
+                variant="secondary" 
+                className="h-10 text-xs" 
                 onClick={async () => {
                   try {
                     const response = await fetch("/api/login", {
                       method: "POST",
                       headers: { "Content-Type": "application/json" },
-                      body: JSON.stringify({ identifier: "emptester@test.com", password: "emp123" }),
+                      body: JSON.stringify({ identifier: "employee@employee.com", password: "employee123" }),
                       credentials: "include",
                     });
                     const result = await response.json();
@@ -359,13 +360,14 @@ export default function Login() {
               </Button>
 
               <Button 
-                className="h-10 text-xs bg-yellow-500 hover:bg-yellow-600 text-black" 
+                variant="secondary" 
+                className="h-10 text-xs" 
                 onClick={async () => {
                   try {
                     const response = await fetch("/api/login", {
                       method: "POST",
                       headers: { "Content-Type": "application/json" },
-                      body: JSON.stringify({ identifier: "restester@test.com", password: "res123" }),
+                      body: JSON.stringify({ identifier: "res@res.com", password: "res123" }),
                       credentials: "include",
                     });
                     const result = await response.json();
@@ -391,7 +393,7 @@ export default function Login() {
                     });
                   }
                 }}
-                data-testid="button-quick-login-resident-tester"
+                data-testid="button-quick-login-resident"
               >
                 <span className="material-icons mr-1 text-base">flash_on</span>
                 resident
