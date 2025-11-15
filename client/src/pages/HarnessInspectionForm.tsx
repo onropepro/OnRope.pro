@@ -35,6 +35,7 @@ export default function HarnessInspectionForm() {
   const { toast } = useToast();
   const [, setLocation] = useLocation();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [selectedGearId, setSelectedGearId] = useState<string>("");
 
   // Initialize all equipment findings with default "pass" values
   const initializeFindings = (): EquipmentFindings => {
@@ -55,6 +56,23 @@ export default function HarnessInspectionForm() {
   // State to manage inspection results for each category and item
   const [findings, setFindings] = useState<EquipmentFindings>(initializeFindings());
 
+  // Fetch current user
+  const { data: userData } = useQuery<{ user: any }>({
+    queryKey: ["/api/user"],
+  });
+  
+  const currentUser = userData?.user;
+
+  // Fetch gear items
+  const { data: gearData } = useQuery<{ items: any[] }>({
+    queryKey: ["/api/gear-items"],
+  });
+
+  const allGearItems = gearData?.items || [];
+  
+  // Filter to only show current user's gear
+  const myGear = allGearItems.filter((item: any) => item.assignedTo === currentUser?.name);
+
   // Fetch projects for optional selection
   const { data: projectsData } = useQuery<{ projects: any[] }>({
     queryKey: ["/api/projects"],
@@ -69,7 +87,7 @@ export default function HarnessInspectionForm() {
     resolver: zodResolver(inspectionFormSchema),
     defaultValues: {
       inspectionDate: today,
-      inspectorName: "",
+      inspectorName: currentUser?.name || "",
       manufacturer: "",
       equipmentId: "",
       projectId: "",
@@ -78,6 +96,39 @@ export default function HarnessInspectionForm() {
       equipmentFindings: {},
     },
   });
+
+  // Handle gear selection and autofill
+  const handleGearSelection = (gearItemId: string) => {
+    setSelectedGearId(gearItemId);
+    
+    if (!gearItemId || gearItemId === "none") {
+      // Clear autofilled fields
+      form.setValue("equipmentId", "");
+      form.setValue("manufacturer", "");
+      form.setValue("dateInService", "");
+      return;
+    }
+
+    const selectedGear = myGear.find((item: any) => item.id === gearItemId);
+    
+    if (selectedGear) {
+      // Autofill equipment ID
+      const serialNumber = selectedGear.serialNumbers && selectedGear.serialNumbers.length > 0 
+        ? selectedGear.serialNumbers[0] 
+        : selectedGear.equipmentType || "";
+      form.setValue("equipmentId", serialNumber);
+      
+      // Autofill manufacturer
+      if (selectedGear.brand) {
+        form.setValue("manufacturer", `${selectedGear.brand}${selectedGear.model ? ` ${selectedGear.model}` : ""}`);
+      }
+      
+      // Autofill date in service
+      if (selectedGear.dateInService) {
+        form.setValue("dateInService", selectedGear.dateInService);
+      }
+    }
+  };
 
   // Calculate overall status and failure summary
   const { overallStatus, failedCategories, failedItems } = useMemo(() => {
@@ -241,6 +292,35 @@ export default function HarnessInspectionForm() {
                 <CardDescription>Inspection details and equipment information</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
+                {/* Gear Selection Dropdown for Autofill */}
+                {myGear.length > 0 && (
+                  <div className="bg-primary/5 border border-primary/20 rounded-md p-4 space-y-3">
+                    <div className="flex items-start gap-3">
+                      <span className="material-icons text-primary mt-0.5">auto_awesome</span>
+                      <div className="flex-1">
+                        <div className="font-semibold mb-1">Quick Fill from My Gear</div>
+                        <p className="text-sm text-muted-foreground mb-3">
+                          Select equipment from your gear to auto-fill details
+                        </p>
+                        <Select onValueChange={handleGearSelection} value={selectedGearId}>
+                          <SelectTrigger data-testid="select-my-gear" className="bg-background">
+                            <SelectValue placeholder="Choose gear to autofill..." />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="none">None (enter manually)</SelectItem>
+                            {myGear.map((item: any) => (
+                              <SelectItem key={item.id} value={item.id}>
+                                {item.equipmentType} {item.brand ? `- ${item.brand}` : ""} {item.model ? item.model : ""} 
+                                {item.serialNumbers && item.serialNumbers.length > 0 ? ` (${item.serialNumbers[0]})` : ""}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <FormField
                     control={form.control}
@@ -263,7 +343,7 @@ export default function HarnessInspectionForm() {
                       <FormItem>
                         <FormLabel>Inspector Name</FormLabel>
                         <FormControl>
-                          <Input {...field} placeholder="Enter your full name" data-testid="input-inspector-name" />
+                          <Input {...field} placeholder="Enter your full name" data-testid="input-inspector-name" readOnly className="bg-muted" />
                         </FormControl>
                         <FormMessage />
                       </FormItem>

@@ -900,6 +900,25 @@ export default function Inventory() {
 
               <FormField
                 control={form.control}
+                name="dateInService"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Date Placed In Service</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="date"
+                        {...field}
+                        value={field.value || ""}
+                        data-testid="input-date-in-service"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
                 name="notes"
                 render={({ field }) => (
                   <FormItem>
