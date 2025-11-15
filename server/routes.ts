@@ -450,20 +450,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
           console.log('[Login] Re-verifying stored license key for company user...');
           const verificationResult = await reverifyLicenseKey(user.licenseKey, user.email);
           
-          let finalLicenseStatus = user.licenseVerified;
-          
           if (verificationResult.success && verificationResult.valid !== null) {
             // API responded definitively - update status
-            finalLicenseStatus = verificationResult.valid;
-            await storage.updateUser(user.id, { licenseVerified: finalLicenseStatus });
-            console.log(`[Login] License status updated to: ${finalLicenseStatus}`);
-            user.licenseVerified = finalLicenseStatus;
+            await storage.updateUser(user.id, { licenseVerified: verificationResult.valid });
+            console.log(`[Login] License status updated to: ${verificationResult.valid}`);
+            user.licenseVerified = verificationResult.valid;
           } else {
-            // API failed - default to TRUE to prevent lockouts during transition
-            finalLicenseStatus = true;
-            await storage.updateUser(user.id, { licenseVerified: true });
-            console.warn('[Login] API failure - defaulting to verified (true) to prevent lockout');
-            user.licenseVerified = true;
+            // API failed - preserve existing status (don't lock out OR auto-verify)
+            console.warn('[Login] API failure - preserving existing license status:', user.licenseVerified);
           }
         }
       }
