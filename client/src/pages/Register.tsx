@@ -27,6 +27,7 @@ const residentSchema = z.object({
 const companySchema = z.object({
   companyName: z.string().min(2, "Company name must be at least 2 characters"),
   name: z.string().min(2, "Owner name must be at least 2 characters"),
+  email: z.string().email("Invalid email address"),
   hourlyRate: z.string().optional().refine((val) => !val || (!isNaN(parseFloat(val)) && parseFloat(val) >= 0), {
     message: "Hourly rate must be a valid number",
   }),
@@ -66,6 +67,7 @@ export default function Register() {
     defaultValues: {
       companyName: "",
       name: "",
+      email: "",
       hourlyRate: "",
       streetAddress: "",
       province: "",
@@ -115,9 +117,8 @@ export default function Register() {
         body: JSON.stringify({
           ...registrationData,
           role: "company",
-          email: null,
           passwordHash: data.password,
-          hourlyRate: parseFloat(data.hourlyRate),
+          hourlyRate: data.hourlyRate ? parseFloat(data.hourlyRate) : null,
         }),
         credentials: "include",
       });
@@ -305,6 +306,23 @@ export default function Register() {
                         <FormControl>
                           <Input placeholder="John Smith" {...field} data-testid="input-owner-name" className="h-12" />
                         </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={companyForm.control}
+                    name="email"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Email</FormLabel>
+                        <FormControl>
+                          <Input type="email" placeholder="you@company.com" {...field} data-testid="input-company-email" className="h-12" />
+                        </FormControl>
+                        <FormDescription className="text-muted-foreground text-sm">
+                          Use this email to log in to your account
+                        </FormDescription>
                         <FormMessage />
                       </FormItem>
                     )}

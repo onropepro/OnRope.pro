@@ -159,6 +159,114 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   // ==================== AUTH ROUTES ====================
   
+  // Provisioning endpoint for external sales platforms
+  app.post("/api/provision-account", async (req: Request, res: Response) => {
+    try {
+      // Verify API key for security
+      const apiKey = req.headers['x-api-key'] as string;
+      const expectedApiKey = process.env.PROVISIONING_API_KEY;
+      
+      if (!expectedApiKey) {
+        console.error("[Provision] PROVISIONING_API_KEY not configured");
+        return res.status(500).json({ message: "Provisioning service not configured" });
+      }
+      
+      if (!apiKey || apiKey !== expectedApiKey) {
+        console.error("[Provision] Invalid API key provided");
+        return res.status(401).json({ message: "Unauthorized" });
+      }
+      
+      const { companyName, name, email, hourlyRate, streetAddress, province, country, zipCode, licenseKey } = req.body;
+      
+      // Validate required fields
+      if (!companyName || !name || !email || !streetAddress || !province || !country || !zipCode) {
+        return res.status(400).json({ message: "Missing required fields" });
+      }
+      
+      // Check if email or company already exists
+      const existingUserByEmail = await storage.getUserByEmail(email);
+      if (existingUserByEmail) {
+        return res.status(400).json({ message: "Email already registered" });
+      }
+      
+      const existingCompany = await storage.getUserByCompanyName(companyName);
+      if (existingCompany) {
+        return res.status(400).json({ message: "Company name already taken" });
+      }
+      
+      // Generate a temporary password (user should reset it on first login)
+      const tempPassword = `Temp${Math.random().toString(36).substring(2, 10)}!`;
+      const passwordHash = await bcrypt.hash(tempPassword, 10);
+      
+      // Verify license key if provided
+      let licenseVerified = false;
+      if (licenseKey) {
+        console.log('[Provision] Verifying provided license key...');
+        const verificationResult = await verifyLicenseKey(licenseKey);
+        
+        if (verificationResult.success && verificationResult.valid) {
+          licenseVerified = true;
+          console.log('[Provision] License key verified successfully');
+        } else {
+          console.warn('[Provision] License key verification failed:', verificationResult.message);
+          // Continue with account creation but mark as unverified
+        }
+      }
+      
+      // Create company account
+      const userData = {
+        email,
+        passwordHash,
+        role: "company" as const,
+        companyName,
+        name,
+        hourlyRate: hourlyRate ? parseFloat(hourlyRate) : null,
+        streetAddress,
+        province,
+        country,
+        zipCode,
+        licenseKey: licenseKey || null,
+        licenseVerified,
+      };
+      
+      const user = await storage.createUser(userData);
+      
+      // Create default payroll config
+      try {
+        await storage.createPayPeriodConfig({
+          companyId: user.id,
+          payPeriodType: "weekly",
+          payPeriodStartDay: 1,
+        });
+      } catch (error) {
+        console.error('[Provision] Error creating payroll config:', error);
+        // Don't fail provisioning if payroll setup fails
+      }
+      
+      console.log(`[Provision] Successfully created account for ${companyName} (${email})`);
+      
+      // Return account details including temporary password
+      res.json({
+        success: true,
+        user: {
+          id: user.id,
+          email: user.email,
+          companyName: user.companyName,
+          name: user.name,
+          licenseVerified,
+        },
+        credentials: {
+          email: user.email,
+          temporaryPassword: tempPassword,
+        },
+        message: "Account provisioned successfully. User should log in with email and change their password."
+      });
+    } catch (error) {
+      console.error("[Provision] Error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+  
   // Registration endpoint
   app.post("/api/register", async (req: Request, res: Response) => {
     try {
