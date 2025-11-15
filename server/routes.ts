@@ -88,10 +88,10 @@ export async function requireVerifiedCompanyForMutations(req: Request, res: Resp
 async function reverifyLicenseKey(licenseKey: string, email: string): Promise<{ success: boolean; valid: boolean | null }> {
   try {
     const externalApiUrl = 'https://ram-website-paquettetom.replit.app/api/verify-license';
-    const apiKey = process.env.LICENSE_VERIFICATION_API_KEY;
+    const apiKey = process.env.PROVISIONING_API_KEY;
     
     if (!apiKey) {
-      console.error('[License Re-verification] LICENSE_VERIFICATION_API_KEY not found in environment');
+      console.error('[License Re-verification] PROVISIONING_API_KEY not found in environment');
       return { success: false, valid: null }; // API configuration error - don't revoke access
     }
     
