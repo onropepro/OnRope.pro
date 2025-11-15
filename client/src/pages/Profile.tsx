@@ -21,6 +21,7 @@ const profileSchema = z.object({
   parkingStallNumber: z.string().optional(),
   companyName: z.string().optional(),
   residentCode: z.string().optional(),
+  residentLinkCode: z.string().optional(),
 });
 
 const passwordSchema = z.object({
@@ -59,6 +60,12 @@ export default function Profile() {
   const activeProject = activeProjects[0];
   const isParkadeProject = activeProject?.jobType === 'parkade_pressure_cleaning';
 
+  // Fetch company data if resident has linked account
+  const { data: companyData } = useQuery({
+    queryKey: ["/api/companies", user?.companyId],
+    enabled: !!user?.companyId && user?.role === "resident",
+  });
+
   const profileForm = useForm<ProfileFormData>({
     resolver: zodResolver(profileSchema),
     values: {
@@ -68,6 +75,7 @@ export default function Profile() {
       parkingStallNumber: user?.parkingStallNumber || "",
       companyName: user?.companyName || "",
       residentCode: user?.residentCode || "",
+      residentLinkCode: "",
     },
   });
 
@@ -155,7 +163,39 @@ export default function Profile() {
     }
   };
 
-  const onProfileSubmit = (data: ProfileFormData) => {
+  const onProfileSubmit = async (data: ProfileFormData) => {
+    // Handle resident company code linking separately
+    if (user?.role === "resident" && data.residentLinkCode && data.residentLinkCode.length === 10) {
+      try {
+        const response = await fetch("/api/link-resident-code", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ residentCode: data.residentLinkCode }),
+          credentials: "include",
+        });
+        
+        if (!response.ok) {
+          const error = await response.json();
+          throw new Error(error.message || "Failed to link account");
+        }
+        
+        toast({ title: "Success!", description: "Company linked successfully" });
+        queryClient.invalidateQueries({ queryKey: ["/api/user"] });
+        queryClient.invalidateQueries({ queryKey: ["/api/projects"] });
+        
+        // Clear the code field
+        profileForm.setValue("residentLinkCode", "");
+      } catch (error) {
+        toast({ 
+          title: "Link Failed", 
+          description: error instanceof Error ? error.message : "Invalid code", 
+          variant: "destructive" 
+        });
+        return;
+      }
+    }
+    
+    // Update regular profile fields
     updateProfileMutation.mutate(data);
   };
 
@@ -282,6 +322,51 @@ export default function Profile() {
                               {...field}
                               data-testid="input-parking-stall"
                               className="h-12"
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    
+                    {/* Company Code Linking */}
+                    {user?.companyId && companyData?.company ? (
+                      <div className="p-4 bg-success/10 border border-success/20 rounded-lg">
+                        <div className="flex items-center gap-2 mb-2">
+                          <span className="material-icons text-success text-lg">check_circle</span>
+                          <span className="text-sm font-medium">Linked to Company</span>
+                        </div>
+                        <p className="text-base font-semibold">{companyData.company.companyName}</p>
+                        <p className="text-xs text-muted-foreground mt-1">
+                          To change, enter a new company code below
+                        </p>
+                      </div>
+                    ) : (
+                      <div className="p-4 bg-muted/50 border border-border rounded-lg">
+                        <div className="flex items-center gap-2 mb-2">
+                          <span className="material-icons text-muted-foreground text-lg">info</span>
+                          <span className="text-sm font-medium">Not Linked</span>
+                        </div>
+                        <p className="text-xs text-muted-foreground">
+                          Enter a company code below to link your account
+                        </p>
+                      </div>
+                    )}
+                    
+                    <FormField
+                      control={profileForm.control}
+                      name="residentLinkCode"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Company Code {!user?.companyId && "(Required to view projects)"}</FormLabel>
+                          <FormControl>
+                            <Input
+                              placeholder="Enter 10-character code"
+                              {...field}
+                              onChange={(e) => field.onChange(e.target.value.toUpperCase())}
+                              maxLength={10}
+                              className="h-12 font-mono"
+                              data-testid="input-company-code"
                             />
                           </FormControl>
                           <FormMessage />

@@ -282,9 +282,14 @@ export default function ResidentDashboard() {
             <span className="material-icons text-2xl text-primary">apartment</span>
             <h1 className="text-xl font-semibold">Resident Portal</h1>
           </div>
-          <Button variant="ghost" onClick={confirmLogout} data-testid="button-logout">
-            <span className="material-icons">logout</span>
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button variant="ghost" size="icon" onClick={() => setLocation("/profile")} data-testid="button-profile">
+              <span className="material-icons">person</span>
+            </Button>
+            <Button variant="ghost" size="icon" onClick={confirmLogout} data-testid="button-logout">
+              <span className="material-icons">logout</span>
+            </Button>
+          </div>
         </header>
 
         <main className="flex-1 p-4 space-y-4">
@@ -418,9 +423,14 @@ export default function ResidentDashboard() {
             <span className="material-icons text-2xl text-primary">apartment</span>
             <h1 className="text-xl font-semibold">Resident Portal</h1>
           </div>
-          <Button variant="ghost" onClick={confirmLogout} data-testid="button-logout">
-            <span className="material-icons">logout</span>
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button variant="ghost" size="icon" onClick={() => setLocation("/profile")} data-testid="button-profile">
+              <span className="material-icons">person</span>
+            </Button>
+            <Button variant="ghost" size="icon" onClick={confirmLogout} data-testid="button-logout">
+              <span className="material-icons">logout</span>
+            </Button>
+          </div>
         </header>
 
         <main className="flex-1 p-4 space-y-4">
