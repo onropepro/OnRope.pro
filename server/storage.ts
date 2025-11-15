@@ -23,6 +23,11 @@ export class Storage {
     return result[0];
   }
 
+  async getUserByResidentCode(residentCode: string): Promise<User | undefined> {
+    const result = await db.select().from(users).where(eq(users.residentCode, residentCode)).limit(1);
+    return result[0];
+  }
+
   async createUser(user: InsertUser): Promise<User> {
     // Hash password before storing
     const hashedPassword = await bcrypt.hash(user.passwordHash, SALT_ROUNDS);

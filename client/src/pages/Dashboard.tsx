@@ -1742,9 +1742,22 @@ export default function Dashboard() {
         <div className="px-6 h-20 flex items-center justify-between max-w-7xl mx-auto">
           <div>
             <h1 className="text-2xl font-bold gradient-text">{getPageTitle()}</h1>
-            {companyName && (
-              <p className="text-sm text-muted-foreground mt-1 font-medium">{companyName}</p>
-            )}
+            <div className="flex items-center gap-3 mt-1">
+              {companyName && (
+                <p className="text-sm text-muted-foreground font-medium">{companyName}</p>
+              )}
+              {currentUser?.role === 'company' && currentUser?.residentCode && (
+                <>
+                  {companyName && <span className="text-muted-foreground/50">•</span>}
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-xs text-muted-foreground font-medium">Resident Code:</span>
+                    <Badge variant="outline" className="font-mono text-sm" data-testid="badge-resident-code">
+                      {currentUser.residentCode}
+                    </Badge>
+                  </div>
+                </>
+              )}
+            </div>
           </div>
           <div className="flex items-center gap-3">
             <Button variant="ghost" size="icon" data-testid="button-profile" onClick={() => setLocation("/profile")} className="hover-elevate w-12 h-12">

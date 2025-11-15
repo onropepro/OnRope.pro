@@ -81,6 +81,35 @@ export async function requireVerifiedCompanyForMutations(req: Request, res: Resp
   }
 }
 
+// Generate unique 10-character resident code using cryptographically secure randomness
+// Provides ~50 bits of entropy (32^10 ≈ 2^50) to resist brute-force attacks
+async function generateResidentCode(): Promise<string> {
+  const crypto = await import('crypto');
+  const characters = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; // Excluding confusing characters like 0, O, 1, I
+  const codeLength = 10;
+  const maxAttempts = 10; // Prevent infinite loops in case of database issues
+  
+  for (let attempt = 0; attempt < maxAttempts; attempt++) {
+    // Generate 10-character code using crypto.randomBytes for security
+    const randomBytes = crypto.randomBytes(codeLength);
+    let code = '';
+    
+    for (let i = 0; i < codeLength; i++) {
+      const randomIndex = randomBytes[i] % characters.length;
+      code += characters.charAt(randomIndex);
+    }
+    
+    // Check if code already exists
+    const existing = await storage.getUserByResidentCode(code);
+    if (!existing) {
+      return code;
+    }
+  }
+  
+  // If we couldn't generate a unique code after max attempts, throw error
+  throw new Error('Unable to generate unique resident code. Please try again.');
+}
+
 // License verification helper - re-verifies license keys with Overhaul Labs API
 // Returns: { success: boolean, valid: boolean | null }
 // - success=false means API failure (keep existing licenseVerified state)
@@ -462,6 +491,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       }
       
+      // GENERATE RESIDENT CODE ON FIRST LOGIN (company role only)
+      if (user.role === 'company' && !user.residentCode) {
+        try {
+          console.log('[Login] Generating resident code for company on first login...');
+          const residentCode = await generateResidentCode();
+          await storage.updateUser(user.id, { residentCode });
+          console.log(`[Login] Resident code generated: ${residentCode}`);
+          user.residentCode = residentCode;
+        } catch (error) {
+          console.error('[Login] Failed to generate resident code:', error);
+          // Continue login even if code generation fails - user can set it later in profile
+        }
+      }
+      
       // Create session
       req.session.userId = user.id;
       req.session.role = user.role;
@@ -739,6 +782,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (user.role === "company") {
         if (req.body.companyName !== undefined) {
           updates.companyName = req.body.companyName;
+        }
+        if (req.body.residentCode !== undefined) {
+          // Validate resident code format (10 characters, alphanumeric)
+          const code = req.body.residentCode.trim().toUpperCase();
+          if (code.length === 0) {
+            // Allow clearing the code
+            updates.residentCode = null;
+          } else if (code.length !== 10) {
+            return res.status(400).json({ message: "Resident code must be exactly 10 characters" });
+          } else if (!/^[A-Z0-9]+$/.test(code)) {
+            return res.status(400).json({ message: "Resident code can only contain letters and numbers" });
+          } else {
+            // Check if code is already in use by another company
+            const existingCompany = await storage.getUserByResidentCode(code);
+            if (existingCompany && existingCompany.id !== user.id) {
+              return res.status(400).json({ message: "This resident code is already in use by another company" });
+            }
+            updates.residentCode = code;
+          }
         }
       }
       

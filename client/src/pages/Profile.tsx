@@ -20,6 +20,7 @@ const profileSchema = z.object({
   unitNumber: z.string().optional(),
   parkingStallNumber: z.string().optional(),
   companyName: z.string().optional(),
+  residentCode: z.string().optional(),
 });
 
 const passwordSchema = z.object({
@@ -66,6 +67,7 @@ export default function Profile() {
       unitNumber: user?.unitNumber || "",
       parkingStallNumber: user?.parkingStallNumber || "",
       companyName: user?.companyName || "",
+      residentCode: user?.residentCode || "",
     },
   });
 
@@ -290,24 +292,45 @@ export default function Profile() {
                 )}
 
                 {user?.role === "company" && (
-                  <FormField
-                    control={profileForm.control}
-                    name="companyName"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Company Name</FormLabel>
-                        <FormControl>
-                          <Input
-                            placeholder="Company name"
-                            {...field}
-                            data-testid="input-company-name"
-                            className="h-12"
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+                  <>
+                    <FormField
+                      control={profileForm.control}
+                      name="companyName"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Company Name</FormLabel>
+                          <FormControl>
+                            <Input
+                              placeholder="Company name"
+                              {...field}
+                              data-testid="input-company-name"
+                              className="h-12"
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={profileForm.control}
+                      name="residentCode"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Resident Code</FormLabel>
+                          <FormControl>
+                            <Input
+                              placeholder="10-character code for residents"
+                              {...field}
+                              data-testid="input-resident-code"
+                              className="h-12 font-mono"
+                              maxLength={10}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </>
                 )}
 
                 <div className="pt-2">

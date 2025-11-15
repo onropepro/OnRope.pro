@@ -91,6 +91,9 @@ export const users = pgTable("users", {
   licenseKey: text("license_key"), // Stored server-side only, never sent to client
   licenseVerified: boolean("license_verified").default(false), // Public flag - safe to expose
   
+  // Resident linking code (company role only)
+  residentCode: varchar("resident_code", { length: 10 }).unique(), // 10-character code for residents to link to company - UNIQUE (~50 bits entropy)
+  
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });

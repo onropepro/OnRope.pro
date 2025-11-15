@@ -45,6 +45,18 @@ The platform is built with a React 18 frontend using TypeScript and Wouter for r
 
 ## Recent Changes
 
+**November 15, 2025** - Resident Code System Implementation
+
+*   Implemented secure resident linking system with unique 10-character company codes
+*   Codes generated automatically on first login for company users using cryptographically secure randomness (crypto.randomBytes)
+*   Database-level UNIQUE constraint ensures no duplicate codes
+*   ~50 bits of entropy (1 trillion+ combinations) prevents brute-force attacks
+*   Character set excludes confusing characters (0, O, 1, I) for improved usability
+*   Resident code displayed prominently in company dashboard header
+*   Editable in company profile page with validation and uniqueness checking
+*   Input normalization (uppercase, trimming) ensures consistent format
+*   Graceful error handling prevents login interruption if code generation fails
+
 **November 15, 2025** - Account Provisioning API Implementation
 
 *   Implemented `/api/provision-account` endpoint for automated customer onboarding from external sales platforms
