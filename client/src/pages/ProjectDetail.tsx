@@ -627,9 +627,22 @@ export default function ProjectDetail() {
             </Button>
             <div className="flex-1">
               <h1 className="text-xl font-bold">{project.buildingName}</h1>
-              <p className="text-xs text-muted-foreground">
-                {project.strataPlanNumber} - {project.jobType.replace(/_/g, ' ')}
-              </p>
+              <div className="flex items-center gap-2 mt-1">
+                <p className="text-xs text-muted-foreground">
+                  {project.strataPlanNumber} - {project.jobType.replace(/_/g, ' ')}
+                </p>
+                {project.companyResidentCode && (
+                  <>
+                    <span className="text-muted-foreground/50">•</span>
+                    <div className="flex items-center gap-1">
+                      <span className="text-xs text-muted-foreground">Code:</span>
+                      <Badge variant="outline" className="font-mono text-xs" data-testid="badge-resident-code">
+                        {project.companyResidentCode}
+                      </Badge>
+                    </div>
+                  </>
+                )}
+              </div>
             </div>
             {/* Start Day Button - Available to all users when no active session exists */}
             {!activeSession && project.status === "active" && (

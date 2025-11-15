@@ -1954,6 +1954,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
                                     currentUser.role === "supervisor" || role === "general_supervisor" || role === "rope_access_supervisor" || 
                                     currentUser.permissions?.includes("view_financial_data");
       
+      // Fetch company's resident code
+      let companyResidentCode: string | null = null;
+      try {
+        const company = await storage.getUserById(project.companyId);
+        if (company && company.residentCode) {
+          companyResidentCode = company.residentCode;
+        }
+      } catch (error) {
+        console.error('[/api/projects/:id] Failed to fetch company resident code:', error);
+      }
+      
       // Add completed drops (total and per-elevation) to the project
       const { north, east, south, west, total } = await storage.getProjectProgress(project.id);
       const projectWithProgress = {
@@ -1963,6 +1974,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         completedDropsEast: east,
         completedDropsSouth: south,
         completedDropsWest: west,
+        companyResidentCode, // Include company's resident code for all staff
       };
       
       // Filter financial data if user doesn't have financial permissions
