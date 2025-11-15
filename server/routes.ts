@@ -304,8 +304,33 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       }
       
-      // Create user
-      const user = await storage.createUser(validatedData);
+      // AUTO-VERIFY LICENSE KEY FOR COMPANY REGISTRATIONS
+      let licenseVerified = validatedData.licenseVerified || false;
+      if (validatedData.role === 'company' && validatedData.licenseKey && validatedData.email) {
+        // Auto-verify test tier licenses (ending in -4)
+        if (validatedData.licenseKey.endsWith('-4')) {
+          licenseVerified = true;
+          console.log('[Registration] Test tier license detected - auto-verified');
+        } else {
+          // Verify production tier licenses via new website API
+          console.log('[Registration] Verifying license key for new company registration...');
+          const verificationResult = await reverifyLicenseKey(validatedData.licenseKey, validatedData.email);
+          
+          if (verificationResult.success && verificationResult.valid) {
+            licenseVerified = true;
+            console.log('[Registration] License key verified successfully during registration');
+          } else {
+            console.warn('[Registration] License key verification failed - user will need to verify manually');
+            // Continue with registration but mark as unverified
+          }
+        }
+      }
+      
+      // Create user with verified license status
+      const user = await storage.createUser({
+        ...validatedData,
+        licenseVerified,
+      });
       
       // If this is a company user, create default payroll config and generate periods
       if (user.role === 'company') {
