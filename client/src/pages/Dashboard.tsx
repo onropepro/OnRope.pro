@@ -5408,23 +5408,50 @@ export default function Dashboard() {
 
       {/* Harness Inspection Details Dialog */}
       <Dialog open={!!selectedInspection} onOpenChange={() => setSelectedInspection(null)}>
-        <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+        <DialogContent className="max-w-4xl max-h-[85vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <span className="material-icons">verified_user</span>
-              Harness Inspection Details
+            <DialogTitle className="flex items-center justify-between gap-2">
+              <div className="flex items-center gap-2">
+                <span className="material-icons">verified_user</span>
+                Rope Access Equipment Inspection
+              </div>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  const printContent = document.getElementById('inspection-print-content');
+                  if (printContent) {
+                    const printWindow = window.open('', '', 'width=800,height=600');
+                    if (printWindow) {
+                      printWindow.document.write('<html><head><title>Inspection Report</title>');
+                      printWindow.document.write('<style>body{font-family:Arial,sans-serif;padding:20px;}h1{font-size:24px;margin-bottom:10px;}h2{font-size:18px;margin-top:20px;margin-bottom:10px;border-bottom:2px solid #333;padding-bottom:5px;}h3{font-size:14px;margin-top:15px;margin-bottom:8px;}.grid{display:grid;grid-template-columns:1fr 1fr;gap:15px;margin-bottom:20px;}.field{margin-bottom:10px;}.label{font-weight:bold;font-size:12px;color:#666;margin-bottom:3px;}.value{font-size:14px;}.category{margin-bottom:20px;border:1px solid #ddd;padding:15px;border-radius:5px;}.item{padding:8px;margin:5px 0;background:#f5f5f5;border-radius:3px;}.pass{color:#22c55e;font-weight:bold;}.fail{color:#ef4444;font-weight:bold;}.warning{color:#f59e0b;font-weight:bold;}.status-badge{display:inline-block;padding:4px 12px;border-radius:4px;font-size:12px;font-weight:bold;}.status-pass{background:#22c55e;color:white;}.status-fail{background:#ef4444;color:white;}</style>');
+                      printWindow.document.write('</head><body>');
+                      printWindow.document.write(printContent.innerHTML);
+                      printWindow.document.write('</body></html>');
+                      printWindow.document.close();
+                      printWindow.print();
+                    }
+                  }
+                }}
+                data-testid="button-download-pdf"
+              >
+                <span className="material-icons text-sm mr-1">download</span>
+                Download PDF
+              </Button>
             </DialogTitle>
           </DialogHeader>
           {selectedInspection && (
-            <div className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-4" id="inspection-print-content">
+              <h1 style={{fontSize: '24px', fontWeight: 'bold', marginBottom: '10px'}}>Rope Access Equipment Inspection Report</h1>
+              
+              <div className="grid grid-cols-2 gap-4 pb-4 border-b">
                 <div>
                   <div className="text-sm font-medium text-muted-foreground">Inspector</div>
-                  <div className="text-base">{selectedInspection.inspectorName}</div>
+                  <div className="text-base font-semibold">{selectedInspection.inspectorName}</div>
                 </div>
                 <div>
-                  <div className="text-sm font-medium text-muted-foreground">Date</div>
-                  <div className="text-base">
+                  <div className="text-sm font-medium text-muted-foreground">Inspection Date</div>
+                  <div className="text-base font-semibold">
                     {new Date(selectedInspection.inspectionDate).toLocaleDateString('en-US', { 
                       weekday: 'long', 
                       year: 'numeric', 
@@ -5434,36 +5461,73 @@ export default function Dashboard() {
                   </div>
                 </div>
                 <div>
-                  <div className="text-sm font-medium text-muted-foreground">Manufacturer</div>
-                  <div className="text-base">{selectedInspection.manufacturer || 'N/A'}</div>
+                  <div className="text-sm font-medium text-muted-foreground">Equipment ID</div>
+                  <div className="text-base">{selectedInspection.equipmentId || selectedInspection.personalHarnessId || 'N/A'}</div>
                 </div>
                 <div>
-                  <div className="text-sm font-medium text-muted-foreground">Model</div>
-                  <div className="text-base">{selectedInspection.model || 'N/A'}</div>
-                </div>
-                <div>
-                  <div className="text-sm font-medium text-muted-foreground">Serial Number</div>
-                  <div className="text-base">{selectedInspection.serialNumber || 'N/A'}</div>
-                </div>
-                <div>
-                  <div className="text-sm font-medium text-muted-foreground">Lanyard Type</div>
-                  <div className="text-base">{selectedInspection.lanyardType || 'N/A'}</div>
-                </div>
-              </div>
-              
-              {selectedInspection.manufactureDate && (
-                <div>
-                  <div className="text-sm font-medium text-muted-foreground">Manufacture Date</div>
+                  <div className="text-sm font-medium text-muted-foreground">Overall Status</div>
                   <div className="text-base">
-                    {new Date(selectedInspection.manufactureDate).toLocaleDateString()}
+                    <Badge variant={selectedInspection.overallStatus === 'pass' ? 'default' : 'destructive'}>
+                      {selectedInspection.overallStatus === 'pass' ? 'PASS' : 'FAIL'}
+                    </Badge>
                   </div>
+                </div>
+                {selectedInspection.manufacturer && (
+                  <div>
+                    <div className="text-sm font-medium text-muted-foreground">Manufacturer</div>
+                    <div className="text-base">{selectedInspection.manufacturer}</div>
+                  </div>
+                )}
+              </div>
+
+              {selectedInspection.equipmentFindings && Object.keys(selectedInspection.equipmentFindings).length > 0 && (
+                <div className="space-y-4">
+                  <h2 className="text-xl font-bold">Equipment Inspection Results</h2>
+                  {Object.entries(selectedInspection.equipmentFindings).map(([categoryKey, categoryData]: [string, any]) => (
+                    <Card key={categoryKey} className="border-l-4" style={{borderLeftColor: categoryData.status === 'pass' ? '#22c55e' : '#ef4444'}}>
+                      <CardHeader className="pb-3">
+                        <div className="flex items-center justify-between">
+                          <CardTitle className="text-lg">
+                            {categoryKey.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}
+                          </CardTitle>
+                          <Badge variant={categoryData.status === 'pass' ? 'default' : 'destructive'}>
+                            {categoryData.status === 'pass' ? 'PASS' : 'FAIL'}
+                          </Badge>
+                        </div>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="space-y-2">
+                          {categoryData.items && Object.entries(categoryData.items).map(([itemKey, itemData]: [string, any]) => (
+                            <div key={itemKey} className="flex items-start justify-between p-2 rounded bg-muted/30">
+                              <div className="flex-1">
+                                <div className="text-sm font-medium">
+                                  {itemKey.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                                </div>
+                                {itemData.notes && (
+                                  <div className="text-xs text-muted-foreground mt-1">
+                                    Note: {itemData.notes}
+                                  </div>
+                                )}
+                              </div>
+                              <Badge 
+                                variant={itemData.result === 'pass' ? 'outline' : itemData.result === 'fail' ? 'destructive' : 'secondary'}
+                                className="ml-2"
+                              >
+                                {itemData.result?.toUpperCase() || 'N/A'}
+                              </Badge>
+                            </div>
+                          ))}
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
                 </div>
               )}
               
               {selectedInspection.notes && (
-                <div>
-                  <div className="text-sm font-medium text-muted-foreground mb-1">Additional Notes</div>
-                  <div className="text-base bg-muted p-3 rounded-md">
+                <div className="mt-4">
+                  <div className="text-sm font-medium text-muted-foreground mb-2">Additional Notes</div>
+                  <div className="text-base bg-muted p-4 rounded-md whitespace-pre-wrap">
                     {selectedInspection.notes}
                   </div>
                 </div>
