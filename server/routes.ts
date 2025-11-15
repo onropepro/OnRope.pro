@@ -1881,7 +1881,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (currentUser.role === "company") {
         // Return only THIS company's projects, filtered by status (all if not specified)
         projects = await storage.getProjectsByCompany(currentUser.id, statusFilter);
-      } else if (currentUser.role === "operations_manager" || currentUser.role === "supervisor" || role === "general_supervisor" || role === "rope_access_supervisor" || currentUser.role === "rope_access_tech") {
+      } else if (currentUser.role === "operations_manager" || currentUser.role === "supervisor" || currentUser.role === "general_supervisor" || currentUser.role === "rope_access_supervisor" || currentUser.role === "rope_access_tech") {
         // Return projects for their company, filtered by status (all if not specified)
         const companyId = currentUser.companyId;
         if (companyId) {
@@ -1951,7 +1951,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Check if user has financial permissions
       const canViewFinancialData = currentUser.role === "company" || 
                                     currentUser.role === "operations_manager" || 
-                                    currentUser.role === "supervisor" || role === "general_supervisor" || role === "rope_access_supervisor" || 
+                                    currentUser.role === "supervisor" || currentUser.role === "general_supervisor" || currentUser.role === "rope_access_supervisor" || 
                                     currentUser.permissions?.includes("view_financial_data");
       
       // Fetch company's resident code
@@ -2473,7 +2473,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Check if user has financial permissions
       const canViewFinancialData = currentUser.role === "company" || 
                                     currentUser.role === "operations_manager" || 
-                                    currentUser.role === "supervisor" || role === "general_supervisor" || role === "rope_access_supervisor" || 
+                                    currentUser.role === "supervisor" || currentUser.role === "general_supervisor" || currentUser.role === "rope_access_supervisor" || 
                                     currentUser.permissions?.includes("view_financial_data");
       
       const sessions = await storage.getWorkSessionsByProject(req.params.projectId, companyId);
@@ -2510,7 +2510,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Check if user has financial permissions
       const canViewFinancialData = currentUser.role === "company" || 
                                     currentUser.role === "operations_manager" || 
-                                    currentUser.role === "supervisor" || role === "general_supervisor" || role === "rope_access_supervisor" || 
+                                    currentUser.role === "supervisor" || currentUser.role === "general_supervisor" || currentUser.role === "rope_access_supervisor" || 
                                     currentUser.permissions?.includes("view_financial_data");
       
       // Get all projects for the company
@@ -2573,7 +2573,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Check if user has financial permissions
       const canViewFinancialData = currentUser.role === "company" || 
                                     currentUser.role === "operations_manager" || 
-                                    currentUser.role === "supervisor" || role === "general_supervisor" || role === "rope_access_supervisor" || 
+                                    currentUser.role === "supervisor" || currentUser.role === "general_supervisor" || currentUser.role === "rope_access_supervisor" || 
                                     currentUser.permissions?.includes("view_financial_data");
       
       // Get all projects for the company
@@ -2851,7 +2851,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       } else if (currentUser.role === "company") {
         // Company sees all complaints for their projects
         complaints = await storage.getComplaintsForCompany(currentUser.id);
-      } else if (currentUser.role === "operations_manager" || currentUser.role === "supervisor" || role === "general_supervisor" || role === "rope_access_supervisor" || currentUser.role === "rope_access_tech") {
+      } else if (currentUser.role === "operations_manager" || currentUser.role === "supervisor" || currentUser.role === "general_supervisor" || currentUser.role === "rope_access_supervisor" || currentUser.role === "rope_access_tech") {
         // Staff sees complaints for their company's projects
         const companyId = currentUser.companyId;
         if (companyId) {
@@ -2892,7 +2892,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         if (project.companyId !== currentUser.id) {
           return res.status(403).json({ message: "Access denied" });
         }
-      } else if (currentUser.role === "operations_manager" || currentUser.role === "supervisor" || role === "general_supervisor" || role === "rope_access_supervisor" || currentUser.role === "rope_access_tech") {
+      } else if (currentUser.role === "operations_manager" || currentUser.role === "supervisor" || currentUser.role === "general_supervisor" || currentUser.role === "rope_access_supervisor" || currentUser.role === "rope_access_tech") {
         if (project.companyId !== currentUser.companyId) {
           return res.status(403).json({ message: "Access denied" });
         }
