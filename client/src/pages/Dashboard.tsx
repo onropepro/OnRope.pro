@@ -1861,8 +1861,8 @@ export default function Dashboard() {
 
         {activeTab === "projects" && (
           <div className="space-y-4">
-            {/* Resident Code Display */}
-            {currentUser?.role === 'company' && currentUser?.residentCode && (
+            {/* Resident Code Display - Show for all company staff */}
+            {(currentUser?.role === 'company' || currentUser?.role === 'operations_manager' || currentUser?.role === 'supervisor' || currentUser?.role === 'rope_access_tech') && currentUser?.companyId && companyData?.residentCode && (
               <Card className="border-primary/20 bg-primary/5">
                 <CardContent className="p-6">
                   <div className="flex items-center justify-between">
@@ -1870,7 +1870,7 @@ export default function Dashboard() {
                       <h3 className="text-sm font-medium text-muted-foreground mb-1">Company Resident Code</h3>
                       <p className="text-xs text-muted-foreground mb-3">Share this code with residents to link their accounts</p>
                       <Badge variant="outline" className="font-mono text-2xl px-4 py-2" data-testid="badge-projects-resident-code">
-                        {currentUser.residentCode}
+                        {companyData.residentCode}
                       </Badge>
                     </div>
                     <span className="material-icons text-6xl text-primary/20">qr_code_2</span>
