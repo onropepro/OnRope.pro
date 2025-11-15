@@ -5419,19 +5419,408 @@ export default function Dashboard() {
                 variant="outline"
                 size="sm"
                 onClick={() => {
-                  const printContent = document.getElementById('inspection-print-content');
-                  if (printContent) {
-                    const printWindow = window.open('', '', 'width=800,height=600');
-                    if (printWindow) {
-                      printWindow.document.write('<html><head><title>Inspection Report</title>');
-                      printWindow.document.write('<style>body{font-family:Arial,sans-serif;padding:20px;}h1{font-size:24px;margin-bottom:10px;}h2{font-size:18px;margin-top:20px;margin-bottom:10px;border-bottom:2px solid #333;padding-bottom:5px;}h3{font-size:14px;margin-top:15px;margin-bottom:8px;}.grid{display:grid;grid-template-columns:1fr 1fr;gap:15px;margin-bottom:20px;}.field{margin-bottom:10px;}.label{font-weight:bold;font-size:12px;color:#666;margin-bottom:3px;}.value{font-size:14px;}.category{margin-bottom:20px;border:1px solid #ddd;padding:15px;border-radius:5px;}.item{padding:8px;margin:5px 0;background:#f5f5f5;border-radius:3px;}.pass{color:#22c55e;font-weight:bold;}.fail{color:#ef4444;font-weight:bold;}.warning{color:#f59e0b;font-weight:bold;}.status-badge{display:inline-block;padding:4px 12px;border-radius:4px;font-size:12px;font-weight:bold;}.status-pass{background:#22c55e;color:white;}.status-fail{background:#ef4444;color:white;}</style>');
-                      printWindow.document.write('</head><body>');
-                      printWindow.document.write(printContent.innerHTML);
-                      printWindow.document.write('</body></html>');
-                      printWindow.document.close();
-                      printWindow.print();
-                    }
-                  }
+                  if (!selectedInspection) return;
+                  
+                  const printWindow = window.open('', '', 'width=210mm,height=297mm');
+                  if (!printWindow) return;
+                  
+                  const doc = printWindow.document;
+                  doc.write(`
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Equipment Inspection Report - ${selectedInspection.equipmentId || 'N/A'}</title>
+  <meta charset="utf-8">
+  <style>
+    @page {
+      size: A4;
+      margin: 0.75in;
+    }
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Inter', 'Segoe UI', 'Roboto', system-ui, -apple-system, sans-serif;
+      font-size: 11pt;
+      line-height: 1.6;
+      color: #1e293b;
+      background: white;
+      padding: 0;
+    }
+    
+    .report-container {
+      max-width: 210mm;
+      margin: 0 auto;
+      background: white;
+    }
+    
+    .report-header {
+      border-bottom: 4px solid #0f172a;
+      padding-bottom: 20px;
+      margin-bottom: 30px;
+    }
+    
+    .report-title {
+      font-size: 20pt;
+      font-weight: 700;
+      color: #0f172a;
+      margin-bottom: 8px;
+      letter-spacing: -0.02em;
+    }
+    
+    .report-subtitle {
+      font-size: 10pt;
+      color: #64748b;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      font-weight: 600;
+    }
+    
+    .metadata-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      margin-bottom: 30px;
+      padding: 20px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 4px;
+    }
+    
+    .metadata-field {
+      margin-bottom: 12px;
+    }
+    
+    .metadata-label {
+      font-size: 9pt;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: #64748b;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+    
+    .metadata-value {
+      font-size: 11pt;
+      color: #0f172a;
+      font-weight: 500;
+    }
+    
+    .status-badge {
+      display: inline-block;
+      padding: 6px 16px;
+      border-radius: 4px;
+      font-size: 10pt;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    
+    .status-pass {
+      background: #10b981;
+      color: white;
+    }
+    
+    .status-fail {
+      background: #ef4444;
+      color: white;
+    }
+    
+    .section-header {
+      font-size: 14pt;
+      font-weight: 700;
+      color: #0f172a;
+      margin-top: 30px;
+      margin-bottom: 20px;
+      padding-bottom: 8px;
+      border-bottom: 2px solid #e2e8f0;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+    
+    .category-block {
+      margin-bottom: 25px;
+      border: 1px solid #e2e8f0;
+      border-radius: 4px;
+      overflow: hidden;
+      page-break-inside: avoid;
+    }
+    
+    .category-header {
+      background: #f1f5f9;
+      padding: 12px 16px;
+      border-left: 4px solid #0ea5e9;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .category-header.fail {
+      border-left-color: #ef4444;
+      background: #fef2f2;
+    }
+    
+    .category-title {
+      font-size: 11pt;
+      font-weight: 700;
+      color: #0f172a;
+    }
+    
+    .category-status {
+      font-size: 9pt;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    
+    .category-status.pass {
+      color: #10b981;
+    }
+    
+    .category-status.fail {
+      color: #ef4444;
+    }
+    
+    .inspection-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    
+    .inspection-table th {
+      background: #f8fafc;
+      padding: 10px 16px;
+      text-align: left;
+      font-size: 9pt;
+      font-weight: 700;
+      color: #475569;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      border-bottom: 2px solid #e2e8f0;
+    }
+    
+    .inspection-table td {
+      padding: 10px 16px;
+      border-bottom: 1px solid #f1f5f9;
+      font-size: 10pt;
+      color: #334155;
+    }
+    
+    .inspection-table tr:nth-child(even) {
+      background: #fafbfc;
+    }
+    
+    .inspection-table tr:last-child td {
+      border-bottom: none;
+    }
+    
+    .item-name {
+      font-weight: 500;
+      color: #1e293b;
+    }
+    
+    .item-status {
+      font-weight: 600;
+      text-transform: uppercase;
+      font-size: 9pt;
+      letter-spacing: 0.03em;
+    }
+    
+    .item-status.pass {
+      color: #10b981;
+    }
+    
+    .item-status.fail {
+      color: #ef4444;
+    }
+    
+    .item-status.na {
+      color: #94a3b8;
+    }
+    
+    .item-notes {
+      font-size: 9pt;
+      color: #64748b;
+      font-style: italic;
+      margin-top: 4px;
+    }
+    
+    .notes-section {
+      margin-top: 30px;
+      padding: 16px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 4px;
+      page-break-inside: avoid;
+    }
+    
+    .notes-title {
+      font-size: 10pt;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: #475569;
+      margin-bottom: 8px;
+    }
+    
+    .notes-content {
+      font-size: 10pt;
+      color: #334155;
+      white-space: pre-wrap;
+      line-height: 1.6;
+    }
+    
+    .signature-section {
+      margin-top: 40px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 40px;
+      page-break-inside: avoid;
+    }
+    
+    .signature-block {
+      border-top: 2px solid #0f172a;
+      padding-top: 8px;
+    }
+    
+    .signature-label {
+      font-size: 9pt;
+      color: #64748b;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      font-weight: 600;
+    }
+    
+    .footer {
+      margin-top: 40px;
+      padding-top: 20px;
+      border-top: 1px solid #e2e8f0;
+      text-align: center;
+      font-size: 8pt;
+      color: #94a3b8;
+    }
+    
+    @media print {
+      body {
+        print-color-adjust: exact;
+        -webkit-print-color-adjust: exact;
+      }
+      
+      .category-block {
+        page-break-inside: avoid;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="report-container">
+    <div class="report-header">
+      <div class="report-title">ROPE ACCESS EQUIPMENT INSPECTION REPORT</div>
+      <div class="report-subtitle">IRATA Compliant Documentation</div>
+    </div>
+    
+    <div class="metadata-grid">
+      <div>
+        <div class="metadata-field">
+          <div class="metadata-label">Inspector</div>
+          <div class="metadata-value">${selectedInspection.inspectorName || 'N/A'}</div>
+        </div>
+        <div class="metadata-field">
+          <div class="metadata-label">Equipment ID</div>
+          <div class="metadata-value">${selectedInspection.equipmentId || selectedInspection.personalHarnessId || 'N/A'}</div>
+        </div>
+        ${selectedInspection.manufacturer ? `
+        <div class="metadata-field">
+          <div class="metadata-label">Manufacturer</div>
+          <div class="metadata-value">${selectedInspection.manufacturer}</div>
+        </div>
+        ` : ''}
+      </div>
+      <div>
+        <div class="metadata-field">
+          <div class="metadata-label">Inspection Date</div>
+          <div class="metadata-value">${new Date(selectedInspection.inspectionDate).toLocaleDateString('en-US', { 
+            year: 'numeric', 
+            month: 'long', 
+            day: 'numeric' 
+          })}</div>
+        </div>
+        <div class="metadata-field">
+          <div class="metadata-label">Overall Status</div>
+          <div class="metadata-value">
+            <span class="status-badge status-${selectedInspection.overallStatus || 'pass'}">${(selectedInspection.overallStatus || 'pass').toUpperCase()}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="section-header">Equipment Inspection Results</div>
+    
+    ${selectedInspection.equipmentFindings ? Object.entries(selectedInspection.equipmentFindings).map(([categoryKey, categoryData]: [string, any]) => `
+      <div class="category-block">
+        <div class="category-header ${categoryData.status === 'fail' ? 'fail' : ''}">
+          <div class="category-title">${categoryKey.replace(/([A-Z])/g, ' $1').trim().toUpperCase()}</div>
+          <div class="category-status ${categoryData.status}">${categoryData.status?.toUpperCase() || 'N/A'}</div>
+        </div>
+        <table class="inspection-table">
+          <thead>
+            <tr>
+              <th style="width: 50%;">Inspection Item</th>
+              <th style="width: 15%;">Status</th>
+              <th style="width: 35%;">Notes</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${categoryData.items ? Object.entries(categoryData.items).map(([itemKey, itemData]: [string, any]) => `
+              <tr>
+                <td>
+                  <div class="item-name">${itemKey.replace(/_/g, ' ').replace(/\b\w/g, (l: string) => l.toUpperCase())}</div>
+                </td>
+                <td>
+                  <span class="item-status ${itemData.result || 'na'}">${(itemData.result || 'N/A').toUpperCase()}</span>
+                </td>
+                <td>
+                  ${itemData.notes ? `<div class="item-notes">${itemData.notes}</div>` : '—'}
+                </td>
+              </tr>
+            `).join('') : ''}
+          </tbody>
+        </table>
+      </div>
+    `).join('') : '<p>No inspection data available.</p>'}
+    
+    ${selectedInspection.notes ? `
+      <div class="notes-section">
+        <div class="notes-title">Additional Notes</div>
+        <div class="notes-content">${selectedInspection.notes}</div>
+      </div>
+    ` : ''}
+    
+    <div class="signature-section">
+      <div class="signature-block">
+        <div class="signature-label">Inspector Signature</div>
+      </div>
+      <div class="signature-block">
+        <div class="signature-label">Date</div>
+      </div>
+    </div>
+    
+    <div class="footer">
+      This inspection report was generated in accordance with IRATA International Code of Practice.<br>
+      Document generated on ${new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
+    </div>
+  </div>
+</body>
+</html>
+                  `);
+                  doc.close();
+                  
+                  setTimeout(() => {
+                    printWindow.print();
+                  }, 250);
                 }}
                 data-testid="button-download-pdf"
               >
