@@ -276,7 +276,7 @@ export default function Login() {
                 data-testid="button-quick-login-testcom"
               >
                 <span className="material-icons mr-1 text-base">flash_on</span>
-                testcom
+                OWNER DEVELOPMENT ONLY
               </Button>
 
               <Button 
@@ -316,7 +316,7 @@ export default function Login() {
                 data-testid="button-quick-login-tester"
               >
                 <span className="material-icons mr-1 text-base">flash_on</span>
-                tester
+                TESTER OWNER
               </Button>
 
               <Button 
@@ -356,7 +356,7 @@ export default function Login() {
                 data-testid="button-quick-login-employee"
               >
                 <span className="material-icons mr-1 text-base">flash_on</span>
-                employee
+                EMPLOYEE TESTER
               </Button>
 
               <Button 
@@ -396,7 +396,7 @@ export default function Login() {
                 data-testid="button-quick-login-resident"
               >
                 <span className="material-icons mr-1 text-base">flash_on</span>
-                resident
+                RESIDENT TESTER
               </Button>
 
               <Button 
