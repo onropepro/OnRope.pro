@@ -202,22 +202,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
       let licenseVerified = false;
       if (licenseKey) {
         console.log('[Provision] Verifying provided license key...');
-        const verificationResult = await verifyLicenseKey(licenseKey);
+        const verificationResult = await reverifyLicenseKey(licenseKey);
         
         if (verificationResult.success && verificationResult.valid) {
           licenseVerified = true;
           console.log('[Provision] License key verified successfully');
         } else {
-          console.warn('[Provision] License key verification failed:', verificationResult.message);
+          console.warn('[Provision] License key verification failed');
           // Continue with account creation but mark as unverified
         }
       }
       
       // Create company account
-      const userData = {
+      const user = await storage.createUser({
         email,
         passwordHash,
-        role: "company" as const,
+        role: "company",
         companyName,
         name,
         hourlyRate: hourlyRate ? parseFloat(hourlyRate) : null,
@@ -227,16 +227,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
         zipCode,
         licenseKey: licenseKey || null,
         licenseVerified,
-      };
+      });
       
-      const user = await storage.createUser(userData);
-      
-      // Create default payroll config
+      // Create default payroll config (semi-monthly: 1st and 15th)
       try {
-        await storage.createPayPeriodConfig({
+        await storage.savePayPeriodConfig({
           companyId: user.id,
-          payPeriodType: "weekly",
-          payPeriodStartDay: 1,
+          periodType: "semi-monthly",
+          firstPayDay: 1,
+          secondPayDay: 15,
         });
       } catch (error) {
         console.error('[Provision] Error creating payroll config:', error);

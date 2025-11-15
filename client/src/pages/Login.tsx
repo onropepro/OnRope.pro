@@ -10,7 +10,7 @@ import { useToast } from "@/hooks/use-toast";
 import overhaulLabsLogo from "@assets/Screenshot 2025-11-09 at 14.46.08_1762728408763.png";
 
 const loginSchema = z.object({
-  identifier: z.string().min(1, "Email or company name is required"),
+  identifier: z.string().min(1, "Email is required"),
   password: z.string().min(1, "Password is required"),
 });
 
@@ -183,14 +183,15 @@ export default function Login() {
                   name="identifier"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-sm font-medium">Email or Company Name</FormLabel>
+                      <FormLabel className="text-sm font-medium">Email</FormLabel>
                       <FormControl>
                         <div className="relative">
                           <span className="material-icons absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground text-xl">
-                            person
+                            email
                           </span>
                           <Input 
-                            placeholder="you@example.com or Company Name" 
+                            type="email"
+                            placeholder="your@email.com" 
                             {...field} 
                             data-testid="input-identifier" 
                             className="h-12 pl-12 text-base" 
