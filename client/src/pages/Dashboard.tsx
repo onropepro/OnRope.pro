@@ -5738,6 +5738,12 @@ export default function Dashboard() {
           <div class="metadata-value">${selectedInspection.manufacturer}</div>
         </div>
         ` : ''}
+        ${selectedInspection.model ? `
+        <div class="metadata-field">
+          <div class="metadata-label">Model</div>
+          <div class="metadata-value">${selectedInspection.model}</div>
+        </div>
+        ` : ''}
       </div>
       <div>
         <div class="metadata-field">
@@ -5748,6 +5754,16 @@ export default function Dashboard() {
             day: 'numeric' 
           })}</div>
         </div>
+        ${selectedInspection.dateInService ? `
+        <div class="metadata-field">
+          <div class="metadata-label">Date In Service</div>
+          <div class="metadata-value">${new Date(selectedInspection.dateInService).toLocaleDateString('en-US', { 
+            year: 'numeric', 
+            month: 'long', 
+            day: 'numeric' 
+          })}</div>
+        </div>
+        ` : ''}
         <div class="metadata-field">
           <div class="metadata-label">Overall Status</div>
           <div class="metadata-value">
@@ -5865,6 +5881,24 @@ export default function Dashboard() {
                   <div>
                     <div className="text-sm font-medium text-muted-foreground">Manufacturer</div>
                     <div className="text-base">{selectedInspection.manufacturer}</div>
+                  </div>
+                )}
+                {selectedInspection.model && (
+                  <div>
+                    <div className="text-sm font-medium text-muted-foreground">Model</div>
+                    <div className="text-base">{selectedInspection.model}</div>
+                  </div>
+                )}
+                {selectedInspection.dateInService && (
+                  <div>
+                    <div className="text-sm font-medium text-muted-foreground">Date In Service</div>
+                    <div className="text-base">
+                      {new Date(selectedInspection.dateInService).toLocaleDateString('en-US', { 
+                        year: 'numeric', 
+                        month: 'long', 
+                        day: 'numeric' 
+                      })}
+                    </div>
                   </div>
                 )}
               </div>
