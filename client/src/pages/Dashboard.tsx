@@ -384,6 +384,7 @@ export default function Dashboard() {
   const [employeeToDelete, setEmployeeToDelete] = useState<string | null>(null);
   const [showDropDialog, setShowDropDialog] = useState(false);
   const [dropProject, setDropProject] = useState<any>(null);
+  const [showInspectionCheckDialog, setShowInspectionCheckDialog] = useState(false);
   const [showStartDayDialog, setShowStartDayDialog] = useState(false);
   const [showEndDayDialog, setShowEndDayDialog] = useState(false);
   const [showLogoutDialog, setShowLogoutDialog] = useState(false);
@@ -1423,8 +1424,18 @@ export default function Dashboard() {
   const handleStartDay = () => {
     if (projects.length > 0) {
       setSelectedProject(projects[0]);
-      setShowStartDayDialog(true);
+      setShowInspectionCheckDialog(true);
     }
+  };
+
+  const handleInspectionComplete = () => {
+    setShowInspectionCheckDialog(false);
+    setShowStartDayDialog(true);
+  };
+
+  const handleGoToInspection = () => {
+    setShowInspectionCheckDialog(false);
+    setLocation("/harness-inspections/new");
   };
 
   const handleEndDay = () => {
@@ -5123,6 +5134,26 @@ export default function Dashboard() {
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
               Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Harness Inspection Check Dialog */}
+      <AlertDialog open={showInspectionCheckDialog} onOpenChange={setShowInspectionCheckDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Have you completed your harness inspection?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Before starting your work day, you must complete a daily rope access equipment inspection to ensure all gear is safe and ready for use.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={handleGoToInspection} data-testid="button-no-inspection">
+              No, take me to inspection
+            </AlertDialogCancel>
+            <AlertDialogAction onClick={handleInspectionComplete} data-testid="button-yes-inspection">
+              Yes, continue
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
