@@ -458,10 +458,18 @@ export class Storage {
       return false;
     }
     
-    // Resident can access project if it matches their strata plan
+    // Resident can access project if it matches their strata plan AND company (if linked)
     if (userRole === "resident") {
       const user = await this.getUserById(userId);
-      return user?.strataPlanNumber === project.strataPlanNumber;
+      const strataPlanMatches = user?.strataPlanNumber === project.strataPlanNumber;
+      
+      // If resident has linked their account to a company, also verify company matches
+      if (user?.companyId) {
+        return strataPlanMatches && project.companyId === user.companyId;
+      }
+      
+      // If not linked to company, only check strata plan (legacy behavior)
+      return strataPlanMatches;
     }
     
     // Company/staff can only access their own projects

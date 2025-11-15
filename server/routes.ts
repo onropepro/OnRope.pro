@@ -1938,8 +1938,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
           projects = [];
         }
       } else if (currentUser.role === "resident") {
-        // Return projects matching resident's strata plan (all statuses if not specified)
-        projects = await storage.getAllProjectsByStrataPlan(currentUser.strataPlanNumber || "", statusFilter);
+        // Return projects matching resident's company AND strata plan
+        if (currentUser.companyId) {
+          // Resident has linked their account - filter by company AND strata plan
+          const allCompanyProjects = await storage.getProjectsByCompany(currentUser.companyId, statusFilter);
+          projects = allCompanyProjects.filter(p => p.strataPlanNumber === currentUser.strataPlanNumber);
+        } else {
+          // Resident hasn't linked - show projects by strata plan only (legacy behavior)
+          projects = await storage.getAllProjectsByStrataPlan(currentUser.strataPlanNumber || "", statusFilter);
+        }
       } else {
         projects = [];
       }
