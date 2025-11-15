@@ -365,6 +365,33 @@ export default function Inventory() {
 
           {/* My Gear Tab */}
           <TabsContent value="my-gear" className="space-y-4">
+            {/* Helpful Banner */}
+            <Card className="bg-primary/5 border-primary/20">
+              <CardContent className="p-4">
+                <div className="flex items-center justify-between gap-4">
+                  <div className="flex items-center gap-3">
+                    <span className="material-icons text-primary text-2xl">info</span>
+                    <div>
+                      <div className="font-semibold">Want to add new gear?</div>
+                      <p className="text-sm text-muted-foreground">
+                        Switch to the "Manage Gear" tab to add inventory items
+                      </p>
+                    </div>
+                  </div>
+                  <Button
+                    onClick={() => {
+                      const manageTab = document.querySelector('[data-testid="tab-manage-gear"]') as HTMLElement;
+                      manageTab?.click();
+                    }}
+                    data-testid="button-go-to-manage"
+                  >
+                    <Plus className="h-4 w-4 mr-2" />
+                    Go to Manage Gear
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+
             {/* Summary Cards */}
             {canViewFinancials && (
               <Card>
