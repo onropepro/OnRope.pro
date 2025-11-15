@@ -685,13 +685,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(403).json({ message: "Your employment has been terminated. Please contact your administrator for more information." });
       }
       
-      // For employees: include parent company's license verification status
+      // For employees: include parent company's license verification status AND resident code
       let companyLicenseVerified: boolean | undefined = undefined;
-      if (user.role !== 'company' && user.companyId) {
+      let companyResidentCode: string | undefined = undefined;
+      if (user.role !== 'company' && user.role !== 'resident' && user.companyId) {
         try {
           const parentCompany = await storage.getUserById(user.companyId);
           if (parentCompany) {
             companyLicenseVerified = parentCompany.licenseVerified;
+            companyResidentCode = parentCompany.residentCode || undefined;
           } else {
             console.warn(`[/api/user] Parent company not found for employee ${user.id}, companyId: ${user.companyId}`);
           }
@@ -706,7 +708,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({ 
         user: {
           ...userWithoutSensitiveData,
-          ...(companyLicenseVerified !== undefined && { companyLicenseVerified })
+          ...(companyLicenseVerified !== undefined && { companyLicenseVerified }),
+          ...(companyResidentCode && { residentCode: companyResidentCode })
         }
       });
     } catch (error) {
