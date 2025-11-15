@@ -52,10 +52,13 @@ The platform is built with a React 18 frontend using TypeScript and Wouter for r
 *   Database-level UNIQUE constraint ensures no duplicate codes
 *   ~50 bits of entropy (1 trillion+ combinations) prevents brute-force attacks
 *   Character set excludes confusing characters (0, O, 1, I) for improved usability
-*   Resident code displayed prominently in company dashboard header
+*   Resident code displayed prominently in company dashboard header and resident portal
 *   Editable in company profile page with validation and uniqueness checking
 *   Input normalization (uppercase, trimming) ensures consistent format
 *   Graceful error handling prevents login interruption if code generation fails
+*   **Code Validation:** Residents store the code they used to link (`linkedResidentCode`)
+*   **Auto-Unlinking:** If company changes their code, residents are automatically unlinked and must re-enter the new code
+*   **Security:** Prevents residents from seeing projects after company changes their code
 
 **November 15, 2025** - Account Provisioning API Implementation
 

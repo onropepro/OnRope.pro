@@ -572,11 +572,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.log(`[link-resident-code] Resident ${currentUser.email} linking to company ${company.companyName} (${company.id})`);
       console.log(`[link-resident-code] Previous companyId: ${currentUser.companyId}`);
       
-      await storage.updateUser(currentUser.id, { companyId: company.id });
+      // Save BOTH the companyId AND the code they used to link
+      await storage.updateUser(currentUser.id, { 
+        companyId: company.id,
+        linkedResidentCode: normalizedCode // Store the code for future validation
+      });
       
       // Verify the update
       const updatedUser = await storage.getUserById(currentUser.id);
-      console.log(`[link-resident-code] New companyId: ${updatedUser?.companyId}`);
+      console.log(`[link-resident-code] New companyId: ${updatedUser?.companyId}, linkedCode: ${updatedUser?.linkedResidentCode}`);
       
       res.json({ 
         message: "Account linked successfully", 
@@ -1951,13 +1955,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       } else if (currentUser.role === "resident") {
         // Return projects matching resident's company AND strata plan
-        if (currentUser.companyId) {
-          // Resident has linked their account - filter by company AND strata plan
-          const allCompanyProjects = await storage.getProjectsByCompany(currentUser.companyId, statusFilter);
-          projects = allCompanyProjects.filter(p => p.strataPlanNumber === currentUser.strataPlanNumber);
+        if (currentUser.companyId && currentUser.linkedResidentCode) {
+          // Resident has linked - but first verify their code still matches
+          const company = await storage.getUserById(currentUser.companyId);
+          
+          if (company && company.residentCode === currentUser.linkedResidentCode) {
+            // Code still matches - show company's projects at this strata plan
+            const allCompanyProjects = await storage.getProjectsByCompany(currentUser.companyId, statusFilter);
+            projects = allCompanyProjects.filter(p => p.strataPlanNumber === currentUser.strataPlanNumber);
+          } else {
+            // Code has changed - unlink the resident (treat as not linked)
+            console.log(`[/api/projects] Resident ${currentUser.email} code mismatch - unlinking`);
+            await storage.updateUser(currentUser.id, { 
+              companyId: null,
+              linkedResidentCode: null
+            });
+            projects = []; // No projects - they need to re-link
+          }
         } else {
-          // Resident hasn't linked - show projects by strata plan only (legacy behavior)
-          projects = await storage.getAllProjectsByStrataPlan(currentUser.strataPlanNumber || "", statusFilter);
+          // Resident hasn't linked - no projects
+          projects = [];
         }
       } else {
         projects = [];
