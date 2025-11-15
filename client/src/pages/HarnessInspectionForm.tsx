@@ -315,7 +315,7 @@ export default function HarnessInspectionForm() {
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                            <SelectItem value="">No project</SelectItem>
+                            <SelectItem value="none">No project</SelectItem>
                             {projects.map((project: any) => (
                               <SelectItem key={project.id} value={project.id}>
                                 {project.buildingName}
