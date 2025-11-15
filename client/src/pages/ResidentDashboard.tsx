@@ -250,7 +250,7 @@ export default function ResidentDashboard() {
         method: "POST",
         credentials: "include",
       });
-      setLocation("/");
+      window.location.href = "/login";
     } catch (error) {
       toast({ title: "Error", description: "Failed to logout", variant: "destructive" });
     }
