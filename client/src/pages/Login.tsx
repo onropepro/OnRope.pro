@@ -298,8 +298,7 @@ export default function Login() {
               </Button>
 
               <Button 
-                variant="secondary" 
-                className="h-10 text-xs" 
+                className="h-10 text-xs bg-green-600 hover:bg-green-700 text-white" 
                 onClick={async () => {
                   try {
                     const response = await fetch("/api/login", {
@@ -338,8 +337,7 @@ export default function Login() {
               </Button>
 
               <Button 
-                variant="secondary" 
-                className="h-10 text-xs" 
+                className="h-10 text-xs bg-blue-600 hover:bg-blue-700 text-white" 
                 onClick={async () => {
                   try {
                     const response = await fetch("/api/login", {
