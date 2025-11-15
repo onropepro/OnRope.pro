@@ -201,15 +201,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Verify license key if provided
       let licenseVerified = false;
       if (licenseKey) {
-        console.log('[Provision] Verifying provided license key...');
-        const verificationResult = await reverifyLicenseKey(licenseKey);
-        
-        if (verificationResult.success && verificationResult.valid) {
+        // Auto-verify test tier licenses (ending in -4)
+        if (licenseKey.endsWith('-4')) {
           licenseVerified = true;
-          console.log('[Provision] License key verified successfully');
+          console.log('[Provision] Test tier license detected - auto-verified');
         } else {
-          console.warn('[Provision] License key verification failed');
-          // Continue with account creation but mark as unverified
+          console.log('[Provision] Verifying provided license key...');
+          const verificationResult = await reverifyLicenseKey(licenseKey);
+          
+          if (verificationResult.success && verificationResult.valid) {
+            licenseVerified = true;
+            console.log('[Provision] License key verified successfully');
+          } else {
+            console.warn('[Provision] License key verification failed');
+            // Continue with account creation but mark as unverified
+          }
         }
       }
       
@@ -401,9 +407,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // RE-VERIFY LICENSE ON EVERY LOGIN (company role only)
       if (user.role === 'company' && user.licenseKey) {
-        // Skip re-verification for bypass mode (development)
+        // Skip re-verification for bypass mode and test tier licenses
         if (user.licenseKey === 'BYPASSED') {
           console.log('[Login] Bypass mode detected - skipping re-verification');
+        } else if (user.licenseKey.endsWith('-4')) {
+          console.log('[Login] Test tier license detected - skipping re-verification');
         } else {
           console.log('[Login] Re-verifying stored license key for company user...');
           const verificationResult = await reverifyLicenseKey(user.licenseKey);
