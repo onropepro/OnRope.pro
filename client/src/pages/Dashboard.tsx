@@ -414,11 +414,9 @@ export default function Dashboard() {
     })
   );
 
-  // Fetch projects with auto-refresh to show real-time progress
+  // Fetch projects
   const { data: projectsData, isLoading: projectsLoading } = useQuery({
     queryKey: ["/api/projects"],
-    refetchInterval: 10000, // Refetch every 10 seconds
-    refetchOnWindowFocus: true,
   });
 
   // Fetch all employees (including terminated) for management
