@@ -246,13 +246,23 @@ export default function ResidentDashboard() {
 
   const confirmLogout = async () => {
     try {
-      await fetch("/api/logout", {
+      const response = await fetch("/api/logout", {
         method: "POST",
         credentials: "include",
       });
-      window.location.href = "/login";
+      
+      if (!response.ok) {
+        throw new Error("Logout failed");
+      }
+      
+      // Clear local storage
+      localStorage.clear();
+      
+      // Redirect to login page
+      window.location.href = "/";
     } catch (error) {
       toast({ title: "Error", description: "Failed to logout", variant: "destructive" });
+      setShowLogoutDialog(false);
     }
   };
 
