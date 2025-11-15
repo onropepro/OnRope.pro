@@ -569,7 +569,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(403).json({ message: "Only residents can link using a company code" });
       }
       
+      console.log(`[link-resident-code] Resident ${currentUser.email} linking to company ${company.companyName} (${company.id})`);
+      console.log(`[link-resident-code] Previous companyId: ${currentUser.companyId}`);
+      
       await storage.updateUser(currentUser.id, { companyId: company.id });
+      
+      // Verify the update
+      const updatedUser = await storage.getUserById(currentUser.id);
+      console.log(`[link-resident-code] New companyId: ${updatedUser?.companyId}`);
       
       res.json({ 
         message: "Account linked successfully", 
@@ -750,6 +757,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Strip sensitive fields (passwordHash and licenseKey)
       const { passwordHash, licenseKey, ...userWithoutSensitiveData } = user;
+      
+      // Disable caching to ensure fresh data
+      res.set('Cache-Control', 'no-store, no-cache, must-revalidate, private');
+      
       res.json({ 
         user: {
           ...userWithoutSensitiveData,

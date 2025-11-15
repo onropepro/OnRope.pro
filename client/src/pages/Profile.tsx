@@ -179,12 +179,17 @@ export default function Profile() {
           throw new Error(error.message || "Failed to link account");
         }
         
-        toast({ title: "Success!", description: "Company linked successfully. Reloading..." });
+        const result = await response.json();
+        toast({ 
+          title: "Success!", 
+          description: `Linked to ${result.companyName}. Reloading...` 
+        });
         
-        // Force page reload to clear all cached data
+        // Force full page reload to clear all caches
         setTimeout(() => {
           window.location.href = "/resident";
-        }, 1000);
+        }, 1500);
+        return; // Prevent regular profile update from running
       } catch (error) {
         toast({ 
           title: "Link Failed", 
