@@ -179,12 +179,12 @@ export default function Profile() {
           throw new Error(error.message || "Failed to link account");
         }
         
-        toast({ title: "Success!", description: "Company linked successfully" });
-        queryClient.invalidateQueries({ queryKey: ["/api/user"] });
-        queryClient.invalidateQueries({ queryKey: ["/api/projects"] });
+        toast({ title: "Success!", description: "Company linked successfully. Reloading..." });
         
-        // Clear the code field
-        profileForm.setValue("residentLinkCode", "");
+        // Force page reload to clear all cached data
+        setTimeout(() => {
+          window.location.href = "/resident";
+        }, 1000);
       } catch (error) {
         toast({ 
           title: "Link Failed", 
