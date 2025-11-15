@@ -298,6 +298,13 @@ export default function ResidentDashboard() {
             </CardContent>
           </Card>
 
+          {/* Company Code Linking */}
+          {!currentUser?.companyId ? (
+            <LinkCompanyCodeCard />
+          ) : (
+            <CompanyLinkedCard companyId={currentUser.companyId} />
+          )}
+
           <Card className="shadow-lg">
             <CardHeader>
               <CardTitle>Send a Message</CardTitle>
@@ -1032,5 +1039,109 @@ export default function ResidentDashboard() {
         </AlertDialogContent>
       </AlertDialog>
     </div>
+  );
+}
+
+// Component for linking company code
+function LinkCompanyCodeCard() {
+  const { toast } = useToast();
+  const [residentCode, setResidentCode] = useState("");
+  
+  const linkCodeMutation = useMutation({
+    mutationFn: async (code: string) => {
+      const response = await fetch("/api/link-resident-code", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ residentCode: code }),
+        credentials: "include",
+      });
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || "Failed to link account");
+      }
+      return response.json();
+    },
+    onSuccess: () => {
+      toast({ title: "Success!", description: "Your account has been linked successfully" });
+      queryClient.invalidateQueries({ queryKey: ["/api/user"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/projects"] });
+      window.location.reload();
+    },
+    onError: (error: Error) => {
+      toast({ title: "Error", description: error.message, variant: "destructive" });
+    },
+  });
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    const code = residentCode.trim().toUpperCase();
+    if (code.length !== 10) {
+      toast({ title: "Invalid Code", description: "Company code must be 10 characters", variant: "destructive" });
+      return;
+    }
+    linkCodeMutation.mutate(code);
+  };
+
+  return (
+    <Card className="shadow-lg border-primary/20">
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2">
+          <span className="material-icons text-primary">link</span>
+          Link Your Account
+        </CardTitle>
+        <CardDescription>
+          Enter the code provided by your building maintenance staff to link your account and view ongoing projects
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <label className="text-sm font-medium mb-2 block">Company Code</label>
+            <Input
+              value={residentCode}
+              onChange={(e) => setResidentCode(e.target.value.toUpperCase())}
+              placeholder="Enter 10-character code"
+              maxLength={10}
+              className="h-12 text-lg font-mono"
+              data-testid="input-resident-code"
+            />
+          </div>
+          <Button
+            type="submit"
+            className="w-full h-12"
+            disabled={linkCodeMutation.isPending || residentCode.length !== 10}
+            data-testid="button-link-code"
+          >
+            {linkCodeMutation.isPending ? "Linking..." : "Link Account"}
+          </Button>
+        </form>
+      </CardContent>
+    </Card>
+  );
+}
+
+// Component showing linked company
+function CompanyLinkedCard({ companyId }: { companyId: string }) {
+  const { data: companyData } = useQuery({
+    queryKey: ["/api/companies", companyId],
+    enabled: !!companyId,
+  });
+
+  if (!companyData?.company) return null;
+
+  return (
+    <Card className="shadow-lg border-success/20 bg-success/5">
+      <CardContent className="pt-6">
+        <div className="flex items-center gap-3">
+          <div className="h-12 w-12 rounded-full bg-success/20 flex items-center justify-center">
+            <span className="material-icons text-success text-2xl">check_circle</span>
+          </div>
+          <div className="flex-1">
+            <p className="text-sm text-muted-foreground">Linked to</p>
+            <p className="text-lg font-semibold">{companyData.company.companyName}</p>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
   );
 }

@@ -536,6 +536,51 @@ export async function registerRoutes(app: Express): Promise<Server> {
     });
   });
   
+  // Link resident account to company using resident code
+  app.post("/api/link-resident-code", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const { residentCode } = req.body;
+      
+      if (!residentCode || typeof residentCode !== 'string') {
+        return res.status(400).json({ message: "Resident code is required" });
+      }
+      
+      const normalizedCode = residentCode.trim().toUpperCase();
+      
+      if (normalizedCode.length !== 10) {
+        return res.status(400).json({ message: "Invalid code format" });
+      }
+      
+      // Find company with this resident code
+      const company = await storage.getUserByResidentCode(normalizedCode);
+      
+      if (!company) {
+        return res.status(404).json({ message: "Invalid code - no company found with this code" });
+      }
+      
+      // Update resident's companyId
+      const currentUser = await storage.getUserById(req.session.userId!);
+      
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      if (currentUser.role !== 'resident') {
+        return res.status(403).json({ message: "Only residents can link using a company code" });
+      }
+      
+      await storage.updateUser(currentUser.id, { companyId: company.id });
+      
+      res.json({ 
+        message: "Account linked successfully", 
+        companyName: company.companyName 
+      });
+    } catch (error) {
+      console.error("Link resident code error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+  
   // Manual license verification endpoint
   app.post("/api/verify-license", requireAuth, async (req: Request, res: Response) => {
     try {

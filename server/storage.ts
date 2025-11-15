@@ -18,6 +18,11 @@ export class Storage {
     return result[0];
   }
 
+  async getUserByResidentCode(residentCode: string): Promise<User | undefined> {
+    const result = await db.select().from(users).where(eq(users.residentCode, residentCode)).limit(1);
+    return result[0];
+  }
+
   async getUserByCompanyName(companyName: string): Promise<User | undefined> {
     const result = await db.select().from(users).where(eq(users.companyName, companyName)).limit(1);
     return result[0];
