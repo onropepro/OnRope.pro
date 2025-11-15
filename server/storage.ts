@@ -87,21 +87,12 @@ export class Storage {
   }
 
   async getResidentsByCompany(companyId: string): Promise<User[]> {
-    // Get all unique strata plan numbers from this company's projects
-    const companyProjects = await this.getProjectsByCompany(companyId);
-    const strataPlanNumbersSet = new Set(companyProjects.map(p => p.strataPlanNumber).filter(Boolean));
-    const strataPlanNumbers = Array.from(strataPlanNumbersSet) as string[];
-    
-    if (strataPlanNumbers.length === 0) {
-      return [];
-    }
-    
-    // Get all residents from those strata plans
+    // Get only residents who have explicitly linked their account to this company
     return db.select().from(users)
       .where(
         and(
           eq(users.role, "resident"),
-          inArray(users.strataPlanNumber, strataPlanNumbers)
+          eq(users.companyId, companyId)
         )
       )
       .orderBy(users.name);
