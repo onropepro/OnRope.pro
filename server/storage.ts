@@ -76,6 +76,27 @@ export class Storage {
       .orderBy(users.email);
   }
 
+  async getResidentsByCompany(companyId: string): Promise<User[]> {
+    // Get all unique strata plan numbers from this company's projects
+    const companyProjects = await this.getProjectsByCompany(companyId);
+    const strataPlanNumbersSet = new Set(companyProjects.map(p => p.strataPlanNumber).filter(Boolean));
+    const strataPlanNumbers = Array.from(strataPlanNumbersSet) as string[];
+    
+    if (strataPlanNumbers.length === 0) {
+      return [];
+    }
+    
+    // Get all residents from those strata plans
+    return db.select().from(users)
+      .where(
+        and(
+          eq(users.role, "resident"),
+          inArray(users.strataPlanNumber, strataPlanNumbers)
+        )
+      )
+      .orderBy(users.name);
+  }
+
   // Client operations
   async createClient(client: InsertClient): Promise<Client> {
     const result = await db.insert(clients).values(client).returning();

@@ -1149,6 +1149,44 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
+  // ==================== RESIDENTS ROUTES ====================
+  
+  // Get all residents for the company
+  app.get("/api/residents", requireAuth, requireRole("company", "operations_manager", "supervisor"), async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      const companyId = currentUser.role === "company" ? currentUser.id : currentUser.companyId;
+      
+      if (!companyId) {
+        return res.status(403).json({ message: "Access denied" });
+      }
+      
+      // Get all residents associated with this company's projects
+      const residents = await storage.getResidentsByCompany(companyId);
+      
+      // Return residents without sensitive data
+      const safeResidents = residents.map(resident => ({
+        id: resident.id,
+        name: resident.name,
+        email: resident.email,
+        phone: resident.phoneNumber,
+        unit: resident.unitNumber,
+        buildingId: resident.strataPlanNumber,
+        companyId: companyId,
+      }));
+      
+      res.json(safeResidents);
+    } catch (error) {
+      console.error("Error fetching residents:", error);
+      res.status(500).json({ message: "Failed to fetch residents" });
+    }
+  });
+  
   // ==================== CLIENT ROUTES ====================
   
   // Get all clients for the company

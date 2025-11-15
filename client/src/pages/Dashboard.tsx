@@ -1636,6 +1636,16 @@ export default function Dashboard() {
       isVisible: () => true, // Everyone
       borderColor: "#14b8a6",
     },
+    {
+      id: "residents",
+      label: "Residents",
+      description: "Building residents",
+      icon: "people",
+      onClick: () => setLocation("/residents"),
+      testId: "button-residents",
+      isVisible: (user: any) => isManagement(user), // Management only
+      borderColor: "#8b5cf6",
+    },
   ].filter(card => {
     try {
       return card.isVisible(currentUser);
