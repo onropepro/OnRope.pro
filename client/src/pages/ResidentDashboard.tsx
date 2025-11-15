@@ -593,6 +593,11 @@ export default function ResidentDashboard() {
                 <p className="text-sm text-muted-foreground capitalize">
                   {projectData.jobType}
                   {companyData?.company?.companyName && ` • ${companyData.company.companyName}`}
+                  {companyData?.company?.residentCode && (
+                    <span className="font-mono text-xs ml-2 text-primary">
+                      ({companyData.company.residentCode})
+                    </span>
+                  )}
                 </p>
               </div>
             </div>
