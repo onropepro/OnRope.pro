@@ -85,17 +85,26 @@ export async function requireVerifiedCompanyForMutations(req: Request, res: Resp
 // Returns: { success: boolean, valid: boolean | null }
 // - success=false means API failure (keep existing licenseVerified state)
 // - success=true, valid=true/false means definitive response (update licenseVerified)
-async function reverifyLicenseKey(licenseKey: string): Promise<{ success: boolean; valid: boolean | null }> {
+async function reverifyLicenseKey(licenseKey: string, email: string): Promise<{ success: boolean; valid: boolean | null }> {
   try {
-    const externalApiUrl = 'https://OverhaulLabs.replit.app/api/verify-license';
+    const externalApiUrl = 'https://ram-website-paquettetom.replit.app/api/verify-license';
+    const apiKey = process.env.LICENSE_VERIFICATION_API_KEY;
+    
+    if (!apiKey) {
+      console.error('[License Re-verification] LICENSE_VERIFICATION_API_KEY not found in environment');
+      return { success: false, valid: null }; // API configuration error - don't revoke access
+    }
     
     console.log('[License Re-verification] Calling external API:', externalApiUrl);
-    console.log('[License Re-verification] Request payload:', { licenseKey: licenseKey.substring(0, 5) + '...' });
+    console.log('[License Re-verification] Request payload:', { licenseKey: licenseKey.substring(0, 5) + '...', email });
     
     const verificationResponse = await fetch(externalApiUrl, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ licenseKey })
+      headers: { 
+        'Content-Type': 'application/json',
+        'x-api-key': apiKey,
+      },
+      body: JSON.stringify({ licenseKey, email })
     });
     
     const responseText = await verificationResponse.text();
@@ -207,7 +216,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           console.log('[Provision] Test tier license detected - auto-verified');
         } else {
           console.log('[Provision] Verifying provided license key...');
-          const verificationResult = await reverifyLicenseKey(licenseKey);
+          const verificationResult = await reverifyLicenseKey(licenseKey, email);
           
           if (verificationResult.success && verificationResult.valid) {
             licenseVerified = true;
@@ -406,7 +415,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       // RE-VERIFY LICENSE ON EVERY LOGIN (company role only)
-      if (user.role === 'company' && user.licenseKey) {
+      if (user.role === 'company' && user.licenseKey && user.email) {
         // Skip re-verification for bypass mode and test tier licenses
         if (user.licenseKey === 'BYPASSED') {
           console.log('[Login] Bypass mode detected - skipping re-verification');
@@ -414,7 +423,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           console.log('[Login] Test tier license detected - skipping re-verification');
         } else {
           console.log('[Login] Re-verifying stored license key for company user...');
-          const verificationResult = await reverifyLicenseKey(user.licenseKey);
+          const verificationResult = await reverifyLicenseKey(user.licenseKey, user.email);
           
           let finalLicenseStatus = user.licenseVerified; // Default to existing status
           
@@ -489,19 +498,41 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
       
-      // Overhaul Labs marketplace API URL
-      const externalApiUrl = 'https://OverhaulLabs.replit.app/api/verify-license';
+      // New RAM website API URL
+      const externalApiUrl = 'https://ram-website-paquettetom.replit.app/api/verify-license';
+      const apiKey = process.env.LICENSE_VERIFICATION_API_KEY;
+      
+      if (!apiKey) {
+        console.error('[License Verification] LICENSE_VERIFICATION_API_KEY not found in environment');
+        return res.status(500).json({
+          success: false,
+          message: "License verification service configuration error"
+        });
+      }
       
       console.log('[License Verification] Calling external API:', externalApiUrl);
       console.log('[License Verification] Request payload:', { licenseKey: licenseKey.substring(0, 5) + '...' });
       
-      // Call Overhaul Labs marketplace API to verify license
+      // Get current user's email for verification
+      const currentUser = await storage.getUserById(req.session.userId!);
+      if (!currentUser || !currentUser.email) {
+        return res.status(400).json({
+          success: false,
+          message: "User email is required for license verification"
+        });
+      }
+      
+      // Call new RAM website API to verify license
       const verificationResponse = await fetch(externalApiUrl, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'x-api-key': apiKey,
         },
-        body: JSON.stringify({ licenseKey })
+        body: JSON.stringify({ 
+          licenseKey,
+          email: currentUser.email 
+        })
       });
       
       const responseText = await verificationResponse.text();
