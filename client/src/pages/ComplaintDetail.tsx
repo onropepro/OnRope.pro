@@ -159,7 +159,11 @@ export default function ComplaintDetail() {
             variant="ghost" 
             size="icon" 
             className="min-w-11 min-h-11" 
-            onClick={() => setLocation("/dashboard")}
+            onClick={() => {
+              // Navigate back to appropriate dashboard based on user role
+              const dashboardPath = userData?.user?.role === "resident" ? "/resident" : "/dashboard";
+              setLocation(dashboardPath);
+            }}
             data-testid="button-back"
           >
             <span className="material-icons">arrow_back</span>
