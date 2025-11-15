@@ -42,3 +42,16 @@ The platform is built with a React 18 frontend using TypeScript and Wouter for r
 *   **File Storage:** Replit Object Storage
 *   **Mapping:** Leaflet (for GPS location visualization)
 *   **License Verification:** Overhaul Labs Marketplace API (for license key management)
+
+## Recent Changes
+
+**November 15, 2025** - Account Provisioning API Implementation
+
+*   Implemented `/api/provision-account` endpoint for automated customer onboarding from external sales platforms
+*   Secured endpoint with API key authentication using `PROVISIONING_API_KEY` environment variable
+*   Whitelisted provisioning endpoint from authentication middleware to allow external access
+*   Fixed critical bug where passwords were being double-hashed during provisioning, causing login failures
+*   Generated temporary passwords follow format: `Temp{8-random-chars}!`
+*   Automatically creates company account, verifies license key, and configures default payroll settings
+*   Comprehensive API documentation provided in `PROVISIONING_API.md`
+*   Test script available at `test-provisioning-api.sh` for validation

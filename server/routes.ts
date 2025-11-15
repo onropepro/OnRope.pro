@@ -140,6 +140,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       '/api/register', 
       '/api/logout', 
       '/api/verify-license',
+      '/api/provision-account', // Allow external provisioning
       '/api/user-preferences' // Allow UI preferences even in read-only mode
     ];
     
@@ -196,7 +197,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Generate a temporary password (user should reset it on first login)
       const tempPassword = `Temp${Math.random().toString(36).substring(2, 10)}!`;
-      const passwordHash = await bcrypt.hash(tempPassword, 10);
       
       // Verify license key if provided
       let licenseVerified = false;
@@ -213,10 +213,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       }
       
-      // Create company account
+      // Create company account (storage.createUser will hash the password)
       const user = await storage.createUser({
         email,
-        passwordHash,
+        passwordHash: tempPassword,
         role: "company",
         companyName,
         name,
@@ -231,7 +231,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Create default payroll config (semi-monthly: 1st and 15th)
       try {
-        await storage.savePayPeriodConfig({
+        await storage.createPayPeriodConfig({
           companyId: user.id,
           periodType: "semi-monthly",
           firstPayDay: 1,

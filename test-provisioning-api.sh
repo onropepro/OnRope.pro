@@ -9,7 +9,7 @@ echo "========================================"
 echo ""
 
 # Configuration
-API_KEY="test-api-key-12345"
+API_KEY="${PROVISIONING_API_KEY}"
 BASE_URL="http://localhost:5000"
 
 # Generate unique test data
