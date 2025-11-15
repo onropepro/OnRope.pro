@@ -50,9 +50,15 @@ export class Storage {
   }
 
   async getAllEmployees(companyId: string): Promise<User[]> {
-    // Get all employees created by this company
+    // Get all employees created by this company (exclude residents and company owner)
     return db.select().from(users)
-      .where(eq(users.companyId, companyId))
+      .where(
+        and(
+          eq(users.companyId, companyId),
+          not(eq(users.role, "resident")),
+          not(eq(users.role, "company"))
+        )
+      )
       .orderBy(desc(users.createdAt));
   }
 
