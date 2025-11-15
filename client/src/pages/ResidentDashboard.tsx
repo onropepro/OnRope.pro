@@ -282,7 +282,7 @@ export default function ResidentDashboard() {
             <span className="material-icons text-2xl text-primary">apartment</span>
             <h1 className="text-xl font-semibold">Resident Portal</h1>
           </div>
-          <Button variant="ghost" onClick={() => setShowLogoutDialog(true)} data-testid="button-logout">
+          <Button variant="ghost" onClick={confirmLogout} data-testid="button-logout">
             <span className="material-icons">logout</span>
           </Button>
         </header>
@@ -411,7 +411,7 @@ export default function ResidentDashboard() {
             <span className="material-icons text-2xl text-primary">apartment</span>
             <h1 className="text-xl font-semibold">Resident Portal</h1>
           </div>
-          <Button variant="ghost" onClick={() => setShowLogoutDialog(true)} data-testid="button-logout">
+          <Button variant="ghost" onClick={confirmLogout} data-testid="button-logout">
             <span className="material-icons">logout</span>
           </Button>
         </header>
@@ -589,7 +589,7 @@ export default function ResidentDashboard() {
               <Button variant="ghost" size="icon" className="min-w-11 min-h-11" data-testid="button-profile" onClick={() => setLocation("/profile")}>
                 <span className="material-icons">person</span>
               </Button>
-              <Button variant="ghost" size="icon" className="min-w-11 min-h-11" data-testid="button-logout" onClick={() => setShowLogoutDialog(true)}>
+              <Button variant="ghost" size="icon" className="min-w-11 min-h-11" data-testid="button-logout" onClick={confirmLogout}>
                 <span className="material-icons">logout</span>
               </Button>
             </div>
