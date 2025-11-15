@@ -239,10 +239,9 @@ export default function Login() {
               </form>
             </Form>
 
-            <div className="grid grid-cols-5 gap-2">
+            <div className="grid grid-cols-2 gap-2">
               <Button 
-                variant="secondary" 
-                className="h-10 text-xs" 
+                className="h-10 text-xs bg-yellow-500 hover:bg-yellow-600 text-black" 
                 onClick={async () => {
                   try {
                     const response = await fetch("/api/login", {
@@ -288,86 +287,6 @@ export default function Login() {
                     const response = await fetch("/api/login", {
                       method: "POST",
                       headers: { "Content-Type": "application/json" },
-                      body: JSON.stringify({ identifier: "tommy@tommy.com", password: "222222" }),
-                      credentials: "include",
-                    });
-                    const result = await response.json();
-                    if (response.ok) {
-                      const user = result.user;
-                      if (user.role === "resident") {
-                        window.location.href = "/resident";
-                      } else {
-                        window.location.href = "/dashboard";
-                      }
-                    } else {
-                      toast({
-                        title: "Quick Login Failed",
-                        description: result.message || "Test account not found in production database",
-                        variant: "destructive",
-                      });
-                    }
-                  } catch (error) {
-                    toast({
-                      title: "Login Error",
-                      description: "Network error. Please try manual login.",
-                      variant: "destructive",
-                    });
-                  }
-                }}
-                data-testid="button-quick-login-tommy"
-              >
-                <span className="material-icons mr-1 text-base">flash_on</span>
-                tommy
-              </Button>
-
-              <Button 
-                variant="secondary" 
-                className="h-10 text-xs" 
-                onClick={async () => {
-                  try {
-                    const response = await fetch("/api/login", {
-                      method: "POST",
-                      headers: { "Content-Type": "application/json" },
-                      body: JSON.stringify({ identifier: "PHS", password: "phs2025" }),
-                      credentials: "include",
-                    });
-                    const result = await response.json();
-                    if (response.ok) {
-                      const user = result.user;
-                      if (user.role === "resident") {
-                        window.location.href = "/resident";
-                      } else {
-                        window.location.href = "/dashboard";
-                      }
-                    } else {
-                      toast({
-                        title: "Quick Login Failed",
-                        description: result.message || "Test account not found in production database",
-                        variant: "destructive",
-                      });
-                    }
-                  } catch (error) {
-                    toast({
-                      title: "Login Error",
-                      description: "Network error. Please try manual login.",
-                      variant: "destructive",
-                    });
-                  }
-                }}
-                data-testid="button-quick-login-phs"
-              >
-                <span className="material-icons mr-1 text-base">flash_on</span>
-                PHS
-              </Button>
-
-              <Button 
-                variant="secondary" 
-                className="h-10 text-xs" 
-                onClick={async () => {
-                  try {
-                    const response = await fetch("/api/login", {
-                      method: "POST",
-                      headers: { "Content-Type": "application/json" },
                       body: JSON.stringify({ identifier: "tester@tester.com", password: "tester123" }),
                       credentials: "include",
                     });
@@ -401,14 +320,13 @@ export default function Login() {
               </Button>
 
               <Button 
-                variant="secondary" 
-                className="h-10 text-xs" 
+                className="h-10 text-xs bg-yellow-500 hover:bg-yellow-600 text-black" 
                 onClick={async () => {
                   try {
                     const response = await fetch("/api/login", {
                       method: "POST",
                       headers: { "Content-Type": "application/json" },
-                      body: JSON.stringify({ identifier: "res@res.com", password: "res123" }),
+                      body: JSON.stringify({ identifier: "emptester@test.com", password: "emp123" }),
                       credentials: "include",
                     });
                     const result = await response.json();
@@ -434,7 +352,46 @@ export default function Login() {
                     });
                   }
                 }}
-                data-testid="button-quick-login-resident"
+                data-testid="button-quick-login-employee"
+              >
+                <span className="material-icons mr-1 text-base">flash_on</span>
+                employee
+              </Button>
+
+              <Button 
+                className="h-10 text-xs bg-yellow-500 hover:bg-yellow-600 text-black" 
+                onClick={async () => {
+                  try {
+                    const response = await fetch("/api/login", {
+                      method: "POST",
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify({ identifier: "restester@test.com", password: "res123" }),
+                      credentials: "include",
+                    });
+                    const result = await response.json();
+                    if (response.ok) {
+                      const user = result.user;
+                      if (user.role === "resident") {
+                        window.location.href = "/resident";
+                      } else {
+                        window.location.href = "/dashboard";
+                      }
+                    } else {
+                      toast({
+                        title: "Quick Login Failed",
+                        description: result.message || "Test account not found in production database",
+                        variant: "destructive",
+                      });
+                    }
+                  } catch (error) {
+                    toast({
+                      title: "Login Error",
+                      description: "Network error. Please try manual login.",
+                      variant: "destructive",
+                    });
+                  }
+                }}
+                data-testid="button-quick-login-resident-tester"
               >
                 <span className="material-icons mr-1 text-base">flash_on</span>
                 resident
@@ -442,7 +399,7 @@ export default function Login() {
 
               <Button 
                 variant="destructive" 
-                className="h-10 text-xs col-span-5" 
+                className="h-10 text-xs col-span-2" 
                 onClick={async () => {
                   try {
                     const response = await fetch("/api/login", {
