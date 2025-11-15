@@ -55,3 +55,18 @@ export const queryClient = new QueryClient({
     },
   },
 });
+
+// Override defaults for security-critical user query
+// This ensures license verification status is always fresh
+queryClient.setQueryDefaults(["/api/user"], {
+  refetchOnWindowFocus: true,  // Recheck when user returns to tab
+  refetchInterval: 60000,      // Automatic recheck every 60 seconds
+  staleTime: 0,                // Always fetch fresh data
+  retry: (failureCount, error: any) => {
+    // Only retry on network errors, not auth failures (401/403)
+    if (error?.message?.includes("401") || error?.message?.includes("403")) {
+      return false; // Don't retry auth failures - user should be logged out
+    }
+    return failureCount < 2; // Retry network errors up to 2 times
+  },
+});

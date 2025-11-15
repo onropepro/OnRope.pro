@@ -9,13 +9,21 @@ interface ProtectedRouteProps {
 
 export default function ProtectedRoute({ children, allowedRoles }: ProtectedRouteProps) {
   const [, setLocation] = useLocation();
-  const { data: userData, isLoading } = useQuery({
+  const { data: userData, isLoading, error } = useQuery({
     queryKey: ["/api/user"],
+    // Global defaults in queryClient.ts handle refetching for security
   });
 
   const user = userData?.user;
 
   useEffect(() => {
+    // If there's an auth error (401/403), log out immediately
+    // Network errors will be retried automatically by queryClient
+    if (error && (error.message?.includes("401") || error.message?.includes("403"))) {
+      setLocation("/");
+      return;
+    }
+    
     if (!isLoading && !user) {
       setLocation("/");
     } else if (!isLoading && user && allowedRoles && !allowedRoles.includes(user.role)) {
@@ -26,7 +34,7 @@ export default function ProtectedRoute({ children, allowedRoles }: ProtectedRout
         setLocation("/dashboard");
       }
     }
-  }, [user, isLoading, allowedRoles, setLocation]);
+  }, [user, isLoading, error, allowedRoles, setLocation]);
 
   if (isLoading) {
     return (

@@ -7,6 +7,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
+import { queryClient } from "@/lib/queryClient";
 import overhaulLabsLogo from "@assets/Screenshot 2025-11-09 at 14.46.08_1762728408763.png";
 
 const loginSchema = z.object({
@@ -42,7 +43,24 @@ export default function Login() {
         return;
       }
 
-      const user = result.user;
+      // Invalidate user cache to ensure fresh data is fetched
+      await queryClient.invalidateQueries({ queryKey: ["/api/user"] });
+      
+      // Fetch fresh user data to get the latest license verification status
+      const userResponse = await fetch("/api/user", {
+        credentials: "include",
+      });
+      
+      if (!userResponse.ok) {
+        form.setError("identifier", { 
+          message: "Failed to verify account status. Please try again." 
+        });
+        return;
+      }
+      
+      const userData = await userResponse.json();
+      const user = userData.user;
+      
       if (user.role === "resident") {
         window.location.href = "/resident";
       } else {
