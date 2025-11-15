@@ -658,10 +658,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
       
-      const user = await storage.getUserById(req.session.userId!);
+      let user = await storage.getUserById(req.session.userId!);
       
       if (!user) {
         return res.status(404).json({ message: "User not found" });
+      }
+      
+      // Auto-generate resident code if company doesn't have one
+      if (user.role === 'company' && !user.residentCode) {
+        try {
+          console.log('[/api/user] Company missing resident code, generating...');
+          const residentCode = await generateResidentCode();
+          await storage.updateUser(user.id, { residentCode });
+          console.log(`[/api/user] Resident code generated: ${residentCode}`);
+          // Refetch user to get the updated code
+          user = await storage.getUserById(user.id) || user;
+        } catch (error) {
+          console.error('[/api/user] Failed to generate resident code:', error);
+          // Continue without code - user can generate later
+        }
       }
       
       // Check if user has been terminated - destroy session if so
