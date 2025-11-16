@@ -1243,7 +1243,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return empWithoutPassword;
       });
       
-      res.json({ employees: employeesWithoutPasswords });
+      // Calculate seat usage for tier-based limits
+      // Count only actual employees (not company owner, not terminated)
+      const activeEmployeeCount = employees.filter(emp => !emp.terminatedDate).length;
+      const tier = detectTier(companyOwner.licenseKey);
+      const seatLimit = getSeatLimit(tier);
+      const seatsUsed = activeEmployeeCount;
+      const seatsAvailable = seatLimit === -1 ? -1 : Math.max(0, seatLimit - seatsUsed);
+      const atSeatLimit = seatLimit > 0 && seatsUsed >= seatLimit;
+      
+      res.json({ 
+        employees: employeesWithoutPasswords,
+        seatInfo: {
+          tier,
+          seatLimit,
+          seatsUsed,
+          seatsAvailable,
+          atSeatLimit
+        }
+      });
     } catch (error) {
       console.error("Get all employees error:", error);
       res.status(500).json({ message: "Internal server error" });

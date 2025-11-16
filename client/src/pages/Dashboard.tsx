@@ -2964,16 +2964,64 @@ export default function Dashboard() {
         {activeTab === "employees" && (
           <div>
             <div className="space-y-4">
+              {/* Seat Usage Information */}
+              {employeesData?.seatInfo && employeesData.seatInfo.tier > 0 && (
+                <Card data-testid="card-seat-info">
+                  <CardContent className="p-4">
+                    <div className="flex items-center justify-between gap-3">
+                      <div className="flex items-center gap-3">
+                        <span className="material-icons text-primary">groups</span>
+                        <div>
+                          <div className="font-medium">Employee Seats</div>
+                          <div className="text-sm text-muted-foreground">
+                            {employeesData.seatInfo.seatsUsed} of {employeesData.seatInfo.seatLimit === -1 ? '∞' : employeesData.seatInfo.seatLimit} seats used
+                          </div>
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <Badge variant={employeesData.seatInfo.atSeatLimit ? "destructive" : "secondary"} data-testid="badge-tier-status">
+                          Tier {employeesData.seatInfo.tier}
+                        </Badge>
+                      </div>
+                    </div>
+                    
+                    {employeesData.seatInfo.atSeatLimit && (
+                      <div className="mt-3 p-3 bg-destructive/10 border border-destructive/20 rounded-md">
+                        <div className="flex items-start gap-2">
+                          <span className="material-icons text-destructive text-sm mt-0.5">warning</span>
+                          <div className="flex-1">
+                            <div className="text-sm font-medium text-destructive">Seat Limit Reached</div>
+                            <div className="text-xs text-muted-foreground mt-1">
+                              You've reached your {employeesData.seatInfo.seatLimit}-employee limit for Tier {employeesData.seatInfo.tier}. Upgrade your tier or purchase additional seats to add more team members.
+                            </div>
+                            <div className="flex gap-2 mt-3">
+                              <Button size="sm" variant="default" data-testid="button-upgrade-tier">
+                                <span className="material-icons text-sm mr-1">upgrade</span>
+                                Upgrade Tier
+                              </Button>
+                              <Button size="sm" variant="outline" data-testid="button-buy-seats">
+                                <span className="material-icons text-sm mr-1">add_shopping_cart</span>
+                                Buy Seats
+                              </Button>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              )}
+              
               {/* Create Employee Button */}
               <Dialog open={showEmployeeDialog} onOpenChange={(open) => { setShowEmployeeDialog(open); if (!open) setEmployeeFormStep(1); }}>
                 <DialogTrigger asChild>
                   <Button 
                     className="w-full h-12 gap-2" 
                     data-testid="button-create-employee"
-                    disabled={userIsReadOnly}
+                    disabled={userIsReadOnly || (employeesData?.seatInfo?.atSeatLimit ?? false)}
                   >
                     <span className="material-icons">person_add</span>
-                    Add New Employee
+                    {employeesData?.seatInfo?.atSeatLimit ? 'Seat Limit Reached' : 'Add New Employee'}
                   </Button>
                 </DialogTrigger>
                 <DialogContent className="max-w-md p-0 max-h-[95vh] flex flex-col">
