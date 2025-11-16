@@ -284,6 +284,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       }
       
+      // Calculate subscription renewal date (30 days from now)
+      const renewalDate = new Date();
+      renewalDate.setDate(renewalDate.getDate() + 30);
+      const subscriptionRenewalDate = renewalDate.toISOString().split('T')[0]; // Format as YYYY-MM-DD
+      
       // Create company account (storage.createUser will hash the password)
       const user = await storage.createUser({
         email,
@@ -298,6 +303,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         zipCode,
         licenseKey: licenseKey || null,
         licenseVerified,
+        subscriptionRenewalDate,
       });
       
       // Create default payroll config (semi-monthly: 1st and 15th)
@@ -382,10 +388,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       }
       
+      // Set subscription renewal date for company accounts (30 days from now)
+      let subscriptionRenewalDate: string | undefined;
+      if (validatedData.role === 'company') {
+        const renewalDate = new Date();
+        renewalDate.setDate(renewalDate.getDate() + 30);
+        subscriptionRenewalDate = renewalDate.toISOString().split('T')[0]; // Format as YYYY-MM-DD
+      }
+      
       // Create user with verified license status
       const user = await storage.createUser({
         ...validatedData,
         licenseVerified,
+        ...(subscriptionRenewalDate && { subscriptionRenewalDate }),
       });
       
       // If this is a company user, create default payroll config and generate periods
