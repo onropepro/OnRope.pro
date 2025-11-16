@@ -32,6 +32,24 @@ export function requireRole(...roles: string[]) {
   };
 }
 
+// Tier detection and seat limit utilities
+function detectTier(licenseKey: string | null): number {
+  if (!licenseKey) return 0; // No tier
+  if (licenseKey.endsWith('-1')) return 1; // Tier 1
+  if (licenseKey.endsWith('-2')) return 2; // Tier 2  
+  if (licenseKey.endsWith('-3')) return 3; // Tier 3
+  return 0; // Unknown/No tier
+}
+
+function getSeatLimit(tier: number): number {
+  switch (tier) {
+    case 1: return 2;  // Tier 1: 2 seats
+    case 2: return 10; // Tier 2: 10 seats (example)
+    case 3: return -1; // Tier 3: unlimited
+    default: return 0; // No limit if no tier
+  }
+}
+
 // Read-only mode enforcement middleware
 // Blocks all mutations for unverified company users
 // Residents are NEVER blocked
@@ -1265,7 +1283,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
           return empWithoutPassword;
         });
       
-      res.json({ employees: activeEmployees });
+      // Calculate seat usage for tier-based limits
+      // Count only actual employees (not company owner)
+      const employeeCount = employees.filter(emp => !emp.terminatedDate).length;
+      const tier = detectTier(companyOwner?.licenseKey || null);
+      const seatLimit = getSeatLimit(tier);
+      const seatsUsed = employeeCount;
+      const seatsAvailable = seatLimit === -1 ? -1 : Math.max(0, seatLimit - seatsUsed);
+      const atSeatLimit = seatLimit > 0 && seatsUsed >= seatLimit;
+      
+      res.json({ 
+        employees: activeEmployees,
+        seatInfo: {
+          tier,
+          seatLimit,
+          seatsUsed,
+          seatsAvailable,
+          atSeatLimit
+        }
+      });
     } catch (error) {
       console.error("Get employees error:", error);
       res.status(500).json({ message: "Internal server error" });
