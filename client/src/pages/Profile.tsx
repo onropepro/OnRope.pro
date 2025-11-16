@@ -2,11 +2,12 @@ import { useQuery, useMutation } from "@tanstack/react-query";
 import { useLocation } from "wouter";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -56,10 +57,10 @@ export default function Profile() {
     enabled: user?.role === "company",
   });
 
-  // Fetch projects to determine if active project is parkade
-  const { data: projectsData } = useQuery<{ projects: any[] }>({
+  // Fetch projects for company users (for subscription tab) and residents
+  const { data: projectsData } = useQuery<{ projects: any[]; projectInfo?: any }>({
     queryKey: ["/api/projects"],
-    enabled: user?.role === "resident",
+    enabled: user?.role === "resident" || user?.role === "company",
   });
 
   const allProjects = projectsData?.projects || [];
@@ -253,8 +254,16 @@ export default function Profile() {
       </header>
 
       <div className="p-4 max-w-2xl mx-auto space-y-4">
-        {/* Profile Information */}
-        <Card>
+        {user?.role === "company" ? (
+          <Tabs defaultValue="profile" className="w-full">
+            <TabsList className="grid w-full grid-cols-2">
+              <TabsTrigger value="profile" data-testid="tab-profile">Profile</TabsTrigger>
+              <TabsTrigger value="subscription" data-testid="tab-subscription">Subscription</TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="profile" className="space-y-4 mt-4">
+              {/* Profile Information */}
+              <Card>
           <CardHeader>
             <CardTitle>Profile Information</CardTitle>
           </CardHeader>
@@ -571,34 +580,439 @@ export default function Profile() {
           </CardContent>
         </Card>
 
-        {/* Delete Account - Company Only */}
-        {user?.role === "company" && (
+              <Separator />
+              
+              {/* Delete Account */}
+              <Card className="border-destructive">
+                <CardHeader>
+                  <CardTitle className="text-destructive">Delete Account</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    <p className="text-sm text-muted-foreground">
+                      Permanently delete your company account and all associated data. This action cannot be undone.
+                    </p>
+                    <p className="text-sm text-destructive font-medium">
+                      Warning: This will delete all employees, projects, work sessions, drop logs, and complaints.
+                    </p>
+                    <Button
+                      variant="destructive"
+                      className="w-full h-12"
+                      onClick={() => setShowDeleteDialog(true)}
+                      data-testid="button-delete-account"
+                    >
+                      <span className="material-icons mr-2">delete_forever</span>
+                      Delete Company Account
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            <TabsContent value="subscription" className="space-y-4 mt-4">
+              {/* License Information */}
+              <Card>
+                <CardHeader>
+                  <CardTitle>License & Subscription</CardTitle>
+                  <CardDescription>
+                    View your subscription details and usage limits
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                  {/* License Key */}
+                  <div className="space-y-2">
+                    <Label className="text-sm font-medium">License Key</Label>
+                    <div className="flex items-center gap-2">
+                      <Input
+                        value={user?.licenseKey || "Not configured"}
+                        readOnly
+                        className="h-12 font-mono text-sm"
+                        data-testid="input-license-key"
+                      />
+                      {user?.licenseVerified ? (
+                        <Badge variant="default" className="shrink-0" data-testid="badge-license-verified">
+                          <span className="material-icons text-xs mr-1">verified</span>
+                          Verified
+                        </Badge>
+                      ) : (
+                        <Badge variant="destructive" className="shrink-0" data-testid="badge-license-unverified">
+                          <span className="material-icons text-xs mr-1">error</span>
+                          Unverified
+                        </Badge>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Tier Information */}
+                  {employeesData?.seatInfo && (
+                    <div className="space-y-4">
+                      <Separator />
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <Label className="text-sm font-medium">Subscription Tier</Label>
+                          <p className="text-xs text-muted-foreground mt-1">
+                            Your current plan and features
+                          </p>
+                        </div>
+                        <Badge 
+                          variant={employeesData.seatInfo.tier === 3 ? "default" : "secondary"}
+                          className="text-base px-3 py-1"
+                          data-testid="badge-subscription-tier"
+                        >
+                          Tier {employeesData.seatInfo.tier}
+                          {employeesData.seatInfo.tier === 1 && " - Starter"}
+                          {employeesData.seatInfo.tier === 2 && " - Professional"}
+                          {employeesData.seatInfo.tier === 3 && " - Enterprise"}
+                        </Badge>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Employee Seats */}
+                  {employeesData?.seatInfo && (
+                    <>
+                      <Separator />
+                      <div className="space-y-3">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-2">
+                            <span className="material-icons text-primary">groups</span>
+                            <Label className="text-sm font-medium">Employee Seats</Label>
+                          </div>
+                          <Badge 
+                            variant={employeesData.seatInfo.atSeatLimit ? "destructive" : "outline"}
+                            data-testid="badge-seat-status"
+                          >
+                            {employeesData.seatInfo.seatsUsed} / {employeesData.seatInfo.seatLimit === -1 ? '∞' : employeesData.seatInfo.seatLimit}
+                          </Badge>
+                        </div>
+                        <div className="pl-8">
+                          <div className="text-sm font-semibold" data-testid="text-seats-used">
+                            {employeesData.seatInfo.seatsUsed} of {employeesData.seatInfo.seatLimit === -1 ? 'unlimited' : employeesData.seatInfo.seatLimit} seats used
+                          </div>
+                          <p className="text-xs text-muted-foreground mt-1">
+                            {employeesData.seatInfo.seatLimit === -1 
+                              ? 'Your plan includes unlimited employee seats'
+                              : employeesData.seatInfo.seatsAvailable > 0 
+                                ? `${employeesData.seatInfo.seatsAvailable} seat${employeesData.seatInfo.seatsAvailable === 1 ? '' : 's'} remaining`
+                                : 'No seats available - upgrade to add more employees'
+                            }
+                          </p>
+                        </div>
+                      </div>
+                    </>
+                  )}
+
+                  {/* Active Projects */}
+                  {projectsData?.projectInfo && (
+                    <>
+                      <Separator />
+                      <div className="space-y-3">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-2">
+                            <span className="material-icons text-primary">folder_open</span>
+                            <Label className="text-sm font-medium">Active Projects</Label>
+                          </div>
+                          <Badge 
+                            variant={projectsData.projectInfo.atProjectLimit ? "destructive" : "outline"}
+                            data-testid="badge-project-status"
+                          >
+                            {projectsData.projectInfo.projectsUsed} / {projectsData.projectInfo.projectLimit === -1 ? '∞' : projectsData.projectInfo.projectLimit}
+                          </Badge>
+                        </div>
+                        <div className="pl-8">
+                          <div className="text-sm font-semibold" data-testid="text-projects-used">
+                            {projectsData.projectInfo.projectsUsed} of {projectsData.projectInfo.projectLimit === -1 ? 'unlimited' : projectsData.projectInfo.projectLimit} projects active
+                          </div>
+                          <p className="text-xs text-muted-foreground mt-1">
+                            {projectsData.projectInfo.projectLimit === -1 
+                              ? 'Your plan includes unlimited active projects'
+                              : projectsData.projectInfo.projectsAvailable > 0 
+                                ? `${projectsData.projectInfo.projectsAvailable} project${projectsData.projectInfo.projectsAvailable === 1 ? '' : 's'} remaining`
+                                : 'No project slots available - upgrade to create more projects'
+                            }
+                          </p>
+                        </div>
+                      </div>
+                    </>
+                  )}
+
+                  {/* Upgrade Options */}
+                  {employeesData?.seatInfo && employeesData.seatInfo.tier < 3 && (
+                    <>
+                      <Separator />
+                      <div className="space-y-3">
+                        <Label className="text-sm font-medium">Need more capacity?</Label>
+                        <div className="flex gap-2">
+                          <Button 
+                            variant="default"
+                            className="flex-1 h-12"
+                            data-testid="button-upgrade-tier"
+                          >
+                            <span className="material-icons mr-2">upgrade</span>
+                            Upgrade Tier
+                          </Button>
+                          {employeesData.seatInfo.tier === 1 && (
+                            <Button 
+                              variant="outline"
+                              className="flex-1 h-12"
+                              data-testid="button-buy-seats"
+                            >
+                              <span className="material-icons mr-2">add_shopping_cart</span>
+                              Buy More Seats
+                            </Button>
+                          )}
+                        </div>
+                      </div>
+                    </>
+                  )}
+                </CardContent>
+              </Card>
+            </TabsContent>
+          </Tabs>
+        ) : (
           <>
-            <Separator />
-            <Card className="border-destructive">
-              <CardHeader>
-                <CardTitle className="text-destructive">Delete Account</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  <p className="text-sm text-muted-foreground">
-                    Permanently delete your company account and all associated data. This action cannot be undone.
-                  </p>
-                  <p className="text-sm text-destructive font-medium">
-                    Warning: This will delete all employees, projects, work sessions, drop logs, and complaints.
-                  </p>
-                  <Button
-                    variant="destructive"
-                    className="w-full h-12"
-                    onClick={() => setShowDeleteDialog(true)}
-                    data-testid="button-delete-account"
-                  >
-                    <span className="material-icons mr-2">delete_forever</span>
-                    Delete Company Account
-                  </Button>
+            {/* Non-company users - regular layout without tabs */}
+            <Card>
+          <CardHeader>
+            <CardTitle>Profile Information</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <Form {...profileForm}>
+              <form onSubmit={profileForm.handleSubmit(onProfileSubmit)} className="space-y-4">
+                <FormField
+                  control={profileForm.control}
+                  name="name"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Name</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="Your name"
+                          {...field}
+                          data-testid="input-name"
+                          className="h-12"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={profileForm.control}
+                  name="email"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Email</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="email"
+                          placeholder="your.email@example.com"
+                          {...field}
+                          data-testid="input-email"
+                          className="h-12"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                {user?.role === "resident" && (
+                  <>
+                    <FormField
+                      control={profileForm.control}
+                      name="unitNumber"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Unit Number</FormLabel>
+                          <FormControl>
+                            <Input
+                              placeholder="e.g., 101, 1205"
+                              {...field}
+                              data-testid="input-unit-number"
+                              className="h-12"
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={profileForm.control}
+                      name="parkingStallNumber"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Parking Stall Number</FormLabel>
+                          <FormControl>
+                            <Input
+                              placeholder="e.g., 42, A-5, P1-23"
+                              {...field}
+                              data-testid="input-parking-stall"
+                              className="h-12"
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    
+                    {/* Company Code Linking */}
+                    {user?.companyId && companyData?.company ? (
+                      <div className="p-4 bg-success/10 border border-success/20 rounded-lg">
+                        <div className="flex items-center gap-2 mb-2">
+                          <span className="material-icons text-success text-lg">check_circle</span>
+                          <span className="text-sm font-medium">Linked to Company</span>
+                        </div>
+                        <p className="text-base font-semibold">{companyData.company.companyName}</p>
+                        <p className="text-xs text-muted-foreground mt-1">
+                          To change, enter a new company code below
+                        </p>
+                      </div>
+                    ) : (
+                      <div className="p-4 bg-muted/50 border border-border rounded-lg">
+                        <div className="flex items-center gap-2 mb-2">
+                          <span className="material-icons text-muted-foreground text-lg">info</span>
+                          <span className="text-sm font-medium">Not Linked</span>
+                        </div>
+                        <p className="text-xs text-muted-foreground">
+                          Enter a company code below to link your account
+                        </p>
+                      </div>
+                    )}
+                    
+                    <FormField
+                      control={profileForm.control}
+                      name="residentLinkCode"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Company Code {!user?.companyId && "(Required to view projects)"}</FormLabel>
+                          <FormControl>
+                            <Input
+                              placeholder="Enter 10-character code"
+                              {...field}
+                              onChange={(e) => field.onChange(e.target.value.toUpperCase())}
+                              maxLength={10}
+                              className="h-12 font-mono"
+                              data-testid="input-company-code"
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </>
+                )}
+
+                <div className="pt-2">
+                  <div className="text-sm text-muted-foreground mb-2">Role</div>
+                  <div className="text-sm font-medium capitalize">
+                    {user?.role.replace(/_/g, " ")}
+                  </div>
                 </div>
-              </CardContent>
-            </Card>
+
+                {user?.techLevel && (
+                  <div className="pt-2">
+                    <div className="text-sm text-muted-foreground mb-2">IRATA Level</div>
+                    <div className="text-sm font-medium">{user.techLevel}</div>
+                  </div>
+                )}
+
+                <Button
+                  type="submit"
+                  className="w-full h-12"
+                  data-testid="button-update-profile"
+                  disabled={updateProfileMutation.isPending}
+                >
+                  {updateProfileMutation.isPending ? "Updating..." : "Update Profile"}
+                </Button>
+              </form>
+            </Form>
+          </CardContent>
+        </Card>
+
+        <Separator />
+
+        {/* Change Password */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Change Password</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <Form {...passwordForm}>
+              <form onSubmit={passwordForm.handleSubmit(onPasswordSubmit)} className="space-y-4">
+                <FormField
+                  control={passwordForm.control}
+                  name="currentPassword"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Current Password</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="password"
+                          placeholder="Enter current password"
+                          {...field}
+                          data-testid="input-current-password"
+                          className="h-12"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={passwordForm.control}
+                  name="newPassword"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>New Password</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="password"
+                          placeholder="Enter new password"
+                          {...field}
+                          data-testid="input-new-password"
+                          className="h-12"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={passwordForm.control}
+                  name="confirmPassword"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Confirm New Password</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="password"
+                          placeholder="Confirm new password"
+                          {...field}
+                          data-testid="input-confirm-password"
+                          className="h-12"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <Button
+                  type="submit"
+                  className="w-full h-12"
+                  data-testid="button-change-password"
+                  disabled={changePasswordMutation.isPending}
+                >
+                  {changePasswordMutation.isPending ? "Changing..." : "Change Password"}
+                </Button>
+              </form>
+            </Form>
+          </CardContent>
+        </Card>
           </>
         )}
       </div>
