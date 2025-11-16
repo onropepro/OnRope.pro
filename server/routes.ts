@@ -763,14 +763,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       // Auto-renew subscription if renewal date has passed (company users only)
-      if (user.role === 'company' && user.subscriptionRenewalDate) {
+      // ONLY renew if license is still verified
+      if (user.role === 'company' && user.subscriptionRenewalDate && user.licenseVerified === true) {
         try {
           const today = new Date();
           today.setHours(0, 0, 0, 0); // Reset to start of day for accurate comparison
           const renewalDate = new Date(user.subscriptionRenewalDate);
           renewalDate.setHours(0, 0, 0, 0);
           
-          // If renewal date has passed, extend by 30 days
+          // If renewal date has passed, extend by 30 days (only if license is verified)
           if (renewalDate <= today) {
             const newRenewalDate = new Date(renewalDate);
             newRenewalDate.setDate(newRenewalDate.getDate() + 30);
@@ -785,6 +786,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
         } catch (error) {
           console.error('[/api/user] Failed to auto-renew subscription:', error);
           // Continue without renewal - user can still access the system
+        }
+      } else if (user.role === 'company' && user.subscriptionRenewalDate && user.licenseVerified !== true) {
+        // License is not verified - do not auto-renew
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        const renewalDate = new Date(user.subscriptionRenewalDate);
+        renewalDate.setHours(0, 0, 0, 0);
+        
+        if (renewalDate <= today) {
+          console.warn(`[/api/user] Subscription expired for ${user.email} - license not verified, skipping auto-renewal`);
         }
       }
       
