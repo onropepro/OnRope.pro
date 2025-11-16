@@ -50,6 +50,7 @@ The platform is built with a React 18 frontend using TypeScript and Wouter for r
 *   Implemented 30-day subscription model with automatic renewal date tracking
 *   Added `subscriptionRenewalDate` field to database schema for company accounts
 *   **Automatic Initialization:** Both `/api/provision-account` and `/api/register` endpoints automatically set renewal date to 30 days from account creation
+*   **Automatic Renewal:** System checks renewal date on every user login/profile access - if date has passed, automatically extends by 30 days
 *   **Profile Display:** Subscription tab now shows renewal date with countdown (e.g., "X days until renewal", "Renews tomorrow", "Renews today")
 *   **Date Formatting:** Displays in readable format (e.g., "Dec 16, 2025") with helpful context
 *   **Backend API:** License key now included in `/api/user` response for company users to view in subscription settings

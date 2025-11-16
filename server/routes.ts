@@ -762,6 +762,32 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "User not found" });
       }
       
+      // Auto-renew subscription if renewal date has passed (company users only)
+      if (user.role === 'company' && user.subscriptionRenewalDate) {
+        try {
+          const today = new Date();
+          today.setHours(0, 0, 0, 0); // Reset to start of day for accurate comparison
+          const renewalDate = new Date(user.subscriptionRenewalDate);
+          renewalDate.setHours(0, 0, 0, 0);
+          
+          // If renewal date has passed, extend by 30 days
+          if (renewalDate <= today) {
+            const newRenewalDate = new Date(renewalDate);
+            newRenewalDate.setDate(newRenewalDate.getDate() + 30);
+            const subscriptionRenewalDate = newRenewalDate.toISOString().split('T')[0];
+            
+            await storage.updateUser(user.id, { subscriptionRenewalDate });
+            console.log(`[/api/user] Subscription auto-renewed for ${user.email}. New renewal date: ${subscriptionRenewalDate}`);
+            
+            // Refetch user to get the updated renewal date
+            user = await storage.getUserById(user.id) || user;
+          }
+        } catch (error) {
+          console.error('[/api/user] Failed to auto-renew subscription:', error);
+          // Continue without renewal - user can still access the system
+        }
+      }
+      
       // Auto-generate resident code if company doesn't have one
       if (user.role === 'company' && !user.residentCode) {
         try {
