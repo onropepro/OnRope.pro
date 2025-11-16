@@ -45,24 +45,31 @@ The platform is built with a React 18 frontend using TypeScript and Wouter for r
 
 ## Recent Changes
 
-**November 16, 2025** - Tier-Based Employee Seat Limits Implementation
+**November 16, 2025** - Tier-Based Employee Seat and Project Limits Implementation
 
-*   Implemented tier-based permission system for employee seat limits
+*   Implemented tier-based permission system for employee seats and active projects
 *   Tier detection based on license key suffix (e.g., `-1` for Tier 1, `-2` for Tier 2, `-3` for Tier 3)
-*   **Tier 1:** Maximum 2 employee seats (license keys ending with `-1`)
-*   **Tier 2:** Maximum 10 employee seats (license keys ending with `-2`)
-*   **Tier 3:** Unlimited employee seats (license keys ending with `-3`)
-*   Seat counting excludes company owner and residents (only counts actual employees)
-*   Real-time seat usage display in employee management section showing "X of Y seats used"
-*   Disabled "Add Employee" button when seat limit is reached with clear messaging
-*   Warning banner displays when at seat limit with upgrade/buy seats placeholder buttons
-*   Backend API endpoints (`/api/employees` and `/api/employees/all`) now return `seatInfo` object with tier, limits, and usage data
-*   Frontend dynamically adjusts UI based on tier status and seat availability
-*   Tier badge color-coded (destructive red when at limit, secondary when within limit)
-*   Upgrade and purchase seat functionality stubbed for future implementation
-*   Added seat usage display to company Profile page showing tier, seats used, and seats remaining
-*   Added seat usage display to SuperUser's Company Detail page for monitoring customer seat usage
-*   Created `/api/superuser/companies/:id/employees` endpoint for SuperUser to view company seat info
+*   **Tier 1 Limits:** Maximum 2 employee seats and 5 active projects
+*   **Tier 2 Limits:** Maximum 10 employee seats and 20 active projects
+*   **Tier 3 Limits:** Unlimited employee seats and projects
+*   **Employee Seat Management:**
+    *   Seat counting excludes company owner and residents (only counts actual employees)
+    *   Real-time seat usage display in employee management section showing "X of Y seats used"
+    *   Disabled "Add Employee" button when seat limit is reached with clear messaging
+    *   Warning banner displays when at seat limit with upgrade/buy seats placeholder buttons
+    *   Backend API endpoints (`/api/employees` and `/api/employees/all`) now return `seatInfo` object with tier, limits, and usage data
+    *   Frontend dynamically adjusts UI based on tier status and seat availability
+    *   Tier badge color-coded (destructive red when at limit, secondary when within limit)
+    *   Added seat usage display to company Profile page showing tier, seats used, and seats remaining
+    *   Added seat usage display to SuperUser's Company Detail page for monitoring customer seat usage
+    *   Created `/api/superuser/companies/:id/employees` endpoint for SuperUser to view company seat info
+*   **Project Limit Management:**
+    *   Backend API endpoint (`/api/projects`) now returns `projectInfo` object with tier, limits, and usage data
+    *   Real-time project usage display in projects section showing "X of Y projects used"
+    *   Disabled "New Project" button when project limit is reached with clear messaging
+    *   Warning banner displays when at project limit with upgrade/buy project slots placeholder buttons
+    *   Frontend dynamically adjusts UI based on project tier status and availability
+*   Upgrade and purchase functionality stubbed for future implementation
 
 **November 15, 2025** - Resident Code System Implementation
 
