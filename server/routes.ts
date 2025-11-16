@@ -843,6 +843,48 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get employee data for a specific company (SuperUser only)
+  app.get("/api/superuser/companies/:id/employees", requireAuth, async (req: Request, res: Response) => {
+    try {
+      // Only allow superuser to access this endpoint
+      if (req.session.userId !== 'superuser') {
+        return res.status(403).json({ message: "Access denied. SuperUser only." });
+      }
+
+      const companyId = req.params.id;
+      const company = await storage.getUserById(companyId);
+      
+      if (!company || company.role !== 'company') {
+        return res.status(404).json({ message: "Company not found" });
+      }
+
+      // Get all employees for this company (including terminated)
+      const employees = await storage.getAllEmployees(companyId);
+      
+      // Calculate seat usage for tier-based limits
+      // Count only actual employees (not company owner, not terminated)
+      const activeEmployeeCount = employees.filter(emp => !emp.terminatedDate).length;
+      const tier = detectTier(company.licenseKey);
+      const seatLimit = getSeatLimit(tier);
+      const seatsUsed = activeEmployeeCount;
+      const seatsAvailable = seatLimit === -1 ? -1 : Math.max(0, seatLimit - seatsUsed);
+      const atSeatLimit = seatLimit > 0 && seatsUsed >= seatLimit;
+      
+      res.json({ 
+        seatInfo: {
+          tier,
+          seatLimit,
+          seatsUsed,
+          seatsAvailable,
+          atSeatLimit
+        }
+      });
+    } catch (error) {
+      console.error("Get company employees error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
   // Update user profile
   app.patch("/api/user/profile", requireAuth, async (req: Request, res: Response) => {
     try {

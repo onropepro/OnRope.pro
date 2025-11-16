@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
+import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -48,6 +49,12 @@ export default function Profile() {
   });
 
   const user = userData?.user;
+
+  // Fetch employee data for seat usage (company users only)
+  const { data: employeesData } = useQuery({
+    queryKey: ["/api/employees/all"],
+    enabled: user?.role === "company",
+  });
 
   // Fetch projects to determine if active project is parkade
   const { data: projectsData } = useQuery<{ projects: any[] }>({
@@ -420,6 +427,37 @@ export default function Profile() {
                         </FormItem>
                       )}
                     />
+                    
+                    {/* Employee Seat Usage */}
+                    {employeesData?.seatInfo && employeesData.seatInfo.tier > 0 && (
+                      <div className="p-4 bg-muted/50 border border-border rounded-lg" data-testid="card-seat-usage">
+                        <div className="flex items-center justify-between gap-3 mb-2">
+                          <div className="flex items-center gap-2">
+                            <span className="material-icons text-primary text-lg">groups</span>
+                            <span className="text-sm font-medium">Employee Seats</span>
+                          </div>
+                          <Badge 
+                            variant={employeesData.seatInfo.atSeatLimit ? "destructive" : "secondary"}
+                            data-testid="badge-tier"
+                          >
+                            Tier {employeesData.seatInfo.tier}
+                          </Badge>
+                        </div>
+                        <div className="space-y-1">
+                          <div className="text-base font-semibold" data-testid="text-seat-usage">
+                            {employeesData.seatInfo.seatsUsed} of {employeesData.seatInfo.seatLimit === -1 ? '∞' : employeesData.seatInfo.seatLimit} seats used
+                          </div>
+                          <div className="text-xs text-muted-foreground">
+                            {employeesData.seatInfo.seatLimit === -1 
+                              ? 'Unlimited employee seats'
+                              : employeesData.seatInfo.seatsAvailable > 0 
+                                ? `${employeesData.seatInfo.seatsAvailable} seat${employeesData.seatInfo.seatsAvailable === 1 ? '' : 's'} remaining`
+                                : 'No seats available - upgrade to add more employees'
+                            }
+                          </div>
+                        </div>
+                      </div>
+                    )}
                   </>
                 )}
 

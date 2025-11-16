@@ -60,6 +60,9 @@ The platform is built with a React 18 frontend using TypeScript and Wouter for r
 *   Frontend dynamically adjusts UI based on tier status and seat availability
 *   Tier badge color-coded (destructive red when at limit, secondary when within limit)
 *   Upgrade and purchase seat functionality stubbed for future implementation
+*   Added seat usage display to company Profile page showing tier, seats used, and seats remaining
+*   Added seat usage display to SuperUser's Company Detail page for monitoring customer seat usage
+*   Created `/api/superuser/companies/:id/employees` endpoint for SuperUser to view company seat info
 
 **November 15, 2025** - Resident Code System Implementation
 

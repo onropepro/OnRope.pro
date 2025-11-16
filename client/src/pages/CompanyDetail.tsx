@@ -19,6 +19,12 @@ export default function CompanyDetail() {
     enabled: !!companyId,
   });
 
+  // Fetch employee data to show seat usage
+  const { data: employeesData } = useQuery({
+    queryKey: ["/api/superuser/companies", companyId, "employees"],
+    enabled: !!companyId,
+  });
+
   // Redirect if not superuser
   if (userData?.user?.role !== 'superuser') {
     setLocation('/');
@@ -117,6 +123,34 @@ export default function CompanyDetail() {
                 <p className="text-sm">{company.streetAddress || 'N/A'}{company.province ? `, ${company.province}` : ''}</p>
               </div>
             </div>
+            
+            {/* Seat Usage Information */}
+            {employeesData?.seatInfo && employeesData.seatInfo.tier > 0 && (
+              <div className="mt-6 pt-6 border-t">
+                <div className="flex items-center justify-between gap-4">
+                  <div>
+                    <p className="text-sm text-muted-foreground mb-1">Employee Seats</p>
+                    <p className="text-lg font-semibold" data-testid="text-seat-usage">
+                      {employeesData.seatInfo.seatsUsed} of {employeesData.seatInfo.seatLimit === -1 ? '∞' : employeesData.seatInfo.seatLimit} seats used
+                    </p>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      {employeesData.seatInfo.seatLimit === -1 
+                        ? 'Unlimited employee seats'
+                        : employeesData.seatInfo.seatsAvailable > 0 
+                          ? `${employeesData.seatInfo.seatsAvailable} seat${employeesData.seatInfo.seatsAvailable === 1 ? '' : 's'} remaining`
+                          : 'At seat limit'
+                      }
+                    </p>
+                  </div>
+                  <Badge 
+                    variant={employeesData.seatInfo.atSeatLimit ? "destructive" : "secondary"}
+                    data-testid="badge-tier"
+                  >
+                    Tier {employeesData.seatInfo.tier}
+                  </Badge>
+                </div>
+              </div>
+            )}
           </CardContent>
         </Card>
 
