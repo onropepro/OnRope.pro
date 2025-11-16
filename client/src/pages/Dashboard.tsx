@@ -1901,20 +1901,21 @@ export default function Dashboard() {
                           <div className="text-xs text-muted-foreground mt-1">
                             You've reached your {projectsData.projectInfo.projectLimit}-project limit for Tier {projectsData.projectInfo.tier}. Upgrade your tier or purchase additional project slots to add more projects.
                           </div>
-                          <div className="flex gap-2 mt-3">
-                            <Button size="sm" variant="default" data-testid="button-upgrade-tier-projects">
-                              <span className="material-icons text-sm mr-1">upgrade</span>
-                              Upgrade Tier
-                            </Button>
-                            <Button size="sm" variant="outline" data-testid="button-buy-projects">
-                              <span className="material-icons text-sm mr-1">add_shopping_cart</span>
-                              Buy Project Slots
-                            </Button>
-                          </div>
                         </div>
                       </div>
                     </div>
                   )}
+                  
+                  <div className="flex gap-2 mt-3">
+                    <Button size="sm" variant="default" data-testid="button-upgrade-tier-projects">
+                      <span className="material-icons text-sm mr-1">upgrade</span>
+                      Upgrade Tier
+                    </Button>
+                    <Button size="sm" variant="outline" data-testid="button-buy-projects">
+                      <span className="material-icons text-sm mr-1">add_shopping_cart</span>
+                      Buy Project Slots
+                    </Button>
+                  </div>
                 </CardContent>
               </Card>
             )}
@@ -3042,20 +3043,21 @@ export default function Dashboard() {
                             <div className="text-xs text-muted-foreground mt-1">
                               You've reached your {employeesData.seatInfo.seatLimit}-employee limit for Tier {employeesData.seatInfo.tier}. Upgrade your tier or purchase additional seats to add more team members.
                             </div>
-                            <div className="flex gap-2 mt-3">
-                              <Button size="sm" variant="default" data-testid="button-upgrade-tier">
-                                <span className="material-icons text-sm mr-1">upgrade</span>
-                                Upgrade Tier
-                              </Button>
-                              <Button size="sm" variant="outline" data-testid="button-buy-seats">
-                                <span className="material-icons text-sm mr-1">add_shopping_cart</span>
-                                Buy Seats
-                              </Button>
-                            </div>
                           </div>
                         </div>
                       </div>
                     )}
+                    
+                    <div className="flex gap-2 mt-3">
+                      <Button size="sm" variant="default" data-testid="button-upgrade-tier">
+                        <span className="material-icons text-sm mr-1">upgrade</span>
+                        Upgrade Tier
+                      </Button>
+                      <Button size="sm" variant="outline" data-testid="button-buy-seats">
+                        <span className="material-icons text-sm mr-1">add_shopping_cart</span>
+                        Buy Seats
+                      </Button>
+                    </div>
                   </CardContent>
                 </Card>
               )}
