@@ -742,25 +742,33 @@ export default function Profile() {
                       <Separator />
                       <div className="space-y-3">
                         <Label className="text-sm font-medium">Need more capacity?</Label>
-                        <div className="flex gap-2">
+                        <div className="flex flex-col gap-2">
                           <Button 
                             variant="default"
-                            className="flex-1 h-12"
+                            className="w-full h-12"
                             data-testid="button-upgrade-tier"
                           >
                             <span className="material-icons mr-2">upgrade</span>
                             Upgrade Tier
                           </Button>
-                          {employeesData.seatInfo.tier === 1 && (
+                          <div className="grid grid-cols-2 gap-2">
                             <Button 
                               variant="outline"
-                              className="flex-1 h-12"
+                              className="h-12"
                               data-testid="button-buy-seats"
                             >
                               <span className="material-icons mr-2">add_shopping_cart</span>
-                              Buy More Seats
+                              Buy Seats
                             </Button>
-                          )}
+                            <Button 
+                              variant="outline"
+                              className="h-12"
+                              data-testid="button-buy-projects"
+                            >
+                              <span className="material-icons mr-2">add_shopping_cart</span>
+                              Buy Projects
+                            </Button>
+                          </div>
                         </div>
                       </div>
                     </>
