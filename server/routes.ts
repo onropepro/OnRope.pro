@@ -786,15 +786,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       }
       
-      // Strip sensitive fields (passwordHash and licenseKey)
-      const { passwordHash, licenseKey, ...userWithoutSensitiveData } = user;
+      // Strip sensitive fields (passwordHash)
+      // Include licenseKey for company users so they can view it in their subscription page
+      const { passwordHash, ...userWithoutPassword } = user;
       
       // Disable caching to ensure fresh data
       res.set('Cache-Control', 'no-store, no-cache, must-revalidate, private');
       
       res.json({ 
         user: {
-          ...userWithoutSensitiveData,
+          ...userWithoutPassword,
           ...(companyLicenseVerified !== undefined && { companyLicenseVerified }),
           ...(companyResidentCode && { residentCode: companyResidentCode })
         }
