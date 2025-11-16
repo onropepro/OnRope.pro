@@ -15,6 +15,7 @@ import { z } from "zod";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { useState } from "react";
+import { format } from "date-fns";
 
 const profileSchema = z.object({
   name: z.string().min(1, "Name is required"),
@@ -665,6 +666,40 @@ export default function Profile() {
                           {employeesData.seatInfo.tier === 3 && " - Enterprise"}
                         </Badge>
                       </div>
+
+                      {/* Subscription Renewal Date */}
+                      {user?.subscriptionRenewalDate && (
+                        <div className="flex items-center justify-between pt-2">
+                          <div>
+                            <Label className="text-sm font-medium">Renewal Date</Label>
+                            <p className="text-xs text-muted-foreground mt-1">
+                              Next billing cycle (30-day subscription)
+                            </p>
+                          </div>
+                          <div className="text-right">
+                            <div className="text-sm font-semibold" data-testid="text-renewal-date">
+                              {format(new Date(user.subscriptionRenewalDate), "MMM d, yyyy")}
+                            </div>
+                            <p className="text-xs text-muted-foreground mt-0.5">
+                              {(() => {
+                                const renewalDate = new Date(user.subscriptionRenewalDate);
+                                const today = new Date();
+                                const daysUntilRenewal = Math.ceil((renewalDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+                                
+                                if (daysUntilRenewal < 0) {
+                                  return `Expired ${Math.abs(daysUntilRenewal)} day${Math.abs(daysUntilRenewal) === 1 ? '' : 's'} ago`;
+                                } else if (daysUntilRenewal === 0) {
+                                  return 'Renews today';
+                                } else if (daysUntilRenewal === 1) {
+                                  return 'Renews tomorrow';
+                                } else {
+                                  return `${daysUntilRenewal} days until renewal`;
+                                }
+                              })()}
+                            </p>
+                          </div>
+                        </div>
+                      )}
                     </div>
                   )}
 
