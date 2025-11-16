@@ -50,6 +50,15 @@ function getSeatLimit(tier: number): number {
   }
 }
 
+function getProjectLimit(tier: number): number {
+  switch (tier) {
+    case 1: return 5;  // Tier 1: 5 projects
+    case 2: return 20; // Tier 2: 20 projects (example)
+    case 3: return -1; // Tier 3: unlimited
+    default: return 0; // No limit if no tier
+  }
+}
+
 // Read-only mode enforcement middleware
 // Blocks all mutations for unverified company users
 // Residents are NEVER blocked
@@ -2092,9 +2101,30 @@ export async function registerRoutes(app: Express): Promise<Server> {
         })
       );
       
+      // Calculate project usage for tier-based limits (company users only)
+      let projectInfo = null;
+      if (currentUser.role === "company") {
+        const tier = detectTier(currentUser.licenseKey);
+        const projectLimit = getProjectLimit(tier);
+        const projectsUsed = projectsWithProgress.length;
+        const projectsAvailable = projectLimit === -1 ? -1 : Math.max(0, projectLimit - projectsUsed);
+        const atProjectLimit = projectLimit > 0 && projectsUsed >= projectLimit;
+        
+        projectInfo = {
+          tier,
+          projectLimit,
+          projectsUsed,
+          projectsAvailable,
+          atProjectLimit
+        };
+      }
+      
       // Disable caching to ensure fresh data
       res.set('Cache-Control', 'no-store, no-cache, must-revalidate, private');
-      res.json({ projects: projectsWithProgress });
+      res.json({ 
+        projects: projectsWithProgress,
+        projectInfo
+      });
     } catch (error) {
       console.error("Get projects error:", error);
       res.status(500).json({ message: "Internal server error" });
