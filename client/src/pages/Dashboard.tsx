@@ -1871,6 +1871,54 @@ export default function Dashboard() {
 
         {activeTab === "projects" && (
           <div className="space-y-4">
+            {/* Project Usage Information */}
+            {projectsData?.projectInfo && projectsData.projectInfo.tier > 0 && (
+              <Card data-testid="card-project-info">
+                <CardContent className="p-4">
+                  <div className="flex items-center justify-between gap-3">
+                    <div className="flex items-center gap-3">
+                      <span className="material-icons text-primary">apartment</span>
+                      <div>
+                        <div className="font-medium">Projects</div>
+                        <div className="text-sm text-muted-foreground">
+                          {projectsData.projectInfo.projectsUsed} of {projectsData.projectInfo.projectLimit === -1 ? '∞' : projectsData.projectInfo.projectLimit} projects used
+                        </div>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <Badge variant={projectsData.projectInfo.atProjectLimit ? "destructive" : "secondary"} data-testid="badge-project-tier-status">
+                        Tier {projectsData.projectInfo.tier}
+                      </Badge>
+                    </div>
+                  </div>
+                  
+                  {projectsData.projectInfo.atProjectLimit && (
+                    <div className="mt-3 p-3 bg-destructive/10 border border-destructive/20 rounded-md">
+                      <div className="flex items-start gap-2">
+                        <span className="material-icons text-destructive text-sm mt-0.5">warning</span>
+                        <div className="flex-1">
+                          <div className="text-sm font-medium text-destructive">Project Limit Reached</div>
+                          <div className="text-xs text-muted-foreground mt-1">
+                            You've reached your {projectsData.projectInfo.projectLimit}-project limit for Tier {projectsData.projectInfo.tier}. Upgrade your tier or purchase additional project slots to add more projects.
+                          </div>
+                          <div className="flex gap-2 mt-3">
+                            <Button size="sm" variant="default" data-testid="button-upgrade-tier-projects">
+                              <span className="material-icons text-sm mr-1">upgrade</span>
+                              Upgrade Tier
+                            </Button>
+                            <Button size="sm" variant="outline" data-testid="button-buy-projects">
+                              <span className="material-icons text-sm mr-1">add_shopping_cart</span>
+                              Buy Project Slots
+                            </Button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            )}
+            
             {/* Resident Code Display - Show for all company staff */}
             {currentUser?.role !== 'resident' && currentUser?.role !== 'superuser' && (currentUser?.residentCode || companyData?.residentCode) && (
               <Card className="border-primary/20 bg-primary/5">
@@ -1908,10 +1956,10 @@ export default function Dashboard() {
                     <Button 
                       className="h-14 px-6 gap-2 shadow-md hover:shadow-lg text-base font-semibold" 
                       data-testid="button-create-project"
-                      disabled={userIsReadOnly}
+                      disabled={userIsReadOnly || (projectsData?.projectInfo?.atProjectLimit ?? false)}
                     >
                       <span className="material-icons text-xl">add_circle</span>
-                      <span className="hidden sm:inline">New Project</span>
+                      <span className="hidden sm:inline">{projectsData?.projectInfo?.atProjectLimit ? 'Project Limit Reached' : 'New Project'}</span>
                     </Button>
                   </DialogTrigger>
                   <DialogContent className="max-w-md p-0 max-h-[95vh] flex flex-col gap-0">
