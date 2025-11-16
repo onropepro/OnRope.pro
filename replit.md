@@ -45,6 +45,22 @@ The platform is built with a React 18 frontend using TypeScript and Wouter for r
 
 ## Recent Changes
 
+**November 16, 2025** - Tier-Based Employee Seat Limits Implementation
+
+*   Implemented tier-based permission system for employee seat limits
+*   Tier detection based on license key suffix (e.g., `-1` for Tier 1, `-2` for Tier 2, `-3` for Tier 3)
+*   **Tier 1:** Maximum 2 employee seats (license keys ending with `-1`)
+*   **Tier 2:** Maximum 10 employee seats (license keys ending with `-2`)
+*   **Tier 3:** Unlimited employee seats (license keys ending with `-3`)
+*   Seat counting excludes company owner and residents (only counts actual employees)
+*   Real-time seat usage display in employee management section showing "X of Y seats used"
+*   Disabled "Add Employee" button when seat limit is reached with clear messaging
+*   Warning banner displays when at seat limit with upgrade/buy seats placeholder buttons
+*   Backend API endpoints (`/api/employees` and `/api/employees/all`) now return `seatInfo` object with tier, limits, and usage data
+*   Frontend dynamically adjusts UI based on tier status and seat availability
+*   Tier badge color-coded (destructive red when at limit, secondary when within limit)
+*   Upgrade and purchase seat functionality stubbed for future implementation
+
 **November 15, 2025** - Resident Code System Implementation
 
 *   Implemented secure resident linking system with unique 10-character company codes
