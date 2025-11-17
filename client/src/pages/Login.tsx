@@ -9,7 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { queryClient } from "@/lib/queryClient";
 import overhaulLabsLogo from "@assets/Screenshot 2025-11-09 at 14.46.08_1762728408763.png";
-import ropeAccessProLogo from "@assets/generated_images/Rope_Access_high-rise_management_logo_0b6291b2.png";
+import ropeAccessProLogo from "@assets/generated_images/Rope_access_worker_and_building_logo_3248a0a9.png";
 
 const loginSchema = z.object({
   identifier: z.string().min(1, "Email is required"),
