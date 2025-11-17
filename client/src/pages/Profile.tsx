@@ -793,7 +793,7 @@ export default function Profile() {
                               data-testid="button-buy-seats"
                             >
                               <span className="material-icons mr-2">add_shopping_cart</span>
-                              Add Seats
+                              Add more seats
                             </Button>
                             <Button 
                               variant="outline"
@@ -801,7 +801,7 @@ export default function Profile() {
                               data-testid="button-buy-projects"
                             >
                               <span className="material-icons mr-2">add_shopping_cart</span>
-                              Add Projects
+                              Add more projects
                             </Button>
                           </div>
                         </div>

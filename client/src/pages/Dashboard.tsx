@@ -3103,7 +3103,7 @@ export default function Dashboard() {
                       </Button>
                       <Button size="sm" variant="outline" data-testid="button-buy-seats">
                         <span className="material-icons text-sm mr-1">add_shopping_cart</span>
-                        Add Seats
+                        Add more seats
                       </Button>
                     </div>
                   </CardContent>
