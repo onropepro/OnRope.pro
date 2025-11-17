@@ -1096,7 +1096,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Count only actual employees (not company owner, not terminated)
       const activeEmployeeCount = employees.filter(emp => !emp.terminatedDate).length;
       const tier = detectTier(company.licenseKey);
-      const seatLimit = getSeatLimit(tier, company.additionalSeats || 0);
+      const additionalSeats = company.additionalSeats || 0;
+      const baseSeatLimit = getSeatLimit(tier, 0); // Get base limit without additions
+      const seatLimit = getSeatLimit(tier, additionalSeats); // Total limit with additions
       const seatsUsed = activeEmployeeCount;
       const seatsAvailable = seatLimit === -1 ? -1 : Math.max(0, seatLimit - seatsUsed);
       const atSeatLimit = seatLimit > 0 && seatsUsed >= seatLimit;
@@ -1105,6 +1107,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         seatInfo: {
           tier,
           seatLimit,
+          baseSeatLimit,
+          additionalSeats,
           seatsUsed,
           seatsAvailable,
           atSeatLimit
@@ -1520,7 +1524,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Count only actual employees (not company owner, not terminated)
       const activeEmployeeCount = employees.filter(emp => !emp.terminatedDate).length;
       const tier = detectTier(companyOwner.licenseKey);
-      const seatLimit = getSeatLimit(tier, companyOwner.additionalSeats || 0);
+      const additionalSeats = companyOwner.additionalSeats || 0;
+      const baseSeatLimit = getSeatLimit(tier, 0); // Get base limit without additions
+      const seatLimit = getSeatLimit(tier, additionalSeats); // Total limit with additions
       const seatsUsed = activeEmployeeCount;
       const seatsAvailable = seatLimit === -1 ? -1 : Math.max(0, seatLimit - seatsUsed);
       const atSeatLimit = seatLimit > 0 && seatsUsed >= seatLimit;
@@ -1530,6 +1536,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         seatInfo: {
           tier,
           seatLimit,
+          baseSeatLimit,
+          additionalSeats,
           seatsUsed,
           seatsAvailable,
           atSeatLimit
@@ -1578,7 +1586,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Count only actual employees (not company owner)
       const employeeCount = employees.filter(emp => !emp.terminatedDate).length;
       const tier = detectTier(companyOwner?.licenseKey || null);
-      const seatLimit = getSeatLimit(tier, companyOwner?.additionalSeats || 0);
+      const additionalSeats = companyOwner?.additionalSeats || 0;
+      const baseSeatLimit = getSeatLimit(tier, 0); // Get base limit without additions
+      const seatLimit = getSeatLimit(tier, additionalSeats); // Total limit with additions
       const seatsUsed = employeeCount;
       const seatsAvailable = seatLimit === -1 ? -1 : Math.max(0, seatLimit - seatsUsed);
       const atSeatLimit = seatLimit > 0 && seatsUsed >= seatLimit;
@@ -1588,6 +1598,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         seatInfo: {
           tier,
           seatLimit,
+          baseSeatLimit,
+          additionalSeats,
           seatsUsed,
           seatsAvailable,
           atSeatLimit

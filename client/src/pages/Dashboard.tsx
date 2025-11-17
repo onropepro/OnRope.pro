@@ -3077,7 +3077,7 @@ export default function Dashboard() {
                           <div className="font-medium">Employee Seats</div>
                           <div className="text-sm text-muted-foreground">
                             {employeesData.seatInfo.tier > 0 
-                              ? `${employeesData.seatInfo.seatsUsed} of ${employeesData.seatInfo.seatLimit === -1 ? '∞' : employeesData.seatInfo.seatLimit} seats used`
+                              ? `${employeesData.seatInfo.seatsUsed} of ${employeesData.seatInfo.seatLimit === -1 ? '∞' : employeesData.seatInfo.seatLimit} seats used${employeesData.seatInfo.additionalSeats > 0 ? ` (${employeesData.seatInfo.baseSeatLimit} base + ${employeesData.seatInfo.additionalSeats} additional)` : ''}`
                               : 'Manage your employee capacity'
                             }
                           </div>
