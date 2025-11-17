@@ -430,6 +430,11 @@ export default function Dashboard() {
     queryKey: ["/api/clients"],
   });
 
+  // Fetch custom job types
+  const { data: customJobTypesData } = useQuery<{ customJobTypes: { id: string; jobTypeName: string }[] }>({
+    queryKey: ["/api/custom-job-types"],
+  });
+
   // Fetch today's drops for daily target
   const { data: myDropsData } = useQuery({
     queryKey: ["/api/my-drops-today"],
@@ -2177,20 +2182,55 @@ export default function Dashboard() {
                             <FormField
                               control={projectForm.control}
                               name="customJobType"
-                              render={({ field }) => (
-                                <FormItem>
-                                  <FormLabel>Custom Job Type</FormLabel>
-                                  <FormControl>
-                                    <Input 
-                                      placeholder="Enter custom job type" 
-                                      {...field} 
-                                      className="h-12" 
-                                      data-testid="input-custom-job-type" 
-                                    />
-                                  </FormControl>
-                                  <FormMessage />
-                                </FormItem>
-                              )}
+                              render={({ field }) => {
+                                const customJobTypes = customJobTypesData?.customJobTypes || [];
+                                const savedTypes = customJobTypes.map(t => t.jobTypeName);
+                                const isNewType = field.value && !savedTypes.includes(field.value);
+                                
+                                return (
+                                  <FormItem>
+                                    <FormLabel>Custom Job Type</FormLabel>
+                                    <FormControl>
+                                      <div className="space-y-2">
+                                        {savedTypes.length > 0 && (
+                                          <Select 
+                                            value={isNewType ? "" : field.value} 
+                                            onValueChange={(value) => {
+                                              if (value === "__new__") {
+                                                field.onChange("");
+                                              } else {
+                                                field.onChange(value);
+                                              }
+                                            }}
+                                          >
+                                            <SelectTrigger className="h-12" data-testid="select-custom-job-type">
+                                              <SelectValue placeholder="Select a saved type or enter new" />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                              {savedTypes.map((typeName) => (
+                                                <SelectItem key={typeName} value={typeName}>
+                                                  {typeName}
+                                                </SelectItem>
+                                              ))}
+                                              <SelectItem value="__new__">+ Enter new custom type</SelectItem>
+                                            </SelectContent>
+                                          </Select>
+                                        )}
+                                        {(savedTypes.length === 0 || isNewType || field.value === "") && (
+                                          <Input 
+                                            placeholder="Enter custom job type" 
+                                            value={field.value} 
+                                            onChange={(e) => field.onChange(e.target.value)}
+                                            className="h-12" 
+                                            data-testid="input-custom-job-type" 
+                                          />
+                                        )}
+                                      </div>
+                                    </FormControl>
+                                    <FormMessage />
+                                  </FormItem>
+                                );
+                              }}
                             />
                             
                             {!showOtherElevationFields && (
