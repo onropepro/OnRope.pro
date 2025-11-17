@@ -1926,7 +1926,7 @@ export default function Dashboard() {
                     </Button>
                     <Button size="sm" variant="outline" data-testid="button-buy-projects">
                       <span className="material-icons text-sm mr-1">add_shopping_cart</span>
-                      Buy Project Slots
+                      Add more projects
                     </Button>
                   </div>
                 </CardContent>
