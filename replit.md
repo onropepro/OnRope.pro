@@ -45,6 +45,16 @@ The platform is built with a React 18 frontend using TypeScript and Wouter for r
 
 ## Recent Changes
 
+**November 17, 2025** - IRATA License Expiration Warning System
+
+*   Implemented automated IRATA certification expiration tracking and warnings
+*   **30-Day Warning:** System automatically displays warning badge when employee's IRATA license expires within 30 days
+*   **Visual Alert:** Red warning badge appears next to employee name in employee list with "IRATA Expiring Soon" message
+*   **Automatic Calculation:** Logic checks expiration date against current date and 30-day threshold on every page load
+*   **Proactive Compliance:** Helps management track and renew IRATA certifications before they expire, ensuring continuous compliance
+*   **Badge Display:** Warning icon and text clearly visible in employee card header for immediate visibility
+*   Prevents work disruptions by alerting management to upcoming certification expirations
+
 **November 17, 2025** - Resident Management UI Enhancement
 
 *   Implemented grouped resident display by strata plan number in Residents Management page
