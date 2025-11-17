@@ -5391,7 +5391,7 @@ export default function Dashboard() {
       <AlertDialog open={showStartDayDialog} onOpenChange={setShowStartDayDialog}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Start Your Work Day?</AlertDialogTitle>
+            <AlertDialogTitle>Start Work Session?</AlertDialogTitle>
             <AlertDialogDescription>
               This will begin tracking your work session for today. You can log drops throughout the day and end your session when finished.
             </AlertDialogDescription>
@@ -5403,7 +5403,7 @@ export default function Dashboard() {
               data-testid="button-confirm-start-day"
               disabled={startDayMutation.isPending}
             >
-              {startDayMutation.isPending ? "Starting..." : "Start Day"}
+              {startDayMutation.isPending ? "Starting..." : "Start Work Session"}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

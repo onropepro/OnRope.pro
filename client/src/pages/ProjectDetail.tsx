@@ -644,7 +644,7 @@ export default function ProjectDetail() {
                 )}
               </div>
             </div>
-            {/* Start Day Button - Available to all users when no active session exists */}
+            {/* Start Work Session Button - Available to all users when no active session exists */}
             {!activeSession && project.status === "active" && (
               <Button
                 onClick={() => setShowStartDayDialog(true)}
@@ -652,7 +652,7 @@ export default function ProjectDetail() {
                 data-testid="button-start-day"
               >
                 <span className="material-icons mr-2 text-base">play_circle</span>
-                Start Day
+                Start Work Session
               </Button>
             )}
             {/* End Day Button - Shown when there IS an active session */}
@@ -1679,7 +1679,7 @@ export default function ProjectDetail() {
       <AlertDialog open={showStartDayDialog} onOpenChange={setShowStartDayDialog}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Start Your Work Day?</AlertDialogTitle>
+            <AlertDialogTitle>Start Work Session?</AlertDialogTitle>
             <AlertDialogDescription>
               This will begin tracking your work session for {project.buildingName}. You can log drops throughout the day and end your session when finished.
             </AlertDialogDescription>
@@ -1696,7 +1696,7 @@ export default function ProjectDetail() {
               disabled={startDayMutation.isPending}
               className="bg-primary text-primary-foreground hover:bg-primary/90"
             >
-              {startDayMutation.isPending ? "Starting..." : "Start Day"}
+              {startDayMutation.isPending ? "Starting..." : "Start Work Session"}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
@@ -2416,7 +2416,7 @@ export default function ProjectDetail() {
       <AlertDialog open={showStartDayDialog} onOpenChange={setShowStartDayDialog}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Start Your Work Day?</AlertDialogTitle>
+            <AlertDialogTitle>Start Work Session?</AlertDialogTitle>
             <AlertDialogDescription>
               This will begin tracking your work session for {project.buildingName}. You can end your session later when finished.
             </AlertDialogDescription>
@@ -2428,7 +2428,7 @@ export default function ProjectDetail() {
               data-testid="button-confirm-start-day"
               disabled={startDayMutation.isPending}
             >
-              {startDayMutation.isPending ? "Starting..." : "Start Day"}
+              {startDayMutation.isPending ? "Starting..." : "Start Work Session"}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
