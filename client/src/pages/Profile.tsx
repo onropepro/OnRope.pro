@@ -661,9 +661,10 @@ export default function Profile() {
                           data-testid="badge-subscription-tier"
                         >
                           Tier {employeesData.seatInfo.tier}
-                          {employeesData.seatInfo.tier === 1 && " - Starter"}
-                          {employeesData.seatInfo.tier === 2 && " - Professional"}
-                          {employeesData.seatInfo.tier === 3 && " - Enterprise"}
+                          {employeesData.seatInfo.tier === 1 && " - Basic"}
+                          {employeesData.seatInfo.tier === 2 && " - Starter"}
+                          {employeesData.seatInfo.tier === 3 && " - Professional"}
+                          {employeesData.seatInfo.tier === 4 && " - Premium"}
                         </Badge>
                       </div>
 
