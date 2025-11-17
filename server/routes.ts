@@ -519,6 +519,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { confirmPassword, ...userData } = req.body;
       
+      console.log('[Register] Received data:', JSON.stringify(userData, null, 2));
+      
       // Validate input
       const validatedData = insertUserSchema.parse(userData);
       
@@ -610,6 +612,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({ user: userWithoutPassword });
     } catch (error) {
       if (error instanceof z.ZodError) {
+        console.error('[Register] Validation errors:', JSON.stringify(error.errors, null, 2));
         return res.status(400).json({ message: "Validation error", errors: error.errors });
       }
       console.error("Registration error:", error);
