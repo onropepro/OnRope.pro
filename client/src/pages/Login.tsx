@@ -81,6 +81,7 @@ export default function Login() {
               <span className="material-icons text-lg">apartment</span>
               Professional High-Rise Maintenance
             </div>
+            <div className="text-4xl font-bold mb-2">Rope Access Pro</div>
             <h1 className="text-5xl font-bold tracking-tight leading-tight">
               Rope Access{" "}
               <span className="bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
