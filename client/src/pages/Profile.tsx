@@ -791,7 +791,15 @@ export default function Profile() {
                               variant="outline"
                               className="h-12"
                               data-testid="button-buy-seats"
-                              onClick={() => window.open('https://ram-website-paquettetom.replit.app/purchase-seats', '_blank')}
+                              onClick={() => {
+                                const params = new URLSearchParams({
+                                  email: user?.email || '',
+                                  tier: employeesData.seatInfo.tier.toString(),
+                                  currentSeats: employeesData.seatInfo.seatLimit.toString(),
+                                  seatsUsed: employeesData.seatInfo.seatsUsed.toString()
+                                });
+                                window.open(`https://ram-website-paquettetom.replit.app/purchase-seats?${params.toString()}`, '_blank');
+                              }}
                             >
                               <span className="material-icons mr-2">add_shopping_cart</span>
                               Add more seats
