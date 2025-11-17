@@ -1526,7 +1526,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         email: resident.email,
         phone: resident.phoneNumber,
         unit: resident.unitNumber,
-        buildingId: resident.strataPlanNumber,
+        parkingStall: resident.parkingStallNumber,
+        strataPlan: resident.strataPlanNumber,
+        buildingId: resident.strataPlanNumber, // Keep for backwards compatibility
         companyId: companyId,
       }));
       

@@ -3,21 +3,27 @@ import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { useLocation } from "wouter";
 
 interface Resident {
-  id: number;
+  id: string;
   name: string;
   email: string;
   phone?: string;
   unit?: string;
-  buildingId?: number;
-  companyId: number;
+  parkingStall?: string;
+  strataPlan?: string;
+  buildingId?: string;
+  companyId: string;
 }
 
 export default function ResidentsManagement() {
   const [, setLocation] = useLocation();
   const [searchQuery, setSearchQuery] = useState("");
+  const [selectedResident, setSelectedResident] = useState<Resident | null>(null);
+  const [expandedStrataPlans, setExpandedStrataPlans] = useState<Set<string>>(new Set());
 
   const { data: residents = [], isLoading } = useQuery<Resident[]>({
     queryKey: ["/api/residents"],
@@ -28,6 +34,29 @@ export default function ResidentsManagement() {
     resident.email?.toLowerCase().includes(searchQuery.toLowerCase()) ||
     resident.unit?.toLowerCase().includes(searchQuery.toLowerCase())
   );
+
+  // Group residents by strata plan number
+  const residentsByStrata = filteredResidents.reduce((acc, resident) => {
+    const strataPlan = resident.strataPlan || "Unknown";
+    if (!acc[strataPlan]) {
+      acc[strataPlan] = [];
+    }
+    acc[strataPlan].push(resident);
+    return acc;
+  }, {} as Record<string, Resident[]>);
+
+  // Sort strata plans alphabetically
+  const sortedStrataPlans = Object.keys(residentsByStrata).sort();
+
+  const toggleStrataPlan = (strataPlan: string) => {
+    const newExpanded = new Set(expandedStrataPlans);
+    if (newExpanded.has(strataPlan)) {
+      newExpanded.delete(strataPlan);
+    } else {
+      newExpanded.add(strataPlan);
+    }
+    setExpandedStrataPlans(newExpanded);
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -74,7 +103,7 @@ export default function ResidentsManagement() {
           </CardContent>
         </Card>
 
-        {/* Residents list */}
+        {/* Residents list grouped by strata plan */}
         {isLoading ? (
           <div className="text-center py-12">
             <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-primary border-t-transparent"></div>
@@ -97,36 +126,79 @@ export default function ResidentsManagement() {
             </CardContent>
           </Card>
         ) : (
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-            {filteredResidents.map((resident) => (
-              <Card key={resident.id} className="shadow-lg hover-elevate" data-testid={`card-resident-${resident.id}`}>
-                <CardHeader>
-                  <div className="flex items-start gap-3">
-                    <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
-                      <span className="material-icons text-2xl text-primary">person</span>
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <CardTitle className="text-lg truncate">{resident.name}</CardTitle>
-                      <CardDescription className="truncate">{resident.email}</CardDescription>
-                    </div>
-                  </div>
-                </CardHeader>
-                <CardContent className="space-y-2">
-                  {resident.phone && (
-                    <div className="flex items-center gap-2 text-sm">
-                      <span className="material-icons text-base text-muted-foreground">phone</span>
-                      <span className="text-muted-foreground">{resident.phone}</span>
-                    </div>
-                  )}
-                  {resident.unit && (
-                    <div className="flex items-center gap-2 text-sm">
-                      <span className="material-icons text-base text-muted-foreground">home</span>
-                      <span className="text-muted-foreground">Unit {resident.unit}</span>
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
-            ))}
+          <div className="space-y-4">
+            {sortedStrataPlans.map((strataPlan) => {
+              const strataPlanResidents = residentsByStrata[strataPlan];
+              const isExpanded = expandedStrataPlans.has(strataPlan);
+              
+              return (
+                <Card key={strataPlan} className="shadow-lg">
+                  <Collapsible
+                    open={isExpanded}
+                    onOpenChange={() => toggleStrataPlan(strataPlan)}
+                  >
+                    <CollapsibleTrigger asChild>
+                      <CardHeader className="cursor-pointer hover-elevate active-elevate-2" data-testid={`button-strata-${strataPlan}`}>
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-3">
+                            <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
+                              <span className="material-icons text-2xl text-primary">apartment</span>
+                            </div>
+                            <div>
+                              <CardTitle className="text-lg">Strata Plan {strataPlan}</CardTitle>
+                              <CardDescription>{strataPlanResidents.length} resident{strataPlanResidents.length !== 1 ? 's' : ''}</CardDescription>
+                            </div>
+                          </div>
+                          <span className="material-icons text-2xl text-muted-foreground">
+                            {isExpanded ? 'expand_less' : 'expand_more'}
+                          </span>
+                        </div>
+                      </CardHeader>
+                    </CollapsibleTrigger>
+                    <CollapsibleContent>
+                      <CardContent className="pt-0">
+                        <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
+                          {strataPlanResidents.map((resident) => (
+                            <Card 
+                              key={resident.id} 
+                              className="hover-elevate active-elevate-2 cursor-pointer" 
+                              onClick={() => setSelectedResident(resident)}
+                              data-testid={`card-resident-${resident.id}`}
+                            >
+                              <CardHeader className="pb-3">
+                                <div className="flex items-start gap-3">
+                                  <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+                                    <span className="material-icons text-xl text-primary">person</span>
+                                  </div>
+                                  <div className="flex-1 min-w-0">
+                                    <CardTitle className="text-base truncate">{resident.name}</CardTitle>
+                                    <CardDescription className="text-xs truncate">{resident.email}</CardDescription>
+                                  </div>
+                                </div>
+                              </CardHeader>
+                              <CardContent className="space-y-1 pt-0">
+                                {resident.unit && (
+                                  <div className="flex items-center gap-2 text-sm">
+                                    <span className="material-icons text-sm text-muted-foreground">home</span>
+                                    <span className="text-muted-foreground">Unit {resident.unit}</span>
+                                  </div>
+                                )}
+                                {resident.phone && (
+                                  <div className="flex items-center gap-2 text-sm">
+                                    <span className="material-icons text-sm text-muted-foreground">phone</span>
+                                    <span className="text-muted-foreground">{resident.phone}</span>
+                                  </div>
+                                )}
+                              </CardContent>
+                            </Card>
+                          ))}
+                        </div>
+                      </CardContent>
+                    </CollapsibleContent>
+                  </Collapsible>
+                </Card>
+              );
+            })}
           </div>
         )}
 
@@ -163,6 +235,89 @@ export default function ResidentsManagement() {
           </CardContent>
         </Card>
       </main>
+
+      {/* Resident Details Dialog */}
+      <Dialog open={!!selectedResident} onOpenChange={() => setSelectedResident(null)}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-3">
+              <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
+                <span className="material-icons text-2xl text-primary">person</span>
+              </div>
+              <div>
+                <div className="text-xl font-bold">{selectedResident?.name}</div>
+                <div className="text-sm text-muted-foreground font-normal">{selectedResident?.email}</div>
+              </div>
+            </DialogTitle>
+          </DialogHeader>
+          
+          {selectedResident && (
+            <div className="space-y-6 pt-4">
+              {/* Contact Information */}
+              <div>
+                <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide mb-3">Contact Information</h3>
+                <div className="space-y-3">
+                  <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
+                    <span className="material-icons text-muted-foreground">email</span>
+                    <div className="flex-1">
+                      <div className="text-xs text-muted-foreground">Email</div>
+                      <div className="font-medium">{selectedResident.email}</div>
+                    </div>
+                  </div>
+                  {selectedResident.phone && (
+                    <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
+                      <span className="material-icons text-muted-foreground">phone</span>
+                      <div className="flex-1">
+                        <div className="text-xs text-muted-foreground">Phone Number</div>
+                        <div className="font-medium">{selectedResident.phone}</div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Property Information */}
+              <div>
+                <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide mb-3">Property Information</h3>
+                <div className="space-y-3">
+                  {selectedResident.strataPlan && (
+                    <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
+                      <span className="material-icons text-muted-foreground">apartment</span>
+                      <div className="flex-1">
+                        <div className="text-xs text-muted-foreground">Strata Plan Number</div>
+                        <div className="font-medium">{selectedResident.strataPlan}</div>
+                      </div>
+                    </div>
+                  )}
+                  {selectedResident.unit && (
+                    <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
+                      <span className="material-icons text-muted-foreground">home</span>
+                      <div className="flex-1">
+                        <div className="text-xs text-muted-foreground">Unit Number</div>
+                        <div className="font-medium">{selectedResident.unit}</div>
+                      </div>
+                    </div>
+                  )}
+                  {selectedResident.parkingStall && (
+                    <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
+                      <span className="material-icons text-muted-foreground">local_parking</span>
+                      <div className="flex-1">
+                        <div className="text-xs text-muted-foreground">Parking Stall</div>
+                        <div className="font-medium">{selectedResident.parkingStall}</div>
+                      </div>
+                    </div>
+                  )}
+                  {!selectedResident.parkingStall && !selectedResident.unit && !selectedResident.strataPlan && (
+                    <div className="text-sm text-muted-foreground text-center py-4">
+                      No property information available
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
