@@ -9,6 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { queryClient } from "@/lib/queryClient";
 import overhaulLabsLogo from "@assets/Screenshot 2025-11-09 at 14.46.08_1762728408763.png";
+import ropeAccessProLogo from "@assets/generated_images/Rope_Access_Pro_logo_ea82469a.png";
 
 const loginSchema = z.object({
   identifier: z.string().min(1, "Email is required"),
@@ -81,7 +82,10 @@ export default function Login() {
               <span className="material-icons text-lg">apartment</span>
               Professional High-Rise Maintenance
             </div>
-            <div className="text-4xl font-bold mb-2">Rope Access Pro</div>
+            <div className="flex items-center gap-4 mb-2">
+              <img src={ropeAccessProLogo} alt="Rope Access Pro Logo" className="w-20 h-20 object-contain" />
+              <div className="text-4xl font-bold">Rope Access Pro</div>
+            </div>
             <h1 className="text-5xl font-bold tracking-tight leading-tight">
               Rope Access{" "}
               <span className="bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
