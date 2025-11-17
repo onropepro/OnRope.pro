@@ -45,6 +45,21 @@ The platform is built with a React 18 frontend using TypeScript and Wouter for r
 
 ## Recent Changes
 
+**November 17, 2025** - Custom Job Type Saving and Reuse
+
+*   Implemented custom job type saving system for company-specific reuse
+*   Created `customJobTypes` table to store company-specific custom job types
+*   **Automatic Saving:** When creating a project with job type "other", the custom job type is automatically saved to the company's custom job types list
+*   **Duplicate Prevention:** System checks if custom job type already exists before saving (case-sensitive)
+*   **Smart UI:** When selecting "other" as job type, UI shows dropdown of saved custom job types with option to enter new ones
+*   **Seamless Experience:** Users can select from previously used custom types or enter a new one that will be saved for future use
+*   **Backend API:**
+    *   `GET /api/custom-job-types` - Fetch all custom job types for the company
+    *   `DELETE /api/custom-job-types/:id` - Delete a custom job type (company/operations_manager only)
+*   **Database Schema:** Added `customJobTypes` table with company_id foreign key, job type name, and created timestamp
+*   **Storage Methods:** Created `getCustomJobTypesByCompany()`, `createCustomJobType()`, `getCustomJobTypeByName()`, and `deleteCustomJobType()`
+*   Improves workflow efficiency by eliminating re-typing of frequently used custom job types
+
 **November 16, 2025** - Subscription Renewal Date Tracking
 
 *   Implemented 30-day subscription model with automatic renewal date tracking
