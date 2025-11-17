@@ -1385,7 +1385,10 @@ export class Storage {
         const assignedEmployees = employeeIds.length > 0
           ? await db.select().from(users).where(
               and(
-                eq(users.companyId, companyId),
+                or(
+                  eq(users.companyId, companyId),
+                  eq(users.id, companyId)
+                ),
                 inArray(users.id, employeeIds)
               )
             )
