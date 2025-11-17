@@ -3111,7 +3111,12 @@ export default function Dashboard() {
                         <span className="material-icons text-sm mr-1">upgrade</span>
                         Upgrade Tier
                       </Button>
-                      <Button size="sm" variant="outline" data-testid="button-buy-seats">
+                      <Button 
+                        size="sm" 
+                        variant="outline" 
+                        data-testid="button-buy-seats"
+                        onClick={() => window.open('https://ram-website-paquettetom.replit.app/purchase-seats', '_blank')}
+                      >
                         <span className="material-icons text-sm mr-1">add_shopping_cart</span>
                         Add more seats
                       </Button>

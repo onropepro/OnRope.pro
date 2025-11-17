@@ -791,6 +791,7 @@ export default function Profile() {
                               variant="outline"
                               className="h-12"
                               data-testid="button-buy-seats"
+                              onClick={() => window.open('https://ram-website-paquettetom.replit.app/purchase-seats', '_blank')}
                             >
                               <span className="material-icons mr-2">add_shopping_cart</span>
                               Add more seats
