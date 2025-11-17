@@ -3625,7 +3625,7 @@ export default function Dashboard() {
                                     </Badge>
                                   )}
                                   {irataStatus === 'expiring-soon' && (
-                                    <Badge variant="destructive" className="text-xs flex items-center gap-1" data-testid={`badge-irata-warning-${employee.id}`}>
+                                    <Badge variant="outline" className="text-xs flex items-center gap-1 bg-yellow-500/10 border-yellow-500 text-yellow-700 dark:text-yellow-400" data-testid={`badge-irata-warning-${employee.id}`}>
                                       <span className="material-icons text-xs">warning</span>
                                       IRATA Expiring Soon
                                     </Badge>
