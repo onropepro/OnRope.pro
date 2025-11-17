@@ -398,10 +398,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Get tier limits
       const tierLimits: Record<number, { seats: number | null; projects: number | null }> = {
         0: { seats: 0, projects: 0 },
-        1: { seats: 2, projects: 5 },
-        2: { seats: 10, projects: 20 },
-        3: { seats: null, projects: null },
-        4: { seats: null, projects: null }, // Test tier - unlimited
+        1: { seats: 4, projects: 2 },      // Basic
+        2: { seats: 8, projects: 4 },      // Starter
+        3: { seats: 18, projects: 9 },     // Professional
+        4: { seats: null, projects: null }, // Premium - unlimited
       };
       
       const limits = tierLimits[tier] || tierLimits[0];
