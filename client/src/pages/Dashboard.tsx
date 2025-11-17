@@ -1885,7 +1885,7 @@ export default function Dashboard() {
         {activeTab === "projects" && (
           <div className="space-y-4">
             {/* Project Usage Information */}
-            {projectsData?.projectInfo && projectsData.projectInfo.tier > 0 && (
+            {projectsData?.projectInfo && (
               <Card data-testid="card-project-info">
                 <CardContent className="p-4">
                   <div className="flex items-center justify-between gap-3">
@@ -1894,15 +1894,20 @@ export default function Dashboard() {
                       <div>
                         <div className="font-medium">Projects</div>
                         <div className="text-sm text-muted-foreground">
-                          {projectsData.projectInfo.projectsUsed} of {projectsData.projectInfo.projectLimit === -1 ? '∞' : projectsData.projectInfo.projectLimit} projects used
+                          {projectsData.projectInfo.tier > 0 
+                            ? `${projectsData.projectInfo.projectsUsed} of ${projectsData.projectInfo.projectLimit === -1 ? '∞' : projectsData.projectInfo.projectLimit} projects used`
+                            : 'Manage your project capacity'
+                          }
                         </div>
                       </div>
                     </div>
-                    <div className="text-right">
-                      <Badge variant={projectsData.projectInfo.atProjectLimit ? "destructive" : "secondary"} data-testid="badge-project-tier-status">
-                        Tier {projectsData.projectInfo.tier}
-                      </Badge>
-                    </div>
+                    {projectsData.projectInfo.tier > 0 && (
+                      <div className="text-right">
+                        <Badge variant={projectsData.projectInfo.atProjectLimit ? "destructive" : "secondary"} data-testid="badge-project-tier-status">
+                          Tier {projectsData.projectInfo.tier}
+                        </Badge>
+                      </div>
+                    )}
                   </div>
                   
                   {projectsData.projectInfo.atProjectLimit && (
