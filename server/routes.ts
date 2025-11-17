@@ -1959,6 +1959,53 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
+  // Get custom job types for a company
+  app.get("/api/custom-job-types", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      // Get company ID (company themselves or the employee's company)
+      const companyId = currentUser.role === "company" ? currentUser.id : currentUser.companyId;
+      
+      if (!companyId) {
+        return res.status(400).json({ message: "Unable to determine company" });
+      }
+      
+      const customJobTypes = await storage.getCustomJobTypesByCompany(companyId);
+      res.json({ customJobTypes });
+    } catch (error) {
+      console.error("Get custom job types error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+  
+  // Delete a custom job type
+  app.delete("/api/custom-job-types/:id", requireAuth, requireRole("company", "operations_manager"), async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      const companyId = currentUser.role === "company" ? currentUser.id : currentUser.companyId;
+      
+      if (!companyId) {
+        return res.status(400).json({ message: "Unable to determine company" });
+      }
+      
+      await storage.deleteCustomJobType(req.params.id);
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Delete custom job type error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+  
   // Create project
   app.post("/api/projects", requireAuth, requireRole("company", "operations_manager"), async (req: Request, res: Response) => {
     try {
@@ -1989,6 +2036,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
       
       const project = await storage.createProject(projectData);
+      
+      // If this is a custom job type, save it to the company's custom job types list (if not already exists)
+      if (project.jobType === "other" && project.customJobType) {
+        const existingCustomJobType = await storage.getCustomJobTypeByName(companyId, project.customJobType);
+        if (!existingCustomJobType) {
+          await storage.createCustomJobType({
+            companyId,
+            jobTypeName: project.customJobType,
+          });
+        }
+      }
       
       // Automatically create a scheduled job for this project if start/end dates are provided
       if (project.startDate && project.endDate) {
