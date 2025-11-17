@@ -48,12 +48,14 @@ The platform is built with a React 18 frontend using TypeScript and Wouter for r
 **November 17, 2025** - IRATA License Expiration Warning System
 
 *   Implemented automated IRATA certification expiration tracking and warnings
-*   **30-Day Warning:** System automatically displays warning badge when employee's IRATA license expires within 30 days
-*   **Visual Alert:** Red warning badge appears next to employee name in employee list with "IRATA Expiring Soon" message
+*   **Dual Warning System:**
+    *   **Expired:** Red badge with error icon displays "IRATA Expired" when certification date has passed
+    *   **Expiring Soon:** Red badge with warning icon displays "IRATA Expiring Soon" when certification expires within 30 days but hasn't passed yet
+*   **Visual Alert:** Warning badges appear next to employee name in employee list for immediate visibility
 *   **Automatic Calculation:** Logic checks expiration date against current date and 30-day threshold on every page load
 *   **Proactive Compliance:** Helps management track and renew IRATA certifications before they expire, ensuring continuous compliance
-*   **Badge Display:** Warning icon and text clearly visible in employee card header for immediate visibility
-*   Prevents work disruptions by alerting management to upcoming certification expirations
+*   **Clear Status Indicators:** Different icons (error vs warning) help distinguish between already expired and upcoming expirations
+*   Prevents work disruptions by alerting management to certification status issues
 
 **November 17, 2025** - Resident Management UI Enhancement
 

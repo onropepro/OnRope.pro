@@ -3594,14 +3594,20 @@ export default function Dashboard() {
                     }
                     
                     return activeEmployees.map((employee: any) => {
-                      // Check if IRATA license expires within 30 days
-                      const irataExpiresWithin30Days = employee.irataExpirationDate ? (() => {
+                      // Check IRATA license expiration status
+                      const irataStatus = employee.irataExpirationDate ? (() => {
                         const expirationDate = new Date(employee.irataExpirationDate);
                         const today = new Date();
                         const thirtyDaysFromNow = new Date();
                         thirtyDaysFromNow.setDate(today.getDate() + 30);
-                        return expirationDate >= today && expirationDate <= thirtyDaysFromNow;
-                      })() : false;
+                        
+                        if (expirationDate < today) {
+                          return 'expired';
+                        } else if (expirationDate <= thirtyDaysFromNow) {
+                          return 'expiring-soon';
+                        }
+                        return null;
+                      })() : null;
 
                       return (
                       <Card key={employee.id} data-testid={`employee-card-${employee.id}`} className="hover-elevate">
@@ -3612,7 +3618,13 @@ export default function Dashboard() {
                               <div className="flex-1">
                                 <div className="flex items-center gap-2">
                                   <div className="font-medium text-lg">{employee.name || employee.companyName || employee.email}</div>
-                                  {irataExpiresWithin30Days && (
+                                  {irataStatus === 'expired' && (
+                                    <Badge variant="destructive" className="text-xs flex items-center gap-1" data-testid={`badge-irata-expired-${employee.id}`}>
+                                      <span className="material-icons text-xs">error</span>
+                                      IRATA Expired
+                                    </Badge>
+                                  )}
+                                  {irataStatus === 'expiring-soon' && (
                                     <Badge variant="destructive" className="text-xs flex items-center gap-1" data-testid={`badge-irata-warning-${employee.id}`}>
                                       <span className="material-icons text-xs">warning</span>
                                       IRATA Expiring Soon
