@@ -45,6 +45,19 @@ The platform is built with a React 18 frontend using TypeScript and Wouter for r
 
 ## Recent Changes
 
+**November 17, 2025** - Resident Management UI Enhancement
+
+*   Implemented grouped resident display by strata plan number in Residents Management page
+*   **Collapsible Strata Groups:** Residents are organized into collapsible sections by strata plan, showing count of residents per building
+*   **Clickable Resident Cards:** Each resident card is now fully clickable to view detailed information
+*   **Comprehensive Detail Dialog:** Opens a modal showing all resident information including:
+    *   Contact: Name, email, phone number
+    *   Property: Strata plan number, unit number, parking stall number
+*   **Enhanced API Response:** Updated `/api/residents` endpoint to include `parkingStall` and `strataPlan` fields
+*   **Better Organization:** Strata plans are sorted alphabetically with expand/collapse functionality for easier navigation
+*   **Improved UX:** Clear visual hierarchy with Material Icons and responsive design for mobile and desktop
+*   Streamlines resident management workflow by reducing visual clutter and providing detailed information on demand
+
 **November 17, 2025** - Custom Job Type Saving and Reuse
 
 *   Implemented custom job type saving system for company-specific reuse
