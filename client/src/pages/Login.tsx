@@ -73,8 +73,8 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary/5 via-background to-primary/10 flex items-center justify-center p-4">
-      <div className="w-full max-w-6xl grid md:grid-cols-2 gap-8 items-center">
+    <div className="min-h-screen bg-gradient-to-br from-primary/5 via-background to-primary/10 flex items-start justify-center p-4 pt-12">
+      <div className="w-full max-w-6xl grid md:grid-cols-2 gap-8 items-start">
         {/* Hero Section - Hidden on mobile */}
         <div className="hidden md:flex flex-col justify-center space-y-8 pr-8">
           <div className="space-y-6">
