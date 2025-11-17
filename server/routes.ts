@@ -206,6 +206,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       '/api/logout', 
       '/api/verify-license',
       '/api/provision-account', // Allow external provisioning
+      '/api/purchase/verify-account', // Allow external purchase system to verify accounts
+      '/api/purchase/update-seats', // Allow external purchase system to update seat limits
       '/api/user-preferences' // Allow UI preferences even in read-only mode
     ];
     
@@ -339,6 +341,170 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
     } catch (error) {
       console.error("[Provision] Error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+  
+  // ==================== PURCHASE API ROUTES ====================
+  // Endpoints for external website to manage seat/project purchases
+  
+  // Verify if account exists (for duplicate prevention)
+  app.post("/api/purchase/verify-account", async (req: Request, res: Response) => {
+    try {
+      // Verify API key for security
+      const apiKey = req.headers['x-api-key'] as string;
+      const expectedApiKey = process.env.PURCHASE_API_KEY;
+      
+      if (!expectedApiKey) {
+        console.error("[Purchase] PURCHASE_API_KEY not configured");
+        return res.status(500).json({ message: "Purchase service not configured" });
+      }
+      
+      if (!apiKey || apiKey !== expectedApiKey) {
+        console.error("[Purchase] Invalid API key provided");
+        return res.status(401).json({ message: "Unauthorized" });
+      }
+      
+      const { email } = req.body;
+      
+      if (!email) {
+        return res.status(400).json({ message: "Email is required" });
+      }
+      
+      // Look up user by email
+      const user = await storage.getUserByEmail(email);
+      
+      if (!user || user.role !== 'company') {
+        return res.json({ 
+          exists: false,
+          message: "No company account found with this email"
+        });
+      }
+      
+      // Extract tier from license key (e.g., "ABC123-1" -> tier 1)
+      let tier = 0;
+      if (user.licenseKey) {
+        const tierMatch = user.licenseKey.match(/-(\d+)$/);
+        if (tierMatch) {
+          tier = parseInt(tierMatch[1], 10);
+        }
+      }
+      
+      // Get tier limits
+      const tierLimits: Record<number, { seats: number | null; projects: number | null }> = {
+        0: { seats: 0, projects: 0 },
+        1: { seats: 2, projects: 5 },
+        2: { seats: 10, projects: 20 },
+        3: { seats: null, projects: null },
+        4: { seats: null, projects: null }, // Test tier - unlimited
+      };
+      
+      const limits = tierLimits[tier] || tierLimits[0];
+      const baseSeatLimit = limits.seats ?? 999999;
+      const additionalSeats = user.additionalSeats || 0;
+      const totalSeats = baseSeatLimit + additionalSeats;
+      
+      console.log(`[Purchase] Account verified: ${user.companyName} (${email}) - Tier ${tier}, ${totalSeats} total seats (${baseSeatLimit} base + ${additionalSeats} additional)`);
+      
+      return res.json({
+        exists: true,
+        companyId: user.id,
+        companyName: user.companyName,
+        email: user.email,
+        tier,
+        currentSeats: totalSeats,
+        baseSeatLimit,
+        additionalSeats,
+        licenseVerified: user.licenseVerified,
+      });
+    } catch (error) {
+      console.error("[Purchase] Error verifying account:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+  
+  // Update seat limits after purchase
+  app.post("/api/purchase/update-seats", async (req: Request, res: Response) => {
+    try {
+      // Verify API key for security
+      const apiKey = req.headers['x-api-key'] as string;
+      const expectedApiKey = process.env.PURCHASE_API_KEY;
+      
+      if (!expectedApiKey) {
+        console.error("[Purchase] PURCHASE_API_KEY not configured");
+        return res.status(500).json({ message: "Purchase service not configured" });
+      }
+      
+      if (!apiKey || apiKey !== expectedApiKey) {
+        console.error("[Purchase] Invalid API key provided");
+        return res.status(401).json({ message: "Unauthorized" });
+      }
+      
+      const { email, additionalSeats } = req.body;
+      
+      if (!email || typeof additionalSeats !== 'number' || additionalSeats < 0) {
+        return res.status(400).json({ 
+          message: "Email and additionalSeats (non-negative number) are required" 
+        });
+      }
+      
+      // Look up user by email
+      const user = await storage.getUserByEmail(email);
+      
+      if (!user || user.role !== 'company') {
+        return res.status(404).json({ 
+          message: "No company account found with this email" 
+        });
+      }
+      
+      // Calculate new total
+      const currentAdditionalSeats = user.additionalSeats || 0;
+      const newAdditionalSeats = currentAdditionalSeats + additionalSeats;
+      
+      // Update the company's additional seats
+      await storage.updateUser(user.id, {
+        additionalSeats: newAdditionalSeats,
+      });
+      
+      // Extract tier info for response
+      let tier = 0;
+      if (user.licenseKey) {
+        const tierMatch = user.licenseKey.match(/-(\d+)$/);
+        if (tierMatch) {
+          tier = parseInt(tierMatch[1], 10);
+        }
+      }
+      
+      const tierLimits: Record<number, { seats: number | null; projects: number | null }> = {
+        0: { seats: 0, projects: 0 },
+        1: { seats: 2, projects: 5 },
+        2: { seats: 10, projects: 20 },
+        3: { seats: null, projects: null },
+        4: { seats: null, projects: null },
+      };
+      
+      const limits = tierLimits[tier] || tierLimits[0];
+      const baseSeatLimit = limits.seats ?? 999999;
+      const totalSeats = baseSeatLimit + newAdditionalSeats;
+      
+      console.log(`[Purchase] Seats updated for ${user.companyName} (${email}): Added ${additionalSeats} seats. New total: ${totalSeats} (${baseSeatLimit} base + ${newAdditionalSeats} additional)`);
+      
+      return res.json({
+        success: true,
+        companyId: user.id,
+        companyName: user.companyName,
+        email: user.email,
+        tier,
+        seatsAdded: additionalSeats,
+        newLimits: {
+          baseSeatLimit,
+          additionalSeats: newAdditionalSeats,
+          totalSeats,
+        },
+        message: `Successfully added ${additionalSeats} seat${additionalSeats !== 1 ? 's' : ''} to ${user.companyName}`,
+      });
+    } catch (error) {
+      console.error("[Purchase] Error updating seats:", error);
       res.status(500).json({ message: "Internal server error" });
     }
   });
