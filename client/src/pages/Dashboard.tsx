@@ -74,6 +74,14 @@ const projectSchema = z.object({
   totalStalls: z.string().optional(),
   stallsPerDay: z.string().optional(),
   assignedEmployees: z.array(z.string()).optional(),
+}).refine((data) => {
+  if (data.jobType === "other") {
+    return data.customJobType && data.customJobType.trim().length > 0;
+  }
+  return true;
+}, {
+  message: "Custom job type is required when 'Other' is selected",
+  path: ["customJobType"],
 });
 
 // Role definitions with icons
