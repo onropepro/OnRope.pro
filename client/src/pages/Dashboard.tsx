@@ -3062,7 +3062,7 @@ export default function Dashboard() {
           <div>
             <div className="space-y-4">
               {/* Seat Usage Information */}
-              {employeesData?.seatInfo && employeesData.seatInfo.tier > 0 && (
+              {employeesData?.seatInfo && (
                 <Card data-testid="card-seat-info">
                   <CardContent className="p-4">
                     <div className="flex items-center justify-between gap-3">
@@ -3071,15 +3071,20 @@ export default function Dashboard() {
                         <div>
                           <div className="font-medium">Employee Seats</div>
                           <div className="text-sm text-muted-foreground">
-                            {employeesData.seatInfo.seatsUsed} of {employeesData.seatInfo.seatLimit === -1 ? '∞' : employeesData.seatInfo.seatLimit} seats used
+                            {employeesData.seatInfo.tier > 0 
+                              ? `${employeesData.seatInfo.seatsUsed} of ${employeesData.seatInfo.seatLimit === -1 ? '∞' : employeesData.seatInfo.seatLimit} seats used`
+                              : 'Manage your employee capacity'
+                            }
                           </div>
                         </div>
                       </div>
-                      <div className="text-right">
-                        <Badge variant={employeesData.seatInfo.atSeatLimit ? "destructive" : "secondary"} data-testid="badge-tier-status">
-                          Tier {employeesData.seatInfo.tier}
-                        </Badge>
-                      </div>
+                      {employeesData.seatInfo.tier > 0 && (
+                        <div className="text-right">
+                          <Badge variant={employeesData.seatInfo.atSeatLimit ? "destructive" : "secondary"} data-testid="badge-tier-status">
+                            Tier {employeesData.seatInfo.tier}
+                          </Badge>
+                        </div>
+                      )}
                     </div>
                     
                     {employeesData.seatInfo.atSeatLimit && (
