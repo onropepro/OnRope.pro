@@ -1,24 +1,23 @@
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { useLocation, useRoute } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { HighRiseBuilding } from "@/components/HighRiseBuilding";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, ChevronDown, ChevronRight, Sparkles } from "lucide-react";
 import { format, getYear, getMonth } from "date-fns";
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from "recharts";
-import { useState, useMemo } from "react";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useMemo, useState } from "react";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { queryClient } from "@/lib/queryClient";
+import { useToast } from "@/hooks/use-toast";
 
 export default function WorkSessionHistory() {
   const [, params] = useRoute("/projects/:id/work-sessions");
   const [, setLocation] = useLocation();
   const projectId = params?.id;
-  
-  // Filter state
-  const [selectedYear, setSelectedYear] = useState<string>("all");
-  const [selectedMonth, setSelectedMonth] = useState<string>("all");
+  const { toast } = useToast();
 
   // Fetch current user to check role
   const { data: userData } = useQuery({
@@ -52,56 +51,34 @@ export default function WorkSessionHistory() {
   const isManagement = user?.role === "company" || 
                        user?.role === "operations_manager" || 
                        user?.role === "supervisor";
-  
-  // Get unique years and months from sessions
-  const availableYears = useMemo(() => {
-    const years = new Set<number>();
+
+  // Group sessions by year, month, and day
+  const groupedSessions = useMemo(() => {
+    const groups: Record<string, Record<string, Record<string, any[]>>> = {};
+    
     allWorkSessions.forEach((session: any) => {
-      const year = getYear(new Date(session.workDate));
-      years.add(year);
+      const sessionDate = new Date(session.workDate);
+      const year = getYear(sessionDate).toString();
+      const month = format(sessionDate, "MMMM");
+      const day = format(sessionDate, "yyyy-MM-dd");
+      
+      if (!groups[year]) groups[year] = {};
+      if (!groups[year][month]) groups[year][month] = {};
+      if (!groups[year][month][day]) groups[year][month][day] = [];
+      
+      groups[year][month][day].push(session);
     });
-    return Array.from(years).sort((a, b) => b - a);
+    
+    return groups;
   }, [allWorkSessions]);
-  
-  const availableMonths = useMemo(() => {
-    if (selectedYear === "all") return [];
-    const months = new Set<number>();
-    allWorkSessions.forEach((session: any) => {
-      const sessionDate = new Date(session.workDate);
-      if (getYear(sessionDate) === parseInt(selectedYear)) {
-        months.add(getMonth(sessionDate));
-      }
-    });
-    return Array.from(months).sort((a, b) => a - b);
-  }, [allWorkSessions, selectedYear]);
-  
-  // Filter work sessions based on selected year and month
-  const workSessions = useMemo(() => {
-    return allWorkSessions.filter((session: any) => {
-      const sessionDate = new Date(session.workDate);
-      
-      if (selectedYear !== "all") {
-        if (getYear(sessionDate) !== parseInt(selectedYear)) {
-          return false;
-        }
-      }
-      
-      if (selectedMonth !== "all") {
-        if (getMonth(sessionDate) !== parseInt(selectedMonth)) {
-          return false;
-        }
-      }
-      
-      return true;
-    });
-  }, [allWorkSessions, selectedYear, selectedMonth]);
-  
-  // Reset month when year changes to "all"
-  useMemo(() => {
-    if (selectedYear === "all") {
-      setSelectedMonth("all");
-    }
-  }, [selectedYear]);
+
+  // Get sorted years (newest first)
+  const sortedYears = Object.keys(groupedSessions).sort((a, b) => parseInt(b) - parseInt(a));
+
+  // Collapsible state
+  const [openYears, setOpenYears] = useState<Record<string, boolean>>({});
+  const [openMonths, setOpenMonths] = useState<Record<string, boolean>>({});
+  const [openDays, setOpenDays] = useState<Record<string, boolean>>({});
 
   if (!project) {
     return (
@@ -122,7 +99,7 @@ export default function WorkSessionHistory() {
                      (project.totalDropsSouth ?? 0) + (project.totalDropsWest ?? 0);
 
   // Calculate completed drops from work sessions (elevation-specific)
-  const completedSessions = workSessions.filter((s: any) => s.endTime !== null);
+  const completedSessions = allWorkSessions.filter((s: any) => s.endTime !== null);
   
   const completedDropsNorth = completedSessions.reduce((sum: number, s: any) => sum + (s.dropsCompletedNorth ?? 0), 0);
   const completedDropsEast = completedSessions.reduce((sum: number, s: any) => sum + (s.dropsCompletedEast ?? 0), 0);
@@ -176,6 +153,36 @@ export default function WorkSessionHistory() {
     { name: "Non-Billable Hours", value: parseFloat(nonBillableHours.toFixed(2)), color: "hsl(var(--chart-2))" },
   ];
 
+  // Generate sample sessions mutation (company only)
+  const generateSampleMutation = useMutation({
+    mutationFn: async () => {
+      const response = await fetch(`/api/projects/${projectId}/generate-sample-sessions`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+      });
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || "Failed to generate sample sessions");
+      }
+      return response.json();
+    },
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ["/api/projects", projectId, "work-sessions"] });
+      toast({
+        title: "Sample data generated",
+        description: `Created ${data.count} sample work sessions across multiple years`,
+      });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
       <div className="max-w-4xl mx-auto p-4 space-y-6">
@@ -193,6 +200,18 @@ export default function WorkSessionHistory() {
             <h1 className="text-2xl font-bold">{project.buildingName || project.strataPlanNumber}</h1>
             <p className="text-sm text-muted-foreground">Work Session History</p>
           </div>
+          {user?.role === "company" && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => generateSampleMutation.mutate()}
+              disabled={generateSampleMutation.isPending}
+              data-testid="button-generate-sample"
+            >
+              <Sparkles className="h-4 w-4 mr-2" />
+              {generateSampleMutation.isPending ? "Generating..." : "Generate Sample Data"}
+            </Button>
+          )}
         </div>
 
         {/* Project Overview */}
@@ -323,140 +342,153 @@ export default function WorkSessionHistory() {
           </Card>
         )}
 
-        {/* Work Sessions List */}
+        {/* Work Sessions List - Organized by Year/Month/Day */}
         <Card>
-          <CardHeader className="space-y-4">
-            <CardTitle>Session History</CardTitle>
-            {allWorkSessions.length > 0 && (
-              <div className="flex flex-col sm:flex-row gap-3">
-                <div className="flex-1">
-                  <label className="text-sm font-medium mb-1.5 block">Year</label>
-                  <Select value={selectedYear} onValueChange={setSelectedYear}>
-                    <SelectTrigger data-testid="select-year">
-                      <SelectValue placeholder="All Years" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">All Years</SelectItem>
-                      {availableYears.map((year) => (
-                        <SelectItem key={year} value={year.toString()}>
-                          {year}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="flex-1">
-                  <label className="text-sm font-medium mb-1.5 block">Month</label>
-                  <Select 
-                    value={selectedMonth} 
-                    onValueChange={setSelectedMonth}
-                    disabled={selectedYear === "all"}
-                  >
-                    <SelectTrigger data-testid="select-month">
-                      <SelectValue placeholder={selectedYear === "all" ? "Select Year First" : "All Months"} />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">All Months</SelectItem>
-                      {availableMonths.map((month) => (
-                        <SelectItem key={month} value={month.toString()}>
-                          {format(new Date(2024, month, 1), "MMMM")}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-                {(selectedYear !== "all" || selectedMonth !== "all") && (
-                  <div className="flex items-end">
-                    <Button 
-                      variant="outline" 
-                      onClick={() => {
-                        setSelectedYear("all");
-                        setSelectedMonth("all");
-                      }}
-                      data-testid="button-clear-filters"
-                    >
-                      <span className="material-icons mr-2">clear</span>
-                      Clear
-                    </Button>
-                  </div>
-                )}
-              </div>
-            )}
+          <CardHeader>
+            <CardTitle>Session History ({allWorkSessions.length} total)</CardTitle>
           </CardHeader>
           <CardContent>
             {allWorkSessions.length === 0 ? (
               <p className="text-center text-muted-foreground py-8">
                 No work sessions recorded yet
               </p>
-            ) : workSessions.length === 0 ? (
-              <div className="text-center py-8 space-y-2">
-                <p className="text-muted-foreground">No work sessions found for the selected period</p>
-                <Button 
-                  variant="outline" 
-                  onClick={() => {
-                    setSelectedYear("all");
-                    setSelectedMonth("all");
-                  }}
-                >
-                  Clear Filters
-                </Button>
-              </div>
             ) : (
-              <div className="space-y-3">
-                <p className="text-sm text-muted-foreground">
-                  Showing {workSessions.length} of {allWorkSessions.length} work session{allWorkSessions.length !== 1 ? "s" : ""}
-                </p>
-                {workSessions.map((session: any) => {
-                  const sessionDate = new Date(session.workDate);
-                  const isCompleted = session.endTime !== null;
-                  const sessionDrops = (session.dropsCompletedNorth ?? 0) + (session.dropsCompletedEast ?? 0) + 
-                                       (session.dropsCompletedSouth ?? 0) + (session.dropsCompletedWest ?? 0);
-                  const metTarget = sessionDrops >= project.dailyDropTarget;
-
+              <div className="space-y-4">
+                {sortedYears.map((year) => {
+                  const monthsInYear = Object.keys(groupedSessions[year]);
+                  const sortedMonths = monthsInYear.sort((a, b) => {
+                    const monthOrder = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+                    return monthOrder.indexOf(b) - monthOrder.indexOf(a);
+                  });
+                  
                   return (
-                    <div
-                      key={session.id}
-                      className="flex items-center justify-between p-4 rounded-lg border bg-card hover-elevate"
-                      data-testid={`session-${session.id}`}
+                    <Collapsible
+                      key={year}
+                      open={openYears[year]}
+                      onOpenChange={(open) => setOpenYears({ ...openYears, [year]: open })}
                     >
-                      <div className="flex-1 space-y-1">
-                        <div className="flex items-center gap-2">
-                          <p className="font-medium">
-                            {format(sessionDate, "EEEE, MMM d, yyyy")}
-                          </p>
-                          {isCompleted ? (
-                            <Badge variant={metTarget ? "default" : "destructive"} data-testid={`badge-${metTarget ? "met" : "below"}-target`}>
-                              {metTarget ? "Target Met" : "Below Target"}
-                            </Badge>
+                      <CollapsibleTrigger asChild>
+                        <Button
+                          variant="outline"
+                          className="w-full justify-between text-lg font-semibold"
+                          data-testid={`button-year-${year}`}
+                        >
+                          <span>{year}</span>
+                          {openYears[year] ? (
+                            <ChevronDown className="h-5 w-5" />
                           ) : (
-                            <Badge variant="outline">In Progress</Badge>
+                            <ChevronRight className="h-5 w-5" />
                           )}
-                        </div>
-                        <p className="text-sm text-muted-foreground">
-                          Tech: {session.techName || "Unknown"}
-                        </p>
-                        {isCompleted && (
-                          <>
-                            <p className="text-sm">
-                              Drops: {sessionDrops} / {project.dailyDropTarget} target
-                            </p>
-                            {session.shortfallReason && (
-                              <p className="text-sm text-muted-foreground italic">
-                                Note: {session.shortfallReason}
-                              </p>
-                            )}
-                          </>
-                        )}
-                      </div>
-                      <div className="text-right text-sm text-muted-foreground">
-                        {isCompleted && (
-                          <p>
-                            {format(new Date(session.startTime), "h:mm a")} -{" "}
-                            {format(new Date(session.endTime), "h:mm a")}
-                          </p>
-                        )}
-                      </div>
-                    </div>
+                        </Button>
+                      </CollapsibleTrigger>
+                      <CollapsibleContent className="ml-4 mt-2 space-y-3">
+                        {sortedMonths.map((month) => {
+                          const daysInMonth = Object.keys(groupedSessions[year][month]);
+                          const sortedDays = daysInMonth.sort((a, b) => b.localeCompare(a));
+                          
+                          return (
+                            <Collapsible
+                              key={`${year}-${month}`}
+                              open={openMonths[`${year}-${month}`]}
+                              onOpenChange={(open) => setOpenMonths({ ...openMonths, [`${year}-${month}`]: open })}
+                            >
+                              <CollapsibleTrigger asChild>
+                                <Button
+                                  variant="ghost"
+                                  className="w-full justify-between font-medium"
+                                  data-testid={`button-month-${year}-${month}`}
+                                >
+                                  <span>{month}</span>
+                                  {openMonths[`${year}-${month}`] ? (
+                                    <ChevronDown className="h-4 w-4" />
+                                  ) : (
+                                    <ChevronRight className="h-4 w-4" />
+                                  )}
+                                </Button>
+                              </CollapsibleTrigger>
+                              <CollapsibleContent className="ml-4 mt-2 space-y-2">
+                                {sortedDays.map((day) => {
+                                  const sessionsOnDay = groupedSessions[year][month][day];
+                                  
+                                  return (
+                                    <Collapsible
+                                      key={day}
+                                      open={openDays[day]}
+                                      onOpenChange={(open) => setOpenDays({ ...openDays, [day]: open })}
+                                    >
+                                      <CollapsibleTrigger asChild>
+                                        <Button
+                                          variant="ghost"
+                                          className="w-full justify-between text-sm"
+                                          data-testid={`button-day-${day}`}
+                                        >
+                                          <span>{format(new Date(day), "EEEE, MMM d")}</span>
+                                          <div className="flex items-center gap-2">
+                                            <Badge variant="secondary">{sessionsOnDay.length}</Badge>
+                                            {openDays[day] ? (
+                                              <ChevronDown className="h-4 w-4" />
+                                            ) : (
+                                              <ChevronRight className="h-4 w-4" />
+                                            )}
+                                          </div>
+                                        </Button>
+                                      </CollapsibleTrigger>
+                                      <CollapsibleContent className="ml-4 mt-2 space-y-2">
+                                        {sessionsOnDay.map((session: any) => {
+                                          const isCompleted = session.endTime !== null;
+                                          const sessionDrops = (session.dropsCompletedNorth ?? 0) + (session.dropsCompletedEast ?? 0) + 
+                                                               (session.dropsCompletedSouth ?? 0) + (session.dropsCompletedWest ?? 0);
+                                          const metTarget = sessionDrops >= project.dailyDropTarget;
+
+                                          return (
+                                            <div
+                                              key={session.id}
+                                              className="p-3 rounded-lg border bg-card hover-elevate"
+                                              data-testid={`session-${session.id}`}
+                                            >
+                                              <div className="space-y-1">
+                                                <div className="flex items-center gap-2 flex-wrap">
+                                                  <p className="font-medium text-sm">
+                                                    Tech: {session.techName || "Unknown"}
+                                                  </p>
+                                                  {isCompleted ? (
+                                                    <Badge variant={metTarget ? "default" : "destructive"} data-testid={`badge-${metTarget ? "met" : "below"}-target`}>
+                                                      {metTarget ? "Target Met" : "Below Target"}
+                                                    </Badge>
+                                                  ) : (
+                                                    <Badge variant="outline">In Progress</Badge>
+                                                  )}
+                                                </div>
+                                                {isCompleted && (
+                                                  <>
+                                                    <p className="text-sm">
+                                                      Drops: {sessionDrops} / {project.dailyDropTarget} target
+                                                    </p>
+                                                    <p className="text-xs text-muted-foreground">
+                                                      {format(new Date(session.startTime), "h:mm a")} -{" "}
+                                                      {format(new Date(session.endTime), "h:mm a")}
+                                                    </p>
+                                                    {session.shortfallReason && (
+                                                      <p className="text-sm text-muted-foreground italic">
+                                                        Note: {session.shortfallReason}
+                                                      </p>
+                                                    )}
+                                                  </>
+                                                )}
+                                              </div>
+                                            </div>
+                                          );
+                                        })}
+                                      </CollapsibleContent>
+                                    </Collapsible>
+                                  );
+                                })}
+                              </CollapsibleContent>
+                            </Collapsible>
+                          );
+                        })}
+                      </CollapsibleContent>
+                    </Collapsible>
                   );
                 })}
               </div>

@@ -2817,6 +2817,130 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Generate sample work sessions for testing
+  app.post("/api/projects/:projectId/generate-sample-sessions", requireAuth, requireRole("company"), async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      const projectId = req.params.projectId;
+      const project = await storage.getProjectById(projectId);
+      if (!project) {
+        return res.status(404).json({ message: "Project not found" });
+      }
+      
+      // Verify project belongs to current company
+      if (project.companyId !== currentUser.id) {
+        return res.status(403).json({ message: "Access denied" });
+      }
+      
+      // Get employees for this company
+      const employees = await storage.getEmployeesByCompany(currentUser.id);
+      const techs = employees.filter(e => e.role === 'rope_access_tech' && !e.terminatedDate);
+      
+      if (techs.length === 0) {
+        return res.status(400).json({ message: "No active technicians found. Please create employees first." });
+      }
+      
+      const generatedSessions = [];
+      const now = new Date();
+      
+      // Generate sessions spanning 3 years (2023, 2024, 2025)
+      for (let year = 2023; year <= 2025; year++) {
+        // For each year, generate sessions across different months
+        const monthsToGenerate = year === 2025 ? [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10] : [0, 2, 4, 6, 8, 10]; // More in current year
+        
+        for (const month of monthsToGenerate) {
+          // Generate 3-8 sessions per month
+          const sessionsThisMonth = Math.floor(Math.random() * 6) + 3;
+          
+          for (let i = 0; i < sessionsThisMonth; i++) {
+            // Random day in the month
+            const day = Math.floor(Math.random() * 28) + 1;
+            const workDate = new Date(year, month, day);
+            
+            // Skip future dates
+            if (workDate > now) continue;
+            
+            // Random tech
+            const tech = techs[Math.floor(Math.random() * techs.length)];
+            
+            // Random start time (6 AM to 10 AM)
+            const startHour = Math.floor(Math.random() * 4) + 6;
+            const startMinute = Math.random() > 0.5 ? 0 : 30;
+            const startTime = new Date(year, month, day, startHour, startMinute, 0);
+            
+            // Work duration (6-10 hours)
+            const workHours = Math.floor(Math.random() * 5) + 6;
+            const endTime = new Date(startTime.getTime() + workHours * 60 * 60 * 1000);
+            
+            // Random drops completed per elevation
+            const dailyTarget = project.dailyDropTarget || 20;
+            const totalTarget = dailyTarget;
+            
+            // 70% chance of meeting target
+            const meetTarget = Math.random() < 0.7;
+            const totalDrops = meetTarget 
+              ? totalTarget + Math.floor(Math.random() * 5) 
+              : Math.floor(totalTarget * (0.6 + Math.random() * 0.3));
+            
+            // Distribute drops across elevations
+            const dropsNorth = Math.floor(totalDrops * 0.3);
+            const dropsEast = Math.floor(totalDrops * 0.25);
+            const dropsSouth = Math.floor(totalDrops * 0.25);
+            const dropsWest = totalDrops - dropsNorth - dropsEast - dropsSouth;
+            
+            const shortfallReason = !meetTarget ? [
+              "Weather conditions",
+              "Equipment issues",
+              "Building access delays",
+              "Staff shortage",
+              "Client requested changes"
+            ][Math.floor(Math.random() * 5)] : null;
+            
+            // Insert directly into database
+            await db.insert(workSessions).values({
+              id: crypto.randomUUID(),
+              employeeId: tech.id,
+              projectId: projectId,
+              workDate: workDate.toISOString().split('T')[0],
+              startTime: startTime.toISOString(),
+              endTime: endTime.toISOString(),
+              dropsCompletedNorth: dropsNorth,
+              dropsCompletedEast: dropsEast,
+              dropsCompletedSouth: dropsSouth,
+              dropsCompletedWest: dropsWest,
+              shortfallReason: shortfallReason,
+              startLatitude: null,
+              startLongitude: null,
+              endLatitude: null,
+              endLongitude: null,
+              createdAt: new Date(),
+              updatedAt: new Date(),
+            });
+            
+            generatedSessions.push({
+              workDate: workDate.toISOString().split('T')[0],
+              techName: tech.name,
+              totalDrops: dropsNorth + dropsEast + dropsSouth + dropsWest,
+            });
+          }
+        }
+      }
+      
+      res.json({ 
+        message: `Generated ${generatedSessions.length} sample work sessions`,
+        count: generatedSessions.length,
+        sessions: generatedSessions.slice(0, 10) // Return first 10 as preview
+      });
+    } catch (error) {
+      console.error("Generate sample sessions error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
   // Get active workers (sessions without end time) - Management only
   app.get("/api/active-workers", requireAuth, requireRole("company", "owner_ceo", "human_resources", "accounting", "operations_manager", "general_supervisor", "rope_access_supervisor", "account_manager", "supervisor"), async (req: Request, res: Response) => {
     try {
