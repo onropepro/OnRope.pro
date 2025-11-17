@@ -1,6 +1,6 @@
 import { db } from "./db";
-import { users, clients, projects, dropLogs, workSessions, nonBillableWorkSessions, complaints, complaintNotes, projectPhotos, jobComments, harnessInspections, toolboxMeetings, payPeriodConfig, payPeriods, quotes, quoteServices, gearItems, scheduledJobs, jobAssignments, userPreferences } from "@shared/schema";
-import type { User, InsertUser, Client, InsertClient, Project, InsertProject, DropLog, InsertDropLog, WorkSession, InsertWorkSession, Complaint, InsertComplaint, ComplaintNote, InsertComplaintNote, ProjectPhoto, InsertProjectPhoto, JobComment, InsertJobComment, HarnessInspection, InsertHarnessInspection, ToolboxMeeting, InsertToolboxMeeting, PayPeriodConfig, InsertPayPeriodConfig, PayPeriod, InsertPayPeriod, EmployeeHoursSummary, Quote, InsertQuote, QuoteService, InsertQuoteService, QuoteWithServices, GearItem, InsertGearItem, ScheduledJob, InsertScheduledJob, JobAssignment, InsertJobAssignment, ScheduledJobWithAssignments, UserPreferences, InsertUserPreferences } from "@shared/schema";
+import { users, clients, projects, customJobTypes, dropLogs, workSessions, nonBillableWorkSessions, complaints, complaintNotes, projectPhotos, jobComments, harnessInspections, toolboxMeetings, payPeriodConfig, payPeriods, quotes, quoteServices, gearItems, scheduledJobs, jobAssignments, userPreferences } from "@shared/schema";
+import type { User, InsertUser, Client, InsertClient, Project, InsertProject, CustomJobType, InsertCustomJobType, DropLog, InsertDropLog, WorkSession, InsertWorkSession, Complaint, InsertComplaint, ComplaintNote, InsertComplaintNote, ProjectPhoto, InsertProjectPhoto, JobComment, InsertJobComment, HarnessInspection, InsertHarnessInspection, ToolboxMeeting, InsertToolboxMeeting, PayPeriodConfig, InsertPayPeriodConfig, PayPeriod, InsertPayPeriod, EmployeeHoursSummary, Quote, InsertQuote, QuoteService, InsertQuoteService, QuoteWithServices, GearItem, InsertGearItem, ScheduledJob, InsertScheduledJob, JobAssignment, InsertJobAssignment, ScheduledJobWithAssignments, UserPreferences, InsertUserPreferences } from "@shared/schema";
 import { eq, and, or, desc, sql, isNull, not, gte, lte, between, inArray } from "drizzle-orm";
 import bcrypt from "bcrypt";
 
@@ -226,6 +226,32 @@ export class Storage {
 
   async permanentlyDeleteProject(id: string): Promise<void> {
     await db.delete(projects).where(eq(projects.id, id));
+  }
+
+  // Custom job type operations
+  async getCustomJobTypesByCompany(companyId: string): Promise<CustomJobType[]> {
+    return db.select().from(customJobTypes)
+      .where(eq(customJobTypes.companyId, companyId))
+      .orderBy(customJobTypes.jobTypeName);
+  }
+
+  async createCustomJobType(jobType: InsertCustomJobType): Promise<CustomJobType> {
+    const result = await db.insert(customJobTypes).values(jobType).returning();
+    return result[0];
+  }
+
+  async getCustomJobTypeByName(companyId: string, jobTypeName: string): Promise<CustomJobType | undefined> {
+    const result = await db.select().from(customJobTypes)
+      .where(and(
+        eq(customJobTypes.companyId, companyId),
+        eq(customJobTypes.jobTypeName, jobTypeName)
+      ))
+      .limit(1);
+    return result[0];
+  }
+
+  async deleteCustomJobType(id: string): Promise<void> {
+    await db.delete(customJobTypes).where(eq(customJobTypes.id, id));
   }
 
   // Drop log operations
