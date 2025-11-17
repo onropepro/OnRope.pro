@@ -15,6 +15,7 @@ interface Resident {
   unit?: string;
   parkingStall?: string;
   strataPlan?: string;
+  buildingName?: string;
   buildingId?: string;
   companyId: string;
 }
@@ -145,8 +146,15 @@ export default function ResidentsManagement() {
                               <span className="material-icons text-2xl text-primary">apartment</span>
                             </div>
                             <div>
-                              <CardTitle className="text-lg">Strata Plan {strataPlan}</CardTitle>
-                              <CardDescription>{strataPlanResidents.length} resident{strataPlanResidents.length !== 1 ? 's' : ''}</CardDescription>
+                              <CardTitle className="text-lg">
+                                {strataPlanResidents[0]?.buildingName || `Strata Plan ${strataPlan}`}
+                              </CardTitle>
+                              <CardDescription>
+                                {strataPlanResidents[0]?.buildingName && (
+                                  <span className="text-xs">Strata Plan {strataPlan} • </span>
+                                )}
+                                {strataPlanResidents.length} resident{strataPlanResidents.length !== 1 ? 's' : ''}
+                              </CardDescription>
                             </div>
                           </div>
                           <span className="material-icons text-2xl text-muted-foreground">
@@ -280,6 +288,15 @@ export default function ResidentsManagement() {
               <div>
                 <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide mb-3">Property Information</h3>
                 <div className="space-y-3">
+                  {selectedResident.buildingName && (
+                    <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
+                      <span className="material-icons text-muted-foreground">business</span>
+                      <div className="flex-1">
+                        <div className="text-xs text-muted-foreground">Building Name</div>
+                        <div className="font-medium">{selectedResident.buildingName}</div>
+                      </div>
+                    </div>
+                  )}
                   {selectedResident.strataPlan && (
                     <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
                       <span className="material-icons text-muted-foreground">apartment</span>
@@ -307,7 +324,7 @@ export default function ResidentsManagement() {
                       </div>
                     </div>
                   )}
-                  {!selectedResident.parkingStall && !selectedResident.unit && !selectedResident.strataPlan && (
+                  {!selectedResident.buildingName && !selectedResident.parkingStall && !selectedResident.unit && !selectedResident.strataPlan && (
                     <div className="text-sm text-muted-foreground text-center py-4">
                       No property information available
                     </div>

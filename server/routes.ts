@@ -1519,7 +1519,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Get all residents associated with this company's projects
       const residents = await storage.getResidentsByCompany(companyId);
       
-      // Return residents without sensitive data
+      // Get all clients to find building names
+      const clients = await storage.getClientsByCompany(companyId);
+      
+      // Create a map of strata plan number to building name
+      const strataPlanToBuilding = new Map<string, string>();
+      clients.forEach(client => {
+        if (client.lmsNumbers && Array.isArray(client.lmsNumbers)) {
+          client.lmsNumbers.forEach((lms: any) => {
+            if (lms.number && lms.buildingName) {
+              strataPlanToBuilding.set(lms.number, lms.buildingName);
+            }
+          });
+        }
+      });
+      
+      // Return residents without sensitive data, with building names
       const safeResidents = residents.map(resident => ({
         id: resident.id,
         name: resident.name,
@@ -1528,6 +1543,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         unit: resident.unitNumber,
         parkingStall: resident.parkingStallNumber,
         strataPlan: resident.strataPlanNumber,
+        buildingName: resident.strataPlanNumber ? strataPlanToBuilding.get(resident.strataPlanNumber) : undefined,
         buildingId: resident.strataPlanNumber, // Keep for backwards compatibility
         companyId: companyId,
       }));
