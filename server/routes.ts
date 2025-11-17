@@ -35,19 +35,20 @@ export function requireRole(...roles: string[]) {
 // Tier detection and seat limit utilities
 function detectTier(licenseKey: string | null): number {
   if (!licenseKey) return 0; // No tier
-  if (licenseKey.endsWith('-1')) return 1; // Tier 1
-  if (licenseKey.endsWith('-2')) return 2; // Tier 2  
-  if (licenseKey.endsWith('-3')) return 3; // Tier 3
+  if (licenseKey.endsWith('-1')) return 1; // Tier 1 (Basic)
+  if (licenseKey.endsWith('-2')) return 2; // Tier 2 (Starter)
+  if (licenseKey.endsWith('-3')) return 3; // Tier 3 (Professional)
+  if (licenseKey.endsWith('-4')) return 4; // Tier 4 (Premium)
   return 0; // Unknown/No tier
 }
 
 function getSeatLimit(tier: number, additionalSeats: number = 0): number {
   let baseLimit: number;
   switch (tier) {
-    case 1: baseLimit = 2; break;  // Tier 1: 2 seats
-    case 2: baseLimit = 10; break; // Tier 2: 10 seats
-    case 3: return -1; // Tier 3: unlimited (additional seats don't apply)
-    case 4: return -1; // Tier 4 (test): unlimited
+    case 1: baseLimit = 4; break;  // Tier 1 (Basic): 4 seats
+    case 2: baseLimit = 8; break;  // Tier 2 (Starter): 8 seats
+    case 3: baseLimit = 18; break; // Tier 3 (Professional): 18 seats
+    case 4: return -1; // Tier 4 (Premium): unlimited
     default: baseLimit = 0; break; // No limit if no tier
   }
   return baseLimit + additionalSeats; // Add purchased seats to base limit
@@ -55,9 +56,10 @@ function getSeatLimit(tier: number, additionalSeats: number = 0): number {
 
 function getProjectLimit(tier: number): number {
   switch (tier) {
-    case 1: return 5;  // Tier 1: 5 projects
-    case 2: return 20; // Tier 2: 20 projects (example)
-    case 3: return -1; // Tier 3: unlimited
+    case 1: return 2;  // Tier 1 (Basic): 2 projects
+    case 2: return 4;  // Tier 2 (Starter): 4 projects
+    case 3: return 9;  // Tier 3 (Professional): 9 projects
+    case 4: return -1; // Tier 4 (Premium): unlimited
     default: return 0; // No limit if no tier
   }
 }

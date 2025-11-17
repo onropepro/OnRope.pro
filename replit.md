@@ -17,19 +17,19 @@ The platform is built with a React 18 frontend using TypeScript and Wouter for r
 
 **Key Features and Design Decisions:**
 
-*   **Multi-Tenant Role-Based Access Control (RBAC):** Supports various roles (Company, Operations Manager, Supervisor, Rope Access Tech, Resident, SuperUser) with granular permissions for data access and actions.
-*   **Project Management System:** Manages diverse job types (e.g., Window Cleaning, Pressure Washing, Painting, Inspection) with visual selection, detailed project attributes, and multiple progress tracking systems (e.g., 4-Elevation, Parkade Grid, In-Suite Progress, Daily Drop Logging).
-*   **Workforce & Time Tracking:** Includes employee management (onboarding, certifications, rates, permissions), real-time clock-in/out with GPS, billable/non-billable hours, and payroll-ready reporting.
+*   **Multi-Tenant Role-Based Access Control (RBAC):** Supports various roles with granular permissions for data access and actions.
+*   **Project Management System:** Manages diverse job types with visual selection, detailed project attributes, and multiple progress tracking systems. Custom job types can be saved and reused.
+*   **Workforce & Time Tracking:** Includes employee management (onboarding, certifications, rates, permissions), real-time clock-in/out with GPS, billable/non-billable hours, and payroll-ready reporting. Includes IRATA certification expiration tracking.
 *   **Client Relationship Management (CRM):** Manages client and building records, offers autofill intelligence for project creation, and streamlines client-to-project workflows.
-*   **Scheduling & Resource Allocation:** Features a dual-calendar system (Job Schedule and Employee Schedule views) with color-coding, drag-and-drop assignment, and conflict detection.
+*   **Scheduling & Resource Allocation:** Features a dual-calendar system with color-coding, drag-and-drop assignment, and conflict detection.
 *   **Safety & Compliance:** Digitizes harness inspections, toolbox meeting documentation, and gear inventory management.
-*   **Resident Portal & Communication:** Provides a complaint management system with two-way communication and a photo gallery with unit-specific tagging and notification badges.
+*   **Resident Portal & Communication:** Provides a complaint management system with two-way communication, a photo gallery with unit-specific tagging, and notification badges. Features secure resident linking via unique company codes.
 *   **Financial Controls & Quoting:** Enables quote generation with labor cost calculations and tax computation, protected by strict permission-based access to financial data.
-*   **License Verification & Subscription Management:** Integrates with an external API for license key verification, enforces a read-only mode for unverified companies, and ensures secure data handling.
+*   **License Verification & Subscription Management:** Integrates with an external API for license key verification, enforces a read-only mode for unverified companies, and manages 30-day subscription renewals and seat purchasing.
 *   **SuperUser Administration:** Offers a centralized dashboard for company oversight, license status monitoring, and detailed company views with analytics.
 *   **Analytics & Reporting:** Provides insights into billable vs. non-billable hours, employee productivity, project labor costs, and real-time active worker tracking.
-*   **Security Architecture:** Implements session-based authentication with secure HTTP-only cookies, multi-tenant data isolation, permission-based API response filtering, and robust API security.
-*   **UI/UX Standards:** Emphasizes obvious, prominent buttons with icons, clear visual feedback, mobile-first design, and accessibility (44px minimum touch targets, high contrast, keyboard navigation).
+*   **Security Architecture:** Implements session-based authentication with secure HTTP-only cookies, multi-tenant data isolation, permission-based API response filtering, and robust API security. Includes an account provisioning API.
+*   **UI/UX Standards:** Emphasizes obvious, prominent buttons with icons, clear visual feedback, mobile-first design, and accessibility.
 
 ## External Dependencies
 
@@ -42,115 +42,3 @@ The platform is built with a React 18 frontend using TypeScript and Wouter for r
 *   **File Storage:** Replit Object Storage
 *   **Mapping:** Leaflet (for GPS location visualization)
 *   **License Verification:** Overhaul Labs Marketplace API (for license key management)
-
-## Recent Changes
-
-**November 17, 2025** - IRATA License Expiration Warning System
-
-*   Implemented automated IRATA certification expiration tracking and warnings
-*   **Dual Warning System:**
-    *   **Expired:** Red badge with error icon displays "IRATA Expired" when certification date has passed
-    *   **Expiring Soon:** Red badge with warning icon displays "IRATA Expiring Soon" when certification expires within 30 days but hasn't passed yet
-*   **Visual Alert:** Warning badges appear next to employee name in employee list for immediate visibility
-*   **Automatic Calculation:** Logic checks expiration date against current date and 30-day threshold on every page load
-*   **Proactive Compliance:** Helps management track and renew IRATA certifications before they expire, ensuring continuous compliance
-*   **Clear Status Indicators:** Different icons (error vs warning) help distinguish between already expired and upcoming expirations
-*   Prevents work disruptions by alerting management to certification status issues
-
-**November 17, 2025** - Resident Management UI Enhancement
-
-*   Implemented grouped resident display by strata plan number in Residents Management page
-*   **Collapsible Strata Groups:** Residents are organized into collapsible sections by strata plan, showing count of residents per building
-*   **Building Name Display:** Strata group headers now show building name as the primary title (from client's LMS data) with strata plan number as subtitle
-*   **Clickable Resident Cards:** Each resident card is now fully clickable to view detailed information
-*   **Comprehensive Detail Dialog:** Opens a modal showing all resident information including:
-    *   Contact: Name, email, phone number
-    *   Property: Building name, strata plan number, unit number, parking stall number
-*   **Enhanced API Response:** Updated `/api/residents` endpoint to:
-    *   Fetch all clients for the company
-    *   Map strata plan numbers to building names from client LMS data
-    *   Include `parkingStall`, `strataPlan`, and `buildingName` fields in response
-*   **Better Organization:** Strata plans are sorted alphabetically with expand/collapse functionality for easier navigation
-*   **Improved UX:** Clear visual hierarchy with Material Icons and responsive design for mobile and desktop
-*   Streamlines resident management workflow by reducing visual clutter and providing detailed information on demand
-
-**November 17, 2025** - Custom Job Type Saving and Reuse
-
-*   Implemented custom job type saving system for company-specific reuse
-*   Created `customJobTypes` table to store company-specific custom job types
-*   **Automatic Saving:** When creating a project with job type "other", the custom job type is automatically saved to the company's custom job types list
-*   **Duplicate Prevention:** System checks if custom job type already exists before saving (case-sensitive)
-*   **Smart UI:** When selecting "other" as job type, UI shows dropdown of saved custom job types with option to enter new ones
-*   **Seamless Experience:** Users can select from previously used custom types or enter a new one that will be saved for future use
-*   **Form Validation:** Added validation to require custom job type field when "Other" is selected - prevents empty submissions
-*   **Backend API:**
-    *   `GET /api/custom-job-types` - Fetch all custom job types for the company
-    *   `DELETE /api/custom-job-types/:id` - Delete a custom job type (company/operations_manager only)
-*   **Database Schema:** Added `customJobTypes` table with company_id foreign key, job type name, and created timestamp
-*   **Storage Methods:** Created `getCustomJobTypesByCompany()`, `createCustomJobType()`, `getCustomJobTypeByName()`, and `deleteCustomJobType()`
-*   Improves workflow efficiency by eliminating re-typing of frequently used custom job types
-
-**November 16, 2025** - Subscription Renewal Date Tracking
-
-*   Implemented 30-day subscription model with automatic renewal date tracking
-*   Added `subscriptionRenewalDate` field to database schema for company accounts
-*   **Automatic Initialization:** Both `/api/provision-account` and `/api/register` endpoints automatically set renewal date to 30 days from account creation
-*   **Automatic Renewal:** System checks renewal date on every user login/profile access - if date has passed AND license is verified, automatically extends by 30 days
-*   **License Validation:** Subscription only auto-renews if `licenseVerified === true` - prevents renewal for expired or invalid licenses
-*   **Security Logging:** System logs when renewal is skipped due to unverified license status
-*   **Profile Display:** Subscription tab now shows renewal date with countdown (e.g., "X days until renewal", "Renews tomorrow", "Renews today")
-*   **Date Formatting:** Displays in readable format (e.g., "Dec 16, 2025") with helpful context
-*   **Backend API:** License key now included in `/api/user` response for company users to view in subscription settings
-*   Provides clear visibility into subscription lifecycle for both company owners and administrators
-
-**November 16, 2025** - Tier-Based Employee Seat and Project Limits Implementation
-
-*   Implemented tier-based permission system for employee seats and active projects
-*   Tier detection based on license key suffix (e.g., `-1` for Tier 1, `-2` for Tier 2, `-3` for Tier 3)
-*   **Tier 1 Limits:** Maximum 2 employee seats and 5 active projects
-*   **Tier 2 Limits:** Maximum 10 employee seats and 20 active projects
-*   **Tier 3 Limits:** Unlimited employee seats and projects
-*   **Employee Seat Management:**
-    *   Seat counting excludes company owner and residents (only counts actual employees)
-    *   Real-time seat usage display in employee management section showing "X of Y seats used"
-    *   Disabled "Add Employee" button when seat limit is reached with clear messaging
-    *   Warning banner displays when at seat limit with upgrade/buy seats placeholder buttons
-    *   Backend API endpoints (`/api/employees` and `/api/employees/all`) now return `seatInfo` object with tier, limits, and usage data
-    *   Frontend dynamically adjusts UI based on tier status and seat availability
-    *   Tier badge color-coded (destructive red when at limit, secondary when within limit)
-    *   Added seat usage display to company Profile page showing tier, seats used, and seats remaining
-    *   Added seat usage display to SuperUser's Company Detail page for monitoring customer seat usage
-    *   Created `/api/superuser/companies/:id/employees` endpoint for SuperUser to view company seat info
-*   **Project Limit Management:**
-    *   Backend API endpoint (`/api/projects`) now returns `projectInfo` object with tier, limits, and usage data
-    *   Real-time project usage display in projects section showing "X of Y projects used"
-    *   Disabled "New Project" button when project limit is reached with clear messaging
-    *   Warning banner displays when at project limit with upgrade/buy project slots placeholder buttons
-    *   Frontend dynamically adjusts UI based on project tier status and availability
-*   Upgrade and purchase functionality stubbed for future implementation
-
-**November 15, 2025** - Resident Code System Implementation
-
-*   Implemented secure resident linking system with unique 10-character company codes
-*   Codes generated automatically on first login for company users using cryptographically secure randomness (crypto.randomBytes)
-*   Database-level UNIQUE constraint ensures no duplicate codes
-*   ~50 bits of entropy (1 trillion+ combinations) prevents brute-force attacks
-*   Character set excludes confusing characters (0, O, 1, I) for improved usability
-*   Resident code displayed prominently in company dashboard header and resident portal
-*   Editable in company profile page with validation and uniqueness checking
-*   Input normalization (uppercase, trimming) ensures consistent format
-*   Graceful error handling prevents login interruption if code generation fails
-*   **Code Validation:** Residents store the code they used to link (`linkedResidentCode`)
-*   **Auto-Unlinking:** If company changes their code, residents are automatically unlinked and must re-enter the new code
-*   **Security:** Prevents residents from seeing projects after company changes their code
-
-**November 15, 2025** - Account Provisioning API Implementation
-
-*   Implemented `/api/provision-account` endpoint for automated customer onboarding from external sales platforms
-*   Secured endpoint with API key authentication using `PROVISIONING_API_KEY` environment variable
-*   Whitelisted provisioning endpoint from authentication middleware to allow external access
-*   Fixed critical bug where passwords were being double-hashed during provisioning, causing login failures
-*   Generated temporary passwords follow format: `Temp{8-random-chars}!`
-*   Automatically creates company account, verifies license key, and configures default payroll settings
-*   Comprehensive API documentation provided in `PROVISIONING_API.md`
-*   Test script available at `test-provisioning-api.sh` for validation
