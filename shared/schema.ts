@@ -156,6 +156,16 @@ export const projects = pgTable("projects", {
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
+// Custom job types table - tracks company-specific custom job types for reuse
+export const customJobTypes = pgTable("custom_job_types", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  companyId: varchar("company_id").notNull().references(() => users.id, { onDelete: "cascade" }), // Foreign key to company
+  jobTypeName: varchar("job_type_name").notNull(), // Custom job type name
+  createdAt: timestamp("created_at").defaultNow(),
+}, (table) => [
+  index("IDX_custom_job_types_company").on(table.companyId),
+]);
+
 // Drop logs table - tracks daily drops per project per tech per elevation
 export const dropLogs = pgTable("drop_logs", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
@@ -886,6 +896,11 @@ export const insertProjectSchema = createInsertSchema(projects)
     }
   });
 
+export const insertCustomJobTypeSchema = createInsertSchema(customJobTypes).omit({
+  id: true,
+  createdAt: true,
+});
+
 export const insertDropLogSchema = createInsertSchema(dropLogs).omit({
   id: true,
   createdAt: true,
@@ -1034,6 +1049,9 @@ export type UserPublic = Omit<User, "passwordHash" | "licenseKey">;
 
 export type Project = typeof projects.$inferSelect;
 export type InsertProject = z.infer<typeof insertProjectSchema>;
+
+export type CustomJobType = typeof customJobTypes.$inferSelect;
+export type InsertCustomJobType = z.infer<typeof insertCustomJobTypeSchema>;
 
 export type DropLog = typeof dropLogs.$inferSelect;
 export type InsertDropLog = z.infer<typeof insertDropLogSchema>;
