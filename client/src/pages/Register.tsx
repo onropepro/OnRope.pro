@@ -120,7 +120,6 @@ export default function Register() {
           ...registrationData,
           role: "company",
           passwordHash: data.password,
-          hourlyRate: data.hourlyRate ? parseFloat(data.hourlyRate) : null,
           licenseKey: data.licenseKey || undefined,
         }),
         credentials: "include",
