@@ -45,9 +45,9 @@ function detectTier(licenseKey: string | null): number {
 function getSeatLimit(tier: number, additionalSeats: number = 0): number {
   let baseLimit: number;
   switch (tier) {
-    case 1: baseLimit = 4; break;  // Tier 1 (Basic): 4 seats
-    case 2: baseLimit = 8; break;  // Tier 2 (Starter): 8 seats
-    case 3: baseLimit = 18; break; // Tier 3 (Professional): 18 seats
+    case 1: baseLimit = 8; break;  // Tier 1 (Starter): 8 seats
+    case 2: baseLimit = 18; break; // Tier 2 (Professional): 18 seats
+    case 3: baseLimit = 50; break; // Tier 3 (Enterprise): 50 seats
     case 4: return -1; // Tier 4 (Premium): unlimited
     default: baseLimit = 0; break; // No limit if no tier
   }
@@ -56,9 +56,9 @@ function getSeatLimit(tier: number, additionalSeats: number = 0): number {
 
 function getProjectLimit(tier: number): number {
   switch (tier) {
-    case 1: return 2;  // Tier 1 (Basic): 2 projects
-    case 2: return 4;  // Tier 2 (Starter): 4 projects
-    case 3: return 9;  // Tier 3 (Professional): 9 projects
+    case 1: return 4;  // Tier 1 (Starter): 4 projects
+    case 2: return 9;  // Tier 2 (Professional): 9 projects
+    case 3: return 25; // Tier 3 (Enterprise): 25 projects
     case 4: return -1; // Tier 4 (Premium): unlimited
     default: return 0; // No limit if no tier
   }
