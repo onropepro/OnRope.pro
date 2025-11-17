@@ -35,6 +35,7 @@ const companySchema = z.object({
   province: z.string().min(1, "Province is required"),
   country: z.string().min(1, "Country is required"),
   zipCode: z.string().min(1, "Zip/postal code is required"),
+  licenseKey: z.string().optional(),
   password: z.string().min(6, "Password must be at least 6 characters"),
   confirmPassword: z.string().min(1, "Please confirm your password"),
 }).refine((data) => data.password === data.confirmPassword, {
@@ -73,6 +74,7 @@ export default function Register() {
       province: "",
       country: "",
       zipCode: "",
+      licenseKey: "",
       password: "",
       confirmPassword: "",
     },
@@ -119,6 +121,7 @@ export default function Register() {
           role: "company",
           passwordHash: data.password,
           hourlyRate: data.hourlyRate ? parseFloat(data.hourlyRate) : null,
+          licenseKey: data.licenseKey || undefined,
         }),
         credentials: "include",
       });
@@ -398,6 +401,23 @@ export default function Register() {
                         <FormControl>
                           <Input placeholder="Canada" {...field} data-testid="input-country" className="h-12" />
                         </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={companyForm.control}
+                    name="licenseKey"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>License Key (Optional)</FormLabel>
+                        <FormControl>
+                          <Input placeholder="ABC123-X" {...field} data-testid="input-license-key" className="h-12" />
+                        </FormControl>
+                        <FormDescription className="text-muted-foreground text-sm">
+                          Enter your license key now to get immediate access, or add it later from your profile
+                        </FormDescription>
                         <FormMessage />
                       </FormItem>
                     )}
