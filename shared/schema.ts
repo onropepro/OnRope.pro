@@ -93,6 +93,9 @@ export const users = pgTable("users", {
   licenseVerified: boolean("license_verified").default(false), // Public flag - safe to expose
   subscriptionRenewalDate: date("subscription_renewal_date"), // 30-day subscription renewal date (company role only)
   
+  // Additional seat/project purchases (company role only)
+  additionalSeats: integer("additional_seats").default(0), // Extra seats purchased beyond tier limit
+  
   // Resident linking code (company role only)
   residentCode: varchar("resident_code", { length: 10 }).unique(), // 10-character code for residents to link to company - UNIQUE (~50 bits entropy)
   
