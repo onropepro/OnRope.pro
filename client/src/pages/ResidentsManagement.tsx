@@ -85,6 +85,27 @@ export default function ResidentsManagement() {
 
       {/* Main content */}
       <main className="container mx-auto px-4 py-6 space-y-6">
+        {/* Resident Seats Management */}
+        <Card className="shadow-lg" data-testid="card-resident-seats">
+          <CardContent className="p-4">
+            <div className="flex items-center justify-between gap-3">
+              <div className="flex items-center gap-3">
+                <span className="material-icons text-primary">groups</span>
+                <div>
+                  <div className="font-medium">Resident Seats</div>
+                  <div className="text-sm text-muted-foreground">
+                    Manage capacity for building residents
+                  </div>
+                </div>
+              </div>
+              <Button size="sm" variant="outline" data-testid="button-add-resident-seats">
+                <span className="material-icons text-sm mr-1">add_shopping_cart</span>
+                Add more seats
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+
         {/* Search bar */}
         <Card className="shadow-lg">
           <CardContent className="pt-6">
