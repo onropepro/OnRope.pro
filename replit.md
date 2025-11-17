@@ -70,6 +70,7 @@ The platform is built with a React 18 frontend using TypeScript and Wouter for r
 *   **Duplicate Prevention:** System checks if custom job type already exists before saving (case-sensitive)
 *   **Smart UI:** When selecting "other" as job type, UI shows dropdown of saved custom job types with option to enter new ones
 *   **Seamless Experience:** Users can select from previously used custom types or enter a new one that will be saved for future use
+*   **Form Validation:** Added validation to require custom job type field when "Other" is selected - prevents empty submissions
 *   **Backend API:**
     *   `GET /api/custom-job-types` - Fetch all custom job types for the company
     *   `DELETE /api/custom-job-types/:id` - Delete a custom job type (company/operations_manager only)
