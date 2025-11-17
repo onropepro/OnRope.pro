@@ -512,24 +512,6 @@ export default function Login() {
               <p className="font-medium">Secure, Professional, Transparent</p>
               <p>Purpose-built for rope access and building maintenance operations</p>
             </div>
-
-            {/* Powered by Overhaul Labs */}
-            <a 
-              href="https://overhaullabs.replit.app" 
-              target="_blank" 
-              rel="noopener noreferrer"
-              className="pt-6 mt-6 border-t flex items-center justify-center gap-2 opacity-60 hover:opacity-100 transition-opacity cursor-pointer"
-              data-testid="link-overhaul-labs"
-            >
-              <img 
-                src={overhaulLabsLogo} 
-                alt="Overhaul Labs" 
-                className="h-8 w-8 object-contain"
-              />
-              <span className="text-xs text-muted-foreground font-medium">
-                Powered by <span className="text-foreground">Overhaul Labs</span>
-              </span>
-            </a>
           </CardContent>
         </Card>
       </div>
