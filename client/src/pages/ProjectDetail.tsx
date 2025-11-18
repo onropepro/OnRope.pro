@@ -102,6 +102,7 @@ export default function ProjectDetail() {
   const [showStartDayDialog, setShowStartDayDialog] = useState(false);
   const [showEndDayDialog, setShowEndDayDialog] = useState(false);
   const [activeSession, setActiveSession] = useState<any>(null);
+  const [showHarnessInspectionDialog, setShowHarnessInspectionDialog] = useState(false);
 
   const endDayForm = useForm<EndDayFormData>({
     resolver: zodResolver(endDaySchema),
@@ -647,7 +648,7 @@ export default function ProjectDetail() {
             {/* Start Work Session Button - Available to all users when no active session exists */}
             {!activeSession && project.status === "active" && (
               <Button
-                onClick={() => setShowStartDayDialog(true)}
+                onClick={() => setShowHarnessInspectionDialog(true)}
                 className="h-10 bg-primary text-primary-foreground hover:bg-primary/90"
                 data-testid="button-start-day"
               >
@@ -1671,6 +1672,50 @@ export default function ProjectDetail() {
             >
               Delete Project
             </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Harness Inspection Check Dialog */}
+      <AlertDialog open={showHarnessInspectionDialog} onOpenChange={setShowHarnessInspectionDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Daily Harness Inspection Complete?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Before starting your work session, please confirm if your daily harness inspection has been completed.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter className="flex-col sm:flex-row gap-2">
+            <Button
+              variant="outline"
+              onClick={() => {
+                setShowHarnessInspectionDialog(false);
+                setShowStartDayDialog(true);
+              }}
+              data-testid="button-harness-not-applicable"
+            >
+              Not Applicable
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={() => {
+                setShowHarnessInspectionDialog(false);
+                setLocation("/harness-inspection");
+              }}
+              data-testid="button-harness-no"
+            >
+              No
+            </Button>
+            <Button
+              variant="default"
+              onClick={() => {
+                setShowHarnessInspectionDialog(false);
+                setShowStartDayDialog(true);
+              }}
+              data-testid="button-harness-yes"
+            >
+              Yes
+            </Button>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
