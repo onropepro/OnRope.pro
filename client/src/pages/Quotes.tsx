@@ -31,7 +31,8 @@ import {
   Pipette,
   Edit,
   Image,
-  Search
+  Search,
+  Download
 } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
@@ -607,6 +608,82 @@ export default function Quotes() {
   // Check if user is a worker
   const isWorker = ["rope_access_tech", "manager", "ground_crew", "ground_crew_supervisor"].includes(currentUser?.role || "");
   
+  // Download quote as text file
+  const downloadQuote = (quote: QuoteWithServices) => {
+    const serviceNames: Record<string, string> = {
+      window_cleaning: "Window Cleaning",
+      dryer_vent_cleaning: "Exterior Dryer Vent Cleaning",
+      pressure_washing: "Pressure Washing",
+      general_pressure_washing: "General Pressure Washing",
+      gutter_cleaning: "Gutter Cleaning",
+      parkade: "Parkade Cleaning",
+      ground_windows: "Ground Windows",
+      in_suite: "In-Suite Dryer Vent"
+    };
+
+    let content = `SERVICE QUOTE
+
+Building: ${quote.buildingName}
+Strata Plan: ${quote.strataPlanNumber}
+Address: ${quote.buildingAddress}
+Floors: ${quote.floorCount}
+Status: ${quote.status.toUpperCase()}
+${quote.createdAt ? `Created: ${new Date(quote.createdAt).toLocaleDateString()}` : ''}
+
+SERVICES:
+${quote.services.map((service, index) => {
+  let serviceDetails = `\n${index + 1}. ${serviceNames[service.serviceType] || service.serviceType}\n`;
+  
+  if (service.dropsNorth || service.dropsEast || service.dropsSouth || service.dropsWest) {
+    serviceDetails += `   Drops: N:${service.dropsNorth || 0} E:${service.dropsEast || 0} S:${service.dropsSouth || 0} W:${service.dropsWest || 0}\n`;
+    if (service.dropsPerDay) serviceDetails += `   Drops per day: ${service.dropsPerDay}\n`;
+  }
+  
+  if (service.parkadeStalls) {
+    serviceDetails += `   Stalls: ${service.parkadeStalls}\n`;
+    if (canViewFinancialData && service.pricePerStall) {
+      serviceDetails += `   Price per stall: $${Number(service.pricePerStall).toFixed(2)}\n`;
+    }
+  }
+  
+  if (service.groundWindowHours) {
+    serviceDetails += `   Hours: ${service.groundWindowHours}\n`;
+  }
+  
+  if (service.suitesPerDay) {
+    serviceDetails += `   Suites per day: ${service.suitesPerDay}\n`;
+  }
+  
+  if (service.floorsPerDay) {
+    serviceDetails += `   Floors per day: ${service.floorsPerDay}\n`;
+  }
+  
+  if (canViewFinancialData) {
+    if (service.totalHours) serviceDetails += `   Total hours: ${service.totalHours}\n`;
+    if (service.pricePerHour) serviceDetails += `   Rate: $${Number(service.pricePerHour).toFixed(2)}/hr\n`;
+    if (service.totalCost) serviceDetails += `   Total: $${Number(service.totalCost).toFixed(2)}\n`;
+  }
+  
+  return serviceDetails;
+}).join('')}
+
+${canViewFinancialData ? `\nGRAND TOTAL: $${quote.services.reduce((sum, s) => sum + Number(s.totalCost || 0), 0).toFixed(2)}` : ''}
+
+---
+This is an official service quote.
+`;
+
+    const blob = new Blob([content], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `Quote_${quote.strataPlanNumber}_${new Date(quote.createdAt || Date.now()).toISOString().split('T')[0]}.txt`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
+  
   // Filter and sort quotes
   const filteredQuotes = (quotesData?.quotes || [])
     .filter(quote => 
@@ -965,19 +1042,29 @@ export default function Quotes() {
                   >
                     {selectedQuote.status}
                   </Badge>
-                  {selectedQuote.status === "draft" && 
-                   (canEditQuotes || selectedQuote.createdBy === currentUser?.id) && (
+                  <div className="flex gap-2">
                     <Button
-                      onClick={() => {
-                        setQuoteToSubmit(selectedQuote);
-                        setIsSubmitDialogOpen(true);
-                      }}
-                      className="bg-[#3B82F6] hover:bg-[#3B82F6]/90"
-                      data-testid="button-submit-quote"
+                      onClick={() => downloadQuote(selectedQuote)}
+                      variant="outline"
+                      data-testid="button-download-quote"
                     >
-                      Submit Quote
+                      <Download className="w-4 h-4 mr-2" />
+                      Download
                     </Button>
-                  )}
+                    {selectedQuote.status === "draft" && 
+                     (canEditQuotes || selectedQuote.createdBy === currentUser?.id) && (
+                      <Button
+                        onClick={() => {
+                          setQuoteToSubmit(selectedQuote);
+                          setIsSubmitDialogOpen(true);
+                        }}
+                        className="bg-[#3B82F6] hover:bg-[#3B82F6]/90"
+                        data-testid="button-submit-quote"
+                      >
+                        Submit Quote
+                      </Button>
+                    )}
+                  </div>
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-4 text-[#71717A]">

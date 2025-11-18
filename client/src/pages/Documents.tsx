@@ -2,9 +2,14 @@ import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { FileText, Download, Calendar } from "lucide-react";
+import { FileText, Download, Calendar, DollarSign } from "lucide-react";
+import { hasFinancialAccess } from "@/lib/permissions";
 
 export default function Documents() {
+  const { data: userData } = useQuery<{ user: any }>({
+    queryKey: ["/api/user"],
+  });
+
   const { data: projectsData } = useQuery<{ projects: any[] }>({
     queryKey: ["/api/projects"],
   });
@@ -17,9 +22,16 @@ export default function Documents() {
     queryKey: ["/api/harness-inspections"],
   });
 
+  const { data: quotesData } = useQuery<{ quotes: any[] }>({
+    queryKey: ["/api/quotes"],
+  });
+
+  const currentUser = userData?.user;
+  const canViewFinancials = hasFinancialAccess(currentUser);
   const projects = projectsData?.projects || [];
   const meetings = meetingsData?.meetings || [];
   const inspections = inspectionsData?.inspections || [];
+  const quotes = quotesData?.quotes || [];
 
   // Collect all rope access plan PDFs
   const allDocuments = projects.flatMap(project => 
@@ -104,6 +116,81 @@ This is an official equipment inspection record.
     const a = document.createElement('a');
     a.href = url;
     a.download = `Equipment_Inspection_${new Date(inspection.inspectionDate).toISOString().split('T')[0]}.txt`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
+
+  const downloadQuote = (quote: any) => {
+    const serviceNames: Record<string, string> = {
+      window_cleaning: "Window Cleaning",
+      dryer_vent_cleaning: "Exterior Dryer Vent Cleaning",
+      pressure_washing: "Pressure Washing",
+      general_pressure_washing: "General Pressure Washing",
+      gutter_cleaning: "Gutter Cleaning",
+      parkade: "Parkade Cleaning",
+      ground_windows: "Ground Windows",
+      in_suite: "In-Suite Dryer Vent"
+    };
+
+    let content = `SERVICE QUOTE
+
+Building: ${quote.buildingName}
+Strata Plan: ${quote.strataPlanNumber}
+Address: ${quote.buildingAddress}
+Floors: ${quote.floorCount}
+Status: ${quote.status.toUpperCase()}
+${quote.createdAt ? `Created: ${new Date(quote.createdAt).toLocaleDateString()}` : ''}
+
+SERVICES:
+${quote.services.map((service: any, index: number) => {
+  let serviceDetails = `\n${index + 1}. ${serviceNames[service.serviceType] || service.serviceType}\n`;
+  
+  if (service.dropsNorth || service.dropsEast || service.dropsSouth || service.dropsWest) {
+    serviceDetails += `   Drops: N:${service.dropsNorth || 0} E:${service.dropsEast || 0} S:${service.dropsSouth || 0} W:${service.dropsWest || 0}\n`;
+    if (service.dropsPerDay) serviceDetails += `   Drops per day: ${service.dropsPerDay}\n`;
+  }
+  
+  if (service.parkadeStalls) {
+    serviceDetails += `   Stalls: ${service.parkadeStalls}\n`;
+    if (canViewFinancials && service.pricePerStall) {
+      serviceDetails += `   Price per stall: $${Number(service.pricePerStall).toFixed(2)}\n`;
+    }
+  }
+  
+  if (service.groundWindowHours) {
+    serviceDetails += `   Hours: ${service.groundWindowHours}\n`;
+  }
+  
+  if (service.suitesPerDay) {
+    serviceDetails += `   Suites per day: ${service.suitesPerDay}\n`;
+  }
+  
+  if (service.floorsPerDay) {
+    serviceDetails += `   Floors per day: ${service.floorsPerDay}\n`;
+  }
+  
+  if (canViewFinancials) {
+    if (service.totalHours) serviceDetails += `   Total hours: ${service.totalHours}\n`;
+    if (service.pricePerHour) serviceDetails += `   Rate: $${Number(service.pricePerHour).toFixed(2)}/hr\n`;
+    if (service.totalCost) serviceDetails += `   Total: $${Number(service.totalCost).toFixed(2)}\n`;
+  }
+  
+  return serviceDetails;
+}).join('')}
+
+${canViewFinancials ? `\nGRAND TOTAL: $${quote.services.reduce((sum: number, s: any) => sum + Number(s.totalCost || 0), 0).toFixed(2)}` : ''}
+
+---
+This is an official service quote.
+`;
+
+    const blob = new Blob([content], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `Quote_${quote.strataPlanNumber}_${new Date(quote.createdAt || Date.now()).toISOString().split('T')[0]}.txt`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
@@ -208,7 +295,7 @@ This is an official equipment inspection record.
         </Card>
 
         {/* Harness Inspections */}
-        <Card>
+        <Card className="mb-6">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <span className="material-icons text-xl">verified_user</span>
@@ -254,6 +341,54 @@ This is an official equipment inspection record.
             )}
           </CardContent>
         </Card>
+
+        {/* Service Quotes */}
+        {canViewFinancials && (
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <DollarSign className="h-5 w-5" />
+                Service Quotes
+                <Badge variant="secondary" className="ml-auto">
+                  {quotes.length}
+                </Badge>
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              {quotes.length > 0 ? (
+                <div className="space-y-2">
+                  {quotes.map((quote) => (
+                    <div key={quote.id} className="flex items-center gap-3 p-3 rounded-md border hover-elevate">
+                      <DollarSign className="h-5 w-5 text-primary flex-shrink-0" />
+                      <div className="flex-1 min-w-0">
+                        <div className="font-medium">{quote.buildingName}</div>
+                        <div className="text-sm text-muted-foreground">
+                          {quote.strataPlanNumber} • {quote.createdAt ? new Date(quote.createdAt).toLocaleDateString() : ''}
+                        </div>
+                      </div>
+                      <Badge variant={quote.status === 'open' ? 'default' : 'secondary'}>
+                        {quote.status}
+                      </Badge>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => downloadQuote(quote)}
+                        data-testid={`download-quote-${quote.id}`}
+                      >
+                        <Download className="h-4 w-4 mr-1" />
+                        Download
+                      </Button>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-center py-8 text-muted-foreground">
+                  No quotes created yet
+                </p>
+              )}
+            </CardContent>
+          </Card>
+        )}
       </div>
     </div>
   );
