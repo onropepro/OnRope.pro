@@ -4282,6 +4282,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Unable to determine company" });
       }
       
+      console.log("Payroll config request body:", JSON.stringify(req.body, null, 2));
+      
       const configData = insertPayPeriodConfigSchema.parse({
         ...req.body,
         companyId,
@@ -4291,6 +4293,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({ config });
     } catch (error) {
       if (error instanceof z.ZodError) {
+        console.error("Payroll config validation error:", JSON.stringify(error.errors, null, 2));
         return res.status(400).json({ message: "Validation error", errors: error.errors });
       }
       console.error("Create/update pay period config error:", error);
