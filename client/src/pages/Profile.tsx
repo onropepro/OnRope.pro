@@ -793,6 +793,11 @@ export default function Profile() {
                               className="h-12"
                               data-testid="button-buy-seats"
                               onClick={() => {
+                                if (!employeesData?.seatInfo) {
+                                  alert('Seat info not loaded. Please refresh the page.');
+                                  return;
+                                }
+                                
                                 const params = new URLSearchParams({
                                   email: user?.email || '',
                                   tier: employeesData.seatInfo.tier.toString(),
@@ -800,14 +805,15 @@ export default function Profile() {
                                   seatsUsed: employeesData.seatInfo.seatsUsed.toString()
                                 });
                                 const url = `https://ram-website-paquettetom.replit.app/purchase-seats?${params.toString()}`;
-                                console.log('[Seat Purchase] Opening URL:', url);
-                                console.log('[Seat Purchase] Parameters:', {
-                                  email: user?.email,
-                                  tier: employeesData.seatInfo.tier,
-                                  currentSeats: employeesData.seatInfo.seatLimit,
-                                  seatsUsed: employeesData.seatInfo.seatsUsed
-                                });
-                                window.open(url, '_blank');
+                                
+                                // Debug: Show URL before opening
+                                const debugInfo = `Opening:\n${url}\n\nEmail: ${user?.email}\nTier: ${employeesData.seatInfo.tier}\nSeats: ${employeesData.seatInfo.seatLimit}\nUsed: ${employeesData.seatInfo.seatsUsed}`;
+                                console.log('[Seat Purchase]', debugInfo);
+                                
+                                const newWindow = window.open(url, '_blank');
+                                if (!newWindow) {
+                                  alert('Pop-up blocked! URL:\n' + url);
+                                }
                               }}
                             >
                               <span className="material-icons mr-2">add_shopping_cart</span>
