@@ -2428,7 +2428,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (currentUser.role === "company") {
         const tier = detectTier(currentUser.licenseKey);
         const projectLimit = getProjectLimit(tier);
-        const projectsUsed = projectsWithProgress.length;
+        // Only count non-completed projects toward the limit
+        const projectsUsed = projectsWithProgress.filter(p => p.progress !== "completed").length;
         const projectsAvailable = projectLimit === -1 ? -1 : Math.max(0, projectLimit - projectsUsed);
         const atProjectLimit = projectLimit > 0 && projectsUsed >= projectLimit;
         
