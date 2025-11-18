@@ -1929,7 +1929,19 @@ export default function Dashboard() {
                       <span className="material-icons text-sm mr-1">upgrade</span>
                       Upgrade Tier
                     </Button>
-                    <Button size="sm" variant="outline" data-testid="button-buy-projects">
+                    <Button 
+                      size="sm" 
+                      variant="outline" 
+                      data-testid="button-buy-projects"
+                      onClick={() => {
+                        const params = new URLSearchParams({
+                          email: currentUser?.email || '',
+                          tier: projectsData.projectInfo.tier.toString(),
+                          currentProjects: projectsData.projectInfo.projectLimit.toString(),
+                        });
+                        window.open(`https://ram-website-paquettetom.replit.app/purchase-projects?${params.toString()}`, '_blank');
+                      }}
+                    >
                       <span className="material-icons text-sm mr-1">add_shopping_cart</span>
                       Add more projects
                     </Button>
