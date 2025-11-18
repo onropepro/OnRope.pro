@@ -119,16 +119,46 @@ export default function Inventory() {
     mutationFn: async (data: Partial<InsertGearItem>) => {
       return apiRequest("POST", "/api/gear-items", data);
     },
-    onSuccess: () => {
+    onSuccess: async (response: any) => {
       queryClient.invalidateQueries({ queryKey: ["/api/gear-items"] });
-      toast({
-        title: "Item Added",
-        description: "The gear item has been added to inventory.",
-      });
+      
+      // If there's an employee assignment, create it
+      if (assignEmployeeId && response?.item?.id) {
+        const quantity = parseInt(assignQuantity) || 0;
+        if (quantity > 0) {
+          try {
+            await apiRequest("POST", "/api/gear-assignments", {
+              gearItemId: response.item.id,
+              employeeId: assignEmployeeId,
+              quantity,
+            });
+            queryClient.invalidateQueries({ queryKey: ["/api/gear-assignments"] });
+            toast({
+              title: "Item Added & Assigned",
+              description: "The gear item has been added and assigned to employee.",
+            });
+          } catch (error) {
+            toast({
+              title: "Item Added",
+              description: "Item added but assignment failed. You can assign it manually.",
+              variant: "destructive",
+            });
+          }
+        }
+      } else {
+        toast({
+          title: "Item Added",
+          description: "The gear item has been added to inventory.",
+        });
+      }
+      
       setShowAddDialog(false);
+      setAddItemStep(1);
       form.reset();
       setSerialNumbers([]);
       setCurrentSerialNumber("");
+      setAssignEmployeeId("");
+      setAssignQuantity("1");
     },
     onError: (error: any) => {
       toast({
@@ -1016,31 +1046,117 @@ export default function Inventory() {
                       </FormItem>
                     )}
                   />
+
+                  <div className="border-t pt-4 mt-4">
+                    <div className="text-sm font-medium mb-3">Assign to Employee (Optional)</div>
+                    
+                    <div className="space-y-3">
+                      <div className="space-y-2">
+                        <Label>Employee</Label>
+                        <Select value={assignEmployeeId} onValueChange={setAssignEmployeeId}>
+                          <SelectTrigger data-testid="select-assign-employee-add">
+                            <SelectValue placeholder="Select employee" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {activeEmployees
+                              .filter((emp: any) => emp.name && emp.name.trim() !== "")
+                              .map((emp: any) => (
+                                <SelectItem key={emp.id} value={emp.id}>
+                                  {emp.name}
+                                </SelectItem>
+                              ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+
+                      {assignEmployeeId && (
+                        <div className="space-y-2">
+                          <Label>How Many to Assign</Label>
+                          <Input
+                            type="number"
+                            min="1"
+                            max={form.watch("quantity") || 1}
+                            value={assignQuantity}
+                            onChange={(e) => setAssignQuantity(e.target.value)}
+                            placeholder="Enter quantity"
+                            data-testid="input-assign-quantity-add"
+                          />
+                          <div className="text-xs text-muted-foreground">
+                            Max: {form.watch("quantity") || 0}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
                 </>
               )}
 
-              {/* Carabiner-specific fields (just price) */}
+              {/* Carabiner-specific fields */}
               {form.watch("equipmentType") === "Carabiner" && (
-                <FormField
-                  control={form.control}
-                  name="itemPrice"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Price</FormLabel>
-                      <FormControl>
-                        <Input
-                          type="number"
-                          step="0.01"
-                          placeholder="0.00"
-                          {...field}
-                          value={field.value || ""}
-                          data-testid="input-price"
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                <>
+                  <FormField
+                    control={form.control}
+                    name="itemPrice"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Price</FormLabel>
+                        <FormControl>
+                          <Input
+                            type="number"
+                            step="0.01"
+                            placeholder="0.00"
+                            {...field}
+                            value={field.value || ""}
+                            data-testid="input-price"
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <div className="border-t pt-4 mt-4">
+                    <div className="text-sm font-medium mb-3">Assign to Employee (Optional)</div>
+                    
+                    <div className="space-y-3">
+                      <div className="space-y-2">
+                        <Label>Employee</Label>
+                        <Select value={assignEmployeeId} onValueChange={setAssignEmployeeId}>
+                          <SelectTrigger data-testid="select-assign-employee-add">
+                            <SelectValue placeholder="Select employee" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {activeEmployees
+                              .filter((emp: any) => emp.name && emp.name.trim() !== "")
+                              .map((emp: any) => (
+                                <SelectItem key={emp.id} value={emp.id}>
+                                  {emp.name}
+                                </SelectItem>
+                              ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+
+                      {assignEmployeeId && (
+                        <div className="space-y-2">
+                          <Label>How Many to Assign</Label>
+                          <Input
+                            type="number"
+                            min="1"
+                            max={form.watch("quantity") || 1}
+                            value={assignQuantity}
+                            onChange={(e) => setAssignQuantity(e.target.value)}
+                            placeholder="Enter quantity"
+                            data-testid="input-assign-quantity-add"
+                          />
+                          <div className="text-xs text-muted-foreground">
+                            Max: {form.watch("quantity") || 0}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </>
               )}
 
               {/* All other gear types: show full details */}
