@@ -670,7 +670,8 @@ export const quotes = pgTable("quotes", {
 export const quoteServices = pgTable("quote_services", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   quoteId: varchar("quote_id").notNull().references(() => quotes.id, { onDelete: "cascade" }),
-  serviceType: varchar("service_type").notNull(), // window_cleaning | dryer_vent_cleaning | building_wash | parkade | ground_windows | in_suite
+  serviceType: varchar("service_type").notNull(), // window_cleaning | dryer_vent_cleaning | building_wash | parkade | ground_windows | in_suite | custom
+  customServiceName: varchar("custom_service_name"), // For custom services
   
   // Elevation-based services (window_cleaning, dryer_vent_cleaning, building_wash)
   dropsNorth: integer("drops_north"),

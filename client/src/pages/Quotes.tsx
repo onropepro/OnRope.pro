@@ -557,8 +557,8 @@ export default function Quotes() {
     } else if (serviceBeingConfigured === "ground_windows") {
       totalHours = data.groundWindowHours || 0;
       totalCost = totalHours * (data.pricePerHour || 0);
-    } else if (serviceBeingConfigured === "general_pressure_washing" || serviceBeingConfigured === "gutter_cleaning") {
-      // Simple services: hours + price per hour
+    } else if (serviceBeingConfigured === "general_pressure_washing" || serviceBeingConfigured === "gutter_cleaning" || serviceBeingConfigured === "custom") {
+      // Simple services (including custom): hours + price per hour
       totalHours = data.simpleServiceHours || 0;
       totalCost = totalHours * (data.pricePerHour || 0);
     } else if (serviceBeingConfigured === "in_suite") {
@@ -593,9 +593,10 @@ export default function Quotes() {
         dryerVentPricePerUnit: data.dryerVentPricePerUnit,
         totalCost,
       } as ServiceFormData;
-    } else if (serviceBeingConfigured === "general_pressure_washing" || serviceBeingConfigured === "gutter_cleaning") {
+    } else if (serviceBeingConfigured === "general_pressure_washing" || serviceBeingConfigured === "gutter_cleaning" || serviceBeingConfigured === "custom") {
       configData = {
         serviceType: data.serviceType,
+        customServiceName: data.customServiceName, // Include custom service name
         simpleServiceHours: data.simpleServiceHours,
         pricePerHour: data.pricePerHour,
         totalHours,
@@ -640,7 +641,8 @@ export default function Quotes() {
       gutter_cleaning: "Gutter Cleaning",
       parkade: "Parkade Cleaning",
       ground_windows: "Ground Windows",
-      in_suite: "In-Suite Dryer Vent"
+      in_suite: "In-Suite Dryer Vent",
+      custom: "Custom Service"
     };
 
     const grandTotal = quote.services.reduce((sum, s) => sum + Number(s.totalCost || 0), 0);
@@ -713,7 +715,7 @@ export default function Quotes() {
         <div class="services-section">
             <h2>Services Proposed</h2>
             ${quote.services.map((service, index) => {
-              const serviceName = serviceNames[service.serviceType] || service.serviceType;
+              const serviceName = service.customServiceName || serviceNames[service.serviceType] || service.serviceType;
               let details = [];
 
               if (service.dropsNorth || service.dropsEast || service.dropsSouth || service.dropsWest) {
@@ -1333,10 +1335,10 @@ export default function Quotes() {
                       </div>
                       <div>
                         <CardTitle className="text-xl font-semibold text-[#0A0A0A]">
-                          {serviceConfig?.name || service.serviceType}
+                          {service.customServiceName || serviceConfig?.name || service.serviceType}
                         </CardTitle>
                         <CardDescription>
-                          {serviceConfig?.description}
+                          {service.customServiceName ? "Custom Service" : serviceConfig?.description}
                         </CardDescription>
                       </div>
                     </div>
