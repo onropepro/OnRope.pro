@@ -217,11 +217,18 @@ export default function Inventory() {
   });
 
   const handleAddItem = (data: Partial<InsertGearItem>) => {
-    const finalData = {
+    const finalData: any = {
       ...data,
       equipmentType: customType || data.equipmentType, // Use custom type if provided
       serialNumbers: serialNumbers.length > 0 ? serialNumbers : undefined,
     };
+    
+    // Add assignment info if provided
+    if (assignEmployeeId) {
+      finalData.assignEmployeeId = assignEmployeeId;
+      finalData.assignQuantity = assignQuantity;
+    }
+    
     addItemMutation.mutate(finalData);
   };
 

@@ -3842,6 +3842,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
       
       const item = await storage.createGearItem(itemData);
+      
+      // If assignment info is provided, create the assignment
+      if (req.body.assignEmployeeId && req.body.assignQuantity) {
+        const assignQuantity = parseInt(req.body.assignQuantity);
+        if (assignQuantity > 0 && assignQuantity <= (item.quantity || 0)) {
+          await storage.createGearAssignment({
+            gearItemId: item.id,
+            companyId,
+            employeeId: req.body.assignEmployeeId,
+            quantity: assignQuantity,
+          });
+        }
+      }
+      
       res.json({ item });
     } catch (error) {
       if (error instanceof z.ZodError) {
