@@ -628,6 +628,10 @@ export const quotes = pgTable("quotes", {
   buildingAddress: text("building_address").notNull(),
   floorCount: integer("floor_count").notNull(),
   
+  // Strata Property Manager information (optional)
+  strataManagerName: varchar("strata_manager_name"),
+  strataManagerAddress: text("strata_manager_address"),
+  
   // Photo attachment
   photoUrl: text("photo_url"), // URL to photo in object storage
   
