@@ -3927,6 +3927,81 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Gear assignments routes
+  
+  // Get all gear assignments (for My Gear view)
+  app.get("/api/gear-assignments", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      const companyId = currentUser.role === "company" ? currentUser.id : currentUser.companyId;
+      
+      if (!companyId) {
+        return res.status(400).json({ message: "Unable to determine company" });
+      }
+      
+      // For regular employees, only show their own assignments
+      // For managers/company, show all assignments
+      let assignments;
+      if (currentUser.role === "company" || isManagement(currentUser)) {
+        assignments = await db.select()
+          .from(gearAssignments)
+          .where(eq(gearAssignments.companyId, companyId));
+      } else {
+        assignments = await db.select()
+          .from(gearAssignments)
+          .where(and(
+            eq(gearAssignments.companyId, companyId),
+            eq(gearAssignments.employeeId, currentUser.id)
+          ));
+      }
+      
+      res.json({ assignments });
+    } catch (error) {
+      console.error("Get all gear assignments error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+  
+  // Create a gear assignment
+  app.post("/api/gear-assignments", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      const companyId = currentUser.role === "company" ? currentUser.id : currentUser.companyId;
+      
+      if (!companyId) {
+        return res.status(400).json({ message: "Unable to determine company" });
+      }
+      
+      console.log("Creating gear assignment:", req.body);
+      
+      const assignment = await storage.createGearAssignment({
+        gearItemId: req.body.gearItemId,
+        companyId,
+        employeeId: req.body.employeeId,
+        quantity: parseInt(req.body.quantity),
+      });
+      
+      console.log("Assignment created successfully:", assignment);
+      
+      res.json({ assignment });
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Validation error", errors: error.errors });
+      }
+      console.error("Create gear assignment error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+  
   app.get("/api/gear-items/:id/assignments", requireAuth, async (req: Request, res: Response) => {
     try {
       const currentUser = await storage.getUserById(req.session.userId!);
