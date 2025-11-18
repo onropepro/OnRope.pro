@@ -13,9 +13,10 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { ArrowLeft, ClipboardCheck, AlertTriangle, CheckCircle2 } from "lucide-react";
+import { ArrowLeft, ClipboardCheck, AlertTriangle, CheckCircle2, Package } from "lucide-react";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { ROPE_ACCESS_EQUIPMENT_CATEGORIES, ROPE_ACCESS_INSPECTION_ITEMS, type RopeAccessEquipmentCategory, type EquipmentFindings, type InspectionResult } from "@shared/schema";
 
 const inspectionFormSchema = z.object({
@@ -36,6 +37,7 @@ export default function HarnessInspectionForm() {
   const [, setLocation] = useLocation();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [selectedGearId, setSelectedGearId] = useState<string>("");
+  const [showHarnessPicker, setShowHarnessPicker] = useState(false);
 
   // Initialize all equipment findings with default "pass" values
   const initializeFindings = (): EquipmentFindings => {
@@ -72,6 +74,11 @@ export default function HarnessInspectionForm() {
   
   // Filter to only show current user's gear
   const myGear = allGearItems.filter((item: any) => item.assignedTo === currentUser?.name);
+  
+  // Filter to only show harnesses
+  const myHarnesses = myGear.filter((item: any) => 
+    item.equipmentType?.toLowerCase().includes('harness')
+  );
 
   // Fetch projects for optional selection
   const { data: projectsData } = useQuery<{ projects: any[] }>({
@@ -128,6 +135,12 @@ export default function HarnessInspectionForm() {
         form.setValue("dateInService", selectedGear.dateInService);
       }
     }
+  };
+
+  // Handle harness selection from picker dialog
+  const handleHarnessSelection = (harness: any) => {
+    handleGearSelection(harness.id);
+    setShowHarnessPicker(false);
   };
 
   // Calculate overall status and failure summary
@@ -292,6 +305,68 @@ export default function HarnessInspectionForm() {
                 <CardDescription>Inspection details and equipment information</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
+                {/* Harness Picker Button */}
+                {myHarnesses.length > 0 && (
+                  <Dialog open={showHarnessPicker} onOpenChange={setShowHarnessPicker}>
+                    <DialogTrigger asChild>
+                      <Button 
+                        type="button" 
+                        variant="default" 
+                        className="w-full h-14"
+                        data-testid="button-pick-harness"
+                      >
+                        <Package className="mr-2 h-5 w-5" />
+                        Pick Harness from Inventory
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+                      <DialogHeader>
+                        <DialogTitle>Select Harness from Inventory</DialogTitle>
+                        <DialogDescription>
+                          Choose a harness to auto-fill inspection details
+                        </DialogDescription>
+                      </DialogHeader>
+                      <div className="grid gap-3 py-4">
+                        {myHarnesses.map((harness: any) => (
+                          <Card 
+                            key={harness.id}
+                            className="hover-elevate active-elevate-2 cursor-pointer"
+                            onClick={() => handleHarnessSelection(harness)}
+                            data-testid={`harness-card-${harness.id}`}
+                          >
+                            <CardContent className="p-4">
+                              <div className="flex items-start gap-3">
+                                <span className="material-icons text-primary text-3xl mt-1">safety_check</span>
+                                <div className="flex-1 min-w-0">
+                                  <div className="font-semibold text-base mb-1">
+                                    {harness.equipmentType}
+                                  </div>
+                                  {(harness.brand || harness.model) && (
+                                    <div className="text-sm text-muted-foreground mb-1">
+                                      {harness.brand} {harness.model}
+                                    </div>
+                                  )}
+                                  {harness.serialNumbers && harness.serialNumbers.length > 0 && (
+                                    <div className="text-sm font-mono bg-muted px-2 py-1 rounded inline-block">
+                                      S/N: {harness.serialNumbers[0]}
+                                    </div>
+                                  )}
+                                  {harness.dateInService && (
+                                    <div className="text-xs text-muted-foreground mt-1">
+                                      In service: {new Date(harness.dateInService).toLocaleDateString()}
+                                    </div>
+                                  )}
+                                </div>
+                                <CheckCircle2 className="h-5 w-5 text-success flex-shrink-0" />
+                              </div>
+                            </CardContent>
+                          </Card>
+                        ))}
+                      </div>
+                    </DialogContent>
+                  </Dialog>
+                )}
+
                 {/* Gear Selection Dropdown for Autofill */}
                 {myGear.length > 0 && (
                   <div className="bg-primary/5 border border-primary/20 rounded-md p-4 space-y-3">
