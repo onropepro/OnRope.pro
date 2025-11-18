@@ -2,7 +2,7 @@ import type { Express, Request, Response, NextFunction } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { db } from "./db";
-import { insertUserSchema, insertClientSchema, insertProjectSchema, insertDropLogSchema, insertComplaintSchema, insertComplaintNoteSchema, insertJobCommentSchema, insertHarnessInspectionSchema, insertToolboxMeetingSchema, insertPayPeriodConfigSchema, insertQuoteSchema, insertQuoteServiceSchema, insertGearItemSchema, insertScheduledJobSchema, insertJobAssignmentSchema, normalizeStrataPlan, type InsertGearItem, jobAssignments } from "@shared/schema";
+import { insertUserSchema, insertClientSchema, insertProjectSchema, insertDropLogSchema, insertComplaintSchema, insertComplaintNoteSchema, insertJobCommentSchema, insertHarnessInspectionSchema, insertToolboxMeetingSchema, insertPayPeriodConfigSchema, insertQuoteSchema, insertQuoteServiceSchema, insertGearItemSchema, insertGearAssignmentSchema, insertScheduledJobSchema, insertJobAssignmentSchema, normalizeStrataPlan, type InsertGearItem, type InsertGearAssignment, gearAssignments, jobAssignments } from "@shared/schema";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
 import bcrypt from "bcrypt";
@@ -3856,6 +3856,130 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({ success: true });
     } catch (error) {
       console.error("Delete gear item error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Gear assignments routes
+  app.get("/api/gear-items/:id/assignments", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      const companyId = currentUser.role === "company" ? currentUser.id : currentUser.companyId;
+      
+      if (!companyId) {
+        return res.status(400).json({ message: "Unable to determine company" });
+      }
+      
+      const assignments = await db.select()
+        .from(gearAssignments)
+        .where(and(
+          eq(gearAssignments.gearItemId, req.params.id),
+          eq(gearAssignments.companyId, companyId)
+        ));
+      
+      res.json({ assignments });
+    } catch (error) {
+      console.error("Get gear assignments error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.post("/api/gear-items/:id/assignments", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      const companyId = currentUser.role === "company" ? currentUser.id : currentUser.companyId;
+      
+      if (!companyId) {
+        return res.status(400).json({ message: "Unable to determine company" });
+      }
+      
+      const assignmentData = insertGearAssignmentSchema.parse({
+        gearItemId: req.params.id,
+        companyId,
+        employeeName: req.body.employeeName,
+        quantityAssigned: req.body.quantityAssigned,
+      });
+      
+      const [assignment] = await db.insert(gearAssignments)
+        .values(assignmentData)
+        .returning();
+      
+      res.json({ assignment });
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Validation error", errors: error.errors });
+      }
+      console.error("Create gear assignment error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.patch("/api/gear-assignments/:id", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      const companyId = currentUser.role === "company" ? currentUser.id : currentUser.companyId;
+      
+      if (!companyId) {
+        return res.status(400).json({ message: "Unable to determine company" });
+      }
+      
+      const updates: Partial<InsertGearAssignment> = {};
+      if (req.body.employeeName !== undefined) updates.employeeName = req.body.employeeName;
+      if (req.body.quantityAssigned !== undefined) updates.quantityAssigned = req.body.quantityAssigned;
+      
+      const [assignment] = await db.update(gearAssignments)
+        .set({ ...updates, updatedAt: new Date() })
+        .where(and(
+          eq(gearAssignments.id, req.params.id),
+          eq(gearAssignments.companyId, companyId)
+        ))
+        .returning();
+      
+      res.json({ assignment });
+    } catch (error) {
+      console.error("Update gear assignment error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.delete("/api/gear-assignments/:id", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      const companyId = currentUser.role === "company" ? currentUser.id : currentUser.companyId;
+      
+      if (!companyId) {
+        return res.status(400).json({ message: "Unable to determine company" });
+      }
+      
+      await db.delete(gearAssignments)
+        .where(and(
+          eq(gearAssignments.id, req.params.id),
+          eq(gearAssignments.companyId, companyId)
+        ));
+      
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Delete gear assignment error:", error);
       res.status(500).json({ message: "Internal server error" });
     }
   });

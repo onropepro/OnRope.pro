@@ -251,7 +251,7 @@ export const gearItems = pgTable("gear_items", {
   itemPrice: numeric("item_price", { precision: 10, scale: 2 }), // Optional - only visible to users with financial permissions
   ropeLength: numeric("rope_length", { precision: 10, scale: 2 }), // Optional - for Rope items only (in feet)
   pricePerFeet: numeric("price_per_feet", { precision: 10, scale: 2 }), // Optional - for Rope items only ($ per foot)
-  assignedTo: varchar("assigned_to").default("Not in use"), // Who has this equipment or "Not in use"
+  assignedTo: varchar("assigned_to").default("Not in use"), // DEPRECATED - kept for backward compatibility
   notes: text("notes"), // Optional - additional notes about the item
   quantity: integer("quantity").default(1).notNull(), // Total quantity of this item (0 = out of stock)
   serialNumbers: text("serial_numbers").array(), // Optional array of serial numbers for individual items
@@ -264,6 +264,20 @@ export const gearItems = pgTable("gear_items", {
   index("IDX_gear_items_employee").on(table.employeeId),
   index("IDX_gear_items_company").on(table.companyId),
   index("IDX_gear_items_type").on(table.equipmentType),
+]);
+
+// Gear assignments table - tracks which employees have which gear and how many
+export const gearAssignments = pgTable("gear_assignments", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  gearItemId: varchar("gear_item_id").notNull().references(() => gearItems.id, { onDelete: "cascade" }),
+  companyId: varchar("company_id").notNull().references(() => users.id, { onDelete: "cascade" }), // For multi-tenant isolation
+  employeeName: varchar("employee_name").notNull(), // Name of employee who has this gear
+  quantityAssigned: integer("quantity_assigned").notNull(), // How many of this item they have
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+}, (table) => [
+  index("IDX_gear_assignments_item").on(table.gearItemId),
+  index("IDX_gear_assignments_company").on(table.companyId),
 ]);
 
 // Complaints table
@@ -935,6 +949,12 @@ export const insertGearItemSchema = createInsertSchema(gearItems).omit({
   updatedAt: true,
 });
 
+export const insertGearAssignmentSchema = createInsertSchema(gearAssignments).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
 export const insertComplaintSchema = createInsertSchema(complaints).omit({
   id: true,
   createdAt: true,
@@ -1074,6 +1094,9 @@ export type InsertNonBillableWorkSession = z.infer<typeof insertNonBillableWorkS
 
 export type GearItem = typeof gearItems.$inferSelect;
 export type InsertGearItem = z.infer<typeof insertGearItemSchema>;
+
+export type GearAssignment = typeof gearAssignments.$inferSelect;
+export type InsertGearAssignment = z.infer<typeof insertGearAssignmentSchema>;
 
 export type Complaint = typeof complaints.$inferSelect;
 export type InsertComplaint = z.infer<typeof insertComplaintSchema>;
