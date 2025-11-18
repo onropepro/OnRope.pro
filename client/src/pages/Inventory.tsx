@@ -50,6 +50,7 @@ export default function Inventory() {
   const [itemToDelete, setItemToDelete] = useState<GearItem | null>(null);
   const [customType, setCustomType] = useState("");
   const [addItemStep, setAddItemStep] = useState(1);
+  const [activeTab, setActiveTab] = useState("my-gear");
 
   // Fetch current user
   const { data: userData } = useQuery<{ user: any }>({
@@ -356,7 +357,7 @@ export default function Inventory() {
       </header>
 
       <div className="p-4 max-w-4xl mx-auto">
-        <Tabs defaultValue="my-gear" className="w-full">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <TabsList className="grid w-full grid-cols-3 mb-4">
             <TabsTrigger value="my-gear" data-testid="tab-my-gear">My Gear</TabsTrigger>
             <TabsTrigger value="manage" data-testid="tab-manage-gear">Manage Gear</TabsTrigger>
@@ -379,10 +380,7 @@ export default function Inventory() {
                     </div>
                   </div>
                   <Button
-                    onClick={() => {
-                      const manageTab = document.querySelector('[data-testid="tab-manage-gear"]') as HTMLElement;
-                      manageTab?.click();
-                    }}
+                    onClick={() => setActiveTab("manage")}
                     data-testid="button-go-to-manage"
                   >
                     <Plus className="h-4 w-4 mr-2" />
