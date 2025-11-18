@@ -14,8 +14,9 @@ import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { insertGearItemSchema, type InsertGearItem, type GearItem } from "@shared/schema";
-import { ArrowLeft, Plus, Pencil, X, Trash2, Shield, Cable, Link2, Gauge, TrendingUp, HardHat, Hand, Fuel, Scissors, PaintBucket, Droplets, CircleDot, Lock, Anchor, MoreHorizontal } from "lucide-react";
+import { insertGearItemSchema, type InsertGearItem, type GearItem, type GearAssignment } from "@shared/schema";
+import { ArrowLeft, Plus, Pencil, X, Trash2, Shield, Cable, Link2, Gauge, TrendingUp, HardHat, Hand, Fuel, Scissors, PaintBucket, Droplets, CircleDot, Lock, Anchor, MoreHorizontal, Users } from "lucide-react";
+import { Label } from "@/components/ui/label";
 import { hasFinancialAccess } from "@/lib/permissions";
 import HarnessInspectionForm from "./HarnessInspectionForm";
 
@@ -51,6 +52,12 @@ export default function Inventory() {
   const [customType, setCustomType] = useState("");
   const [addItemStep, setAddItemStep] = useState(1);
   const [activeTab, setActiveTab] = useState("my-gear");
+  
+  // Assignment dialog state
+  const [showAssignDialog, setShowAssignDialog] = useState(false);
+  const [managingItem, setManagingItem] = useState<GearItem | null>(null);
+  const [assignEmployeeId, setAssignEmployeeId] = useState<string>("");
+  const [assignQuantity, setAssignQuantity] = useState<string>("1");
 
   // Fetch current user
   const { data: userData } = useQuery<{ user: any }>({
@@ -65,6 +72,11 @@ export default function Inventory() {
     queryKey: ["/api/gear-items"],
   });
 
+  // Fetch all gear assignments
+  const { data: assignmentsData } = useQuery<{ assignments: GearAssignment[] }>({
+    queryKey: ["/api/gear-assignments"],
+  });
+
   // Fetch active employees for dropdown
   const { data: employeesData } = useQuery<{ employees: any[] }>({
     queryKey: ["/api/employees"],
@@ -72,6 +84,19 @@ export default function Inventory() {
   
   // Filter for active employees only
   const activeEmployees = (employeesData?.employees || []);
+  
+  // Helper function to get assignments for an item
+  const getItemAssignments = (itemId: string) => {
+    return (assignmentsData?.assignments || []).filter((a: GearAssignment) => a.gearItemId === itemId);
+  };
+  
+  // Helper function to calculate available quantity for an item
+  const getAvailableQuantity = (item: GearItem) => {
+    const totalQuantity = item.quantity || 0;
+    const assignments = getItemAssignments(item.id);
+    const assignedQuantity = assignments.reduce((sum, a) => sum + a.quantity, 0);
+    return totalQuantity - assignedQuantity;
+  };
 
   const form = useForm<Partial<InsertGearItem>>({
     defaultValues: {
@@ -81,7 +106,6 @@ export default function Inventory() {
       itemPrice: undefined,
       ropeLength: undefined,
       pricePerFeet: undefined,
-      assignedTo: "Not in use",
       notes: undefined,
       quantity: undefined,
       serialNumbers: undefined,
@@ -166,7 +190,6 @@ export default function Inventory() {
     const finalData = {
       ...data,
       equipmentType: customType || data.equipmentType, // Use custom type if provided
-      assignedTo: data.assignedTo?.trim() || "Not in use",
       serialNumbers: serialNumbers.length > 0 ? serialNumbers : undefined,
     };
     addItemMutation.mutate(finalData);
@@ -177,12 +200,55 @@ export default function Inventory() {
       const finalData = {
         ...data,
         equipmentType: customType || data.equipmentType, // Use custom type if provided
-        assignedTo: data.assignedTo?.trim() || "Not in use",
         serialNumbers: serialNumbers.length > 0 ? serialNumbers : undefined,
       };
       updateItemMutation.mutate({ id: editingItem.id, data: finalData });
     }
   };
+
+  // Create gear assignment mutation
+  const createAssignmentMutation = useMutation({
+    mutationFn: async (data: { gearItemId: string; employeeId: string; quantity: number }) => {
+      return apiRequest("POST", "/api/gear-assignments", data);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/gear-assignments"] });
+      toast({
+        title: "Gear Assigned",
+        description: "Gear has been assigned to the employee.",
+      });
+      setAssignEmployeeId("");
+      setAssignQuantity("1");
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to assign gear",
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Delete gear assignment mutation
+  const deleteAssignmentMutation = useMutation({
+    mutationFn: async (assignmentId: string) => {
+      return apiRequest("DELETE", `/api/gear-assignments/${assignmentId}`, {});
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/gear-assignments"] });
+      toast({
+        title: "Assignment Removed",
+        description: "Gear assignment has been removed.",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to remove assignment",
+        variant: "destructive",
+      });
+    },
+  });
 
   const handleAddSerialNumber = () => {
     const quantity = form.getValues("quantity");
@@ -248,7 +314,6 @@ export default function Inventory() {
       brand: "",
       model: "",
       itemPrice: "",
-      assignedTo: "Not in use",
       notes: "",
       quantity: undefined,
       serialNumbers: [],
@@ -272,7 +337,6 @@ export default function Inventory() {
       itemPrice: item.itemPrice || undefined,
       ropeLength: item.ropeLength || undefined,
       pricePerFeet: item.pricePerFeet || undefined,
-      assignedTo: item.assignedTo || "Not in use",
       notes: item.notes || undefined,
       quantity: item.quantity || 1,
       serialNumbers: item.serialNumbers || undefined,
@@ -293,6 +357,50 @@ export default function Inventory() {
     setShowEditDialog(true);
   };
 
+  const openAssignDialog = (item: GearItem) => {
+    setManagingItem(item);
+    setAssignEmployeeId("");
+    setAssignQuantity("1");
+    setShowAssignDialog(true);
+  };
+
+  const handleAssignGear = () => {
+    if (!managingItem || !assignEmployeeId) {
+      toast({
+        title: "Validation Error",
+        description: "Please select an employee",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const quantity = parseInt(assignQuantity) || 0;
+    if (quantity <= 0) {
+      toast({
+        title: "Validation Error",
+        description: "Quantity must be greater than 0",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const available = getAvailableQuantity(managingItem);
+    if (quantity > available) {
+      toast({
+        title: "Validation Error",
+        description: `Only ${available} items available`,
+        variant: "destructive",
+      });
+      return;
+    }
+
+    createAssignmentMutation.mutate({
+      gearItemId: managingItem.id,
+      employeeId: assignEmployeeId,
+      quantity,
+    });
+  };
+
   const openDeleteDialog = (item: GearItem) => {
     setItemToDelete(item);
     setShowDeleteDialog(true);
@@ -305,7 +413,12 @@ export default function Inventory() {
   };
 
   const allGearItems = gearData?.items || [];
-  const myGear = allGearItems.filter((item: GearItem) => item.assignedTo === currentUser?.name);
+  
+  // Get gear assigned to current user based on assignments
+  const myGear = allGearItems.filter((item: GearItem) => {
+    const assignments = getItemAssignments(item.id);
+    return assignments.some(a => a.employeeId === currentUser?.id);
+  });
 
   const totalMyItems = myGear.reduce((sum: number, item: any) => sum + (item.quantity || 0), 0);
   const totalMyValue = myGear.reduce((sum: number, item: any) => {
@@ -609,8 +722,32 @@ export default function Inventory() {
                                 ))}
                               </div>
                             )}
-                            <div className="text-sm text-muted-foreground">
-                              Assigned to: {item.assignedTo || "Not in use"}
+                            <div className="text-sm mt-2">
+                              <div className="font-medium text-foreground">
+                                Available: {getAvailableQuantity(item)} / {item.quantity || 0}
+                              </div>
+                              {getItemAssignments(item.id).length > 0 && (
+                                <div className="mt-1 space-y-1">
+                                  <div className="text-xs text-muted-foreground">Assigned:</div>
+                                  {getItemAssignments(item.id).map((assignment) => {
+                                    const employee = activeEmployees.find(e => e.id === assignment.employeeId);
+                                    return (
+                                      <div key={assignment.id} className="flex items-center justify-between gap-2">
+                                        <span className="text-xs">• {employee?.name || "Unknown"} ({assignment.quantity})</span>
+                                        <Button
+                                          size="icon"
+                                          variant="ghost"
+                                          onClick={() => deleteAssignmentMutation.mutate(assignment.id)}
+                                          className="h-5 w-5"
+                                          data-testid={`button-unassign-${assignment.id}`}
+                                        >
+                                          <X className="h-3 w-3" />
+                                        </Button>
+                                      </div>
+                                    );
+                                  })}
+                                </div>
+                              )}
                             </div>
                           </div>
                           <div>
@@ -634,6 +771,15 @@ export default function Inventory() {
                           </div>
                         </div>
                         <div className="flex gap-2">
+                          <Button
+                            size="icon"
+                            variant="ghost"
+                            onClick={() => openAssignDialog(item)}
+                            data-testid={`button-assign-${item.id}`}
+                            title="Assign gear to employee"
+                          >
+                            <Users className="h-4 w-4" />
+                          </Button>
                           <Button
                             size="icon"
                             variant="ghost"
@@ -819,33 +965,6 @@ export default function Inventory() {
                         data-testid="input-quantity"
                       />
                     </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              {/* Assigned To Field */}
-              <FormField
-                control={form.control}
-                name="assignedTo"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Assigned To</FormLabel>
-                    <Select onValueChange={field.onChange} value={field.value || "Not in use"}>
-                      <FormControl>
-                        <SelectTrigger data-testid="select-assigned-to">
-                          <SelectValue placeholder="Select employee or Not in use" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="Not in use">Not in use</SelectItem>
-                        {activeEmployees.filter((emp: any) => emp.name && emp.name.trim() !== "").map((emp: any) => (
-                          <SelectItem key={emp.id} value={emp.name}>
-                            {emp.name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -1355,6 +1474,128 @@ export default function Inventory() {
               data-testid="button-confirm-delete"
             >
               {deleteItemMutation.isPending ? "Deleting..." : "Delete Item"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Assignment Management Dialog */}
+      <Dialog open={showAssignDialog} onOpenChange={setShowAssignDialog}>
+        <DialogContent data-testid="dialog-assign-gear">
+          <DialogHeader>
+            <DialogTitle>Assign Gear to Employee</DialogTitle>
+            <DialogDescription>
+              Manage who this gear item is assigned to
+            </DialogDescription>
+          </DialogHeader>
+          
+          {managingItem && (
+            <div className="space-y-4">
+              {/* Item Info */}
+              <div className="p-3 bg-muted/50 rounded-md">
+                <div className="font-medium">{managingItem.equipmentType}</div>
+                {(managingItem.brand || managingItem.model) && (
+                  <div className="text-sm text-muted-foreground">
+                    {[managingItem.brand, managingItem.model].filter(Boolean).join(" - ")}
+                  </div>
+                )}
+                <div className="text-sm text-muted-foreground mt-1">
+                  Available: {getAvailableQuantity(managingItem)} / {managingItem.quantity || 0}
+                </div>
+              </div>
+
+              {/* Current Assignments */}
+              {getItemAssignments(managingItem.id).length > 0 && (
+                <div>
+                  <div className="text-sm font-medium mb-2">Current Assignments:</div>
+                  <div className="space-y-2">
+                    {getItemAssignments(managingItem.id).map((assignment) => {
+                      const employee = activeEmployees.find(e => e.id === assignment.employeeId);
+                      return (
+                        <div key={assignment.id} className="flex items-center justify-between p-2 bg-muted/30 rounded">
+                          <div className="text-sm">
+                            <div className="font-medium">{employee?.name || "Unknown"}</div>
+                            <div className="text-xs text-muted-foreground">Quantity: {assignment.quantity}</div>
+                          </div>
+                          <Button
+                            size="sm"
+                            variant="destructive"
+                            onClick={() => deleteAssignmentMutation.mutate(assignment.id)}
+                            disabled={deleteAssignmentMutation.isPending}
+                            data-testid={`button-remove-assignment-${assignment.id}`}
+                          >
+                            <Trash2 className="h-3 w-3 mr-1" />
+                            Remove
+                          </Button>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+
+              {/* Add Assignment Form */}
+              <div className="border-t pt-4 space-y-3">
+                <div className="text-sm font-medium">Assign to New Employee:</div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="assign-employee">Employee</Label>
+                  <Select value={assignEmployeeId} onValueChange={setAssignEmployeeId}>
+                    <SelectTrigger data-testid="select-assign-employee">
+                      <SelectValue placeholder="Select employee" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {activeEmployees
+                        .filter((emp: any) => emp.name && emp.name.trim() !== "")
+                        .map((emp: any) => (
+                          <SelectItem key={emp.id} value={emp.id}>
+                            {emp.name}
+                          </SelectItem>
+                        ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="assign-quantity">Quantity</Label>
+                  <Input
+                    id="assign-quantity"
+                    type="number"
+                    min="1"
+                    max={getAvailableQuantity(managingItem)}
+                    value={assignQuantity}
+                    onChange={(e) => setAssignQuantity(e.target.value)}
+                    placeholder="Enter quantity"
+                    data-testid="input-assign-quantity"
+                  />
+                  <div className="text-xs text-muted-foreground">
+                    Max available: {getAvailableQuantity(managingItem)}
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          <DialogFooter>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => {
+                setShowAssignDialog(false);
+                setManagingItem(null);
+                setAssignEmployeeId("");
+                setAssignQuantity("1");
+              }}
+              data-testid="button-cancel-assign"
+            >
+              Close
+            </Button>
+            <Button
+              onClick={handleAssignGear}
+              disabled={createAssignmentMutation.isPending || !assignEmployeeId}
+              data-testid="button-submit-assign"
+            >
+              {createAssignmentMutation.isPending ? "Assigning..." : "Assign Gear"}
             </Button>
           </DialogFooter>
         </DialogContent>

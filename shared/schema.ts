@@ -271,12 +271,13 @@ export const gearAssignments = pgTable("gear_assignments", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   gearItemId: varchar("gear_item_id").notNull().references(() => gearItems.id, { onDelete: "cascade" }),
   companyId: varchar("company_id").notNull().references(() => users.id, { onDelete: "cascade" }), // For multi-tenant isolation
-  employeeName: varchar("employee_name").notNull(), // Name of employee who has this gear
-  quantityAssigned: integer("quantity_assigned").notNull(), // How many of this item they have
+  employeeId: varchar("employee_id").notNull().references(() => users.id, { onDelete: "cascade" }), // Employee who has this gear
+  quantity: integer("quantity").notNull(), // How many of this item they have
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 }, (table) => [
   index("IDX_gear_assignments_item").on(table.gearItemId),
+  index("IDX_gear_assignments_employee").on(table.employeeId),
   index("IDX_gear_assignments_company").on(table.companyId),
 ]);
 

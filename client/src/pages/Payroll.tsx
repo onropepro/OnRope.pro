@@ -371,28 +371,46 @@ export default function Payroll() {
   }
 
   const handleSaveConfiguration = () => {
+    // Validate period type is selected
+    if (!periodType) {
+      toast({
+        title: "Validation Error",
+        description: "Please select a pay period type",
+        variant: "destructive",
+      });
+      return;
+    }
+
     const config: any = {
       periodType,
-      overtimeMultiplier: parseFloat(overtimeMultiplier),
-      doubleTimeMultiplier: parseFloat(doubleTimeMultiplier),
-      overtimeTriggerType,
-      overtimeHoursThreshold: parseFloat(overtimeHoursThreshold),
-      doubleTimeTriggerType,
-      doubleTimeHoursThreshold: parseFloat(doubleTimeHoursThreshold),
+      overtimeMultiplier: parseFloat(overtimeMultiplier) || 1.5,
+      doubleTimeMultiplier: parseFloat(doubleTimeMultiplier) || 2.0,
+      overtimeTriggerType: overtimeTriggerType || 'daily',
+      overtimeHoursThreshold: parseFloat(overtimeHoursThreshold) || 8,
+      doubleTimeTriggerType: doubleTimeTriggerType || 'daily',
+      doubleTimeHoursThreshold: parseFloat(doubleTimeHoursThreshold) || 12,
     };
 
     if (periodType === 'semi-monthly') {
-      config.firstPayDay = parseInt(firstPayDay);
-      config.secondPayDay = parseInt(secondPayDay);
+      config.firstPayDay = parseInt(firstPayDay) || 1;
+      config.secondPayDay = parseInt(secondPayDay) || 15;
     } else if (periodType === 'monthly') {
-      config.monthlyStartDay = parseInt(monthlyStartDay);
-      config.monthlyEndDay = parseInt(monthlyEndDay);
+      config.monthlyStartDay = parseInt(monthlyStartDay) || 1;
+      config.monthlyEndDay = parseInt(monthlyEndDay) || 31;
     } else if (periodType === 'weekly') {
-      config.startDayOfWeek = parseInt(startDayOfWeek);
+      config.startDayOfWeek = parseInt(startDayOfWeek) || 0;
     } else if (periodType === 'bi-weekly') {
-      config.startDayOfWeek = parseInt(startDayOfWeek);
+      config.startDayOfWeek = parseInt(startDayOfWeek) || 0;
       config.biWeeklyAnchorDate = biWeeklyAnchorDate || new Date().toISOString().split('T')[0];
     } else if (periodType === 'custom') {
+      if (!customStartDate || !customEndDate) {
+        toast({
+          title: "Validation Error",
+          description: "Please provide both start and end dates for custom period",
+          variant: "destructive",
+        });
+        return;
+      }
       config.customStartDate = customStartDate;
       config.customEndDate = customEndDate;
     }
