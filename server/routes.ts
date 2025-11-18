@@ -54,14 +54,16 @@ function getSeatLimit(tier: number, additionalSeats: number = 0): number {
   return baseLimit + additionalSeats; // Add purchased seats to base limit
 }
 
-function getProjectLimit(tier: number): number {
+function getProjectLimit(tier: number, additionalProjects: number = 0): number {
+  let baseLimit: number;
   switch (tier) {
-    case 1: return 2;  // Tier 1 (Basic): 2 projects
-    case 2: return 4;  // Tier 2 (Starter): 4 projects
-    case 3: return 9;  // Tier 3 (Professional): 9 projects
+    case 1: baseLimit = 2; break;  // Tier 1 (Basic): 2 projects
+    case 2: baseLimit = 4; break;  // Tier 2 (Starter): 4 projects
+    case 3: baseLimit = 9; break;  // Tier 3 (Professional): 9 projects
     case 4: return -1; // Tier 4 (Premium): unlimited
-    default: return 0; // No limit if no tier
+    default: baseLimit = 0; break; // No limit if no tier
   }
+  return baseLimit + additionalProjects; // Add purchased projects to base limit
 }
 
 // Read-only mode enforcement middleware
@@ -143,10 +145,10 @@ async function generateResidentCode(): Promise<string> {
 }
 
 // License verification helper - re-verifies license keys with Overhaul Labs API
-// Returns: { success: boolean, valid: boolean | null }
+// Returns: { success: boolean, valid: boolean | null, additionalSeats?: number, additionalProjects?: number }
 // - success=false means API failure (keep existing licenseVerified state)
 // - success=true, valid=true/false means definitive response (update licenseVerified)
-async function reverifyLicenseKey(licenseKey: string, email: string): Promise<{ success: boolean; valid: boolean | null }> {
+async function reverifyLicenseKey(licenseKey: string, email: string): Promise<{ success: boolean; valid: boolean | null; additionalSeats?: number; additionalProjects?: number }> {
   try {
     const externalApiUrl = 'https://ram-website-paquettetom.replit.app/api/verify-license';
     const apiKey = process.env.PROVISIONING_API_KEY;
@@ -185,8 +187,10 @@ async function reverifyLicenseKey(licenseKey: string, email: string): Promise<{ 
     // Check if we got a definitive response
     if (verificationResponse.ok && typeof verificationResult.valid === 'boolean') {
       const isValid = verificationResult.valid;
-      console.log(`[License Re-verification] License is ${isValid ? 'valid' : 'invalid'}`);
-      return { success: true, valid: isValid };
+      const additionalSeats = verificationResult.additionalSeats ?? 0;
+      const additionalProjects = verificationResult.additionalProjects ?? 0;
+      console.log(`[License Re-verification] License is ${isValid ? 'valid' : 'invalid'}, additionalSeats: ${additionalSeats}, additionalProjects: ${additionalProjects}`);
+      return { success: true, valid: isValid, additionalSeats, additionalProjects };
     } else {
       // API returned error or unexpected format
       console.warn('[License Re-verification] API returned non-OK status or unexpected format');
@@ -213,6 +217,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       '/api/provision-account', // Allow external provisioning
       '/api/purchase/verify-account', // Allow external purchase system to verify accounts
       '/api/purchase/update-seats', // Allow external purchase system to update seat limits
+      '/api/purchase/update-projects', // Allow external purchase system to update project limits
       '/api/user-preferences' // Allow UI preferences even in read-only mode
     ];
     
@@ -283,6 +288,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
           
           if (verificationResult.success && verificationResult.valid) {
             licenseVerified = true;
+            additionalSeats = verificationResult.additionalSeats ?? 0;
+            additionalProjects = verificationResult.additionalProjects ?? 0;
             console.log('[Provision] License key verified successfully');
           } else {
             console.warn('[Provision] License key verification failed');
@@ -428,6 +435,69 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
+  // Initiate project purchase (company user only)
+  app.post("/api/purchase/initiate-projects", requireAuth, requireRole("company"), async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      const { quantity } = req.body;
+      
+      if (!quantity || typeof quantity !== 'number' || quantity < 1) {
+        return res.status(400).json({ message: "Valid quantity is required" });
+      }
+      
+      const purchaseApiKey = process.env.PURCHASE_API_KEY;
+      
+      if (!purchaseApiKey) {
+        console.error("[Purchase] PURCHASE_API_KEY not configured");
+        return res.status(500).json({ message: "Purchase service not configured" });
+      }
+      
+      // Call the external marketplace API to initiate purchase
+      const marketplaceUrl = 'https://ram-website-paquettetom.replit.app/api/purchase/projects';
+      const returnUrl = `${req.protocol}://${req.get('host')}/settings`;
+      
+      console.log(`[Purchase] Initiating project purchase for ${currentUser.email}: ${quantity} project(s)`);
+      
+      const purchaseResponse = await fetch(marketplaceUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': purchaseApiKey,
+        },
+        body: JSON.stringify({
+          licenseKey: currentUser.licenseKey,
+          quantity,
+          returnUrl,
+        })
+      });
+      
+      if (!purchaseResponse.ok) {
+        const errorText = await purchaseResponse.text();
+        console.error("[Purchase] Marketplace API error:", errorText);
+        return res.status(purchaseResponse.status).json({ 
+          message: "Purchase initiation failed" 
+        });
+      }
+      
+      const result = await purchaseResponse.json();
+      
+      console.log("[Purchase] Purchase initiated successfully:", result);
+      
+      return res.json({
+        checkoutUrl: result.checkoutUrl,
+        quantity,
+      });
+    } catch (error) {
+      console.error("[Purchase] Error initiating project purchase:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+  
   // Update seat limits after purchase
   app.post("/api/purchase/update-seats", async (req: Request, res: Response) => {
     try {
@@ -514,6 +584,76 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
+  // Update project limits after purchase
+  app.post("/api/purchase/update-projects", async (req: Request, res: Response) => {
+    try {
+      // Verify API key for security
+      const apiKey = req.headers['x-api-key'] as string;
+      const expectedApiKey = process.env.PURCHASE_API_KEY;
+      
+      if (!expectedApiKey) {
+        console.error("[Purchase] PURCHASE_API_KEY not configured");
+        return res.status(500).json({ message: "Purchase service not configured" });
+      }
+      
+      if (!apiKey || apiKey !== expectedApiKey) {
+        console.error("[Purchase] Invalid API key provided");
+        return res.status(401).json({ message: "Unauthorized" });
+      }
+      
+      const { email, additionalProjects } = req.body;
+      
+      if (!email || typeof additionalProjects !== 'number' || additionalProjects < 0) {
+        return res.status(400).json({ 
+          message: "Email and additionalProjects (non-negative number) are required" 
+        });
+      }
+      
+      // Look up user by email
+      const user = await storage.getUserByEmail(email);
+      
+      if (!user || user.role !== 'company') {
+        return res.status(404).json({ 
+          message: "No company account found with this email" 
+        });
+      }
+      
+      // Calculate new total
+      const currentAdditionalProjects = user.additionalProjects || 0;
+      const newAdditionalProjects = currentAdditionalProjects + additionalProjects;
+      
+      // Update the company's additional projects
+      await storage.updateUser(user.id, {
+        additionalProjects: newAdditionalProjects,
+      });
+      
+      // Extract tier info for response
+      const tier = detectTier(user.licenseKey);
+      const baseProjectLimit = getProjectLimit(tier, 0);
+      const totalProjects = getProjectLimit(tier, newAdditionalProjects);
+      
+      console.log(`[Purchase] Projects updated for ${user.companyName} (${email}): Added ${additionalProjects} projects. New total: ${totalProjects} (${baseProjectLimit} base + ${newAdditionalProjects} additional)`);
+      
+      return res.json({
+        success: true,
+        companyId: user.id,
+        companyName: user.companyName,
+        email: user.email,
+        tier,
+        projectsAdded: additionalProjects,
+        newLimits: {
+          baseProjectLimit,
+          additionalProjects: newAdditionalProjects,
+          totalProjects,
+        },
+        message: `Successfully added ${additionalProjects} project${additionalProjects !== 1 ? 's' : ''} to ${user.companyName}`,
+      });
+    } catch (error) {
+      console.error("[Purchase] Error updating projects:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+  
   // Registration endpoint
   app.post("/api/register", async (req: Request, res: Response) => {
     try {
@@ -541,6 +681,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // AUTO-VERIFY LICENSE KEY FOR COMPANY REGISTRATIONS
       let licenseVerified = validatedData.licenseVerified || false;
+      let additionalSeats = 0;
+      let additionalProjects = 0;
       if (validatedData.role === 'company' && validatedData.licenseKey && validatedData.email) {
         // Auto-verify test tier licenses (ending in -4)
         if (validatedData.licenseKey.endsWith('-4')) {
@@ -553,6 +695,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
           
           if (verificationResult.success && verificationResult.valid) {
             licenseVerified = true;
+            additionalSeats = verificationResult.additionalSeats ?? 0;
+            additionalProjects = verificationResult.additionalProjects ?? 0;
             console.log('[Registration] License key verified successfully during registration');
           } else {
             console.warn('[Registration] License key verification failed - user will need to verify manually');
@@ -569,10 +713,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         subscriptionRenewalDate = renewalDate.toISOString().split('T')[0]; // Format as YYYY-MM-DD
       }
       
-      // Create user with verified license status
+      // Create user with verified license status and purchase counts
       const user = await storage.createUser({
         ...validatedData,
         licenseVerified,
+        additionalSeats,
+        additionalProjects,
         ...(subscriptionRenewalDate && { subscriptionRenewalDate }),
       });
       
@@ -696,10 +842,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
           const verificationResult = await reverifyLicenseKey(user.licenseKey, user.email);
           
           if (verificationResult.success && verificationResult.valid !== null) {
-            // API responded definitively - update status
-            await storage.updateUser(user.id, { licenseVerified: verificationResult.valid });
-            console.log(`[Login] License status updated to: ${verificationResult.valid}`);
+            // API responded definitively - update status and purchase counts
+            await storage.updateUser(user.id, { 
+              licenseVerified: verificationResult.valid,
+              additionalSeats: verificationResult.additionalSeats ?? user.additionalSeats ?? 0,
+              additionalProjects: verificationResult.additionalProjects ?? user.additionalProjects ?? 0
+            });
+            console.log(`[Login] License status updated to: ${verificationResult.valid}, additionalSeats: ${verificationResult.additionalSeats ?? 0}, additionalProjects: ${verificationResult.additionalProjects ?? 0}`);
             user.licenseVerified = verificationResult.valid;
+            user.additionalSeats = verificationResult.additionalSeats ?? user.additionalSeats ?? 0;
+            user.additionalProjects = verificationResult.additionalProjects ?? user.additionalProjects ?? 0;
           } else {
             // API failed - preserve existing status (don't lock out OR auto-verify)
             console.warn('[Login] API failure - preserving existing license status:', user.licenseVerified);
@@ -2427,7 +2579,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       let projectInfo = null;
       if (currentUser.role === "company") {
         const tier = detectTier(currentUser.licenseKey);
-        const projectLimit = getProjectLimit(tier);
+        const additionalProjects = currentUser.additionalProjects || 0;
+        const baseProjectLimit = getProjectLimit(tier, 0); // Get base limit without additions
+        const projectLimit = getProjectLimit(tier, additionalProjects); // Total limit with additions
         // Only count non-completed projects toward the limit
         const projectsUsed = projectsWithProgress.filter(p => p.progress !== "completed").length;
         const projectsAvailable = projectLimit === -1 ? -1 : Math.max(0, projectLimit - projectsUsed);
@@ -2436,6 +2590,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         projectInfo = {
           tier,
           projectLimit,
+          baseProjectLimit,
+          additionalProjects,
           projectsUsed,
           projectsAvailable,
           atProjectLimit
