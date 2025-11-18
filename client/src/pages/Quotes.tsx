@@ -1592,6 +1592,31 @@ export default function Quotes() {
                 {/* Strata Property Manager */}
                 <div className="space-y-4">
                   <h3 className="text-lg font-semibold">Strata Property Manager (Optional)</h3>
+                  
+                  <div>
+                    <Label>Select from Client List</Label>
+                    <Select
+                      onValueChange={(value) => {
+                        const client = clients.find((c: any) => c.id === value);
+                        if (client) {
+                          editForm.setValue('strataManagerName', `${client.firstName} ${client.lastName}`);
+                          editForm.setValue('strataManagerAddress', client.address || '');
+                        }
+                      }}
+                    >
+                      <SelectTrigger className="h-12" data-testid="select-edit-client">
+                        <SelectValue placeholder="Select from client list..." />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {clients.map((client: any) => (
+                          <SelectItem key={client.id} value={client.id}>
+                            {client.firstName} {client.lastName} {client.company ? `- ${client.company}` : ''}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
                   <div className="grid grid-cols-2 gap-4">
                     <FormField
                       control={editForm.control}
