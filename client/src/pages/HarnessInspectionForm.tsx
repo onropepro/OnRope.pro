@@ -311,7 +311,7 @@ export default function HarnessInspectionForm() {
               </CardHeader>
               <CardContent className="space-y-4">
                 {/* Harness Picker Button */}
-                {myHarnesses.length > 0 && (
+                {myHarnesses.length > 0 ? (
                   <Dialog open={showHarnessPicker} onOpenChange={setShowHarnessPicker}>
                     <DialogTrigger asChild>
                       <Button 
@@ -319,10 +319,9 @@ export default function HarnessInspectionForm() {
                         variant="default" 
                         className="w-full h-14"
                         data-testid="button-pick-harness"
-                        onClick={() => console.log('[Harness Picker] Opening dialog, harnesses:', myHarnesses.length)}
                       >
                         <Package className="mr-2 h-5 w-5" />
-                        Pick Harness from Inventory ({myHarnesses.length})
+                        Pick Harness from Inventory
                       </Button>
                     </DialogTrigger>
                     <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
@@ -371,6 +370,17 @@ export default function HarnessInspectionForm() {
                       </div>
                     </DialogContent>
                   </Dialog>
+                ) : (
+                  <Button 
+                    type="button" 
+                    variant="outline" 
+                    className="w-full h-14"
+                    disabled
+                    data-testid="button-pick-harness-disabled"
+                  >
+                    <Package className="mr-2 h-5 w-5" />
+                    No Harnesses in Inventory - Add harnesses in Inventory first
+                  </Button>
                 )}
 
                 {/* Gear Selection Dropdown for Autofill */}
