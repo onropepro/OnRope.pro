@@ -569,26 +569,14 @@ export default function Schedule() {
       </Button>
 
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <Calendar className="w-8 h-8 text-primary" />
-          <div>
-            <h1 className="text-2xl font-bold">Job Schedule</h1>
-            <p className="text-sm text-muted-foreground">
-              Manage your team's job assignments and schedule
-            </p>
-          </div>
+      <div className="flex items-center gap-3">
+        <Calendar className="w-8 h-8 text-primary" />
+        <div>
+          <h1 className="text-2xl font-bold">Job Schedule</h1>
+          <p className="text-sm text-muted-foreground">
+            Manage your team's job assignments and schedule
+          </p>
         </div>
-        <Button
-          onClick={() => {
-            setSelectedDates(null);
-            setCreateDialogOpen(true);
-          }}
-          data-testid="button-create-job"
-        >
-          <Plus className="w-4 h-4 mr-2" />
-          Create Job
-        </Button>
       </div>
 
       {/* Employee Availability */}
