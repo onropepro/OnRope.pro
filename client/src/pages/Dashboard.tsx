@@ -1652,9 +1652,9 @@ export default function Dashboard() {
     {
       id: "documents",
       label: "Documents",
-      description: "Project files",
-      icon: "folder",
-      onClick: () => handleTabChange("documents"),
+      description: "All company files",
+      icon: "folder_open",
+      onClick: () => setLocation("/documents"),
       testId: "button-documents",
       isVisible: () => true, // Everyone
       borderColor: "#14b8a6",
