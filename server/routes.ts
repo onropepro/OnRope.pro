@@ -277,6 +277,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Verify license key if provided
       let licenseVerified = false;
+      let additionalSeats = 0;
+      let additionalProjects = 0;
       if (licenseKey) {
         // Auto-verify test tier licenses (ending in -4)
         if (licenseKey.endsWith('-4')) {
@@ -317,6 +319,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         zipCode,
         licenseKey: licenseKey || null,
         licenseVerified,
+        additionalSeats,
+        additionalProjects,
         subscriptionRenewalDate,
       });
       
