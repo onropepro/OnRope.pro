@@ -320,8 +320,8 @@ export default function HarnessInspectionForm() {
                 <CardDescription>Inspection details and equipment information</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
-                {/* Harness Picker Button */}
-                {myHarnesses.length > 0 ? (
+                {/* Gear Picker Button */}
+                {myGear.length > 0 ? (
                   <Dialog open={showHarnessPicker} onOpenChange={setShowHarnessPicker}>
                     <DialogTrigger asChild>
                       <Button 
@@ -331,18 +331,18 @@ export default function HarnessInspectionForm() {
                         data-testid="button-pick-harness"
                       >
                         <Package className="mr-2 h-5 w-5" />
-                        Pick Harness from Inventory
+                        Pick Equipment from My Inventory
                       </Button>
                     </DialogTrigger>
                     <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
                       <DialogHeader>
-                        <DialogTitle>Select Harness from Inventory</DialogTitle>
+                        <DialogTitle>Select Equipment from My Inventory</DialogTitle>
                         <DialogDescription>
-                          Choose a harness to auto-fill inspection details
+                          Choose equipment to auto-fill inspection details
                         </DialogDescription>
                       </DialogHeader>
                       <div className="grid gap-3 py-4">
-                        {myHarnesses.map((harness: any) => (
+                        {myGear.map((harness: any) => (
                           <Card 
                             key={harness.id}
                             className="hover-elevate active-elevate-2 cursor-pointer"
@@ -389,7 +389,7 @@ export default function HarnessInspectionForm() {
                     data-testid="button-pick-harness-disabled"
                   >
                     <Package className="mr-2 h-5 w-5" />
-                    No Harnesses in Inventory - Add harnesses in Inventory first
+                    No Equipment Assigned - Go to Inventory and assign equipment to yourself
                   </Button>
                 )}
 
