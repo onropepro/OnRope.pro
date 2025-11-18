@@ -13,6 +13,7 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { insertQuoteSchema, type QuoteWithServices } from "@shared/schema";
 import { 
@@ -105,6 +106,8 @@ const buildingInfoSchema = z.object({
   strataPlanNumber: z.string().min(1, "Strata plan number is required"),
   buildingAddress: z.string().min(1, "Building address is required"),
   floorCount: z.coerce.number().min(1, "Floor count must be at least 1"),
+  strataManagerName: z.string().optional(),
+  strataManagerAddress: z.string().optional(),
 });
 
 const serviceFormSchema = z.object({
@@ -206,6 +209,13 @@ export default function Quotes() {
     queryKey: ["/api/quotes"],
   });
 
+  // Fetch clients for property manager dropdown
+  const { data: clientsData } = useQuery<{ clients: any[] }>({
+    queryKey: ["/api/clients"],
+  });
+
+  const clients = clientsData?.clients || [];
+
   // Create quote mutation
   const createQuoteMutation = useMutation({
     mutationFn: async () => {
@@ -237,6 +247,8 @@ export default function Quotes() {
         strataPlanNumber: buildingInfo.strataPlanNumber,
         buildingAddress: buildingInfo.buildingAddress,
         floorCount: buildingInfo.floorCount,
+        strataManagerName: buildingInfo.strataManagerName,
+        strataManagerAddress: buildingInfo.strataManagerAddress,
         status: "open",
         services, // Include services array
       });
@@ -2008,6 +2020,68 @@ This is an official service quote.
                             placeholder="e.g., 20"
                             className="h-12"
                             data-testid="input-floor-count"
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <div className="space-y-4">
+                    <Label>Strata Property Manager (Optional)</Label>
+                    <Select
+                      onValueChange={(value) => {
+                        const client = clients.find((c: any) => c.id === value);
+                        if (client) {
+                          buildingForm.setValue('strataManagerName', `${client.firstName} ${client.lastName}`);
+                          buildingForm.setValue('strataManagerAddress', client.address || '');
+                        }
+                      }}
+                    >
+                      <SelectTrigger className="h-12" data-testid="select-client">
+                        <SelectValue placeholder="Select from client list..." />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {clients.map((client: any) => (
+                          <SelectItem key={client.id} value={client.id}>
+                            {client.firstName} {client.lastName} {client.company ? `- ${client.company}` : ''}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <FormField
+                    control={buildingForm.control}
+                    name="strataManagerName"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Manager Name</FormLabel>
+                        <FormControl>
+                          <Input
+                            {...field}
+                            placeholder="e.g., John Smith"
+                            className="h-12"
+                            data-testid="input-manager-name"
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={buildingForm.control}
+                    name="strataManagerAddress"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Manager Address</FormLabel>
+                        <FormControl>
+                          <Input
+                            {...field}
+                            placeholder="e.g., 456 Business St, Vancouver, BC"
+                            className="h-12"
+                            data-testid="input-manager-address"
                           />
                         </FormControl>
                         <FormMessage />
