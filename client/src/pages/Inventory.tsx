@@ -58,6 +58,7 @@ export default function Inventory() {
   const [managingItem, setManagingItem] = useState<GearItem | null>(null);
   const [assignEmployeeId, setAssignEmployeeId] = useState<string>("");
   const [assignQuantity, setAssignQuantity] = useState<string>("1");
+  const [assignSerialNumber, setAssignSerialNumber] = useState<string>("");
 
   // Fetch current user
   const { data: userData } = useQuery<{ user: any }>({
@@ -398,6 +399,7 @@ export default function Inventory() {
     setManagingItem(item);
     setAssignEmployeeId("");
     setAssignQuantity("1");
+    setAssignSerialNumber("");
     setShowAssignDialog(true);
   };
 
@@ -435,6 +437,7 @@ export default function Inventory() {
       gearItemId: managingItem.id,
       employeeId: assignEmployeeId,
       quantity,
+      serialNumber: assignSerialNumber || undefined,
     });
   };
 
@@ -639,19 +642,18 @@ export default function Inventory() {
                             )}
                           </div>
 
-                          {/* Serial Numbers */}
-                          {item.serialNumbers && item.serialNumbers.length > 0 && (
-                            <div className="mt-3 pt-3 border-t">
-                              <div className="text-xs text-muted-foreground mb-2">Serial Numbers:</div>
-                              <div className="flex flex-wrap gap-2">
-                                {item.serialNumbers.map((serial: string, idx: number) => (
-                                  <Badge key={idx} variant="secondary" className="text-xs font-mono">
-                                    {serial}
-                                  </Badge>
-                                ))}
+                          {/* Assignment Serial Number */}
+                          {(() => {
+                            const myAssignment = getItemAssignments(item.id).find(a => a.employeeId === currentUser?.id);
+                            return myAssignment?.serialNumber ? (
+                              <div className="mt-3 pt-3 border-t">
+                                <div className="text-xs text-muted-foreground mb-2">Assigned Serial Number:</div>
+                                <Badge variant="secondary" className="text-xs font-mono">
+                                  {myAssignment.serialNumber}
+                                </Badge>
                               </div>
-                            </div>
-                          )}
+                            ) : null;
+                          })()}
 
                           {/* Notes */}
                           {item.notes && (
@@ -1667,6 +1669,9 @@ export default function Inventory() {
                           <div className="text-sm">
                             <div className="font-medium">{employee?.name || "Unknown"}</div>
                             <div className="text-xs text-muted-foreground">Quantity: {assignment.quantity}</div>
+                            {assignment.serialNumber && (
+                              <div className="text-xs text-muted-foreground">S/N: {assignment.serialNumber}</div>
+                            )}
                           </div>
                           <Button
                             size="sm"
@@ -1723,6 +1728,21 @@ export default function Inventory() {
                     Max available: {getAvailableQuantity(managingItem)}
                   </div>
                 </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="assign-serial-number">Serial Number (Optional)</Label>
+                  <Input
+                    id="assign-serial-number"
+                    type="text"
+                    value={assignSerialNumber}
+                    onChange={(e) => setAssignSerialNumber(e.target.value)}
+                    placeholder="Enter serial number of assigned gear"
+                    data-testid="input-assign-serial-number"
+                  />
+                  <div className="text-xs text-muted-foreground">
+                    Enter the serial number of the specific gear item being assigned
+                  </div>
+                </div>
               </div>
             </div>
           )}
@@ -1736,6 +1756,7 @@ export default function Inventory() {
                 setManagingItem(null);
                 setAssignEmployeeId("");
                 setAssignQuantity("1");
+                setAssignSerialNumber("");
               }}
               data-testid="button-cancel-assign"
             >

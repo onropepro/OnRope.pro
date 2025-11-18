@@ -3986,6 +3986,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         companyId,
         employeeId: req.body.employeeId,
         quantity: parseInt(req.body.quantity),
+        serialNumber: req.body.serialNumber || undefined,
       });
       
       console.log("Assignment created successfully:", assignment);

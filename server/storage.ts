@@ -873,7 +873,7 @@ export class Storage {
   }
 
   // Gear assignment operations
-  async createGearAssignment(assignment: { gearItemId: string; companyId: string; employeeId: string; quantity: number }): Promise<any> {
+  async createGearAssignment(assignment: { gearItemId: string; companyId: string; employeeId: string; quantity: number; serialNumber?: string }): Promise<any> {
     const result = await db.insert(gearAssignments).values(assignment).returning();
     return result[0];
   }
