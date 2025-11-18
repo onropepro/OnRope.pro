@@ -773,7 +773,7 @@ export default function Profile() {
                   )}
 
                   {/* Upgrade Options */}
-                  {employeesData?.seatInfo && employeesData.seatInfo.tier < 3 && (
+                  {employeesData?.seatInfo && employeesData.seatInfo.tier < 4 && (
                     <>
                       <Separator />
                       <div className="space-y-3">
