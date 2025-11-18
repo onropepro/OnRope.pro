@@ -21,7 +21,7 @@ const toolboxMeetingFormSchema = z.object({
   projectId: z.string().min(1, "Project is required"),
   meetingDate: z.string().min(1, "Date is required"),
   conductedByName: z.string().min(1, "Your name is required"),
-  attendees: z.string().min(1, "At least one attendee is required"),
+  attendees: z.union([z.string(), z.array(z.string())]).optional(), // Can be string or array, handled in mutation
   
   // Topics
   topicFallProtection: z.boolean().default(false),
@@ -97,7 +97,7 @@ export default function ToolboxMeetingForm() {
       projectId: "",
       meetingDate: new Date().toISOString().split("T")[0],
       conductedByName: "",
-      attendees: "",
+      attendees: [],
       topicFallProtection: false,
       topicAnchorPoints: false,
       topicRopeInspection: false,
@@ -133,15 +133,23 @@ export default function ToolboxMeetingForm() {
 
   const createMeetingMutation = useMutation({
     mutationFn: async (data: ToolboxMeetingFormValues) => {
+      console.log('[Toolbox Meeting] Submitting:', {
+        ...data,
+        attendees: selectedEmployees,
+      });
+      
       // Use selectedEmployees instead of parsing textarea
       const response = await apiRequest("POST", "/api/toolbox-meetings", {
         ...data,
         attendees: selectedEmployees,
       });
       
-      return response.json();
+      const result = await response.json();
+      console.log('[Toolbox Meeting] Success:', result);
+      return result;
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
+      console.log('[Toolbox Meeting] Navigating to dashboard');
       toast({
         title: "Success",
         description: "Toolbox meeting recorded successfully",
@@ -150,6 +158,7 @@ export default function ToolboxMeetingForm() {
       navigate("/dashboard");
     },
     onError: (error: Error) => {
+      console.error('[Toolbox Meeting] Error:', error);
       toast({
         title: "Error",
         description: error.message || "Failed to record toolbox meeting",

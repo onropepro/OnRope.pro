@@ -139,8 +139,13 @@ export default function HarnessInspectionForm() {
 
   // Handle harness selection from picker dialog
   const handleHarnessSelection = (harness: any) => {
+    console.log('[Harness Picker] Selected harness:', harness);
     handleGearSelection(harness.id);
     setShowHarnessPicker(false);
+    toast({
+      title: "Harness selected",
+      description: `${harness.equipmentType} details loaded`,
+    });
   };
 
   // Calculate overall status and failure summary
@@ -314,9 +319,10 @@ export default function HarnessInspectionForm() {
                         variant="default" 
                         className="w-full h-14"
                         data-testid="button-pick-harness"
+                        onClick={() => console.log('[Harness Picker] Opening dialog, harnesses:', myHarnesses.length)}
                       >
                         <Package className="mr-2 h-5 w-5" />
-                        Pick Harness from Inventory
+                        Pick Harness from Inventory ({myHarnesses.length})
                       </Button>
                     </DialogTrigger>
                     <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
