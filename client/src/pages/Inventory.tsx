@@ -970,87 +970,90 @@ export default function Inventory() {
                 )}
               />
 
-              {/* Serial Number Entry */}
-              <div className="space-y-3">
-                <FormLabel>Serial Numbers (Optional)</FormLabel>
-                
-                {/* Current Serial Number Input */}
-                <div className="space-y-2">
-                  <Input
-                    placeholder="Enter serial number"
-                    value={currentSerialNumber}
-                    onChange={(e) => setCurrentSerialNumber(e.target.value)}
-                    data-testid="input-current-serial"
-                  />
-                  
-                  <Button
-                    type="button"
-                    variant="default"
-                    onClick={handleAddSerialNumber}
-                    disabled={serialNumbers.length >= (form.watch("quantity") || 1)}
-                    data-testid="button-add-serial"
-                    className="w-full"
-                  >
-                    <Plus className="h-5 w-5 mr-2" />
-                    Add Serial Number ({serialNumbers.length}/{form.watch("quantity") || 1})
-                  </Button>
-                </div>
-
-                {/* Added Serial Numbers List */}
-                {serialNumbers.length > 0 && (
-                  <div className="space-y-1 bg-muted/30 p-3 rounded-md">
-                    <div className="text-sm font-medium">Added Serial Numbers:</div>
-                    {serialNumbers.map((sn, index) => (
-                      <div key={index} className="flex items-center justify-between text-sm">
-                        <span>• {sn}</span>
-                        <Button
-                          type="button"
-                          size="icon"
-                          variant="ghost"
-                          onClick={() => removeSerialNumber(index)}
-                          data-testid={`button-remove-serial-${index}`}
-                          className="h-6 w-6"
-                        >
-                          <X className="h-3 w-3" />
-                        </Button>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-
-              <FormField
-                control={form.control}
-                name="dateInService"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Date Placed In Service</FormLabel>
-                    <FormControl>
+              {/* Show serial numbers and dates for all gear types EXCEPT Carabiner */}
+              {form.watch("equipmentType") !== "Carabiner" && (
+                <>
+                  {/* Serial Number Entry */}
+                  <div className="space-y-3">
+                    <FormLabel>Serial Numbers (Optional)</FormLabel>
+                    
+                    <div className="space-y-2">
                       <Input
-                        type="date"
-                        {...field}
-                        value={field.value || ""}
-                        data-testid="input-date-in-service"
+                        placeholder="Enter serial number"
+                        value={currentSerialNumber}
+                        onChange={(e) => setCurrentSerialNumber(e.target.value)}
+                        data-testid="input-current-serial"
                       />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+                      
+                      <Button
+                        type="button"
+                        variant="default"
+                        onClick={handleAddSerialNumber}
+                        disabled={serialNumbers.length >= (form.watch("quantity") || 1)}
+                        data-testid="button-add-serial"
+                        className="w-full"
+                      >
+                        <Plus className="h-5 w-5 mr-2" />
+                        Add Serial Number ({serialNumbers.length}/{form.watch("quantity") || 1})
+                      </Button>
+                    </div>
 
-              <FormField
-                control={form.control}
-                name="notes"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Notes</FormLabel>
-                    <FormControl>
-                      <Textarea placeholder="Additional information..." {...field} value={field.value || ""} data-testid="textarea-notes" />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+                    {serialNumbers.length > 0 && (
+                      <div className="space-y-1 bg-muted/30 p-3 rounded-md">
+                        <div className="text-sm font-medium">Added Serial Numbers:</div>
+                        {serialNumbers.map((sn, index) => (
+                          <div key={index} className="flex items-center justify-between text-sm">
+                            <span>• {sn}</span>
+                            <Button
+                              type="button"
+                              size="icon"
+                              variant="ghost"
+                              onClick={() => removeSerialNumber(index)}
+                              data-testid={`button-remove-serial-${index}`}
+                              className="h-6 w-6"
+                            >
+                              <X className="h-3 w-3" />
+                            </Button>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
+                  <FormField
+                    control={form.control}
+                    name="dateInService"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Date Placed In Service</FormLabel>
+                        <FormControl>
+                          <Input
+                            type="date"
+                            {...field}
+                            value={field.value || ""}
+                            data-testid="input-date-in-service"
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="notes"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Notes</FormLabel>
+                        <FormControl>
+                          <Textarea placeholder="Additional information..." {...field} value={field.value || ""} data-testid="textarea-notes" />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </>
+              )}
 
               {canViewFinancials && (
                 form.watch("equipmentType") === "Rope" ? (
