@@ -75,10 +75,20 @@ export default function HarnessInspectionForm() {
   // Filter to only show current user's gear
   const myGear = allGearItems.filter((item: any) => item.assignedTo === currentUser?.name);
   
+  console.log('[Harness Picker Debug] All gear items:', allGearItems.length);
+  console.log('[Harness Picker Debug] My gear:', myGear.length, myGear.map(g => ({ 
+    type: g.equipmentType, 
+    assignedTo: g.assignedTo,
+    brand: g.brand 
+  })));
+  console.log('[Harness Picker Debug] Current user name:', currentUser?.name);
+  
   // Filter to only show harnesses
   const myHarnesses = myGear.filter((item: any) => 
     item.equipmentType?.toLowerCase().includes('harness')
   );
+  
+  console.log('[Harness Picker Debug] My harnesses found:', myHarnesses.length, myHarnesses);
 
   // Fetch projects for optional selection
   const { data: projectsData } = useQuery<{ projects: any[] }>({
