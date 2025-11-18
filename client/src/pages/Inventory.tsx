@@ -970,8 +970,81 @@ export default function Inventory() {
                 )}
               />
 
-              {/* Show serial numbers and dates for all gear types EXCEPT Carabiner */}
-              {form.watch("equipmentType") !== "Carabiner" && (
+              {/* Rope-specific fields */}
+              {form.watch("equipmentType") === "Rope" && (
+                <>
+                  <FormField
+                    control={form.control}
+                    name="ropeLength"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Rope Length (feet)</FormLabel>
+                        <FormControl>
+                          <Input
+                            type="number"
+                            min="0"
+                            step="0.01"
+                            placeholder="Enter rope length"
+                            {...field}
+                            value={field.value || ""}
+                            data-testid="input-rope-length"
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="pricePerFeet"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Price Per Foot</FormLabel>
+                        <FormControl>
+                          <Input
+                            type="number"
+                            min="0"
+                            step="0.01"
+                            placeholder="Enter price per foot"
+                            {...field}
+                            value={field.value || ""}
+                            data-testid="input-price-per-feet"
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </>
+              )}
+
+              {/* Carabiner-specific fields (just price) */}
+              {form.watch("equipmentType") === "Carabiner" && (
+                <FormField
+                  control={form.control}
+                  name="itemPrice"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Price</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="number"
+                          step="0.01"
+                          placeholder="0.00"
+                          {...field}
+                          value={field.value || ""}
+                          data-testid="input-price"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              )}
+
+              {/* All other gear types: show full details */}
+              {form.watch("equipmentType") !== "Carabiner" && form.watch("equipmentType") !== "Rope" && (
                 <>
                   {/* Serial Number Entry */}
                   <div className="space-y-3">
@@ -1052,78 +1125,30 @@ export default function Inventory() {
                       </FormItem>
                     )}
                   />
+
+                  {canViewFinancials && (
+                    <FormField
+                      control={form.control}
+                      name="itemPrice"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Price</FormLabel>
+                          <FormControl>
+                            <Input
+                              type="number"
+                              step="0.01"
+                              placeholder="0.00"
+                              {...field}
+                              value={field.value || ""}
+                              data-testid="input-price"
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  )}
                 </>
-              )}
-
-              {canViewFinancials && (
-                form.watch("equipmentType") === "Rope" ? (
-                  <>
-                    <FormField
-                      control={form.control}
-                      name="ropeLength"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Rope Length (feet)</FormLabel>
-                          <FormControl>
-                            <Input
-                              type="number"
-                              min="0"
-                              step="0.01"
-                              placeholder="Enter rope length"
-                              {...field}
-                              value={field.value || ""}
-                              data-testid="input-rope-length"
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-
-                    <FormField
-                      control={form.control}
-                      name="pricePerFeet"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Price Per Foot</FormLabel>
-                          <FormControl>
-                            <Input
-                              type="number"
-                              min="0"
-                              step="0.01"
-                              placeholder="Enter price per foot"
-                              {...field}
-                              value={field.value || ""}
-                              data-testid="input-price-per-feet"
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </>
-                ) : (
-                  <FormField
-                    control={form.control}
-                    name="itemPrice"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Price</FormLabel>
-                        <FormControl>
-                          <Input
-                            type="number"
-                            step="0.01"
-                            placeholder="0.00"
-                            {...field}
-                            value={field.value || ""}
-                            data-testid="input-price"
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                )
               )}
                   </div>
 
