@@ -1053,11 +1053,11 @@ export default function ProjectDetail() {
           </CardHeader>
           <CardContent className="space-y-6">
             
-            {/* Fall Protection Plan Section */}
+            {/* Rope Access Plan Section */}
             <div className="space-y-3">
               <div className="flex items-center gap-2">
                 <span className="material-icons text-primary">description</span>
-                <h3 className="font-medium">Fall Protection Plan</h3>
+                <h3 className="font-medium">Rope Access Plan</h3>
               </div>
               {project.ropeAccessPlanUrl ? (
                 <div className="flex gap-2">
@@ -1109,6 +1109,51 @@ export default function ProjectDetail() {
             </div>
 
             <Separator />
+
+            {/* Uploaded Documents Section */}
+            {project.documentUrls && project.documentUrls.length > 0 && (
+              <>
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <span className="material-icons text-primary">folder_open</span>
+                      <h3 className="font-medium">Documents</h3>
+                    </div>
+                    <Badge variant="secondary" className="text-xs">
+                      {project.documentUrls.length} {project.documentUrls.length === 1 ? 'document' : 'documents'}
+                    </Badge>
+                  </div>
+                  
+                  <div className="grid gap-2">
+                    {project.documentUrls.map((url: string, index: number) => {
+                      const filename = url.split('/').pop() || `Document ${index + 1}`;
+                      const displayName = filename.replace(/^rope-access-plan-/, 'Rope Access Plan - ').replace(/\.pdf$/, '');
+                      
+                      return (
+                        <div key={index} className="flex items-center gap-2 p-3 rounded-md border bg-card hover-elevate">
+                          <span className="material-icons text-primary">description</span>
+                          <div className="flex-1 min-w-0">
+                            <div className="text-sm font-medium truncate">{displayName}</div>
+                            <div className="text-xs text-muted-foreground">PDF Document</div>
+                          </div>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => window.open(url, '_blank')}
+                            data-testid={`button-download-document-${index}`}
+                          >
+                            <span className="material-icons text-sm">download</span>
+                            Download
+                          </Button>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                <Separator />
+              </>
+            )}
 
             {/* Project Photos Section */}
             <div className="space-y-3">

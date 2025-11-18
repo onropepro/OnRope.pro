@@ -1953,8 +1953,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
         'application/pdf'
       );
       
-      // Update project with new PDF URL
-      const updatedProject = await storage.updateProject(projectId, { ropeAccessPlanUrl: url });
+      // Add to documents array (keep all uploaded PDFs)
+      const currentDocuments = project.documentUrls || [];
+      const updatedDocuments = [...currentDocuments, url];
+      
+      // Update project with new PDF URL and add to documents array
+      const updatedProject = await storage.updateProject(projectId, { 
+        ropeAccessPlanUrl: url,
+        documentUrls: updatedDocuments
+      });
       
       res.json({ project: updatedProject, url });
     } catch (error) {

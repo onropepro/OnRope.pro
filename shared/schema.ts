@@ -140,7 +140,8 @@ export const projects = pgTable("projects", {
   estimatedHours: integer("estimated_hours"), // Estimated total hours for the entire building
   startDate: date("start_date"), // Schedule start date
   endDate: date("end_date"), // Schedule end date
-  ropeAccessPlanUrl: text("rope_access_plan_url"), // URL to PDF in object storage
+  ropeAccessPlanUrl: text("rope_access_plan_url"), // URL to current PDF in object storage
+  documentUrls: text("document_urls").array().default(sql`ARRAY[]::text[]`), // Array of all uploaded document URLs (PDFs)
   imageUrls: text("image_urls").array().default(sql`ARRAY[]::text[]`), // Array of image URLs from object storage
   status: varchar("status").notNull().default('active'), // active | completed
   deleted: boolean("deleted").notNull().default(false), // Soft delete flag
