@@ -3945,18 +3945,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // For regular employees, only show their own assignments
       // For managers/company, show all assignments
+      const isManagement = ["operations_manager", "general_supervisor", "rope_access_supervisor", "supervisor"].includes(currentUser.role);
       let assignments;
-      if (currentUser.role === "company" || isManagement(currentUser)) {
+      if (currentUser.role === "company" || isManagement) {
         assignments = await db.select()
           .from(gearAssignments)
           .where(eq(gearAssignments.companyId, companyId));
       } else {
         assignments = await db.select()
           .from(gearAssignments)
-          .where(and(
-            eq(gearAssignments.companyId, companyId),
-            eq(gearAssignments.employeeId, currentUser.id)
-          ));
+          .where(eq(gearAssignments.employeeId, currentUser.id));
       }
       
       res.json({ assignments });
@@ -4018,10 +4016,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       const assignments = await db.select()
         .from(gearAssignments)
-        .where(and(
-          eq(gearAssignments.gearItemId, req.params.id),
-          eq(gearAssignments.companyId, companyId)
-        ));
+        .where(eq(gearAssignments.gearItemId, req.params.id));
       
       res.json({ assignments });
     } catch (error) {
@@ -4047,8 +4042,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const assignmentData = insertGearAssignmentSchema.parse({
         gearItemId: req.params.id,
         companyId,
-        employeeName: req.body.employeeName,
-        quantityAssigned: req.body.quantityAssigned,
+        employeeId: req.body.employeeId,
+        quantity: req.body.quantity,
       });
       
       const [assignment] = await db.insert(gearAssignments)
@@ -4080,15 +4075,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       const updates: Partial<InsertGearAssignment> = {};
-      if (req.body.employeeName !== undefined) updates.employeeName = req.body.employeeName;
-      if (req.body.quantityAssigned !== undefined) updates.quantityAssigned = req.body.quantityAssigned;
+      if (req.body.employeeId !== undefined) updates.employeeId = req.body.employeeId;
+      if (req.body.quantity !== undefined) updates.quantity = req.body.quantity;
       
       const [assignment] = await db.update(gearAssignments)
         .set({ ...updates, updatedAt: new Date() })
-        .where(and(
-          eq(gearAssignments.id, req.params.id),
-          eq(gearAssignments.companyId, companyId)
-        ))
+        .where(eq(gearAssignments.id, req.params.id))
         .returning();
       
       res.json({ assignment });
@@ -4113,10 +4105,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       await db.delete(gearAssignments)
-        .where(and(
-          eq(gearAssignments.id, req.params.id),
-          eq(gearAssignments.companyId, companyId)
-        ));
+        .where(eq(gearAssignments.id, req.params.id));
       
       res.json({ success: true });
     } catch (error) {
