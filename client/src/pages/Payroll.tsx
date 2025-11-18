@@ -381,14 +381,30 @@ export default function Payroll() {
       return;
     }
 
+    // Parse and validate numeric values
+    const overtimeMult = parseFloat(overtimeMultiplier);
+    const doubleTimeMult = parseFloat(doubleTimeMultiplier);
+    const overtimeThreshold = parseFloat(overtimeHoursThreshold);
+    const doubleTimeThreshold = parseFloat(doubleTimeHoursThreshold);
+    
+    // Check for NaN values
+    if (isNaN(overtimeMult) || isNaN(doubleTimeMult) || isNaN(overtimeThreshold) || isNaN(doubleTimeThreshold)) {
+      toast({
+        title: "Validation Error",
+        description: "Please enter valid numbers for all overtime and double time fields",
+        variant: "destructive",
+      });
+      return;
+    }
+    
     const config: any = {
       periodType,
-      overtimeMultiplier: parseFloat(overtimeMultiplier) || 1.5,
-      doubleTimeMultiplier: parseFloat(doubleTimeMultiplier) || 2.0,
+      overtimeMultiplier: overtimeMult,
+      doubleTimeMultiplier: doubleTimeMult,
       overtimeTriggerType: overtimeTriggerType || 'daily',
-      overtimeHoursThreshold: parseFloat(overtimeHoursThreshold) || 8,
+      overtimeHoursThreshold: overtimeThreshold,
       doubleTimeTriggerType: doubleTimeTriggerType || 'daily',
-      doubleTimeHoursThreshold: parseFloat(doubleTimeHoursThreshold) || 12,
+      doubleTimeHoursThreshold: doubleTimeThreshold,
     };
 
     if (periodType === 'semi-monthly') {
