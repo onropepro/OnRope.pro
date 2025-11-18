@@ -399,12 +399,12 @@ export default function Payroll() {
     
     const config: any = {
       periodType,
-      overtimeMultiplier: overtimeMult,
-      doubleTimeMultiplier: doubleTimeMult,
+      overtimeMultiplier: overtimeMult.toString(),
+      doubleTimeMultiplier: doubleTimeMult.toString(),
       overtimeTriggerType: overtimeTriggerType || 'daily',
-      overtimeHoursThreshold: overtimeThreshold,
+      overtimeHoursThreshold: overtimeThreshold.toString(),
       doubleTimeTriggerType: doubleTimeTriggerType || 'daily',
-      doubleTimeHoursThreshold: doubleTimeThreshold,
+      doubleTimeHoursThreshold: doubleTimeThreshold.toString(),
     };
 
     if (periodType === 'semi-monthly') {
