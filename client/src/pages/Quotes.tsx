@@ -56,8 +56,8 @@ const SERVICE_TYPES = [
     requiresElevation: true
   },
   { 
-    id: "pressure_washing", 
-    name: "Pressure Washing", 
+    id: "building_wash", 
+    name: "Building Wash - Pressure washing", 
     icon: Droplet,
     description: "Building exterior cleaning",
     requiresElevation: true
@@ -613,7 +613,7 @@ export default function Quotes() {
     const serviceNames: Record<string, string> = {
       window_cleaning: "Window Cleaning",
       dryer_vent_cleaning: "Exterior Dryer Vent Cleaning",
-      pressure_washing: "Pressure Washing",
+      building_wash: "Building Wash - Pressure washing",
       general_pressure_washing: "General Pressure Washing",
       gutter_cleaning: "Gutter Cleaning",
       parkade: "Parkade Cleaning",

@@ -54,7 +54,7 @@ const projectSchema = z.object({
   strataPlanNumber: z.string().optional(),
   buildingName: z.string().optional(),
   buildingAddress: z.string().optional(),
-  jobType: z.enum(["window_cleaning", "dryer_vent_cleaning", "pressure_washing", "general_pressure_washing", "gutter_cleaning", "in_suite_dryer_vent_cleaning", "parkade_pressure_cleaning", "ground_window_cleaning", "other"]),
+  jobType: z.enum(["window_cleaning", "dryer_vent_cleaning", "building_wash", "general_pressure_washing", "gutter_cleaning", "in_suite_dryer_vent_cleaning", "parkade_pressure_cleaning", "ground_window_cleaning", "other"]),
   customJobType: z.string().optional(),
   totalDropsNorth: z.string().optional(),
   totalDropsEast: z.string().optional(),
@@ -2155,7 +2155,7 @@ export default function Dashboard() {
                                   {[
                                     { value: "window_cleaning", label: "Window Cleaning", icon: "window" },
                                     { value: "dryer_vent_cleaning", label: "Exterior Dryer Vent", icon: "air" },
-                                    { value: "pressure_washing", label: "Pressure Washing", icon: "water_drop" },
+                                    { value: "building_wash", label: "Building Wash - Pressure washing", icon: "water_drop" },
                                     { value: "general_pressure_washing", label: "General Pressure Washing", icon: "cleaning_services" },
                                     { value: "gutter_cleaning", label: "Gutter Cleaning", icon: "home_repair_service" },
                                     { value: "in_suite_dryer_vent_cleaning", label: "In-Suite Dryer Vent", icon: "meeting_room" },
@@ -2347,7 +2347,7 @@ export default function Dashboard() {
                         />
 
                         {(projectForm.watch("jobType") === "window_cleaning" || 
-                          projectForm.watch("jobType") === "pressure_washing" || 
+                          projectForm.watch("jobType") === "building_wash" || 
                           projectForm.watch("jobType") === "dryer_vent_cleaning" ||
                           (projectForm.watch("jobType") === "other" && showOtherElevationFields)) && (
                           <>

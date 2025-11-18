@@ -2215,7 +2215,7 @@ export default function ProjectDetail() {
                     data-testid="select-edit-job-type"
                   >
                     <option value="window_cleaning">Window Cleaning (4-Elevation)</option>
-                    <option value="pressure_washing">Pressure Washing (4-Elevation)</option>
+                    <option value="building_wash">Building Wash - Pressure washing (4-Elevation)</option>
                     <option value="dryer_vent_cleaning">Dryer Vent Cleaning (4-Elevation)</option>
                     <option value="in_suite_dryer_vent_cleaning">In-Suite Dryer Vent Cleaning</option>
                     <option value="parkade_pressure_cleaning">Parkade Pressure Cleaning</option>

@@ -125,7 +125,7 @@ export const projects = pgTable("projects", {
   buildingName: varchar("building_name"), // Building name for display
   strataPlanNumber: varchar("strata_plan_number"),
   buildingAddress: text("building_address"), // Building address visible to all employees
-  jobType: varchar("job_type").notNull(), // window_cleaning | dryer_vent_cleaning | pressure_washing | in_suite_dryer_vent_cleaning | parkade_pressure_cleaning | ground_window_cleaning | other
+  jobType: varchar("job_type").notNull(), // window_cleaning | dryer_vent_cleaning | building_wash | in_suite_dryer_vent_cleaning | parkade_pressure_cleaning | ground_window_cleaning | other
   customJobType: varchar("custom_job_type"), // Custom job type when jobType is "other"
   
   // Elevation-specific drop totals
@@ -649,9 +649,9 @@ export const quotes = pgTable("quotes", {
 export const quoteServices = pgTable("quote_services", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   quoteId: varchar("quote_id").notNull().references(() => quotes.id, { onDelete: "cascade" }),
-  serviceType: varchar("service_type").notNull(), // window_cleaning | dryer_vent_cleaning | pressure_washing | parkade | ground_windows | in_suite
+  serviceType: varchar("service_type").notNull(), // window_cleaning | dryer_vent_cleaning | building_wash | parkade | ground_windows | in_suite
   
-  // Elevation-based services (window_cleaning, dryer_vent_cleaning, pressure_washing)
+  // Elevation-based services (window_cleaning, dryer_vent_cleaning, building_wash)
   dropsNorth: integer("drops_north"),
   dropsEast: integer("drops_east"),
   dropsSouth: integer("drops_south"),
@@ -865,7 +865,7 @@ export const insertProjectSchema = createInsertSchema(projects)
   })
   .superRefine((data, ctx) => {
     // Job types that use drop-based tracking
-    const dropBasedJobTypes = ['window_cleaning', 'dryer_vent_cleaning', 'pressure_washing'];
+    const dropBasedJobTypes = ['window_cleaning', 'dryer_vent_cleaning', 'building_wash'];
     
     if (dropBasedJobTypes.includes(data.jobType)) {
       // For drop-based jobs, dailyDropTarget is required
@@ -994,7 +994,7 @@ export const scheduledJobs = pgTable("scheduled_jobs", {
   
   title: varchar("title").notNull(),
   description: text("description"),
-  jobType: varchar("job_type").notNull(), // window_cleaning | dryer_vent_cleaning | pressure_washing | in_suite | parkade | ground_window | custom
+  jobType: varchar("job_type").notNull(), // window_cleaning | dryer_vent_cleaning | building_wash | in_suite | parkade | ground_window | custom
   customJobType: varchar("custom_job_type"), // Used when jobType is "custom"
   
   startDate: timestamp("start_date").notNull(),

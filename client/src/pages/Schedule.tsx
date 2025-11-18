@@ -1348,7 +1348,7 @@ function CreateJobDialog({
               <SelectContent>
                 <SelectItem value="window_cleaning">Window Cleaning</SelectItem>
                 <SelectItem value="dryer_vent_cleaning">Dryer Vent Cleaning</SelectItem>
-                <SelectItem value="pressure_washing">Pressure Washing</SelectItem>
+                <SelectItem value="building_wash">Building Wash - Pressure washing</SelectItem>
                 <SelectItem value="in_suite">In-Suite Service</SelectItem>
                 <SelectItem value="parkade">Parkade Cleaning</SelectItem>
                 <SelectItem value="ground_window">Ground Window Cleaning</SelectItem>
@@ -2166,7 +2166,7 @@ function EditJobDialog({
               <SelectContent>
                 <SelectItem value="window_cleaning">Window Cleaning</SelectItem>
                 <SelectItem value="dryer_vent_cleaning">Dryer Vent Cleaning</SelectItem>
-                <SelectItem value="pressure_washing">Pressure Washing</SelectItem>
+                <SelectItem value="building_wash">Building Wash - Pressure washing</SelectItem>
                 <SelectItem value="in_suite">In-Suite Service</SelectItem>
                 <SelectItem value="parkade">Parkade Cleaning</SelectItem>
                 <SelectItem value="ground_window">Ground Window Cleaning</SelectItem>

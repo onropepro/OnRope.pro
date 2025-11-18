@@ -126,7 +126,7 @@ This is an official equipment inspection record.
     const serviceNames: Record<string, string> = {
       window_cleaning: "Window Cleaning",
       dryer_vent_cleaning: "Exterior Dryer Vent Cleaning",
-      pressure_washing: "Pressure Washing",
+      building_wash: "Building Wash - Pressure washing",
       general_pressure_washing: "General Pressure Washing",
       gutter_cleaning: "Gutter Cleaning",
       parkade: "Parkade Cleaning",
