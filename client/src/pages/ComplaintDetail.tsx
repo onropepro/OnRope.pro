@@ -20,7 +20,12 @@ const noteSchema = z.object({
   visibleToResident: z.boolean().default(false),
 });
 
+const residentReplySchema = z.object({
+  note: z.string().min(1, "Reply cannot be empty"),
+});
+
 type NoteFormData = z.infer<typeof noteSchema>;
+type ResidentReplyData = z.infer<typeof residentReplySchema>;
 
 type ComplaintNote = {
   id: string;
@@ -69,6 +74,13 @@ export default function ComplaintDetail() {
     },
   });
 
+  const residentReplyForm = useForm<ResidentReplyData>({
+    resolver: zodResolver(residentReplySchema),
+    defaultValues: {
+      note: "",
+    },
+  });
+
   const addNoteMutation = useMutation({
     mutationFn: async (data: NoteFormData) => {
       const response = await fetch(`/api/complaints/${complaintId}/notes`, {
@@ -89,6 +101,32 @@ export default function ComplaintDetail() {
       queryClient.invalidateQueries({ queryKey: ["/api/complaints", complaintId, "notes"] });
       form.reset();
       toast({ title: "Note added successfully" });
+    },
+    onError: (error: Error) => {
+      toast({ title: "Error", description: error.message, variant: "destructive" });
+    },
+  });
+
+  const addResidentReplyMutation = useMutation({
+    mutationFn: async (data: ResidentReplyData) => {
+      const response = await fetch(`/api/complaints/${complaintId}/resident-reply`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+        credentials: "include",
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || "Failed to send reply");
+      }
+
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/complaints", complaintId, "notes"] });
+      residentReplyForm.reset();
+      toast({ title: "Reply sent successfully" });
     },
     onError: (error: Error) => {
       toast({ title: "Error", description: error.message, variant: "destructive" });
@@ -122,6 +160,10 @@ export default function ComplaintDetail() {
 
   const onSubmit = async (data: NoteFormData) => {
     addNoteMutation.mutate(data);
+  };
+
+  const onResidentReplySubmit = async (data: ResidentReplyData) => {
+    addResidentReplyMutation.mutate(data);
   };
 
   const toggleStatus = () => {
@@ -241,26 +283,88 @@ export default function ComplaintDetail() {
           </CardContent>
         </Card>
 
-        {/* Resident Responses - Visible to both residents and staff */}
+        {/* Conversation - Visible to both residents and staff */}
         {residentNotes.length > 0 && (
           <Card>
             <CardHeader>
-              <CardTitle className="text-base">Responses from Staff</CardTitle>
+              <CardTitle className="text-base">Conversation</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-3">
-                {residentNotes.map((note) => (
-                  <div key={note.id} className="bg-primary/5 border border-primary/20 rounded-lg p-3" data-testid={`resident-note-${note.id}`}>
-                    <div className="flex items-start justify-between mb-2">
-                      <div className="font-medium text-sm">{note.userName}</div>
-                      <div className="text-xs text-muted-foreground">
-                        {new Date(note.createdAt).toLocaleDateString()}
+                {residentNotes.map((note) => {
+                  const isResidentMessage = note.userName === complaint.residentName || 
+                                          note.userName === complaint.unitNumber || 
+                                          note.userName === "Resident";
+                  return (
+                    <div 
+                      key={note.id} 
+                      className={`rounded-lg p-3 ${
+                        isResidentMessage 
+                          ? 'bg-blue-50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-800'
+                          : 'bg-primary/5 border border-primary/20'
+                      }`}
+                      data-testid={`resident-note-${note.id}`}
+                    >
+                      <div className="flex items-start justify-between mb-2">
+                        <div className="flex items-center gap-2">
+                          <div className="font-medium text-sm">{note.userName}</div>
+                          {isResidentMessage && (
+                            <Badge variant="secondary" className="text-xs">You</Badge>
+                          )}
+                        </div>
+                        <div className="text-xs text-muted-foreground">
+                          {new Date(note.createdAt).toLocaleDateString()} at{" "}
+                          {new Date(note.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                        </div>
                       </div>
+                      <p className="text-sm">{note.note}</p>
                     </div>
-                    <p className="text-sm">{note.note}</p>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Resident Reply Form - Only visible to residents */}
+        {!isStaff && (
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-base">Reply to Staff</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <Form {...residentReplyForm}>
+                <form onSubmit={residentReplyForm.handleSubmit(onResidentReplySubmit)} className="space-y-3">
+                  <FormField
+                    control={residentReplyForm.control}
+                    name="note"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Your Message</FormLabel>
+                        <FormControl>
+                          <Textarea
+                            {...field}
+                            placeholder="Type your reply..."
+                            data-testid="input-resident-reply"
+                            className="min-h-24 resize-none"
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  
+                  <Button 
+                    type="submit" 
+                    className="w-full h-12" 
+                    data-testid="button-send-reply" 
+                    disabled={addResidentReplyMutation.isPending}
+                  >
+                    <span className="material-icons mr-2">send</span>
+                    {addResidentReplyMutation.isPending ? "Sending..." : "Send Reply"}
+                  </Button>
+                </form>
+              </Form>
             </CardContent>
           </Card>
         )}

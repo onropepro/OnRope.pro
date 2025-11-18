@@ -3682,7 +3682,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
-  // Add complaint note
+  // Add complaint note (staff only)
   app.post("/api/complaints/:complaintId/notes", requireAuth, requireRole("rope_access_tech", "general_supervisor", "rope_access_supervisor", "supervisor", "operations_manager", "company"), async (req: Request, res: Response) => {
     try {
       const currentUser = await storage.getUserById(req.session.userId!);
@@ -3722,6 +3722,50 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Validation error", errors: error.errors });
       }
       console.error("Create complaint note error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Add resident reply to complaint
+  app.post("/api/complaints/:complaintId/resident-reply", requireAuth, requireRole("resident"), async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      // Verify the complaint belongs to this resident
+      const hasAccess = await storage.verifyComplaintAccess(
+        req.params.complaintId,
+        currentUser.id,
+        currentUser.role,
+        currentUser.companyId
+      );
+      
+      if (!hasAccess) {
+        return res.status(403).json({ message: "Access denied - You can only reply to your own complaints" });
+      }
+      
+      const noteData = insertComplaintNoteSchema.parse({
+        complaintId: req.params.complaintId,
+        userId: req.session.userId,
+        note: req.body.note,
+        visibleToResident: true, // Resident replies are always visible to residents
+      });
+      
+      const noteWithUserName = {
+        ...noteData,
+        userName: currentUser.name || currentUser.unitNumber || "Resident",
+      };
+      
+      const note = await storage.createComplaintNote(noteWithUserName);
+      res.json({ note });
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Validation error", errors: error.errors });
+      }
+      console.error("Create resident reply error:", error);
       res.status(500).json({ message: "Internal server error" });
     }
   });
