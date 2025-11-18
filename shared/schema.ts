@@ -249,6 +249,8 @@ export const gearItems = pgTable("gear_items", {
   brand: varchar("brand"), // Optional
   model: varchar("model"), // Optional
   itemPrice: numeric("item_price", { precision: 10, scale: 2 }), // Optional - only visible to users with financial permissions
+  ropeLength: numeric("rope_length", { precision: 10, scale: 2 }), // Optional - for Rope items only (in feet)
+  pricePerFeet: numeric("price_per_feet", { precision: 10, scale: 2 }), // Optional - for Rope items only ($ per foot)
   assignedTo: varchar("assigned_to").default("Not in use"), // Who has this equipment or "Not in use"
   notes: text("notes"), // Optional - additional notes about the item
   quantity: integer("quantity").default(1).notNull(), // Total quantity of this item (0 = out of stock)

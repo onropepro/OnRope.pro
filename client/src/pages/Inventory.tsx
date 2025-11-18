@@ -79,6 +79,8 @@ export default function Inventory() {
       brand: undefined,
       model: undefined,
       itemPrice: undefined,
+      ropeLength: undefined,
+      pricePerFeet: undefined,
       assignedTo: "Not in use",
       notes: undefined,
       quantity: undefined,
@@ -268,6 +270,8 @@ export default function Inventory() {
       brand: item.brand || undefined,
       model: item.model || undefined,
       itemPrice: item.itemPrice || undefined,
+      ropeLength: item.ropeLength || undefined,
+      pricePerFeet: item.pricePerFeet || undefined,
       assignedTo: item.assignedTo || "Not in use",
       notes: item.notes || undefined,
       quantity: item.quantity || 1,
@@ -930,26 +934,74 @@ export default function Inventory() {
               />
 
               {canViewFinancials && (
-                <FormField
-                  control={form.control}
-                  name="itemPrice"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Price</FormLabel>
-                      <FormControl>
-                        <Input
-                          type="number"
-                          step="0.01"
-                          placeholder="0.00"
-                          {...field}
-                          value={field.value || ""}
-                          data-testid="input-price"
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                form.watch("equipmentType") === "Rope" ? (
+                  <>
+                    <FormField
+                      control={form.control}
+                      name="ropeLength"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Rope Length (feet)</FormLabel>
+                          <FormControl>
+                            <Input
+                              type="number"
+                              min="0"
+                              step="0.01"
+                              placeholder="Enter rope length"
+                              {...field}
+                              value={field.value || ""}
+                              data-testid="input-rope-length"
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="pricePerFeet"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Price Per Foot</FormLabel>
+                          <FormControl>
+                            <Input
+                              type="number"
+                              min="0"
+                              step="0.01"
+                              placeholder="Enter price per foot"
+                              {...field}
+                              value={field.value || ""}
+                              data-testid="input-price-per-feet"
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </>
+                ) : (
+                  <FormField
+                    control={form.control}
+                    name="itemPrice"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Price</FormLabel>
+                        <FormControl>
+                          <Input
+                            type="number"
+                            step="0.01"
+                            placeholder="0.00"
+                            {...field}
+                            value={field.value || ""}
+                            data-testid="input-price"
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                )
               )}
                   </div>
 
@@ -1173,26 +1225,74 @@ export default function Inventory() {
               />
 
               {canViewFinancials && (
-                <FormField
-                  control={form.control}
-                  name="itemPrice"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Price</FormLabel>
-                      <FormControl>
-                        <Input
-                          type="number"
-                          step="0.01"
-                          placeholder="0.00"
-                          {...field}
-                          value={field.value || ""}
-                          data-testid="input-price-edit"
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                form.watch("equipmentType") === "Rope" ? (
+                  <>
+                    <FormField
+                      control={form.control}
+                      name="ropeLength"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Rope Length (feet)</FormLabel>
+                          <FormControl>
+                            <Input
+                              type="number"
+                              min="0"
+                              step="0.01"
+                              placeholder="Enter rope length"
+                              {...field}
+                              value={field.value || ""}
+                              data-testid="input-rope-length-edit"
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="pricePerFeet"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Price Per Foot</FormLabel>
+                          <FormControl>
+                            <Input
+                              type="number"
+                              min="0"
+                              step="0.01"
+                              placeholder="Enter price per foot"
+                              {...field}
+                              value={field.value || ""}
+                              data-testid="input-price-per-feet-edit"
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </>
+                ) : (
+                  <FormField
+                    control={form.control}
+                    name="itemPrice"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Price</FormLabel>
+                        <FormControl>
+                          <Input
+                            type="number"
+                            step="0.01"
+                            placeholder="0.00"
+                            {...field}
+                            value={field.value || ""}
+                            data-testid="input-price-edit"
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                )
               )}
 
               <DialogFooter>
