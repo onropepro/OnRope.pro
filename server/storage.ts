@@ -872,6 +872,12 @@ export class Storage {
     await db.delete(gearItems).where(eq(gearItems.id, id));
   }
 
+  // Gear assignment operations
+  async createGearAssignment(assignment: { gearItemId: string; companyId: string; employeeId: string; quantity: number }): Promise<any> {
+    const result = await db.insert(gearAssignments).values(assignment).returning();
+    return result[0];
+  }
+
   async updateHarnessInspection(id: string, pdfUrl: string): Promise<HarnessInspection> {
     const result = await db.update(harnessInspections)
       .set({ pdfUrl })
