@@ -476,6 +476,16 @@ export default function Login() {
             </Button>
 
             <Button 
+              variant="default" 
+              className="w-full h-12 text-base font-medium bg-primary hover:bg-primary/90" 
+              onClick={() => window.open("https://ram-website-paquettetom.replit.app", "_blank")}
+              data-testid="button-subscribe"
+            >
+              <span className="material-icons mr-2">storefront</span>
+              Subscribe & Purchase Licenses
+            </Button>
+
+            <Button 
               variant="ghost" 
               className="w-full h-10 text-sm" 
               onClick={() => window.location.reload()}
