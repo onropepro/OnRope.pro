@@ -320,29 +320,29 @@ export default function HarnessInspectionForm() {
                 <CardDescription>Inspection details and equipment information</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
-                {/* Gear Picker Button */}
-                {myGear.length > 0 ? (
-                  <Dialog open={showHarnessPicker} onOpenChange={setShowHarnessPicker}>
-                    <DialogTrigger asChild>
-                      <Button 
-                        type="button" 
-                        variant="default" 
-                        className="w-full h-14"
-                        data-testid="button-pick-harness"
-                      >
-                        <Package className="mr-2 h-5 w-5" />
-                        Pick Equipment from My Inventory
-                      </Button>
-                    </DialogTrigger>
-                    <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
-                      <DialogHeader>
-                        <DialogTitle>Select Equipment from My Inventory</DialogTitle>
-                        <DialogDescription>
-                          Choose equipment to auto-fill inspection details
-                        </DialogDescription>
-                      </DialogHeader>
-                      <div className="grid gap-3 py-4">
-                        {myGear.map((harness: any) => (
+                {/* Gear Picker Button - Always Visible */}
+                <Dialog open={showHarnessPicker} onOpenChange={setShowHarnessPicker}>
+                  <DialogTrigger asChild>
+                    <Button 
+                      type="button" 
+                      variant="default" 
+                      className="w-full h-14"
+                      data-testid="button-pick-harness"
+                    >
+                      <Package className="mr-2 h-5 w-5" />
+                      Pick Equipment from My Inventory
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+                    <DialogHeader>
+                      <DialogTitle>Select Equipment from My Inventory</DialogTitle>
+                      <DialogDescription>
+                        Choose equipment to auto-fill inspection details
+                      </DialogDescription>
+                    </DialogHeader>
+                    <div className="grid gap-3 py-4">
+                      {myGear.length > 0 ? (
+                        myGear.map((harness: any) => (
                           <Card 
                             key={harness.id}
                             className="hover-elevate active-elevate-2 cursor-pointer"
@@ -376,22 +376,21 @@ export default function HarnessInspectionForm() {
                               </div>
                             </CardContent>
                           </Card>
-                        ))}
-                      </div>
-                    </DialogContent>
-                  </Dialog>
-                ) : (
-                  <Button 
-                    type="button" 
-                    variant="outline" 
-                    className="w-full h-14"
-                    disabled
-                    data-testid="button-pick-harness-disabled"
-                  >
-                    <Package className="mr-2 h-5 w-5" />
-                    No Equipment Assigned - Go to Inventory and assign equipment to yourself
-                  </Button>
-                )}
+                        ))
+                      ) : (
+                        <div className="text-center py-8">
+                          <Package className="mx-auto h-12 w-12 text-muted-foreground mb-3" />
+                          <p className="text-sm text-muted-foreground">
+                            No equipment assigned to you yet.
+                          </p>
+                          <p className="text-sm text-muted-foreground mt-1">
+                            Go to Inventory and assign equipment to yourself.
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                  </DialogContent>
+                </Dialog>
 
                 {/* Gear Selection Dropdown for Autofill */}
                 {myGear.length > 0 && (
