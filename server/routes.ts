@@ -3842,18 +3842,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
       
       const item = await storage.createGearItem(itemData);
+      console.log("Created gear item:", item.id);
       
       // If assignment info is provided, create the assignment
       if (req.body.assignEmployeeId && req.body.assignQuantity) {
+        console.log("Assignment info provided - employeeId:", req.body.assignEmployeeId, "quantity:", req.body.assignQuantity);
         const assignQuantity = parseInt(req.body.assignQuantity);
         if (assignQuantity > 0 && assignQuantity <= (item.quantity || 0)) {
-          await storage.createGearAssignment({
+          console.log("Creating assignment...");
+          const assignment = await storage.createGearAssignment({
             gearItemId: item.id,
             companyId,
             employeeId: req.body.assignEmployeeId,
             quantity: assignQuantity,
           });
+          console.log("Assignment created:", assignment);
+        } else {
+          console.log("Assignment validation failed - quantity:", assignQuantity, "item quantity:", item.quantity);
         }
+      } else {
+        console.log("No assignment info provided");
       }
       
       res.json({ item });
