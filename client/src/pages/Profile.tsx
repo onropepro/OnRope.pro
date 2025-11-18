@@ -799,7 +799,15 @@ export default function Profile() {
                                   currentSeats: employeesData.seatInfo.seatLimit.toString(),
                                   seatsUsed: employeesData.seatInfo.seatsUsed.toString()
                                 });
-                                window.open(`https://ram-website-paquettetom.replit.app/purchase-seats?${params.toString()}`, '_blank');
+                                const url = `https://ram-website-paquettetom.replit.app/purchase-seats?${params.toString()}`;
+                                console.log('[Seat Purchase] Opening URL:', url);
+                                console.log('[Seat Purchase] Parameters:', {
+                                  email: user?.email,
+                                  tier: employeesData.seatInfo.tier,
+                                  currentSeats: employeesData.seatInfo.seatLimit,
+                                  seatsUsed: employeesData.seatInfo.seatsUsed
+                                });
+                                window.open(url, '_blank');
                               }}
                             >
                               <span className="material-icons mr-2">add_shopping_cart</span>
