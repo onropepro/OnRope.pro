@@ -98,6 +98,13 @@ const SERVICE_TYPES = [
     description: "In-suite dryer vent service",
     requiresElevation: false
   },
+  { 
+    id: "custom", 
+    name: "Custom Service", 
+    icon: Plus,
+    description: "Create your own custom service",
+    requiresElevation: false
+  },
 ];
 
 // Form schemas
@@ -112,6 +119,7 @@ const buildingInfoSchema = z.object({
 
 const serviceFormSchema = z.object({
   serviceType: z.string(),
+  customServiceName: z.string().optional(), // For custom services
   // Elevation-based fields
   dropsNorth: z.coerce.number().optional(),
   dropsEast: z.coerce.number().optional(),
@@ -2475,6 +2483,28 @@ export default function Quotes() {
             <CardContent className="p-8 pt-0">
               <Form {...serviceForm}>
                 <form onSubmit={serviceForm.handleSubmit(handleServiceFormSubmit)} className="space-y-6">
+                  {/* Custom Service Name Input */}
+                  {serviceBeingConfigured === "custom" && (
+                    <FormField
+                      control={serviceForm.control}
+                      name="customServiceName"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Service Name</FormLabel>
+                          <FormControl>
+                            <Input
+                              {...field}
+                              placeholder="e.g., Roof Inspection, Caulking, etc."
+                              className="h-12"
+                              data-testid="input-custom-service-name"
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  )}
+                  
                   {service.requiresElevation && 
                    (serviceBeingConfigured !== "dryer_vent_cleaning" || 
                     serviceForm.watch("dryerVentPricingType") === "per_hour") && (
