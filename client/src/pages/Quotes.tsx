@@ -183,6 +183,8 @@ export default function Quotes() {
       strataPlanNumber: "",
       buildingAddress: "",
       floorCount: undefined,
+      strataManagerName: "",
+      strataManagerAddress: "",
     },
   });
 
@@ -1449,6 +1451,8 @@ export default function Quotes() {
                     strataPlanNumber: selectedQuote.strataPlanNumber,
                     buildingAddress: selectedQuote.buildingAddress,
                     floorCount: selectedQuote.floorCount,
+                    strataManagerName: selectedQuote.strataManagerName || "",
+                    strataManagerAddress: selectedQuote.strataManagerAddress || "",
                   });
                   
                   // Populate services Map from quote
@@ -1577,6 +1581,39 @@ export default function Quotes() {
                               data-testid="input-edit-floor-count"
                               onChange={(e) => field.onChange(e.target.value ? parseInt(e.target.value) : undefined)}
                             />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                </div>
+
+                {/* Strata Property Manager */}
+                <div className="space-y-4">
+                  <h3 className="text-lg font-semibold">Strata Property Manager (Optional)</h3>
+                  <div className="grid grid-cols-2 gap-4">
+                    <FormField
+                      control={editForm.control}
+                      name="strataManagerName"
+                      render={({ field }) => (
+                        <FormItem className="col-span-2">
+                          <FormLabel>Property Manager Name</FormLabel>
+                          <FormControl>
+                            <Input {...field} className="h-12" data-testid="input-edit-strata-manager-name" />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={editForm.control}
+                      name="strataManagerAddress"
+                      render={({ field }) => (
+                        <FormItem className="col-span-2">
+                          <FormLabel>Property Manager Address</FormLabel>
+                          <FormControl>
+                            <Input {...field} className="h-12" data-testid="input-edit-strata-manager-address" />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
