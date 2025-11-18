@@ -1608,11 +1608,15 @@ export default function Quotes() {
                         <SelectValue placeholder="Select from client list..." />
                       </SelectTrigger>
                       <SelectContent>
-                        {clients.map((client: any) => (
-                          <SelectItem key={client.id} value={client.id}>
-                            {client.firstName} {client.lastName} {client.company ? `- ${client.company}` : ''}
-                          </SelectItem>
-                        ))}
+                        {clients.length === 0 ? (
+                          <div className="p-2 text-sm text-muted-foreground">No clients found. Add clients first.</div>
+                        ) : (
+                          clients.map((client: any) => (
+                            <SelectItem key={client.id} value={client.id}>
+                              {client.firstName} {client.lastName} {client.company ? `- ${client.company}` : ''}
+                            </SelectItem>
+                          ))
+                        )}
                       </SelectContent>
                     </Select>
                   </div>
