@@ -860,7 +860,7 @@ export default function Profile() {
                     <>
                       <Separator />
                       <div className="space-y-3">
-                        <Label className="text-sm font-medium text-destructive">Cancel Subscription</Label>
+                        <Label className="text-sm font-medium text-destructive">Cancel Subscription and/or Add-ons</Label>
                         <p className="text-xs text-muted-foreground">
                           Cancel your subscription and stop future billing cycles. Your access will remain active until the end of your current billing period.
                         </p>
@@ -877,7 +877,7 @@ export default function Profile() {
                           }}
                         >
                           <span className="material-icons mr-2">cancel</span>
-                          Cancel Subscription
+                          Cancel Subscription and/or Add-ons
                         </Button>
                       </div>
                     </>
