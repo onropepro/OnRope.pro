@@ -95,6 +95,7 @@ export const users = pgTable("users", {
   
   // Additional seat/project purchases (company role only)
   additionalSeats: integer("additional_seats").default(0), // Extra seats purchased beyond tier limit
+  additionalProjects: integer("additional_projects").default(0), // Extra projects purchased beyond tier limit
   
   // Resident linking code (company role only)
   residentCode: varchar("resident_code", { length: 10 }).unique(), // 10-character code for residents to link to company - UNIQUE (~50 bits entropy)
