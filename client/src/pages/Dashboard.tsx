@@ -35,6 +35,7 @@ import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from "recha
 import { isManagement, hasFinancialAccess, canManageEmployees, canViewPerformance, hasPermission, isReadOnly, canViewSchedule } from "@/lib/permissions";
 import { DocumentUploader } from "@/components/DocumentUploader";
 import { RefreshButton } from "@/components/RefreshButton";
+import { QRCodeSVG } from 'qrcode.react';
 import {
   DndContext,
   closestCenter,
@@ -1971,15 +1972,22 @@ export default function Dashboard() {
             {currentUser?.role !== 'resident' && currentUser?.role !== 'superuser' && (currentUser?.residentCode || companyData?.residentCode) && (
               <Card className="border-primary/20 bg-primary/5">
                 <CardContent className="p-6">
-                  <div className="flex items-center justify-between">
-                    <div>
+                  <div className="flex items-center justify-between gap-6">
+                    <div className="flex-1">
                       <h3 className="text-sm font-medium text-muted-foreground mb-1">Company Resident Code</h3>
-                      <p className="text-xs text-muted-foreground mb-3">Share this code with residents to link their accounts</p>
+                      <p className="text-xs text-muted-foreground mb-3">Share this QR code with residents to link their accounts</p>
                       <Badge variant="outline" className="font-mono text-2xl px-4 py-2" data-testid="badge-projects-resident-code">
                         {currentUser?.residentCode || companyData?.residentCode}
                       </Badge>
                     </div>
-                    <span className="material-icons text-6xl text-primary/20">qr_code_2</span>
+                    <div className="bg-white p-4 rounded-lg shadow-sm">
+                      <QRCodeSVG
+                        value={`${window.location.origin}/link?code=${currentUser?.residentCode || companyData?.residentCode}`}
+                        size={140}
+                        level="M"
+                        data-testid="qr-code-dashboard"
+                      />
+                    </div>
                   </div>
                 </CardContent>
               </Card>
