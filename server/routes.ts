@@ -2,7 +2,7 @@ import type { Express, Request, Response, NextFunction } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { db } from "./db";
-import { insertUserSchema, insertClientSchema, insertProjectSchema, insertDropLogSchema, insertComplaintSchema, insertComplaintNoteSchema, insertJobCommentSchema, insertHarnessInspectionSchema, insertToolboxMeetingSchema, insertPayPeriodConfigSchema, insertQuoteSchema, insertQuoteServiceSchema, insertGearItemSchema, insertGearAssignmentSchema, insertScheduledJobSchema, insertJobAssignmentSchema, normalizeStrataPlan, type InsertGearItem, type InsertGearAssignment, gearAssignments, jobAssignments } from "@shared/schema";
+import { insertUserSchema, insertClientSchema, insertProjectSchema, insertDropLogSchema, insertComplaintSchema, insertComplaintNoteSchema, insertJobCommentSchema, insertHarnessInspectionSchema, insertToolboxMeetingSchema, insertPayPeriodConfigSchema, insertQuoteSchema, insertQuoteServiceSchema, insertGearItemSchema, insertGearAssignmentSchema, insertScheduledJobSchema, insertJobAssignmentSchema, normalizeStrataPlan, type InsertGearItem, type InsertGearAssignment, gearAssignments, jobAssignments, workSessions, nonBillableWorkSessions } from "@shared/schema";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
 import bcrypt from "bcrypt";
@@ -4774,9 +4774,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Missing required fields" });
       }
 
-      // Verify employee belongs to company
+      // Verify employee belongs to company (or IS the company owner)
       const employee = await storage.getUserById(employeeId);
-      if (!employee || employee.companyId !== companyId) {
+      if (!employee || (employee.companyId !== companyId && employee.id !== companyId)) {
         return res.status(400).json({ message: "Invalid employee" });
       }
 
@@ -4807,8 +4807,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         new Date(endTime)
       );
 
-      // Create complete work session with overtime hours
-      const session = await storage.createWorkSession({
+      // Create complete work session with overtime hours using direct DB insert
+      const result = await db.insert(workSessions).values({
         projectId,
         employeeId,
         companyId,
@@ -4820,10 +4820,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         dropsCompletedSouth: south,
         dropsCompletedWest: west,
         shortfallReason: totalDropsCompleted < project.dailyDropTarget ? shortfallReason : undefined,
-        regularHours: overtimeBreakdown.regularHours,
-        overtimeHours: overtimeBreakdown.overtimeHours,
-        doubleTimeHours: overtimeBreakdown.doubleTimeHours,
-      });
+        regularHours: overtimeBreakdown.regularHours.toString(),
+        overtimeHours: overtimeBreakdown.overtimeHours.toString(),
+        doubleTimeHours: overtimeBreakdown.doubleTimeHours.toString(),
+      }).returning();
+      const session = result[0];
 
       res.json({ session });
     } catch (error) {
@@ -4858,9 +4859,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Missing required fields" });
       }
 
-      // Verify employee belongs to company
+      // Verify employee belongs to company (or IS the company owner)
       const employee = await storage.getUserById(employeeId);
-      if (!employee || employee.companyId !== companyId) {
+      if (!employee || (employee.companyId !== companyId && employee.id !== companyId)) {
         return res.status(400).json({ message: "Invalid employee" });
       }
 
@@ -4873,18 +4874,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
         new Date(endTime)
       );
 
-      // Create complete non-billable work session with overtime hours
-      const session = await storage.createNonBillableWorkSession({
+      // Create complete non-billable work session with overtime hours using direct DB insert
+      const result = await db.insert(nonBillableWorkSessions).values({
         employeeId,
         companyId,
         workDate,
         startTime: new Date(startTime),
         endTime: new Date(endTime),
         description,
-        regularHours: overtimeBreakdown.regularHours,
-        overtimeHours: overtimeBreakdown.overtimeHours,
-        doubleTimeHours: overtimeBreakdown.doubleTimeHours,
-      });
+        regularHours: overtimeBreakdown.regularHours.toString(),
+        overtimeHours: overtimeBreakdown.overtimeHours.toString(),
+        doubleTimeHours: overtimeBreakdown.doubleTimeHours.toString(),
+      }).returning();
+      const session = result[0];
 
       res.json({ session });
     } catch (error) {
