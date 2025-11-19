@@ -367,9 +367,10 @@ export default function Profile() {
       <div className="p-4 max-w-2xl mx-auto space-y-4">
         {user?.role === "company" ? (
           <Tabs defaultValue="profile" className="w-full">
-            <TabsList className="grid w-full grid-cols-2">
+            <TabsList className="grid w-full grid-cols-3">
               <TabsTrigger value="profile" data-testid="tab-profile">Profile</TabsTrigger>
               <TabsTrigger value="subscription" data-testid="tab-subscription">Subscription</TabsTrigger>
+              <TabsTrigger value="branding" data-testid="tab-branding">Branding</TabsTrigger>
             </TabsList>
 
             <TabsContent value="profile" className="space-y-4 mt-4">
@@ -1063,6 +1064,205 @@ export default function Profile() {
                       </div>
                     </>
                   )}
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            <TabsContent value="branding" className="space-y-4 mt-4">
+              {/* White Label Branding */}
+              <Card>
+                <CardHeader>
+                  <CardTitle>White Label Branding</CardTitle>
+                  <CardDescription>
+                    Customize your company's branding in the resident portal
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                  {/* Logo Upload */}
+                  <div className="space-y-3">
+                    <Label className="text-sm font-medium">Company Logo</Label>
+                    <p className="text-xs text-muted-foreground">
+                      Upload your company logo to display in the resident portal (recommended: square format, PNG with transparent background)
+                    </p>
+                    {user.brandingLogoUrl && (
+                      <div className="flex items-center gap-3 p-3 bg-muted/30 rounded-lg">
+                        <img 
+                          src={user.brandingLogoUrl} 
+                          alt="Company logo" 
+                          className="w-16 h-16 object-contain"
+                          data-testid="img-current-logo"
+                        />
+                        <div className="flex-1 text-sm text-muted-foreground">
+                          Current logo
+                        </div>
+                      </div>
+                    )}
+                    <div className="flex items-center gap-2">
+                      <Input
+                        type="file"
+                        accept="image/*"
+                        onChange={async (e) => {
+                          const file = e.target.files?.[0];
+                          if (!file) return;
+                          
+                          const formData = new FormData();
+                          formData.append('logo', file);
+                          
+                          try {
+                            const response = await fetch('/api/company/branding/logo', {
+                              method: 'POST',
+                              body: formData,
+                              credentials: 'include',
+                            });
+                            
+                            if (!response.ok) {
+                              throw new Error('Failed to upload logo');
+                            }
+                            
+                            const data = await response.json();
+                            toast({ title: "Logo uploaded successfully" });
+                            queryClient.invalidateQueries({ queryKey: ["/api/user"] });
+                          } catch (error) {
+                            toast({ 
+                              title: "Error", 
+                              description: error instanceof Error ? error.message : "Failed to upload logo",
+                              variant: "destructive" 
+                            });
+                          }
+                        }}
+                        data-testid="input-logo-upload"
+                        className="h-12"
+                      />
+                    </div>
+                  </div>
+
+                  <Separator />
+
+                  {/* Color Customization */}
+                  <div className="space-y-4">
+                    <Label className="text-sm font-medium">Brand Colors</Label>
+                    <p className="text-xs text-muted-foreground">
+                      Choose colors that match your brand identity. These colors will be applied to the resident portal.
+                    </p>
+                    
+                    <div className="grid gap-4 md:grid-cols-2">
+                      {/* Primary Color */}
+                      <div className="space-y-2">
+                        <Label htmlFor="primary-color" className="text-sm">Primary Color</Label>
+                        <div className="flex items-center gap-2">
+                          <Input
+                            id="primary-color"
+                            type="color"
+                            defaultValue={user.brandingPrimaryColor || '#3b82f6'}
+                            onChange={async (e) => {
+                              try {
+                                await apiRequest('PATCH', '/api/company/branding', {
+                                  primaryColor: e.target.value,
+                                });
+                                toast({ title: "Primary color updated" });
+                                queryClient.invalidateQueries({ queryKey: ["/api/user"] });
+                              } catch (error) {
+                                toast({ 
+                                  title: "Error", 
+                                  description: "Failed to update color",
+                                  variant: "destructive" 
+                                });
+                              }
+                            }}
+                            data-testid="input-primary-color"
+                            className="h-12 w-20"
+                          />
+                          <Input
+                            type="text"
+                            value={user.brandingPrimaryColor || '#3b82f6'}
+                            readOnly
+                            className="h-12 font-mono text-sm"
+                            data-testid="text-primary-color-value"
+                          />
+                        </div>
+                      </div>
+
+                      {/* Secondary Color */}
+                      <div className="space-y-2">
+                        <Label htmlFor="secondary-color" className="text-sm">Secondary Color</Label>
+                        <div className="flex items-center gap-2">
+                          <Input
+                            id="secondary-color"
+                            type="color"
+                            defaultValue={user.brandingSecondaryColor || '#10b981'}
+                            onChange={async (e) => {
+                              try {
+                                await apiRequest('PATCH', '/api/company/branding', {
+                                  secondaryColor: e.target.value,
+                                });
+                                toast({ title: "Secondary color updated" });
+                                queryClient.invalidateQueries({ queryKey: ["/api/user"] });
+                              } catch (error) {
+                                toast({ 
+                                  title: "Error", 
+                                  description: "Failed to update color",
+                                  variant: "destructive" 
+                                });
+                              }
+                            }}
+                            data-testid="input-secondary-color"
+                            className="h-12 w-20"
+                          />
+                          <Input
+                            type="text"
+                            value={user.brandingSecondaryColor || '#10b981'}
+                            readOnly
+                            className="h-12 font-mono text-sm"
+                            data-testid="text-secondary-color-value"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <Separator />
+
+                  {/* Preview */}
+                  <div className="space-y-3">
+                    <Label className="text-sm font-medium">Preview</Label>
+                    <p className="text-xs text-muted-foreground">
+                      This is how your branding will appear in the resident portal
+                    </p>
+                    <div 
+                      className="p-6 rounded-lg border-2"
+                      style={{
+                        backgroundColor: `${user.brandingPrimaryColor || '#3b82f6'}15`,
+                        borderColor: user.brandingPrimaryColor || '#3b82f6'
+                      }}
+                    >
+                      <div className="flex items-center gap-4 mb-4">
+                        {user.brandingLogoUrl && (
+                          <img 
+                            src={user.brandingLogoUrl} 
+                            alt="Logo preview" 
+                            className="w-12 h-12 object-contain"
+                            data-testid="img-logo-preview"
+                          />
+                        )}
+                        <div>
+                          <h3 className="font-semibold text-lg" style={{ color: user.brandingPrimaryColor || '#3b82f6' }}>
+                            {user.companyName || 'Your Company Name'}
+                          </h3>
+                          <p className="text-sm text-muted-foreground">Resident Portal</p>
+                        </div>
+                      </div>
+                      <Button 
+                        style={{ 
+                          backgroundColor: user.brandingSecondaryColor || '#10b981',
+                          color: '#ffffff'
+                        }}
+                        className="h-12"
+                        data-testid="button-preview-example"
+                      >
+                        Example Button
+                      </Button>
+                    </div>
+                  </div>
                 </CardContent>
               </Card>
             </TabsContent>
