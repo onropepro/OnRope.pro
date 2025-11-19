@@ -109,18 +109,29 @@ export default function Profile() {
     const fromCancellation = urlParams.has('canceled');
     const fromUpgrade = urlParams.has('upgraded');
     const fromPurchase = urlParams.has('purchased');
+    const newLicenseKeyFromUrl = urlParams.get('newLicenseKey'); // Marketplace sends this after tier upgrade
     const fromMarketplace = fromCancellation || fromUpgrade || fromPurchase || document.referrer.includes('ram-website');
     
     if (fromMarketplace) {
-      // For tier upgrades, we CANNOT auto-verify because marketplace returns a NEW license key
-      // The old key is no longer valid, so we must prompt user to enter their new key
       if (fromUpgrade) {
-        toast({ 
-          title: "Tier Upgraded!", 
-          description: "Please scroll down and click 'Update License Key' to enter your new license key from the marketplace.",
-          duration: 10000,
-        });
-        setShowLicenseDialog(true); // Auto-open the dialog
+        // For tier upgrades, marketplace includes the new license key in URL
+        if (newLicenseKeyFromUrl) {
+          toast({ 
+            title: "Tier upgraded!", 
+            description: "Updating your subscription data..."
+          });
+          setTimeout(() => {
+            reverifyLicenseMutation.mutate(newLicenseKeyFromUrl);
+          }, 500);
+        } else {
+          // Fallback: If marketplace didn't send new key, prompt user to enter it
+          toast({ 
+            title: "Tier Upgraded!", 
+            description: "Please click 'Update License Key' to enter your new license key.",
+            duration: 10000,
+          });
+          setShowLicenseDialog(true);
+        }
       } else if (fromPurchase) {
         // Seat/project purchases don't change the license key, so auto-verify works
         toast({ 
