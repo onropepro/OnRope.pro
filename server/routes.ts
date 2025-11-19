@@ -145,10 +145,11 @@ async function generateResidentCode(): Promise<string> {
 }
 
 // License verification helper - re-verifies license keys with Overhaul Labs API
-// Returns: { success: boolean, valid: boolean | null, additionalSeats?: number, additionalProjects?: number }
+// Returns: { success: boolean, valid: boolean | null, additionalSeats?: number, additionalProjects?: number, newLicenseKey?: string }
 // - success=false means API failure (keep existing licenseVerified state)
 // - success=true, valid=true/false means definitive response (update licenseVerified)
-async function reverifyLicenseKey(licenseKey: string, email: string): Promise<{ success: boolean; valid: boolean | null; additionalSeats?: number; additionalProjects?: number }> {
+// - newLicenseKey is returned when tier upgrade changes the license key (e.g., ABC123-1 → ABC123-2)
+async function reverifyLicenseKey(licenseKey: string, email: string): Promise<{ success: boolean; valid: boolean | null; additionalSeats?: number; additionalProjects?: number; newLicenseKey?: string }> {
   try {
     const externalApiUrl = 'https://ram-website-paquettetom.replit.app/api/verify-license';
     const apiKey = process.env.PROVISIONING_API_KEY;
@@ -189,8 +190,14 @@ async function reverifyLicenseKey(licenseKey: string, email: string): Promise<{ 
       const isValid = verificationResult.valid;
       const additionalSeats = verificationResult.additionalSeats ?? 0;
       const additionalProjects = verificationResult.additionalProjects ?? 0;
+      const newLicenseKey = verificationResult.licenseKey || verificationResult.newLicenseKey; // Check both field names
+      
+      if (newLicenseKey && newLicenseKey !== licenseKey) {
+        console.log(`[License Re-verification] ⚠️  LICENSE KEY CHANGED: ${licenseKey.substring(0, 8)}... → ${newLicenseKey.substring(0, 8)}... (tier upgrade detected)`);
+      }
+      
       console.log(`[License Re-verification] License is ${isValid ? 'valid' : 'invalid'}, additionalSeats: ${additionalSeats}, additionalProjects: ${additionalProjects}`);
-      return { success: true, valid: isValid, additionalSeats, additionalProjects };
+      return { success: true, valid: isValid, additionalSeats, additionalProjects, newLicenseKey };
     } else {
       // API returned error or unexpected format
       console.warn('[License Re-verification] API returned non-OK status or unexpected format');
@@ -292,6 +299,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
             licenseVerified = true;
             additionalSeats = verificationResult.additionalSeats ?? 0;
             additionalProjects = verificationResult.additionalProjects ?? 0;
+            // Use updated license key if marketplace returned one (shouldn't happen on new provision, but handle it)
+            if (verificationResult.newLicenseKey) {
+              licenseKey = verificationResult.newLicenseKey;
+            }
             console.log('[Provision] License key verified successfully');
           } else {
             console.warn('[Provision] License key verification failed');
@@ -701,6 +712,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
             licenseVerified = true;
             additionalSeats = verificationResult.additionalSeats ?? 0;
             additionalProjects = verificationResult.additionalProjects ?? 0;
+            // Use updated license key if marketplace returned one (shouldn't happen on new registration, but handle it)
+            if (verificationResult.newLicenseKey) {
+              validatedData.licenseKey = verificationResult.newLicenseKey;
+            }
             console.log('[Registration] License key verified successfully during registration');
           } else {
             console.warn('[Registration] License key verification failed - user will need to verify manually');
@@ -846,16 +861,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
           const verificationResult = await reverifyLicenseKey(user.licenseKey, user.email);
           
           if (verificationResult.success && verificationResult.valid !== null) {
-            // API responded definitively - update status and purchase counts
-            await storage.updateUser(user.id, { 
+            // API responded definitively - update status, purchase counts, and license key if changed
+            const updateData: any = { 
               licenseVerified: verificationResult.valid,
               additionalSeats: verificationResult.additionalSeats ?? user.additionalSeats ?? 0,
               additionalProjects: verificationResult.additionalProjects ?? user.additionalProjects ?? 0
-            });
+            };
+            
+            // If marketplace returned a new license key (tier upgrade), update it
+            if (verificationResult.newLicenseKey && verificationResult.newLicenseKey !== user.licenseKey) {
+              updateData.licenseKey = verificationResult.newLicenseKey;
+              console.log(`[Login] 🔄 LICENSE KEY UPDATED after tier upgrade: ${user.licenseKey} → ${verificationResult.newLicenseKey}`);
+            }
+            
+            await storage.updateUser(user.id, updateData);
             console.log(`[Login] License status updated to: ${verificationResult.valid}, additionalSeats: ${verificationResult.additionalSeats ?? 0}, additionalProjects: ${verificationResult.additionalProjects ?? 0}`);
+            
             user.licenseVerified = verificationResult.valid;
             user.additionalSeats = verificationResult.additionalSeats ?? user.additionalSeats ?? 0;
             user.additionalProjects = verificationResult.additionalProjects ?? user.additionalProjects ?? 0;
+            if (verificationResult.newLicenseKey) {
+              user.licenseKey = verificationResult.newLicenseKey;
+            }
           } else {
             // API failed - preserve existing status (don't lock out OR auto-verify)
             console.warn('[Login] API failure - preserving existing license status:', user.licenseVerified);
@@ -1045,10 +1072,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       if (verificationResponse.ok && verificationResult.valid === true) {
         // License is valid - save to database INCLUDING additionalSeats and additionalProjects
+        const newLicenseKey = verificationResult.licenseKey || verificationResult.newLicenseKey || licenseKey;
         const updateData: any = { 
-          licenseKey,
+          licenseKey: newLicenseKey,
           licenseVerified: true 
         };
+        
+        // If marketplace returned a different license key (tier upgrade), log it
+        if (newLicenseKey !== licenseKey) {
+          console.log(`[License Verification] 🔄 LICENSE KEY UPDATED after tier upgrade: ${licenseKey} → ${newLicenseKey}`);
+        }
         
         // Save additionalSeats and additionalProjects from marketplace
         if (verificationResult.additionalSeats !== undefined) {
@@ -1066,7 +1099,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
           success: true,
           message: verificationResult.message || "License verified successfully",
           additionalSeats: verificationResult.additionalSeats,
-          additionalProjects: verificationResult.additionalProjects
+          additionalProjects: verificationResult.additionalProjects,
+          licenseKey: newLicenseKey // Return the (possibly updated) license key
         });
       } else {
         // License is invalid
