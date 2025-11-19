@@ -681,7 +681,20 @@ export default function Payroll() {
                                             </div>
                                             <div className="flex items-center gap-2 mb-2">
                                               <span className="material-icons text-sm">schedule</span>
-                                              <span className="font-semibold">{hours.toFixed(2)} hours</span>
+                                              <div className="flex flex-col">
+                                                <span className="font-semibold">{hours.toFixed(2)} hours</span>
+                                                {(session.regularHours || session.overtimeHours || session.doubleTimeHours) && (
+                                                  <span className="text-xs text-muted-foreground">
+                                                    {parseFloat(session.regularHours || '0').toFixed(2)}h regular
+                                                    {session.overtimeHours && parseFloat(session.overtimeHours) > 0 && (
+                                                      <>, <span className="text-orange-600 dark:text-orange-400 font-medium">{parseFloat(session.overtimeHours).toFixed(2)}h OT</span></>
+                                                    )}
+                                                    {session.doubleTimeHours && parseFloat(session.doubleTimeHours) > 0 && (
+                                                      <>, <span className="text-red-600 dark:text-red-400 font-medium">{parseFloat(session.doubleTimeHours).toFixed(2)}h 2x</span></>
+                                                    )}
+                                                  </span>
+                                                )}
+                                              </div>
                                             </div>
                                             <div className="flex items-center gap-2">
                                               <DollarSign className="h-4 w-4" />
