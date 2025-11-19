@@ -87,6 +87,15 @@ export default function ResidentDashboard() {
     enabled: !!activeProject?.companyId,
   });
 
+  // Fetch company branding for white label support
+  const { data: brandingData } = useQuery({
+    queryKey: ["/api/company", activeProject?.companyId, "branding"],
+    enabled: !!activeProject?.companyId,
+  });
+
+  const branding = brandingData || {};
+  const hasCustomBranding = !!(branding.logoUrl || branding.primaryColor || branding.secondaryColor);
+
   // Fetch resident's complaints
   const { data: complaintsData } = useQuery({
     queryKey: ["/api/complaints"],
@@ -277,10 +286,27 @@ export default function ResidentDashboard() {
   if (!activeProject && completedProjects.length === 0) {
     return (
       <div className="min-h-screen bg-background flex flex-col">
-        <header className="flex items-center justify-between p-4 border-b">
+        <header 
+          className="flex items-center justify-between p-4 border-b"
+          style={hasCustomBranding && branding.primaryColor ? { borderColor: `${branding.primaryColor}20` } : {}}
+        >
           <div className="flex items-center gap-3">
-            <span className="material-icons text-2xl text-primary">apartment</span>
-            <h1 className="text-xl font-semibold">Resident Portal</h1>
+            {branding.logoUrl ? (
+              <img 
+                src={branding.logoUrl} 
+                alt={branding.companyName || 'Company logo'} 
+                className="w-8 h-8 object-contain"
+                data-testid="img-company-logo"
+              />
+            ) : (
+              <span className="material-icons text-2xl text-primary">apartment</span>
+            )}
+            <h1 
+              className="text-xl font-semibold"
+              style={hasCustomBranding && branding.primaryColor ? { color: branding.primaryColor } : {}}
+            >
+              {branding.companyName || 'Resident Portal'}
+            </h1>
           </div>
           <div className="flex items-center gap-2">
 
@@ -421,10 +447,27 @@ export default function ResidentDashboard() {
   if (!activeProject && completedProjects.length > 0) {
     return (
       <div className="min-h-screen bg-background flex flex-col">
-        <header className="flex items-center justify-between p-4 border-b">
+        <header 
+          className="flex items-center justify-between p-4 border-b"
+          style={hasCustomBranding && branding.primaryColor ? { borderColor: `${branding.primaryColor}20` } : {}}
+        >
           <div className="flex items-center gap-3">
-            <span className="material-icons text-2xl text-primary">apartment</span>
-            <h1 className="text-xl font-semibold">Resident Portal</h1>
+            {branding.logoUrl ? (
+              <img 
+                src={branding.logoUrl} 
+                alt={branding.companyName || 'Company logo'} 
+                className="w-8 h-8 object-contain"
+                data-testid="img-company-logo"
+              />
+            ) : (
+              <span className="material-icons text-2xl text-primary">apartment</span>
+            )}
+            <h1 
+              className="text-xl font-semibold"
+              style={hasCustomBranding && branding.primaryColor ? { color: branding.primaryColor } : {}}
+            >
+              {branding.companyName || 'Resident Portal'}
+            </h1>
           </div>
           <div className="flex items-center gap-2">
 
@@ -585,13 +628,32 @@ export default function ResidentDashboard() {
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-br from-primary/5 via-background to-primary/10">
       {/* Modern Header */}
-      <header className="sticky top-0 z-[100] bg-card/80 backdrop-blur-xl border-b border-border/50 shadow-lg">
+      <header 
+        className="sticky top-0 z-[100] bg-card/80 backdrop-blur-xl border-b border-border/50 shadow-lg"
+        style={hasCustomBranding && branding.primaryColor ? { borderColor: `${branding.primaryColor}30` } : {}}
+      >
         <div className="container max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="h-20 flex items-center justify-between">
             <div className="flex items-center gap-4">
-              <div className="h-12 w-12 rounded-xl bg-gradient-to-br from-primary to-primary/60 flex items-center justify-center shadow-lg">
-                <span className="material-icons text-white text-2xl">domain</span>
-              </div>
+              {branding.logoUrl ? (
+                <div className="h-12 w-12 rounded-xl bg-white dark:bg-muted flex items-center justify-center shadow-lg p-1">
+                  <img 
+                    src={branding.logoUrl} 
+                    alt={branding.companyName || 'Company logo'} 
+                    className="w-full h-full object-contain"
+                    data-testid="img-company-logo-header"
+                  />
+                </div>
+              ) : (
+                <div 
+                  className="h-12 w-12 rounded-xl bg-gradient-to-br from-primary to-primary/60 flex items-center justify-center shadow-lg"
+                  style={hasCustomBranding && branding.primaryColor ? { 
+                    background: `linear-gradient(to bottom right, ${branding.primaryColor}, ${branding.primaryColor}99)` 
+                  } : {}}
+                >
+                  <span className="material-icons text-white text-2xl">domain</span>
+                </div>
+              )}
               <div>
                 <h1 className="text-xl font-bold tracking-tight" data-testid="text-strata-number">
                   {projectData.strataPlanNumber}
