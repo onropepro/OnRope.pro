@@ -24,6 +24,7 @@ x-api-key: <PURCHASE_API_KEY>
 {
   "email": "customer@example.com",
   "companyName": "Example Company",
+  "licenseKey": "CUST1ISJ6UPGSKEH-2",
   "returnUrl": "https://ram-platform.replit.app/profile"
 }
 ```
@@ -56,7 +57,9 @@ x-api-key: <PURCHASE_API_KEY>
 **Request Body:**
 ```json
 {
-  "email": "customer@example.com"
+  "email": "customer@example.com",
+  "licenseKey": "CUST1ISJ6UPGSKEH-2",
+  "brandingActive": true
 }
 ```
 

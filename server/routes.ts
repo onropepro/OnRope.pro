@@ -849,6 +849,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         body: JSON.stringify({
           email: currentUser.email,
           companyName: currentUser.companyName,
+          licenseKey: currentUser.licenseKey,
           returnUrl,
         })
       });
@@ -891,20 +892,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(401).json({ message: "Unauthorized" });
       }
       
-      const { email } = req.body;
+      const { email, licenseKey, brandingActive } = req.body;
       
-      if (!email) {
+      if (!licenseKey) {
         return res.status(400).json({ 
-          message: "Email is required" 
+          message: "License key is required" 
         });
       }
       
-      // Look up user by email
-      const user = await storage.getUserByEmail(email);
+      // Look up user by license key
+      const user = await storage.getUserByLicenseKey(licenseKey);
       
       if (!user || user.role !== 'company') {
         return res.status(404).json({ 
-          message: "No company account found with this email" 
+          message: "No company account found with this license key" 
         });
       }
       
