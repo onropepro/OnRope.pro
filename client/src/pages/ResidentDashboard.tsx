@@ -676,7 +676,10 @@ export default function ResidentDashboard() {
                   {projectData.jobType}
                   {companyData?.company?.companyName && ` • ${companyData.company.companyName}`}
                   {companyData?.company?.residentCode && (
-                    <span className="font-mono text-xs ml-2 text-primary">
+                    <span 
+                      className="font-mono text-xs ml-2"
+                      style={hasCustomBranding && primaryColor ? { color: primaryColor } : {}}
+                    >
                       ({companyData.company.residentCode})
                     </span>
                   )}
@@ -684,8 +687,21 @@ export default function ResidentDashboard() {
               </div>
             </div>
             <div className="flex items-center gap-3">
-              <Badge variant="secondary" className="text-base px-4 py-2">
-                <span className="material-icons text-sm mr-1.5">layers</span>
+              <Badge 
+                variant="secondary" 
+                className="text-base px-4 py-2"
+                style={hasCustomBranding && primaryColor ? {
+                  backgroundColor: `${primaryColor}20`,
+                  borderColor: `${primaryColor}40`,
+                  color: primaryColor
+                } : {}}
+              >
+                <span 
+                  className="material-icons text-sm mr-1.5"
+                  style={hasCustomBranding && primaryColor ? { color: primaryColor } : {}}
+                >
+                  layers
+                </span>
                 {activeProject?.jobType === 'in_suite_dryer_vent_cleaning' 
                   ? `${projectData.floorCount} Units`
                   : `${projectData.floorCount} Floors`}
