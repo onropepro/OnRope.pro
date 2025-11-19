@@ -1234,18 +1234,14 @@ export default function Profile() {
                           onClick={async () => {
                             try {
                               setIsPurchasingBranding(true);
-                              console.log('Initiating branding subscription purchase...');
-                              const response = await apiRequest('POST', '/api/purchase/branding', {});
-                              console.log('Purchase response:', response);
-                              if (response.checkoutUrl) {
-                                console.log('Redirecting to:', response.checkoutUrl);
-                                window.location.href = response.checkoutUrl;
+                              const res = await apiRequest('POST', '/api/purchase/branding', {});
+                              const data = await res.json();
+                              if (data.checkoutUrl) {
+                                window.location.href = data.checkoutUrl;
                               } else {
-                                console.error('No checkoutUrl in response:', response);
                                 throw new Error('No checkout URL received');
                               }
                             } catch (error) {
-                              console.error('Branding subscription error:', error);
                               setIsPurchasingBranding(false);
                               toast({
                                 title: "Error",
