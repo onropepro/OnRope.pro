@@ -20,7 +20,6 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { AlertCircle } from "lucide-react";
 import { isReadOnly } from "@/lib/permissions";
-import { QRCodeScanner } from "@/components/QRCodeScanner";
 
 const complaintSchema = z.object({
   residentName: z.string().min(1, "Name is required"),
@@ -35,7 +34,6 @@ type ComplaintFormData = z.infer<typeof complaintSchema>;
 export default function ResidentDashboard() {
   const [activeTab, setActiveTab] = useState("building");
   const [showLogoutDialog, setShowLogoutDialog] = useState(false);
-  const [showScanner, setShowScanner] = useState(false);
   const [selectedPhoto, setSelectedPhoto] = useState<File | null>(null);
   const [selectedProjectId, setSelectedProjectId] = useState<string | null>(null);
   const [lastPhotoViewTime, setLastPhotoViewTime] = useState<number>(() => {
@@ -285,11 +283,7 @@ export default function ResidentDashboard() {
             <h1 className="text-xl font-semibold">Resident Portal</h1>
           </div>
           <div className="flex items-center gap-2">
-            {!currentUser?.companyId && (
-              <Button variant="ghost" size="icon" onClick={() => setShowScanner(true)} data-testid="button-scan-code">
-                <span className="material-icons">qr_code_scanner</span>
-              </Button>
-            )}
+
             <Button variant="ghost" size="icon" onClick={() => setLocation("/profile")} data-testid="button-profile">
               <span className="material-icons">person</span>
             </Button>
@@ -418,12 +412,7 @@ export default function ResidentDashboard() {
           </Card>
         </main>
 
-        {/* QR Code Scanner Modal */}
-        {showScanner && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">
-            <QRCodeScanner onClose={() => setShowScanner(false)} />
-          </div>
-        )}
+
       </div>
     );
   }
@@ -438,11 +427,7 @@ export default function ResidentDashboard() {
             <h1 className="text-xl font-semibold">Resident Portal</h1>
           </div>
           <div className="flex items-center gap-2">
-            {!currentUser?.companyId && (
-              <Button variant="ghost" size="icon" onClick={() => setShowScanner(true)} data-testid="button-scan-code">
-                <span className="material-icons">qr_code_scanner</span>
-              </Button>
-            )}
+
             <Button variant="ghost" size="icon" onClick={() => setLocation("/profile")} data-testid="button-profile">
               <span className="material-icons">person</span>
             </Button>
@@ -591,12 +576,7 @@ export default function ResidentDashboard() {
           </Card>
         </main>
 
-        {/* QR Code Scanner Modal */}
-        {showScanner && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">
-            <QRCodeScanner onClose={() => setShowScanner(false)} />
-          </div>
-        )}
+
       </div>
     );
   }
@@ -634,11 +614,6 @@ export default function ResidentDashboard() {
                   ? `${projectData.floorCount} Units`
                   : `${projectData.floorCount} Floors`}
               </Badge>
-              {!currentUser?.companyId && (
-                <Button variant="ghost" size="icon" className="min-w-11 min-h-11" onClick={() => setShowScanner(true)} data-testid="button-scan-code">
-                  <span className="material-icons">qr_code_scanner</span>
-                </Button>
-              )}
               <Button variant="ghost" size="icon" className="min-w-11 min-h-11" data-testid="button-profile" onClick={() => setLocation("/profile")}>
                 <span className="material-icons">person</span>
               </Button>
@@ -1085,12 +1060,6 @@ export default function ResidentDashboard() {
         </AlertDialogContent>
       </AlertDialog>
 
-      {/* QR Code Scanner Modal */}
-      {showScanner && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">
-          <QRCodeScanner onClose={() => setShowScanner(false)} />
-        </div>
-      )}
     </div>
   );
 }
