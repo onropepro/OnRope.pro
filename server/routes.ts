@@ -1485,19 +1485,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Include licenseKey for company users so they can view it in their subscription page
       const { passwordHash, branding_subscription_active, branding_colors, branding_logo_url, ...userWithoutPassword } = user;
       
+      console.log('[/api/user DEBUG] Raw user branding fields:', {
+        branding_subscription_active,
+        branding_colors,
+        branding_logo_url,
+        email: user.email
+      });
+      
       // Disable caching to ensure fresh data
       res.set('Cache-Control', 'no-store, no-cache, must-revalidate, private');
       
-      res.json({ 
-        user: {
-          ...userWithoutPassword,
-          brandingSubscriptionActive: branding_subscription_active,
-          brandingColors: branding_colors,
-          brandingLogoUrl: branding_logo_url,
-          ...(companyLicenseVerified !== undefined && { companyLicenseVerified }),
-          ...(companyResidentCode && { residentCode: companyResidentCode })
-        }
-      });
+      const responseUser = {
+        ...userWithoutPassword,
+        brandingSubscriptionActive: branding_subscription_active,
+        brandingColors: branding_colors,
+        brandingLogoUrl: branding_logo_url,
+        ...(companyLicenseVerified !== undefined && { companyLicenseVerified }),
+        ...(companyResidentCode && { residentCode: companyResidentCode })
+      };
+      
+      console.log('[/api/user DEBUG] Sending brandingSubscriptionActive:', responseUser.brandingSubscriptionActive);
+      
+      res.json({ user: responseUser });
     } catch (error) {
       console.error("Get user error:", error);
       res.status(500).json({ message: "Internal server error" });
