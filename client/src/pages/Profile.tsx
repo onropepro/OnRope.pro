@@ -17,6 +17,7 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { RefreshButton } from "@/components/RefreshButton";
 import { useState, useEffect } from "react";
 import { format } from "date-fns";
+import { QRCodeSVG } from 'qrcode.react';
 
 const profileSchema = z.object({
   name: z.string().min(1, "Name is required"),
@@ -178,6 +179,21 @@ export default function Profile() {
       residentLinkCode: "",
     },
   });
+
+  // Check for pending resident code from QR code scan
+  useEffect(() => {
+    if (user?.role === 'resident') {
+      const pendingCode = sessionStorage.getItem('pendingResidentCode');
+      if (pendingCode) {
+        profileForm.setValue('residentLinkCode', pendingCode);
+        sessionStorage.removeItem('pendingResidentCode');
+        toast({
+          title: "Company code detected",
+          description: "Code has been auto-filled. Click 'Update Profile' to link your account.",
+        });
+      }
+    }
+  }, [user?.role]);
 
   const passwordForm = useForm<PasswordFormData>({
     resolver: zodResolver(passwordSchema),
@@ -528,6 +544,29 @@ export default function Profile() {
                             />
                           </FormControl>
                           <FormMessage />
+                          {field.value && field.value.length === 10 && (
+                            <div className="mt-4 p-4 bg-muted/50 border border-border rounded-lg">
+                              <div className="flex items-start gap-4">
+                                <div className="flex-1">
+                                  <p className="text-sm font-medium mb-2">Share with Residents via QR Code</p>
+                                  <p className="text-xs text-muted-foreground mb-3">
+                                    Residents can scan this code with their phone to automatically link their account to your company
+                                  </p>
+                                  <div className="text-xs text-muted-foreground font-mono">
+                                    Link: {window.location.origin}/link?code={field.value}
+                                  </div>
+                                </div>
+                                <div className="bg-white p-3 rounded-lg">
+                                  <QRCodeSVG
+                                    value={`${window.location.origin}/link?code=${field.value}`}
+                                    size={120}
+                                    level="M"
+                                    data-testid="qr-code-resident-link"
+                                  />
+                                </div>
+                              </div>
+                            </div>
+                          )}
                         </FormItem>
                       )}
                     />

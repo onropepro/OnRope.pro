@@ -28,6 +28,7 @@ import AllCompanies from "@/pages/AllCompanies";
 import CompanyDetail from "@/pages/CompanyDetail";
 import ResidentsManagement from "@/pages/ResidentsManagement";
 import Documents from "@/pages/Documents";
+import ResidentLink from "@/pages/ResidentLink";
 import NotFound from "@/pages/not-found";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import { EMPLOYEE_ROLES } from "@/lib/permissions";
@@ -38,6 +39,7 @@ function Router() {
       <Route path="/" component={Login} />
       <Route path="/register" component={Register} />
       <Route path="/login" component={Login} />
+      <Route path="/link" component={ResidentLink} />
       <Route path="/superuser">
         <ProtectedRoute allowedRoles={["superuser"]}>
           <SuperUser />
