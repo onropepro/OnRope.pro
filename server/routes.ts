@@ -66,6 +66,141 @@ function getProjectLimit(tier: number, additionalProjects: number = 0): number {
   return baseLimit + additionalProjects; // Add purchased projects to base limit
 }
 
+// Overtime calculation utility
+interface OvertimeBreakdown {
+  regularHours: number;
+  overtimeHours: number;
+  doubleTimeHours: number;
+  totalHours: number;
+}
+
+async function calculateOvertimeHours(
+  companyId: string,
+  employeeId: string,
+  workDate: Date,
+  startTime: Date,
+  endTime: Date
+): Promise<OvertimeBreakdown> {
+  // Calculate total hours for this session
+  const totalHours = (endTime.getTime() - startTime.getTime()) / (1000 * 60 * 60);
+  
+  // Get payroll configuration for the company
+  const payrollConfig = await storage.getPayPeriodConfig(companyId);
+  
+  // If no config exists, all hours are regular (no overtime)
+  if (!payrollConfig) {
+    console.log(`[OVERTIME CALC] No payroll config found for company ${companyId}. All hours are regular.`);
+    return {
+      regularHours: parseFloat(totalHours.toFixed(2)),
+      overtimeHours: 0,
+      doubleTimeHours: 0,
+      totalHours: parseFloat(totalHours.toFixed(2))
+    };
+  }
+  
+  const overtimeThreshold = parseFloat(payrollConfig.overtimeHoursThreshold || '8');
+  const doubleTimeThreshold = parseFloat(payrollConfig.doubleTimeHoursThreshold || '12');
+  const overtimeTrigger = payrollConfig.overtimeTriggerType || 'daily';
+  const doubleTimeTrigger = payrollConfig.doubleTimeTriggerType || 'daily';
+  
+  let applicableHours = totalHours;
+  
+  // If weekly triggers are used, calculate total hours for the week
+  if (overtimeTrigger === 'weekly' || doubleTimeTrigger === 'weekly') {
+    const workDateObj = new Date(workDate);
+    const dayOfWeek = workDateObj.getDay();
+    const startOfWeek = new Date(workDateObj);
+    startOfWeek.setDate(workDateObj.getDate() - dayOfWeek);
+    startOfWeek.setHours(0, 0, 0, 0);
+    
+    const endOfWeek = new Date(startOfWeek);
+    endOfWeek.setDate(startOfWeek.getDate() + 6);
+    endOfWeek.setHours(23, 59, 59, 999);
+    
+    // Get all sessions for this week (excluding current session)
+    const weekSessions = await storage.getWorkSessionsByEmployeeDateRange(
+      employeeId, 
+      startOfWeek.toISOString().split('T')[0], 
+      endOfWeek.toISOString().split('T')[0]
+    );
+    
+    // Calculate existing hours this week
+    let existingHours = 0;
+    for (const session of weekSessions) {
+      if (session.endTime && session.id !== 'CURRENT') {
+        const sessionHours = (new Date(session.endTime).getTime() - new Date(session.startTime).getTime()) / (1000 * 60 * 60);
+        existingHours += sessionHours;
+      }
+    }
+    
+    applicableHours = existingHours + totalHours;
+  }
+  
+  let regularHours = 0;
+  let overtimeHours = 0;
+  let doubleTimeHours = 0;
+  
+  // Calculate breakdown based on thresholds
+  if (applicableHours <= overtimeThreshold) {
+    // All regular time
+    regularHours = totalHours;
+  } else if (applicableHours <= doubleTimeThreshold) {
+    // Mix of regular and overtime
+    const hoursIntoOvertime = applicableHours - overtimeThreshold;
+    if (totalHours <= hoursIntoOvertime) {
+      // This entire session is overtime
+      overtimeHours = totalHours;
+    } else {
+      // Part regular, part overtime
+      regularHours = totalHours - hoursIntoOvertime;
+      overtimeHours = hoursIntoOvertime;
+    }
+  } else {
+    // Mix of regular, overtime, and double time
+    const hoursIntoDoubleTime = applicableHours - doubleTimeThreshold;
+    const overtimeRange = doubleTimeThreshold - overtimeThreshold;
+    
+    if (totalHours <= hoursIntoDoubleTime) {
+      // This entire session is double time
+      doubleTimeHours = totalHours;
+    } else if (applicableHours - totalHours >= doubleTimeThreshold) {
+      // This session starts after double time threshold
+      doubleTimeHours = totalHours;
+    } else if (applicableHours - totalHours >= overtimeThreshold) {
+      // This session starts in overtime range
+      const hoursBeforeDoubleTime = doubleTimeThreshold - (applicableHours - totalHours);
+      overtimeHours = hoursBeforeDoubleTime;
+      doubleTimeHours = totalHours - hoursBeforeDoubleTime;
+    } else {
+      // This session spans all three categories
+      const regularPortion = overtimeThreshold - (applicableHours - totalHours);
+      regularHours = regularPortion > 0 ? regularPortion : 0;
+      
+      const remainingAfterRegular = totalHours - regularHours;
+      if (remainingAfterRegular <= overtimeRange) {
+        overtimeHours = remainingAfterRegular;
+      } else {
+        overtimeHours = overtimeRange;
+        doubleTimeHours = remainingAfterRegular - overtimeRange;
+      }
+    }
+  }
+  
+  const result = {
+    regularHours: parseFloat(regularHours.toFixed(2)),
+    overtimeHours: parseFloat(overtimeHours.toFixed(2)),
+    doubleTimeHours: parseFloat(doubleTimeHours.toFixed(2)),
+    totalHours: parseFloat(totalHours.toFixed(2))
+  };
+  
+  console.log(`[OVERTIME CALC] Employee ${employeeId}, Date ${workDate.toISOString().split('T')[0]}`);
+  console.log(`[OVERTIME CALC] Session: ${totalHours.toFixed(2)}h total`);
+  console.log(`[OVERTIME CALC] Thresholds: OT=${overtimeThreshold}h (${overtimeTrigger}), DT=${doubleTimeThreshold}h (${doubleTimeTrigger})`);
+  console.log(`[OVERTIME CALC] Breakdown: Regular=${result.regularHours}h, OT=${result.overtimeHours}h, DT=${result.doubleTimeHours}h`);
+  
+  return result;
+}
+
 // Read-only mode enforcement middleware
 // Blocks all mutations for unverified company users
 // Residents are NEVER blocked
@@ -3165,7 +3300,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Shortfall reason is required when drops completed is less than the daily target" });
       }
       
-      // End the session with elevation-specific drops
+      // Calculate overtime breakdown
+      const now = new Date();
+      const overtimeBreakdown = await calculateOvertimeHours(
+        project.companyId,
+        currentUser.id,
+        new Date(activeSession.workDate),
+        new Date(activeSession.startTime),
+        now
+      );
+      
+      // End the session with elevation-specific drops and overtime hours
       const session = await storage.endWorkSession(
         sessionId,
         north,
@@ -3174,7 +3319,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         west,
         totalDropsCompleted < project.dailyDropTarget ? shortfallReason : undefined,
         endLatitude || null,
-        endLongitude || null
+        endLongitude || null,
+        overtimeBreakdown.regularHours,
+        overtimeBreakdown.overtimeHours,
+        overtimeBreakdown.doubleTimeHours
       );
       
       res.json({ session });
@@ -3577,7 +3725,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Session already ended" });
       }
       
-      const updatedSession = await storage.endNonBillableWorkSession(req.params.sessionId);
+      // Calculate overtime breakdown for non-billable session
+      const now = new Date();
+      const companyId = currentUser.role === "company" ? currentUser.id : currentUser.companyId;
+      const overtimeBreakdown = await calculateOvertimeHours(
+        companyId!,
+        currentUser.id,
+        new Date(session.workDate),
+        new Date(session.startTime),
+        now
+      );
+      
+      const updatedSession = await storage.endNonBillableWorkSession(
+        req.params.sessionId,
+        overtimeBreakdown.regularHours,
+        overtimeBreakdown.overtimeHours,
+        overtimeBreakdown.doubleTimeHours
+      );
       res.json({ session: updatedSession });
     } catch (error) {
       console.error("End non-billable session error:", error);
@@ -4634,7 +4798,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       const totalDropsCompleted = north + east + south + west;
 
-      // Create complete work session
+      // Calculate overtime breakdown for manual session
+      const overtimeBreakdown = await calculateOvertimeHours(
+        companyId,
+        employeeId,
+        new Date(workDate),
+        new Date(startTime),
+        new Date(endTime)
+      );
+
+      // Create complete work session with overtime hours
       const session = await storage.createWorkSession({
         projectId,
         employeeId,
@@ -4647,6 +4820,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         dropsCompletedSouth: south,
         dropsCompletedWest: west,
         shortfallReason: totalDropsCompleted < project.dailyDropTarget ? shortfallReason : undefined,
+        regularHours: overtimeBreakdown.regularHours,
+        overtimeHours: overtimeBreakdown.overtimeHours,
+        doubleTimeHours: overtimeBreakdown.doubleTimeHours,
       });
 
       res.json({ session });
@@ -4688,7 +4864,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Invalid employee" });
       }
 
-      // Create complete non-billable work session
+      // Calculate overtime breakdown for manual non-billable session
+      const overtimeBreakdown = await calculateOvertimeHours(
+        companyId,
+        employeeId,
+        new Date(workDate),
+        new Date(startTime),
+        new Date(endTime)
+      );
+
+      // Create complete non-billable work session with overtime hours
       const session = await storage.createNonBillableWorkSession({
         employeeId,
         companyId,
@@ -4696,6 +4881,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         startTime: new Date(startTime),
         endTime: new Date(endTime),
         description,
+        regularHours: overtimeBreakdown.regularHours,
+        overtimeHours: overtimeBreakdown.overtimeHours,
+        doubleTimeHours: overtimeBreakdown.doubleTimeHours,
       });
 
       res.json({ session });

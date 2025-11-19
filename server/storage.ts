@@ -541,7 +541,10 @@ export class Storage {
     dropsCompletedWest: number,
     shortfallReason?: string,
     endLatitude?: number | null,
-    endLongitude?: number | null
+    endLongitude?: number | null,
+    regularHours?: number,
+    overtimeHours?: number,
+    doubleTimeHours?: number
   ): Promise<WorkSession> {
     const result = await db.update(workSessions)
       .set({
@@ -553,6 +556,9 @@ export class Storage {
         shortfallReason,
         endLatitude: endLatitude !== null && endLatitude !== undefined ? endLatitude.toString() : null,
         endLongitude: endLongitude !== null && endLongitude !== undefined ? endLongitude.toString() : null,
+        regularHours: regularHours !== undefined ? regularHours.toString() : '0',
+        overtimeHours: overtimeHours !== undefined ? overtimeHours.toString() : '0',
+        doubleTimeHours: doubleTimeHours !== undefined ? doubleTimeHours.toString() : '0',
         updatedAt: sql`NOW()`,
       })
       .where(eq(workSessions.id, sessionId))
@@ -640,10 +646,18 @@ export class Storage {
     await db.delete(workSessions).where(eq(workSessions.id, sessionId));
   }
 
-  async endNonBillableWorkSession(sessionId: string): Promise<any> {
+  async endNonBillableWorkSession(
+    sessionId: string,
+    regularHours?: number,
+    overtimeHours?: number,
+    doubleTimeHours?: number
+  ): Promise<any> {
     const result = await db.update(nonBillableWorkSessions)
       .set({
         endTime: sql`NOW()`,
+        regularHours: regularHours !== undefined ? regularHours.toString() : '0',
+        overtimeHours: overtimeHours !== undefined ? overtimeHours.toString() : '0',
+        doubleTimeHours: doubleTimeHours !== undefined ? doubleTimeHours.toString() : '0',
         updatedAt: sql`NOW()`,
       })
       .where(eq(nonBillableWorkSessions.id, sessionId))

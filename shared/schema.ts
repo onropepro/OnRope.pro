@@ -210,6 +210,11 @@ export const workSessions = pgTable("work_sessions", {
   dropsCompletedSouth: integer("drops_completed_south").default(0),
   dropsCompletedWest: integer("drops_completed_west").default(0),
   
+  // Hours breakdown for payroll
+  regularHours: numeric("regular_hours", { precision: 5, scale: 2 }).default('0'),
+  overtimeHours: numeric("overtime_hours", { precision: 5, scale: 2 }).default('0'),
+  doubleTimeHours: numeric("double_time_hours", { precision: 5, scale: 2 }).default('0'),
+  
   shortfallReason: text("shortfall_reason"), // Required if total drops < dailyDropTarget
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
@@ -233,6 +238,11 @@ export const nonBillableWorkSessions = pgTable("non_billable_work_sessions", {
   startLongitude: numeric("start_longitude", { precision: 10, scale: 7 }), // GPS longitude at session start
   endLatitude: numeric("end_latitude", { precision: 10, scale: 7 }), // GPS latitude at session end
   endLongitude: numeric("end_longitude", { precision: 10, scale: 7 }), // GPS longitude at session end
+  
+  // Hours breakdown for payroll
+  regularHours: numeric("regular_hours", { precision: 5, scale: 2 }).default('0'),
+  overtimeHours: numeric("overtime_hours", { precision: 5, scale: 2 }).default('0'),
+  doubleTimeHours: numeric("double_time_hours", { precision: 5, scale: 2 }).default('0'),
   
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
