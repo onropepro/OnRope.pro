@@ -1928,7 +1928,19 @@ export default function Dashboard() {
                   )}
                   
                   <div className="flex gap-2 mt-3">
-                    <Button size="sm" variant="default" data-testid="button-upgrade-tier-projects">
+                    <Button 
+                      size="sm" 
+                      variant="default" 
+                      data-testid="button-upgrade-tier-projects"
+                      onClick={() => {
+                        const email = encodeURIComponent(currentUser?.email || '');
+                        const licenseKey = encodeURIComponent(currentUser?.licenseKey || '');
+                        const currentTier = projectsData.projectInfo.tier.toString();
+                        const returnUrl = encodeURIComponent(`${window.location.origin}/projects?upgraded=true`);
+                        const url = `https://ram-website-paquettetom.replit.app/upgrade-tier?email=${email}&licenseKey=${licenseKey}&currentTier=${currentTier}&returnUrl=${returnUrl}`;
+                        window.location.href = url;
+                      }}
+                    >
                       <span className="material-icons text-sm mr-1">upgrade</span>
                       Upgrade Tier
                     </Button>
@@ -1937,12 +1949,14 @@ export default function Dashboard() {
                       variant="outline" 
                       data-testid="button-buy-projects"
                       onClick={() => {
-                        const params = new URLSearchParams({
-                          email: currentUser?.email || '',
-                          tier: projectsData.projectInfo.tier.toString(),
-                          currentProjects: projectsData.projectInfo.projectsUsed.toString(),
-                        });
-                        window.open(`https://ram-website-paquettetom.replit.app/purchase-projects?${params.toString()}`, '_blank');
+                        const email = encodeURIComponent(currentUser?.email || '');
+                        const licenseKey = encodeURIComponent(currentUser?.licenseKey || '');
+                        const tier = projectsData.projectInfo.tier.toString();
+                        const currentProjects = projectsData.projectInfo.projectLimit.toString();
+                        const projectsUsed = projectsData.projectInfo.projectsUsed.toString();
+                        const returnUrl = encodeURIComponent(`${window.location.origin}/projects?purchased=true`);
+                        const url = `https://ram-website-paquettetom.replit.app/purchase-projects?email=${email}&licenseKey=${licenseKey}&tier=${tier}&currentProjects=${currentProjects}&projectsUsed=${projectsUsed}&returnUrl=${returnUrl}`;
+                        window.location.href = url;
                       }}
                     >
                       <span className="material-icons text-sm mr-1">add_shopping_cart</span>
