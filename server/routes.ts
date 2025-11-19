@@ -261,7 +261,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(401).json({ message: "Unauthorized" });
       }
       
-      const { companyName, name, email, hourlyRate, streetAddress, province, country, zipCode, licenseKey } = req.body;
+      const { companyName, name, email, hourlyRate, streetAddress, province, country, zipCode } = req.body;
+      let licenseKey = req.body.licenseKey; // Use let to allow reassignment on tier upgrade
       
       // Validate required fields
       if (!companyName || !name || !email || !streetAddress || !province || !country || !zipCode) {
