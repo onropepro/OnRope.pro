@@ -663,7 +663,7 @@ export default function Payroll() {
                                             </div>
                                             <div className="flex items-center gap-2 mb-2">
                                               <span className="material-icons text-sm">business</span>
-                                              <span className="text-muted-foreground">{session.projectName || session.description || 'Non-Billable: ' + session.description}</span>
+                                              <span className="text-muted-foreground">{session.projectName || 'Non-Billable'}</span>
                                             </div>
                                             {totalDrops > 0 && (
                                               <div className="flex items-center gap-2">
