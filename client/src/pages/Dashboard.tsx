@@ -1937,7 +1937,7 @@ export default function Dashboard() {
                         const params = new URLSearchParams({
                           email: currentUser?.email || '',
                           tier: projectsData.projectInfo.tier.toString(),
-                          currentProjects: projectsData.projectInfo.projectLimit.toString(),
+                          currentProjects: projectsData.projectInfo.projectsUsed.toString(),
                         });
                         window.open(`https://ram-website-paquettetom.replit.app/purchase-projects?${params.toString()}`, '_blank');
                       }}
