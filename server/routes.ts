@@ -45,10 +45,10 @@ function detectTier(licenseKey: string | null): number {
 function getSeatLimit(tier: number, additionalSeats: number = 0): number {
   let baseLimit: number;
   switch (tier) {
-    case 1: baseLimit = 4; break;  // Tier 1 (Basic): 4 seats
-    case 2: baseLimit = 8; break;  // Tier 2 (Starter): 8 seats
-    case 3: baseLimit = 18; break; // Tier 3 (Professional): 18 seats
-    case 4: return -1; // Tier 4 (Premium): unlimited
+    case 1: baseLimit = 4; break;  // Tier 1: 4 seats
+    case 2: baseLimit = 10; break;  // Tier 2: 10 seats
+    case 3: baseLimit = 18; break; // Tier 3: 18 seats
+    case 4: return -1; // Tier 4: unlimited
     default: baseLimit = 0; break; // No limit if no tier
   }
   return baseLimit + additionalSeats; // Add purchased seats to base limit
@@ -57,10 +57,10 @@ function getSeatLimit(tier: number, additionalSeats: number = 0): number {
 function getProjectLimit(tier: number, additionalProjects: number = 0): number {
   let baseLimit: number;
   switch (tier) {
-    case 1: baseLimit = 2; break;  // Tier 1 (Basic): 2 projects
-    case 2: baseLimit = 4; break;  // Tier 2 (Starter): 4 projects
-    case 3: baseLimit = 9; break;  // Tier 3 (Professional): 9 projects
-    case 4: return -1; // Tier 4 (Premium): unlimited
+    case 1: baseLimit = 2; break;  // Tier 1: 2 projects
+    case 2: baseLimit = 5; break;  // Tier 2: 5 projects
+    case 3: baseLimit = 9; break;  // Tier 3: 9 projects
+    case 4: return -1; // Tier 4: unlimited
     default: baseLimit = 0; break; // No limit if no tier
   }
   return baseLimit + additionalProjects; // Add purchased projects to base limit
@@ -409,10 +409,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Get tier limits
       const tierLimits: Record<number, { seats: number | null; projects: number | null }> = {
         0: { seats: 0, projects: 0 },
-        1: { seats: 4, projects: 2 },      // Basic
-        2: { seats: 8, projects: 4 },      // Starter
-        3: { seats: 18, projects: 9 },     // Professional
-        4: { seats: null, projects: null }, // Premium - unlimited
+        1: { seats: 4, projects: 2 },      // Tier 1
+        2: { seats: 10, projects: 5 },     // Tier 2
+        3: { seats: 18, projects: 9 },     // Tier 3
+        4: { seats: null, projects: null }, // Tier 4 - unlimited
       };
       
       const limits = tierLimits[tier] || tierLimits[0];
@@ -556,10 +556,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       const tierLimits: Record<number, { seats: number | null; projects: number | null }> = {
         0: { seats: 0, projects: 0 },
-        1: { seats: 2, projects: 5 },
-        2: { seats: 10, projects: 20 },
-        3: { seats: null, projects: null },
-        4: { seats: null, projects: null },
+        1: { seats: 4, projects: 2 },      // Tier 1
+        2: { seats: 10, projects: 5 },     // Tier 2
+        3: { seats: 18, projects: 9 },     // Tier 3
+        4: { seats: null, projects: null }, // Tier 4 - unlimited
       };
       
       const limits = tierLimits[tier] || tierLimits[0];
