@@ -591,6 +591,9 @@ export const toolboxMeetings = pgTable("toolbox_meetings", {
   // PDF storage
   pdfUrl: text("pdf_url"),
   
+  // Digital signatures - array of signature objects with employeeId, name, and data URL
+  signatures: jsonb("signatures").$type<Array<{ employeeId: string; employeeName: string; signatureDataUrl: string }>>().default(sql`'[]'::jsonb`),
+  
   createdAt: timestamp("created_at").defaultNow(),
 }, (table) => [
   index("IDX_toolbox_meetings_company_date").on(table.companyId, table.meetingDate),

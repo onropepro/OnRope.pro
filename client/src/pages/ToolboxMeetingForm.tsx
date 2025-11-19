@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -12,10 +12,12 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
-import { ArrowLeft, FileCheck } from "lucide-react";
+import { ArrowLeft, FileCheck, PenTool, X } from "lucide-react";
 import type { Project } from "@shared/schema";
+import SignatureCanvas from "react-signature-canvas";
 
 const toolboxMeetingFormSchema = z.object({
   projectId: z.string().min(1, "Project is required"),
@@ -74,11 +76,21 @@ const topics = [
   { id: "topicBuddySystem", label: "Buddy System and Supervision" },
 ];
 
+type Signature = {
+  employeeId: string;
+  employeeName: string;
+  signatureDataUrl: string;
+};
+
 export default function ToolboxMeetingForm() {
   const [, navigate] = useLocation();
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [selectedEmployees, setSelectedEmployees] = useState<string[]>([]);
+  const [signatures, setSignatures] = useState<Signature[]>([]);
+  const [showSignatureDialog, setShowSignatureDialog] = useState(false);
+  const [selectedSignatureEmployee, setSelectedSignatureEmployee] = useState<string>("");
+  const signatureCanvasRef = useRef<SignatureCanvas>(null);
 
   const { data: projectsData } = useQuery<{ projects: Project[] }>({
     queryKey: ["/api/projects"],
@@ -131,17 +143,88 @@ export default function ToolboxMeetingForm() {
     );
   };
 
+  const handleAddSignature = () => {
+    if (selectedEmployees.length === 0) {
+      toast({
+        title: "No Attendees Selected",
+        description: "Please select attendees first before collecting signatures",
+        variant: "destructive",
+      });
+      return;
+    }
+    setShowSignatureDialog(true);
+  };
+
+  const handleSaveSignature = () => {
+    if (!selectedSignatureEmployee) {
+      toast({
+        title: "Select Employee",
+        description: "Please select an employee for this signature",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (signatureCanvasRef.current?.isEmpty()) {
+      toast({
+        title: "No Signature",
+        description: "Please draw a signature before saving",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const employee = employees.find(e => e.id === selectedSignatureEmployee);
+    if (!employee) return;
+
+    const signatureDataUrl = signatureCanvasRef.current?.toDataURL() || "";
+    
+    // Check if employee already signed
+    if (signatures.some(s => s.employeeId === selectedSignatureEmployee)) {
+      toast({
+        title: "Already Signed",
+        description: `${employee.name} has already signed`,
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setSignatures(prev => [...prev, {
+      employeeId: employee.id,
+      employeeName: employee.name,
+      signatureDataUrl,
+    }]);
+
+    toast({
+      title: "Signature Added",
+      description: `Signature for ${employee.name} has been saved`,
+    });
+
+    setShowSignatureDialog(false);
+    setSelectedSignatureEmployee("");
+    signatureCanvasRef.current?.clear();
+  };
+
+  const removeSignature = (employeeId: string) => {
+    setSignatures(prev => prev.filter(s => s.employeeId !== employeeId));
+    toast({
+      description: "Signature removed",
+    });
+  };
+
   const createMeetingMutation = useMutation({
     mutationFn: async (data: ToolboxMeetingFormValues) => {
       console.log('[Toolbox Meeting] Submitting:', {
         ...data,
         attendees: selectedEmployees,
+        signatures,
       });
       
-      // Use selectedEmployees instead of parsing textarea
+      // Use selectedEmployees and signatures
       const response = await apiRequest("POST", "/api/toolbox-meetings", {
         ...data,
         attendees: selectedEmployees,
+        signatures,
       });
       
       const result = await response.json();
@@ -350,6 +433,65 @@ export default function ToolboxMeetingForm() {
                   )}
                 </div>
 
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <FormLabel>Digital Signatures</FormLabel>
+                      <p className="text-sm text-muted-foreground mt-1">
+                        Collect signatures from attendees
+                      </p>
+                    </div>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={handleAddSignature}
+                      data-testid="button-add-signature"
+                    >
+                      <PenTool className="h-4 w-4 mr-2" />
+                      Add Signature
+                    </Button>
+                  </div>
+
+                  {signatures.length > 0 && (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      {signatures.map((sig) => (
+                        <Card key={sig.employeeId} data-testid={`signature-card-${sig.employeeId}`}>
+                          <CardContent className="p-3">
+                            <div className="space-y-2">
+                              <div className="flex items-center justify-between">
+                                <div className="font-medium text-sm">{sig.employeeName}</div>
+                                <Button
+                                  type="button"
+                                  variant="ghost"
+                                  size="icon"
+                                  onClick={() => removeSignature(sig.employeeId)}
+                                  data-testid={`button-remove-signature-${sig.employeeId}`}
+                                >
+                                  <X className="h-4 w-4" />
+                                </Button>
+                              </div>
+                              <div className="border rounded-md bg-background p-2">
+                                <img 
+                                  src={sig.signatureDataUrl} 
+                                  alt={`Signature of ${sig.employeeName}`}
+                                  className="w-full h-16 object-contain"
+                                  data-testid={`signature-image-${sig.employeeId}`}
+                                />
+                              </div>
+                            </div>
+                          </CardContent>
+                        </Card>
+                      ))}
+                    </div>
+                  )}
+
+                  {signatures.length === 0 && (
+                    <p className="text-sm text-muted-foreground">
+                      No signatures collected yet
+                    </p>
+                  )}
+                </div>
+
                 <div className="space-y-4">
                   <h3 className="font-semibold text-lg">Topics Discussed</h3>
                   <p className="text-sm text-muted-foreground">
@@ -430,6 +572,78 @@ export default function ToolboxMeetingForm() {
             </Form>
           </CardContent>
         </Card>
+
+        <Dialog open={showSignatureDialog} onOpenChange={setShowSignatureDialog}>
+          <DialogContent className="max-w-lg">
+            <DialogHeader>
+              <DialogTitle>Collect Digital Signature</DialogTitle>
+              <DialogDescription>
+                Select an employee and capture their signature on the device
+              </DialogDescription>
+            </DialogHeader>
+
+            <div className="space-y-4">
+              <div>
+                <FormLabel>Select Employee *</FormLabel>
+                <Select value={selectedSignatureEmployee} onValueChange={setSelectedSignatureEmployee}>
+                  <SelectTrigger data-testid="select-signature-employee">
+                    <SelectValue placeholder="Choose employee to sign" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {selectedEmployees.map((attendeeName) => {
+                      const employee = employees.find(e => e.name === attendeeName);
+                      if (!employee) return null;
+                      const alreadySigned = signatures.some(s => s.employeeId === employee.id);
+                      return (
+                        <SelectItem 
+                          key={employee.id} 
+                          value={employee.id}
+                          disabled={alreadySigned}
+                        >
+                          {employee.name} {alreadySigned ? "(Already signed)" : ""}
+                        </SelectItem>
+                      );
+                    })}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div>
+                <FormLabel>Signature *</FormLabel>
+                <div className="border-2 border-dashed rounded-md p-2 bg-background">
+                  <SignatureCanvas
+                    ref={signatureCanvasRef}
+                    canvasProps={{
+                      className: 'signature-canvas w-full h-48 bg-white rounded',
+                      'data-testid': 'signature-canvas'
+                    }}
+                  />
+                </div>
+                <p className="text-xs text-muted-foreground mt-2">
+                  Draw signature with finger or stylus
+                </p>
+              </div>
+            </div>
+
+            <DialogFooter className="gap-2">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => signatureCanvasRef.current?.clear()}
+                data-testid="button-clear-signature"
+              >
+                Clear
+              </Button>
+              <Button
+                type="button"
+                onClick={handleSaveSignature}
+                data-testid="button-save-signature"
+              >
+                Save Signature
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       </div>
     </div>
   );
