@@ -62,6 +62,7 @@ export function QRCodeScanner({ onClose }: QRCodeScannerProps) {
         {
           fps: 10,
           qrbox: { width: 250, height: 250 },
+          aspectRatio: 1.0,
         },
         (decodedText) => {
           // Successfully scanned a QR code
@@ -94,7 +95,19 @@ export function QRCodeScanner({ onClose }: QRCodeScannerProps) {
       setIsScanning(true);
     } catch (err: any) {
       console.error("Camera error:", err);
-      setError(err.message || "Failed to access camera");
+      let errorMsg = "Failed to access camera";
+      
+      if (err.message?.includes("Permission")) {
+        errorMsg = "Camera permission denied. Please allow camera access in your browser settings.";
+      } else if (err.message?.includes("NotFoundError")) {
+        errorMsg = "No camera found on your device.";
+      } else if (err.message?.includes("NotAllowedError")) {
+        errorMsg = "Camera access was blocked. Please check your browser permissions.";
+      } else if (err.message) {
+        errorMsg = err.message;
+      }
+      
+      setError(errorMsg);
       setIsScanning(false);
     }
   };
@@ -171,7 +184,8 @@ export function QRCodeScanner({ onClose }: QRCodeScannerProps) {
 
         <div
           id="qr-reader"
-          className={`${isScanning ? 'block' : 'hidden'} w-full rounded-lg overflow-hidden`}
+          className={`${isScanning ? 'block' : 'hidden'} w-full rounded-lg`}
+          style={{ minHeight: '300px', width: '100%' }}
           data-testid="qr-reader-container"
         />
 
