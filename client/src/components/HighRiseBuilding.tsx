@@ -12,6 +12,7 @@ interface HighRiseBuildingProps {
   completedDropsWest: number;
   className?: string;
   customColor?: string | null;
+  customColors?: string[];
 }
 
 export function HighRiseBuilding({ 
@@ -25,7 +26,8 @@ export function HighRiseBuilding({
   completedDropsSouth,
   completedDropsWest,
   className = "",
-  customColor = null
+  customColor = null,
+  customColors = []
 }: HighRiseBuildingProps) {
   // Calculate progress for each elevation
   const northProgress = totalDropsNorth > 0 ? Math.min(100, (completedDropsNorth / totalDropsNorth) * 100) : 0;
@@ -63,18 +65,20 @@ export function HighRiseBuilding({
 
       {/* Four Elevations - Minimalist Premium Design */}
       <div className="flex justify-center gap-8 overflow-x-auto pb-4 px-4">
-        {elevations.map((elevation) => (
+        {elevations.map((elevation, index) => {
+          const elevationColor = customColors.length > 0 ? customColors[index % customColors.length] : customColor;
+          return (
           <div key={elevation.name} className="flex flex-col items-center min-w-[120px]">
             {/* Elevation Label - Soft Pill */}
             <div 
               className="mb-6 px-6 py-2 rounded-full"
-              style={customColor ? {
-                backgroundColor: `${customColor}1a`,
+              style={elevationColor ? {
+                backgroundColor: `${elevationColor}1a`,
               } : {}}
             >
               <span 
                 className="text-sm font-bold uppercase tracking-wide"
-                style={customColor ? { color: customColor } : {}}
+                style={elevationColor ? { color: elevationColor } : {}}
               >
                 {elevation.name}
               </span>
@@ -85,9 +89,9 @@ export function HighRiseBuilding({
               {/* Progress Fill from Bottom */}
               <div 
                 className="absolute bottom-0 left-0 right-0 transition-all duration-700 ease-out rounded-3xl"
-                style={customColor ? {
+                style={elevationColor ? {
                   height: `${elevation.progress}%`,
-                  background: `linear-gradient(to top, ${customColor}e6, ${customColor}b3, ${customColor}80)`
+                  background: `linear-gradient(to top, ${elevationColor}e6, ${elevationColor}b3, ${elevationColor}80)`
                 } : {
                   height: `${elevation.progress}%`
                 }}
@@ -118,7 +122,7 @@ export function HighRiseBuilding({
             <div className="mt-6 text-center">
               <div 
                 className="text-3xl font-bold mb-1"
-                style={customColor ? { color: customColor } : {}}
+                style={elevationColor ? { color: elevationColor } : {}}
               >
                 {Math.round(elevation.progress)}%
               </div>
@@ -127,7 +131,7 @@ export function HighRiseBuilding({
               </div>
             </div>
           </div>
-        ))}
+        )})}
       </div>
     </div>
   );

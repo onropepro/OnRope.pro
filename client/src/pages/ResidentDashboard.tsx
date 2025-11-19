@@ -94,7 +94,11 @@ export default function ResidentDashboard() {
   });
 
   const branding = brandingData || {};
-  const primaryColor = branding.colors?.[0] || null;
+  const brandColors = branding.colors || [];
+  const primaryColor = brandColors[0] || null;
+  const secondaryColor = brandColors[1] || brandColors[0] || null;
+  const tertiaryColor = brandColors[2] || brandColors[1] || brandColors[0] || null;
+  const quaternaryColor = brandColors[3] || brandColors[2] || brandColors[1] || brandColors[0] || null;
   const hasCustomBranding = !!(branding.logoUrl || (branding.colors && branding.colors.length > 0));
 
   // Fetch resident's complaints
@@ -888,6 +892,7 @@ export default function ResidentDashboard() {
                   completedDropsWest={projectData.completedDropsWest ?? Math.floor(projectData.completedDrops / 4)}
                   className="mb-8"
                   customColor={primaryColor}
+                  customColors={brandColors}
                 />
               )}
 
@@ -910,14 +915,14 @@ export default function ResidentDashboard() {
                   </div>
                   <div 
                     className="text-center p-6 rounded-xl border"
-                    style={hasCustomBranding && primaryColor ? {
-                      background: `linear-gradient(to bottom right, ${primaryColor}1a, ${primaryColor}0d)`,
-                      borderColor: `${primaryColor}33`
+                    style={hasCustomBranding && secondaryColor ? {
+                      background: `linear-gradient(to bottom right, ${secondaryColor}1a, ${secondaryColor}0d)`,
+                      borderColor: `${secondaryColor}33`
                     } : {}}
                   >
                     <div 
                       className="text-3xl font-bold mb-1"
-                      style={hasCustomBranding && primaryColor ? { color: primaryColor } : {}}
+                      style={hasCustomBranding && secondaryColor ? { color: secondaryColor } : {}}
                     >
                       {projectData.completedDrops > 0 ? Math.ceil((projectData.totalDrops - projectData.completedDrops) / projectData.dailyDropTarget) : "N/A"}
                     </div>
@@ -925,14 +930,14 @@ export default function ResidentDashboard() {
                   </div>
                   <div 
                     className="text-center p-6 rounded-xl border"
-                    style={hasCustomBranding && primaryColor ? {
-                      background: `linear-gradient(to bottom right, ${primaryColor}1a, ${primaryColor}0d)`,
-                      borderColor: `${primaryColor}33`
+                    style={hasCustomBranding && tertiaryColor ? {
+                      background: `linear-gradient(to bottom right, ${tertiaryColor}1a, ${tertiaryColor}0d)`,
+                      borderColor: `${tertiaryColor}33`
                     } : {}}
                   >
                     <div 
                       className="text-3xl font-bold mb-1"
-                      style={hasCustomBranding && primaryColor ? { color: primaryColor } : {}}
+                      style={hasCustomBranding && tertiaryColor ? { color: tertiaryColor } : {}}
                     >
                       {projectData.completedDrops}
                     </div>
@@ -940,14 +945,14 @@ export default function ResidentDashboard() {
                   </div>
                   <div 
                     className="text-center p-6 rounded-xl border"
-                    style={hasCustomBranding && primaryColor ? {
-                      background: `linear-gradient(to bottom right, ${primaryColor}1a, ${primaryColor}0d)`,
-                      borderColor: `${primaryColor}33`
+                    style={hasCustomBranding && quaternaryColor ? {
+                      background: `linear-gradient(to bottom right, ${quaternaryColor}1a, ${quaternaryColor}0d)`,
+                      borderColor: `${quaternaryColor}33`
                     } : {}}
                   >
                     <div 
                       className="text-3xl font-bold mb-1"
-                      style={hasCustomBranding && primaryColor ? { color: primaryColor } : {}}
+                      style={hasCustomBranding && quaternaryColor ? { color: quaternaryColor } : {}}
                     >
                       {projectData.totalDrops - projectData.completedDrops}
                     </div>
