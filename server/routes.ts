@@ -2587,7 +2587,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         const baseProjectLimit = getProjectLimit(tier, 0); // Get base limit without additions
         const projectLimit = getProjectLimit(tier, additionalProjects); // Total limit with additions
         // Only count non-completed projects toward the limit
-        const projectsUsed = projectsWithProgress.filter(p => p.progress !== "completed").length;
+        const projectsUsed = projectsWithProgress.filter(p => p.status !== "completed").length;
         const projectsAvailable = projectLimit === -1 ? -1 : Math.max(0, projectLimit - projectsUsed);
         const atProjectLimit = projectLimit > 0 && projectsUsed >= projectLimit;
         
