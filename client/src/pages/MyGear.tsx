@@ -179,6 +179,14 @@ export default function MyGear() {
 
                       {/* Details Grid */}
                       <div className="grid grid-cols-2 gap-3 text-sm">
+                        {item.dateOfManufacture && (
+                          <div>
+                            <span className="text-muted-foreground">Manufactured:</span>
+                            <div className="font-medium mt-0.5">
+                              {new Date(item.dateOfManufacture).toLocaleDateString()}
+                            </div>
+                          </div>
+                        )}
                         {item.dateInService && (
                           <div>
                             <span className="text-muted-foreground">In Service:</span>

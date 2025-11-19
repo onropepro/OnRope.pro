@@ -110,6 +110,7 @@ export default function Inventory() {
       notes: undefined,
       quantity: undefined,
       serialNumbers: undefined,
+      dateOfManufacture: undefined,
       dateInService: undefined,
       dateOutOfService: undefined,
       inService: true,
@@ -355,6 +356,7 @@ export default function Inventory() {
       notes: "",
       quantity: undefined,
       serialNumbers: [],
+      dateOfManufacture: "",
       dateInService: "",
       dateOutOfService: "",
       inService: true,
@@ -378,6 +380,7 @@ export default function Inventory() {
       notes: item.notes || undefined,
       quantity: item.quantity || 1,
       serialNumbers: item.serialNumbers || undefined,
+      dateOfManufacture: item.dateOfManufacture || undefined,
       dateInService: item.dateInService || undefined,
       dateOutOfService: item.dateOutOfService || undefined,
       inService: item.inService,
@@ -624,6 +627,14 @@ export default function Inventory() {
 
                           {/* Details Grid */}
                           <div className="grid grid-cols-2 gap-3 text-sm">
+                            {item.dateOfManufacture && (
+                              <div>
+                                <span className="text-muted-foreground">Manufactured:</span>
+                                <div className="font-medium mt-0.5">
+                                  {new Date(item.dateOfManufacture).toLocaleDateString()}
+                                </div>
+                              </div>
+                            )}
                             {item.dateInService && (
                               <div>
                                 <span className="text-muted-foreground">In Service:</span>
@@ -1217,6 +1228,25 @@ export default function Inventory() {
                       </div>
                     )}
                   </div>
+
+                  <FormField
+                    control={form.control}
+                    name="dateOfManufacture"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Date of Manufacture</FormLabel>
+                        <FormControl>
+                          <Input
+                            type="date"
+                            {...field}
+                            value={field.value || ""}
+                            data-testid="input-date-of-manufacture"
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
 
                   <FormField
                     control={form.control}

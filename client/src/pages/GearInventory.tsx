@@ -16,6 +16,7 @@ const gearFormSchema = z.object({
   brand: z.string().optional(),
   model: z.string().optional(),
   serialNumber: z.string().optional(),
+  dateOfManufacture: z.string().optional(),
   dateInService: z.string().optional(),
   dateOutOfService: z.string().optional(),
   inService: z.boolean().default(true),
@@ -51,6 +52,7 @@ export default function GearInventory() {
       brand: "",
       model: "",
       serialNumber: "",
+      dateOfManufacture: "",
       dateInService: "",
       dateOutOfService: "",
       inService: true,
@@ -66,6 +68,7 @@ export default function GearInventory() {
       brand: "",
       model: "",
       serialNumber: "",
+      dateOfManufacture: "",
       dateInService: "",
       dateOutOfService: "",
       inService: true,
@@ -187,6 +190,20 @@ export default function GearInventory() {
                     <FormLabel>Serial Number</FormLabel>
                     <FormControl>
                       <Input placeholder="e.g., SN123456" {...field} data-testid="input-serial" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="dateOfManufacture"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Date of Manufacture</FormLabel>
+                    <FormControl>
+                      <Input type="date" {...field} data-testid="input-date-of-manufacture" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>

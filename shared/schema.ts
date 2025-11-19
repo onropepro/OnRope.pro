@@ -271,6 +271,7 @@ export const gearItems = pgTable("gear_items", {
   notes: text("notes"), // Optional - additional notes about the item
   quantity: integer("quantity").default(1).notNull(), // Total quantity of this item (0 = out of stock)
   serialNumbers: text("serial_numbers").array(), // Optional array of serial numbers for individual items
+  dateOfManufacture: date("date_of_manufacture"), // Optional - date of manufacture
   dateInService: date("date_in_service"), // Optional
   dateOutOfService: date("date_out_of_service"), // Optional
   inService: boolean("in_service").notNull().default(true), // Checkbox for in service status
