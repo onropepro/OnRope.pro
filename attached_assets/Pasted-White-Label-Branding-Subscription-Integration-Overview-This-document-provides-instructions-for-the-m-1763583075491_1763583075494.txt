@@ -1,0 +1,100 @@
+White Label Branding Subscription Integration
+Overview
+This document provides instructions for the marketplace agent to handle the white label branding subscription feature.
+
+Pricing
+Monthly Subscription Cost: $0.49/month
+Product Name: White Label Branding
+Description: Allows companies to customize the resident portal with their logo and brand colors
+API Endpoints
+1. Purchase Initiation (Called by RAM Platform)
+Endpoint: POST /api/purchase/branding
+
+Request Headers:
+
+Content-Type: application/json
+x-api-key: <PURCHASE_API_KEY>
+
+Request Body:
+
+{
+  "email": "customer@example.com",
+  "companyName": "Example Company",
+  "returnUrl": "https://ram-platform.replit.app/profile"
+}
+
+Response:
+
+{
+  "checkoutUrl": "https://checkout.stripe.com/..."
+}
+
+What the Marketplace Agent Must Do:
+
+Receive the branding subscription purchase request
+Create a Stripe Checkout Session for $0.49/month recurring subscription
+Set up the subscription with the customer's email
+Return the Stripe checkout URL
+After successful payment, call the activation endpoint (below)
+2. Activate Branding Subscription (Called by Marketplace After Payment)
+Endpoint: POST /api/purchase/activate-branding
+
+Request Headers:
+
+Content-Type: application/json
+x-api-key: <PURCHASE_API_KEY>
+
+Request Body:
+
+{
+  "email": "customer@example.com"
+}
+
+Response:
+
+{
+  "success": true,
+  "companyId": "uuid-here",
+  "companyName": "Example Company",
+  "email": "customer@example.com",
+  "brandingActive": true,
+  "message": "Branding subscription activated for Example Company"
+}
+
+What Happens:
+
+The RAM platform sets brandingSubscriptionActive = true for the company
+Branding features (logo upload, color customization) become available immediately
+Resident portal displays company's custom branding
+Important Notes
+API Key Authentication
+All requests must include the x-api-key header with value PURCHASE_API_KEY
+This is the same API key used for seat and project purchases
+The RAM platform validates this key before processing requests
+Flow Summary
+User clicks "Subscribe for $0.49/month" button in Profile > Branding tab
+RAM platform calls POST /api/purchase/branding → marketplace
+Marketplace creates Stripe checkout session
+Marketplace returns checkout URL to RAM platform
+RAM platform redirects user to Stripe checkout
+User completes payment on Stripe
+Stripe webhook fires → marketplace receives payment confirmation
+Marketplace calls POST /api/purchase/activate-branding → RAM platform
+RAM platform activates branding subscription
+User is redirected back to profile page with branding enabled
+Subscription Management
+Subscription is monthly recurring at $0.49/month
+User can cancel anytime via the marketplace cancellation flow
+When cancelled, brandingSubscriptionActive should be set to false via an API call
+Branding features become unavailable immediately upon cancellation
+Logo and colors are preserved in the database but not displayed to residents
+Testing
+Price: $0.49/month
+Test cards work in Stripe test mode
+Verify activation endpoint is called after successful payment
+Verify branding appears in resident portal immediately after activation
+Error Handling
+If email doesn't match an existing company account, return 404
+If API key is invalid, return 401
+If activation fails, retry mechanism should be in place
+Log all errors for debugging
