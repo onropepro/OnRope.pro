@@ -76,8 +76,38 @@ export default function Profile() {
     enabled: !!user?.companyId && user?.role === "resident",
   });
 
+  // Re-verify license mutation
+  const reverifyLicenseMutation = useMutation({
+    mutationFn: async () => {
+      return apiRequest("POST", "/api/verify-license", {
+        licenseKey: user?.licenseKey,
+        email: user?.email,
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/user"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/employees/all"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/projects"] });
+      toast({ title: "License re-verified successfully" });
+    },
+    onError: (error: Error) => {
+      toast({ title: "Error", description: error.message, variant: "destructive" });
+    },
+  });
+
   // Auto-refresh data when user returns from external pages (e.g., cancellation page)
   useEffect(() => {
+    // Check if returning from cancellation page
+    const urlParams = new URLSearchParams(window.location.search);
+    const fromCancellation = urlParams.has('canceled') || document.referrer.includes('cancel-subscription');
+    
+    if (fromCancellation && user?.licenseKey) {
+      // Trigger re-verification immediately
+      reverifyLicenseMutation.mutate();
+      // Clean up URL
+      window.history.replaceState({}, '', '/profile');
+    }
+
     const handleFocus = () => {
       // Refresh all relevant data when window gains focus
       queryClient.invalidateQueries({ queryKey: ["/api/user"] });
@@ -87,7 +117,7 @@ export default function Profile() {
 
     window.addEventListener('focus', handleFocus);
     return () => window.removeEventListener('focus', handleFocus);
-  }, []);
+  }, [user?.licenseKey]);
 
   const profileForm = useForm<ProfileFormData>({
     resolver: zodResolver(profileSchema),
@@ -868,6 +898,31 @@ export default function Profile() {
                     </>
                   )}
 
+                  {/* Re-verify License Button */}
+                  {user?.licenseVerified && (
+                    <>
+                      <Separator />
+                      <div className="space-y-3">
+                        <Label className="text-sm font-medium">Update Subscription Data</Label>
+                        <p className="text-xs text-muted-foreground">
+                          Click here to refresh your subscription details after making changes on the marketplace.
+                        </p>
+                        <Button 
+                          variant="outline"
+                          className="w-full h-12"
+                          data-testid="button-reverify-license"
+                          onClick={() => reverifyLicenseMutation.mutate()}
+                          disabled={reverifyLicenseMutation.isPending}
+                        >
+                          <span className="material-icons mr-2">
+                            {reverifyLicenseMutation.isPending ? "sync" : "refresh"}
+                          </span>
+                          {reverifyLicenseMutation.isPending ? "Updating..." : "Re-verify License"}
+                        </Button>
+                      </div>
+                    </>
+                  )}
+
                   {/* Cancel Subscription */}
                   {user?.licenseVerified && (
                     <>
@@ -884,7 +939,7 @@ export default function Profile() {
                           onClick={() => {
                             const email = encodeURIComponent(user?.email || '');
                             const licenseKey = encodeURIComponent(user?.licenseKey || '');
-                            const returnUrl = encodeURIComponent(`${window.location.origin}/profile`);
+                            const returnUrl = encodeURIComponent(`${window.location.origin}/profile?canceled=true`);
                             const url = `https://ram-website-paquettetom.replit.app/cancel-subscription?email=${email}&licenseKey=${licenseKey}&returnUrl=${returnUrl}`;
                             window.location.href = url;
                           }}
