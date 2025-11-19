@@ -1197,8 +1197,6 @@ export default function Profile() {
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-6">
-                  {console.log('[BRANDING] user.brandingSubscriptionActive =', user.brandingSubscriptionActive)}
-                  {console.log('[BRANDING] Full user object keys:', Object.keys(user))}
                   {/* Subscription Gate */}
                   {!user.brandingSubscriptionActive && (
                     <div className="p-6 border-2 border-dashed rounded-lg bg-muted/30">

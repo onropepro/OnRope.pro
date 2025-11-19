@@ -371,6 +371,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       '/api/purchase/verify-account', // Allow external purchase system to verify accounts
       '/api/purchase/update-seats', // Allow external purchase system to update seat limits
       '/api/purchase/update-projects', // Allow external purchase system to update project limits
+      '/api/purchase/activate-branding', // Allow external purchase system to activate branding subscription
       '/api/user-preferences', // Allow UI preferences even in read-only mode
       '/api/company/branding', // Allow branding color updates even in read-only mode
       '/api/company/branding/logo' // Allow logo uploads even in read-only mode
