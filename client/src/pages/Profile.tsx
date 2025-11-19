@@ -850,6 +850,34 @@ export default function Profile() {
                       </div>
                     </>
                   )}
+
+                  {/* Cancel Subscription */}
+                  {user?.licenseVerified && (
+                    <>
+                      <Separator />
+                      <div className="space-y-3">
+                        <Label className="text-sm font-medium text-destructive">Cancel Subscription</Label>
+                        <p className="text-xs text-muted-foreground">
+                          Cancel your subscription and stop future billing cycles. Your access will remain active until the end of your current billing period.
+                        </p>
+                        <Button 
+                          variant="destructive"
+                          className="w-full h-12"
+                          data-testid="button-cancel-subscription"
+                          onClick={() => {
+                            const params = new URLSearchParams({
+                              email: user?.email || '',
+                              licenseKey: user?.licenseKey || '',
+                            });
+                            window.open(`https://ram-website-paquettetom.replit.app/cancel-subscription?${params.toString()}`, '_blank');
+                          }}
+                        >
+                          <span className="material-icons mr-2">cancel</span>
+                          Cancel Subscription
+                        </Button>
+                      </div>
+                    </>
+                  )}
                 </CardContent>
               </Card>
             </TabsContent>
