@@ -2,9 +2,10 @@ interface ParkadeViewProps {
   totalStalls: number;
   completedStalls: number;
   className?: string;
+  customColor?: string | null;
 }
 
-export function ParkadeView({ totalStalls, completedStalls, className = "" }: ParkadeViewProps) {
+export function ParkadeView({ totalStalls, completedStalls, className = "", customColor = null }: ParkadeViewProps) {
   // Calculate stall size based on total count for scalability
   const getStallConfig = (total: number) => {
     if (total <= 20) return { columns: 4, stallHeight: "h-16", iconSize: "text-2xl" };
@@ -21,7 +22,10 @@ export function ParkadeView({ totalStalls, completedStalls, className = "" }: Pa
     <div className={`space-y-6 ${className}`}>
       {/* Header with progress - Premium Style */}
       <div className="text-center mb-8">
-        <h3 className="text-5xl font-bold gradient-text mb-2">
+        <h3 
+          className="text-5xl font-bold mb-2"
+          style={customColor ? { color: customColor } : {}}
+        >
           {progressPercentage}%
         </h3>
         <p className="text-base font-medium text-foreground">
@@ -36,8 +40,16 @@ export function ParkadeView({ totalStalls, completedStalls, className = "" }: Pa
       <div className="bg-gradient-to-br from-card to-background rounded-2xl p-6 border border-border/50 shadow-premium">
         {/* Parkade entrance header - Premium Badge */}
         <div className="flex items-center justify-center gap-3 mb-6 pb-4 border-b border-border/30">
-          <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
-            <span className="material-icons text-primary text-xl">local_parking</span>
+          <div 
+            className="w-10 h-10 rounded-xl flex items-center justify-center"
+            style={customColor ? { backgroundColor: `${customColor}1a` } : {}}
+          >
+            <span 
+              className="material-icons text-xl"
+              style={customColor ? { color: customColor } : {}}
+            >
+              local_parking
+            </span>
           </div>
           <h4 className="text-lg font-semibold text-foreground">Parking Level</h4>
         </div>

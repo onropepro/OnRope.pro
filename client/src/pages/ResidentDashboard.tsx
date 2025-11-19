@@ -628,6 +628,19 @@ export default function ResidentDashboard() {
 
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-br from-primary/5 via-background to-primary/10">
+      {/* Inject custom brand color styles */}
+      {hasCustomBranding && primaryColor && (
+        <style>{`
+          [data-state="active"][style*="--custom-primary"] {
+            background-color: ${primaryColor}20 !important;
+            color: ${primaryColor} !important;
+            border-bottom: 2px solid ${primaryColor} !important;
+          }
+          [data-state="active"][style*="--custom-primary"]:hover {
+            background-color: ${primaryColor}30 !important;
+          }
+        `}</style>
+      )}
       {/* Modern Header */}
       <header 
         className="sticky top-0 z-[100] bg-card/80 backdrop-blur-xl border-b border-border/50 shadow-lg"
@@ -708,7 +721,12 @@ export default function ResidentDashboard() {
           <Card className="mb-6 shadow-lg">
             <CardContent className="pt-6">
               <div className="flex items-center gap-4">
-                <span className="material-icons text-primary">apartment</span>
+                <span 
+                  className="material-icons"
+                  style={hasCustomBranding && primaryColor ? { color: primaryColor } : {}}
+                >
+                  apartment
+                </span>
                 <div className="flex-1">
                   <label className="text-sm font-medium mb-2 block">Select Project to View</label>
                   <Select value={selectedProjectId || ''} onValueChange={setSelectedProjectId}>
@@ -738,12 +756,28 @@ export default function ResidentDashboard() {
             handleComplaintsTabOpen();
           }
         }} className="w-full">
-          <TabsList className="grid w-full grid-cols-4 mb-4">
-            <TabsTrigger value="building" data-testid="tab-building">Progress</TabsTrigger>
+          <TabsList 
+            className="grid w-full grid-cols-4 mb-4"
+            style={hasCustomBranding && primaryColor ? {
+              borderColor: `${primaryColor}20`
+            } : {}}
+          >
+            <TabsTrigger 
+              value="building" 
+              data-testid="tab-building"
+              style={hasCustomBranding && primaryColor ? {
+                '--custom-primary': primaryColor
+              } as React.CSSProperties : {}}
+            >
+              Progress
+            </TabsTrigger>
             <TabsTrigger 
               value="photos" 
               data-testid="tab-photos"
               className="relative"
+              style={hasCustomBranding && primaryColor ? {
+                '--custom-primary': primaryColor
+              } as React.CSSProperties : {}}
             >
               My Photos
               {newPhotosCount > 0 && (
@@ -756,11 +790,22 @@ export default function ResidentDashboard() {
                 </Badge>
               )}
             </TabsTrigger>
-            <TabsTrigger value="submit" data-testid="tab-submit">Submit</TabsTrigger>
+            <TabsTrigger 
+              value="submit" 
+              data-testid="tab-submit"
+              style={hasCustomBranding && primaryColor ? {
+                '--custom-primary': primaryColor
+              } as React.CSSProperties : {}}
+            >
+              Submit
+            </TabsTrigger>
             <TabsTrigger 
               value="history" 
               data-testid="tab-history"
               className="relative"
+              style={hasCustomBranding && primaryColor ? {
+                '--custom-primary': primaryColor
+              } as React.CSSProperties : {}}
             >
               Complaints
               {newResponsesCount > 0 && (
@@ -783,12 +828,16 @@ export default function ResidentDashboard() {
                   totalStalls={projectData.totalStalls}
                   completedStalls={projectData.completedStalls}
                   className="mb-8"
+                  customColor={primaryColor}
                 />
               ) : activeProject?.jobType === 'in_suite_dryer_vent_cleaning' ? (
                 /* Floor/Unit Progress View for In-Suite Dryer Vent Cleaning */
                 <div className="space-y-6">
                   <div className="text-center mb-8">
-                    <h3 className="text-5xl font-bold text-primary mb-2">
+                    <h3 
+                      className="text-5xl font-bold mb-2"
+                      style={hasCustomBranding && primaryColor ? { color: primaryColor } : {}}
+                    >
                       {Math.round(projectData.progressPercentage)}%
                     </h3>
                     <p className="text-muted-foreground">
@@ -799,8 +848,13 @@ export default function ResidentDashboard() {
                   {/* Progress Bar */}
                   <div className="relative h-8 bg-muted rounded-full overflow-hidden">
                     <div 
-                      className="absolute inset-y-0 left-0 bg-gradient-to-r from-primary to-primary/80 transition-all duration-500 ease-out"
-                      style={{ width: `${projectData.progressPercentage}%` }}
+                      className="absolute inset-y-0 left-0 transition-all duration-500 ease-out"
+                      style={hasCustomBranding && primaryColor ? { 
+                        width: `${projectData.progressPercentage}%`,
+                        background: `linear-gradient(to right, ${primaryColor}, ${primaryColor}cc)`
+                      } : {
+                        width: `${projectData.progressPercentage}%`
+                      }}
                     />
                   </div>
                 </div>
@@ -817,27 +871,70 @@ export default function ResidentDashboard() {
                   completedDropsSouth={projectData.completedDropsSouth ?? Math.floor(projectData.completedDrops / 4) + (projectData.completedDrops % 4 > 2 ? 1 : 0)}
                   completedDropsWest={projectData.completedDropsWest ?? Math.floor(projectData.completedDrops / 4)}
                   className="mb-8"
+                  customColor={primaryColor}
                 />
               )}
 
               {activeProject?.jobType !== 'parkade_pressure_cleaning' && (
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-8">
-                  <div className="text-center p-6 bg-gradient-to-br from-primary/10 to-primary/5 rounded-xl border border-primary/20">
-                    <div className="text-3xl font-bold text-primary mb-1">{projectData.dailyDropTarget}</div>
+                  <div 
+                    className="text-center p-6 rounded-xl border"
+                    style={hasCustomBranding && primaryColor ? {
+                      background: `linear-gradient(to bottom right, ${primaryColor}1a, ${primaryColor}0d)`,
+                      borderColor: `${primaryColor}33`
+                    } : {}}
+                  >
+                    <div 
+                      className="text-3xl font-bold mb-1"
+                      style={hasCustomBranding && primaryColor ? { color: primaryColor } : {}}
+                    >
+                      {projectData.dailyDropTarget}
+                    </div>
                     <div className="text-sm text-muted-foreground">Daily Target</div>
                   </div>
-                  <div className="text-center p-6 bg-gradient-to-br from-blue-500/10 to-blue-500/5 rounded-xl border border-blue-500/20">
-                    <div className="text-3xl font-bold text-blue-600 dark:text-blue-400 mb-1">
+                  <div 
+                    className="text-center p-6 rounded-xl border"
+                    style={hasCustomBranding && primaryColor ? {
+                      background: `linear-gradient(to bottom right, ${primaryColor}1a, ${primaryColor}0d)`,
+                      borderColor: `${primaryColor}33`
+                    } : {}}
+                  >
+                    <div 
+                      className="text-3xl font-bold mb-1"
+                      style={hasCustomBranding && primaryColor ? { color: primaryColor } : {}}
+                    >
                       {projectData.completedDrops > 0 ? Math.ceil((projectData.totalDrops - projectData.completedDrops) / projectData.dailyDropTarget) : "N/A"}
                     </div>
                     <div className="text-sm text-muted-foreground">Days Remaining</div>
                   </div>
-                  <div className="text-center p-6 bg-gradient-to-br from-green-500/10 to-green-500/5 rounded-xl border border-green-500/20">
-                    <div className="text-3xl font-bold text-green-600 dark:text-green-400 mb-1">{projectData.completedDrops}</div>
+                  <div 
+                    className="text-center p-6 rounded-xl border"
+                    style={hasCustomBranding && primaryColor ? {
+                      background: `linear-gradient(to bottom right, ${primaryColor}1a, ${primaryColor}0d)`,
+                      borderColor: `${primaryColor}33`
+                    } : {}}
+                  >
+                    <div 
+                      className="text-3xl font-bold mb-1"
+                      style={hasCustomBranding && primaryColor ? { color: primaryColor } : {}}
+                    >
+                      {projectData.completedDrops}
+                    </div>
                     <div className="text-sm text-muted-foreground">Completed</div>
                   </div>
-                  <div className="text-center p-6 bg-gradient-to-br from-orange-500/10 to-orange-500/5 rounded-xl border border-orange-500/20">
-                    <div className="text-3xl font-bold text-orange-600 dark:text-orange-400 mb-1">{projectData.totalDrops - projectData.completedDrops}</div>
+                  <div 
+                    className="text-center p-6 rounded-xl border"
+                    style={hasCustomBranding && primaryColor ? {
+                      background: `linear-gradient(to bottom right, ${primaryColor}1a, ${primaryColor}0d)`,
+                      borderColor: `${primaryColor}33`
+                    } : {}}
+                  >
+                    <div 
+                      className="text-3xl font-bold mb-1"
+                      style={hasCustomBranding && primaryColor ? { color: primaryColor } : {}}
+                    >
+                      {projectData.totalDrops - projectData.completedDrops}
+                    </div>
                     <div className="text-sm text-muted-foreground">Remaining</div>
                   </div>
                 </div>
@@ -849,7 +946,12 @@ export default function ResidentDashboard() {
             <Card className="shadow-xl border-border/50">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
-                  <span className="material-icons text-primary">photo_library</span>
+                  <span 
+                    className="material-icons"
+                    style={hasCustomBranding && primaryColor ? { color: primaryColor } : {}}
+                  >
+                    photo_library
+                  </span>
                   My Unit Photos
                 </CardTitle>
                 <CardDescription>
@@ -1032,7 +1134,15 @@ export default function ResidentDashboard() {
                       )}
                     </div>
 
-                  <Button type="submit" className="w-full h-12" data-testid="button-submit-complaint">
+                  <Button 
+                    type="submit" 
+                    className="w-full h-12" 
+                    data-testid="button-submit-complaint"
+                    style={hasCustomBranding && primaryColor ? {
+                      backgroundColor: primaryColor,
+                      borderColor: primaryColor
+                    } : {}}
+                  >
                     Submit Feedback
                   </Button>
                 </form>

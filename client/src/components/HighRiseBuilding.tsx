@@ -11,6 +11,7 @@ interface HighRiseBuildingProps {
   completedDropsSouth: number;
   completedDropsWest: number;
   className?: string;
+  customColor?: string | null;
 }
 
 export function HighRiseBuilding({ 
@@ -23,7 +24,8 @@ export function HighRiseBuilding({
   completedDropsEast,
   completedDropsSouth,
   completedDropsWest,
-  className = "" 
+  className = "",
+  customColor = null
 }: HighRiseBuildingProps) {
   // Calculate progress for each elevation
   const northProgress = totalDropsNorth > 0 ? Math.min(100, (completedDropsNorth / totalDropsNorth) * 100) : 0;
@@ -64,18 +66,31 @@ export function HighRiseBuilding({
         {elevations.map((elevation) => (
           <div key={elevation.name} className="flex flex-col items-center min-w-[120px]">
             {/* Elevation Label - Soft Pill */}
-            <div className="mb-6 px-6 py-2 bg-primary/10 rounded-full">
-              <span className="text-sm font-bold text-primary uppercase tracking-wide">
+            <div 
+              className="mb-6 px-6 py-2 rounded-full"
+              style={customColor ? {
+                backgroundColor: `${customColor}1a`,
+              } : {}}
+            >
+              <span 
+                className="text-sm font-bold uppercase tracking-wide"
+                style={customColor ? { color: customColor } : {}}
+              >
                 {elevation.name}
               </span>
             </div>
             
             {/* Building Visualization - Clean Minimal Style */}
-            <div className="relative w-24 h-96 bg-gradient-to-b from-gray-50 to-gray-100 rounded-3xl shadow-xl border border-gray-200/50 overflow-hidden">
+            <div className="relative w-24 h-96 bg-gradient-to-b from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900 rounded-3xl shadow-xl border border-gray-200/50 dark:border-gray-700/50 overflow-hidden">
               {/* Progress Fill from Bottom */}
               <div 
-                className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-primary/90 via-primary/70 to-primary/50 transition-all duration-700 ease-out rounded-3xl"
-                style={{ height: `${elevation.progress}%` }}
+                className="absolute bottom-0 left-0 right-0 transition-all duration-700 ease-out rounded-3xl"
+                style={customColor ? {
+                  height: `${elevation.progress}%`,
+                  background: `linear-gradient(to top, ${customColor}e6, ${customColor}b3, ${customColor}80)`
+                } : {
+                  height: `${elevation.progress}%`
+                }}
                 data-testid={`${elevation.name.toLowerCase()}-progress-fill`}
               >
                 {/* Subtle shine effect */}
@@ -101,7 +116,10 @@ export function HighRiseBuilding({
             
             {/* Stats Below */}
             <div className="mt-6 text-center">
-              <div className="text-3xl font-bold gradient-text mb-1">
+              <div 
+                className="text-3xl font-bold mb-1"
+                style={customColor ? { color: customColor } : {}}
+              >
                 {Math.round(elevation.progress)}%
               </div>
               <div className="text-sm text-muted-foreground font-medium">
