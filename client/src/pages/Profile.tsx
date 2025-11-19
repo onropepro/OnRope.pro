@@ -76,11 +76,14 @@ export default function Profile() {
     enabled: !!user?.companyId && user?.role === "resident",
   });
 
-  // Re-verify license mutation
+  // Re-verify license mutation (with new license key input)
+  const [newLicenseKey, setNewLicenseKey] = useState("");
+  const [showLicenseDialog, setShowLicenseDialog] = useState(false);
+  
   const reverifyLicenseMutation = useMutation({
-    mutationFn: async () => {
+    mutationFn: async (licenseKeyToVerify?: string) => {
       return apiRequest("POST", "/api/verify-license", {
-        licenseKey: user?.licenseKey,
+        licenseKey: licenseKeyToVerify || user?.licenseKey,
         email: user?.email,
       });
     },
@@ -88,7 +91,9 @@ export default function Profile() {
       queryClient.invalidateQueries({ queryKey: ["/api/user"] });
       queryClient.invalidateQueries({ queryKey: ["/api/employees/all"] });
       queryClient.invalidateQueries({ queryKey: ["/api/projects"] });
-      toast({ title: "License re-verified successfully" });
+      toast({ title: "License verified successfully" });
+      setShowLicenseDialog(false);
+      setNewLicenseKey("");
     },
     onError: (error: Error) => {
       toast({ title: "Error", description: error.message, variant: "destructive" });
@@ -107,21 +112,33 @@ export default function Profile() {
     const fromMarketplace = fromCancellation || fromUpgrade || fromPurchase || document.referrer.includes('ram-website');
     
     if (fromMarketplace) {
-      // Show toast immediately
-      let message = "Please wait while we refresh your subscription details.";
-      if (fromUpgrade) message = "Processing tier upgrade...";
-      if (fromPurchase) message = "Processing purchase...";
-      if (fromCancellation) message = "Processing cancellation...";
-      
-      toast({ 
-        title: "Updating subscription data...", 
-        description: message
-      });
-      
-      // Trigger re-verification immediately
-      setTimeout(() => {
-        reverifyLicenseMutation.mutate();
-      }, 500);
+      // For tier upgrades, we CANNOT auto-verify because marketplace returns a NEW license key
+      // The old key is no longer valid, so we must prompt user to enter their new key
+      if (fromUpgrade) {
+        toast({ 
+          title: "Tier Upgraded!", 
+          description: "Please scroll down and click 'Update License Key' to enter your new license key from the marketplace.",
+          duration: 10000,
+        });
+        setShowLicenseDialog(true); // Auto-open the dialog
+      } else if (fromPurchase) {
+        // Seat/project purchases don't change the license key, so auto-verify works
+        toast({ 
+          title: "Purchase complete!", 
+          description: "Refreshing your subscription data..."
+        });
+        setTimeout(() => {
+          reverifyLicenseMutation.mutate();
+        }, 500);
+      } else if (fromCancellation) {
+        toast({ 
+          title: "Cancellation processed", 
+          description: "Refreshing your subscription data..."
+        });
+        setTimeout(() => {
+          reverifyLicenseMutation.mutate();
+        }, 500);
+      }
       
       // Clean up URL
       window.history.replaceState({}, '', '/profile');
@@ -943,26 +960,23 @@ export default function Profile() {
                     </>
                   )}
 
-                  {/* Re-verify License Button */}
+                  {/* Update License Key Button */}
                   {user?.licenseVerified && (
                     <>
                       <Separator />
                       <div className="space-y-3">
-                        <Label className="text-sm font-medium">Update Subscription Data</Label>
+                        <Label className="text-sm font-medium">Update License Key</Label>
                         <p className="text-xs text-muted-foreground">
-                          Click here to refresh your subscription details after making changes on the marketplace.
+                          After upgrading your tier on the marketplace, enter your new license key here to update your subscription.
                         </p>
                         <Button 
                           variant="outline"
                           className="w-full h-12"
-                          data-testid="button-reverify-license"
-                          onClick={() => reverifyLicenseMutation.mutate()}
-                          disabled={reverifyLicenseMutation.isPending}
+                          data-testid="button-update-license"
+                          onClick={() => setShowLicenseDialog(true)}
                         >
-                          <span className="material-icons mr-2">
-                            {reverifyLicenseMutation.isPending ? "sync" : "refresh"}
-                          </span>
-                          {reverifyLicenseMutation.isPending ? "Updating..." : "Re-verify License"}
+                          <span className="material-icons mr-2">vpn_key</span>
+                          Update License Key
                         </Button>
                       </div>
                     </>
@@ -999,6 +1013,53 @@ export default function Profile() {
               </Card>
             </TabsContent>
           </Tabs>
+          
+          {/* License Key Update Dialog */}
+          <AlertDialog open={showLicenseDialog} onOpenChange={setShowLicenseDialog}>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Update License Key</AlertDialogTitle>
+                <AlertDialogDescription>
+                  Enter your new license key from the marketplace. This is required after upgrading your tier.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <div className="py-4">
+                <Label htmlFor="new-license-key">New License Key</Label>
+                <Input
+                  id="new-license-key"
+                  placeholder="Enter your new license key"
+                  value={newLicenseKey}
+                  onChange={(e) => setNewLicenseKey(e.target.value)}
+                  data-testid="input-new-license-key"
+                />
+              </div>
+              <AlertDialogFooter>
+                <AlertDialogCancel onClick={() => {
+                  setShowLicenseDialog(false);
+                  setNewLicenseKey("");
+                }}>
+                  Cancel
+                </AlertDialogCancel>
+                <AlertDialogAction
+                  onClick={() => {
+                    if (!newLicenseKey.trim()) {
+                      toast({ 
+                        title: "Error", 
+                        description: "Please enter a license key",
+                        variant: "destructive" 
+                      });
+                      return;
+                    }
+                    reverifyLicenseMutation.mutate(newLicenseKey.trim());
+                  }}
+                  disabled={reverifyLicenseMutation.isPending}
+                  data-testid="button-confirm-license-update"
+                >
+                  {reverifyLicenseMutation.isPending ? "Verifying..." : "Update License"}
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
         ) : (
           <>
             {/* Non-company users - regular layout without tabs */}
