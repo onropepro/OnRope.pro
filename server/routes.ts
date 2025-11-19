@@ -2036,6 +2036,103 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
+  // ==================== COMPANY BRANDING ROUTES ====================
+  
+  // Upload company logo for white label branding
+  app.post("/api/company/branding/logo", requireAuth, requireRole("company"), imageUpload.single('logo'), async (req: Request, res: Response) => {
+    try {
+      if (!req.file) {
+        return res.status(400).json({ message: "No file uploaded" });
+      }
+
+      const currentUser = await storage.getUserById(req.session.userId!);
+      if (!currentUser || currentUser.role !== "company") {
+        return res.status(403).json({ message: "Access denied" });
+      }
+
+      // Generate unique filename
+      const timestamp = Date.now();
+      const extension = req.file.mimetype.split('/')[1];
+      const filename = `company-logo-${currentUser.id}-${timestamp}.${extension}`;
+
+      // Upload to public object storage (so residents can see it)
+      const objectStorageService = new ObjectStorageService();
+      const url = await objectStorageService.uploadPublicFile(
+        filename,
+        req.file.buffer,
+        req.file.mimetype
+      );
+
+      // Update company's branding logo URL
+      await storage.updateUser(currentUser.id, {
+        brandingLogoUrl: url
+      });
+
+      res.json({ url });
+    } catch (error) {
+      console.error("Logo upload error:", error);
+      const errorMessage = error instanceof Error ? error.message : "Failed to upload logo";
+      res.status(500).json({ message: `Upload failed: ${errorMessage}` });
+    }
+  });
+  
+  // Update company branding colors
+  app.patch("/api/company/branding", requireAuth, requireRole("company"), async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      if (!currentUser || currentUser.role !== "company") {
+        return res.status(403).json({ message: "Access denied" });
+      }
+
+      const { primaryColor, secondaryColor } = req.body;
+
+      // Validate hex color format (optional, basic validation)
+      const hexColorRegex = /^#[0-9A-Fa-f]{6}$/;
+      if (primaryColor && !hexColorRegex.test(primaryColor)) {
+        return res.status(400).json({ message: "Invalid primary color format" });
+      }
+      if (secondaryColor && !hexColorRegex.test(secondaryColor)) {
+        return res.status(400).json({ message: "Invalid secondary color format" });
+      }
+
+      // Update branding colors
+      const updates: any = {};
+      if (primaryColor !== undefined) updates.brandingPrimaryColor = primaryColor;
+      if (secondaryColor !== undefined) updates.brandingSecondaryColor = secondaryColor;
+
+      await storage.updateUser(currentUser.id, updates);
+
+      res.json({ message: "Branding updated successfully" });
+    } catch (error) {
+      console.error("Branding update error:", error);
+      res.status(500).json({ message: "Failed to update branding" });
+    }
+  });
+  
+  // Get company branding (public endpoint for residents)
+  app.get("/api/company/:companyId/branding", async (req: Request, res: Response) => {
+    try {
+      const { companyId } = req.params;
+      
+      const company = await storage.getUserById(companyId);
+      
+      if (!company || company.role !== "company") {
+        return res.status(404).json({ message: "Company not found" });
+      }
+
+      // Return branding info (public, safe to expose)
+      res.json({
+        logoUrl: company.brandingLogoUrl,
+        primaryColor: company.brandingPrimaryColor,
+        secondaryColor: company.brandingSecondaryColor,
+        companyName: company.companyName
+      });
+    } catch (error) {
+      console.error("Error fetching company branding:", error);
+      res.status(500).json({ message: "Failed to fetch branding" });
+    }
+  });
+  
   // ==================== RESIDENTS ROUTES ====================
   
   // Get all residents for the company
