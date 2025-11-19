@@ -721,10 +721,19 @@ export default function Profile() {
                             {employeesData.seatInfo.seatsUsed} / {employeesData.seatInfo.seatLimit === -1 ? '∞' : employeesData.seatInfo.seatLimit}
                           </Badge>
                         </div>
-                        <div className="pl-8">
+                        <div className="pl-8 space-y-2">
                           <div className="text-sm font-semibold" data-testid="text-seats-used">
                             {employeesData.seatInfo.seatsUsed} of {employeesData.seatInfo.seatLimit === -1 ? 'unlimited' : employeesData.seatInfo.seatLimit} seats used
                           </div>
+                          {employeesData.seatInfo.seatLimit !== -1 && (
+                            <div className="text-xs text-muted-foreground space-y-0.5">
+                              <div>Base seats (Tier {employeesData.seatInfo.tier}): {employeesData.seatInfo.baseSeatLimit}</div>
+                              {employeesData.seatInfo.additionalSeats > 0 && (
+                                <div>Additional purchased: +{employeesData.seatInfo.additionalSeats}</div>
+                              )}
+                              <div className="font-medium">Total: {employeesData.seatInfo.seatLimit}</div>
+                            </div>
+                          )}
                           <p className="text-xs text-muted-foreground mt-1">
                             {employeesData.seatInfo.seatLimit === -1 
                               ? 'Your plan includes unlimited employee seats'
@@ -755,10 +764,19 @@ export default function Profile() {
                             {projectsData.projectInfo.projectsUsed} / {projectsData.projectInfo.projectLimit === -1 ? '∞' : projectsData.projectInfo.projectLimit}
                           </Badge>
                         </div>
-                        <div className="pl-8">
+                        <div className="pl-8 space-y-2">
                           <div className="text-sm font-semibold" data-testid="text-projects-used">
                             {projectsData.projectInfo.projectsUsed} of {projectsData.projectInfo.projectLimit === -1 ? 'unlimited' : projectsData.projectInfo.projectLimit} projects active
                           </div>
+                          {projectsData.projectInfo.projectLimit !== -1 && (
+                            <div className="text-xs text-muted-foreground space-y-0.5">
+                              <div>Base projects (Tier {projectsData.projectInfo.tier}): {projectsData.projectInfo.baseProjectLimit}</div>
+                              {projectsData.projectInfo.additionalProjects > 0 && (
+                                <div>Additional purchased: +{projectsData.projectInfo.additionalProjects}</div>
+                              )}
+                              <div className="font-medium">Total: {projectsData.projectInfo.projectLimit}</div>
+                            </div>
+                          )}
                           <p className="text-xs text-muted-foreground mt-1">
                             {projectsData.projectInfo.projectLimit === -1 
                               ? 'Your plan includes unlimited active projects'
