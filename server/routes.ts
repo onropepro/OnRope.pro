@@ -1044,15 +1044,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.log('[License Verification] Parsed result:', verificationResult);
       
       if (verificationResponse.ok && verificationResult.valid === true) {
-        // License is valid - save to database
-        await storage.updateUser(req.session.userId!, { 
+        // License is valid - save to database INCLUDING additionalSeats and additionalProjects
+        const updateData: any = { 
           licenseKey,
           licenseVerified: true 
-        });
+        };
+        
+        // Save additionalSeats and additionalProjects from marketplace
+        if (verificationResult.additionalSeats !== undefined) {
+          updateData.additionalSeats = verificationResult.additionalSeats;
+          console.log('[License Verification] Updating additionalSeats to:', verificationResult.additionalSeats);
+        }
+        if (verificationResult.additionalProjects !== undefined) {
+          updateData.additionalProjects = verificationResult.additionalProjects;
+          console.log('[License Verification] Updating additionalProjects to:', verificationResult.additionalProjects);
+        }
+        
+        await storage.updateUser(req.session.userId!, updateData);
         
         return res.json({
           success: true,
-          message: verificationResult.message || "License verified successfully"
+          message: verificationResult.message || "License verified successfully",
+          additionalSeats: verificationResult.additionalSeats,
+          additionalProjects: verificationResult.additionalProjects
         });
       } else {
         // License is invalid
