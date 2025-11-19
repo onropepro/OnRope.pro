@@ -72,23 +72,10 @@ export default function HarnessInspectionForm() {
 
   const allGearItems = gearData?.items || [];
   
-  // Filter to only show current user's gear
-  const myGear = allGearItems.filter((item: any) => item.assignedTo === currentUser?.name);
-  
-  console.log('[Harness Picker Debug] All gear items:', allGearItems.length);
-  console.log('[Harness Picker Debug] My gear:', myGear.length, myGear.map(g => ({ 
-    type: g.equipmentType, 
-    assignedTo: g.assignedTo,
-    brand: g.brand 
-  })));
-  console.log('[Harness Picker Debug] Current user name:', currentUser?.name);
-  
-  // Filter to only show harnesses
-  const myHarnesses = myGear.filter((item: any) => 
-    item.equipmentType?.toLowerCase().includes('harness')
+  // Show ALL company inventory items (not just assigned ones) - users can inspect any equipment
+  const availableHarnesses = allGearItems.filter((item: any) => 
+    item.equipmentType?.toLowerCase().includes('harness') && item.inService !== false
   );
-  
-  console.log('[Harness Picker Debug] My harnesses found:', myHarnesses.length, myHarnesses);
 
   // Fetch projects for optional selection
   const { data: projectsData } = useQuery<{ projects: any[] }>({
@@ -126,7 +113,7 @@ export default function HarnessInspectionForm() {
       return;
     }
 
-    const selectedGear = myGear.find((item: any) => item.id === gearItemId);
+    const selectedGear = allGearItems.find((item: any) => item.id === gearItemId);
     
     if (selectedGear) {
       // Autofill equipment ID
@@ -330,19 +317,19 @@ export default function HarnessInspectionForm() {
                       data-testid="button-pick-harness"
                     >
                       <Package className="mr-2 h-5 w-5" />
-                      Pick Equipment from My Inventory
+                      Pick Equipment from Inventory
                     </Button>
                   </DialogTrigger>
                   <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
                     <DialogHeader>
-                      <DialogTitle>Select Equipment from My Inventory</DialogTitle>
+                      <DialogTitle>Select Equipment from Inventory</DialogTitle>
                       <DialogDescription>
                         Choose equipment to auto-fill inspection details
                       </DialogDescription>
                     </DialogHeader>
                     <div className="grid gap-3 py-4">
-                      {myGear.length > 0 ? (
-                        myGear.map((harness: any) => (
+                      {availableHarnesses.length > 0 ? (
+                        availableHarnesses.map((harness: any) => (
                           <Card 
                             key={harness.id}
                             className="hover-elevate active-elevate-2 cursor-pointer"
@@ -381,10 +368,10 @@ export default function HarnessInspectionForm() {
                         <div className="text-center py-8">
                           <Package className="mx-auto h-12 w-12 text-muted-foreground mb-3" />
                           <p className="text-sm text-muted-foreground">
-                            No equipment assigned to you yet.
+                            No equipment in inventory yet.
                           </p>
                           <p className="text-sm text-muted-foreground mt-1">
-                            Go to Inventory and assign equipment to yourself.
+                            Add harnesses to your inventory to inspect them.
                           </p>
                         </div>
                       )}
@@ -393,14 +380,14 @@ export default function HarnessInspectionForm() {
                 </Dialog>
 
                 {/* Gear Selection Dropdown for Autofill */}
-                {myGear.length > 0 && (
+                {availableHarnesses.length > 0 && (
                   <div className="bg-primary/5 border border-primary/20 rounded-md p-4 space-y-3">
                     <div className="flex items-start gap-3">
                       <span className="material-icons text-primary mt-0.5">auto_awesome</span>
                       <div className="flex-1">
-                        <div className="font-semibold mb-1">Quick Fill from My Gear</div>
+                        <div className="font-semibold mb-1">Quick Fill from Inventory</div>
                         <p className="text-sm text-muted-foreground mb-3">
-                          Select equipment from your gear to auto-fill details
+                          Select equipment from inventory to auto-fill details
                         </p>
                         <Select onValueChange={handleGearSelection} value={selectedGearId}>
                           <SelectTrigger data-testid="select-my-gear" className="bg-background">
@@ -408,7 +395,7 @@ export default function HarnessInspectionForm() {
                           </SelectTrigger>
                           <SelectContent>
                             <SelectItem value="none">None (enter manually)</SelectItem>
-                            {myGear.map((item: any) => (
+                            {availableHarnesses.map((item: any) => (
                               <SelectItem key={item.id} value={item.id}>
                                 {item.equipmentType} {item.brand ? `- ${item.brand}` : ""} {item.model ? item.model : ""} 
                                 {item.serialNumbers && item.serialNumbers.length > 0 ? ` (${item.serialNumbers[0]})` : ""}
