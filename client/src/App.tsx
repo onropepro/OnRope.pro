@@ -3,8 +3,6 @@ import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { Button } from "@/components/ui/button";
-import { RefreshCw } from "lucide-react";
 
 // Pages
 import Register from "@/pages/Register";
@@ -151,28 +149,12 @@ function Router() {
 }
 
 function App() {
-  const handleRefresh = () => {
-    queryClient.invalidateQueries();
-    window.location.reload();
-  };
-
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
         <div className="fixed top-0 left-0 right-0 z-[9999] bg-red-600 text-white text-center py-0.5 text-[10px] font-medium leading-tight">
           Free Beta Access - Subscription Service Coming Soon - Do Not Distribute
         </div>
-        
-        <Button
-          size="icon"
-          variant="default"
-          onClick={handleRefresh}
-          className="fixed bottom-6 right-6 z-[9998] shadow-xl bg-primary hover:bg-primary/90 rounded-full h-14 w-14"
-          data-testid="button-refresh"
-        >
-          <RefreshCw className="h-6 w-6" />
-        </Button>
-        
         <div className="pt-4">
           <Router />
         </div>
