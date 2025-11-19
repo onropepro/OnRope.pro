@@ -95,19 +95,27 @@ export default function Profile() {
     },
   });
 
-  // Auto-refresh data when user returns from external pages (e.g., cancellation page)
+  // Auto-refresh data when user returns from external pages (e.g., cancellation page, upgrade, purchases)
   useEffect(() => {
     if (!user?.licenseKey) return;
 
-    // Check if returning from cancellation page
+    // Check if returning from marketplace
     const urlParams = new URLSearchParams(window.location.search);
-    const fromCancellation = urlParams.has('canceled') || document.referrer.includes('cancel-subscription');
+    const fromCancellation = urlParams.has('canceled');
+    const fromUpgrade = urlParams.has('upgraded');
+    const fromPurchase = urlParams.has('purchased');
+    const fromMarketplace = fromCancellation || fromUpgrade || fromPurchase || document.referrer.includes('ram-website');
     
-    if (fromCancellation) {
+    if (fromMarketplace) {
       // Show toast immediately
+      let message = "Please wait while we refresh your subscription details.";
+      if (fromUpgrade) message = "Processing tier upgrade...";
+      if (fromPurchase) message = "Processing purchase...";
+      if (fromCancellation) message = "Processing cancellation...";
+      
       toast({ 
         title: "Updating subscription data...", 
-        description: "Please wait while we refresh your subscription details." 
+        description: message
       });
       
       // Trigger re-verification immediately
@@ -859,6 +867,21 @@ export default function Profile() {
                             variant="default"
                             className="w-full h-12"
                             data-testid="button-upgrade-tier"
+                            onClick={() => {
+                              if (!employeesData?.seatInfo) {
+                                alert('Tier info not loaded. Please refresh the page.');
+                                return;
+                              }
+                              
+                              const email = encodeURIComponent(user?.email || '');
+                              const licenseKey = encodeURIComponent(user?.licenseKey || '');
+                              const currentTier = employeesData.seatInfo.tier.toString();
+                              const returnUrl = encodeURIComponent(`${window.location.origin}/profile?upgraded=true`);
+                              const url = `https://ram-website-paquettetom.replit.app/upgrade-tier?email=${email}&licenseKey=${licenseKey}&currentTier=${currentTier}&returnUrl=${returnUrl}`;
+                              
+                              console.log('[Tier Upgrade] Opening:', url);
+                              window.location.href = url;
+                            }}
                           >
                             <span className="material-icons mr-2">upgrade</span>
                             Upgrade Tier
@@ -874,22 +897,16 @@ export default function Profile() {
                                   return;
                                 }
                                 
-                                const params = new URLSearchParams({
-                                  email: user?.email || '',
-                                  tier: employeesData.seatInfo.tier.toString(),
-                                  currentSeats: employeesData.seatInfo.seatLimit.toString(),
-                                  seatsUsed: employeesData.seatInfo.seatsUsed.toString()
-                                });
-                                const url = `https://ram-website-paquettetom.replit.app/purchase-seats?${params.toString()}`;
+                                const email = encodeURIComponent(user?.email || '');
+                                const licenseKey = encodeURIComponent(user?.licenseKey || '');
+                                const tier = employeesData.seatInfo.tier.toString();
+                                const currentSeats = employeesData.seatInfo.seatLimit.toString();
+                                const seatsUsed = employeesData.seatInfo.seatsUsed.toString();
+                                const returnUrl = encodeURIComponent(`${window.location.origin}/profile?purchased=true`);
+                                const url = `https://ram-website-paquettetom.replit.app/purchase-seats?email=${email}&licenseKey=${licenseKey}&tier=${tier}&currentSeats=${currentSeats}&seatsUsed=${seatsUsed}&returnUrl=${returnUrl}`;
                                 
-                                // Debug: Show URL before opening
-                                const debugInfo = `Opening:\n${url}\n\nEmail: ${user?.email}\nTier: ${employeesData.seatInfo.tier}\nSeats: ${employeesData.seatInfo.seatLimit}\nUsed: ${employeesData.seatInfo.seatsUsed}`;
-                                console.log('[Seat Purchase]', debugInfo);
-                                
-                                const newWindow = window.open(url, '_blank');
-                                if (!newWindow) {
-                                  alert('Pop-up blocked! URL:\n' + url);
-                                }
+                                console.log('[Seat Purchase] Opening:', url);
+                                window.location.href = url;
                               }}
                             >
                               <span className="material-icons mr-2">add_shopping_cart</span>
@@ -905,22 +922,16 @@ export default function Profile() {
                                   return;
                                 }
                                 
-                                const params = new URLSearchParams({
-                                  email: user?.email || '',
-                                  tier: projectsData.projectInfo.tier.toString(),
-                                  currentProjects: projectsData.projectInfo.projectLimit.toString(),
-                                  projectsUsed: projectsData.projectInfo.projectsUsed.toString()
-                                });
-                                const url = `https://ram-website-paquettetom.replit.app/purchase-projects?${params.toString()}`;
+                                const email = encodeURIComponent(user?.email || '');
+                                const licenseKey = encodeURIComponent(user?.licenseKey || '');
+                                const tier = projectsData.projectInfo.tier.toString();
+                                const currentProjects = projectsData.projectInfo.projectLimit.toString();
+                                const projectsUsed = projectsData.projectInfo.projectsUsed.toString();
+                                const returnUrl = encodeURIComponent(`${window.location.origin}/profile?purchased=true`);
+                                const url = `https://ram-website-paquettetom.replit.app/purchase-projects?email=${email}&licenseKey=${licenseKey}&tier=${tier}&currentProjects=${currentProjects}&projectsUsed=${projectsUsed}&returnUrl=${returnUrl}`;
                                 
-                                // Debug: Show URL before opening
-                                const debugInfo = `Opening:\n${url}\n\nEmail: ${user?.email}\nTier: ${projectsData.projectInfo.tier}\nProjects: ${projectsData.projectInfo.projectLimit}\nUsed: ${projectsData.projectInfo.projectsUsed}`;
-                                console.log('[Project Purchase]', debugInfo);
-                                
-                                const newWindow = window.open(url, '_blank');
-                                if (!newWindow) {
-                                  alert('Pop-up blocked! URL:\n' + url);
-                                }
+                                console.log('[Project Purchase] Opening:', url);
+                                window.location.href = url;
                               }}
                             >
                               <span className="material-icons mr-2">add_shopping_cart</span>
