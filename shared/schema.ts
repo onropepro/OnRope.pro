@@ -1186,6 +1186,9 @@ export type EmployeeHoursSummary = {
   employeeName: string;
   hourlyRate: string;
   totalHours: number;
+  regularHours: number;
+  overtimeHours: number;
+  doubleTimeHours: number;
   totalPay: number;
   sessions: (WorkSession & { projectName: string })[];
 };

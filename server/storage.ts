@@ -1016,6 +1016,9 @@ export class Storage {
         startTime: workSessions.startTime,
         endTime: workSessions.endTime,
         workDate: workSessions.workDate,
+        regularHours: workSessions.regularHours,
+        overtimeHours: workSessions.overtimeHours,
+        doubleTimeHours: workSessions.doubleTimeHours,
         employeeName: users.name,
         hourlyRate: users.hourlyRate,
         projectName: projects.buildingName,
@@ -1041,6 +1044,9 @@ export class Storage {
         startTime: nonBillableWorkSessions.startTime,
         endTime: nonBillableWorkSessions.endTime,
         workDate: nonBillableWorkSessions.workDate,
+        regularHours: nonBillableWorkSessions.regularHours,
+        overtimeHours: nonBillableWorkSessions.overtimeHours,
+        doubleTimeHours: nonBillableWorkSessions.doubleTimeHours,
         description: nonBillableWorkSessions.description,
         employeeName: users.name,
         hourlyRate: users.hourlyRate,
@@ -1073,13 +1079,23 @@ export class Storage {
           employeeName: session.employeeName,
           hourlyRate: session.hourlyRate || '0',
           totalHours: 0,
+          regularHours: 0,
+          overtimeHours: 0,
+          doubleTimeHours: 0,
           totalPay: 0,
           sessions: [],
         });
       }
 
       const summary = employeeMap.get(session.employeeId)!;
+      const regularHrs = parseFloat(session.regularHours || '0');
+      const overtimeHrs = parseFloat(session.overtimeHours || '0');
+      const doubleTimeHrs = parseFloat(session.doubleTimeHours || '0');
+      
       summary.totalHours += hours;
+      summary.regularHours += regularHrs;
+      summary.overtimeHours += overtimeHrs;
+      summary.doubleTimeHours += doubleTimeHrs;
       summary.totalPay += hours * rate;
       summary.sessions.push({
         id: session.sessionId,
@@ -1113,13 +1129,23 @@ export class Storage {
           employeeName: session.employeeName,
           hourlyRate: session.hourlyRate || '0',
           totalHours: 0,
+          regularHours: 0,
+          overtimeHours: 0,
+          doubleTimeHours: 0,
           totalPay: 0,
           sessions: [],
         });
       }
 
       const summary = employeeMap.get(session.employeeId)!;
+      const regularHrs = parseFloat(session.regularHours || '0');
+      const overtimeHrs = parseFloat(session.overtimeHours || '0');
+      const doubleTimeHrs = parseFloat(session.doubleTimeHours || '0');
+      
       summary.totalHours += hours;
+      summary.regularHours += regularHrs;
+      summary.overtimeHours += overtimeHrs;
+      summary.doubleTimeHours += doubleTimeHrs;
       summary.totalPay += hours * rate;
       summary.sessions.push({
         id: session.sessionId,

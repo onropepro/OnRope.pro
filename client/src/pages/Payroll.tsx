@@ -616,7 +616,12 @@ export default function Payroll() {
                                 <div>
                                   <div className="text-lg font-semibold text-left">{employee.employeeName}</div>
                                   <div className="text-sm text-muted-foreground mt-1">
-                                    Total Hours: <span className="font-medium">{employee.totalHours.toFixed(2)} hours</span>
+                                    Total: <span className="font-medium">{employee.totalHours.toFixed(2)}h</span>
+                                    {" "}(
+                                    <span className="text-foreground">{employee.regularHours.toFixed(2)}h</span> regular
+                                    {employee.overtimeHours > 0 && <>, <span className="text-orange-600 dark:text-orange-400">{employee.overtimeHours.toFixed(2)}h</span> OT</>}
+                                    {employee.doubleTimeHours > 0 && <>, <span className="text-red-600 dark:text-red-400">{employee.doubleTimeHours.toFixed(2)}h</span> 2x</>}
+                                    )
                                   </div>
                                   <div className="text-xs text-muted-foreground mt-0.5">
                                     {employee.sessions.length} work sessions
