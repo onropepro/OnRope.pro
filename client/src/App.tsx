@@ -167,10 +167,10 @@ function App() {
           size="icon"
           variant="default"
           onClick={handleRefresh}
-          className="fixed top-20 left-4 z-[9998] shadow-xl bg-primary hover:bg-primary/90"
+          className="fixed top-14 right-2 z-[9998] shadow-xl bg-primary hover:bg-primary/90"
           data-testid="button-refresh"
         >
-          <RefreshCw className="h-5 w-5" />
+          <RefreshCw className="h-4 w-4" />
         </Button>
         
         <div className="pt-4">
