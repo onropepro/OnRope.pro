@@ -3131,8 +3131,7 @@ export default function Dashboard() {
                           const params = new URLSearchParams({
                             email: currentUser?.email || '',
                             tier: employeesData.seatInfo.tier.toString(),
-                            currentSeats: employeesData.seatInfo.seatLimit.toString(),
-                            seatsUsed: employeesData.seatInfo.seatsUsed.toString()
+                            currentSeats: employeesData.seatInfo.seatsUsed.toString(),
                           });
                           window.open(`https://ram-website-paquettetom.replit.app/purchase-seats?${params.toString()}`, '_blank');
                         }}
