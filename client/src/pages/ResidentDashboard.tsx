@@ -94,7 +94,8 @@ export default function ResidentDashboard() {
   });
 
   const branding = brandingData || {};
-  const hasCustomBranding = !!(branding.logoUrl || branding.primaryColor || branding.secondaryColor);
+  const primaryColor = branding.colors?.[0] || null;
+  const hasCustomBranding = !!(branding.logoUrl || (branding.colors && branding.colors.length > 0));
 
   // Fetch resident's complaints
   const { data: complaintsData } = useQuery({
@@ -288,7 +289,7 @@ export default function ResidentDashboard() {
       <div className="min-h-screen bg-background flex flex-col">
         <header 
           className="flex items-center justify-between p-4 border-b"
-          style={hasCustomBranding && branding.primaryColor ? { borderColor: `${branding.primaryColor}20` } : {}}
+          style={hasCustomBranding && primaryColor ? { borderColor: `${primaryColor}20` } : {}}
         >
           <div className="flex items-center gap-3">
             {branding.logoUrl ? (
@@ -303,7 +304,7 @@ export default function ResidentDashboard() {
             )}
             <h1 
               className="text-xl font-semibold"
-              style={hasCustomBranding && branding.primaryColor ? { color: branding.primaryColor } : {}}
+              style={hasCustomBranding && primaryColor ? { color: primaryColor } : {}}
             >
               {branding.companyName || 'Resident Portal'}
             </h1>
@@ -449,7 +450,7 @@ export default function ResidentDashboard() {
       <div className="min-h-screen bg-background flex flex-col">
         <header 
           className="flex items-center justify-between p-4 border-b"
-          style={hasCustomBranding && branding.primaryColor ? { borderColor: `${branding.primaryColor}20` } : {}}
+          style={hasCustomBranding && primaryColor ? { borderColor: `${primaryColor}20` } : {}}
         >
           <div className="flex items-center gap-3">
             {branding.logoUrl ? (
@@ -464,7 +465,7 @@ export default function ResidentDashboard() {
             )}
             <h1 
               className="text-xl font-semibold"
-              style={hasCustomBranding && branding.primaryColor ? { color: branding.primaryColor } : {}}
+              style={hasCustomBranding && primaryColor ? { color: primaryColor } : {}}
             >
               {branding.companyName || 'Resident Portal'}
             </h1>
@@ -630,7 +631,7 @@ export default function ResidentDashboard() {
       {/* Modern Header */}
       <header 
         className="sticky top-0 z-[100] bg-card/80 backdrop-blur-xl border-b border-border/50 shadow-lg"
-        style={hasCustomBranding && branding.primaryColor ? { borderColor: `${branding.primaryColor}30` } : {}}
+        style={hasCustomBranding && primaryColor ? { borderColor: `${primaryColor}30` } : {}}
       >
         <div className="container max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="h-20 flex items-center justify-between">
@@ -647,8 +648,8 @@ export default function ResidentDashboard() {
               ) : (
                 <div 
                   className="h-12 w-12 rounded-xl bg-gradient-to-br from-primary to-primary/60 flex items-center justify-center shadow-lg"
-                  style={hasCustomBranding && branding.primaryColor ? { 
-                    background: `linear-gradient(to bottom right, ${branding.primaryColor}, ${branding.primaryColor}99)` 
+                  style={hasCustomBranding && primaryColor ? { 
+                    background: `linear-gradient(to bottom right, ${primaryColor}, ${primaryColor}99)` 
                   } : {}}
                 >
                   <span className="material-icons text-white text-2xl">domain</span>

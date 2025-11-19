@@ -102,8 +102,7 @@ export const users = pgTable("users", {
   
   // White label branding (company role only)
   brandingLogoUrl: text("branding_logo_url"), // Custom logo URL for resident portal
-  brandingPrimaryColor: varchar("branding_primary_color"), // Primary brand color (hex code)
-  brandingSecondaryColor: varchar("branding_secondary_color"), // Secondary brand color (hex code)
+  brandingColors: text("branding_colors").array().default(sql`ARRAY[]::text[]`), // Array of brand colors (hex codes)
   
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),

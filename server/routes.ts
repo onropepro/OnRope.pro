@@ -371,7 +371,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       '/api/purchase/verify-account', // Allow external purchase system to verify accounts
       '/api/purchase/update-seats', // Allow external purchase system to update seat limits
       '/api/purchase/update-projects', // Allow external purchase system to update project limits
-      '/api/user-preferences' // Allow UI preferences even in read-only mode
+      '/api/user-preferences', // Allow UI preferences even in read-only mode
+      '/api/company/branding', // Allow branding color updates even in read-only mode
+      '/api/company/branding/logo' // Allow logo uploads even in read-only mode
     ];
     
     // Only check mutations
@@ -822,6 +824,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { confirmPassword, ...userData } = req.body;
       
       console.log('[Register] Received data:', JSON.stringify(userData, null, 2));
+      
+      // Convert empty strings to null for numeric fields
+      if (userData.hourlyRate === '' || userData.hourlyRate === undefined) {
+        userData.hourlyRate = null;
+      }
       
       // Validate input
       const validatedData = insertUserSchema.parse(userData);
@@ -2084,23 +2091,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(403).json({ message: "Access denied" });
       }
 
-      const { primaryColor, secondaryColor } = req.body;
+      const { colors } = req.body;
 
-      // Validate hex color format (optional, basic validation)
-      const hexColorRegex = /^#[0-9A-Fa-f]{6}$/;
-      if (primaryColor && !hexColorRegex.test(primaryColor)) {
-        return res.status(400).json({ message: "Invalid primary color format" });
+      // Validate that colors is an array
+      if (!Array.isArray(colors)) {
+        return res.status(400).json({ message: "Colors must be an array" });
       }
-      if (secondaryColor && !hexColorRegex.test(secondaryColor)) {
-        return res.status(400).json({ message: "Invalid secondary color format" });
+
+      // Validate hex color format for each color
+      const hexColorRegex = /^#[0-9A-Fa-f]{6}$/;
+      for (const color of colors) {
+        if (color && !hexColorRegex.test(color)) {
+          return res.status(400).json({ message: `Invalid color format: ${color}` });
+        }
       }
 
       // Update branding colors
-      const updates: any = {};
-      if (primaryColor !== undefined) updates.brandingPrimaryColor = primaryColor;
-      if (secondaryColor !== undefined) updates.brandingSecondaryColor = secondaryColor;
-
-      await storage.updateUser(currentUser.id, updates);
+      await storage.updateUser(currentUser.id, {
+        brandingColors: colors
+      });
 
       res.json({ message: "Branding updated successfully" });
     } catch (error) {
@@ -2123,8 +2132,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Return branding info (public, safe to expose)
       res.json({
         logoUrl: company.brandingLogoUrl,
-        primaryColor: company.brandingPrimaryColor,
-        secondaryColor: company.brandingSecondaryColor,
+        colors: company.brandingColors || [],
         companyName: company.companyName
       });
     } catch (error) {

@@ -41,6 +41,124 @@ const passwordSchema = z.object({
 type ProfileFormData = z.infer<typeof profileSchema>;
 type PasswordFormData = z.infer<typeof passwordSchema>;
 
+function BrandColorsSection({ user }: { user: any }) {
+  const { toast } = useToast();
+  const [colors, setColors] = useState<string[]>(user?.brandingColors || ['#3b82f6']);
+  const [isSaving, setIsSaving] = useState(false);
+
+  // Update local state when user data changes
+  useEffect(() => {
+    if (user?.brandingColors && user.brandingColors.length > 0) {
+      setColors(user.brandingColors);
+    }
+  }, [user?.brandingColors]);
+
+  const addColor = () => {
+    setColors([...colors, '#3b82f6']);
+  };
+
+  const removeColor = (index: number) => {
+    if (colors.length > 1) {
+      setColors(colors.filter((_, i) => i !== index));
+    } else {
+      toast({
+        title: "Cannot remove",
+        description: "You must have at least one color",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const updateColor = (index: number, newColor: string) => {
+    const newColors = [...colors];
+    newColors[index] = newColor;
+    setColors(newColors);
+  };
+
+  const saveColors = async () => {
+    try {
+      setIsSaving(true);
+      await apiRequest('PATCH', '/api/company/branding', {
+        colors: colors,
+      });
+      toast({ title: "Brand colors updated successfully" });
+      queryClient.invalidateQueries({ queryKey: ["/api/user"] });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to update colors",
+        variant: "destructive"
+      });
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  return (
+    <div className="space-y-4">
+      <div>
+        <Label className="text-sm font-medium">Brand Colors</Label>
+        <p className="text-xs text-muted-foreground mt-1">
+          Choose colors that match your brand identity. These colors will be applied to the resident portal.
+        </p>
+      </div>
+
+      <div className="space-y-3">
+        {colors.map((color, index) => (
+          <div key={index} className="flex items-center gap-3">
+            <div className="flex items-center gap-2 flex-1">
+              <Input
+                type="color"
+                value={color}
+                onChange={(e) => updateColor(index, e.target.value)}
+                data-testid={`input-color-${index}`}
+                className="h-12 w-20"
+              />
+              <Input
+                type="text"
+                value={color}
+                onChange={(e) => updateColor(index, e.target.value)}
+                className="h-12 font-mono text-sm flex-1"
+                data-testid={`text-color-value-${index}`}
+              />
+            </div>
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={() => removeColor(index)}
+              disabled={colors.length === 1}
+              data-testid={`button-remove-color-${index}`}
+              className="h-12"
+            >
+              <span className="material-icons text-lg">delete</span>
+            </Button>
+          </div>
+        ))}
+      </div>
+
+      <div className="flex gap-2">
+        <Button
+          variant="outline"
+          onClick={addColor}
+          data-testid="button-add-color"
+          className="h-12"
+        >
+          <span className="material-icons mr-2">add</span>
+          Add Color
+        </Button>
+        <Button
+          onClick={saveColors}
+          disabled={isSaving}
+          data-testid="button-update-colors"
+          className="h-12"
+        >
+          {isSaving ? "Saving..." : "Save Changes"}
+        </Button>
+      </div>
+    </div>
+  );
+}
+
 export default function Profile() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
@@ -1139,86 +1257,7 @@ export default function Profile() {
                   <Separator />
 
                   {/* Color Customization */}
-                  <div className="space-y-4">
-                    <Label className="text-sm font-medium">Brand Colors</Label>
-                    <p className="text-xs text-muted-foreground">
-                      Choose colors that match your brand identity. These colors will be applied to the resident portal.
-                    </p>
-                    
-                    <div className="grid gap-4 md:grid-cols-2">
-                      {/* Primary Color */}
-                      <div className="space-y-2">
-                        <Label htmlFor="primary-color" className="text-sm">Primary Color</Label>
-                        <div className="flex items-center gap-2">
-                          <Input
-                            id="primary-color"
-                            type="color"
-                            defaultValue={user.brandingPrimaryColor || '#3b82f6'}
-                            onChange={async (e) => {
-                              try {
-                                await apiRequest('PATCH', '/api/company/branding', {
-                                  primaryColor: e.target.value,
-                                });
-                                toast({ title: "Primary color updated" });
-                                queryClient.invalidateQueries({ queryKey: ["/api/user"] });
-                              } catch (error) {
-                                toast({ 
-                                  title: "Error", 
-                                  description: "Failed to update color",
-                                  variant: "destructive" 
-                                });
-                              }
-                            }}
-                            data-testid="input-primary-color"
-                            className="h-12 w-20"
-                          />
-                          <Input
-                            type="text"
-                            value={user.brandingPrimaryColor || '#3b82f6'}
-                            readOnly
-                            className="h-12 font-mono text-sm"
-                            data-testid="text-primary-color-value"
-                          />
-                        </div>
-                      </div>
-
-                      {/* Secondary Color */}
-                      <div className="space-y-2">
-                        <Label htmlFor="secondary-color" className="text-sm">Secondary Color</Label>
-                        <div className="flex items-center gap-2">
-                          <Input
-                            id="secondary-color"
-                            type="color"
-                            defaultValue={user.brandingSecondaryColor || '#10b981'}
-                            onChange={async (e) => {
-                              try {
-                                await apiRequest('PATCH', '/api/company/branding', {
-                                  secondaryColor: e.target.value,
-                                });
-                                toast({ title: "Secondary color updated" });
-                                queryClient.invalidateQueries({ queryKey: ["/api/user"] });
-                              } catch (error) {
-                                toast({ 
-                                  title: "Error", 
-                                  description: "Failed to update color",
-                                  variant: "destructive" 
-                                });
-                              }
-                            }}
-                            data-testid="input-secondary-color"
-                            className="h-12 w-20"
-                          />
-                          <Input
-                            type="text"
-                            value={user.brandingSecondaryColor || '#10b981'}
-                            readOnly
-                            className="h-12 font-mono text-sm"
-                            data-testid="text-secondary-color-value"
-                          />
-                        </div>
-                      </div>
-                    </div>
-                  </div>
+                  <BrandColorsSection user={user} />
 
                   <Separator />
 
@@ -1231,8 +1270,8 @@ export default function Profile() {
                     <div 
                       className="p-6 rounded-lg border-2"
                       style={{
-                        backgroundColor: `${user.brandingPrimaryColor || '#3b82f6'}15`,
-                        borderColor: user.brandingPrimaryColor || '#3b82f6'
+                        backgroundColor: `${user.brandingColors?.[0] || '#3b82f6'}15`,
+                        borderColor: user.brandingColors?.[0] || '#3b82f6'
                       }}
                     >
                       <div className="flex items-center gap-4 mb-4">
@@ -1245,22 +1284,39 @@ export default function Profile() {
                           />
                         )}
                         <div>
-                          <h3 className="font-semibold text-lg" style={{ color: user.brandingPrimaryColor || '#3b82f6' }}>
+                          <h3 className="font-semibold text-lg" style={{ color: user.brandingColors?.[0] || '#3b82f6' }}>
                             {user.companyName || 'Your Company Name'}
                           </h3>
                           <p className="text-sm text-muted-foreground">Resident Portal</p>
                         </div>
                       </div>
-                      <Button 
-                        style={{ 
-                          backgroundColor: user.brandingSecondaryColor || '#10b981',
-                          color: '#ffffff'
-                        }}
-                        className="h-12"
-                        data-testid="button-preview-example"
-                      >
-                        Example Button
-                      </Button>
+                      {user.brandingColors && user.brandingColors.length > 0 && (
+                        <div className="flex flex-wrap gap-2 mb-4">
+                          {user.brandingColors.map((color: string, index: number) => (
+                            <div 
+                              key={index}
+                              className="w-12 h-12 rounded-lg border-2 border-border"
+                              style={{ backgroundColor: color }}
+                              title={color}
+                            />
+                          ))}
+                        </div>
+                      )}
+                      <div className="flex gap-2">
+                        {user.brandingColors?.slice(0, 3).map((color: string, index: number) => (
+                          <Button 
+                            key={index}
+                            style={{ 
+                              backgroundColor: color,
+                              color: '#ffffff'
+                            }}
+                            className="h-12"
+                            data-testid={`button-preview-${index}`}
+                          >
+                            Button {index + 1}
+                          </Button>
+                        ))}
+                      </div>
                     </div>
                   </div>
                 </CardContent>

@@ -23,7 +23,7 @@ The platform is built with a React 18 frontend using TypeScript and Wouter for r
 *   **Client Relationship Management (CRM):** Manages client and building records, offers autofill intelligence for project creation, and streamlines client-to-project workflows.
 *   **Scheduling & Resource Allocation:** Features a dual-calendar system with color-coding, drag-and-drop assignment, and conflict detection.
 *   **Safety & Compliance:** Digitizes harness inspections, toolbox meeting documentation, and gear inventory management.
-*   **Resident Portal & Communication:** Provides a complaint management system with two-way communication, a photo gallery with unit-specific tagging, and notification badges. Features secure resident linking via unique company codes.
+*   **Resident Portal & Communication:** Provides a complaint management system with two-way communication, a photo gallery with unit-specific tagging, and notification badges. Features secure resident linking via unique company codes. Includes white label branding system allowing companies to upload custom logos and add unlimited brand colors to customize the resident portal.
 *   **Financial Controls & Quoting:** Enables quote generation with labor cost calculations and tax computation, protected by strict permission-based access to financial data.
 *   **License Verification & Subscription Management:** Integrates with an external API for license key verification, enforces a read-only mode for unverified companies, and manages 30-day subscription renewals and seat purchasing.
 *   **SuperUser Administration:** Offers a centralized dashboard for company oversight, license status monitoring, and detailed company views with analytics.
