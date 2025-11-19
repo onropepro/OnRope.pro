@@ -1013,53 +1013,6 @@ export default function Profile() {
               </Card>
             </TabsContent>
           </Tabs>
-          
-          {/* License Key Update Dialog */}
-          <AlertDialog open={showLicenseDialog} onOpenChange={setShowLicenseDialog}>
-            <AlertDialogContent>
-              <AlertDialogHeader>
-                <AlertDialogTitle>Update License Key</AlertDialogTitle>
-                <AlertDialogDescription>
-                  Enter your new license key from the marketplace. This is required after upgrading your tier.
-                </AlertDialogDescription>
-              </AlertDialogHeader>
-              <div className="py-4">
-                <Label htmlFor="new-license-key">New License Key</Label>
-                <Input
-                  id="new-license-key"
-                  placeholder="Enter your new license key"
-                  value={newLicenseKey}
-                  onChange={(e) => setNewLicenseKey(e.target.value)}
-                  data-testid="input-new-license-key"
-                />
-              </div>
-              <AlertDialogFooter>
-                <AlertDialogCancel onClick={() => {
-                  setShowLicenseDialog(false);
-                  setNewLicenseKey("");
-                }}>
-                  Cancel
-                </AlertDialogCancel>
-                <AlertDialogAction
-                  onClick={() => {
-                    if (!newLicenseKey.trim()) {
-                      toast({ 
-                        title: "Error", 
-                        description: "Please enter a license key",
-                        variant: "destructive" 
-                      });
-                      return;
-                    }
-                    reverifyLicenseMutation.mutate(newLicenseKey.trim());
-                  }}
-                  disabled={reverifyLicenseMutation.isPending}
-                  data-testid="button-confirm-license-update"
-                >
-                  {reverifyLicenseMutation.isPending ? "Verifying..." : "Update License"}
-                </AlertDialogAction>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialog>
         ) : (
           <>
             {/* Non-company users - regular layout without tabs */}
@@ -1363,6 +1316,53 @@ export default function Profile() {
             <AlertDialogCancel data-testid="button-cancel-logout">Cancel</AlertDialogCancel>
             <AlertDialogAction onClick={confirmLogout} data-testid="button-confirm-logout">
               Logout
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* License Key Update Dialog */}
+      <AlertDialog open={showLicenseDialog} onOpenChange={setShowLicenseDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Update License Key</AlertDialogTitle>
+            <AlertDialogDescription>
+              Enter your new license key from the marketplace. This is required after upgrading your tier.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <div className="py-4">
+            <Label htmlFor="new-license-key">New License Key</Label>
+            <Input
+              id="new-license-key"
+              placeholder="Enter your new license key"
+              value={newLicenseKey}
+              onChange={(e) => setNewLicenseKey(e.target.value)}
+              data-testid="input-new-license-key"
+            />
+          </div>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => {
+              setShowLicenseDialog(false);
+              setNewLicenseKey("");
+            }}>
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => {
+                if (!newLicenseKey.trim()) {
+                  toast({ 
+                    title: "Error", 
+                    description: "Please enter a license key",
+                    variant: "destructive" 
+                  });
+                  return;
+                }
+                reverifyLicenseMutation.mutate(newLicenseKey.trim());
+              }}
+              disabled={reverifyLicenseMutation.isPending}
+              data-testid="button-confirm-license-update"
+            >
+              {reverifyLicenseMutation.isPending ? "Verifying..." : "Update License"}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
