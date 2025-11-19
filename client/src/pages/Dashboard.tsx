@@ -34,6 +34,7 @@ import { normalizeStrataPlan } from "@shared/schema";
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from "recharts";
 import { isManagement, hasFinancialAccess, canManageEmployees, canViewPerformance, hasPermission, isReadOnly, canViewSchedule } from "@/lib/permissions";
 import { DocumentUploader } from "@/components/DocumentUploader";
+import { RefreshButton } from "@/components/RefreshButton";
 import {
   DndContext,
   closestCenter,
@@ -1783,6 +1784,7 @@ export default function Dashboard() {
             </div>
           </div>
           <div className="flex items-center gap-3">
+            <RefreshButton />
             <Button variant="ghost" size="icon" data-testid="button-profile" onClick={() => setLocation("/profile")} className="hover-elevate w-12 h-12">
               <span className="material-icons text-2xl">person</span>
             </Button>

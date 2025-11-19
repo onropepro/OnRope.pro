@@ -14,6 +14,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
+import { RefreshButton } from "@/components/RefreshButton";
 import { useState } from "react";
 import { format } from "date-fns";
 
@@ -243,14 +244,17 @@ export default function Profile() {
             </Button>
             <h1 className="text-lg font-bold">Profile</h1>
           </div>
-          <Button
-            variant="ghost"
-            size="icon"
-            data-testid="button-logout"
-            onClick={() => setShowLogoutDialog(true)}
-          >
-            <span className="material-icons text-xl">logout</span>
-          </Button>
+          <div className="flex items-center gap-2">
+            <RefreshButton />
+            <Button
+              variant="ghost"
+              size="icon"
+              data-testid="button-logout"
+              onClick={() => setShowLogoutDialog(true)}
+            >
+              <span className="material-icons text-xl">logout</span>
+            </Button>
+          </div>
         </div>
       </header>
 
