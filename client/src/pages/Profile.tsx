@@ -15,7 +15,7 @@ import { z } from "zod";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { RefreshButton } from "@/components/RefreshButton";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { format } from "date-fns";
 
 const profileSchema = z.object({
@@ -75,6 +75,19 @@ export default function Profile() {
     queryKey: ["/api/companies", user?.companyId],
     enabled: !!user?.companyId && user?.role === "resident",
   });
+
+  // Auto-refresh data when user returns from external pages (e.g., cancellation page)
+  useEffect(() => {
+    const handleFocus = () => {
+      // Refresh all relevant data when window gains focus
+      queryClient.invalidateQueries({ queryKey: ["/api/user"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/employees/all"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/projects"] });
+    };
+
+    window.addEventListener('focus', handleFocus);
+    return () => window.removeEventListener('focus', handleFocus);
+  }, []);
 
   const profileForm = useForm<ProfileFormData>({
     resolver: zodResolver(profileSchema),
@@ -871,8 +884,9 @@ export default function Profile() {
                           onClick={() => {
                             const email = encodeURIComponent(user?.email || '');
                             const licenseKey = encodeURIComponent(user?.licenseKey || '');
-                            const url = `https://ram-website-paquettetom.replit.app/cancel-subscription?email=${email}&licenseKey=${licenseKey}`;
-                            window.open(url, '_blank');
+                            const returnUrl = encodeURIComponent(`${window.location.origin}/profile`);
+                            const url = `https://ram-website-paquettetom.replit.app/cancel-subscription?email=${email}&licenseKey=${licenseKey}&returnUrl=${returnUrl}`;
+                            window.location.href = url;
                           }}
                         >
                           <span className="material-icons mr-2">cancel</span>
