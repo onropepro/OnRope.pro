@@ -869,11 +869,10 @@ export default function Profile() {
                           className="w-full h-12"
                           data-testid="button-cancel-subscription"
                           onClick={() => {
-                            const params = new URLSearchParams({
-                              email: user?.email || '',
-                              licenseKey: user?.licenseKey || '',
-                            });
-                            window.open(`https://ram-website-paquettetom.replit.app/cancel-subscription?${params.toString()}`, '_blank');
+                            const email = encodeURIComponent(user?.email || '');
+                            const licenseKey = encodeURIComponent(user?.licenseKey || '');
+                            const url = `https://ram-website-paquettetom.replit.app/cancel-subscription?email=${email}&licenseKey=${licenseKey}`;
+                            window.open(url, '_blank');
                           }}
                         >
                           <span className="material-icons mr-2">cancel</span>
