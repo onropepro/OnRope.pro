@@ -435,9 +435,10 @@ export default function Dashboard() {
   });
 
   // Fetch all clients
-  const { data: clientsData, isLoading: clientsLoading } = useQuery<Client[]>({
+  const { data: clientsResponse, isLoading: clientsLoading } = useQuery<{ clients: Client[] }>({
     queryKey: ["/api/clients"],
   });
+  const clientsData = clientsResponse?.clients || [];
 
   // Fetch custom job types
   const { data: customJobTypesData } = useQuery<{ customJobTypes: { id: string; jobTypeName: string }[] }>({
