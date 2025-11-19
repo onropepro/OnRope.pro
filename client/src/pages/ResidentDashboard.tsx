@@ -94,12 +94,12 @@ export default function ResidentDashboard() {
   });
 
   const branding = brandingData || {};
-  const brandColors = branding.colors || [];
+  const brandColors = (branding.subscriptionActive && branding.colors) ? branding.colors : [];
   const primaryColor = brandColors[0] || null;
   const secondaryColor = brandColors[1] || brandColors[0] || null;
   const tertiaryColor = brandColors[2] || brandColors[1] || brandColors[0] || null;
   const quaternaryColor = brandColors[3] || brandColors[2] || brandColors[1] || brandColors[0] || null;
-  const hasCustomBranding = !!(branding.logoUrl || (branding.colors && branding.colors.length > 0));
+  const hasCustomBranding = !!(branding.subscriptionActive && (branding.logoUrl || (branding.colors && branding.colors.length > 0)));
 
   // Fetch resident's complaints
   const { data: complaintsData } = useQuery({

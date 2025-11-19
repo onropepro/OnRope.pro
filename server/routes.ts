@@ -818,6 +818,117 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
+  // Initiate branding subscription purchase (requires company role)
+  app.post("/api/purchase/branding", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      
+      if (!currentUser || currentUser.role !== 'company') {
+        return res.status(403).json({ message: "Only company owners can purchase branding subscription" });
+      }
+      
+      const purchaseApiKey = process.env.PURCHASE_API_KEY;
+      
+      if (!purchaseApiKey) {
+        console.error("[Purchase] PURCHASE_API_KEY not configured");
+        return res.status(500).json({ message: "Purchase service not configured" });
+      }
+      
+      // Call the external marketplace API to initiate branding subscription purchase
+      const marketplaceUrl = 'https://ram-website-paquettetom.replit.app/api/purchase/branding';
+      const returnUrl = `${req.protocol}://${req.get('host')}/profile`;
+      
+      console.log(`[Purchase] Initiating branding subscription for ${currentUser.email}`);
+      
+      const purchaseResponse = await fetch(marketplaceUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': purchaseApiKey,
+        },
+        body: JSON.stringify({
+          email: currentUser.email,
+          companyName: currentUser.companyName,
+          returnUrl,
+        })
+      });
+      
+      if (!purchaseResponse.ok) {
+        const errorText = await purchaseResponse.text();
+        console.error("[Purchase] Marketplace API error:", errorText);
+        return res.status(purchaseResponse.status).json({ 
+          message: "Purchase initiation failed" 
+        });
+      }
+      
+      const result = await purchaseResponse.json();
+      
+      console.log("[Purchase] Branding subscription purchase initiated successfully:", result);
+      
+      return res.json({
+        checkoutUrl: result.checkoutUrl,
+      });
+    } catch (error) {
+      console.error("[Purchase] Error initiating branding subscription:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+  
+  // Update branding subscription status after purchase (called by marketplace)
+  app.post("/api/purchase/activate-branding", async (req: Request, res: Response) => {
+    try {
+      // Verify API key for security
+      const apiKey = req.headers['x-api-key'] as string;
+      const expectedApiKey = process.env.PURCHASE_API_KEY;
+      
+      if (!expectedApiKey) {
+        console.error("[Purchase] PURCHASE_API_KEY not configured");
+        return res.status(500).json({ message: "Purchase service not configured" });
+      }
+      
+      if (!apiKey || apiKey !== expectedApiKey) {
+        console.error("[Purchase] Invalid API key provided");
+        return res.status(401).json({ message: "Unauthorized" });
+      }
+      
+      const { email } = req.body;
+      
+      if (!email) {
+        return res.status(400).json({ 
+          message: "Email is required" 
+        });
+      }
+      
+      // Look up user by email
+      const user = await storage.getUserByEmail(email);
+      
+      if (!user || user.role !== 'company') {
+        return res.status(404).json({ 
+          message: "No company account found with this email" 
+        });
+      }
+      
+      // Activate branding subscription
+      await storage.updateUser(user.id, {
+        brandingSubscriptionActive: true,
+      });
+      
+      console.log(`[Purchase] Branding subscription activated for ${user.companyName} (${email})`);
+      
+      return res.json({
+        success: true,
+        companyId: user.id,
+        companyName: user.companyName,
+        email: user.email,
+        brandingActive: true,
+        message: `Branding subscription activated for ${user.companyName}`,
+      });
+    } catch (error) {
+      console.error("[Purchase] Error activating branding subscription:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+  
   // Registration endpoint
   app.post("/api/register", async (req: Request, res: Response) => {
     try {
@@ -2130,10 +2241,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // Return branding info (public, safe to expose)
+      // Only return branding details if subscription is active
       res.json({
-        logoUrl: company.brandingLogoUrl,
-        colors: company.brandingColors || [],
-        companyName: company.companyName
+        logoUrl: company.brandingSubscriptionActive ? company.brandingLogoUrl : null,
+        colors: company.brandingSubscriptionActive ? (company.brandingColors || []) : [],
+        companyName: company.companyName,
+        subscriptionActive: company.brandingSubscriptionActive || false,
       });
     } catch (error) {
       console.error("Error fetching company branding:", error);

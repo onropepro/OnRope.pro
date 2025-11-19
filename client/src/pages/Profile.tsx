@@ -1196,6 +1196,67 @@ export default function Profile() {
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-6">
+                  {/* Subscription Gate */}
+                  {!user.brandingSubscriptionActive && (
+                    <div className="p-6 border-2 border-dashed rounded-lg bg-muted/30">
+                      <div className="text-center space-y-4">
+                        <span className="material-icons text-5xl text-muted-foreground">palette</span>
+                        <div>
+                          <h3 className="font-semibold text-lg mb-2">White Label Branding Subscription</h3>
+                          <p className="text-sm text-muted-foreground mb-4">
+                            Customize the resident portal with your company's logo and brand colors for just <strong className="text-foreground">$0.49/month</strong>
+                          </p>
+                          <ul className="text-sm text-muted-foreground space-y-2 mb-6 text-left max-w-md mx-auto">
+                            <li className="flex items-start gap-2">
+                              <span className="material-icons text-sm mt-0.5 text-primary">check_circle</span>
+                              <span>Upload custom company logo</span>
+                            </li>
+                            <li className="flex items-start gap-2">
+                              <span className="material-icons text-sm mt-0.5 text-primary">check_circle</span>
+                              <span>Choose unlimited brand colors</span>
+                            </li>
+                            <li className="flex items-start gap-2">
+                              <span className="material-icons text-sm mt-0.5 text-primary">check_circle</span>
+                              <span>Fully branded resident portal experience</span>
+                            </li>
+                            <li className="flex items-start gap-2">
+                              <span className="material-icons text-sm mt-0.5 text-primary">check_circle</span>
+                              <span>Professional appearance for your residents</span>
+                            </li>
+                          </ul>
+                        </div>
+                        <Button
+                          size="lg"
+                          className="h-12 min-w-[200px]"
+                          data-testid="button-subscribe-branding"
+                          onClick={async () => {
+                            try {
+                              const response = await apiRequest('POST', '/api/purchase/branding', {});
+                              if (response.checkoutUrl) {
+                                window.location.href = response.checkoutUrl;
+                              }
+                            } catch (error) {
+                              toast({
+                                title: "Error",
+                                description: "Failed to initiate subscription purchase",
+                                variant: "destructive"
+                              });
+                            }
+                          }}
+                        >
+                          <span className="material-icons mr-2">shopping_cart</span>
+                          Subscribe for $0.49/month
+                        </Button>
+                        <p className="text-xs text-muted-foreground">
+                          Secure payment powered by Stripe. Cancel anytime.
+                        </p>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Branding Controls - Only shown if subscribed */}
+                  {user.brandingSubscriptionActive && (
+                    <>
                   {/* Logo Upload */}
                   <div className="space-y-3">
                     <Label className="text-sm font-medium">Company Logo</Label>
@@ -1319,6 +1380,8 @@ export default function Profile() {
                       </div>
                     </div>
                   </div>
+                  </>
+                  )}
                 </CardContent>
               </Card>
             </TabsContent>

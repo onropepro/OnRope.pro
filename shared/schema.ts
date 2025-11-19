@@ -103,6 +103,7 @@ export const users = pgTable("users", {
   // White label branding (company role only)
   brandingLogoUrl: text("branding_logo_url"), // Custom logo URL for resident portal
   brandingColors: text("branding_colors").array().default(sql`ARRAY[]::text[]`), // Array of brand colors (hex codes)
+  brandingSubscriptionActive: boolean("branding_subscription_active").default(false), // Whether company has active branding subscription ($0.49)
   
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
