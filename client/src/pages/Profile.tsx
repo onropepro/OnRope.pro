@@ -165,6 +165,7 @@ export default function Profile() {
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [showLogoutDialog, setShowLogoutDialog] = useState(false);
   const [deletePassword, setDeletePassword] = useState("");
+  const [isPurchasingBranding, setIsPurchasingBranding] = useState(false);
 
   const { data: userData, isLoading } = useQuery<{ user: any }>({
     queryKey: ["/api/user"],
@@ -1229,23 +1230,42 @@ export default function Profile() {
                           size="lg"
                           className="h-12 min-w-[200px]"
                           data-testid="button-subscribe-branding"
+                          disabled={isPurchasingBranding}
                           onClick={async () => {
                             try {
+                              setIsPurchasingBranding(true);
+                              console.log('Initiating branding subscription purchase...');
                               const response = await apiRequest('POST', '/api/purchase/branding', {});
+                              console.log('Purchase response:', response);
                               if (response.checkoutUrl) {
+                                console.log('Redirecting to:', response.checkoutUrl);
                                 window.location.href = response.checkoutUrl;
+                              } else {
+                                console.error('No checkoutUrl in response:', response);
+                                throw new Error('No checkout URL received');
                               }
                             } catch (error) {
+                              console.error('Branding subscription error:', error);
+                              setIsPurchasingBranding(false);
                               toast({
                                 title: "Error",
-                                description: "Failed to initiate subscription purchase",
+                                description: error instanceof Error ? error.message : "Failed to initiate subscription purchase",
                                 variant: "destructive"
                               });
                             }
                           }}
                         >
-                          <span className="material-icons mr-2">shopping_cart</span>
-                          Subscribe for $0.49/month
+                          {isPurchasingBranding ? (
+                            <>
+                              <span className="material-icons mr-2 animate-spin">refresh</span>
+                              Processing...
+                            </>
+                          ) : (
+                            <>
+                              <span className="material-icons mr-2">shopping_cart</span>
+                              Subscribe for $0.49/month
+                            </>
+                          )}
                         </Button>
                         <p className="text-xs text-muted-foreground">
                           Secure payment powered by Stripe. Cancel anytime.
