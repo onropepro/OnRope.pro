@@ -885,11 +885,13 @@ export default function Profile() {
                   )}
 
                   {/* Upgrade Options */}
-                  {employeesData?.seatInfo && employeesData.seatInfo.tier < 4 && (
+                  {employeesData?.seatInfo && (
                     <>
                       <Separator />
                       <div className="space-y-3">
-                        <Label className="text-sm font-medium">Need more capacity?</Label>
+                        <Label className="text-sm font-medium">
+                          {employeesData.seatInfo.tier < 4 ? 'Need more capacity?' : 'Manage Your Subscription'}
+                        </Label>
                         <div className="flex flex-col gap-2">
                           <Button 
                             variant="default"
@@ -912,60 +914,62 @@ export default function Profile() {
                             }}
                           >
                             <span className="material-icons mr-2">upgrade</span>
-                            Upgrade Tier
+                            {employeesData.seatInfo.tier < 4 ? 'Upgrade Tier' : 'Change Tier'}
                           </Button>
-                          <div className="grid grid-cols-2 gap-2">
-                            <Button 
-                              variant="outline"
-                              className="h-12"
-                              data-testid="button-buy-seats"
-                              onClick={() => {
-                                if (!employeesData?.seatInfo) {
-                                  alert('Seat info not loaded. Please refresh the page.');
-                                  return;
-                                }
-                                
-                                const email = encodeURIComponent(user?.email || '');
-                                const licenseKey = encodeURIComponent(user?.licenseKey || '');
-                                const tier = employeesData.seatInfo.tier.toString();
-                                const currentSeats = employeesData.seatInfo.seatLimit.toString();
-                                const seatsUsed = employeesData.seatInfo.seatsUsed.toString();
-                                const returnUrl = encodeURIComponent(`${window.location.origin}/profile?purchased=true`);
-                                const url = `https://ram-website-paquettetom.replit.app/purchase-seats?email=${email}&licenseKey=${licenseKey}&tier=${tier}&currentSeats=${currentSeats}&seatsUsed=${seatsUsed}&returnUrl=${returnUrl}`;
-                                
-                                console.log('[Seat Purchase] Opening:', url);
-                                window.location.href = url;
-                              }}
-                            >
-                              <span className="material-icons mr-2">add_shopping_cart</span>
-                              Add more seats
-                            </Button>
-                            <Button 
-                              variant="outline"
-                              className="h-12"
-                              data-testid="button-buy-projects"
-                              onClick={() => {
-                                if (!projectsData?.projectInfo) {
-                                  alert('Project info not loaded. Please refresh the page.');
-                                  return;
-                                }
-                                
-                                const email = encodeURIComponent(user?.email || '');
-                                const licenseKey = encodeURIComponent(user?.licenseKey || '');
-                                const tier = projectsData.projectInfo.tier.toString();
-                                const currentProjects = projectsData.projectInfo.projectLimit.toString();
-                                const projectsUsed = projectsData.projectInfo.projectsUsed.toString();
-                                const returnUrl = encodeURIComponent(`${window.location.origin}/profile?purchased=true`);
-                                const url = `https://ram-website-paquettetom.replit.app/purchase-projects?email=${email}&licenseKey=${licenseKey}&tier=${tier}&currentProjects=${currentProjects}&projectsUsed=${projectsUsed}&returnUrl=${returnUrl}`;
-                                
-                                console.log('[Project Purchase] Opening:', url);
-                                window.location.href = url;
-                              }}
-                            >
-                              <span className="material-icons mr-2">add_shopping_cart</span>
-                              Add more projects
-                            </Button>
-                          </div>
+                          {employeesData.seatInfo.tier < 4 && (
+                            <div className="grid grid-cols-2 gap-2">
+                              <Button 
+                                variant="outline"
+                                className="h-12"
+                                data-testid="button-buy-seats"
+                                onClick={() => {
+                                  if (!employeesData?.seatInfo) {
+                                    alert('Seat info not loaded. Please refresh the page.');
+                                    return;
+                                  }
+                                  
+                                  const email = encodeURIComponent(user?.email || '');
+                                  const licenseKey = encodeURIComponent(user?.licenseKey || '');
+                                  const tier = employeesData.seatInfo.tier.toString();
+                                  const currentSeats = employeesData.seatInfo.seatLimit.toString();
+                                  const seatsUsed = employeesData.seatInfo.seatsUsed.toString();
+                                  const returnUrl = encodeURIComponent(`${window.location.origin}/profile?purchased=true`);
+                                  const url = `https://ram-website-paquettetom.replit.app/purchase-seats?email=${email}&licenseKey=${licenseKey}&tier=${tier}&currentSeats=${currentSeats}&seatsUsed=${seatsUsed}&returnUrl=${returnUrl}`;
+                                  
+                                  console.log('[Seat Purchase] Opening:', url);
+                                  window.location.href = url;
+                                }}
+                              >
+                                <span className="material-icons mr-2">add_shopping_cart</span>
+                                Add more seats
+                              </Button>
+                              <Button 
+                                variant="outline"
+                                className="h-12"
+                                data-testid="button-buy-projects"
+                                onClick={() => {
+                                  if (!projectsData?.projectInfo) {
+                                    alert('Project info not loaded. Please refresh the page.');
+                                    return;
+                                  }
+                                  
+                                  const email = encodeURIComponent(user?.email || '');
+                                  const licenseKey = encodeURIComponent(user?.licenseKey || '');
+                                  const tier = projectsData.projectInfo.tier.toString();
+                                  const currentProjects = projectsData.projectInfo.projectLimit.toString();
+                                  const projectsUsed = projectsData.projectInfo.projectsUsed.toString();
+                                  const returnUrl = encodeURIComponent(`${window.location.origin}/profile?purchased=true`);
+                                  const url = `https://ram-website-paquettetom.replit.app/purchase-projects?email=${email}&licenseKey=${licenseKey}&tier=${tier}&currentProjects=${currentProjects}&projectsUsed=${projectsUsed}&returnUrl=${returnUrl}`;
+                                  
+                                  console.log('[Project Purchase] Opening:', url);
+                                  window.location.href = url;
+                                }}
+                              >
+                                <span className="material-icons mr-2">add_shopping_cart</span>
+                                Add more projects
+                              </Button>
+                            </div>
+                          )}
                         </div>
                       </div>
                     </>
