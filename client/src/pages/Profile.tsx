@@ -97,13 +97,24 @@ export default function Profile() {
 
   // Auto-refresh data when user returns from external pages (e.g., cancellation page)
   useEffect(() => {
+    if (!user?.licenseKey) return;
+
     // Check if returning from cancellation page
     const urlParams = new URLSearchParams(window.location.search);
     const fromCancellation = urlParams.has('canceled') || document.referrer.includes('cancel-subscription');
     
-    if (fromCancellation && user?.licenseKey) {
+    if (fromCancellation) {
+      // Show toast immediately
+      toast({ 
+        title: "Updating subscription data...", 
+        description: "Please wait while we refresh your subscription details." 
+      });
+      
       // Trigger re-verification immediately
-      reverifyLicenseMutation.mutate();
+      setTimeout(() => {
+        reverifyLicenseMutation.mutate();
+      }, 500);
+      
       // Clean up URL
       window.history.replaceState({}, '', '/profile');
     }
