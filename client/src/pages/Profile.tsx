@@ -899,6 +899,29 @@ export default function Profile() {
                               variant="outline"
                               className="h-12"
                               data-testid="button-buy-projects"
+                              onClick={() => {
+                                if (!projectsData?.projectInfo) {
+                                  alert('Project info not loaded. Please refresh the page.');
+                                  return;
+                                }
+                                
+                                const params = new URLSearchParams({
+                                  email: user?.email || '',
+                                  tier: projectsData.projectInfo.tier.toString(),
+                                  currentProjects: projectsData.projectInfo.projectLimit.toString(),
+                                  projectsUsed: projectsData.projectInfo.projectsUsed.toString()
+                                });
+                                const url = `https://ram-website-paquettetom.replit.app/purchase-projects?${params.toString()}`;
+                                
+                                // Debug: Show URL before opening
+                                const debugInfo = `Opening:\n${url}\n\nEmail: ${user?.email}\nTier: ${projectsData.projectInfo.tier}\nProjects: ${projectsData.projectInfo.projectLimit}\nUsed: ${projectsData.projectInfo.projectsUsed}`;
+                                console.log('[Project Purchase]', debugInfo);
+                                
+                                const newWindow = window.open(url, '_blank');
+                                if (!newWindow) {
+                                  alert('Pop-up blocked! URL:\n' + url);
+                                }
+                              }}
                             >
                               <span className="material-icons mr-2">add_shopping_cart</span>
                               Add more projects
