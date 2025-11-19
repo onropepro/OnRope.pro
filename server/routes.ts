@@ -103,6 +103,17 @@ async function calculateOvertimeHours(
   const overtimeTrigger = payrollConfig.overtimeTriggerType || 'daily';
   const doubleTimeTrigger = payrollConfig.doubleTimeTriggerType || 'daily';
   
+  // If overtime is disabled (set to "none"), all hours are regular
+  if (overtimeTrigger === 'none') {
+    console.log(`[OVERTIME CALC] Overtime disabled for company ${companyId}. All hours are regular.`);
+    return {
+      regularHours: parseFloat(totalHours.toFixed(2)),
+      overtimeHours: 0,
+      doubleTimeHours: 0,
+      totalHours: parseFloat(totalHours.toFixed(2))
+    };
+  }
+  
   let applicableHours = totalHours;
   
   // If weekly triggers are used, calculate total hours for the week
@@ -144,8 +155,8 @@ async function calculateOvertimeHours(
   if (applicableHours <= overtimeThreshold) {
     // All regular time
     regularHours = totalHours;
-  } else if (applicableHours <= doubleTimeThreshold) {
-    // Mix of regular and overtime
+  } else if (doubleTimeTrigger === 'none' || applicableHours <= doubleTimeThreshold) {
+    // Mix of regular and overtime (no double time or not reached double time threshold)
     const hoursIntoOvertime = applicableHours - overtimeThreshold;
     if (totalHours <= hoursIntoOvertime) {
       // This entire session is overtime

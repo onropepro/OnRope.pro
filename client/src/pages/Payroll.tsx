@@ -1222,6 +1222,7 @@ export default function Payroll() {
                           <SelectValue placeholder="Select trigger type" />
                         </SelectTrigger>
                         <SelectContent>
+                          <SelectItem value="none">None (No Overtime)</SelectItem>
                           <SelectItem value="daily">Per Day</SelectItem>
                           <SelectItem value="weekly">Per Week</SelectItem>
                         </SelectContent>
@@ -1229,7 +1230,7 @@ export default function Payroll() {
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="overtime-hours-threshold">
-                        {overtimeTriggerType === 'daily' ? 'Triggers After (Hours/Day)' : 'Triggers After (Hours/Week)'}
+                        {overtimeTriggerType === 'daily' ? 'Triggers After (Hours/Day)' : overtimeTriggerType === 'weekly' ? 'Triggers After (Hours/Week)' : 'Not Applicable'}
                       </Label>
                       <Input
                         id="overtime-hours-threshold"
@@ -1237,6 +1238,7 @@ export default function Payroll() {
                         min="0"
                         max="168"
                         step="0.5"
+                        disabled={overtimeTriggerType === 'none'}
                         value={overtimeHoursThreshold}
                         onChange={(e) => setOvertimeHoursThreshold(e.target.value)}
                         data-testid="input-overtime-hours-threshold"
@@ -1253,12 +1255,13 @@ export default function Payroll() {
                         min="0"
                         max="10"
                         step="0.1"
+                        disabled={overtimeTriggerType === 'none'}
                         value={overtimeMultiplier}
                         onChange={(e) => setOvertimeMultiplier(e.target.value)}
                         data-testid="input-overtime-multiplier"
                       />
                       <p className="text-sm text-muted-foreground">
-                        e.g., 1.5 for time-and-a-half
+                        {overtimeTriggerType === 'none' ? 'Not applicable' : 'e.g., 1.5 for time-and-a-half'}
                       </p>
                     </div>
                   </div>
@@ -1275,6 +1278,7 @@ export default function Payroll() {
                           <SelectValue placeholder="Select trigger type" />
                         </SelectTrigger>
                         <SelectContent>
+                          <SelectItem value="none">None (No Double Time)</SelectItem>
                           <SelectItem value="daily">Per Day</SelectItem>
                           <SelectItem value="weekly">Per Week</SelectItem>
                         </SelectContent>
@@ -1282,7 +1286,7 @@ export default function Payroll() {
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="double-time-hours-threshold">
-                        {doubleTimeTriggerType === 'daily' ? 'Triggers After (Hours/Day)' : 'Triggers After (Hours/Week)'}
+                        {doubleTimeTriggerType === 'daily' ? 'Triggers After (Hours/Day)' : doubleTimeTriggerType === 'weekly' ? 'Triggers After (Hours/Week)' : 'Not Applicable'}
                       </Label>
                       <Input
                         id="double-time-hours-threshold"
@@ -1290,12 +1294,13 @@ export default function Payroll() {
                         min="0"
                         max="168"
                         step="0.5"
+                        disabled={doubleTimeTriggerType === 'none'}
                         value={doubleTimeHoursThreshold}
                         onChange={(e) => setDoubleTimeHoursThreshold(e.target.value)}
                         data-testid="input-double-time-hours-threshold"
                       />
                       <p className="text-sm text-muted-foreground">
-                        {doubleTimeTriggerType === 'daily' ? 'e.g., after 12 hours/day' : 'e.g., after 60 hours/week'}
+                        {doubleTimeTriggerType === 'none' ? 'Not applicable' : doubleTimeTriggerType === 'daily' ? 'e.g., after 12 hours/day' : 'e.g., after 60 hours/week'}
                       </p>
                     </div>
                     <div className="space-y-2">
@@ -1306,12 +1311,13 @@ export default function Payroll() {
                         min="0"
                         max="10"
                         step="0.1"
+                        disabled={doubleTimeTriggerType === 'none'}
                         value={doubleTimeMultiplier}
                         onChange={(e) => setDoubleTimeMultiplier(e.target.value)}
                         data-testid="input-double-time-multiplier"
                       />
                       <p className="text-sm text-muted-foreground">
-                        e.g., 2.0 for double time
+                        {doubleTimeTriggerType === 'none' ? 'Not applicable' : 'e.g., 2.0 for double time'}
                       </p>
                     </div>
                   </div>
