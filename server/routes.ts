@@ -830,7 +830,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       // Check if user has been terminated
-      if (user.terminationDate) {
+      if (user.terminatedDate) {
         return res.status(403).json({ message: "Your employment has been terminated. Please contact your administrator for more information." });
       }
       
