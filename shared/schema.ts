@@ -100,6 +100,11 @@ export const users = pgTable("users", {
   // Resident linking code (company role only)
   residentCode: varchar("resident_code", { length: 10 }).unique(), // 10-character code for residents to link to company - UNIQUE (~50 bits entropy)
   
+  // White label branding (company role only)
+  brandingLogoUrl: text("branding_logo_url"), // Custom logo URL for resident portal
+  brandingPrimaryColor: varchar("branding_primary_color"), // Primary brand color (hex code)
+  brandingSecondaryColor: varchar("branding_secondary_color"), // Secondary brand color (hex code)
+  
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
