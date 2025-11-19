@@ -1,12 +1,11 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Html5Qrcode } from 'html5-qrcode';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { X, Upload, Camera } from 'lucide-react';
+import { X, Camera } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useMutation } from '@tanstack/react-query';
 import { queryClient } from '@/lib/queryClient';
-import { Input } from '@/components/ui/input';
 
 interface QRCodeScannerProps {
   onClose: () => void;
@@ -14,8 +13,8 @@ interface QRCodeScannerProps {
 
 export function QRCodeScanner({ onClose }: QRCodeScannerProps) {
   const [error, setError] = useState<string | null>(null);
-  const [isProcessing, setIsProcessing] = useState(false);
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [isScanning, setIsScanning] = useState(false);
+  const scannerRef = useRef<Html5Qrcode | null>(null);
   const { toast } = useToast();
 
   const linkCodeMutation = useMutation({
@@ -39,6 +38,7 @@ export function QRCodeScanner({ onClose }: QRCodeScannerProps) {
       });
       queryClient.invalidateQueries({ queryKey: ['/api/user'] });
       queryClient.invalidateQueries({ queryKey: ['/api/projects'] });
+      stopScanning();
       onClose();
     },
     onError: (error: Error) => {
@@ -48,49 +48,96 @@ export function QRCodeScanner({ onClose }: QRCodeScannerProps) {
         variant: "destructive",
       });
       setError(error.message);
-      setIsProcessing(false);
     },
   });
 
-  const handleFileSelect = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
-
+  const startScanning = async () => {
+    if (isScanning) return;
+    
     setError(null);
-    setIsProcessing(true);
-
+    
     try {
-      const html5QrCode = new Html5Qrcode("qr-reader-hidden");
-      const decodedText = await html5QrCode.scanFile(file, true);
-      
-      console.log("QR Code detected:", decodedText);
-      
-      // Check if this is a valid link
-      try {
-        const url = new URL(decodedText);
-        const code = url.searchParams.get('code');
-        
-        if (code && code.length === 10) {
-          // Valid company code found
-          toast({
-            title: "Code detected!",
-            description: "Linking your account...",
-          });
-          linkCodeMutation.mutate(code.toUpperCase());
-        } else {
-          setError("Invalid QR code - no company code found");
-          setIsProcessing(false);
+      const scanner = new Html5Qrcode("qr-reader");
+      scannerRef.current = scanner;
+
+      const config = { 
+        fps: 10, 
+        qrbox: { width: 250, height: 250 },
+        aspectRatio: 1.0
+      };
+
+      await scanner.start(
+        { facingMode: "environment" },  // Use rear camera
+        config,
+        (decodedText) => {
+          console.log("QR Code detected:", decodedText);
+          
+          // Check if this is a valid link
+          try {
+            const url = new URL(decodedText);
+            const code = url.searchParams.get('code');
+            
+            if (code && code.length === 10) {
+              // Valid company code found
+              toast({
+                title: "Code detected!",
+                description: "Linking your account...",
+              });
+              linkCodeMutation.mutate(code.toUpperCase());
+            } else {
+              setError("Invalid QR code - no company code found");
+            }
+          } catch (e) {
+            setError("This QR code is not a valid company link");
+          }
+        },
+        (errorMessage) => {
+          // Scanning errors are normal while searching for QR code
+          // Only log non-"NotFoundException" errors
+          if (!errorMessage.includes("NotFoundException")) {
+            console.warn("Scan warning:", errorMessage);
+          }
         }
-      } catch (e) {
-        setError("This QR code is not a valid company link");
-        setIsProcessing(false);
-      }
+      );
+
+      setIsScanning(true);
     } catch (err: any) {
-      console.error("QR scan error:", err);
-      setError("Could not read QR code from image. Please try again with a clearer photo.");
-      setIsProcessing(false);
+      console.error("Camera error:", err);
+      let errorMsg = "Failed to access camera. ";
+      
+      if (err.message?.includes("NotAllowedError") || err.message?.includes("Permission")) {
+        errorMsg += "Please allow camera access in your browser settings.";
+      } else if (err.message?.includes("NotFoundError")) {
+        errorMsg += "No camera found on your device.";
+      } else if (err.message?.includes("NotReadableError")) {
+        errorMsg += "Camera is already in use by another application.";
+      } else {
+        errorMsg += err.message || "Unknown error.";
+      }
+      
+      setError(errorMsg);
+      setIsScanning(false);
     }
   };
+
+  const stopScanning = async () => {
+    if (scannerRef.current && isScanning) {
+      try {
+        await scannerRef.current.stop();
+        scannerRef.current.clear();
+      } catch (err) {
+        console.error("Error stopping scanner:", err);
+      }
+    }
+    setIsScanning(false);
+    scannerRef.current = null;
+  };
+
+  useEffect(() => {
+    return () => {
+      stopScanning();
+    };
+  }, []);
 
   return (
     <Card className="w-full max-w-md mx-auto">
@@ -99,13 +146,16 @@ export function QRCodeScanner({ onClose }: QRCodeScannerProps) {
           <div>
             <CardTitle>Scan Company QR Code</CardTitle>
             <CardDescription>
-              Take a photo of the QR code or select from your gallery
+              Point your camera at the QR code to link your account
             </CardDescription>
           </div>
           <Button
             variant="ghost"
             size="icon"
-            onClick={onClose}
+            onClick={() => {
+              stopScanning();
+              onClose();
+            }}
             data-testid="button-close-scanner"
           >
             <X className="h-4 w-4" />
@@ -116,69 +166,61 @@ export function QRCodeScanner({ onClose }: QRCodeScannerProps) {
         {error && (
           <div className="p-4 bg-destructive/10 border border-destructive/20 rounded-lg">
             <p className="text-sm text-destructive">{error}</p>
+            {!isScanning && (
+              <Button
+                onClick={() => {
+                  setError(null);
+                  startScanning();
+                }}
+                variant="outline"
+                className="mt-3 w-full"
+                data-testid="button-retry-camera"
+              >
+                Try Again
+              </Button>
+            )}
           </div>
         )}
 
-        <div className="space-y-3">
-          <p className="text-sm text-muted-foreground text-center">
-            Use your camera to take a photo of the QR code shown on the employee's device
-          </p>
-          
-          <Input
-            ref={fileInputRef}
-            type="file"
-            accept="image/*"
-            capture="environment"
-            onChange={handleFileSelect}
-            className="hidden"
-            data-testid="input-qr-file"
-          />
-          
+        {!isScanning && !linkCodeMutation.isPending && (
           <Button
-            onClick={() => fileInputRef.current?.click()}
+            onClick={startScanning}
             className="w-full h-14"
-            disabled={isProcessing || linkCodeMutation.isPending}
-            data-testid="button-upload-qr"
+            data-testid="button-start-camera"
           >
             <Camera className="mr-2 h-5 w-5" />
-            {isProcessing ? "Processing..." : "Take Photo of QR Code"}
+            Start Camera
           </Button>
+        )}
 
-          <div className="relative">
-            <div className="absolute inset-0 flex items-center">
-              <span className="w-full border-t" />
-            </div>
-            <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-card px-2 text-muted-foreground">Or select image</span>
-            </div>
-          </div>
+        <div
+          id="qr-reader"
+          className={`${isScanning ? 'block' : 'hidden'} w-full`}
+          style={{ minHeight: isScanning ? '300px' : '0' }}
+          data-testid="qr-reader-container"
+        />
 
-          <Button
-            onClick={() => {
-              if (fileInputRef.current) {
-                fileInputRef.current.removeAttribute('capture');
-                fileInputRef.current.click();
-              }
-            }}
-            variant="outline"
-            className="w-full h-14"
-            disabled={isProcessing || linkCodeMutation.isPending}
-            data-testid="button-select-qr"
-          >
-            <Upload className="mr-2 h-5 w-5" />
-            Choose from Gallery
-          </Button>
-        </div>
-
-        {(isProcessing || linkCodeMutation.isPending) && (
-          <div className="p-4 bg-primary/10 border border-primary/20 rounded-lg">
-            <p className="text-sm text-center">
-              {linkCodeMutation.isPending ? "Linking your account..." : "Reading QR code..."}
+        {isScanning && (
+          <div className="space-y-3">
+            <p className="text-sm text-center text-muted-foreground">
+              Position the QR code within the frame
             </p>
+            <Button
+              onClick={stopScanning}
+              variant="outline"
+              className="w-full"
+              data-testid="button-stop-camera"
+            >
+              Stop Camera
+            </Button>
           </div>
         )}
 
-        <div id="qr-reader-hidden" className="hidden" />
+        {linkCodeMutation.isPending && (
+          <div className="p-4 bg-primary/10 border border-primary/20 rounded-lg">
+            <p className="text-sm text-center">Linking your account...</p>
+          </div>
+        )}
       </CardContent>
     </Card>
   );
