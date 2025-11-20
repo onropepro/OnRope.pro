@@ -836,7 +836,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       // Call the marketplace API to initiate branding subscription purchase
-      const marketplaceUrl = 'https://ram-website-paquettetom.replit.app/api/purchase/branding';
+      const marketplaceUrl = 'https://marketplace.replit.app/api/purchase/branding';
       const returnUrl = `${req.protocol}://${req.get('host')}/profile`;
       
       console.log(`[Purchase] Initiating branding subscription for ${currentUser.email}`);
