@@ -1243,20 +1243,17 @@ export default function Profile() {
                               
                               const data = await res.json();
                               
-                              // Branding is activated immediately - reload user data
-                              await queryClient.invalidateQueries({ queryKey: ["/api/user"] });
-                              
-                              setIsPurchasingBranding(false);
-                              
-                              toast({
-                                title: "Success!",
-                                description: data.message || "White label branding activated successfully",
-                              });
+                              // Redirect to Stripe checkout
+                              if (data.checkoutUrl) {
+                                window.location.href = data.checkoutUrl;
+                              } else {
+                                throw new Error('No checkout URL received');
+                              }
                             } catch (error) {
                               setIsPurchasingBranding(false);
                               toast({
                                 title: "Error",
-                                description: error instanceof Error ? error.message : "Failed to purchase branding subscription",
+                                description: error instanceof Error ? error.message : "Failed to initiate branding subscription purchase",
                                 variant: "destructive"
                               });
                             }

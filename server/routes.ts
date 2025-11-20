@@ -835,10 +835,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(500).json({ message: "Purchase service not configured" });
       }
       
-      // Call the marketplace API to purchase branding subscription
+      // Call the marketplace API to initiate branding subscription purchase
       const marketplaceUrl = 'https://marketplace.replit.app/api/purchase/branding';
+      const returnUrl = `${req.protocol}://${req.get('host')}/profile`;
       
-      console.log(`[Purchase] Purchasing branding subscription for ${currentUser.email}`);
+      console.log(`[Purchase] Initiating branding subscription for ${currentUser.email}`);
       
       const purchaseResponse = await fetch(marketplaceUrl, {
         method: 'POST',
@@ -848,7 +849,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         },
         body: JSON.stringify({
           email: currentUser.email,
+          companyName: currentUser.companyName,
           licenseKey: currentUser.licenseKey,
+          returnUrl,
         })
       });
       
@@ -862,15 +865,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       const result = await purchaseResponse.json();
       
-      console.log("[Purchase] Branding subscription purchased successfully:", result);
+      if (!result.checkoutUrl) {
+        console.error("[Purchase] No checkout URL received from marketplace");
+        return res.status(500).json({ message: "Purchase initiation failed" });
+      }
       
-      // Branding is activated immediately by the marketplace calling our activation endpoint
+      console.log("[Purchase] Branding subscription purchase initiated, redirecting to checkout");
+      
+      // Return Stripe checkout URL for frontend to redirect user
       return res.json({
-        success: true,
-        message: result.message || "Branding subscription activated successfully",
+        checkoutUrl: result.checkoutUrl,
       });
     } catch (error) {
-      console.error("[Purchase] Error purchasing branding subscription:", error);
+      console.error("[Purchase] Error initiating branding subscription:", error);
       res.status(500).json({ message: "Internal server error" });
     }
   });
