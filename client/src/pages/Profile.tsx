@@ -166,6 +166,7 @@ export default function Profile() {
   const [showLogoutDialog, setShowLogoutDialog] = useState(false);
   const [deletePassword, setDeletePassword] = useState("");
   const [isPurchasingBranding, setIsPurchasingBranding] = useState(false);
+  const [showBrandingConfirmDialog, setShowBrandingConfirmDialog] = useState(false);
 
   const { data: userData, isLoading } = useQuery<{ user: any }>({
     queryKey: ["/api/user"],
@@ -1226,51 +1227,92 @@ export default function Profile() {
                             </li>
                           </ul>
                         </div>
-                        <Button
-                          size="lg"
-                          className="h-12 min-w-[200px]"
-                          data-testid="button-subscribe-branding"
-                          disabled={isPurchasingBranding}
-                          onClick={async () => {
-                            try {
-                              setIsPurchasingBranding(true);
-                              const res = await apiRequest('POST', '/api/purchase/branding', {});
-                              
-                              if (!res.ok) {
-                                const errorData = await res.json();
-                                throw new Error(errorData.message || 'Purchase failed');
-                              }
-                              
-                              const data = await res.json();
-                              
-                              // Redirect to Stripe checkout
-                              if (data.checkoutUrl) {
-                                window.location.href = data.checkoutUrl;
-                              } else {
-                                throw new Error('No checkout URL received');
-                              }
-                            } catch (error) {
-                              setIsPurchasingBranding(false);
-                              toast({
-                                title: "Error",
-                                description: error instanceof Error ? error.message : "Failed to initiate branding subscription purchase",
-                                variant: "destructive"
-                              });
-                            }
-                          }}
-                        >
-                          {isPurchasingBranding ? (
-                            <>
-                              <span className="material-icons mr-2 animate-spin">refresh</span>
-                              Processing...
-                            </>
-                          ) : (
-                            <>
-                              <span className="material-icons mr-2">shopping_cart</span>
-                              Subscribe for $0.49/month
-                            </>
-                          )}
-                        </Button>
+                        
+                        <AlertDialog open={showBrandingConfirmDialog} onOpenChange={setShowBrandingConfirmDialog}>
+                          <Button
+                            size="lg"
+                            className="h-12 min-w-[200px]"
+                            data-testid="button-subscribe-branding"
+                            disabled={isPurchasingBranding}
+                            onClick={() => setShowBrandingConfirmDialog(true)}
+                          >
+                            {isPurchasingBranding ? (
+                              <>
+                                <span className="material-icons mr-2 animate-spin">refresh</span>
+                                Processing...
+                              </>
+                            ) : (
+                              <>
+                                <span className="material-icons mr-2">shopping_cart</span>
+                                Subscribe for $0.49/month
+                              </>
+                            )}
+                          </Button>
+                          
+                          <AlertDialogContent>
+                            <AlertDialogHeader>
+                              <AlertDialogTitle>Subscribe to White Label Branding?</AlertDialogTitle>
+                              <AlertDialogDescription>
+                                You'll be charged <strong>$0.49/month</strong> for white label branding. This will allow you to:
+                                <ul className="mt-3 space-y-2 text-left">
+                                  <li className="flex items-start gap-2">
+                                    <span className="material-icons text-sm mt-0.5 text-primary">check_circle</span>
+                                    <span>Upload your custom company logo</span>
+                                  </li>
+                                  <li className="flex items-start gap-2">
+                                    <span className="material-icons text-sm mt-0.5 text-primary">check_circle</span>
+                                    <span>Choose unlimited brand colors</span>
+                                  </li>
+                                  <li className="flex items-start gap-2">
+                                    <span className="material-icons text-sm mt-0.5 text-primary">check_circle</span>
+                                    <span>Fully brand the resident portal</span>
+                                  </li>
+                                </ul>
+                                <p className="mt-4 text-sm">
+                                  You'll be redirected to Stripe to complete your payment securely. Cancel anytime.
+                                </p>
+                              </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                              <AlertDialogCancel data-testid="button-cancel-branding-dialog">Cancel</AlertDialogCancel>
+                              <AlertDialogAction
+                                data-testid="button-confirm-branding-subscribe"
+                                onClick={async (e) => {
+                                  e.preventDefault();
+                                  setShowBrandingConfirmDialog(false);
+                                  try {
+                                    setIsPurchasingBranding(true);
+                                    const res = await apiRequest('POST', '/api/purchase/branding', {});
+                                    
+                                    if (!res.ok) {
+                                      const errorData = await res.json();
+                                      throw new Error(errorData.message || 'Purchase failed');
+                                    }
+                                    
+                                    const data = await res.json();
+                                    
+                                    // Redirect to Stripe checkout
+                                    if (data.checkoutUrl) {
+                                      window.location.href = data.checkoutUrl;
+                                    } else {
+                                      throw new Error('No checkout URL received');
+                                    }
+                                  } catch (error) {
+                                    setIsPurchasingBranding(false);
+                                    toast({
+                                      title: "Error",
+                                      description: error instanceof Error ? error.message : "Failed to initiate branding subscription purchase",
+                                      variant: "destructive"
+                                    });
+                                  }
+                                }}
+                              >
+                                Continue to Stripe
+                              </AlertDialogAction>
+                            </AlertDialogFooter>
+                          </AlertDialogContent>
+                        </AlertDialog>
+                        
                         <p className="text-xs text-muted-foreground">
                           Secure payment powered by Stripe. Cancel anytime.
                         </p>
