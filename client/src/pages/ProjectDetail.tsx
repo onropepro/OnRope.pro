@@ -705,6 +705,7 @@ export default function ProjectDetail() {
                   completedDropsEast={completedDropsEast}
                   completedDropsSouth={completedDropsSouth}
                   completedDropsWest={completedDropsWest}
+                  customColors={["#3b82f6", "#10b981", "#f59e0b", "#ef4444"]}
                   className="mb-4"
                 />
 
