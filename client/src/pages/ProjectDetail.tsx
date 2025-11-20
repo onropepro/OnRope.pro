@@ -14,10 +14,11 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { HighRiseBuilding } from "@/components/HighRiseBuilding";
 import { VerticalBuildingProgress } from "@/components/VerticalBuildingProgress";
 import { ParkadeView } from "@/components/ParkadeView";
+import { SessionDetailsDialog } from "@/components/SessionDetailsDialog";
 import { useToast } from "@/hooks/use-toast";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { AlertCircle } from "lucide-react";
+import { AlertCircle, MapPin } from "lucide-react";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -1099,6 +1100,9 @@ export default function ProjectDetail() {
                                                                            (session.dropsCompletedSouth ?? 0) + (session.dropsCompletedWest ?? 0);
                                                       const metTarget = sessionDrops >= project.dailyDropTarget;
                                                       
+                                                      const hasLocation = (session.startLatitude && session.startLongitude) || 
+                                                                         (session.endLatitude && session.endLongitude);
+                                                      
                                                       return (
                                                         <div
                                                           key={session.id}
@@ -1106,9 +1110,14 @@ export default function ProjectDetail() {
                                                           className="flex items-center justify-between p-3 rounded-lg border bg-card cursor-pointer hover-elevate active-elevate-2"
                                                           data-testid={`session-${session.id}`}
                                                         >
-                                                          <p className="text-sm font-medium">
-                                                            {session.techName || "Unknown"} {session.techRole && `(${session.techRole.replace(/_/g, ' ')})`}
-                                                          </p>
+                                                          <div className="flex items-center gap-2">
+                                                            <p className="text-sm font-medium">
+                                                              {session.techName || "Unknown"} {session.techRole && `(${session.techRole.replace(/_/g, ' ')})`}
+                                                            </p>
+                                                            {hasLocation && (
+                                                              <MapPin className="h-4 w-4 text-primary" />
+                                                            )}
+                                                          </div>
                                                           {isCompleted ? (
                                                             <Badge variant={metTarget ? "default" : "destructive"} className="text-xs" data-testid={`badge-${metTarget ? "met" : "below"}-target`}>
                                                               {metTarget ? "Target Met" : "Below Target"}
@@ -2029,130 +2038,15 @@ export default function ProjectDetail() {
         </DialogContent>
       </Dialog>
 
-      {/* Work Session Details Dialog */}
-      <Dialog open={!!selectedSession} onOpenChange={() => setSelectedSession(null)}>
-        <DialogContent className="max-w-md">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <span className="material-icons">work_history</span>
-              Work Session Details
-            </DialogTitle>
-          </DialogHeader>
-          {selectedSession && (() => {
-            const sessionDate = new Date(selectedSession.workDate);
-            const isCompleted = selectedSession.endTime !== null;
-            const sessionDrops = (selectedSession.dropsCompletedNorth ?? 0) + 
-                                (selectedSession.dropsCompletedEast ?? 0) + 
-                                (selectedSession.dropsCompletedSouth ?? 0) + 
-                                (selectedSession.dropsCompletedWest ?? 0);
-            const metTarget = sessionDrops >= project.dailyDropTarget;
-            
-            let hoursWorked = 0;
-            let laborCost = 0;
-            if (isCompleted && selectedSession.startTime && selectedSession.endTime) {
-              const start = new Date(selectedSession.startTime);
-              const end = new Date(selectedSession.endTime);
-              hoursWorked = (end.getTime() - start.getTime()) / (1000 * 60 * 60);
-              
-              if (selectedSession.techHourlyRate) {
-                laborCost = hoursWorked * parseFloat(selectedSession.techHourlyRate);
-              }
-            }
-            
-            return (
-              <div className="space-y-4">
-                <div>
-                  <div className="text-sm font-medium text-muted-foreground">Date</div>
-                  <div className="text-base">{format(sessionDate, "EEEE, MMMM d, yyyy")}</div>
-                </div>
-                
-                <div>
-                  <div className="text-sm font-medium text-muted-foreground">Technician</div>
-                  <div className="text-base">{selectedSession.techName || "Unknown"}</div>
-                </div>
-                
-                <div>
-                  <div className="text-sm font-medium text-muted-foreground">Status</div>
-                  {isCompleted ? (
-                    <Badge variant={metTarget ? "default" : "destructive"}>
-                      {metTarget ? "Target Met" : "Below Target"}
-                    </Badge>
-                  ) : (
-                    <Badge variant="outline">In Progress</Badge>
-                  )}
-                </div>
-                
-                {isCompleted && (
-                  <>
-                    <div>
-                      <div className="text-sm font-medium text-muted-foreground">Time</div>
-                      <div className="text-base">
-                        {format(new Date(selectedSession.startTime), "h:mm a")} - {format(new Date(selectedSession.endTime), "h:mm a")}
-                      </div>
-                    </div>
-                    
-                    <div>
-                      <div className="text-sm font-medium text-muted-foreground">Drops Completed</div>
-                      <div className="text-base">
-                        {sessionDrops} / {project.dailyDropTarget} target
-                      </div>
-                      {(selectedSession.dropsCompletedNorth ?? 0) > 0 && (
-                        <div className="text-sm text-muted-foreground">North: {selectedSession.dropsCompletedNorth}</div>
-                      )}
-                      {(selectedSession.dropsCompletedEast ?? 0) > 0 && (
-                        <div className="text-sm text-muted-foreground">East: {selectedSession.dropsCompletedEast}</div>
-                      )}
-                      {(selectedSession.dropsCompletedSouth ?? 0) > 0 && (
-                        <div className="text-sm text-muted-foreground">South: {selectedSession.dropsCompletedSouth}</div>
-                      )}
-                      {(selectedSession.dropsCompletedWest ?? 0) > 0 && (
-                        <div className="text-sm text-muted-foreground">West: {selectedSession.dropsCompletedWest}</div>
-                      )}
-                    </div>
-                    
-                    {canViewFinancialData && (
-                      <div>
-                        <div className="text-sm font-medium text-muted-foreground">Labor Cost</div>
-                        <div className="text-base">
-                          <div>
-                            Hours Worked: {(() => {
-                              const totalMinutes = Math.round(hoursWorked * 60);
-                              const hours = Math.floor(totalMinutes / 60);
-                              const minutes = totalMinutes % 60;
-                              return hours > 0 
-                                ? `${hours}h ${minutes}m`
-                                : `${minutes}m`;
-                            })()}
-                          </div>
-                          <div>Hourly Rate: ${selectedSession.techHourlyRate || "Not set"}</div>
-                          {laborCost > 0 ? (
-                            <div className="text-lg font-medium text-primary mt-1" data-testid="text-labor-cost">
-                              Total: ${laborCost.toFixed(2)}
-                            </div>
-                          ) : (
-                            <div className="text-sm text-muted-foreground mt-1">
-                              No hourly rate set for this employee
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    )}
-                    
-                    {selectedSession.shortfallReason && (
-                      <div>
-                        <div className="text-sm font-medium text-muted-foreground">Shortfall Reason</div>
-                        <div className="text-base bg-muted p-3 rounded-md italic">
-                          {selectedSession.shortfallReason}
-                        </div>
-                      </div>
-                    )}
-                  </>
-                )}
-              </div>
-            );
-          })()}
-        </DialogContent>
-      </Dialog>
+      {/* Work Session Details Dialog with GPS Map */}
+      <SessionDetailsDialog
+        open={!!selectedSession}
+        onOpenChange={() => setSelectedSession(null)}
+        session={selectedSession}
+        employeeName={selectedSession?.techName}
+        projectName={project?.buildingName}
+        jobType={project?.jobType}
+      />
 
       {/* Photo Viewer Dialog */}
       <Dialog open={!!selectedPhoto} onOpenChange={() => setSelectedPhoto(null)}>
