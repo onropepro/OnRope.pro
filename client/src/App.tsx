@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { Switch, Route } from "wouter";
+import { Switch, Route, useLocation } from "wouter";
 import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider, useQuery } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
@@ -153,10 +153,18 @@ function Router() {
 
 // White Label Branding Provider
 function BrandingProvider({ children }: { children: React.ReactNode }) {
+  const [location] = useLocation();
+  
   // Fetch current user
   const { data: userData } = useQuery({
     queryKey: ["/api/user"],
   });
+
+  // NEVER apply branding on login/register pages
+  const isPublicPage = location === '/' || location === '/login' || location === '/register' || location === '/link';
+  
+  // Only apply branding if user is authenticated AND not on public pages
+  const isAuthenticated = !!userData?.user && !isPublicPage;
 
   // Determine company ID to fetch branding for
   // For company users: use their own ID
@@ -183,16 +191,13 @@ function BrandingProvider({ children }: { children: React.ReactNode }) {
       
       return response.json();
     },
-    enabled: !!companyIdForBranding && userData?.user?.role !== 'resident' && userData?.user?.role !== 'superuser',
+    enabled: isAuthenticated && !!companyIdForBranding && userData?.user?.role !== 'resident' && userData?.user?.role !== 'superuser',
     retry: 1, // Only retry once for branding fetch
   });
 
   const branding = brandingData || {};
   const brandColors = (branding.subscriptionActive && branding.colors) ? branding.colors : [];
   const primaryBrandColor = brandColors[0] || null;
-
-  // Only apply branding if user is authenticated
-  const isAuthenticated = !!userData?.user;
 
   // Convert hex color to HSL format required by Tailwind
   const hexToHSL = (hex: string): string => {
@@ -264,7 +269,7 @@ function BrandingProvider({ children }: { children: React.ReactNode }) {
       document.documentElement.style.removeProperty('--sidebar-ring');
       document.documentElement.style.removeProperty('--chart-1');
     };
-  }, [isAuthenticated, primaryBrandColor]);
+  }, [isAuthenticated, primaryBrandColor, location]);
 
   return <>{children}</>;
 }
