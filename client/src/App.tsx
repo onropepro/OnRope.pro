@@ -1,6 +1,6 @@
 import { Switch, Route } from "wouter";
 import { queryClient } from "./lib/queryClient";
-import { QueryClientProvider } from "@tanstack/react-query";
+import { QueryClientProvider, useQuery } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 
@@ -150,17 +150,95 @@ function Router() {
   );
 }
 
+// White Label Branding Provider
+function BrandingProvider({ children }: { children: React.ReactNode }) {
+  // Fetch current user
+  const { data: userData } = useQuery({
+    queryKey: ["/api/user"],
+  });
+
+  // Fetch company branding for white label support
+  const { data: brandingData } = useQuery({
+    queryKey: ["/api/company", userData?.user?.companyId, "branding"],
+    queryFn: async () => {
+      if (!userData?.user?.companyId) return null;
+      const response = await fetch(`/api/company/${userData.user.companyId}/branding`);
+      
+      // 404 means no branding configured - that's okay
+      if (response.status === 404) return null;
+      
+      // Other non-OK responses are actual errors
+      if (!response.ok) {
+        throw new Error(`Failed to fetch branding: ${response.status}`);
+      }
+      
+      return response.json();
+    },
+    enabled: !!userData?.user?.companyId && userData?.user?.role !== 'resident' && userData?.user?.role !== 'superuser',
+    retry: 1, // Only retry once for branding fetch
+  });
+
+  const branding = brandingData || {};
+  const brandColors = (branding.subscriptionActive && branding.colors) ? branding.colors : [];
+  const primaryBrandColor = brandColors[0] || null;
+  const hasCustomBranding = !!(branding.subscriptionActive && (branding.logoUrl || (branding.colors && branding.colors.length > 0)));
+
+  return (
+    <>
+      {/* Inject custom brand color styles when branding is active */}
+      {hasCustomBranding && primaryBrandColor && (
+        <style>{`
+          :root {
+            --custom-primary: ${primaryBrandColor};
+          }
+          .custom-brand-text {
+            color: ${primaryBrandColor} !important;
+          }
+          .custom-brand-border {
+            border-color: ${primaryBrandColor}30 !important;
+          }
+          .custom-brand-bg {
+            background-color: ${primaryBrandColor}10 !important;
+          }
+          .gradient-text {
+            background: linear-gradient(135deg, ${primaryBrandColor} 0%, ${primaryBrandColor}CC 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+          }
+          /* Override primary button colors when branding is active */
+          button[class*="bg-primary"], .bg-primary {
+            background-color: ${primaryBrandColor} !important;
+          }
+          button[class*="bg-primary"]:hover {
+            background-color: ${primaryBrandColor}E6 !important;
+          }
+          .text-primary {
+            color: ${primaryBrandColor} !important;
+          }
+          [class*="border-primary"] {
+            border-color: ${primaryBrandColor} !important;
+          }
+        `}</style>
+      )}
+      {children}
+    </>
+  );
+}
+
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
-        <div className="fixed top-0 left-0 right-0 z-[9999] bg-red-600 text-white text-center py-0.5 text-[10px] font-medium leading-tight">
-          Free Beta Access - Subscription Service Coming Soon - Do Not Distribute
-        </div>
-        <div className="pt-4">
-          <Router />
-        </div>
-        <Toaster />
+        <BrandingProvider>
+          <div className="fixed top-0 left-0 right-0 z-[9999] bg-red-600 text-white text-center py-0.5 text-[10px] font-medium leading-tight">
+            Free Beta Access - Subscription Service Coming Soon - Do Not Distribute
+          </div>
+          <div className="pt-4">
+            <Router />
+          </div>
+          <Toaster />
+        </BrandingProvider>
       </TooltipProvider>
     </QueryClientProvider>
   );

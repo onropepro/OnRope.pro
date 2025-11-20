@@ -489,6 +489,32 @@ export default function Dashboard() {
     enabled: !!userData?.user?.companyId,
   });
 
+  // Fetch company branding for white label support  
+  const { data: brandingData } = useQuery({
+    queryKey: ["/api/company", userData?.user?.companyId, "branding"],
+    queryFn: async () => {
+      if (!userData?.user?.companyId) return null;
+      const response = await fetch(`/api/company/${userData.user.companyId}/branding`);
+      
+      // 404 means no branding configured - that's okay
+      if (response.status === 404) return null;
+      
+      // Other non-OK responses are actual errors
+      if (!response.ok) {
+        throw new Error(`Failed to fetch branding: ${response.status}`);
+      }
+      
+      return response.json();
+    },
+    enabled: !!userData?.user?.companyId,
+    retry: 1, // Only retry once for branding fetch
+  });
+
+  const branding = brandingData || {};
+  const brandColors = (branding.subscriptionActive && branding.colors) ? branding.colors : [];
+  const primaryBrandColor = brandColors[0] || null;
+  const hasCustomBranding = !!(branding.subscriptionActive && (branding.logoUrl || (branding.colors && branding.colors.length > 0)));
+
   const projects = projectsData?.projects || [];
 
   // Fetch all work sessions across all projects for pie chart
@@ -1763,12 +1789,26 @@ export default function Dashboard() {
 
   return (
     <div className="min-h-screen page-gradient">
+      
       {/* Header - Premium Glass Effect */}
-      <header className="sticky top-0 z-[100] glass backdrop-blur-xl border-b border-border/50 shadow-premium">
+      <header 
+        className={`sticky top-0 z-[100] glass backdrop-blur-xl border-b shadow-premium ${hasCustomBranding ? 'custom-brand-border' : 'border-border/50'}`}
+      >
         <div className="px-6 h-20 flex items-center justify-between max-w-7xl mx-auto">
-          <div>
-            <h1 className="text-2xl font-bold gradient-text">{getPageTitle()}</h1>
-            <div className="flex items-center gap-3 mt-1">
+          <div className="flex items-center gap-4">
+            {hasCustomBranding && branding.logoUrl && (
+              <img 
+                src={branding.logoUrl} 
+                alt="Company Logo" 
+                className="h-12 w-auto object-contain"
+                data-testid="company-logo"
+              />
+            )}
+            <div>
+              <h1 className={`text-2xl font-bold ${hasCustomBranding ? 'custom-brand-text' : 'gradient-text'}`}>
+                {getPageTitle()}
+              </h1>
+              <div className="flex items-center gap-3 mt-1">
               {companyName && (
                 <p className="text-sm text-muted-foreground font-medium">{companyName}</p>
               )}
@@ -1783,6 +1823,7 @@ export default function Dashboard() {
                   </div>
                 </>
               )}
+              </div>
             </div>
           </div>
           <div className="flex items-center gap-3">
