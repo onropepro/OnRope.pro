@@ -271,8 +271,14 @@ export default function ProjectDetail() {
           startLatitude: location.latitude,
           startLongitude: location.longitude,
         };
+        console.log("✅ Clock-in location captured:", location);
       } catch (error) {
-        console.warn("Could not get location for clock-in:", error);
+        console.warn("⚠️ Could not get location for clock-in:", error);
+        toast({ 
+          title: "Location Unavailable", 
+          description: "Could not capture your location for clock-in. Session will be saved without GPS data.",
+          variant: "destructive"
+        });
         // Continue without location if unavailable
       }
 
@@ -316,8 +322,14 @@ export default function ProjectDetail() {
           endLatitude: location.latitude,
           endLongitude: location.longitude,
         };
+        console.log("✅ Clock-out location captured:", location);
       } catch (error) {
-        console.warn("Could not get location for clock-out:", error);
+        console.warn("⚠️ Could not get location for clock-out:", error);
+        toast({ 
+          title: "Location Unavailable", 
+          description: "Could not capture your location for clock-out. Session will be saved without GPS data.",
+          variant: "destructive"
+        });
         // Continue without location if unavailable
       }
       
@@ -330,6 +342,8 @@ export default function ProjectDetail() {
         shortfallReason: data.shortfallReason,
         ...locationData,
       };
+      
+      console.log("📤 Sending clock-out data to backend:", payload);
       
       const response = await fetch(`/api/projects/${id}/work-sessions/${activeSession.id}/end`, {
         method: "PATCH",
