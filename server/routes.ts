@@ -835,11 +835,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(500).json({ message: "Purchase service not configured" });
       }
       
-      // Call the marketplace API to initiate branding subscription purchase
+      // Call the marketplace API - immediate charge, no checkout session
       const marketplaceUrl = 'https://ram-website-paquettetom.replit.app/api/purchase/branding';
-      const returnUrl = `${req.protocol}://${req.get('host')}/profile`;
       
-      console.log(`[Purchase] Initiating branding subscription for ${currentUser.email}`);
+      console.log(`[Purchase] Purchasing branding subscription for ${currentUser.email}`);
       
       const purchaseResponse = await fetch(marketplaceUrl, {
         method: 'POST',
@@ -849,9 +848,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
         },
         body: JSON.stringify({
           email: currentUser.email,
-          companyName: currentUser.companyName,
-          licenseKey: currentUser.licenseKey,
-          returnUrl,
         })
       });
       
@@ -865,19 +861,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       const result = await purchaseResponse.json();
       
-      if (!result.checkoutUrl) {
-        console.error("[Purchase] No checkout URL received from marketplace");
-        return res.status(500).json({ message: "Purchase initiation failed" });
-      }
+      console.log("[Purchase] Branding subscription activated:", result.message);
       
-      console.log("[Purchase] Branding subscription purchase initiated, redirecting to checkout");
-      
-      // Return Stripe checkout URL for frontend to redirect user
+      // Return success - no redirect needed
       return res.json({
-        checkoutUrl: result.checkoutUrl,
+        success: true,
+        message: result.message || "Branding subscription activated successfully",
       });
     } catch (error) {
-      console.error("[Purchase] Error initiating branding subscription:", error);
+      console.error("[Purchase] Error purchasing branding subscription:", error);
       res.status(500).json({ message: "Internal server error" });
     }
   });
@@ -899,20 +891,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(401).json({ message: "Unauthorized" });
       }
       
-      const { licenseKey, brandingActive } = req.body;
+      const { email, brandingActive } = req.body;
       
-      if (!licenseKey || brandingActive === undefined) {
+      if (!email || brandingActive === undefined) {
         return res.status(400).json({ 
-          message: "License key and brandingActive are required" 
+          message: "Email and brandingActive are required" 
         });
       }
       
-      // Look up user by license key (just like projects does)
-      const user = await storage.getUserByLicenseKey(licenseKey);
+      // Look up user by email
+      const user = await storage.getUserByEmail(email);
       
       if (!user || user.role !== 'company') {
         return res.status(404).json({ 
-          message: "No company account found with this license key" 
+          message: "No company account found with this email" 
         });
       }
       

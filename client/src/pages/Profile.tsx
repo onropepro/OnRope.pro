@@ -1269,7 +1269,7 @@ export default function Profile() {
                                   </li>
                                 </ul>
                                 <p className="mt-4 text-sm">
-                                  You'll be redirected to Stripe to complete your payment securely. Cancel anytime.
+                                  Your payment will be processed immediately via Stripe. Cancel anytime.
                                 </p>
                               </AlertDialogDescription>
                             </AlertDialogHeader>
@@ -1291,23 +1291,26 @@ export default function Profile() {
                                     
                                     const data = await res.json();
                                     
-                                    // Redirect to Stripe checkout
-                                    if (data.checkoutUrl) {
-                                      window.location.href = data.checkoutUrl;
-                                    } else {
-                                      throw new Error('No checkout URL received');
-                                    }
+                                    // Immediate activation - no redirect
+                                    toast({
+                                      title: "Success!",
+                                      description: data.message || "Branding subscription activated successfully",
+                                    });
+                                    
+                                    // Refresh user data to show branding controls
+                                    queryClient.invalidateQueries({ queryKey: ['/api/user'] });
+                                    setIsPurchasingBranding(false);
                                   } catch (error) {
                                     setIsPurchasingBranding(false);
                                     toast({
                                       title: "Error",
-                                      description: error instanceof Error ? error.message : "Failed to initiate branding subscription purchase",
+                                      description: error instanceof Error ? error.message : "Failed to activate branding subscription",
                                       variant: "destructive"
                                     });
                                   }
                                 }}
                               >
-                                Continue to Stripe
+                                {isPurchasingBranding ? "Processing..." : "Activate Branding"}
                               </AlertDialogAction>
                             </AlertDialogFooter>
                           </AlertDialogContent>
