@@ -66,20 +66,11 @@ export function HighRiseBuilding({
       {/* Four Elevations - Minimalist Premium Design */}
       <div className="flex justify-center gap-8 overflow-x-auto pb-4 px-4">
         {elevations.map((elevation, index) => {
-          const elevationColor = customColors.length > 0 ? customColors[index % customColors.length] : customColor;
           return (
           <div key={elevation.name} className="flex flex-col items-center min-w-[120px]">
             {/* Elevation Label - Soft Pill */}
-            <div 
-              className="mb-6 px-6 py-2 rounded-full"
-              style={elevationColor ? {
-                backgroundColor: `${elevationColor}1a`,
-              } : {}}
-            >
-              <span 
-                className="text-sm font-bold uppercase tracking-wide"
-                style={elevationColor ? { color: elevationColor } : {}}
-              >
+            <div className="mb-6 px-6 py-2 rounded-full bg-muted">
+              <span className="text-sm font-bold uppercase tracking-wide text-foreground">
                 {elevation.name}
               </span>
             </div>
@@ -88,13 +79,8 @@ export function HighRiseBuilding({
             <div className="relative w-24 h-96 bg-gradient-to-b from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900 rounded-3xl shadow-xl border border-gray-200/50 dark:border-gray-700/50 overflow-hidden">
               {/* Progress Fill from Bottom */}
               <div 
-                className="absolute bottom-0 left-0 right-0 transition-all duration-700 ease-out rounded-3xl"
-                style={elevationColor ? {
-                  height: `${elevation.progress}%`,
-                  background: `linear-gradient(to top, ${elevationColor}e6, ${elevationColor}b3, ${elevationColor}80)`
-                } : {
-                  height: `${elevation.progress}%`
-                }}
+                className="absolute bottom-0 left-0 right-0 transition-all duration-700 ease-out rounded-3xl bg-gradient-to-t from-primary/90 via-primary/70 to-primary/50"
+                style={{ height: `${elevation.progress}%` }}
                 data-testid={`${elevation.name.toLowerCase()}-progress-fill`}
               >
                 {/* Subtle shine effect */}
@@ -120,10 +106,7 @@ export function HighRiseBuilding({
             
             {/* Stats Below */}
             <div className="mt-6 text-center">
-              <div 
-                className="text-3xl font-bold mb-1"
-                style={elevationColor ? { color: elevationColor } : {}}
-              >
+              <div className="text-3xl font-bold mb-1 text-primary">
                 {Math.round(elevation.progress)}%
               </div>
               <div className="text-sm text-muted-foreground font-medium">
