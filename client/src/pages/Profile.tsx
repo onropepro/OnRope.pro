@@ -1282,7 +1282,7 @@ export default function Profile() {
                                   setShowBrandingConfirmDialog(false);
                                   try {
                                     setIsPurchasingBranding(true);
-                                    const res = await apiRequest('POST', '/api/purchase/branding', {});
+                                    const res = await apiRequest('POST', '/api/purchase/initiate-branding', {});
                                     
                                     if (!res.ok) {
                                       const errorData = await res.json();

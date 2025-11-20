@@ -371,7 +371,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       '/api/purchase/verify-account', // Allow external purchase system to verify accounts
       '/api/purchase/update-seats', // Allow external purchase system to update seat limits
       '/api/purchase/update-projects', // Allow external purchase system to update project limits
-      '/api/purchase/activate-branding', // Allow external purchase system to activate branding subscription
+      '/api/purchase/update-branding', // Allow external purchase system to update branding subscription
       '/api/user-preferences', // Allow UI preferences even in read-only mode
       '/api/company/branding', // Allow branding color updates even in read-only mode
       '/api/company/branding/logo' // Allow logo uploads even in read-only mode
@@ -820,7 +820,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // Initiate branding subscription purchase (requires company role)
-  app.post("/api/purchase/branding", requireAuth, async (req: Request, res: Response) => {
+  app.post("/api/purchase/initiate-branding", requireAuth, requireRole("company"), async (req: Request, res: Response) => {
     try {
       const currentUser = await storage.getUserById(req.session.userId!);
       
@@ -882,8 +882,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
-  // Activate/deactivate branding subscription (called by marketplace webhook)
-  app.post("/api/purchase/activate-branding", async (req: Request, res: Response) => {
+  // Update branding subscription after purchase (called by marketplace webhook)
+  app.post("/api/purchase/update-branding", async (req: Request, res: Response) => {
     try {
       // Verify API key for security
       const apiKey = req.headers['x-api-key'] as string;
@@ -899,26 +899,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(401).json({ message: "Unauthorized" });
       }
       
-      const { email, licenseKey, brandingActive } = req.body;
+      const { licenseKey, brandingActive } = req.body;
       
-      if (!email || !licenseKey || brandingActive === undefined) {
+      if (!licenseKey || brandingActive === undefined) {
         return res.status(400).json({ 
-          message: "Email, license key, and brandingActive are required" 
+          message: "License key and brandingActive are required" 
         });
       }
       
-      // Look up user by email and license key
+      // Look up user by license key (just like projects does)
       const user = await storage.getUserByLicenseKey(licenseKey);
       
       if (!user || user.role !== 'company') {
         return res.status(404).json({ 
           message: "No company account found with this license key" 
-        });
-      }
-      
-      if (user.email !== email) {
-        return res.status(400).json({ 
-          message: "Email does not match license key" 
         });
       }
       
@@ -928,13 +922,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
       
       const action = brandingActive ? 'activated' : 'deactivated';
-      console.log(`[Purchase] Branding subscription ${action} for ${user.companyName} (${email})`);
+      console.log(`[Purchase] Branding subscription ${action} for ${user.companyName} (${user.email})`);
       
       return res.json({
         success: true,
-        message: `Branding updated successfully`,
+        companyId: user.id,
+        companyName: user.companyName,
         email: user.email,
         brandingActive: brandingActive,
+        message: `Branding subscription ${action} for ${user.companyName}`,
       });
     } catch (error) {
       console.error("[Purchase] Error updating branding subscription:", error);
