@@ -483,18 +483,25 @@ export default function Dashboard() {
     }
   }, [userData, setLocation]);
 
+  // Determine company ID for fetching data
+  // For company users: use their own ID
+  // For employees: use their companyId
+  const companyIdForData = userData?.user?.role === 'company' 
+    ? userData.user.id 
+    : userData?.user?.companyId;
+
   // Fetch company information
   const { data: companyData } = useQuery({
-    queryKey: ["/api/companies", userData?.user?.companyId],
-    enabled: !!userData?.user?.companyId,
+    queryKey: ["/api/companies", companyIdForData],
+    enabled: !!companyIdForData,
   });
 
   // Fetch company branding for white label support  
   const { data: brandingData } = useQuery({
-    queryKey: ["/api/company", userData?.user?.companyId, "branding"],
+    queryKey: ["/api/company", companyIdForData, "branding"],
     queryFn: async () => {
-      if (!userData?.user?.companyId) return null;
-      const response = await fetch(`/api/company/${userData.user.companyId}/branding`);
+      if (!companyIdForData) return null;
+      const response = await fetch(`/api/company/${companyIdForData}/branding`);
       
       // 404 means no branding configured - that's okay
       if (response.status === 404) return null;
@@ -506,7 +513,7 @@ export default function Dashboard() {
       
       return response.json();
     },
-    enabled: !!userData?.user?.companyId,
+    enabled: !!companyIdForData,
     retry: 1, // Only retry once for branding fetch
   });
 
