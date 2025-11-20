@@ -232,12 +232,53 @@ export default function ProjectDetail() {
   // Check if user is management using centralized permission helper
   const isManagement = checkIsManagement(currentUser);
 
+  // Helper function to get current GPS location
+  const getCurrentLocation = (): Promise<{ latitude: number; longitude: number }> => {
+    return new Promise((resolve, reject) => {
+      if (!navigator.geolocation) {
+        reject(new Error("Geolocation is not supported by your browser"));
+        return;
+      }
+
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          resolve({
+            latitude: position.coords.latitude,
+            longitude: position.coords.longitude,
+          });
+        },
+        (error) => {
+          console.error("Geolocation error:", error);
+          reject(new Error("Unable to get your location. Please enable location services."));
+        },
+        {
+          enableHighAccuracy: true,
+          timeout: 10000,
+          maximumAge: 0,
+        }
+      );
+    });
+  };
+
   const startDayMutation = useMutation({
     mutationFn: async (projectId: string) => {
+      // Get current location
+      let locationData = {};
+      try {
+        const location = await getCurrentLocation();
+        locationData = {
+          startLatitude: location.latitude,
+          startLongitude: location.longitude,
+        };
+      } catch (error) {
+        console.warn("Could not get location for clock-in:", error);
+        // Continue without location if unavailable
+      }
+
       const response = await fetch(`/api/projects/${projectId}/work-sessions/start`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({}),
+        body: JSON.stringify(locationData),
         credentials: "include",
       });
 
@@ -266,6 +307,19 @@ export default function ProjectDetail() {
     mutationFn: async (data: EndDayFormData) => {
       if (!activeSession) throw new Error("No active session");
       
+      // Get current location
+      let locationData = {};
+      try {
+        const location = await getCurrentLocation();
+        locationData = {
+          endLatitude: location.latitude,
+          endLongitude: location.longitude,
+        };
+      } catch (error) {
+        console.warn("Could not get location for clock-out:", error);
+        // Continue without location if unavailable
+      }
+      
       // Convert string values to numbers for backend
       const payload = {
         dropsCompletedNorth: parseInt(data.dropsCompletedNorth || "0"),
@@ -273,6 +327,7 @@ export default function ProjectDetail() {
         dropsCompletedSouth: parseInt(data.dropsCompletedSouth || "0"),
         dropsCompletedWest: parseInt(data.dropsCompletedWest || "0"),
         shortfallReason: data.shortfallReason,
+        ...locationData,
       };
       
       const response = await fetch(`/api/projects/${id}/work-sessions/${activeSession.id}/end`, {

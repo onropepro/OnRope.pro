@@ -5,19 +5,22 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { HighRiseBuilding } from "@/components/HighRiseBuilding";
-import { ArrowLeft, ChevronDown, ChevronRight, Sparkles } from "lucide-react";
+import { ArrowLeft, ChevronDown, ChevronRight, Sparkles, MapPin } from "lucide-react";
 import { format, getYear, getMonth } from "date-fns";
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from "recharts";
 import { useMemo, useState } from "react";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import { SessionDetailsDialog } from "@/components/SessionDetailsDialog";
 
 export default function WorkSessionHistory() {
   const [, params] = useRoute("/projects/:id/work-sessions");
   const [, setLocation] = useLocation();
   const projectId = params?.id;
   const { toast } = useToast();
+  const [selectedSession, setSelectedSession] = useState<any>(null);
+  const [showSessionDialog, setShowSessionDialog] = useState(false);
 
   // Fetch current user to check role
   const { data: userData } = useQuery({
@@ -439,18 +442,26 @@ export default function WorkSessionHistory() {
                                           const sessionDrops = (session.dropsCompletedNorth ?? 0) + (session.dropsCompletedEast ?? 0) + 
                                                                (session.dropsCompletedSouth ?? 0) + (session.dropsCompletedWest ?? 0);
                                           const metTarget = sessionDrops >= project.dailyDropTarget;
+                                          const hasLocation = session.startLatitude || session.endLatitude;
 
                                           return (
                                             <div
                                               key={session.id}
-                                              className="p-3 rounded-lg border bg-card hover-elevate"
+                                              className="p-3 rounded-lg border bg-card hover-elevate cursor-pointer active-elevate-2"
                                               data-testid={`session-${session.id}`}
+                                              onClick={() => {
+                                                setSelectedSession(session);
+                                                setShowSessionDialog(true);
+                                              }}
                                             >
                                               <div className="space-y-1">
                                                 <div className="flex items-center gap-2 flex-wrap">
                                                   <p className="font-medium text-sm">
                                                     Tech: {session.techName || "Unknown"}
                                                   </p>
+                                                  {hasLocation && (
+                                                    <MapPin className="h-4 w-4 text-primary" title="GPS location available" />
+                                                  )}
                                                   {isCompleted ? (
                                                     <Badge variant={metTarget ? "default" : "destructive"} data-testid={`badge-${metTarget ? "met" : "below"}-target`}>
                                                       {metTarget ? "Target Met" : "Below Target"}
@@ -496,6 +507,16 @@ export default function WorkSessionHistory() {
           </CardContent>
         </Card>
       </div>
+
+      {/* Session Details Dialog with Map */}
+      <SessionDetailsDialog
+        open={showSessionDialog}
+        onOpenChange={setShowSessionDialog}
+        session={selectedSession}
+        employeeName={selectedSession?.techName}
+        projectName={project?.buildingName || project?.strataPlanNumber}
+        jobType={project?.jobType}
+      />
     </div>
   );
 }
