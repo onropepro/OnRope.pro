@@ -158,12 +158,20 @@ function BrandingProvider({ children }: { children: React.ReactNode }) {
     queryKey: ["/api/user"],
   });
 
+  // Determine company ID to fetch branding for
+  // For company users: use their own ID
+  // For employees: use their companyId
+  const companyIdForBranding = userData?.user?.role === 'company' 
+    ? userData.user.id 
+    : userData?.user?.companyId;
+
   // Fetch company branding for white label support
   const { data: brandingData } = useQuery({
-    queryKey: ["/api/company", userData?.user?.companyId, "branding"],
+    queryKey: ["/api/company", companyIdForBranding, "branding"],
     queryFn: async () => {
-      if (!userData?.user?.companyId) return null;
-      const response = await fetch(`/api/company/${userData.user.companyId}/branding`);
+      if (!companyIdForBranding) return null;
+      
+      const response = await fetch(`/api/company/${companyIdForBranding}/branding`);
       
       // 404 means no branding configured - that's okay
       if (response.status === 404) return null;
@@ -175,7 +183,7 @@ function BrandingProvider({ children }: { children: React.ReactNode }) {
       
       return response.json();
     },
-    enabled: !!userData?.user?.companyId && userData?.user?.role !== 'resident' && userData?.user?.role !== 'superuser',
+    enabled: !!companyIdForBranding && userData?.user?.role !== 'resident' && userData?.user?.role !== 'superuser',
     retry: 1, // Only retry once for branding fetch
   });
 
