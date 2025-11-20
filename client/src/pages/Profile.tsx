@@ -82,7 +82,11 @@ function BrandColorsSection({ user }: { user: any }) {
         colors: colors,
       });
       toast({ title: "Brand colors updated successfully" });
-      queryClient.invalidateQueries({ queryKey: ["/api/user"] });
+      // Invalidate BOTH user cache AND branding cache to trigger re-fetch
+      await queryClient.invalidateQueries({ queryKey: ["/api/user"] });
+      await queryClient.invalidateQueries({ queryKey: ["/api/company"] });
+      // Force a page reload to apply new colors immediately
+      window.location.reload();
     } catch (error) {
       toast({
         title: "Error",
