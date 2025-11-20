@@ -835,11 +835,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(500).json({ message: "Purchase service not configured" });
       }
       
-      // Call the external marketplace API to initiate branding subscription purchase
-      const marketplaceUrl = 'https://ram-website-paquettetom.replit.app/api/purchase/branding';
-      const returnUrl = `${req.protocol}://${req.get('host')}/profile`;
+      // Call the marketplace API to purchase branding subscription
+      const marketplaceUrl = 'https://marketplace.replit.app/api/purchase/branding';
       
-      console.log(`[Purchase] Initiating branding subscription for ${currentUser.email}`);
+      console.log(`[Purchase] Purchasing branding subscription for ${currentUser.email}`);
       
       const purchaseResponse = await fetch(marketplaceUrl, {
         method: 'POST',
@@ -849,34 +848,34 @@ export async function registerRoutes(app: Express): Promise<Server> {
         },
         body: JSON.stringify({
           email: currentUser.email,
-          companyName: currentUser.companyName,
           licenseKey: currentUser.licenseKey,
-          returnUrl,
         })
       });
       
       if (!purchaseResponse.ok) {
-        const errorText = await purchaseResponse.text();
-        console.error("[Purchase] Marketplace API error:", errorText);
+        const errorData = await purchaseResponse.json().catch(() => ({ error: 'Purchase failed' }));
+        console.error("[Purchase] Marketplace API error:", errorData);
         return res.status(purchaseResponse.status).json({ 
-          message: "Purchase initiation failed" 
+          message: errorData.error || "Purchase failed" 
         });
       }
       
       const result = await purchaseResponse.json();
       
-      console.log("[Purchase] Branding subscription purchase initiated successfully:", result);
+      console.log("[Purchase] Branding subscription purchased successfully:", result);
       
+      // Branding is activated immediately by the marketplace calling our activation endpoint
       return res.json({
-        checkoutUrl: result.checkoutUrl,
+        success: true,
+        message: result.message || "Branding subscription activated successfully",
       });
     } catch (error) {
-      console.error("[Purchase] Error initiating branding subscription:", error);
+      console.error("[Purchase] Error purchasing branding subscription:", error);
       res.status(500).json({ message: "Internal server error" });
     }
   });
   
-  // Update branding subscription status after purchase (called by marketplace)
+  // Activate/deactivate branding subscription (called by marketplace webhook)
   app.post("/api/purchase/activate-branding", async (req: Request, res: Response) => {
     try {
       // Verify API key for security
@@ -895,13 +894,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       const { email, licenseKey, brandingActive } = req.body;
       
-      if (!licenseKey) {
+      if (!email || !licenseKey || brandingActive === undefined) {
         return res.status(400).json({ 
-          message: "License key is required" 
+          message: "Email, license key, and brandingActive are required" 
         });
       }
       
-      // Look up user by license key
+      // Look up user by email and license key
       const user = await storage.getUserByLicenseKey(licenseKey);
       
       if (!user || user.role !== 'company') {
@@ -910,23 +909,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
       
-      // Activate branding subscription
+      if (user.email !== email) {
+        return res.status(400).json({ 
+          message: "Email does not match license key" 
+        });
+      }
+      
+      // Update branding subscription status (activate or deactivate)
       await storage.updateUser(user.id, {
-        brandingSubscriptionActive: true,
+        brandingSubscriptionActive: brandingActive,
       });
       
-      console.log(`[Purchase] Branding subscription activated for ${user.companyName} (${email})`);
+      const action = brandingActive ? 'activated' : 'deactivated';
+      console.log(`[Purchase] Branding subscription ${action} for ${user.companyName} (${email})`);
       
       return res.json({
         success: true,
-        companyId: user.id,
-        companyName: user.companyName,
+        message: `Branding updated successfully`,
         email: user.email,
-        brandingActive: true,
-        message: `Branding subscription activated for ${user.companyName}`,
+        brandingActive: brandingActive,
       });
     } catch (error) {
-      console.error("[Purchase] Error activating branding subscription:", error);
+      console.error("[Purchase] Error updating branding subscription:", error);
       res.status(500).json({ message: "Internal server error" });
     }
   });

@@ -1235,17 +1235,28 @@ export default function Profile() {
                             try {
                               setIsPurchasingBranding(true);
                               const res = await apiRequest('POST', '/api/purchase/branding', {});
-                              const data = await res.json();
-                              if (data.checkoutUrl) {
-                                window.location.href = data.checkoutUrl;
-                              } else {
-                                throw new Error('No checkout URL received');
+                              
+                              if (!res.ok) {
+                                const errorData = await res.json();
+                                throw new Error(errorData.message || 'Purchase failed');
                               }
+                              
+                              const data = await res.json();
+                              
+                              // Branding is activated immediately - reload user data
+                              await queryClient.invalidateQueries({ queryKey: ["/api/user"] });
+                              
+                              setIsPurchasingBranding(false);
+                              
+                              toast({
+                                title: "Success!",
+                                description: data.message || "White label branding activated successfully",
+                              });
                             } catch (error) {
                               setIsPurchasingBranding(false);
                               toast({
                                 title: "Error",
-                                description: error instanceof Error ? error.message : "Failed to initiate subscription purchase",
+                                description: error instanceof Error ? error.message : "Failed to purchase branding subscription",
                                 variant: "destructive"
                               });
                             }
