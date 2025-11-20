@@ -1228,93 +1228,23 @@ export default function Profile() {
                           </ul>
                         </div>
                         
-                        <AlertDialog open={showBrandingConfirmDialog} onOpenChange={setShowBrandingConfirmDialog}>
-                          <Button
-                            size="lg"
-                            className="h-12 min-w-[200px]"
-                            data-testid="button-subscribe-branding"
-                            disabled={isPurchasingBranding}
-                            onClick={() => setShowBrandingConfirmDialog(true)}
-                          >
-                            {isPurchasingBranding ? (
-                              <>
-                                <span className="material-icons mr-2 animate-spin">refresh</span>
-                                Processing...
-                              </>
-                            ) : (
-                              <>
-                                <span className="material-icons mr-2">shopping_cart</span>
-                                Subscribe for $0.49/month
-                              </>
-                            )}
-                          </Button>
-                          
-                          <AlertDialogContent>
-                            <AlertDialogHeader>
-                              <AlertDialogTitle>Subscribe to White Label Branding?</AlertDialogTitle>
-                              <AlertDialogDescription>
-                                You'll be charged <strong>$0.49/month</strong> for white label branding. This will allow you to:
-                                <ul className="mt-3 space-y-2 text-left">
-                                  <li className="flex items-start gap-2">
-                                    <span className="material-icons text-sm mt-0.5 text-primary">check_circle</span>
-                                    <span>Upload your custom company logo</span>
-                                  </li>
-                                  <li className="flex items-start gap-2">
-                                    <span className="material-icons text-sm mt-0.5 text-primary">check_circle</span>
-                                    <span>Choose unlimited brand colors</span>
-                                  </li>
-                                  <li className="flex items-start gap-2">
-                                    <span className="material-icons text-sm mt-0.5 text-primary">check_circle</span>
-                                    <span>Fully brand the resident portal</span>
-                                  </li>
-                                </ul>
-                                <p className="mt-4 text-sm">
-                                  Your payment will be processed immediately via Stripe. Cancel anytime.
-                                </p>
-                              </AlertDialogDescription>
-                            </AlertDialogHeader>
-                            <AlertDialogFooter>
-                              <AlertDialogCancel data-testid="button-cancel-branding-dialog">Cancel</AlertDialogCancel>
-                              <AlertDialogAction
-                                data-testid="button-confirm-branding-subscribe"
-                                onClick={async (e) => {
-                                  e.preventDefault();
-                                  setShowBrandingConfirmDialog(false);
-                                  try {
-                                    setIsPurchasingBranding(true);
-                                    const res = await apiRequest('POST', '/api/purchase/initiate-branding', {});
-                                    
-                                    if (!res.ok) {
-                                      const errorData = await res.json();
-                                      throw new Error(errorData.message || 'Purchase failed');
-                                    }
-                                    
-                                    const data = await res.json();
-                                    
-                                    // Immediate activation - no redirect
-                                    toast({
-                                      title: "Success!",
-                                      description: data.message || "Branding subscription activated successfully",
-                                    });
-                                    
-                                    // Refresh user data to show branding controls
-                                    queryClient.invalidateQueries({ queryKey: ['/api/user'] });
-                                    setIsPurchasingBranding(false);
-                                  } catch (error) {
-                                    setIsPurchasingBranding(false);
-                                    toast({
-                                      title: "Error",
-                                      description: error instanceof Error ? error.message : "Failed to activate branding subscription",
-                                      variant: "destructive"
-                                    });
-                                  }
-                                }}
-                              >
-                                {isPurchasingBranding ? "Processing..." : "Activate Branding"}
-                              </AlertDialogAction>
-                            </AlertDialogFooter>
-                          </AlertDialogContent>
-                        </AlertDialog>
+                        <Button
+                          size="lg"
+                          className="h-12 min-w-[200px]"
+                          data-testid="button-subscribe-branding"
+                          onClick={() => {
+                            const email = encodeURIComponent(user?.email || '');
+                            const licenseKey = encodeURIComponent(user?.licenseKey || '');
+                            const returnUrl = encodeURIComponent(`${window.location.origin}/profile?purchased=true`);
+                            const url = `https://ram-website-paquettetom.replit.app/purchase-branding?email=${email}&licenseKey=${licenseKey}&returnUrl=${returnUrl}`;
+                            
+                            console.log('[Branding Purchase] Opening:', url);
+                            window.location.href = url;
+                          }}
+                        >
+                          <span className="material-icons mr-2">shopping_cart</span>
+                          Subscribe for $0.49/month
+                        </Button>
                         
                         <p className="text-xs text-muted-foreground">
                           Secure payment powered by Stripe. Cancel anytime.
