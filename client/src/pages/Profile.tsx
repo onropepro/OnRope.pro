@@ -165,8 +165,6 @@ export default function Profile() {
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [showLogoutDialog, setShowLogoutDialog] = useState(false);
   const [deletePassword, setDeletePassword] = useState("");
-  const [isPurchasingBranding, setIsPurchasingBranding] = useState(false);
-  const [showBrandingConfirmDialog, setShowBrandingConfirmDialog] = useState(false);
 
   const { data: userData, isLoading } = useQuery<{ user: any }>({
     queryKey: ["/api/user"],

@@ -183,16 +183,33 @@ function BrandingProvider({ children }: { children: React.ReactNode }) {
   const brandColors = (branding.subscriptionActive && branding.colors) ? branding.colors : [];
   const primaryBrandColor = brandColors[0] || null;
 
-  // Inject brand color CSS variable when active
+  // Inject brand colors globally - override primary color across entire platform
   useEffect(() => {
     if (primaryBrandColor) {
+      // Override primary color globally (this affects buttons, links, badges, etc. everywhere)
       document.documentElement.style.setProperty('--brand-primary', primaryBrandColor);
+      document.documentElement.style.setProperty('--primary', primaryBrandColor);
+      document.documentElement.style.setProperty('--ring', primaryBrandColor);
+      document.documentElement.style.setProperty('--sidebar-ring', primaryBrandColor);
+      document.documentElement.style.setProperty('--sidebar-primary', primaryBrandColor);
+      document.documentElement.style.setProperty('--chart-1', primaryBrandColor);
     } else {
+      // Remove overrides when branding is inactive
       document.documentElement.style.removeProperty('--brand-primary');
+      document.documentElement.style.removeProperty('--primary');
+      document.documentElement.style.removeProperty('--ring');
+      document.documentElement.style.removeProperty('--sidebar-ring');
+      document.documentElement.style.removeProperty('--sidebar-primary');
+      document.documentElement.style.removeProperty('--chart-1');
     }
 
     return () => {
       document.documentElement.style.removeProperty('--brand-primary');
+      document.documentElement.style.removeProperty('--primary');
+      document.documentElement.style.removeProperty('--ring');
+      document.documentElement.style.removeProperty('--sidebar-ring');
+      document.documentElement.style.removeProperty('--sidebar-primary');
+      document.documentElement.style.removeProperty('--chart-1');
     };
   }, [primaryBrandColor]);
 
