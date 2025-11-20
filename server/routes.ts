@@ -930,6 +930,106 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
+  // Update tier after tier upgrade (called by marketplace webhook)
+  app.post("/api/purchase/update-tier", async (req: Request, res: Response) => {
+    try {
+      // Verify API key for security
+      const apiKey = req.headers['x-api-key'] as string;
+      const expectedApiKey = process.env.PURCHASE_API_KEY;
+      
+      if (!expectedApiKey) {
+        console.error("[Purchase] PURCHASE_API_KEY not configured");
+        return res.status(500).json({ message: "Purchase service not configured" });
+      }
+      
+      if (!apiKey || apiKey !== expectedApiKey) {
+        console.error("[Purchase] Invalid API key provided");
+        return res.status(401).json({ message: "Unauthorized" });
+      }
+      
+      const { email, newLicenseKey, additionalSeats, additionalProjects, licenseVerified } = req.body;
+      
+      // Validate required fields
+      if (!email || !newLicenseKey) {
+        return res.status(400).json({ 
+          message: "Email and newLicenseKey are required" 
+        });
+      }
+      
+      // Look up user by email
+      const user = await storage.getUserByEmail(email);
+      
+      if (!user || user.role !== 'company') {
+        return res.status(404).json({ 
+          message: "No company account found with this email" 
+        });
+      }
+      
+      // Prepare update data
+      const updateData: any = {
+        licenseKey: newLicenseKey,
+        licenseVerified: licenseVerified !== undefined ? licenseVerified : true,
+      };
+      
+      // Only update additionalSeats if explicitly provided AND > 0
+      // CRITICAL: Omitting this field or passing 0 preserves existing purchased seats
+      if (additionalSeats !== undefined && typeof additionalSeats === 'number' && additionalSeats > 0) {
+        updateData.additionalSeats = additionalSeats;
+      }
+      
+      // Only update additionalProjects if explicitly provided AND > 0
+      // CRITICAL: Omitting this field or passing 0 preserves existing purchased projects
+      if (additionalProjects !== undefined && typeof additionalProjects === 'number' && additionalProjects > 0) {
+        updateData.additionalProjects = additionalProjects;
+      }
+      
+      // Update the company's license key and optional fields
+      await storage.updateUser(user.id, updateData);
+      
+      // Extract tier info for logging
+      const oldTier = detectTier(user.licenseKey);
+      const newTier = detectTier(newLicenseKey);
+      const oldSeatLimit = getSeatLimit(oldTier, user.additionalSeats || 0);
+      const newSeatLimit = getSeatLimit(newTier, updateData.additionalSeats ?? user.additionalSeats ?? 0);
+      const oldProjectLimit = getProjectLimit(oldTier, user.additionalProjects || 0);
+      const newProjectLimit = getProjectLimit(newTier, updateData.additionalProjects ?? user.additionalProjects ?? 0);
+      
+      console.log(`[Purchase] Tier upgraded for ${user.companyName} (${user.email})`);
+      console.log(`[Purchase]   Old: ${user.licenseKey} (Tier ${oldTier}) → New: ${newLicenseKey} (Tier ${newTier})`);
+      console.log(`[Purchase]   Seat limit: ${oldSeatLimit} → ${newSeatLimit}`);
+      console.log(`[Purchase]   Project limit: ${oldProjectLimit} → ${newProjectLimit}`);
+      if (updateData.additionalSeats !== undefined) {
+        console.log(`[Purchase]   Additional seats updated: ${user.additionalSeats || 0} → ${updateData.additionalSeats}`);
+      }
+      if (updateData.additionalProjects !== undefined) {
+        console.log(`[Purchase]   Additional projects updated: ${user.additionalProjects || 0} → ${updateData.additionalProjects}`);
+      }
+      
+      return res.json({
+        success: true,
+        companyId: user.id,
+        companyName: user.companyName,
+        email: user.email,
+        oldLicenseKey: user.licenseKey,
+        newLicenseKey: newLicenseKey,
+        oldTier,
+        newTier,
+        newLimits: {
+          baseSeatLimit: getSeatLimit(newTier, 0),
+          additionalSeats: updateData.additionalSeats ?? user.additionalSeats ?? 0,
+          totalSeats: newSeatLimit,
+          baseProjectLimit: getProjectLimit(newTier, 0),
+          additionalProjects: updateData.additionalProjects ?? user.additionalProjects ?? 0,
+          totalProjects: newProjectLimit,
+        },
+        message: `Successfully upgraded ${user.companyName} from Tier ${oldTier} to Tier ${newTier}`,
+      });
+    } catch (error) {
+      console.error("[Purchase] Error updating tier:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+  
   // Registration endpoint
   app.post("/api/register", async (req: Request, res: Response) => {
     try {

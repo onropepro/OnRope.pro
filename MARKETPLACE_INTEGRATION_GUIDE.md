@@ -1,101 +1,325 @@
-# Marketplace Integration Guide - White Label Branding
+# Marketplace Integration Guide
 
-This document provides complete integration specifications for the marketplace platform to enable white label branding subscription purchases for Rope Access Management Platform.
+This guide explains how the RAM platform integrates with the external marketplace for **all purchase types**: tier upgrades, seat purchases, project purchases, and branding subscriptions.
+
+## ⚠️ CRITICAL: Tier Upgrade Lockout Issue - FIXED
+
+**THE PROBLEM (BEFORE FIX):**
+When users upgraded tiers, marketplace generated a new license key (e.g., ABC123-1 → ABC123-2) but there was NO webhook to save it to the platform database. Users got LOCKED OUT because their old license key no longer worked.
+
+**THE SOLUTION (NOW IMPLEMENTED):**
+New `/api/purchase/update-tier` webhook endpoint! Marketplace MUST call this immediately after tier upgrade payments to prevent lockout.
+
+---
 
 ## Overview
 
-The Rope Access Management Platform integrates with the marketplace for $0.49/month white label branding subscriptions. The marketplace handles:
-- Payment processing (Stripe)
-- Subscription billing
-- Renewal management
-- Cancellation handling
+The RAM platform exposes four webhook endpoints that the marketplace **MUST** call after successful payments:
 
-The platform handles:
-- Branding activation/deactivation
-- Logo and color customization
-- Feature access control
+| Purchase Type | Webhook Endpoint | Critical? |
+|--------------|-----------------|-----------|
+| **Tier Upgrade** | `/api/purchase/update-tier` | ⚠️ **YES** - Prevents lockout! |
+| **Additional Seats** | `/api/purchase/update-seats` | Yes |
+| **Additional Projects** | `/api/purchase/update-projects` | Yes |
+| **Branding Subscription** | `/api/purchase/update-branding` | Yes |
 
-## Integration Flow
+## API Authentication
+
+All webhook endpoints require API key authentication:
+
+**Header:** `x-api-key: YOUR_PURCHASE_API_KEY`
+
+The API key is stored in the `PURCHASE_API_KEY` environment secret.
+
+---
+
+## 1. Tier Upgrades (NEW - CRITICAL!)
+
+### ⚠️ When to Call
+
+**User upgrades from one subscription tier to another** (e.g., Tier 1 → Tier 2)
+
+### ⚠️ What Happens
+
+- Marketplace generates **new license key** with updated tier suffix
+- Example: `ABC123-1` (Tier 1) → `ABC123-2` (Tier 2)
+- The new license key **MUST** be saved to platform **IMMEDIATELY**
+
+### ⚠️ Critical: Prevent Lockout!
+
+If you don't call this webhook immediately after tier upgrade payment:
+1. User's database still has old license key (ABC123-1)
+2. Marketplace considers old key invalid
+3. User gets **LOCKED OUT** of their account
+4. User must manually verify license to regain access
+
+**Solution:** Call `/api/purchase/update-tier` webhook IMMEDIATELY after payment success!
+
+### Webhook Endpoint
 
 ```
-User clicks "Subscribe" → Platform calls Marketplace Purchase API → 
-Marketplace processes payment → Marketplace calls Platform Activation Webhook →
-Platform activates branding → User gets access to branding controls
+POST /api/purchase/update-tier
 ```
 
-## 1. Purchase API Endpoint (Marketplace Receives)
-
-**What the platform will call when a user wants to purchase branding:**
-
-### Endpoint
+### Request Headers
 ```
-POST https://marketplace.replit.app/api/purchase/branding
+Content-Type: application/json
+x-api-key: YOUR_PURCHASE_API_KEY
 ```
 
-### Authentication
+### Request Body (Minimal - Preserves Existing Add-ons)
+```json
+{
+  "email": "company@example.com",
+  "newLicenseKey": "ABC123-2"
+}
 ```
-Headers:
-  Content-Type: application/json
-  x-api-key: <PURCHASE_API_KEY>
+
+### Request Body (With Add-on Updates)
+```json
+{
+  "email": "company@example.com",
+  "newLicenseKey": "ABC123-2",
+  "additionalSeats": 5,
+  "additionalProjects": 3,
+  "licenseVerified": true
+}
+```
+
+### Required Fields
+- `email` - Company email address
+- `newLicenseKey` - The new license key with updated tier suffix
+
+### Optional Fields
+- `additionalSeats` - **ABSOLUTE TOTAL** of additional seats to set (must be > 0 to update, omit to preserve existing)
+- `additionalProjects` - **ABSOLUTE TOTAL** of additional projects to set (must be > 0 to update, omit to preserve existing)
+- `licenseVerified` - Whether license should be marked verified (default: true)
+
+### ⚠️ CRITICAL: Add-on Field Behavior
+- **OMIT the field** to keep existing purchased seats/projects (recommended for simple tier upgrades)
+- **Provide positive number (> 0)** to update the absolute total (e.g., `"additionalSeats": 5` sets total to 5)
+- **DO NOT pass 0** - it will be ignored and existing values will be preserved
+- **Example:** User has 3 additional seats, you pass `"additionalSeats": 5` → user now has 5 additional seats (not 8!)
+
+### Success Response (200 OK)
+```json
+{
+  "success": true,
+  "companyId": "uuid-here",
+  "companyName": "Example Company",
+  "email": "company@example.com",
+  "oldLicenseKey": "ABC123-1",
+  "newLicenseKey": "ABC123-2",
+  "oldTier": 1,
+  "newTier": 2,
+  "newLimits": {
+    "baseSeatLimit": 10,
+    "additionalSeats": 3,
+    "totalSeats": 13,
+    "baseProjectLimit": 5,
+    "additionalProjects": 2,
+    "totalProjects": 7
+  },
+  "message": "Successfully upgraded Example Company from Tier 1 to Tier 2"
+}
+```
+**Note:** The `additionalSeats` and `additionalProjects` in the response show the preserved values from before the tier upgrade (user had 3 additional seats and 2 additional projects).
+
+### Error Responses
+
+**400 Bad Request** - Missing required fields
+```json
+{
+  "message": "Email and newLicenseKey are required"
+}
+```
+
+**401 Unauthorized** - Invalid API key
+```json
+{
+  "message": "Unauthorized"
+}
+```
+
+**404 Not Found** - Company doesn't exist
+```json
+{
+  "message": "No company account found with this email"
+}
+```
+
+### Workflow
+
+1. ✅ User completes tier upgrade payment in marketplace
+2. ✅ Marketplace generates new license key (ABC123-2)
+3. ⚠️ **IMMEDIATELY** call `/api/purchase/update-tier` webhook:
+   ```json
+   {
+     "email": "user@company.com",
+     "newLicenseKey": "ABC123-2"
+   }
+   ```
+   (Note: Omit `additionalSeats` and `additionalProjects` to preserve existing purchased add-ons)
+4. ✅ Platform saves new license key and preserves existing add-ons
+5. ✅ User stays logged in with upgraded tier access
+
+---
+
+## 2. Additional Seat Purchases
+
+### When to Call
+
+**User buys additional employee seats** (on top of their tier base limit)
+
+### What Happens
+
+Additional seats counter is **incremented** (not replaced)
+
+### Webhook Endpoint
+
+```
+POST /api/purchase/update-seats
+```
+
+### Request Headers
+```
+Content-Type: application/json
+x-api-key: YOUR_PURCHASE_API_KEY
 ```
 
 ### Request Body
 ```json
 {
   "email": "company@example.com",
-  "licenseKey": "UNIQUE-LICENSE-KEY-123"
+  "additionalSeats": 2
 }
 ```
 
-### Expected Response (Success)
+### Required Fields
+- `email` - Company email address
+- `additionalSeats` - Number of seats to **ADD** (incremental, not total)
+
+### Success Response (200 OK)
 ```json
 {
   "success": true,
-  "message": "Branding subscription activated successfully"
+  "companyId": "uuid-here",
+  "companyName": "Example Company",
+  "email": "company@example.com",
+  "tier": 1,
+  "seatsAdded": 2,
+  "newLimits": {
+    "baseSeatLimit": 4,
+    "additionalSeats": 2,
+    "totalSeats": 6
+  },
+  "message": "Successfully added 2 seats to Example Company"
 }
 ```
 
-### Expected Response (Error)
+### Example: User Already Has 2 Additional Seats, Buys 3 More
+
+**Before:**
+- Base limit: 4 (Tier 1)
+- Additional seats: 2
+- Total: 6 seats
+
+**Call webhook with:**
 ```json
 {
-  "error": "Payment processing failed"
+  "email": "company@example.com",
+  "additionalSeats": 3
 }
 ```
 
-**Status Codes:**
-- `200` - Success (branding activated immediately)
-- `400` - Invalid request (missing fields)
-- `402` - Payment required (card declined, etc.)
-- `500` - Internal error
-
-### Implementation Notes
-After successful payment processing, the marketplace MUST immediately call the platform's activation webhook (see below) to activate the branding subscription.
+**After:**
+- Base limit: 4 (Tier 1)
+- Additional seats: 5 (2 + 3)
+- Total: 9 seats
 
 ---
 
-## 2. Activation/Deactivation Webhook (Marketplace Calls)
+## 3. Additional Project Purchases
 
-**What the marketplace must call after purchase OR cancellation:**
+### When to Call
 
-### Endpoint
+**User buys additional project slots** (on top of their tier base limit)
+
+### What Happens
+
+Additional projects counter is **incremented** (not replaced)
+
+### Webhook Endpoint
+
 ```
-POST https://<platform-domain>/api/purchase/activate-branding
+POST /api/purchase/update-projects
 ```
 
-### Authentication
+### Request Headers
 ```
-Headers:
-  Content-Type: application/json
-  x-api-key: <PURCHASE_API_KEY>
+Content-Type: application/json
+x-api-key: YOUR_PURCHASE_API_KEY
 ```
 
-⚠️ **IMPORTANT:** Use the same `PURCHASE_API_KEY` that was used to authenticate the purchase request.
+### Request Body
+```json
+{
+  "email": "company@example.com",
+  "additionalProjects": 3
+}
+```
+
+### Required Fields
+- `email` - Company email address
+- `additionalProjects` - Number of projects to **ADD** (incremental, not total)
+
+### Success Response (200 OK)
+```json
+{
+  "success": true,
+  "companyId": "uuid-here",
+  "companyName": "Example Company",
+  "email": "company@example.com",
+  "tier": 1,
+  "projectsAdded": 3,
+  "newLimits": {
+    "baseProjectLimit": 2,
+    "additionalProjects": 3,
+    "totalProjects": 5
+  },
+  "message": "Successfully added 3 projects to Example Company"
+}
+```
+
+---
+
+## 4. Branding Subscription ($0.49/month)
+
+### When to Call
+
+- **Activation**: User subscribes to white label branding
+- **Deactivation**: User cancels subscription or payment fails
+
+### What Happens
+
+Branding subscription flag is toggled (boolean)
+
+### Webhook Endpoint
+
+```
+POST /api/purchase/update-branding
+```
+
+### Request Headers
+```
+Content-Type: application/json
+x-api-key: YOUR_PURCHASE_API_KEY
+```
 
 ### Request Body (Activation)
 ```json
 {
   "email": "company@example.com",
-  "licenseKey": "UNIQUE-LICENSE-KEY-123",
   "brandingActive": true
 }
 ```
@@ -104,445 +328,285 @@ Headers:
 ```json
 {
   "email": "company@example.com",
-  "licenseKey": "UNIQUE-LICENSE-KEY-123",
   "brandingActive": false
 }
 ```
 
-### Expected Response (Success)
+### Required Fields
+- `email` - Company email address
+- `brandingActive` - Boolean (true = activate, false = deactivate)
+
+### Success Response (200 OK)
 ```json
 {
   "success": true,
-  "message": "Branding updated successfully",
+  "companyId": "uuid-here",
+  "companyName": "Example Company",
   "email": "company@example.com",
-  "brandingActive": true
-}
-```
-
-### Error Responses
-
-**401 Unauthorized** - Invalid or missing API key
-```json
-{
-  "message": "Unauthorized"
-}
-```
-
-**400 Bad Request** - Missing required fields
-```json
-{
-  "message": "Email, license key, and brandingActive are required"
-}
-```
-
-**400 Bad Request** - Email doesn't match license key
-```json
-{
-  "message": "Email does not match license key"
-}
-```
-
-**404 Not Found** - Invalid license key or not a company account
-```json
-{
-  "message": "No company account found with this license key"
+  "brandingActive": true,
+  "message": "Branding subscription activated for Example Company"
 }
 ```
 
 ---
 
-## 3. Complete Integration Workflow
+## Verification Endpoint (Read-Only)
 
-### Purchase Flow
-1. **User initiates purchase** on platform
-2. **Platform calls marketplace purchase API:**
-   ```
-   POST https://marketplace.replit.app/api/purchase/branding
+Before initiating any purchase, verify the account exists:
+
+### Endpoint
+```
+POST /api/purchase/verify-account
+```
+
+### Request Body
+```json
+{
+  "email": "company@example.com"
+}
+```
+
+### Response (Account Exists)
+```json
+{
+  "exists": true,
+  "companyId": "uuid-here",
+  "companyName": "Example Company",
+  "email": "company@example.com",
+  "tier": 1,
+  "licenseKey": "ABC123-1",
+  "currentLimits": {
+    "baseSeatLimit": 4,
+    "additionalSeats": 0,
+    "totalSeats": 4,
+    "baseProjectLimit": 2,
+    "additionalProjects": 0,
+    "totalProjects": 2
+  }
+}
+```
+
+### Response (Account Doesn't Exist)
+```json
+{
+  "exists": false,
+  "message": "No company account found with this email"
+}
+```
+
+---
+
+## Complete Workflow Examples
+
+### Tier Upgrade Workflow (CRITICAL!)
+
+```
+1. User clicks "Upgrade to Tier 2"
+2. Marketplace processes payment via Stripe
+3. Payment succeeds
+4. Marketplace generates new license key: ABC123-2
+5. ⚠️ IMMEDIATELY call /api/purchase/update-tier:
    {
-     "email": "company@example.com",
-     "licenseKey": "UNIQUE-LICENSE-KEY-123"
+     "email": "user@company.com",
+     "newLicenseKey": "ABC123-2"
    }
-   ```
-3. **Marketplace processes payment** via Stripe
-4. **Marketplace calls platform activation webhook:**
-   ```
-   POST https://<platform-domain>/api/purchase/activate-branding
+   (Omit additionalSeats/additionalProjects to preserve existing purchased add-ons)
+6. Platform saves new license key and preserves existing add-ons
+7. User stays logged in, upgraded tier active, keeps all purchased add-ons
+```
+
+### Seat Purchase Workflow
+
+```
+1. User clicks "Buy 2 More Seats"
+2. Marketplace processes payment
+3. Payment succeeds
+4. Call /api/purchase/update-seats:
    {
-     "email": "company@example.com",
-     "licenseKey": "UNIQUE-LICENSE-KEY-123",
+     "email": "user@company.com",
+     "additionalSeats": 2
+   }
+5. Platform increments additional seats counter
+6. User gets access to hire 2 more employees
+```
+
+### Project Purchase Workflow
+
+```
+1. User clicks "Buy 3 More Projects"
+2. Marketplace processes payment
+3. Payment succeeds
+4. Call /api/purchase/update-projects:
+   {
+     "email": "user@company.com",
+     "additionalProjects": 3
+   }
+5. Platform increments additional projects counter
+6. User can create 3 more active projects
+```
+
+### Branding Subscription Workflow
+
+```
+Activation:
+1. User clicks "Subscribe to Branding"
+2. Marketplace processes $0.49 payment
+3. Payment succeeds
+4. Call /api/purchase/update-branding:
+   {
+     "email": "user@company.com",
      "brandingActive": true
    }
-   ```
-5. **Platform activates branding** and returns success
-6. **User gets access** to branding customization controls
+5. Platform activates branding
+6. User can upload logo and customize colors
 
-### Cancellation Flow
-1. **User cancels subscription** on marketplace
-2. **Marketplace calls platform activation webhook:**
-   ```
-   POST https://<platform-domain>/api/purchase/activate-branding
+Deactivation:
+1. User cancels subscription OR payment fails
+2. Call /api/purchase/update-branding:
    {
-     "email": "company@example.com",
-     "licenseKey": "UNIQUE-LICENSE-KEY-123",
+     "email": "user@company.com",
      "brandingActive": false
    }
-   ```
-3. **Platform deactivates branding** and hides customization controls
-4. **User loses access** to branding features
-
-### Renewal Flow
-- If renewal succeeds: No action needed (branding stays active)
-- If renewal fails: Call activation webhook with `brandingActive: false`
-
----
-
-## 4. Testing Guide
-
-### Test Case 1: Successful Activation
-```bash
-curl -X POST https://<platform-domain>/api/purchase/activate-branding \
-  -H "Content-Type: application/json" \
-  -H "x-api-key: <PURCHASE_API_KEY>" \
-  -d '{
-    "email": "test@test.com",
-    "licenseKey": "UNIQUE-TEST-BRANDING-KEY",
-    "brandingActive": true
-  }'
-
-# Expected: 200 OK with {"success":true,"message":"Branding updated successfully",...}
-```
-
-### Test Case 2: Successful Deactivation
-```bash
-curl -X POST https://<platform-domain>/api/purchase/activate-branding \
-  -H "Content-Type: application/json" \
-  -H "x-api-key: <PURCHASE_API_KEY>" \
-  -d '{
-    "email": "test@test.com",
-    "licenseKey": "UNIQUE-TEST-BRANDING-KEY",
-    "brandingActive": false
-  }'
-
-# Expected: 200 OK with {"success":true,"message":"Branding updated successfully","brandingActive":false}
-```
-
-### Test Case 3: Invalid API Key
-```bash
-curl -X POST https://<platform-domain>/api/purchase/activate-branding \
-  -H "Content-Type: application/json" \
-  -H "x-api-key: INVALID" \
-  -d '{
-    "email": "test@test.com",
-    "licenseKey": "UNIQUE-TEST-BRANDING-KEY",
-    "brandingActive": true
-  }'
-
-# Expected: 401 Unauthorized
-```
-
-### Test Case 4: Missing Field
-```bash
-curl -X POST https://<platform-domain>/api/purchase/activate-branding \
-  -H "Content-Type: application/json" \
-  -H "x-api-key: <PURCHASE_API_KEY>" \
-  -d '{
-    "email": "test@test.com",
-    "brandingActive": true
-  }'
-
-# Expected: 400 Bad Request - "Email, license key, and brandingActive are required"
-```
-
-### Test Case 5: Email Mismatch
-```bash
-curl -X POST https://<platform-domain>/api/purchase/activate-branding \
-  -H "Content-Type: application/json" \
-  -H "x-api-key: <PURCHASE_API_KEY>" \
-  -d '{
-    "email": "wrong@email.com",
-    "licenseKey": "UNIQUE-TEST-BRANDING-KEY",
-    "brandingActive": true
-  }'
-
-# Expected: 400 Bad Request - "Email does not match license key"
-```
-
-### Test Case 6: Invalid License Key
-```bash
-curl -X POST https://<platform-domain>/api/purchase/activate-branding \
-  -H "Content-Type: application/json" \
-  -H "x-api-key: <PURCHASE_API_KEY>" \
-  -d '{
-    "email": "test@test.com",
-    "licenseKey": "INVALID-KEY",
-    "brandingActive": true
-  }'
-
-# Expected: 404 Not Found - "No company account found with this license key"
+3. Platform deactivates branding
+4. Logo and colors revert to defaults
 ```
 
 ---
 
-## 5. Security Requirements
+## Testing Guide
 
-### API Key Management
-- The `PURCHASE_API_KEY` is a shared secret between marketplace and platform
-- Store securely in environment variables
-- Rotate periodically
-- Never expose in client-side code or logs
+### Test Tier Upgrade Webhook (Preserves Existing Add-ons)
+```bash
+curl -X POST https://rope-access-pro.replit.app/api/purchase/update-tier \
+  -H "Content-Type: application/json" \
+  -H "x-api-key: YOUR_PURCHASE_API_KEY" \
+  -d '{
+    "email": "test@example.com",
+    "newLicenseKey": "TEST123-2"
+  }'
+```
 
-### Request Validation
-- Platform validates ALL fields are present
-- Platform validates email matches license key owner
-- Platform validates license key exists and belongs to company account
-- Platform rejects requests with invalid API key
+### Test Tier Upgrade Webhook (Updates Add-ons)
+```bash
+curl -X POST https://rope-access-pro.replit.app/api/purchase/update-tier \
+  -H "Content-Type: application/json" \
+  -H "x-api-key: YOUR_PURCHASE_API_KEY" \
+  -d '{
+    "email": "test@example.com",
+    "newLicenseKey": "TEST123-2",
+    "additionalSeats": 5,
+    "additionalProjects": 3
+  }'
+```
 
-### Idempotency
-- Webhook calls are idempotent
-- Calling activation with `brandingActive: true` when already active is safe
-- Calling deactivation with `brandingActive: false` when already inactive is safe
-- Always returns 200 OK for valid requests regardless of state change
+### Test Seat Purchase Webhook
+```bash
+curl -X POST https://rope-access-pro.replit.app/api/purchase/update-seats \
+  -H "Content-Type: application/json" \
+  -H "x-api-key: YOUR_PURCHASE_API_KEY" \
+  -d '{
+    "email": "test@example.com",
+    "additionalSeats": 2
+  }'
+```
+
+### Test Project Purchase Webhook
+```bash
+curl -X POST https://rope-access-pro.replit.app/api/purchase/update-projects \
+  -H "Content-Type: application/json" \
+  -H "x-api-key: YOUR_PURCHASE_API_KEY" \
+  -d '{
+    "email": "test@example.com",
+    "additionalProjects": 3
+  }'
+```
+
+### Test Branding Activation Webhook
+```bash
+curl -X POST https://rope-access-pro.replit.app/api/purchase/update-branding \
+  -H "Content-Type: application/json" \
+  -H "x-api-key: YOUR_PURCHASE_API_KEY" \
+  -d '{
+    "email": "test@example.com",
+    "brandingActive": true
+  }'
+```
 
 ---
 
-## 6. Error Handling
+## Error Handling
 
 ### Retry Logic (Marketplace Side)
-If webhook call fails:
-- Retry with exponential backoff: 1s, 2s, 4s, 8s, 16s
-- Maximum 5 retry attempts
-- Log all failures for manual review
-- Alert on critical failures (authentication errors)
 
-### Timeout
-- Set webhook request timeout to 30 seconds
+If webhook call fails:
+1. Retry with exponential backoff: 1s, 2s, 4s, 8s, 16s
+2. Maximum 5 retry attempts
+3. Log all failures for manual review
+4. Alert on critical failures (401 authentication errors)
+
+### Webhook Timeout
+
+- Set timeout to 30 seconds
 - Platform typically responds within 500ms
 
-### Monitoring
-Monitor these metrics:
-- Webhook success rate (should be >99%)
-- Response time (should be <1s)
-- 401 errors (indicates API key mismatch)
-- 404 errors (indicates data sync issue)
+### Common Errors
 
----
-
-## 7. Data Synchronization
-
-### Required Data
-Marketplace needs to track:
-- `email`: Company email address
-- `licenseKey`: Unique license key for company
-- `brandingActive`: Current subscription status (boolean)
-- `subscriptionId`: Stripe subscription ID
-- `nextBillingDate`: When next charge occurs
-
-### State Transitions
-```
-NOT_SUBSCRIBED → [Purchase] → ACTIVE
-ACTIVE → [Cancel] → INACTIVE
-ACTIVE → [Payment Failed] → INACTIVE
-INACTIVE → [Re-subscribe] → ACTIVE
-```
-
-Always call the activation webhook when state changes from:
-- NOT_SUBSCRIBED → ACTIVE: `brandingActive: true`
-- ACTIVE → INACTIVE: `brandingActive: false`
-- INACTIVE → ACTIVE: `brandingActive: true`
-
----
-
-## 8. Production Checklist
-
-Before going live, verify:
-
-- [ ] `PURCHASE_API_KEY` is configured on both sides
-- [ ] Webhook endpoint URL is correct for production
-- [ ] All 6 test cases pass successfully
-- [ ] Retry logic is implemented
-- [ ] Monitoring/alerting is configured
-- [ ] Error logging captures all failures
-- [ ] Webhook timeouts are set appropriately
-- [ ] Payment processing handles edge cases
-- [ ] Subscription renewal triggers correct webhook calls
-- [ ] Cancellation flow deactivates branding immediately
-
----
-
-## 9. Support & Troubleshooting
-
-### Common Issues
-
-**"Unauthorized" errors:**
+**401 Unauthorized:**
 - Verify `PURCHASE_API_KEY` matches on both sides
-- Check `x-api-key` header is being sent
-- Ensure API key doesn't have trailing spaces
+- Check `x-api-key` header is being sent correctly
 
-**"Email does not match license key":**
-- Verify the email in your database matches what the license key resolves to
-- Check for case sensitivity issues
-- Confirm license key hasn't been reassigned
+**404 Not Found:**
+- Company account doesn't exist
+- Verify email is correct
 
-**"No company account found":**
-- Verify license key exists in platform database
-- Confirm user role is "company" (not employee/resident)
-- Check for typos in license key
-
-### Contact
-For integration support, contact the platform development team with:
-- Request/response logs
-- Timestamp of failure
-- Email and license key involved
-- Error message received
+**400 Bad Request:**
+- Missing required fields
+- Check request payload structure
 
 ---
 
-## 10. Example Marketplace Implementation (Node.js)
+## Summary Checklist for Marketplace Agent
 
-```javascript
-const PLATFORM_API_KEY = process.env.PURCHASE_API_KEY;
-const PLATFORM_WEBHOOK_URL = process.env.PLATFORM_WEBHOOK_URL;
+### After Tier Upgrade Payment Success:
+- [ ] Generate new license key with updated tier suffix
+- [ ] ⚠️ **IMMEDIATELY** call `/api/purchase/update-tier` webhook
+- [ ] Include `email`, `newLicenseKey` in payload
+- [ ] Wait for 200 OK response
+- [ ] Log success/failure
 
-/**
- * Call platform webhook to activate/deactivate branding
- */
-async function updatePlatformBranding(email, licenseKey, brandingActive) {
-  const maxRetries = 5;
-  const baseDelay = 1000; // 1 second
-  
-  for (let attempt = 0; attempt < maxRetries; attempt++) {
-    try {
-      const response = await fetch(`${PLATFORM_WEBHOOK_URL}/api/purchase/activate-branding`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-api-key': PLATFORM_API_KEY,
-        },
-        body: JSON.stringify({
-          email,
-          licenseKey,
-          brandingActive,
-        }),
-        timeout: 30000, // 30 second timeout
-      });
-      
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(`Platform webhook failed: ${response.status} - ${errorData.message || 'Unknown error'}`);
-      }
-      
-      const result = await response.json();
-      console.log(`✓ Branding ${brandingActive ? 'activated' : 'deactivated'} for ${email}`);
-      return result;
-      
-    } catch (error) {
-      console.error(`Attempt ${attempt + 1}/${maxRetries} failed:`, error.message);
-      
-      // Don't retry on authentication errors
-      if (error.message.includes('401')) {
-        throw new Error('Invalid API key - check PURCHASE_API_KEY configuration');
-      }
-      
-      // Exponential backoff
-      if (attempt < maxRetries - 1) {
-        const delay = baseDelay * Math.pow(2, attempt);
-        console.log(`Retrying in ${delay}ms...`);
-        await new Promise(resolve => setTimeout(resolve, delay));
-      } else {
-        throw new Error(`Failed to update platform branding after ${maxRetries} attempts`);
-      }
-    }
-  }
-}
+### After Seat Purchase Payment Success:
+- [ ] Call `/api/purchase/update-seats` webhook
+- [ ] Include `email`, `additionalSeats` (incremental amount)
+- [ ] Wait for 200 OK response
+- [ ] Log success/failure
 
-/**
- * Handle successful payment
- */
-async function onBrandingPurchaseSuccess(email, licenseKey, stripeSubscriptionId) {
-  try {
-    // Activate branding on platform
-    await updatePlatformBranding(email, licenseKey, true);
-    
-    // Update your database
-    await db.subscriptions.create({
-      email,
-      licenseKey,
-      type: 'branding',
-      stripeSubscriptionId,
-      status: 'active',
-      price: 0.49,
-    });
-    
-  } catch (error) {
-    console.error('Failed to activate branding:', error);
-    // Alert your team for manual intervention
-    await alertTeam('Branding activation failed', { email, licenseKey, error: error.message });
-  }
-}
+### After Project Purchase Payment Success:
+- [ ] Call `/api/purchase/update-projects` webhook
+- [ ] Include `email`, `additionalProjects` (incremental amount)
+- [ ] Wait for 200 OK response
+- [ ] Log success/failure
 
-/**
- * Handle subscription cancellation
- */
-async function onBrandingCancellation(email, licenseKey) {
-  try {
-    // Deactivate branding on platform
-    await updatePlatformBranding(email, licenseKey, false);
-    
-    // Update your database
-    await db.subscriptions.update({
-      where: { email, licenseKey, type: 'branding' },
-      data: { status: 'cancelled' },
-    });
-    
-  } catch (error) {
-    console.error('Failed to deactivate branding:', error);
-    await alertTeam('Branding deactivation failed', { email, licenseKey, error: error.message });
-  }
-}
+### After Branding Subscription Success/Cancellation:
+- [ ] Call `/api/purchase/update-branding` webhook
+- [ ] Include `email`, `brandingActive` (true/false)
+- [ ] Wait for 200 OK response
+- [ ] Log success/failure
 
-/**
- * Handle payment failure (renewal failed)
- */
-async function onPaymentFailed(email, licenseKey) {
-  try {
-    // Deactivate branding on platform
-    await updatePlatformBranding(email, licenseKey, false);
-    
-    // Update your database
-    await db.subscriptions.update({
-      where: { email, licenseKey, type: 'branding' },
-      data: { status: 'payment_failed' },
-    });
-    
-  } catch (error) {
-    console.error('Failed to deactivate branding after payment failure:', error);
-    await alertTeam('Branding deactivation failed', { email, licenseKey, error: error.message });
-  }
-}
-```
+### Error Handling:
+- [ ] Implement retry logic with exponential backoff
+- [ ] Set 30-second timeout on webhook calls
+- [ ] Log all failures for manual review
+- [ ] Alert team on repeated failures
 
 ---
 
-## Summary
+## Critical Success Factors
 
-**Marketplace responsibilities:**
-1. Process $0.49/month payments via Stripe
-2. Call platform activation webhook with `brandingActive: true` after successful purchase
-3. Call platform activation webhook with `brandingActive: false` after cancellation or payment failure
-4. Implement retry logic for webhook calls
-5. Monitor webhook success rate
+1. ⚠️ **Tier upgrades:** Call webhook IMMEDIATELY to prevent lockout
+2. **Seats/Projects:** Use incremental amounts (not totals)
+3. **Branding:** Toggle boolean flag (true/false)
+4. **API Key:** Must match on both sides
+5. **Retry Logic:** Implement for all webhook calls
+6. **Monitoring:** Track success rates and response times
 
-**Platform responsibilities:**
-1. Provide purchase initiation endpoint
-2. Validate webhook authentication
-3. Update branding subscription status in database
-4. Show/hide branding controls based on subscription status
-5. Apply branding customizations when active
-
-**Critical success factors:**
-- Webhook must be called IMMEDIATELY after payment success
-- Webhook must use correct API key
-- Email and license key must match exactly
-- Deactivation must happen immediately on cancellation
-
-This integration enables seamless white label branding subscription management with instant activation and deactivation.
+**This integration ensures seamless purchase management with instant activation and prevents user lockout issues.**
