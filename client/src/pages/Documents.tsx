@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { FileText, Download, Calendar, DollarSign } from "lucide-react";
 import { hasFinancialAccess } from "@/lib/permissions";
+import { jsPDF } from "jspdf";
 
 export default function Documents() {
   const { data: userData } = useQuery<{ user: any }>({
@@ -43,7 +44,66 @@ export default function Documents() {
     }))
   );
 
-  const downloadToolboxMeeting = (meeting: any) => {
+  const downloadToolboxMeeting = async (meeting: any) => {
+    const doc = new jsPDF();
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const pageHeight = doc.internal.pageSize.getHeight();
+    let yPosition = 20;
+
+    // Helper function to add multi-line text with pagination
+    const addMultilineText = (lines: string[], currentY: number, lineHeight: number = 6): number => {
+      let y = currentY;
+      for (const line of lines) {
+        if (y > pageHeight - 30) {
+          doc.addPage();
+          y = 20;
+        }
+        doc.text(line, 20, y);
+        y += lineHeight;
+      }
+      return y;
+    };
+
+    // Header - Title
+    doc.setFillColor(14, 165, 233); // Ocean blue
+    doc.rect(0, 0, pageWidth, 35, 'F');
+    doc.setTextColor(255, 255, 255);
+    doc.setFontSize(22);
+    doc.setFont('helvetica', 'bold');
+    doc.text('DAILY TOOLBOX MEETING RECORD', pageWidth / 2, 15, { align: 'center' });
+    doc.setFontSize(12);
+    doc.setFont('helvetica', 'normal');
+    doc.text('Official Safety Meeting Documentation', pageWidth / 2, 25, { align: 'center' });
+
+    yPosition = 50;
+
+    // Meeting Details Section
+    doc.setTextColor(0, 0, 0);
+    doc.setFontSize(11);
+    doc.setFont('helvetica', 'bold');
+    doc.text('Meeting Information', 20, yPosition);
+    yPosition += 8;
+
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(10);
+    doc.text(`Date: ${new Date(meeting.meetingDate).toLocaleDateString('en-US', { 
+      weekday: 'long', 
+      year: 'numeric', 
+      month: 'long', 
+      day: 'numeric' 
+    })}`, 20, yPosition);
+    yPosition += 6;
+
+    doc.text(`Conducted By: ${meeting.conductedByName}`, 20, yPosition);
+    yPosition += 6;
+
+    // Attendees with wrapping
+    const attendeesText = Array.isArray(meeting.attendees) ? meeting.attendees.join(', ') : meeting.attendees;
+    const attendeesLines = doc.splitTextToSize(`Attendees: ${attendeesText}`, pageWidth - 40);
+    yPosition = addMultilineText(attendeesLines, yPosition);
+    yPosition += 8;
+
+    // Topics Discussed Section
     const topics = [];
     if (meeting.topicFallProtection) topics.push('Fall Protection and Rescue Procedures');
     if (meeting.topicAnchorPoints) topics.push('Anchor Point Selection and Inspection');
@@ -66,60 +126,221 @@ export default function Documents() {
     if (meeting.topicSiteHazards) topics.push('Site-Specific Hazards');
     if (meeting.topicBuddySystem) topics.push('Buddy System and Supervision');
 
-    const content = `DAILY TOOLBOX MEETING RECORD
+    if (yPosition > pageHeight - 30) {
+      doc.addPage();
+      yPosition = 20;
+    }
 
-Date: ${new Date(meeting.meetingDate).toLocaleDateString()}
-Conducted By: ${meeting.conductedByName}
-Attendees: ${Array.isArray(meeting.attendees) ? meeting.attendees.join(', ') : meeting.attendees}
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(11);
+    doc.text('Topics Discussed', 20, yPosition);
+    yPosition += 8;
 
-TOPICS DISCUSSED:
-${topics.map((t, i) => `${i + 1}. ${t}`).join('\n')}
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(10);
+    topics.forEach((topic, index) => {
+      if (yPosition > pageHeight - 30) {
+        doc.addPage();
+        yPosition = 20;
+      }
+      doc.text(`${index + 1}. ${topic}`, 25, yPosition);
+      yPosition += 6;
+    });
 
-${meeting.customTopic ? `\nCustom Topic: ${meeting.customTopic}` : ''}
+    yPosition += 4;
 
-${meeting.additionalNotes ? `\nAdditional Notes:\n${meeting.additionalNotes}` : ''}
+    // Custom Topic
+    if (meeting.customTopic) {
+      if (yPosition > pageHeight - 30) {
+        doc.addPage();
+        yPosition = 20;
+      }
+      
+      doc.setFont('helvetica', 'bold');
+      doc.text('Custom Topic:', 20, yPosition);
+      yPosition += 6;
+      
+      doc.setFont('helvetica', 'normal');
+      const customTopicLines = doc.splitTextToSize(meeting.customTopic, pageWidth - 40);
+      yPosition = addMultilineText(customTopicLines, yPosition);
+      yPosition += 8;
+    }
 
----
-This is an official safety meeting record.
-`;
+    // Additional Notes
+    if (meeting.additionalNotes) {
+      if (yPosition > pageHeight - 30) {
+        doc.addPage();
+        yPosition = 20;
+      }
+      
+      doc.setFont('helvetica', 'bold');
+      doc.text('Additional Notes:', 20, yPosition);
+      yPosition += 6;
+      
+      doc.setFont('helvetica', 'normal');
+      const notesLines = doc.splitTextToSize(meeting.additionalNotes, pageWidth - 40);
+      yPosition = addMultilineText(notesLines, yPosition);
+      yPosition += 8;
+    }
 
-    const blob = new Blob([content], { type: 'text/plain' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `Toolbox_Meeting_${new Date(meeting.meetingDate).toISOString().split('T')[0]}.txt`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
+    // Signatures Section
+    if (meeting.signatures && meeting.signatures.length > 0) {
+      yPosition += 10;
+      
+      if (yPosition > pageHeight - 30) {
+        doc.addPage();
+        yPosition = 20;
+      }
+
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(11);
+      doc.text('Attendee Signatures', 20, yPosition);
+      yPosition += 10;
+
+      for (const sig of meeting.signatures) {
+        if (yPosition > pageHeight - 50) {
+          doc.addPage();
+          yPosition = 20;
+        }
+
+        // Employee name
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(10);
+        doc.text(sig.employeeName, 20, yPosition);
+        yPosition += 5;
+
+        // Add signature image
+        try {
+          doc.addImage(sig.signatureDataUrl, 'PNG', 20, yPosition, 60, 20);
+        } catch (error) {
+          console.error('Error adding signature image:', error);
+        }
+        yPosition += 25;
+
+        // Line under signature
+        doc.setLineWidth(0.5);
+        doc.line(20, yPosition, 80, yPosition);
+        yPosition += 10;
+      }
+    }
+
+    // Footer
+    const footerY = pageHeight - 15;
+    doc.setFontSize(8);
+    doc.setTextColor(100, 100, 100);
+    doc.setFont('helvetica', 'italic');
+    doc.text('This is an official safety meeting record. Keep for compliance purposes.', pageWidth / 2, footerY, { align: 'center' });
+
+    // Save PDF
+    doc.save(`Toolbox_Meeting_${new Date(meeting.meetingDate).toISOString().split('T')[0]}.pdf`);
   };
 
   const downloadHarnessInspection = (inspection: any) => {
-    const content = `ROPE ACCESS EQUIPMENT INSPECTION RECORD
+    const doc = new jsPDF();
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const pageHeight = doc.internal.pageSize.getHeight();
+    let yPosition = 20;
 
-Inspection Date: ${new Date(inspection.inspectionDate).toLocaleDateString()}
-Inspector: ${inspection.inspectorName}
-Manufacturer: ${inspection.manufacturer || 'N/A'}
-Equipment ID: ${inspection.equipmentId || 'N/A'}
-Date in Service: ${inspection.dateInService || 'N/A'}
+    // Helper function to add multi-line text with pagination
+    const addMultilineText = (lines: string[], currentY: number, lineHeight: number = 6): number => {
+      let y = currentY;
+      for (const line of lines) {
+        if (y > pageHeight - 30) {
+          doc.addPage();
+          y = 20;
+        }
+        doc.text(line, 20, y);
+        y += lineHeight;
+      }
+      return y;
+    };
 
-INSPECTION RESULT: ${inspection.overallStatus?.toUpperCase() || 'N/A'}
+    // Header - Title
+    doc.setFillColor(14, 165, 233); // Ocean blue
+    doc.rect(0, 0, pageWidth, 35, 'F');
+    doc.setTextColor(255, 255, 255);
+    doc.setFontSize(20);
+    doc.setFont('helvetica', 'bold');
+    doc.text('ROPE ACCESS EQUIPMENT', pageWidth / 2, 15, { align: 'center' });
+    doc.text('INSPECTION RECORD', pageWidth / 2, 23, { align: 'center' });
+    doc.setFontSize(11);
+    doc.setFont('helvetica', 'normal');
+    doc.text('Official Safety Equipment Documentation', pageWidth / 2, 30, { align: 'center' });
 
-${inspection.comments ? `\nComments:\n${inspection.comments}` : ''}
+    yPosition = 50;
 
----
-This is an official equipment inspection record.
-`;
+    // Inspection Details Section
+    doc.setTextColor(0, 0, 0);
+    doc.setFontSize(11);
+    doc.setFont('helvetica', 'bold');
+    doc.text('Inspection Information', 20, yPosition);
+    yPosition += 8;
 
-    const blob = new Blob([content], { type: 'text/plain' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `Equipment_Inspection_${new Date(inspection.inspectionDate).toISOString().split('T')[0]}.txt`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(10);
+    doc.text(`Inspection Date: ${new Date(inspection.inspectionDate).toLocaleDateString('en-US', {
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    })}`, 20, yPosition);
+    yPosition += 6;
+
+    doc.text(`Inspector: ${inspection.inspectorName}`, 20, yPosition);
+    yPosition += 6;
+
+    doc.text(`Manufacturer: ${inspection.manufacturer || 'N/A'}`, 20, yPosition);
+    yPosition += 6;
+
+    doc.text(`Equipment ID: ${inspection.equipmentId || 'N/A'}`, 20, yPosition);
+    yPosition += 6;
+
+    doc.text(`Date in Service: ${inspection.dateInService || 'N/A'}`, 20, yPosition);
+    yPosition += 12;
+
+    // Inspection Result
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(12);
+    const status = inspection.overallStatus?.toUpperCase() || 'N/A';
+    if (status === 'PASS') {
+      doc.setTextColor(34, 197, 94); // Green
+    } else if (status === 'FAIL') {
+      doc.setTextColor(239, 68, 68); // Red
+    } else {
+      doc.setTextColor(234, 179, 8); // Yellow
+    }
+    doc.text(`INSPECTION RESULT: ${status}`, 20, yPosition);
+    yPosition += 12;
+
+    // Comments
+    if (inspection.comments) {
+      if (yPosition > pageHeight - 30) {
+        doc.addPage();
+        yPosition = 20;
+      }
+      
+      doc.setTextColor(0, 0, 0);
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(11);
+      doc.text('Comments:', 20, yPosition);
+      yPosition += 6;
+
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(10);
+      const commentsLines = doc.splitTextToSize(inspection.comments, pageWidth - 40);
+      yPosition = addMultilineText(commentsLines, yPosition);
+      yPosition += 8;
+    }
+
+    // Footer
+    const footerY = pageHeight - 15;
+    doc.setFontSize(8);
+    doc.setTextColor(100, 100, 100);
+    doc.setFont('helvetica', 'italic');
+    doc.text('This is an official equipment inspection record. Keep for compliance purposes.', pageWidth / 2, footerY, { align: 'center' });
+
+    // Save PDF
+    doc.save(`Equipment_Inspection_${new Date(inspection.inspectionDate).toISOString().split('T')[0]}.pdf`);
   };
 
   // Same professional HTML download function as Quotes.tsx
