@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
+import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -436,7 +437,7 @@ export default function ToolboxMeetingForm() {
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
                     <div>
-                      <FormLabel>Digital Signatures</FormLabel>
+                      <Label>Digital Signatures</Label>
                       <p className="text-sm text-muted-foreground mt-1">
                         Collect signatures from attendees
                       </p>
@@ -584,7 +585,7 @@ export default function ToolboxMeetingForm() {
 
             <div className="space-y-4">
               <div>
-                <FormLabel>Select Employee *</FormLabel>
+                <Label>Select Employee *</Label>
                 <Select value={selectedSignatureEmployee} onValueChange={setSelectedSignatureEmployee}>
                   <SelectTrigger data-testid="select-signature-employee">
                     <SelectValue placeholder="Choose employee to sign" />
@@ -609,13 +610,12 @@ export default function ToolboxMeetingForm() {
               </div>
 
               <div>
-                <FormLabel>Signature *</FormLabel>
+                <Label>Signature *</Label>
                 <div className="border-2 border-dashed rounded-md p-2 bg-background">
                   <SignatureCanvas
                     ref={signatureCanvasRef}
                     canvasProps={{
-                      className: 'signature-canvas w-full h-48 bg-white rounded',
-                      'data-testid': 'signature-canvas'
+                      className: 'signature-canvas w-full h-48 bg-white rounded'
                     }}
                   />
                 </div>
