@@ -16,6 +16,8 @@ import { VerticalBuildingProgress } from "@/components/VerticalBuildingProgress"
 import { ParkadeView } from "@/components/ParkadeView";
 import { useToast } from "@/hooks/use-toast";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { AlertCircle } from "lucide-react";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -849,18 +851,36 @@ export default function ProjectDetail() {
                       
                       const estimatedHours = project.estimatedHours || 0;
                       const hoursRemaining = Math.max(0, estimatedHours - totalHoursWorked);
+                      const isOverBudget = totalHoursWorked > estimatedHours;
+                      const hoursOver = isOverBudget ? totalHoursWorked - estimatedHours : 0;
                       
-                      // Calculate total labor cost
-                      const totalLaborCost = completedSessions.reduce((sum: number, session: any) => {
+                      // Calculate total labor cost and overage cost
+                      let totalLaborCost = 0;
+                      let cumulativeHours = 0;
+                      let overageCost = 0;
+                      
+                      completedSessions.forEach((session: any) => {
                         if (session.startTime && session.endTime && session.techHourlyRate) {
                           const start = new Date(session.startTime);
                           const end = new Date(session.endTime);
                           const hours = (end.getTime() - start.getTime()) / (1000 * 60 * 60);
                           const cost = hours * parseFloat(session.techHourlyRate);
-                          return sum + cost;
+                          totalLaborCost += cost;
+                          
+                          // Track overage cost (hours beyond estimated hours)
+                          if (isOverBudget) {
+                            const previousCumulative = cumulativeHours;
+                            cumulativeHours += hours;
+                            
+                            if (cumulativeHours > estimatedHours) {
+                              // This session crosses or is beyond the budget
+                              const overageHoursInSession = Math.min(hours, cumulativeHours - estimatedHours);
+                              const sessionOverageCost = overageHoursInSession * parseFloat(session.techHourlyRate);
+                              overageCost += sessionOverageCost;
+                            }
+                          }
                         }
-                        return sum;
-                      }, 0);
+                      });
                       
                       const hoursPieData = [
                         { name: 'Hours Worked', value: parseFloat(totalHoursWorked.toFixed(2)), color: '#1976D2' },
@@ -891,6 +911,26 @@ export default function ProjectDetail() {
                               <Legend />
                             </PieChart>
                           </ResponsiveContainer>
+                          
+                          {isOverBudget && (
+                            <Alert className="w-full max-w-sm mt-6 border-destructive/50 bg-destructive/10">
+                              <AlertCircle className="h-4 w-4 text-destructive" />
+                              <AlertTitle className="text-destructive">Over Budget</AlertTitle>
+                              <AlertDescription className="text-destructive/90">
+                                <div className="space-y-1">
+                                  <div className="font-semibold">
+                                    {hoursOver.toFixed(1)}h over allocated hours
+                                  </div>
+                                  <div className="text-sm">
+                                    Overage cost: ${overageCost.toFixed(2)}
+                                  </div>
+                                  <div className="text-xs mt-2">
+                                    Allocated: {estimatedHours}h | Worked: {totalHoursWorked.toFixed(1)}h
+                                  </div>
+                                </div>
+                              </AlertDescription>
+                            </Alert>
+                          )}
                           
                           <div className="grid grid-cols-2 gap-4 mt-4 w-full max-w-sm">
                             <div className="text-center p-4 rounded-lg border bg-card">
