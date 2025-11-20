@@ -150,7 +150,7 @@ function BrandColorsSection({ user }: { user: any }) {
           onClick={saveColors}
           disabled={isSaving}
           data-testid="button-update-colors"
-          className="h-12"
+          className="h-12 !bg-blue-600 hover:!bg-blue-700 !text-white"
         >
           {isSaving ? "Saving..." : "Save Changes"}
         </Button>

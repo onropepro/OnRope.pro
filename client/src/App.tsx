@@ -191,6 +191,9 @@ function BrandingProvider({ children }: { children: React.ReactNode }) {
   const brandColors = (branding.subscriptionActive && branding.colors) ? branding.colors : [];
   const primaryBrandColor = brandColors[0] || null;
 
+  // Only apply branding if user is authenticated
+  const isAuthenticated = !!userData?.user;
+
   // Convert hex color to HSL format required by Tailwind
   const hexToHSL = (hex: string): string => {
     // Remove # if present
@@ -220,9 +223,9 @@ function BrandingProvider({ children }: { children: React.ReactNode }) {
     return `${Math.round(h * 360)} ${Math.round(s * 100)}% ${Math.round(l * 100)}%`;
   };
 
-  // Inject brand colors globally - override primary color across entire platform
+  // Inject brand colors globally - ONLY when user is authenticated
   useEffect(() => {
-    if (primaryBrandColor) {
+    if (isAuthenticated && primaryBrandColor) {
       // Convert hex to HSL format for Tailwind
       const hslColor = hexToHSL(primaryBrandColor);
       
@@ -261,7 +264,7 @@ function BrandingProvider({ children }: { children: React.ReactNode }) {
       document.documentElement.style.removeProperty('--sidebar-ring');
       document.documentElement.style.removeProperty('--chart-1');
     };
-  }, [primaryBrandColor]);
+  }, [isAuthenticated, primaryBrandColor]);
 
   return <>{children}</>;
 }
