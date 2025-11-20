@@ -191,32 +191,74 @@ function BrandingProvider({ children }: { children: React.ReactNode }) {
   const brandColors = (branding.subscriptionActive && branding.colors) ? branding.colors : [];
   const primaryBrandColor = brandColors[0] || null;
 
+  // Convert hex color to HSL format required by Tailwind
+  const hexToHSL = (hex: string): string => {
+    // Remove # if present
+    hex = hex.replace(/^#/, '');
+    
+    // Parse hex to RGB
+    const r = parseInt(hex.substring(0, 2), 16) / 255;
+    const g = parseInt(hex.substring(2, 4), 16) / 255;
+    const b = parseInt(hex.substring(4, 6), 16) / 255;
+    
+    const max = Math.max(r, g, b);
+    const min = Math.min(r, g, b);
+    let h = 0, s = 0, l = (max + min) / 2;
+    
+    if (max !== min) {
+      const d = max - min;
+      s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+      
+      switch (max) {
+        case r: h = ((g - b) / d + (g < b ? 6 : 0)) / 6; break;
+        case g: h = ((b - r) / d + 2) / 6; break;
+        case b: h = ((r - g) / d + 4) / 6; break;
+      }
+    }
+    
+    // Return in "H S% L%" format (no hsl() wrapper, Tailwind adds that)
+    return `${Math.round(h * 360)} ${Math.round(s * 100)}% ${Math.round(l * 100)}%`;
+  };
+
   // Inject brand colors globally - override primary color across entire platform
   useEffect(() => {
     if (primaryBrandColor) {
-      // Override primary color globally (this affects buttons, links, badges, etc. everywhere)
-      document.documentElement.style.setProperty('--brand-primary', primaryBrandColor);
-      document.documentElement.style.setProperty('--primary', primaryBrandColor);
-      document.documentElement.style.setProperty('--ring', primaryBrandColor);
-      document.documentElement.style.setProperty('--sidebar-ring', primaryBrandColor);
-      document.documentElement.style.setProperty('--sidebar-primary', primaryBrandColor);
-      document.documentElement.style.setProperty('--chart-1', primaryBrandColor);
+      // Convert hex to HSL format for Tailwind
+      const hslColor = hexToHSL(primaryBrandColor);
+      
+      // Override ALL brand color variables across entire platform
+      document.documentElement.style.setProperty('--brand-primary', primaryBrandColor); // Keep hex for legacy components
+      document.documentElement.style.setProperty('--primary', hslColor);
+      document.documentElement.style.setProperty('--ring', hslColor);
+      document.documentElement.style.setProperty('--sidebar-primary', hslColor);
+      document.documentElement.style.setProperty('--sidebar-ring', hslColor);
+      document.documentElement.style.setProperty('--chart-1', hslColor);
+      
+      // Calculate contrasting foreground color (white for dark colors, dark for light colors)
+      const l = parseInt(hslColor.split(' ')[2]);
+      const foreground = l < 50 ? '0 0% 100%' : '240 10% 3.9%';
+      document.documentElement.style.setProperty('--primary-foreground', foreground);
+      document.documentElement.style.setProperty('--sidebar-primary-foreground', foreground);
     } else {
       // Remove overrides when branding is inactive
       document.documentElement.style.removeProperty('--brand-primary');
       document.documentElement.style.removeProperty('--primary');
+      document.documentElement.style.removeProperty('--primary-foreground');
       document.documentElement.style.removeProperty('--ring');
-      document.documentElement.style.removeProperty('--sidebar-ring');
       document.documentElement.style.removeProperty('--sidebar-primary');
+      document.documentElement.style.removeProperty('--sidebar-primary-foreground');
+      document.documentElement.style.removeProperty('--sidebar-ring');
       document.documentElement.style.removeProperty('--chart-1');
     }
 
     return () => {
       document.documentElement.style.removeProperty('--brand-primary');
       document.documentElement.style.removeProperty('--primary');
+      document.documentElement.style.removeProperty('--primary-foreground');
       document.documentElement.style.removeProperty('--ring');
-      document.documentElement.style.removeProperty('--sidebar-ring');
       document.documentElement.style.removeProperty('--sidebar-primary');
+      document.documentElement.style.removeProperty('--sidebar-primary-foreground');
+      document.documentElement.style.removeProperty('--sidebar-ring');
       document.documentElement.style.removeProperty('--chart-1');
     };
   }, [primaryBrandColor]);
