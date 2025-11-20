@@ -369,6 +369,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       '/api/verify-license',
       '/api/provision-account', // Allow external provisioning
       '/api/purchase/verify-account', // Allow external purchase system to verify accounts
+      '/api/purchase/update-tier', // CRITICAL: Allow tier upgrade webhook to prevent lockouts
       '/api/purchase/update-seats', // Allow external purchase system to update seat limits
       '/api/purchase/update-projects', // Allow external purchase system to update project limits
       '/api/purchase/update-branding', // Allow external purchase system to update branding subscription

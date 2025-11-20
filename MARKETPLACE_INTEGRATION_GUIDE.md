@@ -2,13 +2,19 @@
 
 This guide explains how the RAM platform integrates with the external marketplace for **all purchase types**: tier upgrades, seat purchases, project purchases, and branding subscriptions.
 
-## ⚠️ CRITICAL: Tier Upgrade Lockout Issue - FIXED
+## ⚠️ CRITICAL: Tier Upgrade Lockout Issue - FIXED (January 2025)
 
 **THE PROBLEM (BEFORE FIX):**
-When users upgraded tiers, marketplace generated a new license key (e.g., ABC123-1 → ABC123-2) but there was NO webhook to save it to the platform database. Users got LOCKED OUT because their old license key no longer worked.
+When users upgraded tiers, marketplace generated a new license key (e.g., ABC123-1 → ABC123-2) but:
+1. The webhook endpoint `/api/purchase/update-tier` existed but was NOT whitelisted from read-only mode
+2. Calls to this webhook were being BLOCKED by security middleware
+3. The new license key was NEVER saved to the database
+4. Users got LOCKED OUT because their old license key no longer worked
 
 **THE SOLUTION (NOW IMPLEMENTED):**
-New `/api/purchase/update-tier` webhook endpoint! Marketplace MUST call this immediately after tier upgrade payments to prevent lockout.
+1. ✅ Created `/api/purchase/update-tier` webhook endpoint
+2. ✅ **FIXED:** Added endpoint to read-only mode whitelist so it can be called even for unverified licenses
+3. ✅ Marketplace MUST call this immediately after tier upgrade payments to prevent lockout
 
 ---
 
@@ -51,9 +57,12 @@ If you don't call this webhook immediately after tier upgrade payment:
 1. User's database still has old license key (ABC123-1)
 2. Marketplace considers old key invalid
 3. User gets **LOCKED OUT** of their account
-4. User must manually verify license to regain access
+4. Platform goes into read-only mode
+5. User must manually verify license to regain access
 
-**Solution:** Call `/api/purchase/update-tier` webhook IMMEDIATELY after payment success!
+**Solution:** Call `/api/purchase/update-tier` webhook IMMEDIATELY after Stripe payment success!
+
+**Important:** This endpoint is whitelisted from read-only mode checks, so it will work even if the user's license is currently unverified.
 
 ### Webhook Endpoint
 
@@ -175,6 +184,12 @@ x-api-key: YOUR_PURCHASE_API_KEY
 
 Additional seats counter is **incremented** (not replaced)
 
+### ⚠️ Important: Incremental Semantics
+
+- `/api/purchase/update-seats` **ADDS** to existing count (incremental)
+- `/api/purchase/update-tier` **SETS** absolute totals (when provided)
+- **Never use update-tier for seat purchases!** Always use the dedicated `/api/purchase/update-seats` endpoint
+
 ### Webhook Endpoint
 
 ```
@@ -248,6 +263,12 @@ x-api-key: YOUR_PURCHASE_API_KEY
 ### What Happens
 
 Additional projects counter is **incremented** (not replaced)
+
+### ⚠️ Important: Incremental Semantics
+
+- `/api/purchase/update-projects` **ADDS** to existing count (incremental)
+- `/api/purchase/update-tier` **SETS** absolute totals (when provided)
+- **Never use update-tier for project purchases!** Always use the dedicated `/api/purchase/update-projects` endpoint
 
 ### Webhook Endpoint
 
