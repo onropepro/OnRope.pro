@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { Switch, Route } from "wouter";
 import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider, useQuery } from "@tanstack/react-query";
@@ -181,49 +182,21 @@ function BrandingProvider({ children }: { children: React.ReactNode }) {
   const branding = brandingData || {};
   const brandColors = (branding.subscriptionActive && branding.colors) ? branding.colors : [];
   const primaryBrandColor = brandColors[0] || null;
-  const hasCustomBranding = !!(branding.subscriptionActive && (branding.logoUrl || (branding.colors && branding.colors.length > 0)));
 
-  return (
-    <>
-      {/* Inject custom brand color styles when branding is active */}
-      {hasCustomBranding && primaryBrandColor && (
-        <style>{`
-          :root {
-            --custom-primary: ${primaryBrandColor};
-          }
-          .custom-brand-text {
-            color: ${primaryBrandColor} !important;
-          }
-          .custom-brand-border {
-            border-color: ${primaryBrandColor}30 !important;
-          }
-          .custom-brand-bg {
-            background-color: ${primaryBrandColor}10 !important;
-          }
-          .gradient-text {
-            background: linear-gradient(135deg, ${primaryBrandColor} 0%, ${primaryBrandColor}CC 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-          }
-          /* Override primary button colors when branding is active */
-          button[class*="bg-primary"], .bg-primary {
-            background-color: ${primaryBrandColor} !important;
-          }
-          button[class*="bg-primary"]:hover {
-            background-color: ${primaryBrandColor}E6 !important;
-          }
-          .text-primary {
-            color: ${primaryBrandColor} !important;
-          }
-          [class*="border-primary"] {
-            border-color: ${primaryBrandColor} !important;
-          }
-        `}</style>
-      )}
-      {children}
-    </>
-  );
+  // Inject brand color CSS variable when active
+  useEffect(() => {
+    if (primaryBrandColor) {
+      document.documentElement.style.setProperty('--brand-primary', primaryBrandColor);
+    } else {
+      document.documentElement.style.removeProperty('--brand-primary');
+    }
+
+    return () => {
+      document.documentElement.style.removeProperty('--brand-primary');
+    };
+  }, [primaryBrandColor]);
+
+  return <>{children}</>;
 }
 
 function App() {
