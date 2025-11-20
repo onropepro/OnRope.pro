@@ -456,6 +456,26 @@ export default function Profile() {
     );
   }
 
+  // Determine company ID to fetch branding for logo display
+  const companyIdForBranding = user?.role === 'company' ? user.id : user?.companyId;
+
+  // Fetch company branding for logo  
+  const { data: brandingData } = useQuery({
+    queryKey: ["/api/company", companyIdForBranding, "branding"],
+    queryFn: async () => {
+      if (!companyIdForBranding) return null;
+      const response = await fetch(`/api/company/${companyIdForBranding}/branding`);
+      if (response.status === 404) return null;
+      if (!response.ok) throw new Error(`Failed to fetch branding: ${response.status}`);
+      return response.json();
+    },
+    enabled: !!companyIdForBranding && user?.role !== 'resident' && user?.role !== 'superuser',
+    retry: 1,
+  });
+
+  const branding = brandingData || {};
+  const hasLogo = !!(branding.subscriptionActive && branding.logoUrl);
+
   return (
     <div className="min-h-screen bg-background pb-20">
       {/* Header */}
@@ -470,6 +490,14 @@ export default function Profile() {
             >
               <span className="material-icons text-xl">arrow_back</span>
             </Button>
+            {hasLogo && (
+              <img 
+                src={branding.logoUrl} 
+                alt="Company Logo" 
+                className="h-10 w-auto object-contain"
+                data-testid="img-company-logo"
+              />
+            )}
             <h1 className="text-lg font-bold">Profile</h1>
           </div>
           <div className="flex items-center gap-2">
