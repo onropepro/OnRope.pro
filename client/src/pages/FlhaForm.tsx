@@ -108,6 +108,10 @@ export default function FlhaForm() {
   const [selectedSignatureEmployee, setSelectedSignatureEmployee] = useState<string>("");
   const signatureCanvasRef = useRef<SignatureCanvas>(null);
 
+  const { data: userData } = useQuery<{ user: any }>({
+    queryKey: ["/api/user"],
+  });
+
   const { data: projectsData } = useQuery<{ projects: Project[] }>({
     queryKey: ["/api/projects"],
   });
@@ -116,6 +120,7 @@ export default function FlhaForm() {
     queryKey: ["/api/employees"],
   });
 
+  const currentUser = userData?.user;
   const employees = (employeesData?.employees || []);
 
   const form = useForm<FlhaFormValues>({
@@ -217,6 +222,7 @@ export default function FlhaForm() {
     mutationFn: async (data: FlhaFormValues) => {
       const response = await apiRequest("POST", "/api/flha-forms", {
         ...data,
+        assessorId: currentUser?.id,
         teamMembers: selectedEmployees,
         signatures,
       });
