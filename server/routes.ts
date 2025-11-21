@@ -5079,17 +5079,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // Upload file to object storage
-      const fileName = `${documentType}_${Date.now()}_${req.file.originalname}`;
-      const filePath = `.private/company_documents/${companyId}/${fileName}`;
-      
-      await bucket.file(filePath).save(req.file.buffer, {
-        contentType: req.file.mimetype,
-        metadata: {
-          originalName: req.file.originalname,
-        },
-      });
-
-      const fileUrl = `https://storage.googleapis.com/${bucket.name}/${filePath}`;
+      const objectStorageService = new ObjectStorageService();
+      const timestamp = Date.now();
+      const filename = `company-documents/${documentType}-${timestamp}-${req.file.originalname}`;
+      const fileUrl = await objectStorageService.uploadPrivateFile(
+        filename,
+        req.file.buffer,
+        req.file.mimetype
+      );
 
       // Save to database
       const document = await storage.createCompanyDocument({
