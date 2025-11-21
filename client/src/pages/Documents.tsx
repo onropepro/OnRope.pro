@@ -1,12 +1,20 @@
-import { useQuery } from "@tanstack/react-query";
+import { useState } from "react";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { FileText, Download, Calendar, DollarSign } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { FileText, Download, Calendar, DollarSign, Upload, Trash2, Shield, BookOpen } from "lucide-react";
 import { hasFinancialAccess } from "@/lib/permissions";
+import { useToast } from "@/hooks/use-toast";
+import { apiRequest, queryClient } from "@/lib/queryClient";
 import { jsPDF } from "jspdf";
 
 export default function Documents() {
+  const { toast } = useToast();
+  const [uploadingHealthSafety, setUploadingHealthSafety] = useState(false);
+  const [uploadingPolicy, setUploadingPolicy] = useState(false);
+
   const { data: userData } = useQuery<{ user: any }>({
     queryKey: ["/api/user"],
   });
@@ -31,13 +39,22 @@ export default function Documents() {
     queryKey: ["/api/quotes"],
   });
 
+  const { data: companyDocsData } = useQuery<{ documents: any[] }>({
+    queryKey: ["/api/company-documents"],
+  });
+
   const currentUser = userData?.user;
   const canViewFinancials = hasFinancialAccess(currentUser);
+  const canUploadDocuments = currentUser?.role === 'company' || currentUser?.role === 'operations_manager';
   const projects = projectsData?.projects || [];
   const meetings = meetingsData?.meetings || [];
   const flhaForms = flhaFormsData?.flhaForms || [];
   const inspections = inspectionsData?.inspections || [];
   const quotes = quotesData?.quotes || [];
+  const companyDocuments = companyDocsData?.documents || [];
+
+  const healthSafetyDocs = companyDocuments.filter((doc: any) => doc.documentType === 'health_safety_manual');
+  const policyDocs = companyDocuments.filter((doc: any) => doc.documentType === 'company_policy');
 
   // Collect all rope access plan PDFs
   const allDocuments = projects.flatMap(project => 
@@ -745,6 +762,64 @@ export default function Documents() {
     URL.revokeObjectURL(url);
   };
 
+  const handleDocumentUpload = async (file: File, documentType: 'health_safety_manual' | 'company_policy') => {
+    const setUploading = documentType === 'health_safety_manual' ? setUploadingHealthSafety : setUploadingPolicy;
+    
+    setUploading(true);
+    try {
+      const formData = new FormData();
+      formData.append('document', file);
+      formData.append('documentType', documentType);
+
+      const response = await fetch('/api/company-documents', {
+        method: 'POST',
+        body: formData,
+        credentials: 'include',
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || 'Upload failed');
+      }
+
+      toast({
+        title: "Success",
+        description: `Document uploaded successfully`,
+      });
+
+      queryClient.invalidateQueries({ queryKey: ["/api/company-documents"] });
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to upload document",
+        variant: "destructive",
+      });
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const deleteDocumentMutation = useMutation({
+    mutationFn: async (id: string) => {
+      const response = await apiRequest("DELETE", `/api/company-documents/${id}`);
+      return await response.json();
+    },
+    onSuccess: () => {
+      toast({
+        title: "Success",
+        description: "Document deleted successfully",
+      });
+      queryClient.invalidateQueries({ queryKey: ["/api/company-documents"] });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to delete document",
+        variant: "destructive",
+      });
+    },
+  });
+
   return (
     <div className="min-h-screen bg-background p-4 pb-24">
       <div className="max-w-4xl mx-auto">
@@ -752,6 +827,162 @@ export default function Documents() {
           <h1 className="text-3xl font-bold mb-2">Documents</h1>
           <p className="text-muted-foreground">All company documents and safety records</p>
         </div>
+
+        {/* Health & Safety Manual */}
+        <Card className="mb-6">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Shield className="h-5 w-5" />
+              Health & Safety Manual
+              <Badge variant="secondary" className="ml-auto">
+                {healthSafetyDocs.length}
+              </Badge>
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {canUploadDocuments && (
+              <div className="mb-4 p-4 border rounded-lg bg-muted/50">
+                <label htmlFor="health-safety-upload" className="block mb-2 text-sm font-medium">
+                  Upload Health & Safety Manual
+                </label>
+                <Input
+                  id="health-safety-upload"
+                  type="file"
+                  accept=".pdf,.doc,.docx"
+                  disabled={uploadingHealthSafety}
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) {
+                      handleDocumentUpload(file, 'health_safety_manual');
+                      e.target.value = '';
+                    }
+                  }}
+                  data-testid="input-health-safety-upload"
+                />
+                {uploadingHealthSafety && (
+                  <p className="text-sm text-muted-foreground mt-2">Uploading...</p>
+                )}
+              </div>
+            )}
+            
+            {healthSafetyDocs.length > 0 ? (
+              <div className="space-y-2">
+                {healthSafetyDocs.map((doc: any) => (
+                  <div key={doc.id} className="flex items-center gap-3 p-3 rounded-md border hover-elevate">
+                    <Shield className="h-5 w-5 text-primary flex-shrink-0" />
+                    <div className="flex-1 min-w-0">
+                      <div className="font-medium truncate">{doc.fileName}</div>
+                      <div className="text-sm text-muted-foreground">
+                        Uploaded by {doc.uploadedByName} on {new Date(doc.createdAt).toLocaleDateString()}
+                      </div>
+                    </div>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => window.open(doc.fileUrl, '_blank')}
+                      data-testid={`download-health-safety-${doc.id}`}
+                    >
+                      <Download className="h-4 w-4 mr-1" />
+                      View
+                    </Button>
+                    {canUploadDocuments && (
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        onClick={() => deleteDocumentMutation.mutate(doc.id)}
+                        data-testid={`delete-health-safety-${doc.id}`}
+                      >
+                        <Trash2 className="h-4 w-4 text-destructive" />
+                      </Button>
+                    )}
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-center py-8 text-muted-foreground">
+                No Health & Safety Manual uploaded yet
+              </p>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Company Policies */}
+        <Card className="mb-6">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <BookOpen className="h-5 w-5" />
+              Company Policies
+              <Badge variant="secondary" className="ml-auto">
+                {policyDocs.length}
+              </Badge>
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {canUploadDocuments && (
+              <div className="mb-4 p-4 border rounded-lg bg-muted/50">
+                <label htmlFor="policy-upload" className="block mb-2 text-sm font-medium">
+                  Upload Company Policy
+                </label>
+                <Input
+                  id="policy-upload"
+                  type="file"
+                  accept=".pdf,.doc,.docx"
+                  disabled={uploadingPolicy}
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) {
+                      handleDocumentUpload(file, 'company_policy');
+                      e.target.value = '';
+                    }
+                  }}
+                  data-testid="input-policy-upload"
+                />
+                {uploadingPolicy && (
+                  <p className="text-sm text-muted-foreground mt-2">Uploading...</p>
+                )}
+              </div>
+            )}
+            
+            {policyDocs.length > 0 ? (
+              <div className="space-y-2">
+                {policyDocs.map((doc: any) => (
+                  <div key={doc.id} className="flex items-center gap-3 p-3 rounded-md border hover-elevate">
+                    <BookOpen className="h-5 w-5 text-primary flex-shrink-0" />
+                    <div className="flex-1 min-w-0">
+                      <div className="font-medium truncate">{doc.fileName}</div>
+                      <div className="text-sm text-muted-foreground">
+                        Uploaded by {doc.uploadedByName} on {new Date(doc.createdAt).toLocaleDateString()}
+                      </div>
+                    </div>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => window.open(doc.fileUrl, '_blank')}
+                      data-testid={`download-policy-${doc.id}`}
+                    >
+                      <Download className="h-4 w-4 mr-1" />
+                      View
+                    </Button>
+                    {canUploadDocuments && (
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        onClick={() => deleteDocumentMutation.mutate(doc.id)}
+                        data-testid={`delete-policy-${doc.id}`}
+                      >
+                        <Trash2 className="h-4 w-4 text-destructive" />
+                      </Button>
+                    )}
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-center py-8 text-muted-foreground">
+                No Company Policies uploaded yet
+              </p>
+            )}
+          </CardContent>
+        </Card>
 
         {/* Rope Access Plans */}
         <Card className="mb-6">
