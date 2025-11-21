@@ -5051,6 +5051,98 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // ==================== COMPANY DOCUMENTS ROUTES ====================
+
+  // Upload company document (Health & Safety Manual or Company Policy)
+  app.post("/api/company-documents", requireAuth, requireRole("operations_manager", "company"), upload.single('document'), async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      const companyId = currentUser.role === "company" ? currentUser.id : currentUser.companyId;
+      
+      if (!companyId) {
+        return res.status(400).json({ message: "Unable to determine company" });
+      }
+
+      if (!req.file) {
+        return res.status(400).json({ message: "No file uploaded" });
+      }
+
+      const { documentType } = req.body;
+      
+      if (!documentType || !['health_safety_manual', 'company_policy'].includes(documentType)) {
+        return res.status(400).json({ message: "Invalid document type" });
+      }
+
+      // Upload file to object storage
+      const fileName = `${documentType}_${Date.now()}_${req.file.originalname}`;
+      const filePath = `.private/company_documents/${companyId}/${fileName}`;
+      
+      await bucket.file(filePath).save(req.file.buffer, {
+        contentType: req.file.mimetype,
+        metadata: {
+          originalName: req.file.originalname,
+        },
+      });
+
+      const fileUrl = `https://storage.googleapis.com/${bucket.name}/${filePath}`;
+
+      // Save to database
+      const document = await storage.createCompanyDocument({
+        companyId,
+        documentType,
+        fileName: req.file.originalname,
+        fileUrl,
+        uploadedById: currentUser.id,
+        uploadedByName: currentUser.name || currentUser.email || "Unknown User",
+      });
+
+      res.json({ document });
+    } catch (error) {
+      console.error("Upload company document error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Get all company documents
+  app.get("/api/company-documents", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      const companyId = currentUser.role === "company" ? currentUser.id : currentUser.companyId;
+      
+      if (!companyId) {
+        return res.status(400).json({ message: "Unable to determine company" });
+      }
+      
+      const documents = await storage.getCompanyDocuments(companyId);
+      res.json({ documents });
+    } catch (error) {
+      console.error("Get company documents error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Delete company document
+  app.delete("/api/company-documents/:id", requireAuth, requireRole("operations_manager", "company"), async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      await storage.deleteCompanyDocument(id);
+      res.json({ message: "Document deleted successfully" });
+    } catch (error) {
+      console.error("Delete company document error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
   // ==================== JOB COMMENTS ROUTES ====================
   
   // Create job comment
