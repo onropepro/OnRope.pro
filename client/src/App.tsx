@@ -17,6 +17,7 @@ import Profile from "@/pages/Profile";
 import HarnessInspectionForm from "@/pages/HarnessInspectionForm";
 import SafetyForms from "@/pages/SafetyForms";
 import ToolboxMeetingForm from "@/pages/ToolboxMeetingForm";
+import FlhaForm from "@/pages/FlhaForm";
 import Payroll from "@/pages/Payroll";
 import Quotes from "@/pages/Quotes";
 import ActiveWorkers from "@/pages/ActiveWorkers";
@@ -105,6 +106,11 @@ function Router() {
       <Route path="/toolbox-meeting">
         <ProtectedRoute allowedRoles={["rope_access_tech", "supervisor", "operations_manager", "company"]}>
           <ToolboxMeetingForm />
+        </ProtectedRoute>
+      </Route>
+      <Route path="/flha-form">
+        <ProtectedRoute allowedRoles={["rope_access_tech", "supervisor", "operations_manager", "company"]}>
+          <FlhaForm />
         </ProtectedRoute>
       </Route>
       <Route path="/payroll">
