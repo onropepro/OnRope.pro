@@ -15,6 +15,7 @@ import WorkSessionHistory from "@/pages/WorkSessionHistory";
 import ProjectDetail from "@/pages/ProjectDetail";
 import Profile from "@/pages/Profile";
 import HarnessInspectionForm from "@/pages/HarnessInspectionForm";
+import SafetyForms from "@/pages/SafetyForms";
 import ToolboxMeetingForm from "@/pages/ToolboxMeetingForm";
 import Payroll from "@/pages/Payroll";
 import Quotes from "@/pages/Quotes";
@@ -94,6 +95,11 @@ function Router() {
       <Route path="/harness-inspection">
         <ProtectedRoute allowedRoles={["rope_access_tech", "supervisor", "operations_manager", "company"]}>
           <HarnessInspectionForm />
+        </ProtectedRoute>
+      </Route>
+      <Route path="/safety-forms">
+        <ProtectedRoute allowedRoles={EMPLOYEE_ROLES}>
+          <SafetyForms />
         </ProtectedRoute>
       </Route>
       <Route path="/toolbox-meeting">

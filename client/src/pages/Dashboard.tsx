@@ -1646,12 +1646,12 @@ export default function Dashboard() {
       borderColor: "#d97706",
     },
     {
-      id: "toolbox-meeting",
+      id: "safety-forms",
       label: "Safety Forms",
       description: "Safety meeting",
       icon: "group",
-      onClick: () => setLocation("/toolbox-meeting"),
-      testId: "button-toolbox-meeting",
+      onClick: () => setLocation("/safety-forms"),
+      testId: "button-safety-forms",
       isVisible: () => true, // Everyone
       borderColor: "#f87171",
     },
