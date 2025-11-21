@@ -666,6 +666,21 @@ export const flhaForms = pgTable("flha_forms", {
   index("IDX_flha_assessor").on(table.assessorId, table.assessmentDate),
 ]);
 
+// Company documents table - for policy and safety manuals
+export const companyDocuments = pgTable("company_documents", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  companyId: varchar("company_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  documentType: varchar("document_type").notNull(), // 'health_safety_manual' | 'company_policy'
+  fileName: varchar("file_name").notNull(),
+  fileUrl: text("file_url").notNull(),
+  uploadedById: varchar("uploaded_by_id").notNull().references(() => users.id),
+  uploadedByName: varchar("uploaded_by_name").notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
+}, (table) => [
+  index("IDX_company_docs_company").on(table.companyId),
+  index("IDX_company_docs_type").on(table.companyId, table.documentType),
+]);
+
 // Pay period configuration table - one per company
 export const payPeriodConfig = pgTable("pay_period_config", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
