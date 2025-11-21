@@ -1,7 +1,7 @@
 import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
-import { ArrowLeft, FileCheck, ClipboardList, Shield } from "lucide-react";
+import { ArrowLeft, FileCheck, ClipboardList, Shield, AlertTriangle } from "lucide-react";
 
 export default function SafetyForms() {
   const [, navigate] = useLocation();
@@ -17,17 +17,26 @@ export default function SafetyForms() {
       borderColor: "border-l-red-500",
       testId: "card-toolbox-meeting",
     },
-    // Future safety forms can be added here
-    // {
-    //   id: "incident-report",
-    //   title: "Incident Report",
-    //   description: "Report workplace incidents and near-misses",
-    //   icon: ClipboardList,
-    //   onClick: () => navigate("/incident-report"),
-    //   iconColor: "text-orange-500",
-    //   borderColor: "border-l-orange-500",
-    //   testId: "card-incident-report",
-    // },
+    {
+      id: "flha-form",
+      title: "Field Level Hazard Assessment",
+      description: "Comprehensive FLHA for rope access operations",
+      icon: AlertTriangle,
+      onClick: () => navigate("/flha-form"),
+      iconColor: "text-orange-500",
+      borderColor: "border-l-orange-500",
+      testId: "card-flha-form",
+    },
+    {
+      id: "harness-inspection",
+      title: "Harness Inspection",
+      description: "Daily harness and PPE safety inspection",
+      icon: ClipboardList,
+      onClick: () => navigate("/harness-inspection"),
+      iconColor: "text-blue-500",
+      borderColor: "border-l-blue-500",
+      testId: "card-harness-inspection",
+    },
   ];
 
   return (
