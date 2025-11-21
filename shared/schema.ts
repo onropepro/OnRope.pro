@@ -601,6 +601,71 @@ export const toolboxMeetings = pgTable("toolbox_meetings", {
   index("IDX_toolbox_meetings_conductor").on(table.conductedBy, table.meetingDate),
 ]);
 
+// Field Level Hazard Assessment (FLHA) table - Rope Access specific
+export const flhaForms = pgTable("flha_forms", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  companyId: varchar("company_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  projectId: varchar("project_id").notNull().references(() => projects.id, { onDelete: "cascade" }),
+  assessorId: varchar("assessor_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  assessmentDate: date("assessment_date").notNull(),
+  
+  // Basic Information
+  assessorName: varchar("assessor_name").notNull(),
+  jobDescription: text("job_description").notNull(),
+  location: varchar("location").notNull(),
+  workArea: varchar("work_area"), // Specific work area/zone
+  
+  // Hazards Identified - Rope Access Specific
+  hazardFalling: boolean("hazard_falling").notNull().default(false),
+  hazardSwingFall: boolean("hazard_swing_fall").notNull().default(false),
+  hazardSuspendedRescue: boolean("hazard_suspended_rescue").notNull().default(false),
+  hazardWeather: boolean("hazard_weather").notNull().default(false),
+  hazardElectrical: boolean("hazard_electrical").notNull().default(false),
+  hazardFallingObjects: boolean("hazard_falling_objects").notNull().default(false),
+  hazardChemical: boolean("hazard_chemical").notNull().default(false),
+  hazardConfined: boolean("hazard_confined").notNull().default(false),
+  hazardSharpEdges: boolean("hazard_sharp_edges").notNull().default(false),
+  hazardUnstableAnchors: boolean("hazard_unstable_anchors").notNull().default(false),
+  hazardPowerTools: boolean("hazard_power_tools").notNull().default(false),
+  hazardPublic: boolean("hazard_public").notNull().default(false),
+  
+  // Controls Implemented
+  controlPPE: boolean("control_ppe").notNull().default(false),
+  controlBackupSystem: boolean("control_backup_system").notNull().default(false),
+  controlEdgeProtection: boolean("control_edge_protection").notNull().default(false),
+  controlBarricades: boolean("control_barricades").notNull().default(false),
+  controlWeatherMonitoring: boolean("control_weather_monitoring").notNull().default(false),
+  controlRescuePlan: boolean("control_rescue_plan").notNull().default(false),
+  controlCommunication: boolean("control_communication").notNull().default(false),
+  controlToolTethering: boolean("control_tool_tethering").notNull().default(false),
+  controlPermits: boolean("control_permits").notNull().default(false),
+  controlInspections: boolean("control_inspections").notNull().default(false),
+  
+  // Risk Assessment
+  riskLevelBefore: varchar("risk_level_before"), // low | medium | high | extreme
+  riskLevelAfter: varchar("risk_level_after"), // low | medium | high | extreme
+  
+  // Additional Information
+  additionalHazards: text("additional_hazards"),
+  additionalControls: text("additional_controls"),
+  emergencyContacts: text("emergency_contacts"),
+  
+  // Team members
+  teamMembers: text("team_members").array().notNull().default(sql`ARRAY[]::text[]`),
+  
+  // Digital signatures
+  signatures: jsonb("signatures").$type<Array<{ employeeId: string; employeeName: string; signatureDataUrl: string }>>().default(sql`'[]'::jsonb`),
+  
+  // PDF storage
+  pdfUrl: text("pdf_url"),
+  
+  createdAt: timestamp("created_at").defaultNow(),
+}, (table) => [
+  index("IDX_flha_company_date").on(table.companyId, table.assessmentDate),
+  index("IDX_flha_project").on(table.projectId, table.assessmentDate),
+  index("IDX_flha_assessor").on(table.assessorId, table.assessmentDate),
+]);
+
 // Pay period configuration table - one per company
 export const payPeriodConfig = pgTable("pay_period_config", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
@@ -1013,6 +1078,12 @@ export const insertToolboxMeetingSchema = createInsertSchema(toolboxMeetings).om
   pdfUrl: true, // Generated server-side
 });
 
+export const insertFlhaFormSchema = createInsertSchema(flhaForms).omit({
+  id: true,
+  createdAt: true,
+  pdfUrl: true, // Generated server-side
+});
+
 export const insertPayPeriodConfigSchema = createInsertSchema(payPeriodConfig).omit({
   id: true,
   createdAt: true,
@@ -1138,6 +1209,9 @@ export type InsertHarnessInspection = z.infer<typeof insertHarnessInspectionSche
 
 export type ToolboxMeeting = typeof toolboxMeetings.$inferSelect;
 export type InsertToolboxMeeting = z.infer<typeof insertToolboxMeetingSchema>;
+
+export type FlhaForm = typeof flhaForms.$inferSelect;
+export type InsertFlhaForm = z.infer<typeof insertFlhaFormSchema>;
 
 export type PayPeriodConfig = typeof payPeriodConfig.$inferSelect;
 export type InsertPayPeriodConfig = z.infer<typeof insertPayPeriodConfigSchema>;
