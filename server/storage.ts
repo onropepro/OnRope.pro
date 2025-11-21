@@ -1,5 +1,5 @@
 import { db } from "./db";
-import { users, clients, projects, customJobTypes, dropLogs, workSessions, nonBillableWorkSessions, complaints, complaintNotes, projectPhotos, jobComments, harnessInspections, toolboxMeetings, flhaForms, payPeriodConfig, payPeriods, quotes, quoteServices, gearItems, gearAssignments, scheduledJobs, jobAssignments, userPreferences } from "@shared/schema";
+import { users, clients, projects, customJobTypes, dropLogs, workSessions, nonBillableWorkSessions, complaints, complaintNotes, projectPhotos, jobComments, harnessInspections, toolboxMeetings, flhaForms, companyDocuments, payPeriodConfig, payPeriods, quotes, quoteServices, gearItems, gearAssignments, scheduledJobs, jobAssignments, userPreferences } from "@shared/schema";
 import type { User, InsertUser, Client, InsertClient, Project, InsertProject, CustomJobType, InsertCustomJobType, DropLog, InsertDropLog, WorkSession, InsertWorkSession, Complaint, InsertComplaint, ComplaintNote, InsertComplaintNote, ProjectPhoto, InsertProjectPhoto, JobComment, InsertJobComment, HarnessInspection, InsertHarnessInspection, ToolboxMeeting, InsertToolboxMeeting, FlhaForm, InsertFlhaForm, PayPeriodConfig, InsertPayPeriodConfig, PayPeriod, InsertPayPeriod, EmployeeHoursSummary, Quote, InsertQuote, QuoteService, InsertQuoteService, QuoteWithServices, GearItem, InsertGearItem, GearAssignment, InsertGearAssignment, ScheduledJob, InsertScheduledJob, JobAssignment, InsertJobAssignment, ScheduledJobWithAssignments, UserPreferences, InsertUserPreferences } from "@shared/schema";
 import { eq, and, or, desc, sql, isNull, not, gte, lte, between, inArray } from "drizzle-orm";
 import bcrypt from "bcrypt";
@@ -961,6 +961,31 @@ export class Storage {
 
   async deleteFlhaForm(id: string): Promise<void> {
     await db.delete(flhaForms).where(eq(flhaForms.id, id));
+  }
+
+  // Company documents operations
+  async createCompanyDocument(document: any): Promise<any> {
+    const result = await db.insert(companyDocuments).values(document).returning();
+    return result[0];
+  }
+
+  async getCompanyDocuments(companyId: string): Promise<any[]> {
+    return db.select().from(companyDocuments)
+      .where(eq(companyDocuments.companyId, companyId))
+      .orderBy(desc(companyDocuments.createdAt));
+  }
+
+  async getCompanyDocumentsByType(companyId: string, documentType: string): Promise<any[]> {
+    return db.select().from(companyDocuments)
+      .where(and(
+        eq(companyDocuments.companyId, companyId),
+        eq(companyDocuments.documentType, documentType)
+      ))
+      .orderBy(desc(companyDocuments.createdAt));
+  }
+
+  async deleteCompanyDocument(id: string): Promise<void> {
+    await db.delete(companyDocuments).where(eq(companyDocuments.id, id));
   }
 
   // Pay period configuration operations
