@@ -2,7 +2,7 @@ import type { Express, Request, Response, NextFunction } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { db } from "./db";
-import { insertUserSchema, insertClientSchema, insertProjectSchema, insertDropLogSchema, insertComplaintSchema, insertComplaintNoteSchema, insertJobCommentSchema, insertHarnessInspectionSchema, insertToolboxMeetingSchema, insertPayPeriodConfigSchema, insertQuoteSchema, insertQuoteServiceSchema, insertGearItemSchema, insertGearAssignmentSchema, insertScheduledJobSchema, insertJobAssignmentSchema, normalizeStrataPlan, type InsertGearItem, type InsertGearAssignment, gearAssignments, jobAssignments, workSessions, nonBillableWorkSessions } from "@shared/schema";
+import { insertUserSchema, insertClientSchema, insertProjectSchema, insertDropLogSchema, insertComplaintSchema, insertComplaintNoteSchema, insertJobCommentSchema, insertHarnessInspectionSchema, insertToolboxMeetingSchema, insertFlhaFormSchema, insertPayPeriodConfigSchema, insertQuoteSchema, insertQuoteServiceSchema, insertGearItemSchema, insertGearAssignmentSchema, insertScheduledJobSchema, insertJobAssignmentSchema, normalizeStrataPlan, type InsertGearItem, type InsertGearAssignment, gearAssignments, jobAssignments, workSessions, nonBillableWorkSessions } from "@shared/schema";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
 import bcrypt from "bcrypt";
@@ -4973,6 +4973,80 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({ message: "Toolbox meeting deleted successfully" });
     } catch (error) {
       console.error("Delete toolbox meeting error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // FLHA form routes
+  app.post("/api/flha-forms", requireAuth, requireRole("rope_access_tech", "general_supervisor", "rope_access_supervisor", "supervisor", "operations_manager", "company"), async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      const companyId = currentUser.role === "company" ? currentUser.id : currentUser.companyId;
+      
+      if (!companyId) {
+        return res.status(400).json({ message: "Unable to determine company" });
+      }
+      
+      const flhaData = insertFlhaFormSchema.parse({
+        ...req.body,
+        companyId,
+      });
+      
+      const flha = await storage.createFlhaForm(flhaData);
+      res.json({ flha });
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Validation error", errors: error.errors });
+      }
+      console.error("Create FLHA form error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.get("/api/flha-forms", requireAuth, requireRole("operations_manager", "general_supervisor", "rope_access_supervisor", "supervisor", "company"), async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      const companyId = currentUser.role === "company" ? currentUser.id : currentUser.companyId;
+      
+      if (!companyId) {
+        return res.status(400).json({ message: "Unable to determine company" });
+      }
+      
+      const flhaForms = await storage.getFlhaFormsByCompany(companyId);
+      res.json({ flhaForms });
+    } catch (error) {
+      console.error("Get FLHA forms error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.get("/api/projects/:projectId/flha-forms", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const flhaForms = await storage.getFlhaFormsByProject(req.params.projectId);
+      res.json({ flhaForms });
+    } catch (error) {
+      console.error("Get project FLHA forms error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.delete("/api/flha-forms/:id", requireAuth, requireRole("operations_manager", "general_supervisor", "rope_access_supervisor", "supervisor", "company"), async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      await storage.deleteFlhaForm(id);
+      res.json({ message: "FLHA form deleted successfully" });
+    } catch (error) {
+      console.error("Delete FLHA form error:", error);
       res.status(500).json({ message: "Internal server error" });
     }
   });
