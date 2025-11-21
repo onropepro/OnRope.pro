@@ -19,6 +19,10 @@ export default function Documents() {
     queryKey: ["/api/toolbox-meetings"],
   });
 
+  const { data: flhaFormsData } = useQuery<{ flhaForms: any[] }>({
+    queryKey: ["/api/flha-forms"],
+  });
+
   const { data: inspectionsData } = useQuery<{ inspections: any[] }>({
     queryKey: ["/api/harness-inspections"],
   });
@@ -31,6 +35,7 @@ export default function Documents() {
   const canViewFinancials = hasFinancialAccess(currentUser);
   const projects = projectsData?.projects || [];
   const meetings = meetingsData?.meetings || [];
+  const flhaForms = flhaFormsData?.flhaForms || [];
   const inspections = inspectionsData?.inspections || [];
   const quotes = quotesData?.quotes || [];
 
@@ -233,6 +238,261 @@ export default function Documents() {
 
     // Save PDF
     doc.save(`Toolbox_Meeting_${new Date(meeting.meetingDate).toISOString().split('T')[0]}.pdf`);
+  };
+
+  const downloadFlhaForm = async (flha: any) => {
+    const doc = new jsPDF();
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const pageHeight = doc.internal.pageSize.getHeight();
+    let yPosition = 20;
+
+    const addMultilineText = (lines: string[], currentY: number, lineHeight: number = 6): number => {
+      let y = currentY;
+      for (const line of lines) {
+        if (y > pageHeight - 30) {
+          doc.addPage();
+          y = 20;
+        }
+        doc.text(line, 20, y);
+        y += lineHeight;
+      }
+      return y;
+    };
+
+    // Header
+    doc.setFillColor(251, 146, 60); // Orange
+    doc.rect(0, 0, pageWidth, 35, 'F');
+    doc.setTextColor(255, 255, 255);
+    doc.setFontSize(20);
+    doc.setFont('helvetica', 'bold');
+    doc.text('FIELD LEVEL HAZARD ASSESSMENT', pageWidth / 2, 15, { align: 'center' });
+    doc.setFontSize(12);
+    doc.setFont('helvetica', 'normal');
+    doc.text('Rope Access Safety Documentation', pageWidth / 2, 25, { align: 'center' });
+
+    yPosition = 50;
+
+    // Assessment Details
+    doc.setTextColor(0, 0, 0);
+    doc.setFontSize(11);
+    doc.setFont('helvetica', 'bold');
+    doc.text('Assessment Information', 20, yPosition);
+    yPosition += 8;
+
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(10);
+    doc.text(`Date: ${new Date(flha.assessmentDate).toLocaleDateString('en-US', {
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    })}`, 20, yPosition);
+    yPosition += 6;
+
+    doc.text(`Assessor: ${flha.assessorName}`, 20, yPosition);
+    yPosition += 6;
+
+    doc.text(`Location: ${flha.location}`, 20, yPosition);
+    yPosition += 6;
+
+    if (flha.workArea) {
+      doc.text(`Work Area: ${flha.workArea}`, 20, yPosition);
+      yPosition += 6;
+    }
+
+    yPosition += 4;
+
+    // Job Description
+    doc.setFont('helvetica', 'bold');
+    doc.text('Job Description:', 20, yPosition);
+    yPosition += 6;
+    
+    doc.setFont('helvetica', 'normal');
+    const jobDescLines = doc.splitTextToSize(flha.jobDescription, pageWidth - 40);
+    yPosition = addMultilineText(jobDescLines, yPosition);
+    yPosition += 10;
+
+    // Identified Hazards
+    if (yPosition > pageHeight - 30) {
+      doc.addPage();
+      yPosition = 20;
+    }
+
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(11);
+    doc.text('Identified Hazards', 20, yPosition);
+    yPosition += 8;
+
+    const hazardsList = [];
+    if (flha.hazardFalling) hazardsList.push('Falls from Height');
+    if (flha.hazardSwingFall) hazardsList.push('Swing Fall Hazard');
+    if (flha.hazardSuspendedRescue) hazardsList.push('Suspension Trauma / Rescue Required');
+    if (flha.hazardWeather) hazardsList.push('Adverse Weather Conditions');
+    if (flha.hazardElectrical) hazardsList.push('Electrical Hazards');
+    if (flha.hazardFallingObjects) hazardsList.push('Falling Tools/Objects');
+    if (flha.hazardChemical) hazardsList.push('Chemical Exposure');
+    if (flha.hazardConfined) hazardsList.push('Confined Spaces');
+    if (flha.hazardSharpEdges) hazardsList.push('Sharp Edges / Rope Damage');
+    if (flha.hazardUnstableAnchors) hazardsList.push('Unstable Anchor Points');
+    if (flha.hazardPowerTools) hazardsList.push('Power Tool Operation at Height');
+    if (flha.hazardPublic) hazardsList.push('Public Interaction / Access');
+
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(10);
+    hazardsList.forEach((hazard, index) => {
+      if (yPosition > pageHeight - 30) {
+        doc.addPage();
+        yPosition = 20;
+      }
+      doc.text(`• ${hazard}`, 25, yPosition);
+      yPosition += 6;
+    });
+
+    if (flha.additionalHazards) {
+      yPosition += 4;
+      doc.setFont('helvetica', 'bold');
+      doc.text('Additional Hazards:', 20, yPosition);
+      yPosition += 6;
+      
+      doc.setFont('helvetica', 'normal');
+      const additionalHazardsLines = doc.splitTextToSize(flha.additionalHazards, pageWidth - 40);
+      yPosition = addMultilineText(additionalHazardsLines, yPosition);
+    }
+
+    yPosition += 10;
+
+    // Controls Implemented
+    if (yPosition > pageHeight - 30) {
+      doc.addPage();
+      yPosition = 20;
+    }
+
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(11);
+    doc.text('Controls Implemented', 20, yPosition);
+    yPosition += 8;
+
+    const controlsList = [];
+    if (flha.controlPPE) controlsList.push('Proper PPE (Harness, Helmet, etc.)');
+    if (flha.controlBackupSystem) controlsList.push('Backup Safety Systems');
+    if (flha.controlEdgeProtection) controlsList.push('Edge Protection Installed');
+    if (flha.controlBarricades) controlsList.push('Barricades / Signage');
+    if (flha.controlWeatherMonitoring) controlsList.push('Weather Monitoring');
+    if (flha.controlRescuePlan) controlsList.push('Emergency Rescue Plan');
+    if (flha.controlCommunication) controlsList.push('Communication System');
+    if (flha.controlToolTethering) controlsList.push('Tool Tethering / Drop Prevention');
+    if (flha.controlPermits) controlsList.push('Work Permits Obtained');
+    if (flha.controlInspections) controlsList.push('Pre-work Equipment Inspections');
+
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(10);
+    controlsList.forEach((control) => {
+      if (yPosition > pageHeight - 30) {
+        doc.addPage();
+        yPosition = 20;
+      }
+      doc.text(`• ${control}`, 25, yPosition);
+      yPosition += 6;
+    });
+
+    if (flha.additionalControls) {
+      yPosition += 4;
+      doc.setFont('helvetica', 'bold');
+      doc.text('Additional Controls:', 20, yPosition);
+      yPosition += 6;
+      
+      doc.setFont('helvetica', 'normal');
+      const additionalControlsLines = doc.splitTextToSize(flha.additionalControls, pageWidth - 40);
+      yPosition = addMultilineText(additionalControlsLines, yPosition);
+    }
+
+    yPosition += 10;
+
+    // Risk Assessment
+    if (yPosition > pageHeight - 30) {
+      doc.addPage();
+      yPosition = 20;
+    }
+
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(11);
+    doc.text('Risk Assessment', 20, yPosition);
+    yPosition += 8;
+
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(10);
+    if (flha.riskLevelBefore) {
+      doc.text(`Risk Level (Before Controls): ${flha.riskLevelBefore.toUpperCase()}`, 20, yPosition);
+      yPosition += 6;
+    }
+    if (flha.riskLevelAfter) {
+      doc.text(`Risk Level (After Controls): ${flha.riskLevelAfter.toUpperCase()}`, 20, yPosition);
+      yPosition += 6;
+    }
+
+    yPosition += 4;
+
+    // Emergency Contacts
+    if (flha.emergencyContacts) {
+      if (yPosition > pageHeight - 30) {
+        doc.addPage();
+        yPosition = 20;
+      }
+
+      doc.setFont('helvetica', 'bold');
+      doc.text('Emergency Contacts:', 20, yPosition);
+      yPosition += 6;
+      
+      doc.setFont('helvetica', 'normal');
+      const emergencyContactsLines = doc.splitTextToSize(flha.emergencyContacts, pageWidth - 40);
+      yPosition = addMultilineText(emergencyContactsLines, yPosition);
+      yPosition += 10;
+    }
+
+    // Signatures
+    if (flha.signatures && flha.signatures.length > 0) {
+      if (yPosition > pageHeight - 30) {
+        doc.addPage();
+        yPosition = 20;
+      }
+
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(11);
+      doc.text('Team Member Signatures', 20, yPosition);
+      yPosition += 10;
+
+      for (const sig of flha.signatures) {
+        if (yPosition > pageHeight - 50) {
+          doc.addPage();
+          yPosition = 20;
+        }
+
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(10);
+        doc.text(sig.employeeName, 20, yPosition);
+        yPosition += 5;
+
+        try {
+          doc.addImage(sig.signatureDataUrl, 'PNG', 20, yPosition, 60, 20);
+        } catch (error) {
+          console.error('Error adding signature image:', error);
+        }
+        yPosition += 25;
+
+        doc.setLineWidth(0.5);
+        doc.line(20, yPosition, 80, yPosition);
+        yPosition += 10;
+      }
+    }
+
+    // Footer
+    const footerY = pageHeight - 15;
+    doc.setFontSize(8);
+    doc.setTextColor(100, 100, 100);
+    doc.setFont('helvetica', 'italic');
+    doc.text('This is an official FLHA record. Keep for compliance purposes.', pageWidth / 2, footerY, { align: 'center' });
+
+    doc.save(`FLHA_${new Date(flha.assessmentDate).toISOString().split('T')[0]}.pdf`);
   };
 
   const downloadHarnessInspection = (inspection: any) => {
@@ -577,6 +837,51 @@ export default function Documents() {
             ) : (
               <p className="text-center py-8 text-muted-foreground">
                 No toolbox meetings recorded yet
+              </p>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* FLHA Forms */}
+        <Card className="mb-6">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Calendar className="h-5 w-5" />
+              FLHA Records
+              <Badge variant="secondary" className="ml-auto">
+                {flhaForms.length}
+              </Badge>
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {flhaForms.length > 0 ? (
+              <div className="space-y-2">
+                {flhaForms.map((flha) => (
+                  <div key={flha.id} className="flex items-center gap-3 p-3 rounded-md border hover-elevate">
+                    <Calendar className="h-5 w-5 text-primary flex-shrink-0" />
+                    <div className="flex-1 min-w-0">
+                      <div className="font-medium">
+                        {new Date(flha.assessmentDate).toLocaleDateString()}
+                      </div>
+                      <div className="text-sm text-muted-foreground">
+                        Assessor: {flha.assessorName}
+                      </div>
+                    </div>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => downloadFlhaForm(flha)}
+                      data-testid={`download-flha-${flha.id}`}
+                    >
+                      <Download className="h-4 w-4 mr-1" />
+                      Download
+                    </Button>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-center py-8 text-muted-foreground">
+                No FLHA forms recorded yet
               </p>
             )}
           </CardContent>
