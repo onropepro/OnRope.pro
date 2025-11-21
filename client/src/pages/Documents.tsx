@@ -1,16 +1,18 @@
 import { useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
+import { useLocation } from "wouter";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
-import { FileText, Download, Calendar, DollarSign, Upload, Trash2, Shield, BookOpen } from "lucide-react";
+import { FileText, Download, Calendar, DollarSign, Upload, Trash2, Shield, BookOpen, ArrowLeft } from "lucide-react";
 import { hasFinancialAccess } from "@/lib/permissions";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { jsPDF } from "jspdf";
 
 export default function Documents() {
+  const [, navigate] = useLocation();
   const { toast } = useToast();
   const [uploadingHealthSafety, setUploadingHealthSafety] = useState(false);
   const [uploadingPolicy, setUploadingPolicy] = useState(false);
@@ -824,7 +826,17 @@ export default function Documents() {
     <div className="min-h-screen bg-background p-4 pb-24">
       <div className="max-w-4xl mx-auto">
         <div className="mb-6">
-          <h1 className="text-3xl font-bold mb-2">Documents</h1>
+          <div className="flex items-center gap-3 mb-4">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => navigate("/dashboard")}
+              data-testid="button-back"
+            >
+              <ArrowLeft className="h-5 w-5" />
+            </Button>
+            <h1 className="text-3xl font-bold">Documents</h1>
+          </div>
           <p className="text-muted-foreground">All company documents and safety records</p>
         </div>
 
