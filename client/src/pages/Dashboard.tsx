@@ -1647,7 +1647,7 @@ export default function Dashboard() {
     },
     {
       id: "toolbox-meeting",
-      label: "Toolbox Meeting",
+      label: "Safety Forms",
       description: "Safety meeting",
       icon: "group",
       onClick: () => setLocation("/toolbox-meeting"),
