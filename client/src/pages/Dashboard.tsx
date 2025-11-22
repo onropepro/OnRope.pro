@@ -1933,7 +1933,18 @@ export default function Dashboard() {
                         <div className="font-medium">Projects</div>
                         <div className="text-sm text-muted-foreground">
                           {projectsData.projectInfo.tier > 0 
-                            ? `${projectsData.projectInfo.projectsUsed} of ${projectsData.projectInfo.projectLimit === -1 ? '∞' : projectsData.projectInfo.projectLimit} projects used`
+                            ? (() => {
+                                const projectsRemaining = projectsData.projectInfo.projectLimit === -1 
+                                  ? '∞' 
+                                  : Math.max(0, projectsData.projectInfo.projectLimit - projectsData.projectInfo.projectsUsed);
+                                const additionalInfo = projectsData.projectInfo.additionalProjects > 0 
+                                  ? ` (${projectsData.projectInfo.baseProjectLimit} base + ${projectsData.projectInfo.additionalProjects} additional)` 
+                                  : '';
+                                
+                                return projectsData.projectInfo.projectLimit === -1
+                                  ? `${projectsData.projectInfo.projectsUsed} projects used • Unlimited available`
+                                  : `${projectsData.projectInfo.projectsUsed} of ${projectsData.projectInfo.projectLimit} used • ${projectsRemaining} ${projectsRemaining === 1 ? 'project' : 'projects'} remaining${additionalInfo}`;
+                              })()
                             : 'Manage your project capacity'
                           }
                         </div>
