@@ -51,6 +51,7 @@ export default function ProtectedRoute({ children, allowedRoles }: ProtectedRout
   }, [user, isLoading, error, allowedRoles, setLocation, location]);
 
   if (isLoading) {
+    console.log("⏳ ProtectedRoute: Showing loading screen");
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
@@ -61,8 +62,10 @@ export default function ProtectedRoute({ children, allowedRoles }: ProtectedRout
   }
 
   if (!user || (allowedRoles && !allowedRoles.includes(user.role))) {
+    console.log("🚫 ProtectedRoute: Returning null (no user or role mismatch)");
     return null;
   }
 
+  console.log("✨ ProtectedRoute: Rendering protected content!");
   return <>{children}</>;
 }
