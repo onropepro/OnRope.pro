@@ -2300,7 +2300,7 @@ export default function Dashboard() {
                               name="suitesPerDay"
                               render={({ field }) => (
                                 <FormItem>
-                                  <FormLabel>Suites per Day</FormLabel>
+                                  <FormLabel>Expected completed suite per day</FormLabel>
                                   <FormControl>
                                     <Input type="number" min="0" placeholder="e.g., 10" {...field} data-testid="input-suites-per-day" className="h-12" />
                                   </FormControl>

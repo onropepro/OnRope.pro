@@ -484,7 +484,11 @@ export default function ProjectDetail() {
     const totalDrops = north + east + south + west;
 
     // Check if shortfall reason is required but missing
-    if (totalDrops < project.dailyDropTarget && !data.shortfallReason?.trim()) {
+    const isInSuite = project.jobType === "in_suite_dryer_vent_cleaning";
+    const isParkade = project.jobType === "parkade_pressure_cleaning";
+    const target = isInSuite || isParkade ? (project.suitesPerDay || project.stallsPerDay || 0) : project.dailyDropTarget;
+    
+    if (totalDrops < target && !data.shortfallReason?.trim()) {
       endDayForm.setError("shortfallReason", {
         message: "Please explain why the daily target wasn't met"
       });
@@ -2687,17 +2691,20 @@ export default function ProjectDetail() {
                 const west = parseInt(endDayForm.watch("dropsCompletedWest") || "0");
                 const totalDrops = north + east + south + west;
                 const isInSuite = project.jobType === "in_suite_dryer_vent_cleaning";
+                const isParkade = project.jobType === "parkade_pressure_cleaning";
+                const target = isInSuite || isParkade ? (project.suitesPerDay || project.stallsPerDay || 0) : project.dailyDropTarget;
+                const isBelowTarget = totalDrops < target;
 
                 return (
                   <>
-                    {!isInSuite && (
+                    {!isInSuite && !isParkade && (
                       <div className="p-3 bg-muted rounded-md">
                         <div className="text-sm text-muted-foreground">Total Drops</div>
                         <div className="text-2xl font-bold">{totalDrops}</div>
                       </div>
                     )}
 
-                    {totalDrops < project.dailyDropTarget && (
+                    {isBelowTarget && (
                       <FormField
                         control={endDayForm.control}
                         name="shortfallReason"
