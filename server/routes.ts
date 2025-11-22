@@ -907,19 +907,30 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       console.log(`[Stripe] Adding white label branding to subscription ${user.stripeSubscriptionId}`);
 
-      // Add white label branding to subscription
-      await stripe.subscriptionItems.create({
-        subscription: user.stripeSubscriptionId,
-        price: addonPriceId,
-        proration_behavior: 'create_prorations',
+      // Check if white label branding is already on the subscription
+      // Use expand to get all items (handles pagination automatically)
+      const subscriptionDetails = await stripe.subscriptions.retrieve(user.stripeSubscriptionId, {
+        expand: ['items.data'],
       });
+      const hasWhiteLabel = subscriptionDetails.items.data.some(item => 
+        item.price.id === addonPriceId
+      );
+
+      if (!hasWhiteLabel) {
+        // Add white label branding to subscription
+        await stripe.subscriptionItems.create({
+          subscription: user.stripeSubscriptionId,
+          price: addonPriceId,
+          proration_behavior: 'create_prorations',
+        });
+      }
 
       // Update user to enable white label in database
       await storage.updateUser(user.id, {
-        whiteLabelEnabled: true,
+        whitelabelBrandingActive: true,
       });
 
-      console.log(`[Stripe] White label branding added successfully`);
+      console.log(`[Stripe] White label branding ${hasWhiteLabel ? 'already active' : 'added successfully'}`);
       res.json({
         success: true,
         message: "White label branding unlocked successfully",

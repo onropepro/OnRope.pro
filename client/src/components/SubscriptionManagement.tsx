@@ -540,7 +540,7 @@ export function SubscriptionManagement() {
               <p className="text-sm text-muted-foreground">Custom logo and brand colors</p>
             </div>
             <div className="text-right">
-              <p className="font-semibold">$0.49/month</p>
+              <p className="font-semibold">$49/month</p>
               <p className="text-xs text-muted-foreground">Available for Starter+</p>
             </div>
           </button>
@@ -780,7 +780,7 @@ export function SubscriptionManagement() {
               <div className="space-y-4 pt-4">
                 <div className="flex items-center justify-between">
                   <span className="text-sm">Price:</span>
-                  <span className="font-semibold text-base">$0.49/month</span>
+                  <span className="font-semibold text-base">$49/month</span>
                 </div>
                 <div className="space-y-2">
                   <div className="flex items-center gap-2">

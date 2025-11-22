@@ -29,12 +29,12 @@ export const STRIPE_PRICE_IDS = {
     usd: {
       extra_seats: 'price_1SW7VZBzDsOltscrbwWEthqa',     // $19 one-time - 2 seats
       extra_project: 'price_1SW7VZBzDsOltscr2GWJYRai',   // $49 one-time - 1 project
-      white_label: 'price_1SW7VaBzDsOltscr5DD1ciiO',     // $0.49/mo recurring
+      white_label: 'price_1SWCTnBzDsOltscrD2qcZ47m',     // $49/mo recurring
     },
     cad: {
       extra_seats: 'price_1SW7VZBzDsOltscrv1ZoRlfG',     // $19 CAD one-time - 2 seats
       extra_project: 'price_1SW7VaBzDsOltscrpZt2U150',   // $49 CAD one-time - 1 project
-      white_label: 'price_1SW7VaBzDsOltscrkWa2c0FQ',     // $0.49 CAD/mo recurring
+      white_label: 'price_1SWCToBzDsOltscrRljmQTLz',     // $49 CAD/mo recurring
     },
   },
 } as const;
@@ -101,8 +101,8 @@ export const ADDON_CONFIG = {
   },
   white_label: {
     name: 'White Label Branding',
-    priceUSD: 0.49,
-    priceCAD: 0.49,  // Same price, Stripe handles currency
+    priceUSD: 49,
+    priceCAD: 49,  // Same price, Stripe handles currency
     priceIdUSD: STRIPE_PRICE_IDS.addons.usd.white_label,
     priceIdCAD: STRIPE_PRICE_IDS.addons.cad.white_label,
     type: 'recurring' as const,
