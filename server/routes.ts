@@ -953,6 +953,139 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   /**
+   * Get subscription details including add-ons
+   * GET /api/subscription/details
+   */
+  app.get("/api/subscription/details", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const user = await storage.getUserById(req.session.userId!);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      if (!user.stripeSubscriptionId) {
+        return res.status(404).json({ message: "No active subscription found" });
+      }
+
+      // Get subscription from Stripe
+      const subscription = await stripe.subscriptions.retrieve(user.stripeSubscriptionId);
+      const currentPriceId = subscription.items.data[0]?.price.id;
+      
+      // Determine currency
+      let currency: 'usd' | 'cad' = 'usd';
+      for (const [, config] of Object.entries(TIER_CONFIG)) {
+        if (config.priceIdUSD === currentPriceId) {
+          currency = 'usd';
+          break;
+        } else if (config.priceIdCAD === currentPriceId) {
+          currency = 'cad';
+          break;
+        }
+      }
+
+      res.json({
+        tier: user.subscriptionTier,
+        status: subscription.status,
+        currentPeriodEnd: new Date(subscription.current_period_end * 1000).toISOString(),
+        cancelAtPeriodEnd: subscription.cancel_at_period_end,
+        whitelabelBrandingActive: user.whitelabelBrandingActive || false,
+        extraSeats: user.extraSeats || 0,
+        extraProjects: user.extraProjects || 0,
+        currency,
+      });
+    } catch (error: any) {
+      console.error('[Stripe] Get subscription details error:', error);
+      res.status(500).json({ message: error.message || "Failed to fetch subscription details" });
+    }
+  });
+
+  /**
+   * Cancel white label branding add-on
+   * POST /api/stripe/cancel-whitelabel
+   */
+  app.post("/api/stripe/cancel-whitelabel", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const user = await storage.getUserById(req.session.userId!);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      if (!user.stripeSubscriptionId) {
+        return res.status(400).json({ message: "No active subscription found" });
+      }
+
+      if (!user.whitelabelBrandingActive) {
+        return res.status(400).json({ message: "White label branding is not active" });
+      }
+
+      // Get current subscription to determine currency
+      const subscription = await stripe.subscriptions.retrieve(user.stripeSubscriptionId);
+      const currentPriceId = subscription.items.data[0]?.price.id;
+      
+      // Determine currency
+      let currency: 'usd' | 'cad' = 'usd';
+      for (const [, config] of Object.entries(TIER_CONFIG)) {
+        if (config.priceIdUSD === currentPriceId) {
+          currency = 'usd';
+          break;
+        } else if (config.priceIdCAD === currentPriceId) {
+          currency = 'cad';
+          break;
+        }
+      }
+
+      // Get white label price ID
+      const addonConfig = ADDON_CONFIG.white_label;
+      const addonPriceId = currency === 'usd' ? addonConfig.priceIdUSD : addonConfig.priceIdCAD;
+
+      console.log(`[Stripe] Cancelling white label branding from subscription ${user.stripeSubscriptionId}`);
+
+      // Find and remove the white label subscription item
+      let itemToRemove: string | null = null;
+      let startingAfter: string | undefined = undefined;
+      
+      do {
+        const itemsPage = await stripe.subscriptionItems.list({
+          subscription: user.stripeSubscriptionId,
+          limit: 100,
+          ...(startingAfter && { starting_after: startingAfter }),
+        });
+        
+        const whitelabelItem = itemsPage.data.find(item => item.price.id === addonPriceId);
+        if (whitelabelItem) {
+          itemToRemove = whitelabelItem.id;
+          break;
+        }
+        
+        if (!itemsPage.has_more) break;
+        
+        startingAfter = itemsPage.data[itemsPage.data.length - 1]?.id;
+      } while (true);
+
+      if (itemToRemove) {
+        // Remove the subscription item (will take effect at period end)
+        await stripe.subscriptionItems.del(itemToRemove, {
+          proration_behavior: 'none', // No proration on cancellation
+        });
+      }
+
+      // Update user to disable white label in database
+      await storage.updateUser(user.id, {
+        whitelabelBrandingActive: false,
+      });
+
+      console.log(`[Stripe] White label branding cancelled successfully`);
+      res.json({
+        success: true,
+        message: "White label branding will be cancelled at the end of your billing period",
+      });
+    } catch (error: any) {
+      console.error('[Stripe] Cancel white label error:', error);
+      res.status(500).json({ message: error.message || "Failed to cancel white label branding" });
+    }
+  });
+
+  /**
    * Create Stripe checkout session for subscription purchase
    * POST /api/stripe/create-checkout-session
    */

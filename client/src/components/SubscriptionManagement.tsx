@@ -392,10 +392,10 @@ export function SubscriptionManagement() {
             ) : (
               <Button
                 variant="outline"
-                onClick={() => setShowCancelDialog(true)}
-                data-testid="button-cancel-subscription"
+                onClick={() => window.location.href = '/manage-subscription'}
+                data-testid="button-manage-subscription"
               >
-                Cancel Subscription
+                Manage Subscription
               </Button>
             )}
           </CardFooter>

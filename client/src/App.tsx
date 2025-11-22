@@ -16,6 +16,7 @@ import ComplaintDetail from "@/pages/ComplaintDetail";
 import WorkSessionHistory from "@/pages/WorkSessionHistory";
 import ProjectDetail from "@/pages/ProjectDetail";
 import Profile from "@/pages/Profile";
+import ManageSubscription from "@/pages/ManageSubscription";
 import HarnessInspectionForm from "@/pages/HarnessInspectionForm";
 import SafetyForms from "@/pages/SafetyForms";
 import ToolboxMeetingForm from "@/pages/ToolboxMeetingForm";
@@ -96,6 +97,11 @@ function Router() {
       <Route path="/profile">
         <ProtectedRoute>
           <Profile />
+        </ProtectedRoute>
+      </Route>
+      <Route path="/manage-subscription">
+        <ProtectedRoute allowedRoles={EMPLOYEE_ROLES}>
+          <ManageSubscription />
         </ProtectedRoute>
       </Route>
       <Route path="/harness-inspection">
