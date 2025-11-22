@@ -5230,7 +5230,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const objectStorageService = new ObjectStorageService();
       const timestamp = Date.now();
       const filename = `company-documents/${documentType}-${timestamp}-${req.file.originalname}`;
-      const fileUrl = await objectStorageService.uploadPrivateFile(
+      const fileUrl = await objectStorageService.uploadPublicFile(
         filename,
         req.file.buffer,
         req.file.mimetype
