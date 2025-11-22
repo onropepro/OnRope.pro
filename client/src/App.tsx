@@ -35,6 +35,7 @@ import Documents from "@/pages/Documents";
 import ResidentLink from "@/pages/ResidentLink";
 import NotFound from "@/pages/not-found";
 import ProtectedRoute from "@/components/ProtectedRoute";
+import DebugConsole from "@/components/DebugConsole";
 import { EMPLOYEE_ROLES } from "@/lib/permissions";
 
 function Router() {
@@ -302,6 +303,7 @@ function App() {
             <Router />
           </div>
           <Toaster />
+          <DebugConsole />
         </BrandingProvider>
       </TooltipProvider>
     </QueryClientProvider>
