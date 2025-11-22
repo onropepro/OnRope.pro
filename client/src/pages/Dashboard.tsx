@@ -1932,7 +1932,7 @@ export default function Dashboard() {
                       <div>
                         <div className="font-medium">Projects</div>
                         <div className="text-sm text-muted-foreground">
-                          {projectsData.projectInfo.tier > 0 
+                          {projectsData.projectInfo.tier && projectsData.projectInfo.tier !== 'none'
                             ? (() => {
                                 const projectsRemaining = projectsData.projectInfo.projectLimit === -1 
                                   ? '∞' 
@@ -1950,10 +1950,10 @@ export default function Dashboard() {
                         </div>
                       </div>
                     </div>
-                    {projectsData.projectInfo.tier > 0 && (
+                    {projectsData.projectInfo.tier && projectsData.projectInfo.tier !== 'none' && (
                       <div className="text-right">
                         <Badge variant={projectsData.projectInfo.atProjectLimit ? "destructive" : "secondary"} data-testid="badge-project-tier-status">
-                          Tier {projectsData.projectInfo.tier}
+                          {projectsData.projectInfo.tier.charAt(0).toUpperCase() + projectsData.projectInfo.tier.slice(1)}
                         </Badge>
                       </div>
                     )}
@@ -3106,7 +3106,7 @@ export default function Dashboard() {
                         <div>
                           <div className="font-medium">Employee Seats</div>
                           <div className="text-sm text-muted-foreground">
-                            {employeesData.seatInfo.tier > 0 
+                            {employeesData.seatInfo.tier && employeesData.seatInfo.tier !== 'none'
                               ? (() => {
                                   const seatsRemaining = employeesData.seatInfo.seatLimit === -1 
                                     ? '∞' 
@@ -3124,10 +3124,10 @@ export default function Dashboard() {
                           </div>
                         </div>
                       </div>
-                      {employeesData.seatInfo.tier > 0 && (
+                      {employeesData.seatInfo.tier && employeesData.seatInfo.tier !== 'none' && (
                         <div className="text-right">
                           <Badge variant={employeesData.seatInfo.atSeatLimit ? "destructive" : "secondary"} data-testid="badge-tier-status">
-                            Tier {employeesData.seatInfo.tier}
+                            {employeesData.seatInfo.tier.charAt(0).toUpperCase() + employeesData.seatInfo.tier.slice(1)}
                           </Badge>
                         </div>
                       )}
