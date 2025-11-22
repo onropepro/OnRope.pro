@@ -885,26 +885,8 @@ export default function Profile() {
                           </ul>
                         </div>
                         
-                        <Button
-                          size="lg"
-                          className="h-12 min-w-[200px]"
-                          data-testid="button-subscribe-branding"
-                          onClick={() => {
-                            const email = encodeURIComponent(user?.email || '');
-                            const licenseKey = encodeURIComponent(user?.licenseKey || '');
-                            const returnUrl = encodeURIComponent(`${window.location.origin}/profile?purchased=true`);
-                            const url = `https://ram-website-paquettetom.replit.app/purchase-branding?email=${email}&licenseKey=${licenseKey}&returnUrl=${returnUrl}`;
-                            
-                            console.log('[Branding Purchase] Opening:', url);
-                            window.location.href = url;
-                          }}
-                        >
-                          <span className="material-icons mr-2">shopping_cart</span>
-                          Subscribe for $0.49/month
-                        </Button>
-                        
-                        <p className="text-xs text-muted-foreground">
-                          Secure payment powered by Stripe. Cancel anytime.
+                        <p className="text-sm text-muted-foreground px-4">
+                          Branding subscription is included in the SubscriptionManagement component. Visit the Subscription tab to enable white label branding.
                         </p>
                       </div>
                     </div>
@@ -1356,7 +1338,7 @@ export default function Profile() {
           <AlertDialogHeader>
             <AlertDialogTitle>Update License Key</AlertDialogTitle>
             <AlertDialogDescription>
-              Enter your new license key from the marketplace. This is required after upgrading your tier.
+              Enter your new license key. This is required after upgrading your tier.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <div className="py-4">

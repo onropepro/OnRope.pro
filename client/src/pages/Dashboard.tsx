@@ -3136,35 +3136,22 @@ export default function Dashboard() {
                           <div className="flex-1">
                             <div className="text-sm font-medium text-destructive">Seat Limit Reached</div>
                             <div className="text-xs text-muted-foreground mt-1">
-                              You've reached your {employeesData.seatInfo.seatLimit}-employee limit for Tier {employeesData.seatInfo.tier}. Upgrade your tier or purchase additional seats to add more team members.
+                              You've reached your {employeesData.seatInfo.seatLimit}-employee limit. Visit Profile → Subscription to upgrade your tier or add more seats.
                             </div>
                           </div>
                         </div>
+                        <Button 
+                          size="sm" 
+                          variant="default" 
+                          className="mt-2 w-full"
+                          data-testid="button-manage-subscription-seats"
+                          onClick={() => window.location.href = "/profile"}
+                        >
+                          <span className="material-icons text-sm mr-1">settings</span>
+                          Manage Subscription
+                        </Button>
                       </div>
                     )}
-                    
-                    <div className="flex gap-2 mt-3">
-                      <Button size="sm" variant="default" data-testid="button-upgrade-tier">
-                        <span className="material-icons text-sm mr-1">upgrade</span>
-                        Upgrade Tier
-                      </Button>
-                      <Button 
-                        size="sm" 
-                        variant="outline" 
-                        data-testid="button-buy-seats"
-                        onClick={() => {
-                          const params = new URLSearchParams({
-                            email: currentUser?.email || '',
-                            tier: employeesData.seatInfo.tier.toString(),
-                            currentSeats: employeesData.seatInfo.seatsUsed.toString(),
-                          });
-                          window.open(`https://ram-website-paquettetom.replit.app/purchase-seats?${params.toString()}`, '_blank');
-                        }}
-                      >
-                        <span className="material-icons text-sm mr-1">add_shopping_cart</span>
-                        Add more seats
-                      </Button>
-                    </div>
                   </CardContent>
                 </Card>
               )}
