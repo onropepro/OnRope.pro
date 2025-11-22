@@ -154,11 +154,11 @@ export default function CompleteRegistration() {
 
       toast({
         title: "Success!",
-        description: "Your account has been created. Redirecting to dashboard...",
+        description: "Your account has been created. Redirecting to your profile...",
       });
 
-      // Redirect to dashboard after successful registration
-      setTimeout(() => setLocation('/dashboard'), 2000);
+      // Redirect to profile page to complete account details
+      setTimeout(() => setLocation('/profile'), 2000);
     } catch (error: any) {
       console.error('[CompleteRegistration] Registration error:', error);
       toast({
