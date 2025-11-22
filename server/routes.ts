@@ -388,8 +388,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
           subscriptionTier: license.tier,
           subscriptionStatus: 'trialing',
           licenseKey: licenseKey, // Store license key in users table
-          maxProjects: tierConfig.maxProjects,
-          maxSeats: tierConfig.maxSeats,
         }).returning();
 
         if (!user) {
@@ -708,8 +706,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       await storage.updateUser(user.id, {
         tier: tier as any,
         licenseKey: newLicenseKey,
-        maxProjects: tierConfig.maxProjects,
-        maxSeats: tierConfig.maxSeats,
       });
 
       console.log(`[Stripe] Subscription upgraded successfully. New tier: ${tier}`);
@@ -1010,8 +1006,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         currentPeriodEnd: new Date(subscription.current_period_end * 1000).toISOString(),
         cancelAtPeriodEnd: subscription.cancel_at_period_end,
         whitelabelBrandingActive: user.whitelabelBrandingActive || false,
-        extraSeats: user.extraSeats || 0,
-        extraProjects: user.extraProjects || 0,
+        additionalSeatsCount: user.additionalSeatsCount || 0,
+        additionalProjectsCount: user.additionalProjectsCount || 0,
         currency,
       });
     } catch (error: any) {
