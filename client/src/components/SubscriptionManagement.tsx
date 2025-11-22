@@ -491,7 +491,7 @@ export function SubscriptionManagement() {
 
       {/* Upgrade Confirmation Dialog */}
       <Dialog open={showUpgradeDialog} onOpenChange={setShowUpgradeDialog}>
-        <DialogContent data-testid="dialog-upgrade-subscription">
+        <DialogContent data-testid="dialog-upgrade-subscription" className="max-w-md">
           <DialogHeader>
             <DialogTitle>
               {pendingUpgradeTier && subStatus?.currentTier && 
@@ -500,13 +500,72 @@ export function SubscriptionManagement() {
                 : 'Change Subscription'
               }
             </DialogTitle>
-            <DialogDescription>
+            <DialogDescription asChild>
               {pendingUpgradeTier && subStatus?.currentTier && (
-                <>
-                  You're about to change your plan from <strong>{TIER_INFO[subStatus.currentTier]?.name}</strong> to <strong>{TIER_INFO[pendingUpgradeTier]?.name}</strong>.
-                  <br /><br />
-                  Your billing will be prorated automatically, and changes will take effect immediately.
-                </>
+                <div className="space-y-4 pt-2">
+                  <div className="text-sm text-muted-foreground">
+                    You're about to change your plan from <strong className="text-foreground">{TIER_INFO[subStatus.currentTier]?.name}</strong> to <strong className="text-foreground">{TIER_INFO[pendingUpgradeTier]?.name}</strong>.
+                  </div>
+
+                  {/* Pricing Comparison */}
+                  <div className="bg-muted/50 rounded-lg p-4 space-y-2">
+                    <div className="flex items-center justify-between text-sm">
+                      <span className="text-muted-foreground">Current Price:</span>
+                      <span className="font-medium line-through">
+                        {selectedCurrency === 'usd' ? '$' : 'C$'}{TIER_INFO[subStatus.currentTier].price[selectedCurrency]}/mo
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="font-semibold">New Price:</span>
+                      <span className="text-lg font-bold text-primary">
+                        {selectedCurrency === 'usd' ? '$' : 'C$'}{TIER_INFO[pendingUpgradeTier].price[selectedCurrency]}/mo
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Feature Upgrades */}
+                  <div className="space-y-2">
+                    <h4 className="text-sm font-semibold">What you'll get:</h4>
+                    <div className="space-y-1.5 text-sm">
+                      {TIER_INFO[subStatus.currentTier].projects !== TIER_INFO[pendingUpgradeTier].projects && (
+                        <div className="flex items-center gap-2">
+                          <Check className="w-4 h-4 text-primary shrink-0" />
+                          <span>
+                            <strong>
+                              {TIER_INFO[pendingUpgradeTier].projects === -1 ? 'Unlimited' : TIER_INFO[pendingUpgradeTier].projects}
+                            </strong> active projects 
+                            <span className="text-muted-foreground ml-1">
+                              (from {TIER_INFO[subStatus.currentTier].projects})
+                            </span>
+                          </span>
+                        </div>
+                      )}
+                      {TIER_INFO[subStatus.currentTier].seats !== TIER_INFO[pendingUpgradeTier].seats && (
+                        <div className="flex items-center gap-2">
+                          <Check className="w-4 h-4 text-primary shrink-0" />
+                          <span>
+                            <strong>
+                              {TIER_INFO[pendingUpgradeTier].seats === -1 ? 'Unlimited' : TIER_INFO[pendingUpgradeTier].seats}
+                            </strong> team seats
+                            <span className="text-muted-foreground ml-1">
+                              (from {TIER_INFO[subStatus.currentTier].seats})
+                            </span>
+                          </span>
+                        </div>
+                      )}
+                      {TIER_INFO[pendingUpgradeTier].features.slice(2).map((feature, idx) => (
+                        <div key={idx} className="flex items-center gap-2">
+                          <Check className="w-4 h-4 text-primary shrink-0" />
+                          <span>{feature}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="text-xs text-muted-foreground pt-2 border-t">
+                    Your billing will be prorated automatically. Changes take effect immediately.
+                  </div>
+                </div>
               )}
             </DialogDescription>
           </DialogHeader>
@@ -527,7 +586,7 @@ export function SubscriptionManagement() {
               disabled={upgradeMutation.isPending}
               data-testid="button-confirm-upgrade"
             >
-              {upgradeMutation.isPending ? 'Processing...' : 'Confirm Change'}
+              {upgradeMutation.isPending ? 'Processing...' : 'Confirm Upgrade'}
             </Button>
           </DialogFooter>
         </DialogContent>
