@@ -34,6 +34,24 @@ export const sessions = pgTable(
   (table) => [index("IDX_session_expire").on(table.expire)],
 );
 
+// License keys table - tracks generated license keys from Stripe checkouts
+export const licenseKeys = pgTable("license_keys", {
+  licenseKey: varchar("license_key").primaryKey(), // The generated license key (COMPANY-XXXXX-XXXXX-XXXXX-[1-4])
+  stripeSessionId: varchar("stripe_session_id").notNull().unique(), // Stripe checkout session ID
+  stripeCustomerId: varchar("stripe_customer_id").notNull(), // Stripe customer ID
+  stripeSubscriptionId: varchar("stripe_subscription_id").notNull(), // Stripe subscription ID
+  tier: varchar("tier").notNull(), // basic | starter | premium | enterprise
+  currency: varchar("currency").notNull(), // usd | cad
+  used: boolean("used").default(false).notNull(), // Whether this key has been used for registration
+  usedByUserId: varchar("used_by_user_id").references(() => users.id, { onDelete: "set null" }), // User who used this key
+  usedAt: timestamp("used_at"), // When the key was used
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+}, (table) => ({
+  // Database constraint: Once a license is used (usedAt is set), it cannot be unmarked
+  // This prevents any code bug or manual DB manipulation from resetting the used flag
+  usedAtEnforcesUsed: sql`CHECK (("used_at" IS NULL AND "used" = false) OR ("used_at" IS NOT NULL AND "used" = true))`,
+}));
+
 // Users table - supports multiple roles
 export const users = pgTable("users", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),

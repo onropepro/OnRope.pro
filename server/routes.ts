@@ -2,8 +2,8 @@ import type { Express, Request, Response, NextFunction } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { db } from "./db";
-import { insertUserSchema, insertClientSchema, insertProjectSchema, insertDropLogSchema, insertComplaintSchema, insertComplaintNoteSchema, insertJobCommentSchema, insertHarnessInspectionSchema, insertToolboxMeetingSchema, insertFlhaFormSchema, insertPayPeriodConfigSchema, insertQuoteSchema, insertQuoteServiceSchema, insertGearItemSchema, insertGearAssignmentSchema, insertScheduledJobSchema, insertJobAssignmentSchema, normalizeStrataPlan, type InsertGearItem, type InsertGearAssignment, type Project, gearAssignments, jobAssignments, workSessions, nonBillableWorkSessions } from "@shared/schema";
-import { eq } from "drizzle-orm";
+import { insertUserSchema, insertClientSchema, insertProjectSchema, insertDropLogSchema, insertComplaintSchema, insertComplaintNoteSchema, insertJobCommentSchema, insertHarnessInspectionSchema, insertToolboxMeetingSchema, insertFlhaFormSchema, insertPayPeriodConfigSchema, insertQuoteSchema, insertQuoteServiceSchema, insertGearItemSchema, insertGearAssignmentSchema, insertScheduledJobSchema, insertJobAssignmentSchema, normalizeStrataPlan, type InsertGearItem, type InsertGearAssignment, type Project, gearAssignments, jobAssignments, workSessions, nonBillableWorkSessions, licenseKeys, users } from "@shared/schema";
+import { eq, sql } from "drizzle-orm";
 import { z } from "zod";
 import bcrypt from "bcrypt";
 import multer from "multer";
@@ -301,6 +301,155 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
+  // Registration with license (for new customers after Stripe checkout)
+  app.post("/api/register-with-license", async (req: Request, res: Response) => {
+    try {
+      const { 
+        companyName, 
+        email, 
+        password, 
+        licenseKey, 
+        stripeCustomerId, 
+        stripeSubscriptionId, 
+        tier 
+      } = req.body;
+
+      console.log('[Register-License] Creating account with license:', { companyName, email, licenseKey });
+
+      // Validation
+      if (!companyName || !email || !password || !licenseKey) {
+        return res.status(400).json({ message: "Missing required fields" });
+      }
+
+      // CRITICAL SECURITY: Use database transaction with row-level locking to prevent race conditions
+      // ALL database operations must happen within this transaction
+      const result = await db.transaction(async (tx) => {
+        // Lock the license row with SELECT FOR UPDATE to prevent concurrent access
+        const validLicense = await tx.execute(
+          sql`SELECT * FROM ${licenseKeys} WHERE ${licenseKeys.licenseKey} = ${licenseKey} FOR UPDATE`
+        );
+
+        if (!validLicense.rows || validLicense.rows.length === 0) {
+          console.error('[Register-License] Invalid license key:', licenseKey);
+          throw new Error("Invalid license key");
+        }
+
+        const license = validLicense.rows[0] as any;
+
+        // Check if license has already been used (while holding the lock)
+        if (license.used === true) {
+          console.error('[Register-License] License key already used:', licenseKey);
+          throw new Error("License key has already been used");
+        }
+
+        // Verify the tier and Stripe IDs match the license record
+        if (license.tier !== tier) {
+          console.error('[Register-License] Tier mismatch:', { provided: tier, expected: license.tier });
+          throw new Error("License tier does not match");
+        }
+
+        if (license.stripe_customer_id !== stripeCustomerId || 
+            license.stripe_subscription_id !== stripeSubscriptionId) {
+          console.error('[Register-License] Stripe ID mismatch');
+          throw new Error("Stripe information does not match license");
+        }
+
+        // Check if user already exists (using transaction client)
+        const existingUserByEmail = await tx.query.users.findFirst({
+          where: eq(users.email, email),
+        });
+
+        if (existingUserByEmail) {
+          throw new Error("Email already registered");
+        }
+
+        const existingUserByCompanyName = await tx.query.users.findFirst({
+          where: eq(users.companyName, companyName),
+        });
+
+        if (existingUserByCompanyName) {
+          throw new Error("Company name already taken");
+        }
+
+        // Hash password
+        const passwordHash = await bcrypt.hash(password, 10);
+
+        // Get tier configuration
+        const tierConfig = TIER_CONFIG[license.tier as TierName];
+
+        // Create user with subscription data (using transaction client)
+        const [user] = await tx.insert(users).values({
+          companyName,
+          email,
+          passwordHash,
+          role: 'company',
+          stripeCustomerId: license.stripe_customer_id,
+          stripeSubscriptionId: license.stripe_subscription_id,
+          subscriptionTier: license.tier,
+          subscriptionStatus: 'trialing',
+          maxProjects: tierConfig.maxProjects,
+          maxSeats: tierConfig.maxSeats,
+        }).returning();
+
+        if (!user) {
+          throw new Error("Failed to create user");
+        }
+
+        console.log('[Register-License] User created:', user.id);
+
+        // Mark license key as used (within the same transaction)
+        await tx.update(licenseKeys)
+          .set({ 
+            used: true, 
+            usedByUserId: user.id,
+            usedAt: new Date(),
+          })
+          .where(eq(licenseKeys.licenseKey, licenseKey));
+        
+        console.log('[Register-License] License key marked as used:', licenseKey);
+
+        return user;
+      });
+
+      // Create default payroll config (outside transaction - not critical if it fails)
+      try {
+        await storage.createPayPeriodConfig({
+          companyId: result.id,
+          periodType: 'semi-monthly',
+          firstPayDay: 1,
+          secondPayDay: 15,
+        });
+        await storage.generatePayPeriods(result.id, 6);
+        console.log('[Register-License] Payroll config created');
+      } catch (error) {
+        console.error('[Register-License] Payroll setup error:', error);
+        // Don't fail registration
+      }
+
+      // Create session
+      req.session.userId = result.id;
+      req.session.role = result.role;
+
+      await new Promise<void>((resolve, reject) => {
+        req.session.save((err) => {
+          if (err) reject(err);
+          else resolve();
+        });
+      });
+
+      console.log('[Register-License] Registration complete for:', email);
+
+      // Return user without password
+      const { passwordHash: _, ...userWithoutPassword } = result;
+      res.json({ user: userWithoutPassword });
+    } catch (error: any) {
+      console.error('[Register-License] Error:', error);
+      // Check for specific error messages from transaction
+      const message = error.message || "Registration failed";
+      res.status(400).json({ message });
+    }
+  });
+
   // Login endpoint
   app.post("/api/login", async (req: Request, res: Response) => {
     try {
@@ -594,6 +743,117 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: error.message || "Failed to create checkout session" });
     }
   });
+
+  /**
+   * Retrieve checkout session and generate license key
+   * GET /api/stripe/checkout-session/:sessionId
+   * Used by complete-registration page to get license details
+   */
+  app.get("/api/stripe/checkout-session/:sessionId", async (req: Request, res: Response) => {
+    try {
+      const { sessionId } = req.params;
+
+      // Check if we already generated a license key for this session
+      const existingLicense = await db.query.licenseKeys.findFirst({
+        where: eq(licenseKeys.stripeSessionId, sessionId),
+      });
+
+      if (existingLicense) {
+        // Return existing license key
+        const tierConfig = TIER_CONFIG[existingLicense.tier as TierName];
+        const subscription = await stripe.subscriptions.retrieve(existingLicense.stripeSubscriptionId);
+        
+        return res.json({
+          licenseKey: existingLicense.licenseKey,
+          tier: existingLicense.tier,
+          tierName: tierConfig.name,
+          currency: existingLicense.currency,
+          maxProjects: tierConfig.maxProjects,
+          maxSeats: tierConfig.maxSeats,
+          stripeCustomerId: existingLicense.stripeCustomerId,
+          stripeSubscriptionId: existingLicense.stripeSubscriptionId,
+          trialEnd: subscription.trial_end,
+        });
+      }
+
+      // Retrieve the session from Stripe
+      const session = await stripe.checkout.sessions.retrieve(sessionId, {
+        expand: ['subscription', 'customer'],
+      });
+
+      if (!session) {
+        return res.status(404).json({ message: "Session not found" });
+      }
+
+      // Verify session is completed
+      if (session.status !== 'complete') {
+        return res.status(400).json({ message: "Checkout session not completed" });
+      }
+
+      // Get tier from metadata
+      const tier = session.metadata?.tier;
+      const currency = session.metadata?.currency || 'usd';
+
+      if (!tier) {
+        return res.status(400).json({ message: "Missing tier information" });
+      }
+
+      // Get customer and subscription IDs
+      const stripeCustomerId = typeof session.customer === 'string' ? session.customer : session.customer?.id;
+      const subscription = session.subscription as Stripe.Subscription;
+      const stripeSubscriptionId = typeof subscription === 'string' ? subscription : subscription?.id;
+
+      if (!stripeCustomerId || !stripeSubscriptionId) {
+        return res.status(400).json({ message: "Missing customer or subscription data" });
+      }
+
+      // Generate license key with tier suffix
+      // Format: COMPANY-XXXXX-XXXXX-XXXXX-[TIER]
+      // -1 = Basic, -2 = Starter, -3 = Premium, -4 = Enterprise
+      const tierSuffix = tier === 'basic' ? '1' : tier === 'starter' ? '2' : tier === 'premium' ? '3' : '4';
+      const licenseKey = `COMPANY-${generateRandomSegment()}-${generateRandomSegment()}-${generateRandomSegment()}-${tierSuffix}`;
+
+      // Store license key in database
+      await db.insert(licenseKeys).values({
+        licenseKey,
+        stripeSessionId: sessionId,
+        stripeCustomerId,
+        stripeSubscriptionId,
+        tier,
+        currency,
+        used: false,
+      });
+
+      console.log(`[License] Generated and stored license key: ${licenseKey} for session ${sessionId}`);
+
+      const tierConfig = TIER_CONFIG[tier as TierName];
+
+      res.json({
+        licenseKey,
+        tier,
+        tierName: tierConfig.name,
+        currency,
+        maxProjects: tierConfig.maxProjects,
+        maxSeats: tierConfig.maxSeats,
+        stripeCustomerId,
+        stripeSubscriptionId,
+        trialEnd: subscription && typeof subscription !== 'string' ? subscription.trial_end : null,
+      });
+    } catch (error: any) {
+      console.error('[Stripe] Get checkout session error:', error);
+      res.status(500).json({ message: error.message || "Failed to retrieve session" });
+    }
+  });
+
+  // Helper function to generate random license key segment
+  function generateRandomSegment(): string {
+    const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; // Excluding similar-looking characters
+    let segment = '';
+    for (let i = 0; i < 5; i++) {
+      segment += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    return segment;
+  }
 
   /**
    * Stripe webhook handler
