@@ -2374,9 +2374,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const extension = req.file.mimetype === 'application/pdf' ? 'pdf' : req.file.mimetype.split('/')[1];
       const filename = `employee-document-${timestamp}.${extension}`;
 
-      // Upload to private object storage
+      // Upload to public object storage (same as resident portal and quotes)
       const objectStorageService = new ObjectStorageService();
-      const url = await objectStorageService.uploadPrivateFile(
+      const url = await objectStorageService.uploadPublicFile(
         filename,
         req.file.buffer,
         req.file.mimetype
