@@ -656,18 +656,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // Get current subscription to determine currency
       const subscription = await stripe.subscriptions.retrieve(user.stripeSubscriptionId);
-      const currentPriceId = subscription.items.data[0]?.price.id;
       
-      // Determine currency from current price
-      let currency: 'usd' | 'cad' = 'usd';
-      for (const [, config] of Object.entries(TIER_CONFIG)) {
-        if (config.priceIdUSD === currentPriceId) {
-          currency = 'usd';
-          break;
-        } else if (config.priceIdCAD === currentPriceId) {
-          currency = 'cad';
-          break;
-        }
+      // Use Stripe's subscription currency (authoritative source)
+      const currency = subscription.currency.toLowerCase() as 'usd' | 'cad';
+      
+      // Validate currency is supported
+      if (currency !== 'usd' && currency !== 'cad') {
+        return res.status(400).json({ 
+          message: `Unsupported currency: ${currency}. Only USD and CAD are supported.` 
+        });
       }
 
       // Get new price ID
@@ -750,18 +747,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // Get current subscription to determine currency
       const subscription = await stripe.subscriptions.retrieve(user.stripeSubscriptionId);
-      const currentPriceId = subscription.items.data[0]?.price.id;
       
-      // Determine currency from current price
-      let currency: 'usd' | 'cad' = 'usd';
-      for (const [, config] of Object.entries(TIER_CONFIG)) {
-        if (config.priceIdUSD === currentPriceId) {
-          currency = 'usd';
-          break;
-        } else if (config.priceIdCAD === currentPriceId) {
-          currency = 'cad';
-          break;
-        }
+      // Use Stripe's subscription currency (authoritative source)
+      const currency = subscription.currency.toLowerCase() as 'usd' | 'cad';
+      
+      // Validate currency is supported
+      if (currency !== 'usd' && currency !== 'cad') {
+        return res.status(400).json({ 
+          message: `Unsupported currency: ${currency}. Only USD and CAD are supported.` 
+        });
       }
 
       // Get extra seats price ID
@@ -830,18 +824,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // Get current subscription to determine currency
       const subscription = await stripe.subscriptions.retrieve(user.stripeSubscriptionId);
-      const currentPriceId = subscription.items.data[0]?.price.id;
       
-      // Determine currency from current price
-      let currency: 'usd' | 'cad' = 'usd';
-      for (const [, config] of Object.entries(TIER_CONFIG)) {
-        if (config.priceIdUSD === currentPriceId) {
-          currency = 'usd';
-          break;
-        } else if (config.priceIdCAD === currentPriceId) {
-          currency = 'cad';
-          break;
-        }
+      // Use Stripe's subscription currency (authoritative source)
+      const currency = subscription.currency.toLowerCase() as 'usd' | 'cad';
+      
+      // Validate currency is supported
+      if (currency !== 'usd' && currency !== 'cad') {
+        return res.status(400).json({ 
+          message: `Unsupported currency: ${currency}. Only USD and CAD are supported.` 
+        });
       }
 
       // Get extra project price ID
@@ -915,18 +906,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // Get current subscription to determine currency
       const subscription = await stripe.subscriptions.retrieve(user.stripeSubscriptionId);
-      const currentPriceId = subscription.items.data[0]?.price.id;
       
-      // Determine currency from current price
-      let currency: 'usd' | 'cad' = 'usd';
-      for (const [, config] of Object.entries(TIER_CONFIG)) {
-        if (config.priceIdUSD === currentPriceId) {
-          currency = 'usd';
-          break;
-        } else if (config.priceIdCAD === currentPriceId) {
-          currency = 'cad';
-          break;
-        }
+      // Use Stripe's subscription currency (authoritative source)
+      const currency = subscription.currency.toLowerCase() as 'usd' | 'cad';
+      
+      // Validate currency is supported
+      if (currency !== 'usd' && currency !== 'cad') {
+        return res.status(400).json({ 
+          message: `Unsupported currency: ${currency}. Only USD and CAD are supported.` 
+        });
       }
 
       // Get white label price ID
