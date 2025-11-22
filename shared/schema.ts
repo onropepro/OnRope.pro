@@ -112,6 +112,7 @@ export const users = pgTable("users", {
   subscriptionStatus: varchar("subscription_status").default('inactive'), // inactive | active | past_due | canceled | trialing
   subscriptionEndDate: date("subscription_end_date"), // Date subscription ends or ended
   stripeSubscriptionId: varchar("stripe_subscription_id"), // Current Stripe subscription ID
+  licenseKey: varchar("license_key"), // Current license key (COMPANY-XXXXX-XXXXX-XXXXX-[1-4])
   
   // Add-ons tracking (company role only)
   additionalSeatsCount: integer("additional_seats_count").default(0), // Number of extra seats purchased

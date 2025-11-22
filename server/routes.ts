@@ -387,6 +387,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           stripeSubscriptionId: license.stripe_subscription_id,
           subscriptionTier: license.tier,
           subscriptionStatus: 'trialing',
+          licenseKey: licenseKey, // Store license key in users table
           maxProjects: tierConfig.maxProjects,
           maxSeats: tierConfig.maxSeats,
         }).returning();
