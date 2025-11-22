@@ -74,7 +74,7 @@ export async function createCheckoutSession(params: {
       mode: params.mode,
     });
 
-    const session = await stripe.checkout.sessions.create({
+    const sessionConfig: any = {
       customer: params.customerId,
       mode: params.mode,
       payment_method_types: ['card'],
@@ -89,7 +89,17 @@ export async function createCheckoutSession(params: {
       metadata: params.metadata || {},
       allow_promotion_codes: true,
       billing_address_collection: 'auto',
-    });
+    };
+
+    // Add 1-month free trial for subscription mode
+    if (params.mode === 'subscription') {
+      sessionConfig.subscription_data = {
+        trial_period_days: 30, // 1-month free trial
+        metadata: params.metadata || {},
+      };
+    }
+
+    const session = await stripe.checkout.sessions.create(sessionConfig);
 
     console.log(`[Stripe] Checkout session created: ${session.id}`);
     return session;
@@ -122,7 +132,7 @@ export async function createSubscriptionChangeSession(params: {
       cancel_at_period_end: true,
     });
 
-    // Create new subscription checkout
+    // Create new subscription checkout with 1-month free trial
     const session = await stripe.checkout.sessions.create({
       customer: params.customerId,
       mode: 'subscription',
@@ -136,6 +146,7 @@ export async function createSubscriptionChangeSession(params: {
       success_url: params.successUrl,
       cancel_url: params.cancelUrl,
       subscription_data: {
+        trial_period_days: 30, // 1-month free trial
         metadata: {
           upgrade_from: params.currentSubscriptionId,
         },
