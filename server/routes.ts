@@ -1103,6 +1103,153 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   /**
+   * Remove one extra seat pack from subscription
+   * POST /api/stripe/remove-addon-seats
+   */
+  app.post("/api/stripe/remove-addon-seats", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const user = await storage.getUserById(req.session.userId!);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      if (!user.stripeSubscriptionId) {
+        return res.status(400).json({ message: "No active subscription found" });
+      }
+
+      if ((user.additionalSeatsCount || 0) === 0) {
+        return res.status(400).json({ message: "No extra seat packs to remove" });
+      }
+
+      // Get current subscription to determine currency
+      const subscription = await stripe.subscriptions.retrieve(user.stripeSubscriptionId);
+      const currency = subscription.currency.toLowerCase() as 'usd' | 'cad';
+
+      // Get extra seats price ID
+      const addonConfig = ADDON_CONFIG.extra_seats;
+      const addonPriceId = currency === 'usd' ? addonConfig.priceIdUSD : addonConfig.priceIdCAD;
+
+      console.log(`[Stripe] Removing one extra seat pack from subscription ${user.stripeSubscriptionId}`);
+
+      // Find the subscription item for extra seats
+      const existingItem = subscription.items.data.find(item => item.price.id === addonPriceId);
+
+      if (!existingItem) {
+        return res.status(404).json({ message: "Extra seats subscription item not found" });
+      }
+
+      let newQuantity = 0;
+      const currentQuantity = existingItem.quantity || 1;
+
+      if (currentQuantity > 1) {
+        // Decrement quantity by 1
+        console.log(`[Stripe] Reducing seat packs from ${currentQuantity} to ${currentQuantity - 1}`);
+        const updatedItem = await stripe.subscriptionItems.update(existingItem.id, {
+          quantity: currentQuantity - 1,
+          proration_behavior: 'create_prorations',
+        });
+        newQuantity = updatedItem.quantity || 0;
+      } else {
+        // Remove the subscription item entirely
+        console.log(`[Stripe] Removing last seat pack`);
+        await stripe.subscriptionItems.del(existingItem.id, {
+          proration_behavior: 'create_prorations',
+        });
+        newQuantity = 0;
+      }
+
+      // Update database with new quantity
+      await storage.updateUser(user.id, {
+        additionalSeatsCount: newQuantity,
+      });
+
+      console.log(`[Stripe] Extra seat pack removed successfully. Remaining packs: ${newQuantity}`);
+      res.json({
+        success: true,
+        message: "Extra seat pack removed successfully",
+        remainingPacks: newQuantity,
+        totalExtraSeats: newQuantity * addonConfig.seats,
+      });
+    } catch (error: any) {
+      console.error('[Stripe] Remove seat pack error:', error);
+      res.status(500).json({ message: error.message || "Failed to remove extra seat pack" });
+    }
+  });
+
+  /**
+   * Remove one extra project from subscription
+   * POST /api/stripe/remove-addon-projects
+   */
+  app.post("/api/stripe/remove-addon-projects", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const user = await storage.getUserById(req.session.userId!);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      if (!user.stripeSubscriptionId) {
+        return res.status(400).json({ message: "No active subscription found" });
+      }
+
+      if ((user.additionalProjectsCount || 0) === 0) {
+        return res.status(400).json({ message: "No extra projects to remove" });
+      }
+
+      // Get current subscription to determine currency
+      const subscription = await stripe.subscriptions.retrieve(user.stripeSubscriptionId);
+      const currency = subscription.currency.toLowerCase() as 'usd' | 'cad';
+
+      // Get extra project price ID
+      const addonConfig = ADDON_CONFIG.extra_project;
+      const addonPriceId = currency === 'usd' ? addonConfig.priceIdUSD : addonConfig.priceIdCAD;
+
+      console.log(`[Stripe] Removing one extra project from subscription ${user.stripeSubscriptionId}`);
+
+      // Find the subscription item for extra projects
+      const existingItem = subscription.items.data.find(item => item.price.id === addonPriceId);
+
+      if (!existingItem) {
+        return res.status(404).json({ message: "Extra projects subscription item not found" });
+      }
+
+      let newQuantity = 0;
+      const currentQuantity = existingItem.quantity || 1;
+
+      if (currentQuantity > 1) {
+        // Decrement quantity by 1
+        console.log(`[Stripe] Reducing extra projects from ${currentQuantity} to ${currentQuantity - 1}`);
+        const updatedItem = await stripe.subscriptionItems.update(existingItem.id, {
+          quantity: currentQuantity - 1,
+          proration_behavior: 'create_prorations',
+        });
+        newQuantity = updatedItem.quantity || 0;
+      } else {
+        // Remove the subscription item entirely
+        console.log(`[Stripe] Removing last extra project`);
+        await stripe.subscriptionItems.del(existingItem.id, {
+          proration_behavior: 'create_prorations',
+        });
+        newQuantity = 0;
+      }
+
+      // Update database with new quantity
+      await storage.updateUser(user.id, {
+        additionalProjectsCount: newQuantity,
+      });
+
+      console.log(`[Stripe] Extra project removed successfully. Remaining projects: ${newQuantity}`);
+      res.json({
+        success: true,
+        message: "Extra project removed successfully",
+        remainingProjects: newQuantity,
+      });
+    } catch (error: any) {
+      console.error('[Stripe] Remove extra project error:', error);
+      res.status(500).json({ message: error.message || "Failed to remove extra project" });
+    }
+  });
+
+  /**
    * Create Stripe checkout session for subscription purchase
    * POST /api/stripe/create-checkout-session
    */
