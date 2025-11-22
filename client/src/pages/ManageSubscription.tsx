@@ -56,6 +56,8 @@ export default function ManageSubscription() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
   const [cancelTarget, setCancelTarget] = useState<'subscription' | 'whitelabel' | 'seats' | 'projects' | null>(null);
+  const [cancelSeatPackNumber, setCancelSeatPackNumber] = useState<number>(0);
+  const [cancelProjectNumber, setCancelProjectNumber] = useState<number>(0);
 
   const { data: user } = useQuery({
     queryKey: ["/api/user"],
@@ -308,60 +310,76 @@ export default function ManageSubscription() {
               </>
             )}
 
-            {/* Extra Seats */}
+            {/* Extra Seats - Display each pack individually */}
             {subscriptionData.additionalSeatsCount > 0 && (
               <>
-                <div className="flex items-center justify-between p-4 border rounded-md">
-                  <div className="flex items-center gap-3">
-                    <div className="p-2 bg-primary/10 rounded-md">
-                      <CreditCard className="w-5 h-5 text-primary" />
+                {Array.from({ length: subscriptionData.additionalSeatsCount }).map((_, index) => (
+                  <div key={`seat-pack-${index}`}>
+                    <div className="flex items-center justify-between p-4 border rounded-md">
+                      <div className="flex items-center gap-3">
+                        <div className="p-2 bg-primary/10 rounded-md">
+                          <CreditCard className="w-5 h-5 text-primary" />
+                        </div>
+                        <div>
+                          <h3 className="font-medium">Extra Team Seats - Pack {index + 1}</h3>
+                          <p className="text-sm text-muted-foreground">
+                            2 seats • {currencySymbol}19/month
+                          </p>
+                        </div>
+                      </div>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => {
+                          setCancelSeatPackNumber(index + 1);
+                          setCancelTarget('seats');
+                        }}
+                        data-testid={`button-cancel-seats-${index + 1}`}
+                      >
+                        <XCircle className="w-4 h-4 mr-2" />
+                        Cancel
+                      </Button>
                     </div>
-                    <div>
-                      <h3 className="font-medium">Extra Team Seats</h3>
-                      <p className="text-sm text-muted-foreground">
-                        {subscriptionData.additionalSeatsCount} pack{subscriptionData.additionalSeatsCount > 1 ? 's' : ''} ({subscriptionData.additionalSeatsCount * 2} seats) • {currencySymbol}19/month per pack
-                      </p>
-                    </div>
+                    {index < subscriptionData.additionalSeatsCount - 1 && <Separator />}
                   </div>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setCancelTarget('seats')}
-                    data-testid="button-cancel-seats"
-                  >
-                    <XCircle className="w-4 h-4 mr-2" />
-                    Cancel
-                  </Button>
-                </div>
+                ))}
                 <Separator />
               </>
             )}
 
-            {/* Extra Projects */}
+            {/* Extra Projects - Display each project individually */}
             {subscriptionData.additionalProjectsCount > 0 && (
               <>
-                <div className="flex items-center justify-between p-4 border rounded-md">
-                  <div className="flex items-center gap-3">
-                    <div className="p-2 bg-primary/10 rounded-md">
-                      <CreditCard className="w-5 h-5 text-primary" />
+                {Array.from({ length: subscriptionData.additionalProjectsCount }).map((_, index) => (
+                  <div key={`project-${index}`}>
+                    <div className="flex items-center justify-between p-4 border rounded-md">
+                      <div className="flex items-center gap-3">
+                        <div className="p-2 bg-primary/10 rounded-md">
+                          <CreditCard className="w-5 h-5 text-primary" />
+                        </div>
+                        <div>
+                          <h3 className="font-medium">Extra Project {index + 1}</h3>
+                          <p className="text-sm text-muted-foreground">
+                            {currencySymbol}49/month
+                          </p>
+                        </div>
+                      </div>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => {
+                          setCancelProjectNumber(index + 1);
+                          setCancelTarget('projects');
+                        }}
+                        data-testid={`button-cancel-projects-${index + 1}`}
+                      >
+                        <XCircle className="w-4 h-4 mr-2" />
+                        Cancel
+                      </Button>
                     </div>
-                    <div>
-                      <h3 className="font-medium">Extra Projects</h3>
-                      <p className="text-sm text-muted-foreground">
-                        {subscriptionData.additionalProjectsCount} project{subscriptionData.additionalProjectsCount > 1 ? 's' : ''} • {currencySymbol}49/month each
-                      </p>
-                    </div>
+                    {index < subscriptionData.additionalProjectsCount - 1 && <Separator />}
                   </div>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setCancelTarget('projects')}
-                    data-testid="button-cancel-projects"
-                  >
-                    <XCircle className="w-4 h-4 mr-2" />
-                    Cancel
-                  </Button>
-                </div>
+                ))}
                 <Separator />
               </>
             )}
@@ -447,9 +465,9 @@ export default function ManageSubscription() {
       <Dialog open={cancelTarget === 'seats'} onOpenChange={(open) => !open && setCancelTarget(null)}>
         <DialogContent data-testid="dialog-cancel-seats">
           <DialogHeader>
-            <DialogTitle>Cancel Extra Team Seats</DialogTitle>
+            <DialogTitle>Cancel Extra Team Seats - Pack {cancelSeatPackNumber}</DialogTitle>
             <DialogDescription>
-              Are you sure you want to cancel all extra team seats? They will remain active until {renewalDate}.
+              Are you sure you want to cancel this seat pack? The 2 seats from Pack {cancelSeatPackNumber} will remain active until {renewalDate}.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter className="gap-2">
@@ -476,9 +494,9 @@ export default function ManageSubscription() {
       <Dialog open={cancelTarget === 'projects'} onOpenChange={(open) => !open && setCancelTarget(null)}>
         <DialogContent data-testid="dialog-cancel-projects">
           <DialogHeader>
-            <DialogTitle>Cancel Extra Projects</DialogTitle>
+            <DialogTitle>Cancel Extra Project {cancelProjectNumber}</DialogTitle>
             <DialogDescription>
-              Are you sure you want to cancel all extra projects? They will remain active until {renewalDate}.
+              Are you sure you want to cancel this extra project? Extra Project {cancelProjectNumber} will remain active until {renewalDate}.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter className="gap-2">
