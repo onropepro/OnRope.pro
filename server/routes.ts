@@ -707,7 +707,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         ? `https://${process.env.REPL_SLUG}.${process.env.REPL_OWNER}.repl.co` 
         : 'http://localhost:5000';
 
-      // Create checkout session WITHOUT a customer (customer created during checkout)
+      // Create checkout session (customer created automatically for subscription mode)
       const session = await stripe.checkout.sessions.create({
         mode: 'subscription',
         payment_method_types: ['card'],
@@ -733,7 +733,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
         },
         allow_promotion_codes: true,
         billing_address_collection: 'auto',
-        customer_creation: 'always', // Always create a new customer
       });
 
       console.log(`[Stripe] License checkout session created: ${session.id}`);
