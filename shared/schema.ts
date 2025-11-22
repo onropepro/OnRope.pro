@@ -88,14 +88,17 @@ export const users = pgTable("users", {
   terminationReason: text("termination_reason"), // Reason for termination (optional)
   terminationNotes: text("termination_notes"), // Additional notes about termination (optional)
   
-  // License verification (company role only)
-  licenseKey: text("license_key"), // Stored server-side only, never sent to client
-  licenseVerified: boolean("license_verified").default(false), // Public flag - safe to expose
-  subscriptionRenewalDate: date("subscription_renewal_date"), // 30-day subscription renewal date (company role only)
+  // Stripe subscription management (company role only)
+  stripeCustomerId: varchar("stripe_customer_id"), // Stripe customer ID for billing
+  subscriptionTier: varchar("subscription_tier").default('none'), // none | basic | starter | premium | enterprise
+  subscriptionStatus: varchar("subscription_status").default('inactive'), // inactive | active | past_due | canceled | trialing
+  subscriptionEndDate: date("subscription_end_date"), // Date subscription ends or ended
+  stripeSubscriptionId: varchar("stripe_subscription_id"), // Current Stripe subscription ID
   
-  // Additional seat/project purchases (company role only)
-  additionalSeats: integer("additional_seats").default(0), // Extra seats purchased beyond tier limit
-  additionalProjects: integer("additional_projects").default(0), // Extra projects purchased beyond tier limit
+  // Add-ons tracking (company role only)
+  additionalSeatsCount: integer("additional_seats_count").default(0), // Number of extra seats purchased
+  additionalProjectsCount: integer("additional_projects_count").default(0), // Number of extra projects purchased
+  whitelabelBrandingActive: boolean("whitelabel_branding_active").default(false), // Whether white-label branding is active
   
   // Resident linking code (company role only)
   residentCode: varchar("resident_code", { length: 10 }).unique(), // 10-character code for residents to link to company - UNIQUE (~50 bits entropy)
@@ -103,7 +106,6 @@ export const users = pgTable("users", {
   // White label branding (company role only)
   brandingLogoUrl: text("branding_logo_url"), // Custom logo URL for resident portal
   brandingColors: text("branding_colors").array().default(sql`ARRAY[]::text[]`), // Array of brand colors (hex codes)
-  brandingSubscriptionActive: boolean("branding_subscription_active").default(false), // Whether company has active branding subscription ($0.49)
   
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),

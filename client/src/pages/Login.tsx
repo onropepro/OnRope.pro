@@ -20,6 +20,7 @@ type LoginFormData = z.infer<typeof loginSchema>;
 
 export default function Login() {
   const { toast } = useToast();
+  const [showLoginForm, setShowLoginForm] = useState(false);
   const form = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
@@ -47,7 +48,7 @@ export default function Login() {
       // Invalidate user cache to ensure fresh data is fetched
       await queryClient.invalidateQueries({ queryKey: ["/api/user"] });
       
-      // Fetch fresh user data to get the latest license verification status
+      // Fetch fresh user data to get the latest subscription status
       const userResponse = await fetch("/api/user", {
         credentials: "include",
       });
@@ -73,8 +74,26 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary/5 via-background to-primary/10 flex items-start justify-center p-4 pt-12">
-      <div className="w-full max-w-6xl grid md:grid-cols-2 gap-8 items-start">
+    <div className="min-h-screen bg-gradient-to-br from-primary/5 via-background to-primary/10 flex flex-col">
+      {/* Header with Sign In Button */}
+      <header className="flex items-center justify-between px-8 py-4 border-b">
+        <div className="flex items-center gap-3">
+          <img src={ropeAccessProLogo} alt="Rope Access Pro" className="w-8 h-8 object-contain" />
+          <span className="font-bold text-lg">Rope Access Pro</span>
+        </div>
+        <Button 
+          onClick={() => setShowLoginForm(!showLoginForm)}
+          variant="default"
+          data-testid="button-sign-in-header"
+        >
+          Sign In
+        </Button>
+      </header>
+
+      {/* Main Content */}
+      <div className="flex-1 flex items-center justify-center p-4">
+        <div className="w-full max-w-6xl grid md:grid-cols-2 gap-8 items-center">
+      <div className="w-full max-w-6xl grid md:grid-cols-2 gap-8 items-center">
         {/* Hero Section - Hidden on mobile */}
         <div className="hidden md:flex flex-col justify-center space-y-8 pr-8">
           <div className="space-y-6">
@@ -82,16 +101,11 @@ export default function Login() {
               <span className="material-icons text-lg">apartment</span>
               Professional High-Rise Maintenance
             </div>
-            <div className="flex items-center gap-6 mb-2">
-              <img src={ropeAccessProLogo} alt="Rope Access Pro Logo" className="w-32 h-32 object-contain" />
-              <div className="text-4xl font-bold">Rope Access Pro</div>
-            </div>
-            <h1 className="text-5xl font-bold tracking-tight leading-tight">
-              Rope Access{" "}
+            <div className="text-5xl font-bold">Rope Access{" "}
               <span className="bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
                 Management Platform
               </span>
-            </h1>
+            </div>
             <p className="text-xl text-muted-foreground leading-relaxed">
               The comprehensive solution for managing building maintenance operations. From project planning to completion tracking, streamline your entire workflow with precision and transparency.
             </p>
