@@ -665,8 +665,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         customerId,
         priceId,
         mode: 'subscription',
-        successUrl: `${process.env.REPL_SLUG ? `https://${process.env.REPL_SLUG}.${process.env.REPL_OWNER}.repl.co` : 'http://localhost:5000'}/profile?subscription=success`,
-        cancelUrl: `${process.env.REPL_SLUG ? `https://${process.env.REPL_SLUG}.${process.env.REPL_OWNER}.repl.co` : 'http://localhost:5000'}/profile?subscription=canceled`,
+        successUrl: `${process.env.REPLIT_DEV_DOMAIN ? `https://${process.env.REPLIT_DEV_DOMAIN}` : process.env.REPL_SLUG ? `https://${process.env.REPL_SLUG}.${process.env.REPL_OWNER}.repl.co` : 'http://localhost:5000'}/profile?subscription=success`,
+        cancelUrl: `${process.env.REPLIT_DEV_DOMAIN ? `https://${process.env.REPLIT_DEV_DOMAIN}` : process.env.REPL_SLUG ? `https://${process.env.REPL_SLUG}.${process.env.REPL_OWNER}.repl.co` : 'http://localhost:5000'}/profile?subscription=canceled`,
         metadata: {
           userId: user.id.toString(),
           tier,
@@ -703,9 +703,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const tierConfig = TIER_CONFIG[tier as TierName];
       const priceId = currency === 'usd' ? tierConfig.priceIdUSD : tierConfig.priceIdCAD;
 
-      const baseUrl = process.env.REPL_SLUG 
-        ? `https://${process.env.REPL_SLUG}.${process.env.REPL_OWNER}.repl.co` 
-        : 'http://localhost:5000';
+      // Use REPLIT_DEV_DOMAIN for development, fallback to production URL construction
+      const baseUrl = process.env.REPLIT_DEV_DOMAIN 
+        ? `https://${process.env.REPLIT_DEV_DOMAIN}` 
+        : process.env.REPL_SLUG 
+          ? `https://${process.env.REPL_SLUG}.${process.env.REPL_OWNER}.repl.co` 
+          : 'http://localhost:5000';
 
       // Create checkout session (customer created automatically for subscription mode)
       const session = await stripe.checkout.sessions.create({
