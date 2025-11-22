@@ -25,16 +25,18 @@ export const STRIPE_PRICE_IDS = {
   },
   
   // Add-ons - Same price, different currency
+  // NOTE: All add-ons must be RECURRING prices to work with subscription system
+  // Old one-time price IDs have been kept below but marked as DEPRECATED
   addons: {
     usd: {
-      extra_seats: 'price_1SW7VZBzDsOltscrbwWEthqa',     // $19 one-time - 2 seats
-      extra_project: 'price_1SW7VZBzDsOltscr2GWJYRai',   // $49 one-time - 1 project
-      white_label: 'price_1SWCTnBzDsOltscrD2qcZ47m',     // $49/mo recurring
+      extra_seats: 'price_1SW7VZBzDsOltscrbwWEthqa',     // DEPRECATED: was $19 one-time. NEED: $19/mo recurring - 2 seats
+      extra_project: 'price_1SW7VZBzDsOltscr2GWJYRai',   // DEPRECATED: was $49 one-time. NEED: $49/mo recurring - 1 project
+      white_label: 'price_1SWCTnBzDsOltscrD2qcZ47m',     // $49/mo recurring ✓
     },
     cad: {
-      extra_seats: 'price_1SW7VZBzDsOltscrv1ZoRlfG',     // $19 CAD one-time - 2 seats
-      extra_project: 'price_1SW7VaBzDsOltscrpZt2U150',   // $49 CAD one-time - 1 project
-      white_label: 'price_1SWCToBzDsOltscrRljmQTLz',     // $49 CAD/mo recurring
+      extra_seats: 'price_1SW7VZBzDsOltscrv1ZoRlfG',     // DEPRECATED: was $19 CAD one-time. NEED: $19 CAD/mo recurring - 2 seats
+      extra_project: 'price_1SW7VaBzDsOltscrpZt2U150',   // DEPRECATED: was $49 CAD one-time. NEED: $49 CAD/mo recurring - 1 project
+      white_label: 'price_1SWCToBzDsOltscrRljmQTLz',     // $49 CAD/mo recurring ✓
     },
   },
 } as const;
@@ -80,6 +82,7 @@ export const TIER_CONFIG = {
 } as const;
 
 // Add-on configuration with pricing (same price for both currencies)
+// NOTE: All add-ons are RECURRING to work with subscription system
 export const ADDON_CONFIG = {
   extra_seats: {
     name: 'Extra Seats (2)',
@@ -88,7 +91,7 @@ export const ADDON_CONFIG = {
     seats: 2,
     priceIdUSD: STRIPE_PRICE_IDS.addons.usd.extra_seats,
     priceIdCAD: STRIPE_PRICE_IDS.addons.cad.extra_seats,
-    type: 'one_time' as const,
+    type: 'recurring' as const,  // Changed from one_time - requires new Stripe price
   },
   extra_project: {
     name: 'Extra Project',
@@ -97,7 +100,7 @@ export const ADDON_CONFIG = {
     projects: 1,
     priceIdUSD: STRIPE_PRICE_IDS.addons.usd.extra_project,
     priceIdCAD: STRIPE_PRICE_IDS.addons.cad.extra_project,
-    type: 'one_time' as const,
+    type: 'recurring' as const,  // Changed from one_time - requires new Stripe price
   },
   white_label: {
     name: 'White Label Branding',
