@@ -16,42 +16,40 @@ export default function ProtectedRoute({ children, allowedRoles }: ProtectedRout
 
   const user = userData?.user;
 
+  // Handle redirects in useEffect to avoid setState during render
   useEffect(() => {
-    console.log("🔒 ProtectedRoute check:", {
-      currentPath: location,
-      isLoading,
-      hasUser: !!user,
-      userRole: user?.role,
-      allowedRoles,
-      hasError: !!error
-    });
-    
-    // If there's an auth error (401/403), log out immediately
-    // Network errors will be retried automatically by queryClient
+    if (isLoading) return;
+
+    // If there's an auth error (401/403), redirect to login
     if (error && (error.message?.includes("401") || error.message?.includes("403"))) {
       console.log("❌ Auth error detected, redirecting to login");
       setLocation("/");
       return;
     }
     
-    if (!isLoading && !user) {
-      console.log("❌ No user found after loading, redirecting to login");
+    // No user found - redirect to login
+    if (!user) {
+      console.log("❌ No user found, redirecting to login");
       setLocation("/");
-    } else if (!isLoading && user && allowedRoles && !allowedRoles.includes(user.role)) {
-      console.log("⛔ User role not allowed for this route, redirecting to appropriate dashboard");
-      // Redirect to appropriate dashboard based on role
+      return;
+    }
+    
+    // User role not allowed for this route
+    if (allowedRoles && !allowedRoles.includes(user.role)) {
+      console.log("⛔ User role not allowed, redirecting to appropriate dashboard");
       if (user.role === "resident") {
         setLocation("/resident");
       } else {
         setLocation("/dashboard");
       }
-    } else if (!isLoading && user) {
-      console.log("✅ ProtectedRoute: Access granted!");
+      return;
     }
-  }, [user, isLoading, error, allowedRoles, setLocation, location]);
+    
+    console.log("✅ ProtectedRoute: Access granted!");
+  }, [user, isLoading, error, allowedRoles, setLocation]);
 
+  // Show loading state
   if (isLoading) {
-    console.log("⏳ ProtectedRoute: Showing loading screen");
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
@@ -61,11 +59,11 @@ export default function ProtectedRoute({ children, allowedRoles }: ProtectedRout
     );
   }
 
+  // Block render if no user or role mismatch (useEffect will redirect)
   if (!user || (allowedRoles && !allowedRoles.includes(user.role))) {
-    console.log("🚫 ProtectedRoute: Returning null (no user or role mismatch)");
     return null;
   }
 
-  console.log("✨ ProtectedRoute: Rendering protected content!");
+  // Render protected content
   return <>{children}</>;
 }
