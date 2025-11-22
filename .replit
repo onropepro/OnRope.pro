@@ -106,3 +106,4 @@ expertMode = true
 
 [userenv.shared]
 PRIVATE_OBJECT_DIR = "/rope-access-files/private"
+PUBLIC_OBJECT_SEARCH_PATHS = "/rope-access-files/public"
