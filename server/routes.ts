@@ -908,13 +908,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.log(`[Stripe] Adding white label branding to subscription ${user.stripeSubscriptionId}`);
 
       // Check if white label branding is already on the subscription
-      // Use expand to get all items (handles pagination automatically)
-      const subscriptionDetails = await stripe.subscriptions.retrieve(user.stripeSubscriptionId, {
-        expand: ['items.data'],
-      });
-      const hasWhiteLabel = subscriptionDetails.items.data.some(item => 
-        item.price.id === addonPriceId
-      );
+      // Paginate through all subscription items to find white label
+      let hasWhiteLabel = false;
+      let startingAfter: string | undefined = undefined;
+      
+      do {
+        const itemsPage = await stripe.subscriptionItems.list({
+          subscription: user.stripeSubscriptionId,
+          limit: 100,
+          ...(startingAfter && { starting_after: startingAfter }),
+        });
+        
+        hasWhiteLabel = itemsPage.data.some(item => item.price.id === addonPriceId);
+        
+        if (hasWhiteLabel || !itemsPage.has_more) break;
+        
+        startingAfter = itemsPage.data[itemsPage.data.length - 1]?.id;
+      } while (true);
 
       if (!hasWhiteLabel) {
         // Add white label branding to subscription
