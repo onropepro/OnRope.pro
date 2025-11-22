@@ -280,6 +280,7 @@ export async function handleWebhookEvent(
     tier?: TierName;
     status?: string;
     currentPeriodEnd?: Date;
+    whitelabelBrandingActive?: boolean;
   }) => Promise<void>
 ): Promise<void> {
   console.log(`[Stripe Webhook] Processing event: ${event.type}`);
@@ -314,14 +315,26 @@ export async function handleWebhookEvent(
           return;
         }
 
-        // Determine tier from price ID
-        const priceId = subscription.items.data[0]?.price.id;
+        // Check all subscription items to determine tier and add-ons
         let tier: TierName | undefined;
+        let whitelabelBrandingActive = false;
 
-        for (const [tierName, config] of Object.entries(TIER_CONFIG)) {
-          if (config.priceIdUSD === priceId || config.priceIdCAD === priceId) {
-            tier = tierName as TierName;
-            break;
+        for (const item of subscription.items.data) {
+          const priceId = item.price.id;
+          
+          // Check if this is a tier price
+          for (const [tierName, config] of Object.entries(TIER_CONFIG)) {
+            if (config.priceIdUSD === priceId || config.priceIdCAD === priceId) {
+              tier = tierName as TierName;
+              break;
+            }
+          }
+          
+          // Check if this is white label branding add-on
+          if (priceId === ADDON_CONFIG.white_label.priceIdUSD || 
+              priceId === ADDON_CONFIG.white_label.priceIdCAD) {
+            whitelabelBrandingActive = true;
+            console.log(`[Webhook] White label branding detected for user ${userId}`);
           }
         }
 
@@ -333,9 +346,10 @@ export async function handleWebhookEvent(
           tier,
           status: subscription.status,
           currentPeriodEnd: (subscription as any).current_period_end ? new Date((subscription as any).current_period_end * 1000) : undefined,
+          whitelabelBrandingActive,
         });
 
-        console.log(`[Webhook] Subscription updated for user ${userId}: ${tier} (${subscription.status})`);
+        console.log(`[Webhook] Subscription updated for user ${userId}: ${tier} (${subscription.status}), white label: ${whitelabelBrandingActive}`);
         break;
       }
 

@@ -1351,6 +1351,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           subscriptionTier: params.tier,
           subscriptionStatus: params.status,
           subscriptionEndDate: params.currentPeriodEnd,
+          whitelabelBrandingActive: params.whitelabelBrandingActive,
         });
       });
 

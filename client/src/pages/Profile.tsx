@@ -856,7 +856,7 @@ export default function Profile() {
                 </CardHeader>
                 <CardContent className="space-y-6">
                   {/* Subscription Gate */}
-                  {!user.brandingSubscriptionActive && (
+                  {!user.whitelabelBrandingActive && (
                     <div className="p-6 border-2 border-dashed rounded-lg bg-muted/30">
                       <div className="text-center space-y-4">
                         <span className="material-icons text-5xl text-muted-foreground">palette</span>
@@ -893,7 +893,7 @@ export default function Profile() {
                   )}
 
                   {/* Branding Controls - Only shown if subscribed */}
-                  {user.brandingSubscriptionActive && (
+                  {user.whitelabelBrandingActive && (
                     <>
                   {/* Logo Upload */}
                   <div className="space-y-3">
