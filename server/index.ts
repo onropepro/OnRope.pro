@@ -4,6 +4,7 @@ import connectPg from "connect-pg-simple";
 import { pool } from "./db";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
+import { runMigrations } from "./migrate";
 
 const app = express();
 
@@ -79,6 +80,9 @@ app.use((req, res, next) => {
 });
 
 (async () => {
+  // Run database migrations (triggers, constraints)
+  await runMigrations();
+  
   const server = await registerRoutes(app);
 
   app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
