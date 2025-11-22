@@ -10,7 +10,7 @@ import multer from "multer";
 import { ObjectStorageService } from "./objectStorage";
 import * as stripeService from "./stripe-service";
 import Stripe from "stripe";
-import { type TierName, type Currency, TIER_CONFIG } from "../shared/stripe-config";
+import { type TierName, type Currency, TIER_CONFIG, ADDON_CONFIG } from "../shared/stripe-config";
 import { checkSubscriptionLimits } from "./subscription-middleware";
 
 // Initialize Stripe for direct API calls
@@ -726,6 +726,208 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error: any) {
       console.error('[Stripe] Upgrade subscription error:', error);
       res.status(500).json({ message: error.message || "Failed to upgrade subscription" });
+    }
+  });
+
+  /**
+   * Add extra seats to subscription
+   * POST /api/stripe/add-seats
+   */
+  app.post("/api/stripe/add-seats", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const user = await storage.getUserById(req.session.userId!);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      if (user.role !== 'company') {
+        return res.status(403).json({ message: "Only company accounts can purchase add-ons" });
+      }
+
+      if (!user.stripeSubscriptionId) {
+        return res.status(400).json({ message: "No active subscription found" });
+      }
+
+      // Get current subscription to determine currency
+      const subscription = await stripe.subscriptions.retrieve(user.stripeSubscriptionId);
+      const currentPriceId = subscription.items.data[0]?.price.id;
+      
+      // Determine currency from current price
+      let currency: 'usd' | 'cad' = 'usd';
+      for (const [, config] of Object.entries(TIER_CONFIG)) {
+        if (config.priceIdUSD === currentPriceId) {
+          currency = 'usd';
+          break;
+        } else if (config.priceIdCAD === currentPriceId) {
+          currency = 'cad';
+          break;
+        }
+      }
+
+      // Get extra seats price ID
+      const addonConfig = ADDON_CONFIG.extra_seats;
+      const addonPriceId = currency === 'usd' ? addonConfig.priceIdUSD : addonConfig.priceIdCAD;
+
+      console.log(`[Stripe] Adding extra seats to subscription ${user.stripeSubscriptionId}`);
+
+      // Add extra seats to subscription
+      await stripe.subscriptionItems.create({
+        subscription: user.stripeSubscriptionId,
+        price: addonPriceId,
+        proration_behavior: 'create_prorations',
+      });
+
+      // Update user's max seats in database
+      const currentMaxSeats = user.maxSeats || 0;
+      await storage.updateUser(user.id, {
+        maxSeats: currentMaxSeats + addonConfig.seats,
+      });
+
+      console.log(`[Stripe] Extra seats added successfully. New max seats: ${currentMaxSeats + addonConfig.seats}`);
+      res.json({
+        success: true,
+        message: "Extra seats added successfully",
+        newMaxSeats: currentMaxSeats + addonConfig.seats,
+      });
+    } catch (error: any) {
+      console.error('[Stripe] Add seats error:', error);
+      res.status(500).json({ message: error.message || "Failed to add extra seats" });
+    }
+  });
+
+  /**
+   * Add extra project to subscription
+   * POST /api/stripe/add-project
+   */
+  app.post("/api/stripe/add-project", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const user = await storage.getUserById(req.session.userId!);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      if (user.role !== 'company') {
+        return res.status(403).json({ message: "Only company accounts can purchase add-ons" });
+      }
+
+      if (!user.stripeSubscriptionId) {
+        return res.status(400).json({ message: "No active subscription found" });
+      }
+
+      // Get current subscription to determine currency
+      const subscription = await stripe.subscriptions.retrieve(user.stripeSubscriptionId);
+      const currentPriceId = subscription.items.data[0]?.price.id;
+      
+      // Determine currency from current price
+      let currency: 'usd' | 'cad' = 'usd';
+      for (const [, config] of Object.entries(TIER_CONFIG)) {
+        if (config.priceIdUSD === currentPriceId) {
+          currency = 'usd';
+          break;
+        } else if (config.priceIdCAD === currentPriceId) {
+          currency = 'cad';
+          break;
+        }
+      }
+
+      // Get extra project price ID
+      const addonConfig = ADDON_CONFIG.extra_project;
+      const addonPriceId = currency === 'usd' ? addonConfig.priceIdUSD : addonConfig.priceIdCAD;
+
+      console.log(`[Stripe] Adding extra project to subscription ${user.stripeSubscriptionId}`);
+
+      // Add extra project to subscription
+      await stripe.subscriptionItems.create({
+        subscription: user.stripeSubscriptionId,
+        price: addonPriceId,
+        proration_behavior: 'create_prorations',
+      });
+
+      // Update user's max projects in database
+      const currentMaxProjects = user.maxProjects || 0;
+      await storage.updateUser(user.id, {
+        maxProjects: currentMaxProjects + addonConfig.projects,
+      });
+
+      console.log(`[Stripe] Extra project added successfully. New max projects: ${currentMaxProjects + addonConfig.projects}`);
+      res.json({
+        success: true,
+        message: "Extra project added successfully",
+        newMaxProjects: currentMaxProjects + addonConfig.projects,
+      });
+    } catch (error: any) {
+      console.error('[Stripe] Add project error:', error);
+      res.status(500).json({ message: error.message || "Failed to add extra project" });
+    }
+  });
+
+  /**
+   * Add white label branding to subscription
+   * POST /api/stripe/add-branding
+   */
+  app.post("/api/stripe/add-branding", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const user = await storage.getUserById(req.session.userId!);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      if (user.role !== 'company') {
+        return res.status(403).json({ message: "Only company accounts can purchase add-ons" });
+      }
+
+      if (!user.stripeSubscriptionId) {
+        return res.status(400).json({ message: "No active subscription found" });
+      }
+
+      // Check if user is on Starter tier or above (Basic cannot have white label)
+      if (user.subscriptionTier === 'basic') {
+        return res.status(400).json({ message: "White label branding is only available for Starter tier and above" });
+      }
+
+      // Get current subscription to determine currency
+      const subscription = await stripe.subscriptions.retrieve(user.stripeSubscriptionId);
+      const currentPriceId = subscription.items.data[0]?.price.id;
+      
+      // Determine currency from current price
+      let currency: 'usd' | 'cad' = 'usd';
+      for (const [, config] of Object.entries(TIER_CONFIG)) {
+        if (config.priceIdUSD === currentPriceId) {
+          currency = 'usd';
+          break;
+        } else if (config.priceIdCAD === currentPriceId) {
+          currency = 'cad';
+          break;
+        }
+      }
+
+      // Get white label price ID
+      const addonConfig = ADDON_CONFIG.white_label;
+      const addonPriceId = currency === 'usd' ? addonConfig.priceIdUSD : addonConfig.priceIdCAD;
+
+      console.log(`[Stripe] Adding white label branding to subscription ${user.stripeSubscriptionId}`);
+
+      // Add white label branding to subscription
+      await stripe.subscriptionItems.create({
+        subscription: user.stripeSubscriptionId,
+        price: addonPriceId,
+        proration_behavior: 'create_prorations',
+      });
+
+      // Update user to enable white label in database
+      await storage.updateUser(user.id, {
+        whiteLabelEnabled: true,
+      });
+
+      console.log(`[Stripe] White label branding added successfully`);
+      res.json({
+        success: true,
+        message: "White label branding unlocked successfully",
+        whiteLabelEnabled: true,
+      });
+    } catch (error: any) {
+      console.error('[Stripe] Add branding error:', error);
+      res.status(500).json({ message: error.message || "Failed to add white label branding" });
     }
   });
 
