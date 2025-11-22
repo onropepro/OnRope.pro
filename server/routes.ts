@@ -624,6 +624,111 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // =====================================================================
   
   /**
+   * Upgrade/downgrade existing subscription with proration
+   * POST /api/stripe/upgrade-subscription
+   */
+  app.post("/api/stripe/upgrade-subscription", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const user = await storage.getUserById(req.session.userId!);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      if (user.role !== 'company') {
+        return res.status(403).json({ message: "Only company accounts can upgrade subscriptions" });
+      }
+
+      if (!user.stripeSubscriptionId) {
+        return res.status(400).json({ message: "No active subscription found" });
+      }
+
+      const { tier } = req.body;
+
+      if (!tier || !['basic', 'starter', 'premium', 'enterprise'].includes(tier)) {
+        return res.status(400).json({ message: "Invalid subscription tier" });
+      }
+
+      // Check if user is already on this tier
+      if (user.tier === tier) {
+        return res.status(400).json({ message: "You are already on this tier" });
+      }
+
+      // Get current subscription to determine currency
+      const subscription = await stripe.subscriptions.retrieve(user.stripeSubscriptionId);
+      const currentPriceId = subscription.items.data[0]?.price.id;
+      
+      // Determine currency from current price
+      let currency: 'usd' | 'cad' = 'usd';
+      for (const [, config] of Object.entries(TIER_CONFIG)) {
+        if (config.priceIdUSD === currentPriceId) {
+          currency = 'usd';
+          break;
+        } else if (config.priceIdCAD === currentPriceId) {
+          currency = 'cad';
+          break;
+        }
+      }
+
+      // Get new price ID
+      const tierConfig = TIER_CONFIG[tier as TierName];
+      const newPriceId = currency === 'usd' ? tierConfig.priceIdUSD : tierConfig.priceIdCAD;
+
+      console.log(`[Stripe] Upgrading subscription ${user.stripeSubscriptionId} from ${user.tier} to ${tier}`);
+
+      // Update subscription with proration
+      const updatedSubscription = await stripe.subscriptions.update(user.stripeSubscriptionId, {
+        items: [
+          {
+            id: subscription.items.data[0].id,
+            price: newPriceId,
+          },
+        ],
+        proration_behavior: 'create_prorations', // Automatically calculate and charge/credit difference
+      });
+
+      // Generate new license key with correct tier suffix
+      const oldLicenseKey = user.licenseKey!;
+      const tierSuffix: Record<string, string> = { basic: '1', starter: '2', premium: '3', enterprise: '4' };
+      const newLicenseKey = oldLicenseKey.substring(0, oldLicenseKey.lastIndexOf('-') + 1) + tierSuffix[tier];
+
+      console.log(`[License] Replacing license key: ${oldLicenseKey} → ${newLicenseKey}`);
+
+      // Update license key in database (create new entry)
+      await db.insert(licenseKeys).values({
+        licenseKey: newLicenseKey,
+        stripeSessionId: `upgrade-${Date.now()}`, // Unique identifier for upgrade
+        stripeCustomerId: user.stripeCustomerId!,
+        stripeSubscriptionId: user.stripeSubscriptionId,
+        tier: tier,
+        currency: currency,
+        used: true,
+        usedByUserId: user.id,
+        usedAt: new Date(),
+      });
+
+      // Update user with new tier and license key
+      await storage.updateUser(user.id, {
+        tier: tier as any,
+        licenseKey: newLicenseKey,
+        maxProjects: tierConfig.maxProjects,
+        maxSeats: tierConfig.maxSeats,
+      });
+
+      console.log(`[Stripe] Subscription upgraded successfully. New tier: ${tier}`);
+      res.json({
+        success: true,
+        message: "Subscription upgraded successfully",
+        newTier: tier,
+        newLicenseKey: newLicenseKey,
+        proratedAmount: updatedSubscription.latest_invoice,
+      });
+    } catch (error: any) {
+      console.error('[Stripe] Upgrade subscription error:', error);
+      res.status(500).json({ message: error.message || "Failed to upgrade subscription" });
+    }
+  });
+
+  /**
    * Create Stripe checkout session for subscription purchase
    * POST /api/stripe/create-checkout-session
    */

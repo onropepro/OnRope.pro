@@ -122,10 +122,8 @@ export function SubscriptionManagement() {
   // Create checkout session mutation
   const createCheckoutMutation = useMutation({
     mutationFn: async ({ tier, currency }: { tier: TierName, currency: Currency }) => {
-      return apiRequest('/api/stripe/create-checkout-session', {
-        method: 'POST',
-        body: JSON.stringify({ tier, currency }),
-      });
+      const response = await apiRequest('POST', '/api/stripe/create-checkout-session', { tier, currency });
+      return response.json();
     },
     onSuccess: (data) => {
       if (data.url) {
@@ -144,9 +142,8 @@ export function SubscriptionManagement() {
   // Cancel subscription mutation
   const cancelMutation = useMutation({
     mutationFn: async () => {
-      return apiRequest('/api/stripe/cancel-subscription', {
-        method: 'POST',
-      });
+      const response = await apiRequest('POST', '/api/stripe/cancel-subscription');
+      return response.json();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/stripe/subscription-status'] });
@@ -168,9 +165,8 @@ export function SubscriptionManagement() {
   // Reactivate subscription mutation
   const reactivateMutation = useMutation({
     mutationFn: async () => {
-      return apiRequest('/api/stripe/reactivate-subscription', {
-        method: 'POST',
-      });
+      const response = await apiRequest('POST', '/api/stripe/reactivate-subscription');
+      return response.json();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/stripe/subscription-status'] });
@@ -188,9 +184,39 @@ export function SubscriptionManagement() {
     },
   });
 
+  // Upgrade/downgrade subscription mutation (prorated)
+  const upgradeMutation = useMutation({
+    mutationFn: async (tier: TierName) => {
+      const response = await apiRequest('POST', '/api/stripe/upgrade-subscription', { tier });
+      return response.json();
+    },
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ['/api/stripe/subscription-status'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/user'] });
+      toast({
+        title: "Subscription Updated!",
+        description: `Your subscription has been upgraded to ${data.newTier}. Changes are effective immediately.`,
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Upgrade Failed",
+        description: error.message || "Failed to upgrade subscription",
+        variant: "destructive",
+      });
+    },
+  });
+
   const handleUpgrade = (tier: TierName) => {
     setSelectedTier(tier);
-    createCheckoutMutation.mutate({ tier, currency: selectedCurrency });
+    
+    // If user has active subscription, use prorated upgrade endpoint
+    if (subStatus?.hasActiveSubscription) {
+      upgradeMutation.mutate(tier);
+    } else {
+      // For new subscriptions, use checkout flow
+      createCheckoutMutation.mutate({ tier, currency: selectedCurrency });
+    }
   };
 
   if (isLoading) {
