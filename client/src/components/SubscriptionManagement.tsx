@@ -113,6 +113,9 @@ export function SubscriptionManagement() {
   const [showCancelDialog, setShowCancelDialog] = useState(false);
   const [showUpgradeDialog, setShowUpgradeDialog] = useState(false);
   const [pendingUpgradeTier, setPendingUpgradeTier] = useState<TierName | null>(null);
+  const [showAddSeatsDialog, setShowAddSeatsDialog] = useState(false);
+  const [showAddProjectDialog, setShowAddProjectDialog] = useState(false);
+  const [showAddBrandingDialog, setShowAddBrandingDialog] = useState(false);
 
   // Fetch current subscription status
   const { data: subStatus, isLoading } = useQuery<SubscriptionStatus>({
@@ -206,6 +209,81 @@ export function SubscriptionManagement() {
       toast({
         title: "Upgrade Failed",
         description: error.message || "Failed to upgrade subscription",
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Add extra seats mutation
+  const addSeatsMutation = useMutation({
+    mutationFn: async () => {
+      const response = await apiRequest('POST', '/api/stripe/add-seats', {});
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/stripe/subscription-status'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/user'] });
+      setShowAddSeatsDialog(false);
+      toast({
+        title: "Seats Added!",
+        description: "2 additional seats have been added to your subscription. Changes are effective immediately.",
+      });
+    },
+    onError: (error: any) => {
+      setShowAddSeatsDialog(false);
+      toast({
+        title: "Failed to Add Seats",
+        description: error.message || "Failed to add extra seats",
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Add extra project mutation
+  const addProjectMutation = useMutation({
+    mutationFn: async () => {
+      const response = await apiRequest('POST', '/api/stripe/add-project', {});
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/stripe/subscription-status'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/user'] });
+      setShowAddProjectDialog(false);
+      toast({
+        title: "Project Added!",
+        description: "1 additional project slot has been added to your subscription. Changes are effective immediately.",
+      });
+    },
+    onError: (error: any) => {
+      setShowAddProjectDialog(false);
+      toast({
+        title: "Failed to Add Project",
+        description: error.message || "Failed to add extra project",
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Add white label branding mutation
+  const addBrandingMutation = useMutation({
+    mutationFn: async () => {
+      const response = await apiRequest('POST', '/api/stripe/add-branding', {});
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/stripe/subscription-status'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/user'] });
+      setShowAddBrandingDialog(false);
+      toast({
+        title: "White Label Branding Unlocked!",
+        description: "You can now customize your logo and brand colors in Settings.",
+      });
+    },
+    onError: (error: any) => {
+      setShowAddBrandingDialog(false);
+      toast({
+        title: "Failed to Add Branding",
+        description: error.message || "Failed to add white label branding",
         variant: "destructive",
       });
     },
@@ -416,7 +494,12 @@ export function SubscriptionManagement() {
           <CardDescription>Enhance your subscription with optional features</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="flex items-center justify-between p-4 border rounded-lg">
+          <button
+            onClick={() => setShowAddSeatsDialog(true)}
+            disabled={!subStatus?.hasActiveSubscription}
+            className="w-full flex items-center justify-between p-4 border rounded-lg hover-elevate active-elevate-2 text-left disabled:opacity-50 disabled:cursor-not-allowed"
+            data-testid="button-add-seats"
+          >
             <div>
               <h4 className="font-medium">Extra Team Seats</h4>
               <p className="text-sm text-muted-foreground">Add 2 additional seats to your plan</p>
@@ -425,9 +508,14 @@ export function SubscriptionManagement() {
               <p className="font-semibold">{selectedCurrency === 'usd' ? '$19' : 'C$24'}/month</p>
               <p className="text-xs text-muted-foreground">per pack</p>
             </div>
-          </div>
+          </button>
 
-          <div className="flex items-center justify-between p-4 border rounded-lg">
+          <button
+            onClick={() => setShowAddProjectDialog(true)}
+            disabled={!subStatus?.hasActiveSubscription}
+            className="w-full flex items-center justify-between p-4 border rounded-lg hover-elevate active-elevate-2 text-left disabled:opacity-50 disabled:cursor-not-allowed"
+            data-testid="button-add-project"
+          >
             <div>
               <h4 className="font-medium">Extra Project</h4>
               <p className="text-sm text-muted-foreground">Add 1 additional active project</p>
@@ -436,9 +524,14 @@ export function SubscriptionManagement() {
               <p className="font-semibold">{selectedCurrency === 'usd' ? '$49' : 'C$64'}/month</p>
               <p className="text-xs text-muted-foreground">per project</p>
             </div>
-          </div>
+          </button>
 
-          <div className="flex items-center justify-between p-4 border rounded-lg">
+          <button
+            onClick={() => setShowAddBrandingDialog(true)}
+            disabled={!subStatus?.hasActiveSubscription}
+            className="w-full flex items-center justify-between p-4 border rounded-lg hover-elevate active-elevate-2 text-left disabled:opacity-50 disabled:cursor-not-allowed"
+            data-testid="button-add-branding"
+          >
             <div>
               <h4 className="font-medium flex items-center gap-2">
                 <Palette className="w-4 h-4" />
@@ -450,7 +543,7 @@ export function SubscriptionManagement() {
               <p className="font-semibold">$0.49/month</p>
               <p className="text-xs text-muted-foreground">Available for Starter+</p>
             </div>
-          </div>
+          </button>
 
           <p className="text-sm text-muted-foreground italic">
             Add-ons can be purchased during checkout or added to your existing subscription.
@@ -586,6 +679,146 @@ export function SubscriptionManagement() {
               data-testid="button-confirm-upgrade"
             >
               {upgradeMutation.isPending ? 'Processing...' : 'Confirm Upgrade'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Add Extra Seats Dialog */}
+      <Dialog open={showAddSeatsDialog} onOpenChange={setShowAddSeatsDialog}>
+        <DialogContent data-testid="dialog-add-seats">
+          <DialogHeader>
+            <DialogTitle>Add Extra Team Seats</DialogTitle>
+            <DialogDescription>
+              <div className="space-y-4 pt-4">
+                <div className="flex items-center justify-between">
+                  <span className="text-sm">Price:</span>
+                  <span className="font-semibold text-base">{selectedCurrency === 'usd' ? '$19' : 'C$24'}/month</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Check className="w-4 h-4 text-primary" />
+                  <span className="text-sm">Add 2 additional team seats</span>
+                </div>
+                <div className="text-xs text-muted-foreground pt-2 border-t space-y-1">
+                  <p><strong>Prorated Billing:</strong> You'll only be charged for the time remaining in your current billing period.</p>
+                  <p>Changes take effect immediately. Your team can use the extra seats right away.</p>
+                </div>
+              </div>
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="gap-2">
+            <Button
+              variant="outline"
+              onClick={() => setShowAddSeatsDialog(false)}
+              data-testid="button-add-seats-cancel"
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="default"
+              onClick={() => addSeatsMutation.mutate()}
+              disabled={addSeatsMutation.isPending}
+              data-testid="button-confirm-add-seats"
+            >
+              {addSeatsMutation.isPending ? 'Processing...' : 'Confirm Purchase'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Add Extra Project Dialog */}
+      <Dialog open={showAddProjectDialog} onOpenChange={setShowAddProjectDialog}>
+        <DialogContent data-testid="dialog-add-project">
+          <DialogHeader>
+            <DialogTitle>Add Extra Project</DialogTitle>
+            <DialogDescription>
+              <div className="space-y-4 pt-4">
+                <div className="flex items-center justify-between">
+                  <span className="text-sm">Price:</span>
+                  <span className="font-semibold text-base">{selectedCurrency === 'usd' ? '$49' : 'C$64'}/month</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Check className="w-4 h-4 text-primary" />
+                  <span className="text-sm">Add 1 additional active project slot</span>
+                </div>
+                <div className="text-xs text-muted-foreground pt-2 border-t space-y-1">
+                  <p><strong>Prorated Billing:</strong> You'll only be charged for the time remaining in your current billing period.</p>
+                  <p>Changes take effect immediately. You can create a new project right away.</p>
+                </div>
+              </div>
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="gap-2">
+            <Button
+              variant="outline"
+              onClick={() => setShowAddProjectDialog(false)}
+              data-testid="button-add-project-cancel"
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="default"
+              onClick={() => addProjectMutation.mutate()}
+              disabled={addProjectMutation.isPending}
+              data-testid="button-confirm-add-project"
+            >
+              {addProjectMutation.isPending ? 'Processing...' : 'Confirm Purchase'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Add White Label Branding Dialog */}
+      <Dialog open={showAddBrandingDialog} onOpenChange={setShowAddBrandingDialog}>
+        <DialogContent data-testid="dialog-add-branding">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Palette className="w-5 h-5" />
+              Add White Label Branding
+            </DialogTitle>
+            <DialogDescription>
+              <div className="space-y-4 pt-4">
+                <div className="flex items-center justify-between">
+                  <span className="text-sm">Price:</span>
+                  <span className="font-semibold text-base">$0.49/month</span>
+                </div>
+                <div className="space-y-2">
+                  <div className="flex items-center gap-2">
+                    <Check className="w-4 h-4 text-primary" />
+                    <span className="text-sm">Upload custom logo</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Check className="w-4 h-4 text-primary" />
+                    <span className="text-sm">Customize brand colors</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Check className="w-4 h-4 text-primary" />
+                    <span className="text-sm">Apply branding across entire platform</span>
+                  </div>
+                </div>
+                <div className="text-xs text-muted-foreground pt-2 border-t space-y-1">
+                  <p><strong>Available for Starter tier and above.</strong></p>
+                  <p><strong>Prorated Billing:</strong> You'll only be charged for the time remaining in your current billing period.</p>
+                  <p>Changes take effect immediately. Configure your branding in Settings.</p>
+                </div>
+              </div>
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="gap-2">
+            <Button
+              variant="outline"
+              onClick={() => setShowAddBrandingDialog(false)}
+              data-testid="button-add-branding-cancel"
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="default"
+              onClick={() => addBrandingMutation.mutate()}
+              disabled={addBrandingMutation.isPending}
+              data-testid="button-confirm-add-branding"
+            >
+              {addBrandingMutation.isPending ? 'Processing...' : 'Confirm Purchase'}
             </Button>
           </DialogFooter>
         </DialogContent>
