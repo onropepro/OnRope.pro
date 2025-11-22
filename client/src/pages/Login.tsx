@@ -548,12 +548,6 @@ export default function Login() {
           )}
         </div>
       </div>
-      
-      {/* Small red square in center */}
-      <div 
-        className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-12 h-12 bg-red-500 z-50"
-        data-testid="red-square"
-      />
     </div>
   );
 }
