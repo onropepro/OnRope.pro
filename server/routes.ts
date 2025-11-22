@@ -8,6 +8,8 @@ import { z } from "zod";
 import bcrypt from "bcrypt";
 import multer from "multer";
 import { ObjectStorageService } from "./objectStorage";
+import * as stripeService from "./stripe-service";
+import { type TierName, type Currency, TIER_CONFIG } from "../shared/stripe-config";
 
 // Authentication middleware
 export function requireAuth(req: Request, res: Response, next: NextFunction) {
@@ -578,6 +580,211 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
     }
   });
+  
+  // =====================================================================
+  // STRIPE SUBSCRIPTION MANAGEMENT ENDPOINTS
+  // Following "It Just Works" principle - zero-failure tolerance
+  // =====================================================================
+  
+  /**
+   * Create Stripe checkout session for subscription purchase
+   * POST /api/stripe/create-checkout-session
+   */
+  app.post("/api/stripe/create-checkout-session", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const user = await storage.getUserById(req.session.userId!);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      if (user.role !== 'company') {
+        return res.status(403).json({ message: "Only company accounts can purchase subscriptions" });
+      }
+
+      const { tier, currency = 'usd' } = req.body;
+
+      if (!tier || !['basic', 'starter', 'premium', 'enterprise'].includes(tier)) {
+        return res.status(400).json({ message: "Invalid subscription tier" });
+      }
+
+      if (!['usd', 'cad'].includes(currency)) {
+        return res.status(400).json({ message: "Invalid currency. Must be 'usd' or 'cad'" });
+      }
+
+      // Get or create Stripe customer
+      const customerId = await stripeService.getOrCreateCustomer(user);
+
+      // Update user with customer ID if new
+      if (customerId !== user.stripeCustomerId) {
+        await storage.updateUser(user.id, { stripeCustomerId: customerId });
+      }
+
+      // Get price ID for selected tier and currency
+      const tierConfig = TIER_CONFIG[tier as TierName];
+      const priceId = currency === 'usd' ? tierConfig.priceIdUSD : tierConfig.priceIdCAD;
+
+      // Create checkout session
+      const session = await stripeService.createCheckoutSession({
+        customerId,
+        priceId,
+        mode: 'subscription',
+        successUrl: `${process.env.REPL_SLUG ? `https://${process.env.REPL_SLUG}.${process.env.REPL_OWNER}.repl.co` : 'http://localhost:5000'}/profile?subscription=success`,
+        cancelUrl: `${process.env.REPL_SLUG ? `https://${process.env.REPL_SLUG}.${process.env.REPL_OWNER}.repl.co` : 'http://localhost:5000'}/profile?subscription=canceled`,
+        metadata: {
+          userId: user.id.toString(),
+          tier,
+          currency,
+        },
+      });
+
+      console.log(`[Stripe] Checkout session created for user ${user.id}: ${session.id}`);
+      res.json({ url: session.url });
+    } catch (error: any) {
+      console.error('[Stripe] Create checkout session error:', error);
+      res.status(500).json({ message: error.message || "Failed to create checkout session" });
+    }
+  });
+
+  /**
+   * Stripe webhook handler
+   * POST /api/stripe/webhook
+   * Processes subscription lifecycle events
+   */
+  app.post("/api/stripe/webhook", async (req: Request, res: Response) => {
+    const sig = req.headers['stripe-signature'];
+
+    if (!sig) {
+      console.error('[Stripe Webhook] Missing signature');
+      return res.status(400).send('Missing signature');
+    }
+
+    try {
+      // Construct event from webhook payload
+      const event = stripeService.constructWebhookEvent(
+        req.body,
+        sig as string,
+        process.env.STRIPE_WEBHOOK_SECRET || ''
+      );
+
+      // Handle the event with database update callback
+      await stripeService.handleWebhookEvent(event, async (params) => {
+        await storage.updateUser(params.userId, {
+          stripeCustomerId: params.stripeCustomerId,
+          currentSubscriptionId: params.subscriptionId,
+          currentSubscriptionTier: params.tier,
+          subscriptionStatus: params.status,
+          subscriptionEndDate: params.currentPeriodEnd,
+        });
+      });
+
+      res.json({ received: true });
+    } catch (error: any) {
+      console.error('[Stripe Webhook] Error:', error);
+      res.status(400).send(`Webhook Error: ${error.message}`);
+    }
+  });
+
+  /**
+   * Get subscription status for current user
+   * GET /api/stripe/subscription-status
+   */
+  app.get("/api/stripe/subscription-status", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const user = await storage.getUserById(req.session.userId!);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      if (user.role !== 'company') {
+        return res.status(403).json({ message: "Only company accounts have subscriptions" });
+      }
+
+      if (!user.stripeCustomerId) {
+        return res.json({
+          hasActiveSubscription: false,
+          message: "No subscription found",
+        });
+      }
+
+      // Get subscription status from Stripe
+      const status = await stripeService.getSubscriptionStatus(user.stripeCustomerId);
+
+      res.json(status);
+    } catch (error: any) {
+      console.error('[Stripe] Get subscription status error:', error);
+      res.status(500).json({ message: error.message || "Failed to retrieve subscription status" });
+    }
+  });
+
+  /**
+   * Cancel subscription (at period end)
+   * POST /api/stripe/cancel-subscription
+   */
+  app.post("/api/stripe/cancel-subscription", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const user = await storage.getUserById(req.session.userId!);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      if (user.role !== 'company') {
+        return res.status(403).json({ message: "Only company accounts can manage subscriptions" });
+      }
+
+      if (!user.currentSubscriptionId) {
+        return res.status(400).json({ message: "No active subscription to cancel" });
+      }
+
+      // Cancel subscription at period end
+      await stripeService.cancelSubscription(user.currentSubscriptionId);
+
+      console.log(`[Stripe] Subscription canceled for user ${user.id}`);
+      res.json({ 
+        message: "Subscription will be canceled at the end of the current billing period",
+        success: true 
+      });
+    } catch (error: any) {
+      console.error('[Stripe] Cancel subscription error:', error);
+      res.status(500).json({ message: error.message || "Failed to cancel subscription" });
+    }
+  });
+
+  /**
+   * Reactivate a subscription scheduled for cancellation
+   * POST /api/stripe/reactivate-subscription
+   */
+  app.post("/api/stripe/reactivate-subscription", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const user = await storage.getUserById(req.session.userId!);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      if (user.role !== 'company') {
+        return res.status(403).json({ message: "Only company accounts can manage subscriptions" });
+      }
+
+      if (!user.currentSubscriptionId) {
+        return res.status(400).json({ message: "No subscription to reactivate" });
+      }
+
+      // Reactivate subscription
+      await stripeService.reactivateSubscription(user.currentSubscriptionId);
+
+      console.log(`[Stripe] Subscription reactivated for user ${user.id}`);
+      res.json({ 
+        message: "Subscription reactivated successfully",
+        success: true 
+      });
+    } catch (error: any) {
+      console.error('[Stripe] Reactivate subscription error:', error);
+      res.status(500).json({ message: error.message || "Failed to reactivate subscription" });
+    }
+  });
+  
+  // =====================================================================
+  // END STRIPE ENDPOINTS
+  // =====================================================================
   
   // Get current user
   app.get("/api/user", requireAuth, async (req: Request, res: Response) => {
