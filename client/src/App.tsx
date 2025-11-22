@@ -179,7 +179,7 @@ function BrandingProvider({ children }: { children: React.ReactNode }) {
   const [location] = useLocation();
   
   // Fetch current user
-  const { data: userData } = useQuery({
+  const { data: userData } = useQuery<{ user: any }>({
     queryKey: ["/api/user"],
   });
 

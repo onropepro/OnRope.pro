@@ -9,7 +9,7 @@ interface ProtectedRouteProps {
 
 export default function ProtectedRoute({ children, allowedRoles }: ProtectedRouteProps) {
   const [location, setLocation] = useLocation();
-  const { data: userData, isLoading, error } = useQuery({
+  const { data: userData, isLoading, error } = useQuery<{ user: any }>({
     queryKey: ["/api/user"],
     // Global defaults in queryClient.ts handle refetching for security
   });

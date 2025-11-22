@@ -68,7 +68,7 @@ export default function ManageSubscription() {
 
   const cancelSubscriptionMutation = useMutation({
     mutationFn: async () => {
-      return await apiRequest("/api/stripe/cancel-subscription", "POST");
+      return await apiRequest("POST", "/api/stripe/cancel-subscription");
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/user"] });
@@ -90,7 +90,7 @@ export default function ManageSubscription() {
 
   const cancelWhitelabelMutation = useMutation({
     mutationFn: async () => {
-      return await apiRequest("/api/stripe/cancel-whitelabel", "POST");
+      return await apiRequest("POST", "/api/stripe/cancel-whitelabel");
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/user"] });
