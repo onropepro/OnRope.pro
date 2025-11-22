@@ -238,6 +238,7 @@ export function SubscriptionManagement() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/stripe/subscription-status'] });
       queryClient.invalidateQueries({ queryKey: ['/api/user'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/subscription/details'] });
       setShowAddSeatsDialog(false);
       toast({
         title: "Seats Added!",
@@ -263,6 +264,7 @@ export function SubscriptionManagement() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/stripe/subscription-status'] });
       queryClient.invalidateQueries({ queryKey: ['/api/user'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/subscription/details'] });
       setShowAddProjectDialog(false);
       toast({
         title: "Project Added!",
