@@ -105,8 +105,8 @@ expertMode = true
 [userenv]
 
 [userenv.shared]
-PRIVATE_OBJECT_DIR = "/rope-access-files/private"
-PUBLIC_OBJECT_SEARCH_PATHS = "/rope-access-files/public"
+PRIVATE_OBJECT_DIR = "/replit-objstore-6e6b229a-26f3-44e3-8851-0347a883531e/private"
+PUBLIC_OBJECT_SEARCH_PATHS = "/replit-objstore-6e6b229a-26f3-44e3-8851-0347a883531e/public"
 
 [objectStorage]
 defaultBucketID = "replit-objstore-6e6b229a-26f3-44e3-8851-0347a883531e"
