@@ -374,7 +374,9 @@ export default function Dashboard() {
   const [showProjectDialog, setShowProjectDialog] = useState(false);
   const [showEmployeeDialog, setShowEmployeeDialog] = useState(false);
   const [showEditEmployeeDialog, setShowEditEmployeeDialog] = useState(false);
+  const [showEmployeeDetailDialog, setShowEmployeeDetailDialog] = useState(false);
   const [employeeToEdit, setEmployeeToEdit] = useState<any | null>(null);
+  const [employeeToView, setEmployeeToView] = useState<any | null>(null);
   const [showClientDialog, setShowClientDialog] = useState(false);
   const [showEditClientDialog, setShowEditClientDialog] = useState(false);
   const [showDeleteClientDialog, setShowDeleteClientDialog] = useState(false);
@@ -3660,7 +3662,15 @@ export default function Dashboard() {
                       })() : null;
 
                       return (
-                      <Card key={employee.id} data-testid={`employee-card-${employee.id}`} className="hover-elevate">
+                      <Card 
+                        key={employee.id} 
+                        data-testid={`employee-card-${employee.id}`} 
+                        className="hover-elevate cursor-pointer"
+                        onClick={() => {
+                          setEmployeeToView(employee);
+                          setShowEmployeeDetailDialog(true);
+                        }}
+                      >
                         <CardContent className="p-4">
                           <div className="space-y-3">
                             {/* Header - Name and Actions */}
@@ -3689,7 +3699,10 @@ export default function Dashboard() {
                                 <Button
                                   variant="ghost"
                                   size="icon"
-                                  onClick={() => handleEditEmployee(employee)}
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleEditEmployee(employee);
+                                  }}
                                   data-testid={`button-edit-employee-${employee.id}`}
                                   className="h-9 w-9"
                                   disabled={userIsReadOnly}
@@ -3699,7 +3712,10 @@ export default function Dashboard() {
                                 <Button
                                   variant="ghost"
                                   size="icon"
-                                  onClick={() => setEmployeeToDelete(employee.id)}
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    setEmployeeToDelete(employee.id);
+                                  }}
                                   data-testid={`button-delete-employee-${employee.id}`}
                                   className="h-9 w-9 text-destructive hover:text-destructive"
                                   disabled={userIsReadOnly}
@@ -5363,6 +5379,315 @@ export default function Dashboard() {
                 </div>
               </form>
             </Form>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Employee Detail Dialog */}
+      <Dialog open={showEmployeeDetailDialog} onOpenChange={setShowEmployeeDetailDialog}>
+        <DialogContent className="max-w-2xl max-h-[90vh] p-0">
+          <div className="overflow-y-auto">
+            {employeeToView && (
+              <>
+                <DialogHeader className="p-6 border-b sticky top-0 bg-background z-10">
+                  <DialogTitle>Employee Details</DialogTitle>
+                  <DialogDescription>
+                    View complete employee information, documents, and certifications
+                  </DialogDescription>
+                </DialogHeader>
+
+                <div className="p-6 space-y-6">
+                  {/* Profile Photo & Basic Info */}
+                  <div className="flex items-start gap-4">
+                    {employeeToView.photoUrl ? (
+                      <img 
+                        src={employeeToView.photoUrl} 
+                        alt={employeeToView.name || 'Employee'} 
+                        className="w-24 h-24 rounded-full object-cover border"
+                      />
+                    ) : (
+                      <div className="w-24 h-24 rounded-full bg-muted flex items-center justify-center border">
+                        <span className="material-icons text-4xl text-muted-foreground">person</span>
+                      </div>
+                    )}
+                    <div className="flex-1">
+                      <h3 className="text-xl font-semibold">{employeeToView.name || employeeToView.email}</h3>
+                      <Badge variant="secondary" className="mt-1 capitalize">
+                        {employeeToView.role?.replace(/_/g, ' ')}
+                      </Badge>
+                      {employeeToView.terminatedDate && (
+                        <Badge variant="destructive" className="mt-1 ml-2">
+                          Terminated: {new Date(employeeToView.terminatedDate).toLocaleDateString()}
+                        </Badge>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Contact Information */}
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="text-base flex items-center gap-2">
+                        <span className="material-icons text-lg">contact_mail</span>
+                        Contact Information
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-2">
+                      <div className="flex items-center gap-2">
+                        <span className="material-icons text-sm text-muted-foreground">email</span>
+                        <span className="text-sm">{employeeToView.email}</span>
+                      </div>
+                      {employeeToView.employeePhoneNumber && (
+                        <div className="flex items-center gap-2">
+                          <span className="material-icons text-sm text-muted-foreground">phone</span>
+                          <span className="text-sm">{employeeToView.employeePhoneNumber}</span>
+                        </div>
+                      )}
+                    </CardContent>
+                  </Card>
+
+                  {/* Employment Details */}
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="text-base flex items-center gap-2">
+                        <span className="material-icons text-lg">work</span>
+                        Employment Details
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-3">
+                      {employeeToView.startDate && (
+                        <div>
+                          <div className="text-xs text-muted-foreground">Start Date</div>
+                          <div className="text-sm font-medium">{new Date(employeeToView.startDate).toLocaleDateString()}</div>
+                        </div>
+                      )}
+                      {employeeToView.hourlyRate && hasFinancialAccess(user) && (
+                        <div>
+                          <div className="text-xs text-muted-foreground">Hourly Rate</div>
+                          <div className="text-sm font-medium">${employeeToView.hourlyRate}/hr</div>
+                        </div>
+                      )}
+                      {employeeToView.techLevel && (
+                        <div>
+                          <div className="text-xs text-muted-foreground">Tech Level</div>
+                          <div className="text-sm font-medium">IRATA {employeeToView.techLevel}</div>
+                        </div>
+                      )}
+                    </CardContent>
+                  </Card>
+
+                  {/* IRATA Certification */}
+                  {employeeToView.irataLevel && (
+                    <Card>
+                      <CardHeader>
+                        <CardTitle className="text-base flex items-center gap-2">
+                          <span className="material-icons text-lg">workspace_premium</span>
+                          IRATA Certification
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent className="space-y-3">
+                        <div>
+                          <div className="text-xs text-muted-foreground">Level</div>
+                          <div className="text-sm font-medium">Level {employeeToView.irataLevel}</div>
+                        </div>
+                        {employeeToView.irataLicenseNumber && (
+                          <div>
+                            <div className="text-xs text-muted-foreground">License Number</div>
+                            <div className="text-sm font-medium">{employeeToView.irataLicenseNumber}</div>
+                          </div>
+                        )}
+                        {employeeToView.irataExpirationDate && (
+                          <div>
+                            <div className="text-xs text-muted-foreground">Expiration Date</div>
+                            <div className="text-sm font-medium">
+                              {new Date(employeeToView.irataExpirationDate).toLocaleDateString()}
+                              {(() => {
+                                const expirationDate = new Date(employeeToView.irataExpirationDate);
+                                const today = new Date();
+                                if (expirationDate < today) {
+                                  return <Badge variant="destructive" className="ml-2">Expired</Badge>;
+                                }
+                                const thirtyDaysFromNow = new Date();
+                                thirtyDaysFromNow.setDate(today.getDate() + 30);
+                                if (expirationDate <= thirtyDaysFromNow) {
+                                  return <Badge variant="outline" className="ml-2 bg-yellow-500/10 border-yellow-500 text-yellow-700 dark:text-yellow-400">Expiring Soon</Badge>;
+                                }
+                                return null;
+                              })()}
+                            </div>
+                          </div>
+                        )}
+                        {employeeToView.irataDocuments && employeeToView.irataDocuments.length > 0 && (
+                          <div>
+                            <div className="text-xs text-muted-foreground mb-2">Documents</div>
+                            <div className="space-y-1">
+                              {employeeToView.irataDocuments.map((doc: string, idx: number) => (
+                                <a 
+                                  key={idx} 
+                                  href={doc} 
+                                  target="_blank" 
+                                  rel="noopener noreferrer"
+                                  className="flex items-center gap-2 text-sm text-primary hover:underline"
+                                >
+                                  <span className="material-icons text-sm">description</span>
+                                  Document {idx + 1}
+                                </a>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                      </CardContent>
+                    </Card>
+                  )}
+
+                  {/* Driver's License */}
+                  {(employeeToView.driversLicenseNumber || employeeToView.driversLicenseProvince) && (
+                    <Card>
+                      <CardHeader>
+                        <CardTitle className="text-base flex items-center gap-2">
+                          <span className="material-icons text-lg">badge</span>
+                          Driver's License
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent className="space-y-3">
+                        {employeeToView.driversLicenseNumber && (
+                          <div>
+                            <div className="text-xs text-muted-foreground">License Number</div>
+                            <div className="text-sm font-medium">{employeeToView.driversLicenseNumber}</div>
+                          </div>
+                        )}
+                        {employeeToView.driversLicenseProvince && (
+                          <div>
+                            <div className="text-xs text-muted-foreground">Province/State</div>
+                            <div className="text-sm font-medium">{employeeToView.driversLicenseProvince}</div>
+                          </div>
+                        )}
+                        {employeeToView.driversLicenseDocuments && employeeToView.driversLicenseDocuments.length > 0 && (
+                          <div>
+                            <div className="text-xs text-muted-foreground mb-2">Documents</div>
+                            <div className="space-y-1">
+                              {employeeToView.driversLicenseDocuments.map((doc: string, idx: number) => (
+                                <a 
+                                  key={idx} 
+                                  href={doc} 
+                                  target="_blank" 
+                                  rel="noopener noreferrer"
+                                  className="flex items-center gap-2 text-sm text-primary hover:underline"
+                                >
+                                  <span className="material-icons text-sm">description</span>
+                                  Document {idx + 1}
+                                </a>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                      </CardContent>
+                    </Card>
+                  )}
+
+                  {/* Emergency Contact */}
+                  {employeeToView.emergencyContactName && (
+                    <Card>
+                      <CardHeader>
+                        <CardTitle className="text-base flex items-center gap-2">
+                          <span className="material-icons text-lg">contact_emergency</span>
+                          Emergency Contact
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent className="space-y-3">
+                        <div>
+                          <div className="text-xs text-muted-foreground">Name</div>
+                          <div className="text-sm font-medium">{employeeToView.emergencyContactName}</div>
+                        </div>
+                        {employeeToView.emergencyContactPhone && (
+                          <div>
+                            <div className="text-xs text-muted-foreground">Phone</div>
+                            <div className="text-sm font-medium">{employeeToView.emergencyContactPhone}</div>
+                          </div>
+                        )}
+                      </CardContent>
+                    </Card>
+                  )}
+
+                  {/* Permissions */}
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="text-base flex items-center gap-2">
+                        <span className="material-icons text-lg">admin_panel_settings</span>
+                        Permissions
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="grid grid-cols-2 gap-2">
+                        <div className="flex items-center gap-2">
+                          {employeeToView.canCreateProjects ? (
+                            <span className="material-icons text-sm text-green-600">check_circle</span>
+                          ) : (
+                            <span className="material-icons text-sm text-muted-foreground">cancel</span>
+                          )}
+                          <span className="text-sm">Create Projects</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          {employeeToView.canViewAllProjects ? (
+                            <span className="material-icons text-sm text-green-600">check_circle</span>
+                          ) : (
+                            <span className="material-icons text-sm text-muted-foreground">cancel</span>
+                          )}
+                          <span className="text-sm">View All Projects</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          {employeeToView.canManageEmployees ? (
+                            <span className="material-icons text-sm text-green-600">check_circle</span>
+                          ) : (
+                            <span className="material-icons text-sm text-muted-foreground">cancel</span>
+                          )}
+                          <span className="text-sm">Manage Employees</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          {employeeToView.canAccessFinancials ? (
+                            <span className="material-icons text-sm text-green-600">check_circle</span>
+                          ) : (
+                            <span className="material-icons text-sm text-muted-foreground">cancel</span>
+                          )}
+                          <span className="text-sm">Access Financials</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          {employeeToView.canGenerateReports ? (
+                            <span className="material-icons text-sm text-green-600">check_circle</span>
+                          ) : (
+                            <span className="material-icons text-sm text-muted-foreground">cancel</span>
+                          )}
+                          <span className="text-sm">Generate Reports</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          {employeeToView.canManageClients ? (
+                            <span className="material-icons text-sm text-green-600">check_circle</span>
+                          ) : (
+                            <span className="material-icons text-sm text-muted-foreground">cancel</span>
+                          )}
+                          <span className="text-sm">Manage Clients</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          {employeeToView.canApproveHours ? (
+                            <span className="material-icons text-sm text-green-600">check_circle</span>
+                          ) : (
+                            <span className="material-icons text-sm text-muted-foreground">cancel</span>
+                          )}
+                          <span className="text-sm">Approve Hours</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          {employeeToView.canManageCompliance ? (
+                            <span className="material-icons text-sm text-green-600">check_circle</span>
+                          ) : (
+                            <span className="material-icons text-sm text-muted-foreground">cancel</span>
+                          )}
+                          <span className="text-sm">Manage Compliance</span>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+              </>
+            )}
           </div>
         </DialogContent>
       </Dialog>
