@@ -465,24 +465,6 @@ export default function Dashboard() {
   // Extract user from userData for use throughout component
   const user = userData?.user;
 
-  // License verification gate - redirect unverified company owners
-  useEffect(() => {
-    if (user) {
-      // Only check company role users
-      if (user.role === 'company' && user.licenseVerified !== true) {
-        // Check if user explicitly chose read-only mode
-        const allowReadOnly = localStorage.getItem("allowReadOnlyMode");
-        
-        if (allowReadOnly !== "true") {
-          console.log('[License Gate] Redirecting unverified company user to license verification page');
-          setLocation("/license-verification");
-        } else {
-          console.log('[License Gate] User in read-only mode - allowing access with restrictions');
-        }
-      }
-    }
-  }, [userData, setLocation]);
-
   // Determine company ID for fetching data
   // For company users: use their own ID
   // For employees: use their companyId
