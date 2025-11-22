@@ -767,35 +767,38 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Check if extra seats already exists on subscription
       const existingItem = subscription.items.data.find(item => item.price.id === addonPriceId);
 
+      let newQuantity: number;
       if (existingItem) {
         // Update quantity of existing subscription item
         console.log(`[Stripe] Extra seats already on subscription. Updating quantity from ${existingItem.quantity} to ${(existingItem.quantity || 1) + 1}`);
-        await stripe.subscriptionItems.update(existingItem.id, {
+        const updatedItem = await stripe.subscriptionItems.update(existingItem.id, {
           quantity: (existingItem.quantity || 1) + 1,
           proration_behavior: 'create_prorations',
         });
+        newQuantity = updatedItem.quantity || 1;
       } else {
         // Create new subscription item with quantity 1
         console.log(`[Stripe] Adding extra seats as new subscription item`);
-        await stripe.subscriptionItems.create({
+        const newItem = await stripe.subscriptionItems.create({
           subscription: user.stripeSubscriptionId,
           price: addonPriceId,
           quantity: 1,
           proration_behavior: 'create_prorations',
         });
+        newQuantity = newItem.quantity || 1;
       }
 
-      // Update user's max seats in database
-      const currentMaxSeats = user.maxSeats || 0;
+      // Update user's additional seats count in database with authoritative Stripe quantity
       await storage.updateUser(user.id, {
-        maxSeats: currentMaxSeats + addonConfig.seats,
+        additionalSeatsCount: newQuantity,
       });
 
-      console.log(`[Stripe] Extra seats added successfully. New max seats: ${currentMaxSeats + addonConfig.seats}`);
+      console.log(`[Stripe] Extra seats added successfully. Additional packs: ${newQuantity}, Total extra seats: ${newQuantity * addonConfig.seats}`);
       res.json({
         success: true,
         message: "Extra seats added successfully",
-        newMaxSeats: currentMaxSeats + addonConfig.seats,
+        additionalPacks: newQuantity,
+        totalExtraSeats: newQuantity * addonConfig.seats,
       });
     } catch (error: any) {
       console.error('[Stripe] Add seats error:', error);
@@ -844,35 +847,37 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Check if extra project already exists on subscription
       const existingItem = subscription.items.data.find(item => item.price.id === addonPriceId);
 
+      let newQuantity: number;
       if (existingItem) {
         // Update quantity of existing subscription item
         console.log(`[Stripe] Extra project already on subscription. Updating quantity from ${existingItem.quantity} to ${(existingItem.quantity || 1) + 1}`);
-        await stripe.subscriptionItems.update(existingItem.id, {
+        const updatedItem = await stripe.subscriptionItems.update(existingItem.id, {
           quantity: (existingItem.quantity || 1) + 1,
           proration_behavior: 'create_prorations',
         });
+        newQuantity = updatedItem.quantity || 1;
       } else {
         // Create new subscription item with quantity 1
         console.log(`[Stripe] Adding extra project as new subscription item`);
-        await stripe.subscriptionItems.create({
+        const newItem = await stripe.subscriptionItems.create({
           subscription: user.stripeSubscriptionId,
           price: addonPriceId,
           quantity: 1,
           proration_behavior: 'create_prorations',
         });
+        newQuantity = newItem.quantity || 1;
       }
 
-      // Update user's max projects in database
-      const currentMaxProjects = user.maxProjects || 0;
+      // Update user's additional projects count in database with authoritative Stripe quantity
       await storage.updateUser(user.id, {
-        maxProjects: currentMaxProjects + addonConfig.projects,
+        additionalProjectsCount: newQuantity,
       });
 
-      console.log(`[Stripe] Extra project added successfully. New max projects: ${currentMaxProjects + addonConfig.projects}`);
+      console.log(`[Stripe] Extra project added successfully. Additional projects: ${newQuantity}`);
       res.json({
         success: true,
         message: "Extra project added successfully",
-        newMaxProjects: currentMaxProjects + addonConfig.projects,
+        additionalProjects: newQuantity,
       });
     } catch (error: any) {
       console.error('[Stripe] Add project error:', error);
