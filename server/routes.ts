@@ -770,12 +770,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       console.log(`[Stripe] Adding extra seats to subscription ${user.stripeSubscriptionId}`);
 
-      // Add extra seats to subscription
-      await stripe.subscriptionItems.create({
-        subscription: user.stripeSubscriptionId,
-        price: addonPriceId,
-        proration_behavior: 'create_prorations',
-      });
+      // Check if extra seats already exists on subscription
+      const existingItem = subscription.items.data.find(item => item.price.id === addonPriceId);
+
+      if (existingItem) {
+        // Update quantity of existing subscription item
+        console.log(`[Stripe] Extra seats already on subscription. Updating quantity from ${existingItem.quantity} to ${(existingItem.quantity || 1) + 1}`);
+        await stripe.subscriptionItems.update(existingItem.id, {
+          quantity: (existingItem.quantity || 1) + 1,
+          proration_behavior: 'create_prorations',
+        });
+      } else {
+        // Create new subscription item with quantity 1
+        console.log(`[Stripe] Adding extra seats as new subscription item`);
+        await stripe.subscriptionItems.create({
+          subscription: user.stripeSubscriptionId,
+          price: addonPriceId,
+          quantity: 1,
+          proration_behavior: 'create_prorations',
+        });
+      }
 
       // Update user's max seats in database
       const currentMaxSeats = user.maxSeats || 0;
@@ -836,12 +850,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       console.log(`[Stripe] Adding extra project to subscription ${user.stripeSubscriptionId}`);
 
-      // Add extra project to subscription
-      await stripe.subscriptionItems.create({
-        subscription: user.stripeSubscriptionId,
-        price: addonPriceId,
-        proration_behavior: 'create_prorations',
-      });
+      // Check if extra project already exists on subscription
+      const existingItem = subscription.items.data.find(item => item.price.id === addonPriceId);
+
+      if (existingItem) {
+        // Update quantity of existing subscription item
+        console.log(`[Stripe] Extra project already on subscription. Updating quantity from ${existingItem.quantity} to ${(existingItem.quantity || 1) + 1}`);
+        await stripe.subscriptionItems.update(existingItem.id, {
+          quantity: (existingItem.quantity || 1) + 1,
+          proration_behavior: 'create_prorations',
+        });
+      } else {
+        // Create new subscription item with quantity 1
+        console.log(`[Stripe] Adding extra project as new subscription item`);
+        await stripe.subscriptionItems.create({
+          subscription: user.stripeSubscriptionId,
+          price: addonPriceId,
+          quantity: 1,
+          proration_behavior: 'create_prorations',
+        });
+      }
 
       // Update user's max projects in database
       const currentMaxProjects = user.maxProjects || 0;
