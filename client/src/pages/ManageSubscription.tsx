@@ -33,8 +33,8 @@ interface SubscriptionDetails {
   currentPeriodEnd: string;
   cancelAtPeriodEnd: boolean;
   whitelabelBrandingActive?: boolean;
-  extraSeats?: number;
-  extraProjects?: number;
+  additionalSeatsCount: number;
+  additionalProjectsCount: number;
   currency: 'usd' | 'cad';
 }
 
@@ -55,7 +55,7 @@ const TIER_PRICES = {
 export default function ManageSubscription() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
-  const [cancelTarget, setCancelTarget] = useState<'subscription' | 'whitelabel' | null>(null);
+  const [cancelTarget, setCancelTarget] = useState<'subscription' | 'whitelabel' | 'seats' | 'projects' | null>(null);
 
   const { data: user } = useQuery({
     queryKey: ["/api/user"],
@@ -98,6 +98,50 @@ export default function ManageSubscription() {
       toast({
         title: "White Label Branding Cancelled",
         description: "Your white label branding will remain active until the end of your current billing period.",
+      });
+      setCancelTarget(null);
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
+
+  const cancelSeatsMutation = useMutation({
+    mutationFn: async () => {
+      return await apiRequest("POST", "/api/stripe/remove-addon-seats");
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/user"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/subscription/details"] });
+      toast({
+        title: "Extra Seats Cancelled",
+        description: "Your extra seats have been cancelled and will be removed at the end of your billing period.",
+      });
+      setCancelTarget(null);
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
+
+  const cancelProjectsMutation = useMutation({
+    mutationFn: async () => {
+      return await apiRequest("POST", "/api/stripe/remove-addon-projects");
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/user"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/subscription/details"] });
+      toast({
+        title: "Extra Projects Cancelled",
+        description: "Your extra projects have been cancelled and will be removed at the end of your billing period.",
       });
       setCancelTarget(null);
     },
@@ -264,51 +308,67 @@ export default function ManageSubscription() {
               </>
             )}
 
-            {/* Extra Seats - Coming Soon */}
-            {subscriptionData.extraSeats && subscriptionData.extraSeats > 0 && (
+            {/* Extra Seats */}
+            {subscriptionData.additionalSeatsCount > 0 && (
               <>
-                <div className="flex items-center justify-between p-4 border rounded-md opacity-50">
+                <div className="flex items-center justify-between p-4 border rounded-md">
                   <div className="flex items-center gap-3">
-                    <div className="p-2 bg-muted rounded-md">
-                      <CreditCard className="w-5 h-5" />
+                    <div className="p-2 bg-primary/10 rounded-md">
+                      <CreditCard className="w-5 h-5 text-primary" />
                     </div>
                     <div>
                       <h3 className="font-medium">Extra Team Seats</h3>
                       <p className="text-sm text-muted-foreground">
-                        {subscriptionData.extraSeats} seats • {currencySymbol}19/month
+                        {subscriptionData.additionalSeatsCount} pack{subscriptionData.additionalSeatsCount > 1 ? 's' : ''} ({subscriptionData.additionalSeatsCount * 2} seats) • {currencySymbol}19/month per pack
                       </p>
                     </div>
                   </div>
-                  <Badge variant="secondary">Coming Soon</Badge>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setCancelTarget('seats')}
+                    data-testid="button-cancel-seats"
+                  >
+                    <XCircle className="w-4 h-4 mr-2" />
+                    Cancel
+                  </Button>
                 </div>
                 <Separator />
               </>
             )}
 
-            {/* Extra Projects - Coming Soon */}
-            {subscriptionData.extraProjects && subscriptionData.extraProjects > 0 && (
+            {/* Extra Projects */}
+            {subscriptionData.additionalProjectsCount > 0 && (
               <>
-                <div className="flex items-center justify-between p-4 border rounded-md opacity-50">
+                <div className="flex items-center justify-between p-4 border rounded-md">
                   <div className="flex items-center gap-3">
-                    <div className="p-2 bg-muted rounded-md">
-                      <CreditCard className="w-5 h-5" />
+                    <div className="p-2 bg-primary/10 rounded-md">
+                      <CreditCard className="w-5 h-5 text-primary" />
                     </div>
                     <div>
                       <h3 className="font-medium">Extra Projects</h3>
                       <p className="text-sm text-muted-foreground">
-                        {subscriptionData.extraProjects} projects • {currencySymbol}49/month each
+                        {subscriptionData.additionalProjectsCount} project{subscriptionData.additionalProjectsCount > 1 ? 's' : ''} • {currencySymbol}49/month each
                       </p>
                     </div>
                   </div>
-                  <Badge variant="secondary">Coming Soon</Badge>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setCancelTarget('projects')}
+                    data-testid="button-cancel-projects"
+                  >
+                    <XCircle className="w-4 h-4 mr-2" />
+                    Cancel
+                  </Button>
                 </div>
                 <Separator />
               </>
             )}
 
             {!subscriptionData.whitelabelBrandingActive && 
-             (!subscriptionData.extraSeats || subscriptionData.extraSeats === 0) &&
-             (!subscriptionData.extraProjects || subscriptionData.extraProjects === 0) && (
+             subscriptionData.additionalSeatsCount === 0 &&
+             subscriptionData.additionalProjectsCount === 0 && (
               <div className="text-center py-8">
                 <p className="text-muted-foreground">No active add-ons</p>
                 <Button
@@ -378,6 +438,64 @@ export default function ManageSubscription() {
               data-testid="button-cancel-whitelabel-yes"
             >
               {cancelWhitelabelMutation.isPending ? "Cancelling..." : "Yes, Cancel"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Cancel Extra Seats Dialog */}
+      <Dialog open={cancelTarget === 'seats'} onOpenChange={(open) => !open && setCancelTarget(null)}>
+        <DialogContent data-testid="dialog-cancel-seats">
+          <DialogHeader>
+            <DialogTitle>Cancel Extra Team Seats</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to cancel all extra team seats? They will remain active until {renewalDate}.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="gap-2">
+            <Button
+              variant="outline"
+              onClick={() => setCancelTarget(null)}
+              data-testid="button-cancel-seats-no"
+            >
+              Keep Add-on
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={() => cancelSeatsMutation.mutate()}
+              disabled={cancelSeatsMutation.isPending}
+              data-testid="button-cancel-seats-yes"
+            >
+              {cancelSeatsMutation.isPending ? "Cancelling..." : "Yes, Cancel"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Cancel Extra Projects Dialog */}
+      <Dialog open={cancelTarget === 'projects'} onOpenChange={(open) => !open && setCancelTarget(null)}>
+        <DialogContent data-testid="dialog-cancel-projects">
+          <DialogHeader>
+            <DialogTitle>Cancel Extra Projects</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to cancel all extra projects? They will remain active until {renewalDate}.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="gap-2">
+            <Button
+              variant="outline"
+              onClick={() => setCancelTarget(null)}
+              data-testid="button-cancel-projects-no"
+            >
+              Keep Add-on
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={() => cancelProjectsMutation.mutate()}
+              disabled={cancelProjectsMutation.isPending}
+              data-testid="button-cancel-projects-yes"
+            >
+              {cancelProjectsMutation.isPending ? "Cancelling..." : "Yes, Cancel"}
             </Button>
           </DialogFooter>
         </DialogContent>

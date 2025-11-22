@@ -122,6 +122,21 @@ export function SubscriptionManagement() {
     queryKey: ['/api/stripe/subscription-status'],
   });
 
+  // Fetch subscription details including add-ons
+  const { data: subDetails } = useQuery<{
+    tier: string;
+    status: string;
+    currentPeriodEnd: string;
+    cancelAtPeriodEnd: boolean;
+    whitelabelBrandingActive: boolean;
+    additionalSeatsCount: number;
+    additionalProjectsCount: number;
+    currency: string;
+  }>({
+    queryKey: ['/api/subscription/details'],
+    enabled: subStatus?.hasActiveSubscription || false,
+  });
+
   // Create checkout session mutation
   const createCheckoutMutation = useMutation({
     mutationFn: async ({ tier, currency }: { tier: TierName, currency: Currency }) => {
@@ -349,6 +364,14 @@ export function SubscriptionManagement() {
               const tierInfo = TIER_INFO[subStatus.currentTier];
               const TierIcon = tierInfo.icon;
               
+              // Calculate total limits including add-ons
+              const additionalProjects = subDetails?.additionalProjectsCount || 0;
+              const additionalSeats = subDetails?.additionalSeatsCount || 0;
+              const seatsPerPack = 2;
+              
+              const totalProjects = tierInfo.projects === -1 ? -1 : tierInfo.projects + additionalProjects;
+              const totalSeats = tierInfo.seats === -1 ? -1 : tierInfo.seats + (additionalSeats * seatsPerPack);
+              
               return (
                 <div className="flex items-center gap-3">
                   <div className={`p-3 rounded-lg ${tierInfo.color}`}>
@@ -357,8 +380,8 @@ export function SubscriptionManagement() {
                   <div>
                     <h3 className="font-semibold text-lg">{tierInfo.name}</h3>
                     <p className="text-sm text-muted-foreground">
-                      {tierInfo.projects === -1 ? 'Unlimited' : tierInfo.projects} projects, 
-                      {tierInfo.seats === -1 ? ' Unlimited' : ` ${tierInfo.seats}`} seats
+                      {totalProjects === -1 ? 'Unlimited' : totalProjects} projects, 
+                      {totalSeats === -1 ? ' Unlimited' : ` ${totalSeats}`} seats
                     </p>
                   </div>
                 </div>
