@@ -2,13 +2,10 @@ import { useState } from "react";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { TIER_CONFIG } from "@shared/stripe-config";
 
 export default function GetLicense() {
-  const [selectedCurrency, setSelectedCurrency] = useState<'usd' | 'cad'>('usd');
   const [processingTier, setProcessingTier] = useState<string | null>(null);
   const { toast } = useToast();
 
@@ -16,14 +13,14 @@ export default function GetLicense() {
     try {
       setProcessingTier(tierName);
       
-      // Create checkout session for new customer
+      // Create checkout session for new customer (always USD)
       const response = await fetch('/api/stripe/create-license-checkout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
         body: JSON.stringify({
           tier: tierName,
-          currency: selectedCurrency,
+          currency: 'usd',
         }),
       });
 
@@ -78,36 +75,16 @@ export default function GetLicense() {
       <div className="container mx-auto px-4 py-12 max-w-7xl">
         <div className="text-center mb-12">
           <h2 className="text-4xl font-bold mb-4">Choose Your License Tier</h2>
-          <p className="text-xl text-muted-foreground mb-6">
+          <p className="text-xl text-muted-foreground">
             Start your 30-day free trial today - No credit card required
           </p>
-          
-          {/* Currency Selector */}
-          <div className="flex items-center justify-center gap-4 mb-8">
-            <Label className="text-base font-medium">Currency:</Label>
-            <RadioGroup 
-              value={selectedCurrency} 
-              onValueChange={(value) => setSelectedCurrency(value as 'usd' | 'cad')}
-              className="flex gap-4"
-            >
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="usd" id="currency-usd" data-testid="radio-currency-usd" />
-                <Label htmlFor="currency-usd" className="cursor-pointer">USD ($)</Label>
-              </div>
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="cad" id="currency-cad" data-testid="radio-currency-cad" />
-                <Label htmlFor="currency-cad" className="cursor-pointer">CAD ($)</Label>
-              </div>
-            </RadioGroup>
-          </div>
         </div>
 
         {/* Pricing Grid */}
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
           {(Object.keys(TIER_CONFIG) as Array<keyof typeof TIER_CONFIG>).map((tierKey) => {
             const tier = TIER_CONFIG[tierKey];
-            const price = selectedCurrency === 'usd' ? tier.priceUSD : tier.priceCAD;
-            const currency = selectedCurrency === 'usd' ? 'USD' : 'CAD';
+            const price = tier.priceUSD;
             const isProcessing = processingTier === tierKey;
             const isEnterprise = tierKey === 'enterprise';
             const isPremium = tierKey === 'premium';
@@ -134,7 +111,7 @@ export default function GetLicense() {
                         ${price}
                       </span>
                       <span className="text-muted-foreground ml-2">
-                        {currency}/month
+                        USD/month
                       </span>
                     </div>
                     <div className="mt-2 text-sm">
