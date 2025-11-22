@@ -38,6 +38,12 @@ import ProtectedRoute from "@/components/ProtectedRoute";
 import { EMPLOYEE_ROLES } from "@/lib/permissions";
 
 function Router() {
+  const [location] = useLocation();
+  
+  useEffect(() => {
+    console.log("🛣️ Router: Current location changed to:", location);
+  }, [location]);
+  
   return (
     <Switch>
       <Route path="/" component={Login} />

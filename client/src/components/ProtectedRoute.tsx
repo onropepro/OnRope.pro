@@ -8,7 +8,7 @@ interface ProtectedRouteProps {
 }
 
 export default function ProtectedRoute({ children, allowedRoles }: ProtectedRouteProps) {
-  const [, setLocation] = useLocation();
+  const [location, setLocation] = useLocation();
   const { data: userData, isLoading, error } = useQuery({
     queryKey: ["/api/user"],
     // Global defaults in queryClient.ts handle refetching for security
@@ -17,24 +17,38 @@ export default function ProtectedRoute({ children, allowedRoles }: ProtectedRout
   const user = userData?.user;
 
   useEffect(() => {
+    console.log("🔒 ProtectedRoute check:", {
+      currentPath: location,
+      isLoading,
+      hasUser: !!user,
+      userRole: user?.role,
+      allowedRoles,
+      hasError: !!error
+    });
+    
     // If there's an auth error (401/403), log out immediately
     // Network errors will be retried automatically by queryClient
     if (error && (error.message?.includes("401") || error.message?.includes("403"))) {
+      console.log("❌ Auth error detected, redirecting to login");
       setLocation("/");
       return;
     }
     
     if (!isLoading && !user) {
+      console.log("❌ No user found after loading, redirecting to login");
       setLocation("/");
     } else if (!isLoading && user && allowedRoles && !allowedRoles.includes(user.role)) {
+      console.log("⛔ User role not allowed for this route, redirecting to appropriate dashboard");
       // Redirect to appropriate dashboard based on role
       if (user.role === "resident") {
         setLocation("/resident");
       } else {
         setLocation("/dashboard");
       }
+    } else if (!isLoading && user) {
+      console.log("✅ ProtectedRoute: Access granted!");
     }
-  }, [user, isLoading, error, allowedRoles, setLocation]);
+  }, [user, isLoading, error, allowedRoles, setLocation, location]);
 
   if (isLoading) {
     return (

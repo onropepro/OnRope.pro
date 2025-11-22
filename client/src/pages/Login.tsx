@@ -66,12 +66,23 @@ export default function Login() {
       const userData = await userResponse.json();
       const user = userData.user;
       
+      console.log("🔐 Login successful! User data:", {
+        id: user.id,
+        username: user.username,
+        role: user.role,
+        companyId: user.companyId
+      });
+      
       // Use client-side navigation to preserve React state and cache
       if (user.role === "resident") {
+        console.log("🏠 Redirecting to resident dashboard...");
         setLocation("/resident");
       } else {
+        console.log("📊 Redirecting to employee dashboard...");
         setLocation("/dashboard");
       }
+      
+      console.log("✅ Navigation triggered to:", user.role === "resident" ? "/resident" : "/dashboard");
     } catch (error) {
       form.setError("identifier", { message: "An error occurred. Please try again." });
     }
