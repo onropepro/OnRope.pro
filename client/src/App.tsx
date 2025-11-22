@@ -25,7 +25,6 @@ import NonBillableHours from "@/pages/NonBillableHours";
 import Inventory from "@/pages/Inventory";
 import HoursAnalytics from "@/pages/HoursAnalytics";
 import Schedule from "@/pages/Schedule";
-import LicenseVerification from "@/pages/LicenseVerification";
 import SuperUser from "@/pages/SuperUser";
 import AllCompanies from "@/pages/AllCompanies";
 import CompanyDetail from "@/pages/CompanyDetail";
@@ -56,11 +55,6 @@ function Router() {
       <Route path="/superuser/companies">
         <ProtectedRoute allowedRoles={["superuser"]}>
           <AllCompanies />
-        </ProtectedRoute>
-      </Route>
-      <Route path="/license-verification">
-        <ProtectedRoute allowedRoles={["company"]}>
-          <LicenseVerification />
         </ProtectedRoute>
       </Route>
       <Route path="/resident">

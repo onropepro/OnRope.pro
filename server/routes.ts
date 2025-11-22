@@ -32,40 +32,6 @@ export function requireRole(...roles: string[]) {
   };
 }
 
-// Tier detection and seat limit utilities
-function detectTier(licenseKey: string | null): number {
-  if (!licenseKey) return 0; // No tier
-  if (licenseKey.endsWith('-1')) return 1; // Tier 1 (Basic)
-  if (licenseKey.endsWith('-2')) return 2; // Tier 2 (Starter)
-  if (licenseKey.endsWith('-3')) return 3; // Tier 3 (Professional)
-  if (licenseKey.endsWith('-4')) return 4; // Tier 4 (Premium)
-  return 0; // Unknown/No tier
-}
-
-function getSeatLimit(tier: number, additionalSeats: number = 0): number {
-  let baseLimit: number;
-  switch (tier) {
-    case 1: baseLimit = 4; break;  // Tier 1: 4 seats
-    case 2: baseLimit = 10; break;  // Tier 2: 10 seats
-    case 3: baseLimit = 18; break; // Tier 3: 18 seats
-    case 4: return -1; // Tier 4: unlimited
-    default: baseLimit = 0; break; // No limit if no tier
-  }
-  return baseLimit + additionalSeats; // Add purchased seats to base limit
-}
-
-function getProjectLimit(tier: number, additionalProjects: number = 0): number {
-  let baseLimit: number;
-  switch (tier) {
-    case 1: baseLimit = 2; break;  // Tier 1: 2 projects
-    case 2: baseLimit = 5; break;  // Tier 2: 5 projects
-    case 3: baseLimit = 9; break;  // Tier 3: 9 projects
-    case 4: return -1; // Tier 4: unlimited
-    default: baseLimit = 0; break; // No limit if no tier
-  }
-  return baseLimit + additionalProjects; // Add purchased projects to base limit
-}
-
 // Overtime calculation utility
 interface OvertimeBreakdown {
   regularHours: number;
@@ -212,55 +178,6 @@ async function calculateOvertimeHours(
   return result;
 }
 
-// Read-only mode enforcement middleware
-// Blocks all mutations for unverified company users
-// Residents are NEVER blocked
-export async function requireVerifiedCompanyForMutations(req: Request, res: Response, next: NextFunction) {
-  try {
-    // Fetch current user to check verification status
-    const user = await storage.getUserById(req.session.userId!);
-    
-    if (!user) {
-      return res.status(401).json({ message: "User not found" });
-    }
-    
-    // Residents are NEVER in read-only mode - they can always submit feedback
-    if (user.role === 'resident') {
-      return next();
-    }
-    
-    // Determine which company to check:
-    // - For company role: check their own license
-    // - For employees: check their parent company's license
-    let companyToCheck = user;
-    
-    if (user.role !== 'company' && user.companyId) {
-      // This is an employee - lookup the parent company
-      const parentCompany = await storage.getUserById(user.companyId);
-      if (!parentCompany) {
-        return res.status(500).json({ message: "Parent company not found" });
-      }
-      companyToCheck = parentCompany;
-    }
-    
-    // Block mutations if company is not verified
-    if (companyToCheck.licenseVerified !== true) {
-      const companyName = companyToCheck.companyName || 'Unknown Company';
-      const userRole = user.role === 'company' ? 'owner' : user.role;
-      console.log(`[Read-Only Mode] Blocked mutation from ${userRole} of unverified company:`, companyName);
-      return res.status(403).json({ 
-        message: "Read-only mode: Your company must verify its license to make changes",
-        readOnlyMode: true 
-      });
-    }
-    
-    next();
-  } catch (error) {
-    console.error('[Read-Only Mode] Error checking license status:', error);
-    return res.status(500).json({ message: "Internal server error" });
-  }
-}
-
 // Generate unique 10-character resident code using cryptographically secure randomness
 // Provides ~50 bits of entropy (32^10 ≈ 2^50) to resist brute-force attacks
 async function generateResidentCode(): Promise<string> {
@@ -290,108 +207,7 @@ async function generateResidentCode(): Promise<string> {
   throw new Error('Unable to generate unique resident code. Please try again.');
 }
 
-// License verification helper - re-verifies license keys with Overhaul Labs API
-// Returns: { success: boolean, valid: boolean | null, additionalSeats?: number, additionalProjects?: number, newLicenseKey?: string }
-// - success=false means API failure (keep existing licenseVerified state)
-// - success=true, valid=true/false means definitive response (update licenseVerified)
-// - newLicenseKey is returned when tier upgrade changes the license key (e.g., ABC123-1 → ABC123-2)
-async function reverifyLicenseKey(licenseKey: string, email: string): Promise<{ success: boolean; valid: boolean | null; additionalSeats?: number; additionalProjects?: number; newLicenseKey?: string }> {
-  try {
-    const externalApiUrl = 'https://ram-website-paquettetom.replit.app/api/verify-license';
-    const apiKey = process.env.PROVISIONING_API_KEY;
-    
-    if (!apiKey) {
-      console.error('[License Re-verification] PROVISIONING_API_KEY not found in environment');
-      return { success: false, valid: null }; // API configuration error - don't revoke access
-    }
-    
-    console.log('[License Re-verification] Calling external API:', externalApiUrl);
-    console.log('[License Re-verification] Request payload:', { licenseKey: licenseKey.substring(0, 5) + '...', email });
-    
-    const verificationResponse = await fetch(externalApiUrl, {
-      method: 'POST',
-      headers: { 
-        'Content-Type': 'application/json',
-        'x-api-key': apiKey,
-      },
-      body: JSON.stringify({ licenseKey, email })
-    });
-    
-    const responseText = await verificationResponse.text();
-    console.log('[License Re-verification] Response status:', verificationResponse.status);
-    console.log('[License Re-verification] Response body (raw):', responseText);
-    
-    // Try to parse as JSON
-    let verificationResult;
-    try {
-      verificationResult = JSON.parse(responseText);
-    } catch (parseError) {
-      console.error('[License Re-verification] Failed to parse response as JSON - API may be down');
-      console.warn('[License Re-verification] Keeping existing license status due to parse error');
-      return { success: false, valid: null }; // API failure - don't revoke access
-    }
-    
-    // Check if we got a definitive response
-    if (verificationResponse.ok && typeof verificationResult.valid === 'boolean') {
-      const isValid = verificationResult.valid;
-      const additionalSeats = verificationResult.additionalSeats ?? 0;
-      const additionalProjects = verificationResult.additionalProjects ?? 0;
-      const newLicenseKey = verificationResult.licenseKey || verificationResult.newLicenseKey; // Check both field names
-      
-      if (newLicenseKey && newLicenseKey !== licenseKey) {
-        console.log(`[License Re-verification] ⚠️  LICENSE KEY CHANGED: ${licenseKey.substring(0, 8)}... → ${newLicenseKey.substring(0, 8)}... (tier upgrade detected)`);
-      }
-      
-      console.log(`[License Re-verification] License is ${isValid ? 'valid' : 'invalid'}, additionalSeats: ${additionalSeats}, additionalProjects: ${additionalProjects}`);
-      return { success: true, valid: isValid, additionalSeats, additionalProjects, newLicenseKey };
-    } else {
-      // API returned error or unexpected format
-      console.warn('[License Re-verification] API returned non-OK status or unexpected format');
-      console.warn('[License Re-verification] Keeping existing license status due to API error');
-      return { success: false, valid: null }; // API failure - don't revoke access
-    }
-  } catch (error: any) {
-    console.error('[License Re-verification] Network error:', error.message);
-    console.warn('[License Re-verification] Keeping existing license status due to network error');
-    return { success: false, valid: null }; // Network failure - don't revoke access
-  }
-}
-
 export async function registerRoutes(app: Express): Promise<Server> {
-  // ==================== GLOBAL MUTATION GUARD ====================
-  // Automatically enforces read-only mode for unverified companies on all mutations
-  app.use((req: Request, res: Response, next: NextFunction) => {
-    const mutationMethods = ['POST', 'PUT', 'PATCH', 'DELETE'];
-    const whitelistedPaths = [
-      '/api/login', 
-      '/api/register', 
-      '/api/logout', 
-      '/api/verify-license',
-      '/api/provision-account', // Allow external provisioning
-      '/api/purchase/verify-account', // Allow external purchase system to verify accounts
-      '/api/purchase/update-tier', // CRITICAL: Allow tier upgrade webhook to prevent lockouts
-      '/api/purchase/update-seats', // Allow external purchase system to update seat limits
-      '/api/purchase/update-projects', // Allow external purchase system to update project limits
-      '/api/purchase/update-branding', // Allow external purchase system to update branding subscription
-      '/api/user-preferences', // Allow UI preferences even in read-only mode
-      '/api/company/branding', // Allow branding color updates even in read-only mode
-      '/api/company/branding/logo' // Allow logo uploads even in read-only mode
-    ];
-    
-    // Only check mutations
-    if (!mutationMethods.includes(req.method)) {
-      return next();
-    }
-    
-    // Skip whitelisted auth/license endpoints
-    if (whitelistedPaths.includes(req.path)) {
-      return next();
-    }
-    
-    // Apply read-only mode check for all other mutations
-    return requireVerifiedCompanyForMutations(req, res, next);
-  });
-  
   // ==================== AUTH ROUTES ====================
   
   // Provisioning endpoint for external sales platforms
