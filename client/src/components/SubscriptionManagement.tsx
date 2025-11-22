@@ -73,7 +73,6 @@ const TIER_INFO = {
       '10 team seats',
       'Advanced analytics',
       'Priority support',
-      'Branding add-on available',
     ]
   },
   premium: {
@@ -88,7 +87,6 @@ const TIER_INFO = {
       '18 team seats',
       'Premium analytics',
       'API access',
-      'White label branding included',
     ]
   },
   enterprise: {
@@ -103,7 +101,6 @@ const TIER_INFO = {
       'Unlimited team seats',
       'Enterprise analytics',
       'Dedicated support',
-      'White label branding included',
       'Custom integrations',
     ]
   }
