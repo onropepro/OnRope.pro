@@ -6,42 +6,13 @@ import { useToast } from "@/hooks/use-toast";
 import { TIER_CONFIG } from "@shared/stripe-config";
 
 export default function GetLicense() {
-  const [processingTier, setProcessingTier] = useState<string | null>(null);
+  const [selectedTier, setSelectedTier] = useState<string | null>(null);
   const { toast } = useToast();
 
   const handleSelectTier = async (tierName: keyof typeof TIER_CONFIG) => {
-    try {
-      setProcessingTier(tierName);
-      
-      // Create checkout session for new customer (always USD)
-      const response = await fetch('/api/stripe/create-license-checkout', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify({
-          tier: tierName,
-          currency: 'usd',
-        }),
-      });
-
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.message || 'Failed to create checkout session');
-      }
-
-      const { sessionUrl } = await response.json();
-      
-      // Redirect to Stripe Checkout
-      window.location.href = sessionUrl;
-    } catch (error: any) {
-      console.error('[GetLicense] Failed to start checkout:', error);
-      toast({
-        title: "Checkout Error",
-        description: error.message || "Failed to start checkout process. Please try again.",
-        variant: "destructive",
-      });
-      setProcessingTier(null);
-    }
+    // Save tier selection and redirect to registration
+    setSelectedTier(tierName);
+    window.location.href = `/register?tier=${tierName}`;
   };
 
   return (

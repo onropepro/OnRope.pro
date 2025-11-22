@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -7,8 +7,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage, FormDescription } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Badge } from "@/components/ui/badge";
 import { ArrowLeft } from "lucide-react";
 import { Link } from "wouter";
+import { TIER_CONFIG } from "@shared/stripe-config";
 
 const residentSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
@@ -35,7 +37,6 @@ const companySchema = z.object({
   province: z.string().min(1, "Province is required"),
   country: z.string().min(1, "Country is required"),
   zipCode: z.string().min(1, "Zip/postal code is required"),
-  licenseKey: z.string().optional(),
   password: z.string().min(6, "Password must be at least 6 characters"),
   confirmPassword: z.string().min(1, "Please confirm your password"),
 }).refine((data) => data.password === data.confirmPassword, {
@@ -48,6 +49,17 @@ type CompanyFormData = z.infer<typeof companySchema>;
 
 export default function Register() {
   const [activeTab, setActiveTab] = useState<"resident" | "company">("resident");
+  const [selectedTier, setSelectedTier] = useState<string | null>(null);
+
+  // Check for tier in URL params (coming from Get License page)
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const tier = params.get('tier');
+    if (tier && ['basic', 'starter', 'premium', 'enterprise'].includes(tier)) {
+      setSelectedTier(tier);
+      setActiveTab('company'); // Switch to company tab if tier is selected
+    }
+  }, []);
 
   const residentForm = useForm<ResidentFormData>({
     resolver: zodResolver(residentSchema),
