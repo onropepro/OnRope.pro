@@ -560,8 +560,9 @@ export function SubscriptionManagement() {
                     </div>
                   </div>
 
-                  <div className="text-xs text-muted-foreground pt-2 border-t">
-                    Your billing will be prorated automatically. Changes take effect immediately.
+                  <div className="text-xs text-muted-foreground pt-2 border-t space-y-1">
+                    <p><strong>Prorated Billing:</strong> You'll only be charged for the price difference, adjusted for the time remaining in your current billing period.</p>
+                    <p>Changes take effect immediately. Your next invoice will reflect the new pricing.</p>
                   </div>
                 </div>
               )}
