@@ -25,17 +25,16 @@ export const STRIPE_PRICE_IDS = {
   },
   
   // Add-ons - Same price, different currency
-  // NOTE: All add-ons must be RECURRING prices to work with subscription system
-  // Old one-time price IDs have been kept below but marked as DEPRECATED
+  // All add-ons are RECURRING to work with subscription system
   addons: {
     usd: {
-      extra_seats: 'price_1SW7VZBzDsOltscrbwWEthqa',     // DEPRECATED: was $19 one-time. NEED: $19/mo recurring - 2 seats
-      extra_project: 'price_1SW7VZBzDsOltscr2GWJYRai',   // DEPRECATED: was $49 one-time. NEED: $49/mo recurring - 1 project
+      extra_seats: 'price_1SWDH4BzDsOltscrMxt5u3ij',     // $19/mo recurring - 2 seats ✓
+      extra_project: 'price_1SWDH5BzDsOltscrmWT8Bfuw',   // $49/mo recurring - 1 project ✓
       white_label: 'price_1SWCTnBzDsOltscrD2qcZ47m',     // $49/mo recurring ✓
     },
     cad: {
-      extra_seats: 'price_1SW7VZBzDsOltscrv1ZoRlfG',     // DEPRECATED: was $19 CAD one-time. NEED: $19 CAD/mo recurring - 2 seats
-      extra_project: 'price_1SW7VaBzDsOltscrpZt2U150',   // DEPRECATED: was $49 CAD one-time. NEED: $49 CAD/mo recurring - 1 project
+      extra_seats: 'price_1SWDH5BzDsOltscrT9ip4d8u',     // $19 CAD/mo recurring - 2 seats ✓
+      extra_project: 'price_1SWDH5BzDsOltscrEyPZV89W',   // $49 CAD/mo recurring - 1 project ✓
       white_label: 'price_1SWCToBzDsOltscrRljmQTLz',     // $49 CAD/mo recurring ✓
     },
   },
