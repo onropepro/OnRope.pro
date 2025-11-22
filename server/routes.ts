@@ -2,7 +2,7 @@ import type { Express, Request, Response, NextFunction } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { db } from "./db";
-import { insertUserSchema, insertClientSchema, insertProjectSchema, insertDropLogSchema, insertComplaintSchema, insertComplaintNoteSchema, insertJobCommentSchema, insertHarnessInspectionSchema, insertToolboxMeetingSchema, insertFlhaFormSchema, insertPayPeriodConfigSchema, insertQuoteSchema, insertQuoteServiceSchema, insertGearItemSchema, insertGearAssignmentSchema, insertScheduledJobSchema, insertJobAssignmentSchema, normalizeStrataPlan, type InsertGearItem, type InsertGearAssignment, gearAssignments, jobAssignments, workSessions, nonBillableWorkSessions } from "@shared/schema";
+import { insertUserSchema, insertClientSchema, insertProjectSchema, insertDropLogSchema, insertComplaintSchema, insertComplaintNoteSchema, insertJobCommentSchema, insertHarnessInspectionSchema, insertToolboxMeetingSchema, insertFlhaFormSchema, insertPayPeriodConfigSchema, insertQuoteSchema, insertQuoteServiceSchema, insertGearItemSchema, insertGearAssignmentSchema, insertScheduledJobSchema, insertJobAssignmentSchema, normalizeStrataPlan, type InsertGearItem, type InsertGearAssignment, type Project, gearAssignments, jobAssignments, workSessions, nonBillableWorkSessions } from "@shared/schema";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
 import bcrypt from "bcrypt";
@@ -97,12 +97,17 @@ async function calculateOvertimeHours(
     endOfWeek.setDate(startOfWeek.getDate() + 6);
     endOfWeek.setHours(23, 59, 59, 999);
     
-    // Get all sessions for this week (excluding current session)
-    const weekSessions = await storage.getWorkSessionsByEmployee(
-      employeeId, 
-      startOfWeek.toISOString().split('T')[0], 
-      endOfWeek.toISOString().split('T')[0]
-    );
+    // Get all sessions for this employee across all projects (we'll filter by date manually)
+    // Note: getWorkSessionsByEmployee only takes employeeId and projectId
+    // For weekly overtime calc, we need all sessions regardless of project
+    const allSessions = await db.select().from(workSessions)
+      .where(eq(workSessions.employeeId, employeeId));
+    
+    // Filter sessions to this week's date range
+    const weekSessions = allSessions.filter(session => {
+      const sessionDate = new Date(session.workDate);
+      return sessionDate >= startOfWeek && sessionDate <= endOfWeek;
+    });
     
     // Calculate existing hours this week
     let existingHours = 0;
@@ -229,14 +234,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const validatedData = insertUserSchema.parse(userData);
       
       // Check if user already exists
-      if (validatedData.email) {
+      if (validatedData.email && typeof validatedData.email === 'string') {
         const existingUser = await storage.getUserByEmail(validatedData.email);
         if (existingUser) {
           return res.status(400).json({ message: "Email already registered" });
         }
       }
       
-      if (validatedData.companyName) {
+      if (validatedData.companyName && typeof validatedData.companyName === 'string') {
         const existingCompany = await storage.getUserByCompanyName(validatedData.companyName);
         if (existingCompany) {
           return res.status(400).json({ message: "Company name already taken" });
@@ -250,7 +255,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (user.role === 'company') {
         try {
           // Create default semi-monthly payroll config (1st and 15th)
-          await storage.setPayPeriodConfig({
+          await storage.createPayPeriodConfig({
             companyId: user.id,
             periodType: 'semi-monthly',
             firstPayDay: 1,
@@ -545,10 +550,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // Handle the event with database update callback
       await stripeService.handleWebhookEvent(event, async (params) => {
-        await storage.updateUser(params.userId, {
+        await storage.updateUser(params.userId.toString(), {
           stripeCustomerId: params.stripeCustomerId,
           stripeSubscriptionId: params.subscriptionId,
-          currentSubscriptionTier: params.tier,
+          subscriptionTier: params.tier,
           subscriptionStatus: params.status,
           subscriptionEndDate: params.currentPeriodEnd,
         });
@@ -2105,7 +2110,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         const endDate = new Date(project.endDate);
         
         // Create job title based on building name or strata plan number
-        const jobTitle = project.buildingName || `${normalizeStrataPlan(project.strataPlanNumber)} - ${project.jobType.replace(/_/g, ' ')}`;
+        const jobTitle = project.buildingName || (project.strataPlanNumber ? `${normalizeStrataPlan(project.strataPlanNumber)} - ${project.jobType.replace(/_/g, ' ')}` : project.jobType.replace(/_/g, ' '));
         
         const job = await storage.createScheduledJob({
           companyId,
@@ -2402,7 +2407,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       // Get all residents with matching strata plan number
-      const residents = await storage.getResidentsByStrataPlan(project.strataPlanNumber);
+      const residents = project.strataPlanNumber 
+        ? await storage.getResidentsByStrataPlan(project.strataPlanNumber)
+        : [];
       
       // Return residents without sensitive data
       const residentsData = residents.map(resident => ({
@@ -2637,8 +2644,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       let dropLog;
       if (existingLog) {
-        // Update existing log
-        dropLog = await storage.updateDropLog(existingLog.id, dropData.dropsCompleted);
+        // Update existing log with directional drops (method expects 5 args: id + 4 numbers)
+        dropLog = await storage.updateDropLog(
+          existingLog.id,
+          dropData.dropsCompletedNorth || 0,
+          dropData.dropsCompletedEast || 0,
+          dropData.dropsCompletedSouth || 0,
+          dropData.dropsCompletedWest || 0
+        );
       } else {
         // Create new log
         dropLog = await storage.createDropLog(dropData);
@@ -2689,7 +2702,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const today = new Date().toISOString().split('T')[0];
       const dropLogs = await storage.getDropLogsByUserAndDate(req.session.userId!, today);
       
-      const totalDropsToday = dropLogs.reduce((sum, log) => sum + log.dropsCompleted, 0);
+      // Sum up all directional drops
+      const totalDropsToday = dropLogs.reduce((sum, log) => {
+        return sum + (log.dropsCompletedNorth || 0) + (log.dropsCompletedEast || 0) + 
+               (log.dropsCompletedSouth || 0) + (log.dropsCompletedWest || 0);
+      }, 0);
       
       res.json({ 
         totalDropsToday,
@@ -2746,7 +2763,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         projectId,
         employeeId: currentUser.id,
         companyId: project.companyId,
-        workDate: now,
+        workDate: now.toISOString().split('T')[0], // Convert to date string
         startTime: now,
         startLatitude: startLatitude || null,
         startLongitude: startLongitude || null,
@@ -2796,8 +2813,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       const totalDropsCompleted = north + east + south + west;
       
-      // If drops < target, require shortfall reason
-      if (totalDropsCompleted < project.dailyDropTarget && (!shortfallReason || shortfallReason.trim() === '')) {
+      // If drops < target, require shortfall reason (only if dailyDropTarget is set)
+      if (project.dailyDropTarget && totalDropsCompleted < project.dailyDropTarget && (!shortfallReason || shortfallReason.trim() === '')) {
         return res.status(400).json({ message: "Shortfall reason is required when drops completed is less than the daily target" });
       }
       
@@ -2818,7 +2835,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         east,
         south,
         west,
-        totalDropsCompleted < project.dailyDropTarget ? shortfallReason : undefined,
+        (project.dailyDropTarget && totalDropsCompleted < project.dailyDropTarget) ? shortfallReason : undefined,
         endLatitude || null,
         endLongitude || null,
         overtimeBreakdown.regularHours,
@@ -3028,25 +3045,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
               "Client requested changes"
             ][Math.floor(Math.random() * 5)] : null;
             
-            // Insert directly into database
+            // Insert directly into database (id is auto-generated, don't specify it)
             await db.insert(workSessions).values({
-              id: crypto.randomUUID(),
               employeeId: tech.id,
               projectId: projectId,
+              companyId: project.companyId,
               workDate: workDate.toISOString().split('T')[0],
-              startTime: startTime.toISOString(),
-              endTime: endTime.toISOString(),
+              startTime: new Date(startTime),
+              endTime: new Date(endTime),
               dropsCompletedNorth: dropsNorth,
               dropsCompletedEast: dropsEast,
               dropsCompletedSouth: dropsSouth,
               dropsCompletedWest: dropsWest,
+              regularHours: workHours.toString(),
+              overtimeHours: '0',
+              doubleTimeHours: '0',
               shortfallReason: shortfallReason,
               startLatitude: null,
               startLongitude: null,
               endLatitude: null,
               endLongitude: null,
-              createdAt: new Date(),
-              updatedAt: new Date(),
             });
             
             generatedSessions.push({
@@ -4483,7 +4501,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         dropsCompletedEast: east,
         dropsCompletedSouth: south,
         dropsCompletedWest: west,
-        shortfallReason: totalDropsCompleted < project.dailyDropTarget ? shortfallReason : undefined,
+        shortfallReason: (project.dailyDropTarget && totalDropsCompleted < project.dailyDropTarget) ? shortfallReason : undefined,
         regularHours: overtimeBreakdown.regularHours.toString(),
         overtimeHours: overtimeBreakdown.overtimeHours.toString(),
         doubleTimeHours: overtimeBreakdown.doubleTimeHours.toString(),

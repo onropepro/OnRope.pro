@@ -19,7 +19,7 @@ import { STRIPE_PRICE_IDS, TIER_CONFIG, ADDON_CONFIG, type TierName, type AddonN
 
 // Initialize Stripe with latest API version
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: '2025-11-17.clover',
+  apiVersion: '2024-11-20.acacia',
 });
 
 /**
