@@ -8,6 +8,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 // Pages
 import Register from "@/pages/Register";
 import Login from "@/pages/Login";
+import GetLicense from "@/pages/GetLicense";
 import ResidentDashboard from "@/pages/ResidentDashboard";
 import Dashboard from "@/pages/Dashboard";
 import ComplaintDetail from "@/pages/ComplaintDetail";
@@ -41,6 +42,7 @@ function Router() {
       <Route path="/" component={Login} />
       <Route path="/register" component={Register} />
       <Route path="/login" component={Login} />
+      <Route path="/get-license" component={GetLicense} />
       <Route path="/link" component={ResidentLink} />
       <Route path="/superuser">
         <ProtectedRoute allowedRoles={["superuser"]}>

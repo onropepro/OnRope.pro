@@ -9,8 +9,14 @@ import bcrypt from "bcrypt";
 import multer from "multer";
 import { ObjectStorageService } from "./objectStorage";
 import * as stripeService from "./stripe-service";
+import Stripe from "stripe";
 import { type TierName, type Currency, TIER_CONFIG } from "../shared/stripe-config";
 import { checkSubscriptionLimits } from "./subscription-middleware";
+
+// Initialize Stripe for direct API calls
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
+  apiVersion: '2024-11-20.acacia' as any,
+});
 
 // Authentication middleware
 export function requireAuth(req: Request, res: Response, next: NextFunction) {
@@ -523,6 +529,68 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({ url: session.url });
     } catch (error: any) {
       console.error('[Stripe] Create checkout session error:', error);
+      res.status(500).json({ message: error.message || "Failed to create checkout session" });
+    }
+  });
+
+  /**
+   * Create Stripe checkout session for NEW customers (license purchase)
+   * POST /api/stripe/create-license-checkout
+   * No authentication required - this is for new customers
+   */
+  app.post("/api/stripe/create-license-checkout", async (req: Request, res: Response) => {
+    try {
+      const { tier, currency = 'usd' } = req.body;
+
+      if (!tier || !['basic', 'starter', 'premium', 'enterprise'].includes(tier)) {
+        return res.status(400).json({ message: "Invalid subscription tier" });
+      }
+
+      if (!['usd', 'cad'].includes(currency)) {
+        return res.status(400).json({ message: "Invalid currency. Must be 'usd' or 'cad'" });
+      }
+
+      // Get price ID for selected tier and currency
+      const tierConfig = TIER_CONFIG[tier as TierName];
+      const priceId = currency === 'usd' ? tierConfig.priceIdUSD : tierConfig.priceIdCAD;
+
+      const baseUrl = process.env.REPL_SLUG 
+        ? `https://${process.env.REPL_SLUG}.${process.env.REPL_OWNER}.repl.co` 
+        : 'http://localhost:5000';
+
+      // Create checkout session WITHOUT a customer (customer created during checkout)
+      const session = await stripe.checkout.sessions.create({
+        mode: 'subscription',
+        payment_method_types: ['card'],
+        line_items: [
+          {
+            price: priceId,
+            quantity: 1,
+          },
+        ],
+        success_url: `${baseUrl}/complete-registration?session_id={CHECKOUT_SESSION_ID}`,
+        cancel_url: `${baseUrl}/get-license?canceled=true`,
+        metadata: {
+          tier,
+          currency,
+          newCustomer: 'true', // Flag to indicate this is a new customer purchase
+        },
+        subscription_data: {
+          trial_period_days: 30, // 1-month free trial
+          metadata: {
+            tier,
+            currency,
+          },
+        },
+        allow_promotion_codes: true,
+        billing_address_collection: 'auto',
+        customer_creation: 'always', // Always create a new customer
+      });
+
+      console.log(`[Stripe] License checkout session created: ${session.id}`);
+      res.json({ sessionUrl: session.url });
+    } catch (error: any) {
+      console.error('[Stripe] Create license checkout error:', error);
       res.status(500).json({ message: error.message || "Failed to create checkout session" });
     }
   });
