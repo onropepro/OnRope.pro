@@ -8,7 +8,7 @@
  */
 
 export const STRIPE_PRICE_IDS = {
-  // Subscription Tiers (Recurring Monthly) - USD
+  // Subscription Tiers (Recurring Monthly) - Same price, different currency
   tiers: {
     usd: {
       basic: 'price_1SW7VXBzDsOltscr9WZ6NPBV',       // $79/mo - 2 projects, 4 seats
@@ -17,14 +17,14 @@ export const STRIPE_PRICE_IDS = {
       enterprise: 'price_1SW7VYBzDsOltscrIAUE5EyJ',  // $899/mo - Unlimited
     },
     cad: {
-      basic: 'price_1SW7VXBzDsOltscrExhtYscJ',       // $107 CAD/mo - 2 projects, 4 seats
-      starter: 'price_1SW7VXBzDsOltscr1kSadPRG',     // $404 CAD/mo - 5 projects, 10 seats
-      premium: 'price_1SW7VYBzDsOltscrnMVcmbVN',     // $674 CAD/mo - 9 projects, 18 seats
-      enterprise: 'price_1SW7VYBzDsOltscrzfWODg4L',  // $1214 CAD/mo - Unlimited
+      basic: 'price_1SW7VXBzDsOltscrExhtYscJ',       // $79 CAD/mo - 2 projects, 4 seats
+      starter: 'price_1SW7VXBzDsOltscr1kSadPRG',     // $299 CAD/mo - 5 projects, 10 seats
+      premium: 'price_1SW7VYBzDsOltscrnMVcmbVN',     // $499 CAD/mo - 9 projects, 18 seats
+      enterprise: 'price_1SW7VYBzDsOltscrzfWODg4L',  // $899 CAD/mo - Unlimited
     },
   },
   
-  // Add-ons - USD & CAD
+  // Add-ons - Same price, different currency
   addons: {
     usd: {
       extra_seats: 'price_1SW7VZBzDsOltscrbwWEthqa',     // $19 one-time - 2 seats
@@ -32,19 +32,19 @@ export const STRIPE_PRICE_IDS = {
       white_label: 'price_1SW7VaBzDsOltscr5DD1ciiO',     // $0.49/mo recurring
     },
     cad: {
-      extra_seats: 'price_1SW7VZBzDsOltscrv1ZoRlfG',     // $26 CAD one-time - 2 seats
-      extra_project: 'price_1SW7VaBzDsOltscrpZt2U150',   // $67 CAD one-time - 1 project
-      white_label: 'price_1SW7VaBzDsOltscrkWa2c0FQ',     // $0.67 CAD/mo recurring
+      extra_seats: 'price_1SW7VZBzDsOltscrv1ZoRlfG',     // $19 CAD one-time - 2 seats
+      extra_project: 'price_1SW7VaBzDsOltscrpZt2U150',   // $49 CAD one-time - 1 project
+      white_label: 'price_1SW7VaBzDsOltscrkWa2c0FQ',     // $0.49 CAD/mo recurring
     },
   },
 } as const;
 
-// Tier configuration with limits and pricing in both currencies
+// Tier configuration with limits and pricing (same price for both currencies)
 export const TIER_CONFIG = {
   basic: {
     name: 'Basic',
     priceUSD: 79,
-    priceCAD: 107,
+    priceCAD: 79,  // Same price, Stripe handles currency
     maxProjects: 2,
     maxSeats: 4,
     priceIdUSD: STRIPE_PRICE_IDS.tiers.usd.basic,
@@ -53,7 +53,7 @@ export const TIER_CONFIG = {
   starter: {
     name: 'Starter',
     priceUSD: 299,
-    priceCAD: 404,
+    priceCAD: 299,  // Same price, Stripe handles currency
     maxProjects: 5,
     maxSeats: 10,
     priceIdUSD: STRIPE_PRICE_IDS.tiers.usd.starter,
@@ -62,7 +62,7 @@ export const TIER_CONFIG = {
   premium: {
     name: 'Premium',
     priceUSD: 499,
-    priceCAD: 674,
+    priceCAD: 499,  // Same price, Stripe handles currency
     maxProjects: 9,
     maxSeats: 18,
     priceIdUSD: STRIPE_PRICE_IDS.tiers.usd.premium,
@@ -71,7 +71,7 @@ export const TIER_CONFIG = {
   enterprise: {
     name: 'Enterprise',
     priceUSD: 899,
-    priceCAD: 1214,
+    priceCAD: 899,  // Same price, Stripe handles currency
     maxProjects: -1, // unlimited
     maxSeats: -1,    // unlimited
     priceIdUSD: STRIPE_PRICE_IDS.tiers.usd.enterprise,
@@ -79,12 +79,12 @@ export const TIER_CONFIG = {
   },
 } as const;
 
-// Add-on configuration with pricing in both currencies
+// Add-on configuration with pricing (same price for both currencies)
 export const ADDON_CONFIG = {
   extra_seats: {
     name: 'Extra Seats (2)',
     priceUSD: 19,
-    priceCAD: 26,
+    priceCAD: 19,  // Same price, Stripe handles currency
     seats: 2,
     priceIdUSD: STRIPE_PRICE_IDS.addons.usd.extra_seats,
     priceIdCAD: STRIPE_PRICE_IDS.addons.cad.extra_seats,
@@ -93,7 +93,7 @@ export const ADDON_CONFIG = {
   extra_project: {
     name: 'Extra Project',
     priceUSD: 49,
-    priceCAD: 67,
+    priceCAD: 49,  // Same price, Stripe handles currency
     projects: 1,
     priceIdUSD: STRIPE_PRICE_IDS.addons.usd.extra_project,
     priceIdCAD: STRIPE_PRICE_IDS.addons.cad.extra_project,
@@ -102,7 +102,7 @@ export const ADDON_CONFIG = {
   white_label: {
     name: 'White Label Branding',
     priceUSD: 0.49,
-    priceCAD: 0.67,
+    priceCAD: 0.49,  // Same price, Stripe handles currency
     priceIdUSD: STRIPE_PRICE_IDS.addons.usd.white_label,
     priceIdCAD: STRIPE_PRICE_IDS.addons.cad.white_label,
     type: 'recurring' as const,
