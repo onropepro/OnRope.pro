@@ -6,8 +6,8 @@ export interface User {
   permissions?: string[];
   viewFinancialData?: boolean;
   companyId?: string;
-  licenseVerified?: boolean;
-  companyLicenseVerified?: boolean; // For employees: parent company's verification status
+  subscriptionStatus?: string; // For company role: Stripe subscription status
+  companySubscriptionStatus?: string; // For employees: parent company's subscription status
 }
 
 // Management roles that have elevated privileges
@@ -97,8 +97,8 @@ export function hasPermission(user: User | null | undefined, permission: string)
 }
 
 // Check if user is in read-only mode
-// - For company role: check their own license verification
-// - For employees: check their parent company's license verification
+// - For company role: check their Stripe subscription status
+// - For employees: check their parent company's subscription status
 // - Residents are NEVER in read-only mode
 export function isReadOnly(user: User | null | undefined): boolean {
   if (!user) return false;
@@ -108,12 +108,16 @@ export function isReadOnly(user: User | null | undefined): boolean {
     return false;
   }
   
-  // For company role: check their own license
+  // For company role: check their Stripe subscription status
   if (user.role === 'company') {
-    return user.licenseVerified !== true;
+    // Allow full access if subscription is active or trialing
+    // If no subscription data exists, assume legacy user with full access
+    if (!user.subscriptionStatus) return false;
+    return !['active', 'trialing'].includes(user.subscriptionStatus);
   }
   
-  // For employees: check parent company's license
-  // If companyLicenseVerified is undefined, assume verified (no restriction)
-  return user.companyLicenseVerified === false;
+  // For employees: check parent company's subscription status
+  // If companySubscriptionStatus is undefined, assume full access
+  if (!user.companySubscriptionStatus) return false;
+  return !['active', 'trialing'].includes(user.companySubscriptionStatus);
 }
