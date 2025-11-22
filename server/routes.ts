@@ -650,7 +650,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // Check if user is already on this tier
-      if (user.tier === tier) {
+      if (user.subscriptionTier === tier) {
         return res.status(400).json({ message: "You are already on this tier" });
       }
 
@@ -674,7 +674,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const tierConfig = TIER_CONFIG[tier as TierName];
       const newPriceId = currency === 'usd' ? tierConfig.priceIdUSD : tierConfig.priceIdCAD;
 
-      console.log(`[Stripe] Upgrading subscription ${user.stripeSubscriptionId} from ${user.tier} to ${tier}`);
+      console.log(`[Stripe] Upgrading subscription ${user.stripeSubscriptionId} from ${user.subscriptionTier} to ${tier}`);
 
       // Update subscription with proration
       const updatedSubscription = await stripe.subscriptions.update(user.stripeSubscriptionId, {

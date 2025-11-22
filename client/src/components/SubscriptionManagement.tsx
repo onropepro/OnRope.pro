@@ -113,6 +113,8 @@ export function SubscriptionManagement() {
   const [selectedTier, setSelectedTier] = useState<TierName | null>(null);
   const [selectedCurrency, setSelectedCurrency] = useState<Currency>('usd');
   const [showCancelDialog, setShowCancelDialog] = useState(false);
+  const [showUpgradeDialog, setShowUpgradeDialog] = useState(false);
+  const [pendingUpgradeTier, setPendingUpgradeTier] = useState<TierName | null>(null);
 
   // Fetch current subscription status
   const { data: subStatus, isLoading } = useQuery<SubscriptionStatus>({
@@ -193,12 +195,16 @@ export function SubscriptionManagement() {
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['/api/stripe/subscription-status'] });
       queryClient.invalidateQueries({ queryKey: ['/api/user'] });
+      setShowUpgradeDialog(false);
+      setPendingUpgradeTier(null);
       toast({
         title: "Subscription Updated!",
         description: `Your subscription has been upgraded to ${data.newTier}. Changes are effective immediately.`,
       });
     },
     onError: (error: any) => {
+      setShowUpgradeDialog(false);
+      setPendingUpgradeTier(null);
       toast({
         title: "Upgrade Failed",
         description: error.message || "Failed to upgrade subscription",
@@ -209,13 +215,20 @@ export function SubscriptionManagement() {
 
   const handleUpgrade = (tier: TierName) => {
     setSelectedTier(tier);
+    setPendingUpgradeTier(tier);
     
-    // If user has active subscription, use prorated upgrade endpoint
+    // If user has active subscription, show confirmation dialog for upgrade/downgrade
     if (subStatus?.hasActiveSubscription) {
-      upgradeMutation.mutate(tier);
+      setShowUpgradeDialog(true);
     } else {
-      // For new subscriptions, use checkout flow
+      // For new subscriptions, use checkout flow (Stripe handles confirmation)
       createCheckoutMutation.mutate({ tier, currency: selectedCurrency });
+    }
+  };
+
+  const confirmUpgrade = () => {
+    if (pendingUpgradeTier) {
+      upgradeMutation.mutate(pendingUpgradeTier);
     }
   };
 
@@ -471,6 +484,50 @@ export function SubscriptionManagement() {
               data-testid="button-confirm-cancel"
             >
               {cancelMutation.isPending ? 'Canceling...' : 'Confirm Cancellation'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Upgrade Confirmation Dialog */}
+      <Dialog open={showUpgradeDialog} onOpenChange={setShowUpgradeDialog}>
+        <DialogContent data-testid="dialog-upgrade-subscription">
+          <DialogHeader>
+            <DialogTitle>
+              {pendingUpgradeTier && subStatus?.currentTier && 
+                TIER_INFO[pendingUpgradeTier].price[selectedCurrency] > TIER_INFO[subStatus.currentTier].price[selectedCurrency]
+                ? 'Upgrade Subscription'
+                : 'Change Subscription'
+              }
+            </DialogTitle>
+            <DialogDescription>
+              {pendingUpgradeTier && subStatus?.currentTier && (
+                <>
+                  You're about to change your plan from <strong>{TIER_INFO[subStatus.currentTier]?.name}</strong> to <strong>{TIER_INFO[pendingUpgradeTier]?.name}</strong>.
+                  <br /><br />
+                  Your billing will be prorated automatically, and changes will take effect immediately.
+                </>
+              )}
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="gap-2">
+            <Button
+              variant="outline"
+              onClick={() => {
+                setShowUpgradeDialog(false);
+                setPendingUpgradeTier(null);
+              }}
+              data-testid="button-upgrade-dialog-cancel"
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="default"
+              onClick={confirmUpgrade}
+              disabled={upgradeMutation.isPending}
+              data-testid="button-confirm-upgrade"
+            >
+              {upgradeMutation.isPending ? 'Processing...' : 'Confirm Change'}
             </Button>
           </DialogFooter>
         </DialogContent>
