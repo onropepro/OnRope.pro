@@ -660,13 +660,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const tierConfig = TIER_CONFIG[tier as TierName];
       const priceId = currency === 'usd' ? tierConfig.priceIdUSD : tierConfig.priceIdCAD;
 
+      // Construct base URL from request (works in both dev and production)
+      const protocol = req.get('x-forwarded-proto') || req.protocol || 'https';
+      const host = req.get('host');
+      const baseUrl = `${protocol}://${host}`;
+
       // Create checkout session
       const session = await stripeService.createCheckoutSession({
         customerId,
         priceId,
         mode: 'subscription',
-        successUrl: `${process.env.REPLIT_DEV_DOMAIN ? `https://${process.env.REPLIT_DEV_DOMAIN}` : process.env.REPL_SLUG ? `https://${process.env.REPL_SLUG}.${process.env.REPL_OWNER}.repl.co` : 'http://localhost:5000'}/profile?subscription=success`,
-        cancelUrl: `${process.env.REPLIT_DEV_DOMAIN ? `https://${process.env.REPLIT_DEV_DOMAIN}` : process.env.REPL_SLUG ? `https://${process.env.REPL_SLUG}.${process.env.REPL_OWNER}.repl.co` : 'http://localhost:5000'}/profile?subscription=canceled`,
+        successUrl: `${baseUrl}/profile?subscription=success`,
+        cancelUrl: `${baseUrl}/profile?subscription=canceled`,
         metadata: {
           userId: user.id.toString(),
           tier,
@@ -703,12 +708,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const tierConfig = TIER_CONFIG[tier as TierName];
       const priceId = currency === 'usd' ? tierConfig.priceIdUSD : tierConfig.priceIdCAD;
 
-      // Use REPLIT_DEV_DOMAIN for development, fallback to production URL construction
-      const baseUrl = process.env.REPLIT_DEV_DOMAIN 
-        ? `https://${process.env.REPLIT_DEV_DOMAIN}` 
-        : process.env.REPL_SLUG 
-          ? `https://${process.env.REPL_SLUG}.${process.env.REPL_OWNER}.repl.co` 
-          : 'http://localhost:5000';
+      // Construct base URL from request (works in both dev and production)
+      const protocol = req.get('x-forwarded-proto') || req.protocol || 'https';
+      const host = req.get('host');
+      const baseUrl = `${protocol}://${host}`;
 
       // Create checkout session (customer created automatically for subscription mode)
       const session = await stripe.checkout.sessions.create({
