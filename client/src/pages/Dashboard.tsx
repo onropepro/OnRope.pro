@@ -2295,34 +2295,19 @@ export default function Dashboard() {
 
                         {projectForm.watch("jobType") === "in_suite_dryer_vent_cleaning" && (
                           <>
-                            <div className="grid grid-cols-2 gap-4">
-                              <FormField
-                                control={projectForm.control}
-                                name="suitesPerDay"
-                                render={({ field }) => (
-                                  <FormItem>
-                                    <FormLabel>Suites per Day</FormLabel>
-                                    <FormControl>
-                                      <Input type="number" min="0" placeholder="e.g., 10" {...field} data-testid="input-suites-per-day" className="h-12" />
-                                    </FormControl>
-                                    <FormMessage />
-                                  </FormItem>
-                                )}
-                              />
-                              <FormField
-                                control={projectForm.control}
-                                name="floorsPerDay"
-                                render={({ field }) => (
-                                  <FormItem>
-                                    <FormLabel>Floors per Day (alt.)</FormLabel>
-                                    <FormControl>
-                                      <Input type="number" min="0" placeholder="e.g., 5" {...field} data-testid="input-floors-per-day" className="h-12" />
-                                    </FormControl>
-                                    <FormMessage />
-                                  </FormItem>
-                                )}
-                              />
-                            </div>
+                            <FormField
+                              control={projectForm.control}
+                              name="suitesPerDay"
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel>Suites per Day</FormLabel>
+                                  <FormControl>
+                                    <Input type="number" min="0" placeholder="e.g., 10" {...field} data-testid="input-suites-per-day" className="h-12" />
+                                  </FormControl>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
                             <FormField
                               control={projectForm.control}
                               name="buildingFloors"
