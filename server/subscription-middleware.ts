@@ -19,7 +19,7 @@ import { TIER_CONFIG, type TierName } from '../shared/stripe-config';
  * Check if user has exceeded their subscription limits
  * Returns { exceeded: boolean, limits: object, usage: object }
  */
-export async function checkSubscriptionLimits(userId: number): Promise<{
+export async function checkSubscriptionLimits(userId: string): Promise<{
   exceeded: boolean;
   limits: {
     maxProjects: number;
@@ -44,7 +44,7 @@ export async function checkSubscriptionLimits(userId: number): Promise<{
     }
 
     // Determine tier limits
-    const tier = user.currentSubscriptionTier as TierName | null;
+    const tier = user.subscriptionTier as TierName | null;
     let maxProjects = 0;
     let maxSeats = 0;
 
@@ -82,9 +82,9 @@ export async function checkSubscriptionLimits(userId: number): Promise<{
       maxSeats = 2; // Allow at least 2 seats (owner + 1)
     }
 
-    // Count current usage
-    const employees = await storage.getEmployees(user.id);
-    const projects = await storage.getProjects(user.id);
+    // Count current usage (multi-tenant safe)
+    const employees = await storage.getAllEmployees(user.id);
+    const projects = await storage.getProjectsByCompany(user.id);
 
     const currentEmployees = employees.length;
     const currentProjects = projects.length;
@@ -211,7 +211,7 @@ export async function requireActiveSubscription(req: Request, res: Response, nex
     }
 
     // Check if subscription is active or in grace period
-    const tier = user.currentSubscriptionTier;
+    const tier = user.subscriptionTier;
     const status = user.subscriptionStatus;
 
     // Active subscription

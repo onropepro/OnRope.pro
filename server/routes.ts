@@ -10,6 +10,7 @@ import multer from "multer";
 import { ObjectStorageService } from "./objectStorage";
 import * as stripeService from "./stripe-service";
 import { type TierName, type Currency, TIER_CONFIG } from "../shared/stripe-config";
+import { checkSubscriptionLimits } from "./subscription-middleware";
 
 // Authentication middleware
 export function requireAuth(req: Request, res: Response, next: NextFunction) {
@@ -97,7 +98,7 @@ async function calculateOvertimeHours(
     endOfWeek.setHours(23, 59, 59, 999);
     
     // Get all sessions for this week (excluding current session)
-    const weekSessions = await storage.getWorkSessionsByEmployeeDateRange(
+    const weekSessions = await storage.getWorkSessionsByEmployee(
       employeeId, 
       startOfWeek.toISOString().split('T')[0], 
       endOfWeek.toISOString().split('T')[0]
@@ -249,7 +250,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (user.role === 'company') {
         try {
           // Create default semi-monthly payroll config (1st and 15th)
-          await storage.savePayPeriodConfig({
+          await storage.setPayPeriodConfig({
             companyId: user.id,
             periodType: 'semi-monthly',
             firstPayDay: 1,
@@ -380,7 +381,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
       
       // Return user without sensitive fields (passwordHash and licenseKey)
-      const { passwordHash, licenseKey, ...userWithoutSensitiveData } = user;
+      const { passwordHash,  ...userWithoutSensitiveData } = user;
       res.json({ user: userWithoutSensitiveData });
     } catch (error) {
       console.error("Login error:", error);
@@ -454,132 +455,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
-  // Manual license verification endpoint
-  app.post("/api/verify-license", requireAuth, async (req: Request, res: Response) => {
-    try {
-      const { licenseKey, bypass } = req.body;
-      
-      // BYPASS MODE (for development/testing)
-      if (bypass === true) {
-        console.log('[License Verification] BYPASS activated - setting license as verified without API call');
-        await storage.updateUser(req.session.userId!, { 
-          licenseKey: 'BYPASSED',
-          licenseVerified: true 
-        });
-        return res.json({
-          success: true,
-          message: "License verification bypassed (development mode)"
-        });
-      }
-      
-      if (!licenseKey) {
-        return res.status(400).json({ 
-          success: false, 
-          message: "License key is required" 
-        });
-      }
-      
-      // New RAM website API URL
-      const externalApiUrl = 'https://ram-website-paquettetom.replit.app/api/verify-license';
-      const apiKey = process.env.LICENSE_VERIFICATION_API_KEY;
-      
-      if (!apiKey) {
-        console.error('[License Verification] LICENSE_VERIFICATION_API_KEY not found in environment');
-        return res.status(500).json({
-          success: false,
-          message: "License verification service configuration error"
-        });
-      }
-      
-      console.log('[License Verification] Calling external API:', externalApiUrl);
-      console.log('[License Verification] Request payload:', { licenseKey: licenseKey.substring(0, 5) + '...' });
-      
-      // Get current user's email for verification
-      const currentUser = await storage.getUserById(req.session.userId!);
-      if (!currentUser || !currentUser.email) {
-        return res.status(400).json({
-          success: false,
-          message: "User email is required for license verification"
-        });
-      }
-      
-      // Call new RAM website API to verify license
-      const verificationResponse = await fetch(externalApiUrl, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-api-key': apiKey,
-        },
-        body: JSON.stringify({ 
-          licenseKey,
-          email: currentUser.email 
-        })
-      });
-      
-      const responseText = await verificationResponse.text();
-      console.log('[License Verification] Response status:', verificationResponse.status);
-      console.log('[License Verification] Response body (raw):', responseText);
-      
-      let verificationResult;
-      try {
-        verificationResult = JSON.parse(responseText);
-      } catch (parseError) {
-        console.error('[License Verification] Failed to parse response as JSON:', parseError);
-        return res.status(502).json({
-          success: false,
-          message: "License verification service is temporarily unavailable"
-        });
-      }
-      
-      console.log('[License Verification] Parsed result:', verificationResult);
-      
-      if (verificationResponse.ok && verificationResult.valid === true) {
-        // License is valid - save to database INCLUDING additionalSeats and additionalProjects
-        const newLicenseKey = verificationResult.licenseKey || verificationResult.newLicenseKey || licenseKey;
-        const updateData: any = { 
-          licenseKey: newLicenseKey,
-          licenseVerified: true 
-        };
-        
-        // If marketplace returned a different license key (tier upgrade), log it
-        if (newLicenseKey !== licenseKey) {
-          console.log(`[License Verification] 🔄 LICENSE KEY UPDATED after tier upgrade: ${licenseKey} → ${newLicenseKey}`);
-        }
-        
-        // Save additionalSeats and additionalProjects from marketplace
-        if (verificationResult.additionalSeats !== undefined) {
-          updateData.additionalSeats = verificationResult.additionalSeats;
-          console.log('[License Verification] Updating additionalSeats to:', verificationResult.additionalSeats);
-        }
-        if (verificationResult.additionalProjects !== undefined) {
-          updateData.additionalProjects = verificationResult.additionalProjects;
-          console.log('[License Verification] Updating additionalProjects to:', verificationResult.additionalProjects);
-        }
-        
-        await storage.updateUser(req.session.userId!, updateData);
-        
-        return res.json({
-          success: true,
-          message: verificationResult.message || "License verified successfully",
-          additionalSeats: verificationResult.additionalSeats,
-          additionalProjects: verificationResult.additionalProjects,
-          licenseKey: newLicenseKey // Return the (possibly updated) license key
-        });
-      } else {
-        // License is invalid
-        return res.status(400).json({
-          success: false,
-          message: verificationResult.message || "Invalid license key"
-        });
-      }
-    } catch (error: any) {
-      console.error('[License Verification] Error:', error);
-      return res.status(500).json({
-        success: false,
-        message: "An error occurred during verification"
-      });
-    }
-  });
+  // OLD LICENSE VERIFICATION ENDPOINT REMOVED - Now using Stripe subscriptions
+  // See /api/stripe/* endpoints for subscription management
   
   // =====================================================================
   // STRIPE SUBSCRIPTION MANAGEMENT ENDPOINTS
@@ -670,7 +547,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       await stripeService.handleWebhookEvent(event, async (params) => {
         await storage.updateUser(params.userId, {
           stripeCustomerId: params.stripeCustomerId,
-          currentSubscriptionId: params.subscriptionId,
+          stripeSubscriptionId: params.subscriptionId,
           currentSubscriptionTier: params.tier,
           subscriptionStatus: params.status,
           subscriptionEndDate: params.currentPeriodEnd,
@@ -731,12 +608,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(403).json({ message: "Only company accounts can manage subscriptions" });
       }
 
-      if (!user.currentSubscriptionId) {
+      if (!user.stripeSubscriptionId) {
         return res.status(400).json({ message: "No active subscription to cancel" });
       }
 
       // Cancel subscription at period end
-      await stripeService.cancelSubscription(user.currentSubscriptionId);
+      await stripeService.cancelSubscription(user.stripeSubscriptionId);
 
       console.log(`[Stripe] Subscription canceled for user ${user.id}`);
       res.json({ 
@@ -764,12 +641,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(403).json({ message: "Only company accounts can manage subscriptions" });
       }
 
-      if (!user.currentSubscriptionId) {
+      if (!user.stripeSubscriptionId) {
         return res.status(400).json({ message: "No subscription to reactivate" });
       }
 
       // Reactivate subscription
-      await stripeService.reactivateSubscription(user.currentSubscriptionId);
+      await stripeService.reactivateSubscription(user.stripeSubscriptionId);
 
       console.log(`[Stripe] Subscription reactivated for user ${user.id}`);
       res.json({ 
@@ -917,7 +794,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Return companies without sensitive password hashes
       const companiesWithoutPasswords = companies.map(company => {
-        const { passwordHash, licenseKey, ...companyData } = company;
+        const { passwordHash,  ...companyData } = company;
         return companyData;
       });
 
@@ -943,7 +820,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // Return company without sensitive password hash
-      const { passwordHash, licenseKey, ...companyData } = company;
+      const { passwordHash,  ...companyData } = company;
       res.json({ company: companyData });
     } catch (error) {
       console.error("Get company error:", error);
@@ -969,16 +846,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Get all employees for this company (including terminated)
       const employees = await storage.getAllEmployees(companyId);
       
-      // Calculate seat usage for tier-based limits
-      // Count only actual employees (not company owner, not terminated)
+      // Calculate seat usage using new subscription system
+      const limitsCheck = await checkSubscriptionLimits(companyId);
       const activeEmployeeCount = employees.filter(emp => !emp.terminatedDate).length;
-      const tier = detectTier(company.licenseKey);
-      const additionalSeats = company.additionalSeats || 0;
-      const baseSeatLimit = getSeatLimit(tier, 0); // Get base limit without additions
-      const seatLimit = getSeatLimit(tier, additionalSeats); // Total limit with additions
-      const seatsUsed = activeEmployeeCount;
-      const seatsAvailable = seatLimit === -1 ? -1 : Math.max(0, seatLimit - seatsUsed);
-      const atSeatLimit = seatLimit > 0 && seatsUsed >= seatLimit;
+      const tier = company.subscriptionTier || 'none';
+      const additionalSeats = company.additionalSeatsCountCount || 0;
+      const baseSeatLimit = limitsCheck.limits.maxSeats - additionalSeats;
+      const seatLimit = limitsCheck.limits.maxSeats;
       
       res.json({ 
         seatInfo: {
@@ -986,9 +860,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
           seatLimit,
           baseSeatLimit,
           additionalSeats,
-          seatsUsed,
-          seatsAvailable,
-          atSeatLimit
+          seatsUsed: activeEmployeeCount,
+          seatsAvailable: seatLimit === -1 ? -1 : Math.max(0, seatLimit - activeEmployeeCount),
+          atSeatLimit: seatLimit > 0 && activeEmployeeCount >= seatLimit
         }
       });
     } catch (error) {
@@ -1397,16 +1271,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return empWithoutPassword;
       });
       
-      // Calculate seat usage for tier-based limits
-      // Count only actual employees (not company owner, not terminated)
+      // Calculate seat usage using new subscription system
       const activeEmployeeCount = employees.filter(emp => !emp.terminatedDate).length;
-      const tier = detectTier(companyOwner.licenseKey);
-      const additionalSeats = companyOwner.additionalSeats || 0;
-      const baseSeatLimit = getSeatLimit(tier, 0); // Get base limit without additions
-      const seatLimit = getSeatLimit(tier, additionalSeats); // Total limit with additions
-      const seatsUsed = activeEmployeeCount;
-      const seatsAvailable = seatLimit === -1 ? -1 : Math.max(0, seatLimit - seatsUsed);
-      const atSeatLimit = seatLimit > 0 && seatsUsed >= seatLimit;
+      const limitsCheck = await checkSubscriptionLimits(currentUser.id);
+      const tier = companyOwner.subscriptionTier || 'none';
+      const additionalSeats = companyOwner.additionalSeatsCount || 0;
+      const seatLimit = limitsCheck.limits.maxSeats;
+      const baseSeatLimit = seatLimit - additionalSeats;
       
       res.json({ 
         employees: employeesWithoutPasswords,
@@ -1415,9 +1286,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
           seatLimit,
           baseSeatLimit,
           additionalSeats,
-          seatsUsed,
-          seatsAvailable,
-          atSeatLimit
+          seatsUsed: activeEmployeeCount,
+          seatsAvailable: seatLimit === -1 ? -1 : Math.max(0, seatLimit - activeEmployeeCount),
+          atSeatLimit: seatLimit > 0 && activeEmployeeCount >= seatLimit
         }
       });
     } catch (error) {
@@ -1459,16 +1330,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
           return empWithoutPassword;
         });
       
-      // Calculate seat usage for tier-based limits
-      // Count only actual employees (not company owner)
+      // Calculate seat usage using new subscription system
       const employeeCount = employees.filter(emp => !emp.terminatedDate).length;
-      const tier = detectTier(companyOwner?.licenseKey || null);
-      const additionalSeats = companyOwner?.additionalSeats || 0;
-      const baseSeatLimit = getSeatLimit(tier, 0); // Get base limit without additions
-      const seatLimit = getSeatLimit(tier, additionalSeats); // Total limit with additions
-      const seatsUsed = employeeCount;
-      const seatsAvailable = seatLimit === -1 ? -1 : Math.max(0, seatLimit - seatsUsed);
-      const atSeatLimit = seatLimit > 0 && seatsUsed >= seatLimit;
+      const limitsCheck = await checkSubscriptionLimits(companyId);
+      const tier = companyOwner?.subscriptionTier || 'none';
+      const additionalSeats = companyOwner?.additionalSeatsCount || 0;
+      const seatLimit = limitsCheck.limits.maxSeats;
+      const baseSeatLimit = seatLimit - additionalSeats;
       
       res.json({ 
         employees: activeEmployees,
@@ -1477,9 +1345,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
           seatLimit,
           baseSeatLimit,
           additionalSeats,
-          seatsUsed,
-          seatsAvailable,
-          atSeatLimit
+          seatsUsed: employeeCount,
+          seatsAvailable: seatLimit === -1 ? -1 : Math.max(0, seatLimit - employeeCount),
+          atSeatLimit: seatLimit > 0 && employeeCount >= seatLimit
         }
       });
     } catch (error) {
@@ -2395,13 +2263,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
         })
       );
       
-      // Calculate project usage for tier-based limits (company users only)
+      // Calculate project usage using new subscription system (company users only)
       let projectInfo = null;
       if (currentUser.role === "company") {
-        const tier = detectTier(currentUser.licenseKey);
-        const additionalProjects = currentUser.additionalProjects || 0;
-        const baseProjectLimit = getProjectLimit(tier, 0); // Get base limit without additions
-        const projectLimit = getProjectLimit(tier, additionalProjects); // Total limit with additions
+        const limitsCheck = await checkSubscriptionLimits(currentUser.id);
+        const tier = currentUser.subscriptionTier || 'none';
+        const additionalProjects = currentUser.additionalProjectsCount || 0;
+        const projectLimit = limitsCheck.limits.maxProjects;
+        const baseProjectLimit = projectLimit - additionalProjects;
         // Only count non-completed projects toward the limit
         const projectsUsed = projectsWithProgress.filter(p => p.status !== "completed").length;
         const projectsAvailable = projectLimit === -1 ? -1 : Math.max(0, projectLimit - projectsUsed);
@@ -3096,7 +2965,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       // Get employees for this company
-      const employees = await storage.getEmployeesByCompany(currentUser.id);
+      const employees = await storage.getAllEmployees(currentUser.id);
       const techs = employees.filter(e => e.role === 'rope_access_tech' && !e.terminatedDate);
       
       if (techs.length === 0) {
@@ -3453,7 +3322,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
         // For residents without projectId, find company from their strataPlanNumber
         else if (currentUser?.role === "resident" && currentUser.strataPlanNumber) {
-          const projects = await storage.getProjectsByStrataPlan(currentUser.strataPlanNumber);
+          const projects = await storage.getAllProjectsByStrataPlan(currentUser.strataPlanNumber);
           if (projects.length > 0) {
             companyId = projects[0].companyId;
           } else {
