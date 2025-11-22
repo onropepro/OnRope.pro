@@ -480,15 +480,27 @@ export default function Login() {
               </div>
             </div>
 
-            <Button 
-              variant="outline" 
-              className="w-full h-12 text-base font-medium" 
-              onClick={() => window.location.href = "/register"}
-              data-testid="link-register"
-            >
-              <span className="material-icons mr-2">person_add</span>
-              Create Company or Resident/Owner Account
-            </Button>
+            <div className="space-y-3">
+              <Button 
+                variant="default" 
+                className="w-full h-12 text-base font-medium" 
+                onClick={() => window.location.href = "/get-license"}
+                data-testid="button-get-license"
+              >
+                <span className="material-icons mr-2">shopping_cart</span>
+                Get License
+              </Button>
+
+              <Button 
+                variant="outline" 
+                className="w-full h-12 text-base font-medium" 
+                onClick={() => window.location.href = "/register"}
+                data-testid="link-register"
+              >
+                <span className="material-icons mr-2">person_add</span>
+                Create Account (Already Have License)
+              </Button>
+            </div>
 
             {/* Mobile-only feature highlights */}
             <div className="md:hidden pt-4 space-y-4 border-t">
