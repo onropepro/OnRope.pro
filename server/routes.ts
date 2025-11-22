@@ -210,16 +210,12 @@ async function generateResidentCode(): Promise<string> {
 export async function registerRoutes(app: Express): Promise<Server> {
   // ==================== AUTH ROUTES ====================
   
-  // Provisioning endpoint for external sales platforms
-  app.post("/api/provision-account", async (req: Request, res: Response) => {
+  // Registration endpoint
+  app.post("/api/register", async (req: Request, res: Response) => {
     try {
-      // Verify API key for security
-      const apiKey = req.headers['x-api-key'] as string;
-      const expectedApiKey = process.env.PROVISIONING_API_KEY;
+      const { confirmPassword, ...userData } = req.body;
       
-      if (!expectedApiKey) {
-        console.error("[Provision] PROVISIONING_API_KEY not configured");
-        return res.status(500).json({ message: "Provisioning service not configured" });
+      console.log('[Register] Received data:', JSON.stringify(userData, null, 2));
       }
       
       if (!apiKey || apiKey !== expectedApiKey) {
