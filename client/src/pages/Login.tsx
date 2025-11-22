@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
@@ -10,7 +11,7 @@ import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { queryClient } from "@/lib/queryClient";
 import overhaulLabsLogo from "@assets/Screenshot 2025-11-09 at 14.46.08_1762728408763.png";
-import ropeAccessProLogo from "@assets/generated_images/Blue_rope_access_worker_logo_ac1aa8fd.png";
+import ropeAccessProLogo from "@/assets/generated_images/Blue_rope_access_worker_logo_ac1aa8fd.png";
 
 const loginSchema = z.object({
   identifier: z.string().min(1, "Email is required"),
@@ -21,6 +22,7 @@ type LoginFormData = z.infer<typeof loginSchema>;
 
 export default function Login() {
   const { toast } = useToast();
+  const [, setLocation] = useLocation();
   const [showLoginForm, setShowLoginForm] = useState(false);
   const form = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
@@ -64,10 +66,11 @@ export default function Login() {
       const userData = await userResponse.json();
       const user = userData.user;
       
+      // Use client-side navigation to preserve React state and cache
       if (user.role === "resident") {
-        window.location.href = "/resident";
+        setLocation("/resident");
       } else {
-        window.location.href = "/dashboard";
+        setLocation("/dashboard");
       }
     } catch (error) {
       form.setError("identifier", { message: "An error occurred. Please try again." });
