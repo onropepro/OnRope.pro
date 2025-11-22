@@ -2315,10 +2315,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Return branding info (public, safe to expose)
       // Only return branding details if subscription is active
       res.json({
-        logoUrl: company.brandingSubscriptionActive ? company.brandingLogoUrl : null,
-        colors: company.brandingSubscriptionActive ? (company.brandingColors || []) : [],
+        logoUrl: company.whitelabelBrandingActive ? company.brandingLogoUrl : null,
+        colors: company.whitelabelBrandingActive ? (company.brandingColors || []) : [],
         companyName: company.companyName,
-        subscriptionActive: company.brandingSubscriptionActive || false,
+        subscriptionActive: company.whitelabelBrandingActive || false,
       });
     } catch (error) {
       console.error("Error fetching company branding:", error);

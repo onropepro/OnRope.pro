@@ -276,8 +276,13 @@ export function SubscriptionManagement() {
       setShowAddBrandingDialog(false);
       toast({
         title: "White Label Branding Unlocked!",
-        description: "You can now customize your logo and brand colors in Settings.",
+        description: "Refreshing page to apply changes...",
       });
+      
+      // Reload page after 1 second to ensure fresh data from server
+      setTimeout(() => {
+        window.location.reload();
+      }, 1000);
     },
     onError: (error: any) => {
       setShowAddBrandingDialog(false);
