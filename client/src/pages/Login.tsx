@@ -11,7 +11,7 @@ import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { queryClient } from "@/lib/queryClient";
 import overhaulLabsLogo from "@assets/Screenshot 2025-11-09 at 14.46.08_1762728408763.png";
-import ropeAccessProLogo from "@/assets/generated_images/Blue_rope_access_worker_logo_ac1aa8fd.png";
+import ropeAccessProLogo from "@assets/generated_images/Blue_rope_access_worker_logo_ac1aa8fd.png";
 
 const loginSchema = z.object({
   identifier: z.string().min(1, "Email is required"),
