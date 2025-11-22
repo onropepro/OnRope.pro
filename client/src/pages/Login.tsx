@@ -498,7 +498,7 @@ export default function Login() {
                 data-testid="link-register"
               >
                 <span className="material-icons mr-2">person_add</span>
-                Create Account (Already Have License)
+                Create Resident Account
               </Button>
             </div>
 
