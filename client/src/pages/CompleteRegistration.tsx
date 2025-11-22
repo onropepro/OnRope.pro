@@ -40,6 +40,7 @@ export default function CompleteRegistration() {
     const sessionId = params.get('session_id');
 
     if (!sessionId) {
+      setLoading(false); // Stop loading state
       toast({
         title: "Missing Session ID",
         description: "No checkout session found. Redirecting to license purchase...",
@@ -51,7 +52,7 @@ export default function CompleteRegistration() {
 
     // Fetch session data
     fetchSessionData(sessionId);
-  }, []);
+  }, [toast, setLocation]);
 
   const fetchSessionData = async (sessionId: string) => {
     try {
