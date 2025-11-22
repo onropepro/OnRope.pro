@@ -6164,8 +6164,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Upload quote photo - All employees can upload photos
-  app.post("/api/quotes/:id/photo", requireAuth, requireRole("company", "owner_ceo", "human_resources", "accounting", "operations_manager", "general_supervisor", "rope_access_supervisor", "account_manager", "supervisor", "rope_access_tech", "manager", "ground_crew", "ground_crew_supervisor"), imageUpload.single("photo"), async (req: Request, res: Response) => {
+  // Upload quote photo(s) - All employees can upload photos - supports multiple files
+  app.post("/api/quotes/:id/photo", requireAuth, requireRole("company", "owner_ceo", "human_resources", "accounting", "operations_manager", "general_supervisor", "rope_access_supervisor", "account_manager", "supervisor", "rope_access_tech", "manager", "ground_crew", "ground_crew_supervisor"), imageUpload.array("photos", 10), async (req: Request, res: Response) => {
     try {
       const currentUser = await storage.getUserById(req.session.userId!);
       if (!currentUser) {
@@ -6187,23 +6187,75 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(403).json({ message: "Forbidden" });
       }
       
-      if (!req.file) {
-        return res.status(400).json({ message: "No photo file uploaded" });
+      const files = req.files as Express.Multer.File[];
+      if (!files || files.length === 0) {
+        return res.status(400).json({ message: "No photo files uploaded" });
       }
       
+      // Upload all photos
       const objectStorageService = new ObjectStorageService();
-      const timestamp = Date.now();
-      const filename = `quotes/${companyId}/${timestamp}-${req.file.originalname}`;
-      const photoUrl = await objectStorageService.uploadPublicFile(
-        filename,
-        req.file.buffer,
-        req.file.mimetype
-      );
-      const updatedQuote = await storage.updateQuote(req.params.id, { photoUrl });
+      const uploadPromises = files.map(async (file) => {
+        const timestamp = Date.now();
+        const randomSuffix = Math.random().toString(36).substring(7);
+        const filename = `quotes/${companyId}/${timestamp}-${randomSuffix}-${file.originalname}`;
+        return await objectStorageService.uploadPublicFile(
+          filename,
+          file.buffer,
+          file.mimetype
+        );
+      });
       
-      res.json({ quote: updatedQuote, photoUrl });
+      const newPhotoUrls = await Promise.all(uploadPromises);
+      
+      // Append new photos to existing photos
+      const existingPhotoUrls = quote.photoUrls || [];
+      const updatedPhotoUrls = [...existingPhotoUrls, ...newPhotoUrls];
+      
+      const updatedQuote = await storage.updateQuote(req.params.id, { photoUrls: updatedPhotoUrls });
+      
+      res.json({ quote: updatedQuote, photoUrls: newPhotoUrls });
     } catch (error) {
       console.error("Upload quote photo error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Delete quote photo
+  app.delete("/api/quotes/:id/photo", requireAuth, requireRole("company", "owner_ceo", "human_resources", "accounting", "operations_manager", "general_supervisor", "rope_access_supervisor", "account_manager", "supervisor"), async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      const companyId = currentUser.role === "company" ? currentUser.id : currentUser.companyId;
+      if (!companyId) {
+        return res.status(400).json({ message: "Unable to determine company" });
+      }
+      
+      const quote = await storage.getQuoteById(req.params.id);
+      if (!quote) {
+        return res.status(404).json({ message: "Quote not found" });
+      }
+      
+      if (quote.companyId !== companyId) {
+        return res.status(403).json({ message: "Forbidden" });
+      }
+      
+      const { photoUrl } = req.body;
+      if (!photoUrl) {
+        return res.status(400).json({ message: "Photo URL is required" });
+      }
+      
+      // Remove the photo from the array
+      const currentPhotoUrls = quote.photoUrls || [];
+      const updatedPhotoUrls = currentPhotoUrls.filter(url => url !== photoUrl);
+      
+      const updatedQuote = await storage.updateQuote(req.params.id, { photoUrls: updatedPhotoUrls });
+      
+      res.json({ quote: updatedQuote, message: "Photo deleted successfully" });
+    } catch (error) {
+      console.error("Delete quote photo error:", error);
       res.status(500).json({ message: "Internal server error" });
     }
   });

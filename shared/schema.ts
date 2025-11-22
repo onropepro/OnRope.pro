@@ -100,6 +100,10 @@ export const users = pgTable("users", {
   irataLicenseNumber: varchar("irata_license_number"), // IRATA license number
   irataIssuedDate: date("irata_issued_date"), // IRATA certification issue date
   irataExpirationDate: date("irata_expiration_date"), // IRATA certification expiration date
+  irataDocuments: text("irata_documents").array().default(sql`ARRAY[]::text[]`), // Array of IRATA certification document URLs
+  
+  // Employee photo
+  photoUrl: text("photo_url"), // Employee profile photo URL
   
   // Employment termination
   terminatedDate: date("terminated_date"), // Date employment was terminated (optional)
@@ -771,8 +775,8 @@ export const quotes = pgTable("quotes", {
   strataManagerName: varchar("strata_manager_name"),
   strataManagerAddress: text("strata_manager_address"),
   
-  // Photo attachment
-  photoUrl: text("photo_url"), // URL to photo in object storage
+  // Photo attachments - support multiple photos
+  photoUrls: text("photo_urls").array().default(sql`ARRAY[]::text[]`), // Array of photo URLs in object storage
   
   // Tracking
   createdBy: varchar("created_by").notNull().references(() => users.id), // User who created the quote
