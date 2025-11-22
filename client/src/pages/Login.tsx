@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -93,8 +94,7 @@ export default function Login() {
       {/* Main Content */}
       <div className="flex-1 flex items-center justify-center p-4">
         <div className="w-full max-w-6xl grid md:grid-cols-2 gap-8 items-center">
-      <div className="w-full max-w-6xl grid md:grid-cols-2 gap-8 items-center">
-        {/* Hero Section - Hidden on mobile */}
+          {/* Hero Section - Hidden on mobile */}
         <div className="hidden md:flex flex-col justify-center space-y-8 pr-8">
           <div className="space-y-6">
             <div className="inline-flex items-center gap-2 px-4 py-2 bg-primary/10 rounded-full text-sm font-medium text-primary">
@@ -195,8 +195,9 @@ export default function Login() {
           </div>
         </div>
 
-        {/* Login Card */}
-        <Card className="w-full shadow-2xl border-2">
+          {/* Login Card - Conditionally shown */}
+          {showLoginForm && (
+            <Card className="w-full shadow-2xl border-2">
           <CardHeader className="space-y-3 pb-6">
             <div className="flex items-center gap-3 md:hidden mb-2">
               <div className="h-12 w-12 rounded-xl bg-primary/10 flex items-center justify-center">
@@ -538,6 +539,8 @@ export default function Login() {
             </div>
           </CardContent>
         </Card>
+          )}
+        </div>
       </div>
     </div>
   );
