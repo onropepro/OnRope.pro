@@ -18,8 +18,9 @@ import type { User } from '../shared/schema';
 import { STRIPE_PRICE_IDS, TIER_CONFIG, ADDON_CONFIG, type TierName, type AddonName, type Currency } from '../shared/stripe-config';
 
 // Initialize Stripe with latest API version
+// Using type assertion because Stripe types default to latest version
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: '2024-11-20.acacia',
+  apiVersion: '2024-11-20.acacia' as any,
 });
 
 /**
@@ -193,7 +194,7 @@ export async function getSubscriptionStatus(customerId: string): Promise<{
       subscriptionId: activeSubscription.id,
       currentTier,
       status: activeSubscription.status,
-      currentPeriodEnd: activeSubscription.current_period_end ? new Date(activeSubscription.current_period_end * 1000) : undefined,
+      currentPeriodEnd: (activeSubscription as any).current_period_end ? new Date((activeSubscription as any).current_period_end * 1000) : undefined,
       cancelAtPeriodEnd: activeSubscription.cancel_at_period_end || false,
     };
   } catch (error) {
@@ -320,7 +321,7 @@ export async function handleWebhookEvent(
           subscriptionId: subscription.id,
           tier,
           status: subscription.status,
-          currentPeriodEnd: subscription.current_period_end ? new Date(subscription.current_period_end * 1000) : undefined,
+          currentPeriodEnd: (subscription as any).current_period_end ? new Date((subscription as any).current_period_end * 1000) : undefined,
         });
 
         console.log(`[Webhook] Subscription updated for user ${userId}: ${tier} (${subscription.status})`);

@@ -224,63 +224,9 @@ export default function Profile() {
     },
   });
 
-  // Auto-refresh data when user returns from external pages (e.g., cancellation page, upgrade, purchases)
+  // Auto-refresh data when window gains focus
   useEffect(() => {
-    if (!user?.licenseKey) return;
-
-    // Check if returning from marketplace
-    const urlParams = new URLSearchParams(window.location.search);
-    const fromCancellation = urlParams.has('canceled');
-    const fromUpgrade = urlParams.has('upgraded');
-    const fromPurchase = urlParams.has('purchased');
-    const newLicenseKeyFromUrl = urlParams.get('newLicenseKey'); // Marketplace sends this after tier upgrade
-    const fromMarketplace = fromCancellation || fromUpgrade || fromPurchase || document.referrer.includes('ram-website');
-    
-    if (fromMarketplace) {
-      if (fromUpgrade) {
-        // For tier upgrades, marketplace includes the new license key in URL
-        if (newLicenseKeyFromUrl) {
-          toast({ 
-            title: "Tier upgraded!", 
-            description: "Updating your subscription data..."
-          });
-          setTimeout(() => {
-            reverifyLicenseMutation.mutate(newLicenseKeyFromUrl);
-          }, 500);
-        } else {
-          // Fallback: If marketplace didn't send new key, prompt user to enter it
-          toast({ 
-            title: "Tier Upgraded!", 
-            description: "Please click 'Update License Key' to enter your new license key.",
-            duration: 10000,
-          });
-          setShowLicenseDialog(true);
-        }
-      } else if (fromPurchase) {
-        // Seat/project purchases don't change the license key, so auto-verify works
-        toast({ 
-          title: "Purchase complete!", 
-          description: "Refreshing your subscription data..."
-        });
-        setTimeout(() => {
-          reverifyLicenseMutation.mutate();
-        }, 500);
-      } else if (fromCancellation) {
-        toast({ 
-          title: "Cancellation processed", 
-          description: "Refreshing your subscription data..."
-        });
-        setTimeout(() => {
-          reverifyLicenseMutation.mutate();
-        }, 500);
-      }
-      
-      // Clean up URL
-      window.history.replaceState({}, '', '/profile');
-    }
-
     const handleFocus = () => {
-      // Refresh all relevant data when window gains focus
       queryClient.invalidateQueries({ queryKey: ["/api/user"] });
       queryClient.invalidateQueries({ queryKey: ["/api/employees/all"] });
       queryClient.invalidateQueries({ queryKey: ["/api/projects"] });
@@ -288,7 +234,7 @@ export default function Profile() {
 
     window.addEventListener('focus', handleFocus);
     return () => window.removeEventListener('focus', handleFocus);
-  }, [user?.licenseKey]);
+  }, []);
 
   const profileForm = useForm<ProfileFormData>({
     resolver: zodResolver(profileSchema),

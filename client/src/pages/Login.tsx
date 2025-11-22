@@ -490,26 +490,6 @@ export default function Login() {
               Create Company or Resident/Owner Account
             </Button>
 
-            <Button 
-              variant="default" 
-              className="w-full h-12 text-base font-medium bg-primary hover:bg-primary/90" 
-              onClick={() => window.open("https://ram-website-paquettetom.replit.app", "_blank")}
-              data-testid="button-subscribe"
-            >
-              <span className="material-icons mr-2">storefront</span>
-              Subscribe & Purchase Licenses
-            </Button>
-
-            <Button 
-              variant="ghost" 
-              className="w-full h-10 text-sm" 
-              onClick={() => window.location.reload()}
-              data-testid="button-refresh"
-            >
-              <span className="material-icons mr-2 text-base">refresh</span>
-              Refresh To Get Latest Update
-            </Button>
-
             {/* Mobile-only feature highlights */}
             <div className="md:hidden pt-4 space-y-4 border-t">
               <h3 className="text-sm font-semibold text-center">Built for All Stakeholders</h3>

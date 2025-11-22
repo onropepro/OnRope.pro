@@ -1973,49 +1973,22 @@ export default function Dashboard() {
                         <div className="flex-1">
                           <div className="text-sm font-medium text-destructive">Project Limit Reached</div>
                           <div className="text-xs text-muted-foreground mt-1">
-                            You've reached your {projectsData.projectInfo.projectLimit}-project limit for Tier {projectsData.projectInfo.tier}. Upgrade your tier or purchase additional project slots to add more projects.
+                            You've reached your {projectsData.projectInfo.projectLimit}-project limit. Visit Profile → Subscription to upgrade your tier or add more projects.
                           </div>
                         </div>
                       </div>
+                      <Button 
+                        size="sm" 
+                        variant="default" 
+                        className="mt-2 w-full"
+                        data-testid="button-manage-subscription"
+                        onClick={() => window.location.href = "/profile"}
+                      >
+                        <span className="material-icons text-sm mr-1">settings</span>
+                        Manage Subscription
+                      </Button>
                     </div>
                   )}
-                  
-                  <div className="flex gap-2 mt-3">
-                    <Button 
-                      size="sm" 
-                      variant="default" 
-                      data-testid="button-upgrade-tier-projects"
-                      onClick={() => {
-                        const email = encodeURIComponent(currentUser?.email || '');
-                        const licenseKey = encodeURIComponent(currentUser?.licenseKey || '');
-                        const currentTier = projectsData.projectInfo.tier.toString();
-                        const returnUrl = encodeURIComponent(`${window.location.origin}/projects?upgraded=true`);
-                        const url = `https://ram-website-paquettetom.replit.app/upgrade-tier?email=${email}&licenseKey=${licenseKey}&currentTier=${currentTier}&returnUrl=${returnUrl}`;
-                        window.location.href = url;
-                      }}
-                    >
-                      <span className="material-icons text-sm mr-1">upgrade</span>
-                      Upgrade Tier
-                    </Button>
-                    <Button 
-                      size="sm" 
-                      variant="outline" 
-                      data-testid="button-buy-projects"
-                      onClick={() => {
-                        const email = encodeURIComponent(currentUser?.email || '');
-                        const licenseKey = encodeURIComponent(currentUser?.licenseKey || '');
-                        const tier = projectsData.projectInfo.tier.toString();
-                        const currentProjects = projectsData.projectInfo.projectLimit.toString();
-                        const projectsUsed = projectsData.projectInfo.projectsUsed.toString();
-                        const returnUrl = encodeURIComponent(`${window.location.origin}/projects?purchased=true`);
-                        const url = `https://ram-website-paquettetom.replit.app/purchase-projects?email=${email}&licenseKey=${licenseKey}&tier=${tier}&currentProjects=${currentProjects}&projectsUsed=${projectsUsed}&returnUrl=${returnUrl}`;
-                        window.location.href = url;
-                      }}
-                    >
-                      <span className="material-icons text-sm mr-1">add_shopping_cart</span>
-                      Add more projects
-                    </Button>
-                  </div>
                 </CardContent>
               </Card>
             )}
