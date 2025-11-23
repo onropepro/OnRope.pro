@@ -1383,6 +1383,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/stripe/checkout-session/:sessionId", async (req: Request, res: Response) => {
     try {
       const { sessionId } = req.params;
+      console.log(`[Stripe] Retrieving checkout session: ${sessionId}`);
 
       // Check if we already generated a license key for this session
       const existingLicense = await db.query.licenseKeys.findFirst({
@@ -1390,6 +1391,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
 
       if (existingLicense) {
+        console.log(`[Stripe] Found existing license for session ${sessionId}: ${existingLicense.licenseKey}`);
         // Return existing license key
         const tierConfig = TIER_CONFIG[existingLicense.tier as TierName];
         const subscription = await stripe.subscriptions.retrieve(existingLicense.stripeSubscriptionId);
@@ -1407,18 +1409,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
 
+      console.log(`[Stripe] No existing license found, retrieving session from Stripe...`);
+
       // Retrieve the session from Stripe
       const session = await stripe.checkout.sessions.retrieve(sessionId, {
         expand: ['subscription', 'customer'],
       });
 
+      console.log(`[Stripe] Session retrieved: status=${session.status}, customer=${session.customer ? 'present' : 'missing'}`);
+
       if (!session) {
-        return res.status(404).json({ message: "Session not found" });
+        console.error(`[Stripe] Session ${sessionId} not found in Stripe`);
+        return res.status(404).json({ message: "Session not found in Stripe. Please verify you're using the correct Stripe account (test or live mode)." });
       }
 
       // Verify session is completed
       if (session.status !== 'complete') {
-        return res.status(400).json({ message: "Checkout session not completed" });
+        console.error(`[Stripe] Session ${sessionId} status is ${session.status}, expected 'complete'`);
+        return res.status(400).json({ message: `Checkout session not completed. Current status: ${session.status}` });
       }
 
       // Get tier from metadata
@@ -1426,7 +1434,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const currency = session.metadata?.currency || 'usd';
 
       if (!tier) {
-        return res.status(400).json({ message: "Missing tier information" });
+        console.error(`[Stripe] Session ${sessionId} missing tier metadata`);
+        return res.status(400).json({ message: "Missing tier information in session metadata" });
       }
 
       // Get customer and subscription IDs
@@ -1435,6 +1444,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const stripeSubscriptionId = typeof subscription === 'string' ? subscription : subscription?.id;
 
       if (!stripeCustomerId || !stripeSubscriptionId) {
+        console.error(`[Stripe] Session ${sessionId} missing customer or subscription data`);
         return res.status(400).json({ message: "Missing customer or subscription data" });
       }
 
@@ -1472,7 +1482,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
     } catch (error: any) {
       console.error('[Stripe] Get checkout session error:', error);
-      res.status(500).json({ message: error.message || "Failed to retrieve session" });
+      console.error('[Stripe] Error details:', {
+        message: error.message,
+        type: error.type,
+        code: error.code,
+        statusCode: error.statusCode,
+      });
+      
+      // Provide more helpful error messages
+      let userMessage = "Failed to retrieve session";
+      if (error.type === 'StripeInvalidRequestError') {
+        userMessage = "Invalid session ID or session not found in Stripe. Please verify your Stripe account settings.";
+      } else if (error.code === 'resource_missing') {
+        userMessage = "Session not found. The checkout session may have expired or you're using different Stripe accounts between environments.";
+      }
+      
+      res.status(500).json({ 
+        message: userMessage,
+        details: error.message 
+      });
     }
   });
 
