@@ -3761,7 +3761,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       const { sessionId } = req.params;
-      const { dropsCompletedNorth, dropsCompletedEast, dropsCompletedSouth, dropsCompletedWest, shortfallReason, endLatitude, endLongitude } = req.body;
+      const { dropsCompletedNorth, dropsCompletedEast, dropsCompletedSouth, dropsCompletedWest, shortfallReason, endLatitude, endLongitude, manualCompletionPercentage } = req.body;
       
       // Get the session to verify ownership
       const activeSession = await storage.getActiveWorkSession(currentUser.id, req.params.projectId);
@@ -3774,6 +3774,54 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const project = await storage.getProjectById(req.params.projectId);
       if (!project) {
         return res.status(404).json({ message: "Project not found" });
+      }
+      
+      // Validate manual completion percentage for hours-based job types
+      const isHoursBased = project.jobType === "general_pressure_washing" || project.jobType === "ground_window_cleaning";
+      let validatedPercentage: number | undefined = undefined;
+      
+      if (isHoursBased) {
+        // Manual completion percentage is REQUIRED for hours-based job types
+        if (manualCompletionPercentage === undefined || manualCompletionPercentage === null) {
+          return res.status(400).json({ message: "Completion percentage is required for this job type" });
+        }
+        
+        // Only accept string or number types
+        if (typeof manualCompletionPercentage !== 'string' && typeof manualCompletionPercentage !== 'number') {
+          return res.status(400).json({ message: "Completion percentage must be a number" });
+        }
+        
+        // Strict validation: reject malformed numeric strings
+        let percentageValue: number;
+        if (typeof manualCompletionPercentage === 'string') {
+          const trimmed = manualCompletionPercentage.trim();
+          // Reject empty or whitespace-only strings
+          if (trimmed.length === 0) {
+            return res.status(400).json({ message: "Completion percentage cannot be empty" });
+          }
+          // Strict regex: only allow decimal numbers (blocks hex like 0x10, binary, etc.)
+          if (!/^\d+(\.\d+)?$/.test(trimmed)) {
+            return res.status(400).json({ message: "Completion percentage must be a valid decimal number" });
+          }
+          percentageValue = Number(trimmed);
+          // Explicit NaN check after conversion (defensive)
+          if (isNaN(percentageValue)) {
+            return res.status(400).json({ message: "Completion percentage must be a valid number" });
+          }
+        } else {
+          percentageValue = manualCompletionPercentage;
+          // Check for NaN in numeric inputs
+          if (isNaN(percentageValue)) {
+            return res.status(400).json({ message: "Completion percentage must be a valid number" });
+          }
+        }
+        
+        // Range validation
+        if (percentageValue < 0 || percentageValue > 100) {
+          return res.status(400).json({ message: "Completion percentage must be between 0 and 100" });
+        }
+        
+        validatedPercentage = percentageValue;
       }
       
       // Validate elevation drops (ensure they are numbers and non-negative)
@@ -3803,6 +3851,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         now
       );
       
+      // Prepare manual completion percentage (rounded to integer for hours-based jobs)
+      // Use the validatedPercentage from earlier validation
+      const completionPercentage = validatedPercentage !== undefined ? Math.round(validatedPercentage) : undefined;
+      
       // End the session with elevation-specific drops and overtime hours
       const session = await storage.endWorkSession(
         sessionId,
@@ -3815,7 +3867,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         endLongitude || null,
         overtimeBreakdown.regularHours,
         overtimeBreakdown.overtimeHours,
-        overtimeBreakdown.doubleTimeHours
+        overtimeBreakdown.doubleTimeHours,
+        completionPercentage
       );
       
       res.json({ session });

@@ -549,7 +549,8 @@ export class Storage {
     endLongitude?: number | null,
     regularHours?: number,
     overtimeHours?: number,
-    doubleTimeHours?: number
+    doubleTimeHours?: number,
+    manualCompletionPercentage?: number
   ): Promise<WorkSession> {
     const result = await db.update(workSessions)
       .set({
@@ -564,6 +565,7 @@ export class Storage {
         regularHours: regularHours !== undefined ? regularHours.toString() : '0',
         overtimeHours: overtimeHours !== undefined ? overtimeHours.toString() : '0',
         doubleTimeHours: doubleTimeHours !== undefined ? doubleTimeHours.toString() : '0',
+        manualCompletionPercentage: manualCompletionPercentage !== undefined ? manualCompletionPercentage : null,
         updatedAt: sql`NOW()`,
       })
       .where(eq(workSessions.id, sessionId))
@@ -589,6 +591,7 @@ export class Storage {
       startLongitude: workSessions.startLongitude,
       endLatitude: workSessions.endLatitude,
       endLongitude: workSessions.endLongitude,
+      manualCompletionPercentage: workSessions.manualCompletionPercentage,
       createdAt: workSessions.createdAt,
       updatedAt: workSessions.updatedAt,
       techName: users.name,
