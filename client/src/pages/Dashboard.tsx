@@ -1899,6 +1899,17 @@ export default function Dashboard() {
                   </div>
                 </>
               )}
+              {currentUser?.role === 'company' && currentUser?.propertyManagerCode && (
+                <>
+                  {(companyName || currentUser?.residentCode) && <span className="text-muted-foreground/50">•</span>}
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-xs text-muted-foreground font-medium">Property Manager Code:</span>
+                    <Badge variant="outline" className="font-mono text-sm" data-testid="badge-property-manager-code">
+                      {currentUser.propertyManagerCode}
+                    </Badge>
+                  </div>
+                </>
+              )}
               </div>
             </div>
           </div>
