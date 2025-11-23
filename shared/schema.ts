@@ -57,7 +57,7 @@ export const users = pgTable("users", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   email: varchar("email").unique(), // null for company accounts
   passwordHash: text("password_hash").notNull(),
-  role: varchar("role").notNull(), // company | resident | operations_manager | supervisor | rope_access_tech | manager | ground_crew | ground_crew_supervisor
+  role: varchar("role").notNull(), // company | resident | property_manager | operations_manager | supervisor | rope_access_tech | manager | ground_crew | ground_crew_supervisor
   
   // Company-specific fields
   companyName: varchar("company_name"), // for company role
@@ -69,6 +69,11 @@ export const users = pgTable("users", {
   
   // Shared fields
   name: varchar("name"), // for resident and employee roles
+  
+  // Property Manager-specific fields
+  firstName: varchar("first_name"), // for property_manager role
+  lastName: varchar("last_name"), // for property_manager role
+  propertyManagementCompany: varchar("property_management_company"), // for property_manager role
   
   // Resident-specific fields
   strataPlanNumber: varchar("strata_plan_number"), // for resident role
@@ -134,6 +139,18 @@ export const users = pgTable("users", {
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
+
+// Property Manager Company Links - junction table for property managers to access multiple companies via company codes
+export const propertyManagerCompanyLinks = pgTable("property_manager_company_links", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  propertyManagerId: varchar("property_manager_id").notNull().references(() => users.id, { onDelete: "cascade" }), // Foreign key to property manager user
+  companyCode: varchar("company_code", { length: 10 }).notNull(), // The company code (residentCode) they're linking to
+  companyId: varchar("company_id").notNull().references(() => users.id, { onDelete: "cascade" }), // Foreign key to the company this code belongs to
+  addedAt: timestamp("added_at").defaultNow(),
+}, (table) => ({
+  // Unique constraint: a property manager can only link to each company code once
+  uniquePropertyManagerCompany: sql`UNIQUE ("property_manager_id", "company_code")`,
+}));
 
 // Clients table - for managing property managers and building owners
 export const clients = pgTable("clients", {
@@ -1099,6 +1116,14 @@ export const insertUserSchema = createInsertSchema(users).omit({
   createdAt: true,
   updatedAt: true,
 });
+
+export const insertPropertyManagerCompanyLinkSchema = createInsertSchema(propertyManagerCompanyLinks).omit({
+  id: true,
+  addedAt: true,
+});
+
+export type InsertPropertyManagerCompanyLink = z.infer<typeof insertPropertyManagerCompanyLinkSchema>;
+export type PropertyManagerCompanyLink = typeof propertyManagerCompanyLinks.$inferSelect;
 
 export const insertClientSchema = createInsertSchema(clients).omit({
   id: true,
