@@ -1,6 +1,6 @@
 import { db } from "./db";
-import { users, clients, projects, customJobTypes, dropLogs, workSessions, nonBillableWorkSessions, complaints, complaintNotes, projectPhotos, jobComments, harnessInspections, toolboxMeetings, flhaForms, incidentReports, companyDocuments, payPeriodConfig, payPeriods, quotes, quoteServices, gearItems, gearAssignments, scheduledJobs, jobAssignments, userPreferences } from "@shared/schema";
-import type { User, InsertUser, Client, InsertClient, Project, InsertProject, CustomJobType, InsertCustomJobType, DropLog, InsertDropLog, WorkSession, InsertWorkSession, Complaint, InsertComplaint, ComplaintNote, InsertComplaintNote, ProjectPhoto, InsertProjectPhoto, JobComment, InsertJobComment, HarnessInspection, InsertHarnessInspection, ToolboxMeeting, InsertToolboxMeeting, FlhaForm, InsertFlhaForm, IncidentReport, InsertIncidentReport, PayPeriodConfig, InsertPayPeriodConfig, PayPeriod, InsertPayPeriod, EmployeeHoursSummary, Quote, InsertQuote, QuoteService, InsertQuoteService, QuoteWithServices, GearItem, InsertGearItem, GearAssignment, InsertGearAssignment, ScheduledJob, InsertScheduledJob, JobAssignment, InsertJobAssignment, ScheduledJobWithAssignments, UserPreferences, InsertUserPreferences } from "@shared/schema";
+import { users, clients, projects, customJobTypes, dropLogs, workSessions, nonBillableWorkSessions, complaints, complaintNotes, projectPhotos, jobComments, harnessInspections, toolboxMeetings, flhaForms, incidentReports, companyDocuments, payPeriodConfig, payPeriods, quotes, quoteServices, gearItems, gearAssignments, scheduledJobs, jobAssignments, userPreferences, propertyManagerCompanyLinks } from "@shared/schema";
+import type { User, InsertUser, Client, InsertClient, Project, InsertProject, CustomJobType, InsertCustomJobType, DropLog, InsertDropLog, WorkSession, InsertWorkSession, Complaint, InsertComplaint, ComplaintNote, InsertComplaintNote, ProjectPhoto, InsertProjectPhoto, JobComment, InsertJobComment, HarnessInspection, InsertHarnessInspection, ToolboxMeeting, InsertToolboxMeeting, FlhaForm, InsertFlhaForm, IncidentReport, InsertIncidentReport, PayPeriodConfig, InsertPayPeriodConfig, PayPeriod, InsertPayPeriod, EmployeeHoursSummary, Quote, InsertQuote, QuoteService, InsertQuoteService, QuoteWithServices, GearItem, InsertGearItem, GearAssignment, InsertGearAssignment, ScheduledJob, InsertScheduledJob, JobAssignment, InsertJobAssignment, ScheduledJobWithAssignments, UserPreferences, InsertUserPreferences, PropertyManagerCompanyLink, InsertPropertyManagerCompanyLink } from "@shared/schema";
 import { eq, and, or, desc, sql, isNull, not, gte, lte, between, inArray } from "drizzle-orm";
 import bcrypt from "bcrypt";
 
@@ -1843,6 +1843,57 @@ export class Storage {
         .returning();
       return result[0];
     }
+  }
+
+  // Property Manager Company Links operations
+  async addPropertyManagerCompanyLink(
+    link: InsertPropertyManagerCompanyLink
+  ): Promise<PropertyManagerCompanyLink> {
+    const result = await db.insert(propertyManagerCompanyLinks)
+      .values(link)
+      .returning();
+    return result[0];
+  }
+
+  async getPropertyManagerCompanyLinks(
+    propertyManagerId: string
+  ): Promise<PropertyManagerCompanyLink[]> {
+    return await db.select()
+      .from(propertyManagerCompanyLinks)
+      .where(eq(propertyManagerCompanyLinks.propertyManagerId, propertyManagerId));
+  }
+
+  async removePropertyManagerCompanyLink(
+    linkId: string,
+    propertyManagerId: string
+  ): Promise<void> {
+    await db.delete(propertyManagerCompanyLinks)
+      .where(
+        and(
+          eq(propertyManagerCompanyLinks.id, linkId),
+          eq(propertyManagerCompanyLinks.propertyManagerId, propertyManagerId)
+        )
+      );
+  }
+
+  async getPropertyManagerLinkedCompanies(
+    propertyManagerId: string
+  ): Promise<User[]> {
+    const links = await this.getPropertyManagerCompanyLinks(propertyManagerId);
+    const companyIds = links.map(link => link.companyId);
+    
+    if (companyIds.length === 0) {
+      return [];
+    }
+    
+    return await db.select()
+      .from(users)
+      .where(
+        and(
+          eq(users.role, 'company'),
+          sql`${users.id} IN (${sql.join(companyIds.map(id => sql`${id}`), sql`, `)})`
+        )
+      );
   }
 }
 
