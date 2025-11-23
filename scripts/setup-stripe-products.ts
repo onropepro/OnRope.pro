@@ -159,7 +159,7 @@ async function setupStripeProducts() {
     });
     const brandingPriceCAD = await stripe.prices.create({
       product: brandingProduct.id,
-      unit_amount: 6700, // $67.00 CAD
+      unit_amount: 4900, // $49.00 CAD
       currency: 'cad',
       recurring: {
         interval: 'month',
@@ -168,7 +168,7 @@ async function setupStripeProducts() {
     });
     console.log(`✅ White Label Branding:`);
     console.log(`   USD: ${brandingPriceUSD.id} ($49/mo)`);
-    console.log(`   CAD: ${brandingPriceCAD.id} ($67 CAD/mo)`);
+    console.log(`   CAD: ${brandingPriceCAD.id} ($49 CAD/mo)`);
 
     // Print summary with price IDs
     console.log('\n\n🎉 All Products Created Successfully!\n');
