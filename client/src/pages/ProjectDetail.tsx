@@ -667,6 +667,7 @@ export default function ProjectDetail() {
   const isParkade = project.jobType === "parkade_pressure_cleaning";
   
   let totalDrops: number, completedDrops: number, progressPercent: number;
+  let completedDropsNorth = 0, completedDropsEast = 0, completedDropsSouth = 0, completedDropsWest = 0;
   
   if (isHoursBased) {
     // Percentage-based tracking (General Pressure Washing, Ground Window)
@@ -697,10 +698,10 @@ export default function ProjectDetail() {
         (project.totalDropsSouth ?? 0) + (project.totalDropsWest ?? 0);  // For window cleaning, use elevation drops
     
     // Calculate completed drops from work sessions (elevation-specific)
-    const completedDropsNorth = completedSessions.reduce((sum: number, s: any) => sum + (s.dropsCompletedNorth ?? 0), 0);
-    const completedDropsEast = completedSessions.reduce((sum: number, s: any) => sum + (s.dropsCompletedEast ?? 0), 0);
-    const completedDropsSouth = completedSessions.reduce((sum: number, s: any) => sum + (s.dropsCompletedSouth ?? 0), 0);
-    const completedDropsWest = completedSessions.reduce((sum: number, s: any) => sum + (s.dropsCompletedWest ?? 0), 0);
+    completedDropsNorth = completedSessions.reduce((sum: number, s: any) => sum + (s.dropsCompletedNorth ?? 0), 0);
+    completedDropsEast = completedSessions.reduce((sum: number, s: any) => sum + (s.dropsCompletedEast ?? 0), 0);
+    completedDropsSouth = completedSessions.reduce((sum: number, s: any) => sum + (s.dropsCompletedSouth ?? 0), 0);
+    completedDropsWest = completedSessions.reduce((sum: number, s: any) => sum + (s.dropsCompletedWest ?? 0), 0);
     
     completedDrops = completedDropsNorth + completedDropsEast + completedDropsSouth + completedDropsWest;
     
