@@ -217,6 +217,32 @@ async function generateResidentCode(): Promise<string> {
     }
   }
   
+  throw new Error('Failed to generate unique resident code after maximum attempts');
+}
+
+async function generatePropertyManagerCode(): Promise<string> {
+  const crypto = await import('crypto');
+  const characters = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; // Excluding confusing characters like 0, O, 1, I
+  const codeLength = 10;
+  const maxAttempts = 10; // Prevent infinite loops in case of database issues
+  
+  for (let attempt = 0; attempt < maxAttempts; attempt++) {
+    // Generate 10-character code using crypto.randomBytes for security
+    const randomBytes = crypto.randomBytes(codeLength);
+    let code = '';
+    
+    for (let i = 0; i < codeLength; i++) {
+      const randomIndex = randomBytes[i] % characters.length;
+      code += characters.charAt(randomIndex);
+    }
+    
+    // Check if code already exists
+    const existing = await storage.getUserByPropertyManagerCode(code);
+    if (!existing) {
+      return code;
+    }
+  }
+  
   // If we couldn't generate a unique code after max attempts, throw error
   throw new Error('Unable to generate unique resident code. Please try again.');
 }
@@ -258,10 +284,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // For property managers: use a transaction to create user AND company link atomically
       if (validatedData.role === 'property_manager' && req.body.companyCode) {
-        // Validate company code BEFORE starting transaction
-        const company = await storage.getUserByResidentCode(req.body.companyCode);
+        // Validate property manager code BEFORE starting transaction
+        const company = await storage.getUserByPropertyManagerCode(req.body.companyCode);
         if (!company || company.role !== 'company') {
-          return res.status(400).json({ message: "Invalid company code. Please check with the rope access company and try again." });
+          return res.status(400).json({ message: "Invalid property manager code. Please check with the rope access company and try again." });
         }
         
         // Hash password before transaction (CRITICAL for security)
@@ -554,17 +580,42 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(403).json({ message: "Your employment has been terminated. Please contact your administrator for more information." });
       }
       
-      // GENERATE RESIDENT CODE ON FIRST LOGIN (company role only)
-      if (user.role === 'company' && !user.residentCode) {
-        try {
-          console.log('[Login] Generating resident code for company on first login...');
-          const residentCode = await generateResidentCode();
-          await storage.updateUser(user.id, { residentCode });
-          console.log(`[Login] Resident code generated: ${residentCode}`);
-          user.residentCode = residentCode;
-        } catch (error) {
-          console.error('[Login] Failed to generate resident code:', error);
-          // Continue login even if code generation fails - user can set it later in profile
+      // GENERATE CODES ON FIRST LOGIN (company role only)
+      if (user.role === 'company') {
+        const updates: any = {};
+        
+        // Generate resident code if missing
+        if (!user.residentCode) {
+          try {
+            console.log('[Login] Generating resident code for company on first login...');
+            const residentCode = await generateResidentCode();
+            updates.residentCode = residentCode;
+            console.log(`[Login] Resident code generated: ${residentCode}`);
+          } catch (error) {
+            console.error('[Login] Failed to generate resident code:', error);
+          }
+        }
+        
+        // Generate property manager code if missing
+        if (!user.propertyManagerCode) {
+          try {
+            console.log('[Login] Generating property manager code for company on first login...');
+            const propertyManagerCode = await generatePropertyManagerCode();
+            updates.propertyManagerCode = propertyManagerCode;
+            console.log(`[Login] Property manager code generated: ${propertyManagerCode}`);
+          } catch (error) {
+            console.error('[Login] Failed to generate property manager code:', error);
+          }
+        }
+        
+        // Update user if any codes were generated
+        if (Object.keys(updates).length > 0) {
+          await storage.updateUser(user.id, updates);
+          // Refetch user from database to ensure codes are persisted
+          const updatedUser = await storage.getUserById(user.id);
+          if (updatedUser) {
+            user = updatedUser;
+          }
         }
       }
       
@@ -1756,18 +1807,39 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       }
       
-      // Auto-generate resident code if company doesn't have one
-      if (user.role === 'company' && !user.residentCode) {
-        try {
-          console.log('[/api/user] Company missing resident code, generating...');
-          const residentCode = await generateResidentCode();
-          await storage.updateUser(user.id, { residentCode });
-          console.log(`[/api/user] Resident code generated: ${residentCode}`);
-          // Refetch user to get the updated code
+      // Auto-generate codes if company doesn't have them
+      if (user.role === 'company') {
+        const updates: any = {};
+        
+        // Generate resident code if missing
+        if (!user.residentCode) {
+          try {
+            console.log('[/api/user] Company missing resident code, generating...');
+            const residentCode = await generateResidentCode();
+            updates.residentCode = residentCode;
+            console.log(`[/api/user] Resident code generated: ${residentCode}`);
+          } catch (error) {
+            console.error('[/api/user] Failed to generate resident code:', error);
+          }
+        }
+        
+        // Generate property manager code if missing
+        if (!user.propertyManagerCode) {
+          try {
+            console.log('[/api/user] Company missing property manager code, generating...');
+            const propertyManagerCode = await generatePropertyManagerCode();
+            updates.propertyManagerCode = propertyManagerCode;
+            console.log(`[/api/user] Property manager code generated: ${propertyManagerCode}`);
+          } catch (error) {
+            console.error('[/api/user] Failed to generate property manager code:', error);
+          }
+        }
+        
+        // Update user if any codes were generated
+        if (Object.keys(updates).length > 0) {
+          await storage.updateUser(user.id, updates);
+          // Refetch user to get the updated codes
           user = await storage.getUserById(user.id) || user;
-        } catch (error) {
-          console.error('[/api/user] Failed to generate resident code:', error);
-          // Continue without code - user can generate later
         }
       }
       
@@ -1847,10 +1919,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Invalid company code format. Must be 10 characters." });
       }
       
-      // Validate company code exists
-      const company = await storage.getUserByResidentCode(companyCode);
+      // Validate property manager code exists
+      const company = await storage.getUserByPropertyManagerCode(companyCode);
       if (!company || company.role !== 'company') {
-        return res.status(400).json({ message: "Invalid company code. Please check with the rope access company." });
+        return res.status(400).json({ message: "Invalid property manager code. Please check with the rope access company." });
       }
       
       // Check if link already exists

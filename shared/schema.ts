@@ -132,6 +132,9 @@ export const users = pgTable("users", {
   // Resident linking code (company role only)
   residentCode: varchar("resident_code", { length: 10 }).unique(), // 10-character code for residents to link to company - UNIQUE (~50 bits entropy)
   
+  // Property Manager linking code (company role only)
+  propertyManagerCode: varchar("property_manager_code", { length: 10 }).unique(), // 10-character code for property managers to link to company - UNIQUE
+  
   // White label branding (company role only)
   brandingLogoUrl: text("branding_logo_url"), // Custom logo URL for resident portal
   brandingColors: text("branding_colors").array().default(sql`ARRAY[]::text[]`), // Array of brand colors (hex codes)
@@ -140,11 +143,11 @@ export const users = pgTable("users", {
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
-// Property Manager Company Links - junction table for property managers to access multiple companies via company codes
+// Property Manager Company Links - junction table for property managers to access multiple companies via property manager codes
 export const propertyManagerCompanyLinks = pgTable("property_manager_company_links", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   propertyManagerId: varchar("property_manager_id").notNull().references(() => users.id, { onDelete: "cascade" }), // Foreign key to property manager user
-  companyCode: varchar("company_code", { length: 10 }).notNull(), // The company code (residentCode) they're linking to
+  companyCode: varchar("company_code", { length: 10 }).notNull(), // The property manager code (propertyManagerCode) they're linking to
   companyId: varchar("company_id").notNull().references(() => users.id, { onDelete: "cascade" }), // Foreign key to the company this code belongs to
   addedAt: timestamp("added_at").defaultNow(),
 }, (table) => ({

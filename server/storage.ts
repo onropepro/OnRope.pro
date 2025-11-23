@@ -23,6 +23,11 @@ export class Storage {
     return result[0];
   }
 
+  async getUserByPropertyManagerCode(propertyManagerCode: string): Promise<User | undefined> {
+    const result = await db.select().from(users).where(eq(users.propertyManagerCode, propertyManagerCode)).limit(1);
+    return result[0];
+  }
+
   async getUserByLicenseKey(licenseKey: string): Promise<User | undefined> {
     const result = await db.select().from(users).where(eq(users.licenseKey, licenseKey)).limit(1);
     return result[0];
