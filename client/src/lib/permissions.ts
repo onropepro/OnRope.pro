@@ -17,7 +17,7 @@ export const MANAGEMENT_ROLES = ['company', 'owner_ceo', 'human_resources', 'acc
 export const WORKER_ROLES = ['rope_access_tech', 'manager', 'ground_crew', 'ground_crew_supervisor', 'labourer'];
 
 // All employee roles (management + workers) that should access the dashboard
-export const EMPLOYEE_ROLES = [...MANAGEMENT_ROLES, ...WORKER_ROLES];
+export const EMPLOYEE_ROLES = [...MANAGEMENT_ROLES, ...WORKER_ROLES, 'property_manager'];
 
 // Check if user has a management role
 export function isManagement(user: User | null | undefined): boolean {
