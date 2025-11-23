@@ -2659,11 +2659,18 @@ export default function Dashboard() {
                     </Card>
                   ) : (
                     filteredProjects.filter((p: Project) => p.status === "active").map((project: Project) => {
-                      const isInSuite = project.jobType === "in_suite";
-                      const completed = isInSuite ? (project.completedUnits || 0) : (project.completedDrops || 0);
-                      const total = isInSuite ? (project.totalUnits || 0) : (project.totalDrops || 0);
+                      const isInSuite = project.jobType === "in_suite_dryer_vent_cleaning";
+                      const isParkade = project.jobType === "parkade_pressure_cleaning";
+                      
+                      const completed = project.completedDrops || 0;
+                      const total = isInSuite 
+                        ? (project.floorCount || 0)  // For dryer vent, use total suite count
+                        : isParkade 
+                        ? (project.totalStalls || project.floorCount || 0)  // For parkade, use total stalls
+                        : (project.totalDrops || 0);  // For window cleaning, use total drops
+                      
                       const progressPercent = total > 0 ? (completed / total) * 100 : 0;
-                      const unitLabel = isInSuite ? "units" : "drops";
+                      const unitLabel = isInSuite ? "suites" : isParkade ? "stalls" : "drops";
 
                       return (
                         <Card 
