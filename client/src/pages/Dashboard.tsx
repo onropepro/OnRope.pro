@@ -2776,10 +2776,13 @@ export default function Dashboard() {
                                   </div>
                                 )}
                               </div>
-                              <Badge variant="secondary" className="text-sm px-3 py-1">
-                                <span className="material-icons text-xs mr-1">layers</span>
-                                {project.floorCount}
-                              </Badge>
+                              {/* Hide floor count badge for hours-based projects (General Pressure Washing, Ground Window) */}
+                              {!isHoursBased && (
+                                <Badge variant="secondary" className="text-sm px-3 py-1">
+                                  <span className="material-icons text-xs mr-1">layers</span>
+                                  {project.floorCount}
+                                </Badge>
+                              )}
                             </div>
                             <div className="space-y-3">
                               <div className="flex items-center justify-between">
