@@ -33,8 +33,13 @@ export default function NonBillableHours() {
   // Start new non-billable work session
   const startSessionMutation = useMutation({
     mutationFn: async (description: string) => {
+      // Get local date in YYYY-MM-DD format (user's timezone)
+      const localDate = new Date();
+      const localDateString = `${localDate.getFullYear()}-${String(localDate.getMonth() + 1).padStart(2, '0')}-${String(localDate.getDate()).padStart(2, '0')}`;
+      
       return apiRequest("POST", "/api/non-billable-sessions", {
         description,
+        workDate: localDateString, // Send client's local date
       });
     },
     onSuccess: () => {

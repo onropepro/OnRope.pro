@@ -1395,9 +1395,15 @@ export default function Dashboard() {
     mutationFn: async (projectId: string) => {
       const location = await getCurrentLocation();
       console.log("Starting work session with location:", location);
+      
+      // Get local date in YYYY-MM-DD format (user's timezone)
+      const localDate = new Date();
+      const localDateString = `${localDate.getFullYear()}-${String(localDate.getMonth() + 1).padStart(2, '0')}-${String(localDate.getDate()).padStart(2, '0')}`;
+      
       return apiRequest("POST", `/api/projects/${projectId}/work-sessions/start`, {
         startLatitude: location?.latitude,
         startLongitude: location?.longitude,
+        workDate: localDateString, // Send client's local date
       });
     },
     onSuccess: (data) => {

@@ -3690,7 +3690,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       const { projectId } = req.params;
-      const { startLatitude, startLongitude } = req.body;
+      const { startLatitude, startLongitude, workDate } = req.body;
       
       // Verify employee has access to this project
       const hasAccess = await storage.verifyProjectAccess(
@@ -3719,11 +3719,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Create new work session
       const now = new Date();
+      // Use client's local date if provided, otherwise fall back to server date
+      const sessionDate = workDate || now.toISOString().split('T')[0];
       const session = await storage.startWorkSession({
         projectId,
         employeeId: currentUser.id,
         companyId: project.companyId,
-        workDate: now.toISOString().split('T')[0], // Convert to date string
+        workDate: sessionDate, // Use client's local date
         startTime: now,
         startLatitude: startLatitude || null,
         startLongitude: startLongitude || null,
@@ -4154,11 +4156,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "You already have an active non-billable session" });
       }
       
+      // Use client's local date if provided, otherwise fall back to server date
+      const now = new Date();
+      const sessionDate = req.body.workDate || now.toISOString().split('T')[0];
+      
       console.log("Creating non-billable session with data:", {
         employeeId: currentUser.id,
         companyId: currentUser.companyId || currentUser.id,
-        workDate: new Date(),
-        startTime: new Date(),
+        workDate: sessionDate,
+        startTime: now,
         endTime: null,
         description: req.body.description,
       });
@@ -4166,8 +4172,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const session = await storage.createNonBillableWorkSession({
         employeeId: currentUser.id,
         companyId: currentUser.companyId || currentUser.id,
-        workDate: new Date(),
-        startTime: new Date(),
+        workDate: sessionDate,
+        startTime: now,
         endTime: null,
         description: req.body.description,
       });

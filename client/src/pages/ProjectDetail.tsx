@@ -282,10 +282,17 @@ export default function ProjectDetail() {
         // Continue without location if unavailable
       }
 
+      // Get local date in YYYY-MM-DD format (user's timezone)
+      const localDate = new Date();
+      const localDateString = `${localDate.getFullYear()}-${String(localDate.getMonth() + 1).padStart(2, '0')}-${String(localDate.getDate()).padStart(2, '0')}`;
+
       const response = await fetch(`/api/projects/${projectId}/work-sessions/start`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(locationData),
+        body: JSON.stringify({
+          ...locationData,
+          workDate: localDateString, // Send client's local date
+        }),
         credentials: "include",
       });
 
