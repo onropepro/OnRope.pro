@@ -1891,6 +1891,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
             updates.residentCode = code;
           }
         }
+        // Company profile fields
+        if (req.body.streetAddress !== undefined) {
+          updates.streetAddress = req.body.streetAddress || null;
+        }
+        if (req.body.province !== undefined) {
+          updates.province = req.body.province || null;
+        }
+        if (req.body.country !== undefined) {
+          updates.country = req.body.country || null;
+        }
+        if (req.body.zipCode !== undefined) {
+          updates.zipCode = req.body.zipCode || null;
+        }
+        if (req.body.employeePhoneNumber !== undefined) {
+          updates.employeePhoneNumber = req.body.employeePhoneNumber || null;
+        }
+        if (req.body.hourlyRate !== undefined) {
+          // Convert empty string to null, otherwise parse as number
+          updates.hourlyRate = req.body.hourlyRate === '' ? null : req.body.hourlyRate;
+        }
       }
       
       await storage.updateUser(user.id, updates);

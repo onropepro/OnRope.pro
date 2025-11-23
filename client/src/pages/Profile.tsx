@@ -28,6 +28,13 @@ const profileSchema = z.object({
   companyName: z.string().optional(),
   residentCode: z.string().optional(),
   residentLinkCode: z.string().optional(),
+  // Company owner fields
+  hourlyRate: z.string().optional(),
+  streetAddress: z.string().optional(),
+  province: z.string().optional(),
+  country: z.string().optional(),
+  zipCode: z.string().optional(),
+  employeePhoneNumber: z.string().optional(),
 });
 
 const passwordSchema = z.object({
@@ -246,6 +253,13 @@ export default function Profile() {
       companyName: user?.companyName || "",
       residentCode: user?.residentCode || "",
       residentLinkCode: "",
+      // Company owner fields
+      hourlyRate: user?.hourlyRate?.toString() || "",
+      streetAddress: user?.streetAddress || "",
+      province: user?.province || "",
+      country: user?.country || "",
+      zipCode: user?.zipCode || "",
+      employeePhoneNumber: user?.employeePhoneNumber || "",
     },
   });
 
@@ -668,6 +682,133 @@ export default function Profile() {
                         </FormItem>
                       )}
                     />
+
+                    <Separator className="my-4" />
+
+                    <div className="space-y-4">
+                      <h3 className="text-sm font-medium">Company Information</h3>
+                      
+                      <FormField
+                        control={profileForm.control}
+                        name="streetAddress"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Street Address</FormLabel>
+                            <FormControl>
+                              <Input
+                                placeholder="123 Main St, Suite 100"
+                                {...field}
+                                data-testid="input-street-address"
+                                className="h-12"
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <FormField
+                          control={profileForm.control}
+                          name="province"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Province/State</FormLabel>
+                              <FormControl>
+                                <Input
+                                  placeholder="BC, ON, etc."
+                                  {...field}
+                                  data-testid="input-province"
+                                  className="h-12"
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+
+                        <FormField
+                          control={profileForm.control}
+                          name="country"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Country</FormLabel>
+                              <FormControl>
+                                <Input
+                                  placeholder="Canada, USA, etc."
+                                  {...field}
+                                  data-testid="input-country"
+                                  className="h-12"
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </div>
+
+                      <FormField
+                        control={profileForm.control}
+                        name="zipCode"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Postal/Zip Code</FormLabel>
+                            <FormControl>
+                              <Input
+                                placeholder="V6B 1A1, 90210, etc."
+                                {...field}
+                                data-testid="input-zip-code"
+                                className="h-12"
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      <FormField
+                        control={profileForm.control}
+                        name="employeePhoneNumber"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Phone Number</FormLabel>
+                            <FormControl>
+                              <Input
+                                placeholder="(604) 555-1234"
+                                {...field}
+                                data-testid="input-phone-number"
+                                className="h-12"
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      <FormField
+                        control={profileForm.control}
+                        name="hourlyRate"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Hourly Rate (for yourself)</FormLabel>
+                            <FormControl>
+                              <Input
+                                type="number"
+                                step="0.01"
+                                min="0"
+                                placeholder="25.00"
+                                {...field}
+                                data-testid="input-hourly-rate"
+                                className="h-12"
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+
+                    <Separator className="my-4" />
                     
                     {/* Employee Seat Usage */}
                     {employeesData?.seatInfo && employeesData.seatInfo.tier > 0 && (
