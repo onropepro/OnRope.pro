@@ -815,7 +815,7 @@ export default function ProjectDetail() {
                                 `}
                                 data-testid={`suite-${index + 1}`}
                               >
-                                <span className={`material-icons ${config.iconSize} ${isCompleted ? 'text-success' : 'text-muted-foreground/40'}`}>
+                                <span className={`material-icons ${config.iconSize} ${isCompleted ? 'text-green-600 dark:text-green-500' : 'text-muted-foreground/40'}`}>
                                   {isCompleted ? 'check_circle' : 'meeting_room'}
                                 </span>
                               </div>
