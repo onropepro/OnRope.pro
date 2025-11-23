@@ -334,7 +334,7 @@ export default function Register() {
                   />
 
                   <Button type="submit" className="w-full h-12" data-testid="button-register-resident">
-                    Create Resident Account
+                    Create Resident/Property Manager Account
                   </Button>
                 </form>
               </Form>
