@@ -1488,27 +1488,33 @@ export default function Dashboard() {
   };
 
   const handleEndDay = () => {
-    // For General Pressure Washing and Ground Window, skip the drop count dialog
-    // Progress is tracked by hours worked vs hours allowed, not drops
+    // Show the end day dialog for all job types
+    // The dialog will show appropriate inputs based on job type (percentage for hours-based, drops/stalls/suites for others)
     const activeProject = projects.find(p => p.id === activeSession?.projectId);
-    const isHoursBased = activeProject?.jobType === "general_pressure_washing" || 
-                         activeProject?.jobType === "ground_window_cleaning";
+    const isHoursBased = activeProject?.jobType === "general_pressure_washing" || activeProject?.jobType === "ground_window_cleaning";
     
-    if (isHoursBased && activeSession) {
-      // Directly end session without asking for drop counts
-      endDayMutation.mutate({
+    if (isHoursBased) {
+      // Pre-fill with the last recorded percentage (or 0 if none)
+      const lastPercentage = (activeProject as any)?.latestCompletionPercentage || 0;
+      endDayForm.reset({
+        dropsNorth: lastPercentage.toString(),
+        dropsEast: "0",
+        dropsSouth: "0",
+        dropsWest: "0",
+        shortfallReason: "",
+      });
+    } else {
+      // Reset to defaults for drop-based projects
+      endDayForm.reset({
         dropsNorth: "0",
         dropsEast: "0",
         dropsSouth: "0",
         dropsWest: "0",
-        shortfallReason: undefined,
-        sessionId: activeSession.id,
-        projectId: activeSession.projectId,
+        shortfallReason: "",
       });
-    } else {
-      // Show drop count dialog for other job types
-      setShowEndDayDialog(true);
     }
+    
+    setShowEndDayDialog(true);
   };
 
   const confirmStartDay = () => {
@@ -1525,31 +1531,57 @@ export default function Dashboard() {
     
     // Get the daily target from the active session's project
     const activeProject = projects.find(p => p.id === activeSession.projectId);
-    const sessionDailyTarget = activeProject?.dailyDropTarget || 0;
+    const isHoursBased = activeProject?.jobType === "general_pressure_washing" || activeProject?.jobType === "ground_window_cleaning";
     
-    // Calculate total drops from all elevations being submitted
-    const dropsNorth = parseInt(data.dropsNorth) || 0;
-    const dropsEast = parseInt(data.dropsEast) || 0;
-    const dropsSouth = parseInt(data.dropsSouth) || 0;
-    const dropsWest = parseInt(data.dropsWest) || 0;
-    const totalDropsBeingSubmitted = dropsNorth + dropsEast + dropsSouth + dropsWest;
-    
-    // Calculate total drops today: existing drops + new drops being submitted
-    const totalDropsToday = todayDrops + totalDropsBeingSubmitted;
-    
-    // Validate shortfall reason is required when TOTAL drops < target
-    if (totalDropsToday < sessionDailyTarget && !data.shortfallReason?.trim()) {
-      endDayForm.setError("shortfallReason", {
-        message: "Please explain why the daily target wasn't met"
+    if (isHoursBased) {
+      // For hours-based projects, use percentage-based tracking
+      const completionPercentage = parseInt(data.dropsNorth) || 0;
+      
+      // Validate percentage is between 0-100
+      if (completionPercentage < 0 || completionPercentage > 100) {
+        endDayForm.setError("dropsNorth", {
+          message: "Percentage must be between 0 and 100"
+        });
+        return;
+      }
+      
+      endDayMutation.mutate({
+        sessionId: activeSession.id,
+        projectId: activeSession.projectId,
+        dropsCompletedNorth: 0,
+        dropsCompletedEast: 0,
+        dropsCompletedSouth: 0,
+        dropsCompletedWest: 0,
+        manualCompletionPercentage: completionPercentage,
       });
-      return;
+    } else {
+      // For drop-based projects, use the existing logic
+      const sessionDailyTarget = activeProject?.dailyDropTarget || 0;
+      
+      // Calculate total drops from all elevations being submitted
+      const dropsNorth = parseInt(data.dropsNorth) || 0;
+      const dropsEast = parseInt(data.dropsEast) || 0;
+      const dropsSouth = parseInt(data.dropsSouth) || 0;
+      const dropsWest = parseInt(data.dropsWest) || 0;
+      const totalDropsBeingSubmitted = dropsNorth + dropsEast + dropsSouth + dropsWest;
+      
+      // Calculate total drops today: existing drops + new drops being submitted
+      const totalDropsToday = todayDrops + totalDropsBeingSubmitted;
+      
+      // Validate shortfall reason is required when TOTAL drops < target
+      if (totalDropsToday < sessionDailyTarget && !data.shortfallReason?.trim()) {
+        endDayForm.setError("shortfallReason", {
+          message: "Please explain why the daily target wasn't met"
+        });
+        return;
+      }
+      
+      endDayMutation.mutate({
+        ...data,
+        sessionId: activeSession.id,
+        projectId: activeSession.projectId,
+      });
     }
-    
-    endDayMutation.mutate({
-      ...data,
-      sessionId: activeSession.id,
-      projectId: activeSession.projectId,
-    });
   };
 
   const selectedRole = employeeForm.watch("role");
@@ -2696,11 +2728,12 @@ export default function Dashboard() {
                       let completed: number, total: number, progressPercent: number, unitLabel: string;
                       
                       if (isHoursBased) {
-                        // Hours-based tracking (General Pressure Washing, Ground Window)
-                        completed = (project as any).totalHoursWorked || 0;
-                        total = project.estimatedHours || 0;  // Use estimatedHours field
-                        progressPercent = total > 0 ? (completed / total) * 100 : 0;
-                        unitLabel = "hours";
+                        // Percentage-based tracking (General Pressure Washing, Ground Window)
+                        // Use the latest manually entered completion percentage
+                        progressPercent = (project as any).latestCompletionPercentage || 0;
+                        completed = progressPercent;
+                        total = 100;
+                        unitLabel = "%";
                       } else if (isInSuite) {
                         // Suite-based tracking (In-Suite Dryer Vent)
                         completed = project.completedDrops || 0;
@@ -5805,7 +5838,10 @@ export default function Dashboard() {
             <DialogDescription>
               {(() => {
                 const activeProject = projects.find(p => p.id === activeSession?.projectId);
-                if (activeProject?.jobType === "parkade_pressure_cleaning") {
+                const isHoursBased = activeProject?.jobType === "general_pressure_washing" || activeProject?.jobType === "ground_window_cleaning";
+                if (isHoursBased) {
+                  return "Enter the current completion percentage for this project (0-100%).";
+                } else if (activeProject?.jobType === "parkade_pressure_cleaning") {
                   return "Enter the number of parking stalls you completed today.";
                 } else if (activeProject?.jobType === "in_suite_dryer_vent_cleaning") {
                   return "Enter the number of suites you completed today.";
@@ -5820,10 +5856,39 @@ export default function Dashboard() {
             <form onSubmit={endDayForm.handleSubmit(onEndDaySubmit)} className="space-y-4">
               {(() => {
                 const activeProject = projects.find(p => p.id === activeSession?.projectId);
+                const isHoursBased = activeProject?.jobType === "general_pressure_washing" || activeProject?.jobType === "ground_window_cleaning";
                 const isParkade = activeProject?.jobType === "parkade_pressure_cleaning";
                 const isInSuite = activeProject?.jobType === "in_suite_dryer_vent_cleaning";
                 
-                if (isParkade) {
+                if (isHoursBased) {
+                  return (
+                    <FormField
+                      control={endDayForm.control}
+                      name="dropsNorth"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Project Completion Percentage</FormLabel>
+                          <FormControl>
+                            <Input
+                              type="number"
+                              min="0"
+                              max="100"
+                              step="1"
+                              placeholder="0"
+                              {...field}
+                              data-testid="input-completion-percentage"
+                              className="h-12 text-xl"
+                            />
+                          </FormControl>
+                          <FormDescription className="text-xs">
+                            Enter a value between 0-100% representing the overall project completion
+                          </FormDescription>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  );
+                } else if (isParkade) {
                   return (
                     <FormField
                       control={endDayForm.control}

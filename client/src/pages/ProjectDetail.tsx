@@ -669,19 +669,24 @@ export default function ProjectDetail() {
   let totalDrops: number, completedDrops: number, progressPercent: number;
   
   if (isHoursBased) {
-    // Hours-based tracking (General Pressure Washing, Ground Window)
-    const totalHoursWorked = completedSessions.reduce((sum: number, s: any) => {
-      if (s.startTime && s.endTime) {
-        const hours = (new Date(s.endTime).getTime() - new Date(s.startTime).getTime()) / (1000 * 60 * 60);
-        return sum + hours;
-      }
-      return sum;
-    }, 0);
-    totalDrops = project.estimatedHours || 0;  // Use estimatedHours field
-    completedDrops = totalHoursWorked;          // Hours worked
-    progressPercent = totalDrops > 0 
-      ? Math.min(100, Math.round((completedDrops / totalDrops) * 100))
-      : 0;
+    // Percentage-based tracking (General Pressure Washing, Ground Window)
+    // Use the latest manually entered completion percentage from work sessions
+    const sessionsWithPercentage = completedSessions.filter((s: any) => 
+      s.manualCompletionPercentage !== null && s.manualCompletionPercentage !== undefined
+    );
+    
+    if (sessionsWithPercentage.length > 0) {
+      // Sort by end time descending and get the most recent percentage
+      const sortedSessions = [...sessionsWithPercentage].sort((a: any, b: any) => 
+        new Date(b.endTime).getTime() - new Date(a.endTime).getTime()
+      );
+      progressPercent = sortedSessions[0].manualCompletionPercentage;
+    } else {
+      progressPercent = 0;
+    }
+    
+    totalDrops = 100;
+    completedDrops = progressPercent;
   } else {
     // Drop/Unit-based tracking
     totalDrops = isInSuite 
@@ -770,22 +775,7 @@ export default function ProjectDetail() {
             {/* End Day Button - Shown when there IS an active session */}
             {activeSession && (
               <Button
-                onClick={() => {
-                  // For hours-based tracking (General Pressure Washing, Ground Window),
-                  // skip the drop count dialog and directly end the session
-                  if (isHoursBased) {
-                    onEndDaySubmit({
-                      dropsNorth: "0",
-                      dropsEast: "0",
-                      dropsSouth: "0",
-                      dropsWest: "0",
-                      shortfallReason: undefined,
-                    });
-                  } else {
-                    // Show drop count dialog for other job types
-                    setShowEndDayDialog(true);
-                  }
-                }}
+                onClick={() => setShowEndDayDialog(true)}
                 variant="destructive"
                 className="h-10"
                 data-testid="button-end-day"

@@ -3232,11 +3232,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
             return sum;
           }, 0);
           
+          // Get the latest manual completion percentage for hours-based projects
+          const latestCompletionPercentage = completedSessions.length > 0
+            ? completedSessions
+                .filter(s => s.manualCompletionPercentage !== null && s.manualCompletionPercentage !== undefined)
+                .sort((a, b) => new Date(b.endTime!).getTime() - new Date(a.endTime!).getTime())[0]
+                ?.manualCompletionPercentage || null
+            : null;
+          
           return {
             ...project,
             completedDrops: total,
             totalDrops,
             totalHoursWorked,
+            latestCompletionPercentage,
           };
         })
       );
