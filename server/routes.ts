@@ -257,6 +257,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Create user
       const user = await storage.createUser(validatedData);
       
+      // If this is a property manager, link them to the company via company code
+      if (user.role === 'property_manager' && req.body.companyCode) {
+        try {
+          // Validate company code exists
+          const company = await storage.getUserByResidentCode(req.body.companyCode);
+          if (!company || company.role !== 'company') {
+            return res.status(400).json({ message: "Invalid company code. Please check with the rope access company." });
+          }
+          
+          // Create the company link
+          await storage.addPropertyManagerCompanyLink({
+            propertyManagerId: user.id,
+            companyCode: req.body.companyCode,
+            companyId: company.id,
+          });
+        } catch (error) {
+          console.error('Error linking property manager to company:', error);
+          return res.status(500).json({ message: "Failed to link to company. Please contact support." });
+        }
+      }
+      
       // If this is a company user, create default payroll config and generate periods
       if (user.role === 'company') {
         try {
@@ -1770,6 +1791,83 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
     } catch (error) {
       console.error("Get user error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Property Manager: Get all company links
+  app.get("/api/property-manager/company-links", requireAuth, requireRole("property_manager"), async (req: Request, res: Response) => {
+    try {
+      const links = await storage.getPropertyManagerCompanyLinks(req.session.userId!);
+      
+      // Fetch company details for each link
+      const linksWithCompanyDetails = await Promise.all(
+        links.map(async (link) => {
+          const company = await storage.getUserById(link.companyId);
+          return {
+            ...link,
+            companyName: company?.companyName || 'Unknown Company',
+          };
+        })
+      );
+      
+      res.json({ links: linksWithCompanyDetails });
+    } catch (error) {
+      console.error("Get property manager company links error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Property Manager: Add new company link
+  app.post("/api/property-manager/company-links", requireAuth, requireRole("property_manager"), async (req: Request, res: Response) => {
+    try {
+      const { companyCode } = req.body;
+      
+      if (!companyCode || typeof companyCode !== 'string' || companyCode.length !== 10) {
+        return res.status(400).json({ message: "Invalid company code format. Must be 10 characters." });
+      }
+      
+      // Validate company code exists
+      const company = await storage.getUserByResidentCode(companyCode);
+      if (!company || company.role !== 'company') {
+        return res.status(400).json({ message: "Invalid company code. Please check with the rope access company." });
+      }
+      
+      // Check if link already exists
+      const existingLinks = await storage.getPropertyManagerCompanyLinks(req.session.userId!);
+      if (existingLinks.some(link => link.companyCode === companyCode)) {
+        return res.status(400).json({ message: "You are already linked to this company." });
+      }
+      
+      // Create the link
+      const link = await storage.addPropertyManagerCompanyLink({
+        propertyManagerId: req.session.userId!,
+        companyCode,
+        companyId: company.id,
+      });
+      
+      res.json({ 
+        link: {
+          ...link,
+          companyName: company.companyName,
+        }
+      });
+    } catch (error) {
+      console.error("Add property manager company link error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Property Manager: Remove company link
+  app.delete("/api/property-manager/company-links/:id", requireAuth, requireRole("property_manager"), async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      
+      await storage.removePropertyManagerCompanyLink(id, req.session.userId!);
+      
+      res.json({ message: "Company link removed successfully" });
+    } catch (error) {
+      console.error("Remove property manager company link error:", error);
       res.status(500).json({ message: "Internal server error" });
     }
   });
