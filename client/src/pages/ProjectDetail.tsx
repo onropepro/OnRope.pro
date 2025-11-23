@@ -2937,19 +2937,20 @@ export default function ProjectDetail() {
                 const totalDrops = north + east + south + west;
                 const isInSuite = project.jobType === "in_suite_dryer_vent_cleaning";
                 const isParkade = project.jobType === "parkade_pressure_cleaning";
+                const isHoursBasedLocal = project.jobType === "general_pressure_washing" || project.jobType === "ground_window_cleaning";
                 const target = isInSuite || isParkade ? (project.suitesPerDay || project.stallsPerDay || 0) : project.dailyDropTarget;
                 const isBelowTarget = totalDrops < target;
 
                 return (
                   <>
-                    {!isInSuite && !isParkade && (
+                    {!isInSuite && !isParkade && !isHoursBasedLocal && (
                       <div className="p-3 bg-muted rounded-md">
                         <div className="text-sm text-muted-foreground">Total Drops</div>
                         <div className="text-2xl font-bold">{totalDrops}</div>
                       </div>
                     )}
 
-                    {isBelowTarget && (
+                    {isBelowTarget && !isHoursBasedLocal && (
                       <FormField
                         control={endDayForm.control}
                         name="shortfallReason"
