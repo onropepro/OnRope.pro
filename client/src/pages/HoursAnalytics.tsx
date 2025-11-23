@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { queryClient, apiRequest } from "@/lib/queryClient";
+import { hasFinancialAccess } from "@/lib/permissions";
 import { useLocation } from "wouter";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -1221,6 +1222,7 @@ export default function HoursAnalytics() {
           employeeName={selectedSession?.employeeName}
           projectName={selectedSession?.projectName || selectedSession?.project?.buildingName}
           jobType={selectedSession?.project?.jobType || selectedSession?.jobType}
+          hasFinancialPermission={hasFinancialAccess(userData?.user)}
         />
       </div>
     </div>

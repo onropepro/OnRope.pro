@@ -2281,6 +2281,7 @@ export default function ProjectDetail() {
         employeeName={selectedSession?.techName}
         projectName={project?.buildingName}
         jobType={project?.jobType}
+        hasFinancialPermission={hasFinancialAccess(userData?.user)}
       />
 
       {/* Photo Viewer Dialog */}

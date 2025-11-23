@@ -1,5 +1,6 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useLocation, useRoute } from "wouter";
+import { hasFinancialAccess } from "@/lib/permissions";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -516,6 +517,7 @@ export default function WorkSessionHistory() {
         employeeName={selectedSession?.techName}
         projectName={project?.buildingName || project?.strataPlanNumber}
         jobType={project?.jobType}
+        hasFinancialPermission={hasFinancialAccess(userData?.user)}
       />
     </div>
   );
