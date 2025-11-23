@@ -246,6 +246,10 @@ export const workSessions = pgTable("work_sessions", {
   doubleTimeHours: numeric("double_time_hours", { precision: 5, scale: 2 }).default('0'),
   
   shortfallReason: text("shortfall_reason"), // Required if total drops < dailyDropTarget
+  
+  // Manual completion percentage for hours-based job types (General Pressure Washing, Ground Window)
+  manualCompletionPercentage: integer("manual_completion_percentage"), // 0-100, null if not applicable
+  
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 }, (table) => [
