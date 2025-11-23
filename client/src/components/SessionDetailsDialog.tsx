@@ -70,6 +70,9 @@ export function SessionDetailsDialog({
   jobType,
   hasFinancialPermission = false,
 }: SessionDetailsDialogProps) {
+  // CRITICAL: Check for session BEFORE calling any hooks (Rules of Hooks)
+  if (!session) return null;
+
   const { toast } = useToast();
   const [isEditMode, setIsEditMode] = useState(false);
   
@@ -82,8 +85,6 @@ export function SessionDetailsDialog({
   const [dropsWest, setDropsWest] = useState("");
   const [manualPercentage, setManualPercentage] = useState("");
   const [isBillable, setIsBillable] = useState(true);
-
-  if (!session) return null;
   
   const isParkade = jobType === "parkade_pressure_cleaning";
   const isInSuite = jobType === "in_suite_dryer_vent_cleaning";
