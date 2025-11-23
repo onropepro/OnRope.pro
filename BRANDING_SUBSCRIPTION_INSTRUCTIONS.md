@@ -4,7 +4,7 @@
 This document provides instructions for the marketplace agent to handle the white label branding subscription feature.
 
 ## Pricing
-- **Monthly Subscription Cost:** $0.49/month
+- **Monthly Subscription Cost:** $49/month
 - **Product Name:** White Label Branding
 - **Description:** Allows companies to customize the resident portal with their logo and brand colors
 
@@ -38,7 +38,7 @@ x-api-key: <PURCHASE_API_KEY>
 
 **What the Marketplace Agent Must Do:**
 1. Receive the branding subscription purchase request
-2. Create a Stripe Checkout Session for $0.49/month recurring subscription
+2. Create a Stripe Checkout Session for $49/month recurring subscription
 3. Set up the subscription with the customer's email
 4. Return the Stripe checkout URL
 5. After successful payment, call the activation endpoint (below)
@@ -90,7 +90,7 @@ x-api-key: <PURCHASE_API_KEY>
 - The RAM platform validates this key before processing requests
 
 ### Flow Summary
-1. **User clicks "Subscribe for $0.49/month" button** in Profile > Branding tab
+1. **User clicks "Subscribe for $49/month" button** in Profile > Branding tab
 2. **RAM platform calls** `POST /api/purchase/branding` → marketplace
 3. **Marketplace creates** Stripe checkout session
 4. **Marketplace returns** checkout URL to RAM platform
@@ -102,14 +102,14 @@ x-api-key: <PURCHASE_API_KEY>
 10. **User is redirected** back to profile page with branding enabled
 
 ### Subscription Management
-- Subscription is **monthly recurring** at $0.49/month
+- Subscription is **monthly recurring** at $49/month
 - User can cancel anytime via the marketplace cancellation flow
 - When cancelled, `brandingSubscriptionActive` should be set to `false` via an API call
 - Branding features become unavailable immediately upon cancellation
 - Logo and colors are preserved in the database but not displayed to residents
 
 ### Testing
-- Price: **$0.49/month**
+- Price: **$49/month**
 - Test cards work in Stripe test mode
 - Verify activation endpoint is called after successful payment
 - Verify branding appears in resident portal immediately after activation

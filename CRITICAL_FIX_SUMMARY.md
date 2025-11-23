@@ -114,7 +114,7 @@ Body:
 
 ### For Branding Subscription
 
-**When:** User subscribes to white label branding ($0.49/month)
+**When:** User subscribes to white label branding ($49/month)
 
 **What to do after Stripe payment succeeds:**
 

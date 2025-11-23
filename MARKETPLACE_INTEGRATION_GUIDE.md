@@ -314,7 +314,7 @@ x-api-key: YOUR_PURCHASE_API_KEY
 
 ---
 
-## 4. Branding Subscription ($0.49/month)
+## 4. Branding Subscription ($49/month)
 
 ### When to Call
 
