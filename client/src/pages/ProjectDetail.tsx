@@ -757,12 +757,19 @@ export default function ProjectDetail() {
           <CardContent className="space-y-6">
             {/* Building Visualization */}
             {project.jobType === "in_suite_dryer_vent_cleaning" ? (
-              <VerticalBuildingProgress
-                buildingFloors={project.buildingFloors || Math.ceil(project.floorCount / 10)}
-                totalUnits={project.floorCount}
-                completedUnits={completedDrops}
-                className="mb-4"
-              />
+              <div className="space-y-4">
+                {/* Suite Progress Summary */}
+                <div className="space-y-2">
+                  <div className="flex justify-between text-sm">
+                    <span className="text-muted-foreground">Suites Completed</span>
+                    <span className="font-medium">{progressPercent}%</span>
+                  </div>
+                  <Progress value={progressPercent} className="h-2" />
+                  <p className="text-xs text-muted-foreground text-center">
+                    {completedDrops} of {project.floorCount} suites completed
+                  </p>
+                </div>
+              </div>
             ) : project.jobType === "parkade_pressure_cleaning" ? (
               <ParkadeView
                 totalStalls={project.totalStalls || 0}
@@ -802,13 +809,33 @@ export default function ProjectDetail() {
             {/* Stats */}
             <div className="grid grid-cols-2 gap-4">
               <div className="text-center p-4 bg-muted/50 rounded-lg">
-                <div className="text-2xl font-bold">{project.dailyDropTarget}</div>
-                <div className="text-sm text-muted-foreground mt-1">Daily Target</div>
+                <div className="text-2xl font-bold">
+                  {project.jobType === "in_suite_dryer_vent_cleaning" 
+                    ? project.suitesPerDay 
+                    : project.jobType === "parkade_pressure_cleaning" 
+                    ? project.stallsPerDay 
+                    : project.dailyDropTarget}
+                </div>
+                <div className="text-sm text-muted-foreground mt-1">
+                  {project.jobType === "in_suite_dryer_vent_cleaning" 
+                    ? "Expected Suites/Day" 
+                    : project.jobType === "parkade_pressure_cleaning" 
+                    ? "Expected Stalls/Day" 
+                    : "Daily Target"}
+                </div>
               </div>
               <div className="text-center p-4 bg-muted/50 rounded-lg">
                 <div className="text-2xl font-bold">
                   {completedDrops > 0 
-                    ? Math.ceil((totalDrops - completedDrops) / project.dailyDropTarget) 
+                    ? (() => {
+                        const dailyTarget = project.jobType === "in_suite_dryer_vent_cleaning" 
+                          ? project.suitesPerDay 
+                          : project.jobType === "parkade_pressure_cleaning" 
+                          ? project.stallsPerDay 
+                          : project.dailyDropTarget;
+                        const remaining = totalDrops - completedDrops;
+                        return Math.ceil(remaining / (dailyTarget || 1));
+                      })()
                     : "N/A"}
                 </div>
                 <div className="text-sm text-muted-foreground mt-1">Days Remaining</div>
