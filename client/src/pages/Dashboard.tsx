@@ -2728,8 +2728,14 @@ export default function Dashboard() {
                       
                       if (isHoursBased) {
                         // Percentage-based tracking (General Pressure Washing, Ground Window)
-                        // Use the latest manually entered completion percentage
-                        progressPercent = (project as any).latestCompletionPercentage || 0;
+                        // Get the latest completion percentage from work sessions
+                        const projectSessions = allWorkSessions.filter((s: any) => 
+                          s.projectId === project.id && s.endTime && s.manualCompletionPercentage !== null
+                        );
+                        const latestSession = projectSessions.sort((a: any, b: any) => 
+                          new Date(b.endTime).getTime() - new Date(a.endTime).getTime()
+                        )[0];
+                        progressPercent = latestSession?.manualCompletionPercentage || 0;
                         completed = progressPercent;
                         total = 100;
                         unitLabel = "%";
