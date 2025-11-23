@@ -2772,13 +2772,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "User not found" });
       }
       
-      const companyId = currentUser.role === "company" ? currentUser.id : currentUser.companyId;
+      let clients: any[] = [];
       
-      if (!companyId) {
-        return res.status(403).json({ message: "Access denied" });
+      if (currentUser.role === "property_manager") {
+        // Property managers can see clients from all linked companies
+        const links = await storage.getPropertyManagerCompanyLinks(currentUser.id);
+        const allClients = await Promise.all(
+          links.map(link => storage.getClientsByCompany(link.companyId))
+        );
+        clients = allClients.flat();
+      } else {
+        // Company users and employees see their own company's clients
+        const companyId = currentUser.role === "company" ? currentUser.id : currentUser.companyId;
+        
+        if (!companyId) {
+          return res.status(403).json({ message: "Access denied" });
+        }
+        
+        clients = await storage.getClientsByCompany(companyId);
       }
       
-      const clients = await storage.getClientsByCompany(companyId);
       res.json({ clients });
     } catch (error) {
       console.error("Error fetching clients:", error);
@@ -2801,10 +2814,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "Client not found" });
       }
       
-      const companyId = currentUser.role === "company" ? currentUser.id : currentUser.companyId;
-      
-      if (client.companyId !== companyId) {
-        return res.status(403).json({ message: "Access denied" });
+      // Verify access
+      if (currentUser.role === "property_manager") {
+        // Property managers can access clients from linked companies
+        const links = await storage.getPropertyManagerCompanyLinks(currentUser.id);
+        const linkedCompanyIds = links.map(link => link.companyId);
+        
+        if (!linkedCompanyIds.includes(client.companyId)) {
+          return res.status(403).json({ message: "Access denied" });
+        }
+      } else {
+        // Company users and employees can only access their own company's clients
+        const companyId = currentUser.role === "company" ? currentUser.id : currentUser.companyId;
+        
+        if (client.companyId !== companyId) {
+          return res.status(403).json({ message: "Access denied" });
+        }
       }
       
       res.json(client);
@@ -3423,6 +3448,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
           // Resident hasn't linked - no projects
           projects = [];
         }
+      } else if (currentUser.role === "property_manager") {
+        // Return projects from all linked companies
+        projects = await storage.getProjectsForPropertyManager(currentUser.id, statusFilter);
       } else {
         projects = [];
       }

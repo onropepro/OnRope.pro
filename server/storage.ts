@@ -189,6 +189,36 @@ export class Storage {
       .orderBy(desc(projects.createdAt));
   }
 
+  async getProjectsForPropertyManager(propertyManagerId: string, status?: string): Promise<Project[]> {
+    // Get all company links for this property manager
+    const links = await db.select()
+      .from(propertyManagerCompanyLinks)
+      .where(eq(propertyManagerCompanyLinks.propertyManagerId, propertyManagerId));
+    
+    if (links.length === 0) {
+      return [];
+    }
+    
+    // Get company IDs
+    const companyIds = links.map(link => link.companyId);
+    
+    // Get all projects from all linked companies
+    const allProjects: Project[] = [];
+    for (const companyId of companyIds) {
+      const companyProjects = await this.getProjectsByCompany(companyId, status);
+      allProjects.push(...companyProjects);
+    }
+    
+    // Sort by created date descending
+    allProjects.sort((a, b) => {
+      const dateA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+      const dateB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+      return dateB - dateA;
+    });
+    
+    return allProjects;
+  }
+
   async getAllProjects(): Promise<Project[]> {
     return db.select().from(projects).orderBy(desc(projects.createdAt));
   }
@@ -493,6 +523,16 @@ export class Storage {
       
       // If not linked to company, only check strata plan (legacy behavior)
       return strataPlanMatches;
+    }
+    
+    // Property manager can access projects from any linked company
+    if (userRole === "property_manager") {
+      const links = await db.select()
+        .from(propertyManagerCompanyLinks)
+        .where(eq(propertyManagerCompanyLinks.propertyManagerId, userId));
+      
+      const linkedCompanyIds = links.map(link => link.companyId);
+      return linkedCompanyIds.includes(project.companyId);
     }
     
     // Company/staff can only access their own projects
