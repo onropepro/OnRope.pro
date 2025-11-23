@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
-import { FileText, Download, Calendar, DollarSign, Upload, Trash2, Shield, BookOpen, ArrowLeft } from "lucide-react";
+import { FileText, Download, Calendar, DollarSign, Upload, Trash2, Shield, BookOpen, ArrowLeft, AlertTriangle, Plus } from "lucide-react";
 import { hasFinancialAccess } from "@/lib/permissions";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
@@ -1525,6 +1525,79 @@ export default function Documents() {
             ) : (
               <p className="text-center py-8 text-muted-foreground">
                 No FLHA forms recorded yet
+              </p>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Incident Reports */}
+        <Card className="mb-6">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <AlertTriangle className="h-5 w-5" />
+              Incident Reports
+              <Badge variant="secondary" className="ml-auto">
+                {incidentReports.length}
+              </Badge>
+            </CardTitle>
+            <div className="flex gap-2 mt-2">
+              <Button
+                onClick={() => navigate("/incident-report")}
+                size="sm"
+                data-testid="create-incident-report"
+              >
+                <Plus className="h-4 w-4 mr-1" />
+                Create Report
+              </Button>
+            </div>
+          </CardHeader>
+          <CardContent>
+            {incidentReports.length > 0 ? (
+              <div className="space-y-2">
+                {incidentReports.map((report) => (
+                  <div key={report.id} className="flex items-center gap-3 p-3 rounded-md border hover-elevate">
+                    <AlertTriangle className="h-5 w-5 text-destructive flex-shrink-0" />
+                    <div className="flex-1 min-w-0">
+                      <div className="font-medium">
+                        {new Date(report.incidentDate).toLocaleDateString()}
+                        {report.location && ` - ${report.location}`}
+                      </div>
+                      <div className="text-sm text-muted-foreground">
+                        {report.incidentType || 'Incident'} • Severity: {report.severity || 'N/A'}
+                      </div>
+                      {report.description && (
+                        <div className="text-sm text-muted-foreground mt-1 line-clamp-1">
+                          {report.description}
+                        </div>
+                      )}
+                    </div>
+                    {report.severity && (
+                      <Badge 
+                        variant={
+                          report.severity === 'critical' ? 'destructive' :
+                          report.severity === 'major' ? 'destructive' :
+                          report.severity === 'moderate' ? 'default' :
+                          'secondary'
+                        }
+                      >
+                        {report.severity}
+                      </Badge>
+                    )}
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => downloadIncidentReport(report)}
+                      data-testid={`download-incident-${report.id}`}
+                    >
+                      <Download className="h-4 w-4 mr-1" />
+                      Download
+                    </Button>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-center py-8 text-muted-foreground">
+                No incident reports recorded yet
               </p>
             )}
           </CardContent>
