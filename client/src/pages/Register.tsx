@@ -43,11 +43,25 @@ const companySchema = z.object({
   path: ["confirmPassword"],
 });
 
+const propertyManagerSchema = z.object({
+  firstName: z.string().min(2, "First name must be at least 2 characters"),
+  lastName: z.string().min(2, "Last name must be at least 2 characters"),
+  propertyManagementCompany: z.string().min(2, "Property management company name is required"),
+  companyCode: z.string().length(10, "Company code must be exactly 10 characters"),
+  email: z.string().email("Invalid email address"),
+  password: z.string().min(6, "Password must be at least 6 characters"),
+  confirmPassword: z.string().min(1, "Please confirm your password"),
+}).refine((data) => data.password === data.confirmPassword, {
+  message: "Passwords do not match",
+  path: ["confirmPassword"],
+});
+
 type ResidentFormData = z.infer<typeof residentSchema>;
 type CompanyFormData = z.infer<typeof companySchema>;
+type PropertyManagerFormData = z.infer<typeof propertyManagerSchema>;
 
 export default function Register() {
-  const [activeTab, setActiveTab] = useState<"resident" | "company">("resident");
+  const [activeTab, setActiveTab] = useState<"resident" | "company" | "property_manager">("resident");
 
   const residentForm = useForm<ResidentFormData>({
     resolver: zodResolver(residentSchema),
@@ -75,6 +89,19 @@ export default function Register() {
       country: "",
       zipCode: "",
       licenseKey: "",
+      password: "",
+      confirmPassword: "",
+    },
+  });
+
+  const propertyManagerForm = useForm<PropertyManagerFormData>({
+    resolver: zodResolver(propertyManagerSchema),
+    defaultValues: {
+      firstName: "",
+      lastName: "",
+      propertyManagementCompany: "",
+      companyCode: "",
+      email: "",
       password: "",
       confirmPassword: "",
     },
@@ -139,6 +166,36 @@ export default function Register() {
     }
   };
 
+  const onPropertyManagerSubmit = async (data: PropertyManagerFormData) => {
+    try {
+      const { confirmPassword, ...registrationData } = data;
+      
+      const response = await fetch("/api/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          ...registrationData,
+          role: "property_manager",
+          passwordHash: data.password,
+          companyCode: data.companyCode,
+        }),
+        credentials: "include",
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        propertyManagerForm.setError("email", { message: result.message || "Registration failed" });
+        return;
+      }
+
+      // Redirect to property manager dashboard (you may create a dedicated page later)
+      window.location.href = "/buildings";
+    } catch (error) {
+      propertyManagerForm.setError("email", { message: "An error occurred. Please try again." });
+    }
+  };
+
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4">
       <Card className="w-full max-w-md">
@@ -154,10 +211,11 @@ export default function Register() {
           <CardDescription className="text-center">Choose your account type to get started</CardDescription>
         </CardHeader>
         <CardContent>
-          <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as "resident" | "company")}>
-            <TabsList className="grid w-full grid-cols-2 mb-6">
+          <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as "resident" | "company" | "property_manager")}>
+            <TabsList className="grid w-full grid-cols-3 mb-6">
               <TabsTrigger value="resident" data-testid="tab-resident">Resident</TabsTrigger>
               <TabsTrigger value="company" data-testid="tab-company">Company</TabsTrigger>
+              <TabsTrigger value="property_manager" data-testid="tab-property-manager">Property Manager</TabsTrigger>
             </TabsList>
 
             <TabsContent value="resident">
@@ -452,6 +510,119 @@ export default function Register() {
 
                   <Button type="submit" className="w-full h-12" data-testid="button-register-company">
                     Create Company Account
+                  </Button>
+                </form>
+              </Form>
+            </TabsContent>
+
+            <TabsContent value="property_manager">
+              <Form {...propertyManagerForm}>
+                <form onSubmit={propertyManagerForm.handleSubmit(onPropertyManagerSubmit)} className="space-y-4">
+                  <div className="grid grid-cols-2 gap-4">
+                    <FormField
+                      control={propertyManagerForm.control}
+                      name="firstName"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>First Name</FormLabel>
+                          <FormControl>
+                            <Input placeholder="John" {...field} data-testid="input-first-name" className="h-12" />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={propertyManagerForm.control}
+                      name="lastName"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Last Name</FormLabel>
+                          <FormControl>
+                            <Input placeholder="Doe" {...field} data-testid="input-last-name" className="h-12" />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+
+                  <FormField
+                    control={propertyManagerForm.control}
+                    name="propertyManagementCompany"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Property Management Company</FormLabel>
+                        <FormControl>
+                          <Input placeholder="ABC Property Management Inc." {...field} data-testid="input-property-management-company" className="h-12" />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={propertyManagerForm.control}
+                    name="companyCode"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Company Code</FormLabel>
+                        <FormControl>
+                          <Input placeholder="ABC1234567" {...field} data-testid="input-company-code" className="h-12" maxLength={10} />
+                        </FormControl>
+                        <FormDescription className="text-muted-foreground text-sm">
+                          Enter the 10-character code provided by the rope access company
+                        </FormDescription>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={propertyManagerForm.control}
+                    name="email"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Email</FormLabel>
+                        <FormControl>
+                          <Input type="email" placeholder="you@propertymanagement.com" {...field} data-testid="input-property-manager-email" className="h-12" />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={propertyManagerForm.control}
+                    name="password"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Password</FormLabel>
+                        <FormControl>
+                          <Input type="password" placeholder="••••••••" {...field} data-testid="input-property-manager-password" className="h-12" />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={propertyManagerForm.control}
+                    name="confirmPassword"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Confirm Password</FormLabel>
+                        <FormControl>
+                          <Input type="password" placeholder="••••••••" {...field} data-testid="input-property-manager-confirm-password" className="h-12" />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <Button type="submit" className="w-full h-12" data-testid="button-register-property-manager">
+                    Create Property Manager Account
                   </Button>
                 </form>
               </Form>

@@ -1849,6 +1849,24 @@ export class Storage {
   async addPropertyManagerCompanyLink(
     link: InsertPropertyManagerCompanyLink
   ): Promise<PropertyManagerCompanyLink> {
+    // Validate that the company exists and is actually a company role
+    const company = await this.getUserById(link.companyId);
+    if (!company || company.role !== 'company') {
+      throw new Error('Invalid company ID - company does not exist or is not a company role');
+    }
+    
+    // Validate that the property manager exists and has property_manager role
+    const propertyManager = await this.getUserById(link.propertyManagerId);
+    if (!propertyManager || propertyManager.role !== 'property_manager') {
+      throw new Error('Invalid property manager ID - user does not exist or is not a property manager');
+    }
+    
+    // Check for duplicate link (database has unique constraint but we provide better error message)
+    const existingLinks = await this.getPropertyManagerCompanyLinks(link.propertyManagerId);
+    if (existingLinks.some(existingLink => existingLink.companyCode === link.companyCode)) {
+      throw new Error('Property manager is already linked to this company');
+    }
+    
     const result = await db.insert(propertyManagerCompanyLinks)
       .values(link)
       .returning();

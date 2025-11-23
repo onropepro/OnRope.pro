@@ -254,28 +254,48 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       }
       
-      // Create user
-      const user = await storage.createUser(validatedData);
+      let user;
       
-      // If this is a property manager, link them to the company via company code
-      if (user.role === 'property_manager' && req.body.companyCode) {
+      // For property managers: use a transaction to create user AND company link atomically
+      if (validatedData.role === 'property_manager' && req.body.companyCode) {
+        // Validate company code BEFORE starting transaction
+        const company = await storage.getUserByResidentCode(req.body.companyCode);
+        if (!company || company.role !== 'company') {
+          return res.status(400).json({ message: "Invalid company code. Please check with the rope access company and try again." });
+        }
+        
+        // Hash password before transaction (CRITICAL for security)
+        const hashedPassword = await bcrypt.hash(validatedData.passwordHash, 10);
+        
+        // Atomic transaction: create user AND link to company
         try {
-          // Validate company code exists
-          const company = await storage.getUserByResidentCode(req.body.companyCode);
-          if (!company || company.role !== 'company') {
-            return res.status(400).json({ message: "Invalid company code. Please check with the rope access company." });
-          }
-          
-          // Create the company link
-          await storage.addPropertyManagerCompanyLink({
-            propertyManagerId: user.id,
-            companyCode: req.body.companyCode,
-            companyId: company.id,
+          user = await db.transaction(async (tx) => {
+            // Create user with hashed password
+            const [newUser] = await tx.insert(users).values({
+              ...validatedData,
+              passwordHash: hashedPassword,
+            }).returning();
+            
+            // Create company link
+            await tx.insert(propertyManagerCompanyLinks).values({
+              propertyManagerId: newUser.id,
+              companyCode: req.body.companyCode,
+              companyId: company.id,
+            });
+            
+            return newUser;
           });
         } catch (error) {
-          console.error('Error linking property manager to company:', error);
-          return res.status(500).json({ message: "Failed to link to company. Please contact support." });
+          console.error('Error creating property manager account:', error);
+          // Check for PostgreSQL unique constraint violation (code 23505)
+          if (error && typeof error === 'object' && 'code' in error && error.code === '23505') {
+            return res.status(400).json({ message: "You are already linked to this company." });
+          }
+          return res.status(500).json({ message: "Failed to create account. Please try again." });
         }
+      } else {
+        // For non-property-managers, create user normally
+        user = await storage.createUser(validatedData);
       }
       
       // If this is a company user, create default payroll config and generate periods
