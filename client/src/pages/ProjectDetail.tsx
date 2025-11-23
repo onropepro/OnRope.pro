@@ -797,7 +797,39 @@ export default function ProjectDetail() {
           </CardHeader>
           <CardContent className="space-y-6">
             {/* Building Visualization */}
-            {project.jobType === "in_suite_dryer_vent_cleaning" ? (
+            {isHoursBased ? (
+              <div className="space-y-6">
+                {/* Header with progress */}
+                <div className="text-center">
+                  <h3 className="text-5xl font-bold mb-2">{progressPercent}%</h3>
+                  <p className="text-base font-medium text-foreground">Project Completion</p>
+                  <p className="text-sm text-muted-foreground mt-1">
+                    Manual percentage tracking
+                  </p>
+                </div>
+
+                {/* Progress bar */}
+                <div className="relative h-10 bg-muted/50 rounded-xl overflow-hidden border border-border/30 shadow-sm">
+                  <div 
+                    className="absolute inset-y-0 left-0 bg-gradient-to-r from-primary to-primary/80 transition-all duration-500 ease-out flex items-center justify-end pr-4"
+                    style={{ width: `${progressPercent}%` }}
+                  >
+                    {progressPercent > 15 && (
+                      <span className="text-sm font-bold text-white drop-shadow">
+                        {progressPercent}%
+                      </span>
+                    )}
+                  </div>
+                  {progressPercent <= 15 && progressPercent > 0 && (
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <span className="text-sm font-bold text-muted-foreground">
+                        {progressPercent}%
+                      </span>
+                    </div>
+                  )}
+                </div>
+              </div>
+            ) : project.jobType === "in_suite_dryer_vent_cleaning" ? (
               <div className="space-y-6">
                 {/* Header with progress */}
                 <div className="text-center">
@@ -937,41 +969,43 @@ export default function ProjectDetail() {
               </>
             )}
 
-            {/* Stats */}
-            <div className="grid grid-cols-2 gap-4">
-              <div className="text-center p-4 bg-muted/50 rounded-lg">
-                <div className="text-2xl font-bold">
-                  {project.jobType === "in_suite_dryer_vent_cleaning" 
-                    ? project.suitesPerDay 
-                    : project.jobType === "parkade_pressure_cleaning" 
-                    ? project.stallsPerDay 
-                    : project.dailyDropTarget}
+            {/* Stats - Hide for hours-based projects since they don't have daily targets */}
+            {!isHoursBased && (
+              <div className="grid grid-cols-2 gap-4">
+                <div className="text-center p-4 bg-muted/50 rounded-lg">
+                  <div className="text-2xl font-bold">
+                    {project.jobType === "in_suite_dryer_vent_cleaning" 
+                      ? project.suitesPerDay 
+                      : project.jobType === "parkade_pressure_cleaning" 
+                      ? project.stallsPerDay 
+                      : project.dailyDropTarget}
+                  </div>
+                  <div className="text-sm text-muted-foreground mt-1">
+                    {project.jobType === "in_suite_dryer_vent_cleaning" 
+                      ? "Expected Suites/Day" 
+                      : project.jobType === "parkade_pressure_cleaning" 
+                      ? "Expected Stalls/Day" 
+                      : "Daily Target"}
+                  </div>
                 </div>
-                <div className="text-sm text-muted-foreground mt-1">
-                  {project.jobType === "in_suite_dryer_vent_cleaning" 
-                    ? "Expected Suites/Day" 
-                    : project.jobType === "parkade_pressure_cleaning" 
-                    ? "Expected Stalls/Day" 
-                    : "Daily Target"}
+                <div className="text-center p-4 bg-muted/50 rounded-lg">
+                  <div className="text-2xl font-bold">
+                    {completedDrops > 0 
+                      ? (() => {
+                          const dailyTarget = project.jobType === "in_suite_dryer_vent_cleaning" 
+                            ? project.suitesPerDay 
+                            : project.jobType === "parkade_pressure_cleaning" 
+                            ? project.stallsPerDay 
+                            : project.dailyDropTarget;
+                          const remaining = totalDrops - completedDrops;
+                          return Math.ceil(remaining / (dailyTarget || 1));
+                        })()
+                      : "N/A"}
+                  </div>
+                  <div className="text-sm text-muted-foreground mt-1">Days Remaining</div>
                 </div>
               </div>
-              <div className="text-center p-4 bg-muted/50 rounded-lg">
-                <div className="text-2xl font-bold">
-                  {completedDrops > 0 
-                    ? (() => {
-                        const dailyTarget = project.jobType === "in_suite_dryer_vent_cleaning" 
-                          ? project.suitesPerDay 
-                          : project.jobType === "parkade_pressure_cleaning" 
-                          ? project.stallsPerDay 
-                          : project.dailyDropTarget;
-                        const remaining = totalDrops - completedDrops;
-                        return Math.ceil(remaining / (dailyTarget || 1));
-                      })()
-                    : "N/A"}
-                </div>
-                <div className="text-sm text-muted-foreground mt-1">Days Remaining</div>
-              </div>
-            </div>
+            )}
 
             {/* Active Workers */}
             {(() => {
