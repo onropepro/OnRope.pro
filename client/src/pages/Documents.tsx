@@ -1540,16 +1540,6 @@ export default function Documents() {
                 {incidentReports.length}
               </Badge>
             </CardTitle>
-            <div className="flex gap-2 mt-2">
-              <Button
-                onClick={() => navigate("/incident-report")}
-                size="sm"
-                data-testid="create-incident-report"
-              >
-                <Plus className="h-4 w-4 mr-1" />
-                Create Report
-              </Button>
-            </div>
           </CardHeader>
           <CardContent>
             {incidentReports.length > 0 ? (
