@@ -272,7 +272,9 @@ export default function HoursAnalytics() {
       
       // Only include sessions from elevation-based projects (not hours-based projects)
       const project = projects.find((p: any) => p.id === s.projectId);
-      const isHoursBased = project?.jobType === 'general_pressure_washing' || project?.jobType === 'ground_window_cleaning';
+      const isHoursBased = project?.jobType === 'general_pressure_washing' || 
+                           project?.jobType === 'ground_window_cleaning' ||
+                           project?.jobType === 'in_suite_dryer_vent_cleaning';
       
       return sessionDate >= monthStart && sessionDate <= monthEnd && !isHoursBased;
     })
@@ -316,7 +318,9 @@ export default function HoursAnalytics() {
   const sessionsWithDrops = workSessions.filter((s: any) => {
     if (!s.endTime) return false;
     const project = projects.find((p: any) => p.id === s.projectId);
-    const isHoursBased = project?.jobType === 'general_pressure_washing' || project?.jobType === 'ground_window_cleaning';
+    const isHoursBased = project?.jobType === 'general_pressure_washing' || 
+                         project?.jobType === 'ground_window_cleaning' ||
+                         project?.jobType === 'in_suite_dryer_vent_cleaning';
     return !isHoursBased;
   });
   const avgDropsPerSession = sessionsWithDrops.length > 0
