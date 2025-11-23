@@ -36,6 +36,7 @@ import ResidentsManagement from "@/pages/ResidentsManagement";
 import Documents from "@/pages/Documents";
 import ResidentLink from "@/pages/ResidentLink";
 import PropertyManagerSettings from "@/pages/PropertyManagerSettings";
+import PropertyManager from "@/pages/PropertyManager";
 import NotFound from "@/pages/not-found";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import { EMPLOYEE_ROLES } from "@/lib/permissions";
@@ -73,6 +74,11 @@ function Router() {
       <Route path="/resident">
         <ProtectedRoute allowedRoles={["resident"]}>
           <ResidentDashboard />
+        </ProtectedRoute>
+      </Route>
+      <Route path="/property-manager">
+        <ProtectedRoute allowedRoles={["property_manager"]}>
+          <PropertyManager />
         </ProtectedRoute>
       </Route>
       <Route path="/dashboard">

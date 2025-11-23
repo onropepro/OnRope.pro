@@ -1964,6 +1964,48 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Property Manager: Get vendor summaries (My Vendors interface)
+  app.get("/api/property-managers/me/vendors", requireAuth, requireRole("property_manager"), async (req: Request, res: Response) => {
+    try {
+      const vendorSummaries = await storage.getPropertyManagerVendorSummaries(req.session.userId!);
+      res.json({ vendors: vendorSummaries });
+    } catch (error) {
+      console.error("Get property manager vendor summaries error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Property Manager: Add new vendor using company code
+  app.post("/api/property-managers/vendors", requireAuth, requireRole("property_manager"), async (req: Request, res: Response) => {
+    try {
+      const { companyCode } = req.body;
+      
+      if (!companyCode || typeof companyCode !== 'string' || companyCode.length !== 10) {
+        return res.status(400).json({ message: "Invalid company code format. Must be 10 characters." });
+      }
+      
+      const link = await storage.addPropertyManagerVendor(req.session.userId!, companyCode);
+      
+      const vendorSummaries = await storage.getPropertyManagerVendorSummaries(req.session.userId!);
+      const addedVendor = vendorSummaries.find(v => v.id === link.companyId);
+      
+      res.json({ 
+        link,
+        vendor: addedVendor,
+        message: "Vendor added successfully"
+      });
+    } catch (error: any) {
+      console.error("Add property manager vendor error:", error);
+      if (error.message?.includes('Invalid company code')) {
+        return res.status(400).json({ message: error.message });
+      }
+      if (error.message?.includes('already linked')) {
+        return res.status(400).json({ message: "You are already linked to this company." });
+      }
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
   // SuperUser: Get all companies
   app.get("/api/superuser/companies", requireAuth, async (req: Request, res: Response) => {
     try {

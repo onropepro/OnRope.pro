@@ -77,12 +77,15 @@ export default function Login() {
       if (user.role === "resident") {
         console.log("🏠 Redirecting to resident dashboard...");
         setLocation("/resident");
+      } else if (user.role === "property_manager") {
+        console.log("🏢 Redirecting to property manager dashboard...");
+        setLocation("/property-manager");
       } else {
         console.log("📊 Redirecting to employee dashboard...");
         setLocation("/dashboard");
       }
       
-      console.log("✅ Navigation triggered to:", user.role === "resident" ? "/resident" : "/dashboard");
+      console.log("✅ Navigation triggered");
     } catch (error) {
       form.setError("identifier", { message: "An error occurred. Please try again." });
     }
@@ -307,6 +310,8 @@ export default function Login() {
                       const user = result.user;
                       if (user.role === "resident") {
                         window.location.href = "/resident";
+                      } else if (user.role === "property_manager") {
+                        window.location.href = "/property-manager";
                       } else {
                         window.location.href = "/dashboard";
                       }
@@ -346,6 +351,8 @@ export default function Login() {
                       const user = result.user;
                       if (user.role === "resident") {
                         window.location.href = "/resident";
+                      } else if (user.role === "property_manager") {
+                        window.location.href = "/property-manager";
                       } else {
                         window.location.href = "/dashboard";
                       }
@@ -385,6 +392,8 @@ export default function Login() {
                       const user = result.user;
                       if (user.role === "resident") {
                         window.location.href = "/resident";
+                      } else if (user.role === "property_manager") {
+                        window.location.href = "/property-manager";
                       } else {
                         window.location.href = "/dashboard";
                       }
@@ -425,6 +434,8 @@ export default function Login() {
                       const user = result.user;
                       if (user.role === "resident") {
                         window.location.href = "/resident";
+                      } else if (user.role === "property_manager") {
+                        window.location.href = "/property-manager";
                       } else {
                         window.location.href = "/dashboard";
                       }
@@ -462,7 +473,7 @@ export default function Login() {
                     });
                     const result = await response.json();
                     if (response.ok) {
-                      window.location.href = "/dashboard";
+                      window.location.href = "/property-manager";
                     } else {
                       toast({
                         title: "Quick Login Failed",

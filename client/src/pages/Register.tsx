@@ -189,8 +189,8 @@ export default function Register() {
         return;
       }
 
-      // Redirect to dashboard
-      window.location.href = "/dashboard";
+      // Redirect to property manager dashboard
+      window.location.href = "/property-manager";
     } catch (error) {
       propertyManagerForm.setError("email", { message: "An error occurred. Please try again." });
     }

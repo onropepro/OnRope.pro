@@ -1958,6 +1958,65 @@ export class Storage {
         )
       );
   }
+
+  async getPropertyManagerVendorSummaries(propertyManagerId: string): Promise<Array<{
+    id: string;
+    companyName: string;
+    email: string;
+    phone: string | null;
+    logo: string | null;
+    activeProjectsCount: number;
+    residentCode: string | null;
+    propertyManagerCode: string | null;
+  }>> {
+    const companies = await this.getPropertyManagerLinkedCompanies(propertyManagerId);
+    
+    const vendorSummaries = await Promise.all(
+      companies.map(async (company) => {
+        const activeProjects = await db.select()
+          .from(projects)
+          .where(
+            and(
+              eq(projects.companyId, company.id),
+              eq(projects.status, 'active')
+            )
+          );
+        
+        return {
+          id: company.id,
+          companyName: company.fullName || company.username,
+          email: company.email,
+          phone: company.phone,
+          logo: company.logo,
+          activeProjectsCount: activeProjects.length,
+          residentCode: company.residentCode,
+          propertyManagerCode: company.propertyManagerCode,
+        };
+      })
+    );
+    
+    return vendorSummaries;
+  }
+
+  async addPropertyManagerVendor(propertyManagerId: string, companyCode: string): Promise<PropertyManagerCompanyLink> {
+    const company = await this.getUserByPropertyManagerCode(companyCode);
+    
+    if (!company) {
+      throw new Error('Invalid company code - no company found with this property manager code');
+    }
+    
+    if (company.role !== 'company') {
+      throw new Error('Invalid code - this code does not belong to a company');
+    }
+    
+    const link: InsertPropertyManagerCompanyLink = {
+      propertyManagerId,
+      companyId: company.id,
+      companyCode,
+    };
+    
+    return await this.createPropertyManagerCompanyLink(link);
+  }
 }
 
 export const storage = new Storage();
