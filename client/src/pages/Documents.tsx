@@ -660,6 +660,368 @@ export default function Documents() {
     doc.save(`Equipment_Inspection_${new Date(inspection.inspectionDate).toISOString().split('T')[0]}.pdf`);
   };
 
+  const downloadIncidentReport = async (report: any) => {
+    const doc = new jsPDF();
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const pageHeight = doc.internal.pageSize.getHeight();
+    let yPosition = 20;
+
+    const addMultilineText = (lines: string[], currentY: number, lineHeight: number = 6): number => {
+      let y = currentY;
+      for (const line of lines) {
+        if (y > pageHeight - 30) {
+          doc.addPage();
+          y = 20;
+        }
+        doc.text(line, 20, y);
+        y += lineHeight;
+      }
+      return y;
+    };
+
+    // Header
+    doc.setFillColor(239, 68, 68); // Red for incidents
+    
+    const brandingHeight = addCompanyBranding(doc, pageWidth);
+    const headerHeight = 35 + brandingHeight;
+    doc.rect(0, 0, pageWidth, headerHeight, 'F');
+    
+    doc.setTextColor(255, 255, 255);
+    doc.setFontSize(20);
+    doc.setFont('helvetica', 'bold');
+    doc.text('INCIDENT REPORT', pageWidth / 2, 15 + brandingHeight, { align: 'center' });
+    doc.setFontSize(11);
+    doc.setFont('helvetica', 'normal');
+    doc.text('Official Incident Documentation and Investigation', pageWidth / 2, 25 + brandingHeight, { align: 'center' });
+
+    yPosition = 45 + brandingHeight;
+
+    // Basic Information Section
+    doc.setTextColor(0, 0, 0);
+    doc.setFontSize(11);
+    doc.setFont('helvetica', 'bold');
+    doc.text('Incident Information', 20, yPosition);
+    yPosition += 8;
+
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(10);
+    doc.text(`Date: ${new Date(report.incidentDate).toLocaleDateString('en-US', {
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    })}`, 20, yPosition);
+    yPosition += 6;
+
+    doc.text(`Time: ${report.incidentTime || 'N/A'}`, 20, yPosition);
+    yPosition += 6;
+
+    doc.text(`Location: ${report.location || 'N/A'}`, 20, yPosition);
+    yPosition += 6;
+
+    if (report.projectName) {
+      doc.text(`Project: ${report.projectName}`, 20, yPosition);
+      yPosition += 6;
+    }
+
+    doc.text(`Reported By: ${report.reportedByName}`, 20, yPosition);
+    yPosition += 6;
+
+    doc.text(`Report Date: ${new Date(report.reportDate).toLocaleDateString()}`, 20, yPosition);
+    yPosition += 10;
+
+    // Description
+    if (report.description) {
+      if (yPosition > pageHeight - 30) {
+        doc.addPage();
+        yPosition = 20;
+      }
+      
+      doc.setFont('helvetica', 'bold');
+      doc.text('Incident Description:', 20, yPosition);
+      yPosition += 6;
+      
+      doc.setFont('helvetica', 'normal');
+      const descLines = doc.splitTextToSize(report.description, pageWidth - 40);
+      yPosition = addMultilineText(descLines, yPosition);
+      yPosition += 10;
+    }
+
+    // Incident Classification
+    if (yPosition > pageHeight - 30) {
+      doc.addPage();
+      yPosition = 20;
+    }
+
+    doc.setFont('helvetica', 'bold');
+    doc.text('Incident Classification', 20, yPosition);
+    yPosition += 8;
+
+    doc.setFont('helvetica', 'normal');
+    doc.text(`Type: ${report.incidentType || 'N/A'}`, 20, yPosition);
+    yPosition += 6;
+
+    doc.text(`Severity: ${report.severity || 'N/A'}`, 20, yPosition);
+    yPosition += 6;
+
+    doc.text(`Immediate Cause: ${report.immediateCause || 'N/A'}`, 20, yPosition);
+    yPosition += 10;
+
+    // People Involved
+    if (report.peopleInvolved && report.peopleInvolved.length > 0) {
+      if (yPosition > pageHeight - 30) {
+        doc.addPage();
+        yPosition = 20;
+      }
+
+      doc.setFont('helvetica', 'bold');
+      doc.text('People Involved', 20, yPosition);
+      yPosition += 8;
+
+      report.peopleInvolved.forEach((person: any, index: number) => {
+        if (yPosition > pageHeight - 50) {
+          doc.addPage();
+          yPosition = 20;
+        }
+
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(10);
+        doc.text(`Person ${index + 1}:`, 25, yPosition);
+        yPosition += 6;
+
+        doc.setFont('helvetica', 'normal');
+        doc.text(`Name: ${person.name}`, 30, yPosition);
+        yPosition += 5;
+        doc.text(`Role: ${person.role}`, 30, yPosition);
+        yPosition += 5;
+
+        if (person.injuryType && person.injuryType !== 'none') {
+          doc.text(`Injury Type: ${person.injuryType}`, 30, yPosition);
+          yPosition += 5;
+        }
+
+        if (person.bodyPartAffected) {
+          doc.text(`Body Part Affected: ${person.bodyPartAffected}`, 30, yPosition);
+          yPosition += 5;
+        }
+
+        if (person.medicalTreatment) {
+          doc.text(`Medical Treatment: ${person.medicalTreatment}`, 30, yPosition);
+          yPosition += 5;
+        }
+
+        yPosition += 3;
+      });
+
+      yPosition += 5;
+    }
+
+    // Root Cause Analysis
+    if (report.rootCause) {
+      if (yPosition > pageHeight - 30) {
+        doc.addPage();
+        yPosition = 20;
+      }
+
+      doc.setFont('helvetica', 'bold');
+      doc.text('Root Cause Analysis:', 20, yPosition);
+      yPosition += 6;
+
+      doc.setFont('helvetica', 'normal');
+      const rootCauseLines = doc.splitTextToSize(report.rootCause, pageWidth - 40);
+      yPosition = addMultilineText(rootCauseLines, yPosition);
+      yPosition += 10;
+    }
+
+    // Contributing Factors
+    if (report.contributingFactors) {
+      if (yPosition > pageHeight - 30) {
+        doc.addPage();
+        yPosition = 20;
+      }
+
+      doc.setFont('helvetica', 'bold');
+      doc.text('Contributing Factors:', 20, yPosition);
+      yPosition += 6;
+
+      doc.setFont('helvetica', 'normal');
+      const factorsLines = doc.splitTextToSize(report.contributingFactors, pageWidth - 40);
+      yPosition = addMultilineText(factorsLines, yPosition);
+      yPosition += 10;
+    }
+
+    // Corrective Actions
+    if (report.correctiveActionItems && report.correctiveActionItems.length > 0) {
+      if (yPosition > pageHeight - 30) {
+        doc.addPage();
+        yPosition = 20;
+      }
+
+      doc.setFont('helvetica', 'bold');
+      doc.text('Corrective Actions', 20, yPosition);
+      yPosition += 8;
+
+      report.correctiveActionItems.forEach((action: any, index: number) => {
+        if (yPosition > pageHeight - 40) {
+          doc.addPage();
+          yPosition = 20;
+        }
+
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(10);
+        doc.text(`Action ${index + 1}:`, 25, yPosition);
+        yPosition += 6;
+
+        doc.setFont('helvetica', 'normal');
+        const actionLines = doc.splitTextToSize(action.action, pageWidth - 50);
+        actionLines.forEach((line: string) => {
+          doc.text(line, 30, yPosition);
+          yPosition += 5;
+        });
+
+        doc.text(`Assigned To: ${action.assignedTo}`, 30, yPosition);
+        yPosition += 5;
+        doc.text(`Due Date: ${new Date(action.dueDate).toLocaleDateString()}`, 30, yPosition);
+        yPosition += 5;
+        doc.text(`Status: ${action.status}`, 30, yPosition);
+        yPosition += 8;
+      });
+    }
+
+    // Regulatory Information
+    if (report.reportableToRegulator || report.regulatorNotificationDate) {
+      if (yPosition > pageHeight - 30) {
+        doc.addPage();
+        yPosition = 20;
+      }
+
+      doc.setFont('helvetica', 'bold');
+      doc.text('Regulatory Reporting', 20, yPosition);
+      yPosition += 8;
+
+      doc.setFont('helvetica', 'normal');
+      doc.text(`Reportable to Regulator: ${report.reportableToRegulator ? 'Yes' : 'No'}`, 20, yPosition);
+      yPosition += 6;
+
+      if (report.regulatorNotificationDate) {
+        doc.text(`Notification Date: ${new Date(report.regulatorNotificationDate).toLocaleDateString()}`, 20, yPosition);
+        yPosition += 6;
+      }
+
+      if (report.regulatorReferenceNumber) {
+        doc.text(`Reference Number: ${report.regulatorReferenceNumber}`, 20, yPosition);
+        yPosition += 6;
+      }
+
+      yPosition += 5;
+    }
+
+    // Supervisor Review
+    if (report.supervisorReviewDate) {
+      if (yPosition > pageHeight - 30) {
+        doc.addPage();
+        yPosition = 20;
+      }
+
+      doc.setFont('helvetica', 'bold');
+      doc.text('Supervisor Review', 20, yPosition);
+      yPosition += 8;
+
+      doc.setFont('helvetica', 'normal');
+      doc.text(`Reviewed By: ${report.supervisorReviewedBy || 'N/A'}`, 20, yPosition);
+      yPosition += 6;
+      doc.text(`Review Date: ${new Date(report.supervisorReviewDate).toLocaleDateString()}`, 20, yPosition);
+      yPosition += 6;
+
+      if (report.supervisorComments) {
+        doc.setFont('helvetica', 'bold');
+        doc.text('Comments:', 20, yPosition);
+        yPosition += 6;
+
+        doc.setFont('helvetica', 'normal');
+        const commentsLines = doc.splitTextToSize(report.supervisorComments, pageWidth - 40);
+        yPosition = addMultilineText(commentsLines, yPosition);
+        yPosition += 8;
+      }
+    }
+
+    // Management Review
+    if (report.managementReviewDate) {
+      if (yPosition > pageHeight - 30) {
+        doc.addPage();
+        yPosition = 20;
+      }
+
+      doc.setFont('helvetica', 'bold');
+      doc.text('Management Review', 20, yPosition);
+      yPosition += 8;
+
+      doc.setFont('helvetica', 'normal');
+      doc.text(`Reviewed By: ${report.managementReviewedBy || 'N/A'}`, 20, yPosition);
+      yPosition += 6;
+      doc.text(`Review Date: ${new Date(report.managementReviewDate).toLocaleDateString()}`, 20, yPosition);
+      yPosition += 6;
+
+      if (report.managementComments) {
+        doc.setFont('helvetica', 'bold');
+        doc.text('Comments:', 20, yPosition);
+        yPosition += 6;
+
+        doc.setFont('helvetica', 'normal');
+        const commentsLines = doc.splitTextToSize(report.managementComments, pageWidth - 40);
+        yPosition = addMultilineText(commentsLines, yPosition);
+        yPosition += 8;
+      }
+    }
+
+    // Signatures Section
+    if (report.signatures && report.signatures.length > 0) {
+      yPosition += 10;
+
+      if (yPosition > pageHeight - 30) {
+        doc.addPage();
+        yPosition = 20;
+      }
+
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(11);
+      doc.text('Signatures', 20, yPosition);
+      yPosition += 10;
+
+      for (const sig of report.signatures) {
+        if (yPosition > pageHeight - 50) {
+          doc.addPage();
+          yPosition = 20;
+        }
+
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(10);
+        doc.text(`${sig.role}: ${sig.name}`, 20, yPosition);
+        yPosition += 5;
+
+        try {
+          doc.addImage(sig.signatureDataUrl, 'PNG', 20, yPosition, 60, 20);
+        } catch (error) {
+          console.error('Error adding signature image:', error);
+        }
+        yPosition += 25;
+
+        doc.setLineWidth(0.5);
+        doc.line(20, yPosition, 80, yPosition);
+        yPosition += 10;
+      }
+    }
+
+    // Footer
+    const footerY = pageHeight - 15;
+    doc.setFontSize(8);
+    doc.setTextColor(100, 100, 100);
+    doc.setFont('helvetica', 'italic');
+    doc.text('This is an official incident report. Keep for compliance and regulatory purposes.', pageWidth / 2, footerY, { align: 'center' });
+
+    doc.save(`Incident_Report_${new Date(report.incidentDate).toISOString().split('T')[0]}.pdf`);
+  };
+
   // Same professional HTML download function as Quotes.tsx
   const downloadQuote = (quote: any) => {
     const serviceNames: Record<string, string> = {
