@@ -651,9 +651,13 @@ export default function ProjectDetail() {
     );
   }
 
-  // Calculate total drops from elevation-specific fields
-  const totalDrops = (project.totalDropsNorth ?? 0) + (project.totalDropsEast ?? 0) + 
-                     (project.totalDropsSouth ?? 0) + (project.totalDropsWest ?? 0);
+  // Calculate total drops/units based on job type
+  const totalDrops = project.jobType === "in_suite_dryer_vent_cleaning" 
+    ? project.floorCount  // For dryer vent, use total suite count
+    : project.jobType === "parkade_pressure_cleaning"
+    ? (project.totalStalls || project.floorCount)  // For parkade, use total stalls
+    : (project.totalDropsNorth ?? 0) + (project.totalDropsEast ?? 0) + 
+      (project.totalDropsSouth ?? 0) + (project.totalDropsWest ?? 0);  // For window cleaning, use elevation drops
 
   // Calculate completed drops from work sessions (elevation-specific)
   const completedSessions = workSessions.filter((s: any) => s.endTime !== null);
