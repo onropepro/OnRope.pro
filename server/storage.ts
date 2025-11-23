@@ -545,6 +545,47 @@ export class Storage {
     return result[0];
   }
 
+  async getWorkSessionForCompany(sessionId: string, companyId: string): Promise<WorkSession | undefined> {
+    // SECURITY: Company-scoped query that JOINs with projects to ensure session belongs to company
+    const result = await db.select({
+      id: workSessions.id,
+      projectId: workSessions.projectId,
+      employeeId: workSessions.employeeId,
+      companyId: workSessions.companyId,
+      workDate: workSessions.workDate,
+      startTime: workSessions.startTime,
+      endTime: workSessions.endTime,
+      startLatitude: workSessions.startLatitude,
+      startLongitude: workSessions.startLongitude,
+      endLatitude: workSessions.endLatitude,
+      endLongitude: workSessions.endLongitude,
+      dropsCompletedNorth: workSessions.dropsCompletedNorth,
+      dropsCompletedEast: workSessions.dropsCompletedEast,
+      dropsCompletedSouth: workSessions.dropsCompletedSouth,
+      dropsCompletedWest: workSessions.dropsCompletedWest,
+      regularHours: workSessions.regularHours,
+      overtimeHours: workSessions.overtimeHours,
+      doubleTimeHours: workSessions.doubleTimeHours,
+      shortfallReason: workSessions.shortfallReason,
+      manualCompletionPercentage: workSessions.manualCompletionPercentage,
+      isBillable: workSessions.isBillable,
+      description: workSessions.description,
+      createdAt: workSessions.createdAt,
+      updatedAt: workSessions.updatedAt,
+    })
+    .from(workSessions)
+    .innerJoin(projects, eq(workSessions.projectId, projects.id))
+    .where(
+      and(
+        eq(workSessions.id, sessionId),
+        eq(projects.companyId, companyId)
+      )
+    )
+    .limit(1);
+    
+    return result[0];
+  }
+
   async endWorkSession(
     sessionId: string, 
     dropsCompletedNorth: number,

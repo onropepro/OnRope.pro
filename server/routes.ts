@@ -3916,34 +3916,37 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "User not found" });
       }
       
-      // Check financial permission
-      const hasFinancialAccess = currentUser.role === "company" || 
-                                 currentUser.role === "operations_manager" || 
-                                 currentUser.role === "supervisor" || 
-                                 currentUser.role === "general_supervisor" || 
-                                 currentUser.role === "rope_access_supervisor" || 
-                                 currentUser.permissions?.includes("view_financial_data");
+      // CRITICAL SECURITY: Check financial permission before allowing edits
+      const hasFinancialPermission = currentUser.role === "company" || 
+                                     currentUser.viewFinancialData === true ||
+                                     currentUser.role === "operations_manager" || 
+                                     currentUser.role === "supervisor" || 
+                                     currentUser.role === "general_supervisor" || 
+                                     currentUser.role === "rope_access_supervisor" || 
+                                     currentUser.permissions?.includes("view_financial_data");
       
-      if (!hasFinancialAccess) {
-        return res.status(403).json({ message: "Access denied - financial permission required" });
+      if (!hasFinancialPermission) {
+        return res.status(403).json({ message: "Access denied - financial permission required to edit work sessions" });
       }
       
       const { sessionId } = req.params;
       const { startTime, endTime, dropsCompletedNorth, dropsCompletedEast, dropsCompletedSouth, dropsCompletedWest, manualCompletionPercentage, isBillable } = req.body;
       
-      // Get existing session to verify company access
-      const existingSession = await storage.getWorkSessionById(sessionId);
+      // CRITICAL SECURITY: Get company ID and fetch session with company-scoped query
+      const companyId = currentUser.role === "company" ? currentUser.id : currentUser.companyId;
+      
+      if (!companyId) {
+        return res.status(403).json({ message: "Unable to determine company" });
+      }
+      
+      // Company-scoped query ensures session belongs to requester's company
+      const existingSession = await storage.getWorkSessionForCompany(sessionId, companyId);
       if (!existingSession) {
+        // Either session doesn't exist OR it belongs to another company (intentionally ambiguous for security)
         return res.status(404).json({ message: "Work session not found" });
       }
       
-      // Verify user has access to this company's data
-      const companyId = currentUser.role === "company" ? currentUser.id : currentUser.companyId;
-      if (existingSession.companyId !== companyId) {
-        return res.status(403).json({ message: "Access denied - not your company's data" });
-      }
-      
-      // Get project to check job type for validation
+      // Get project to check job type for validation (company ownership already verified)
       const project = await storage.getProjectById(existingSession.projectId);
       if (!project) {
         return res.status(404).json({ message: "Project not found" });
