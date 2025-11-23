@@ -656,29 +656,6 @@ export default function Profile() {
                             />
                           </FormControl>
                           <FormMessage />
-                          {field.value && field.value.length === 10 && (
-                            <div className="mt-4 p-4 bg-muted/50 border border-border rounded-lg">
-                              <div className="flex items-start gap-4">
-                                <div className="flex-1">
-                                  <p className="text-sm font-medium mb-2">Share with Residents via QR Code</p>
-                                  <p className="text-xs text-muted-foreground mb-3">
-                                    Residents can scan this code with their phone to automatically link their account to your company
-                                  </p>
-                                  <div className="text-xs text-muted-foreground font-mono">
-                                    Link: {window.location.origin}/link?code={field.value}
-                                  </div>
-                                </div>
-                                <div className="bg-white p-3 rounded-lg">
-                                  <QRCodeSVG
-                                    value={`${window.location.origin}/link?code=${field.value}`}
-                                    size={120}
-                                    level="M"
-                                    data-testid="qr-code-resident-link"
-                                  />
-                                </div>
-                              </div>
-                            </div>
-                          )}
                         </FormItem>
                       )}
                     />
