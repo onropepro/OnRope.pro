@@ -5577,7 +5577,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(403).json({ message: "Access denied" });
       }
       
-      const report = await storage.updateIncidentReport(id, req.body);
+      // Merge server-derived companyId to prevent tampering
+      const payload = { ...req.body, companyId };
+      const report = await storage.updateIncidentReport(id, payload);
       res.json({ report });
     } catch (error) {
       console.error("Update incident report error:", error);
