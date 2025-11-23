@@ -512,7 +512,7 @@ export default function Login() {
                 data-testid="link-register"
               >
                 <span className="material-icons mr-2">person_add</span>
-                Create Resident Account
+                Create Resident/Property Manager Account
               </Button>
             </div>
 
