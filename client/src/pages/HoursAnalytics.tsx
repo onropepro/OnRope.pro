@@ -261,7 +261,7 @@ export default function HoursAnalytics() {
     ? ((monthBillable + monthNonBillable) / totalEmployees).toFixed(1)
     : '0.0';
   
-  // Calculate total drops completed this month
+  // Calculate total drops completed this month (only for elevation-based projects)
   const totalDropsThisMonth = workSessions
     .filter((s: any) => {
       if (!s.endTime) return false;
@@ -269,7 +269,12 @@ export default function HoursAnalytics() {
       if (!dateStr) return false;
       const parts = dateStr.split('T')[0].split('-');
       const sessionDate = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
-      return sessionDate >= monthStart && sessionDate <= monthEnd;
+      
+      // Only include sessions from elevation-based projects (not hours-based projects)
+      const project = projects.find((p: any) => p.id === s.projectId);
+      const isHoursBased = project?.jobType === 'general_pressure_washing' || project?.jobType === 'ground_window_cleaning';
+      
+      return sessionDate >= monthStart && sessionDate <= monthEnd && !isHoursBased;
     })
     .reduce((sum: number, s: any) => {
       return sum + (s.dropsCompletedNorth || 0) + (s.dropsCompletedEast || 0) + 
@@ -307,8 +312,13 @@ export default function HoursAnalytics() {
     }
   });
   
-  // Calculate average drops per work session
-  const sessionsWithDrops = workSessions.filter((s: any) => s.endTime);
+  // Calculate average drops per work session (only for elevation-based projects)
+  const sessionsWithDrops = workSessions.filter((s: any) => {
+    if (!s.endTime) return false;
+    const project = projects.find((p: any) => p.id === s.projectId);
+    const isHoursBased = project?.jobType === 'general_pressure_washing' || project?.jobType === 'ground_window_cleaning';
+    return !isHoursBased;
+  });
   const avgDropsPerSession = sessionsWithDrops.length > 0
     ? (totalDropsThisMonth / sessionsWithDrops.length).toFixed(1)
     : '0.0';
