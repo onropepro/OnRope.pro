@@ -35,6 +35,7 @@ import CompanyDetail from "@/pages/CompanyDetail";
 import ResidentsManagement from "@/pages/ResidentsManagement";
 import Documents from "@/pages/Documents";
 import ResidentLink from "@/pages/ResidentLink";
+import PropertyManagerSettings from "@/pages/PropertyManagerSettings";
 import NotFound from "@/pages/not-found";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import { EMPLOYEE_ROLES } from "@/lib/permissions";
@@ -97,6 +98,11 @@ function Router() {
       <Route path="/profile">
         <ProtectedRoute>
           <Profile />
+        </ProtectedRoute>
+      </Route>
+      <Route path="/property-manager-settings">
+        <ProtectedRoute allowedRoles={["property_manager"]}>
+          <PropertyManagerSettings />
         </ProtectedRoute>
       </Route>
       <Route path="/manage-subscription">
