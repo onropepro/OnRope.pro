@@ -135,6 +135,7 @@ const employeeSchema = z.object({
   // New employee details
   startDate: z.string().optional(),
   birthday: z.string().optional(),
+  socialInsuranceNumber: z.string().optional(),
   driversLicenseNumber: z.string().optional(),
   driversLicenseProvince: z.string().optional(),
   driversLicenseDocuments: z.array(z.string()).default([]),
@@ -159,6 +160,7 @@ const editEmployeeSchema = z.object({
   // New employee details
   startDate: z.string().optional(),
   birthday: z.string().optional(),
+  socialInsuranceNumber: z.string().optional(),
   driversLicenseNumber: z.string().optional(),
   driversLicenseProvince: z.string().optional(),
   driversLicenseDocuments: z.array(z.string()).default([]),
@@ -610,6 +612,7 @@ export default function Dashboard() {
       permissions: [],
       startDate: "",
       birthday: "",
+      socialInsuranceNumber: "",
       driversLicenseNumber: "",
       driversLicenseProvince: "",
       driversLicenseDocuments: [],
@@ -635,6 +638,7 @@ export default function Dashboard() {
       permissions: [],
       startDate: "",
       birthday: "",
+      socialInsuranceNumber: "",
       driversLicenseNumber: "",
       driversLicenseProvince: "",
       driversLicenseDocuments: [],
@@ -885,6 +889,7 @@ export default function Dashboard() {
         permissions: data.permissions,
         startDate: data.startDate,
         birthday: data.birthday,
+        socialInsuranceNumber: data.socialInsuranceNumber,
         driversLicenseNumber: data.driversLicenseNumber,
         driversLicenseProvince: data.driversLicenseProvince,
         driversLicenseDocuments: data.driversLicenseDocuments,
@@ -1089,6 +1094,7 @@ export default function Dashboard() {
       permissions: employee.permissions || [],
       startDate: employee.startDate ?? "",
       birthday: employee.birthday ?? "",
+      socialInsuranceNumber: employee.socialInsuranceNumber ?? "",
       driversLicenseNumber: employee.driversLicenseNumber ?? "",
       driversLicenseProvince: employee.driversLicenseProvince ?? "",
       driversLicenseDocuments: employee.driversLicenseDocuments || [],
@@ -3444,6 +3450,20 @@ export default function Dashboard() {
 
                           <FormField
                             control={employeeForm.control}
+                            name="socialInsuranceNumber"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Social Insurance Number</FormLabel>
+                                <FormControl>
+                                  <Input placeholder="XXX-XXX-XXX" {...field} data-testid="input-employee-sin" className="h-12" />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+
+                          <FormField
+                            control={employeeForm.control}
                             name="driversLicenseNumber"
                             render={({ field }) => (
                               <FormItem>
@@ -5184,6 +5204,20 @@ export default function Dashboard() {
                           <FormLabel>Birthday</FormLabel>
                           <FormControl>
                             <Input type="date" {...field} data-testid="input-edit-employee-birthday" className="h-12" />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={editEmployeeForm.control}
+                      name="socialInsuranceNumber"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Social Insurance Number</FormLabel>
+                          <FormControl>
+                            <Input placeholder="XXX-XXX-XXX" {...field} data-testid="input-edit-employee-sin" className="h-12" />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
