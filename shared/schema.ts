@@ -696,6 +696,122 @@ export const flhaForms = pgTable("flha_forms", {
   index("IDX_flha_assessor").on(table.assessorId, table.assessmentDate),
 ]);
 
+// Incident Reports table - for workplace incident documentation
+export const incidentReports = pgTable("incident_reports", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  companyId: varchar("company_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  projectId: varchar("project_id").references(() => projects.id, { onDelete: "cascade" }), // Optional - may not be project-specific
+  reportedById: varchar("reported_by_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  
+  // Basic Information
+  reporterName: varchar("reporter_name").notNull(),
+  reporterTitle: varchar("reporter_title").notNull(), // Job title of person filing report
+  incidentDate: date("incident_date").notNull(),
+  incidentTime: varchar("incident_time").notNull(), // Time of incident (HH:MM format)
+  reportDate: date("report_date").notNull(), // Date report was filed
+  location: text("location").notNull(), // Where incident occurred
+  specificLocation: text("specific_location"), // More detailed location (e.g., "3rd floor, east side")
+  
+  // Incident Classification
+  incidentType: varchar("incident_type").notNull(), // injury | near_miss | property_damage | environmental | equipment_failure | other
+  incidentSeverity: varchar("incident_severity").notNull(), // minor | moderate | serious | critical | fatal
+  workRelated: boolean("work_related").notNull().default(true), // Was this work-related?
+  
+  // Injured/Affected Person(s)
+  injuredPersonName: varchar("injured_person_name"), // Name of injured person (if applicable)
+  injuredPersonRole: varchar("injured_person_role"), // Role/title of injured person
+  injuredPersonCompany: varchar("injured_person_company"), // Company (in case of contractor/visitor)
+  injuryType: varchar("injury_type"), // Type of injury: cut | bruise | fracture | sprain | burn | other
+  injuryLocation: varchar("injury_location"), // Body part: head | neck | back | arm | leg | hand | foot | other
+  medicalTreatment: varchar("medical_treatment"), // none | first_aid | clinic | hospital | emergency
+  timeOffWork: boolean("time_off_work").default(false), // Did person miss work?
+  estimatedDaysOff: integer("estimated_days_off"), // Estimated days off work
+  
+  // Incident Description
+  incidentDescription: text("incident_description").notNull(), // Detailed description of what happened
+  taskBeingPerformed: text("task_being_performed"), // What task was being performed
+  equipmentInvolved: text("equipment_involved"), // Equipment/tools involved
+  environmentalFactors: text("environmental_factors"), // Weather, lighting, noise, etc.
+  
+  // Witnesses
+  witnesses: text("witnesses").array().default(sql`ARRAY[]::text[]`), // Array of witness names
+  witnessStatements: text("witness_statements"), // Statements from witnesses
+  
+  // Immediate Actions Taken
+  firstAidProvided: boolean("first_aid_provided").default(false),
+  emergencyServicesContacted: boolean("emergency_services_contacted").default(false),
+  areaSecured: boolean("area_secured").default(false),
+  equipmentIsolated: boolean("equipment_isolated").default(false),
+  immediateActionDescription: text("immediate_action_description"), // Description of immediate actions
+  
+  // Root Cause Analysis
+  rootCauseEquipmentFailure: boolean("root_cause_equipment_failure").default(false),
+  rootCauseHumanError: boolean("root_cause_human_error").default(false),
+  rootCauseInadequateTraining: boolean("root_cause_inadequate_training").default(false),
+  rootCauseUnsafeConditions: boolean("root_cause_unsafe_conditions").default(false),
+  rootCausePoorCommunication: boolean("root_cause_poor_communication").default(false),
+  rootCauseInsufficientPPE: boolean("root_cause_insufficient_ppe").default(false),
+  rootCauseWeatherConditions: boolean("root_cause_weather_conditions").default(false),
+  rootCauseOther: boolean("root_cause_other").default(false),
+  rootCauseDetails: text("root_cause_details"), // Detailed root cause analysis
+  
+  // Corrective Actions
+  correctiveActionsRequired: text("corrective_actions_required"), // Actions to prevent recurrence
+  correctiveActionResponsible: varchar("corrective_action_responsible"), // Person responsible for actions
+  correctiveActionDeadline: date("corrective_action_deadline"), // Deadline for completion
+  correctiveActionsCompleted: boolean("corrective_actions_completed").default(false),
+  correctiveActionsCompletionDate: date("corrective_actions_completion_date"),
+  
+  // Preventive Measures
+  preventiveTrainingRequired: boolean("preventive_training_required").default(false),
+  preventiveEquipmentModification: boolean("preventive_equipment_modification").default(false),
+  preventiveProcedureUpdate: boolean("preventive_procedure_update").default(false),
+  preventiveAdditionalPPE: boolean("preventive_additional_ppe").default(false),
+  preventiveEngineeringControls: boolean("preventive_engineering_controls").default(false),
+  preventiveMeasuresDetails: text("preventive_measures_details"),
+  
+  // Regulatory Reporting
+  reportableToAuthorities: boolean("reportable_to_authorities").default(false),
+  authoritiesNotified: boolean("authorities_notified").default(false),
+  authorityName: varchar("authority_name"), // Name of regulatory authority
+  authorityReportDate: date("authority_report_date"),
+  authorityReferenceNumber: varchar("authority_reference_number"),
+  
+  // Supervisor/Manager Review
+  reviewedBySupervisorId: varchar("reviewed_by_supervisor_id").references(() => users.id),
+  reviewedBySupervisorName: varchar("reviewed_by_supervisor_name"),
+  supervisorReviewDate: date("supervisor_review_date"),
+  supervisorComments: text("supervisor_comments"),
+  
+  // Management Review
+  reviewedByManagementId: varchar("reviewed_by_management_id").references(() => users.id),
+  reviewedByManagementName: varchar("reviewed_by_management_name"),
+  managementReviewDate: date("management_review_date"),
+  managementComments: text("management_comments"),
+  
+  // Photos/Evidence
+  photoUrls: text("photo_urls").array().default(sql`ARRAY[]::text[]`), // Photos of incident scene
+  evidenceNotes: text("evidence_notes"), // Notes about evidence collected
+  
+  // Digital signatures
+  signatures: jsonb("signatures").$type<Array<{ employeeId: string; employeeName: string; signatureDataUrl: string; role: string }>>().default(sql`'[]'::jsonb`),
+  
+  // Status
+  reportStatus: varchar("report_status").notNull().default('draft'), // draft | submitted | under_review | closed
+  
+  // PDF storage
+  pdfUrl: text("pdf_url"),
+  
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+}, (table) => [
+  index("IDX_incident_company_date").on(table.companyId, table.incidentDate),
+  index("IDX_incident_project").on(table.projectId),
+  index("IDX_incident_reporter").on(table.reportedById),
+  index("IDX_incident_severity").on(table.companyId, table.incidentSeverity),
+  index("IDX_incident_type").on(table.companyId, table.incidentType),
+]);
+
 // Company documents table - for policy and safety manuals
 export const companyDocuments = pgTable("company_documents", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
@@ -1129,6 +1245,13 @@ export const insertFlhaFormSchema = createInsertSchema(flhaForms).omit({
   pdfUrl: true, // Generated server-side
 });
 
+export const insertIncidentReportSchema = createInsertSchema(incidentReports).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+  pdfUrl: true, // Generated server-side
+});
+
 export const insertPayPeriodConfigSchema = createInsertSchema(payPeriodConfig).omit({
   id: true,
   createdAt: true,
@@ -1257,6 +1380,9 @@ export type InsertToolboxMeeting = z.infer<typeof insertToolboxMeetingSchema>;
 
 export type FlhaForm = typeof flhaForms.$inferSelect;
 export type InsertFlhaForm = z.infer<typeof insertFlhaFormSchema>;
+
+export type IncidentReport = typeof incidentReports.$inferSelect;
+export type InsertIncidentReport = z.infer<typeof insertIncidentReportSchema>;
 
 export type PayPeriodConfig = typeof payPeriodConfig.$inferSelect;
 export type InsertPayPeriodConfig = z.infer<typeof insertPayPeriodConfigSchema>;
