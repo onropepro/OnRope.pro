@@ -37,6 +37,10 @@ export default function Documents() {
     queryKey: ["/api/harness-inspections"],
   });
 
+  const { data: incidentReportsData } = useQuery<{ reports: any[] }>({
+    queryKey: ["/api/incident-reports"],
+  });
+
   const { data: quotesData } = useQuery<{ quotes: any[] }>({
     queryKey: ["/api/quotes"],
   });
@@ -52,6 +56,7 @@ export default function Documents() {
   const meetings = meetingsData?.meetings || [];
   const flhaForms = flhaFormsData?.flhaForms || [];
   const inspections = inspectionsData?.inspections || [];
+  const incidentReports = incidentReportsData?.reports || [];
   const quotes = quotesData?.quotes || [];
   const companyDocuments = companyDocsData?.documents || [];
 

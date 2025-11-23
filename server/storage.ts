@@ -1,6 +1,6 @@
 import { db } from "./db";
-import { users, clients, projects, customJobTypes, dropLogs, workSessions, nonBillableWorkSessions, complaints, complaintNotes, projectPhotos, jobComments, harnessInspections, toolboxMeetings, flhaForms, companyDocuments, payPeriodConfig, payPeriods, quotes, quoteServices, gearItems, gearAssignments, scheduledJobs, jobAssignments, userPreferences } from "@shared/schema";
-import type { User, InsertUser, Client, InsertClient, Project, InsertProject, CustomJobType, InsertCustomJobType, DropLog, InsertDropLog, WorkSession, InsertWorkSession, Complaint, InsertComplaint, ComplaintNote, InsertComplaintNote, ProjectPhoto, InsertProjectPhoto, JobComment, InsertJobComment, HarnessInspection, InsertHarnessInspection, ToolboxMeeting, InsertToolboxMeeting, FlhaForm, InsertFlhaForm, PayPeriodConfig, InsertPayPeriodConfig, PayPeriod, InsertPayPeriod, EmployeeHoursSummary, Quote, InsertQuote, QuoteService, InsertQuoteService, QuoteWithServices, GearItem, InsertGearItem, GearAssignment, InsertGearAssignment, ScheduledJob, InsertScheduledJob, JobAssignment, InsertJobAssignment, ScheduledJobWithAssignments, UserPreferences, InsertUserPreferences } from "@shared/schema";
+import { users, clients, projects, customJobTypes, dropLogs, workSessions, nonBillableWorkSessions, complaints, complaintNotes, projectPhotos, jobComments, harnessInspections, toolboxMeetings, flhaForms, incidentReports, companyDocuments, payPeriodConfig, payPeriods, quotes, quoteServices, gearItems, gearAssignments, scheduledJobs, jobAssignments, userPreferences } from "@shared/schema";
+import type { User, InsertUser, Client, InsertClient, Project, InsertProject, CustomJobType, InsertCustomJobType, DropLog, InsertDropLog, WorkSession, InsertWorkSession, Complaint, InsertComplaint, ComplaintNote, InsertComplaintNote, ProjectPhoto, InsertProjectPhoto, JobComment, InsertJobComment, HarnessInspection, InsertHarnessInspection, ToolboxMeeting, InsertToolboxMeeting, FlhaForm, InsertFlhaForm, IncidentReport, InsertIncidentReport, PayPeriodConfig, InsertPayPeriodConfig, PayPeriod, InsertPayPeriod, EmployeeHoursSummary, Quote, InsertQuote, QuoteService, InsertQuoteService, QuoteWithServices, GearItem, InsertGearItem, GearAssignment, InsertGearAssignment, ScheduledJob, InsertScheduledJob, JobAssignment, InsertJobAssignment, ScheduledJobWithAssignments, UserPreferences, InsertUserPreferences } from "@shared/schema";
 import { eq, and, or, desc, sql, isNull, not, gte, lte, between, inArray } from "drizzle-orm";
 import bcrypt from "bcrypt";
 
@@ -1012,6 +1012,35 @@ export class Storage {
 
   async deleteFlhaForm(id: string): Promise<void> {
     await db.delete(flhaForms).where(eq(flhaForms.id, id));
+  }
+
+  // Incident report operations
+  async createIncidentReport(report: InsertIncidentReport): Promise<IncidentReport> {
+    const result = await db.insert(incidentReports).values(report).returning();
+    return result[0];
+  }
+
+  async getIncidentReportsByCompany(companyId: string): Promise<IncidentReport[]> {
+    return db.select().from(incidentReports)
+      .where(eq(incidentReports.companyId, companyId))
+      .orderBy(desc(incidentReports.incidentDate), desc(incidentReports.createdAt));
+  }
+
+  async getIncidentReportById(id: string): Promise<IncidentReport | undefined> {
+    const result = await db.select().from(incidentReports).where(eq(incidentReports.id, id));
+    return result[0];
+  }
+
+  async updateIncidentReport(id: string, updates: Partial<InsertIncidentReport>): Promise<IncidentReport> {
+    const result = await db.update(incidentReports)
+      .set({ ...updates, updatedAt: new Date() })
+      .where(eq(incidentReports.id, id))
+      .returning();
+    return result[0];
+  }
+
+  async deleteIncidentReport(id: string): Promise<void> {
+    await db.delete(incidentReports).where(eq(incidentReports.id, id));
   }
 
   // Company documents operations
