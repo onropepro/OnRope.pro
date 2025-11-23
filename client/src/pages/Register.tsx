@@ -189,8 +189,8 @@ export default function Register() {
         return;
       }
 
-      // Redirect to property manager dashboard (you may create a dedicated page later)
-      window.location.href = "/buildings";
+      // Redirect to dashboard
+      window.location.href = "/dashboard";
     } catch (error) {
       propertyManagerForm.setError("email", { message: "An error occurred. Please try again." });
     }
