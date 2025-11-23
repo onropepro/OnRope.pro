@@ -213,7 +213,7 @@ export default function Register() {
         <CardContent>
           <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as "resident" | "property_manager")}>
             <TabsList className="grid w-full grid-cols-2 mb-6">
-              <TabsTrigger value="resident" data-testid="tab-resident">Resident / Property Manager</TabsTrigger>
+              <TabsTrigger value="resident" data-testid="tab-resident">Resident</TabsTrigger>
               <TabsTrigger value="property_manager" data-testid="tab-property-manager">Property Manager</TabsTrigger>
             </TabsList>
 
