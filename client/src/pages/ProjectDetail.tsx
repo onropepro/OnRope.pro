@@ -10,7 +10,7 @@ import { Progress } from "@/components/ui/progress";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { HighRiseBuilding } from "@/components/HighRiseBuilding";
 import { VerticalBuildingProgress } from "@/components/VerticalBuildingProgress";
 import { ParkadeView } from "@/components/ParkadeView";
@@ -33,10 +33,11 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 
 const endDaySchema = z.object({
-  dropsCompletedNorth: z.string(),
-  dropsCompletedEast: z.string(),
-  dropsCompletedSouth: z.string(),
-  dropsCompletedWest: z.string(),
+  dropsCompletedNorth: z.string().optional(),
+  dropsCompletedEast: z.string().optional(),
+  dropsCompletedSouth: z.string().optional(),
+  dropsCompletedWest: z.string().optional(),
+  manualCompletionPercentage: z.string().optional(),
   shortfallReason: z.string().optional(),
 });
 
@@ -114,6 +115,7 @@ export default function ProjectDetail() {
       dropsCompletedEast: "0",
       dropsCompletedSouth: "0",
       dropsCompletedWest: "0",
+      manualCompletionPercentage: "0",
       shortfallReason: "",
     },
   });
@@ -340,15 +342,24 @@ export default function ProjectDetail() {
         // Continue without location if unavailable
       }
       
-      // Convert string values to numbers for backend
-      const payload = {
-        dropsCompletedNorth: parseInt(data.dropsCompletedNorth || "0"),
-        dropsCompletedEast: parseInt(data.dropsCompletedEast || "0"),
-        dropsCompletedSouth: parseInt(data.dropsCompletedSouth || "0"),
-        dropsCompletedWest: parseInt(data.dropsCompletedWest || "0"),
-        shortfallReason: data.shortfallReason,
+      // Build payload based on job type
+      const isHoursBased = project.jobType === "general_pressure_washing" || project.jobType === "ground_window_cleaning";
+      
+      const payload: any = {
         ...locationData,
       };
+      
+      if (isHoursBased) {
+        // For hours-based projects, send manual completion percentage
+        payload.manualCompletionPercentage = parseInt(data.manualCompletionPercentage || "0");
+      } else {
+        // For drop-based projects, send drop counts
+        payload.dropsCompletedNorth = parseInt(data.dropsCompletedNorth || "0");
+        payload.dropsCompletedEast = parseInt(data.dropsCompletedEast || "0");
+        payload.dropsCompletedSouth = parseInt(data.dropsCompletedSouth || "0");
+        payload.dropsCompletedWest = parseInt(data.dropsCompletedWest || "0");
+        payload.shortfallReason = data.shortfallReason;
+      }
       
       console.log("📤 Sending clock-out data to backend:", payload);
       
@@ -484,22 +495,36 @@ export default function ProjectDetail() {
   });
 
   const onEndDaySubmit = (data: EndDayFormData) => {
-    const north = parseInt(data.dropsCompletedNorth || "0");
-    const east = parseInt(data.dropsCompletedEast || "0");
-    const south = parseInt(data.dropsCompletedSouth || "0");
-    const west = parseInt(data.dropsCompletedWest || "0");
-    const totalDrops = north + east + south + west;
-
-    // Check if shortfall reason is required but missing
-    const isInSuite = project.jobType === "in_suite_dryer_vent_cleaning";
-    const isParkade = project.jobType === "parkade_pressure_cleaning";
-    const target = isInSuite || isParkade ? (project.suitesPerDay || project.stallsPerDay || 0) : project.dailyDropTarget;
+    const isHoursBased = project.jobType === "general_pressure_washing" || project.jobType === "ground_window_cleaning";
     
-    if (totalDrops < target && !data.shortfallReason?.trim()) {
-      endDayForm.setError("shortfallReason", {
-        message: "Please explain why the daily target wasn't met"
-      });
-      return;
+    if (isHoursBased) {
+      // For hours-based projects, validate percentage
+      const percentage = parseInt(data.manualCompletionPercentage || "0");
+      if (percentage < 0 || percentage > 100) {
+        endDayForm.setError("manualCompletionPercentage", {
+          message: "Percentage must be between 0 and 100"
+        });
+        return;
+      }
+    } else {
+      // For drop-based projects, validate drops and daily target
+      const north = parseInt(data.dropsCompletedNorth || "0");
+      const east = parseInt(data.dropsCompletedEast || "0");
+      const south = parseInt(data.dropsCompletedSouth || "0");
+      const west = parseInt(data.dropsCompletedWest || "0");
+      const totalDrops = north + east + south + west;
+
+      // Check if shortfall reason is required but missing
+      const isInSuite = project.jobType === "in_suite_dryer_vent_cleaning";
+      const isParkade = project.jobType === "parkade_pressure_cleaning";
+      const target = isInSuite || isParkade ? (project.suitesPerDay || project.stallsPerDay || 0) : project.dailyDropTarget;
+      
+      if (totalDrops < target && !data.shortfallReason?.trim()) {
+        endDayForm.setError("shortfallReason", {
+          message: "Please explain why the daily target wasn't met"
+        });
+        return;
+      }
     }
 
     endDayMutation.mutate(data);
@@ -2730,7 +2755,9 @@ export default function ProjectDetail() {
           <DialogHeader>
             <DialogTitle>End Your Work Day</DialogTitle>
             <DialogDescription>
-              {project.jobType === "in_suite_dryer_vent_cleaning" 
+              {isHoursBased
+                ? `Enter the completion percentage (0-100%) for your work on ${project.buildingName}.`
+                : project.jobType === "in_suite_dryer_vent_cleaning" 
                 ? `Enter the number of units you completed today for ${project.buildingName}.`
                 : project.jobType === "parkade_pressure_cleaning"
                 ? `Enter the number of stalls you cleaned today for ${project.buildingName}.`
@@ -2740,7 +2767,33 @@ export default function ProjectDetail() {
 
           <Form {...endDayForm}>
             <form onSubmit={endDayForm.handleSubmit(onEndDaySubmit)} className="space-y-4">
-              {project.jobType === "in_suite_dryer_vent_cleaning" ? (
+              {isHoursBased ? (
+                <FormField
+                  control={endDayForm.control}
+                  name="manualCompletionPercentage"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Completion Percentage (%)</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="number"
+                          min="0"
+                          max="100"
+                          placeholder="0"
+                          {...field}
+                          data-testid="input-completion-percentage"
+                          className="h-16 text-3xl font-bold text-center"
+                          autoComplete="off"
+                        />
+                      </FormControl>
+                      <FormDescription>
+                        Enter how much of this job you completed (0-100%)
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              ) : project.jobType === "in_suite_dryer_vent_cleaning" ? (
                 <FormField
                   control={endDayForm.control}
                   name="dropsCompletedNorth"
