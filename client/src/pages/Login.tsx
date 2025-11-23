@@ -450,6 +450,41 @@ export default function Login() {
               </Button>
 
               <Button 
+                variant="secondary" 
+                className="h-10 text-xs" 
+                onClick={async () => {
+                  try {
+                    const response = await fetch("/api/login", {
+                      method: "POST",
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify({ identifier: "property@property.com", password: "property123" }),
+                      credentials: "include",
+                    });
+                    const result = await response.json();
+                    if (response.ok) {
+                      window.location.href = "/dashboard";
+                    } else {
+                      toast({
+                        title: "Quick Login Failed",
+                        description: result.message || "Property manager account not found",
+                        variant: "destructive",
+                      });
+                    }
+                  } catch (error) {
+                    toast({
+                      title: "Login Error",
+                      description: "Network error. Please try manual login.",
+                      variant: "destructive",
+                    });
+                  }
+                }}
+                data-testid="button-quick-login-property-manager"
+              >
+                <span className="material-icons mr-1 text-base">flash_on</span>
+                PROPERTY MANAGER
+              </Button>
+
+              <Button 
                 variant="destructive" 
                 className="h-10 text-xs col-span-2" 
                 onClick={async () => {
