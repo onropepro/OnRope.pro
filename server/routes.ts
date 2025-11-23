@@ -5555,6 +5555,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.patch("/api/incident-reports/:id", requireAuth, requireRole("operations_manager", "general_supervisor", "rope_access_supervisor", "supervisor", "company"), async (req: Request, res: Response) => {
     try {
       const { id } = req.params;
+      const currentUser = await storage.getUserById(req.session.userId!);
+      
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      const companyId = currentUser.role === "company" ? currentUser.id : currentUser.companyId;
+      
+      if (!companyId) {
+        return res.status(400).json({ message: "Unable to determine company" });
+      }
+      
+      // Verify the incident report belongs to this company
+      const existingReport = await storage.getIncidentReportById(id);
+      if (!existingReport) {
+        return res.status(404).json({ message: "Incident report not found" });
+      }
+      
+      if (existingReport.companyId !== companyId) {
+        return res.status(403).json({ message: "Access denied" });
+      }
+      
       const report = await storage.updateIncidentReport(id, req.body);
       res.json({ report });
     } catch (error) {
@@ -5566,6 +5588,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.delete("/api/incident-reports/:id", requireAuth, requireRole("operations_manager", "general_supervisor", "rope_access_supervisor", "supervisor", "company"), async (req: Request, res: Response) => {
     try {
       const { id } = req.params;
+      const currentUser = await storage.getUserById(req.session.userId!);
+      
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      const companyId = currentUser.role === "company" ? currentUser.id : currentUser.companyId;
+      
+      if (!companyId) {
+        return res.status(400).json({ message: "Unable to determine company" });
+      }
+      
+      // Verify the incident report belongs to this company
+      const existingReport = await storage.getIncidentReportById(id);
+      if (!existingReport) {
+        return res.status(404).json({ message: "Incident report not found" });
+      }
+      
+      if (existingReport.companyId !== companyId) {
+        return res.status(403).json({ message: "Access denied" });
+      }
+      
       await storage.deleteIncidentReport(id);
       res.json({ message: "Incident report deleted successfully" });
     } catch (error) {
