@@ -181,9 +181,13 @@ export default function HoursAnalytics() {
         
         // Create date object in local timezone by parsing as YYYY-MM-DD
         const parts = dateStr.split('T')[0].split('-');
-        const sessionDate = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
+        const sessionDate = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]), 0, 0, 0, 0);
         
-        return sessionDate >= startDate && sessionDate <= endDate;
+        // Normalize comparison dates to midnight
+        const normalizedStart = new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate(), 0, 0, 0, 0);
+        const normalizedEnd = new Date(endDate.getFullYear(), endDate.getMonth(), endDate.getDate(), 23, 59, 59, 999);
+        
+        return sessionDate >= normalizedStart && sessionDate <= normalizedEnd;
       })
       .reduce((sum: number, session: any) => {
         if (session.startTime && session.endTime) {
