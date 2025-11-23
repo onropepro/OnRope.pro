@@ -377,6 +377,9 @@ export default function Dashboard() {
   const [showEmployeeDetailDialog, setShowEmployeeDetailDialog] = useState(false);
   const [employeeToEdit, setEmployeeToEdit] = useState<any | null>(null);
   const [employeeToView, setEmployeeToView] = useState<any | null>(null);
+  const [employeeToChangePassword, setEmployeeToChangePassword] = useState<any | null>(null);
+  const [showChangePasswordDialog, setShowChangePasswordDialog] = useState(false);
+  const [newPassword, setNewPassword] = useState("");
   const [showClientDialog, setShowClientDialog] = useState(false);
   const [showEditClientDialog, setShowEditClientDialog] = useState(false);
   const [showDeleteClientDialog, setShowDeleteClientDialog] = useState(false);
@@ -1161,6 +1164,24 @@ export default function Dashboard() {
       queryClient.invalidateQueries({ queryKey: ["/api/employees/all"] });
       setEmployeeToDelete(null);
       toast({ title: "Employee deleted successfully" });
+    },
+    onError: (error: Error) => {
+      toast({ title: "Error", description: error.message, variant: "destructive" });
+    },
+  });
+
+  const changePasswordMutation = useMutation({
+    mutationFn: async ({ employeeId, newPassword }: { employeeId: string; newPassword: string }) => {
+      const response = await apiRequest("PATCH", `/api/employees/${employeeId}/change-password`, {
+        newPassword,
+      });
+      return response;
+    },
+    onSuccess: () => {
+      setShowChangePasswordDialog(false);
+      setEmployeeToChangePassword(null);
+      setNewPassword("");
+      toast({ title: "Password changed successfully" });
     },
     onError: (error: Error) => {
       toast({ title: "Error", description: error.message, variant: "destructive" });
@@ -3791,6 +3812,22 @@ export default function Dashboard() {
                                 >
                                   <span className="material-icons text-sm">edit</span>
                                 </Button>
+                                {user?.role === "company" && (
+                                  <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      setEmployeeToChangePassword(employee);
+                                      setShowChangePasswordDialog(true);
+                                    }}
+                                    data-testid={`button-change-password-${employee.id}`}
+                                    className="h-9 w-9"
+                                    disabled={userIsReadOnly}
+                                  >
+                                    <span className="material-icons text-sm">lock_reset</span>
+                                  </Button>
+                                )}
                                 <Button
                                   variant="ghost"
                                   size="icon"
@@ -5795,6 +5832,79 @@ export default function Dashboard() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* Change Password Dialog */}
+      <Dialog open={showChangePasswordDialog} onOpenChange={(open) => {
+        setShowChangePasswordDialog(open);
+        if (!open) {
+          setEmployeeToChangePassword(null);
+          setNewPassword("");
+        }
+      }}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Change Employee Password</DialogTitle>
+            <DialogDescription>
+              Set a new password for {employeeToChangePassword?.name || employeeToChangePassword?.email}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <label htmlFor="new-password" className="text-sm font-medium">
+                New Password
+              </label>
+              <Input
+                id="new-password"
+                type="password"
+                placeholder="Enter new password (min 6 characters)"
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+                data-testid="input-new-password"
+                className="h-12"
+              />
+              <p className="text-xs text-muted-foreground">
+                Give this password to the employee. They can change it later from their profile.
+              </p>
+            </div>
+          </div>
+          <div className="flex gap-3">
+            <Button
+              variant="outline"
+              onClick={() => {
+                setShowChangePasswordDialog(false);
+                setEmployeeToChangePassword(null);
+                setNewPassword("");
+              }}
+              className="flex-1"
+              data-testid="button-cancel-password-change"
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={() => {
+                if (!employeeToChangePassword) return;
+                if (!newPassword || newPassword.length < 6) {
+                  toast({ 
+                    title: "Invalid Password", 
+                    description: "Password must be at least 6 characters long",
+                    variant: "destructive" 
+                  });
+                  return;
+                }
+                changePasswordMutation.mutate({
+                  employeeId: employeeToChangePassword.id,
+                  newPassword,
+                });
+              }}
+              className="flex-1"
+              disabled={changePasswordMutation.isPending || !newPassword || newPassword.length < 6}
+              data-testid="button-confirm-password-change"
+            >
+              {changePasswordMutation.isPending ? "Changing..." : "Change Password"}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
 
       {/* Harness Inspection Check Dialog */}
       <AlertDialog open={showInspectionCheckDialog} onOpenChange={setShowInspectionCheckDialog}>

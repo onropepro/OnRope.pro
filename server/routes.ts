@@ -2229,6 +2229,55 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
+  // Change employee password (company owner only)
+  app.patch("/api/employees/:id/change-password", requireAuth, requireRole("company"), async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      const companyId = currentUser.role === "company" ? currentUser.id : currentUser.companyId;
+      
+      if (!companyId) {
+        return res.status(400).json({ message: "Unable to determine company" });
+      }
+      
+      // Get the employee to verify they belong to this company
+      const employee = await storage.getUserById(req.params.id);
+      
+      if (!employee || employee.companyId !== companyId) {
+        return res.status(403).json({ message: "Access denied" });
+      }
+      
+      // Prevent changing other company owners' passwords
+      if (employee.role === "company" && employee.id !== currentUser.id) {
+        return res.status(403).json({ message: "Cannot change another company owner's password" });
+      }
+      
+      const { newPassword } = req.body;
+      
+      // Validate password
+      if (!newPassword || typeof newPassword !== "string" || newPassword.length < 6) {
+        return res.status(400).json({ message: "Password must be at least 6 characters long" });
+      }
+      
+      // Hash new password
+      const passwordHash = await bcrypt.hash(newPassword, 10);
+      
+      // Update employee password
+      await storage.updateUser(req.params.id, {
+        passwordHash,
+      });
+      
+      res.json({ message: "Password changed successfully" });
+    } catch (error) {
+      console.error("Change password error:", error);
+      res.status(500).json({ message: "Failed to change password" });
+    }
+  });
+  
   // Delete employee
   app.delete("/api/employees/:id", requireAuth, requireRole("company", "operations_manager"), async (req: Request, res: Response) => {
     try {
