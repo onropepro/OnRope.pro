@@ -3907,6 +3907,108 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
+  // Edit/update existing work session (requires financial permission)
+  app.patch("/api/work-sessions/:sessionId", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      // Check financial permission
+      const hasFinancialAccess = currentUser.role === "company" || 
+                                 currentUser.role === "operations_manager" || 
+                                 currentUser.role === "supervisor" || 
+                                 currentUser.role === "general_supervisor" || 
+                                 currentUser.role === "rope_access_supervisor" || 
+                                 currentUser.permissions?.includes("view_financial_data");
+      
+      if (!hasFinancialAccess) {
+        return res.status(403).json({ message: "Access denied - financial permission required" });
+      }
+      
+      const { sessionId } = req.params;
+      const { startTime, endTime, dropsCompletedNorth, dropsCompletedEast, dropsCompletedSouth, dropsCompletedWest, manualCompletionPercentage, isBillable } = req.body;
+      
+      // Get existing session to verify company access
+      const existingSession = await storage.getWorkSessionById(sessionId);
+      if (!existingSession) {
+        return res.status(404).json({ message: "Work session not found" });
+      }
+      
+      // Verify user has access to this company's data
+      const companyId = currentUser.role === "company" ? currentUser.id : currentUser.companyId;
+      if (existingSession.companyId !== companyId) {
+        return res.status(403).json({ message: "Access denied - not your company's data" });
+      }
+      
+      // Get project to check job type for validation
+      const project = await storage.getProjectById(existingSession.projectId);
+      if (!project) {
+        return res.status(404).json({ message: "Project not found" });
+      }
+      
+      // Prepare updates object
+      const updates: any = {};
+      
+      // Handle time updates and recalculate overtime if both times provided
+      if (startTime !== undefined) {
+        updates.startTime = new Date(startTime);
+      }
+      if (endTime !== undefined) {
+        updates.endTime = endTime ? new Date(endTime) : null;
+      }
+      
+      // Recalculate overtime hours if both start and end times are available
+      if ((updates.startTime || existingSession.startTime) && (updates.endTime || existingSession.endTime)) {
+        const finalStartTime = updates.startTime || new Date(existingSession.startTime);
+        const finalEndTime = updates.endTime || new Date(existingSession.endTime);
+        
+        const overtimeBreakdown = await calculateOvertimeHours(
+          project.companyId,
+          existingSession.employeeId,
+          finalStartTime,
+          finalStartTime,
+          finalEndTime
+        );
+        
+        updates.regularHours = overtimeBreakdown.regularHours.toString();
+        updates.overtimeHours = overtimeBreakdown.overtimeHours.toString();
+        updates.doubleTimeHours = overtimeBreakdown.doubleTimeHours.toString();
+      }
+      
+      // Handle drops completed for elevation-based projects
+      if (dropsCompletedNorth !== undefined) updates.dropsCompletedNorth = parseInt(dropsCompletedNorth);
+      if (dropsCompletedEast !== undefined) updates.dropsCompletedEast = parseInt(dropsCompletedEast);
+      if (dropsCompletedSouth !== undefined) updates.dropsCompletedSouth = parseInt(dropsCompletedSouth);
+      if (dropsCompletedWest !== undefined) updates.dropsCompletedWest = parseInt(dropsCompletedWest);
+      
+      // Handle manual completion percentage for hours-based projects
+      const isHoursBased = project.jobType === "general_pressure_washing" || project.jobType === "ground_window_cleaning";
+      if (isHoursBased && manualCompletionPercentage !== undefined) {
+        const percentage = parseInt(manualCompletionPercentage);
+        if (percentage < 0 || percentage > 100) {
+          return res.status(400).json({ message: "Completion percentage must be between 0 and 100" });
+        }
+        updates.manualCompletionPercentage = percentage;
+      }
+      
+      // Handle billable status
+      if (isBillable !== undefined) {
+        updates.isBillable = isBillable;
+      }
+      
+      // Update the session
+      const updatedSession = await storage.updateWorkSession(sessionId, updates);
+      
+      res.json({ session: updatedSession });
+    } catch (error) {
+      console.error("Update work session error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+  
   // Get work sessions for a project (management and tech view)
   app.get("/api/projects/:projectId/work-sessions", requireAuth, requireRole("company", "owner_ceo", "human_resources", "accounting", "operations_manager", "general_supervisor", "rope_access_supervisor", "account_manager", "supervisor", "rope_access_tech"), async (req: Request, res: Response) => {
     try {

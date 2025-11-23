@@ -538,6 +538,13 @@ export class Storage {
     return result[0];
   }
 
+  async getWorkSessionById(sessionId: string): Promise<WorkSession | undefined> {
+    const result = await db.select().from(workSessions)
+      .where(eq(workSessions.id, sessionId))
+      .limit(1);
+    return result[0];
+  }
+
   async endWorkSession(
     sessionId: string, 
     dropsCompletedNorth: number,
