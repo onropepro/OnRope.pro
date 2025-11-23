@@ -68,6 +68,24 @@ export default function Documents() {
     }))
   );
 
+  // Helper function to add company branding to PDFs when active
+  const addCompanyBranding = (doc: jsPDF, pageWidth: number): number => {
+    // Check if branding is active
+    if (!currentUser?.whitelabelBrandingActive || !currentUser?.companyName) {
+      return 0; // No branding, return 0 additional height
+    }
+
+    const companyName = currentUser?.companyName || '';
+
+    // Add company name at top of header
+    doc.setTextColor(255, 255, 255);
+    doc.setFontSize(9);
+    doc.setFont('helvetica', 'bold');
+    doc.text(companyName.toUpperCase(), pageWidth / 2, 8, { align: 'center' });
+
+    return 5; // Return additional height used by branding
+  };
+
   const downloadToolboxMeeting = async (meeting: any) => {
     const doc = new jsPDF();
     const pageWidth = doc.internal.pageSize.getWidth();
@@ -90,16 +108,21 @@ export default function Documents() {
 
     // Header - Title
     doc.setFillColor(14, 165, 233); // Ocean blue
-    doc.rect(0, 0, pageWidth, 35, 'F');
+    
+    // Add company branding if active
+    const brandingHeight = addCompanyBranding(doc, pageWidth);
+    const headerHeight = 35 + brandingHeight; // Dynamic height based on branding
+    doc.rect(0, 0, pageWidth, headerHeight, 'F');
+    
     doc.setTextColor(255, 255, 255);
     doc.setFontSize(22);
     doc.setFont('helvetica', 'bold');
-    doc.text('DAILY TOOLBOX MEETING RECORD', pageWidth / 2, 15, { align: 'center' });
+    doc.text('DAILY TOOLBOX MEETING RECORD', pageWidth / 2, 15 + brandingHeight, { align: 'center' });
     doc.setFontSize(12);
     doc.setFont('helvetica', 'normal');
-    doc.text('Official Safety Meeting Documentation', pageWidth / 2, 25, { align: 'center' });
+    doc.text('Official Safety Meeting Documentation', pageWidth / 2, 25 + brandingHeight, { align: 'center' });
 
-    yPosition = 50;
+    yPosition = 45 + brandingHeight;
 
     // Meeting Details Section
     doc.setTextColor(0, 0, 0);
@@ -280,16 +303,21 @@ export default function Documents() {
 
     // Header
     doc.setFillColor(251, 146, 60); // Orange
-    doc.rect(0, 0, pageWidth, 35, 'F');
+    
+    // Add company branding if active
+    const brandingHeight = addCompanyBranding(doc, pageWidth);
+    const headerHeight = 35 + brandingHeight; // Dynamic height based on branding
+    doc.rect(0, 0, pageWidth, headerHeight, 'F');
+    
     doc.setTextColor(255, 255, 255);
     doc.setFontSize(20);
     doc.setFont('helvetica', 'bold');
-    doc.text('FIELD LEVEL HAZARD ASSESSMENT', pageWidth / 2, 15, { align: 'center' });
+    doc.text('FIELD LEVEL HAZARD ASSESSMENT', pageWidth / 2, 15 + brandingHeight, { align: 'center' });
     doc.setFontSize(12);
     doc.setFont('helvetica', 'normal');
-    doc.text('Rope Access Safety Documentation', pageWidth / 2, 25, { align: 'center' });
+    doc.text('Rope Access Safety Documentation', pageWidth / 2, 25 + brandingHeight, { align: 'center' });
 
-    yPosition = 50;
+    yPosition = 45 + brandingHeight;
 
     // Assessment Details
     doc.setTextColor(0, 0, 0);
@@ -514,7 +542,7 @@ export default function Documents() {
     doc.save(`FLHA_${new Date(flha.assessmentDate).toISOString().split('T')[0]}.pdf`);
   };
 
-  const downloadHarnessInspection = (inspection: any) => {
+  const downloadHarnessInspection = async (inspection: any) => {
     const doc = new jsPDF();
     const pageWidth = doc.internal.pageSize.getWidth();
     const pageHeight = doc.internal.pageSize.getHeight();
@@ -536,17 +564,22 @@ export default function Documents() {
 
     // Header - Title
     doc.setFillColor(14, 165, 233); // Ocean blue
-    doc.rect(0, 0, pageWidth, 35, 'F');
+    
+    // Add company branding if active
+    const brandingHeight = addCompanyBranding(doc, pageWidth);
+    const headerHeight = 35 + brandingHeight; // Dynamic height based on branding
+    doc.rect(0, 0, pageWidth, headerHeight, 'F');
+    
     doc.setTextColor(255, 255, 255);
     doc.setFontSize(20);
     doc.setFont('helvetica', 'bold');
-    doc.text('ROPE ACCESS EQUIPMENT', pageWidth / 2, 15, { align: 'center' });
-    doc.text('INSPECTION RECORD', pageWidth / 2, 23, { align: 'center' });
+    doc.text('ROPE ACCESS EQUIPMENT', pageWidth / 2, 15 + brandingHeight, { align: 'center' });
+    doc.text('INSPECTION RECORD', pageWidth / 2, 23 + brandingHeight, { align: 'center' });
     doc.setFontSize(11);
     doc.setFont('helvetica', 'normal');
-    doc.text('Official Safety Equipment Documentation', pageWidth / 2, 30, { align: 'center' });
+    doc.text('Official Safety Equipment Documentation', pageWidth / 2, 30 + brandingHeight, { align: 'center' });
 
-    yPosition = 50;
+    yPosition = 45 + brandingHeight;
 
     // Inspection Details Section
     doc.setTextColor(0, 0, 0);
