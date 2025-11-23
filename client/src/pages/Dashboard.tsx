@@ -1488,7 +1488,27 @@ export default function Dashboard() {
   };
 
   const handleEndDay = () => {
-    setShowEndDayDialog(true);
+    // For General Pressure Washing and Ground Window, skip the drop count dialog
+    // Progress is tracked by hours worked vs hours allowed, not drops
+    const activeProject = projects.find(p => p.id === activeSession?.projectId);
+    const isHoursBased = activeProject?.jobType === "general_pressure_washing" || 
+                         activeProject?.jobType === "ground_window_cleaning";
+    
+    if (isHoursBased && activeSession) {
+      // Directly end session without asking for drop counts
+      endDayMutation.mutate({
+        dropsNorth: "0",
+        dropsEast: "0",
+        dropsSouth: "0",
+        dropsWest: "0",
+        shortfallReason: undefined,
+        sessionId: activeSession.id,
+        projectId: activeSession.projectId,
+      });
+    } else {
+      // Show drop count dialog for other job types
+      setShowEndDayDialog(true);
+    }
   };
 
   const confirmStartDay = () => {
@@ -2349,25 +2369,29 @@ export default function Dashboard() {
                           />
                         )}
 
-                        <FormField
-                          control={projectForm.control}
-                          name="floorCount"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>
-                                {projectForm.watch("jobType") === "parkade_pressure_cleaning" 
-                                  ? "Stall Count" 
-                                  : projectForm.watch("jobType") === "in_suite_dryer_vent_cleaning"
-                                  ? "Unit Count"
-                                  : "Floor Count"}
-                              </FormLabel>
-                              <FormControl>
-                                <Input type="number" min="1" {...field} data-testid="input-floor-count" className="h-12" />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
+                        {/* Hide Floor Count for General Pressure Washing and Ground Window (hours-based tracking) */}
+                        {projectForm.watch("jobType") !== "general_pressure_washing" && 
+                         projectForm.watch("jobType") !== "ground_window_cleaning" && (
+                          <FormField
+                            control={projectForm.control}
+                            name="floorCount"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>
+                                  {projectForm.watch("jobType") === "parkade_pressure_cleaning" 
+                                    ? "Stall Count" 
+                                    : projectForm.watch("jobType") === "in_suite_dryer_vent_cleaning"
+                                    ? "Unit Count"
+                                    : "Floor Count"}
+                                </FormLabel>
+                                <FormControl>
+                                  <Input type="number" min="1" {...field} data-testid="input-floor-count" className="h-12" />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                        )}
 
                         {(projectForm.watch("jobType") === "window_cleaning" || 
                           projectForm.watch("jobType") === "building_wash" || 
@@ -2667,16 +2691,35 @@ export default function Dashboard() {
                     filteredProjects.filter((p: Project) => p.status === "active").map((project: Project) => {
                       const isInSuite = project.jobType === "in_suite_dryer_vent_cleaning";
                       const isParkade = project.jobType === "parkade_pressure_cleaning";
+                      const isHoursBased = project.jobType === "general_pressure_washing" || project.jobType === "ground_window_cleaning";
                       
-                      const completed = project.completedDrops || 0;
-                      const total = isInSuite 
-                        ? (project.floorCount || 0)  // For dryer vent, use total suite count
-                        : isParkade 
-                        ? (project.totalStalls || project.floorCount || 0)  // For parkade, use total stalls
-                        : (project.totalDrops || 0);  // For window cleaning, use total drops
+                      let completed: number, total: number, progressPercent: number, unitLabel: string;
                       
-                      const progressPercent = total > 0 ? (completed / total) * 100 : 0;
-                      const unitLabel = isInSuite ? "suites" : isParkade ? "stalls" : "drops";
+                      if (isHoursBased) {
+                        // Hours-based tracking (General Pressure Washing, Ground Window)
+                        completed = (project as any).totalHoursWorked || 0;
+                        total = project.estimatedHours || 0;  // Use estimatedHours field
+                        progressPercent = total > 0 ? (completed / total) * 100 : 0;
+                        unitLabel = "hours";
+                      } else if (isInSuite) {
+                        // Suite-based tracking (In-Suite Dryer Vent)
+                        completed = project.completedDrops || 0;
+                        total = project.floorCount || 0;
+                        progressPercent = total > 0 ? (completed / total) * 100 : 0;
+                        unitLabel = "suites";
+                      } else if (isParkade) {
+                        // Stall-based tracking (Parkade)
+                        completed = project.completedDrops || 0;
+                        total = project.totalStalls || project.floorCount || 0;
+                        progressPercent = total > 0 ? (completed / total) * 100 : 0;
+                        unitLabel = "stalls";
+                      } else {
+                        // Drop-based tracking (Window Cleaning, Building Wash, etc.)
+                        completed = project.completedDrops || 0;
+                        total = project.totalDrops || 0;
+                        progressPercent = total > 0 ? (completed / total) * 100 : 0;
+                        unitLabel = "drops";
+                      }
 
                       return (
                         <Card 

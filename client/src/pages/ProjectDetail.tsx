@@ -658,27 +658,51 @@ export default function ProjectDetail() {
     );
   }
 
-  // Calculate total drops/units based on job type
-  const totalDrops = project.jobType === "in_suite_dryer_vent_cleaning" 
-    ? project.floorCount  // For dryer vent, use total suite count
-    : project.jobType === "parkade_pressure_cleaning"
-    ? (project.totalStalls || project.floorCount)  // For parkade, use total stalls
-    : (project.totalDropsNorth ?? 0) + (project.totalDropsEast ?? 0) + 
-      (project.totalDropsSouth ?? 0) + (project.totalDropsWest ?? 0);  // For window cleaning, use elevation drops
-
-  // Calculate completed drops from work sessions (elevation-specific)
+  // Calculate completed sessions
   const completedSessions = workSessions.filter((s: any) => s.endTime !== null);
   
-  const completedDropsNorth = completedSessions.reduce((sum: number, s: any) => sum + (s.dropsCompletedNorth ?? 0), 0);
-  const completedDropsEast = completedSessions.reduce((sum: number, s: any) => sum + (s.dropsCompletedEast ?? 0), 0);
-  const completedDropsSouth = completedSessions.reduce((sum: number, s: any) => sum + (s.dropsCompletedSouth ?? 0), 0);
-  const completedDropsWest = completedSessions.reduce((sum: number, s: any) => sum + (s.dropsCompletedWest ?? 0), 0);
+  // Determine tracking type and calculate progress
+  const isHoursBased = project.jobType === "general_pressure_washing" || project.jobType === "ground_window_cleaning";
+  const isInSuite = project.jobType === "in_suite_dryer_vent_cleaning";
+  const isParkade = project.jobType === "parkade_pressure_cleaning";
   
-  const completedDrops = completedDropsNorth + completedDropsEast + completedDropsSouth + completedDropsWest;
+  let totalDrops: number, completedDrops: number, progressPercent: number;
   
-  const progressPercent = totalDrops > 0 
-    ? Math.min(100, Math.round((completedDrops / totalDrops) * 100))
-    : 0;
+  if (isHoursBased) {
+    // Hours-based tracking (General Pressure Washing, Ground Window)
+    const totalHoursWorked = completedSessions.reduce((sum: number, s: any) => {
+      if (s.startTime && s.endTime) {
+        const hours = (new Date(s.endTime).getTime() - new Date(s.startTime).getTime()) / (1000 * 60 * 60);
+        return sum + hours;
+      }
+      return sum;
+    }, 0);
+    totalDrops = project.estimatedHours || 0;  // Use estimatedHours field
+    completedDrops = totalHoursWorked;          // Hours worked
+    progressPercent = totalDrops > 0 
+      ? Math.min(100, Math.round((completedDrops / totalDrops) * 100))
+      : 0;
+  } else {
+    // Drop/Unit-based tracking
+    totalDrops = isInSuite 
+      ? project.floorCount  // For dryer vent, use total suite count
+      : isParkade
+      ? (project.totalStalls || project.floorCount)  // For parkade, use total stalls
+      : (project.totalDropsNorth ?? 0) + (project.totalDropsEast ?? 0) + 
+        (project.totalDropsSouth ?? 0) + (project.totalDropsWest ?? 0);  // For window cleaning, use elevation drops
+    
+    // Calculate completed drops from work sessions (elevation-specific)
+    const completedDropsNorth = completedSessions.reduce((sum: number, s: any) => sum + (s.dropsCompletedNorth ?? 0), 0);
+    const completedDropsEast = completedSessions.reduce((sum: number, s: any) => sum + (s.dropsCompletedEast ?? 0), 0);
+    const completedDropsSouth = completedSessions.reduce((sum: number, s: any) => sum + (s.dropsCompletedSouth ?? 0), 0);
+    const completedDropsWest = completedSessions.reduce((sum: number, s: any) => sum + (s.dropsCompletedWest ?? 0), 0);
+    
+    completedDrops = completedDropsNorth + completedDropsEast + completedDropsSouth + completedDropsWest;
+    
+    progressPercent = totalDrops > 0 
+      ? Math.min(100, Math.round((completedDrops / totalDrops) * 100))
+      : 0;
+  }
 
   // Calculate target met statistics (sum all elevation drops per session)
   const targetMetCount = completedSessions.filter((s: any) => {
@@ -746,7 +770,22 @@ export default function ProjectDetail() {
             {/* End Day Button - Shown when there IS an active session */}
             {activeSession && (
               <Button
-                onClick={() => setShowEndDayDialog(true)}
+                onClick={() => {
+                  // For hours-based tracking (General Pressure Washing, Ground Window),
+                  // skip the drop count dialog and directly end the session
+                  if (isHoursBased) {
+                    onEndDaySubmit({
+                      dropsNorth: "0",
+                      dropsEast: "0",
+                      dropsSouth: "0",
+                      dropsWest: "0",
+                      shortfallReason: undefined,
+                    });
+                  } else {
+                    // Show drop count dialog for other job types
+                    setShowEndDayDialog(true);
+                  }
+                }}
                 variant="destructive"
                 className="h-10"
                 data-testid="button-end-day"

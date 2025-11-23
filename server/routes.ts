@@ -3212,7 +3212,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         projects = [];
       }
       
-      // Add completedDrops and totalDrops to each project
+      // Add completedDrops, totalDrops, and totalHoursWorked to each project
       const projectsWithProgress = await Promise.all(
         projects.map(async (project) => {
           const { total } = await storage.getProjectProgress(project.id);
@@ -3220,10 +3220,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
                             (project.totalDropsEast ?? 0) + 
                             (project.totalDropsSouth ?? 0) + 
                             (project.totalDropsWest ?? 0);
+          
+          // Calculate total hours worked from work sessions (for hours-based tracking)
+          const workSessions = await storage.getWorkSessionsByProject(project.id);
+          const completedSessions = workSessions.filter(s => s.endTime);
+          const totalHoursWorked = completedSessions.reduce((sum, session) => {
+            if (session.startTime && session.endTime) {
+              const hours = (new Date(session.endTime).getTime() - new Date(session.startTime).getTime()) / (1000 * 60 * 60);
+              return sum + hours;
+            }
+            return sum;
+          }, 0);
+          
           return {
             ...project,
             completedDrops: total,
             totalDrops,
+            totalHoursWorked,
           };
         })
       );
