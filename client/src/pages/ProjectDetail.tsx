@@ -806,7 +806,7 @@ export default function ProjectDetail() {
                                 key={index}
                                 className={`
                                   ${config.height}
-                                  flex flex-col items-center justify-center
+                                  flex items-center justify-center
                                   rounded-xl border transition-premium
                                   ${isCompleted 
                                     ? 'bg-success/10 border-success/30 shadow-sm' 
@@ -817,9 +817,6 @@ export default function ProjectDetail() {
                               >
                                 <span className={`material-icons ${config.iconSize} ${isCompleted ? 'text-success' : 'text-muted-foreground/40'}`}>
                                   {isCompleted ? 'check_circle' : 'meeting_room'}
-                                </span>
-                                <span className={`text-xs font-semibold mt-0.5 ${isCompleted ? 'text-success' : 'text-muted-foreground/60'}`}>
-                                  {index + 1}
                                 </span>
                               </div>
                             );
