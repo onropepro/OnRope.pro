@@ -792,7 +792,7 @@ export default function Payroll() {
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="billable">Billable (Project Work)</SelectItem>
-                      <SelectItem value="non-billable">Non-Billable (Errands, Training)</SelectItem>
+                      <SelectItem value="non-billable">Non-Billable (Errands, Maintenance)</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -824,7 +824,7 @@ export default function Payroll() {
                     type="text"
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
-                    placeholder="e.g., Errands, Training, Equipment Maintenance"
+                    placeholder="e.g., Errands, Equipment Maintenance, Admin Work"
                     data-testid="input-description"
                   />
                 </div>
@@ -1494,7 +1494,7 @@ function EditSessionForm({ session, onSave, onCancel, isPending, projects }: {
             type="text"
             value={description}
             onChange={(e) => setDescription(e.target.value)}
-            placeholder="e.g., Training, Errands"
+                placeholder="e.g., Errands, Admin Work"
             data-testid="input-edit-description"
           />
         </div>

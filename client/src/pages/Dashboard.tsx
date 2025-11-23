@@ -2253,7 +2253,6 @@ export default function Dashboard() {
                                     { value: "ground_window_cleaning", label: "Ground Window", icon: "storefront" },
                                     { value: "painting", label: "Painting", icon: "format_paint" },
                                     { value: "inspection", label: "Inspection", icon: "fact_check" },
-                                    { value: "training", label: "Training", icon: "school" },
                                     { value: "other", label: "Other", icon: "more_horiz" },
                                   ].map((jobType) => (
                                     <button
