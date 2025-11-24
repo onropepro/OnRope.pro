@@ -52,6 +52,7 @@ export default function PropertyManager() {
   const [strataNumber, setStrataNumber] = useState("");
   const [uploadingAnchorInspection, setUploadingAnchorInspection] = useState(false);
   const [vendorToRemove, setVendorToRemove] = useState<VendorSummary | null>(null);
+  const [selectedComplaint, setSelectedComplaint] = useState<any | null>(null);
   
   const accountForm = useForm<UpdatePropertyManagerAccount>({
     resolver: zodResolver(updatePropertyManagerAccountSchema),
@@ -1243,7 +1244,12 @@ export default function PropertyManager() {
                         ) : (
                           <div className="space-y-3 max-h-60 overflow-y-auto">
                             {projectDetailsData.complaints.map((complaint: any) => (
-                              <Card key={complaint.id} className="bg-muted/50" data-testid={`card-complaint-${complaint.id}`}>
+                              <Card 
+                                key={complaint.id} 
+                                className="bg-muted/50 cursor-pointer hover-elevate" 
+                                data-testid={`card-complaint-${complaint.id}`}
+                                onClick={() => setSelectedComplaint(complaint)}
+                              >
                                 <CardContent className="p-3">
                                   <div className="space-y-2">
                                     <div className="flex items-start justify-between gap-2">
@@ -1259,7 +1265,7 @@ export default function PropertyManager() {
                                       </Badge>
                                     </div>
                                     {complaint.description && (
-                                      <div className="text-sm text-muted-foreground">
+                                      <div className="text-sm text-muted-foreground line-clamp-2">
                                         {complaint.description}
                                       </div>
                                     )}
@@ -1321,6 +1327,104 @@ export default function PropertyManager() {
                 data-testid="button-confirm-remove-vendor"
               >
                 {removeVendorMutation.isPending ? "Removing..." : "Remove Vendor"}
+              </Button>
+            </div>
+          </DialogContent>
+        </Dialog>
+
+        {/* Complaint Details Dialog */}
+        <Dialog open={selectedComplaint !== null} onOpenChange={(open) => !open && setSelectedComplaint(null)}>
+          <DialogContent className="h-[90vh] flex flex-col p-0 max-w-2xl" data-testid="dialog-complaint-details">
+            <DialogHeader className="shrink-0 px-6 pt-6 pb-4 border-b">
+              <DialogTitle data-testid="text-complaint-title">
+                {selectedComplaint?.subject || 'No Subject'}
+              </DialogTitle>
+              <DialogDescription data-testid="text-complaint-timestamp">
+                Submitted on {selectedComplaint ? new Date(selectedComplaint.createdAt).toLocaleDateString() : ''} at{' '}
+                {selectedComplaint ? new Date(selectedComplaint.createdAt).toLocaleTimeString() : ''}
+              </DialogDescription>
+            </DialogHeader>
+
+            <div className="flex-1 overflow-y-auto px-6 py-4">
+              <div className="space-y-6">
+                {/* Status Badge */}
+                <div className="flex items-center gap-2">
+                  <span className="text-sm font-medium">Status:</span>
+                  <Badge variant={selectedComplaint?.status === 'resolved' ? 'default' : 'secondary'}>
+                    {selectedComplaint?.status}
+                  </Badge>
+                </div>
+
+                {/* Resident Information */}
+                <div className="space-y-2">
+                  <h4 className="text-sm font-semibold">Resident Information</h4>
+                  <div className="bg-muted/50 rounded-lg p-3 space-y-1 text-sm">
+                    <div><span className="font-medium">Name:</span> {selectedComplaint?.residentName || 'N/A'}</div>
+                    {selectedComplaint?.unitNumber && (
+                      <div><span className="font-medium">Unit:</span> {selectedComplaint.unitNumber}</div>
+                    )}
+                    {selectedComplaint?.phoneNumber && (
+                      <div><span className="font-medium">Phone:</span> {selectedComplaint.phoneNumber}</div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Description */}
+                {selectedComplaint?.description && (
+                  <div className="space-y-2">
+                    <h4 className="text-sm font-semibold">Description</h4>
+                    <div className="bg-muted/50 rounded-lg p-3 text-sm whitespace-pre-wrap">
+                      {selectedComplaint.description}
+                    </div>
+                  </div>
+                )}
+
+                {/* Photo */}
+                {selectedComplaint?.photoUrl && (
+                  <div className="space-y-2">
+                    <h4 className="text-sm font-semibold">Attached Photo</h4>
+                    <div className="bg-muted/50 rounded-lg p-3">
+                      <img 
+                        src={selectedComplaint.photoUrl} 
+                        alt="Complaint photo" 
+                        className="w-full h-auto rounded-md"
+                        data-testid="img-complaint-photo"
+                      />
+                    </div>
+                  </div>
+                )}
+
+                {/* Notes (visible to resident) */}
+                {selectedComplaint?.notes && selectedComplaint.notes.length > 0 && (
+                  <div className="space-y-2">
+                    <h4 className="text-sm font-semibold">Communication History</h4>
+                    <div className="space-y-2">
+                      {selectedComplaint.notes
+                        .filter((note: any) => note.visibleToResident)
+                        .map((note: any) => (
+                          <div key={note.id} className="bg-muted/50 rounded-lg p-3" data-testid={`note-${note.id}`}>
+                            <div className="flex items-start justify-between gap-2 mb-2">
+                              <span className="text-xs font-medium">{note.authorName}</span>
+                              <span className="text-xs text-muted-foreground">
+                                {new Date(note.createdAt).toLocaleDateString()} {new Date(note.createdAt).toLocaleTimeString()}
+                              </span>
+                            </div>
+                            <p className="text-sm whitespace-pre-wrap">{note.content}</p>
+                          </div>
+                        ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            <div className="shrink-0 px-6 py-4 border-t flex justify-end">
+              <Button
+                variant="outline"
+                onClick={() => setSelectedComplaint(null)}
+                data-testid="button-close-complaint-details"
+              >
+                Close
               </Button>
             </div>
           </DialogContent>
