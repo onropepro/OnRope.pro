@@ -1112,10 +1112,92 @@ export class Storage {
     return result[0];
   }
 
-  async getMethodStatementsByCompany(companyId: string): Promise<MethodStatement[]> {
-    return db.select().from(methodStatements)
+  async getMethodStatementsByCompany(companyId: string): Promise<any[]> {
+    const results = await db.select({
+      statement: methodStatements,
+      preparer: users,
+    })
+      .from(methodStatements)
+      .leftJoin(users, eq(methodStatements.preparedById, users.id))
       .where(eq(methodStatements.companyId, companyId))
       .orderBy(desc(methodStatements.dateCreated), desc(methodStatements.createdAt));
+    
+    return results.map(({ statement, preparer }) => {
+      // Parse JSON array fields if they're strings
+      const parseArrayField = (field: any): string[] => {
+        if (!field) return [];
+        if (Array.isArray(field)) return field;
+        if (typeof field === 'string') {
+          // Handle Postgres array literal: {item1,item2} → ["item1","item2"]
+          if (field.startsWith('{') && field.endsWith('}')) {
+            const items = field.slice(1, -1).split(',').map(s => s.trim()).filter(Boolean);
+            return items;
+          }
+          // Handle JSON array: ["item1","item2"] → JavaScript array
+          try {
+            const parsed = JSON.parse(field);
+            return Array.isArray(parsed) ? parsed : [];
+          } catch {
+            return [];
+          }
+        }
+        return [];
+      };
+
+      // Parse signatures if it's a JSON string
+      const parseSignatures = (sigs: any) => {
+        if (!sigs) return [];
+        if (Array.isArray(sigs)) return sigs;
+        if (typeof sigs === 'string') {
+          try {
+            const parsed = JSON.parse(sigs);
+            return Array.isArray(parsed) ? parsed : [];
+          } catch {
+            return [];
+          }
+        }
+        return [];
+      };
+
+      return {
+        id: statement.id,
+        projectId: statement.projectId,
+        companyId: statement.companyId,
+        dateCreated: statement.dateCreated,
+        preparedById: statement.preparedById,
+        preparedByName: preparer?.name || 'Unknown',
+        jobTitle: statement.jobTitle || preparer?.jobTitle || '',
+        location: statement.location,
+        workDescription: statement.workDescription,
+        scopeDetails: statement.scopeDetails,
+        workDuration: statement.workDuration,
+        numberOfWorkers: statement.numberOfWorkers,
+        hazardsIdentified: parseArrayField(statement.hazardsIdentified),
+        controlMeasures: parseArrayField(statement.controlMeasures),
+        requiredEquipment: parseArrayField(statement.requiredEquipment),
+        requiredPpe: parseArrayField(statement.requiredPpe),
+        emergencyProcedures: statement.emergencyProcedures,
+        rescuePlan: statement.rescuePlan,
+        emergencyContacts: statement.emergencyContacts,
+        permitsRequired: parseArrayField(statement.permitsRequired),
+        weatherRestrictions: statement.weatherRestrictions,
+        workingHeightRange: statement.workingHeightRange,
+        accessMethod: statement.accessMethod,
+        competencyRequirements: parseArrayField(statement.competencyRequirements),
+        irataLevelRequired: statement.irataLevelRequired,
+        communicationMethod: statement.communicationMethod,
+        signalProtocol: statement.signalProtocol,
+        teamMembers: parseArrayField(statement.teamMembers),
+        reviewedByName: statement.reviewedByName,
+        reviewDate: statement.reviewDate,
+        approvedByName: statement.approvedByName,
+        approvalDate: statement.approvalDate,
+        signatures: parseSignatures(statement.signatures),
+        status: statement.status,
+        createdAt: statement.createdAt,
+        updatedAt: statement.updatedAt,
+      };
+    });
   }
 
   async getMethodStatementsByProject(projectId: string): Promise<MethodStatement[]> {

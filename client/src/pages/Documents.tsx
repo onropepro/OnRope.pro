@@ -10,6 +10,7 @@ import { hasFinancialAccess } from "@/lib/permissions";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { jsPDF } from "jspdf";
+import { downloadMethodStatement } from "@/pages/MethodStatementForm";
 
 export default function Documents() {
   const [, navigate] = useLocation();
@@ -41,6 +42,10 @@ export default function Documents() {
     queryKey: ["/api/incident-reports"],
   });
 
+  const { data: methodStatementsData } = useQuery<{ statements: any[] }>({
+    queryKey: ["/api/method-statements"],
+  });
+
   const { data: quotesData } = useQuery<{ quotes: any[] }>({
     queryKey: ["/api/quotes"],
   });
@@ -57,6 +62,7 @@ export default function Documents() {
   const flhaForms = flhaFormsData?.flhaForms || [];
   const inspections = inspectionsData?.inspections || [];
   const incidentReports = incidentReportsData?.reports || [];
+  const methodStatements = methodStatementsData?.statements || [];
   const quotes = quotesData?.quotes || [];
   const companyDocuments = companyDocsData?.documents || [];
 
@@ -1588,6 +1594,59 @@ export default function Documents() {
             ) : (
               <p className="text-center py-8 text-muted-foreground">
                 No incident reports recorded yet
+              </p>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Method Statements */}
+        <Card className="mb-6">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <FileText className="h-5 w-5" />
+              Method Statements
+              <Badge variant="secondary" className="ml-auto">
+                {methodStatements.length}
+              </Badge>
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {methodStatements.length > 0 ? (
+              <div className="space-y-2">
+                {methodStatements.map((statement) => (
+                  <div key={statement.id} className="flex items-center gap-3 p-3 rounded-md border hover-elevate">
+                    <FileText className="h-5 w-5 text-green-500 flex-shrink-0" />
+                    <div className="flex-1 min-w-0">
+                      <div className="font-medium">
+                        {statement.location || 'Method Statement'}
+                      </div>
+                      <div className="text-sm text-muted-foreground">
+                        {new Date(statement.dateCreated).toLocaleDateString()} • Prepared by: {statement.preparedByName}
+                      </div>
+                      {statement.workDescription && (
+                        <div className="text-sm text-muted-foreground mt-1 line-clamp-1">
+                          {statement.workDescription}
+                        </div>
+                      )}
+                    </div>
+                    <Badge variant={statement.status === 'approved' ? 'default' : 'secondary'}>
+                      {statement.status || 'draft'}
+                    </Badge>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => downloadMethodStatement(statement, currentUser)}
+                      data-testid={`download-method-statement-${statement.id}`}
+                    >
+                      <Download className="h-4 w-4 mr-1" />
+                      Download
+                    </Button>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-center py-8 text-muted-foreground">
+                No method statements recorded yet
               </p>
             )}
           </CardContent>

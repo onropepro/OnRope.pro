@@ -18,6 +18,7 @@ import { apiRequest, queryClient } from "@/lib/queryClient";
 import { ArrowLeft, FileCheck, PenTool, X, Shield, Plus, Trash2 } from "lucide-react";
 import type { Project } from "@shared/schema";
 import SignatureCanvas from "react-signature-canvas";
+import { jsPDF } from "jspdf";
 
 const methodStatementFormSchema = z.object({
   projectId: z.string().min(1, "Project is required"),
@@ -64,6 +65,418 @@ type Signature = {
   signatureDataUrl: string;
   role: string;
   signedAt: string;
+};
+
+// Helper function to add company branding to PDF
+const addCompanyBranding = (doc: jsPDF, pageWidth: number, currentUser: any): number => {
+  if (!currentUser?.whitelabelBrandingActive || !currentUser?.companyName) {
+    return 0; // No branding, return 0 additional height
+  }
+
+  const companyName = currentUser?.companyName || '';
+
+  // Add company name at top of header
+  doc.setTextColor(255, 255, 255);
+  doc.setFontSize(9);
+  doc.setFont('helvetica', 'bold');
+  doc.text(companyName.toUpperCase(), pageWidth / 2, 8, { align: 'center' });
+
+  return 5; // Return additional height used by branding
+};
+
+// Download Method Statement as PDF
+export const downloadMethodStatement = (statement: any, currentUser: any) => {
+  const doc = new jsPDF();
+  const pageWidth = doc.internal.pageSize.getWidth();
+  const pageHeight = doc.internal.pageSize.getHeight();
+  let yPosition = 20;
+
+  // Helper function to add multi-line text with pagination
+  const addMultilineText = (lines: string[], currentY: number, lineHeight: number = 6): number => {
+    let y = currentY;
+    for (const line of lines) {
+      if (y > pageHeight - 30) {
+        doc.addPage();
+        y = 20;
+      }
+      doc.text(line, 20, y);
+      y += lineHeight;
+    }
+    return y;
+  };
+
+  // Header - Green for Method Statement
+  doc.setFillColor(34, 197, 94); // Green
+  
+  // Add company branding if active
+  const brandingHeight = addCompanyBranding(doc, pageWidth, currentUser);
+  const headerHeight = 35 + brandingHeight;
+  doc.rect(0, 0, pageWidth, headerHeight, 'F');
+  
+  doc.setTextColor(255, 255, 255);
+  doc.setFontSize(20);
+  doc.setFont('helvetica', 'bold');
+  doc.text('METHOD STATEMENT', pageWidth / 2, 15 + brandingHeight, { align: 'center' });
+  doc.setFontSize(11);
+  doc.setFont('helvetica', 'normal');
+  doc.text('Safe Work Procedure & Risk Control Document', pageWidth / 2, 25 + brandingHeight, { align: 'center' });
+
+  yPosition = 45 + brandingHeight;
+
+  // Basic Information Section
+  doc.setTextColor(0, 0, 0);
+  doc.setFontSize(11);
+  doc.setFont('helvetica', 'bold');
+  doc.text('Document Information', 20, yPosition);
+  yPosition += 8;
+
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(10);
+  doc.text(`Location: ${statement.location || 'N/A'}`, 20, yPosition);
+  yPosition += 6;
+  doc.text(`Date Created: ${new Date(statement.dateCreated).toLocaleDateString('en-US', {
+    weekday: 'long',
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric'
+  })}`, 20, yPosition);
+  yPosition += 6;
+  doc.text(`Prepared By: ${statement.preparedByName}`, 20, yPosition);
+  yPosition += 6;
+  doc.text(`Job Title: ${statement.jobTitle}`, 20, yPosition);
+  yPosition += 10;
+
+  // Work Description Section
+  if (yPosition > pageHeight - 40) {
+    doc.addPage();
+    yPosition = 20;
+  }
+
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(11);
+  doc.text('Work Description', 20, yPosition);
+  yPosition += 8;
+
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(10);
+  const workDescriptionLines = doc.splitTextToSize(statement.workDescription || 'N/A', pageWidth - 40);
+  yPosition = addMultilineText(workDescriptionLines, yPosition);
+  yPosition += 6;
+
+  doc.setFont('helvetica', 'bold');
+  doc.text('Scope Details:', 20, yPosition);
+  yPosition += 6;
+  doc.setFont('helvetica', 'normal');
+  const scopeLines = doc.splitTextToSize(statement.scopeDetails || 'N/A', pageWidth - 40);
+  yPosition = addMultilineText(scopeLines, yPosition);
+  yPosition += 6;
+
+  if (statement.workDuration) {
+    doc.text(`Duration: ${statement.workDuration}`, 20, yPosition);
+    yPosition += 6;
+  }
+  if (statement.numberOfWorkers) {
+    doc.text(`Number of Workers: ${statement.numberOfWorkers}`, 20, yPosition);
+    yPosition += 6;
+  }
+  yPosition += 4;
+
+  // Hazards Section
+  if (yPosition > pageHeight - 40) {
+    doc.addPage();
+    yPosition = 20;
+  }
+
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(11);
+  doc.text('Hazards Identified', 20, yPosition);
+  yPosition += 8;
+
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(10);
+  const hazards = Array.isArray(statement.hazardsIdentified) 
+    ? statement.hazardsIdentified 
+    : (statement.hazardsIdentified ? [statement.hazardsIdentified] : []);
+  
+  if (hazards.length > 0) {
+    hazards.forEach((hazard: string, index: number) => {
+      if (yPosition > pageHeight - 30) {
+        doc.addPage();
+        yPosition = 20;
+      }
+      const hazardLines = doc.splitTextToSize(`${index + 1}. ${hazard}`, pageWidth - 40);
+      yPosition = addMultilineText(hazardLines, yPosition);
+      yPosition += 2;
+    });
+  } else {
+    doc.text('No hazards specified', 20, yPosition);
+    yPosition += 6;
+  }
+  yPosition += 6;
+
+  // Control Measures Section
+  if (yPosition > pageHeight - 40) {
+    doc.addPage();
+    yPosition = 20;
+  }
+
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(11);
+  doc.text('Control Measures', 20, yPosition);
+  yPosition += 8;
+
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(10);
+  const controls = Array.isArray(statement.controlMeasures) 
+    ? statement.controlMeasures 
+    : (statement.controlMeasures ? [statement.controlMeasures] : []);
+  
+  if (controls.length > 0) {
+    controls.forEach((control: string, index: number) => {
+      if (yPosition > pageHeight - 30) {
+        doc.addPage();
+        yPosition = 20;
+      }
+      const controlLines = doc.splitTextToSize(`${index + 1}. ${control}`, pageWidth - 40);
+      yPosition = addMultilineText(controlLines, yPosition);
+      yPosition += 2;
+    });
+  } else {
+    doc.text('No control measures specified', 20, yPosition);
+    yPosition += 6;
+  }
+  yPosition += 6;
+
+  // Equipment Section
+  if (yPosition > pageHeight - 40) {
+    doc.addPage();
+    yPosition = 20;
+  }
+
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(11);
+  doc.text('Required Equipment', 20, yPosition);
+  yPosition += 8;
+
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(10);
+  const equipment = Array.isArray(statement.requiredEquipment) 
+    ? statement.requiredEquipment 
+    : (statement.requiredEquipment ? [statement.requiredEquipment] : []);
+  
+  if (equipment.length > 0) {
+    equipment.forEach((item: string, index: number) => {
+      if (yPosition > pageHeight - 30) {
+        doc.addPage();
+        yPosition = 20;
+      }
+      doc.text(`• ${item}`, 20, yPosition);
+      yPosition += 6;
+    });
+  } else {
+    doc.text('No equipment specified', 20, yPosition);
+    yPosition += 6;
+  }
+  yPosition += 6;
+
+  // PPE Section
+  if (yPosition > pageHeight - 40) {
+    doc.addPage();
+    yPosition = 20;
+  }
+
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(11);
+  doc.text('Required PPE', 20, yPosition);
+  yPosition += 8;
+
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(10);
+  const ppe = Array.isArray(statement.requiredPpe) 
+    ? statement.requiredPpe 
+    : (statement.requiredPpe ? [statement.requiredPpe] : []);
+  
+  if (ppe.length > 0) {
+    ppe.forEach((item: string, index: number) => {
+      if (yPosition > pageHeight - 30) {
+        doc.addPage();
+        yPosition = 20;
+      }
+      doc.text(`• ${item}`, 20, yPosition);
+      yPosition += 6;
+    });
+  } else {
+    doc.text('No PPE specified', 20, yPosition);
+    yPosition += 6;
+  }
+  yPosition += 6;
+
+  // Emergency Procedures Section
+  if (yPosition > pageHeight - 40) {
+    doc.addPage();
+    yPosition = 20;
+  }
+
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(11);
+  doc.text('Emergency Procedures', 20, yPosition);
+  yPosition += 8;
+
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(10);
+  const emergencyLines = doc.splitTextToSize(statement.emergencyProcedures || 'N/A', pageWidth - 40);
+  yPosition = addMultilineText(emergencyLines, yPosition);
+  yPosition += 6;
+
+  if (statement.rescuePlan) {
+    doc.setFont('helvetica', 'bold');
+    doc.text('Rescue Plan:', 20, yPosition);
+    yPosition += 6;
+    doc.setFont('helvetica', 'normal');
+    const rescueLines = doc.splitTextToSize(statement.rescuePlan, pageWidth - 40);
+    yPosition = addMultilineText(rescueLines, yPosition);
+    yPosition += 6;
+  }
+
+  if (statement.emergencyContacts) {
+    doc.setFont('helvetica', 'bold');
+    doc.text('Emergency Contacts:', 20, yPosition);
+    yPosition += 6;
+    doc.setFont('helvetica', 'normal');
+    const contactsLines = doc.splitTextToSize(statement.emergencyContacts, pageWidth - 40);
+    yPosition = addMultilineText(contactsLines, yPosition);
+    yPosition += 6;
+  }
+  yPosition += 6;
+
+  // Additional Details Section
+  if (statement.competencyRequirements || statement.irataLevelRequired || statement.teamMembers) {
+    if (yPosition > pageHeight - 40) {
+      doc.addPage();
+      yPosition = 20;
+    }
+
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(11);
+    doc.text('Team & Competency Requirements', 20, yPosition);
+    yPosition += 8;
+
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(10);
+
+    if (statement.irataLevelRequired) {
+      doc.text(`IRATA Level Required: ${statement.irataLevelRequired}`, 20, yPosition);
+      yPosition += 6;
+    }
+
+    const competencies = Array.isArray(statement.competencyRequirements) 
+      ? statement.competencyRequirements 
+      : (statement.competencyRequirements ? [statement.competencyRequirements] : []);
+    
+    if (competencies.length > 0) {
+      doc.setFont('helvetica', 'bold');
+      doc.text('Competencies:', 20, yPosition);
+      yPosition += 6;
+      doc.setFont('helvetica', 'normal');
+      competencies.forEach((comp: string) => {
+        if (yPosition > pageHeight - 30) {
+          doc.addPage();
+          yPosition = 20;
+        }
+        doc.text(`• ${comp}`, 20, yPosition);
+        yPosition += 6;
+      });
+    }
+
+    const team = Array.isArray(statement.teamMembers) 
+      ? statement.teamMembers 
+      : (statement.teamMembers ? [statement.teamMembers] : []);
+    
+    if (team.length > 0) {
+      doc.setFont('helvetica', 'bold');
+      doc.text('Team Members:', 20, yPosition);
+      yPosition += 6;
+      doc.setFont('helvetica', 'normal');
+      team.forEach((member: string) => {
+        if (yPosition > pageHeight - 30) {
+          doc.addPage();
+          yPosition = 20;
+        }
+        doc.text(`• ${member}`, 20, yPosition);
+        yPosition += 6;
+      });
+    }
+    yPosition += 6;
+  }
+
+  // Signatures Section
+  if (statement.signatures && statement.signatures.length > 0) {
+    if (yPosition > pageHeight - 60) {
+      doc.addPage();
+      yPosition = 20;
+    }
+
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(11);
+    doc.text('Approvals & Signatures', 20, yPosition);
+    yPosition += 8;
+
+    statement.signatures.forEach((sig: any) => {
+      if (yPosition > pageHeight - 50) {
+        doc.addPage();
+        yPosition = 20;
+      }
+
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(10);
+      doc.text(`${sig.role}:`, 20, yPosition);
+      yPosition += 6;
+
+      doc.setFont('helvetica', 'normal');
+      doc.text(`Name: ${sig.employeeName}`, 20, yPosition);
+      yPosition += 6;
+
+      if (sig.signedAt) {
+        doc.text(`Date: ${new Date(sig.signedAt).toLocaleDateString()}`, 20, yPosition);
+        yPosition += 6;
+      }
+
+      if (sig.signatureDataUrl) {
+        try {
+          doc.addImage(sig.signatureDataUrl, 'PNG', 20, yPosition, 60, 20);
+          yPosition += 25;
+        } catch (error) {
+          console.error('Error adding signature image:', error);
+          yPosition += 6;
+        }
+      }
+      yPosition += 6;
+    });
+  }
+
+  // Footer
+  const pageCount = doc.getNumberOfPages();
+  for (let i = 1; i <= pageCount; i++) {
+    doc.setPage(i);
+    doc.setFontSize(8);
+    doc.setTextColor(100, 100, 100);
+    doc.text(
+      `Method Statement - Page ${i} of ${pageCount}`,
+      pageWidth / 2,
+      pageHeight - 10,
+      { align: 'center' }
+    );
+    doc.text(
+      `Generated: ${new Date().toLocaleDateString()}`,
+      pageWidth - 20,
+      pageHeight - 10,
+      { align: 'right' }
+    );
+  }
+
+  // Save PDF
+  const fileName = `Method_Statement_${statement.location}_${new Date(statement.dateCreated).toLocaleDateString().replace(/\//g, '-')}.pdf`;
+  doc.save(fileName);
 };
 
 export default function MethodStatementForm() {

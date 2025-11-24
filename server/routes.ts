@@ -6059,7 +6059,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Get all method statements for company
-  app.get("/api/method-statements", requireAuth, requireRole("operations_manager", "general_supervisor", "rope_access_supervisor", "supervisor", "company"), async (req: Request, res: Response) => {
+  app.get("/api/method-statements", requireAuth, requireRole("rope_access_tech", "operations_manager", "general_supervisor", "rope_access_supervisor", "supervisor", "company"), async (req: Request, res: Response) => {
     try {
       const currentUser = await storage.getUserById(req.session.userId!);
       
