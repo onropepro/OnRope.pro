@@ -2125,7 +2125,9 @@ export class Storage {
           companyName: company.companyName || company.email || "Unknown Company",
           email: company.email,
           phone: company.phone,
-          logo: company.logo,
+          logo: company.whitelabelBrandingActive && company.brandingLogoUrl 
+            ? company.brandingLogoUrl 
+            : company.logo,
           activeProjectsCount: activeProjects.length,
           residentCode: company.residentCode,
           propertyManagerCode: company.propertyManagerCode,
