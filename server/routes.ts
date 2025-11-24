@@ -2006,6 +2006,46 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Property Manager: Update strata number for a vendor link
+  app.patch("/api/property-managers/vendors/:linkId", requireAuth, requireRole("property_manager"), async (req: Request, res: Response) => {
+    try {
+      const { linkId } = req.params;
+      const { strataNumber } = req.body;
+      
+      // Validate strata number (optional, max 100 chars)
+      if (strataNumber && (typeof strataNumber !== 'string' || strataNumber.length > 100)) {
+        return res.status(400).json({ message: "Invalid strata number format. Maximum 100 characters." });
+      }
+      
+      const updatedLink = await storage.updatePropertyManagerStrataNumber(linkId, strataNumber || null);
+      
+      res.json({ 
+        link: updatedLink,
+        message: "Strata number updated successfully"
+      });
+    } catch (error: any) {
+      console.error("Update strata number error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Property Manager: Get projects filtered by company and strata number
+  app.get("/api/property-managers/vendors/:linkId/projects", requireAuth, requireRole("property_manager"), async (req: Request, res: Response) => {
+    try {
+      const { linkId } = req.params;
+      
+      const projects = await storage.getPropertyManagerFilteredProjects(linkId);
+      
+      res.json({ projects });
+    } catch (error: any) {
+      console.error("Get filtered projects error:", error);
+      if (error.message?.includes('not found')) {
+        return res.status(404).json({ message: "Vendor link not found" });
+      }
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
   // Property Manager: Update account settings
   app.patch("/api/property-managers/me/account", requireAuth, requireRole("property_manager"), async (req: Request, res: Response) => {
     try {

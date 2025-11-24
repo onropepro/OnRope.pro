@@ -2091,6 +2091,7 @@ export class Storage {
   }
 
   async getPropertyManagerVendorSummaries(propertyManagerId: string): Promise<Array<{
+    linkId: string;
     id: string;
     companyName: string;
     email: string;
@@ -2099,11 +2100,16 @@ export class Storage {
     activeProjectsCount: number;
     residentCode: string | null;
     propertyManagerCode: string | null;
+    strataNumber: string | null;
   }>> {
+    const links = await this.getPropertyManagerCompanyLinks(propertyManagerId);
     const companies = await this.getPropertyManagerLinkedCompanies(propertyManagerId);
     
     const vendorSummaries = await Promise.all(
       companies.map(async (company) => {
+        // Find the corresponding link for this company
+        const link = links.find(l => l.companyId === company.id);
+        
         const activeProjects = await db.select()
           .from(projects)
           .where(
@@ -2114,6 +2120,7 @@ export class Storage {
           );
         
         return {
+          linkId: link?.id || '',
           id: company.id,
           companyName: company.companyName || company.email || "Unknown Company",
           email: company.email,
@@ -2122,6 +2129,7 @@ export class Storage {
           activeProjectsCount: activeProjects.length,
           residentCode: company.residentCode,
           propertyManagerCode: company.propertyManagerCode,
+          strataNumber: link?.strataNumber || null,
         };
       })
     );
@@ -2147,6 +2155,54 @@ export class Storage {
     };
     
     return await this.createPropertyManagerCompanyLink(link);
+  }
+
+  async updatePropertyManagerStrataNumber(linkId: string, strataNumber: string | null): Promise<PropertyManagerCompanyLink> {
+    const [updated] = await db.update(propertyManagerCompanyLinks)
+      .set({ strataNumber })
+      .where(eq(propertyManagerCompanyLinks.id, linkId))
+      .returning();
+    
+    if (!updated) {
+      throw new Error('Property manager company link not found');
+    }
+    
+    return updated;
+  }
+
+  async getPropertyManagerFilteredProjects(linkId: string): Promise<any[]> {
+    // Get the link to find company and strata number
+    const [link] = await db.select()
+      .from(propertyManagerCompanyLinks)
+      .where(eq(propertyManagerCompanyLinks.id, linkId));
+    
+    if (!link) {
+      throw new Error('Property manager company link not found');
+    }
+    
+    // Normalize strata number helper function
+    const normalizeStrata = (strata: string | null | undefined): string => {
+      if (!strata) return '';
+      return strata.toUpperCase().replace(/\s+/g, '');
+    };
+    
+    // Get all projects for this company
+    let query = db.select()
+      .from(projects)
+      .where(eq(projects.companyId, link.companyId));
+    
+    const allProjects = await query;
+    
+    // Filter projects by normalized strata number if one is set
+    if (link.strataNumber) {
+      const normalizedLinkStrata = normalizeStrata(link.strataNumber);
+      return allProjects.filter(project => 
+        normalizeStrata(project.strataPlanNumber) === normalizedLinkStrata
+      );
+    }
+    
+    // If no strata number set, return all projects for this company
+    return allProjects;
   }
 }
 
