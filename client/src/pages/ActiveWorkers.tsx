@@ -77,10 +77,42 @@ export default function ActiveWorkers() {
     queryKey: ["/api/all-work-sessions"],
   });
 
+  // Fetch harness inspections for today and past week
+  const { data: harnessInspectionsData, isLoading: isLoadingInspections } = useQuery({
+    queryKey: ["/api/harness-inspections"],
+  });
+
+  // Fetch all employees for inspection tracking
+  const { data: employeesData, isLoading: isLoadingEmployees } = useQuery({
+    queryKey: ["/api/employees"],
+  });
+
   const activeWorkers = activeWorkersData?.sessions || [];
   const allSessions = allSessionsData?.sessions || [];
+  const harnessInspections = harnessInspectionsData?.inspections || [];
+  const employees = employeesData?.employees || [];
   
-  const isLoading = isLoadingActive || isLoadingAll;
+  const isLoading = isLoadingActive || isLoadingAll || isLoadingInspections || isLoadingEmployees;
+
+  // Helper function to check if employee submitted harness inspection for a given date
+  const hasHarnessInspection = (employeeId: string, date: Date): boolean => {
+    const dateStr = format(date, 'yyyy-MM-dd');
+    return harnessInspections.some((inspection: any) => 
+      inspection.workerId === employeeId && inspection.inspectionDate === dateStr
+    );
+  };
+
+  // Get past 7 days for inspection tracking
+  const past7Days = useMemo(() => {
+    const days = [];
+    const today = new Date();
+    for (let i = 0; i < 7; i++) {
+      const date = new Date(today);
+      date.setDate(date.getDate() - i);
+      days.push(date);
+    }
+    return days;
+  }, []);
 
   // Filter sessions by time period (using startTime instead of workDate)
   const filteredSessions = useMemo(() => {
@@ -206,10 +238,14 @@ export default function ActiveWorkers() {
 
       <div className="max-w-6xl mx-auto p-4">
         <Tabs defaultValue="workers" className="w-full">
-          <TabsList className="grid w-full max-w-md mx-auto grid-cols-2 mb-6">
+          <TabsList className="grid w-full max-w-3xl mx-auto grid-cols-3 mb-6">
             <TabsTrigger value="workers" data-testid="tab-workers">
               <span className="material-icons text-sm mr-2">people</span>
               Workers
+            </TabsTrigger>
+            <TabsTrigger value="inspections" data-testid="tab-inspections">
+              <span className="material-icons text-sm mr-2">verified</span>
+              Inspections
             </TabsTrigger>
             <TabsTrigger value="locations" data-testid="tab-locations">
               <span className="material-icons text-sm mr-2">map</span>
@@ -250,10 +286,29 @@ export default function ActiveWorkers() {
                             {session.projectName || 'Unknown Project'}
                           </CardDescription>
                         </div>
-                        <Badge variant="default" className="bg-primary">
-                          <span className="material-icons text-xs mr-1">schedule</span>
-                          Active
-                        </Badge>
+                        <div className="flex gap-2">
+                          {/* Harness Inspection Status */}
+                          {(() => {
+                            const today = new Date();
+                            const hasTodayInspection = hasHarnessInspection(session.employeeId, today);
+                            return (
+                              <Badge 
+                                variant={hasTodayInspection ? "default" : "destructive"}
+                                className="flex items-center gap-1"
+                                title={hasTodayInspection ? "Harness inspection completed" : "Harness inspection missing"}
+                              >
+                                <span className="material-icons text-xs">
+                                  {hasTodayInspection ? 'verified' : 'warning'}
+                                </span>
+                                {hasTodayInspection ? 'Inspected' : 'Not Inspected'}
+                              </Badge>
+                            );
+                          })()}
+                          <Badge variant="default" className="bg-primary">
+                            <span className="material-icons text-xs mr-1">schedule</span>
+                            Active
+                          </Badge>
+                        </div>
                       </div>
                     </CardHeader>
                     <CardContent>
@@ -301,6 +356,73 @@ export default function ActiveWorkers() {
                 ))}
               </div>
             )}
+          </TabsContent>
+
+          <TabsContent value="inspections">
+            <Card className="glass-card border-0 shadow-premium">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <span className="material-icons">verified</span>
+                  Harness Inspection Tracking - Past 7 Days
+                </CardTitle>
+                <CardDescription>
+                  Daily harness inspection submissions for all employees
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="overflow-x-auto">
+                <table className="w-full">
+                  <thead>
+                    <tr className="border-b">
+                      <th className="text-left p-3 font-medium text-sm">Employee</th>
+                      {past7Days.map((date, index) => (
+                        <th key={index} className="text-center p-3 font-medium text-sm">
+                          <div>{format(date, 'EEE')}</div>
+                          <div className="text-xs text-muted-foreground">{format(date, 'MMM d')}</div>
+                        </th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {employees.length === 0 ? (
+                      <tr>
+                        <td colSpan={8} className="text-center p-8 text-muted-foreground">
+                          No employees found
+                        </td>
+                      </tr>
+                    ) : (
+                      employees.map((employee: any) => (
+                        <tr 
+                          key={employee.id} 
+                          className="border-b hover-elevate"
+                          data-testid={`employee-inspection-row-${employee.id}`}
+                        >
+                          <td className="p-3">
+                            <div className="font-medium">{employee.name}</div>
+                            <div className="text-xs text-muted-foreground">{employee.role?.replace(/_/g, ' ')}</div>
+                          </td>
+                          {past7Days.map((date, index) => {
+                            const hasInspection = hasHarnessInspection(employee.id, date);
+                            return (
+                              <td key={index} className="text-center p-3">
+                                {hasInspection ? (
+                                  <span className="material-icons text-green-500" title="Inspection submitted">
+                                    check_circle
+                                  </span>
+                                ) : (
+                                  <span className="material-icons text-red-500" title="No inspection">
+                                    cancel
+                                  </span>
+                                )}
+                              </td>
+                            );
+                          })}
+                        </tr>
+                      ))
+                    )}
+                  </tbody>
+                </table>
+              </CardContent>
+            </Card>
           </TabsContent>
 
           <TabsContent value="locations">
