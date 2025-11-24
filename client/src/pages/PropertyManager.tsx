@@ -132,7 +132,7 @@ export default function PropertyManager() {
     mutationFn: async ({ linkId, strataNumber }: { linkId: string; strataNumber: string }) => {
       return await apiRequest("PATCH", `/api/property-managers/vendors/${linkId}`, { strataNumber });
     },
-    onSuccess: async (data) => {
+    onSuccess: async (data: any) => {
       // Invalidate and refetch vendors list
       await queryClient.invalidateQueries({ queryKey: ["/api/property-managers/me/vendors"] });
       
@@ -273,7 +273,7 @@ export default function PropertyManager() {
   const vendors = vendorsData?.vendors || [];
 
   return (
-    <div className="min-h-screen bg-background p-4 md:p-6">
+    <div className="h-screen overflow-y-auto bg-background p-4 md:p-6">
       <div className="max-w-6xl mx-auto">
         <div className="mb-6 flex flex-wrap items-start justify-between gap-4">
           <div>
