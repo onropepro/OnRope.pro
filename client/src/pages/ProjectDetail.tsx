@@ -1,7 +1,7 @@
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useParams, useLocation } from "wouter";
 import { queryClient } from "@/lib/queryClient";
-import { hasFinancialAccess, isManagement as checkIsManagement, hasPermission } from "@/lib/permissions";
+import { hasFinancialAccess, isManagement as checkIsManagement, hasPermission, canViewSafetyDocuments } from "@/lib/permissions";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -1428,62 +1428,66 @@ export default function ProjectDetail() {
           </CardHeader>
           <CardContent className="space-y-6">
             
-            {/* Rope Access Plan Section */}
-            <div className="space-y-3">
-              <div className="flex items-center gap-2">
-                <span className="material-icons text-primary">description</span>
-                <h3 className="font-medium">Rope Access Plan</h3>
-              </div>
-              {project.ropeAccessPlanUrl ? (
-                <div className="flex gap-2">
-                  <Button
-                    variant="outline"
-                    className="flex-1 h-12 gap-2"
-                    onClick={() => window.open(project.ropeAccessPlanUrl!, '_blank')}
-                    data-testid="button-view-pdf"
-                  >
-                    <span className="material-icons text-lg">description</span>
-                    View Current PDF
-                  </Button>
-                  <Button
-                    variant="outline"
-                    className="h-12 gap-2"
-                    onClick={() => document.getElementById('pdf-upload-input')?.click()}
-                    disabled={uploadingPdf}
-                    data-testid="button-replace-pdf"
-                  >
-                    <span className="material-icons text-lg">upload</span>
-                    {uploadingPdf ? "Uploading..." : "Replace"}
-                  </Button>
+            {/* Rope Access Plan Section - Only visible to users with safety document permission */}
+            {canViewSafetyDocuments(currentUser) && (
+              <>
+                <div className="space-y-3">
+                  <div className="flex items-center gap-2">
+                    <span className="material-icons text-primary">description</span>
+                    <h3 className="font-medium">Rope Access Plan</h3>
+                  </div>
+                  {project.ropeAccessPlanUrl ? (
+                    <div className="flex gap-2">
+                      <Button
+                        variant="outline"
+                        className="flex-1 h-12 gap-2"
+                        onClick={() => window.open(project.ropeAccessPlanUrl!, '_blank')}
+                        data-testid="button-view-pdf"
+                      >
+                        <span className="material-icons text-lg">description</span>
+                        View Current PDF
+                      </Button>
+                      <Button
+                        variant="outline"
+                        className="h-12 gap-2"
+                        onClick={() => document.getElementById('pdf-upload-input')?.click()}
+                        disabled={uploadingPdf}
+                        data-testid="button-replace-pdf"
+                      >
+                        <span className="material-icons text-lg">upload</span>
+                        {uploadingPdf ? "Uploading..." : "Replace"}
+                      </Button>
+                    </div>
+                  ) : (
+                    <Button
+                      variant="outline"
+                      className="w-full h-12 gap-2"
+                      onClick={() => document.getElementById('pdf-upload-input')?.click()}
+                      disabled={uploadingPdf}
+                      data-testid="button-upload-pdf"
+                    >
+                      <span className="material-icons text-lg">upload</span>
+                      {uploadingPdf ? "Uploading..." : "Upload PDF"}
+                    </Button>
+                  )}
+                  <input
+                    id="pdf-upload-input"
+                    type="file"
+                    accept="application/pdf"
+                    className="hidden"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) {
+                        handlePdfUpload(file);
+                        e.target.value = '';
+                      }
+                    }}
+                  />
                 </div>
-              ) : (
-                <Button
-                  variant="outline"
-                  className="w-full h-12 gap-2"
-                  onClick={() => document.getElementById('pdf-upload-input')?.click()}
-                  disabled={uploadingPdf}
-                  data-testid="button-upload-pdf"
-                >
-                  <span className="material-icons text-lg">upload</span>
-                  {uploadingPdf ? "Uploading..." : "Upload PDF"}
-                </Button>
-              )}
-              <input
-                id="pdf-upload-input"
-                type="file"
-                accept="application/pdf"
-                className="hidden"
-                onChange={(e) => {
-                  const file = e.target.files?.[0];
-                  if (file) {
-                    handlePdfUpload(file);
-                    e.target.value = '';
-                  }
-                }}
-              />
-            </div>
 
-            <Separator />
+                <Separator />
+              </>
+            )}
 
             {/* Anchor Inspection Certificate Section */}
             <div className="space-y-3">
