@@ -1491,7 +1491,9 @@ export default function Dashboard() {
         method: "POST",
         credentials: "include",
       });
-      setLocation("/");
+      // Clear ALL query cache to prevent stale data from causing redirect issues
+      queryClient.clear();
+      setLocation("/login");
     } catch (error) {
       toast({ title: "Error", description: "Failed to logout", variant: "destructive" });
     }

@@ -40,7 +40,10 @@ export default function PropertyManager() {
         credentials: "include",
       });
       
-      await queryClient.invalidateQueries({ queryKey: ["/api/user"] });
+      // Clear ALL query cache to prevent stale data from causing redirect issues
+      queryClient.clear();
+      
+      // Navigate to login page
       setLocation("/login");
       
       toast({

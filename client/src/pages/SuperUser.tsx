@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { useLocation } from "wouter";
 import { useQuery } from "@tanstack/react-query";
+import { queryClient } from "@/lib/queryClient";
 
 export default function SuperUser() {
   const [, setLocation] = useLocation();
@@ -18,7 +19,9 @@ export default function SuperUser() {
   
   const handleLogout = async () => {
     await fetch('/api/logout', { method: 'POST', credentials: 'include' });
-    setLocation('/');
+    // Clear ALL query cache to prevent stale data from causing redirect issues
+    queryClient.clear();
+    setLocation('/login');
   };
   
   return (

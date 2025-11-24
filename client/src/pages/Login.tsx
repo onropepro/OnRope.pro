@@ -34,12 +34,18 @@ export default function Login() {
   });
 
   // Check if user is already logged in and redirect appropriately
-  const { data: userData } = useQuery<{ user: any }>({
+  const { data: userData, isLoading: isCheckingAuth, error: authError } = useQuery<{ user: any }>({
     queryKey: ["/api/user"],
     retry: false,
   });
 
   useEffect(() => {
+    // Don't redirect while loading or if there's an auth error
+    if (isCheckingAuth || authError) {
+      return;
+    }
+    
+    // Only redirect if we have confirmed user data from a successful API call
     if (userData?.user) {
       console.log("👤 Already logged in, redirecting...", userData.user.role);
       if (userData.user.role === "resident") {
@@ -52,7 +58,7 @@ export default function Login() {
         setLocation("/dashboard");
       }
     }
-  }, [userData, setLocation]);
+  }, [userData, isCheckingAuth, authError, setLocation]);
 
   const onSubmit = async (data: LoginFormData) => {
     try {
