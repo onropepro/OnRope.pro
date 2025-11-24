@@ -1144,27 +1144,25 @@ export class Storage {
         return [];
       };
 
-      // Parse signatures if it's a JSON string
-      const parseSignatures = (sigs: any) => {
-        if (!sigs) return [];
-        if (Array.isArray(sigs)) return sigs;
-        if (typeof sigs === 'string') {
+      // Parse JSONB fields (signatures, complex objects)
+      const parseJsonField = (field: any) => {
+        if (!field) return null;
+        if (typeof field === 'object') return field; // Already parsed by Drizzle
+        if (typeof field === 'string') {
           try {
-            const parsed = JSON.parse(sigs);
-            return Array.isArray(parsed) ? parsed : [];
+            return JSON.parse(field);
           } catch {
-            return [];
+            return null;
           }
         }
-        return [];
+        return null;
       };
 
+      // Return clean DTO with only UI-needed fields (exclude raw DB bookkeeping like preparedById, createdAt, updatedAt)
       return {
         id: statement.id,
         projectId: statement.projectId,
-        companyId: statement.companyId,
         dateCreated: statement.dateCreated,
-        preparedById: statement.preparedById,
         preparedByName: preparer?.name || 'Unknown',
         jobTitle: statement.jobTitle || preparer?.jobTitle || '',
         location: statement.location,
@@ -1192,10 +1190,8 @@ export class Storage {
         reviewDate: statement.reviewDate,
         approvedByName: statement.approvedByName,
         approvalDate: statement.approvalDate,
-        signatures: parseSignatures(statement.signatures),
+        signatures: parseJsonField(statement.signatures) || [],
         status: statement.status,
-        createdAt: statement.createdAt,
-        updatedAt: statement.updatedAt,
       };
     });
   }
