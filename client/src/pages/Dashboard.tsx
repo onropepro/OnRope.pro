@@ -1939,25 +1939,26 @@ export default function Dashboard() {
               {companyName && (
                 <p className="text-sm text-muted-foreground font-medium">{companyName}</p>
               )}
-              {currentUser?.role === 'company' && currentUser?.residentCode && (
+              {(currentUser?.role === 'company' && (currentUser?.residentCode || currentUser?.propertyManagerCode)) && (
                 <>
                   {companyName && <span className="text-muted-foreground/50">•</span>}
-                  <div className="flex items-center gap-1.5">
-                    <span className="text-xs text-muted-foreground font-medium">Resident Code:</span>
-                    <Badge variant="outline" className="font-mono text-sm" data-testid="badge-resident-code">
-                      {currentUser.residentCode}
-                    </Badge>
-                  </div>
-                </>
-              )}
-              {currentUser?.role === 'company' && currentUser?.propertyManagerCode && (
-                <>
-                  {(companyName || currentUser?.residentCode) && <span className="text-muted-foreground/50">•</span>}
-                  <div className="flex items-center gap-1.5">
-                    <span className="text-xs text-muted-foreground font-medium">Property Manager Code:</span>
-                    <Badge variant="outline" className="font-mono text-sm" data-testid="badge-property-manager-code">
-                      {currentUser.propertyManagerCode}
-                    </Badge>
+                  <div className="flex flex-col gap-0.5">
+                    {currentUser?.residentCode && (
+                      <div className="flex items-center gap-1.5">
+                        <span className="text-xs text-muted-foreground font-medium">Resident Code:</span>
+                        <Badge variant="outline" className="font-mono text-sm" data-testid="badge-resident-code">
+                          {currentUser.residentCode}
+                        </Badge>
+                      </div>
+                    )}
+                    {currentUser?.propertyManagerCode && (
+                      <div className="flex items-center gap-1.5">
+                        <span className="text-xs text-muted-foreground font-medium">Property Manager Code:</span>
+                        <Badge variant="outline" className="font-mono text-sm" data-testid="badge-property-manager-code">
+                          {currentUser.propertyManagerCode}
+                        </Badge>
+                      </div>
+                    )}
                   </div>
                 </>
               )}
