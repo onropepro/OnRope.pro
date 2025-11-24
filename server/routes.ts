@@ -2065,6 +2065,32 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Property Manager: Remove a vendor link
+  app.delete("/api/property-managers/vendors/:linkId", requireAuth, requireRole("property_manager"), async (req: Request, res: Response) => {
+    try {
+      const { linkId } = req.params;
+      const propertyManagerId = req.session.userId!;
+      
+      // Verify the link belongs to this property manager
+      const links = await storage.getPropertyManagerCompanyLinks(propertyManagerId);
+      const ownedLink = links.find(link => link.id === linkId);
+      
+      if (!ownedLink) {
+        return res.status(403).json({ message: "Unauthorized: This vendor link does not belong to you" });
+      }
+      
+      // Remove the link
+      await storage.removePropertyManagerCompanyLink(linkId, propertyManagerId);
+      
+      res.json({ 
+        message: "Vendor removed successfully"
+      });
+    } catch (error: any) {
+      console.error("Remove vendor link error:", error);
+      res.status(500).json({ message: "Failed to remove vendor. Please try again." });
+    }
+  });
+
   // Property Manager: Get projects filtered by company and strata number
   app.get("/api/property-managers/vendors/:linkId/projects", requireAuth, requireRole("property_manager"), async (req: Request, res: Response) => {
     try {

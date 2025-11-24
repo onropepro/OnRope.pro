@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
-import { Building2, Plus, Mail, Phone, LogOut, Settings, FileText, Download, AlertCircle, CheckCircle2, Clock, Upload, FileCheck } from "lucide-react";
+import { Building2, Plus, Mail, Phone, LogOut, Settings, FileText, Download, AlertCircle, CheckCircle2, Clock, Upload, FileCheck, Trash2 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Label } from "@/components/ui/label";
 import { useForm } from "react-hook-form";
@@ -42,6 +42,7 @@ export default function PropertyManager() {
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [strataNumber, setStrataNumber] = useState("");
   const [uploadingAnchorInspection, setUploadingAnchorInspection] = useState(false);
+  const [vendorToRemove, setVendorToRemove] = useState<VendorSummary | null>(null);
   
   const accountForm = useForm<UpdatePropertyManagerAccount>({
     resolver: zodResolver(updatePropertyManagerAccountSchema),
@@ -104,6 +105,27 @@ export default function PropertyManager() {
       toast({
         title: "Failed to Add Vendor",
         description: error.message || "Invalid company code. Please check with the rope access company.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const removeVendorMutation = useMutation({
+    mutationFn: async (linkId: string) => {
+      return await apiRequest("DELETE", `/api/property-managers/vendors/${linkId}`, null);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/property-managers/me/vendors"] });
+      toast({
+        title: "Vendor Removed",
+        description: "The vendor has been successfully removed from your list.",
+      });
+      setVendorToRemove(null);
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Failed to Remove Vendor",
+        description: error.message || "Failed to remove vendor. Please try again.",
         variant: "destructive",
       });
     },
@@ -395,7 +417,7 @@ export default function PropertyManager() {
                 {vendors.map((vendor) => (
                   <Card 
                     key={vendor.id} 
-                    className="hover-elevate cursor-pointer"
+                    className="hover-elevate cursor-pointer relative"
                     onClick={() => setSelectedVendor(vendor)}
                     data-testid={`card-vendor-${vendor.id}`}
                   >
@@ -426,6 +448,18 @@ export default function PropertyManager() {
                             )}
                           </div>
                         </div>
+                        <Button
+                          size="icon"
+                          variant="ghost"
+                          className="absolute top-4 right-4"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setVendorToRemove(vendor);
+                          }}
+                          data-testid={`button-remove-vendor-${vendor.id}`}
+                        >
+                          <Trash2 className="w-4 h-4 text-destructive" />
+                        </Button>
                       </div>
                     </CardContent>
                   </Card>
@@ -1170,6 +1204,39 @@ export default function PropertyManager() {
                 </div>
               </>
             )}
+          </DialogContent>
+        </Dialog>
+
+        {/* Remove Vendor Confirmation Dialog */}
+        <Dialog open={vendorToRemove !== null} onOpenChange={(open) => !open && setVendorToRemove(null)}>
+          <DialogContent data-testid="dialog-remove-vendor">
+            <DialogHeader>
+              <DialogTitle data-testid="text-remove-vendor-title">Remove Vendor?</DialogTitle>
+              <DialogDescription data-testid="text-remove-vendor-description">
+                Are you sure you want to remove {vendorToRemove?.companyName} from your vendors list? This action cannot be undone.
+              </DialogDescription>
+            </DialogHeader>
+            <div className="flex gap-2 justify-end pt-4">
+              <Button
+                variant="outline"
+                onClick={() => setVendorToRemove(null)}
+                data-testid="button-cancel-remove-vendor"
+              >
+                Cancel
+              </Button>
+              <Button
+                variant="destructive"
+                onClick={() => {
+                  if (vendorToRemove) {
+                    removeVendorMutation.mutate(vendorToRemove.linkId);
+                  }
+                }}
+                disabled={removeVendorMutation.isPending}
+                data-testid="button-confirm-remove-vendor"
+              >
+                {removeVendorMutation.isPending ? "Removing..." : "Remove Vendor"}
+              </Button>
+            </div>
           </DialogContent>
         </Dialog>
       </div>
