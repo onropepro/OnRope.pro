@@ -401,16 +401,17 @@ export default function ProjectDetail() {
       const localDate = new Date();
       const localDateString = `${localDate.getFullYear()}-${String(localDate.getMonth() + 1).padStart(2, '0')}-${String(localDate.getDate()).padStart(2, '0')}`;
       
+      // Backend auto-fills workerId from session.userId and companyId from user data
       const response = await fetch('/api/harness-inspections', {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          projectId: id,
+          projectId: id || undefined,
           inspectionDate: localDateString,
           inspectorName: currentUser.name || currentUser.email || "Unknown",
           overallStatus: "not_applicable",
           equipmentFindings: {},
-          comments: "Harness not required for this work session",
+          comments: "Harness not applicable for this work session",
         }),
         credentials: "include",
       });

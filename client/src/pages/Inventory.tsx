@@ -1082,11 +1082,21 @@ export default function Inventory() {
                             </td>
                             {inspectionDays.map((date, index) => {
                               const hadSession = hadWorkSession(employee.id, date);
-                              const hasInspection = hasHarnessInspection(employee.id, date);
+                              const dateStr = format(date, 'yyyy-MM-dd');
+                              const inspection = harnessInspections.find((inspection: any) =>
+                                inspection.workerId === employee.id && inspection.inspectionDate === dateStr
+                              );
+                              const isNotApplicable = inspection?.overallStatus === "not_applicable";
+                              const hasValidInspection = inspection && !isNotApplicable;
+                              
                               return (
                                 <td key={index} className="text-center p-3">
                                   {hadSession ? (
-                                    hasInspection ? (
+                                    isNotApplicable ? (
+                                      <span className="text-xs font-medium text-muted-foreground/60" title="Harness not applicable for this session">
+                                        N/A
+                                      </span>
+                                    ) : hasValidInspection ? (
                                       <span className="material-icons text-green-500" title="Inspection submitted">
                                         check_circle
                                       </span>
