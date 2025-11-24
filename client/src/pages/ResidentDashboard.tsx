@@ -187,15 +187,19 @@ export default function ResidentDashboard() {
       form.setValue("phoneNumber", currentUser.phoneNumber || "");
     }
     
-    // Auto-select project if there's only one project (active or completed)
-    if (!form.getValues("projectId")) {
+    // Auto-select project based on currently viewed project or if there's only one project
+    if (activeProject) {
+      // If user has selected a project to view, use that for the complaint form
+      form.setValue("projectId", activeProject.id.toString());
+    } else if (!form.getValues("projectId")) {
+      // Otherwise, auto-select if there's only one project (active or completed)
       if (activeProjects.length === 1) {
         form.setValue("projectId", activeProjects[0].id.toString());
       } else if (activeProjects.length === 0 && completedProjects.length === 1) {
         form.setValue("projectId", completedProjects[0].id.toString());
       }
     }
-  }, [currentUser, form, activeProjects, completedProjects]);
+  }, [currentUser, form, activeProjects, completedProjects, activeProject]);
 
   const submitComplaintMutation = useMutation({
     mutationFn: async (data: ComplaintFormData) => {
