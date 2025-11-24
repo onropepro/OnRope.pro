@@ -2011,13 +2011,32 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { linkId } = req.params;
       const { strataNumber } = req.body;
+      const propertyManagerId = req.session.userId!;
       
-      // Validate strata number (optional, max 100 chars)
-      if (strataNumber && (typeof strataNumber !== 'string' || strataNumber.length > 100)) {
-        return res.status(400).json({ message: "Invalid strata number format. Maximum 100 characters." });
+      // Verify the link belongs to this property manager
+      const links = await storage.getPropertyManagerCompanyLinks(propertyManagerId);
+      const ownedLink = links.find(link => link.id === linkId);
+      
+      if (!ownedLink) {
+        return res.status(403).json({ message: "Unauthorized: This vendor link does not belong to you" });
       }
       
-      const updatedLink = await storage.updatePropertyManagerStrataNumber(linkId, strataNumber || null);
+      // Validate strata number (required, 1-100 chars)
+      if (!strataNumber || typeof strataNumber !== 'string' || strataNumber.trim() === '') {
+        return res.status(400).json({ message: "Strata number is required and cannot be empty." });
+      }
+      
+      if (strataNumber.length > 100) {
+        return res.status(400).json({ message: "Strata number cannot exceed 100 characters." });
+      }
+      
+      // Normalize strata number before saving (uppercase, no whitespace)
+      const normalizeStrata = (strata: string): string => {
+        return strata.toUpperCase().replace(/\s+/g, '');
+      };
+      
+      const normalizedStrata = normalizeStrata(strataNumber);
+      const updatedLink = await storage.updatePropertyManagerStrataNumber(linkId, normalizedStrata);
       
       res.json({ 
         link: updatedLink,
@@ -2033,8 +2052,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/property-managers/vendors/:linkId/projects", requireAuth, requireRole("property_manager"), async (req: Request, res: Response) => {
     try {
       const { linkId } = req.params;
+      const propertyManagerId = req.session.userId!;
       
-      const projects = await storage.getPropertyManagerFilteredProjects(linkId);
+      // Verify the link belongs to this property manager
+      const links = await storage.getPropertyManagerCompanyLinks(propertyManagerId);
+      const ownedLink = links.find(link => link.id === linkId);
+      
+      if (!ownedLink) {
+        return res.status(403).json({ message: "Unauthorized: This vendor link does not belong to you" });
+      }
+      
+      // Require strata number to be set before fetching projects
+      if (!ownedLink.strataNumber) {
+        return res.status(400).json({ message: "Strata number required. Please set your strata/building number first." });
+      }
+      
+      // Get filtered projects using companyId and normalized strata number
+      const projects = await storage.getPropertyManagerFilteredProjects(
+        ownedLink.companyId, 
+        ownedLink.strataNumber
+      );
       
       res.json({ projects });
     } catch (error: any) {

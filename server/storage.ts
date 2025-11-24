@@ -2170,39 +2170,29 @@ export class Storage {
     return updated;
   }
 
-  async getPropertyManagerFilteredProjects(linkId: string): Promise<any[]> {
-    // Get the link to find company and strata number
-    const [link] = await db.select()
-      .from(propertyManagerCompanyLinks)
-      .where(eq(propertyManagerCompanyLinks.id, linkId));
-    
-    if (!link) {
-      throw new Error('Property manager company link not found');
+  async getPropertyManagerFilteredProjects(companyId: string, normalizedStrata: string | null): Promise<any[]> {
+    // Strata number is required for filtering - reject null/empty values
+    if (!normalizedStrata || normalizedStrata.trim() === '') {
+      throw new Error('Strata number is required to filter projects');
     }
     
     // Normalize strata number helper function
-    const normalizeStrata = (strata: string | null | undefined): string => {
-      if (!strata) return '';
+    const normalizeStrata = (strata: string | null | undefined): string | null => {
+      if (!strata || strata.trim() === '') return null;
       return strata.toUpperCase().replace(/\s+/g, '');
     };
     
     // Get all projects for this company
-    let query = db.select()
+    const allProjects = await db.select()
       .from(projects)
-      .where(eq(projects.companyId, link.companyId));
+      .where(eq(projects.companyId, companyId));
     
-    const allProjects = await query;
-    
-    // Filter projects by normalized strata number if one is set
-    if (link.strataNumber) {
-      const normalizedLinkStrata = normalizeStrata(link.strataNumber);
-      return allProjects.filter(project => 
-        normalizeStrata(project.strataPlanNumber) === normalizedLinkStrata
-      );
-    }
-    
-    // If no strata number set, return all projects for this company
-    return allProjects;
+    // Filter projects by normalized strata number
+    // Only include projects that have a strataPlanNumber AND it matches the filter
+    return allProjects.filter(project => {
+      const projectStrata = normalizeStrata(project.strataPlanNumber);
+      return projectStrata !== null && projectStrata === normalizedStrata;
+    });
   }
 }
 

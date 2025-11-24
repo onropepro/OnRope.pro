@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useLocation } from "wouter";
 import { queryClient, apiRequest } from "@/lib/queryClient";
@@ -16,6 +16,7 @@ import { updatePropertyManagerAccountSchema, type UpdatePropertyManagerAccount }
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 
 type VendorSummary = {
+  linkId: string;
   id: string;
   companyName: string;
   email: string;
@@ -24,6 +25,7 @@ type VendorSummary = {
   activeProjectsCount: number;
   residentCode: string | null;
   propertyManagerCode: string | null;
+  strataNumber: string | null;
 };
 
 export default function PropertyManager() {
@@ -33,6 +35,7 @@ export default function PropertyManager() {
   const [companyCode, setCompanyCode] = useState("");
   const [selectedVendor, setSelectedVendor] = useState<VendorSummary | null>(null);
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const [strataNumber, setStrataNumber] = useState("");
   
   const accountForm = useForm<UpdatePropertyManagerAccount>({
     resolver: zodResolver(updatePropertyManagerAccountSchema),
@@ -121,6 +124,81 @@ export default function PropertyManager() {
       });
     },
   });
+
+  const updateStrataMutation = useMutation({
+    mutationFn: async ({ linkId, strataNumber }: { linkId: string; strataNumber: string }) => {
+      return await apiRequest("PATCH", `/api/property-managers/vendors/${linkId}`, { strataNumber });
+    },
+    onSuccess: async (data) => {
+      // Invalidate and refetch vendors list
+      await queryClient.invalidateQueries({ queryKey: ["/api/property-managers/me/vendors"] });
+      
+      // Update selectedVendor with the new strata number from the response
+      if (selectedVendor && data?.link) {
+        setSelectedVendor({
+          ...selectedVendor,
+          strataNumber: data.link.strataNumber,
+        });
+      }
+      
+      toast({
+        title: "Strata Number Updated",
+        description: "The strata number has been saved successfully.",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Update Failed",
+        description: error.message || "Failed to update strata number.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const { data: projectsData, isLoading: isLoadingProjects, error: projectsError } = useQuery({
+    queryKey: ["/api/property-managers/vendors", selectedVendor?.linkId, "projects"],
+    queryFn: async () => {
+      const response = await fetch(`/api/property-managers/vendors/${selectedVendor!.linkId}/projects`, {
+        credentials: 'include',
+      });
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.message || 'Failed to fetch projects');
+      }
+      return data;
+    },
+    enabled: !!selectedVendor?.linkId && !!selectedVendor?.strataNumber,
+    retry: false,
+  });
+
+  useEffect(() => {
+    // Only show toast once when error first appears
+    if (projectsError) {
+      const errorMessage = (projectsError as Error).message;
+      // Don't show toast for "strata required" errors - those are handled in UI
+      if (!errorMessage?.includes('Strata number required')) {
+        toast({
+          title: "Failed to Load Projects",
+          description: errorMessage || "Unable to load projects. Please try again.",
+          variant: "destructive",
+        });
+      }
+    }
+  }, [projectsError]);
+
+  useEffect(() => {
+    if (selectedVendor) {
+      setStrataNumber(selectedVendor.strataNumber || "");
+    }
+  }, [selectedVendor]);
+
+  const handleSaveStrata = () => {
+    if (!selectedVendor) return;
+    updateStrataMutation.mutate({ 
+      linkId: selectedVendor.linkId, 
+      strataNumber: strataNumber.trim() 
+    });
+  };
 
   const handleAddVendor = () => {
     if (companyCode.trim().length !== 10) {
@@ -318,7 +396,17 @@ export default function PropertyManager() {
           </DialogContent>
         </Dialog>
 
-        <Dialog open={selectedVendor !== null} onOpenChange={(open) => !open && setSelectedVendor(null)}>
+        <Dialog open={selectedVendor !== null} onOpenChange={(open) => {
+          if (!open) {
+            // Clear projects query cache when closing dialog to prevent stale errors
+            if (selectedVendor?.linkId) {
+              queryClient.removeQueries({ 
+                queryKey: ["/api/property-managers/vendors", selectedVendor.linkId, "projects"] 
+              });
+            }
+            setSelectedVendor(null);
+          }
+        }}>
           <DialogContent className="max-w-2xl" data-testid="dialog-vendor-details">
             <DialogHeader>
               <DialogTitle className="flex items-center gap-3" data-testid="text-vendor-details-title">
@@ -374,7 +462,78 @@ export default function PropertyManager() {
                   )}
                 </div>
 
-                <div className="flex justify-end pt-4">
+                <div className="space-y-3 border-t pt-4">
+                  <Label className="text-sm font-medium">Strata/Building Number (Required)</Label>
+                  <p className="text-xs text-muted-foreground">
+                    Enter your strata/building number to access projects for your building. This field is required.
+                  </p>
+                  <div className="flex gap-2">
+                    <Input
+                      placeholder="e.g., LMS1234 or EPS 1234"
+                      value={strataNumber}
+                      onChange={(e) => setStrataNumber(e.target.value)}
+                      maxLength={100}
+                      data-testid="input-strata-number"
+                    />
+                    <Button
+                      onClick={handleSaveStrata}
+                      disabled={updateStrataMutation.isPending || !strataNumber.trim()}
+                      data-testid="button-save-strata"
+                    >
+                      {updateStrataMutation.isPending ? "Saving..." : "Save"}
+                    </Button>
+                  </div>
+                  {!strataNumber.trim() && (
+                    <p className="text-xs text-destructive">
+                      Strata number cannot be empty
+                    </p>
+                  )}
+                </div>
+
+                <div className="space-y-3 border-t pt-4">
+                  <Label className="text-sm font-medium">Projects for Your Building</Label>
+                  {!selectedVendor.strataNumber ? (
+                    <div className="text-sm text-muted-foreground bg-muted/50 p-4 rounded-md" data-testid="text-strata-required">
+                      <strong>Strata number required:</strong> Please enter and save your strata/building number above to view projects for your building.
+                    </div>
+                  ) : projectsError ? (
+                    <div className="text-sm text-muted-foreground bg-muted/50 p-4 rounded-md" data-testid="text-projects-error">
+                      <strong>Unable to load projects:</strong> {(projectsError as Error).message || "Please try again or contact support."}
+                    </div>
+                  ) : isLoadingProjects ? (
+                    <div className="text-sm text-muted-foreground" data-testid="text-loading-projects">
+                      Loading projects...
+                    </div>
+                  ) : projectsData?.projects && projectsData.projects.length > 0 ? (
+                    <div className="space-y-2 max-h-60 overflow-y-auto">
+                      {projectsData.projects.map((project: any) => (
+                        <Card key={project.id} className="hover-elevate" data-testid={`card-project-${project.id}`}>
+                          <CardContent className="p-3">
+                            <div className="space-y-1">
+                              <div className="font-medium" data-testid={`text-project-name-${project.id}`}>
+                                {project.projectName}
+                              </div>
+                              {project.strataPlanNumber && (
+                                <div className="text-xs text-muted-foreground" data-testid={`text-project-strata-${project.id}`}>
+                                  Strata: {project.strataPlanNumber}
+                                </div>
+                              )}
+                              <div className="text-xs text-muted-foreground" data-testid={`text-project-status-${project.id}`}>
+                                Status: {project.status}
+                              </div>
+                            </div>
+                          </CardContent>
+                        </Card>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="text-sm text-muted-foreground" data-testid="text-no-projects">
+                      No projects found for strata number "{selectedVendor.strataNumber}". Please verify your strata number is correct.
+                    </div>
+                  )}
+                </div>
+
+                <div className="flex justify-end pt-4 border-t">
                   <Button
                     variant="outline"
                     onClick={() => setSelectedVendor(null)}
