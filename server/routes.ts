@@ -2097,14 +2097,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(403).json({ message: "Unauthorized: This vendor link does not belong to you" });
       }
       
-      // Get project details with complaints
-      const details = await storage.getPropertyManagerProjectDetails(projectId, ownedLink.companyId);
+      // SECURITY: Require strata number to prevent cross-building data leaks
+      if (!ownedLink.strataNumber) {
+        return res.status(400).json({ message: "Strata number required. Please set your strata/building number first." });
+      }
+      
+      // Get project details with complaints - enforces strata filtering
+      const details = await storage.getPropertyManagerProjectDetails(
+        projectId, 
+        ownedLink.companyId,
+        ownedLink.strataNumber // Pass normalized strata for dual-filter security
+      );
       
       res.json(details);
     } catch (error: any) {
       console.error("Get project details error:", error);
       if (error.message?.includes('not found') || error.message?.includes('access denied')) {
         return res.status(404).json({ message: error.message });
+      }
+      if (error.message?.includes('Strata number required')) {
+        return res.status(400).json({ message: error.message });
       }
       res.status(500).json({ message: "Internal server error" });
     }

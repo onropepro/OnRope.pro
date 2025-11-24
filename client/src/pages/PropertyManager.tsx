@@ -174,7 +174,7 @@ export default function PropertyManager() {
     retry: false,
   });
 
-  const { data: projectDetailsData, isLoading: isLoadingProjectDetails } = useQuery({
+  const { data: projectDetailsData, isLoading: isLoadingProjectDetails, error: projectDetailsError } = useQuery({
     queryKey: ["/api/property-managers/vendors", selectedVendor?.linkId, "projects", selectedProject?.id],
     queryFn: async () => {
       const response = await fetch(
@@ -190,6 +190,19 @@ export default function PropertyManager() {
     enabled: !!selectedVendor?.linkId && !!selectedProject?.id,
     retry: false,
   });
+
+  // SECURITY: Clear selectedProject if details fetch fails to prevent showing stale data
+  useEffect(() => {
+    if (projectDetailsError) {
+      toast({
+        title: "Unable to Load Project Details",
+        description: (projectDetailsError as Error).message || "Please try again.",
+        variant: "destructive",
+      });
+      // Close dialog and clear selection to prevent stale data display
+      setSelectedProject(null);
+    }
+  }, [projectDetailsError, toast]);
 
   useEffect(() => {
     // Only show toast once when error first appears

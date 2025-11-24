@@ -2195,8 +2195,19 @@ export class Storage {
     });
   }
 
-  async getPropertyManagerProjectDetails(projectId: string, companyId: string): Promise<{ project: any; complaints: any[] }> {
-    // Verify project belongs to the company
+  async getPropertyManagerProjectDetails(projectId: string, companyId: string, normalizedStrata: string): Promise<{ project: any; complaints: any[] }> {
+    // Strata number is required for security
+    if (!normalizedStrata || normalizedStrata.trim() === '') {
+      throw new Error('Strata number is required');
+    }
+    
+    // Normalize strata number helper function
+    const normalizeStrata = (strata: string | null | undefined): string | null => {
+      if (!strata || strata.trim() === '') return null;
+      return strata.toUpperCase().replace(/\s+/g, '');
+    };
+    
+    // Verify project belongs to the company AND matches the strata number
     const [project] = await db.select()
       .from(projects)
       .where(and(
@@ -2205,6 +2216,12 @@ export class Storage {
       ));
     
     if (!project) {
+      throw new Error('Project not found or access denied');
+    }
+    
+    // CRITICAL: Enforce strata filtering - prevent access to projects from other buildings
+    const projectStrata = normalizeStrata(project.strataPlanNumber);
+    if (projectStrata !== normalizedStrata) {
       throw new Error('Project not found or access denied');
     }
     
