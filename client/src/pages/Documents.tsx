@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { FileText, Download, Calendar, DollarSign, Upload, Trash2, Shield, BookOpen, ArrowLeft, AlertTriangle, Plus } from "lucide-react";
 import { hasFinancialAccess, canViewSafetyDocuments } from "@/lib/permissions";
 import { useToast } from "@/hooks/use-toast";
@@ -17,6 +18,7 @@ export default function Documents() {
   const { toast } = useToast();
   const [uploadingHealthSafety, setUploadingHealthSafety] = useState(false);
   const [uploadingPolicy, setUploadingPolicy] = useState(false);
+  const [activeTab, setActiveTab] = useState("health-safety");
 
   const { data: userData } = useQuery<{ user: any }>({
     queryKey: ["/api/user"],
@@ -1247,7 +1249,18 @@ export default function Documents() {
           <p className="text-muted-foreground ml-14">All company documents and safety records</p>
         </div>
 
-        {/* Health & Safety Manual */}
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+          <TabsList className="grid w-full grid-cols-2 mb-6 max-w-md">
+            <TabsTrigger value="health-safety" data-testid="tab-health-safety">
+              Health & Safety Manual
+            </TabsTrigger>
+            <TabsTrigger value="company-policy" data-testid="tab-company-policy">
+              Company Policy
+            </TabsTrigger>
+          </TabsList>
+
+          {/* Health & Safety Manual Tab */}
+          <TabsContent value="health-safety">
         <Card className="mb-6 overflow-hidden">
           <CardHeader className="bg-gradient-to-br from-blue-500/10 via-blue-500/5 to-transparent pb-4">
             <div className="flex items-start gap-4">
@@ -1341,8 +1354,10 @@ export default function Documents() {
             )}
           </CardContent>
         </Card>
+          </TabsContent>
 
-        {/* Company Policies */}
+          {/* Company Policy Tab */}
+          <TabsContent value="company-policy">
         <Card className="mb-6 overflow-hidden">
           <CardHeader className="bg-gradient-to-br from-purple-500/10 via-purple-500/5 to-transparent pb-4">
             <div className="flex items-start gap-4">
@@ -1436,6 +1451,8 @@ export default function Documents() {
             )}
           </CardContent>
         </Card>
+          </TabsContent>
+        </Tabs>
 
         {/* Rope Access Plans - Only visible if user has safety document permission */}
         {canViewSafety && (

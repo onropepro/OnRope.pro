@@ -1964,27 +1964,6 @@ export default function Dashboard() {
             </div>
           </div>
           <div className="flex items-center gap-3">
-            {/* Company Document Status Badges */}
-            <div className="flex flex-col gap-1">
-              {/* Health & Safety Manual */}
-              <div className="flex items-center gap-1.5" title={hasHealthSafetyManual ? "Health & Safety Manual uploaded" : "Health & Safety Manual missing"}>
-                <span className={`material-icons text-lg ${hasHealthSafetyManual ? 'text-green-500' : 'text-red-500'}`}>
-                  {hasHealthSafetyManual ? 'check_circle' : 'cancel'}
-                </span>
-                <span className="text-sm text-muted-foreground">Health & Safety Manual</span>
-              </div>
-              
-              {/* Company Policy */}
-              <div className="flex items-center gap-1.5" title={hasCompanyPolicy ? "Company Policy uploaded" : "Company Policy missing"}>
-                <span className={`material-icons text-lg ${hasCompanyPolicy ? 'text-green-500' : 'text-red-500'}`}>
-                  {hasCompanyPolicy ? 'check_circle' : 'cancel'}
-                </span>
-                <span className="text-sm text-muted-foreground">Company Policy</span>
-              </div>
-            </div>
-            
-            <Separator orientation="vertical" className="h-12" />
-            
             <RefreshButton />
             <Button variant="ghost" size="icon" data-testid="button-profile" onClick={() => setLocation("/profile")} className="hover-elevate w-12 h-12">
               <span className="material-icons text-2xl">person</span>
