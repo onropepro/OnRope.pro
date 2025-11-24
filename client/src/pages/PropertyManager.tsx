@@ -7,13 +7,15 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
-import { Building2, Plus, Mail, Phone, LogOut, Settings } from "lucide-react";
+import { Building2, Plus, Mail, Phone, LogOut, Settings, FileText, Download, AlertCircle, CheckCircle2, Clock } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Label } from "@/components/ui/label";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { updatePropertyManagerAccountSchema, type UpdatePropertyManagerAccount } from "@shared/schema";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
 
 type VendorSummary = {
   linkId: string;
@@ -34,6 +36,7 @@ export default function PropertyManager() {
   const [addCodeOpen, setAddCodeOpen] = useState(false);
   const [companyCode, setCompanyCode] = useState("");
   const [selectedVendor, setSelectedVendor] = useState<VendorSummary | null>(null);
+  const [selectedProject, setSelectedProject] = useState<any | null>(null);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [strataNumber, setStrataNumber] = useState("");
   
@@ -168,6 +171,23 @@ export default function PropertyManager() {
       return data;
     },
     enabled: !!selectedVendor?.linkId && !!selectedVendor?.strataNumber,
+    retry: false,
+  });
+
+  const { data: projectDetailsData, isLoading: isLoadingProjectDetails } = useQuery({
+    queryKey: ["/api/property-managers/vendors", selectedVendor?.linkId, "projects", selectedProject?.id],
+    queryFn: async () => {
+      const response = await fetch(
+        `/api/property-managers/vendors/${selectedVendor!.linkId}/projects/${selectedProject!.id}`,
+        { credentials: 'include' }
+      );
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.message || 'Failed to fetch project details');
+      }
+      return data;
+    },
+    enabled: !!selectedVendor?.linkId && !!selectedProject?.id,
     retry: false,
   });
 
@@ -505,26 +525,85 @@ export default function PropertyManager() {
                       Loading projects...
                     </div>
                   ) : projectsData?.projects && projectsData.projects.length > 0 ? (
-                    <div className="space-y-2 max-h-60 overflow-y-auto">
-                      {projectsData.projects.map((project: any) => (
-                        <Card key={project.id} className="hover-elevate" data-testid={`card-project-${project.id}`}>
-                          <CardContent className="p-3">
-                            <div className="space-y-1">
-                              <div className="font-medium" data-testid={`text-project-name-${project.id}`}>
-                                {project.projectName}
-                              </div>
-                              {project.strataPlanNumber && (
-                                <div className="text-xs text-muted-foreground" data-testid={`text-project-strata-${project.id}`}>
-                                  Strata: {project.strataPlanNumber}
+                    <div className="space-y-4 max-h-96 overflow-y-auto">
+                      {(() => {
+                        const activeProjects = projectsData.projects.filter((p: any) => p.status === 'active');
+                        const completedProjects = projectsData.projects.filter((p: any) => p.status === 'completed');
+                        
+                        return (
+                          <>
+                            {activeProjects.length > 0 && (
+                              <div className="space-y-2">
+                                <div className="flex items-center gap-2">
+                                  <Clock className="w-4 h-4 text-blue-500" />
+                                  <h4 className="text-sm font-medium">Active Projects ({activeProjects.length})</h4>
                                 </div>
-                              )}
-                              <div className="text-xs text-muted-foreground" data-testid={`text-project-status-${project.id}`}>
-                                Status: {project.status}
+                                <div className="space-y-2">
+                                  {activeProjects.map((project: any) => (
+                                    <Card 
+                                      key={project.id} 
+                                      className="hover-elevate cursor-pointer active-elevate-2" 
+                                      onClick={() => setSelectedProject(project)}
+                                      data-testid={`card-project-${project.id}`}
+                                    >
+                                      <CardContent className="p-3">
+                                        <div className="flex items-start justify-between gap-2">
+                                          <div className="space-y-1 flex-1">
+                                            <div className="font-medium" data-testid={`text-project-name-${project.id}`}>
+                                              {project.buildingName || project.projectName || 'Unnamed Project'}
+                                            </div>
+                                            <div className="text-xs text-muted-foreground">
+                                              {project.jobType?.replace(/_/g, ' ')}
+                                            </div>
+                                          </div>
+                                          <Badge variant="default" className="text-xs">
+                                            Active
+                                          </Badge>
+                                        </div>
+                                      </CardContent>
+                                    </Card>
+                                  ))}
+                                </div>
                               </div>
-                            </div>
-                          </CardContent>
-                        </Card>
-                      ))}
+                            )}
+                            
+                            {completedProjects.length > 0 && (
+                              <div className="space-y-2">
+                                <div className="flex items-center gap-2">
+                                  <CheckCircle2 className="w-4 h-4 text-green-500" />
+                                  <h4 className="text-sm font-medium">Completed Projects ({completedProjects.length})</h4>
+                                </div>
+                                <div className="space-y-2">
+                                  {completedProjects.map((project: any) => (
+                                    <Card 
+                                      key={project.id} 
+                                      className="hover-elevate cursor-pointer active-elevate-2" 
+                                      onClick={() => setSelectedProject(project)}
+                                      data-testid={`card-project-${project.id}`}
+                                    >
+                                      <CardContent className="p-3">
+                                        <div className="flex items-start justify-between gap-2">
+                                          <div className="space-y-1 flex-1">
+                                            <div className="font-medium" data-testid={`text-project-name-${project.id}`}>
+                                              {project.buildingName || project.projectName || 'Unnamed Project'}
+                                            </div>
+                                            <div className="text-xs text-muted-foreground">
+                                              {project.jobType?.replace(/_/g, ' ')}
+                                            </div>
+                                          </div>
+                                          <Badge variant="secondary" className="text-xs">
+                                            Completed
+                                          </Badge>
+                                        </div>
+                                      </CardContent>
+                                    </Card>
+                                  ))}
+                                </div>
+                              </div>
+                            )}
+                          </>
+                        );
+                      })()}
                     </div>
                   ) : (
                     <div className="text-sm text-muted-foreground" data-testid="text-no-projects">
@@ -657,6 +736,155 @@ export default function PropertyManager() {
                 </div>
               </form>
             </Form>
+          </DialogContent>
+        </Dialog>
+
+        <Dialog open={selectedProject !== null} onOpenChange={(open) => !open && setSelectedProject(null)}>
+          <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto" data-testid="dialog-project-details">
+            {selectedProject && (
+              <>
+                <DialogHeader>
+                  <DialogTitle className="flex items-center gap-2" data-testid="text-project-details-title">
+                    <Building2 className="w-5 h-5" />
+                    {selectedProject.buildingName || selectedProject.projectName || 'Project Details'}
+                  </DialogTitle>
+                  <DialogDescription data-testid="text-project-details-description">
+                    View project information, progress, and complaint history
+                  </DialogDescription>
+                </DialogHeader>
+
+                {isLoadingProjectDetails ? (
+                  <div className="text-sm text-muted-foreground text-center py-8" data-testid="text-loading-details">
+                    Loading project details...
+                  </div>
+                ) : projectDetailsData ? (
+                  <div className="space-y-4 pt-4">
+                    {/* Project Info */}
+                    <Card data-testid="card-project-info">
+                      <CardHeader>
+                        <div className="flex items-center justify-between gap-2">
+                          <CardTitle className="text-lg">Project Information</CardTitle>
+                          <Badge variant={projectDetailsData.project.status === 'active' ? 'default' : 'secondary'}>
+                            {projectDetailsData.project.status}
+                          </Badge>
+                        </div>
+                      </CardHeader>
+                      <CardContent className="space-y-3">
+                        <div className="grid grid-cols-2 gap-3 text-sm">
+                          <div>
+                            <Label className="text-xs text-muted-foreground">Job Type</Label>
+                            <p className="font-medium capitalize">{projectDetailsData.project.jobType?.replace(/_/g, ' ')}</p>
+                          </div>
+                          {projectDetailsData.project.startDate && (
+                            <div>
+                              <Label className="text-xs text-muted-foreground">Start Date</Label>
+                              <p className="font-medium">{new Date(projectDetailsData.project.startDate).toLocaleDateString()}</p>
+                            </div>
+                          )}
+                          {projectDetailsData.project.endDate && (
+                            <div>
+                              <Label className="text-xs text-muted-foreground">End Date</Label>
+                              <p className="font-medium">{new Date(projectDetailsData.project.endDate).toLocaleDateString()}</p>
+                            </div>
+                          )}
+                          {projectDetailsData.project.buildingAddress && (
+                            <div className="col-span-2">
+                              <Label className="text-xs text-muted-foreground">Address</Label>
+                              <p className="font-medium">{projectDetailsData.project.buildingAddress}</p>
+                            </div>
+                          )}
+                        </div>
+                      </CardContent>
+                    </Card>
+
+                    {/* Rope Access Plan */}
+                    {projectDetailsData.project.ropeAccessPlanUrl && (
+                      <Card data-testid="card-rope-access-plan">
+                        <CardHeader>
+                          <CardTitle className="text-lg flex items-center gap-2">
+                            <FileText className="w-5 h-5" />
+                            Rope Access Plan
+                          </CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                          <Button
+                            variant="outline"
+                            className="w-full"
+                            onClick={() => window.open(projectDetailsData.project.ropeAccessPlanUrl, '_blank')}
+                            data-testid="button-download-rope-access-plan"
+                          >
+                            <Download className="w-4 h-4 mr-2" />
+                            View/Download Rope Access Plan
+                          </Button>
+                        </CardContent>
+                      </Card>
+                    )}
+
+                    {/* Complaints History */}
+                    <Card data-testid="card-complaints-history">
+                      <CardHeader>
+                        <CardTitle className="text-lg flex items-center gap-2">
+                          <AlertCircle className="w-5 h-5" />
+                          Complaints History
+                          {projectDetailsData.complaints.length > 0 && (
+                            <Badge variant="secondary">{projectDetailsData.complaints.length}</Badge>
+                          )}
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        {projectDetailsData.complaints.length === 0 ? (
+                          <div className="text-sm text-muted-foreground text-center py-4" data-testid="text-no-complaints">
+                            No complaints recorded for this project
+                          </div>
+                        ) : (
+                          <div className="space-y-3 max-h-60 overflow-y-auto">
+                            {projectDetailsData.complaints.map((complaint: any) => (
+                              <Card key={complaint.id} className="bg-muted/50" data-testid={`card-complaint-${complaint.id}`}>
+                                <CardContent className="p-3">
+                                  <div className="space-y-2">
+                                    <div className="flex items-start justify-between gap-2">
+                                      <div className="flex-1">
+                                        <p className="text-sm font-medium">{complaint.subject || 'No Subject'}</p>
+                                        <p className="text-xs text-muted-foreground mt-1">
+                                          {new Date(complaint.createdAt).toLocaleDateString()} at{' '}
+                                          {new Date(complaint.createdAt).toLocaleTimeString()}
+                                        </p>
+                                      </div>
+                                      <Badge variant={complaint.status === 'resolved' ? 'default' : 'secondary'} className="text-xs">
+                                        {complaint.status}
+                                      </Badge>
+                                    </div>
+                                    {complaint.description && (
+                                      <div className="text-sm text-muted-foreground">
+                                        {complaint.description}
+                                      </div>
+                                    )}
+                                  </div>
+                                </CardContent>
+                              </Card>
+                            ))}
+                          </div>
+                        )}
+                      </CardContent>
+                    </Card>
+
+                    <div className="flex justify-end pt-4 border-t">
+                      <Button
+                        variant="outline"
+                        onClick={() => setSelectedProject(null)}
+                        data-testid="button-close-project-details"
+                      >
+                        Close
+                      </Button>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="text-sm text-muted-foreground text-center py-8" data-testid="text-error-loading-details">
+                    Failed to load project details
+                  </div>
+                )}
+              </>
+            )}
           </DialogContent>
         </Dialog>
       </div>
