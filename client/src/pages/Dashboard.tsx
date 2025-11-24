@@ -1931,33 +1931,36 @@ export default function Dashboard() {
                 data-testid="company-logo"
               />
             )}
-            <div>
-              <h1 className={`text-2xl font-bold ${hasCustomBranding ? 'custom-brand-text' : 'gradient-text'}`}>
-                {getPageTitle()}
-              </h1>
-              <div className="flex items-center gap-2 mt-1 text-xs text-muted-foreground">
-              {companyName && (
-                <p className="font-medium">{companyName}</p>
-              )}
-              {currentUser?.role === 'company' && currentUser?.residentCode && (
-                <>
-                  {companyName && <span>•</span>}
-                  <span className="font-medium">Resident:</span>
-                  <Badge variant="outline" className="font-mono text-xs px-2 py-0.5" data-testid="badge-resident-code">
-                    {currentUser.residentCode}
-                  </Badge>
-                </>
-              )}
-              {currentUser?.role === 'company' && currentUser?.propertyManagerCode && (
-                <>
-                  {(companyName || currentUser?.residentCode) && <span>•</span>}
-                  <span className="font-medium">Property Mgr:</span>
-                  <Badge variant="outline" className="font-mono text-xs px-2 py-0.5" data-testid="badge-property-manager-code">
-                    {currentUser.propertyManagerCode}
-                  </Badge>
-                </>
-              )}
+            <div className="flex items-center gap-4">
+              <div>
+                <h1 className={`text-2xl font-bold ${hasCustomBranding ? 'custom-brand-text' : 'gradient-text'}`}>
+                  {getPageTitle()}
+                </h1>
+                {companyName && (
+                  <p className="text-xs text-muted-foreground font-medium mt-1">{companyName}</p>
+                )}
               </div>
+              
+              {currentUser?.role === 'company' && (currentUser?.residentCode || currentUser?.propertyManagerCode) && (
+                <div className="flex flex-col gap-0.5 text-xs">
+                  {currentUser?.residentCode && (
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-muted-foreground font-medium">Resident:</span>
+                      <Badge variant="outline" className="font-mono text-xs px-2 py-0.5" data-testid="badge-resident-code">
+                        {currentUser.residentCode}
+                      </Badge>
+                    </div>
+                  )}
+                  {currentUser?.propertyManagerCode && (
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-muted-foreground font-medium">Property Mgr:</span>
+                      <Badge variant="outline" className="font-mono text-xs px-2 py-0.5" data-testid="badge-property-manager-code">
+                        {currentUser.propertyManagerCode}
+                      </Badge>
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
           </div>
           <div className="flex items-center gap-3">
