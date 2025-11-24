@@ -275,8 +275,8 @@ export default function PropertyManager() {
   const vendors = vendorsData?.vendors || [];
 
   return (
-    <div className="h-screen overflow-y-auto bg-background p-4 md:p-6">
-      <div className="max-w-6xl mx-auto">
+    <div className="min-h-screen bg-background">
+      <div className="max-w-6xl mx-auto p-4 md:p-6">
         <div className="mb-6 flex flex-wrap items-start justify-between gap-4">
           <div>
             <h1 className="text-3xl font-bold mb-2" data-testid="text-page-title">My Vendors</h1>
@@ -755,10 +755,10 @@ export default function PropertyManager() {
         </Dialog>
 
         <Dialog open={selectedProject !== null} onOpenChange={(open) => !open && setSelectedProject(null)}>
-          <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto" data-testid="dialog-project-details">
+          <DialogContent className="max-w-3xl h-[95vh] flex flex-col p-0" data-testid="dialog-project-details">
             {selectedProject && (
               <>
-                <DialogHeader>
+                <DialogHeader className="p-6 pb-4 shrink-0">
                   <DialogTitle className="flex items-center gap-2" data-testid="text-project-details-title">
                     <Building2 className="w-5 h-5" />
                     {selectedProject.buildingName || selectedProject.projectName || 'Project Details'}
@@ -767,6 +767,8 @@ export default function PropertyManager() {
                     View project information, progress, and complaint history
                   </DialogDescription>
                 </DialogHeader>
+                
+                <div className="flex-1 overflow-y-auto px-6 pb-6">
 
                 {isLoadingProjectDetails ? (
                   <div className="text-sm text-muted-foreground text-center py-8" data-testid="text-loading-details">
@@ -961,6 +963,7 @@ export default function PropertyManager() {
                     Failed to load project details
                   </div>
                 )}
+                </div>
               </>
             )}
           </DialogContent>
