@@ -2121,6 +2121,16 @@ export class Storage {
             )
           );
         
+        // Convert brandingColors array to JSON format for frontend
+        let brandingColorsJson: string | null = null;
+        if (company.brandingColors && Array.isArray(company.brandingColors) && company.brandingColors.length > 0) {
+          // Convert array [primary, secondary, ...] to {primary: color1, secondary: color2, ...}
+          brandingColorsJson = JSON.stringify({
+            primary: company.brandingColors[0] || null,
+            secondary: company.brandingColors[1] || null,
+          });
+        }
+
         return {
           linkId: link?.id || '',
           id: company.id,
@@ -2135,7 +2145,7 @@ export class Storage {
           propertyManagerCode: company.propertyManagerCode,
           strataNumber: link?.strataNumber || null,
           whitelabelBrandingActive: company.whitelabelBrandingActive || false,
-          brandingColors: company.brandingColors,
+          brandingColors: brandingColorsJson,
         };
       })
     );
