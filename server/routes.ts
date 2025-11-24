@@ -4437,13 +4437,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
         
         // Add dailyDropTarget and calculate total dropsCompleted from elevation fields
-        const sessionsWithTarget = projectSessions.map(session => ({
-          ...session,
-          dailyDropTarget: dailyTarget,
-          dropsCompleted: (session.dropsCompletedNorth || 0) + 
-                         (session.dropsCompletedEast || 0) + 
-                         (session.dropsCompletedSouth || 0) + 
-                         (session.dropsCompletedWest || 0),
+        // Also enrich with employee name by fetching user
+        const sessionsWithTarget = await Promise.all(projectSessions.map(async (session) => {
+          // Fetch employee name from users table
+          const employee = await storage.getUserById(session.employeeId);
+          
+          return {
+            ...session,
+            employeeName: employee?.name || null, // Add employeeName for GPS legend
+            dailyDropTarget: dailyTarget,
+            projectName: project.buildingName, // Add project name for map popups
+            dropsCompleted: (session.dropsCompletedNorth || 0) + 
+                           (session.dropsCompletedEast || 0) + 
+                           (session.dropsCompletedSouth || 0) + 
+                           (session.dropsCompletedWest || 0),
+          };
         }));
         allSessions.push(...sessionsWithTarget);
       }
