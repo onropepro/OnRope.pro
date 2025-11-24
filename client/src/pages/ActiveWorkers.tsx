@@ -94,6 +94,19 @@ export default function ActiveWorkers() {
   
   const isLoading = isLoadingActive || isLoadingAll || isLoadingInspections || isLoadingEmployees;
 
+  // Helper function to check if employee had a work session on a given date
+  const hadWorkSession = (employeeId: string, date: Date): boolean => {
+    const dateStr = format(date, 'yyyy-MM-dd');
+    return allSessions.some((session: any) => {
+      if (session.employeeId !== employeeId) return false;
+      // Check if session's work date matches (use startTime to determine work date)
+      const sessionDate = session.startTime ? new Date(session.startTime) : null;
+      if (!sessionDate) return false;
+      const sessionDateStr = format(sessionDate, 'yyyy-MM-dd');
+      return sessionDateStr === dateStr;
+    });
+  };
+
   // Helper function to check if employee submitted harness inspection for a given date
   const hasHarnessInspection = (employeeId: string, date: Date): boolean => {
     const dateStr = format(date, 'yyyy-MM-dd');
@@ -401,17 +414,22 @@ export default function ActiveWorkers() {
                             <div className="text-xs text-muted-foreground">{employee.role?.replace(/_/g, ' ')}</div>
                           </td>
                           {past7Days.map((date, index) => {
+                            const hadSession = hadWorkSession(employee.id, date);
                             const hasInspection = hasHarnessInspection(employee.id, date);
                             return (
                               <td key={index} className="text-center p-3">
-                                {hasInspection ? (
-                                  <span className="material-icons text-green-500" title="Inspection submitted">
-                                    check_circle
-                                  </span>
+                                {hadSession ? (
+                                  hasInspection ? (
+                                    <span className="material-icons text-green-500" title="Inspection submitted">
+                                      check_circle
+                                    </span>
+                                  ) : (
+                                    <span className="material-icons text-red-500" title="No inspection submitted">
+                                      cancel
+                                    </span>
+                                  )
                                 ) : (
-                                  <span className="material-icons text-red-500" title="No inspection">
-                                    cancel
-                                  </span>
+                                  <span className="text-muted-foreground/30" title="No work session">—</span>
                                 )}
                               </td>
                             );
