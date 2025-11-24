@@ -475,6 +475,7 @@ export default function PropertyManager() {
                       data-testid={`card-vendor-${vendor.id}`}
                       style={primaryColor ? {
                         borderLeft: `4px solid ${primaryColor}`,
+                        borderTop: `4px solid ${primaryColor}`,
                       } : undefined}
                     >
                       {primaryColor && (
