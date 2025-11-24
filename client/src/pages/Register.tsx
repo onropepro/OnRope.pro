@@ -198,13 +198,14 @@ export default function Register() {
 
   const onPropertyManagerSubmit = async (data: PropertyManagerFormData) => {
     try {
-      const { confirmPassword, ...registrationData } = data;
+      const { confirmPassword, firstName, lastName, ...registrationData } = data;
       
       const response = await fetch("/api/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           ...registrationData,
+          name: `${firstName} ${lastName}`.trim(), // Combine first and last name
           role: "property_manager",
           passwordHash: data.password,
           companyCode: data.companyCode,
