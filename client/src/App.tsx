@@ -22,6 +22,7 @@ import SafetyForms from "@/pages/SafetyForms";
 import ToolboxMeetingForm from "@/pages/ToolboxMeetingForm";
 import FlhaForm from "@/pages/FlhaForm";
 import IncidentReportForm from "@/pages/IncidentReportForm";
+import MethodStatementForm from "@/pages/MethodStatementForm";
 import Payroll from "@/pages/Payroll";
 import Quotes from "@/pages/Quotes";
 import ActiveWorkers from "@/pages/ActiveWorkers";
@@ -139,6 +140,11 @@ function Router() {
       <Route path="/incident-report">
         <ProtectedRoute allowedRoles={["operations_manager", "general_supervisor", "rope_access_supervisor", "supervisor", "company"]}>
           <IncidentReportForm />
+        </ProtectedRoute>
+      </Route>
+      <Route path="/method-statement">
+        <ProtectedRoute allowedRoles={["rope_access_tech", "general_supervisor", "rope_access_supervisor", "supervisor", "operations_manager", "company"]}>
+          <MethodStatementForm />
         </ProtectedRoute>
       </Route>
       <Route path="/payroll">

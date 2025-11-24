@@ -1,7 +1,7 @@
 import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
-import { ArrowLeft, FileCheck, ClipboardList, Shield, AlertTriangle, FileWarning, BookOpen } from "lucide-react";
+import { ArrowLeft, FileCheck, ClipboardList, Shield, AlertTriangle, FileWarning, BookOpen, FileText } from "lucide-react";
 
 export default function SafetyForms() {
   const [, navigate] = useLocation();
@@ -56,6 +56,16 @@ export default function SafetyForms() {
       iconColor: "text-destructive",
       borderColor: "border-l-destructive",
       testId: "card-incident-report",
+    },
+    {
+      id: "method-statement",
+      title: "Method Statement",
+      description: "Safe work procedures and risk controls",
+      icon: FileText,
+      onClick: () => navigate("/method-statement"),
+      iconColor: "text-green-500",
+      borderColor: "border-l-green-500",
+      testId: "card-method-statement",
     },
   ];
 
