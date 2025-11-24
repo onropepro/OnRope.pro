@@ -2942,7 +2942,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const objectStorageService = new ObjectStorageService();
       const fileUrl = await objectStorageService.uploadPublicFile(
         req.file.originalname,
-        req.file.buffer
+        req.file.buffer,
+        req.file.mimetype
       );
       
       // Get property manager info for uploaded by name
