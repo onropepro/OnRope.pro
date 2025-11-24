@@ -3188,6 +3188,84 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
+  // Upload anchor inspection certificate
+  app.post("/api/upload-anchor-certificate", requireAuth, requireRole("company", "operations_manager", "rope_access_tech"), upload.single('file'), async (req: Request, res: Response) => {
+    try {
+      if (!req.file) {
+        return res.status(400).json({ message: "No file uploaded" });
+      }
+      
+      // Generate unique filename
+      const timestamp = Date.now();
+      const filename = `anchor-inspection-certificate-${timestamp}.pdf`;
+      
+      // Upload to object storage
+      const objectStorageService = new ObjectStorageService();
+      const url = await objectStorageService.uploadPublicFile(
+        filename,
+        req.file.buffer,
+        'application/pdf'
+      );
+      
+      res.json({ url });
+    } catch (error) {
+      console.error("Anchor certificate upload error:", error);
+      const errorMessage = error instanceof Error ? error.message : "Failed to upload file";
+      res.status(500).json({ message: `Upload failed: ${errorMessage}` });
+    }
+  });
+  
+  // Update project's anchor inspection certificate
+  app.patch("/api/projects/:id/anchor-certificate", requireAuth, requireRole("company", "operations_manager", "rope_access_tech"), upload.single('file'), async (req: Request, res: Response) => {
+    try {
+      if (!req.file) {
+        return res.status(400).json({ message: "No file uploaded" });
+      }
+      
+      const projectId = req.params.id;
+      const currentUser = await storage.getUserById(req.session.userId!);
+      
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      // Get the project to verify access
+      const project = await storage.getProjectById(projectId);
+      if (!project) {
+        return res.status(404).json({ message: "Project not found" });
+      }
+      
+      // Verify user has access to this project (same company)
+      const userCompanyId = currentUser.role === "company" ? currentUser.id : currentUser.companyId;
+      if (project.companyId !== userCompanyId) {
+        return res.status(403).json({ message: "Access denied" });
+      }
+      
+      // Generate unique filename
+      const timestamp = Date.now();
+      const filename = `anchor-inspection-certificate-${timestamp}.pdf`;
+      
+      // Upload to object storage
+      const objectStorageService = new ObjectStorageService();
+      const url = await objectStorageService.uploadPublicFile(
+        filename,
+        req.file.buffer,
+        'application/pdf'
+      );
+      
+      // Update project with new certificate URL
+      const updatedProject = await storage.updateProject(projectId, { 
+        anchorInspectionCertificateUrl: url
+      });
+      
+      res.json({ project: updatedProject, url });
+    } catch (error) {
+      console.error("Anchor certificate upload error:", error);
+      const errorMessage = error instanceof Error ? error.message : "Failed to upload file";
+      res.status(500).json({ message: `Upload failed: ${errorMessage}` });
+    }
+  });
+  
   // Upload image to project with optional unit number and comment
   app.post("/api/projects/:id/images", requireAuth, requireRole("company", "owner_ceo", "human_resources", "accounting", "operations_manager", "general_supervisor", "rope_access_supervisor", "account_manager", "supervisor", "rope_access_tech", "manager", "ground_crew", "ground_crew_supervisor"), imageUpload.single('file'), async (req: Request, res: Response) => {
     try {
