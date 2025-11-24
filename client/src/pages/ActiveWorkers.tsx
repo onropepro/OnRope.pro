@@ -107,7 +107,9 @@ export default function ActiveWorkers() {
     const markers: any[] = [];
     
     filteredSessions.forEach((session: any) => {
-      const employeeColor = stringToColor(session.employeeName || session.employeeId || 'unknown');
+      // Use employeeName as primary source for color generation (consistent with legend)
+      const colorKey = session.employeeName || `employee-${session.employeeId}`;
+      const employeeColor = stringToColor(colorKey);
       
       // Add start location marker
       if (session.startLatitude && session.startLongitude) {
@@ -135,18 +137,20 @@ export default function ActiveWorkers() {
     return markers;
   }, [filteredSessions]);
 
-  // Get unique employees with their colors
+  // Get unique employees with their colors (MUST use same logic as markers!)
   const employeeColors = useMemo(() => {
     const uniqueEmployees = new Map<string, { name: string; color: string }>();
     
     filteredSessions.forEach((session: any) => {
-      const employeeKey = session.employeeId || session.employeeName || 'unknown';
-      const employeeName = session.employeeName || 'Unknown Employee';
+      // Only show employees that have a name (skip sessions without employeeName)
+      if (!session.employeeName) return;
+      
+      const employeeKey = session.employeeName;
       
       if (!uniqueEmployees.has(employeeKey)) {
         uniqueEmployees.set(employeeKey, {
-          name: employeeName,
-          color: stringToColor(employeeName || employeeKey),
+          name: session.employeeName,
+          color: stringToColor(session.employeeName), // Same as marker color generation
         });
       }
     });
