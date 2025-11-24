@@ -66,47 +66,27 @@ function FitBounds({ markers }: { markers: any[] }) {
 export default function ActiveWorkers() {
   const [, setLocation] = useLocation();
   const [timeFilter, setTimeFilter] = useState<"today" | "week">("today");
-  const [inspectionFilter, setInspectionFilter] = useState<"week" | "month" | "all">("week");
 
   // Fetch all active work sessions
-  const { data: activeWorkersData, isLoading: isLoadingActive } = useQuery({
+  const { data: activeWorkersData, isLoading: isLoadingActive } = useQuery<{ sessions: any[] }>({
     queryKey: ["/api/active-workers"],
   });
 
   // Fetch all work sessions for GPS tracking
-  const { data: allSessionsData, isLoading: isLoadingAll } = useQuery({
+  const { data: allSessionsData, isLoading: isLoadingAll } = useQuery<{ sessions: any[] }>({
     queryKey: ["/api/all-work-sessions"],
   });
 
-  // Fetch harness inspections for today and past week
-  const { data: harnessInspectionsData, isLoading: isLoadingInspections } = useQuery({
+  // Fetch harness inspections (for status badge)
+  const { data: harnessInspectionsData } = useQuery<{ inspections: any[] }>({
     queryKey: ["/api/harness-inspections"],
-  });
-
-  // Fetch all employees for inspection tracking
-  const { data: employeesData, isLoading: isLoadingEmployees } = useQuery({
-    queryKey: ["/api/employees"],
   });
 
   const activeWorkers = activeWorkersData?.sessions || [];
   const allSessions = allSessionsData?.sessions || [];
   const harnessInspections = harnessInspectionsData?.inspections || [];
-  const employees = employeesData?.employees || [];
   
-  const isLoading = isLoadingActive || isLoadingAll || isLoadingInspections || isLoadingEmployees;
-
-  // Helper function to check if employee had a work session on a given date
-  const hadWorkSession = (employeeId: string, date: Date): boolean => {
-    const dateStr = format(date, 'yyyy-MM-dd');
-    return allSessions.some((session: any) => {
-      if (session.employeeId !== employeeId) return false;
-      // Check if session's work date matches (use startTime to determine work date)
-      const sessionDate = session.startTime ? new Date(session.startTime) : null;
-      if (!sessionDate) return false;
-      const sessionDateStr = format(sessionDate, 'yyyy-MM-dd');
-      return sessionDateStr === dateStr;
-    });
-  };
+  const isLoading = isLoadingActive || isLoadingAll;
 
   // Helper function to check if employee submitted harness inspection for a given date
   const hasHarnessInspection = (employeeId: string, date: Date): boolean => {
@@ -115,74 +95,6 @@ export default function ActiveWorkers() {
       inspection.workerId === employeeId && inspection.inspectionDate === dateStr
     );
   };
-
-  // Get date range for inspection tracking based on filter
-  const inspectionDays = useMemo(() => {
-    const days = [];
-    const today = new Date();
-    let daysToShow = 7;
-    
-    if (inspectionFilter === "month") {
-      daysToShow = 30;
-    } else if (inspectionFilter === "all") {
-      // Show all days since the earliest work session
-      const earliestSession = allSessions.reduce((earliest: Date | null, session: any) => {
-        if (!session.startTime) return earliest;
-        const sessionDate = new Date(session.startTime);
-        if (!earliest || sessionDate < earliest) return sessionDate;
-        return earliest;
-      }, null);
-      
-      if (earliestSession) {
-        const daysSinceEarliest = Math.floor((today.getTime() - earliestSession.getTime()) / (1000 * 60 * 60 * 24));
-        daysToShow = Math.min(daysSinceEarliest + 1, 90); // Cap at 90 days for performance
-      }
-    }
-    
-    for (let i = 0; i < daysToShow; i++) {
-      const date = new Date(today);
-      date.setDate(date.getDate() - i);
-      days.push(date);
-    }
-    return days;
-  }, [inspectionFilter, allSessions]);
-
-  // Calculate company safety rating - percentage of required inspections completed
-  const companySafetyRating = useMemo(() => {
-    let totalRequiredInspections = 0;
-    let totalCompletedInspections = 0;
-
-    // For each day in the current filter period
-    inspectionDays.forEach((date) => {
-      const dateStr = format(date, 'yyyy-MM-dd');
-      
-      // Find all unique employees who had work sessions on this day
-      const workersWithSessions = new Set<string>();
-      allSessions.forEach((session: any) => {
-        if (!session.startTime || !session.employeeId) return;
-        const sessionDate = new Date(session.startTime);
-        const sessionDateStr = format(sessionDate, 'yyyy-MM-dd');
-        if (sessionDateStr === dateStr) {
-          workersWithSessions.add(session.employeeId);
-        }
-      });
-
-      // Count how many of those workers submitted inspections
-      workersWithSessions.forEach((workerId) => {
-        totalRequiredInspections++;
-        const hasInspection = harnessInspections.some((inspection: any) =>
-          inspection.workerId === workerId && inspection.inspectionDate === dateStr
-        );
-        if (hasInspection) {
-          totalCompletedInspections++;
-        }
-      });
-    });
-
-    // Calculate percentage
-    if (totalRequiredInspections === 0) return 0;
-    return Math.round((totalCompletedInspections / totalRequiredInspections) * 100);
-  }, [inspectionDays, allSessions, harnessInspections]);
 
   // Filter sessions by time period (using startTime instead of workDate)
   const filteredSessions = useMemo(() => {
@@ -308,14 +220,10 @@ export default function ActiveWorkers() {
 
       <div className="max-w-6xl mx-auto p-4">
         <Tabs defaultValue="workers" className="w-full">
-          <TabsList className="grid w-full max-w-3xl mx-auto grid-cols-3 mb-6">
+          <TabsList className="grid w-full max-w-2xl mx-auto grid-cols-2 mb-6">
             <TabsTrigger value="workers" data-testid="tab-workers">
               <span className="material-icons text-sm mr-2">people</span>
               Workers
-            </TabsTrigger>
-            <TabsTrigger value="inspections" data-testid="tab-inspections">
-              <span className="material-icons text-sm mr-2">verified</span>
-              Daily Harness Inspection
             </TabsTrigger>
             <TabsTrigger value="locations" data-testid="tab-locations">
               <span className="material-icons text-sm mr-2">map</span>
@@ -426,148 +334,6 @@ export default function ActiveWorkers() {
                 ))}
               </div>
             )}
-          </TabsContent>
-
-          <TabsContent value="inspections">
-            <Card className="glass-card border-0 shadow-premium">
-              <CardHeader>
-                <div className="flex items-center justify-between">
-                  <div>
-                    <CardTitle className="flex items-center gap-2">
-                      <span className="material-icons">verified</span>
-                      Harness Inspection Tracking
-                    </CardTitle>
-                    <CardDescription>
-                      Daily inspections for employees with work sessions
-                    </CardDescription>
-                  </div>
-                  <div className="flex gap-2">
-                    <Button
-                      variant={inspectionFilter === "week" ? "default" : "outline"}
-                      size="sm"
-                      onClick={() => setInspectionFilter("week")}
-                      data-testid="filter-week-inspections"
-                    >
-                      7 Days
-                    </Button>
-                    <Button
-                      variant={inspectionFilter === "month" ? "default" : "outline"}
-                      size="sm"
-                      onClick={() => setInspectionFilter("month")}
-                      data-testid="filter-month-inspections"
-                    >
-                      Last Month
-                    </Button>
-                    <Button
-                      variant={inspectionFilter === "all" ? "default" : "outline"}
-                      size="sm"
-                      onClick={() => setInspectionFilter("all")}
-                      data-testid="filter-all-inspections"
-                    >
-                      All Time
-                    </Button>
-                  </div>
-                </div>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                {/* Company Safety Rating */}
-                <Card className="border-2" style={{
-                  borderColor: companySafetyRating >= 90 ? 'hsl(142, 76%, 36%)' : 
-                               companySafetyRating >= 70 ? 'hsl(48, 96%, 53%)' : 
-                               'hsl(0, 84%, 60%)',
-                  backgroundColor: companySafetyRating >= 90 ? 'hsl(142, 76%, 96%)' : 
-                                   companySafetyRating >= 70 ? 'hsl(48, 96%, 95%)' : 
-                                   'hsl(0, 84%, 96%)'
-                }}>
-                  <CardContent className="p-6">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <div className="text-sm font-medium text-muted-foreground mb-1">
-                          Company Safety Rating
-                        </div>
-                        <div className="text-xs text-muted-foreground">
-                          {inspectionFilter === "week" ? "Last 7 Days" : 
-                           inspectionFilter === "month" ? "Last 30 Days" : 
-                           "All Time"}
-                        </div>
-                      </div>
-                      <div className="text-center">
-                        <div className="text-5xl font-bold" style={{
-                          color: companySafetyRating >= 90 ? 'hsl(142, 76%, 36%)' : 
-                                 companySafetyRating >= 70 ? 'hsl(48, 96%, 53%)' : 
-                                 'hsl(0, 84%, 60%)'
-                        }}>
-                          {companySafetyRating}%
-                        </div>
-                        <div className="text-sm text-muted-foreground mt-1">
-                          Inspection Compliance
-                        </div>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-
-                {/* Inspection Grid */}
-                <div className="overflow-x-auto">
-                <table className="w-full">
-                  <thead>
-                    <tr className="border-b">
-                      <th className="text-left p-3 font-medium text-sm">Employee</th>
-                      {inspectionDays.map((date, index) => (
-                        <th key={index} className="text-center p-3 font-medium text-sm">
-                          <div>{format(date, 'EEE')}</div>
-                          <div className="text-xs text-muted-foreground">{format(date, 'MMM d')}</div>
-                        </th>
-                      ))}
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {employees.length === 0 ? (
-                      <tr>
-                        <td colSpan={inspectionDays.length + 1} className="text-center p-8 text-muted-foreground">
-                          No employees found
-                        </td>
-                      </tr>
-                    ) : (
-                      employees.map((employee: any) => (
-                        <tr 
-                          key={employee.id} 
-                          className="border-b hover-elevate"
-                          data-testid={`employee-inspection-row-${employee.id}`}
-                        >
-                          <td className="p-3">
-                            <div className="font-medium">{employee.name}</div>
-                            <div className="text-xs text-muted-foreground">{employee.role?.replace(/_/g, ' ')}</div>
-                          </td>
-                          {inspectionDays.map((date, index) => {
-                            const hadSession = hadWorkSession(employee.id, date);
-                            const hasInspection = hasHarnessInspection(employee.id, date);
-                            return (
-                              <td key={index} className="text-center p-3">
-                                {hadSession ? (
-                                  hasInspection ? (
-                                    <span className="material-icons text-green-500" title="Inspection submitted">
-                                      check_circle
-                                    </span>
-                                  ) : (
-                                    <span className="material-icons text-red-500" title="No inspection submitted">
-                                      cancel
-                                    </span>
-                                  )
-                                ) : (
-                                  <span className="text-muted-foreground/30" title="No work session">—</span>
-                                )}
-                              </td>
-                            );
-                          })}
-                        </tr>
-                      ))
-                    )}
-                  </tbody>
-                </table>
-                </div>
-              </CardContent>
-            </Card>
           </TabsContent>
 
           <TabsContent value="locations">
