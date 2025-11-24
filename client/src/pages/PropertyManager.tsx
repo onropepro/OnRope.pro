@@ -126,7 +126,7 @@ export default function PropertyManager() {
                         <Avatar className="w-12 h-12">
                           <AvatarImage src={vendor.logo || undefined} />
                           <AvatarFallback className="bg-primary text-primary-foreground">
-                            {vendor.companyName.substring(0, 2).toUpperCase()}
+                            {vendor.companyName ? vendor.companyName.substring(0, 2).toUpperCase() : "RA"}
                           </AvatarFallback>
                         </Avatar>
                         <div className="flex-1 min-w-0">
@@ -213,7 +213,7 @@ export default function PropertyManager() {
                 <Avatar className="w-10 h-10">
                   <AvatarImage src={selectedVendor?.logo || undefined} />
                   <AvatarFallback className="bg-primary text-primary-foreground">
-                    {selectedVendor?.companyName.substring(0, 2).toUpperCase()}
+                    {selectedVendor?.companyName ? selectedVendor.companyName.substring(0, 2).toUpperCase() : "RA"}
                   </AvatarFallback>
                 </Avatar>
                 {selectedVendor?.companyName}

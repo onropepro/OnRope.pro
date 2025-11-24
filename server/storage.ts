@@ -1984,7 +1984,7 @@ export class Storage {
         
         return {
           id: company.id,
-          companyName: company.fullName || company.username,
+          companyName: company.companyName || company.email || "Unknown Company",
           email: company.email,
           phone: company.phone,
           logo: company.logo,
