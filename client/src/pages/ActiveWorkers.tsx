@@ -278,7 +278,7 @@ export default function ActiveWorkers() {
             </TabsTrigger>
             <TabsTrigger value="inspections" data-testid="tab-inspections">
               <span className="material-icons text-sm mr-2">verified</span>
-              Inspections
+              Daily Harness Inspection
             </TabsTrigger>
             <TabsTrigger value="locations" data-testid="tab-locations">
               <span className="material-icons text-sm mr-2">map</span>
