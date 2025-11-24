@@ -1,6 +1,6 @@
 import { db } from "./db";
-import { users, clients, projects, customJobTypes, dropLogs, workSessions, nonBillableWorkSessions, complaints, complaintNotes, projectPhotos, jobComments, harnessInspections, toolboxMeetings, flhaForms, incidentReports, companyDocuments, payPeriodConfig, payPeriods, quotes, quoteServices, gearItems, gearAssignments, scheduledJobs, jobAssignments, userPreferences, propertyManagerCompanyLinks } from "@shared/schema";
-import type { User, InsertUser, Client, InsertClient, Project, InsertProject, CustomJobType, InsertCustomJobType, DropLog, InsertDropLog, WorkSession, InsertWorkSession, Complaint, InsertComplaint, ComplaintNote, InsertComplaintNote, ProjectPhoto, InsertProjectPhoto, JobComment, InsertJobComment, HarnessInspection, InsertHarnessInspection, ToolboxMeeting, InsertToolboxMeeting, FlhaForm, InsertFlhaForm, IncidentReport, InsertIncidentReport, PayPeriodConfig, InsertPayPeriodConfig, PayPeriod, InsertPayPeriod, EmployeeHoursSummary, Quote, InsertQuote, QuoteService, InsertQuoteService, QuoteWithServices, GearItem, InsertGearItem, GearAssignment, InsertGearAssignment, ScheduledJob, InsertScheduledJob, JobAssignment, InsertJobAssignment, ScheduledJobWithAssignments, UserPreferences, InsertUserPreferences, PropertyManagerCompanyLink, InsertPropertyManagerCompanyLink } from "@shared/schema";
+import { users, clients, projects, customJobTypes, dropLogs, workSessions, nonBillableWorkSessions, complaints, complaintNotes, projectPhotos, jobComments, harnessInspections, toolboxMeetings, flhaForms, incidentReports, methodStatements, companyDocuments, payPeriodConfig, payPeriods, quotes, quoteServices, gearItems, gearAssignments, scheduledJobs, jobAssignments, userPreferences, propertyManagerCompanyLinks } from "@shared/schema";
+import type { User, InsertUser, Client, InsertClient, Project, InsertProject, CustomJobType, InsertCustomJobType, DropLog, InsertDropLog, WorkSession, InsertWorkSession, Complaint, InsertComplaint, ComplaintNote, InsertComplaintNote, ProjectPhoto, InsertProjectPhoto, JobComment, InsertJobComment, HarnessInspection, InsertHarnessInspection, ToolboxMeeting, InsertToolboxMeeting, FlhaForm, InsertFlhaForm, IncidentReport, InsertIncidentReport, MethodStatement, InsertMethodStatement, PayPeriodConfig, InsertPayPeriodConfig, PayPeriod, InsertPayPeriod, EmployeeHoursSummary, Quote, InsertQuote, QuoteService, InsertQuoteService, QuoteWithServices, GearItem, InsertGearItem, GearAssignment, InsertGearAssignment, ScheduledJob, InsertScheduledJob, JobAssignment, InsertJobAssignment, ScheduledJobWithAssignments, UserPreferences, InsertUserPreferences, PropertyManagerCompanyLink, InsertPropertyManagerCompanyLink } from "@shared/schema";
 import { eq, and, or, desc, sql, isNull, not, gte, lte, between, inArray } from "drizzle-orm";
 import bcrypt from "bcrypt";
 
@@ -1104,6 +1104,41 @@ export class Storage {
 
   async deleteIncidentReport(id: string): Promise<void> {
     await db.delete(incidentReports).where(eq(incidentReports.id, id));
+  }
+
+  // Method statement operations
+  async createMethodStatement(statement: InsertMethodStatement): Promise<MethodStatement> {
+    const result = await db.insert(methodStatements).values(statement).returning();
+    return result[0];
+  }
+
+  async getMethodStatementsByCompany(companyId: string): Promise<MethodStatement[]> {
+    return db.select().from(methodStatements)
+      .where(eq(methodStatements.companyId, companyId))
+      .orderBy(desc(methodStatements.dateCreated), desc(methodStatements.createdAt));
+  }
+
+  async getMethodStatementsByProject(projectId: string): Promise<MethodStatement[]> {
+    return db.select().from(methodStatements)
+      .where(eq(methodStatements.projectId, projectId))
+      .orderBy(desc(methodStatements.dateCreated));
+  }
+
+  async getMethodStatementById(id: string): Promise<MethodStatement | undefined> {
+    const result = await db.select().from(methodStatements).where(eq(methodStatements.id, id));
+    return result[0];
+  }
+
+  async updateMethodStatement(id: string, updates: Partial<InsertMethodStatement>): Promise<MethodStatement> {
+    const result = await db.update(methodStatements)
+      .set({ ...updates, updatedAt: new Date() })
+      .where(eq(methodStatements.id, id))
+      .returning();
+    return result[0];
+  }
+
+  async deleteMethodStatement(id: string): Promise<void> {
+    await db.delete(methodStatements).where(eq(methodStatements.id, id));
   }
 
   // Company documents operations

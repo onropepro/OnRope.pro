@@ -2,7 +2,7 @@ import type { Express, Request, Response, NextFunction } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { db } from "./db";
-import { insertUserSchema, insertClientSchema, insertProjectSchema, insertDropLogSchema, insertComplaintSchema, insertComplaintNoteSchema, insertJobCommentSchema, insertHarnessInspectionSchema, insertToolboxMeetingSchema, insertFlhaFormSchema, insertIncidentReportSchema, insertPayPeriodConfigSchema, insertQuoteSchema, insertQuoteServiceSchema, insertGearItemSchema, insertGearAssignmentSchema, insertScheduledJobSchema, insertJobAssignmentSchema, updatePropertyManagerAccountSchema, normalizeStrataPlan, type InsertGearItem, type InsertGearAssignment, type Project, gearAssignments, jobAssignments, workSessions, nonBillableWorkSessions, licenseKeys, users, propertyManagerCompanyLinks } from "@shared/schema";
+import { insertUserSchema, insertClientSchema, insertProjectSchema, insertDropLogSchema, insertComplaintSchema, insertComplaintNoteSchema, insertJobCommentSchema, insertHarnessInspectionSchema, insertToolboxMeetingSchema, insertFlhaFormSchema, insertIncidentReportSchema, insertMethodStatementSchema, insertPayPeriodConfigSchema, insertQuoteSchema, insertQuoteServiceSchema, insertGearItemSchema, insertGearAssignmentSchema, insertScheduledJobSchema, insertJobAssignmentSchema, updatePropertyManagerAccountSchema, normalizeStrataPlan, type InsertGearItem, type InsertGearAssignment, type Project, gearAssignments, jobAssignments, workSessions, nonBillableWorkSessions, licenseKeys, users, propertyManagerCompanyLinks } from "@shared/schema";
 import { eq, sql } from "drizzle-orm";
 import { z } from "zod";
 import bcrypt from "bcrypt";
@@ -6020,6 +6020,158 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({ message: "Incident report deleted successfully" });
     } catch (error) {
       console.error("Delete incident report error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // ==================== METHOD STATEMENT ROUTES ====================
+
+  // Create method statement
+  app.post("/api/method-statements", requireAuth, requireRole("rope_access_tech", "general_supervisor", "rope_access_supervisor", "supervisor", "operations_manager", "company"), async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      const companyId = currentUser.role === "company" ? currentUser.id : currentUser.companyId;
+      
+      if (!companyId) {
+        return res.status(400).json({ message: "Unable to determine company" });
+      }
+      
+      const statementData = insertMethodStatementSchema.parse({
+        ...req.body,
+        companyId,
+        preparedById: req.session.userId,
+      });
+      
+      const statement = await storage.createMethodStatement(statementData);
+      res.json({ statement });
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Validation error", errors: error.errors });
+      }
+      console.error("Create method statement error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Get all method statements for company
+  app.get("/api/method-statements", requireAuth, requireRole("operations_manager", "general_supervisor", "rope_access_supervisor", "supervisor", "company"), async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      const companyId = currentUser.role === "company" ? currentUser.id : currentUser.companyId;
+      
+      if (!companyId) {
+        return res.status(400).json({ message: "Unable to determine company" });
+      }
+      
+      const statements = await storage.getMethodStatementsByCompany(companyId);
+      res.json({ statements });
+    } catch (error) {
+      console.error("Get method statements error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Get method statements for specific project
+  app.get("/api/projects/:projectId/method-statements", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const statements = await storage.getMethodStatementsByProject(req.params.projectId);
+      res.json({ statements });
+    } catch (error) {
+      console.error("Get project method statements error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Get specific method statement
+  app.get("/api/method-statements/:id", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const statement = await storage.getMethodStatementById(req.params.id);
+      if (!statement) {
+        return res.status(404).json({ message: "Method statement not found" });
+      }
+      res.json({ statement });
+    } catch (error) {
+      console.error("Get method statement error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Update method statement
+  app.patch("/api/method-statements/:id", requireAuth, requireRole("operations_manager", "general_supervisor", "rope_access_supervisor", "supervisor", "company"), async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      const currentUser = await storage.getUserById(req.session.userId!);
+      
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      const companyId = currentUser.role === "company" ? currentUser.id : currentUser.companyId;
+      
+      if (!companyId) {
+        return res.status(400).json({ message: "Unable to determine company" });
+      }
+      
+      // Verify the method statement belongs to this company
+      const existingStatement = await storage.getMethodStatementById(id);
+      if (!existingStatement) {
+        return res.status(404).json({ message: "Method statement not found" });
+      }
+      
+      if (existingStatement.companyId !== companyId) {
+        return res.status(403).json({ message: "Access denied" });
+      }
+      
+      // Merge server-derived companyId to prevent tampering
+      const payload = { ...req.body, companyId };
+      const statement = await storage.updateMethodStatement(id, payload);
+      res.json({ statement });
+    } catch (error) {
+      console.error("Update method statement error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Delete method statement
+  app.delete("/api/method-statements/:id", requireAuth, requireRole("operations_manager", "general_supervisor", "rope_access_supervisor", "supervisor", "company"), async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      const currentUser = await storage.getUserById(req.session.userId!);
+      
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      const companyId = currentUser.role === "company" ? currentUser.id : currentUser.companyId;
+      
+      if (!companyId) {
+        return res.status(400).json({ message: "Unable to determine company" });
+      }
+      
+      // Verify the method statement belongs to this company
+      const existingStatement = await storage.getMethodStatementById(id);
+      if (!existingStatement) {
+        return res.status(404).json({ message: "Method statement not found" });
+      }
+      
+      if (existingStatement.companyId !== companyId) {
+        return res.status(403).json({ message: "Access denied" });
+      }
+      
+      await storage.deleteMethodStatement(id);
+      res.json({ message: "Method statement deleted successfully" });
+    } catch (error) {
+      console.error("Delete method statement error:", error);
       res.status(500).json({ message: "Internal server error" });
     }
   });
