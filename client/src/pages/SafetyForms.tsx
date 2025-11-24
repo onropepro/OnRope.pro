@@ -1,7 +1,7 @@
 import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
-import { ArrowLeft, FileCheck, ClipboardList, Shield, AlertTriangle, FileWarning } from "lucide-react";
+import { ArrowLeft, FileCheck, ClipboardList, Shield, AlertTriangle, FileWarning, BookOpen } from "lucide-react";
 
 export default function SafetyForms() {
   const [, navigate] = useLocation();
@@ -36,6 +36,16 @@ export default function SafetyForms() {
       iconColor: "text-blue-500",
       borderColor: "border-l-blue-500",
       testId: "card-harness-inspection",
+    },
+    {
+      id: "irata-icop",
+      title: "IRATA ICOP",
+      description: "International Code of Practice (TC-102ENG)",
+      icon: BookOpen,
+      onClick: () => window.open("https://irata.org/downloads/2055", "_blank", "noopener,noreferrer"),
+      iconColor: "text-primary",
+      borderColor: "border-l-primary",
+      testId: "card-irata-icop",
     },
     {
       id: "incident-report",
