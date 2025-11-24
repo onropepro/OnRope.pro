@@ -442,8 +442,8 @@ export default function PropertyManager() {
             setSelectedVendor(null);
           }
         }}>
-          <DialogContent className="max-w-2xl" data-testid="dialog-vendor-details">
-            <DialogHeader>
+          <DialogContent className="max-w-2xl h-[90vh] flex flex-col p-0" data-testid="dialog-vendor-details">
+            <DialogHeader className="p-6 pb-4 shrink-0">
               <DialogTitle className="flex items-center gap-3" data-testid="text-vendor-details-title">
                 <Avatar className="w-10 h-10">
                   <AvatarImage src={selectedVendor?.logo || undefined} />
@@ -458,7 +458,8 @@ export default function PropertyManager() {
               </DialogDescription>
             </DialogHeader>
             {selectedVendor && (
-              <div className="space-y-6 pt-4">
+              <div className="flex-1 overflow-y-auto px-6 pb-6">
+                <div className="space-y-6 pt-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <Label className="text-xs text-muted-foreground">Company Email</Label>
@@ -635,6 +636,7 @@ export default function PropertyManager() {
                   >
                     Close
                   </Button>
+                </div>
                 </div>
               </div>
             )}
