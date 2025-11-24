@@ -66,6 +66,7 @@ function FitBounds({ markers }: { markers: any[] }) {
 export default function ActiveWorkers() {
   const [, setLocation] = useLocation();
   const [timeFilter, setTimeFilter] = useState<"today" | "week">("today");
+  const [inspectionFilter, setInspectionFilter] = useState<"week" | "month" | "all">("week");
 
   // Fetch all active work sessions
   const { data: activeWorkersData, isLoading: isLoadingActive } = useQuery({
@@ -115,17 +116,36 @@ export default function ActiveWorkers() {
     );
   };
 
-  // Get past 7 days for inspection tracking
-  const past7Days = useMemo(() => {
+  // Get date range for inspection tracking based on filter
+  const inspectionDays = useMemo(() => {
     const days = [];
     const today = new Date();
-    for (let i = 0; i < 7; i++) {
+    let daysToShow = 7;
+    
+    if (inspectionFilter === "month") {
+      daysToShow = 30;
+    } else if (inspectionFilter === "all") {
+      // Show all days since the earliest work session
+      const earliestSession = allSessions.reduce((earliest: Date | null, session: any) => {
+        if (!session.startTime) return earliest;
+        const sessionDate = new Date(session.startTime);
+        if (!earliest || sessionDate < earliest) return sessionDate;
+        return earliest;
+      }, null);
+      
+      if (earliestSession) {
+        const daysSinceEarliest = Math.floor((today.getTime() - earliestSession.getTime()) / (1000 * 60 * 60 * 24));
+        daysToShow = Math.min(daysSinceEarliest + 1, 90); // Cap at 90 days for performance
+      }
+    }
+    
+    for (let i = 0; i < daysToShow; i++) {
       const date = new Date(today);
       date.setDate(date.getDate() - i);
       days.push(date);
     }
     return days;
-  }, []);
+  }, [inspectionFilter, allSessions]);
 
   // Filter sessions by time period (using startTime instead of workDate)
   const filteredSessions = useMemo(() => {
@@ -374,20 +394,50 @@ export default function ActiveWorkers() {
           <TabsContent value="inspections">
             <Card className="glass-card border-0 shadow-premium">
               <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <span className="material-icons">verified</span>
-                  Harness Inspection Tracking - Past 7 Days
-                </CardTitle>
-                <CardDescription>
-                  Daily harness inspection submissions for all employees
-                </CardDescription>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <CardTitle className="flex items-center gap-2">
+                      <span className="material-icons">verified</span>
+                      Harness Inspection Tracking
+                    </CardTitle>
+                    <CardDescription>
+                      Daily inspections for employees with work sessions
+                    </CardDescription>
+                  </div>
+                  <div className="flex gap-2">
+                    <Button
+                      variant={inspectionFilter === "week" ? "default" : "outline"}
+                      size="sm"
+                      onClick={() => setInspectionFilter("week")}
+                      data-testid="filter-week-inspections"
+                    >
+                      7 Days
+                    </Button>
+                    <Button
+                      variant={inspectionFilter === "month" ? "default" : "outline"}
+                      size="sm"
+                      onClick={() => setInspectionFilter("month")}
+                      data-testid="filter-month-inspections"
+                    >
+                      Last Month
+                    </Button>
+                    <Button
+                      variant={inspectionFilter === "all" ? "default" : "outline"}
+                      size="sm"
+                      onClick={() => setInspectionFilter("all")}
+                      data-testid="filter-all-inspections"
+                    >
+                      All Time
+                    </Button>
+                  </div>
+                </div>
               </CardHeader>
               <CardContent className="overflow-x-auto">
                 <table className="w-full">
                   <thead>
                     <tr className="border-b">
                       <th className="text-left p-3 font-medium text-sm">Employee</th>
-                      {past7Days.map((date, index) => (
+                      {inspectionDays.map((date, index) => (
                         <th key={index} className="text-center p-3 font-medium text-sm">
                           <div>{format(date, 'EEE')}</div>
                           <div className="text-xs text-muted-foreground">{format(date, 'MMM d')}</div>
@@ -398,7 +448,7 @@ export default function ActiveWorkers() {
                   <tbody>
                     {employees.length === 0 ? (
                       <tr>
-                        <td colSpan={8} className="text-center p-8 text-muted-foreground">
+                        <td colSpan={inspectionDays.length + 1} className="text-center p-8 text-muted-foreground">
                           No employees found
                         </td>
                       </tr>
@@ -413,7 +463,7 @@ export default function ActiveWorkers() {
                             <div className="font-medium">{employee.name}</div>
                             <div className="text-xs text-muted-foreground">{employee.role?.replace(/_/g, ' ')}</div>
                           </td>
-                          {past7Days.map((date, index) => {
+                          {inspectionDays.map((date, index) => {
                             const hadSession = hadWorkSession(employee.id, date);
                             const hasInspection = hasHarnessInspection(employee.id, date);
                             return (
