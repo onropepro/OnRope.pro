@@ -2909,40 +2909,40 @@ export default function Dashboard() {
                               )}
                             </div>
                             
-                            {/* Safety Documents Status */}
-                            <div className="flex items-center gap-2 mb-3">
-                              {/* Anchor Inspection Certificate */}
-                              <div className="flex items-center gap-1" title={project.anchorInspectionCertificateUrl ? "Anchor inspection uploaded" : "Anchor inspection missing"}>
-                                <span className={`material-icons text-xs ${project.anchorInspectionCertificateUrl ? 'text-green-500' : 'text-red-500'}`}>
-                                  {project.anchorInspectionCertificateUrl ? 'check_circle' : 'cancel'}
-                                </span>
-                                <span className="text-xs text-muted-foreground">Anchor</span>
-                              </div>
-                              
-                              {/* Rope Access Plan */}
-                              <div className="flex items-center gap-1" title={project.ropeAccessPlanUrl ? "Rope access plan uploaded" : "Rope access plan missing"}>
-                                <span className={`material-icons text-xs ${project.ropeAccessPlanUrl ? 'text-green-500' : 'text-red-500'}`}>
-                                  {project.ropeAccessPlanUrl ? 'check_circle' : 'cancel'}
-                                </span>
-                                <span className="text-xs text-muted-foreground">Plan</span>
-                              </div>
-                              
-                              {/* Toolbox Meetings */}
-                              {(() => {
-                                const projectMeetings = toolboxMeetings.filter((m: any) => m.projectId === project.id);
-                                const hasMeetings = projectMeetings.length > 0;
-                                return (
-                                  <div className="flex items-center gap-1" title={hasMeetings ? `${projectMeetings.length} toolbox meeting(s)` : "No toolbox meetings"}>
-                                    <span className={`material-icons text-xs ${hasMeetings ? 'text-green-500' : 'text-red-500'}`}>
-                                      {hasMeetings ? 'check_circle' : 'cancel'}
-                                    </span>
-                                    <span className="text-xs text-muted-foreground">Toolbox</span>
-                                  </div>
-                                );
-                              })()}
-                            </div>
-                            
                             <div className="space-y-3">
+                              {/* Safety Documents Status - Right Side Above Progress */}
+                              <div className="flex items-center justify-end gap-3 mb-2">
+                                {/* Anchor Inspection Certificate */}
+                                <div className="flex items-center gap-1" title={project.anchorInspectionCertificateUrl ? "Anchor inspection uploaded" : "Anchor inspection missing"}>
+                                  <span className={`material-icons text-base ${project.anchorInspectionCertificateUrl ? 'text-green-500' : 'text-red-500'}`}>
+                                    {project.anchorInspectionCertificateUrl ? 'check_circle' : 'cancel'}
+                                  </span>
+                                  <span className="text-sm text-muted-foreground">Anchor</span>
+                                </div>
+                                
+                                {/* Rope Access Plan */}
+                                <div className="flex items-center gap-1" title={project.ropeAccessPlanUrl ? "Rope access plan uploaded" : "Rope access plan missing"}>
+                                  <span className={`material-icons text-base ${project.ropeAccessPlanUrl ? 'text-green-500' : 'text-red-500'}`}>
+                                    {project.ropeAccessPlanUrl ? 'check_circle' : 'cancel'}
+                                  </span>
+                                  <span className="text-sm text-muted-foreground">Plan</span>
+                                </div>
+                                
+                                {/* Toolbox Meetings */}
+                                {(() => {
+                                  const projectMeetings = toolboxMeetings.filter((m: any) => m.projectId === project.id);
+                                  const hasMeetings = projectMeetings.length > 0;
+                                  return (
+                                    <div className="flex items-center gap-1" title={hasMeetings ? `${projectMeetings.length} toolbox meeting(s)` : "No toolbox meetings"}>
+                                      <span className={`material-icons text-base ${hasMeetings ? 'text-green-500' : 'text-red-500'}`}>
+                                        {hasMeetings ? 'check_circle' : 'cancel'}
+                                      </span>
+                                      <span className="text-sm text-muted-foreground">Toolbox</span>
+                                    </div>
+                                  );
+                                })()}
+                              </div>
+                              
                               <div className="flex items-center justify-between">
                                 <span className="text-sm text-muted-foreground">Progress</span>
                                 <span className="text-2xl font-bold">{Math.round(progressPercent)}%</span>
