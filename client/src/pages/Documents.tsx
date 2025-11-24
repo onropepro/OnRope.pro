@@ -1231,9 +1231,9 @@ export default function Documents() {
 
   return (
     <div className="min-h-screen bg-background p-4 pb-24">
-      <div className="max-w-4xl mx-auto">
-        <div className="mb-6">
-          <div className="flex items-center gap-3 mb-4">
+      <div className="max-w-6xl mx-auto">
+        <div className="mb-8">
+          <div className="flex items-center gap-3 mb-2">
             <Button
               variant="ghost"
               size="icon"
@@ -1242,27 +1242,33 @@ export default function Documents() {
             >
               <ArrowLeft className="h-5 w-5" />
             </Button>
-            <h1 className="text-3xl font-bold">Documents</h1>
+            <h1 className="text-3xl font-bold">Documents & Records</h1>
           </div>
-          <p className="text-muted-foreground">All company documents and safety records</p>
+          <p className="text-muted-foreground ml-14">All company documents and safety records</p>
         </div>
 
         {/* Health & Safety Manual */}
-        <Card className="mb-6">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Shield className="h-5 w-5" />
-              Health & Safety Manual
-              <Badge variant="secondary" className="ml-auto">
+        <Card className="mb-6 overflow-hidden">
+          <CardHeader className="bg-gradient-to-br from-blue-500/10 via-blue-500/5 to-transparent pb-4">
+            <div className="flex items-start gap-4">
+              <div className="p-3 bg-blue-500/10 rounded-xl ring-1 ring-blue-500/20">
+                <Shield className="h-6 w-6 text-blue-600 dark:text-blue-400" />
+              </div>
+              <div className="flex-1">
+                <CardTitle className="text-xl mb-1">Health & Safety Manual</CardTitle>
+                <p className="text-sm text-muted-foreground">Essential workplace safety documentation</p>
+              </div>
+              <Badge variant="secondary" className="text-base font-semibold px-3">
                 {healthSafetyDocs.length}
               </Badge>
-            </CardTitle>
+            </div>
           </CardHeader>
-          <CardContent>
+          <CardContent className="pt-6">
             {canUploadDocuments && (
-              <div className="mb-4 p-4 border rounded-lg bg-muted/50">
-                <label htmlFor="health-safety-upload" className="block mb-2 text-sm font-medium">
-                  Upload Health & Safety Manual
+              <div className="mb-6 p-5 border-2 border-dashed rounded-xl bg-muted/30 hover-elevate">
+                <label htmlFor="health-safety-upload" className="block mb-3 text-sm font-semibold flex items-center gap-2">
+                  <Upload className="h-4 w-4" />
+                  Upload New Manual
                 </label>
                 <Input
                   id="health-safety-upload"
@@ -1279,68 +1285,85 @@ export default function Documents() {
                   data-testid="input-health-safety-upload"
                 />
                 {uploadingHealthSafety && (
-                  <p className="text-sm text-muted-foreground mt-2">Uploading...</p>
+                  <p className="text-sm text-muted-foreground mt-2 flex items-center gap-2">
+                    <span className="inline-block h-4 w-4 border-2 border-primary border-t-transparent rounded-full animate-spin"></span>
+                    Uploading...
+                  </p>
                 )}
               </div>
             )}
             
             {healthSafetyDocs.length > 0 ? (
-              <div className="space-y-2">
+              <div className="space-y-3">
                 {healthSafetyDocs.map((doc: any) => (
-                  <div key={doc.id} className="flex items-center gap-3 p-3 rounded-md border hover-elevate">
-                    <Shield className="h-5 w-5 text-primary flex-shrink-0" />
+                  <div key={doc.id} className="flex items-center gap-4 p-4 rounded-xl border bg-card hover-elevate active-elevate-2">
+                    <div className="p-2 bg-blue-500/10 rounded-lg">
+                      <Shield className="h-5 w-5 text-blue-600 dark:text-blue-400 flex-shrink-0" />
+                    </div>
                     <div className="flex-1 min-w-0">
-                      <div className="font-medium truncate">{doc.fileName}</div>
+                      <div className="font-semibold truncate">{doc.fileName}</div>
                       <div className="text-sm text-muted-foreground">
-                        Uploaded by {doc.uploadedByName} on {new Date(doc.createdAt).toLocaleDateString()}
+                        Uploaded by {doc.uploadedByName} • {new Date(doc.createdAt).toLocaleDateString()}
                       </div>
                     </div>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() => window.open(doc.fileUrl, '_blank')}
-                      data-testid={`download-health-safety-${doc.id}`}
-                    >
-                      <Download className="h-4 w-4 mr-1" />
-                      View
-                    </Button>
-                    {canUploadDocuments && (
+                    <div className="flex items-center gap-2">
                       <Button
                         size="sm"
-                        variant="ghost"
-                        onClick={() => deleteDocumentMutation.mutate(doc.id)}
-                        data-testid={`delete-health-safety-${doc.id}`}
+                        variant="outline"
+                        onClick={() => window.open(doc.fileUrl, '_blank')}
+                        data-testid={`download-health-safety-${doc.id}`}
                       >
-                        <Trash2 className="h-4 w-4 text-destructive" />
+                        <Download className="h-4 w-4 mr-1" />
+                        View
                       </Button>
-                    )}
+                      {canUploadDocuments && (
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={() => deleteDocumentMutation.mutate(doc.id)}
+                          data-testid={`delete-health-safety-${doc.id}`}
+                        >
+                          <Trash2 className="h-4 w-4 text-destructive" />
+                        </Button>
+                      )}
+                    </div>
                   </div>
                 ))}
               </div>
             ) : (
-              <p className="text-center py-8 text-muted-foreground">
-                No Health & Safety Manual uploaded yet
-              </p>
+              <div className="text-center py-12">
+                <div className="inline-flex p-4 bg-blue-500/5 rounded-full mb-4">
+                  <Shield className="h-8 w-8 text-blue-500/50" />
+                </div>
+                <p className="text-muted-foreground font-medium">No Health & Safety Manual uploaded yet</p>
+                <p className="text-sm text-muted-foreground mt-1">Upload your first document to get started</p>
+              </div>
             )}
           </CardContent>
         </Card>
 
         {/* Company Policies */}
-        <Card className="mb-6">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <BookOpen className="h-5 w-5" />
-              Company Policies
-              <Badge variant="secondary" className="ml-auto">
+        <Card className="mb-6 overflow-hidden">
+          <CardHeader className="bg-gradient-to-br from-purple-500/10 via-purple-500/5 to-transparent pb-4">
+            <div className="flex items-start gap-4">
+              <div className="p-3 bg-purple-500/10 rounded-xl ring-1 ring-purple-500/20">
+                <BookOpen className="h-6 w-6 text-purple-600 dark:text-purple-400" />
+              </div>
+              <div className="flex-1">
+                <CardTitle className="text-xl mb-1">Company Policies</CardTitle>
+                <p className="text-sm text-muted-foreground">Operational guidelines and procedures</p>
+              </div>
+              <Badge variant="secondary" className="text-base font-semibold px-3">
                 {policyDocs.length}
               </Badge>
-            </CardTitle>
+            </div>
           </CardHeader>
-          <CardContent>
+          <CardContent className="pt-6">
             {canUploadDocuments && (
-              <div className="mb-4 p-4 border rounded-lg bg-muted/50">
-                <label htmlFor="policy-upload" className="block mb-2 text-sm font-medium">
-                  Upload Company Policy
+              <div className="mb-6 p-5 border-2 border-dashed rounded-xl bg-muted/30 hover-elevate">
+                <label htmlFor="policy-upload" className="block mb-3 text-sm font-semibold flex items-center gap-2">
+                  <Upload className="h-4 w-4" />
+                  Upload New Policy
                 </label>
                 <Input
                   id="policy-upload"
@@ -1357,119 +1380,155 @@ export default function Documents() {
                   data-testid="input-policy-upload"
                 />
                 {uploadingPolicy && (
-                  <p className="text-sm text-muted-foreground mt-2">Uploading...</p>
+                  <p className="text-sm text-muted-foreground mt-2 flex items-center gap-2">
+                    <span className="inline-block h-4 w-4 border-2 border-primary border-t-transparent rounded-full animate-spin"></span>
+                    Uploading...
+                  </p>
                 )}
               </div>
             )}
             
             {policyDocs.length > 0 ? (
-              <div className="space-y-2">
+              <div className="space-y-3">
                 {policyDocs.map((doc: any) => (
-                  <div key={doc.id} className="flex items-center gap-3 p-3 rounded-md border hover-elevate">
-                    <BookOpen className="h-5 w-5 text-primary flex-shrink-0" />
+                  <div key={doc.id} className="flex items-center gap-4 p-4 rounded-xl border bg-card hover-elevate active-elevate-2">
+                    <div className="p-2 bg-purple-500/10 rounded-lg">
+                      <BookOpen className="h-5 w-5 text-purple-600 dark:text-purple-400 flex-shrink-0" />
+                    </div>
                     <div className="flex-1 min-w-0">
-                      <div className="font-medium truncate">{doc.fileName}</div>
+                      <div className="font-semibold truncate">{doc.fileName}</div>
                       <div className="text-sm text-muted-foreground">
-                        Uploaded by {doc.uploadedByName} on {new Date(doc.createdAt).toLocaleDateString()}
+                        Uploaded by {doc.uploadedByName} • {new Date(doc.createdAt).toLocaleDateString()}
                       </div>
                     </div>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() => window.open(doc.fileUrl, '_blank')}
-                      data-testid={`download-policy-${doc.id}`}
-                    >
-                      <Download className="h-4 w-4 mr-1" />
-                      View
-                    </Button>
-                    {canUploadDocuments && (
+                    <div className="flex items-center gap-2">
                       <Button
                         size="sm"
-                        variant="ghost"
-                        onClick={() => deleteDocumentMutation.mutate(doc.id)}
-                        data-testid={`delete-policy-${doc.id}`}
+                        variant="outline"
+                        onClick={() => window.open(doc.fileUrl, '_blank')}
+                        data-testid={`download-policy-${doc.id}`}
                       >
-                        <Trash2 className="h-4 w-4 text-destructive" />
+                        <Download className="h-4 w-4 mr-1" />
+                        View
                       </Button>
-                    )}
+                      {canUploadDocuments && (
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={() => deleteDocumentMutation.mutate(doc.id)}
+                          data-testid={`delete-policy-${doc.id}`}
+                        >
+                          <Trash2 className="h-4 w-4 text-destructive" />
+                        </Button>
+                      )}
+                    </div>
                   </div>
                 ))}
               </div>
             ) : (
-              <p className="text-center py-8 text-muted-foreground">
-                No Company Policies uploaded yet
-              </p>
+              <div className="text-center py-12">
+                <div className="inline-flex p-4 bg-purple-500/5 rounded-full mb-4">
+                  <BookOpen className="h-8 w-8 text-purple-500/50" />
+                </div>
+                <p className="text-muted-foreground font-medium">No Company Policies uploaded yet</p>
+                <p className="text-sm text-muted-foreground mt-1">Upload your first policy document</p>
+              </div>
             )}
           </CardContent>
         </Card>
 
-        {/* Rope Access Plans */}
-        <Card className="mb-6">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <FileText className="h-5 w-5" />
-              Rope Access Plans
-              <Badge variant="secondary" className="ml-auto">
-                {allDocuments.length}
-              </Badge>
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            {allDocuments.length > 0 ? (
-              <div className="space-y-2">
-                {allDocuments.map((doc, index) => {
-                  const filename = doc.url.split('/').pop() || 'Document';
-                  return (
-                    <div key={index} className="flex items-center gap-3 p-3 rounded-md border hover-elevate">
-                      <FileText className="h-5 w-5 text-primary flex-shrink-0" />
-                      <div className="flex-1 min-w-0">
-                        <div className="font-medium truncate">{doc.projectName}</div>
-                        <div className="text-sm text-muted-foreground">{filename}</div>
-                      </div>
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => window.open(doc.url, '_blank')}
-                        data-testid={`download-pdf-${index}`}
-                      >
-                        <Download className="h-4 w-4 mr-1" />
-                        Download
-                      </Button>
-                    </div>
-                  );
-                })}
+        {/* Rope Access Plans - Only visible if user has safety document permission */}
+        {canViewSafety && (
+          <Card className="mb-6 overflow-hidden">
+            <CardHeader className="bg-gradient-to-br from-teal-500/10 via-teal-500/5 to-transparent pb-4">
+              <div className="flex items-start gap-4">
+                <div className="p-3 bg-teal-500/10 rounded-xl ring-1 ring-teal-500/20">
+                  <FileText className="h-6 w-6 text-teal-600 dark:text-teal-400" />
+                </div>
+                <div className="flex-1">
+                  <CardTitle className="text-xl mb-1">Rope Access Plans</CardTitle>
+                  <p className="text-sm text-muted-foreground">Project-specific access plans and documentation</p>
+                </div>
+                <Badge variant="secondary" className="text-base font-semibold px-3">
+                  {allDocuments.length}
+                </Badge>
               </div>
-            ) : (
-              <p className="text-center py-8 text-muted-foreground">
-                No rope access plans uploaded yet
-              </p>
-            )}
-          </CardContent>
-        </Card>
+            </CardHeader>
+            <CardContent className="pt-6">
+              {allDocuments.length > 0 ? (
+                <div className="space-y-3">
+                  {allDocuments.map((doc, index) => {
+                    const filename = doc.url.split('/').pop() || 'Document';
+                    return (
+                      <div key={index} className="flex items-center gap-4 p-4 rounded-xl border bg-card hover-elevate active-elevate-2">
+                        <div className="p-2 bg-teal-500/10 rounded-lg">
+                          <FileText className="h-5 w-5 text-teal-600 dark:text-teal-400 flex-shrink-0" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="font-semibold truncate">{doc.projectName}</div>
+                          <div className="text-sm text-muted-foreground truncate">{filename}</div>
+                        </div>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => window.open(doc.url, '_blank')}
+                          data-testid={`download-pdf-${index}`}
+                        >
+                          <Download className="h-4 w-4 mr-1" />
+                          Download
+                        </Button>
+                      </div>
+                    );
+                  })}
+                </div>
+              ) : (
+                <div className="text-center py-12">
+                  <div className="inline-flex p-4 bg-teal-500/5 rounded-full mb-4">
+                    <FileText className="h-8 w-8 text-teal-500/50" />
+                  </div>
+                  <p className="text-muted-foreground font-medium">No rope access plans uploaded yet</p>
+                  <p className="text-sm text-muted-foreground mt-1">Plans will appear here when added to projects</p>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        )}
 
         {/* Toolbox Meetings */}
-        <Card className="mb-6">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Calendar className="h-5 w-5" />
-              Toolbox Meeting Records
-              <Badge variant="secondary" className="ml-auto">
+        <Card className="mb-6 overflow-hidden">
+          <CardHeader className="bg-gradient-to-br from-cyan-500/10 via-cyan-500/5 to-transparent pb-4">
+            <div className="flex items-start gap-4">
+              <div className="p-3 bg-cyan-500/10 rounded-xl ring-1 ring-cyan-500/20">
+                <Calendar className="h-6 w-6 text-cyan-600 dark:text-cyan-400" />
+              </div>
+              <div className="flex-1">
+                <CardTitle className="text-xl mb-1">Toolbox Meeting Records</CardTitle>
+                <p className="text-sm text-muted-foreground">Daily safety briefings and discussions</p>
+              </div>
+              <Badge variant="secondary" className="text-base font-semibold px-3">
                 {meetings.length}
               </Badge>
-            </CardTitle>
+            </div>
           </CardHeader>
-          <CardContent>
+          <CardContent className="pt-6">
             {meetings.length > 0 ? (
-              <div className="space-y-2">
+              <div className="space-y-3">
                 {meetings.map((meeting) => (
-                  <div key={meeting.id} className="flex items-center gap-3 p-3 rounded-md border hover-elevate">
-                    <Calendar className="h-5 w-5 text-primary flex-shrink-0" />
+                  <div key={meeting.id} className="flex items-center gap-4 p-4 rounded-xl border bg-card hover-elevate active-elevate-2">
+                    <div className="p-2 bg-cyan-500/10 rounded-lg">
+                      <Calendar className="h-5 w-5 text-cyan-600 dark:text-cyan-400 flex-shrink-0" />
+                    </div>
                     <div className="flex-1 min-w-0">
-                      <div className="font-medium">
-                        {new Date(meeting.meetingDate).toLocaleDateString()}
+                      <div className="font-semibold">
+                        {new Date(meeting.meetingDate).toLocaleDateString('en-US', { 
+                          weekday: 'short', 
+                          year: 'numeric', 
+                          month: 'short', 
+                          day: 'numeric' 
+                        })}
                       </div>
                       <div className="text-sm text-muted-foreground">
-                        Conducted by: {meeting.conductedByName}
+                        Conducted by {meeting.conductedByName}
                       </div>
                     </div>
                     <Button
@@ -1485,34 +1544,50 @@ export default function Documents() {
                 ))}
               </div>
             ) : (
-              <p className="text-center py-8 text-muted-foreground">
-                No toolbox meetings recorded yet
-              </p>
+              <div className="text-center py-12">
+                <div className="inline-flex p-4 bg-cyan-500/5 rounded-full mb-4">
+                  <Calendar className="h-8 w-8 text-cyan-500/50" />
+                </div>
+                <p className="text-muted-foreground font-medium">No toolbox meetings recorded yet</p>
+                <p className="text-sm text-muted-foreground mt-1">Safety meetings will appear here when conducted</p>
+              </div>
             )}
           </CardContent>
         </Card>
 
         {/* FLHA Forms - Only visible to users with safety document permission */}
         {canViewSafety && (
-          <Card className="mb-6">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Calendar className="h-5 w-5" />
-                FLHA Records
-                <Badge variant="secondary" className="ml-auto">
+          <Card className="mb-6 overflow-hidden">
+            <CardHeader className="bg-gradient-to-br from-orange-500/10 via-orange-500/5 to-transparent pb-4">
+              <div className="flex items-start gap-4">
+                <div className="p-3 bg-orange-500/10 rounded-xl ring-1 ring-orange-500/20">
+                  <Calendar className="h-6 w-6 text-orange-600 dark:text-orange-400" />
+                </div>
+                <div className="flex-1">
+                  <CardTitle className="text-xl mb-1">FLHA Records</CardTitle>
+                  <p className="text-sm text-muted-foreground">Field-level hazard assessments</p>
+                </div>
+                <Badge variant="secondary" className="text-base font-semibold px-3">
                   {flhaForms.length}
                 </Badge>
-              </CardTitle>
+              </div>
             </CardHeader>
-            <CardContent>
+            <CardContent className="pt-6">
               {flhaForms.length > 0 ? (
-                <div className="space-y-2">
+                <div className="space-y-3">
                   {flhaForms.map((flha) => (
-                    <div key={flha.id} className="flex items-center gap-3 p-3 rounded-md border hover-elevate">
-                      <Calendar className="h-5 w-5 text-primary flex-shrink-0" />
+                    <div key={flha.id} className="flex items-center gap-4 p-4 rounded-xl border bg-card hover-elevate active-elevate-2">
+                      <div className="p-2 bg-orange-500/10 rounded-lg">
+                        <Calendar className="h-5 w-5 text-orange-600 dark:text-orange-400 flex-shrink-0" />
+                      </div>
                       <div className="flex-1 min-w-0">
-                        <div className="font-medium">
-                          {new Date(flha.assessmentDate).toLocaleDateString()}
+                        <div className="font-semibold">
+                          {new Date(flha.assessmentDate).toLocaleDateString('en-US', { 
+                            weekday: 'short', 
+                            year: 'numeric', 
+                            month: 'short', 
+                            day: 'numeric' 
+                          })}
                         </div>
                         <div className="text-sm text-muted-foreground">
                           Assessor: {flha.assessorName}
@@ -1531,9 +1606,13 @@ export default function Documents() {
                   ))}
                 </div>
               ) : (
-                <p className="text-center py-8 text-muted-foreground">
-                  No FLHA forms recorded yet
-                </p>
+                <div className="text-center py-12">
+                  <div className="inline-flex p-4 bg-orange-500/5 rounded-full mb-4">
+                    <Calendar className="h-8 w-8 text-orange-500/50" />
+                  </div>
+                  <p className="text-muted-foreground font-medium">No FLHA forms recorded yet</p>
+                  <p className="text-sm text-muted-foreground mt-1">Hazard assessments will appear here when completed</p>
+                </div>
               )}
             </CardContent>
           </Card>
@@ -1541,92 +1620,110 @@ export default function Documents() {
 
         {/* Incident Reports - Only visible to users with safety document permission */}
         {canViewSafety && (
-          <Card className="mb-6">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <AlertTriangle className="h-5 w-5" />
-              Incident Reports
-              <Badge variant="secondary" className="ml-auto">
-                {incidentReports.length}
-              </Badge>
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            {incidentReports.length > 0 ? (
-              <div className="space-y-2">
-                {incidentReports.map((report) => (
-                  <div key={report.id} className="flex items-center gap-3 p-3 rounded-md border hover-elevate">
-                    <AlertTriangle className="h-5 w-5 text-destructive flex-shrink-0" />
-                    <div className="flex-1 min-w-0">
-                      <div className="font-medium">
-                        {new Date(report.incidentDate).toLocaleDateString()}
-                        {report.location && ` - ${report.location}`}
-                      </div>
-                      <div className="text-sm text-muted-foreground">
-                        {report.incidentType || 'Incident'} • Severity: {report.severity || 'N/A'}
-                      </div>
-                      {report.description && (
-                        <div className="text-sm text-muted-foreground mt-1 line-clamp-1">
-                          {report.description}
-                        </div>
-                      )}
-                    </div>
-                    {report.severity && (
-                      <Badge 
-                        variant={
-                          report.severity === 'critical' ? 'destructive' :
-                          report.severity === 'major' ? 'destructive' :
-                          report.severity === 'moderate' ? 'default' :
-                          'secondary'
-                        }
-                      >
-                        {report.severity}
-                      </Badge>
-                    )}
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() => downloadIncidentReport(report)}
-                      data-testid={`download-incident-${report.id}`}
-                    >
-                      <Download className="h-4 w-4 mr-1" />
-                      Download
-                    </Button>
-                  </div>
-                ))}
+          <Card className="mb-6 overflow-hidden">
+            <CardHeader className="bg-gradient-to-br from-red-500/10 via-red-500/5 to-transparent pb-4">
+              <div className="flex items-start gap-4">
+                <div className="p-3 bg-red-500/10 rounded-xl ring-1 ring-red-500/20">
+                  <AlertTriangle className="h-6 w-6 text-red-600 dark:text-red-400" />
+                </div>
+                <div className="flex-1">
+                  <CardTitle className="text-xl mb-1">Incident Reports</CardTitle>
+                  <p className="text-sm text-muted-foreground">Safety incidents and accident reports</p>
+                </div>
+                <Badge variant="secondary" className="text-base font-semibold px-3">
+                  {incidentReports.length}
+                </Badge>
               </div>
-            ) : (
-              <p className="text-center py-8 text-muted-foreground">
-                No incident reports recorded yet
-              </p>
-            )}
-          </CardContent>
-        </Card>
+            </CardHeader>
+            <CardContent className="pt-6">
+              {incidentReports.length > 0 ? (
+                <div className="space-y-3">
+                  {incidentReports.map((report) => (
+                    <div key={report.id} className="flex items-center gap-4 p-4 rounded-xl border bg-card hover-elevate active-elevate-2">
+                      <div className="p-2 bg-red-500/10 rounded-lg">
+                        <AlertTriangle className="h-5 w-5 text-red-600 dark:text-red-400 flex-shrink-0" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="font-semibold">
+                          {new Date(report.incidentDate).toLocaleDateString()}
+                          {report.location && <span className="text-muted-foreground font-normal"> • {report.location}</span>}
+                        </div>
+                        <div className="text-sm text-muted-foreground">
+                          {report.incidentType || 'Incident'} • Severity: {report.severity || 'N/A'}
+                        </div>
+                        {report.description && (
+                          <div className="text-sm text-muted-foreground mt-1 line-clamp-1">
+                            {report.description}
+                          </div>
+                        )}
+                      </div>
+                      {report.severity && (
+                        <Badge 
+                          variant={
+                            report.severity === 'critical' ? 'destructive' :
+                            report.severity === 'major' ? 'destructive' :
+                            report.severity === 'moderate' ? 'default' :
+                            'secondary'
+                          }
+                        >
+                          {report.severity}
+                        </Badge>
+                      )}
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => downloadIncidentReport(report)}
+                        data-testid={`download-incident-${report.id}`}
+                      >
+                        <Download className="h-4 w-4 mr-1" />
+                        Download
+                      </Button>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-12">
+                  <div className="inline-flex p-4 bg-red-500/5 rounded-full mb-4">
+                    <AlertTriangle className="h-8 w-8 text-red-500/50" />
+                  </div>
+                  <p className="text-muted-foreground font-medium">No incident reports recorded yet</p>
+                  <p className="text-sm text-muted-foreground mt-1">Safety incidents will be documented here</p>
+                </div>
+              )}
+            </CardContent>
+          </Card>
         )}
 
         {/* Method Statements */}
-        <Card className="mb-6">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <FileText className="h-5 w-5" />
-              Method Statements
-              <Badge variant="secondary" className="ml-auto">
+        <Card className="mb-6 overflow-hidden">
+          <CardHeader className="bg-gradient-to-br from-emerald-500/10 via-emerald-500/5 to-transparent pb-4">
+            <div className="flex items-start gap-4">
+              <div className="p-3 bg-emerald-500/10 rounded-xl ring-1 ring-emerald-500/20">
+                <FileText className="h-6 w-6 text-emerald-600 dark:text-emerald-400" />
+              </div>
+              <div className="flex-1">
+                <CardTitle className="text-xl mb-1">Method Statements</CardTitle>
+                <p className="text-sm text-muted-foreground">Work procedures and safety methods</p>
+              </div>
+              <Badge variant="secondary" className="text-base font-semibold px-3">
                 {methodStatements.length}
               </Badge>
-            </CardTitle>
+            </div>
           </CardHeader>
-          <CardContent>
+          <CardContent className="pt-6">
             {methodStatements.length > 0 ? (
-              <div className="space-y-2">
+              <div className="space-y-3">
                 {methodStatements.map((statement) => (
-                  <div key={statement.id} className="flex items-center gap-3 p-3 rounded-md border hover-elevate">
-                    <FileText className="h-5 w-5 text-green-500 flex-shrink-0" />
+                  <div key={statement.id} className="flex items-center gap-4 p-4 rounded-xl border bg-card hover-elevate active-elevate-2">
+                    <div className="p-2 bg-emerald-500/10 rounded-lg">
+                      <FileText className="h-5 w-5 text-emerald-600 dark:text-emerald-400 flex-shrink-0" />
+                    </div>
                     <div className="flex-1 min-w-0">
-                      <div className="font-medium">
+                      <div className="font-semibold">
                         {statement.location || 'Method Statement'}
                       </div>
                       <div className="text-sm text-muted-foreground">
-                        {new Date(statement.dateCreated).toLocaleDateString()} • Prepared by: {statement.preparedByName}
+                        {new Date(statement.dateCreated).toLocaleDateString()} • Prepared by {statement.preparedByName}
                       </div>
                       {statement.workDescription && (
                         <div className="text-sm text-muted-foreground mt-1 line-clamp-1">
@@ -1650,32 +1747,43 @@ export default function Documents() {
                 ))}
               </div>
             ) : (
-              <p className="text-center py-8 text-muted-foreground">
-                No method statements recorded yet
-              </p>
+              <div className="text-center py-12">
+                <div className="inline-flex p-4 bg-emerald-500/5 rounded-full mb-4">
+                  <FileText className="h-8 w-8 text-emerald-500/50" />
+                </div>
+                <p className="text-muted-foreground font-medium">No method statements recorded yet</p>
+                <p className="text-sm text-muted-foreground mt-1">Work procedures will be documented here</p>
+              </div>
             )}
           </CardContent>
         </Card>
 
         {/* Harness Inspections */}
-        <Card className="mb-6">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <span className="material-icons text-xl">verified_user</span>
-              Equipment Inspection Records
-              <Badge variant="secondary" className="ml-auto">
+        <Card className="mb-6 overflow-hidden">
+          <CardHeader className="bg-gradient-to-br from-indigo-500/10 via-indigo-500/5 to-transparent pb-4">
+            <div className="flex items-start gap-4">
+              <div className="p-3 bg-indigo-500/10 rounded-xl ring-1 ring-indigo-500/20">
+                <Shield className="h-6 w-6 text-indigo-600 dark:text-indigo-400" />
+              </div>
+              <div className="flex-1">
+                <CardTitle className="text-xl mb-1">Equipment Inspection Records</CardTitle>
+                <p className="text-sm text-muted-foreground">Rope access gear and safety equipment</p>
+              </div>
+              <Badge variant="secondary" className="text-base font-semibold px-3">
                 {inspections.length}
               </Badge>
-            </CardTitle>
+            </div>
           </CardHeader>
-          <CardContent>
+          <CardContent className="pt-6">
             {inspections.length > 0 ? (
-              <div className="space-y-2">
+              <div className="space-y-3">
                 {inspections.map((inspection) => (
-                  <div key={inspection.id} className="flex items-center gap-3 p-3 rounded-md border hover-elevate">
-                    <span className="material-icons text-primary flex-shrink-0">verified_user</span>
+                  <div key={inspection.id} className="flex items-center gap-4 p-4 rounded-xl border bg-card hover-elevate active-elevate-2">
+                    <div className="p-2 bg-indigo-500/10 rounded-lg">
+                      <Shield className="h-5 w-5 text-indigo-600 dark:text-indigo-400 flex-shrink-0" />
+                    </div>
                     <div className="flex-1 min-w-0">
-                      <div className="font-medium">
+                      <div className="font-semibold">
                         {new Date(inspection.inspectionDate).toLocaleDateString()} - {inspection.inspectorName}
                       </div>
                       <div className="text-sm text-muted-foreground">
@@ -1698,33 +1806,44 @@ export default function Documents() {
                 ))}
               </div>
             ) : (
-              <p className="text-center py-8 text-muted-foreground">
-                No equipment inspections recorded yet
-              </p>
+              <div className="text-center py-12">
+                <div className="inline-flex p-4 bg-indigo-500/5 rounded-full mb-4">
+                  <Shield className="h-8 w-8 text-indigo-500/50" />
+                </div>
+                <p className="text-muted-foreground font-medium">No equipment inspections recorded yet</p>
+                <p className="text-sm text-muted-foreground mt-1">Inspections will be logged here</p>
+              </div>
             )}
           </CardContent>
         </Card>
 
         {/* Service Quotes */}
         {canViewFinancials && (
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <DollarSign className="h-5 w-5" />
-                Service Quotes
-                <Badge variant="secondary" className="ml-auto">
+          <Card className="mb-6 overflow-hidden">
+            <CardHeader className="bg-gradient-to-br from-amber-500/10 via-amber-500/5 to-transparent pb-4">
+              <div className="flex items-start gap-4">
+                <div className="p-3 bg-amber-500/10 rounded-xl ring-1 ring-amber-500/20">
+                  <DollarSign className="h-6 w-6 text-amber-600 dark:text-amber-400" />
+                </div>
+                <div className="flex-1">
+                  <CardTitle className="text-xl mb-1">Service Quotes</CardTitle>
+                  <p className="text-sm text-muted-foreground">Client proposals and estimates</p>
+                </div>
+                <Badge variant="secondary" className="text-base font-semibold px-3">
                   {quotes.length}
                 </Badge>
-              </CardTitle>
+              </div>
             </CardHeader>
-            <CardContent>
+            <CardContent className="pt-6">
               {quotes.length > 0 ? (
-                <div className="space-y-2">
+                <div className="space-y-3">
                   {quotes.map((quote) => (
-                    <div key={quote.id} className="flex items-center gap-3 p-3 rounded-md border hover-elevate">
-                      <DollarSign className="h-5 w-5 text-primary flex-shrink-0" />
+                    <div key={quote.id} className="flex items-center gap-4 p-4 rounded-xl border bg-card hover-elevate active-elevate-2">
+                      <div className="p-2 bg-amber-500/10 rounded-lg">
+                        <DollarSign className="h-5 w-5 text-amber-600 dark:text-amber-400 flex-shrink-0" />
+                      </div>
                       <div className="flex-1 min-w-0">
-                        <div className="font-medium">{quote.buildingName}</div>
+                        <div className="font-semibold">{quote.buildingName}</div>
                         <div className="text-sm text-muted-foreground">
                           {quote.strataPlanNumber} • {quote.createdAt ? new Date(quote.createdAt).toLocaleDateString() : ''}
                         </div>
@@ -1745,9 +1864,13 @@ export default function Documents() {
                   ))}
                 </div>
               ) : (
-                <p className="text-center py-8 text-muted-foreground">
-                  No quotes created yet
-                </p>
+                <div className="text-center py-12">
+                  <div className="inline-flex p-4 bg-amber-500/5 rounded-full mb-4">
+                    <DollarSign className="h-8 w-8 text-amber-500/50" />
+                  </div>
+                  <p className="text-muted-foreground font-medium">No quotes created yet</p>
+                  <p className="text-sm text-muted-foreground mt-1">Service proposals will appear here</p>
+                </div>
               )}
             </CardContent>
           </Card>
