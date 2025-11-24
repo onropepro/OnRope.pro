@@ -52,6 +52,13 @@ const TIER_PRICES = {
   enterprise: { usd: 899, cad: 1199 },
 };
 
+const TIER_LIMITS = {
+  basic: { projects: 2, seats: 4 },
+  starter: { projects: 5, seats: 10 },
+  premium: { projects: 9, seats: 18 },
+  enterprise: { projects: Infinity, seats: Infinity },
+};
+
 export default function ManageSubscription() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
@@ -229,10 +236,10 @@ export default function ManageSubscription() {
               <div>
                 <CardTitle className="flex items-center gap-2">
                   <Crown className="w-5 h-5" />
-                  {tierName} Plan
+                  Current Plan
                 </CardTitle>
                 <CardDescription>
-                  {currencySymbol}{tierPrice}/month
+                  Your active subscription
                 </CardDescription>
               </div>
               <Badge variant={subscriptionData.cancelAtPeriodEnd ? "secondary" : "default"}>
@@ -241,6 +248,99 @@ export default function ManageSubscription() {
             </div>
           </CardHeader>
           <CardContent className="space-y-4">
+            {/* Base Subscription */}
+            <div className="flex items-center justify-between p-4 bg-muted/50 rounded-md">
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-primary/10 rounded-md">
+                  <Crown className="w-5 h-5 text-primary" />
+                </div>
+                <div>
+                  <h3 className="font-medium">{tierName}</h3>
+                  <p className="text-sm text-muted-foreground">
+                    {TIER_LIMITS[subscriptionData.tier].projects === Infinity 
+                      ? 'Unlimited projects' 
+                      : `${TIER_LIMITS[subscriptionData.tier].projects} projects`}, {TIER_LIMITS[subscriptionData.tier].seats === Infinity 
+                      ? 'unlimited seats' 
+                      : `${TIER_LIMITS[subscriptionData.tier].seats} seats`}
+                  </p>
+                </div>
+              </div>
+              <div className="text-right">
+                <p className="font-medium">{currencySymbol}{tierPrice}/month</p>
+              </div>
+            </div>
+
+            {/* Active Add-ons in Current Plan */}
+            {(subscriptionData.whitelabelBrandingActive || 
+              subscriptionData.additionalSeatsCount > 0 || 
+              subscriptionData.additionalProjectsCount > 0) && (
+              <>
+                <div className="text-sm font-medium text-muted-foreground">Active Add-ons:</div>
+                
+                {/* White Label Branding */}
+                {subscriptionData.whitelabelBrandingActive && (
+                  <div className="flex items-center justify-between p-4 bg-muted/50 rounded-md">
+                    <div className="flex items-center gap-3">
+                      <div className="p-2 bg-primary/10 rounded-md">
+                        <Palette className="w-5 h-5 text-primary" />
+                      </div>
+                      <div>
+                        <h3 className="font-medium">White Label Branding</h3>
+                        <p className="text-sm text-muted-foreground">
+                          Custom logo & brand colors
+                        </p>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <p className="font-medium">{currencySymbol}49/month</p>
+                    </div>
+                  </div>
+                )}
+
+                {/* Extra Seats Summary */}
+                {subscriptionData.additionalSeatsCount > 0 && (
+                  <div className="flex items-center justify-between p-4 bg-muted/50 rounded-md">
+                    <div className="flex items-center gap-3">
+                      <div className="p-2 bg-primary/10 rounded-md">
+                        <CreditCard className="w-5 h-5 text-primary" />
+                      </div>
+                      <div>
+                        <h3 className="font-medium">Extra Team Seats</h3>
+                        <p className="text-sm text-muted-foreground">
+                          {subscriptionData.additionalSeatsCount} pack{subscriptionData.additionalSeatsCount > 1 ? 's' : ''} ({subscriptionData.additionalSeatsCount * 2} seats)
+                        </p>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <p className="font-medium">{currencySymbol}{subscriptionData.additionalSeatsCount * 19}/month</p>
+                    </div>
+                  </div>
+                )}
+
+                {/* Extra Projects Summary */}
+                {subscriptionData.additionalProjectsCount > 0 && (
+                  <div className="flex items-center justify-between p-4 bg-muted/50 rounded-md">
+                    <div className="flex items-center gap-3">
+                      <div className="p-2 bg-primary/10 rounded-md">
+                        <CreditCard className="w-5 h-5 text-primary" />
+                      </div>
+                      <div>
+                        <h3 className="font-medium">Extra Projects</h3>
+                        <p className="text-sm text-muted-foreground">
+                          {subscriptionData.additionalProjectsCount} additional project{subscriptionData.additionalProjectsCount > 1 ? 's' : ''}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <p className="font-medium">{currencySymbol}{subscriptionData.additionalProjectsCount * 49}/month</p>
+                    </div>
+                  </div>
+                )}
+              </>
+            )}
+
+            <Separator />
+
             <div className="flex items-center gap-2 text-sm">
               <Calendar className="w-4 h-4 text-muted-foreground" />
               <span>
@@ -252,12 +352,11 @@ export default function ManageSubscription() {
 
             {!subscriptionData.cancelAtPeriodEnd && (
               <Button
-                variant="destructive"
+                variant="outline"
                 onClick={() => setCancelTarget('subscription')}
                 data-testid="button-cancel-main-subscription"
               >
-                <XCircle className="w-4 h-4 mr-2" />
-                Cancel Subscription
+                Manage Subscription
               </Button>
             )}
 
