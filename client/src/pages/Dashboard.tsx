@@ -2910,8 +2910,8 @@ export default function Dashboard() {
                             </div>
                             
                             <div className="space-y-3">
-                              {/* Safety Documents Status - Right Side Above Progress */}
-                              <div className="flex items-center justify-end gap-3 mb-2">
+                              {/* Safety Documents Status - Stacked Vertically */}
+                              <div className="flex flex-col items-end gap-1 mb-2">
                                 {/* Anchor Inspection Certificate */}
                                 <div className="flex items-center gap-1" title={project.anchorInspectionCertificateUrl ? "Anchor inspection uploaded" : "Anchor inspection missing"}>
                                   <span className={`material-icons text-base ${project.anchorInspectionCertificateUrl ? 'text-green-500' : 'text-red-500'}`}>
