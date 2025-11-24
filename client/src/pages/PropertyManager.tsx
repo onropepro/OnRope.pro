@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
-import { Building2, Plus, Mail, Phone, LogOut, Settings, FileText, Download, AlertCircle, CheckCircle2, Clock } from "lucide-react";
+import { Building2, Plus, Mail, Phone, LogOut, Settings, FileText, Download, AlertCircle, CheckCircle2, Clock, Upload, FileCheck } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Label } from "@/components/ui/label";
 import { useForm } from "react-hook-form";
@@ -41,6 +41,7 @@ export default function PropertyManager() {
   const [selectedProject, setSelectedProject] = useState<any | null>(null);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [strataNumber, setStrataNumber] = useState("");
+  const [uploadingAnchorInspection, setUploadingAnchorInspection] = useState(false);
   
   const accountForm = useForm<UpdatePropertyManagerAccount>({
     resolver: zodResolver(updatePropertyManagerAccountSchema),
@@ -245,6 +246,52 @@ export default function PropertyManager() {
       return;
     }
     addVendorMutation.mutate(companyCode.trim());
+  };
+
+  // Handle anchor inspection document upload
+  const handleAnchorInspectionUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file || !selectedProject || !selectedVendor) return;
+
+    setUploadingAnchorInspection(true);
+    try {
+      const formData = new FormData();
+      formData.append('document', file);
+
+      const response = await fetch(
+        `/api/property-managers/vendors/${selectedVendor.linkId}/projects/${selectedProject.id}/anchor-inspection`,
+        {
+          method: 'POST',
+          body: formData,
+          credentials: 'include',
+        }
+      );
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || 'Upload failed');
+      }
+
+      toast({
+        title: "Success",
+        description: "Anchor inspection document uploaded successfully",
+      });
+
+      // Refresh project details to show the new document
+      queryClient.invalidateQueries({ 
+        queryKey: ["/api/property-managers/vendors", selectedVendor.linkId, "projects", selectedProject.id] 
+      });
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to upload document",
+        variant: "destructive",
+      });
+    } finally {
+      setUploadingAnchorInspection(false);
+      // Reset the file input
+      event.target.value = '';
+    }
   };
 
   const onSubmitAccountSettings = (data: UpdatePropertyManagerAccount) => {
@@ -901,6 +948,65 @@ export default function PropertyManager() {
                         </CardContent>
                       </Card>
                     )}
+
+                    {/* Anchor Inspection Document */}
+                    <Card data-testid="card-anchor-inspection">
+                      <CardHeader>
+                        <CardTitle className="text-lg flex items-center gap-2">
+                          <FileCheck className="w-5 h-5" />
+                          Anchor Inspection Document
+                        </CardTitle>
+                        <CardDescription>
+                          Upload anchor inspection certificate for this project
+                        </CardDescription>
+                      </CardHeader>
+                      <CardContent className="space-y-3">
+                        {projectDetailsData.project.anchorInspectionCertificateUrl ? (
+                          <div className="space-y-2">
+                            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                              <CheckCircle2 className="w-4 h-4 text-green-500" />
+                              <span>Anchor inspection document uploaded</span>
+                            </div>
+                            <Button
+                              variant="outline"
+                              className="w-full"
+                              onClick={() => window.open(projectDetailsData.project.anchorInspectionCertificateUrl, '_blank')}
+                              data-testid="button-view-anchor-inspection"
+                            >
+                              <Download className="w-4 h-4 mr-2" />
+                              View/Download Document
+                            </Button>
+                          </div>
+                        ) : (
+                          <div className="text-sm text-muted-foreground">
+                            No anchor inspection document uploaded yet
+                          </div>
+                        )}
+                        
+                        {/* Upload new document */}
+                        <div>
+                          <input
+                            type="file"
+                            id="anchor-inspection-upload"
+                            className="hidden"
+                            accept=".pdf,image/*"
+                            onChange={handleAnchorInspectionUpload}
+                            disabled={uploadingAnchorInspection}
+                            data-testid="input-anchor-inspection-upload"
+                          />
+                          <Button
+                            variant="default"
+                            className="w-full"
+                            onClick={() => document.getElementById('anchor-inspection-upload')?.click()}
+                            disabled={uploadingAnchorInspection}
+                            data-testid="button-upload-anchor-inspection"
+                          >
+                            <Upload className="w-4 h-4 mr-2" />
+                            {uploadingAnchorInspection ? 'Uploading...' : (projectDetailsData.project.anchorInspectionCertificateUrl ? 'Upload New Document' : 'Upload Document')}
+                          </Button>
+                        </div>
+                      </CardContent>
+                    </Card>
 
                     {/* Complaints History */}
                     <Card data-testid="card-complaints-history">
