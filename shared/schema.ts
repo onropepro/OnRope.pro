@@ -833,6 +833,91 @@ export const incidentReports = pgTable("incident_reports", {
   index("IDX_incident_type").on(table.companyId, table.incidentType),
 ]);
 
+// Method Statements / Work Plans table - IRATA-compliant safe work method statements
+export const methodStatements = pgTable("method_statements", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  companyId: varchar("company_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  projectId: varchar("project_id").notNull().references(() => projects.id, { onDelete: "cascade" }),
+  preparedById: varchar("prepared_by_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  
+  // Basic Information
+  preparedByName: varchar("prepared_by_name").notNull(),
+  dateCreated: date("date_created").notNull(),
+  jobTitle: varchar("job_title").notNull(),
+  location: varchar("location").notNull(),
+  workDescription: text("work_description").notNull(),
+  
+  // Scope of Work
+  scopeDetails: text("scope_details").notNull(),
+  workDuration: varchar("work_duration"), // e.g., "3 days", "1 week"
+  numberOfWorkers: integer("number_of_workers"),
+  
+  // Hazards Identified
+  hazardsIdentified: text("hazards_identified").array().notNull().default(sql`ARRAY[]::text[]`),
+  
+  // Control Measures / Safe Work Procedures
+  controlMeasures: text("control_measures").array().notNull().default(sql`ARRAY[]::text[]`),
+  
+  // Required Equipment & PPE
+  requiredEquipment: text("required_equipment").array().notNull().default(sql`ARRAY[]::text[]`),
+  requiredPPE: text("required_ppe").array().notNull().default(sql`ARRAY[]::text[]`),
+  
+  // Emergency Procedures
+  emergencyProcedures: text("emergency_procedures").notNull(),
+  rescuePlan: text("rescue_plan"),
+  emergencyContacts: text("emergency_contacts"),
+  
+  // Permits & Approvals Required
+  permitsRequired: text("permits_required").array().default(sql`ARRAY[]::text[]`),
+  
+  // Environmental Conditions
+  weatherRestrictions: text("weather_restrictions"),
+  workingHeightRange: varchar("working_height_range"), // e.g., "20-50m"
+  accessMethod: varchar("access_method"), // e.g., "rope access", "suspended platform"
+  
+  // Competency Requirements
+  competencyRequirements: text("competency_requirements").array().default(sql`ARRAY[]::text[]`),
+  irataLevelRequired: varchar("irata_level_required"), // L1, L2, L3
+  
+  // Communication Plan
+  communicationMethod: text("communication_method"),
+  signalProtocol: text("signal_protocol"),
+  
+  // Team Members Assigned
+  teamMembers: text("team_members").array().notNull().default(sql`ARRAY[]::text[]`),
+  
+  // Review & Approval
+  reviewedById: varchar("reviewed_by_id").references(() => users.id),
+  reviewedByName: varchar("reviewed_by_name"),
+  reviewDate: date("review_date"),
+  approvedById: varchar("approved_by_id").references(() => users.id),
+  approvedByName: varchar("approved_by_name"),
+  approvalDate: date("approval_date"),
+  
+  // Digital Signatures
+  signatures: jsonb("signatures").$type<Array<{ 
+    role: string; // "preparer" | "reviewer" | "approver" | "worker"
+    employeeId: string; 
+    employeeName: string; 
+    signatureDataUrl: string;
+    signedAt: string;
+  }>>().default(sql`'[]'::jsonb`),
+  
+  // PDF storage
+  pdfUrl: text("pdf_url"),
+  
+  // Status
+  status: varchar("status").notNull().default('draft'), // draft | active | archived
+  
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+}, (table) => [
+  index("IDX_method_statements_company_date").on(table.companyId, table.dateCreated),
+  index("IDX_method_statements_project").on(table.projectId, table.dateCreated),
+  index("IDX_method_statements_preparer").on(table.preparedById, table.dateCreated),
+  index("IDX_method_statements_status").on(table.companyId, table.status),
+]);
+
 // Company documents table - for policy and safety manuals
 export const companyDocuments = pgTable("company_documents", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
@@ -1300,6 +1385,13 @@ export const insertIncidentReportSchema = createInsertSchema(incidentReports).om
   pdfUrl: true, // Generated server-side
 });
 
+export const insertMethodStatementSchema = createInsertSchema(methodStatements).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+  pdfUrl: true, // Generated server-side
+});
+
 export const insertPayPeriodConfigSchema = createInsertSchema(payPeriodConfig).omit({
   id: true,
   createdAt: true,
@@ -1431,6 +1523,9 @@ export type InsertFlhaForm = z.infer<typeof insertFlhaFormSchema>;
 
 export type IncidentReport = typeof incidentReports.$inferSelect;
 export type InsertIncidentReport = z.infer<typeof insertIncidentReportSchema>;
+
+export type MethodStatement = typeof methodStatements.$inferSelect;
+export type InsertMethodStatement = z.infer<typeof insertMethodStatementSchema>;
 
 export type PayPeriodConfig = typeof payPeriodConfig.$inferSelect;
 export type InsertPayPeriodConfig = z.infer<typeof insertPayPeriodConfigSchema>;
