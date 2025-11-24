@@ -579,12 +579,19 @@ export default function Inventory() {
       });
 
       workersWithSessions.forEach((workerId) => {
-        totalRequiredInspections++;
-        const hasInspection = harnessInspections.some((inspection: any) =>
+        // Find inspection for this worker on this date
+        const inspection = harnessInspections.find((inspection: any) =>
           inspection.workerId === workerId && inspection.inspectionDate === dateStr
         );
-        if (hasInspection) {
-          totalCompletedInspections++;
+        
+        // Only count workers who needed harness inspection (exclude "not_applicable")
+        if (!inspection || inspection.overallStatus !== "not_applicable") {
+          totalRequiredInspections++;
+          
+          // Count as completed if they have an inspection that's not "not_applicable"
+          if (inspection && inspection.overallStatus !== "not_applicable") {
+            totalCompletedInspections++;
+          }
         }
       });
     });
