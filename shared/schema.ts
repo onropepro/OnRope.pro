@@ -193,6 +193,7 @@ export const projects = pgTable("projects", {
   startDate: date("start_date"), // Schedule start date
   endDate: date("end_date"), // Schedule end date
   ropeAccessPlanUrl: text("rope_access_plan_url"), // URL to current PDF in object storage
+  anchorInspectionCertificateUrl: text("anchor_inspection_certificate_url"), // URL to anchor inspection certificate PDF in object storage
   documentUrls: text("document_urls").array().default(sql`ARRAY[]::text[]`), // Array of all uploaded document URLs (PDFs)
   imageUrls: text("image_urls").array().default(sql`ARRAY[]::text[]`), // Array of image URLs from object storage
   status: varchar("status").notNull().default('active'), // active | completed
