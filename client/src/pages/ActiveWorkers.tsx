@@ -147,6 +147,43 @@ export default function ActiveWorkers() {
     return days;
   }, [inspectionFilter, allSessions]);
 
+  // Calculate company safety rating - percentage of required inspections completed
+  const companySafetyRating = useMemo(() => {
+    let totalRequiredInspections = 0;
+    let totalCompletedInspections = 0;
+
+    // For each day in the current filter period
+    inspectionDays.forEach((date) => {
+      const dateStr = format(date, 'yyyy-MM-dd');
+      
+      // Find all unique employees who had work sessions on this day
+      const workersWithSessions = new Set<string>();
+      allSessions.forEach((session: any) => {
+        if (!session.startTime || !session.employeeId) return;
+        const sessionDate = new Date(session.startTime);
+        const sessionDateStr = format(sessionDate, 'yyyy-MM-dd');
+        if (sessionDateStr === dateStr) {
+          workersWithSessions.add(session.employeeId);
+        }
+      });
+
+      // Count how many of those workers submitted inspections
+      workersWithSessions.forEach((workerId) => {
+        totalRequiredInspections++;
+        const hasInspection = harnessInspections.some((inspection: any) =>
+          inspection.workerId === workerId && inspection.inspectionDate === dateStr
+        );
+        if (hasInspection) {
+          totalCompletedInspections++;
+        }
+      });
+    });
+
+    // Calculate percentage
+    if (totalRequiredInspections === 0) return 0;
+    return Math.round((totalCompletedInspections / totalRequiredInspections) * 100);
+  }, [inspectionDays, allSessions, harnessInspections]);
+
   // Filter sessions by time period (using startTime instead of workDate)
   const filteredSessions = useMemo(() => {
     const now = new Date();
@@ -432,7 +469,46 @@ export default function ActiveWorkers() {
                   </div>
                 </div>
               </CardHeader>
-              <CardContent className="overflow-x-auto">
+              <CardContent className="space-y-6">
+                {/* Company Safety Rating */}
+                <Card className="border-2" style={{
+                  borderColor: companySafetyRating >= 90 ? 'hsl(142, 76%, 36%)' : 
+                               companySafetyRating >= 70 ? 'hsl(48, 96%, 53%)' : 
+                               'hsl(0, 84%, 60%)',
+                  backgroundColor: companySafetyRating >= 90 ? 'hsl(142, 76%, 96%)' : 
+                                   companySafetyRating >= 70 ? 'hsl(48, 96%, 95%)' : 
+                                   'hsl(0, 84%, 96%)'
+                }}>
+                  <CardContent className="p-6">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <div className="text-sm font-medium text-muted-foreground mb-1">
+                          Company Safety Rating
+                        </div>
+                        <div className="text-xs text-muted-foreground">
+                          {inspectionFilter === "week" ? "Last 7 Days" : 
+                           inspectionFilter === "month" ? "Last 30 Days" : 
+                           "All Time"}
+                        </div>
+                      </div>
+                      <div className="text-center">
+                        <div className="text-5xl font-bold" style={{
+                          color: companySafetyRating >= 90 ? 'hsl(142, 76%, 36%)' : 
+                                 companySafetyRating >= 70 ? 'hsl(48, 96%, 53%)' : 
+                                 'hsl(0, 84%, 60%)'
+                        }}>
+                          {companySafetyRating}%
+                        </div>
+                        <div className="text-sm text-muted-foreground mt-1">
+                          Inspection Compliance
+                        </div>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Inspection Grid */}
+                <div className="overflow-x-auto">
                 <table className="w-full">
                   <thead>
                     <tr className="border-b">
@@ -489,6 +565,7 @@ export default function ActiveWorkers() {
                     )}
                   </tbody>
                 </table>
+                </div>
               </CardContent>
             </Card>
           </TabsContent>
