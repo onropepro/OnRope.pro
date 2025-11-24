@@ -15,7 +15,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
-import { ArrowLeft, AlertTriangle, PenTool, Plus, X, Trash2, Shield } from "lucide-react";
+import { ArrowLeft, AlertTriangle, PenTool, Plus, X, Trash2 } from "lucide-react";
 import type { Project } from "@shared/schema";
 import SignatureCanvas from "react-signature-canvas";
 
@@ -302,45 +302,6 @@ export default function IncidentReportForm() {
             </div>
           </div>
         </div>
-
-        <Card className="mb-4 border-primary/20 bg-primary/5">
-          <CardHeader>
-            <div className="flex items-center gap-2">
-              <Shield className="h-5 w-5 text-primary" />
-              <CardTitle className="text-lg">IRATA International Code of Practice (ICOP)</CardTitle>
-            </div>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            <p className="text-sm text-muted-foreground">
-              All rope access operations must comply with the IRATA International Code of Practice for Industrial Rope Access (TC-102ENG).
-              This document outlines mandatory safety requirements, technical procedures, and best practices for rope access work.
-            </p>
-            <div className="flex flex-wrap gap-2">
-              <Badge variant="outline" className="text-xs">
-                <a 
-                  href="https://irata.org/downloads/2055" 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-1 hover:text-primary"
-                  data-testid="link-irata-icop"
-                >
-                  Download Official ICOP Document
-                </a>
-              </Badge>
-              <Badge variant="outline" className="text-xs">
-                <a 
-                  href="https://irata.org/page/international-code-of-practice" 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-1 hover:text-primary"
-                  data-testid="link-irata-icop-info"
-                >
-                  View IRATA ICOP Information
-                </a>
-              </Badge>
-            </div>
-          </CardContent>
-        </Card>
 
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
