@@ -1,12 +1,13 @@
 import { useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
+import { useLocation } from "wouter";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
-import { Building2, Plus, Mail, Phone, FileText, X } from "lucide-react";
+import { Building2, Plus, Mail, Phone, FileText, X, LogOut } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Label } from "@/components/ui/label";
 
@@ -23,6 +24,7 @@ type VendorSummary = {
 
 export default function PropertyManager() {
   const { toast } = useToast();
+  const [, setLocation] = useLocation();
   const [addCodeOpen, setAddCodeOpen] = useState(false);
   const [companyCode, setCompanyCode] = useState("");
   const [selectedVendor, setSelectedVendor] = useState<VendorSummary | null>(null);
@@ -30,6 +32,29 @@ export default function PropertyManager() {
   const { data: vendorsData, isLoading } = useQuery<{ vendors: VendorSummary[] }>({
     queryKey: ["/api/property-managers/me/vendors"],
   });
+
+  const handleLogout = async () => {
+    try {
+      await fetch("/api/logout", {
+        method: "POST",
+        credentials: "include",
+      });
+      
+      await queryClient.invalidateQueries({ queryKey: ["/api/user"] });
+      setLocation("/login");
+      
+      toast({
+        title: "Logged Out",
+        description: "You have been successfully logged out.",
+      });
+    } catch (error) {
+      toast({
+        title: "Logout Failed",
+        description: "An error occurred while logging out. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
 
   const addVendorMutation = useMutation({
     mutationFn: async (code: string) => {
@@ -74,11 +99,21 @@ export default function PropertyManager() {
   return (
     <div className="min-h-screen bg-background p-4 md:p-6">
       <div className="max-w-6xl mx-auto">
-        <div className="mb-6">
-          <h1 className="text-3xl font-bold mb-2" data-testid="text-page-title">My Vendors</h1>
-          <p className="text-muted-foreground" data-testid="text-page-description">
-            Manage your connected rope access companies and view their information
-          </p>
+        <div className="mb-6 flex flex-wrap items-start justify-between gap-4">
+          <div>
+            <h1 className="text-3xl font-bold mb-2" data-testid="text-page-title">My Vendors</h1>
+            <p className="text-muted-foreground" data-testid="text-page-description">
+              Manage your connected rope access companies and view their information
+            </p>
+          </div>
+          <Button 
+            variant="outline" 
+            onClick={handleLogout}
+            data-testid="button-logout"
+          >
+            <LogOut className="w-4 h-4 mr-2" />
+            Log Out
+          </Button>
         </div>
 
         <Card className="mb-6" data-testid="card-my-vendors">
