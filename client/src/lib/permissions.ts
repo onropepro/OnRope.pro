@@ -85,6 +85,23 @@ export function canViewSchedule(user: User | null | undefined): boolean {
   return user.permissions?.includes('view_schedule') || false;
 }
 
+// Check if user can view safety documents (incident reports, FLHA forms, rope access plans)
+export function canViewSafetyDocuments(user: User | null | undefined): boolean {
+  if (!user) return false;
+  
+  // Company role always has access
+  if (user.role === 'company') return true;
+  
+  // Operations managers always have access to safety documents
+  if (user.role === 'operations_manager') return true;
+  
+  // Supervisors always have access to safety documents
+  if (user.role === 'supervisor') return true;
+  
+  // Check granular permissions - rope_access_tech and other roles need explicit permission
+  return user.permissions?.includes('view_safety_documents') || false;
+}
+
 // Check if user has specific permission
 export function hasPermission(user: User | null | undefined, permission: string): boolean {
   if (!user) return false;

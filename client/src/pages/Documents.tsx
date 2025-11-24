@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { FileText, Download, Calendar, DollarSign, Upload, Trash2, Shield, BookOpen, ArrowLeft, AlertTriangle, Plus } from "lucide-react";
-import { hasFinancialAccess } from "@/lib/permissions";
+import { hasFinancialAccess, canViewSafetyDocuments } from "@/lib/permissions";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { jsPDF } from "jspdf";
@@ -56,6 +56,7 @@ export default function Documents() {
 
   const currentUser = userData?.user;
   const canViewFinancials = hasFinancialAccess(currentUser);
+  const canViewSafety = canViewSafetyDocuments(currentUser);
   const canUploadDocuments = currentUser?.role === 'company' || currentUser?.role === 'operations_manager';
   const projects = projectsData?.projects || [];
   const meetings = meetingsData?.meetings || [];
@@ -69,15 +70,15 @@ export default function Documents() {
   const healthSafetyDocs = companyDocuments.filter((doc: any) => doc.documentType === 'health_safety_manual');
   const policyDocs = companyDocuments.filter((doc: any) => doc.documentType === 'company_policy');
 
-  // Collect all rope access plan PDFs
-  const allDocuments = projects.flatMap(project => 
+  // Collect all rope access plan PDFs - only if user has permission
+  const allDocuments = canViewSafety ? projects.flatMap(project => 
     (project.documentUrls || []).map((url: string) => ({
       type: 'pdf',
       url,
       projectName: project.buildingName,
       date: project.createdAt
     }))
-  );
+  ) : [];
 
   // Helper function to add company branding to PDFs when active
   const addCompanyBranding = (doc: jsPDF, pageWidth: number): number => {
@@ -1491,53 +1492,56 @@ export default function Documents() {
           </CardContent>
         </Card>
 
-        {/* FLHA Forms */}
-        <Card className="mb-6">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Calendar className="h-5 w-5" />
-              FLHA Records
-              <Badge variant="secondary" className="ml-auto">
-                {flhaForms.length}
-              </Badge>
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            {flhaForms.length > 0 ? (
-              <div className="space-y-2">
-                {flhaForms.map((flha) => (
-                  <div key={flha.id} className="flex items-center gap-3 p-3 rounded-md border hover-elevate">
-                    <Calendar className="h-5 w-5 text-primary flex-shrink-0" />
-                    <div className="flex-1 min-w-0">
-                      <div className="font-medium">
-                        {new Date(flha.assessmentDate).toLocaleDateString()}
+        {/* FLHA Forms - Only visible to users with safety document permission */}
+        {canViewSafety && (
+          <Card className="mb-6">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Calendar className="h-5 w-5" />
+                FLHA Records
+                <Badge variant="secondary" className="ml-auto">
+                  {flhaForms.length}
+                </Badge>
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              {flhaForms.length > 0 ? (
+                <div className="space-y-2">
+                  {flhaForms.map((flha) => (
+                    <div key={flha.id} className="flex items-center gap-3 p-3 rounded-md border hover-elevate">
+                      <Calendar className="h-5 w-5 text-primary flex-shrink-0" />
+                      <div className="flex-1 min-w-0">
+                        <div className="font-medium">
+                          {new Date(flha.assessmentDate).toLocaleDateString()}
+                        </div>
+                        <div className="text-sm text-muted-foreground">
+                          Assessor: {flha.assessorName}
+                        </div>
                       </div>
-                      <div className="text-sm text-muted-foreground">
-                        Assessor: {flha.assessorName}
-                      </div>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => downloadFlhaForm(flha)}
+                        data-testid={`download-flha-${flha.id}`}
+                      >
+                        <Download className="h-4 w-4 mr-1" />
+                        Download
+                      </Button>
                     </div>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() => downloadFlhaForm(flha)}
-                      data-testid={`download-flha-${flha.id}`}
-                    >
-                      <Download className="h-4 w-4 mr-1" />
-                      Download
-                    </Button>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <p className="text-center py-8 text-muted-foreground">
-                No FLHA forms recorded yet
-              </p>
-            )}
-          </CardContent>
-        </Card>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-center py-8 text-muted-foreground">
+                  No FLHA forms recorded yet
+                </p>
+              )}
+            </CardContent>
+          </Card>
+        )}
 
-        {/* Incident Reports */}
-        <Card className="mb-6">
+        {/* Incident Reports - Only visible to users with safety document permission */}
+        {canViewSafety && (
+          <Card className="mb-6">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <AlertTriangle className="h-5 w-5" />
@@ -1598,6 +1602,7 @@ export default function Documents() {
             )}
           </CardContent>
         </Card>
+        )}
 
         {/* Method Statements */}
         <Card className="mb-6">
