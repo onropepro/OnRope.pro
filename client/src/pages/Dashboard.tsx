@@ -2917,7 +2917,7 @@ export default function Dashboard() {
                                   <span className={`material-icons text-base ${project.anchorInspectionCertificateUrl ? 'text-green-500' : 'text-red-500'}`}>
                                     {project.anchorInspectionCertificateUrl ? 'check_circle' : 'cancel'}
                                   </span>
-                                  <span className="text-sm text-muted-foreground">Anchor</span>
+                                  <span className="text-sm text-muted-foreground">Anchor Inspection</span>
                                 </div>
                                 
                                 {/* Rope Access Plan */}
@@ -2925,7 +2925,7 @@ export default function Dashboard() {
                                   <span className={`material-icons text-base ${project.ropeAccessPlanUrl ? 'text-green-500' : 'text-red-500'}`}>
                                     {project.ropeAccessPlanUrl ? 'check_circle' : 'cancel'}
                                   </span>
-                                  <span className="text-sm text-muted-foreground">Plan</span>
+                                  <span className="text-sm text-muted-foreground">Rope Access Plan</span>
                                 </div>
                                 
                                 {/* Toolbox Meetings */}
@@ -2937,7 +2937,7 @@ export default function Dashboard() {
                                       <span className={`material-icons text-base ${hasMeetings ? 'text-green-500' : 'text-red-500'}`}>
                                         {hasMeetings ? 'check_circle' : 'cancel'}
                                       </span>
-                                      <span className="text-sm text-muted-foreground">Toolbox</span>
+                                      <span className="text-sm text-muted-foreground">Toolbox Meeting</span>
                                     </div>
                                   );
                                 })()}
