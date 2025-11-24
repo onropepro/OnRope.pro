@@ -535,6 +535,11 @@ export default function Dashboard() {
   const { data: toolboxMeetingsData } = useQuery({
     queryKey: ["/api/toolbox-meetings"],
   });
+
+  // Fetch company documents
+  const { data: companyDocumentsData } = useQuery({
+    queryKey: ["/api/company-documents"],
+  });
   
   const employees = employeesData?.employees || [];
   const todayDrops = myDropsData?.totalDropsToday || 0;
@@ -543,6 +548,11 @@ export default function Dashboard() {
   const complaints = complaintsData?.complaints || [];
   const harnessInspections = harnessInspectionsData?.inspections || [];
   const toolboxMeetings = toolboxMeetingsData?.meetings || [];
+  const companyDocuments = companyDocumentsData?.documents || [];
+  
+  // Check if specific company documents are uploaded
+  const hasHealthSafetyManual = companyDocuments.some((doc: any) => doc.documentType === 'health_safety_manual');
+  const hasCompanyPolicy = companyDocuments.some((doc: any) => doc.documentType === 'company_policy');
 
   // Calculate overall target met statistics across all projects
   const allWorkSessions = allWorkSessionsData?.sessions || [];
@@ -1955,6 +1965,27 @@ export default function Dashboard() {
             </div>
           </div>
           <div className="flex items-center gap-3">
+            {/* Company Document Status Badges */}
+            <div className="flex flex-col gap-1">
+              {/* Health & Safety Manual */}
+              <div className="flex items-center gap-1.5" title={hasHealthSafetyManual ? "Health & Safety Manual uploaded" : "Health & Safety Manual missing"}>
+                <span className={`material-icons text-lg ${hasHealthSafetyManual ? 'text-green-500' : 'text-red-500'}`}>
+                  {hasHealthSafetyManual ? 'check_circle' : 'cancel'}
+                </span>
+                <span className="text-sm text-muted-foreground">Health & Safety Manual</span>
+              </div>
+              
+              {/* Company Policy */}
+              <div className="flex items-center gap-1.5" title={hasCompanyPolicy ? "Company Policy uploaded" : "Company Policy missing"}>
+                <span className={`material-icons text-lg ${hasCompanyPolicy ? 'text-green-500' : 'text-red-500'}`}>
+                  {hasCompanyPolicy ? 'check_circle' : 'cancel'}
+                </span>
+                <span className="text-sm text-muted-foreground">Company Policy</span>
+              </div>
+            </div>
+            
+            <Separator orientation="vertical" className="h-12" />
+            
             <RefreshButton />
             <Button variant="ghost" size="icon" data-testid="button-profile" onClick={() => setLocation("/profile")} className="hover-elevate w-12 h-12">
               <span className="material-icons text-2xl">person</span>
