@@ -135,6 +135,25 @@ export default function ActiveWorkers() {
     return markers;
   }, [filteredSessions]);
 
+  // Get unique employees with their colors
+  const employeeColors = useMemo(() => {
+    const uniqueEmployees = new Map<string, { name: string; color: string }>();
+    
+    filteredSessions.forEach((session: any) => {
+      const employeeKey = session.employeeId || session.employeeName || 'unknown';
+      const employeeName = session.employeeName || 'Unknown Employee';
+      
+      if (!uniqueEmployees.has(employeeKey)) {
+        uniqueEmployees.set(employeeKey, {
+          name: employeeName,
+          color: stringToColor(employeeName || employeeKey),
+        });
+      }
+    });
+    
+    return Array.from(uniqueEmployees.values()).sort((a, b) => a.name.localeCompare(b.name));
+  }, [filteredSessions]);
+
   // Calculate map center and bounds
   const mapCenter = useMemo(() => {
     if (gpsMarkers.length === 0) return [49.2827, -123.1207]; // Default to Vancouver
@@ -380,19 +399,47 @@ export default function ActiveWorkers() {
               {gpsMarkers.length > 0 && (
                 <Card className="glass-card border-0 shadow-premium">
                   <CardContent className="p-4">
-                    <div className="text-sm font-medium mb-3">Legend</div>
-                    <div className="grid grid-cols-2 gap-4 text-sm">
-                      <div className="flex items-center gap-2">
-                        <div className="w-4 h-4 rounded-full border-2 border-primary bg-primary opacity-60"></div>
-                        <span>Start Location (Solid)</span>
+                    <div className="space-y-4">
+                      {/* Marker Type Legend */}
+                      <div>
+                        <div className="text-sm font-medium mb-3">Legend</div>
+                        <div className="grid grid-cols-2 gap-4 text-sm">
+                          <div className="flex items-center gap-2">
+                            <div className="w-4 h-4 rounded-full border-2 border-primary bg-primary opacity-60"></div>
+                            <span>Start Location (Solid)</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <div className="w-4 h-4 rounded-full border border-dashed border-primary bg-primary opacity-30"></div>
+                            <span>End Location (Dashed)</span>
+                          </div>
+                        </div>
                       </div>
-                      <div className="flex items-center gap-2">
-                        <div className="w-4 h-4 rounded-full border border-dashed border-primary bg-primary opacity-30"></div>
-                        <span>End Location (Dashed)</span>
+
+                      {/* Employee Color Chart */}
+                      {employeeColors.length > 0 && (
+                        <div className="pt-4 border-t">
+                          <div className="text-sm font-medium mb-3">Employee Colors</div>
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                            {employeeColors.map((employee) => (
+                              <div 
+                                key={employee.name} 
+                                className="flex items-center gap-2 text-sm"
+                                data-testid={`employee-color-${employee.name}`}
+                              >
+                                <div 
+                                  className="w-4 h-4 rounded-full border-2 border-white shadow-sm flex-shrink-0"
+                                  style={{ backgroundColor: employee.color }}
+                                ></div>
+                                <span className="truncate">{employee.name}</span>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      <div className="text-xs text-muted-foreground pt-4 border-t">
+                        {filteredSessions.length} session{filteredSessions.length !== 1 ? 's' : ''} shown from {employeeColors.length} employee{employeeColors.length !== 1 ? 's' : ''}.
                       </div>
-                    </div>
-                    <div className="text-xs text-muted-foreground mt-3">
-                      Each employee has a unique color. {filteredSessions.length} session{filteredSessions.length !== 1 ? 's' : ''} shown.
                     </div>
                   </CardContent>
                 </Card>
