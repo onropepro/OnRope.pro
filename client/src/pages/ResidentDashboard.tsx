@@ -164,6 +164,8 @@ export default function ResidentDashboard() {
     progressPercentage: progressData?.progressPercentage || 0,
     totalStalls: progressData?.totalStalls || activeProject?.totalStalls || 0,
     completedStalls: progressData?.completedStalls || 0,
+    totalSuites: progressData?.totalSuites || activeProject?.totalSuites || 0,
+    completedSuites: progressData?.completedSuites || 0,
   };
 
   const form = useForm<ComplaintFormData>({
@@ -838,61 +840,105 @@ export default function ResidentDashboard() {
 
           <TabsContent value="building" className="mt-6">
             <div className="bg-card/60 backdrop-blur-sm rounded-2xl border border-border/50 shadow-xl p-6 sm:p-8">
-              {activeProject?.jobType === 'parkade_pressure_cleaning' ? (
-                /* Parkade View for Parking Stall Cleaning */
-                <ParkadeView
-                  totalStalls={projectData.totalStalls}
-                  completedStalls={projectData.completedStalls}
-                  className="mb-8"
-                  customColor={primaryColor}
-                />
-              ) : activeProject?.jobType === 'in_suite_dryer_vent_cleaning' ? (
-                /* Floor/Unit Progress View for In-Suite Dryer Vent Cleaning */
-                <div className="space-y-6">
-                  <div className="text-center mb-8">
-                    <h3 
-                      className="text-5xl font-bold mb-2"
-                      style={hasCustomBranding && primaryColor ? { color: primaryColor } : {}}
-                    >
-                      {Math.round(projectData.progressPercentage)}%
-                    </h3>
-                    <p className="text-muted-foreground">
-                      Work in Progress
-                    </p>
-                  </div>
-                  
-                  {/* Progress Bar */}
-                  <div className="relative h-8 bg-muted rounded-full overflow-hidden">
-                    <div 
-                      className="absolute inset-y-0 left-0 transition-all duration-500 ease-out"
-                      style={hasCustomBranding && primaryColor ? { 
-                        width: `${projectData.progressPercentage}%`,
-                        background: `linear-gradient(to right, ${primaryColor}, ${primaryColor}cc)`
-                      } : {
-                        width: `${projectData.progressPercentage}%`
-                      }}
+              {(() => {
+                // Determine job type category
+                const isHoursBased = activeProject?.jobType === 'general_pressure_washing' || 
+                                    activeProject?.jobType === 'ground_window_cleaning';
+                const isInSuite = activeProject?.jobType === 'in_suite_dryer_vent_cleaning';
+                const isParkade = activeProject?.jobType === 'parkade_pressure_cleaning';
+                
+                if (isParkade) {
+                  // Parkade View for Parking Stall Cleaning
+                  return (
+                    <ParkadeView
+                      totalStalls={projectData.totalStalls}
+                      completedStalls={projectData.completedStalls}
+                      className="mb-8"
+                      customColor={primaryColor}
                     />
-                  </div>
-                </div>
-              ) : (
-                /* 4-Elevation Building View for other job types */
-                <HighRiseBuilding
-                  floors={projectData.floorCount}
-                  totalDropsNorth={projectData.totalDropsNorth ?? Math.floor(projectData.totalDrops / 4) + (projectData.totalDrops % 4 > 0 ? 1 : 0)}
-                  totalDropsEast={projectData.totalDropsEast ?? Math.floor(projectData.totalDrops / 4) + (projectData.totalDrops % 4 > 1 ? 1 : 0)}
-                  totalDropsSouth={projectData.totalDropsSouth ?? Math.floor(projectData.totalDrops / 4) + (projectData.totalDrops % 4 > 2 ? 1 : 0)}
-                  totalDropsWest={projectData.totalDropsWest ?? Math.floor(projectData.totalDrops / 4)}
-                  completedDropsNorth={projectData.completedDropsNorth ?? Math.floor(projectData.completedDrops / 4) + (projectData.completedDrops % 4 > 0 ? 1 : 0)}
-                  completedDropsEast={projectData.completedDropsEast ?? Math.floor(projectData.completedDrops / 4) + (projectData.completedDrops % 4 > 1 ? 1 : 0)}
-                  completedDropsSouth={projectData.completedDropsSouth ?? Math.floor(projectData.completedDrops / 4) + (projectData.completedDrops % 4 > 2 ? 1 : 0)}
-                  completedDropsWest={projectData.completedDropsWest ?? Math.floor(projectData.completedDrops / 4)}
-                  className="mb-8"
-                  customColor={primaryColor}
-                  customColors={brandColors}
-                />
-              )}
+                  );
+                } else if (isHoursBased) {
+                  // Hours-based: Show percentage only
+                  return (
+                    <div className="space-y-6">
+                      <div className="text-center mb-8">
+                        <h3 
+                          className="text-5xl font-bold mb-2"
+                          style={hasCustomBranding && primaryColor ? { color: primaryColor } : {}}
+                        >
+                          {Math.round(projectData.progressPercentage)}%
+                        </h3>
+                        <p className="text-muted-foreground">
+                          Work in Progress
+                        </p>
+                      </div>
+                      
+                      {/* Progress Bar */}
+                      <div className="relative h-8 bg-muted rounded-full overflow-hidden">
+                        <div 
+                          className="absolute inset-y-0 left-0 transition-all duration-500 ease-out"
+                          style={hasCustomBranding && primaryColor ? { 
+                            width: `${projectData.progressPercentage}%`,
+                            background: `linear-gradient(to right, ${primaryColor}, ${primaryColor}cc)`
+                          } : {
+                            width: `${projectData.progressPercentage}%`
+                          }}
+                        />
+                      </div>
+                    </div>
+                  );
+                } else if (isInSuite) {
+                  // In-suite: Show suite count progress
+                  return (
+                    <div className="space-y-6">
+                      <div className="text-center mb-8">
+                        <h3 
+                          className="text-5xl font-bold mb-2"
+                          style={hasCustomBranding && primaryColor ? { color: primaryColor } : {}}
+                        >
+                          {projectData.completedSuites} / {projectData.totalSuites}
+                        </h3>
+                        <p className="text-muted-foreground">
+                          Suites Completed
+                        </p>
+                      </div>
+                      
+                      {/* Progress Bar */}
+                      <div className="relative h-8 bg-muted rounded-full overflow-hidden">
+                        <div 
+                          className="absolute inset-y-0 left-0 transition-all duration-500 ease-out"
+                          style={hasCustomBranding && primaryColor ? { 
+                            width: `${projectData.totalSuites > 0 ? (projectData.completedSuites / projectData.totalSuites * 100) : 0}%`,
+                            background: `linear-gradient(to right, ${primaryColor}, ${primaryColor}cc)`
+                          } : {
+                            width: `${projectData.totalSuites > 0 ? (projectData.completedSuites / projectData.totalSuites * 100) : 0}%`
+                          }}
+                        />
+                      </div>
+                    </div>
+                  );
+                } else {
+                  // 4-Elevation Building View for elevation-based jobs (window_cleaning, building_wash, dryer_vent_cleaning)
+                  return (
+                    <HighRiseBuilding
+                      floors={projectData.floorCount}
+                      totalDropsNorth={projectData.totalDropsNorth ?? Math.floor(projectData.totalDrops / 4) + (projectData.totalDrops % 4 > 0 ? 1 : 0)}
+                      totalDropsEast={projectData.totalDropsEast ?? Math.floor(projectData.totalDrops / 4) + (projectData.totalDrops % 4 > 1 ? 1 : 0)}
+                      totalDropsSouth={projectData.totalDropsSouth ?? Math.floor(projectData.totalDrops / 4) + (projectData.totalDrops % 4 > 2 ? 1 : 0)}
+                      totalDropsWest={projectData.totalDropsWest ?? Math.floor(projectData.totalDrops / 4)}
+                      completedDropsNorth={projectData.completedDropsNorth ?? Math.floor(projectData.completedDrops / 4) + (projectData.completedDrops % 4 > 0 ? 1 : 0)}
+                      completedDropsEast={projectData.completedDropsEast ?? Math.floor(projectData.completedDrops / 4) + (projectData.completedDrops % 4 > 1 ? 1 : 0)}
+                      completedDropsSouth={projectData.completedDropsSouth ?? Math.floor(projectData.completedDrops / 4) + (projectData.completedDrops % 4 > 2 ? 1 : 0)}
+                      completedDropsWest={projectData.completedDropsWest ?? Math.floor(projectData.completedDrops / 4)}
+                      className="mb-8"
+                      customColor={primaryColor}
+                      customColors={brandColors}
+                    />
+                  );
+                }
+              })()}
 
-              {activeProject?.jobType !== 'parkade_pressure_cleaning' && (
+              {!['parkade_pressure_cleaning', 'in_suite_dryer_vent_cleaning', 'general_pressure_washing', 'ground_window_cleaning'].includes(activeProject?.jobType || '') && (
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-8">
                   <div 
                     className="text-center p-6 rounded-xl border"
