@@ -1,7 +1,9 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import { useQuery } from "@tanstack/react-query";
+import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage, FormDescription } from "@/components/ui/form";
@@ -62,6 +64,28 @@ type PropertyManagerFormData = z.infer<typeof propertyManagerSchema>;
 
 export default function Register() {
   const [activeTab, setActiveTab] = useState<"resident" | "company" | "property_manager">("resident");
+  const [, setLocation] = useLocation();
+
+  // Check if user is already logged in and redirect appropriately
+  const { data: userData } = useQuery<{ user: any }>({
+    queryKey: ["/api/user"],
+    retry: false,
+  });
+
+  useEffect(() => {
+    if (userData?.user) {
+      console.log("👤 Already logged in, redirecting...", userData.user.role);
+      if (userData.user.role === "resident") {
+        setLocation("/resident");
+      } else if (userData.user.role === "property_manager") {
+        setLocation("/property-manager");
+      } else if (userData.user.role === "superuser") {
+        setLocation("/superuser");
+      } else {
+        setLocation("/dashboard");
+      }
+    }
+  }, [userData, setLocation]);
 
   const residentForm = useForm<ResidentFormData>({
     resolver: zodResolver(residentSchema),
