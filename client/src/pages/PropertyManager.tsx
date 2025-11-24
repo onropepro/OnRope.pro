@@ -863,6 +863,102 @@ export default function PropertyManager() {
                       </CardContent>
                     </Card>
 
+                    {/* Progress Display - Different for each job type */}
+                    {(() => {
+                      const isHoursBased = projectDetailsData.project.jobType === 'general_pressure_washing' || 
+                                          projectDetailsData.project.jobType === 'ground_window_cleaning';
+                      const isInSuite = projectDetailsData.project.jobType === 'in_suite_dryer_vent_cleaning';
+                      const isParkade = projectDetailsData.project.jobType === 'parkade_pressure_cleaning';
+                      
+                      // Calculate completed sessions
+                      const completedSessions = (projectDetailsData.project.workSessions || [])
+                        .filter((s: any) => s.endTime !== null);
+                      
+                      if (isHoursBased) {
+                        // Hours-based: Show percentage from manualCompletionPercentage
+                        const sessionsWithPercentage = completedSessions.filter((s: any) => 
+                          s.manualCompletionPercentage !== null && s.manualCompletionPercentage !== undefined
+                        );
+                        
+                        let progressPercent = 0;
+                        if (sessionsWithPercentage.length > 0) {
+                          const sortedSessions = [...sessionsWithPercentage].sort((a: any, b: any) => 
+                            new Date(b.endTime).getTime() - new Date(a.endTime).getTime()
+                          );
+                          progressPercent = sortedSessions[0].manualCompletionPercentage;
+                        }
+                        
+                        return (
+                          <Card data-testid="card-project-progress">
+                            <CardContent className="pt-6">
+                              <div className="text-center space-y-4">
+                                <div>
+                                  <h3 className="text-5xl font-bold mb-2">{progressPercent}%</h3>
+                                  <p className="text-base font-medium text-foreground">Project Completion</p>
+                                  <p className="text-xs text-muted-foreground mt-1">Hours-based tracking</p>
+                                </div>
+                                <Progress value={progressPercent} className="h-3" />
+                              </div>
+                            </CardContent>
+                          </Card>
+                        );
+                      } else if (isInSuite) {
+                        // In-Suite: Show suite count progress
+                        const completedSuites = completedSessions.reduce((sum: number, s: any) => 
+                          sum + (s.dropsCompletedNorth ?? 0), 0
+                        );
+                        const totalSuites = projectDetailsData.project.floorCount || 0;
+                        const progressPercent = totalSuites > 0 
+                          ? Math.min(100, Math.round((completedSuites / totalSuites) * 100))
+                          : 0;
+                        
+                        return (
+                          <Card data-testid="card-project-progress">
+                            <CardContent className="pt-6">
+                              <div className="text-center space-y-4">
+                                <div>
+                                  <h3 className="text-5xl font-bold mb-2">{progressPercent}%</h3>
+                                  <p className="text-base font-medium text-foreground">Project Completion</p>
+                                  <p className="text-xs text-muted-foreground mt-1">
+                                    {completedSuites} of {totalSuites} units completed
+                                  </p>
+                                </div>
+                                <Progress value={progressPercent} className="h-3" />
+                              </div>
+                            </CardContent>
+                          </Card>
+                        );
+                      } else if (isParkade) {
+                        // Parkade: Show stall count progress
+                        const completedStalls = completedSessions.reduce((sum: number, s: any) => 
+                          sum + (s.dropsCompletedNorth ?? 0), 0
+                        );
+                        const totalStalls = projectDetailsData.project.totalStalls || projectDetailsData.project.floorCount || 0;
+                        const progressPercent = totalStalls > 0 
+                          ? Math.min(100, Math.round((completedStalls / totalStalls) * 100))
+                          : 0;
+                        
+                        return (
+                          <Card data-testid="card-project-progress">
+                            <CardContent className="pt-6">
+                              <div className="text-center space-y-4">
+                                <div>
+                                  <h3 className="text-5xl font-bold mb-2">{progressPercent}%</h3>
+                                  <p className="text-base font-medium text-foreground">Project Completion</p>
+                                  <p className="text-xs text-muted-foreground mt-1">
+                                    {completedStalls} of {totalStalls} stalls completed
+                                  </p>
+                                </div>
+                                <Progress value={progressPercent} className="h-3" />
+                              </div>
+                            </CardContent>
+                          </Card>
+                        );
+                      }
+                      
+                      return null;
+                    })()}
+
                     {/* Building Progress Visualization - Only for 4-elevation job types */}
                     {!['in_suite_dryer_vent_cleaning', 'parkade_pressure_cleaning', 'ground_window_cleaning', 'general_pressure_washing'].includes(projectDetailsData.project.jobType) && (
                       <Card data-testid="card-building-progress">
