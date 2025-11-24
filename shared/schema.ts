@@ -923,15 +923,17 @@ export const methodStatements = pgTable("method_statements", {
 export const companyDocuments = pgTable("company_documents", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   companyId: varchar("company_id").notNull().references(() => users.id, { onDelete: "cascade" }),
-  documentType: varchar("document_type").notNull(), // 'health_safety_manual' | 'company_policy'
+  documentType: varchar("document_type").notNull(), // 'health_safety_manual' | 'company_policy' | 'equipment_inspection'
   fileName: varchar("file_name").notNull(),
   fileUrl: text("file_url").notNull(),
   uploadedById: varchar("uploaded_by_id").notNull().references(() => users.id),
   uploadedByName: varchar("uploaded_by_name").notNull(),
+  projectId: varchar("project_id").references(() => projects.id, { onDelete: "set null" }), // Optional: link to specific project (for equipment inspections)
   createdAt: timestamp("created_at").defaultNow(),
 }, (table) => [
   index("IDX_company_docs_company").on(table.companyId),
   index("IDX_company_docs_type").on(table.companyId, table.documentType),
+  index("IDX_company_docs_project").on(table.projectId),
 ]);
 
 // Pay period configuration table - one per company
