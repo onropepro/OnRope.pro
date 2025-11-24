@@ -2194,6 +2194,31 @@ export class Storage {
       return projectStrata !== null && projectStrata === normalizedStrata;
     });
   }
+
+  async getPropertyManagerProjectDetails(projectId: string, companyId: string): Promise<{ project: any; complaints: any[] }> {
+    // Verify project belongs to the company
+    const [project] = await db.select()
+      .from(projects)
+      .where(and(
+        eq(projects.id, projectId),
+        eq(projects.companyId, companyId)
+      ));
+    
+    if (!project) {
+      throw new Error('Project not found or access denied');
+    }
+    
+    // Get complaints for this project
+    const projectComplaints = await db.select()
+      .from(complaints)
+      .where(eq(complaints.projectId, projectId))
+      .orderBy(desc(complaints.createdAt));
+    
+    return {
+      project,
+      complaints: projectComplaints,
+    };
+  }
 }
 
 export const storage = new Storage();

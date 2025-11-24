@@ -2083,6 +2083,33 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Property Manager: Get project details with complaints and documents
+  app.get("/api/property-managers/vendors/:linkId/projects/:projectId", requireAuth, requireRole("property_manager"), async (req: Request, res: Response) => {
+    try {
+      const { linkId, projectId } = req.params;
+      const propertyManagerId = req.session.userId!;
+      
+      // Verify the link belongs to this property manager
+      const links = await storage.getPropertyManagerCompanyLinks(propertyManagerId);
+      const ownedLink = links.find(link => link.id === linkId);
+      
+      if (!ownedLink) {
+        return res.status(403).json({ message: "Unauthorized: This vendor link does not belong to you" });
+      }
+      
+      // Get project details with complaints
+      const details = await storage.getPropertyManagerProjectDetails(projectId, ownedLink.companyId);
+      
+      res.json(details);
+    } catch (error: any) {
+      console.error("Get project details error:", error);
+      if (error.message?.includes('not found') || error.message?.includes('access denied')) {
+        return res.status(404).json({ message: error.message });
+      }
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
   // Property Manager: Update account settings
   app.patch("/api/property-managers/me/account", requireAuth, requireRole("property_manager"), async (req: Request, res: Response) => {
     try {
