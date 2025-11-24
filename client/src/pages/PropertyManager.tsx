@@ -16,6 +16,8 @@ import { updatePropertyManagerAccountSchema, type UpdatePropertyManagerAccount }
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
+import { Progress } from "@/components/ui/progress";
+import { HighRiseBuilding } from "@/components/HighRiseBuilding";
 
 type VendorSummary = {
   linkId: string;
@@ -809,6 +811,69 @@ export default function PropertyManager() {
                         </div>
                       </CardContent>
                     </Card>
+
+                    {/* Building Progress Visualization - Only for 4-elevation job types */}
+                    {!['in_suite_dryer_vent_cleaning', 'parkade_pressure_cleaning', 'ground_window_cleaning'].includes(projectDetailsData.project.jobType) && (
+                      <Card data-testid="card-building-progress">
+                        <CardHeader>
+                          <CardTitle className="text-lg">Building Progress</CardTitle>
+                          <CardDescription>
+                            Visual representation of work completed across all four elevations
+                          </CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                          {(() => {
+                            // Calculate completed drops from all work sessions
+                            const completedDropsNorth = (projectDetailsData.project.workSessions || [])
+                              .reduce((sum: number, s: any) => sum + (s.dropsCompletedNorth ?? 0), 0);
+                            const completedDropsEast = (projectDetailsData.project.workSessions || [])
+                              .reduce((sum: number, s: any) => sum + (s.dropsCompletedEast ?? 0), 0);
+                            const completedDropsSouth = (projectDetailsData.project.workSessions || [])
+                              .reduce((sum: number, s: any) => sum + (s.dropsCompletedSouth ?? 0), 0);
+                            const completedDropsWest = (projectDetailsData.project.workSessions || [])
+                              .reduce((sum: number, s: any) => sum + (s.dropsCompletedWest ?? 0), 0);
+                            
+                            const totalDrops = (projectDetailsData.project.totalDropsNorth ?? 0) + 
+                              (projectDetailsData.project.totalDropsEast ?? 0) + 
+                              (projectDetailsData.project.totalDropsSouth ?? 0) + 
+                              (projectDetailsData.project.totalDropsWest ?? 0);
+                            
+                            const completedDrops = completedDropsNorth + completedDropsEast + completedDropsSouth + completedDropsWest;
+                            const progressPercent = totalDrops > 0 
+                              ? Math.min(100, Math.round((completedDrops / totalDrops) * 100))
+                              : 0;
+
+                            return (
+                              <>
+                                <HighRiseBuilding
+                                  floors={projectDetailsData.project.floors || 25}
+                                  totalDropsNorth={projectDetailsData.project.totalDropsNorth ?? 0}
+                                  totalDropsEast={projectDetailsData.project.totalDropsEast ?? 0}
+                                  totalDropsSouth={projectDetailsData.project.totalDropsSouth ?? 0}
+                                  totalDropsWest={projectDetailsData.project.totalDropsWest ?? 0}
+                                  completedDropsNorth={completedDropsNorth}
+                                  completedDropsEast={completedDropsEast}
+                                  completedDropsSouth={completedDropsSouth}
+                                  completedDropsWest={completedDropsWest}
+                                />
+                                
+                                {/* Overall Progress Bar */}
+                                <div className="mt-6 space-y-2">
+                                  <div className="flex items-center justify-between text-sm">
+                                    <span className="text-muted-foreground">Overall Progress</span>
+                                    <span className="font-medium">{progressPercent}%</span>
+                                  </div>
+                                  <Progress value={progressPercent} className="h-2" />
+                                  <div className="text-xs text-muted-foreground text-center">
+                                    {completedDrops} of {totalDrops} drops completed
+                                  </div>
+                                </div>
+                              </>
+                            );
+                          })()}
+                        </CardContent>
+                      </Card>
+                    )}
 
                     {/* Rope Access Plan */}
                     {projectDetailsData.project.ropeAccessPlanUrl && (

@@ -2231,8 +2231,19 @@ export class Storage {
       .where(eq(complaints.projectId, projectId))
       .orderBy(desc(complaints.createdAt));
     
+    // Get work sessions for building progress calculation
+    const projectWorkSessions = await db.select()
+      .from(workSessions)
+      .where(and(
+        eq(workSessions.projectId, projectId),
+        eq(workSessions.status, 'completed')
+      ));
+    
     return {
-      project,
+      project: {
+        ...project,
+        workSessions: projectWorkSessions,
+      },
       complaints: projectComplaints,
     };
   }
