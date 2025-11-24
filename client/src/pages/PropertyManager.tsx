@@ -864,7 +864,7 @@ export default function PropertyManager() {
                     </Card>
 
                     {/* Building Progress Visualization - Only for 4-elevation job types */}
-                    {!['in_suite_dryer_vent_cleaning', 'parkade_pressure_cleaning', 'ground_window_cleaning'].includes(projectDetailsData.project.jobType) && (
+                    {!['in_suite_dryer_vent_cleaning', 'parkade_pressure_cleaning', 'ground_window_cleaning', 'general_pressure_washing'].includes(projectDetailsData.project.jobType) && (
                       <Card data-testid="card-building-progress">
                         <CardHeader>
                           <CardTitle className="text-lg">Building Progress</CardTitle>
