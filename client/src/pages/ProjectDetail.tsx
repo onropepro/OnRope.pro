@@ -393,6 +393,48 @@ export default function ProjectDetail() {
     },
   });
 
+  // Create "not applicable" inspection record
+  const createNotApplicableInspectionMutation = useMutation({
+    mutationFn: async () => {
+      if (!currentUser) throw new Error("User not found");
+      
+      const localDate = new Date();
+      const localDateString = `${localDate.getFullYear()}-${String(localDate.getMonth() + 1).padStart(2, '0')}-${String(localDate.getDate()).padStart(2, '0')}`;
+      
+      const response = await fetch('/api/harness-inspections', {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          projectId: id,
+          inspectionDate: localDateString,
+          inspectorName: currentUser.name || currentUser.email || "Unknown",
+          overallStatus: "not_applicable",
+          equipmentFindings: {},
+          comments: "Harness not required for this work session",
+        }),
+        credentials: "include",
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || "Failed to record harness status");
+      }
+
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/harness-inspections"] });
+      setShowHarnessInspectionDialog(false);
+      setShowStartDayDialog(true);
+    },
+    onError: (error: Error) => {
+      console.error("Error creating not applicable inspection:", error);
+      // Still proceed to start day dialog even if this fails
+      setShowHarnessInspectionDialog(false);
+      setShowStartDayDialog(true);
+    },
+  });
+
   const deleteProjectMutation = useMutation({
     mutationFn: async (projectId: string) => {
       const response = await fetch(`/api/projects/${projectId}`, {
@@ -2169,13 +2211,11 @@ export default function ProjectDetail() {
           <AlertDialogFooter className="flex-col sm:flex-row gap-2">
             <Button
               variant="outline"
-              onClick={() => {
-                setShowHarnessInspectionDialog(false);
-                setShowStartDayDialog(true);
-              }}
+              onClick={() => createNotApplicableInspectionMutation.mutate()}
+              disabled={createNotApplicableInspectionMutation.isPending}
               data-testid="button-harness-not-applicable"
             >
-              Not Applicable
+              {createNotApplicableInspectionMutation.isPending ? "Recording..." : "Not Applicable"}
             </Button>
             <Button
               variant="destructive"
