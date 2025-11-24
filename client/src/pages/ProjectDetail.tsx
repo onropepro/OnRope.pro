@@ -88,6 +88,7 @@ export default function ProjectDetail() {
   }
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [uploadingPdf, setUploadingPdf] = useState(false);
+  const [uploadingAnchorCertificate, setUploadingAnchorCertificate] = useState(false);
   const [uploadingImage, setUploadingImage] = useState(false);
   const [showPhotoDialog, setShowPhotoDialog] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -567,6 +568,40 @@ export default function ProjectDetail() {
       });
     } finally {
       setUploadingPdf(false);
+    }
+  };
+
+  const handleAnchorCertificateUpload = async (file: File) => {
+    if (!id) return;
+    
+    setUploadingAnchorCertificate(true);
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+      
+      const response = await fetch(`/api/projects/${id}/anchor-certificate`, {
+        method: 'PATCH',
+        body: formData,
+        credentials: 'include',
+      });
+      
+      const result = await response.json();
+      
+      if (!response.ok) {
+        throw new Error(result.message || 'Failed to upload anchor inspection certificate');
+      }
+      
+      queryClient.invalidateQueries({ queryKey: ["/api/projects", id] });
+      queryClient.invalidateQueries({ queryKey: ["/api/projects"] });
+      toast({ title: "Anchor inspection certificate uploaded successfully" });
+    } catch (error) {
+      toast({ 
+        title: "Upload failed", 
+        description: error instanceof Error ? error.message : "Failed to upload anchor inspection certificate", 
+        variant: "destructive" 
+      });
+    } finally {
+      setUploadingAnchorCertificate(false);
     }
   };
 
@@ -1442,6 +1477,63 @@ export default function ProjectDetail() {
                   const file = e.target.files?.[0];
                   if (file) {
                     handlePdfUpload(file);
+                    e.target.value = '';
+                  }
+                }}
+              />
+            </div>
+
+            <Separator />
+
+            {/* Anchor Inspection Certificate Section */}
+            <div className="space-y-3">
+              <div className="flex items-center gap-2">
+                <span className="material-icons text-primary">verified</span>
+                <h3 className="font-medium">Anchor Inspection Certificate</h3>
+              </div>
+              {project.anchorInspectionCertificateUrl ? (
+                <div className="flex gap-2">
+                  <Button
+                    variant="outline"
+                    className="flex-1 h-12 gap-2"
+                    onClick={() => window.open(project.anchorInspectionCertificateUrl!, '_blank')}
+                    data-testid="button-view-anchor-certificate"
+                  >
+                    <span className="material-icons text-lg">description</span>
+                    View Certificate
+                  </Button>
+                  <Button
+                    variant="outline"
+                    className="h-12 gap-2"
+                    onClick={() => document.getElementById('anchor-certificate-input')?.click()}
+                    disabled={uploadingAnchorCertificate}
+                    data-testid="button-replace-anchor-certificate"
+                  >
+                    <span className="material-icons text-lg">upload</span>
+                    {uploadingAnchorCertificate ? "Uploading..." : "Replace"}
+                  </Button>
+                </div>
+              ) : (
+                <Button
+                  variant="outline"
+                  className="w-full h-12 gap-2"
+                  onClick={() => document.getElementById('anchor-certificate-input')?.click()}
+                  disabled={uploadingAnchorCertificate}
+                  data-testid="button-upload-anchor-certificate"
+                >
+                  <span className="material-icons text-lg">upload</span>
+                  {uploadingAnchorCertificate ? "Uploading..." : "Upload Certificate"}
+                </Button>
+              )}
+              <input
+                id="anchor-certificate-input"
+                type="file"
+                accept="application/pdf"
+                className="hidden"
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (file) {
+                    handleAnchorCertificateUpload(file);
                     e.target.value = '';
                   }
                 }}
