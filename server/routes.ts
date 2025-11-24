@@ -41,6 +41,23 @@ export function requireRole(...roles: string[]) {
   };
 }
 
+// Helper function to check if user can view safety documents
+function canViewSafetyDocuments(user: any): boolean {
+  if (!user) return false;
+  
+  // Company role always has access
+  if (user.role === 'company') return true;
+  
+  // Operations managers always have access to safety documents
+  if (user.role === 'operations_manager') return true;
+  
+  // Supervisors always have access to safety documents
+  if (user.role === 'supervisor') return true;
+  
+  // Check granular permissions - rope_access_tech and other roles need explicit permission
+  return user.permissions?.includes('view_safety_documents') || false;
+}
+
 // Overtime calculation utility
 interface OvertimeBreakdown {
   regularHours: number;
@@ -5959,12 +5976,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/flha-forms", requireAuth, requireRole("operations_manager", "general_supervisor", "rope_access_supervisor", "supervisor", "company"), async (req: Request, res: Response) => {
+  app.get("/api/flha-forms", requireAuth, async (req: Request, res: Response) => {
     try {
       const currentUser = await storage.getUserById(req.session.userId!);
       
       if (!currentUser) {
         return res.status(404).json({ message: "User not found" });
+      }
+      
+      // Check if user has permission to view safety documents
+      if (!canViewSafetyDocuments(currentUser)) {
+        return res.status(403).json({ message: "Forbidden - You don't have permission to view FLHA records" });
       }
       
       const companyId = currentUser.role === "company" ? currentUser.id : currentUser.companyId;
@@ -6034,12 +6056,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/incident-reports", requireAuth, requireRole("operations_manager", "general_supervisor", "rope_access_supervisor", "supervisor", "company"), async (req: Request, res: Response) => {
+  app.get("/api/incident-reports", requireAuth, async (req: Request, res: Response) => {
     try {
       const currentUser = await storage.getUserById(req.session.userId!);
       
       if (!currentUser) {
         return res.status(404).json({ message: "User not found" });
+      }
+      
+      // Check if user has permission to view safety documents
+      if (!canViewSafetyDocuments(currentUser)) {
+        return res.status(403).json({ message: "Forbidden - You don't have permission to view incident reports" });
       }
       
       const companyId = currentUser.role === "company" ? currentUser.id : currentUser.companyId;
