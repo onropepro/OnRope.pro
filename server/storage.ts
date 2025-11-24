@@ -2101,6 +2101,8 @@ export class Storage {
     residentCode: string | null;
     propertyManagerCode: string | null;
     strataNumber: string | null;
+    whitelabelBrandingActive: boolean;
+    brandingColors: string | null;
   }>> {
     const links = await this.getPropertyManagerCompanyLinks(propertyManagerId);
     const companies = await this.getPropertyManagerLinkedCompanies(propertyManagerId);
@@ -2132,6 +2134,8 @@ export class Storage {
           residentCode: company.residentCode,
           propertyManagerCode: company.propertyManagerCode,
           strataNumber: link?.strataNumber || null,
+          whitelabelBrandingActive: company.whitelabelBrandingActive || false,
+          brandingColors: company.brandingColors,
         };
       })
     );

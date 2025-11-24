@@ -37,6 +37,8 @@ type VendorSummary = {
   residentCode: string | null;
   propertyManagerCode: string | null;
   strataNumber: string | null;
+  whitelabelBrandingActive: boolean;
+  brandingColors: string | null;
 };
 
 export default function PropertyManager() {
@@ -432,56 +434,122 @@ export default function PropertyManager() {
               </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {vendors.map((vendor) => (
-                  <Card 
-                    key={vendor.id} 
-                    className="hover-elevate cursor-pointer relative"
-                    onClick={() => setSelectedVendor(vendor)}
-                    data-testid={`card-vendor-${vendor.id}`}
-                  >
-                    <CardContent className="p-6">
-                      <div className="flex items-start gap-4">
-                        <Avatar className="w-12 h-12">
-                          <AvatarImage src={vendor.logo || undefined} />
-                          <AvatarFallback className="bg-primary text-primary-foreground">
-                            {vendor.companyName ? vendor.companyName.substring(0, 2).toUpperCase() : "RA"}
-                          </AvatarFallback>
-                        </Avatar>
-                        <div className="flex-1 min-w-0">
-                          <h3 className="font-semibold mb-1 truncate" data-testid={`text-vendor-name-${vendor.id}`}>
-                            {vendor.companyName}
-                          </h3>
-                          <div className="space-y-1 text-sm text-muted-foreground">
-                            <div className="flex items-center gap-2">
-                              <Mail className="w-3 h-3 flex-shrink-0" />
-                              <span className="truncate" data-testid={`text-vendor-email-${vendor.id}`}>
-                                {vendor.email}
-                              </span>
-                            </div>
-                            {vendor.phone && (
-                              <div className="flex items-center gap-2">
-                                <Phone className="w-3 h-3 flex-shrink-0" />
-                                <span data-testid={`text-vendor-phone-${vendor.id}`}>{vendor.phone}</span>
-                              </div>
-                            )}
-                          </div>
-                        </div>
-                        <Button
-                          size="icon"
-                          variant="ghost"
-                          className="absolute top-4 right-4"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setVendorToRemove(vendor);
+                {vendors.map((vendor) => {
+                  // Parse brand colors if branding is active
+                  let brandColors: any = null;
+                  let primaryColor: string | null = null;
+                  
+                  if (vendor.whitelabelBrandingActive && vendor.brandingColors) {
+                    try {
+                      const parsed = JSON.parse(vendor.brandingColors);
+                      if (parsed && typeof parsed === 'object') {
+                        // Support both 'primary' and 'primaryColor' keys for flexibility
+                        const colorValue = parsed.primary || parsed.primaryColor;
+                        
+                        // Validate color string (allow hex, rgb, hsl, named colors)
+                        if (colorValue && typeof colorValue === 'string' && colorValue.trim().length > 0) {
+                          const trimmedColor = colorValue.trim();
+                          // Accept hex (#fff, #ffffff), rgb/rgba, hsl/hsla, or CSS named colors
+                          if (
+                            trimmedColor.match(/^#([0-9A-Fa-f]{3}|[0-9A-Fa-f]{6})$/) || // hex
+                            trimmedColor.startsWith('rgb') || // rgb/rgba
+                            trimmedColor.startsWith('hsl') || // hsl/hsla
+                            /^[a-z]+$/i.test(trimmedColor) // named colors (letters only)
+                          ) {
+                            brandColors = parsed;
+                            primaryColor = trimmedColor;
+                          }
+                        }
+                      }
+                    } catch (e) {
+                      console.error('Failed to parse brand colors:', e);
+                    }
+                  }
+
+                  return (
+                    <Card 
+                      key={vendor.id} 
+                      className="hover-elevate cursor-pointer relative overflow-hidden"
+                      onClick={() => setSelectedVendor(vendor)}
+                      data-testid={`card-vendor-${vendor.id}`}
+                      style={primaryColor ? {
+                        borderLeft: `4px solid ${primaryColor}`,
+                      } : undefined}
+                    >
+                      {primaryColor && (
+                        <div 
+                          className="absolute top-0 right-0 w-32 h-32 opacity-5 pointer-events-none"
+                          style={{
+                            background: `radial-gradient(circle at top right, ${primaryColor}, transparent)`,
                           }}
-                          data-testid={`button-remove-vendor-${vendor.id}`}
-                        >
-                          <Trash2 className="w-4 h-4 text-destructive" />
-                        </Button>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
+                        />
+                      )}
+                      <CardContent className="p-6 relative z-10">
+                        <div className="flex items-start gap-4">
+                          <Avatar className="w-12 h-12 ring-2 ring-offset-2" style={primaryColor ? {
+                            ringColor: primaryColor,
+                          } : undefined}>
+                            <AvatarImage src={vendor.logo || undefined} />
+                            <AvatarFallback 
+                              style={primaryColor ? {
+                                backgroundColor: primaryColor,
+                                color: 'white',
+                              } : undefined}
+                              className={!primaryColor ? "bg-primary text-primary-foreground" : ""}
+                            >
+                              {vendor.companyName ? vendor.companyName.substring(0, 2).toUpperCase() : "RA"}
+                            </AvatarFallback>
+                          </Avatar>
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2 mb-1">
+                              <h3 className="font-semibold truncate" data-testid={`text-vendor-name-${vendor.id}`}>
+                                {vendor.companyName}
+                              </h3>
+                              {vendor.whitelabelBrandingActive && (
+                                <Badge 
+                                  variant="outline" 
+                                  className="text-xs"
+                                  style={primaryColor ? {
+                                    borderColor: primaryColor,
+                                    color: primaryColor,
+                                  } : undefined}
+                                >
+                                  Branded
+                                </Badge>
+                              )}
+                            </div>
+                            <div className="space-y-1 text-sm text-muted-foreground">
+                              <div className="flex items-center gap-2">
+                                <Mail className="w-3 h-3 flex-shrink-0" />
+                                <span className="truncate" data-testid={`text-vendor-email-${vendor.id}`}>
+                                  {vendor.email}
+                                </span>
+                              </div>
+                              {vendor.phone && (
+                                <div className="flex items-center gap-2">
+                                  <Phone className="w-3 h-3 flex-shrink-0" />
+                                  <span data-testid={`text-vendor-phone-${vendor.id}`}>{vendor.phone}</span>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                          <Button
+                            size="icon"
+                            variant="ghost"
+                            className="absolute top-4 right-4"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setVendorToRemove(vendor);
+                            }}
+                            data-testid={`button-remove-vendor-${vendor.id}`}
+                          >
+                            <Trash2 className="w-4 h-4 text-destructive" />
+                          </Button>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  );
+                })}
               </div>
             )}
           </CardContent>
