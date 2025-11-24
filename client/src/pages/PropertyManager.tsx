@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
-import { Building2, Plus, Mail, Phone, LogOut, Settings, FileText, Download, AlertCircle, CheckCircle2, Clock, Upload, FileCheck, Trash2 } from "lucide-react";
+import { Building2, Plus, Mail, Phone, LogOut, Settings, FileText, Download, AlertCircle, CheckCircle2, Clock, Upload, FileCheck, Trash2, User } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Label } from "@/components/ui/label";
 import { useForm } from "react-hook-form";
@@ -18,6 +18,13 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Progress } from "@/components/ui/progress";
 import { HighRiseBuilding } from "@/components/HighRiseBuilding";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 type VendorSummary = {
   linkId: string;
@@ -353,32 +360,43 @@ export default function PropertyManager() {
               Manage your connected rope access companies and view their information
             </p>
           </div>
-          <div className="flex gap-2">
-            <Button 
-              variant="outline" 
-              onClick={() => {
-                accountForm.reset({
-                  name: userData?.user?.name || "",
-                  email: userData?.user?.email || "",
-                  currentPassword: "",
-                  newPassword: "",
-                });
-                setSettingsOpen(true);
-              }}
-              data-testid="button-account-settings"
-            >
-              <Settings className="w-4 h-4 mr-2" />
-              Account Settings
-            </Button>
-            <Button 
-              variant="outline" 
-              onClick={handleLogout}
-              data-testid="button-logout"
-            >
-              <LogOut className="w-4 h-4 mr-2" />
-              Log Out
-            </Button>
-          </div>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                data-testid="button-profile" 
+                className="hover-elevate h-12 w-12"
+              >
+                <User className="w-6 h-6" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-56">
+              <DropdownMenuItem 
+                onClick={() => {
+                  accountForm.reset({
+                    name: userData?.user?.name || "",
+                    email: userData?.user?.email || "",
+                    currentPassword: "",
+                    newPassword: "",
+                  });
+                  setSettingsOpen(true);
+                }}
+                data-testid="menu-account-settings"
+              >
+                <Settings className="w-4 h-4 mr-2" />
+                Account Settings
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem 
+                onClick={handleLogout}
+                data-testid="menu-logout"
+              >
+                <LogOut className="w-4 h-4 mr-2" />
+                Log Out
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
 
         <Card className="mb-6" data-testid="card-my-vendors">
