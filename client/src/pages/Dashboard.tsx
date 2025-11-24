@@ -408,6 +408,8 @@ export default function Dashboard() {
   const [activeSession, setActiveSession] = useState<any>(null);
   const [uploadedPlanFile, setUploadedPlanFile] = useState<File | null>(null);
   const [isUploadingPlan, setIsUploadingPlan] = useState(false);
+  const [uploadedAnchorCertFile, setUploadedAnchorCertFile] = useState<File | null>(null);
+  const [isUploadingAnchorCert, setIsUploadingAnchorCert] = useState(false);
   const [selectedInspection, setSelectedInspection] = useState<any>(null);
   const [selectedMeeting, setSelectedMeeting] = useState<any>(null);
   const [employeeFormStep, setEmployeeFormStep] = useState<1 | 2>(1); // Track form step (1 = info, 2 = permissions)
@@ -778,7 +780,7 @@ export default function Dashboard() {
   }, [projects, activeSession]);
 
   const createProjectMutation = useMutation({
-    mutationFn: async (data: ProjectFormData & { ropeAccessPlanUrl?: string | null }) => {
+    mutationFn: async (data: ProjectFormData & { ropeAccessPlanUrl?: string | null; anchorInspectionCertificateUrl?: string | null }) => {
       const response = await fetch("/api/projects", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -798,6 +800,7 @@ export default function Dashboard() {
           endDate: data.endDate || undefined,
           estimatedHours: data.estimatedHours ? parseInt(data.estimatedHours) : undefined,
           ropeAccessPlanUrl: data.ropeAccessPlanUrl || undefined,
+          anchorInspectionCertificateUrl: data.anchorInspectionCertificateUrl || undefined,
           suitesPerDay: data.suitesPerDay ? parseInt(data.suitesPerDay) : undefined,
           totalFloors: data.totalFloors ? parseInt(data.totalFloors) : undefined,
           floorsPerDay: data.floorsPerDay ? parseInt(data.floorsPerDay) : undefined,
@@ -829,6 +832,7 @@ export default function Dashboard() {
       setShowProjectDialog(false);
       projectForm.reset();
       setUploadedPlanFile(null);
+      setUploadedAnchorCertFile(null);
       setSelectedClientForProject("");
       setSelectedStrataForProject("");
       setShowOtherElevationFields(false);
@@ -1040,8 +1044,9 @@ export default function Dashboard() {
     };
     
     let ropeAccessPlanUrl = null;
+    let anchorInspectionCertificateUrl = null;
     
-    // Upload PDF if one was selected
+    // Upload rope access plan PDF if one was selected
     if (uploadedPlanFile) {
       setIsUploadingPlan(true);
       try {
@@ -1073,11 +1078,45 @@ export default function Dashboard() {
       setIsUploadingPlan(false);
     }
     
+    // Upload anchor inspection certificate PDF if one was selected
+    if (uploadedAnchorCertFile) {
+      setIsUploadingAnchorCert(true);
+      try {
+        const formData = new FormData();
+        formData.append('file', uploadedAnchorCertFile);
+        
+        const uploadResponse = await fetch('/api/upload-anchor-certificate', {
+          method: 'POST',
+          body: formData,
+          credentials: 'include',
+        });
+        
+        const uploadResult = await uploadResponse.json();
+        
+        if (!uploadResponse.ok) {
+          throw new Error(uploadResult.message || 'Failed to upload anchor inspection certificate');
+        }
+        
+        anchorInspectionCertificateUrl = uploadResult.url;
+      } catch (error) {
+        setIsUploadingAnchorCert(false);
+        toast({ 
+          title: "Upload failed", 
+          description: error instanceof Error ? error.message : "Failed to upload anchor inspection certificate", 
+          variant: "destructive" 
+        });
+        return;
+      }
+      setIsUploadingAnchorCert(false);
+    }
+    
     createProjectMutation.mutate({
       ...normalizedData,
       ropeAccessPlanUrl,
+      anchorInspectionCertificateUrl,
     });
     setUploadedPlanFile(null);
+    setUploadedAnchorCertFile(null);
   };
 
   const onEmployeeSubmit = async (data: EmployeeFormData) => {
@@ -2729,13 +2768,52 @@ export default function Dashboard() {
                           </FormDescription>
                         </div>
 
+                        <div className="space-y-2">
+                          <label className="text-sm font-medium">Anchor Inspection Certificate (PDF)</label>
+                          <Input
+                            type="file"
+                            accept=".pdf"
+                            onChange={(e) => {
+                              const file = e.target.files?.[0];
+                              if (file) {
+                                if (file.type !== 'application/pdf') {
+                                  toast({ title: "Invalid file", description: "Please select a PDF file", variant: "destructive" });
+                                  e.target.value = '';
+                                  return;
+                                }
+                                setUploadedAnchorCertFile(file);
+                              }
+                            }}
+                            data-testid="input-anchor-certificate"
+                            className="h-12"
+                          />
+                          {uploadedAnchorCertFile && (
+                            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                              <span className="material-icons text-base">description</span>
+                              <span>{uploadedAnchorCertFile.name}</span>
+                              <Button
+                                type="button"
+                                variant="ghost"
+                                size="icon"
+                                className="h-6 w-6 ml-auto"
+                                onClick={() => setUploadedAnchorCertFile(null)}
+                              >
+                                <span className="material-icons text-base">close</span>
+                              </Button>
+                            </div>
+                          )}
+                          <FormDescription className="text-xs">
+                            Optional: Upload the anchor inspection certificate PDF
+                          </FormDescription>
+                        </div>
+
                         <Button 
                           type="submit" 
                           className="w-full h-12" 
                           data-testid="button-submit-project"
-                          disabled={isUploadingPlan}
+                          disabled={isUploadingPlan || isUploadingAnchorCert}
                         >
-                          {isUploadingPlan ? "Uploading..." : "Create Project"}
+                          {isUploadingPlan || isUploadingAnchorCert ? "Uploading..." : "Create Project"}
                         </Button>
                       </form>
                     </Form>
