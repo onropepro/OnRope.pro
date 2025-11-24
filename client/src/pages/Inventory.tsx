@@ -53,7 +53,7 @@ export default function Inventory() {
   const [customType, setCustomType] = useState("");
   const [addItemStep, setAddItemStep] = useState(1);
   const [activeTab, setActiveTab] = useState("my-gear");
-  const [inspectionFilter, setInspectionFilter] = useState<"week" | "month" | "all">("week");
+  const [inspectionFilter, setInspectionFilter] = useState<"week" | "month" | "all" | "combined">("week");
   
   // Assignment dialog state
   const [showAssignDialog, setShowAssignDialog] = useState(false);
@@ -539,7 +539,7 @@ export default function Inventory() {
     
     if (inspectionFilter === "month") {
       daysToShow = 30;
-    } else if (inspectionFilter === "all") {
+    } else if (inspectionFilter === "all" || inspectionFilter === "combined") {
       const earliestSession = allSessions.reduce((earliest: Date | null, session: any) => {
         if (!session.startTime) return earliest;
         const sessionDate = new Date(session.startTime);
@@ -561,8 +561,77 @@ export default function Inventory() {
     return days;
   }, [inspectionFilter, allSessions]);
 
-  // Calculate company safety rating
+  // Helper function to calculate rating for a specific number of days
+  const calculateRatingForDays = (daysCount: number) => {
+    const today = new Date();
+    const days = [];
+    for (let i = 0; i < daysCount; i++) {
+      const date = new Date(today);
+      date.setDate(date.getDate() - i);
+      days.push(date);
+    }
+
+    let totalRequiredInspections = 0;
+    let totalCompletedInspections = 0;
+
+    days.forEach((date) => {
+      const dateStr = format(date, 'yyyy-MM-dd');
+      const workersWithSessions = new Set<string>();
+      allSessions.forEach((session: any) => {
+        if (!session.startTime || !session.employeeId) return;
+        const sessionDate = new Date(session.startTime);
+        const sessionDateStr = format(sessionDate, 'yyyy-MM-dd');
+        if (sessionDateStr === dateStr) {
+          workersWithSessions.add(session.employeeId);
+        }
+      });
+
+      workersWithSessions.forEach((workerId) => {
+        const inspection = harnessInspections.find((inspection: any) =>
+          inspection.workerId === workerId && inspection.inspectionDate === dateStr
+        );
+        
+        if (!inspection || inspection.overallStatus !== "not_applicable") {
+          totalRequiredInspections++;
+          if (inspection && inspection.overallStatus !== "not_applicable") {
+            totalCompletedInspections++;
+          }
+        }
+      });
+    });
+
+    if (totalRequiredInspections === 0) return 0;
+    return Math.round((totalCompletedInspections / totalRequiredInspections) * 100);
+  };
+
+  // Calculate company safety rating based on filter
   const companySafetyRating = useMemo(() => {
+    if (inspectionFilter === "combined") {
+      // Calculate average of week, month, and all-time ratings
+      const weekRating = calculateRatingForDays(7);
+      const monthRating = calculateRatingForDays(30);
+      
+      // Calculate all-time rating
+      const earliestSession = allSessions.reduce((earliest: Date | null, session: any) => {
+        if (!session.startTime) return earliest;
+        const sessionDate = new Date(session.startTime);
+        if (!earliest || sessionDate < earliest) return sessionDate;
+        return earliest;
+      }, null);
+      
+      let allTimeRating = 0;
+      if (earliestSession) {
+        const today = new Date();
+        const daysSinceEarliest = Math.floor((today.getTime() - earliestSession.getTime()) / (1000 * 60 * 60 * 24));
+        const daysToShow = Math.min(daysSinceEarliest + 1, 90);
+        allTimeRating = calculateRatingForDays(daysToShow);
+      }
+      
+      // Return average of all three
+      return Math.round((weekRating + monthRating + allTimeRating) / 3);
+    }
+    
+    // Regular calculation for single period
     let totalRequiredInspections = 0;
     let totalCompletedInspections = 0;
 
@@ -579,16 +648,12 @@ export default function Inventory() {
       });
 
       workersWithSessions.forEach((workerId) => {
-        // Find inspection for this worker on this date
         const inspection = harnessInspections.find((inspection: any) =>
           inspection.workerId === workerId && inspection.inspectionDate === dateStr
         );
         
-        // Only count workers who needed harness inspection (exclude "not_applicable")
         if (!inspection || inspection.overallStatus !== "not_applicable") {
           totalRequiredInspections++;
-          
-          // Count as completed if they have an inspection that's not "not_applicable"
           if (inspection && inspection.overallStatus !== "not_applicable") {
             totalCompletedInspections++;
           }
@@ -598,7 +663,7 @@ export default function Inventory() {
 
     if (totalRequiredInspections === 0) return 0;
     return Math.round((totalCompletedInspections / totalRequiredInspections) * 100);
-  }, [inspectionDays, allSessions, harnessInspections]);
+  }, [inspectionFilter, inspectionDays, allSessions, harnessInspections]);
 
   return (
     <div className="min-h-screen bg-background pb-20">
@@ -997,7 +1062,7 @@ export default function Inventory() {
                       onClick={() => setInspectionFilter("month")}
                       data-testid="filter-month-inspections"
                     >
-                      Last Month
+                      30 Days
                     </Button>
                     <Button
                       variant={inspectionFilter === "all" ? "default" : "outline"}
@@ -1006,6 +1071,14 @@ export default function Inventory() {
                       data-testid="filter-all-inspections"
                     >
                       All Time
+                    </Button>
+                    <Button
+                      variant={inspectionFilter === "combined" ? "default" : "outline"}
+                      size="sm"
+                      onClick={() => setInspectionFilter("combined")}
+                      data-testid="filter-combined-inspections"
+                    >
+                      Overall
                     </Button>
                   </div>
                 </div>
@@ -1029,7 +1102,8 @@ export default function Inventory() {
                         <div className="text-xs text-muted-foreground">
                           {inspectionFilter === "week" ? "Last 7 Days" : 
                            inspectionFilter === "month" ? "Last 30 Days" : 
-                           "All Time"}
+                           inspectionFilter === "all" ? "All Time" :
+                           "Combined Overall (7d + 30d + All)"}
                         </div>
                       </div>
                       <div className="text-center">
