@@ -4,6 +4,7 @@ import { queryClient, apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -13,7 +14,7 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { ArrowLeft, ClipboardCheck, AlertTriangle, CheckCircle2, Package } from "lucide-react";
+import { ArrowLeft, ClipboardCheck, AlertTriangle, CheckCircle2, Package, Shield } from "lucide-react";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
@@ -279,6 +280,45 @@ export default function HarnessInspectionForm() {
             </div>
           </div>
         </div>
+
+        <Card className="mb-4 border-primary/20 bg-primary/5">
+          <CardHeader>
+            <div className="flex items-center gap-2">
+              <Shield className="h-5 w-5 text-primary" />
+              <CardTitle className="text-lg">IRATA International Code of Practice (ICOP)</CardTitle>
+            </div>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            <p className="text-sm text-muted-foreground">
+              All rope access operations must comply with the IRATA International Code of Practice for Industrial Rope Access (TC-102ENG).
+              This document outlines mandatory safety requirements, technical procedures, and best practices for rope access work.
+            </p>
+            <div className="flex flex-wrap gap-2">
+              <Badge variant="outline" className="text-xs">
+                <a 
+                  href="https://irata.org/downloads/2055" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-1 hover:text-primary"
+                  data-testid="link-irata-icop"
+                >
+                  Download Official ICOP Document
+                </a>
+              </Badge>
+              <Badge variant="outline" className="text-xs">
+                <a 
+                  href="https://irata.org/page/international-code-of-practice" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-1 hover:text-primary"
+                  data-testid="link-irata-icop-info"
+                >
+                  View IRATA ICOP Information
+                </a>
+              </Badge>
+            </div>
+          </CardContent>
+        </Card>
 
         {/* Failure Summary Banner */}
         {failedItems > 0 && (

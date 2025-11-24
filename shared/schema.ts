@@ -1128,6 +1128,25 @@ export const insertPropertyManagerCompanyLinkSchema = createInsertSchema(propert
 export type InsertPropertyManagerCompanyLink = z.infer<typeof insertPropertyManagerCompanyLinkSchema>;
 export type PropertyManagerCompanyLink = typeof propertyManagerCompanyLinks.$inferSelect;
 
+// Schema for property manager account updates
+export const updatePropertyManagerAccountSchema = z.object({
+  name: z.string().min(1, "Name is required").optional(),
+  email: z.string().email("Invalid email address").optional(),
+  currentPassword: z.string().optional(),
+  newPassword: z.string().min(6, "Password must be at least 6 characters").optional(),
+}).refine((data) => {
+  // If newPassword is provided, currentPassword must also be provided
+  if (data.newPassword && !data.currentPassword) {
+    return false;
+  }
+  return true;
+}, {
+  message: "Current password is required to change password",
+  path: ["currentPassword"],
+});
+
+export type UpdatePropertyManagerAccount = z.infer<typeof updatePropertyManagerAccountSchema>;
+
 export const insertClientSchema = createInsertSchema(clients).omit({
   id: true,
   createdAt: true,

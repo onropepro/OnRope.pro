@@ -86,6 +86,24 @@ export class Storage {
     return result[0];
   }
 
+  async updateUserPassword(userId: string, hashedPassword: string): Promise<void> {
+    await db.update(users)
+      .set({ passwordHash: hashedPassword })
+      .where(eq(users.id, userId));
+  }
+
+  async updateUserEmail(userId: string, email: string): Promise<void> {
+    await db.update(users)
+      .set({ email })
+      .where(eq(users.id, userId));
+  }
+
+  async updateUserName(userId: string, name: string): Promise<void> {
+    await db.update(users)
+      .set({ name })
+      .where(eq(users.id, userId));
+  }
+
   async getResidentsByStrataPlan(strataPlanNumber: string): Promise<User[]> {
     return db.select().from(users)
       .where(

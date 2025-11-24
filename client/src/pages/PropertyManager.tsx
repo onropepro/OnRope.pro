@@ -7,9 +7,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
-import { Building2, Plus, Mail, Phone, FileText, X, LogOut } from "lucide-react";
+import { Building2, Plus, Mail, Phone, LogOut, Settings } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Label } from "@/components/ui/label";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { updatePropertyManagerAccountSchema, type UpdatePropertyManagerAccount } from "@shared/schema";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 
 type VendorSummary = {
   id: string;
@@ -28,9 +32,24 @@ export default function PropertyManager() {
   const [addCodeOpen, setAddCodeOpen] = useState(false);
   const [companyCode, setCompanyCode] = useState("");
   const [selectedVendor, setSelectedVendor] = useState<VendorSummary | null>(null);
+  const [settingsOpen, setSettingsOpen] = useState(false);
+  
+  const accountForm = useForm<UpdatePropertyManagerAccount>({
+    resolver: zodResolver(updatePropertyManagerAccountSchema),
+    defaultValues: {
+      name: "",
+      email: "",
+      currentPassword: "",
+      newPassword: "",
+    },
+  });
 
   const { data: vendorsData, isLoading } = useQuery<{ vendors: VendorSummary[] }>({
     queryKey: ["/api/property-managers/me/vendors"],
+  });
+
+  const { data: userData } = useQuery<{ user: any }>({
+    queryKey: ["/api/user"],
   });
 
   const handleLogout = async () => {
@@ -61,11 +80,7 @@ export default function PropertyManager() {
 
   const addVendorMutation = useMutation({
     mutationFn: async (code: string) => {
-      return await apiRequest("/api/property-managers/vendors", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ companyCode: code }),
-      });
+      return await apiRequest("POST", "/api/property-managers/vendors", { companyCode: code });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/property-managers/me/vendors"] });
@@ -85,6 +100,28 @@ export default function PropertyManager() {
     },
   });
 
+  const updateAccountMutation = useMutation({
+    mutationFn: async (data: UpdatePropertyManagerAccount) => {
+      return await apiRequest("PATCH", "/api/property-managers/me/account", data);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/user"] });
+      toast({
+        title: "Account Updated",
+        description: "Your account settings have been successfully updated.",
+      });
+      accountForm.reset();
+      setSettingsOpen(false);
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Update Failed",
+        description: error.message || "Failed to update account settings.",
+        variant: "destructive",
+      });
+    },
+  });
+
   const handleAddVendor = () => {
     if (companyCode.trim().length !== 10) {
       toast({
@@ -95,6 +132,31 @@ export default function PropertyManager() {
       return;
     }
     addVendorMutation.mutate(companyCode.trim());
+  };
+
+  const onSubmitAccountSettings = (data: UpdatePropertyManagerAccount) => {
+    // Filter out empty values
+    const updateData: Partial<UpdatePropertyManagerAccount> = {};
+    if (data.name && data.name !== userData?.user?.name) {
+      updateData.name = data.name;
+    }
+    if (data.email && data.email !== userData?.user?.email) {
+      updateData.email = data.email;
+    }
+    if (data.newPassword) {
+      updateData.currentPassword = data.currentPassword;
+      updateData.newPassword = data.newPassword;
+    }
+
+    if (Object.keys(updateData).length === 0) {
+      toast({
+        title: "No Changes",
+        description: "No changes were made to your account.",
+      });
+      return;
+    }
+
+    updateAccountMutation.mutate(updateData as UpdatePropertyManagerAccount);
   };
 
   const vendors = vendorsData?.vendors || [];
@@ -109,14 +171,32 @@ export default function PropertyManager() {
               Manage your connected rope access companies and view their information
             </p>
           </div>
-          <Button 
-            variant="outline" 
-            onClick={handleLogout}
-            data-testid="button-logout"
-          >
-            <LogOut className="w-4 h-4 mr-2" />
-            Log Out
-          </Button>
+          <div className="flex gap-2">
+            <Button 
+              variant="outline" 
+              onClick={() => {
+                accountForm.reset({
+                  name: userData?.user?.name || "",
+                  email: userData?.user?.email || "",
+                  currentPassword: "",
+                  newPassword: "",
+                });
+                setSettingsOpen(true);
+              }}
+              data-testid="button-account-settings"
+            >
+              <Settings className="w-4 h-4 mr-2" />
+              Account Settings
+            </Button>
+            <Button 
+              variant="outline" 
+              onClick={handleLogout}
+              data-testid="button-logout"
+            >
+              <LogOut className="w-4 h-4 mr-2" />
+              Log Out
+            </Button>
+          </div>
         </div>
 
         <Card className="mb-6" data-testid="card-my-vendors">
@@ -184,12 +264,6 @@ export default function PropertyManager() {
                                 <span data-testid={`text-vendor-phone-${vendor.id}`}>{vendor.phone}</span>
                               </div>
                             )}
-                            <div className="flex items-center gap-2">
-                              <FileText className="w-3 h-3 flex-shrink-0" />
-                              <span data-testid={`text-vendor-projects-${vendor.id}`}>
-                                {vendor.activeProjectsCount} active {vendor.activeProjectsCount === 1 ? 'project' : 'projects'}
-                              </span>
-                            </div>
                           </div>
                         </div>
                       </div>
@@ -281,16 +355,6 @@ export default function PropertyManager() {
                   )}
                 </div>
 
-                <div>
-                  <Label className="text-xs text-muted-foreground">Active Projects</Label>
-                  <div className="flex items-center gap-2 mt-1">
-                    <FileText className="w-4 h-4 text-muted-foreground" />
-                    <span data-testid="text-vendor-detail-projects">
-                      {selectedVendor.activeProjectsCount} active {selectedVendor.activeProjectsCount === 1 ? 'project' : 'projects'}
-                    </span>
-                  </div>
-                </div>
-
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {selectedVendor.residentCode && (
                     <div>
@@ -321,6 +385,119 @@ export default function PropertyManager() {
                 </div>
               </div>
             )}
+          </DialogContent>
+        </Dialog>
+
+        <Dialog open={settingsOpen} onOpenChange={setSettingsOpen}>
+          <DialogContent className="max-w-2xl" data-testid="dialog-account-settings">
+            <DialogHeader>
+              <DialogTitle data-testid="text-settings-title">Account Settings</DialogTitle>
+              <DialogDescription data-testid="text-settings-description">
+                Update your account information and password
+              </DialogDescription>
+            </DialogHeader>
+            <Form {...accountForm}>
+              <form onSubmit={accountForm.handleSubmit(onSubmitAccountSettings)} className="space-y-4 pt-4">
+                <FormField
+                  control={accountForm.control}
+                  name="name"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Name</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="Your full name"
+                          {...field}
+                          data-testid="input-account-name"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={accountForm.control}
+                  name="email"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Email Address</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="email"
+                          placeholder="your.email@example.com"
+                          {...field}
+                          data-testid="input-account-email"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <div className="border-t pt-4 mt-4">
+                  <h4 className="font-semibold mb-4">Change Password (Optional)</h4>
+                  <div className="space-y-4">
+                    <FormField
+                      control={accountForm.control}
+                      name="currentPassword"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Current Password</FormLabel>
+                          <FormControl>
+                            <Input
+                              type="password"
+                              placeholder="Enter current password"
+                              {...field}
+                              data-testid="input-current-password"
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={accountForm.control}
+                      name="newPassword"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>New Password</FormLabel>
+                          <FormControl>
+                            <Input
+                              type="password"
+                              placeholder="Enter new password (min 6 characters)"
+                              {...field}
+                              data-testid="input-new-password"
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                </div>
+
+                <div className="flex gap-2 justify-end pt-4">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => {
+                      setSettingsOpen(false);
+                      accountForm.reset();
+                    }}
+                    data-testid="button-cancel-settings"
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    type="submit"
+                    disabled={updateAccountMutation.isPending}
+                    data-testid="button-save-settings"
+                  >
+                    {updateAccountMutation.isPending ? "Saving..." : "Save Changes"}
+                  </Button>
+                </div>
+              </form>
+            </Form>
           </DialogContent>
         </Dialog>
       </div>

@@ -2,7 +2,7 @@ import type { Express, Request, Response, NextFunction } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { db } from "./db";
-import { insertUserSchema, insertClientSchema, insertProjectSchema, insertDropLogSchema, insertComplaintSchema, insertComplaintNoteSchema, insertJobCommentSchema, insertHarnessInspectionSchema, insertToolboxMeetingSchema, insertFlhaFormSchema, insertIncidentReportSchema, insertPayPeriodConfigSchema, insertQuoteSchema, insertQuoteServiceSchema, insertGearItemSchema, insertGearAssignmentSchema, insertScheduledJobSchema, insertJobAssignmentSchema, normalizeStrataPlan, type InsertGearItem, type InsertGearAssignment, type Project, gearAssignments, jobAssignments, workSessions, nonBillableWorkSessions, licenseKeys, users, propertyManagerCompanyLinks } from "@shared/schema";
+import { insertUserSchema, insertClientSchema, insertProjectSchema, insertDropLogSchema, insertComplaintSchema, insertComplaintNoteSchema, insertJobCommentSchema, insertHarnessInspectionSchema, insertToolboxMeetingSchema, insertFlhaFormSchema, insertIncidentReportSchema, insertPayPeriodConfigSchema, insertQuoteSchema, insertQuoteServiceSchema, insertGearItemSchema, insertGearAssignmentSchema, insertScheduledJobSchema, insertJobAssignmentSchema, updatePropertyManagerAccountSchema, normalizeStrataPlan, type InsertGearItem, type InsertGearAssignment, type Project, gearAssignments, jobAssignments, workSessions, nonBillableWorkSessions, licenseKeys, users, propertyManagerCompanyLinks } from "@shared/schema";
 import { eq, sql } from "drizzle-orm";
 import { z } from "zod";
 import bcrypt from "bcrypt";
@@ -2002,6 +2002,64 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (error.message?.includes('already linked')) {
         return res.status(400).json({ message: "You are already linked to this company." });
       }
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Property Manager: Update account settings
+  app.patch("/api/property-managers/me/account", requireAuth, requireRole("property_manager"), async (req: Request, res: Response) => {
+    try {
+      const propertyManagerId = req.session.userId!;
+      
+      // Validate request body using Zod schema
+      const validationResult = updatePropertyManagerAccountSchema.safeParse(req.body);
+      if (!validationResult.success) {
+        return res.status(400).json({ 
+          message: "Validation failed", 
+          errors: validationResult.error.errors 
+        });
+      }
+      
+      const { name, email, currentPassword, newPassword } = validationResult.data;
+      
+      // Get current property manager data
+      const currentUser = await storage.getUserById(propertyManagerId);
+      if (!currentUser) {
+        return res.status(404).json({ message: "Property manager not found" });
+      }
+      
+      // Handle password change if requested
+      if (newPassword) {
+        // Verify current password
+        const isPasswordValid = await bcrypt.compare(currentPassword!, currentUser.passwordHash);
+        if (!isPasswordValid) {
+          return res.status(401).json({ message: "Current password is incorrect" });
+        }
+        
+        // Hash and update new password
+        const hashedPassword = await bcrypt.hash(newPassword, 10);
+        await storage.updateUserPassword(propertyManagerId, hashedPassword);
+      }
+      
+      // Update email if changed
+      if (email && email !== currentUser.email) {
+        // Check if email is already in use by another user
+        const existingUser = await storage.getUserByEmail(email);
+        if (existingUser && existingUser.id !== propertyManagerId) {
+          return res.status(400).json({ message: "Email address is already in use" });
+        }
+        
+        await storage.updateUserEmail(propertyManagerId, email);
+      }
+      
+      // Update name if changed
+      if (name && name !== currentUser.name) {
+        await storage.updateUserName(propertyManagerId, name);
+      }
+      
+      res.json({ message: "Account settings updated successfully" });
+    } catch (error) {
+      console.error("Update property manager account error:", error);
       res.status(500).json({ message: "Internal server error" });
     }
   });
