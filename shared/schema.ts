@@ -149,6 +149,7 @@ export const propertyManagerCompanyLinks = pgTable("property_manager_company_lin
   propertyManagerId: varchar("property_manager_id").notNull().references(() => users.id, { onDelete: "cascade" }), // Foreign key to property manager user
   companyCode: varchar("company_code", { length: 10 }).notNull(), // The property manager code (propertyManagerCode) they're linking to
   companyId: varchar("company_id").notNull().references(() => users.id, { onDelete: "cascade" }), // Foreign key to the company this code belongs to
+  strataNumber: varchar("strata_number", { length: 100 }), // Strata/building number for filtering projects
   addedAt: timestamp("added_at").defaultNow(),
 }, (table) => ({
   // Unique constraint: a property manager can only link to each company code once
