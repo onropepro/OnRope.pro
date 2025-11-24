@@ -506,18 +506,6 @@ export default function PropertyManager() {
                               <h3 className="font-semibold truncate" data-testid={`text-vendor-name-${vendor.id}`}>
                                 {vendor.companyName}
                               </h3>
-                              {vendor.whitelabelBrandingActive && (
-                                <Badge 
-                                  variant="outline" 
-                                  className="text-xs"
-                                  style={primaryColor ? {
-                                    borderColor: primaryColor,
-                                    color: primaryColor,
-                                  } : undefined}
-                                >
-                                  Branded
-                                </Badge>
-                              )}
                             </div>
                             <div className="space-y-1 text-sm text-muted-foreground">
                               <div className="flex items-center gap-2">
