@@ -2154,7 +2154,7 @@ export class Storage {
       companyCode,
     };
     
-    return await this.createPropertyManagerCompanyLink(link);
+    return await this.addPropertyManagerCompanyLink(link);
   }
 
   async updatePropertyManagerStrataNumber(linkId: string, strataNumber: string | null): Promise<PropertyManagerCompanyLink> {
