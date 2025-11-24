@@ -51,8 +51,8 @@ function canViewSafetyDocuments(user: any): boolean {
   // Operations managers always have access to safety documents
   if (user.role === 'operations_manager') return true;
   
-  // Supervisors always have access to safety documents
-  if (user.role === 'supervisor') return true;
+  // All supervisor roles always have access to safety documents
+  if (user.role === 'supervisor' || user.role === 'general_supervisor' || user.role === 'rope_access_supervisor') return true;
   
   // Check granular permissions - rope_access_tech and other roles need explicit permission
   return user.permissions?.includes('view_safety_documents') || false;
@@ -3945,6 +3945,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
                                     currentUser.role === "supervisor" || currentUser.role === "general_supervisor" || currentUser.role === "rope_access_supervisor" || 
                                     currentUser.permissions?.includes("view_financial_data");
       
+      // Check if user can view safety documents (rope access plans)
+      const canViewSafetyDocs = canViewSafetyDocuments(currentUser);
+      
       // Fetch company's resident code
       let companyResidentCode: string | null = null;
       try {
@@ -3968,11 +3971,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
         companyResidentCode, // Include company's resident code for all staff
       };
       
+      // Filter sensitive data based on permissions
+      let filteredProject = { ...projectWithProgress };
+      
       // Filter financial data if user doesn't have financial permissions
-      const filteredProject = canViewFinancialData ? projectWithProgress : {
-        ...projectWithProgress,
-        estimatedHours: null,
-      };
+      if (!canViewFinancialData) {
+        filteredProject.estimatedHours = null;
+      }
+      
+      // Filter rope access plan if user doesn't have safety document permissions
+      if (!canViewSafetyDocs) {
+        filteredProject.ropeAccessPlanUrl = null;
+      }
       
       res.set('Cache-Control', 'no-store, no-cache, must-revalidate, private');
       res.json({ project: filteredProject });

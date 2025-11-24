@@ -95,8 +95,8 @@ export function canViewSafetyDocuments(user: User | null | undefined): boolean {
   // Operations managers always have access to safety documents
   if (user.role === 'operations_manager') return true;
   
-  // Supervisors always have access to safety documents
-  if (user.role === 'supervisor') return true;
+  // All supervisor roles always have access to safety documents
+  if (user.role === 'supervisor' || user.role === 'general_supervisor' || user.role === 'rope_access_supervisor') return true;
   
   // Check granular permissions - rope_access_tech and other roles need explicit permission
   return user.permissions?.includes('view_safety_documents') || false;
