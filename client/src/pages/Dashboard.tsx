@@ -214,8 +214,8 @@ type DropLogFormData = z.infer<typeof dropLogSchema>;
 type EndDayFormData = z.infer<typeof endDaySchema>;
 type ClientFormData = z.infer<typeof clientSchema>;
 
-// Sortable Card Component
-function SortableCard({ card, isRearranging }: { card: any; isRearranging: boolean }) {
+// Sortable Card Component with brand color support
+function SortableCard({ card, isRearranging, colorIndex }: { card: any; isRearranging: boolean; colorIndex: number }) {
   const {
     attributes,
     listeners,
@@ -225,18 +225,52 @@ function SortableCard({ card, isRearranging }: { card: any; isRearranging: boole
     isDragging,
   } = useSortable({ id: card.id, disabled: !isRearranging });
 
-  const style = {
+  // Get brand color tint from CSS variables (if branding active)
+  const getTintStyle = () => {
+    if (typeof document === 'undefined') return {};
+    
+    const tintVars = [
+      '--brand-primary-tint',
+      '--brand-secondary-tint', 
+      '--brand-tertiary-tint',
+      '--brand-quaternary-tint'
+    ];
+    const textVars = [
+      '--brand-primary-text',
+      '--brand-secondary-text', 
+      '--brand-tertiary-text',
+      '--brand-quaternary-text'
+    ];
+    
+    const tintVar = tintVars[colorIndex % tintVars.length];
+    const textVar = textVars[colorIndex % textVars.length];
+    const tintValue = getComputedStyle(document.documentElement).getPropertyValue(tintVar).trim();
+    const textValue = getComputedStyle(document.documentElement).getPropertyValue(textVar).trim();
+    
+    if (tintValue) {
+      return { 
+        background: `hsl(${tintValue})`,
+        textColor: textValue ? `hsl(${textValue})` : undefined
+      };
+    }
+    return {};
+  };
+
+  const brandStyles = getTintStyle();
+
+  const style: React.CSSProperties = {
     transform: CSS.Transform.toString(transform),
     transition,
     opacity: isDragging ? 0.5 : 1,
     borderLeft: `6px solid ${card.borderColor}`,
+    ...(brandStyles.background && { background: brandStyles.background })
   };
 
   return (
     <div
       ref={setNodeRef}
       style={style}
-      className="bg-white dark:bg-card rounded-xl border-2 border-border shadow-md hover:shadow-lg transition-all duration-300 cursor-pointer overflow-hidden group hover-scale relative"
+      className="bg-card rounded-xl border border-border/50 shadow-md hover:shadow-lg transition-all duration-300 cursor-pointer overflow-hidden group hover-scale relative"
       onClick={isRearranging ? undefined : card.onClick}
       data-testid={card.testId}
       {...attributes}
@@ -255,12 +289,21 @@ function SortableCard({ card, isRearranging }: { card: any; isRearranging: boole
         
         <div 
           className="w-14 h-14 rounded-xl flex items-center justify-center transition-transform duration-300 group-hover:scale-110 border-2"
-          style={{ backgroundColor: `${card.borderColor}15`, color: card.borderColor, borderColor: `${card.borderColor}40` }}
+          style={{ 
+            backgroundColor: `${card.borderColor}15`, 
+            color: card.borderColor, 
+            borderColor: `${card.borderColor}40` 
+          }}
         >
           <span className="material-icons text-4xl">{card.icon}</span>
         </div>
         <div className="text-center">
-          <div className="text-base font-bold text-foreground mb-0.5">{card.label}</div>
+          <div 
+            className="text-base font-bold mb-0.5"
+            style={{ color: brandStyles.textColor || 'hsl(var(--foreground))' }}
+          >
+            {card.label}
+          </div>
           <div className="text-xs text-muted-foreground">{card.description}</div>
         </div>
       </div>
@@ -2050,8 +2093,8 @@ export default function Dashboard() {
                   strategy={rectSortingStrategy}
                 >
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {sortedDashboardCards.map(card => (
-                      <SortableCard key={card.id} card={card} isRearranging={isRearranging} />
+                    {sortedDashboardCards.map((card, index) => (
+                      <SortableCard key={card.id} card={card} isRearranging={isRearranging} colorIndex={index} />
                     ))}
                   </div>
                 </SortableContext>
