@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { useLocation } from "wouter";
@@ -18,12 +18,14 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
-import { Calendar, Plus, Edit2, Trash2, Users, ArrowLeft, UserCheck, UserX, Lock } from "lucide-react";
+import { Calendar, Plus, Edit2, Trash2, Users, ArrowLeft, UserCheck, UserX, Lock, ChevronLeft, ChevronRight, Briefcase } from "lucide-react";
 import type { ScheduledJobWithAssignments, User } from "@shared/schema";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { DndContext, DragOverlay, useDraggable, useDroppable, closestCenter, DragEndEvent } from '@dnd-kit/core';
 import { canViewSchedule } from "@/lib/permissions";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
 export default function Schedule() {
   const { toast } = useToast();
@@ -43,6 +45,9 @@ export default function Schedule() {
     startDate: "",
     endDate: "",
   });
+  
+  // Employee schedule week navigation
+  const [weekOffset, setWeekOffset] = useState(0);
 
   // Fetch current user
   const { data: currentUserData, isLoading: isLoadingUser } = useQuery<{ user: User }>({
@@ -134,6 +139,65 @@ export default function Schedule() {
       };
     });
   });
+
+  // Simple Employee Schedule Week View helpers
+  const getWeekDates = useMemo(() => {
+    const today = new Date();
+    const dayOfWeek = today.getDay();
+    const startOfWeek = new Date(today);
+    startOfWeek.setDate(today.getDate() - dayOfWeek + (weekOffset * 7));
+    
+    const days: Date[] = [];
+    for (let i = 0; i < 7; i++) {
+      const day = new Date(startOfWeek);
+      day.setDate(startOfWeek.getDate() + i);
+      days.push(day);
+    }
+    return days;
+  }, [weekOffset]);
+
+  const formatWeekRange = useMemo(() => {
+    const start = getWeekDates[0];
+    const end = getWeekDates[6];
+    const startMonth = start.toLocaleDateString('en-US', { month: 'short' });
+    const endMonth = end.toLocaleDateString('en-US', { month: 'short' });
+    const year = end.getFullYear();
+    
+    if (startMonth === endMonth) {
+      return `${startMonth} ${start.getDate()} - ${end.getDate()}, ${year}`;
+    }
+    return `${startMonth} ${start.getDate()} - ${endMonth} ${end.getDate()}, ${year}`;
+  }, [getWeekDates]);
+
+  // Get employee assignments for a specific day (using local date to avoid timezone issues)
+  const getEmployeeJobsForDay = (employeeId: string, date: Date) => {
+    // Format date as YYYY-MM-DD in local timezone to avoid UTC conversion issues
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    const dateStr = `${year}-${month}-${day}`;
+    
+    return jobs.filter(job => {
+      // Check if employee is assigned to this job
+      const isAssigned = job.employeeAssignments?.some((assignment: any) => {
+        if (assignment.employee.id !== employeeId) return false;
+        
+        // Check if the date falls within the assignment's date range
+        const assignStart = String(assignment.startDate || job.startDate);
+        const assignEnd = String(assignment.endDate || job.endDate);
+        
+        return dateStr >= assignStart && dateStr <= assignEnd;
+      });
+      
+      return isAssigned;
+    });
+  };
+
+  // Check if a date is today
+  const isToday = (date: Date) => {
+    const today = new Date();
+    return date.toDateString() === today.toDateString();
+  };
 
   // Transform jobs into FullCalendar events [UPDATED: Testing date filtering]
   // Create separate event blocks for each day in multi-day jobs
@@ -860,105 +924,169 @@ export default function Schedule() {
         </TabsContent>
 
         <TabsContent value="employee-schedule" className="mt-4">
-          <div className="bg-card rounded-lg shadow-premium p-6">
-            <div className="schedule-calendar-wrapper">
-              <style>{`
-                .employee-schedule-calendar .fc-resource-timeline-divider {
-                  width: 2px;
-                  background: hsl(var(--border));
-                }
-                .employee-schedule-calendar .fc-col-header-cell {
-                  background: hsl(var(--muted));
-                  font-weight: 600;
-                  padding: 6px 4px;
-                  text-transform: uppercase;
-                  font-size: 0.65rem;
-                  letter-spacing: 0.03em;
-                  line-height: 1.2;
-                }
-                .employee-schedule-calendar .fc-timeline-slot-cushion {
-                  font-size: 0.7rem;
-                  padding: 2px 4px;
-                }
-                .employee-schedule-calendar .fc-scrollgrid {
-                  border-color: hsl(var(--border)) !important;
-                }
-                .employee-schedule-calendar .fc-resource-timeline-lane {
-                  background: hsl(var(--background));
-                  min-height: 50px;
-                }
-                .employee-schedule-calendar .fc-datagrid-cell-frame {
-                  padding: 6px 8px;
-                  font-weight: 500;
-                  font-size: 0.85rem;
-                }
-                .employee-schedule-calendar .fc-datagrid-header-cell {
-                  background: hsl(var(--muted));
-                  font-weight: 700;
-                  text-transform: uppercase;
-                  font-size: 0.7rem;
-                  letter-spacing: 0.05em;
-                  padding: 8px;
-                }
-                .employee-schedule-calendar .fc-toolbar-title {
-                  font-size: 1.1rem !important;
-                  font-weight: 700;
-                }
-                .employee-schedule-calendar .fc-button {
-                  padding: 0.4rem 0.75rem !important;
-                  font-size: 0.8rem !important;
-                }
-                
-                /* Mobile optimizations */
-                @media (max-width: 768px) {
-                  .employee-schedule-calendar .fc-datagrid-cell-frame {
-                    padding: 4px 6px;
-                    font-size: 0.75rem;
-                  }
-                  .employee-schedule-calendar .fc-col-header-cell {
-                    font-size: 0.6rem;
-                    padding: 4px 2px;
-                  }
-                  .employee-schedule-calendar .fc-timeline-slot-cushion {
-                    font-size: 0.65rem;
-                    padding: 2px;
-                  }
-                  .employee-schedule-calendar .fc-toolbar-title {
-                    font-size: 0.9rem !important;
-                  }
-                  .employee-schedule-calendar .fc-button {
-                    padding: 0.3rem 0.5rem !important;
-                    font-size: 0.7rem !important;
-                  }
-                  .employee-schedule-calendar .fc-resource-timeline-lane {
-                    min-height: 40px;
-                  }
-                }
-              `}</style>
-              <div className="employee-schedule-calendar">
-                <FullCalendar
-                  plugins={[resourceTimelinePlugin, interactionPlugin]}
-                  initialView="resourceTimelineWeek"
-                  headerToolbar={{
-                    left: "prev,next today",
-                    center: "title",
-                    right: "resourceTimelineDay,resourceTimelineWeek,resourceTimelineMonth",
-                  }}
-                  resources={employees.map(emp => ({
-                    id: emp.id,
-                    title: emp.name,
-                  }))}
-                  events={employeeTimelineEvents}
-                  height="700px"
-                  slotMinTime="07:00:00"
-                  slotMaxTime="19:00:00"
-                  resourceAreaWidth="120px"
-                  resourceAreaHeaderContent="Team"
-                  slotDuration="01:00:00"
-                  scrollTime={new Date().toTimeString().slice(0, 8)}
-                  nowIndicator={true}
-                  data-testid="employee-calendar"
-                />
+          <div className="bg-card rounded-lg shadow-premium p-4 md:p-6">
+            {/* Week Navigation Header */}
+            <div className="flex items-center justify-between mb-6">
+              <Button 
+                variant="outline" 
+                size="icon"
+                onClick={() => setWeekOffset(prev => prev - 1)}
+                data-testid="button-prev-week"
+              >
+                <ChevronLeft className="h-4 w-4" />
+              </Button>
+              
+              <div className="flex items-center gap-3">
+                <h3 className="text-lg font-semibold" data-testid="text-week-range">
+                  {formatWeekRange}
+                </h3>
+                {weekOffset !== 0 && (
+                  <Button 
+                    variant="ghost" 
+                    size="sm"
+                    onClick={() => setWeekOffset(0)}
+                    data-testid="button-today"
+                  >
+                    Today
+                  </Button>
+                )}
+              </div>
+              
+              <Button 
+                variant="outline" 
+                size="icon"
+                onClick={() => setWeekOffset(prev => prev + 1)}
+                data-testid="button-next-week"
+              >
+                <ChevronRight className="h-4 w-4" />
+              </Button>
+            </div>
+
+            {/* Day Headers */}
+            <div className="grid grid-cols-8 gap-1 mb-2">
+              <div className="font-medium text-sm text-muted-foreground px-2">Team</div>
+              {getWeekDates.map((date, idx) => (
+                <div 
+                  key={idx}
+                  className={`text-center py-2 rounded-md ${
+                    isToday(date) 
+                      ? 'bg-primary text-primary-foreground font-semibold' 
+                      : 'bg-muted font-medium'
+                  }`}
+                >
+                  <div className="text-xs uppercase">
+                    {date.toLocaleDateString('en-US', { weekday: 'short' })}
+                  </div>
+                  <div className="text-lg">
+                    {date.getDate()}
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Employee Rows */}
+            <div className="space-y-2">
+              {employees.length === 0 ? (
+                <div className="text-center py-12 text-muted-foreground">
+                  <Users className="w-12 h-12 mx-auto mb-3 opacity-50" />
+                  <p>No team members found</p>
+                </div>
+              ) : (
+                employees.map((employee) => (
+                  <div 
+                    key={employee.id}
+                    className="grid grid-cols-8 gap-1 items-stretch"
+                    data-testid={`employee-row-${employee.id}`}
+                  >
+                    {/* Employee Name */}
+                    <div className="flex items-center gap-2 px-2 py-3 bg-muted/50 rounded-md">
+                      <Avatar className="h-8 w-8">
+                        <AvatarFallback className="text-xs font-medium">
+                          {employee.name?.split(' ').map((n: string) => n[0]).join('').toUpperCase().slice(0, 2)}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div className="min-w-0 flex-1">
+                        <div className="font-medium text-sm truncate">{employee.name}</div>
+                        {employee.role && (
+                          <div className="text-xs text-muted-foreground truncate">
+                            {employee.role.replace(/_/g, ' ')}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                    
+                    {/* Day Cells */}
+                    {getWeekDates.map((date, dayIdx) => {
+                      const dayJobs = getEmployeeJobsForDay(employee.id, date);
+                      const hasJobs = dayJobs.length > 0;
+                      
+                      return (
+                        <div 
+                          key={dayIdx}
+                          className={`min-h-[60px] rounded-md p-1 ${
+                            isToday(date) 
+                              ? 'bg-primary/5 border border-primary/20' 
+                              : 'bg-muted/30 border border-transparent'
+                          }`}
+                        >
+                          {hasJobs ? (
+                            <div className="space-y-1">
+                              {dayJobs.slice(0, 2).map((job) => (
+                                <Tooltip key={job.id}>
+                                  <TooltipTrigger asChild>
+                                    <div 
+                                      className="px-2 py-1.5 rounded text-xs font-medium text-white truncate cursor-pointer hover-elevate"
+                                      style={{ backgroundColor: job.color || '#3b82f6' }}
+                                      onClick={() => {
+                                        setSelectedJob(job);
+                                        setDetailDialogOpen(true);
+                                      }}
+                                      data-testid={`job-block-${job.id}-${dayIdx}`}
+                                    >
+                                      {job.project?.buildingName || job.title}
+                                    </div>
+                                  </TooltipTrigger>
+                                  <TooltipContent side="top" className="max-w-xs">
+                                    <div className="font-semibold">{job.project?.buildingName || job.title}</div>
+                                    {job.project?.buildingAddress && (
+                                      <div className="text-xs text-muted-foreground">{job.project.buildingAddress}</div>
+                                    )}
+                                    <div className="text-xs mt-1">
+                                      {String(job.startDate)} to {String(job.endDate)}
+                                    </div>
+                                  </TooltipContent>
+                                </Tooltip>
+                              ))}
+                              {dayJobs.length > 2 && (
+                                <div className="text-xs text-muted-foreground text-center">
+                                  +{dayJobs.length - 2} more
+                                </div>
+                              )}
+                            </div>
+                          ) : (
+                            <div className="h-full flex items-center justify-center text-muted-foreground/30">
+                              <span className="text-xs">-</span>
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                ))
+              )}
+            </div>
+
+            {/* Legend */}
+            <div className="mt-6 pt-4 border-t">
+              <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
+                <div className="flex items-center gap-2">
+                  <div className="w-3 h-3 rounded bg-primary"></div>
+                  <span>Today</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Briefcase className="w-4 h-4" />
+                  <span>Click on a job to view details</span>
+                </div>
               </div>
             </div>
           </div>
