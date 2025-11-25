@@ -123,11 +123,17 @@ export default function FlhaForm() {
   const currentUser = userData?.user;
   const employees = (employeesData?.employees || []);
 
+  // Helper for local date formatting
+  const getLocalDateString = () => {
+    const d = new Date();
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+  };
+
   const form = useForm<FlhaFormValues>({
     resolver: zodResolver(flhaFormSchema),
     defaultValues: {
       projectId: "",
-      assessmentDate: new Date().toISOString().split("T")[0],
+      assessmentDate: getLocalDateString(),
       assessorName: "",
       jobDescription: "",
       location: "",

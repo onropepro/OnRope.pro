@@ -104,11 +104,17 @@ export default function ToolboxMeetingForm() {
   // Filter out terminated employees
   const employees = (employeesData?.employees || []);
 
+  // Helper for local date formatting
+  const getLocalDateString = () => {
+    const d = new Date();
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+  };
+
   const form = useForm<ToolboxMeetingFormValues>({
     resolver: zodResolver(toolboxMeetingFormSchema),
     defaultValues: {
       projectId: "",
-      meetingDate: new Date().toISOString().split("T")[0],
+      meetingDate: getLocalDateString(),
       conductedByName: "",
       attendees: [],
       topicFallProtection: false,

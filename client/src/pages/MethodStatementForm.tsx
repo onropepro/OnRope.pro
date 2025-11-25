@@ -509,11 +509,17 @@ export default function MethodStatementForm() {
 
   const employees = (employeesData?.employees || []);
 
+  // Helper for local date formatting
+  const getLocalDateString = () => {
+    const d = new Date();
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+  };
+
   const form = useForm<MethodStatementFormValues>({
     resolver: zodResolver(methodStatementFormSchema),
     defaultValues: {
       projectId: "",
-      dateCreated: new Date().toISOString().split("T")[0],
+      dateCreated: getLocalDateString(),
       preparedByName: "",
       jobTitle: "",
       location: "",

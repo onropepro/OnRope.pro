@@ -669,11 +669,17 @@ export default function Dashboard() {
     },
   });
 
+  // Helper for local date formatting
+  const getLocalDateString = () => {
+    const d = new Date();
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+  };
+
   const dropForm = useForm<DropLogFormData>({
     resolver: zodResolver(dropLogSchema),
     defaultValues: {
       projectId: "",
-      date: new Date().toISOString().split('T')[0],
+      date: getLocalDateString(),
       dropsCompleted: "",
     },
   });
@@ -1411,7 +1417,7 @@ export default function Dashboard() {
       queryClient.invalidateQueries({ queryKey: ["/api/my-drops-today"] });
       dropForm.reset({
         projectId: "",
-        date: new Date().toISOString().split('T')[0],
+        date: getLocalDateString(),
         dropsCompleted: "",
       });
       setShowDropDialog(false);

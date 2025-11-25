@@ -44,7 +44,13 @@ export default function Payroll() {
   const [selectedEmployeeId, setSelectedEmployeeId] = useState<string>("");
   const [sessionType, setSessionType] = useState<string>("billable");
   const [selectedProjectId, setSelectedProjectId] = useState<string>("");
-  const [workDate, setWorkDate] = useState<string>(new Date().toISOString().split('T')[0]);
+  // Helper for local date formatting
+  const getLocalDateString = () => {
+    const d = new Date();
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+  };
+  
+  const [workDate, setWorkDate] = useState<string>(getLocalDateString());
   const [startTime, setStartTime] = useState<string>("08:00");
   const [endTime, setEndTime] = useState<string>("16:00");
   const [description, setDescription] = useState<string>("");
@@ -417,7 +423,7 @@ export default function Payroll() {
       config.startDayOfWeek = parseInt(startDayOfWeek) || 0;
     } else if (periodType === 'bi-weekly') {
       config.startDayOfWeek = parseInt(startDayOfWeek) || 0;
-      config.biWeeklyAnchorDate = biWeeklyAnchorDate || new Date().toISOString().split('T')[0];
+      config.biWeeklyAnchorDate = biWeeklyAnchorDate || getLocalDateString();
     } else if (periodType === 'custom') {
       if (!customStartDate || !customEndDate) {
         toast({

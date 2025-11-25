@@ -108,15 +108,21 @@ export default function IncidentReportForm() {
 
   const projects = projectsData?.projects || [];
 
+  // Helper for local date formatting
+  const getLocalDateString = () => {
+    const d = new Date();
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+  };
+
   const form = useForm<IncidentReportFormValues>({
     resolver: zodResolver(incidentReportFormSchema),
     defaultValues: {
-      incidentDate: new Date().toISOString().split("T")[0],
+      incidentDate: getLocalDateString(),
       incidentTime: "",
       location: "",
       projectId: "",
       reportedByName: "",
-      reportDate: new Date().toISOString().split("T")[0],
+      reportDate: getLocalDateString(),
       description: "",
       incidentType: "",
       severity: "",
