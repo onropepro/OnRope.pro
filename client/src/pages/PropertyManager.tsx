@@ -260,6 +260,85 @@ export default function PropertyManager() {
     }
   }, [selectedVendor]);
 
+  // Apply vendor's brand colors when viewing a vendor with active branding
+  useEffect(() => {
+    // CSS variables to manage
+    const cssVars = ['--primary', '--ring', '--sidebar-primary', '--primary-foreground', 
+                     '--sidebar-primary-foreground', '--sidebar-ring',
+                     '--chart-1', '--chart-2', '--chart-3', '--chart-4', '--chart-5'];
+    
+    // Helper to clear all brand CSS variables
+    const clearBrandingVars = () => {
+      cssVars.forEach(v => document.documentElement.style.removeProperty(v));
+    };
+
+    // If no vendor selected or vendor doesn't have active branding, clear all brand vars
+    if (!selectedVendor || !selectedVendor.whitelabelBrandingActive || !selectedVendor.brandingColors) {
+      clearBrandingVars();
+      return;
+    }
+
+    // Parse brand colors (stored as JSON string)
+    let colors: string[] = [];
+    try {
+      colors = typeof selectedVendor.brandingColors === 'string' 
+        ? JSON.parse(selectedVendor.brandingColors) 
+        : selectedVendor.brandingColors;
+    } catch {
+      colors = [];
+    }
+
+    if (colors.length === 0) {
+      clearBrandingVars();
+      return;
+    }
+
+    // Convert hex to HSL for CSS variables
+    const hexToHSL = (hex: string): string => {
+      hex = hex.replace(/^#/, '');
+      const r = parseInt(hex.substring(0, 2), 16) / 255;
+      const g = parseInt(hex.substring(2, 4), 16) / 255;
+      const b = parseInt(hex.substring(4, 6), 16) / 255;
+      const max = Math.max(r, g, b);
+      const min = Math.min(r, g, b);
+      let h = 0, s = 0, l = (max + min) / 2;
+      if (max !== min) {
+        const d = max - min;
+        s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+        switch (max) {
+          case r: h = ((g - b) / d + (g < b ? 6 : 0)) / 6; break;
+          case g: h = ((b - r) / d + 2) / 6; break;
+          case b: h = ((r - g) / d + 4) / 6; break;
+        }
+      }
+      return `${Math.round(h * 360)} ${Math.round(s * 100)}% ${Math.round(l * 100)}%`;
+    };
+
+    const primaryHSL = hexToHSL(colors[0]);
+    document.documentElement.style.setProperty('--primary', primaryHSL);
+    document.documentElement.style.setProperty('--ring', primaryHSL);
+    document.documentElement.style.setProperty('--sidebar-primary', primaryHSL);
+    document.documentElement.style.setProperty('--sidebar-ring', primaryHSL);
+    document.documentElement.style.setProperty('--chart-1', primaryHSL);
+    
+    // Calculate foreground color
+    const l = parseInt(primaryHSL.split(' ')[2]);
+    const foreground = l < 50 ? '0 0% 100%' : '240 10% 3.9%';
+    document.documentElement.style.setProperty('--primary-foreground', foreground);
+    document.documentElement.style.setProperty('--sidebar-primary-foreground', foreground);
+    
+    // Apply additional brand colors for charts
+    if (colors[1]) document.documentElement.style.setProperty('--chart-2', hexToHSL(colors[1]));
+    if (colors[2]) document.documentElement.style.setProperty('--chart-3', hexToHSL(colors[2]));
+    if (colors[3]) document.documentElement.style.setProperty('--chart-4', hexToHSL(colors[3]));
+    if (colors[4]) document.documentElement.style.setProperty('--chart-5', hexToHSL(colors[4]));
+    
+    // Cleanup on unmount - always clear brand vars
+    return () => {
+      clearBrandingVars();
+    };
+  }, [selectedVendor]);
+
   const handleSaveStrata = () => {
     if (!selectedVendor) return;
     updateStrataMutation.mutate({ 
