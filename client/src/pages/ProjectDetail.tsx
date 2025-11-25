@@ -2222,7 +2222,7 @@ export default function ProjectDetail() {
               variant="destructive"
               onClick={() => {
                 setShowHarnessInspectionDialog(false);
-                setLocation("/harness-inspection");
+                setLocation(`/harness-inspection?projectId=${id}`);
               }}
               data-testid="button-harness-no"
             >

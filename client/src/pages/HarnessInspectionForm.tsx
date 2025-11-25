@@ -1,8 +1,8 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
-import { useLocation } from "wouter";
+import { useLocation, useSearch } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -36,9 +36,14 @@ type InspectionFormData = z.infer<typeof inspectionFormSchema>;
 export default function HarnessInspectionForm() {
   const { toast } = useToast();
   const [, setLocation] = useLocation();
+  const searchString = useSearch();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [selectedGearId, setSelectedGearId] = useState<string>("");
   const [showHarnessPicker, setShowHarnessPicker] = useState(false);
+  
+  // Get project ID from URL params (when coming from project start day flow)
+  const urlParams = new URLSearchParams(searchString);
+  const projectIdFromUrl = urlParams.get('projectId');
 
   // Initialize all equipment findings with default "pass" values
   const initializeFindings = (): EquipmentFindings => {
@@ -96,12 +101,22 @@ export default function HarnessInspectionForm() {
       inspectorName: currentUser?.name || "",
       manufacturer: "",
       equipmentId: "",
-      projectId: "",
+      projectId: projectIdFromUrl || "",
       dateInService: "",
       comments: "",
       equipmentFindings: {},
     },
   });
+  
+  // Auto-set project if coming from a project's start day flow
+  useEffect(() => {
+    if (projectIdFromUrl && projects.length > 0) {
+      const projectExists = projects.some((p: any) => p.id === projectIdFromUrl);
+      if (projectExists) {
+        form.setValue("projectId", projectIdFromUrl);
+      }
+    }
+  }, [projectIdFromUrl, projects, form]);
 
   // Handle gear selection and autofill
   const handleGearSelection = (gearItemId: string) => {
