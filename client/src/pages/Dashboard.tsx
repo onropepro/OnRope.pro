@@ -214,7 +214,7 @@ type DropLogFormData = z.infer<typeof dropLogSchema>;
 type EndDayFormData = z.infer<typeof endDaySchema>;
 type ClientFormData = z.infer<typeof clientSchema>;
 
-// Sortable Card Component with branding colors
+// Sortable Card Component - uses brand colors when active, otherwise original multicolor
 function SortableCard({ card, isRearranging, colorIndex }: { card: any; isRearranging: boolean; colorIndex: number }) {
   const {
     attributes,
@@ -250,7 +250,7 @@ function SortableCard({ card, isRearranging, colorIndex }: { card: any; isRearra
     return `hsl(${Math.round(h * 360)}, ${Math.round(s * 100)}%, ${lightness}%)`;
   };
 
-  // Get brand colors from CSS variables - these are set by the branding system
+  // Check if branding is active by looking for brand-primary CSS variable
   const getBrandColor = (index: number): { hex: string; tint: string } | null => {
     if (typeof document === 'undefined') return null;
     
@@ -267,24 +267,27 @@ function SortableCard({ card, isRearranging, colorIndex }: { card: any; isRearra
     return null;
   };
 
-  // Try to get brand color, fall back to card's default border color
+  // Check if branding is active (has at least the primary color set)
   const brandColor = getBrandColor(colorIndex);
-  const activeColor = brandColor?.hex || card.borderColor;
-  const activeTint = brandColor?.tint || createTintFromHex(card.borderColor, 90);
+  const hasBranding = brandColor !== null;
+
+  // Use brand colors when active, otherwise use original card borderColor with white background
+  const activeColor = hasBranding ? brandColor.hex : card.borderColor;
+  const cardBackground = hasBranding ? brandColor.tint : undefined; // undefined = use default bg-card
 
   const style: React.CSSProperties = {
     transform: CSS.Transform.toString(transform),
     transition,
     opacity: isDragging ? 0.5 : 1,
     borderLeft: `6px solid ${activeColor}`,
-    background: activeTint,
+    ...(cardBackground && { background: cardBackground }),
   };
 
   return (
     <div
       ref={setNodeRef}
       style={style}
-      className="rounded-xl border border-border/50 shadow-md hover:shadow-lg transition-all duration-300 cursor-pointer overflow-hidden group hover-scale relative"
+      className="bg-card rounded-xl border border-border/50 shadow-md hover:shadow-lg transition-all duration-300 cursor-pointer overflow-hidden group hover-scale relative"
       onClick={isRearranging ? undefined : card.onClick}
       data-testid={card.testId}
       {...attributes}
@@ -304,9 +307,9 @@ function SortableCard({ card, isRearranging, colorIndex }: { card: any; isRearra
         <div 
           className="w-14 h-14 rounded-xl flex items-center justify-center transition-transform duration-300 group-hover:scale-110 border-2"
           style={{ 
-            backgroundColor: `${activeColor}25`, 
+            backgroundColor: `${activeColor}15`, 
             color: activeColor, 
-            borderColor: `${activeColor}50` 
+            borderColor: `${activeColor}40` 
           }}
         >
           <span className="material-icons text-4xl">{card.icon}</span>
