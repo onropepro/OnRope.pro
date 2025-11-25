@@ -281,9 +281,9 @@
   body {
     @apply font-sans antialiased text-foreground;
     background: 
-      radial-gradient(ellipse at top right, hsl(var(--primary) / 0.08), transparent 50%),
-      radial-gradient(ellipse at bottom left, hsl(var(--brand-secondary-hsl, var(--chart-2)) / 0.06), transparent 50%),
-      radial-gradient(ellipse at center left, hsl(var(--brand-tertiary-hsl, var(--chart-3)) / 0.04), transparent 40%),
+      radial-gradient(ellipse 80% 60% at top right, hsl(var(--primary) / 0.25), transparent 60%),
+      radial-gradient(ellipse 70% 50% at bottom left, hsl(var(--brand-secondary-hsl, var(--chart-2)) / 0.20), transparent 55%),
+      radial-gradient(ellipse 60% 40% at center left, hsl(var(--brand-tertiary-hsl, var(--chart-3)) / 0.15), transparent 45%),
       hsl(var(--background));
     background-attachment: fixed;
     min-height: 100vh;
