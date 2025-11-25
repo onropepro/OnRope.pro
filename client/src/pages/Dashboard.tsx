@@ -1,6 +1,7 @@
 // GPS Location Tracking - v2.0 - CACHE BUST
-import { useState, useEffect, useMemo, useRef } from "react";
+import { useState, useEffect, useMemo, useRef, useContext } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { BrandingContext } from "@/App";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -413,6 +414,9 @@ function DeletedProjectsTab() {
 
 export default function Dashboard() {
   const [activeTab, setActiveTab] = useState("");
+  
+  const { brandColors: contextBrandColors, brandingActive } = useContext(BrandingContext);
+  const defaultCalendarColor = brandingActive && contextBrandColors.length > 0 ? contextBrandColors[0] : "#3b82f6";
 
   // Scroll to top when changing tabs
   const handleTabChange = (tab: string) => {
@@ -639,7 +643,7 @@ export default function Dashboard() {
       endDate: "",
       targetCompletionDate: "",
       estimatedHours: "",
-      calendarColor: "#3b82f6",
+      calendarColor: defaultCalendarColor,
       assignedEmployees: [],
     },
   });

@@ -93,6 +93,7 @@ export default function HoursAnalytics() {
   // Get branding colors
   const { brandColors, brandingActive } = useContext(BrandingContext);
   const hasCustomBranding = brandingActive && brandColors.length > 0;
+  const primaryColor = hasCustomBranding ? brandColors[0] : "#3b82f6";
   
   // Drag-and-drop sensors
   const sensors = useSensors(
@@ -768,24 +769,24 @@ export default function HoursAnalytics() {
                   <PieChart>
                     <Pie
                       data={[
-                        { name: 'In Progress', value: 35, color: '#3b82f6' },
-                        { name: 'Completed', value: 45, color: '#60a5fa' },
-                        { name: 'Task 98', value: 10, color: '#93c5fd' },
-                        { name: 'On Hold', value: 10, color: '#dbeafe' },
+                        { name: 'In Progress', value: 35, color: primaryColor },
+                        { name: 'Completed', value: 45, color: `${primaryColor}99` },
+                        { name: 'Task 98', value: 10, color: `${primaryColor}66` },
+                        { name: 'On Hold', value: 10, color: `${primaryColor}33` },
                       ]}
                       cx="50%"
                       cy="50%"
                       innerRadius={70}
                       outerRadius={110}
-                      fill="#8884d8"
+                      fill={primaryColor}
                       dataKey="value"
                       label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
                     >
                       {[
-                        { name: 'In Progress', value: 35, color: '#3b82f6' },
-                        { name: 'Completed', value: 45, color: '#60a5fa' },
-                        { name: 'Task 98', value: 10, color: '#93c5fd' },
-                        { name: 'On Hold', value: 10, color: '#dbeafe' },
+                        { name: 'In Progress', value: 35, color: primaryColor },
+                        { name: 'Completed', value: 45, color: `${primaryColor}99` },
+                        { name: 'Task 98', value: 10, color: `${primaryColor}66` },
+                        { name: 'On Hold', value: 10, color: `${primaryColor}33` },
                       ].map((entry, index) => (
                         <Cell key={`cell-${index}`} fill={entry.color} />
                       ))}

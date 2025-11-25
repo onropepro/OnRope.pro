@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useContext } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { useLocation } from "wouter";
@@ -26,6 +26,7 @@ import { DndContext, DragOverlay, useDraggable, useDroppable, closestCenter, Dra
 import { canViewSchedule } from "@/lib/permissions";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { BrandingContext } from "@/App";
 
 export default function Schedule() {
   const { toast } = useToast();
@@ -36,6 +37,9 @@ export default function Schedule() {
   const [selectedJob, setSelectedJob] = useState<ScheduledJobWithAssignments | null>(null);
   const [selectedDates, setSelectedDates] = useState<{ start: Date; end: Date } | null>(null);
   const [activeEmployeeId, setActiveEmployeeId] = useState<string | null>(null);
+  
+  const { brandColors, brandingActive } = useContext(BrandingContext);
+  const defaultJobColor = brandingActive && brandColors.length > 0 ? brandColors[0] : "#3b82f6";
   
   // Shared assignment dialog state (used by both drag-drop and job detail button)
   const [assignmentDialogOpen, setAssignmentDialogOpen] = useState(false);
@@ -130,8 +134,8 @@ export default function Schedule() {
         title: job.project?.buildingName || job.title,
         start: startDate,
         end: endDate,
-        backgroundColor: job.color || "#0EA5E9",
-        borderColor: job.color || "#0EA5E9",
+        backgroundColor: job.color || defaultJobColor,
+        borderColor: job.color || defaultJobColor,
         extendedProps: {
           job,
           employee: assignment.employee,
@@ -217,7 +221,7 @@ export default function Schedule() {
       }
     }
     
-    const color = job.color || "#3b82f6";
+    const color = job.color || defaultJobColor;
     // Use project dates if job is linked to a project, otherwise use job dates
     const startDate = job.project?.startDate || job.startDate;
     const endDate = job.project?.endDate || job.endDate;
@@ -1052,7 +1056,7 @@ export default function Schedule() {
                                   <TooltipTrigger asChild>
                                     <div 
                                       className="px-2 py-1.5 rounded text-xs font-medium text-white truncate cursor-pointer hover-elevate"
-                                      style={{ backgroundColor: job.color || '#3b82f6' }}
+                                      style={{ backgroundColor: job.color || defaultJobColor }}
                                       onClick={() => {
                                         setSelectedJob(job);
                                         setDetailDialogOpen(true);
@@ -1290,6 +1294,8 @@ function CreateJobDialog({
   employees: User[];
 }) {
   const { toast } = useToast();
+  const { brandColors, brandingActive } = useContext(BrandingContext);
+  const defaultJobColor = brandingActive && brandColors.length > 0 ? brandColors[0] : "#3b82f6";
   
   // Fetch projects for dropdown
   const { data: projectsData } = useQuery<{ projects: any[] }>({
@@ -1308,7 +1314,7 @@ function CreateJobDialog({
     notes: "",
     startDate: "",
     endDate: "",
-    color: "#3b82f6",
+    color: defaultJobColor,
     employeeIds: [] as string[],
   });
 
@@ -1379,7 +1385,7 @@ function CreateJobDialog({
       notes: "",
       startDate: "",
       endDate: "",
-      color: "#3b82f6",
+      color: defaultJobColor,
       employeeIds: [],
     });
   };
@@ -2098,6 +2104,8 @@ function EditJobDialog({
   employees: User[];
 }) {
   const { toast } = useToast();
+  const { brandColors, brandingActive } = useContext(BrandingContext);
+  const defaultJobColor = brandingActive && brandColors.length > 0 ? brandColors[0] : "#3b82f6";
   
   // Fetch projects for dropdown
   const { data: projectsData } = useQuery<{ projects: any[] }>({
@@ -2117,7 +2125,7 @@ function EditJobDialog({
     startDate: "",
     endDate: "",
     status: "",
-    color: "#3b82f6",
+    color: defaultJobColor,
     employeeIds: [] as string[],
   });
 
@@ -2136,7 +2144,7 @@ function EditJobDialog({
         startDate: job.startDate ? new Date(job.startDate).toISOString().slice(0, 16) : "",
         endDate: job.endDate ? new Date(job.endDate).toISOString().slice(0, 16) : "",
         status: job.status || "upcoming",
-        color: job.color || "#3b82f6",
+        color: job.color || defaultJobColor,
         employeeIds: job.assignedEmployees?.map(e => e.id) || [],
       });
     }
