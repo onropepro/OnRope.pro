@@ -57,6 +57,10 @@ export default function Documents() {
     queryKey: ["/api/company-documents"],
   });
 
+  const { data: workSessionsData } = useQuery<{ sessions: any[] }>({
+    queryKey: ["/api/all-work-sessions"],
+  });
+
   const currentUser = userData?.user;
   const canViewFinancials = hasFinancialAccess(currentUser);
   const canViewSafety = canViewSafetyDocuments(currentUser);
@@ -72,6 +76,40 @@ export default function Documents() {
 
   const healthSafetyDocs = companyDocuments.filter((doc: any) => doc.documentType === 'health_safety_manual');
   const policyDocs = companyDocuments.filter((doc: any) => doc.documentType === 'company_policy');
+  const workSessions = workSessionsData?.sessions || [];
+
+  // Calculate toolbox meeting compliance rating
+  // For each project on each day with work sessions, at least one toolbox meeting should exist
+  const toolboxMeetingCompliance = (() => {
+    // Get unique (projectId, date) combinations where work sessions occurred
+    const workSessionDays = new Set<string>();
+    workSessions.forEach((session: any) => {
+      if (session.projectId && session.workDate) {
+        workSessionDays.add(`${session.projectId}|${session.workDate}`);
+      }
+    });
+
+    // Create a map of (projectId, date) to check if toolbox meeting exists
+    const toolboxMeetingDays = new Set<string>();
+    meetings.forEach((meeting: any) => {
+      if (meeting.projectId && meeting.meetingDate) {
+        toolboxMeetingDays.add(`${meeting.projectId}|${meeting.meetingDate}`);
+      }
+    });
+
+    // Count how many work session days have a corresponding toolbox meeting
+    let daysWithMeeting = 0;
+    let totalDays = 0;
+    workSessionDays.forEach((dayKey) => {
+      totalDays++;
+      if (toolboxMeetingDays.has(dayKey)) {
+        daysWithMeeting++;
+      }
+    });
+
+    const percentage = totalDays > 0 ? Math.round((daysWithMeeting / totalDays) * 100) : 0;
+    return { daysWithMeeting, totalDays, percentage };
+  })();
 
   // Collect all rope access plan PDFs - only if user has permission
   const allDocuments = canViewSafety ? projects.flatMap(project => 
@@ -1351,12 +1389,15 @@ export default function Documents() {
         })()}
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-2 mb-6 max-w-md">
+          <TabsList className="grid w-full grid-cols-3 mb-6 max-w-xl">
             <TabsTrigger value="health-safety" data-testid="tab-health-safety">
               Health & Safety Manual
             </TabsTrigger>
             <TabsTrigger value="company-policy" data-testid="tab-company-policy">
               Company Policy
+            </TabsTrigger>
+            <TabsTrigger value="inspections-safety" data-testid="tab-inspections-safety">
+              Inspections & Safety
             </TabsTrigger>
           </TabsList>
 
@@ -1552,6 +1593,189 @@ export default function Documents() {
             )}
           </CardContent>
         </Card>
+          </TabsContent>
+
+          {/* Inspections & Safety Tab */}
+          <TabsContent value="inspections-safety">
+            {/* Toolbox Meeting Safety Rating */}
+            <Card className="mb-6 overflow-hidden">
+              <CardHeader className="bg-gradient-to-br from-orange-500/10 via-orange-500/5 to-transparent pb-4">
+                <div className="flex items-start gap-4">
+                  <div className={`p-3 rounded-xl ring-1 ${
+                    toolboxMeetingCompliance.percentage >= 90 
+                      ? 'bg-emerald-500/10 ring-emerald-500/20' 
+                      : toolboxMeetingCompliance.percentage >= 50 
+                        ? 'bg-amber-500/10 ring-amber-500/20'
+                        : 'bg-red-500/10 ring-red-500/20'
+                  }`}>
+                    <Calendar className={`h-6 w-6 ${
+                      toolboxMeetingCompliance.percentage >= 90 
+                        ? 'text-emerald-600 dark:text-emerald-400' 
+                        : toolboxMeetingCompliance.percentage >= 50 
+                          ? 'text-amber-600 dark:text-amber-400'
+                          : 'text-red-600 dark:text-red-400'
+                    }`} />
+                  </div>
+                  <div className="flex-1">
+                    <CardTitle className="text-xl mb-1">Toolbox Meeting Compliance</CardTitle>
+                    <p className="text-sm text-muted-foreground">
+                      {toolboxMeetingCompliance.totalDays === 0 
+                        ? 'No work sessions recorded yet'
+                        : toolboxMeetingCompliance.percentage >= 90 
+                          ? 'Excellent! Daily toolbox meetings are being conducted consistently' 
+                          : toolboxMeetingCompliance.percentage >= 50 
+                            ? 'Some project days are missing toolbox meetings'
+                            : 'Most project work days are missing toolbox meetings'}
+                    </p>
+                  </div>
+                  <div className="text-right">
+                    <div className={`text-3xl font-bold ${
+                      toolboxMeetingCompliance.percentage >= 90 
+                        ? 'text-emerald-600 dark:text-emerald-400' 
+                        : toolboxMeetingCompliance.percentage >= 50 
+                          ? 'text-amber-600 dark:text-amber-400'
+                          : 'text-red-600 dark:text-red-400'
+                    }`}>
+                      {toolboxMeetingCompliance.percentage}%
+                    </div>
+                    <div className="text-sm text-muted-foreground">
+                      {toolboxMeetingCompliance.daysWithMeeting}/{toolboxMeetingCompliance.totalDays} work days
+                    </div>
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent className="pt-4">
+                <div className="mb-3 text-sm text-muted-foreground">
+                  Measures how often a toolbox meeting was conducted on days when work sessions were active on each project.
+                  Only one meeting per project per day is required.
+                </div>
+                <Progress 
+                  value={toolboxMeetingCompliance.percentage} 
+                  className={`h-2 ${
+                    toolboxMeetingCompliance.percentage >= 90 
+                      ? '[&>div]:bg-emerald-500' 
+                      : toolboxMeetingCompliance.percentage >= 50 
+                        ? '[&>div]:bg-amber-500'
+                        : '[&>div]:bg-red-500'
+                  }`} 
+                />
+              </CardContent>
+            </Card>
+
+            {/* Harness Inspections */}
+            <Card className="mb-6 overflow-hidden">
+              <CardHeader className="bg-gradient-to-br from-indigo-500/10 via-indigo-500/5 to-transparent pb-4">
+                <div className="flex items-start gap-4">
+                  <div className="p-3 bg-indigo-500/10 rounded-xl ring-1 ring-indigo-500/20">
+                    <Shield className="h-6 w-6 text-indigo-600 dark:text-indigo-400" />
+                  </div>
+                  <div className="flex-1">
+                    <CardTitle className="text-xl mb-1">Equipment Inspection Records</CardTitle>
+                    <p className="text-sm text-muted-foreground">Rope access gear and safety equipment</p>
+                  </div>
+                  <Badge variant="secondary" className="text-base font-semibold px-3">
+                    {inspections.length}
+                  </Badge>
+                </div>
+              </CardHeader>
+              <CardContent className="pt-6">
+                {inspections.length > 0 ? (
+                  <div className="space-y-3">
+                    {inspections.map((inspection) => (
+                      <div key={inspection.id} className="flex items-center gap-4 p-4 rounded-xl border bg-card hover-elevate active-elevate-2">
+                        <div className="p-2 bg-indigo-500/10 rounded-lg">
+                          <Shield className="h-5 w-5 text-indigo-600 dark:text-indigo-400 flex-shrink-0" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="font-semibold">
+                            {new Date(inspection.inspectionDate).toLocaleDateString()} - {inspection.inspectorName}
+                          </div>
+                          <div className="text-sm text-muted-foreground">
+                            {inspection.manufacturer || 'Equipment inspection'}
+                          </div>
+                        </div>
+                        <Badge variant={inspection.overallStatus === 'pass' ? 'default' : 'destructive'}>
+                          {inspection.overallStatus || 'N/A'}
+                        </Badge>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => downloadHarnessInspection(inspection)}
+                          data-testid={`download-inspection-tab-${inspection.id}`}
+                        >
+                          <Download className="h-4 w-4 mr-1" />
+                          Download
+                        </Button>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-12">
+                    <div className="inline-flex p-4 bg-indigo-500/5 rounded-full mb-4">
+                      <Shield className="h-8 w-8 text-indigo-500/50" />
+                    </div>
+                    <p className="text-muted-foreground font-medium">No equipment inspections recorded yet</p>
+                    <p className="text-sm text-muted-foreground mt-1">Inspections will be logged here</p>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+
+            {/* Toolbox Meetings List */}
+            <Card className="mb-6 overflow-hidden">
+              <CardHeader className="bg-gradient-to-br from-cyan-500/10 via-cyan-500/5 to-transparent pb-4">
+                <div className="flex items-start gap-4">
+                  <div className="p-3 bg-cyan-500/10 rounded-xl ring-1 ring-cyan-500/20">
+                    <Calendar className="h-6 w-6 text-cyan-600 dark:text-cyan-400" />
+                  </div>
+                  <div className="flex-1">
+                    <CardTitle className="text-xl mb-1">Toolbox Meeting Records</CardTitle>
+                    <p className="text-sm text-muted-foreground">Daily safety meeting documentation</p>
+                  </div>
+                  <Badge variant="secondary" className="text-base font-semibold px-3">
+                    {meetings.length}
+                  </Badge>
+                </div>
+              </CardHeader>
+              <CardContent className="pt-6">
+                {meetings.length > 0 ? (
+                  <div className="space-y-3">
+                    {meetings.map((meeting) => (
+                      <div key={meeting.id} className="flex items-center gap-4 p-4 rounded-xl border bg-card hover-elevate active-elevate-2">
+                        <div className="p-2 bg-cyan-500/10 rounded-lg">
+                          <Calendar className="h-5 w-5 text-cyan-600 dark:text-cyan-400 flex-shrink-0" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="font-semibold">
+                            {new Date(meeting.meetingDate).toLocaleDateString()} - {meeting.conductedByName}
+                          </div>
+                          <div className="text-sm text-muted-foreground">
+                            {meeting.projectName || 'Project meeting'}
+                          </div>
+                        </div>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => downloadToolboxMeeting(meeting)}
+                          data-testid={`download-toolbox-meeting-tab-${meeting.id}`}
+                        >
+                          <Download className="h-4 w-4 mr-1" />
+                          Download
+                        </Button>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-12">
+                    <div className="inline-flex p-4 bg-cyan-500/5 rounded-full mb-4">
+                      <Calendar className="h-8 w-8 text-cyan-500/50" />
+                    </div>
+                    <p className="text-muted-foreground font-medium">No toolbox meetings recorded yet</p>
+                    <p className="text-sm text-muted-foreground mt-1">Safety meetings will be documented here</p>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
           </TabsContent>
         </Tabs>
 
@@ -1871,65 +2095,6 @@ export default function Documents() {
                 </div>
                 <p className="text-muted-foreground font-medium">No method statements recorded yet</p>
                 <p className="text-sm text-muted-foreground mt-1">Work procedures will be documented here</p>
-              </div>
-            )}
-          </CardContent>
-        </Card>
-
-        {/* Harness Inspections */}
-        <Card className="mb-6 overflow-hidden">
-          <CardHeader className="bg-gradient-to-br from-indigo-500/10 via-indigo-500/5 to-transparent pb-4">
-            <div className="flex items-start gap-4">
-              <div className="p-3 bg-indigo-500/10 rounded-xl ring-1 ring-indigo-500/20">
-                <Shield className="h-6 w-6 text-indigo-600 dark:text-indigo-400" />
-              </div>
-              <div className="flex-1">
-                <CardTitle className="text-xl mb-1">Equipment Inspection Records</CardTitle>
-                <p className="text-sm text-muted-foreground">Rope access gear and safety equipment</p>
-              </div>
-              <Badge variant="secondary" className="text-base font-semibold px-3">
-                {inspections.length}
-              </Badge>
-            </div>
-          </CardHeader>
-          <CardContent className="pt-6">
-            {inspections.length > 0 ? (
-              <div className="space-y-3">
-                {inspections.map((inspection) => (
-                  <div key={inspection.id} className="flex items-center gap-4 p-4 rounded-xl border bg-card hover-elevate active-elevate-2">
-                    <div className="p-2 bg-indigo-500/10 rounded-lg">
-                      <Shield className="h-5 w-5 text-indigo-600 dark:text-indigo-400 flex-shrink-0" />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="font-semibold">
-                        {new Date(inspection.inspectionDate).toLocaleDateString()} - {inspection.inspectorName}
-                      </div>
-                      <div className="text-sm text-muted-foreground">
-                        {inspection.manufacturer || 'Equipment inspection'}
-                      </div>
-                    </div>
-                    <Badge variant={inspection.overallStatus === 'pass' ? 'default' : 'destructive'}>
-                      {inspection.overallStatus || 'N/A'}
-                    </Badge>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() => downloadHarnessInspection(inspection)}
-                      data-testid={`download-inspection-${inspection.id}`}
-                    >
-                      <Download className="h-4 w-4 mr-1" />
-                      Download
-                    </Button>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <div className="text-center py-12">
-                <div className="inline-flex p-4 bg-indigo-500/5 rounded-full mb-4">
-                  <Shield className="h-8 w-8 text-indigo-500/50" />
-                </div>
-                <p className="text-muted-foreground font-medium">No equipment inspections recorded yet</p>
-                <p className="text-sm text-muted-foreground mt-1">Inspections will be logged here</p>
               </div>
             )}
           </CardContent>
