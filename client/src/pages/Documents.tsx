@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Progress } from "@/components/ui/progress";
 import { FileText, Download, Calendar, DollarSign, Upload, Trash2, Shield, BookOpen, ArrowLeft, AlertTriangle, Plus } from "lucide-react";
 import { hasFinancialAccess, canViewSafetyDocuments } from "@/lib/permissions";
 import { useToast } from "@/hooks/use-toast";
@@ -1248,6 +1249,106 @@ export default function Documents() {
           </div>
           <p className="text-muted-foreground ml-14">All company documents and safety records</p>
         </div>
+
+        {/* Documentation Safety Rating */}
+        {(() => {
+          const hasHealthSafety = healthSafetyDocs.length > 0;
+          const hasPolicy = policyDocs.length > 0;
+          const docsCount = (hasHealthSafety ? 1 : 0) + (hasPolicy ? 1 : 0);
+          const ratingPercent = docsCount === 2 ? 100 : docsCount === 1 ? 50 : 0;
+          
+          return (
+            <Card className="mb-6 overflow-hidden">
+              <CardHeader className="bg-gradient-to-br from-emerald-500/10 via-emerald-500/5 to-transparent pb-4">
+                <div className="flex items-start gap-4">
+                  <div className={`p-3 rounded-xl ring-1 ${
+                    ratingPercent === 100 
+                      ? 'bg-emerald-500/10 ring-emerald-500/20' 
+                      : ratingPercent >= 50 
+                        ? 'bg-amber-500/10 ring-amber-500/20'
+                        : 'bg-red-500/10 ring-red-500/20'
+                  }`}>
+                    <Shield className={`h-6 w-6 ${
+                      ratingPercent === 100 
+                        ? 'text-emerald-600 dark:text-emerald-400' 
+                        : ratingPercent >= 50 
+                          ? 'text-amber-600 dark:text-amber-400'
+                          : 'text-red-600 dark:text-red-400'
+                    }`} />
+                  </div>
+                  <div className="flex-1">
+                    <CardTitle className="text-xl mb-1">Documentation Safety Rating</CardTitle>
+                    <p className="text-sm text-muted-foreground">
+                      {ratingPercent === 100 
+                        ? 'Excellent! All required documents are uploaded' 
+                        : ratingPercent >= 50 
+                          ? 'Partial compliance - upload missing documents'
+                          : 'No documents uploaded yet'}
+                    </p>
+                  </div>
+                  <div className="text-right">
+                    <div className={`text-3xl font-bold ${
+                      ratingPercent === 100 
+                        ? 'text-emerald-600 dark:text-emerald-400' 
+                        : ratingPercent >= 50 
+                          ? 'text-amber-600 dark:text-amber-400'
+                          : 'text-red-600 dark:text-red-400'
+                    }`}>
+                      {ratingPercent}%
+                    </div>
+                    <div className="text-sm text-muted-foreground">{docsCount}/2 documents</div>
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent className="pt-4">
+                <div className="flex gap-4 mb-3">
+                  <div className={`flex items-center gap-2 px-3 py-1.5 rounded-md text-sm ${
+                    hasHealthSafety 
+                      ? 'bg-emerald-500/10 text-emerald-700 dark:text-emerald-300' 
+                      : 'bg-muted text-muted-foreground'
+                  }`}>
+                    {hasHealthSafety ? (
+                      <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                      </svg>
+                    ) : (
+                      <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                      </svg>
+                    )}
+                    Health & Safety Manual
+                  </div>
+                  <div className={`flex items-center gap-2 px-3 py-1.5 rounded-md text-sm ${
+                    hasPolicy 
+                      ? 'bg-emerald-500/10 text-emerald-700 dark:text-emerald-300' 
+                      : 'bg-muted text-muted-foreground'
+                  }`}>
+                    {hasPolicy ? (
+                      <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                      </svg>
+                    ) : (
+                      <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                      </svg>
+                    )}
+                    Company Policy
+                  </div>
+                </div>
+                <Progress 
+                  value={ratingPercent} 
+                  className={`h-2 ${
+                    ratingPercent === 100 
+                      ? '[&>div]:bg-emerald-500' 
+                      : ratingPercent >= 50 
+                        ? '[&>div]:bg-amber-500'
+                        : '[&>div]:bg-red-500'
+                  }`} 
+                />
+              </CardContent>
+            </Card>
+          );
+        })()}
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <TabsList className="grid w-full grid-cols-2 mb-6 max-w-md">
