@@ -358,19 +358,20 @@ function BrandingProvider({ children }: { children: React.ReactNode }) {
       const hslColor = hexToHSL(primaryBrandColor);
       
       // Override ALL brand color variables across entire platform
-      document.documentElement.style.setProperty('--brand-primary', primaryBrandColor);
-      document.documentElement.style.setProperty('--brand-primary-tint', createLightTint(primaryBrandColor, 97));
-      document.documentElement.style.setProperty('--brand-primary-text', getReadableForeground(primaryBrandColor));
-      document.documentElement.style.setProperty('--primary', hslColor);
-      document.documentElement.style.setProperty('--ring', hslColor);
-      document.documentElement.style.setProperty('--sidebar-primary', hslColor);
-      document.documentElement.style.setProperty('--sidebar-ring', hslColor);
-      document.documentElement.style.setProperty('--chart-1', hslColor);
+      const root = document.documentElement;
+      root.style.setProperty('--brand-primary', primaryBrandColor);
+      root.style.setProperty('--brand-primary-tint', createLightTint(primaryBrandColor, 97));
+      root.style.setProperty('--brand-primary-text', getReadableForeground(primaryBrandColor));
+      root.style.setProperty('--primary', hslColor);
+      root.style.setProperty('--ring', hslColor);
+      root.style.setProperty('--sidebar-primary', hslColor);
+      root.style.setProperty('--sidebar-ring', hslColor);
+      root.style.setProperty('--chart-1', hslColor);
       
       // Create a subtle tinted card background
-      document.documentElement.style.setProperty('--card', createLightTint(primaryBrandColor, 99));
-      document.documentElement.style.setProperty('--sidebar', createLightTint(primaryBrandColor, 98));
-      document.documentElement.style.setProperty('--muted', createLightTint(primaryBrandColor, 96));
+      root.style.setProperty('--card', createLightTint(primaryBrandColor, 99));
+      root.style.setProperty('--sidebar', createLightTint(primaryBrandColor, 98));
+      root.style.setProperty('--muted', createLightTint(primaryBrandColor, 96));
       
       // Apply secondary brand color (for gradients, accents)
       if (secondaryBrandColor) {
