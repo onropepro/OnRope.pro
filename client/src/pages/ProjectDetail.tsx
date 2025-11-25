@@ -29,9 +29,11 @@ import { format } from "date-fns";
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from "recharts";
 import { parseLocalDate } from "@/lib/dateUtils";
 import type { Project } from "@shared/schema";
+import { IRATA_TASK_TYPES } from "@shared/schema";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import { apiRequest } from "@/lib/queryClient";
 
 const endDaySchema = z.object({
   dropsCompletedNorth: z.string().optional(),
@@ -109,6 +111,17 @@ export default function ProjectDetail() {
   const [showEndDayDialog, setShowEndDayDialog] = useState(false);
   const [activeSession, setActiveSession] = useState<any>(null);
   const [showHarnessInspectionDialog, setShowHarnessInspectionDialog] = useState(false);
+  const [showIrataTaskDialog, setShowIrataTaskDialog] = useState(false);
+  const [selectedIrataTasks, setSelectedIrataTasks] = useState<string[]>([]);
+  const [irataTaskNotes, setIrataTaskNotes] = useState("");
+  const [endedSessionData, setEndedSessionData] = useState<{
+    sessionId: string;
+    hoursWorked: number;
+    workDate: string;
+    projectId: string;
+    buildingName: string;
+    buildingAddress: string;
+  } | null>(null);
 
   const endDayForm = useForm<EndDayFormData>({
     resolver: zodResolver(endDaySchema),
@@ -379,7 +392,23 @@ export default function ProjectDetail() {
 
       return response.json();
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
+      // Calculate hours worked from session data
+      const session = data.session;
+      const startTime = new Date(session.startTime);
+      const endTime = new Date(session.endTime);
+      const hoursWorked = (endTime.getTime() - startTime.getTime()) / (1000 * 60 * 60);
+      
+      // Store session data for IRATA task logging
+      setEndedSessionData({
+        sessionId: session.id,
+        hoursWorked: parseFloat(hoursWorked.toFixed(2)),
+        workDate: session.workDate,
+        projectId: id || "",
+        buildingName: project?.buildingName || "",
+        buildingAddress: project?.buildingAddress || "",
+      });
+      
       setActiveSession(null);
       setShowEndDayDialog(false);
       queryClient.invalidateQueries({ queryKey: ["/api/projects"] });
@@ -387,12 +416,75 @@ export default function ProjectDetail() {
       queryClient.invalidateQueries({ queryKey: ["/api/projects", id, "work-sessions"] });
       queryClient.invalidateQueries({ queryKey: ["/api/my-drops-today"] });
       endDayForm.reset();
-      toast({ title: "Work session ended", description: "Great work today!" });
+      
+      // Show IRATA task dialog for rope access technicians to log their tasks
+      if (currentUser?.role === "rope_access_tech" || currentUser?.irataLevel) {
+        setShowIrataTaskDialog(true);
+      } else {
+        toast({ title: "Work session ended", description: "Great work today!" });
+      }
     },
     onError: (error: Error) => {
       toast({ title: "Error", description: error.message, variant: "destructive" });
     },
   });
+
+  // IRATA Task Log mutation
+  const saveIrataTaskLogMutation = useMutation({
+    mutationFn: async (data: { 
+      workSessionId: string; 
+      tasksPerformed: string[];
+      notes?: string;
+    }) => {
+      return apiRequest("/api/irata-task-logs", {
+        method: "POST",
+        body: JSON.stringify(data),
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/my-irata-task-logs"] });
+      setShowIrataTaskDialog(false);
+      setSelectedIrataTasks([]);
+      setIrataTaskNotes("");
+      setEndedSessionData(null);
+      toast({ title: "Work session ended", description: "Your IRATA tasks have been logged!" });
+    },
+    onError: (error: Error) => {
+      toast({ title: "Error saving tasks", description: error.message, variant: "destructive" });
+    },
+  });
+
+  // Handle IRATA task log submission
+  const handleSaveIrataTasks = () => {
+    if (!endedSessionData || selectedIrataTasks.length === 0) {
+      toast({ title: "Select tasks", description: "Please select at least one task you performed", variant: "destructive" });
+      return;
+    }
+    
+    saveIrataTaskLogMutation.mutate({
+      workSessionId: endedSessionData.sessionId,
+      tasksPerformed: selectedIrataTasks,
+      notes: irataTaskNotes || undefined,
+    });
+  };
+
+  // Skip IRATA task logging
+  const handleSkipIrataTasks = () => {
+    setShowIrataTaskDialog(false);
+    setSelectedIrataTasks([]);
+    setIrataTaskNotes("");
+    setEndedSessionData(null);
+    toast({ title: "Work session ended", description: "Great work today!" });
+  };
+
+  // Toggle IRATA task selection
+  const toggleIrataTask = (taskId: string) => {
+    setSelectedIrataTasks(prev => 
+      prev.includes(taskId) 
+        ? prev.filter(t => t !== taskId)
+        : [...prev, taskId]
+    );
+  };
 
   // Create "not applicable" inspection record
   const createNotApplicableInspectionMutation = useMutation({
@@ -3139,6 +3231,126 @@ export default function ProjectDetail() {
               </div>
             </form>
           </Form>
+        </DialogContent>
+      </Dialog>
+
+      {/* IRATA Task Selection Dialog */}
+      <Dialog open={showIrataTaskDialog} onOpenChange={(open) => {
+        if (!open) handleSkipIrataTasks();
+      }}>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <span className="material-icons text-primary">assignment</span>
+              Log Your IRATA Tasks
+            </DialogTitle>
+            <DialogDescription>
+              Select all the rope access tasks you performed during this session at {endedSessionData?.buildingName || "this building"}. 
+              This helps track your IRATA logbook hours for certification progression.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-4 py-4">
+            {/* Session Info */}
+            <div className="flex flex-wrap gap-4 p-3 bg-muted rounded-md">
+              <div>
+                <div className="text-xs text-muted-foreground">Hours Worked</div>
+                <div className="text-lg font-semibold">{endedSessionData?.hoursWorked.toFixed(1)} hrs</div>
+              </div>
+              <div>
+                <div className="text-xs text-muted-foreground">Date</div>
+                <div className="text-lg font-semibold">
+                  {endedSessionData?.workDate ? format(parseLocalDate(endedSessionData.workDate), "MMM d, yyyy") : "-"}
+                </div>
+              </div>
+              <div className="flex-1">
+                <div className="text-xs text-muted-foreground">Building</div>
+                <div className="text-sm font-medium truncate">{endedSessionData?.buildingName || "-"}</div>
+              </div>
+            </div>
+
+            {/* Task Selection Grid */}
+            <div>
+              <Label className="text-sm font-medium mb-3 block">Select Tasks Performed (click to select)</Label>
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                {IRATA_TASK_TYPES.map((task) => {
+                  const isSelected = selectedIrataTasks.includes(task.id);
+                  return (
+                    <button
+                      key={task.id}
+                      type="button"
+                      onClick={() => toggleIrataTask(task.id)}
+                      data-testid={`button-irata-task-${task.id}`}
+                      className={`
+                        p-3 rounded-md border text-left transition-all
+                        ${isSelected 
+                          ? "border-primary bg-primary/10 ring-2 ring-primary/30" 
+                          : "border-border hover-elevate"
+                        }
+                      `}
+                    >
+                      <div className="flex items-start gap-2">
+                        <div className={`
+                          w-5 h-5 rounded flex items-center justify-center shrink-0 mt-0.5
+                          ${isSelected 
+                            ? "bg-primary text-primary-foreground" 
+                            : "border border-muted-foreground/30"
+                          }
+                        `}>
+                          {isSelected && <span className="material-icons text-sm">check</span>}
+                        </div>
+                        <div>
+                          <div className="text-sm font-medium">{task.label}</div>
+                          <div className="text-xs text-muted-foreground line-clamp-2">{task.description}</div>
+                        </div>
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Selected Count */}
+            {selectedIrataTasks.length > 0 && (
+              <div className="p-2 bg-primary/10 rounded-md text-center">
+                <span className="text-sm font-medium text-primary">
+                  {selectedIrataTasks.length} task{selectedIrataTasks.length !== 1 ? "s" : ""} selected
+                </span>
+              </div>
+            )}
+
+            {/* Notes */}
+            <div>
+              <Label className="text-sm font-medium mb-2 block">Additional Notes (Optional)</Label>
+              <Textarea
+                placeholder="Any additional details about the work performed..."
+                value={irataTaskNotes}
+                onChange={(e) => setIrataTaskNotes(e.target.value)}
+                className="min-h-20"
+                data-testid="input-irata-notes"
+              />
+            </div>
+          </div>
+
+          <DialogFooter className="flex gap-2 sm:gap-2">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={handleSkipIrataTasks}
+              data-testid="button-skip-irata-tasks"
+            >
+              Skip for Now
+            </Button>
+            <Button
+              type="button"
+              onClick={handleSaveIrataTasks}
+              disabled={selectedIrataTasks.length === 0 || saveIrataTaskLogMutation.isPending}
+              data-testid="button-save-irata-tasks"
+            >
+              <span className="material-icons mr-2 text-sm">save</span>
+              {saveIrataTaskLogMutation.isPending ? "Saving..." : "Save to Logbook"}
+            </Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
     </div>

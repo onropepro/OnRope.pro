@@ -2,7 +2,7 @@ import type { Express, Request, Response, NextFunction } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { db } from "./db";
-import { insertUserSchema, insertClientSchema, insertProjectSchema, insertDropLogSchema, insertComplaintSchema, insertComplaintNoteSchema, insertJobCommentSchema, insertHarnessInspectionSchema, insertToolboxMeetingSchema, insertFlhaFormSchema, insertIncidentReportSchema, insertMethodStatementSchema, insertPayPeriodConfigSchema, insertQuoteSchema, insertQuoteServiceSchema, insertGearItemSchema, insertGearAssignmentSchema, insertScheduledJobSchema, insertJobAssignmentSchema, updatePropertyManagerAccountSchema, normalizeStrataPlan, type InsertGearItem, type InsertGearAssignment, type Project, gearAssignments, jobAssignments, workSessions, nonBillableWorkSessions, licenseKeys, users, propertyManagerCompanyLinks } from "@shared/schema";
+import { insertUserSchema, insertClientSchema, insertProjectSchema, insertDropLogSchema, insertComplaintSchema, insertComplaintNoteSchema, insertJobCommentSchema, insertHarnessInspectionSchema, insertToolboxMeetingSchema, insertFlhaFormSchema, insertIncidentReportSchema, insertMethodStatementSchema, insertPayPeriodConfigSchema, insertQuoteSchema, insertQuoteServiceSchema, insertGearItemSchema, insertGearAssignmentSchema, insertScheduledJobSchema, insertJobAssignmentSchema, updatePropertyManagerAccountSchema, normalizeStrataPlan, type InsertGearItem, type InsertGearAssignment, type Project, gearAssignments, jobAssignments, workSessions, nonBillableWorkSessions, licenseKeys, users, propertyManagerCompanyLinks, IRATA_TASK_TYPES } from "@shared/schema";
 import { eq, sql } from "drizzle-orm";
 import { z } from "zod";
 import bcrypt from "bcrypt";
@@ -5205,6 +5205,248 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({ sessions });
     } catch (error) {
       console.error("Get non-billable sessions by employee error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+  
+  // ==================== IRATA TASK LOG ROUTES ====================
+  
+  // Valid IRATA task IDs derived from canonical schema definition
+  const VALID_IRATA_TASK_IDS = IRATA_TASK_TYPES.map(t => t.id);
+  
+  // Create IRATA task log (when ending a work session)
+  app.post("/api/irata-task-logs", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      const { workSessionId, tasksPerformed, notes } = req.body;
+      
+      // Validate required fields
+      if (!workSessionId || !tasksPerformed || tasksPerformed.length === 0) {
+        return res.status(400).json({ message: "Missing required fields" });
+      }
+      
+      // Validate workSessionId exists and belongs to the current user
+      const workSession = await storage.getWorkSessionById(workSessionId);
+      if (!workSession) {
+        return res.status(400).json({ message: "Work session not found" });
+      }
+      
+      if (workSession.employeeId !== currentUser.id) {
+        return res.status(403).json({ message: "You can only log tasks for your own work sessions" });
+      }
+      
+      // Ensure work session is completed (has endTime)
+      if (!workSession.endTime) {
+        return res.status(400).json({ message: "Cannot log tasks for an incomplete work session" });
+      }
+      
+      // Check for duplicate log for this work session
+      const existingLog = await storage.getIrataTaskLogByWorkSession(workSessionId);
+      if (existingLog) {
+        return res.status(400).json({ message: "IRATA tasks have already been logged for this work session" });
+      }
+      
+      // Validate tasksPerformed is an array of strings
+      if (!Array.isArray(tasksPerformed) || tasksPerformed.length === 0) {
+        return res.status(400).json({ message: "Tasks performed must be a non-empty array" });
+      }
+      
+      // Validate all entries are strings
+      if (tasksPerformed.some(t => typeof t !== 'string')) {
+        return res.status(400).json({ message: "All task IDs must be strings" });
+      }
+      
+      // Canonicalize: filter to valid task IDs only, ensure uniqueness
+      const canonicalTasks = [...new Set(
+        tasksPerformed
+          .filter((t: string) => VALID_IRATA_TASK_IDS.includes(t))
+      )];
+      
+      // Reject if no valid tasks remain after canonicalization
+      if (canonicalTasks.length === 0) {
+        return res.status(400).json({ message: "At least one valid IRATA task must be selected" });
+      }
+      
+      // Report invalid task IDs that were filtered out
+      const invalidTasks = tasksPerformed.filter((t: string) => !VALID_IRATA_TASK_IDS.includes(t));
+      if (invalidTasks.length > 0) {
+        return res.status(400).json({ message: `Invalid task IDs: ${invalidTasks.join(', ')}` });
+      }
+      
+      // Compute hoursWorked and workDate from the authoritative work session data
+      const sessionStart = new Date(workSession.startTime);
+      const sessionEnd = new Date(workSession.endTime);
+      const hoursWorked = ((sessionEnd.getTime() - sessionStart.getTime()) / (1000 * 60 * 60)).toFixed(2);
+      const workDate = sessionStart.toISOString().split('T')[0]; // YYYY-MM-DD format
+      
+      // Get project info from the work session's project (authoritative source)
+      const project = await storage.getProjectById(workSession.projectId);
+      const derivedBuildingName = project?.buildingName || null;
+      const derivedBuildingAddress = project?.buildingAddress || null;
+      
+      // Get company ID from work session (authoritative source)
+      const companyId = workSession.companyId;
+      
+      try {
+        const log = await storage.createIrataTaskLog({
+          workSessionId,
+          employeeId: currentUser.id,
+          companyId,
+          projectId: workSession.projectId,
+          buildingName: derivedBuildingName,
+          buildingAddress: derivedBuildingAddress,
+          tasksPerformed: canonicalTasks,
+          workDate,
+          hoursWorked,
+          notes: typeof notes === 'string' ? notes : null,
+        });
+        
+        res.json({ log });
+      } catch (dbError: any) {
+        // Handle unique constraint violation (duplicate insert race condition)
+        if (dbError.code === '23505') {
+          return res.status(400).json({ message: "IRATA tasks have already been logged for this work session" });
+        }
+        throw dbError;
+      }
+    } catch (error) {
+      console.error("Create IRATA task log error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+  
+  // Get my IRATA task logs (employee's own logs)
+  app.get("/api/my-irata-task-logs", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      const logs = await storage.getIrataTaskLogsByEmployee(currentUser.id);
+      res.json({ logs });
+    } catch (error) {
+      console.error("Get my IRATA task logs error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+  
+  // Get all IRATA task logs for company (management only)
+  app.get("/api/irata-task-logs", requireAuth, requireRole("company", "owner_ceo", "human_resources", "accounting", "operations_manager", "general_supervisor", "rope_access_supervisor", "account_manager", "supervisor"), async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      const companyId = currentUser.role === "company" ? currentUser.id : currentUser.companyId;
+      
+      if (!companyId) {
+        return res.status(400).json({ message: "Unable to determine company" });
+      }
+      
+      const logs = await storage.getIrataTaskLogsByCompany(companyId);
+      res.json({ logs });
+    } catch (error) {
+      console.error("Get IRATA task logs error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+  
+  // Get IRATA task logs by employee ID (management only)
+  app.get("/api/irata-task-logs/employee/:employeeId", requireAuth, requireRole("company", "owner_ceo", "human_resources", "accounting", "operations_manager", "general_supervisor", "rope_access_supervisor", "account_manager", "supervisor"), async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      const logs = await storage.getIrataTaskLogsByEmployee(req.params.employeeId);
+      res.json({ logs });
+    } catch (error) {
+      console.error("Get IRATA task logs by employee error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+  
+  // Get IRATA task log by work session ID
+  app.get("/api/irata-task-logs/work-session/:workSessionId", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      const log = await storage.getIrataTaskLogByWorkSession(req.params.workSessionId);
+      res.json({ log: log || null });
+    } catch (error) {
+      console.error("Get IRATA task log by work session error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+  
+  // Update IRATA task log
+  app.patch("/api/irata-task-logs/:logId", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      // Verify ownership
+      const existingLog = await storage.getIrataTaskLogById(req.params.logId);
+      if (!existingLog || existingLog.employeeId !== currentUser.id) {
+        return res.status(403).json({ message: "Access denied" });
+      }
+      
+      const { tasksPerformed, notes } = req.body;
+      
+      const log = await storage.updateIrataTaskLog(req.params.logId, {
+        tasksPerformed: tasksPerformed || existingLog.tasksPerformed,
+        notes: notes !== undefined ? notes : existingLog.notes,
+      });
+      
+      res.json({ log });
+    } catch (error) {
+      console.error("Update IRATA task log error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+  
+  // Delete IRATA task log
+  app.delete("/api/irata-task-logs/:logId", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      // Verify ownership or management role
+      const existingLog = await storage.getIrataTaskLogById(req.params.logId);
+      if (!existingLog) {
+        return res.status(404).json({ message: "Log not found" });
+      }
+      
+      const isManagement = ["company", "owner_ceo", "operations_manager", "supervisor"].includes(currentUser.role);
+      if (existingLog.employeeId !== currentUser.id && !isManagement) {
+        return res.status(403).json({ message: "Access denied" });
+      }
+      
+      await storage.deleteIrataTaskLog(req.params.logId);
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Delete IRATA task log error:", error);
       res.status(500).json({ message: "Internal server error" });
     }
   });

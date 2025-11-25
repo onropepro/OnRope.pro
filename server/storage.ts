@@ -1,6 +1,6 @@
 import { db } from "./db";
-import { users, clients, projects, customJobTypes, dropLogs, workSessions, nonBillableWorkSessions, complaints, complaintNotes, projectPhotos, jobComments, harnessInspections, toolboxMeetings, flhaForms, incidentReports, methodStatements, companyDocuments, payPeriodConfig, payPeriods, quotes, quoteServices, gearItems, gearAssignments, scheduledJobs, jobAssignments, userPreferences, propertyManagerCompanyLinks } from "@shared/schema";
-import type { User, InsertUser, Client, InsertClient, Project, InsertProject, CustomJobType, InsertCustomJobType, DropLog, InsertDropLog, WorkSession, InsertWorkSession, Complaint, InsertComplaint, ComplaintNote, InsertComplaintNote, ProjectPhoto, InsertProjectPhoto, JobComment, InsertJobComment, HarnessInspection, InsertHarnessInspection, ToolboxMeeting, InsertToolboxMeeting, FlhaForm, InsertFlhaForm, IncidentReport, InsertIncidentReport, MethodStatement, InsertMethodStatement, PayPeriodConfig, InsertPayPeriodConfig, PayPeriod, InsertPayPeriod, EmployeeHoursSummary, Quote, InsertQuote, QuoteService, InsertQuoteService, QuoteWithServices, GearItem, InsertGearItem, GearAssignment, InsertGearAssignment, ScheduledJob, InsertScheduledJob, JobAssignment, InsertJobAssignment, ScheduledJobWithAssignments, UserPreferences, InsertUserPreferences, PropertyManagerCompanyLink, InsertPropertyManagerCompanyLink } from "@shared/schema";
+import { users, clients, projects, customJobTypes, dropLogs, workSessions, nonBillableWorkSessions, complaints, complaintNotes, projectPhotos, jobComments, harnessInspections, toolboxMeetings, flhaForms, incidentReports, methodStatements, companyDocuments, payPeriodConfig, payPeriods, quotes, quoteServices, gearItems, gearAssignments, scheduledJobs, jobAssignments, userPreferences, propertyManagerCompanyLinks, irataTaskLogs } from "@shared/schema";
+import type { User, InsertUser, Client, InsertClient, Project, InsertProject, CustomJobType, InsertCustomJobType, DropLog, InsertDropLog, WorkSession, InsertWorkSession, Complaint, InsertComplaint, ComplaintNote, InsertComplaintNote, ProjectPhoto, InsertProjectPhoto, JobComment, InsertJobComment, HarnessInspection, InsertHarnessInspection, ToolboxMeeting, InsertToolboxMeeting, FlhaForm, InsertFlhaForm, IncidentReport, InsertIncidentReport, MethodStatement, InsertMethodStatement, PayPeriodConfig, InsertPayPeriodConfig, PayPeriod, InsertPayPeriod, EmployeeHoursSummary, Quote, InsertQuote, QuoteService, InsertQuoteService, QuoteWithServices, GearItem, InsertGearItem, GearAssignment, InsertGearAssignment, ScheduledJob, InsertScheduledJob, JobAssignment, InsertJobAssignment, ScheduledJobWithAssignments, UserPreferences, InsertUserPreferences, PropertyManagerCompanyLink, InsertPropertyManagerCompanyLink, IrataTaskLog, InsertIrataTaskLog } from "@shared/schema";
 import { eq, and, or, desc, sql, isNull, isNotNull, not, gte, lte, between, inArray } from "drizzle-orm";
 import bcrypt from "bcrypt";
 
@@ -2263,6 +2263,65 @@ export class Storage {
       },
       complaints: projectComplaints,
     };
+  }
+
+  // IRATA Task Log operations
+  async createIrataTaskLog(log: InsertIrataTaskLog): Promise<IrataTaskLog> {
+    const [result] = await db.insert(irataTaskLogs).values(log).returning();
+    return result;
+  }
+
+  async getIrataTaskLogsByEmployee(employeeId: string): Promise<IrataTaskLog[]> {
+    return db.select()
+      .from(irataTaskLogs)
+      .where(eq(irataTaskLogs.employeeId, employeeId))
+      .orderBy(desc(irataTaskLogs.workDate));
+  }
+
+  async getIrataTaskLogsByCompany(companyId: string): Promise<IrataTaskLog[]> {
+    return db.select()
+      .from(irataTaskLogs)
+      .where(eq(irataTaskLogs.companyId, companyId))
+      .orderBy(desc(irataTaskLogs.workDate));
+  }
+
+  async getIrataTaskLogByWorkSession(workSessionId: string): Promise<IrataTaskLog | undefined> {
+    const [result] = await db.select()
+      .from(irataTaskLogs)
+      .where(eq(irataTaskLogs.workSessionId, workSessionId))
+      .limit(1);
+    return result;
+  }
+
+  async getIrataTaskLogById(logId: string): Promise<IrataTaskLog | undefined> {
+    const [result] = await db.select()
+      .from(irataTaskLogs)
+      .where(eq(irataTaskLogs.id, logId))
+      .limit(1);
+    return result;
+  }
+
+  async updateIrataTaskLog(logId: string, updates: Partial<InsertIrataTaskLog>): Promise<IrataTaskLog> {
+    const [result] = await db.update(irataTaskLogs)
+      .set(updates)
+      .where(eq(irataTaskLogs.id, logId))
+      .returning();
+    return result;
+  }
+
+  async deleteIrataTaskLog(logId: string): Promise<void> {
+    await db.delete(irataTaskLogs).where(eq(irataTaskLogs.id, logId));
+  }
+
+  async getIrataTaskLogsByDateRange(employeeId: string, startDate: string, endDate: string): Promise<IrataTaskLog[]> {
+    return db.select()
+      .from(irataTaskLogs)
+      .where(and(
+        eq(irataTaskLogs.employeeId, employeeId),
+        gte(irataTaskLogs.workDate, startDate),
+        lte(irataTaskLogs.workDate, endDate)
+      ))
+      .orderBy(desc(irataTaskLogs.workDate));
   }
 }
 

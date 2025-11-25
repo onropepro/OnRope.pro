@@ -1548,6 +1548,70 @@ export type InsertScheduledJob = z.infer<typeof insertScheduledJobSchema>;
 export type JobAssignment = typeof jobAssignments.$inferSelect;
 export type InsertJobAssignment = z.infer<typeof insertJobAssignmentSchema>;
 
+// IRATA Task Logs - tracks rope access tasks performed during work sessions for logbook
+export const irataTaskLogs = pgTable("irata_task_logs", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  workSessionId: varchar("work_session_id").notNull().references(() => workSessions.id, { onDelete: "cascade" }),
+  employeeId: varchar("employee_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  companyId: varchar("company_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  
+  // Building/Project info captured at log time
+  projectId: varchar("project_id").references(() => projects.id, { onDelete: "set null" }),
+  buildingName: varchar("building_name"),
+  buildingAddress: text("building_address"),
+  
+  // Tasks performed (stored as array of task type strings)
+  tasksPerformed: text("tasks_performed").array().default(sql`ARRAY[]::text[]`).notNull(),
+  
+  // Hours and date info
+  workDate: date("work_date").notNull(),
+  hoursWorked: numeric("hours_worked", { precision: 5, scale: 2 }).notNull(),
+  
+  // Optional notes
+  notes: text("notes"),
+  
+  createdAt: timestamp("created_at").defaultNow(),
+}, (table) => ({
+  employeeIdx: index("IDX_irata_task_logs_employee").on(table.employeeId),
+  companyIdx: index("IDX_irata_task_logs_company").on(table.companyId),
+  workSessionIdx: index("IDX_irata_task_logs_work_session").on(table.workSessionId),
+  uniqueWorkSession: sql`UNIQUE("work_session_id")`,
+}));
+
+export const insertIrataTaskLogSchema = createInsertSchema(irataTaskLogs).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type IrataTaskLog = typeof irataTaskLogs.$inferSelect;
+export type InsertIrataTaskLog = z.infer<typeof insertIrataTaskLogSchema>;
+
+// IRATA task types for logbook
+export const IRATA_TASK_TYPES = [
+  { id: "rope_transfer", label: "Rope Transfer", description: "Transferring between rope systems" },
+  { id: "re_anchor", label: "Re-Anchor", description: "Re-anchoring operations" },
+  { id: "ascending", label: "Ascending", description: "Ascending on rope" },
+  { id: "descending", label: "Descending", description: "Descending on rope" },
+  { id: "rigging", label: "Rigging", description: "Setting up rigging systems" },
+  { id: "deviation", label: "Deviation", description: "Using deviation anchors" },
+  { id: "aid_climbing", label: "Aid Climbing", description: "Aid climbing techniques" },
+  { id: "edge_transition", label: "Edge Transition", description: "Transitioning over edges" },
+  { id: "knot_passing", label: "Knot Passing", description: "Passing knots while on rope" },
+  { id: "rope_to_rope_transfer", label: "Rope to Rope Transfer", description: "Transferring between different rope systems" },
+  { id: "mid_rope_changeover", label: "Mid-Rope Changeover", description: "Changing over mid-rope" },
+  { id: "rescue_technique", label: "Rescue Technique", description: "Performing rescue operations" },
+  { id: "hauling", label: "Hauling", description: "Hauling equipment or personnel" },
+  { id: "lowering", label: "Lowering", description: "Lowering equipment or personnel" },
+  { id: "tensioned_rope", label: "Tensioned Rope Work", description: "Working on tensioned rope systems" },
+  { id: "horizontal_traverse", label: "Horizontal Traverse", description: "Moving horizontally on rope" },
+  { id: "window_cleaning", label: "Window Cleaning", description: "Performing window cleaning tasks" },
+  { id: "building_inspection", label: "Building Inspection", description: "Conducting building inspections" },
+  { id: "maintenance_work", label: "Maintenance Work", description: "Performing maintenance tasks" },
+  { id: "other", label: "Other", description: "Other rope access tasks" },
+] as const;
+
+export type IrataTaskType = typeof IRATA_TASK_TYPES[number]['id'];
+
 // User preferences table
 export const userPreferences = pgTable("user_preferences", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
