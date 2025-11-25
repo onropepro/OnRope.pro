@@ -20,6 +20,13 @@ The platform is built with a React 18 frontend using TypeScript and Wouter for r
 *   **Multi-Tenant Role-Based Access Control (RBAC):** Supports various roles with granular permissions for data access and actions.
 *   **Project Management System:** Manages diverse job types with visual selection, detailed project attributes, and multiple progress tracking systems. Custom job types can be saved and reused.
 *   **Workforce & Time Tracking:** Includes employee management (onboarding, certifications, rates, permissions), real-time clock-in/out with GPS, billable/non-billable hours, and payroll-ready reporting. Includes IRATA certification expiration tracking.
+*   **IRATA Task Logging System:** Comprehensive work hours logging system for IRATA technicians to track specific rope access tasks performed during work sessions, supporting certification progression. Features include:
+    - Task selection dialog after ending work sessions (IRATA technicians only)
+    - 20+ canonical rope access task types (rope transfer, ascending, descending, rigging, deviation, rescue techniques, etc.)
+    - Server-derived metadata (hours, dates, building info) from authoritative work session/project records
+    - Security hardening: canonical task validation, unique constraints, work session ownership verification
+    - "My Logged Hours" page (/my-logged-hours) with full history, filtering, and statistics
+    - Dashboard navigation card for easy access
 *   **Client Relationship Management (CRM):** Manages client and building records, offers autofill intelligence for project creation, and streamlines client-to-project workflows.
 *   **Scheduling & Resource Allocation:** Features a dual-calendar system with color-coding, drag-and-drop assignment, and conflict detection.
 *   **Safety & Compliance:** Digitizes harness inspections with professional PDF export, toolbox meeting documentation with digital signatures and PDF generation, FLHA (Field Level Hazard Assessment) forms, incident reports with comprehensive tracking, and gear inventory management with date of manufacture tracking. Incident reports include detailed incident classification, injured person tracking, root cause analysis, corrective actions, regulatory reporting, supervisor/management review, and digital signatures. All safety documents can be downloaded as professionally formatted PDFs with proper pagination, embedded signatures, and compliance-ready styling. When white-label branding is active, company name appears at the top of safety document PDFs (first page).
