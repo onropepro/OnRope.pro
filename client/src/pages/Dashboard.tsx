@@ -1,5 +1,6 @@
 // GPS Location Tracking - v2.0 - CACHE BUST
-import { useState, useEffect, useMemo, useRef } from "react";
+import { useState, useEffect, useMemo, useRef, useContext } from "react";
+import { BrandingContext } from "@/App";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { Button } from "@/components/ui/button";
@@ -225,6 +226,9 @@ function SortableCard({ card, isRearranging, colorIndex }: { card: any; isRearra
     isDragging,
   } = useSortable({ id: card.id, disabled: !isRearranging });
 
+  // Get brand colors from context (reliable, no timing issues)
+  const { brandColors, brandingActive } = useContext(BrandingContext);
+
   // Create a light tint from hex color
   const createTintFromHex = (hex: string, lightness: number = 90): string => {
     hex = hex.replace(/^#/, '');
@@ -250,34 +254,19 @@ function SortableCard({ card, isRearranging, colorIndex }: { card: any; isRearra
     return `hsl(${Math.round(h * 360)}, ${Math.round(s * 100)}%, ${lightness}%)`;
   };
 
-  // Check if branding is active by looking for brand-primary CSS variable
-  const getBrandColor = (index: number): { hex: string; tint: string } | null => {
-    if (typeof document === 'undefined') return null;
-    
-    const brandVars = ['--brand-primary', '--brand-secondary', '--brand-tertiary', '--brand-quaternary'];
-    const varName = brandVars[index % brandVars.length];
-    const hexValue = getComputedStyle(document.documentElement).getPropertyValue(varName).trim();
-    
-    if (hexValue && hexValue.startsWith('#')) {
-      return {
-        hex: hexValue,
-        tint: createTintFromHex(hexValue, 90)
-      };
-    }
-    return null;
-  };
-
-  // Check if branding is active (has at least the primary color set)
-  const brandColor = getBrandColor(colorIndex);
-  const hasBranding = brandColor !== null;
-
   // When branding is active: use ONLY brand colors for EVERYTHING
   // When branding is NOT active: use original card borderColor with default bg-card
-  const activeColor = hasBranding ? brandColor.hex : card.borderColor;
-  const cardBackground = hasBranding ? brandColor.tint : undefined;
-  
-  // Icon color: ALWAYS use brand color when branding active, otherwise use card's borderColor
-  const iconColor = hasBranding ? brandColor.hex : card.borderColor;
+  let activeColor = card.borderColor;
+  let cardBackground: string | undefined = undefined;
+  let iconColor = card.borderColor;
+
+  if (brandingActive && brandColors.length > 0) {
+    // Cycle through brand colors
+    const brandColor = brandColors[colorIndex % brandColors.length];
+    activeColor = brandColor;
+    cardBackground = createTintFromHex(brandColor, 90);
+    iconColor = brandColor;
+  }
 
   const style: React.CSSProperties = {
     transform: CSS.Transform.toString(transform),

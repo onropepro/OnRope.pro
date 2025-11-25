@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, createContext } from "react";
 import { Switch, Route, useLocation } from "wouter";
 import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider, useQuery } from "@tanstack/react-query";
@@ -196,6 +196,17 @@ function Router() {
     </Switch>
   );
 }
+
+// Branding Context - share brand colors with all components
+interface BrandingContextType {
+  brandColors: string[];
+  brandingActive: boolean;
+}
+
+export const BrandingContext = createContext<BrandingContextType>({
+  brandColors: [],
+  brandingActive: false,
+});
 
 // White Label Branding Provider
 function BrandingProvider({ children }: { children: React.ReactNode }) {
@@ -426,7 +437,17 @@ function BrandingProvider({ children }: { children: React.ReactNode }) {
     };
   }, [isAuthenticated, primaryBrandColor, secondaryBrandColor, tertiaryBrandColor, quaternaryBrandColor, brandColors, location]);
 
-  return <>{children}</>;
+  // Provide brand colors via context so components can access them reliably
+  const contextValue: BrandingContextType = {
+    brandColors: brandColors,
+    brandingActive: isAuthenticated && brandColors.length > 0,
+  };
+
+  return (
+    <BrandingContext.Provider value={contextValue}>
+      {children}
+    </BrandingContext.Provider>
+  );
 }
 
 function App() {
