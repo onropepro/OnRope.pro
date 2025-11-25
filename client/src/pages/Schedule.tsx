@@ -924,9 +924,21 @@ export default function Schedule() {
         </TabsContent>
 
         <TabsContent value="employee-schedule" className="mt-4">
-          <div className="bg-card rounded-lg shadow-premium p-4 md:p-6">
+          <div 
+            className="rounded-lg shadow-premium p-4 md:p-6 relative overflow-hidden"
+            style={{
+              background: `linear-gradient(135deg, hsl(var(--primary) / 0.12) 0%, hsl(var(--primary) / 0.04) 50%, hsl(var(--card)) 100%)`
+            }}
+          >
+            {/* Subtle decorative gradient overlay */}
+            <div 
+              className="absolute inset-0 pointer-events-none"
+              style={{
+                background: `radial-gradient(ellipse at top right, hsl(var(--primary) / 0.15), transparent 50%)`
+              }}
+            />
             {/* Week Navigation Header */}
-            <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center justify-between mb-6 relative z-10">
               <Button 
                 variant="outline" 
                 size="icon"
@@ -963,7 +975,7 @@ export default function Schedule() {
             </div>
 
             {/* Day Headers */}
-            <div className="grid grid-cols-8 gap-1 mb-2">
+            <div className="grid grid-cols-8 gap-1 mb-2 relative z-10">
               <div className="font-medium text-sm text-muted-foreground px-2">Team</div>
               {getWeekDates.map((date, idx) => (
                 <div 
@@ -985,7 +997,7 @@ export default function Schedule() {
             </div>
 
             {/* Employee Rows */}
-            <div className="space-y-2">
+            <div className="space-y-2 relative z-10">
               {employees.length === 0 ? (
                 <div className="text-center py-12 text-muted-foreground">
                   <Users className="w-12 h-12 mx-auto mb-3 opacity-50" />
@@ -1077,7 +1089,7 @@ export default function Schedule() {
             </div>
 
             {/* Legend */}
-            <div className="mt-6 pt-4 border-t">
+            <div className="mt-6 pt-4 border-t relative z-10">
               <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
                 <div className="flex items-center gap-2">
                   <div className="w-3 h-3 rounded bg-primary"></div>
