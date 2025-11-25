@@ -39,7 +39,7 @@ export default function Schedule() {
   const [activeEmployeeId, setActiveEmployeeId] = useState<string | null>(null);
   
   const { brandColors, brandingActive } = useContext(BrandingContext);
-  const defaultJobColor = brandingActive && brandColors.length > 0 ? brandColors[0] : "#3b82f6";
+  const defaultJobColor = brandingActive && brandColors.length > 0 ? brandColors[0] : "hsl(var(--primary))";
   
   // Shared assignment dialog state (used by both drag-drop and job detail button)
   const [assignmentDialogOpen, setAssignmentDialogOpen] = useState(false);
@@ -1295,7 +1295,7 @@ function CreateJobDialog({
 }) {
   const { toast } = useToast();
   const { brandColors, brandingActive } = useContext(BrandingContext);
-  const defaultJobColor = brandingActive && brandColors.length > 0 ? brandColors[0] : "#3b82f6";
+  const defaultJobColor = brandingActive && brandColors.length > 0 ? brandColors[0] : "hsl(var(--primary))";
   
   // Fetch projects for dropdown
   const { data: projectsData } = useQuery<{ projects: any[] }>({
@@ -2105,7 +2105,7 @@ function EditJobDialog({
 }) {
   const { toast } = useToast();
   const { brandColors, brandingActive } = useContext(BrandingContext);
-  const defaultJobColor = brandingActive && brandColors.length > 0 ? brandColors[0] : "#3b82f6";
+  const defaultJobColor = brandingActive && brandColors.length > 0 ? brandColors[0] : "hsl(var(--primary))";
   
   // Fetch projects for dropdown
   const { data: projectsData } = useQuery<{ projects: any[] }>({

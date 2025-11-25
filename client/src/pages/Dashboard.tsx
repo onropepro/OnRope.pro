@@ -416,7 +416,7 @@ export default function Dashboard() {
   const [activeTab, setActiveTab] = useState("");
   
   const { brandColors: contextBrandColors, brandingActive } = useContext(BrandingContext);
-  const defaultCalendarColor = brandingActive && contextBrandColors.length > 0 ? contextBrandColors[0] : "#3b82f6";
+  const defaultCalendarColor = brandingActive && contextBrandColors.length > 0 ? contextBrandColors[0] : "hsl(var(--primary))";
 
   // Scroll to top when changing tabs
   const handleTabChange = (tab: string) => {

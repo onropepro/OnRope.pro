@@ -93,7 +93,7 @@ export default function HoursAnalytics() {
   // Get branding colors
   const { brandColors, brandingActive } = useContext(BrandingContext);
   const hasCustomBranding = brandingActive && brandColors.length > 0;
-  const primaryColor = hasCustomBranding ? brandColors[0] : "#3b82f6";
+  const primaryColor = hasCustomBranding ? brandColors[0] : "hsl(var(--primary))";
   
   // Drag-and-drop sensors
   const sensors = useSensors(
