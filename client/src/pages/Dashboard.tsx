@@ -214,7 +214,7 @@ type DropLogFormData = z.infer<typeof dropLogSchema>;
 type EndDayFormData = z.infer<typeof endDaySchema>;
 type ClientFormData = z.infer<typeof clientSchema>;
 
-// Sortable Card Component with tinted backgrounds based on card's border color
+// Sortable Card Component with branding colors
 function SortableCard({ card, isRearranging, colorIndex }: { card: any; isRearranging: boolean; colorIndex: number }) {
   const {
     attributes,
@@ -225,8 +225,8 @@ function SortableCard({ card, isRearranging, colorIndex }: { card: any; isRearra
     isDragging,
   } = useSortable({ id: card.id, disabled: !isRearranging });
 
-  // Create a light tint from the card's border color for background
-  const createTintFromHex = (hex: string): string => {
+  // Create a light tint from hex color
+  const createTintFromHex = (hex: string, lightness: number = 90): string => {
     hex = hex.replace(/^#/, '');
     const r = parseInt(hex.substring(0, 2), 16) / 255;
     const g = parseInt(hex.substring(2, 4), 16) / 255;
@@ -234,10 +234,11 @@ function SortableCard({ card, isRearranging, colorIndex }: { card: any; isRearra
     
     const max = Math.max(r, g, b);
     const min = Math.min(r, g, b);
-    let h = 0, s = 0, l = (max + min) / 2;
+    let h = 0, s = 0;
     
     if (max !== min) {
       const d = max - min;
+      const l = (max + min) / 2;
       s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
       switch (max) {
         case r: h = ((g - b) / d + (g < b ? 6 : 0)) / 6; break;
@@ -246,18 +247,37 @@ function SortableCard({ card, isRearranging, colorIndex }: { card: any; isRearra
       }
     }
     
-    // Return a more visible tint (90% lightness) for noticeable background
-    return `hsl(${Math.round(h * 360)}, ${Math.round(s * 100)}%, 90%)`;
+    return `hsl(${Math.round(h * 360)}, ${Math.round(s * 100)}%, ${lightness}%)`;
   };
 
-  const tintBackground = createTintFromHex(card.borderColor);
+  // Get brand colors from CSS variables - these are set by the branding system
+  const getBrandColor = (index: number): { hex: string; tint: string } | null => {
+    if (typeof document === 'undefined') return null;
+    
+    const brandVars = ['--brand-primary', '--brand-secondary', '--brand-tertiary', '--brand-quaternary'];
+    const varName = brandVars[index % brandVars.length];
+    const hexValue = getComputedStyle(document.documentElement).getPropertyValue(varName).trim();
+    
+    if (hexValue && hexValue.startsWith('#')) {
+      return {
+        hex: hexValue,
+        tint: createTintFromHex(hexValue, 90)
+      };
+    }
+    return null;
+  };
+
+  // Try to get brand color, fall back to card's default border color
+  const brandColor = getBrandColor(colorIndex);
+  const activeColor = brandColor?.hex || card.borderColor;
+  const activeTint = brandColor?.tint || createTintFromHex(card.borderColor, 90);
 
   const style: React.CSSProperties = {
     transform: CSS.Transform.toString(transform),
     transition,
     opacity: isDragging ? 0.5 : 1,
-    borderLeft: `6px solid ${card.borderColor}`,
-    background: tintBackground,
+    borderLeft: `6px solid ${activeColor}`,
+    background: activeTint,
   };
 
   return (
@@ -284,9 +304,9 @@ function SortableCard({ card, isRearranging, colorIndex }: { card: any; isRearra
         <div 
           className="w-14 h-14 rounded-xl flex items-center justify-center transition-transform duration-300 group-hover:scale-110 border-2"
           style={{ 
-            backgroundColor: `${card.borderColor}20`, 
-            color: card.borderColor, 
-            borderColor: `${card.borderColor}40` 
+            backgroundColor: `${activeColor}25`, 
+            color: activeColor, 
+            borderColor: `${activeColor}50` 
           }}
         >
           <span className="material-icons text-4xl">{card.icon}</span>
