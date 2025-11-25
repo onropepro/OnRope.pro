@@ -228,6 +228,9 @@ function SortableCard({ card, isRearranging, colorIndex }: { card: any; isRearra
 
   // Get brand colors from context (reliable, no timing issues)
   const { brandColors, brandingActive } = useContext(BrandingContext);
+  
+  // DEBUG: Log what the component receives
+  console.log('[SortableCard] Context received:', { brandColors, brandingActive, colorIndex });
 
   // Create a light tint from hex color
   const createTintFromHex = (hex: string, lightness: number = 90): string => {
