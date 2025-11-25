@@ -80,29 +80,42 @@ export default function Documents() {
 
   // Calculate toolbox meeting compliance rating
   // For each project on each day with work sessions, at least one toolbox meeting should exist
+  // "Other" meetings (off-site, office, training) count for ALL work sessions on that date
   const toolboxMeetingCompliance = (() => {
     // Get unique (projectId, date) combinations where work sessions occurred
     const workSessionDays = new Set<string>();
+    const workSessionDates = new Set<string>(); // Just dates for "Other" matching
     workSessions.forEach((session: any) => {
       if (session.projectId && session.workDate) {
         workSessionDays.add(`${session.projectId}|${session.workDate}`);
+        workSessionDates.add(session.workDate);
       }
     });
 
     // Create a map of (projectId, date) to check if toolbox meeting exists
     const toolboxMeetingDays = new Set<string>();
+    const otherMeetingDates = new Set<string>(); // Dates with "Other" meetings
     meetings.forEach((meeting: any) => {
-      if (meeting.projectId && meeting.meetingDate) {
-        toolboxMeetingDays.add(`${meeting.projectId}|${meeting.meetingDate}`);
+      if (meeting.meetingDate) {
+        if (meeting.projectId === 'other') {
+          // "Other" meetings cover all work sessions on that date
+          otherMeetingDates.add(meeting.meetingDate);
+        } else if (meeting.projectId) {
+          toolboxMeetingDays.add(`${meeting.projectId}|${meeting.meetingDate}`);
+        }
       }
     });
 
     // Count how many work session days have a corresponding toolbox meeting
+    // A work session day is covered if:
+    // 1. There's a project-specific meeting for that (projectId, date) combo, OR
+    // 2. There's an "Other" meeting on that date
     let daysWithMeeting = 0;
     let totalDays = 0;
     workSessionDays.forEach((dayKey) => {
       totalDays++;
-      if (toolboxMeetingDays.has(dayKey)) {
+      const date = dayKey.split('|')[1];
+      if (toolboxMeetingDays.has(dayKey) || otherMeetingDates.has(date)) {
         daysWithMeeting++;
       }
     });
@@ -1646,8 +1659,8 @@ export default function Documents() {
               </CardHeader>
               <CardContent className="pt-4">
                 <div className="mb-3 text-sm text-muted-foreground">
-                  Measures how often a toolbox meeting was conducted on days when work sessions were active on each project.
-                  Only one meeting per project per day is required.
+                  Measures how often a toolbox meeting was conducted on days when work sessions were active.
+                  Project-specific meetings cover that project. "Other" meetings (office, training) cover all work sessions on that date.
                 </div>
                 <Progress 
                   value={toolboxMeetingCompliance.percentage} 

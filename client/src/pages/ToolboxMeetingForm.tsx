@@ -367,6 +367,9 @@ export default function ToolboxMeetingForm() {
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
+                          <SelectItem value="other">
+                            Other / Off-site (Office, Training, etc.)
+                          </SelectItem>
                           {projectsData?.projects.map((project) => (
                             <SelectItem key={project.id} value={project.id}>
                               {project.buildingName}
