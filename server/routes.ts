@@ -6054,6 +6054,193 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Company Safety Rating (CSR) endpoint - combines all safety metrics
+  app.get("/api/company-safety-rating", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      const companyId = currentUser.role === "company" ? currentUser.id : currentUser.companyId;
+      
+      if (!companyId) {
+        return res.status(400).json({ message: "Unable to determine company" });
+      }
+      
+      // 1. Documentation Safety Rating (Health & Safety Manual + Company Policy)
+      const companyDocuments = await storage.getCompanyDocuments(companyId);
+      const hasHealthSafety = companyDocuments.some((doc: any) => doc.documentType === 'health_safety_manual');
+      const hasCompanyPolicy = companyDocuments.some((doc: any) => doc.documentType === 'company_policy');
+      const documentationRating = (hasHealthSafety && hasCompanyPolicy) ? 100 : (hasHealthSafety || hasCompanyPolicy) ? 50 : 0;
+      
+      // 2. Toolbox Meeting Compliance
+      const projects = await storage.getProjectsByCompany(companyId);
+      const meetings = await storage.getToolboxMeetingsByCompany(companyId);
+      
+      // Get all work sessions across projects
+      const allWorkSessions: any[] = [];
+      for (const project of projects) {
+        const projectSessions = await storage.getWorkSessionsByProject(project.id, companyId);
+        allWorkSessions.push(...projectSessions);
+      }
+      
+      // Calculate toolbox meeting compliance
+      const workSessionDays = new Set<string>();
+      const workSessionDates = new Set<string>();
+      allWorkSessions.forEach((session: any) => {
+        if (session.projectId && session.workDate) {
+          workSessionDays.add(`${session.projectId}|${session.workDate}`);
+          workSessionDates.add(session.workDate);
+        }
+      });
+      
+      const toolboxMeetingDays = new Set<string>();
+      const otherMeetingDates = new Set<string>();
+      meetings.forEach((meeting: any) => {
+        if (meeting.meetingDate) {
+          if (meeting.projectId === 'other') {
+            otherMeetingDates.add(meeting.meetingDate);
+          } else if (meeting.projectId) {
+            toolboxMeetingDays.add(`${meeting.projectId}|${meeting.meetingDate}`);
+          }
+        }
+      });
+      
+      let toolboxDaysWithMeeting = 0;
+      let toolboxTotalDays = 0;
+      workSessionDays.forEach((dayKey) => {
+        toolboxTotalDays++;
+        const date = dayKey.split('|')[1];
+        if (toolboxMeetingDays.has(dayKey) || otherMeetingDates.has(date)) {
+          toolboxDaysWithMeeting++;
+        }
+      });
+      const toolboxMeetingRating = toolboxTotalDays > 0 ? Math.round((toolboxDaysWithMeeting / toolboxTotalDays) * 100) : 100;
+      
+      // 3. Daily Harness Inspection Rating (last 30 days)
+      const harnessInspections = await storage.getHarnessInspectionsByCompany(companyId);
+      const today = new Date();
+      const thirtyDaysAgo = new Date(today);
+      thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+      
+      let harnessRequiredInspections = 0;
+      let harnessCompletedInspections = 0;
+      
+      // Check each day in the last 30 days
+      for (let i = 0; i < 30; i++) {
+        const checkDate = new Date(today);
+        checkDate.setDate(checkDate.getDate() - i);
+        const dateStr = `${checkDate.getFullYear()}-${String(checkDate.getMonth() + 1).padStart(2, '0')}-${String(checkDate.getDate()).padStart(2, '0')}`;
+        
+        // Find workers with sessions on this day
+        const workersWithSessions = new Set<string>();
+        allWorkSessions.forEach((session: any) => {
+          if (session.employeeId && session.workDate === dateStr) {
+            workersWithSessions.add(session.employeeId);
+          }
+        });
+        
+        // Check if each worker has an inspection
+        workersWithSessions.forEach((workerId) => {
+          const inspection = harnessInspections.find((insp: any) =>
+            insp.workerId === workerId && insp.inspectionDate === dateStr
+          );
+          
+          if (!inspection || inspection.overallStatus !== "not_applicable") {
+            harnessRequiredInspections++;
+            if (inspection && inspection.overallStatus !== "not_applicable") {
+              harnessCompletedInspections++;
+            }
+          }
+        });
+      }
+      const harnessInspectionRating = harnessRequiredInspections > 0 
+        ? Math.round((harnessCompletedInspections / harnessRequiredInspections) * 100) 
+        : 100;
+      
+      // 4. Project Completion Rate (average progress of all active/completed projects)
+      let totalProjectProgress = 0;
+      let projectCount = 0;
+      
+      for (const project of projects) {
+        if (project.status === 'deleted') continue;
+        
+        projectCount++;
+        const projectSessions = allWorkSessions.filter((s: any) => s.projectId === project.id && s.endTime);
+        
+        // Calculate progress based on job type
+        if (project.jobType === 'general_pressure_washing' || project.jobType === 'ground_window_cleaning') {
+          // Hours-based: use manualCompletionPercentage
+          const sessionsWithPercentage = projectSessions.filter((s: any) => 
+            s.manualCompletionPercentage !== null && s.manualCompletionPercentage !== undefined
+          );
+          if (sessionsWithPercentage.length > 0) {
+            const sortedSessions = [...sessionsWithPercentage].sort((a: any, b: any) => 
+              new Date(b.endTime).getTime() - new Date(a.endTime).getTime()
+            );
+            totalProjectProgress += sortedSessions[0].manualCompletionPercentage || 0;
+          }
+        } else if (project.jobType === 'in_suite_dryer_vent_cleaning') {
+          // Suite-based
+          const completedSuites = projectSessions.reduce((sum: number, s: any) => 
+            sum + (s.suitesCompleted || 0), 0);
+          const totalSuites = (project.floorCount || 1) * (project.suitesPerDay || 1);
+          totalProjectProgress += totalSuites > 0 ? Math.min(100, (completedSuites / totalSuites) * 100) : 0;
+        } else if (project.jobType === 'parkade_pressure_cleaning') {
+          // Stall-based
+          const completedStalls = projectSessions.reduce((sum: number, s: any) => 
+            sum + (s.stallsCompleted || 0), 0);
+          const totalStalls = project.totalStalls || project.floorCount || 1;
+          totalProjectProgress += totalStalls > 0 ? Math.min(100, (completedStalls / totalStalls) * 100) : 0;
+        } else {
+          // Drop-based
+          const totalDrops = (project.totalDropsNorth || 0) + (project.totalDropsEast || 0) + 
+                            (project.totalDropsSouth || 0) + (project.totalDropsWest || 0);
+          const completedDrops = projectSessions.reduce((sum: number, s: any) => 
+            sum + (s.dropsCompletedNorth || 0) + (s.dropsCompletedEast || 0) + 
+                  (s.dropsCompletedSouth || 0) + (s.dropsCompletedWest || 0), 0);
+          totalProjectProgress += totalDrops > 0 ? Math.min(100, (completedDrops / totalDrops) * 100) : 0;
+        }
+        
+        // If project is marked completed, count as 100%
+        if (project.status === 'completed') {
+          totalProjectProgress = (totalProjectProgress - (projectCount > 0 ? totalProjectProgress / projectCount : 0)) + 100;
+        }
+      }
+      const projectCompletionRating = projectCount > 0 ? Math.round(totalProjectProgress / projectCount) : 0;
+      
+      // Calculate overall CSR (average of all four ratings)
+      const overallCSR = Math.round(
+        (documentationRating + toolboxMeetingRating + harnessInspectionRating + projectCompletionRating) / 4
+      );
+      
+      res.json({
+        overallCSR,
+        breakdown: {
+          documentationRating,
+          toolboxMeetingRating,
+          harnessInspectionRating,
+          projectCompletionRating
+        },
+        details: {
+          hasHealthSafety,
+          hasCompanyPolicy,
+          toolboxDaysWithMeeting,
+          toolboxTotalDays,
+          harnessCompletedInspections,
+          harnessRequiredInspections,
+          projectCount,
+          totalProjectProgress: projectCount > 0 ? Math.round(totalProjectProgress / projectCount) : 0
+        }
+      });
+    } catch (error) {
+      console.error("Get company safety rating error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
   // FLHA form routes
   app.post("/api/flha-forms", requireAuth, requireRole("rope_access_tech", "general_supervisor", "rope_access_supervisor", "supervisor", "operations_manager", "company"), async (req: Request, res: Response) => {
     try {
