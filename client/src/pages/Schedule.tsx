@@ -927,14 +927,18 @@ export default function Schedule() {
           <div 
             className="rounded-lg shadow-premium p-4 md:p-6 relative overflow-hidden"
             style={{
-              background: `linear-gradient(135deg, hsl(var(--primary) / 0.12) 0%, hsl(var(--primary) / 0.04) 50%, hsl(var(--card)) 100%)`
+              background: `linear-gradient(135deg, hsl(var(--primary) / 0.12) 0%, hsl(var(--brand-secondary-hsl, var(--chart-2)) / 0.06) 50%, hsl(var(--card)) 100%)`
             }}
           >
-            {/* Subtle decorative gradient overlay */}
+            {/* Multi-color decorative gradient overlays */}
             <div 
               className="absolute inset-0 pointer-events-none"
               style={{
-                background: `radial-gradient(ellipse at top right, hsl(var(--primary) / 0.15), transparent 50%)`
+                background: `
+                  radial-gradient(ellipse at top right, hsl(var(--primary) / 0.15), transparent 50%),
+                  radial-gradient(ellipse at bottom left, hsl(var(--brand-secondary-hsl, var(--chart-2)) / 0.10), transparent 40%),
+                  radial-gradient(ellipse at top left, hsl(var(--brand-tertiary-hsl, var(--chart-3)) / 0.08), transparent 35%)
+                `
               }}
             />
             {/* Week Navigation Header */}

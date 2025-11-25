@@ -244,6 +244,9 @@ function BrandingProvider({ children }: { children: React.ReactNode }) {
   const branding = brandingData || {};
   const brandColors = (branding.subscriptionActive && branding.colors) ? branding.colors : [];
   const primaryBrandColor = brandColors[0] || null;
+  const secondaryBrandColor = brandColors[1] || null;
+  const tertiaryBrandColor = brandColors[2] || null;
+  const quaternaryBrandColor = brandColors[3] || null;
 
   // Convert hex color to HSL format required by Tailwind
   const hexToHSL = (hex: string): string => {
@@ -288,6 +291,39 @@ function BrandingProvider({ children }: { children: React.ReactNode }) {
       document.documentElement.style.setProperty('--sidebar-ring', hslColor);
       document.documentElement.style.setProperty('--chart-1', hslColor);
       
+      // Apply secondary brand color (for gradients, accents)
+      if (secondaryBrandColor) {
+        const hslSecondary = hexToHSL(secondaryBrandColor);
+        document.documentElement.style.setProperty('--brand-secondary', secondaryBrandColor);
+        document.documentElement.style.setProperty('--brand-secondary-hsl', hslSecondary);
+        document.documentElement.style.setProperty('--chart-2', hslSecondary);
+      } else {
+        document.documentElement.style.removeProperty('--brand-secondary');
+        document.documentElement.style.removeProperty('--brand-secondary-hsl');
+      }
+      
+      // Apply tertiary brand color (for additional accents)
+      if (tertiaryBrandColor) {
+        const hslTertiary = hexToHSL(tertiaryBrandColor);
+        document.documentElement.style.setProperty('--brand-tertiary', tertiaryBrandColor);
+        document.documentElement.style.setProperty('--brand-tertiary-hsl', hslTertiary);
+        document.documentElement.style.setProperty('--chart-3', hslTertiary);
+      } else {
+        document.documentElement.style.removeProperty('--brand-tertiary');
+        document.documentElement.style.removeProperty('--brand-tertiary-hsl');
+      }
+      
+      // Apply quaternary brand color
+      if (quaternaryBrandColor) {
+        const hslQuaternary = hexToHSL(quaternaryBrandColor);
+        document.documentElement.style.setProperty('--brand-quaternary', quaternaryBrandColor);
+        document.documentElement.style.setProperty('--brand-quaternary-hsl', hslQuaternary);
+        document.documentElement.style.setProperty('--chart-4', hslQuaternary);
+      } else {
+        document.documentElement.style.removeProperty('--brand-quaternary');
+        document.documentElement.style.removeProperty('--brand-quaternary-hsl');
+      }
+      
       // Calculate contrasting foreground color (white for dark colors, dark for light colors)
       const l = parseInt(hslColor.split(' ')[2]);
       const foreground = l < 50 ? '0 0% 100%' : '240 10% 3.9%';
@@ -296,6 +332,12 @@ function BrandingProvider({ children }: { children: React.ReactNode }) {
     } else {
       // Remove overrides when branding is inactive
       document.documentElement.style.removeProperty('--brand-primary');
+      document.documentElement.style.removeProperty('--brand-secondary');
+      document.documentElement.style.removeProperty('--brand-secondary-hsl');
+      document.documentElement.style.removeProperty('--brand-tertiary');
+      document.documentElement.style.removeProperty('--brand-tertiary-hsl');
+      document.documentElement.style.removeProperty('--brand-quaternary');
+      document.documentElement.style.removeProperty('--brand-quaternary-hsl');
       document.documentElement.style.removeProperty('--primary');
       document.documentElement.style.removeProperty('--primary-foreground');
       document.documentElement.style.removeProperty('--ring');
@@ -303,10 +345,19 @@ function BrandingProvider({ children }: { children: React.ReactNode }) {
       document.documentElement.style.removeProperty('--sidebar-primary-foreground');
       document.documentElement.style.removeProperty('--sidebar-ring');
       document.documentElement.style.removeProperty('--chart-1');
+      document.documentElement.style.removeProperty('--chart-2');
+      document.documentElement.style.removeProperty('--chart-3');
+      document.documentElement.style.removeProperty('--chart-4');
     }
 
     return () => {
       document.documentElement.style.removeProperty('--brand-primary');
+      document.documentElement.style.removeProperty('--brand-secondary');
+      document.documentElement.style.removeProperty('--brand-secondary-hsl');
+      document.documentElement.style.removeProperty('--brand-tertiary');
+      document.documentElement.style.removeProperty('--brand-tertiary-hsl');
+      document.documentElement.style.removeProperty('--brand-quaternary');
+      document.documentElement.style.removeProperty('--brand-quaternary-hsl');
       document.documentElement.style.removeProperty('--primary');
       document.documentElement.style.removeProperty('--primary-foreground');
       document.documentElement.style.removeProperty('--ring');
@@ -314,8 +365,11 @@ function BrandingProvider({ children }: { children: React.ReactNode }) {
       document.documentElement.style.removeProperty('--sidebar-primary-foreground');
       document.documentElement.style.removeProperty('--sidebar-ring');
       document.documentElement.style.removeProperty('--chart-1');
+      document.documentElement.style.removeProperty('--chart-2');
+      document.documentElement.style.removeProperty('--chart-3');
+      document.documentElement.style.removeProperty('--chart-4');
     };
-  }, [isAuthenticated, primaryBrandColor, location]);
+  }, [isAuthenticated, primaryBrandColor, secondaryBrandColor, tertiaryBrandColor, quaternaryBrandColor, location]);
 
   return <>{children}</>;
 }
