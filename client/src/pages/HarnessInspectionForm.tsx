@@ -85,8 +85,9 @@ export default function HarnessInspectionForm() {
 
   const projects = projectsData?.projects || [];
 
-  // Get today's date as default
-  const today = new Date().toISOString().split('T')[0];
+  // Get today's date as default (using local timezone, not UTC)
+  const localDate = new Date();
+  const today = `${localDate.getFullYear()}-${String(localDate.getMonth() + 1).padStart(2, '0')}-${String(localDate.getDate()).padStart(2, '0')}`;
 
   const form = useForm<InspectionFormData>({
     resolver: zodResolver(inspectionFormSchema),
