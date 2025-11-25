@@ -436,10 +436,7 @@ export default function ProjectDetail() {
       tasksPerformed: string[];
       notes?: string;
     }) => {
-      return apiRequest("/api/irata-task-logs", {
-        method: "POST",
-        body: JSON.stringify(data),
-      });
+      return apiRequest("POST", "/api/irata-task-logs", data);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/my-irata-task-logs"] });
