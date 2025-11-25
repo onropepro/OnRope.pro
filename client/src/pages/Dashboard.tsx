@@ -2061,7 +2061,7 @@ export default function Dashboard() {
           <>
             <div className="mb-8">
               <div className="flex items-center justify-between mb-6">
-                <h2 className="text-3xl font-bold gradient-text">Quick Actions</h2>
+                <h2 className={`text-3xl font-bold ${hasCustomBranding ? 'custom-brand-text' : 'gradient-text'}`}>Quick Actions</h2>
                 <div className="flex gap-2">
                   <Button
                     variant={isRearranging ? "default" : "outline"}
@@ -2118,7 +2118,7 @@ export default function Dashboard() {
               variant="ghost" 
               onClick={handleBackToNav}
               data-testid="button-back-to-nav"
-              className="gap-2"
+              className="gap-2 text-primary"
             >
               <span className="material-icons">arrow_back</span>
               Back to Dashboard
@@ -2195,7 +2195,7 @@ export default function Dashboard() {
             {/* Search and Create */}
             <div className="flex gap-3">
                 <div className="relative flex-1">
-                  <span className="material-icons absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground text-base">
+                  <span className="material-icons absolute left-4 top-1/2 -translate-y-1/2 text-primary/60 text-base">
                     search
                   </span>
                   <Input
@@ -2213,7 +2213,7 @@ export default function Dashboard() {
                       data-testid="button-create-project"
                       disabled={userIsReadOnly || (projectsData?.projectInfo?.atProjectLimit ?? false)}
                     >
-                      <span className="material-icons text-xl">add_circle</span>
+                      <span className="material-icons text-xl text-primary-foreground">add_circle</span>
                       <span className="hidden sm:inline">{projectsData?.projectInfo?.atProjectLimit ? 'Project Limit Reached' : 'New Project'}</span>
                     </Button>
                   </DialogTrigger>
@@ -2489,7 +2489,7 @@ export default function Dashboard() {
                                 className="w-full h-12"
                                 data-testid="button-enter-elevation"
                               >
-                                <span className="material-icons mr-2">apartment</span>
+                                <span className="material-icons mr-2 text-primary">apartment</span>
                                 Enter Elevation
                               </Button>
                             )}
@@ -2957,12 +2957,12 @@ export default function Dashboard() {
                                 <div className="text-xl font-bold mb-1">{project.buildingName}</div>
                                 <div className="text-sm font-medium text-muted-foreground mb-1">{project.strataPlanNumber}</div>
                                 <div className="text-sm text-muted-foreground capitalize flex items-center gap-2">
-                                  <span className="material-icons text-base">business</span>
+                                  <span className="material-icons text-base text-primary">business</span>
                                   {project.jobType.replace(/_/g, ' ')}
                                 </div>
                                 {project.createdAt && (
                                   <div className="text-xs text-muted-foreground mt-1 flex items-center gap-1">
-                                    <span className="material-icons text-xs">event</span>
+                                    <span className="material-icons text-xs text-primary/70">event</span>
                                     Created {new Date(project.createdAt).toLocaleDateString()}
                                   </div>
                                 )}

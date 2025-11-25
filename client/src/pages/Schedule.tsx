@@ -702,7 +702,7 @@ export default function Schedule() {
 
             {/* Available Employees */}
             <DroppableAvailableZone isDragging={activeEmployeeId !== null}>
-              <div className="bg-card rounded p-1.5 border-l-4 border-l-blue-600 shadow-sm">
+              <div className="bg-card rounded p-1.5 border-l-4 border-l-primary shadow-sm">
                 <div className="flex items-center gap-1 mb-1">
                   <UserX className="w-3.5 h-3.5 text-primary" />
                   <h3 className="font-bold text-xs text-primary">Available ({availableEmployees.length})</h3>
@@ -1265,13 +1265,10 @@ function DroppableAvailableZone({ isDragging, children }: { isDragging: boolean;
   return (
     <div 
       ref={setNodeRef} 
-      className={`relative ${isOver ? 'ring-2 ring-blue-500 ring-offset-2 rounded-lg' : ''}`}
-      style={{
-        backgroundColor: isOver ? 'rgba(59, 130, 246, 0.1)' : undefined,
-      }}
+      className={`relative ${isOver ? 'ring-2 ring-primary ring-offset-2 rounded-lg bg-primary/10' : ''}`}
     >
       {isOver && (
-        <div className="absolute inset-0 flex items-center justify-center bg-primary/50/10 rounded-lg z-10 pointer-events-none">
+        <div className="absolute inset-0 flex items-center justify-center bg-primary/5 rounded-lg z-10 pointer-events-none">
           <p className="text-sm font-bold text-primary">Drop to unassign from all jobs</p>
         </div>
       )}

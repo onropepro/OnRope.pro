@@ -86,7 +86,7 @@ export default function WorkSessionHistory() {
 
   if (!project) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 p-4">
+      <div className="min-h-screen page-gradient p-4">
         <div className="max-w-4xl mx-auto">
           <Card>
             <CardContent className="p-6">
@@ -188,7 +188,7 @@ export default function WorkSessionHistory() {
   });
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
+    <div className="min-h-screen page-gradient">
       <div className="max-w-4xl mx-auto p-4 space-y-6">
         {/* Header */}
         <div className="flex items-center gap-4">

@@ -744,7 +744,7 @@ export default function ProjectDetail() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
+      <div className="min-h-screen page-gradient p-4">
         <div className="max-w-2xl mx-auto">
           <div className="text-center py-8">Loading...</div>
         </div>
@@ -754,7 +754,7 @@ export default function ProjectDetail() {
 
   if (!project) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
+      <div className="min-h-screen page-gradient p-4">
         <div className="max-w-2xl mx-auto">
           <div className="text-center py-8">Project not found</div>
         </div>

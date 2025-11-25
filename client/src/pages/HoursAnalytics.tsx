@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { hasFinancialAccess } from "@/lib/permissions";
@@ -11,6 +11,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from "recharts";
 import { ArrowLeft, Clock, Users, TrendingUp, Award } from "lucide-react";
 import { SessionDetailsDialog } from "@/components/SessionDetailsDialog";
+import { BrandingContext } from "@/App";
 import {
   DndContext,
   closestCenter,
@@ -89,6 +90,10 @@ export default function HoursAnalytics() {
   const [selectedSession, setSelectedSession] = useState<any>(null);
   const [sessionDetailsOpen, setSessionDetailsOpen] = useState(false);
   
+  // Get branding colors
+  const { brandColors, brandingActive } = useContext(BrandingContext);
+  const hasCustomBranding = brandingActive && brandColors.length > 0;
+  
   // Drag-and-drop sensors
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -156,7 +161,7 @@ export default function HoursAnalytics() {
 
   if (!user) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 flex items-center justify-center">
+      <div className="min-h-screen page-gradient flex items-center justify-center">
         <Card>
           <CardContent className="pt-6">
             <p className="text-muted-foreground">Loading...</p>
@@ -529,7 +534,7 @@ export default function HoursAnalytics() {
             <ArrowLeft className="h-5 w-5" />
           </Button>
           <div className="flex-1">
-            <h1 className="text-3xl font-bold gradient-text">{isManagement ? "Hours Analytics" : "My Hours"}</h1>
+            <h1 className={`text-3xl font-bold ${hasCustomBranding ? 'text-primary' : 'gradient-text'}`}>{isManagement ? "Hours Analytics" : "My Hours"}</h1>
             <p className="text-sm text-muted-foreground mt-1">
               {isManagement ? "Billable vs Non-Billable Hours Breakdown" : "View your work hours and session history"}
             </p>
@@ -575,23 +580,23 @@ export default function HoursAnalytics() {
               
               {/* Left Column - Weekly Hours Card */}
               <div className="lg:col-span-1">
-                <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-blue-500 to-blue-600 p-8 shadow-xl h-full">
+                <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-primary to-primary/80 p-8 shadow-xl h-full">
                   <div className="relative z-10">
                     <div className="flex items-center gap-2 mb-6">
-                      <span className="material-icons text-white/80">event_note</span>
-                      <div className="text-sm font-semibold text-white/80 uppercase tracking-wide">Total Hours This Month</div>
+                      <span className="material-icons text-primary-foreground/80">event_note</span>
+                      <div className="text-sm font-semibold text-primary-foreground/80 uppercase tracking-wide">Total Hours This Month</div>
                     </div>
-                    <div className="text-6xl font-bold text-white mb-4">
+                    <div className="text-6xl font-bold text-primary-foreground mb-4">
                       {(monthBillable + monthNonBillable).toFixed(1).replace('.', ',')}
                     </div>
-                    <div className="flex items-center gap-2 text-white/90">
+                    <div className="flex items-center gap-2 text-primary-foreground/90">
                       <span className="material-icons">trending_up</span>
                       <span className="text-lg">{((monthBillable / (monthBillable + monthNonBillable || 1)) * 100).toFixed(0)}% Billable</span>
                     </div>
                   </div>
                   {/* Decorative circles */}
-                  <div className="absolute top-10 right-10 w-24 h-24 border-4 border-white/20 rounded-full"></div>
-                  <div className="absolute bottom-10 right-16 w-16 h-16 bg-white/10 rounded-full"></div>
+                  <div className="absolute top-10 right-10 w-24 h-24 border-4 border-primary-foreground/20 rounded-full"></div>
+                  <div className="absolute bottom-10 right-16 w-16 h-16 bg-primary-foreground/10 rounded-full"></div>
                 </div>
               </div>
 
@@ -633,21 +638,21 @@ export default function HoursAnalytics() {
 
               {/* Right Column - Stats Cards */}
               <div className="lg:col-span-1 grid gap-6">
-                <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-blue-600 to-blue-700 p-6 shadow-xl">
+                <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-primary/90 to-primary p-6 shadow-xl">
                   <div className="relative z-10">
-                    <div className="text-sm font-semibold text-white/80 mb-2">Year Efficiency</div>
-                    <div className="text-4xl font-bold text-white mb-1">{((yearBillable / (yearBillable + yearNonBillable || 1)) * 100).toFixed(0)}%</div>
-                    <div className="text-white/70 text-sm">Completion</div>
-                    <div className="text-white/70 text-xs mt-2">{yearBillable.toFixed(1)}h billable</div>
+                    <div className="text-sm font-semibold text-primary-foreground/80 mb-2">Year Efficiency</div>
+                    <div className="text-4xl font-bold text-primary-foreground mb-1">{((yearBillable / (yearBillable + yearNonBillable || 1)) * 100).toFixed(0)}%</div>
+                    <div className="text-primary-foreground/70 text-sm">Completion</div>
+                    <div className="text-primary-foreground/70 text-xs mt-2">{yearBillable.toFixed(1)}h billable</div>
                   </div>
                 </div>
                 
-                <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-blue-600 to-blue-700 p-6 shadow-xl">
+                <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-primary/90 to-primary p-6 shadow-xl">
                   <div className="relative z-10">
-                    <div className="text-sm font-semibold text-white/80 mb-2">Today's Hours</div>
-                    <div className="text-4xl font-bold text-white mb-1">{(dayBillable + dayNonBillable).toFixed(1).replace('.', ',')}</div>
-                    <div className="text-white/70 text-sm">{dayBillable.toFixed(1)}h billable</div>
-                    <div className="text-white/70 text-xs mt-2">{dayNonBillable.toFixed(1)}h non-billable</div>
+                    <div className="text-sm font-semibold text-primary-foreground/80 mb-2">Today's Hours</div>
+                    <div className="text-4xl font-bold text-primary-foreground mb-1">{(dayBillable + dayNonBillable).toFixed(1).replace('.', ',')}</div>
+                    <div className="text-primary-foreground/70 text-sm">{dayBillable.toFixed(1)}h billable</div>
+                    <div className="text-primary-foreground/70 text-xs mt-2">{dayNonBillable.toFixed(1)}h non-billable</div>
                   </div>
                 </div>
               </div>
@@ -707,13 +712,13 @@ export default function HoursAnalytics() {
                           <div className="flex flex-col gap-1 w-full">
                             {/* Billable bar */}
                             <div 
-                              className="w-full bg-gradient-to-t from-blue-500 to-blue-400 rounded-t-lg transition-all hover:opacity-80"
+                              className="w-full bg-gradient-to-t from-primary to-primary/80 rounded-t-lg transition-all hover:opacity-80"
                               style={{ height: `${Math.max(empBillable * 20, 2)}px` }}
                               title={`${empBillable.toFixed(1)}h billable`}
                             ></div>
                             {/* Non-billable bar */}
                             <div 
-                              className="w-full bg-gradient-to-t from-blue-300 to-blue-200 rounded-b-lg transition-all hover:opacity-80"
+                              className="w-full bg-gradient-to-t from-primary/50 to-primary/40 rounded-b-lg transition-all hover:opacity-80"
                               style={{ height: `${Math.max(empNonBillable * 20, 2)}px` }}
                               title={`${empNonBillable.toFixed(1)}h non-billable`}
                             ></div>
@@ -724,7 +729,7 @@ export default function HoursAnalytics() {
                           <div className="text-xs text-muted-foreground">
                             {totalHours.toFixed(1)}h
                           </div>
-                          <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-400 to-blue-500 flex items-center justify-center text-xs font-bold text-white">
+                          <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary/70 to-primary flex items-center justify-center text-xs font-bold text-primary-foreground">
                             {displayName[0]?.toUpperCase() || '?'}
                           </div>
                         </div>

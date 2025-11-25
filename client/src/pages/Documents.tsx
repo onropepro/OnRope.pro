@@ -1418,9 +1418,9 @@ export default function Documents() {
           {/* Health & Safety Manual Tab */}
           <TabsContent value="health-safety">
         <Card className="mb-6 overflow-hidden">
-          <CardHeader className="bg-gradient-to-br from-blue-500/10 via-blue-500/5 to-transparent pb-4">
+          <CardHeader className="bg-gradient-to-br from-primary/10 via-primary/5 to-transparent pb-4">
             <div className="flex items-start gap-4">
-              <div className="p-3 bg-primary/50/10 rounded-xl ring-1 ring-blue-500/20">
+              <div className="p-3 bg-primary/10 rounded-xl ring-1 ring-primary/20">
                 <Shield className="h-6 w-6 text-primary dark:text-primary" />
               </div>
               <div className="flex-1">
