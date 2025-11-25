@@ -248,7 +248,8 @@ function BrandingProvider({ children }: { children: React.ReactNode }) {
       
       return response.json();
     },
-    enabled: isAuthenticated && !!companyIdForBranding && userData?.user?.role !== 'resident' && userData?.user?.role !== 'superuser',
+    // Enable branding for all users EXCEPT superuser and property_manager (property managers link to multiple vendors)
+    enabled: isAuthenticated && !!companyIdForBranding && userData?.user?.role !== 'superuser' && userData?.user?.role !== 'property_manager',
     retry: 1, // Only retry once for branding fetch
   });
 
