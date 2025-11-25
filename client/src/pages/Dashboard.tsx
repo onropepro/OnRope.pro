@@ -246,8 +246,8 @@ function SortableCard({ card, isRearranging, colorIndex }: { card: any; isRearra
       }
     }
     
-    // Return a very light tint (96% lightness) for subtle background
-    return `hsl(${Math.round(h * 360)}, ${Math.round(s * 100)}%, 96%)`;
+    // Return a more visible tint (90% lightness) for noticeable background
+    return `hsl(${Math.round(h * 360)}, ${Math.round(s * 100)}%, 90%)`;
   };
 
   const tintBackground = createTintFromHex(card.borderColor);
