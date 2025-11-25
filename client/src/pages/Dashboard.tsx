@@ -36,6 +36,7 @@ import { isManagement, hasFinancialAccess, canManageEmployees, canViewPerformanc
 import { DocumentUploader } from "@/components/DocumentUploader";
 import { RefreshButton } from "@/components/RefreshButton";
 import { CSRBadge } from "@/components/CSRBadge";
+import { formatLocalDate, formatLocalDateLong } from "@/lib/dateUtils";
 import { QRCodeSVG } from 'qrcode.react';
 import {
   DndContext,
@@ -4311,7 +4312,7 @@ export default function Dashboard() {
                           <div className="flex items-start justify-between gap-3">
                             <div className="flex-1 min-w-0">
                               <div className="font-medium">
-                                {new Date(meeting.meetingDate).toLocaleDateString('en-US', { 
+                                {formatLocalDate(meeting.meetingDate, { 
                                   weekday: 'short', 
                                   year: 'numeric', 
                                   month: 'short', 
@@ -6953,7 +6954,7 @@ export default function Dashboard() {
                 <div>
                   <div className="text-sm font-medium text-muted-foreground">Date</div>
                   <div className="text-base">
-                    {new Date(selectedMeeting.meetingDate).toLocaleDateString('en-US', { 
+                    {formatLocalDate(selectedMeeting.meetingDate, { 
                       weekday: 'long', 
                       year: 'numeric', 
                       month: 'long', 

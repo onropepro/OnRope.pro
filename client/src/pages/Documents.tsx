@@ -13,6 +13,7 @@ import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { jsPDF } from "jspdf";
 import { downloadMethodStatement } from "@/pages/MethodStatementForm";
+import { formatLocalDate, formatLocalDateLong, formatLocalDateMedium, parseLocalDate } from "@/lib/dateUtils";
 
 export default function Documents() {
   const [, navigate] = useLocation();
@@ -199,7 +200,7 @@ export default function Documents() {
 
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(10);
-    doc.text(`Date: ${new Date(meeting.meetingDate).toLocaleDateString('en-US', { 
+    doc.text(`Date: ${formatLocalDate(meeting.meetingDate, { 
       weekday: 'long', 
       year: 'numeric', 
       month: 'long', 
@@ -345,7 +346,7 @@ export default function Documents() {
     doc.text('This is an official safety meeting record. Keep for compliance purposes.', pageWidth / 2, footerY, { align: 'center' });
 
     // Save PDF
-    doc.save(`Toolbox_Meeting_${new Date(meeting.meetingDate).toISOString().split('T')[0]}.pdf`);
+    doc.save(`Toolbox_Meeting_${meeting.meetingDate}.pdf`);
   };
 
   const downloadFlhaForm = async (flha: any) => {
@@ -1760,7 +1761,7 @@ export default function Documents() {
                         </div>
                         <div className="flex-1 min-w-0">
                           <div className="font-semibold">
-                            {new Date(meeting.meetingDate).toLocaleDateString()} - {meeting.conductedByName}
+                            {formatLocalDate(meeting.meetingDate)} - {meeting.conductedByName}
                           </div>
                           <div className="text-sm text-muted-foreground">
                             {meeting.projectName || 'Project meeting'}
@@ -1875,7 +1876,7 @@ export default function Documents() {
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="font-semibold">
-                        {new Date(meeting.meetingDate).toLocaleDateString('en-US', { 
+                        {formatLocalDate(meeting.meetingDate, { 
                           weekday: 'short', 
                           year: 'numeric', 
                           month: 'short', 

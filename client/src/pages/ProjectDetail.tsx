@@ -27,6 +27,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { useState, useEffect } from "react";
 import { format } from "date-fns";
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from "recharts";
+import { parseLocalDate } from "@/lib/dateUtils";
 import type { Project } from "@shared/schema";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -1894,7 +1895,7 @@ export default function ProjectDetail() {
                         <div className="flex items-start justify-between gap-2 mb-1">
                           <div className="flex-1 min-w-0">
                             <div className="text-sm font-medium">
-                              {format(new Date(meeting.meetingDate), 'MMMM d, yyyy')}
+                              {format(parseLocalDate(meeting.meetingDate), 'MMMM d, yyyy')}
                             </div>
                             <div className="text-xs text-muted-foreground">
                               Conducted by: {meeting.conductedByName}
@@ -2795,7 +2796,7 @@ export default function ProjectDetail() {
                 <div>
                   <div className="text-sm font-medium text-muted-foreground">Date</div>
                   <div className="text-base">
-                    {format(new Date(selectedMeeting.meetingDate), 'EEEE, MMMM d, yyyy')}
+                    {format(parseLocalDate(selectedMeeting.meetingDate), 'EEEE, MMMM d, yyyy')}
                   </div>
                 </div>
                 <div>
