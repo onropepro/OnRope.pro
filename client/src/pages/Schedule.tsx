@@ -704,8 +704,8 @@ export default function Schedule() {
             <DroppableAvailableZone isDragging={activeEmployeeId !== null}>
               <div className="bg-card rounded p-1.5 border-l-4 border-l-blue-600 shadow-sm">
                 <div className="flex items-center gap-1 mb-1">
-                  <UserX className="w-3.5 h-3.5 text-blue-600" />
-                  <h3 className="font-bold text-xs text-blue-700">Available ({availableEmployees.length})</h3>
+                  <UserX className="w-3.5 h-3.5 text-primary" />
+                  <h3 className="font-bold text-xs text-primary">Available ({availableEmployees.length})</h3>
                 </div>
                 {availableEmployees.length === 0 ? (
                   <p className="text-xs text-muted-foreground">All employees assigned</p>
@@ -721,7 +721,7 @@ export default function Schedule() {
                           onClick={() => setActiveEmployeeId(isActive ? null : employee.id)}
                           type="available"
                         >
-                          <Badge variant="default" className="mt-0.5 text-[9px] h-4 px-1.5 py-0 bg-blue-600 hover:bg-blue-700">
+                          <Badge variant="default" className="mt-0.5 text-[9px] h-4 px-1.5 py-0 bg-primary hover:bg-primary/90">
                             Ready
                           </Badge>
                         </DraggableEmployeeCard>
@@ -1231,13 +1231,13 @@ function DraggableEmployeeCard({
 
   const bgColor = type === 'assigned' 
     ? 'bg-green-50 dark:bg-green-950/30' 
-    : 'bg-blue-50 dark:bg-blue-950/30';
+    : 'bg-primary/5 dark:bg-primary/20/30';
   
   const borderColor = isActive 
     ? 'border-primary border-2' 
     : type === 'assigned'
       ? 'border-green-200 dark:border-green-800'
-      : 'border-blue-200 dark:border-blue-800';
+      : 'border-primary/20 dark:border-primary/80';
 
   return (
     <div
@@ -1271,8 +1271,8 @@ function DroppableAvailableZone({ isDragging, children }: { isDragging: boolean;
       }}
     >
       {isOver && (
-        <div className="absolute inset-0 flex items-center justify-center bg-blue-500/10 rounded-lg z-10 pointer-events-none">
-          <p className="text-sm font-bold text-blue-600">Drop to unassign from all jobs</p>
+        <div className="absolute inset-0 flex items-center justify-center bg-primary/50/10 rounded-lg z-10 pointer-events-none">
+          <p className="text-sm font-bold text-primary">Drop to unassign from all jobs</p>
         </div>
       )}
       {children}
@@ -1603,7 +1603,7 @@ function CreateJobDialog({
                           });
                         }
                       }}
-                      className="rounded border-gray-300"
+                      className="rounded border-border"
                       data-testid={`checkbox-employee-${employee.id}`}
                     />
                     <label
@@ -1787,9 +1787,9 @@ function JobDetailDialog({
   if (!job) return null;
 
   const statusColors: Record<string, string> = {
-    upcoming: "bg-blue-500/10 text-blue-600 border-blue-500/20",
+    upcoming: "bg-primary/50/10 text-primary border-primary/50/20",
     in_progress: "bg-green-500/10 text-green-600 border-green-500/20",
-    completed: "bg-gray-500/10 text-gray-600 border-gray-500/20",
+    completed: "bg-muted-foreground/10 text-muted-foreground border-muted-foreground/20",
     cancelled: "bg-red-500/10 text-red-600 border-red-500/20",
   };
 
@@ -2417,7 +2417,7 @@ function EditJobDialog({
                           });
                         }
                       }}
-                      className="rounded border-gray-300"
+                      className="rounded border-border"
                       data-testid={`checkbox-edit-employee-${employee.id}`}
                     />
                     <label

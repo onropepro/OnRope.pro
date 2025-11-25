@@ -1420,8 +1420,8 @@ export default function Documents() {
         <Card className="mb-6 overflow-hidden">
           <CardHeader className="bg-gradient-to-br from-blue-500/10 via-blue-500/5 to-transparent pb-4">
             <div className="flex items-start gap-4">
-              <div className="p-3 bg-blue-500/10 rounded-xl ring-1 ring-blue-500/20">
-                <Shield className="h-6 w-6 text-blue-600 dark:text-blue-400" />
+              <div className="p-3 bg-primary/50/10 rounded-xl ring-1 ring-blue-500/20">
+                <Shield className="h-6 w-6 text-primary dark:text-primary" />
               </div>
               <div className="flex-1">
                 <CardTitle className="text-xl mb-1">Health & Safety Manual</CardTitle>
@@ -1466,8 +1466,8 @@ export default function Documents() {
               <div className="space-y-3">
                 {healthSafetyDocs.map((doc: any) => (
                   <div key={doc.id} className="flex items-center gap-4 p-4 rounded-xl border bg-card hover-elevate active-elevate-2">
-                    <div className="p-2 bg-blue-500/10 rounded-lg">
-                      <Shield className="h-5 w-5 text-blue-600 dark:text-blue-400 flex-shrink-0" />
+                    <div className="p-2 bg-primary/50/10 rounded-lg">
+                      <Shield className="h-5 w-5 text-primary dark:text-primary flex-shrink-0" />
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="font-semibold truncate">{doc.fileName}</div>
@@ -1501,8 +1501,8 @@ export default function Documents() {
               </div>
             ) : (
               <div className="text-center py-12">
-                <div className="inline-flex p-4 bg-blue-500/5 rounded-full mb-4">
-                  <Shield className="h-8 w-8 text-blue-500/50" />
+                <div className="inline-flex p-4 bg-primary/50/5 rounded-full mb-4">
+                  <Shield className="h-8 w-8 text-primary/50" />
                 </div>
                 <p className="text-muted-foreground font-medium">No Health & Safety Manual uploaded yet</p>
                 <p className="text-sm text-muted-foreground mt-1">Upload your first document to get started</p>

@@ -787,7 +787,7 @@ export default function PropertyManager() {
                             {activeProjects.length > 0 && (
                               <div className="space-y-2">
                                 <div className="flex items-center gap-2">
-                                  <Clock className="w-4 h-4 text-blue-500" />
+                                  <Clock className="w-4 h-4 text-primary" />
                                   <h4 className="text-sm font-medium">Active Projects ({activeProjects.length})</h4>
                                 </div>
                                 <div className="space-y-2">

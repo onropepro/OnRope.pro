@@ -406,7 +406,7 @@ export default function Login() {
               </Button>
 
               <Button 
-                className="h-10 text-xs bg-blue-600 hover:bg-blue-700 text-white" 
+                className="h-10 text-xs bg-primary hover:bg-primary/90 text-white" 
                 onClick={async () => {
                   try {
                     const response = await fetch("/api/login", {

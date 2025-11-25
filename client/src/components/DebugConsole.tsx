@@ -110,7 +110,7 @@ export default function DebugConsole() {
           style={{ maxHeight: '400px' }}
         >
           {logs.length === 0 ? (
-            <div className="text-gray-500 italic">Waiting for logs...</div>
+            <div className="text-muted-foreground italic">Waiting for logs...</div>
           ) : (
             logs.map((log, index) => (
               <div 
@@ -121,7 +121,7 @@ export default function DebugConsole() {
                   'text-green-300'
                 }`}
               >
-                <span className="text-gray-500 text-[10px]">
+                <span className="text-muted-foreground text-[10px]">
                   {new Date(log.timestamp).toLocaleTimeString()}
                 </span>
                 {" "}
@@ -135,11 +135,11 @@ export default function DebugConsole() {
       {/* Footer */}
       {!isMinimized && (
         <div className="p-2 border-t border-green-500/30 bg-green-900/10 flex justify-between items-center">
-          <span className="text-[10px] text-gray-400 font-mono">{logs.length} logs</span>
+          <span className="text-[10px] text-muted-foreground font-mono">{logs.length} logs</span>
           <Button
             size="sm"
             variant="ghost"
-            className="h-6 text-[10px] text-gray-400 hover:text-gray-300 hover:bg-green-500/20"
+            className="h-6 text-[10px] text-muted-foreground hover:text-muted-foreground/70 hover:bg-green-500/20"
             onClick={() => setLogs([])}
             data-testid="button-clear-logs"
           >

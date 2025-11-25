@@ -300,7 +300,7 @@ export default function ComplaintDetail() {
                       key={note.id} 
                       className={`rounded-lg p-3 ${
                         isResidentMessage 
-                          ? 'bg-blue-50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-800'
+                          ? 'bg-primary/5 dark:bg-primary/20/20 border border-primary/20 dark:border-primary/80'
                           : 'bg-primary/5 border border-primary/20'
                       }`}
                       data-testid={`resident-note-${note.id}`}

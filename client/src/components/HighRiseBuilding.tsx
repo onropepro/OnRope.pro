@@ -76,7 +76,7 @@ export function HighRiseBuilding({
             </div>
             
             {/* Building Visualization - Clean Minimal Style */}
-            <div className="relative w-24 h-96 bg-gradient-to-b from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900 rounded-3xl shadow-xl border border-gray-200/50 dark:border-gray-700/50 overflow-hidden">
+            <div className="relative w-24 h-96 bg-gradient-to-b from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900 rounded-3xl shadow-xl border border-border/50 dark:border-muted-foreground/50 overflow-hidden">
               {/* Progress Fill from Bottom */}
               <div 
                 className="absolute bottom-0 left-0 right-0 transition-all duration-700 ease-out rounded-3xl bg-gradient-to-t from-primary/90 via-primary/70 to-primary/50"
@@ -91,7 +91,7 @@ export function HighRiseBuilding({
               {buildingFloors.slice(0, 15).map(({ floorNumber }, index) => (
                 <div
                   key={floorNumber}
-                  className="absolute left-0 right-0 border-t border-gray-300/30"
+                  className="absolute left-0 right-0 border-t border-border/30"
                   style={{ top: `${(index / 15) * 100}%` }}
                 />
               ))}
@@ -99,7 +99,7 @@ export function HighRiseBuilding({
               {/* Windows Pattern */}
               <div className="absolute inset-4 grid grid-cols-2 gap-2 opacity-20">
                 {Array.from({ length: 30 }).map((_, i) => (
-                  <div key={i} className="h-3 bg-gray-400 rounded-sm"></div>
+                  <div key={i} className="h-3 bg-muted-foreground/50 rounded-sm"></div>
                 ))}
               </div>
             </div>

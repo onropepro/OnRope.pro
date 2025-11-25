@@ -1240,8 +1240,8 @@ export default function ResidentDashboard() {
                         statusBadge = <Badge variant="secondary" className="bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/20">Closed</Badge>;
                         statusIcon = <span className="material-icons text-green-600">check_circle</span>;
                       } else if (isViewed) {
-                        statusBadge = <Badge variant="secondary" className="bg-blue-500/10 text-blue-700 dark:text-blue-400 border-blue-500/20">Viewed</Badge>;
-                        statusIcon = <span className="material-icons text-blue-600">visibility</span>;
+                        statusBadge = <Badge variant="secondary" className="bg-primary/50/10 text-primary dark:text-primary border-primary/50/20">Viewed</Badge>;
+                        statusIcon = <span className="material-icons text-primary">visibility</span>;
                       } else {
                         statusBadge = <Badge variant="secondary" className="bg-orange-500/10 text-orange-700 dark:text-orange-400 border-orange-500/20">Open</Badge>;
                         statusIcon = <span className="material-icons text-orange-600">pending</span>;

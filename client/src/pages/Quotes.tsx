@@ -799,7 +799,7 @@ export default function Quotes() {
     // If worker, show tabbed interface
     if (isWorker) {
       return (
-        <div className="min-h-screen bg-[#FAFAFA] p-4 md:p-8">
+        <div className="min-h-screen bg-background p-4 md:p-8">
           <div className="max-w-7xl mx-auto">
             <Link href="/dashboard">
               <Button
@@ -813,8 +813,8 @@ export default function Quotes() {
             </Link>
 
             <div className="mb-8">
-              <h1 className="text-4xl font-bold text-[#0A0A0A] mb-2">Service Quotes</h1>
-              <p className="text-[#71717A]">Create and manage service quotes for buildings</p>
+              <h1 className="text-4xl font-bold text-foreground mb-2">Service Quotes</h1>
+              <p className="text-muted-foreground">Create and manage service quotes for buildings</p>
             </div>
 
             <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as "create" | "my-quotes")}>
@@ -827,7 +827,7 @@ export default function Quotes() {
                 {/* Search bar */}
                 <div className="mb-6">
                   <div className="relative">
-                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-[#71717A]" />
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                     <Input
                       placeholder="Search by strata plan number or building name..."
                       value={searchQuery}
@@ -840,22 +840,22 @@ export default function Quotes() {
 
                 {isLoading ? (
                   <div className="text-center py-12">
-                    <p className="text-[#71717A]">Loading quotes...</p>
+                    <p className="text-muted-foreground">Loading quotes...</p>
                   </div>
                 ) : filteredQuotes.length === 0 ? (
-                  <Card className="rounded-2xl shadow-lg border border-[#F4F4F5]">
+                  <Card className="rounded-2xl shadow-lg border border-border">
                     <CardContent className="p-12 text-center">
-                      <Building2 className="w-12 h-12 text-[#71717A] mx-auto mb-4" />
-                      <h3 className="text-xl font-semibold text-[#0A0A0A] mb-2">
+                      <Building2 className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+                      <h3 className="text-xl font-semibold text-foreground mb-2">
                         {searchQuery ? "No quotes found" : "No quotes yet"}
                       </h3>
-                      <p className="text-[#71717A] mb-6">
+                      <p className="text-muted-foreground mb-6">
                         {searchQuery ? "Try a different search term" : "Create your first service quote to get started"}
                       </p>
                       {!searchQuery && (
                         <Button
                           onClick={() => setActiveTab("create")}
-                          className="bg-[#3B82F6] hover:bg-[#3B82F6]/90"
+                          className="bg-primary hover:bg-primary/90"
                           data-testid="button-create-first-quote"
                         >
                           <Plus className="w-4 h-4 mr-2" />
@@ -869,7 +869,7 @@ export default function Quotes() {
                     {filteredQuotes.map((quote) => (
                       <Card
                         key={quote.id}
-                        className="rounded-2xl shadow-lg border border-[#F4F4F5] hover:shadow-xl transition-shadow cursor-pointer"
+                        className="rounded-2xl shadow-lg border border-border hover:shadow-xl transition-shadow cursor-pointer"
                         onClick={() => {
                           setSelectedQuote(quote);
                           setView("detail");
@@ -879,27 +879,27 @@ export default function Quotes() {
                         <CardHeader className="p-6">
                           <div className="flex items-start justify-between mb-4">
                             <div className="flex-1">
-                              <CardTitle className="text-xl font-semibold text-[#0A0A0A] mb-1">
+                              <CardTitle className="text-xl font-semibold text-foreground mb-1">
                                 {quote.buildingName}
                               </CardTitle>
-                              <CardDescription className="text-[#71717A]">
+                              <CardDescription className="text-muted-foreground">
                                 {quote.strataPlanNumber}
                               </CardDescription>
                             </div>
                             <Badge
                               className={`rounded-full px-3 py-1 ${
                                 quote.status === "open"
-                                  ? "bg-[#06B6D4] text-white"
+                                  ? "bg-chart-2 text-white"
                                   : quote.status === "draft"
-                                  ? "bg-[#71717A] text-white"
-                                  : "bg-[#84CC16] text-white"
+                                  ? "bg-muted-foreground text-white"
+                                  : "bg-success text-white"
                               }`}
                               data-testid={`badge-status-${quote.id}`}
                             >
                               {quote.status}
                             </Badge>
                           </div>
-                          <div className="space-y-2 text-sm text-[#71717A]">
+                          <div className="space-y-2 text-sm text-muted-foreground">
                             <p>{quote.buildingAddress}</p>
                             <p>{quote.floorCount} floors</p>
                             {quote.createdAt && (
@@ -912,7 +912,7 @@ export default function Quotes() {
                         <CardContent className="p-6 pt-0">
                           <div className="space-y-3">
                             <div className="flex items-center justify-between text-sm">
-                              <span className="text-[#71717A]">Services:</span>
+                              <span className="text-muted-foreground">Services:</span>
                               <Badge variant="outline" data-testid={`badge-service-count-${quote.id}`}>
                                 {quote.services.length}
                               </Badge>
@@ -926,17 +926,17 @@ export default function Quotes() {
               </TabsContent>
 
               <TabsContent value="create">
-                <Card className="rounded-2xl shadow-lg border border-[#F4F4F5]">
+                <Card className="rounded-2xl shadow-lg border border-border">
                   <CardContent className="p-12 text-center">
-                    <Building2 className="w-12 h-12 text-[#71717A] mx-auto mb-4" />
-                    <h3 className="text-xl font-semibold text-[#0A0A0A] mb-2">Create a new quote</h3>
-                    <p className="text-[#71717A] mb-6">Start creating a service quote for a building</p>
+                    <Building2 className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+                    <h3 className="text-xl font-semibold text-foreground mb-2">Create a new quote</h3>
+                    <p className="text-muted-foreground mb-6">Start creating a service quote for a building</p>
                     <Button
                       onClick={() => {
                         resetForm();
                         setView("create");
                       }}
-                      className="bg-[#3B82F6] hover:bg-[#3B82F6]/90"
+                      className="bg-primary hover:bg-primary/90"
                       data-testid="button-create-quote"
                     >
                       <Plus className="w-4 h-4 mr-2" />
@@ -953,7 +953,7 @@ export default function Quotes() {
 
     // Management view (no tabs)
     return (
-      <div className="min-h-screen bg-[#FAFAFA] p-4 md:p-8">
+      <div className="min-h-screen bg-background p-4 md:p-8">
         <div className="max-w-7xl mx-auto">
           <Link href="/dashboard">
             <Button
@@ -968,15 +968,15 @@ export default function Quotes() {
 
           <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-8 gap-4">
             <div>
-              <h1 className="text-4xl font-bold text-[#0A0A0A] mb-2">Service Quotes</h1>
-              <p className="text-[#71717A]">Create and manage service quotes for buildings</p>
+              <h1 className="text-4xl font-bold text-foreground mb-2">Service Quotes</h1>
+              <p className="text-muted-foreground">Create and manage service quotes for buildings</p>
             </div>
             <Button
               onClick={() => {
                 resetForm();
                 setView("create");
               }}
-              className="bg-[#3B82F6] hover:bg-[#3B82F6]/90"
+              className="bg-primary hover:bg-primary/90"
               data-testid="button-create-quote"
             >
               <Plus className="w-4 h-4 mr-2" />
@@ -987,7 +987,7 @@ export default function Quotes() {
           {/* Search bar */}
           <div className="mb-6">
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-[#71717A]" />
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
               <Input
                 placeholder="Search by strata plan number or building name..."
                 value={searchQuery}
@@ -1000,16 +1000,16 @@ export default function Quotes() {
 
           {isLoading ? (
             <div className="text-center py-12">
-              <p className="text-[#71717A]">Loading quotes...</p>
+              <p className="text-muted-foreground">Loading quotes...</p>
             </div>
           ) : filteredQuotes.length === 0 ? (
-            <Card className="rounded-2xl shadow-lg border border-[#F4F4F5]">
+            <Card className="rounded-2xl shadow-lg border border-border">
               <CardContent className="p-12 text-center">
-                <Building2 className="w-12 h-12 text-[#71717A] mx-auto mb-4" />
-                <h3 className="text-xl font-semibold text-[#0A0A0A] mb-2">
+                <Building2 className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+                <h3 className="text-xl font-semibold text-foreground mb-2">
                   {searchQuery ? "No quotes found" : "No quotes yet"}
                 </h3>
-                <p className="text-[#71717A] mb-6">
+                <p className="text-muted-foreground mb-6">
                   {searchQuery ? "Try a different search term" : "Create your first service quote to get started"}
                 </p>
                 {!searchQuery && (
@@ -1018,7 +1018,7 @@ export default function Quotes() {
                       resetForm();
                       setView("create");
                     }}
-                    className="bg-[#3B82F6] hover:bg-[#3B82F6]/90"
+                    className="bg-primary hover:bg-primary/90"
                     data-testid="button-create-first-quote"
                   >
                     <Plus className="w-4 h-4 mr-2" />
@@ -1032,7 +1032,7 @@ export default function Quotes() {
               {filteredQuotes.map((quote) => (
                 <Card
                   key={quote.id}
-                  className="rounded-2xl shadow-lg border border-[#F4F4F5] hover:shadow-xl transition-shadow cursor-pointer"
+                  className="rounded-2xl shadow-lg border border-border hover:shadow-xl transition-shadow cursor-pointer"
                   onClick={() => {
                     setSelectedQuote(quote);
                     setView("detail");
@@ -1042,27 +1042,27 @@ export default function Quotes() {
                   <CardHeader className="p-6">
                     <div className="flex items-start justify-between mb-4">
                       <div className="flex-1">
-                        <CardTitle className="text-xl font-semibold text-[#0A0A0A] mb-1">
+                        <CardTitle className="text-xl font-semibold text-foreground mb-1">
                           {quote.buildingName}
                         </CardTitle>
-                        <CardDescription className="text-[#71717A]">
+                        <CardDescription className="text-muted-foreground">
                           {quote.strataPlanNumber}
                         </CardDescription>
                       </div>
                       <Badge
                         className={`rounded-full px-3 py-1 ${
                           quote.status === "open"
-                            ? "bg-[#06B6D4] text-white"
+                            ? "bg-chart-2 text-white"
                             : quote.status === "draft"
-                            ? "bg-[#71717A] text-white"
-                            : "bg-[#84CC16] text-white"
+                            ? "bg-muted-foreground text-white"
+                            : "bg-success text-white"
                         }`}
                         data-testid={`badge-status-${quote.id}`}
                       >
                         {quote.status}
                       </Badge>
                     </div>
-                    <div className="space-y-2 text-sm text-[#71717A]">
+                    <div className="space-y-2 text-sm text-muted-foreground">
                       <p>{quote.buildingAddress}</p>
                       <p>{quote.floorCount} floors</p>
                       {quote.createdAt && (
@@ -1075,15 +1075,15 @@ export default function Quotes() {
                   <CardContent className="p-6 pt-0">
                     <div className="space-y-3">
                       <div className="flex items-center justify-between text-sm">
-                        <span className="text-[#71717A]">Services:</span>
+                        <span className="text-muted-foreground">Services:</span>
                         <Badge variant="outline" data-testid={`badge-service-count-${quote.id}`}>
                           {quote.services.length}
                         </Badge>
                       </div>
                       {canViewFinancialData && (
                         <div className="flex items-center justify-between">
-                          <span className="text-[#71717A]">Total:</span>
-                          <span className="text-2xl font-bold text-[#3B82F6]">
+                          <span className="text-muted-foreground">Total:</span>
+                          <span className="text-2xl font-bold text-primary">
                             ${quote.services.reduce((sum, s) => sum + Number(s.totalCost || 0), 0).toFixed(2)}
                           </span>
                         </div>
@@ -1103,7 +1103,7 @@ export default function Quotes() {
   if (view === "detail" && selectedQuote) {
     return (
       <>
-        <div className="min-h-screen bg-[#FAFAFA] p-4 md:p-8">
+        <div className="min-h-screen bg-background p-4 md:p-8">
         <div className="max-w-4xl mx-auto">
           <Button
             variant="ghost"
@@ -1118,14 +1118,14 @@ export default function Quotes() {
             Back to Quotes
           </Button>
 
-          <Card className="rounded-2xl shadow-lg border border-[#F4F4F5] mb-8">
+          <Card className="rounded-2xl shadow-lg border border-border mb-8">
             <CardHeader className="p-4 md:p-8">
               <div className="flex items-start justify-between mb-4">
                 <div>
-                  <CardTitle className="text-3xl font-bold text-[#0A0A0A] mb-2">
+                  <CardTitle className="text-3xl font-bold text-foreground mb-2">
                     {selectedQuote.buildingName}
                   </CardTitle>
-                  <CardDescription className="text-lg text-[#71717A]">
+                  <CardDescription className="text-lg text-muted-foreground">
                     {selectedQuote.strataPlanNumber}
                   </CardDescription>
                 </div>
@@ -1133,12 +1133,12 @@ export default function Quotes() {
                   <Badge
                     className={`rounded-full px-4 py-2 text-base ${
                       selectedQuote.status === "draft"
-                        ? "bg-[#71717A] text-white"
+                        ? "bg-muted-foreground text-white"
                         : selectedQuote.status === "submitted"
-                        ? "bg-[#3B82F6] text-white"
+                        ? "bg-primary text-white"
                         : selectedQuote.status === "open"
-                        ? "bg-[#06B6D4] text-white"
-                        : "bg-[#84CC16] text-white"
+                        ? "bg-chart-2 text-white"
+                        : "bg-success text-white"
                     }`}
                     data-testid="badge-quote-status"
                   >
@@ -1160,7 +1160,7 @@ export default function Quotes() {
                           setQuoteToSubmit(selectedQuote);
                           setIsSubmitDialogOpen(true);
                         }}
-                        className="bg-[#3B82F6] hover:bg-[#3B82F6]/90"
+                        className="bg-primary hover:bg-primary/90"
                         data-testid="button-submit-quote"
                       >
                         Submit Quote
@@ -1169,14 +1169,14 @@ export default function Quotes() {
                   </div>
                 </div>
               </div>
-              <div className="grid grid-cols-2 gap-4 text-[#71717A]">
+              <div className="grid grid-cols-2 gap-4 text-muted-foreground">
                 <div>
                   <p className="text-sm mb-1">Address</p>
-                  <p className="font-medium text-[#0A0A0A]">{selectedQuote.buildingAddress}</p>
+                  <p className="font-medium text-foreground">{selectedQuote.buildingAddress}</p>
                 </div>
                 <div>
                   <p className="text-sm mb-1">Floor Count</p>
-                  <p className="font-medium text-[#0A0A0A]">{selectedQuote.floorCount} floors</p>
+                  <p className="font-medium text-foreground">{selectedQuote.floorCount} floors</p>
                 </div>
               </div>
             </CardHeader>
@@ -1184,9 +1184,9 @@ export default function Quotes() {
 
           {/* Building Photo Section - visible to all if photo exists, or to editors for upload */}
           {(selectedQuote.photoUrl || canEditQuotes) && (
-            <Card className="rounded-2xl shadow-lg border border-[#F4F4F5] mb-8">
+            <Card className="rounded-2xl shadow-lg border border-border mb-8">
               <CardHeader className="p-4 md:p-8">
-                <CardTitle className="text-xl font-bold text-[#0A0A0A] mb-4">Building Photo</CardTitle>
+                <CardTitle className="text-xl font-bold text-foreground mb-4">Building Photo</CardTitle>
                 {selectedQuote.photoUrl ? (
                   <div className="space-y-4">
                     <img
@@ -1260,7 +1260,7 @@ export default function Quotes() {
                     )}
                   </div>
                 ) : (
-                    <div className="border-2 border-dashed border-[#E4E4E7] rounded-lg p-8 hover:border-[#3B82F6] transition-colors">
+                    <div className="border-2 border-dashed border-muted rounded-lg p-8 hover:border-primary transition-colors">
                       <input
                         type="file"
                         accept="image/*"
@@ -1309,8 +1309,8 @@ export default function Quotes() {
                         data-testid="input-add-photo"
                       />
                       <label htmlFor="quote-photo-add" className="flex flex-col items-center cursor-pointer">
-                        <Image className="w-16 h-16 text-[#71717A] mb-3" />
-                        <p className="text-lg text-[#71717A] text-center">
+                        <Image className="w-16 h-16 text-muted-foreground mb-3" />
+                        <p className="text-lg text-muted-foreground text-center">
                           {uploadingPhoto ? "Uploading..." : "Click to upload building photo"}
                         </p>
                       </label>
@@ -1320,21 +1320,21 @@ export default function Quotes() {
             </Card>
           )}
 
-          <h2 className="text-2xl font-bold text-[#0A0A0A] mb-6">Services</h2>
+          <h2 className="text-2xl font-bold text-foreground mb-6">Services</h2>
           <div className="space-y-6 mb-8">
             {selectedQuote.services.map((service) => {
               const serviceConfig = SERVICE_TYPES.find(s => s.id === service.serviceType);
               const Icon = serviceConfig?.icon || Building2;
 
               return (
-                <Card key={service.id} className="rounded-2xl shadow-lg border border-[#F4F4F5]">
+                <Card key={service.id} className="rounded-2xl shadow-lg border border-border">
                   <CardHeader className="p-6">
                     <div className="flex items-center gap-3 mb-4">
-                      <div className="w-12 h-12 rounded-lg bg-[#3B82F6]/10 flex items-center justify-center">
-                        <Icon className="w-6 h-6 text-[#3B82F6]" />
+                      <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center">
+                        <Icon className="w-6 h-6 text-primary" />
                       </div>
                       <div>
-                        <CardTitle className="text-xl font-semibold text-[#0A0A0A]">
+                        <CardTitle className="text-xl font-semibold text-foreground">
                           {service.customServiceName || serviceConfig?.name || service.serviceType}
                         </CardTitle>
                         <CardDescription>
@@ -1347,24 +1347,24 @@ export default function Quotes() {
                       {serviceConfig?.requiresElevation && (
                         <>
                           <div>
-                            <p className="text-[#71717A] mb-1">North</p>
-                            <p className="font-medium text-[#0A0A0A]">{service.dropsNorth || 0} drops</p>
+                            <p className="text-muted-foreground mb-1">North</p>
+                            <p className="font-medium text-foreground">{service.dropsNorth || 0} drops</p>
                           </div>
                           <div>
-                            <p className="text-[#71717A] mb-1">East</p>
-                            <p className="font-medium text-[#0A0A0A]">{service.dropsEast || 0} drops</p>
+                            <p className="text-muted-foreground mb-1">East</p>
+                            <p className="font-medium text-foreground">{service.dropsEast || 0} drops</p>
                           </div>
                           <div>
-                            <p className="text-[#71717A] mb-1">South</p>
-                            <p className="font-medium text-[#0A0A0A]">{service.dropsSouth || 0} drops</p>
+                            <p className="text-muted-foreground mb-1">South</p>
+                            <p className="font-medium text-foreground">{service.dropsSouth || 0} drops</p>
                           </div>
                           <div>
-                            <p className="text-[#71717A] mb-1">West</p>
-                            <p className="font-medium text-[#0A0A0A]">{service.dropsWest || 0} drops</p>
+                            <p className="text-muted-foreground mb-1">West</p>
+                            <p className="font-medium text-foreground">{service.dropsWest || 0} drops</p>
                           </div>
                           <div>
-                            <p className="text-[#71717A] mb-1">Drops/Day</p>
-                            <p className="font-medium text-[#0A0A0A]">{service.dropsPerDay}</p>
+                            <p className="text-muted-foreground mb-1">Drops/Day</p>
+                            <p className="font-medium text-foreground">{service.dropsPerDay}</p>
                           </div>
                         </>
                       )}
@@ -1372,13 +1372,13 @@ export default function Quotes() {
                       {service.serviceType === "parkade" && (
                         <>
                           <div>
-                            <p className="text-[#71717A] mb-1">Stalls</p>
-                            <p className="font-medium text-[#0A0A0A]">{service.parkadeStalls}</p>
+                            <p className="text-muted-foreground mb-1">Stalls</p>
+                            <p className="font-medium text-foreground">{service.parkadeStalls}</p>
                           </div>
                           {canViewFinancialData && (
                             <div>
-                              <p className="text-[#71717A] mb-1">Price/Stall</p>
-                              <p className="font-medium text-[#0A0A0A]">${Number(service.pricePerStall).toFixed(2)}</p>
+                              <p className="text-muted-foreground mb-1">Price/Stall</p>
+                              <p className="font-medium text-foreground">${Number(service.pricePerStall).toFixed(2)}</p>
                             </div>
                           )}
                         </>
@@ -1386,8 +1386,8 @@ export default function Quotes() {
 
                       {service.serviceType === "ground_windows" && (
                         <div>
-                          <p className="text-[#71717A] mb-1">Hours</p>
-                          <p className="font-medium text-[#0A0A0A]">{Number(service.groundWindowHours).toFixed(1)}</p>
+                          <p className="text-muted-foreground mb-1">Hours</p>
+                          <p className="font-medium text-foreground">{Number(service.groundWindowHours).toFixed(1)}</p>
                         </div>
                       )}
 
@@ -1395,14 +1395,14 @@ export default function Quotes() {
                         <>
                           {service.suitesPerDay && (
                             <div>
-                              <p className="text-[#71717A] mb-1">Suites/Day</p>
-                              <p className="font-medium text-[#0A0A0A]">{service.suitesPerDay}</p>
+                              <p className="text-muted-foreground mb-1">Suites/Day</p>
+                              <p className="font-medium text-foreground">{service.suitesPerDay}</p>
                             </div>
                           )}
                           {service.floorsPerDay && (
                             <div>
-                              <p className="text-[#71717A] mb-1">Floors/Day</p>
-                              <p className="font-medium text-[#0A0A0A]">{service.floorsPerDay}</p>
+                              <p className="text-muted-foreground mb-1">Floors/Day</p>
+                              <p className="font-medium text-foreground">{service.floorsPerDay}</p>
                             </div>
                           )}
                         </>
@@ -1411,16 +1411,16 @@ export default function Quotes() {
                       {canViewFinancialData && (
                         <>
                           <div>
-                            <p className="text-[#71717A] mb-1">Price/Hour</p>
-                            <p className="font-medium text-[#0A0A0A]">${Number(service.pricePerHour).toFixed(2)}</p>
+                            <p className="text-muted-foreground mb-1">Price/Hour</p>
+                            <p className="font-medium text-foreground">${Number(service.pricePerHour).toFixed(2)}</p>
                           </div>
                           <div>
-                            <p className="text-[#71717A] mb-1">Total Hours</p>
-                            <p className="font-medium text-[#0A0A0A]">{Number(service.totalHours).toFixed(1)}</p>
+                            <p className="text-muted-foreground mb-1">Total Hours</p>
+                            <p className="font-medium text-foreground">{Number(service.totalHours).toFixed(1)}</p>
                           </div>
                           <div>
-                            <p className="text-[#71717A] mb-1">Total Cost</p>
-                            <p className="text-xl font-bold text-[#3B82F6]">
+                            <p className="text-muted-foreground mb-1">Total Cost</p>
+                            <p className="text-xl font-bold text-primary">
                               ${Number(service.totalCost).toFixed(2)}
                             </p>
                           </div>
@@ -1434,16 +1434,16 @@ export default function Quotes() {
           </div>
 
           {canViewFinancialData && (
-            <Card className="rounded-2xl shadow-lg border border-[#F4F4F5] bg-[#3B82F6]/5">
+            <Card className="rounded-2xl shadow-lg border border-border bg-primary/5">
               <CardContent className="p-8">
                 <div className="flex items-center justify-between">
                   <div>
-                    <h3 className="text-xl font-semibold text-[#0A0A0A] mb-1">Quote Total</h3>
-                    <p className="text-[#71717A]">
+                    <h3 className="text-xl font-semibold text-foreground mb-1">Quote Total</h3>
+                    <p className="text-muted-foreground">
                       {selectedQuote.services.length} service{selectedQuote.services.length !== 1 ? 's' : ''}
                     </p>
                   </div>
-                  <div className="text-4xl font-bold text-[#3B82F6]">
+                  <div className="text-4xl font-bold text-primary">
                     ${selectedQuote.services.reduce((sum, s) => sum + Number(s.totalCost || 0), 0).toFixed(2)}
                   </div>
                 </div>
@@ -1491,7 +1491,7 @@ export default function Quotes() {
                   setEditingServices(servicesMap);
                   setIsEditDialogOpen(true);
                 }}
-                className="bg-[#3B82F6] hover:bg-[#3B82F6]/90"
+                className="bg-primary hover:bg-primary/90"
                 data-testid="button-edit-quote"
               >
                 <Edit className="w-4 h-4 mr-2" />
@@ -1502,7 +1502,7 @@ export default function Quotes() {
               <Button
                 onClick={() => closeQuoteMutation.mutate(selectedQuote.id)}
                 disabled={closeQuoteMutation.isPending}
-                className="bg-[#84CC16] hover:bg-[#84CC16]/90"
+                className="bg-success hover:bg-success/90"
                 data-testid="button-close-quote"
               >
                 <CheckCircle2 className="w-4 h-4 mr-2" />
@@ -1673,8 +1673,8 @@ export default function Quotes() {
                         <AccordionItem key={serviceType} value={serviceType} className="border rounded-lg px-4">
                           <AccordionTrigger className="hover:no-underline">
                             <div className="flex items-center gap-3">
-                              <div className="w-10 h-10 rounded-lg bg-[#3B82F6]/10 flex items-center justify-center">
-                                <Icon className="w-5 h-5 text-[#3B82F6]" />
+                              <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
+                                <Icon className="w-5 h-5 text-primary" />
                               </div>
                               <span className="font-medium">{serviceConfig?.name || serviceType}</span>
                             </div>
@@ -1959,10 +1959,10 @@ export default function Quotes() {
                         alt={selectedQuote.buildingName}
                         className="w-full max-h-48 object-contain rounded-lg"
                       />
-                      <p className="text-sm text-[#71717A]">Current Photo</p>
+                      <p className="text-sm text-muted-foreground">Current Photo</p>
                     </div>
                   )}
-                  <div className="border-2 border-dashed border-[#E4E4E7] rounded-lg p-6 hover:border-[#3B82F6] transition-colors">
+                  <div className="border-2 border-dashed border-muted rounded-lg p-6 hover:border-primary transition-colors">
                     <input
                       type="file"
                       accept="image/*"
@@ -1980,8 +1980,8 @@ export default function Quotes() {
                       htmlFor="edit-quote-photo"
                       className="flex flex-col items-center cursor-pointer"
                     >
-                      <Image className="w-12 h-12 text-[#71717A] mb-2" />
-                      <p className="text-sm text-[#71717A] text-center">
+                      <Image className="w-12 h-12 text-muted-foreground mb-2" />
+                      <p className="text-sm text-muted-foreground text-center">
                         {editPhotoFile ? editPhotoFile.name : selectedQuote.photoUrl ? "Click to replace photo" : "Click to upload building photo"}
                       </p>
                       {editPhotoFile && (
@@ -2018,7 +2018,7 @@ export default function Quotes() {
                   <Button
                     type="submit"
                     disabled={editQuoteMutation.isPending}
-                    className="bg-[#3B82F6] hover:bg-[#3B82F6]/90"
+                    className="bg-primary hover:bg-primary/90"
                     data-testid="button-submit-edit"
                   >
                     {editQuoteMutation.isPending ? "Saving..." : "Save Changes"}
@@ -2063,7 +2063,7 @@ export default function Quotes() {
                     submitQuoteMutation.mutate(quoteToSubmit.id);
                   }
                 }}
-                className="bg-[#3B82F6] hover:bg-[#3B82F6]/90"
+                className="bg-primary hover:bg-primary/90"
                 data-testid="button-confirm-submit"
               >
                 Submit Quote
@@ -2079,7 +2079,7 @@ export default function Quotes() {
   // Render create view - Building info step
   if (view === "create" && createStep === "building") {
     return (
-      <div className="min-h-screen bg-[#FAFAFA] p-8">
+      <div className="min-h-screen bg-background p-8">
         <div className="max-w-2xl mx-auto">
           <Button
             variant="ghost"
@@ -2091,9 +2091,9 @@ export default function Quotes() {
             Back to Services
           </Button>
 
-          <Card className="rounded-2xl shadow-lg border border-[#F4F4F5]">
+          <Card className="rounded-2xl shadow-lg border border-border">
             <CardHeader className="p-8">
-              <CardTitle className="text-3xl font-bold text-[#0A0A0A] mb-2">
+              <CardTitle className="text-3xl font-bold text-foreground mb-2">
                 Building Information
               </CardTitle>
               <CardDescription className="text-lg">
@@ -2245,7 +2245,7 @@ export default function Quotes() {
 
                   <div className="space-y-2">
                     <Label>Building Photo (Optional)</Label>
-                    <div className="border-2 border-dashed border-[#E4E4E7] rounded-lg p-6 hover:border-[#3B82F6] transition-colors">
+                    <div className="border-2 border-dashed border-muted rounded-lg p-6 hover:border-primary transition-colors">
                       <input
                         type="file"
                         accept="image/*"
@@ -2263,8 +2263,8 @@ export default function Quotes() {
                         htmlFor="quote-photo-upload"
                         className="flex flex-col items-center cursor-pointer"
                       >
-                        <Image className="w-12 h-12 text-[#71717A] mb-2" />
-                        <p className="text-sm text-[#71717A] text-center">
+                        <Image className="w-12 h-12 text-muted-foreground mb-2" />
+                        <p className="text-sm text-muted-foreground text-center">
                           {selectedPhotoFile ? selectedPhotoFile.name : "Click to upload building photo"}
                         </p>
                         {selectedPhotoFile && (
@@ -2289,7 +2289,7 @@ export default function Quotes() {
                   <Button
                     type="submit"
                     disabled={createQuoteMutation.isPending}
-                    className="w-full bg-[#3B82F6] hover:bg-[#3B82F6]/90 h-12"
+                    className="w-full bg-primary hover:bg-primary/90 h-12"
                     data-testid="button-create-quote-submit"
                   >
                     {createQuoteMutation.isPending ? "Creating..." : "Create Quote"}
@@ -2306,7 +2306,7 @@ export default function Quotes() {
   // Render create view - Service selection step
   if (view === "create" && createStep === "services") {
     return (
-      <div className="min-h-screen bg-[#FAFAFA] p-8">
+      <div className="min-h-screen bg-background p-8">
         <div className="max-w-6xl mx-auto">
           <Button
             variant="ghost"
@@ -2322,8 +2322,8 @@ export default function Quotes() {
           </Button>
 
           <div className="mb-8">
-            <h1 className="text-4xl font-bold text-[#0A0A0A] mb-2">Select Services</h1>
-            <p className="text-[#71717A] text-lg">
+            <h1 className="text-4xl font-bold text-foreground mb-2">Select Services</h1>
+            <p className="text-muted-foreground text-lg">
               Choose one or more services for this quote
             </p>
           </div>
@@ -2339,8 +2339,8 @@ export default function Quotes() {
                   key={service.id}
                   className={`rounded-2xl shadow-lg border-2 cursor-pointer transition-all ${
                     isSelected
-                      ? "border-[#3B82F6] bg-[#3B82F6]/5"
-                      : "border-[#F4F4F5] hover:border-[#3B82F6]/30"
+                      ? "border-primary bg-primary/5"
+                      : "border-border hover:border-primary/30"
                   }`}
                   data-testid={`card-service-${service.id}`}
                 >
@@ -2348,21 +2348,21 @@ export default function Quotes() {
                     <div className="flex items-start gap-4">
                       <div
                         className={`w-16 h-16 rounded-xl flex items-center justify-center ${
-                          isSelected ? "bg-[#3B82F6]" : "bg-[#F4F4F5]"
+                          isSelected ? "bg-primary" : "bg-muted"
                         }`}
                       >
-                        <Icon className={`w-8 h-8 ${isSelected ? "text-white" : "text-[#71717A]"}`} />
+                        <Icon className={`w-8 h-8 ${isSelected ? "text-white" : "text-muted-foreground"}`} />
                       </div>
                       <div className="flex-1">
                         <div className="flex items-center justify-between mb-2">
-                          <h3 className="font-semibold text-[#0A0A0A]">{service.name}</h3>
+                          <h3 className="font-semibold text-foreground">{service.name}</h3>
                           {isConfigured && (
-                            <Badge className="bg-[#84CC16] text-white rounded-full">
+                            <Badge className="bg-success text-white rounded-full">
                               <CheckCircle2 className="w-3 h-3" />
                             </Badge>
                           )}
                         </div>
-                        <p className="text-sm text-[#71717A]">{service.description}</p>
+                        <p className="text-sm text-muted-foreground">{service.description}</p>
                       </div>
                     </div>
                   </CardHeader>
@@ -2372,7 +2372,7 @@ export default function Quotes() {
                         onClick={() => handleServiceToggle(service.id)}
                         variant={isSelected ? "destructive" : "default"}
                         className={`flex-1 ${
-                          !isSelected ? "bg-[#3B82F6] hover:bg-[#3B82F6]/90" : ""
+                          !isSelected ? "bg-primary hover:bg-primary/90" : ""
                         }`}
                         data-testid={`button-toggle-${service.id}`}
                       >
@@ -2405,14 +2405,14 @@ export default function Quotes() {
           </div>
 
           {selectedServices.length > 0 && (
-            <Card className="rounded-2xl shadow-lg border border-[#F4F4F5] bg-[#3B82F6]/5">
+            <Card className="rounded-2xl shadow-lg border border-border bg-primary/5">
               <CardContent className="p-8">
                 <div className="flex items-center justify-between mb-4">
                   <div className="flex-1">
-                    <h3 className="text-xl font-semibold text-[#0A0A0A] mb-1">
+                    <h3 className="text-xl font-semibold text-foreground mb-1">
                       {selectedServices.length} Service{selectedServices.length !== 1 ? 's' : ''} Selected
                     </h3>
-                    <p className="text-[#71717A]">
+                    <p className="text-muted-foreground">
                       {canFinalize
                         ? "All services configured. Ready to create quote."
                         : "Please configure all selected services."}
@@ -2420,8 +2420,8 @@ export default function Quotes() {
                   </div>
                   {canViewFinancialData && (
                     <div className="text-right">
-                      <p className="text-sm text-[#71717A] mb-1">Estimated Total</p>
-                      <p className="text-3xl font-bold text-[#3B82F6]">
+                      <p className="text-sm text-muted-foreground mb-1">Estimated Total</p>
+                      <p className="text-3xl font-bold text-primary">
                         ${calculateQuoteTotal().toFixed(2)}
                       </p>
                     </div>
@@ -2430,7 +2430,7 @@ export default function Quotes() {
                 <Button
                   onClick={() => setCreateStep("building")}
                   disabled={!canFinalize}
-                  className="w-full bg-[#3B82F6] hover:bg-[#3B82F6]/90 h-12"
+                  className="w-full bg-primary hover:bg-primary/90 h-12"
                   data-testid="button-next-to-building"
                 >
                   Next: Building Info
@@ -2451,7 +2451,7 @@ export default function Quotes() {
     const Icon = service.icon;
 
     return (
-      <div className="min-h-screen bg-[#FAFAFA] p-8">
+      <div className="min-h-screen bg-background p-8">
         <div className="max-w-2xl mx-auto">
           <Button
             variant="ghost"
@@ -2466,14 +2466,14 @@ export default function Quotes() {
             Back to Service Selection
           </Button>
 
-          <Card className="rounded-2xl shadow-lg border border-[#F4F4F5]">
+          <Card className="rounded-2xl shadow-lg border border-border">
             <CardHeader className="p-8">
               <div className="flex items-center gap-4 mb-4">
-                <div className="w-16 h-16 rounded-xl bg-[#3B82F6] flex items-center justify-center">
+                <div className="w-16 h-16 rounded-xl bg-primary flex items-center justify-center">
                   <Icon className="w-8 h-8 text-white" />
                 </div>
                 <div>
-                  <CardTitle className="text-3xl font-bold text-[#0A0A0A] mb-1">
+                  <CardTitle className="text-3xl font-bold text-foreground mb-1">
                     {service.name}
                   </CardTitle>
                   <CardDescription className="text-lg">
@@ -2873,7 +2873,7 @@ export default function Quotes() {
 
                   <Button
                     type="submit"
-                    className="w-full bg-[#3B82F6] hover:bg-[#3B82F6]/90 h-12"
+                    className="w-full bg-primary hover:bg-primary/90 h-12"
                     data-testid="button-save-service-config"
                   >
                     Save Configuration

@@ -51,7 +51,7 @@ const TIER_INFO = {
     price: { usd: 79, cad: 99 },
     projects: 2,
     seats: 4,
-    color: 'bg-blue-500',
+    color: 'bg-primary/50',
     icon: Briefcase,
     features: [
       '2 active projects',

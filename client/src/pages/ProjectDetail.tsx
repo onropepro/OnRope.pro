@@ -70,7 +70,7 @@ export default function ProjectDetail() {
             <p className="font-bold">Error Message:</p>
             <p className="font-mono text-sm">{renderError.message}</p>
           </div>
-          <div className="bg-gray-100 p-4 rounded">
+          <div className="bg-muted p-4 rounded">
             <p className="font-bold mb-2">Stack Trace:</p>
             <pre className="text-xs overflow-auto">{renderError.stack}</pre>
           </div>
@@ -79,7 +79,7 @@ export default function ProjectDetail() {
               setRenderError(null);
               window.location.reload();
             }}
-            className="mt-4 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+            className="mt-4 bg-primary text-white px-4 py-2 rounded hover:bg-primary/90"
           >
             Reload Page
           </button>
@@ -1956,7 +1956,7 @@ export default function ProjectDetail() {
                     if (status === 'closed') {
                       statusBadge = <Badge variant="secondary" className="bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/20 text-xs">Closed</Badge>;
                     } else if (isViewed) {
-                      statusBadge = <Badge variant="secondary" className="bg-blue-500/10 text-blue-700 dark:text-blue-400 border-blue-500/20 text-xs">Viewed</Badge>;
+                      statusBadge = <Badge variant="secondary" className="bg-primary/50/10 text-primary dark:text-primary border-primary/50/20 text-xs">Viewed</Badge>;
                     } else {
                       statusBadge = <Badge variant="secondary" className="bg-orange-500/10 text-orange-700 dark:text-orange-400 border-orange-500/20 text-xs">New</Badge>;
                     }

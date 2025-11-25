@@ -327,13 +327,13 @@ export default function HoursAnalytics() {
     ? (totalDropsThisMonth / sessionsWithDrops.length).toFixed(1)
     : '0.0';
 
-  // Stats cards configuration
+  // Stats cards configuration - uses brand CSS variables for consistent branding
   const defaultStatsCards = [
     {
       id: 'activeProjects',
       icon: 'assignment',
-      bgColor: 'bg-blue-100',
-      iconColor: 'text-blue-600',
+      bgColor: 'bg-primary/10',
+      iconColor: 'text-primary',
       value: activeProjects,
       label: 'Active Projects',
       subtitle: 'In Progress',
@@ -343,8 +343,8 @@ export default function HoursAnalytics() {
     {
       id: 'completedProjects',
       icon: 'check_circle',
-      bgColor: 'bg-emerald-100',
-      iconColor: 'text-emerald-600',
+      bgColor: 'bg-success/10',
+      iconColor: 'text-success',
       value: completedProjects,
       label: 'Completed Projects',
       subtitle: 'All Time',
@@ -354,8 +354,8 @@ export default function HoursAnalytics() {
     {
       id: 'totalEmployees',
       icon: 'group',
-      bgColor: 'bg-blue-100',
-      iconColor: 'text-blue-600',
+      bgColor: 'bg-primary/10',
+      iconColor: 'text-primary',
       value: totalEmployees,
       label: 'Total Employees',
       subtitle: 'Company Wide',
@@ -365,8 +365,8 @@ export default function HoursAnalytics() {
     {
       id: 'activeEmployees',
       icon: 'people',
-      bgColor: 'bg-blue-100',
-      iconColor: 'text-blue-600',
+      bgColor: 'bg-primary/10',
+      iconColor: 'text-primary',
       value: uniqueEmployeesThisMonth,
       label: 'Active This Month',
       subtitle: 'Employees',
@@ -376,8 +376,8 @@ export default function HoursAnalytics() {
     {
       id: 'workSessions',
       icon: 'calendar_month',
-      bgColor: 'bg-purple-100',
-      iconColor: 'text-purple-600',
+      bgColor: 'bg-chart-2/10',
+      iconColor: 'text-chart-2',
       value: totalSessionsThisMonth,
       label: 'Work Sessions',
       subtitle: 'This Month',
@@ -387,8 +387,8 @@ export default function HoursAnalytics() {
     {
       id: 'avgDuration',
       icon: 'schedule',
-      bgColor: 'bg-blue-100',
-      iconColor: 'text-blue-600',
+      bgColor: 'bg-primary/10',
+      iconColor: 'text-primary',
       value: `${avgSessionDuration}h`,
       label: 'Avg Session Duration',
       subtitle: 'Per Session',
@@ -398,8 +398,8 @@ export default function HoursAnalytics() {
     {
       id: 'totalDrops',
       icon: 'arrow_downward',
-      bgColor: 'bg-orange-100',
-      iconColor: 'text-orange-600',
+      bgColor: 'bg-warning/10',
+      iconColor: 'text-warning',
       value: totalDropsThisMonth,
       label: 'Total Drops',
       subtitle: 'This Month',
@@ -409,8 +409,8 @@ export default function HoursAnalytics() {
     {
       id: 'avgDrops',
       icon: 'speed',
-      bgColor: 'bg-blue-100',
-      iconColor: 'text-blue-600',
+      bgColor: 'bg-primary/10',
+      iconColor: 'text-primary',
       value: avgDropsPerSession,
       label: 'Avg Drops/Session',
       subtitle: 'Productivity',
@@ -420,8 +420,8 @@ export default function HoursAnalytics() {
     {
       id: 'billablePercentage',
       icon: 'percent',
-      bgColor: 'bg-emerald-100',
-      iconColor: 'text-emerald-600',
+      bgColor: 'bg-success/10',
+      iconColor: 'text-success',
       value: `${billablePercentage}%`,
       label: 'Billable Rate',
       subtitle: 'This Month',
@@ -431,8 +431,8 @@ export default function HoursAnalytics() {
     {
       id: 'avgHoursPerEmployee',
       icon: 'trending_up',
-      bgColor: 'bg-blue-100',
-      iconColor: 'text-blue-600',
+      bgColor: 'bg-primary/10',
+      iconColor: 'text-primary',
       value: `${avgHoursPerEmployee}h`,
       label: 'Avg Hours/Employee',
       subtitle: 'This Month',
@@ -453,8 +453,8 @@ export default function HoursAnalytics() {
     {
       id: 'todaysHours',
       icon: 'today',
-      bgColor: 'bg-blue-100',
-      iconColor: 'text-blue-600',
+      bgColor: 'bg-primary/10',
+      iconColor: 'text-primary',
       value: `${(dayBillable + dayNonBillable).toFixed(1)}h`,
       label: "Today's Hours",
       subtitle: `${dayBillable.toFixed(1)}h billable`,
@@ -957,7 +957,7 @@ export default function HoursAnalytics() {
           <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle className="flex items-center gap-2">
-                <span className="material-icons text-blue-600">assignment</span>
+                <span className="material-icons text-primary">assignment</span>
                 Active Projects
               </DialogTitle>
               <DialogDescription>Currently in-progress projects</DialogDescription>
@@ -1016,7 +1016,7 @@ export default function HoursAnalytics() {
           <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle className="flex items-center gap-2">
-                <span className="material-icons text-blue-600">group</span>
+                <span className="material-icons text-primary">group</span>
                 All Employees
               </DialogTitle>
               <DialogDescription>{totalEmployees} total employees company-wide</DialogDescription>
@@ -1049,7 +1049,7 @@ export default function HoursAnalytics() {
           <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle className="flex items-center gap-2">
-                <span className="material-icons text-blue-600">people</span>
+                <span className="material-icons text-primary">people</span>
                 Active Employees This Month
               </DialogTitle>
               <DialogDescription>{uniqueEmployeesThisMonth} employees worked this month</DialogDescription>
@@ -1146,7 +1146,7 @@ export default function HoursAnalytics() {
           <DialogContent>
             <DialogHeader>
               <DialogTitle className="flex items-center gap-2">
-                <span className="material-icons text-blue-600">schedule</span>
+                <span className="material-icons text-primary">schedule</span>
                 Average Session Duration
               </DialogTitle>
               <DialogDescription>Insights into typical work session length</DialogDescription>
@@ -1211,7 +1211,7 @@ export default function HoursAnalytics() {
           <DialogContent>
             <DialogHeader>
               <DialogTitle className="flex items-center gap-2">
-                <span className="material-icons text-blue-600">speed</span>
+                <span className="material-icons text-primary">speed</span>
                 Average Drops Per Session
               </DialogTitle>
               <DialogDescription>Productivity metric for rope access work</DialogDescription>

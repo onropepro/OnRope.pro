@@ -33,7 +33,7 @@ export default function SafetyForms() {
       description: "Daily harness and PPE safety inspection",
       icon: ClipboardList,
       onClick: () => navigate("/harness-inspection"),
-      iconColor: "text-blue-500",
+      iconColor: "text-primary",
       borderColor: "border-l-blue-500",
       testId: "card-harness-inspection",
     },
