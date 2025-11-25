@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -101,6 +101,11 @@ export default function ToolboxMeetingForm() {
     queryKey: ["/api/employees"],
   });
 
+  // Get current user to auto-fill the "Conducted By" field
+  const { data: currentUser } = useQuery<{ id: number; firstName: string; lastName: string; fullName?: string }>({
+    queryKey: ["/api/user"],
+  });
+
   // Filter out terminated employees
   const employees = (employeesData?.employees || []);
 
@@ -141,6 +146,16 @@ export default function ToolboxMeetingForm() {
       additionalNotes: "",
     },
   });
+
+  // Auto-fill the current user's name when data loads
+  useEffect(() => {
+    if (currentUser) {
+      const fullName = currentUser.fullName || `${currentUser.firstName || ''} ${currentUser.lastName || ''}`.trim();
+      if (fullName && !form.getValues("conductedByName")) {
+        form.setValue("conductedByName", fullName);
+      }
+    }
+  }, [currentUser, form]);
 
   const toggleEmployee = (employeeName: string) => {
     setSelectedEmployees(prev => 
