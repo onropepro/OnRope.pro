@@ -35,6 +35,7 @@ import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from "recha
 import { isManagement, hasFinancialAccess, canManageEmployees, canViewPerformance, hasPermission, isReadOnly, canViewSchedule } from "@/lib/permissions";
 import { DocumentUploader } from "@/components/DocumentUploader";
 import { RefreshButton } from "@/components/RefreshButton";
+import { CSRBadge } from "@/components/CSRBadge";
 import { QRCodeSVG } from 'qrcode.react';
 import {
   DndContext,
@@ -1970,6 +1971,7 @@ export default function Dashboard() {
             </div>
           </div>
           <div className="flex items-center gap-3">
+            <CSRBadge />
             <RefreshButton />
             <Button variant="ghost" size="icon" data-testid="button-profile" onClick={() => setLocation("/profile")} className="hover-elevate w-12 h-12">
               <span className="material-icons text-2xl">person</span>

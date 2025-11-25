@@ -2,7 +2,6 @@ import { useQuery } from "@tanstack/react-query";
 import { Badge } from "@/components/ui/badge";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { Shield, FileText, ClipboardCheck, HardHat, TrendingUp } from "lucide-react";
-import { Progress } from "@/components/ui/progress";
 
 interface CSRData {
   overallCSR: number;
@@ -31,17 +30,29 @@ function getRatingColor(rating: number): string {
   return "text-red-600 dark:text-red-400";
 }
 
-function getProgressColor(rating: number): string {
-  if (rating >= 90) return "bg-green-500";
-  if (rating >= 70) return "bg-yellow-500";
-  if (rating >= 50) return "bg-orange-500";
-  return "bg-red-500";
+function getBadgeColors(rating: number): string {
+  if (rating >= 90) return "bg-green-600 dark:bg-green-500 text-white border-green-700 dark:border-green-400";
+  if (rating >= 70) return "bg-yellow-500 dark:bg-yellow-500 text-black dark:text-black border-yellow-600 dark:border-yellow-400";
+  if (rating >= 50) return "bg-orange-500 dark:bg-orange-500 text-white border-orange-600 dark:border-orange-400";
+  return "bg-red-600 dark:bg-red-500 text-white border-red-700 dark:border-red-400";
 }
 
-function getBadgeVariant(rating: number): "default" | "secondary" | "destructive" | "outline" {
-  if (rating >= 90) return "default";
-  if (rating >= 70) return "secondary";
-  return "destructive";
+function ColoredProgress({ value, rating }: { value: number; rating: number }) {
+  const getBarColor = () => {
+    if (rating >= 90) return "bg-green-500 dark:bg-green-400";
+    if (rating >= 70) return "bg-yellow-500 dark:bg-yellow-400";
+    if (rating >= 50) return "bg-orange-500 dark:bg-orange-400";
+    return "bg-red-500 dark:bg-red-400";
+  };
+
+  return (
+    <div className="h-1.5 w-full rounded-full bg-muted overflow-hidden">
+      <div 
+        className={`h-full rounded-full transition-all ${getBarColor()}`}
+        style={{ width: `${Math.min(100, Math.max(0, value))}%` }}
+      />
+    </div>
+  );
 }
 
 export function CSRBadge() {
@@ -68,8 +79,8 @@ export function CSRBadge() {
     <Tooltip>
       <TooltipTrigger asChild>
         <Badge 
-          variant={getBadgeVariant(overallCSR)} 
-          className="gap-1.5 px-3 py-1.5 cursor-help no-default-hover-elevate no-default-active-elevate"
+          variant="outline" 
+          className={`gap-1.5 px-3 py-1.5 cursor-help no-default-hover-elevate no-default-active-elevate ${getBadgeColors(overallCSR)}`}
           data-testid="badge-csr"
         >
           <Shield className="w-4 h-4" />
@@ -103,10 +114,7 @@ export function CSRBadge() {
                 {breakdown.documentationRating}%
               </span>
             </div>
-            <Progress 
-              value={breakdown.documentationRating} 
-              className="h-1.5" 
-            />
+            <ColoredProgress value={breakdown.documentationRating} rating={breakdown.documentationRating} />
             <p className="text-[10px] text-muted-foreground">
               {details.hasHealthSafety && details.hasCompanyPolicy 
                 ? "Both manuals uploaded" 
@@ -126,10 +134,7 @@ export function CSRBadge() {
                 {breakdown.toolboxMeetingRating}%
               </span>
             </div>
-            <Progress 
-              value={breakdown.toolboxMeetingRating} 
-              className="h-1.5" 
-            />
+            <ColoredProgress value={breakdown.toolboxMeetingRating} rating={breakdown.toolboxMeetingRating} />
             <p className="text-[10px] text-muted-foreground">
               {details.toolboxDaysWithMeeting} of {details.toolboxTotalDays} work days covered
             </p>
@@ -145,10 +150,7 @@ export function CSRBadge() {
                 {breakdown.harnessInspectionRating}%
               </span>
             </div>
-            <Progress 
-              value={breakdown.harnessInspectionRating} 
-              className="h-1.5" 
-            />
+            <ColoredProgress value={breakdown.harnessInspectionRating} rating={breakdown.harnessInspectionRating} />
             <p className="text-[10px] text-muted-foreground">
               {details.harnessCompletedInspections} of {details.harnessRequiredInspections} inspections (30 days)
             </p>
@@ -164,10 +166,7 @@ export function CSRBadge() {
                 {breakdown.projectCompletionRating}%
               </span>
             </div>
-            <Progress 
-              value={breakdown.projectCompletionRating} 
-              className="h-1.5" 
-            />
+            <ColoredProgress value={breakdown.projectCompletionRating} rating={breakdown.projectCompletionRating} />
             <p className="text-[10px] text-muted-foreground">
               Average across {details.projectCount} project{details.projectCount !== 1 ? 's' : ''}
             </p>
