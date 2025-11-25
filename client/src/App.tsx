@@ -443,19 +443,6 @@ function BrandingProvider({ children }: { children: React.ReactNode }) {
     brandingActive: isAuthenticated && brandColors.length > 0,
   };
 
-  // DEBUG: Log branding context state with more details
-  console.log('[BrandingProvider] Full debug:', {
-    location,
-    isPublicPage,
-    isAuthenticated,
-    userData: userData?.user ? { id: userData.user.id, role: userData.user.role, companyId: userData.user.companyId } : null,
-    companyIdForBranding,
-    brandingData: brandingData,
-    branding,
-    brandColors,
-    brandingActive: contextValue.brandingActive,
-  });
-
   return (
     <BrandingContext.Provider value={contextValue}>
       {children}

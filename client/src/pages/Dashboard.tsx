@@ -1,6 +1,5 @@
 // GPS Location Tracking - v2.0 - CACHE BUST
-import { useState, useEffect, useMemo, useRef, useContext } from "react";
-import { BrandingContext } from "@/App";
+import { useState, useEffect, useMemo, useRef } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { Button } from "@/components/ui/button";
@@ -216,7 +215,7 @@ type EndDayFormData = z.infer<typeof endDaySchema>;
 type ClientFormData = z.infer<typeof clientSchema>;
 
 // Sortable Card Component - uses brand colors when active, otherwise original multicolor
-function SortableCard({ card, isRearranging, colorIndex }: { card: any; isRearranging: boolean; colorIndex: number }) {
+function SortableCard({ card, isRearranging, colorIndex, brandColors }: { card: any; isRearranging: boolean; colorIndex: number; brandColors: string[] }) {
   const {
     attributes,
     listeners,
@@ -226,11 +225,8 @@ function SortableCard({ card, isRearranging, colorIndex }: { card: any; isRearra
     isDragging,
   } = useSortable({ id: card.id, disabled: !isRearranging });
 
-  // Get brand colors from context (reliable, no timing issues)
-  const { brandColors, brandingActive } = useContext(BrandingContext);
-  
-  // DEBUG: Log what the component receives
-  console.log('[SortableCard] Context received:', { brandColors, brandingActive, colorIndex });
+  // Brand colors passed directly as props - most reliable approach
+  const brandingActive = brandColors.length > 0;
 
   // Create a light tint from hex color
   const createTintFromHex = (hex: string, lightness: number = 90): string => {
@@ -2104,7 +2100,7 @@ export default function Dashboard() {
                 >
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                     {sortedDashboardCards.map((card, index) => (
-                      <SortableCard key={card.id} card={card} isRearranging={isRearranging} colorIndex={index} />
+                      <SortableCard key={card.id} card={card} isRearranging={isRearranging} colorIndex={index} brandColors={brandColors} />
                     ))}
                   </div>
                 </SortableContext>
