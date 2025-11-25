@@ -271,9 +271,13 @@ function SortableCard({ card, isRearranging, colorIndex }: { card: any; isRearra
   const brandColor = getBrandColor(colorIndex);
   const hasBranding = brandColor !== null;
 
-  // Use brand colors when active, otherwise use original card borderColor with white background
+  // When branding is active: use ONLY brand colors for EVERYTHING
+  // When branding is NOT active: use original card borderColor with default bg-card
   const activeColor = hasBranding ? brandColor.hex : card.borderColor;
-  const cardBackground = hasBranding ? brandColor.tint : undefined; // undefined = use default bg-card
+  const cardBackground = hasBranding ? brandColor.tint : undefined;
+  
+  // Icon color: ALWAYS use brand color when branding active, otherwise use card's borderColor
+  const iconColor = hasBranding ? brandColor.hex : card.borderColor;
 
   const style: React.CSSProperties = {
     transform: CSS.Transform.toString(transform),
@@ -307,9 +311,9 @@ function SortableCard({ card, isRearranging, colorIndex }: { card: any; isRearra
         <div 
           className="w-14 h-14 rounded-xl flex items-center justify-center transition-transform duration-300 group-hover:scale-110 border-2"
           style={{ 
-            backgroundColor: `${activeColor}15`, 
-            color: activeColor, 
-            borderColor: `${activeColor}40` 
+            backgroundColor: `${iconColor}15`, 
+            color: iconColor, 
+            borderColor: `${iconColor}40` 
           }}
         >
           <span className="material-icons text-4xl">{card.icon}</span>
