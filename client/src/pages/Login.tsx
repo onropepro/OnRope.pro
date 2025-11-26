@@ -219,6 +219,38 @@ export default function Login() {
         </div>
       </section>
 
+      {/* CTA Section */}
+      <section className="py-16 md:py-24 px-6 bg-muted/30">
+        <div className="max-w-3xl mx-auto text-center">
+          <h2 className="text-2xl md:text-4xl font-bold mb-4">
+            Ready to Streamline Your Rope Access Operations?
+          </h2>
+          <p className="text-muted-foreground mb-8">
+            Join rope access companies who've already ditched the spreadsheet chaos
+          </p>
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+            <Button 
+              size="lg"
+              onClick={() => setLocation("/register")}
+              className="gap-2 px-6"
+              data-testid="button-start-free-trial"
+            >
+              <Rocket className="w-4 h-4" />
+              Start Free Trial
+            </Button>
+            <Button 
+              variant="outline"
+              size="lg"
+              className="gap-2 px-6"
+              data-testid="button-schedule-demo"
+            >
+              <span className="material-icons text-lg">calendar_today</span>
+              Schedule Demo
+            </Button>
+          </div>
+        </div>
+      </section>
+
       {/* Login Modal - Overlay when shown */}
       {showLoginForm && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
