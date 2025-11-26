@@ -20,10 +20,39 @@ const loginSchema = z.object({
 
 type LoginFormData = z.infer<typeof loginSchema>;
 
+const rotatingWords = [
+  "project",
+  "safety meeting",
+  "hour worked",
+  "drop",
+  "resident complaint",
+  "piece of gear",
+  "non-billable hour",
+  "job quote",
+  "safety document",
+  "hour scheduled",
+  "employee's performance level",
+  "job's progress"
+];
+
 export default function Login() {
   const { toast } = useToast();
   const [, setLocation] = useLocation();
   const [showLoginForm, setShowLoginForm] = useState(false);
+  const [currentWordIndex, setCurrentWordIndex] = useState(0);
+  const [isAnimating, setIsAnimating] = useState(false);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setIsAnimating(true);
+      setTimeout(() => {
+        setCurrentWordIndex((prev) => (prev + 1) % rotatingWords.length);
+        setIsAnimating(false);
+      }, 300);
+    }, 2500);
+    return () => clearInterval(interval);
+  }, []);
+
   const form = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
@@ -159,7 +188,15 @@ export default function Login() {
         </div>
         
         <p className="text-base md:text-lg text-muted-foreground max-w-xl mb-8">
-          You track every <span className="font-semibold text-primary">hour worked</span>, from a single platform that actually speaks rope access.
+          You track every{" "}
+          <span 
+            className={`inline-block font-semibold text-primary transition-all duration-300 ${
+              isAnimating ? 'opacity-0 translate-y-2' : 'opacity-100 translate-y-0'
+            }`}
+          >
+            {rotatingWords[currentWordIndex]}
+          </span>
+          , from a single platform that actually speaks rope access.
         </p>
         
         <div className="flex flex-col sm:flex-row items-center gap-4">
