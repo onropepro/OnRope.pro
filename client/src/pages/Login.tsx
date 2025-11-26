@@ -197,10 +197,10 @@ export default function Login() {
               They're losing <span className="font-semibold text-destructive">$40K/year</span> to payroll errors they don't see.
             </p>
             <p>
-              They're spending <span className="font-semibold text-primary">80 hours monthly</span> on admin that should take 10.
+              They're spending <span className="font-semibold text-[#e84a6c]">80 hours monthly</span> on admin that should take 10.
             </p>
             <p>
-              They're underbidding <span className="font-semibold text-primary">25% of jobs</span> because they're guessing.
+              They're underbidding <span className="font-semibold text-[#e84a6c]">25% of jobs</span> because they're guessing.
             </p>
             <p>
               They're <span className="font-semibold text-destructive">juggling resident complaints</span> between memory, emails, texts, phone calls, notes in a glovebox.
