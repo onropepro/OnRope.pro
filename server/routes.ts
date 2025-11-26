@@ -5451,6 +5451,43 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
+  // Update my IRATA baseline hours (for logbook)
+  app.patch("/api/my-irata-baseline-hours", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      const { baselineHours } = req.body;
+      
+      if (typeof baselineHours !== 'number' || baselineHours < 0) {
+        return res.status(400).json({ message: "Baseline hours must be a non-negative number" });
+      }
+      
+      if (baselineHours > 100000) {
+        return res.status(400).json({ message: "Baseline hours seems unreasonably high" });
+      }
+      
+      await storage.updateUser(currentUser.id, {
+        irataBaselineHours: baselineHours.toString(),
+      });
+      
+      const updatedUser = await storage.getUserById(currentUser.id);
+      const { passwordHash, ...userWithoutPassword } = updatedUser!;
+      
+      res.json({ 
+        success: true, 
+        user: userWithoutPassword,
+        message: "Baseline hours updated successfully" 
+      });
+    } catch (error) {
+      console.error("Update IRATA baseline hours error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+  
   // ==================== COMPLAINT ROUTES ====================
   
   // Create complaint (with optional photo upload)
