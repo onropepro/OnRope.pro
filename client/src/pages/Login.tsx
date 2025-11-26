@@ -333,7 +333,7 @@ export default function Login() {
                 <DollarSign className="w-5 h-5 text-primary" />
               </div>
               <p className="text-xs text-muted-foreground uppercase tracking-wide">Non-Billable Hour Tracker</p>
-              <h3 className="font-bold">$12,600 Fell Through The Cracks Last Year</h3>
+              <h3 className="font-bold">$12,600 Fell Through The Cracks</h3>
               <p className="text-sm text-primary font-medium">Travel Time. Setup Time. You Paid. Client Didn't.</p>
               <p className="text-sm text-muted-foreground">
                 Paid for 45 hours. Billed for 32 hours. That's 13 hours donated. Every. Single. Week. Track travel time, equipment setup, weather delays separately. See your billable ratio: 68%. Target: 75%+. Stop the bleed. Your margins thank you.
