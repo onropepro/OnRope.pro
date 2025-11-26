@@ -18,7 +18,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
-import { Calendar, Plus, Edit2, Trash2, Users, ArrowLeft, UserCheck, UserX, Lock, ChevronLeft, ChevronRight, Briefcase } from "lucide-react";
+import { Calendar, Plus, Edit2, Trash2, Users, ArrowLeft, UserCheck, UserX, Lock, ChevronLeft, ChevronRight, Briefcase, ChevronDown } from "lucide-react";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import type { ScheduledJobWithAssignments, User, EmployeeTimeOff } from "@shared/schema";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -52,6 +53,9 @@ export default function Schedule() {
   
   // Employee schedule week navigation
   const [weekOffset, setWeekOffset] = useState(0);
+  
+  // Mobile: collapse availability section by default
+  const [availabilityOpen, setAvailabilityOpen] = useState(false);
 
   // Fetch current user
   const { data: currentUserData, isLoading: isLoadingUser } = useQuery<{ user: User }>({
@@ -763,8 +767,112 @@ export default function Schedule() {
         </div>
       </div>
 
-      {/* Employee Availability */}
-      <Card className="sticky top-0 z-10 border-2 border-primary bg-gradient-to-r from-primary/10 to-primary/5 shadow-lg backdrop-blur-sm">
+      {/* Employee Availability - Collapsible on mobile */}
+      <Collapsible open={availabilityOpen} onOpenChange={setAvailabilityOpen} className="md:hidden">
+        <Card className="border-2 border-primary bg-gradient-to-r from-primary/10 to-primary/5 shadow-lg backdrop-blur-sm">
+          <CollapsibleTrigger asChild>
+            <CardHeader className="pb-2 pt-2 cursor-pointer">
+              <CardTitle className="text-sm font-bold flex items-center justify-between text-primary">
+                <div className="flex items-center gap-1.5">
+                  <Users className="w-4 h-4" />
+                  EMPLOYEE AVAILABILITY
+                  <Badge variant="secondary" className="ml-2 text-xs">
+                    {assignedEmployees.length} / {employees.length}
+                  </Badge>
+                </div>
+                <ChevronDown className={`w-4 h-4 transition-transform ${availabilityOpen ? 'rotate-180' : ''}`} />
+              </CardTitle>
+            </CardHeader>
+          </CollapsibleTrigger>
+          <CollapsibleContent>
+            <CardContent className="pt-0 pb-2">
+              <div className="grid gap-2">
+                {/* Assigned Employees */}
+                <div className="bg-card rounded p-1.5 border-l-4 border-l-green-600 shadow-sm">
+                  <div className="flex items-center gap-1 mb-1">
+                    <UserCheck className="w-3.5 h-3.5 text-green-600" />
+                    <h3 className="font-bold text-xs text-green-700">Assigned ({assignedEmployees.length})</h3>
+                  </div>
+                  {assignedEmployees.length === 0 ? (
+                    <p className="text-xs text-muted-foreground">No employees assigned</p>
+                  ) : (
+                    <div className="space-y-0.5 max-h-24 overflow-y-auto pr-1">
+                      {assignedEmployees.map(employee => {
+                        const employeeJobs = jobs.filter(job => 
+                          job.assignedEmployees?.some(e => e.id === employee.id)
+                        );
+                        const isActive = activeEmployeeId === employee.id;
+                        return (
+                          <DraggableEmployeeCard
+                            key={employee.id}
+                            employee={employee}
+                            isActive={isActive}
+                            onClick={() => setActiveEmployeeId(isActive ? null : employee.id)}
+                          >
+                            <div className="flex flex-wrap gap-0.5 mt-0.5">
+                              {employeeJobs.map(job => (
+                                <Badge 
+                                  key={job.id} 
+                                  variant="default" 
+                                  className="text-[9px] h-4 px-1.5 py-0 bg-green-600 hover:bg-red-600 cursor-pointer transition-colors"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    const currentAssignments = job.assignedEmployees?.map(e => e.id) || [];
+                                    const newAssignments = currentAssignments.filter(id => id !== employee.id);
+                                    quickAssignMutation.mutate({ jobId: job.id, employeeIds: newAssignments });
+                                  }}
+                                  title="Click to remove from this job"
+                                >
+                                  {job.project?.buildingName || job.title} ✕
+                                </Badge>
+                              ))}
+                            </div>
+                          </DraggableEmployeeCard>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+
+                {/* Available Employees */}
+                <DroppableAvailableZone isDragging={activeEmployeeId !== null}>
+                  <div className="bg-card rounded p-1.5 border-l-4 border-l-primary shadow-sm">
+                    <div className="flex items-center gap-1 mb-1">
+                      <UserX className="w-3.5 h-3.5 text-primary" />
+                      <h3 className="font-bold text-xs text-primary">Available ({availableEmployees.length})</h3>
+                    </div>
+                    {availableEmployees.length === 0 ? (
+                      <p className="text-xs text-muted-foreground">All employees assigned</p>
+                    ) : (
+                      <div className="space-y-0.5 max-h-24 overflow-y-auto pr-1">
+                        {availableEmployees.map(employee => {
+                          const isActive = activeEmployeeId === employee.id;
+                          return (
+                            <DraggableEmployeeCard
+                              key={employee.id}
+                              employee={employee}
+                              isActive={isActive}
+                              onClick={() => setActiveEmployeeId(isActive ? null : employee.id)}
+                              type="available"
+                            >
+                              <Badge variant="default" className="mt-0.5 text-[9px] h-4 px-1.5 py-0 bg-primary hover:bg-primary/90">
+                                Ready
+                              </Badge>
+                            </DraggableEmployeeCard>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </div>
+                </DroppableAvailableZone>
+              </div>
+            </CardContent>
+          </CollapsibleContent>
+        </Card>
+      </Collapsible>
+      
+      {/* Desktop version - always visible */}
+      <Card className="hidden md:block sticky top-0 z-10 border-2 border-primary bg-gradient-to-r from-primary/10 to-primary/5 shadow-lg backdrop-blur-sm">
         <CardHeader className="pb-1 pt-2">
           <CardTitle className="text-sm font-bold flex items-center gap-1.5 text-primary">
             <Users className="w-4 h-4" />
@@ -1061,106 +1169,114 @@ export default function Schedule() {
                 `
               }}
             />
-            {/* Week Navigation Header */}
-            <div className="flex items-center justify-between mb-6 relative z-10">
-              <Button 
-                variant="outline" 
-                size="icon"
-                onClick={() => setWeekOffset(prev => prev - 1)}
-                data-testid="button-prev-week"
-              >
-                <ChevronLeft className="h-4 w-4" />
-              </Button>
-              
-              <div className="flex items-center gap-3">
-                <h3 className="text-lg font-semibold" data-testid="text-week-range">
+            {/* Week Navigation Header - Mobile optimized */}
+            <div className="flex flex-col gap-3 mb-4 md:mb-6 relative z-10">
+              {/* Top row: navigation and date */}
+              <div className="flex items-center justify-between gap-2">
+                <div className="flex items-center gap-1">
+                  <Button 
+                    variant="outline" 
+                    size="icon"
+                    onClick={() => setWeekOffset(prev => prev - 1)}
+                    data-testid="button-prev-week"
+                  >
+                    <ChevronLeft className="h-4 w-4" />
+                  </Button>
+                  {weekOffset !== 0 && (
+                    <Button 
+                      variant="ghost" 
+                      size="sm"
+                      onClick={() => setWeekOffset(0)}
+                      data-testid="button-today"
+                      className="px-2"
+                    >
+                      Today
+                    </Button>
+                  )}
+                </div>
+                
+                <h3 className="text-sm md:text-lg font-semibold text-center" data-testid="text-week-range">
                   {formatWeekRange}
                 </h3>
-                {weekOffset !== 0 && (
+                
+                <div className="flex items-center gap-1">
                   <Button 
-                    variant="ghost" 
-                    size="sm"
-                    onClick={() => setWeekOffset(0)}
-                    data-testid="button-today"
+                    variant="outline" 
+                    size="icon"
+                    onClick={() => setWeekOffset(prev => prev + 1)}
+                    data-testid="button-next-week"
                   >
-                    Today
+                    <ChevronRight className="h-4 w-4" />
                   </Button>
-                )}
+                </div>
               </div>
               
-              <div className="flex items-center gap-2">
-                <Button 
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setTimeOffDialogOpen(true)}
-                  data-testid="button-schedule-time-off"
-                >
-                  <Calendar className="h-4 w-4 mr-2" />
-                  Schedule Time Off
-                </Button>
-                <Button 
-                  variant="outline" 
-                  size="icon"
-                  onClick={() => setWeekOffset(prev => prev + 1)}
-                  data-testid="button-next-week"
-                >
-                  <ChevronRight className="h-4 w-4" />
-                </Button>
-              </div>
+              {/* Bottom row: action button (full width on mobile) */}
+              <Button 
+                variant="outline"
+                size="sm"
+                onClick={() => setTimeOffDialogOpen(true)}
+                data-testid="button-schedule-time-off"
+                className="w-full md:w-auto md:absolute md:top-0 md:right-0"
+              >
+                <Calendar className="h-4 w-4 mr-2" />
+                Schedule Time Off
+              </Button>
             </div>
 
-            {/* Day Headers */}
-            <div className="grid grid-cols-8 gap-1 mb-2 relative z-10">
-              <div className="font-medium text-sm text-muted-foreground px-2">Team</div>
-              {getWeekDates.map((date, idx) => (
-                <div 
-                  key={idx}
-                  className={`text-center py-2 rounded-md ${
-                    isToday(date) 
-                      ? 'bg-primary text-primary-foreground font-semibold' 
-                      : 'bg-muted font-medium'
-                  }`}
-                >
-                  <div className="text-xs uppercase">
-                    {date.toLocaleDateString('en-US', { weekday: 'short' })}
-                  </div>
-                  <div className="text-lg">
-                    {date.getDate()}
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            {/* Employee Rows */}
-            <div className="space-y-2 relative z-10">
-              {employees.length === 0 ? (
-                <div className="text-center py-12 text-muted-foreground">
-                  <Users className="w-12 h-12 mx-auto mb-3 opacity-50" />
-                  <p>No team members found</p>
-                </div>
-              ) : (
-                employees.map((employee) => (
-                  <div 
-                    key={employee.id}
-                    className="grid grid-cols-8 gap-1 items-stretch"
-                    data-testid={`employee-row-${employee.id}`}
-                  >
-                    {/* Employee Name */}
-                    <div className="flex items-center gap-2 px-2 py-3 bg-muted/50 rounded-md">
-                      <Avatar className="h-8 w-8">
-                        <AvatarFallback className="text-xs font-medium">
-                          {employee.name?.split(' ').map((n: string) => n[0]).join('').toUpperCase().slice(0, 2)}
-                        </AvatarFallback>
-                      </Avatar>
-                      <div className="min-w-0 flex-1">
-                        <div className="font-medium text-sm truncate">{employee.name}</div>
-                        {employee.role && (
-                          <div className="text-xs text-muted-foreground truncate">
-                            {employee.role.replace(/_/g, ' ')}
-                          </div>
-                        )}
+            {/* Day Headers + Employee Rows - Scrollable on mobile */}
+            <div className="overflow-x-auto -mx-4 md:mx-0 px-4 md:px-0 relative z-10">
+              <div className="min-w-[700px] md:min-w-0">
+                {/* Day Headers */}
+                <div className="grid grid-cols-8 gap-1 mb-2">
+                  <div className="font-medium text-xs md:text-sm text-muted-foreground px-2 flex items-center">Team</div>
+                  {getWeekDates.map((date, idx) => (
+                    <div 
+                      key={idx}
+                      className={`text-center py-1.5 md:py-2 rounded-md ${
+                        isToday(date) 
+                          ? 'bg-primary text-primary-foreground font-semibold' 
+                          : 'bg-muted font-medium'
+                      }`}
+                    >
+                      <div className="text-[10px] md:text-xs uppercase">
+                        {date.toLocaleDateString('en-US', { weekday: 'short' })}
+                      </div>
+                      <div className="text-sm md:text-lg">
+                        {date.getDate()}
                       </div>
                     </div>
+                  ))}
+                </div>
+
+                {/* Employee Rows */}
+                <div className="space-y-1.5 md:space-y-2">
+                  {employees.length === 0 ? (
+                    <div className="text-center py-12 text-muted-foreground">
+                      <Users className="w-12 h-12 mx-auto mb-3 opacity-50" />
+                      <p>No team members found</p>
+                    </div>
+                  ) : (
+                    employees.map((employee) => (
+                      <div 
+                        key={employee.id}
+                        className="grid grid-cols-8 gap-1 items-stretch"
+                        data-testid={`employee-row-${employee.id}`}
+                      >
+                        {/* Employee Name */}
+                        <div className="flex items-center gap-1.5 md:gap-2 px-1.5 md:px-2 py-2 md:py-3 bg-muted/50 rounded-md">
+                          <Avatar className="h-6 w-6 md:h-8 md:w-8 flex-shrink-0">
+                            <AvatarFallback className="text-[10px] md:text-xs font-medium">
+                              {employee.name?.split(' ').map((n: string) => n[0]).join('').toUpperCase().slice(0, 2)}
+                            </AvatarFallback>
+                          </Avatar>
+                          <div className="min-w-0 flex-1">
+                            <div className="font-medium text-xs md:text-sm truncate">{employee.name}</div>
+                            <div className="text-[10px] md:text-xs text-muted-foreground truncate hidden md:block">
+                              {employee.role?.replace(/_/g, ' ')}
+                            </div>
+                          </div>
+                        </div>
                     
                     {/* Day Cells */}
                     {getWeekDates.map((date, dayIdx) => {
@@ -1256,7 +1372,12 @@ export default function Schedule() {
                   </div>
                 ))
               )}
+              </div>
+              {/* End Employee Rows */}
             </div>
+            {/* End min-w wrapper */}
+          </div>
+          {/* End overflow-x-auto wrapper */}
 
             {/* Legend */}
             <div className="mt-6 pt-4 border-t relative z-10">
