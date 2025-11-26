@@ -160,7 +160,7 @@ export default function MyLoggedHours() {
   return (
     <div className="min-h-screen bg-background pb-20">
       <header className="sticky top-0 z-[100] bg-card border-b shadow-md">
-        <div className="px-4 h-16 flex items-center justify-between gap-4 max-w-7xl mx-auto">
+        <div className="px-4 py-3 flex items-center justify-between gap-4 max-w-7xl mx-auto">
           <div className="flex items-center gap-3">
             <Button
               variant="ghost"
@@ -173,16 +173,29 @@ export default function MyLoggedHours() {
             <div>
               <h1 className="text-xl font-bold tracking-tight">My Logged Hours</h1>
               <p className="text-xs text-muted-foreground mt-0.5">
-                IRATA Logbook for {currentUser?.name}
+                IRATA Logbook
               </p>
             </div>
           </div>
-          {currentUser?.irataLevel && (
-            <Badge variant="outline" className="hidden sm:flex items-center gap-1">
-              <span className="material-icons text-sm">verified</span>
-              IRATA {currentUser.irataLevel}
-            </Badge>
-          )}
+          <div className="flex flex-col items-end gap-1">
+            <div className="flex items-center gap-2">
+              <span className="material-icons text-sm text-muted-foreground">person</span>
+              <span className="font-semibold" data-testid="text-employee-name">{currentUser?.name}</span>
+              {currentUser?.irataLevel && (
+                <Badge variant="outline" className="flex items-center gap-1">
+                  <span className="material-icons text-xs">verified</span>
+                  Level {currentUser.irataLevel}
+                </Badge>
+              )}
+            </div>
+            {currentUser?.irataLicenseNumber && (
+              <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
+                <span className="material-icons text-xs">badge</span>
+                <span>License:</span>
+                <span className="font-medium text-foreground" data-testid="text-irata-license">{currentUser.irataLicenseNumber}</span>
+              </div>
+            )}
+          </div>
         </div>
       </header>
 
