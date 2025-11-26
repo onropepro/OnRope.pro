@@ -6338,6 +6338,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Company Safety Rating (CSR) endpoint - combines all safety metrics
+  // NEW LOGIC: Start at 100%, only deduct for non-compliance
+  // - Documentation: -25% if either Health & Safety Manual or Company Policy is missing
+  // - Toolbox Meetings: Deduct proportionally if meetings are missed (only when there are work sessions)
+  // - Harness Inspections: Deduct proportionally if inspections are missed (only when required)
+  // - Project Completion: Bonus metric - doesn't penalize new companies
   app.get("/api/company-safety-rating", requireAuth, async (req: Request, res: Response) => {
     try {
       const currentUser = await storage.getUserById(req.session.userId!);
@@ -6353,10 +6358,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       // 1. Documentation Safety Rating (Health & Safety Manual + Company Policy)
+      // -25% penalty if either document is missing
       const companyDocuments = await storage.getCompanyDocuments(companyId);
       const hasHealthSafety = companyDocuments.some((doc: any) => doc.documentType === 'health_safety_manual');
       const hasCompanyPolicy = companyDocuments.some((doc: any) => doc.documentType === 'company_policy');
-      const documentationRating = (hasHealthSafety && hasCompanyPolicy) ? 100 : (hasHealthSafety || hasCompanyPolicy) ? 50 : 0;
+      const documentationRating = (hasHealthSafety && hasCompanyPolicy) ? 100 : 0;
+      const documentationPenalty = documentationRating === 100 ? 0 : 25;
       
       // 2. Toolbox Meeting Compliance
       const projects = await storage.getProjectsByCompany(companyId);
@@ -6400,13 +6407,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
           toolboxDaysWithMeeting++;
         }
       });
-      const toolboxMeetingRating = toolboxTotalDays > 0 ? Math.round((toolboxDaysWithMeeting / toolboxTotalDays) * 100) : 100;
+      
+      // If no work sessions, 100% compliance (nothing to comply with)
+      // Otherwise, calculate based on meeting coverage
+      const toolboxMeetingRating = toolboxTotalDays > 0 
+        ? Math.round((toolboxDaysWithMeeting / toolboxTotalDays) * 100) 
+        : 100;
+      // Penalty is proportional to missed meetings (max 25%)
+      const toolboxPenalty = toolboxTotalDays > 0 
+        ? Math.round(((toolboxTotalDays - toolboxDaysWithMeeting) / toolboxTotalDays) * 25)
+        : 0;
       
       // 3. Daily Harness Inspection Rating (last 30 days)
       const harnessInspections = await storage.getHarnessInspectionsByCompany(companyId);
       const today = new Date();
-      const thirtyDaysAgo = new Date(today);
-      thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
       
       let harnessRequiredInspections = 0;
       let harnessCompletedInspections = 0;
@@ -6439,11 +6453,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
           }
         });
       }
+      
+      // If no required inspections, 100% compliance
       const harnessInspectionRating = harnessRequiredInspections > 0 
         ? Math.round((harnessCompletedInspections / harnessRequiredInspections) * 100) 
         : 100;
+      // Penalty is proportional to missed inspections (max 25%)
+      const harnessPenalty = harnessRequiredInspections > 0 
+        ? Math.round(((harnessRequiredInspections - harnessCompletedInspections) / harnessRequiredInspections) * 25)
+        : 0;
       
       // 4. Project Completion Rate (average progress of all active/completed projects)
+      // This is a bonus metric - new companies with no projects get 100%
       let totalProjectProgress = 0;
       let projectCount = 0;
       
@@ -6452,6 +6473,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         
         projectCount++;
         const projectSessions = allWorkSessions.filter((s: any) => s.projectId === project.id && s.endTime);
+        
+        // If project is marked completed, count as 100%
+        if (project.status === 'completed') {
+          totalProjectProgress += 100;
+          continue;
+        }
         
         // Calculate progress based on job type
         if (project.jobType === 'general_pressure_washing' || project.jobType === 'ground_window_cleaning') {
@@ -6486,18 +6513,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
                   (s.dropsCompletedSouth || 0) + (s.dropsCompletedWest || 0), 0);
           totalProjectProgress += totalDrops > 0 ? Math.min(100, (completedDrops / totalDrops) * 100) : 0;
         }
-        
-        // If project is marked completed, count as 100%
-        if (project.status === 'completed') {
-          totalProjectProgress = (totalProjectProgress - (projectCount > 0 ? totalProjectProgress / projectCount : 0)) + 100;
-        }
       }
-      const projectCompletionRating = projectCount > 0 ? Math.round(totalProjectProgress / projectCount) : 0;
       
-      // Calculate overall CSR (average of all four ratings)
-      const overallCSR = Math.round(
-        (documentationRating + toolboxMeetingRating + harnessInspectionRating + projectCompletionRating) / 4
-      );
+      // Project completion - no penalty for new companies with no projects
+      // For companies with projects, this reflects their overall project health
+      const projectCompletionRating = projectCount > 0 ? Math.round(totalProjectProgress / projectCount) : 100;
+      // No penalty from projects - this is informational only
+      const projectPenalty = 0;
+      
+      // Calculate overall CSR: Start at 100%, subtract penalties
+      // Max penalty is 75% (25% each for docs, toolbox, harness)
+      // Project completion is shown but doesn't penalize
+      const totalPenalty = documentationPenalty + toolboxPenalty + harnessPenalty + projectPenalty;
+      const overallCSR = Math.max(0, 100 - totalPenalty);
       
       res.json({
         overallCSR,
@@ -6515,7 +6543,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           harnessCompletedInspections,
           harnessRequiredInspections,
           projectCount,
-          totalProjectProgress: projectCount > 0 ? Math.round(totalProjectProgress / projectCount) : 0
+          totalProjectProgress: projectCount > 0 ? Math.round(totalProjectProgress / projectCount) : 100
         }
       });
     } catch (error) {
