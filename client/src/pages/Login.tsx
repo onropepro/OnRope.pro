@@ -8,10 +8,9 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { queryClient } from "@/lib/queryClient";
-import overhaulLabsLogo from "@assets/Screenshot 2025-11-09 at 14.46.08_1762728408763.png";
+import { Rocket, Play } from "lucide-react";
 import ropeAccessProLogo from "@assets/generated_images/Blue_rope_access_worker_logo_ac1aa8fd.png";
 
 const loginSchema = z.object({
@@ -120,129 +119,110 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary/5 via-background to-primary/10 flex flex-col">
-      {/* Header with Sign In Button */}
-      <header className="flex items-center justify-between px-8 py-4 border-b">
-        <div className="flex items-center gap-3">
-          <img src={ropeAccessProLogo} alt="Rope Access Pro" className="w-8 h-8 object-contain" />
-          <span className="font-bold text-lg">Rope Access Pro</span>
+    <div className="min-h-screen bg-gradient-to-b from-primary/5 via-background to-background flex flex-col">
+      {/* Header */}
+      <header className="flex items-center justify-between px-6 md:px-8 py-4 border-b bg-background/80 backdrop-blur-sm sticky top-0 z-50">
+        <div className="flex items-center gap-2">
+          <img src={ropeAccessProLogo} alt="OnRopePro" className="w-7 h-7 object-contain" />
+          <span className="font-bold text-lg">OnRopePro</span>
         </div>
-        <Button 
-          onClick={() => setShowLoginForm(!showLoginForm)}
-          variant="default"
-          data-testid="button-sign-in-header"
-        >
-          Sign In
-        </Button>
+        <div className="flex items-center gap-3">
+          <Button 
+            variant="ghost"
+            onClick={() => setShowLoginForm(true)}
+            data-testid="button-sign-in-header"
+          >
+            Sign In
+          </Button>
+          <Button 
+            onClick={() => setLocation("/register")}
+            data-testid="button-get-started-header"
+          >
+            Get Started
+          </Button>
+        </div>
       </header>
 
-      {/* Main Content */}
-      <div className="flex-1 flex items-center justify-center p-4">
-        <div className="w-full max-w-6xl grid md:grid-cols-2 gap-8 items-center">
-          {/* Hero Section - Hidden on mobile */}
-        <div className="hidden md:flex flex-col justify-center space-y-8 pr-8">
-          <div className="space-y-6">
-            <div className="inline-flex items-center gap-2 px-4 py-2 bg-primary/10 rounded-full text-sm font-medium text-primary">
-              <span className="material-icons text-lg">apartment</span>
-              Professional High-Rise Maintenance
-            </div>
-            <div className="text-5xl font-bold">Rope Access{" "}
-              <span className="bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
-                Management Platform
-              </span>
-            </div>
-            <p className="text-xl text-muted-foreground leading-relaxed">
-              The comprehensive solution for managing building maintenance operations. From project planning to completion tracking, streamline your entire workflow with precision and transparency.
+      {/* Hero Section */}
+      <section className="flex flex-col items-center justify-center text-center px-6 py-16 md:py-24 bg-gradient-to-b from-primary/5 to-transparent">
+        <p className="text-xs md:text-sm font-semibold tracking-widest text-muted-foreground uppercase mb-6">
+          Building Maintenance Management Software<br />
+          Built by a Level 3 IRATA Tech
+        </p>
+        
+        <h1 className="text-2xl md:text-4xl font-medium text-primary mb-2">
+          Your competitors think they're organized.
+        </h1>
+        
+        <div className="text-5xl md:text-7xl lg:text-8xl font-black tracking-tight mb-6">
+          THEY'RE NOT
+        </div>
+        
+        <p className="text-base md:text-lg text-muted-foreground max-w-xl mb-8">
+          You track every <span className="font-semibold text-primary">hour worked</span>, from a single platform that actually speaks rope access.
+        </p>
+        
+        <div className="flex flex-col sm:flex-row items-center gap-4">
+          <Button 
+            size="lg"
+            onClick={() => setLocation("/register")}
+            className="gap-2 px-6"
+            data-testid="button-get-started-free"
+          >
+            <Rocket className="w-4 h-4" />
+            Get Started Free
+          </Button>
+          <Button 
+            variant="outline"
+            size="lg"
+            className="gap-2 px-6"
+            data-testid="button-watch-demo"
+          >
+            <Play className="w-4 h-4" />
+            Watch Demo
+          </Button>
+        </div>
+      </section>
+
+      {/* Pain Points Section - Below the Fold */}
+      <section className="py-16 md:py-24 px-6">
+        <div className="max-w-3xl mx-auto text-center">
+          <h2 className="text-2xl md:text-4xl font-bold mb-12">
+            Your competitors think they're organized.<br />
+            <span className="font-normal">But in reality:</span>
+          </h2>
+          
+          <div className="space-y-4 md:space-y-5 text-base md:text-lg text-muted-foreground">
+            <p>
+              They're losing <span className="font-semibold text-destructive">$40K/year</span> to payroll errors they don't see.
+            </p>
+            <p>
+              They're spending <span className="font-semibold text-primary">80 hours monthly</span> on admin that should take 10.
+            </p>
+            <p>
+              They're underbidding <span className="font-semibold text-primary">25% of jobs</span> because they're guessing.
+            </p>
+            <p>
+              They're <span className="font-semibold text-destructive">juggling resident complaints</span> between memory, emails, texts, phone calls, notes in a glovebox.
+            </p>
+            <p>
+              They're <span className="font-semibold text-destructive">one accident away</span> from a lawsuit they can't defend because their safety documentation is (maybe) under the driver's front seat.
+            </p>
+            <p>
+              They're losing contracts because they look like amateurs next to you.
             </p>
           </div>
           
-          {/* Key Features */}
-          <div className="space-y-4">
-            <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">Comprehensive Platform Features</h3>
-            <div className="grid gap-3">
-              <div className="flex items-start gap-3">
-                <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
-                  <span className="material-icons text-primary">location_city</span>
-                </div>
-                <div>
-                  <div className="font-semibold text-sm">4-Elevation Building Visualization</div>
-                  <div className="text-sm text-muted-foreground">Track progress across all building sides with real-time completion metrics and visual progress bars</div>
-                </div>
-              </div>
-              <div className="flex items-start gap-3">
-                <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
-                  <span className="material-icons text-primary">badge</span>
-                </div>
-                <div>
-                  <div className="font-semibold text-sm">Employee Management & Payroll</div>
-                  <div className="text-sm text-muted-foreground">Manage IRATA certifications, hourly rates, work sessions, and automated payroll across 5 pay period types</div>
-                </div>
-              </div>
-              <div className="flex items-start gap-3">
-                <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
-                  <span className="material-icons text-primary">inventory_2</span>
-                </div>
-                <div>
-                  <div className="font-semibold text-sm">Gear Inventory System</div>
-                  <div className="text-sm text-muted-foreground">Track personal safety equipment with serial numbers, employee assignments, and service dates</div>
-                </div>
-              </div>
-              <div className="flex items-start gap-3">
-                <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
-                  <span className="material-icons text-primary">request_quote</span>
-                </div>
-                <div>
-                  <div className="font-semibold text-sm">Multi-Service Quoting</div>
-                  <div className="text-sm text-muted-foreground">Create detailed quotes with photo attachments, cost breakdowns, and service-specific pricing</div>
-                </div>
-              </div>
-              <div className="flex items-start gap-3">
-                <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
-                  <span className="material-icons text-primary">schedule</span>
-                </div>
-                <div>
-                  <div className="font-semibold text-sm">Real-Time Worker Tracking</div>
-                  <div className="text-sm text-muted-foreground">Monitor active workers, billable/non-billable hours, and performance analytics with live dashboards</div>
-                </div>
-              </div>
-              <div className="flex items-start gap-3">
-                <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
-                  <span className="material-icons text-primary">verified_user</span>
-                </div>
-                <div>
-                  <div className="font-semibold text-sm">Safety Compliance</div>
-                  <div className="text-sm text-muted-foreground">Digital safety forms, PDF rope access plans, and comprehensive safety documentation management</div>
-                </div>
-              </div>
-              <div className="flex items-start gap-3">
-                <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
-                  <span className="material-icons text-primary">home</span>
-                </div>
-                <div>
-                  <div className="font-semibold text-sm">Resident Portal</div>
-                  <div className="text-sm text-muted-foreground">Transparent project tracking, complaint submission, and real-time progress updates for building residents</div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Services */}
-          <div className="space-y-3">
-            <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">Supported Services</h3>
-            <div className="flex flex-wrap gap-2">
-              <Badge variant="secondary" className="px-3 py-1">Window Cleaning</Badge>
-              <Badge variant="secondary" className="px-3 py-1">Dryer Vent Cleaning</Badge>
-              <Badge variant="secondary" className="px-3 py-1">Pressure Washing</Badge>
-              <Badge variant="secondary" className="px-3 py-1">In-Suite Services</Badge>
-              <Badge variant="secondary" className="px-3 py-1">Parkade Cleaning</Badge>
-              <Badge variant="secondary" className="px-3 py-1">Ground Window Cleaning</Badge>
-            </div>
-          </div>
+          <p className="text-xl md:text-2xl font-bold mt-12">
+            Let them keep thinking they're organized.
+          </p>
         </div>
+      </section>
 
-          {/* Login Card - Conditionally shown */}
-          {showLoginForm && (
-            <Card className="w-full shadow-2xl border-2">
+      {/* Login Modal - Overlay when shown */}
+      {showLoginForm && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <Card className="w-full max-w-md shadow-2xl border-2 relative">
           <CardHeader className="space-y-3 pb-6">
             <div className="flex items-center gap-3 md:hidden mb-2">
               <div className="h-12 w-12 rounded-xl bg-primary/10 flex items-center justify-center">
@@ -618,10 +598,18 @@ export default function Login() {
               <p>Purpose-built for rope access and building maintenance operations</p>
             </div>
           </CardContent>
+          <Button 
+            variant="ghost" 
+            size="icon"
+            className="absolute top-4 right-4"
+            onClick={() => setShowLoginForm(false)}
+            data-testid="button-close-login"
+          >
+            <span className="material-icons">close</span>
+          </Button>
         </Card>
-          )}
         </div>
-      </div>
+      )}
     </div>
   );
 }
