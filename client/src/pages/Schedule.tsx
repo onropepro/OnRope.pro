@@ -19,7 +19,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import { Calendar, Plus, Edit2, Trash2, Users, ArrowLeft, UserCheck, UserX, Lock, ChevronLeft, ChevronRight, Briefcase } from "lucide-react";
-import type { ScheduledJobWithAssignments, User } from "@shared/schema";
+import type { ScheduledJobWithAssignments, User, EmployeeTimeOff } from "@shared/schema";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { DndContext, DragOverlay, useDraggable, useDroppable, closestCenter, DragEndEvent } from '@dnd-kit/core';
@@ -117,6 +117,122 @@ export default function Schedule() {
     queryKey: ["/api/employees"],
   });
   const employees = employeesData?.employees || [];
+
+  // Fetch employee time off entries
+  const { data: timeOffData } = useQuery<{ timeOff: EmployeeTimeOff[] }>({
+    queryKey: ["/api/employee-time-off"],
+  });
+  const timeOffEntries = timeOffData?.timeOff || [];
+
+  // Time off dialog state
+  const [timeOffDialogOpen, setTimeOffDialogOpen] = useState(false);
+  const [selectedEmployeeForTimeOff, setSelectedEmployeeForTimeOff] = useState<string>("");
+  const [selectedTimeOffDate, setSelectedTimeOffDate] = useState<string>("");
+  const [selectedTimeOffType, setSelectedTimeOffType] = useState<string>("day_off");
+  const [timeOffNotes, setTimeOffNotes] = useState<string>("");
+
+  // Time off type options with display labels and colors
+  const timeOffTypes = [
+    { value: "day_off", label: "Day Off", color: "hsl(210, 15%, 70%)" },
+    { value: "paid_day_off", label: "Paid Day Off", color: "hsl(142, 60%, 50%)" },
+    { value: "stat_holiday", label: "Stat Holiday", color: "hsl(280, 60%, 55%)" },
+    { value: "sick_day", label: "Sick Day", color: "hsl(25, 85%, 55%)" },
+    { value: "sick_paid_day", label: "Sick Day (Paid)", color: "hsl(25, 85%, 45%)" },
+    { value: "vacation", label: "Vacation", color: "hsl(200, 80%, 50%)" },
+    { value: "unpaid_leave", label: "Unpaid Leave", color: "hsl(0, 60%, 55%)" },
+  ];
+
+  // Create time off mutation
+  const createTimeOffMutation = useMutation({
+    mutationFn: async (data: { employeeId: string; date: string; timeOffType: string; notes?: string }) => {
+      const response = await apiRequest("POST", "/api/employee-time-off", data);
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/employee-time-off"] });
+      toast({
+        title: "Time Off Scheduled",
+        description: "Time off has been scheduled successfully.",
+      });
+      setTimeOffDialogOpen(false);
+      resetTimeOffForm();
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to schedule time off.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Delete time off mutation
+  const deleteTimeOffMutation = useMutation({
+    mutationFn: async (id: string) => {
+      const response = await apiRequest("DELETE", `/api/employee-time-off/${id}`);
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/employee-time-off"] });
+      toast({
+        title: "Time Off Removed",
+        description: "Time off entry has been removed.",
+      });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to remove time off.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const resetTimeOffForm = () => {
+    setSelectedEmployeeForTimeOff("");
+    setSelectedTimeOffDate("");
+    setSelectedTimeOffType("day_off");
+    setTimeOffNotes("");
+  };
+
+  const handleCreateTimeOff = () => {
+    if (!selectedEmployeeForTimeOff || !selectedTimeOffDate || !selectedTimeOffType) {
+      toast({
+        title: "Missing Information",
+        description: "Please select an employee, date, and time off type.",
+        variant: "destructive",
+      });
+      return;
+    }
+    createTimeOffMutation.mutate({
+      employeeId: selectedEmployeeForTimeOff,
+      date: selectedTimeOffDate,
+      timeOffType: selectedTimeOffType,
+      notes: timeOffNotes || undefined,
+    });
+  };
+
+  // Get time off for a specific employee on a specific date
+  const getTimeOffForDay = (employeeId: string, date: Date): EmployeeTimeOff | null => {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    const dateStr = `${year}-${month}-${day}`;
+    
+    return timeOffEntries.find(entry => 
+      entry.employeeId === employeeId && entry.date === dateStr
+    ) || null;
+  };
+
+  // Get color for time off type
+  const getTimeOffColor = (type: string): string => {
+    return timeOffTypes.find(t => t.value === type)?.color || "hsl(210, 15%, 70%)";
+  };
+
+  // Get label for time off type
+  const getTimeOffLabel = (type: string): string => {
+    return timeOffTypes.find(t => t.value === type)?.label || type.replace(/_/g, ' ');
+  };
 
   // Transform jobs into employee timeline events for Employee Schedule view
   const employeeTimelineEvents: EventInput[] = jobs.flatMap((job) => {
@@ -972,14 +1088,25 @@ export default function Schedule() {
                 )}
               </div>
               
-              <Button 
-                variant="outline" 
-                size="icon"
-                onClick={() => setWeekOffset(prev => prev + 1)}
-                data-testid="button-next-week"
-              >
-                <ChevronRight className="h-4 w-4" />
-              </Button>
+              <div className="flex items-center gap-2">
+                <Button 
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setTimeOffDialogOpen(true)}
+                  data-testid="button-schedule-time-off"
+                >
+                  <Calendar className="h-4 w-4 mr-2" />
+                  Schedule Time Off
+                </Button>
+                <Button 
+                  variant="outline" 
+                  size="icon"
+                  onClick={() => setWeekOffset(prev => prev + 1)}
+                  data-testid="button-next-week"
+                >
+                  <ChevronRight className="h-4 w-4" />
+                </Button>
+              </div>
             </div>
 
             {/* Day Headers */}
@@ -1039,6 +1166,7 @@ export default function Schedule() {
                     {getWeekDates.map((date, dayIdx) => {
                       const dayJobs = getEmployeeJobsForDay(employee.id, date);
                       const hasJobs = dayJobs.length > 0;
+                      const timeOff = getTimeOffForDay(employee.id, date);
                       
                       return (
                         <div 
@@ -1048,46 +1176,80 @@ export default function Schedule() {
                               ? 'bg-primary/5 border border-primary/20' 
                               : 'bg-muted/30 border border-transparent'
                           }`}
+                          data-testid={`day-cell-${employee.id}-${dayIdx}`}
                         >
-                          {hasJobs ? (
-                            <div className="space-y-1">
-                              {dayJobs.slice(0, 2).map((job) => (
-                                <Tooltip key={job.id}>
-                                  <TooltipTrigger asChild>
-                                    <div 
-                                      className="px-2 py-1.5 rounded text-xs font-medium text-white truncate cursor-pointer hover-elevate"
-                                      style={{ backgroundColor: job.color || defaultJobColor }}
-                                      onClick={() => {
-                                        setSelectedJob(job);
-                                        setDetailDialogOpen(true);
-                                      }}
-                                      data-testid={`job-block-${job.id}-${dayIdx}`}
-                                    >
-                                      {job.project?.buildingName || job.title}
-                                    </div>
-                                  </TooltipTrigger>
-                                  <TooltipContent side="top" className="max-w-xs">
-                                    <div className="font-semibold">{job.project?.buildingName || job.title}</div>
-                                    {job.project?.buildingAddress && (
-                                      <div className="text-xs text-muted-foreground">{job.project.buildingAddress}</div>
-                                    )}
-                                    <div className="text-xs mt-1">
-                                      {String(job.startDate)} to {String(job.endDate)}
-                                    </div>
-                                  </TooltipContent>
-                                </Tooltip>
-                              ))}
-                              {dayJobs.length > 2 && (
-                                <div className="text-xs text-muted-foreground text-center">
-                                  +{dayJobs.length - 2} more
-                                </div>
-                              )}
-                            </div>
-                          ) : (
-                            <div className="h-full flex items-center justify-center text-muted-foreground/30">
-                              <span className="text-xs">-</span>
-                            </div>
-                          )}
+                          <div className="space-y-1">
+                            {timeOff && (
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <div 
+                                    className="px-2 py-1 rounded text-xs font-semibold text-white cursor-pointer text-center"
+                                    style={{ backgroundColor: getTimeOffColor(timeOff.timeOffType) }}
+                                    onClick={() => {
+                                      if (window.confirm(`Remove ${getTimeOffLabel(timeOff.timeOffType)} for ${employee.name}?`)) {
+                                        deleteTimeOffMutation.mutate(timeOff.id);
+                                      }
+                                    }}
+                                    data-testid={`time-off-${employee.id}-${dayIdx}`}
+                                  >
+                                    {getTimeOffLabel(timeOff.timeOffType)}
+                                  </div>
+                                </TooltipTrigger>
+                                <TooltipContent side="top">
+                                  <div className="font-semibold">{getTimeOffLabel(timeOff.timeOffType)}</div>
+                                  {timeOff.notes && (
+                                    <div className="text-xs text-muted-foreground">{timeOff.notes}</div>
+                                  )}
+                                  <div className="text-xs mt-1 text-muted-foreground">Click to remove</div>
+                                </TooltipContent>
+                              </Tooltip>
+                            )}
+                            {hasJobs && (
+                              <>
+                                {dayJobs.slice(0, timeOff ? 1 : 2).map((job) => (
+                                  <Tooltip key={job.id}>
+                                    <TooltipTrigger asChild>
+                                      <div 
+                                        className={`px-2 py-1.5 rounded text-xs font-medium text-white truncate cursor-pointer hover-elevate ${timeOff ? 'opacity-60' : ''}`}
+                                        style={{ backgroundColor: job.color || defaultJobColor }}
+                                        onClick={() => {
+                                          setSelectedJob(job);
+                                          setDetailDialogOpen(true);
+                                        }}
+                                        data-testid={`job-block-${job.id}-${dayIdx}`}
+                                      >
+                                        {job.project?.buildingName || job.title}
+                                      </div>
+                                    </TooltipTrigger>
+                                    <TooltipContent side="top" className="max-w-xs">
+                                      <div className="font-semibold">{job.project?.buildingName || job.title}</div>
+                                      {job.project?.buildingAddress && (
+                                        <div className="text-xs text-muted-foreground">{job.project.buildingAddress}</div>
+                                      )}
+                                      <div className="text-xs mt-1">
+                                        {String(job.startDate)} to {String(job.endDate)}
+                                      </div>
+                                      {timeOff && (
+                                        <div className="text-xs mt-1 text-amber-500 font-medium">
+                                          Note: Employee has time off scheduled
+                                        </div>
+                                      )}
+                                    </TooltipContent>
+                                  </Tooltip>
+                                ))}
+                                {dayJobs.length > (timeOff ? 1 : 2) && (
+                                  <div className="text-xs text-muted-foreground text-center">
+                                    +{dayJobs.length - (timeOff ? 1 : 2)} more
+                                  </div>
+                                )}
+                              </>
+                            )}
+                            {!timeOff && !hasJobs && (
+                              <div className="h-full min-h-[52px] flex items-center justify-center text-muted-foreground/30">
+                                <span className="text-xs">-</span>
+                              </div>
+                            )}
+                          </div>
                         </div>
                       );
                     })}
@@ -1098,7 +1260,7 @@ export default function Schedule() {
 
             {/* Legend */}
             <div className="mt-6 pt-4 border-t relative z-10">
-              <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
+              <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground mb-3">
                 <div className="flex items-center gap-2">
                   <div className="w-3 h-3 rounded bg-primary"></div>
                   <span>Today</span>
@@ -1108,10 +1270,118 @@ export default function Schedule() {
                   <span>Click on a job to view details</span>
                 </div>
               </div>
+              <div className="flex flex-wrap items-center gap-3 text-xs">
+                <span className="font-medium text-muted-foreground">Time Off:</span>
+                {timeOffTypes.map((type) => (
+                  <div key={type.value} className="flex items-center gap-1.5">
+                    <div 
+                      className="w-3 h-3 rounded"
+                      style={{ backgroundColor: type.color }}
+                    />
+                    <span className="text-muted-foreground">{type.label}</span>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         </TabsContent>
       </Tabs>
+
+      {/* Time Off Dialog */}
+      <Dialog open={timeOffDialogOpen} onOpenChange={setTimeOffDialogOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Schedule Time Off</DialogTitle>
+            <DialogDescription>
+              Schedule time off for a team member. This will block that day on their schedule.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label>Employee</Label>
+              <Select
+                value={selectedEmployeeForTimeOff}
+                onValueChange={setSelectedEmployeeForTimeOff}
+              >
+                <SelectTrigger data-testid="select-time-off-employee">
+                  <SelectValue placeholder="Select employee..." />
+                </SelectTrigger>
+                <SelectContent>
+                  {employees.map((employee) => (
+                    <SelectItem key={employee.id} value={employee.id}>
+                      {employee.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            
+            <div className="space-y-2">
+              <Label>Date</Label>
+              <Input
+                type="date"
+                value={selectedTimeOffDate}
+                onChange={(e) => setSelectedTimeOffDate(e.target.value)}
+                data-testid="input-time-off-date"
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <Label>Type</Label>
+              <Select
+                value={selectedTimeOffType}
+                onValueChange={setSelectedTimeOffType}
+              >
+                <SelectTrigger data-testid="select-time-off-type">
+                  <SelectValue placeholder="Select type..." />
+                </SelectTrigger>
+                <SelectContent>
+                  {timeOffTypes.map((type) => (
+                    <SelectItem key={type.value} value={type.value}>
+                      <div className="flex items-center gap-2">
+                        <div 
+                          className="w-3 h-3 rounded"
+                          style={{ backgroundColor: type.color }}
+                        />
+                        {type.label}
+                      </div>
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            
+            <div className="space-y-2">
+              <Label>Notes (Optional)</Label>
+              <Textarea
+                value={timeOffNotes}
+                onChange={(e) => setTimeOffNotes(e.target.value)}
+                placeholder="Add any notes about this time off..."
+                data-testid="input-time-off-notes"
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => {
+                setTimeOffDialogOpen(false);
+                resetTimeOffForm();
+              }}
+              data-testid="button-cancel-time-off"
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={handleCreateTimeOff}
+              disabled={createTimeOffMutation.isPending}
+              data-testid="button-save-time-off"
+            >
+              {createTimeOffMutation.isPending ? "Scheduling..." : "Schedule Time Off"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       {/* Create Job Dialog */}
       <CreateJobDialog
