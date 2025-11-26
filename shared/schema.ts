@@ -1476,6 +1476,45 @@ export const insertJobAssignmentSchema = createInsertSchema(jobAssignments).omit
   endDate: z.coerce.date().optional(),
 });
 
+// Time off types for employee scheduling
+export const TIME_OFF_TYPES = [
+  { id: "day_off", label: "Day Off", color: "#6b7280", paid: false },
+  { id: "paid_day_off", label: "Paid Day Off", color: "#3b82f6", paid: true },
+  { id: "stat_holiday", label: "Stat Holiday", color: "#8b5cf6", paid: true },
+  { id: "sick_day", label: "Sick Day", color: "#f59e0b", paid: false },
+  { id: "sick_paid_day", label: "Paid Sick Day", color: "#10b981", paid: true },
+  { id: "vacation", label: "Vacation", color: "#06b6d4", paid: true },
+  { id: "personal_day", label: "Personal Day", color: "#ec4899", paid: false },
+  { id: "bereavement", label: "Bereavement", color: "#374151", paid: true },
+  { id: "jury_duty", label: "Jury Duty", color: "#64748b", paid: true },
+  { id: "training", label: "Training", color: "#14b8a6", paid: true },
+] as const;
+
+export type TimeOffTypeId = typeof TIME_OFF_TYPES[number]["id"];
+
+// Employee time off table for scheduling leave
+export const employeeTimeOff = pgTable("employee_time_off", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  companyId: varchar("company_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  employeeId: varchar("employee_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  
+  date: date("date").notNull(), // The date of the time off
+  timeOffType: varchar("time_off_type").notNull(), // day_off | paid_day_off | stat_holiday | sick_day | sick_paid_day | vacation | personal_day | bereavement | jury_duty | training
+  
+  notes: text("notes"), // Optional notes
+  
+  createdAt: timestamp("created_at").defaultNow(),
+  createdBy: varchar("created_by").references(() => users.id),
+});
+
+export const insertEmployeeTimeOffSchema = createInsertSchema(employeeTimeOff).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type EmployeeTimeOff = typeof employeeTimeOff.$inferSelect;
+export type InsertEmployeeTimeOff = z.infer<typeof insertEmployeeTimeOffSchema>;
+
 // Type exports
 export type User = typeof users.$inferSelect;
 export type InsertUser = z.infer<typeof insertUserSchema>;

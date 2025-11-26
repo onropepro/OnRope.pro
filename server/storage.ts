@@ -1,6 +1,6 @@
 import { db } from "./db";
-import { users, clients, projects, customJobTypes, dropLogs, workSessions, nonBillableWorkSessions, complaints, complaintNotes, projectPhotos, jobComments, harnessInspections, toolboxMeetings, flhaForms, incidentReports, methodStatements, companyDocuments, payPeriodConfig, payPeriods, quotes, quoteServices, gearItems, gearAssignments, scheduledJobs, jobAssignments, userPreferences, propertyManagerCompanyLinks, irataTaskLogs } from "@shared/schema";
-import type { User, InsertUser, Client, InsertClient, Project, InsertProject, CustomJobType, InsertCustomJobType, DropLog, InsertDropLog, WorkSession, InsertWorkSession, Complaint, InsertComplaint, ComplaintNote, InsertComplaintNote, ProjectPhoto, InsertProjectPhoto, JobComment, InsertJobComment, HarnessInspection, InsertHarnessInspection, ToolboxMeeting, InsertToolboxMeeting, FlhaForm, InsertFlhaForm, IncidentReport, InsertIncidentReport, MethodStatement, InsertMethodStatement, PayPeriodConfig, InsertPayPeriodConfig, PayPeriod, InsertPayPeriod, EmployeeHoursSummary, Quote, InsertQuote, QuoteService, InsertQuoteService, QuoteWithServices, GearItem, InsertGearItem, GearAssignment, InsertGearAssignment, ScheduledJob, InsertScheduledJob, JobAssignment, InsertJobAssignment, ScheduledJobWithAssignments, UserPreferences, InsertUserPreferences, PropertyManagerCompanyLink, InsertPropertyManagerCompanyLink, IrataTaskLog, InsertIrataTaskLog } from "@shared/schema";
+import { users, clients, projects, customJobTypes, dropLogs, workSessions, nonBillableWorkSessions, complaints, complaintNotes, projectPhotos, jobComments, harnessInspections, toolboxMeetings, flhaForms, incidentReports, methodStatements, companyDocuments, payPeriodConfig, payPeriods, quotes, quoteServices, gearItems, gearAssignments, scheduledJobs, jobAssignments, userPreferences, propertyManagerCompanyLinks, irataTaskLogs, employeeTimeOff } from "@shared/schema";
+import type { User, InsertUser, Client, InsertClient, Project, InsertProject, CustomJobType, InsertCustomJobType, DropLog, InsertDropLog, WorkSession, InsertWorkSession, Complaint, InsertComplaint, ComplaintNote, InsertComplaintNote, ProjectPhoto, InsertProjectPhoto, JobComment, InsertJobComment, HarnessInspection, InsertHarnessInspection, ToolboxMeeting, InsertToolboxMeeting, FlhaForm, InsertFlhaForm, IncidentReport, InsertIncidentReport, MethodStatement, InsertMethodStatement, PayPeriodConfig, InsertPayPeriodConfig, PayPeriod, InsertPayPeriod, EmployeeHoursSummary, Quote, InsertQuote, QuoteService, InsertQuoteService, QuoteWithServices, GearItem, InsertGearItem, GearAssignment, InsertGearAssignment, ScheduledJob, InsertScheduledJob, JobAssignment, InsertJobAssignment, ScheduledJobWithAssignments, UserPreferences, InsertUserPreferences, PropertyManagerCompanyLink, InsertPropertyManagerCompanyLink, IrataTaskLog, InsertIrataTaskLog, EmployeeTimeOff, InsertEmployeeTimeOff } from "@shared/schema";
 import { eq, and, or, desc, sql, isNull, isNotNull, not, gte, lte, between, inArray } from "drizzle-orm";
 import bcrypt from "bcrypt";
 
@@ -1988,6 +1988,57 @@ export class Storage {
     }
     
     return conflicts;
+  }
+
+  // Employee Time Off operations
+  async createEmployeeTimeOff(timeOff: InsertEmployeeTimeOff): Promise<EmployeeTimeOff> {
+    const result = await db.insert(employeeTimeOff).values(timeOff).returning();
+    return result[0];
+  }
+
+  async getEmployeeTimeOffByCompany(companyId: string, startDate?: string, endDate?: string): Promise<EmployeeTimeOff[]> {
+    let query = db.select().from(employeeTimeOff)
+      .where(eq(employeeTimeOff.companyId, companyId));
+    
+    if (startDate && endDate) {
+      query = query.where(
+        and(
+          eq(employeeTimeOff.companyId, companyId),
+          gte(employeeTimeOff.date, startDate),
+          lte(employeeTimeOff.date, endDate)
+        )
+      );
+    }
+    
+    return query.orderBy(employeeTimeOff.date);
+  }
+
+  async getEmployeeTimeOffByEmployee(employeeId: string, startDate?: string, endDate?: string): Promise<EmployeeTimeOff[]> {
+    let query = db.select().from(employeeTimeOff)
+      .where(eq(employeeTimeOff.employeeId, employeeId));
+    
+    if (startDate && endDate) {
+      query = query.where(
+        and(
+          eq(employeeTimeOff.employeeId, employeeId),
+          gte(employeeTimeOff.date, startDate),
+          lte(employeeTimeOff.date, endDate)
+        )
+      );
+    }
+    
+    return query.orderBy(employeeTimeOff.date);
+  }
+
+  async getEmployeeTimeOffById(id: string): Promise<EmployeeTimeOff | undefined> {
+    const result = await db.select().from(employeeTimeOff)
+      .where(eq(employeeTimeOff.id, id))
+      .limit(1);
+    return result[0];
+  }
+
+  async deleteEmployeeTimeOff(id: string): Promise<void> {
+    await db.delete(employeeTimeOff).where(eq(employeeTimeOff.id, id));
   }
 
   // User Preferences operations

@@ -8394,6 +8394,115 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // ==================== EMPLOYEE TIME OFF ROUTES ====================
+
+  // Get employee time off entries
+  app.get("/api/employee-time-off", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      const companyId = currentUser.role === "company" ? currentUser.id : currentUser.companyId;
+      if (!companyId) {
+        return res.status(400).json({ message: "Unable to determine company" });
+      }
+      
+      const startDate = req.query.startDate as string | undefined;
+      const endDate = req.query.endDate as string | undefined;
+      
+      const timeOffEntries = await storage.getEmployeeTimeOffByCompany(companyId, startDate, endDate);
+      res.json({ timeOff: timeOffEntries });
+    } catch (error) {
+      console.error("Get employee time off error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Create employee time off entry
+  app.post("/api/employee-time-off", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      // Only management roles can create time off entries
+      const managementRoles = ["company", "owner_ceo", "operations_manager", "supervisor"];
+      if (!managementRoles.includes(currentUser.role)) {
+        return res.status(403).json({ message: "Only management can schedule time off" });
+      }
+      
+      const companyId = currentUser.role === "company" ? currentUser.id : currentUser.companyId;
+      if (!companyId) {
+        return res.status(400).json({ message: "Unable to determine company" });
+      }
+      
+      const { employeeId, date, timeOffType, notes } = req.body;
+      
+      if (!employeeId || !date || !timeOffType) {
+        return res.status(400).json({ message: "employeeId, date, and timeOffType are required" });
+      }
+      
+      // Verify the employee belongs to this company
+      const employee = await storage.getUserById(employeeId);
+      if (!employee || (employee.companyId !== companyId && employee.id !== companyId)) {
+        return res.status(403).json({ message: "Employee not found or not in your company" });
+      }
+      
+      const timeOff = await storage.createEmployeeTimeOff({
+        companyId,
+        employeeId,
+        date,
+        timeOffType,
+        notes: notes || null,
+        createdBy: currentUser.id,
+      });
+      
+      res.json({ timeOff });
+    } catch (error) {
+      console.error("Create employee time off error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Delete employee time off entry
+  app.delete("/api/employee-time-off/:id", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      // Only management roles can delete time off entries
+      const managementRoles = ["company", "owner_ceo", "operations_manager", "supervisor"];
+      if (!managementRoles.includes(currentUser.role)) {
+        return res.status(403).json({ message: "Only management can delete time off" });
+      }
+      
+      const companyId = currentUser.role === "company" ? currentUser.id : currentUser.companyId;
+      if (!companyId) {
+        return res.status(400).json({ message: "Unable to determine company" });
+      }
+      
+      const timeOff = await storage.getEmployeeTimeOffById(req.params.id);
+      if (!timeOff) {
+        return res.status(404).json({ message: "Time off entry not found" });
+      }
+      
+      if (timeOff.companyId !== companyId) {
+        return res.status(403).json({ message: "Forbidden" });
+      }
+      
+      await storage.deleteEmployeeTimeOff(req.params.id);
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Delete employee time off error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
   // Get user preferences
   app.get("/api/user-preferences", requireAuth, async (req: Request, res: Response) => {
     try {
