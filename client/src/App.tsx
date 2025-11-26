@@ -48,6 +48,8 @@ function Router() {
   
   useEffect(() => {
     console.log("🛣️ Router: Current location changed to:", location);
+    // Scroll to top when navigating to a new page
+    window.scrollTo(0, 0);
   }, [location]);
   
   return (
