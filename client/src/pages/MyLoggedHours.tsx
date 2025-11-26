@@ -1,13 +1,18 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { useLocation } from "wouter";
 import { format } from "date-fns";
 import { parseLocalDate } from "@/lib/dateUtils";
 import { IRATA_TASK_TYPES, type IrataTaskLog } from "@shared/schema";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
+import { useToast } from "@/hooks/use-toast";
+import { apiRequest, queryClient } from "@/lib/queryClient";
+import { useState } from "react";
 
 const getTaskLabel = (taskId: string): string => {
   const task = IRATA_TASK_TYPES.find(t => t.id === taskId);
@@ -42,8 +47,11 @@ const getTaskIcon = (taskId: string): string => {
 
 export default function MyLoggedHours() {
   const [, setLocation] = useLocation();
+  const { toast } = useToast();
+  const [showBaselineDialog, setShowBaselineDialog] = useState(false);
+  const [baselineInput, setBaselineInput] = useState("");
 
-  const { data: userData } = useQuery({
+  const { data: userData, refetch: refetchUser } = useQuery({
     queryKey: ["/api/user"],
   });
 
@@ -54,9 +62,42 @@ export default function MyLoggedHours() {
   const currentUser = userData?.user;
   const logs = logsData?.logs || [];
 
-  const totalHours = logs.reduce((sum: number, log: IrataTaskLog) => {
+  const baselineHours = parseFloat(currentUser?.irataBaselineHours || "0");
+  
+  const loggedHours = logs.reduce((sum: number, log: IrataTaskLog) => {
     return sum + parseFloat(log.hoursWorked || "0");
   }, 0);
+
+  const totalHours = baselineHours + loggedHours;
+
+  const updateBaselineHoursMutation = useMutation({
+    mutationFn: async (hours: number) => {
+      return apiRequest("PATCH", "/api/my-irata-baseline-hours", { baselineHours: hours });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/user"] });
+      refetchUser();
+      setShowBaselineDialog(false);
+      toast({ title: "Success", description: "Baseline hours updated successfully" });
+    },
+    onError: (error: Error) => {
+      toast({ title: "Error", description: error.message, variant: "destructive" });
+    },
+  });
+
+  const handleSaveBaselineHours = () => {
+    const hours = parseFloat(baselineInput);
+    if (isNaN(hours) || hours < 0) {
+      toast({ title: "Invalid input", description: "Please enter a valid number of hours", variant: "destructive" });
+      return;
+    }
+    updateBaselineHoursMutation.mutate(hours);
+  };
+
+  const openBaselineDialog = () => {
+    setBaselineInput(baselineHours.toString());
+    setShowBaselineDialog(true);
+  };
 
   const totalSessions = logs.length;
 
@@ -121,19 +162,48 @@ export default function MyLoggedHours() {
       </header>
 
       <div className="max-w-7xl mx-auto px-4 py-6">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-          <Card>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+          <Card className="bg-primary/5 border-primary/20">
             <CardHeader className="pb-3">
               <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
-                <span className="material-icons text-lg">schedule</span>
-                Total Hours Logged
+                <span className="material-icons text-lg text-primary">schedule</span>
+                Total Logbook Hours
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold">{totalHours.toFixed(1)}</div>
-              <p className="text-xs text-muted-foreground mt-1">
-                Across {totalSessions} session{totalSessions !== 1 ? "s" : ""}
-              </p>
+              <div className="text-3xl font-bold text-primary">{totalHours.toFixed(1)}</div>
+              <div className="text-xs text-muted-foreground mt-2 space-y-0.5">
+                <div className="flex items-center justify-between">
+                  <span>Prior logbook hours:</span>
+                  <span className="font-medium">{baselineHours.toFixed(1)}</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span>Hours from this system:</span>
+                  <span className="font-medium">{loggedHours.toFixed(1)}</span>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader className="pb-3">
+              <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
+                <span className="material-icons text-lg">book</span>
+                Prior Logbook Hours
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-3xl font-bold">{baselineHours.toFixed(1)}</div>
+              <Button 
+                variant="outline" 
+                size="sm" 
+                className="mt-2 w-full"
+                onClick={openBaselineDialog}
+                data-testid="button-set-baseline-hours"
+              >
+                <span className="material-icons text-sm mr-1">edit</span>
+                {baselineHours > 0 ? "Update" : "Set"} Hours
+              </Button>
             </CardContent>
           </Card>
 
@@ -147,7 +217,7 @@ export default function MyLoggedHours() {
             <CardContent>
               <div className="text-3xl font-bold">{totalSessions}</div>
               <p className="text-xs text-muted-foreground mt-1">
-                Sessions with logged tasks
+                Sessions logged in this system
               </p>
             </CardContent>
           </Card>
@@ -163,7 +233,7 @@ export default function MyLoggedHours() {
               {sortedTasks.length > 0 ? (
                 <div className="space-y-1">
                   {sortedTasks.slice(0, 3).map(([taskId, count]) => (
-                    <div key={taskId} className="flex items-center justify-between">
+                    <div key={taskId} className="flex items-center justify-between gap-2">
                       <span className="text-sm truncate">{getTaskLabel(taskId)}</span>
                       <Badge variant="secondary" className="text-xs">{count}</Badge>
                     </div>
@@ -344,6 +414,65 @@ export default function MyLoggedHours() {
           </Card>
         )}
       </div>
+
+      <Dialog open={showBaselineDialog} onOpenChange={setShowBaselineDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <span className="material-icons">book</span>
+              Set Prior Logbook Hours
+            </DialogTitle>
+            <DialogDescription>
+              Enter the total number of hours you have recorded in your IRATA logbook before using this system. This will be added to your hours logged here to show your complete total.
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="py-4">
+            <label className="text-sm font-medium block mb-2">
+              Total hours from your existing logbook
+            </label>
+            <Input
+              type="number"
+              step="0.5"
+              min="0"
+              placeholder="e.g., 250"
+              value={baselineInput}
+              onChange={(e) => setBaselineInput(e.target.value)}
+              data-testid="input-baseline-hours"
+            />
+            <p className="text-xs text-muted-foreground mt-2">
+              This is the total number of hours you have accumulated before starting to use this system.
+            </p>
+          </div>
+
+          <DialogFooter>
+            <Button 
+              variant="outline" 
+              onClick={() => setShowBaselineDialog(false)}
+              data-testid="button-cancel-baseline"
+            >
+              Cancel
+            </Button>
+            <Button 
+              onClick={handleSaveBaselineHours}
+              disabled={updateBaselineHoursMutation.isPending}
+              data-testid="button-save-baseline"
+            >
+              {updateBaselineHoursMutation.isPending ? (
+                <>
+                  <span className="material-icons animate-spin text-sm mr-1">refresh</span>
+                  Saving...
+                </>
+              ) : (
+                <>
+                  <span className="material-icons text-sm mr-1">save</span>
+                  Save Hours
+                </>
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
