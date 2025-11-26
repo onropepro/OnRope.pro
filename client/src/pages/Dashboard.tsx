@@ -1992,28 +1992,28 @@ export default function Dashboard() {
       <header 
         className={`sticky top-0 z-[100] glass backdrop-blur-xl border-b shadow-premium ${hasCustomBranding ? 'custom-brand-border' : 'border-border/50'}`}
       >
-        <div className="px-6 h-20 flex items-center justify-between max-w-7xl mx-auto">
-          <div className="flex items-center gap-4">
+        <div className="px-3 sm:px-6 h-14 sm:h-20 flex items-center justify-between max-w-7xl mx-auto gap-2">
+          <div className="flex items-center gap-2 sm:gap-4 min-w-0 flex-1">
             {hasCustomBranding && branding.logoUrl && (
               <img 
                 src={branding.logoUrl} 
                 alt="Company Logo" 
-                className="h-12 w-auto object-contain"
+                className="h-8 sm:h-12 w-auto object-contain flex-shrink-0"
                 data-testid="company-logo"
               />
             )}
-            <div className="flex items-center gap-4">
-              <div>
-                <h1 className={`text-2xl font-bold ${hasCustomBranding ? 'custom-brand-text' : 'gradient-text'}`}>
+            <div className="flex items-center gap-2 sm:gap-4 min-w-0">
+              <div className="min-w-0">
+                <h1 className={`text-lg sm:text-2xl font-bold truncate ${hasCustomBranding ? 'custom-brand-text' : 'gradient-text'}`}>
                   {getPageTitle()}
                 </h1>
                 {companyName && (
-                  <p className="text-xs text-muted-foreground font-medium mt-1">{companyName}</p>
+                  <p className="text-xs text-muted-foreground font-medium mt-0.5 sm:mt-1 truncate">{companyName}</p>
                 )}
               </div>
               
               {currentUser?.role === 'company' && (currentUser?.residentCode || currentUser?.propertyManagerCode) && (
-                <div className="flex flex-col gap-0.5 text-xs">
+                <div className="hidden lg:flex flex-col gap-0.5 text-xs">
                   {currentUser?.residentCode && (
                     <div className="flex items-center gap-1.5">
                       <span className="text-muted-foreground font-medium">Resident:</span>
@@ -2034,14 +2034,14 @@ export default function Dashboard() {
               )}
             </div>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-1 sm:gap-3 flex-shrink-0">
             <CSRBadge />
             <RefreshButton />
-            <Button variant="ghost" size="icon" data-testid="button-profile" onClick={() => setLocation("/profile")} className="hover-elevate w-12 h-12">
-              <span className="material-icons text-2xl">person</span>
+            <Button variant="ghost" size="icon" data-testid="button-profile" onClick={() => setLocation("/profile")}>
+              <span className="material-icons text-xl sm:text-2xl">person</span>
             </Button>
-            <Button variant="ghost" size="icon" data-testid="button-logout" onClick={() => setShowLogoutDialog(true)} className="hover-elevate w-12 h-12">
-              <span className="material-icons text-2xl">logout</span>
+            <Button variant="ghost" size="icon" data-testid="button-logout" onClick={() => setShowLogoutDialog(true)}>
+              <span className="material-icons text-xl sm:text-2xl">logout</span>
             </Button>
           </div>
         </div>
