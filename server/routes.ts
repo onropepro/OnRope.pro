@@ -5452,6 +5452,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // Update my IRATA baseline hours (for logbook)
+  const baselineHoursSchema = z.object({
+    baselineHours: z.number().min(0, "Hours must be non-negative").max(100000, "Hours seems unreasonably high"),
+  });
+  
   app.patch("/api/my-irata-baseline-hours", requireAuth, async (req: Request, res: Response) => {
     try {
       const currentUser = await storage.getUserById(req.session.userId!);
@@ -5460,15 +5464,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "User not found" });
       }
       
-      const { baselineHours } = req.body;
-      
-      if (typeof baselineHours !== 'number' || baselineHours < 0) {
-        return res.status(400).json({ message: "Baseline hours must be a non-negative number" });
+      const parseResult = baselineHoursSchema.safeParse(req.body);
+      if (!parseResult.success) {
+        return res.status(400).json({ 
+          message: "Invalid input", 
+          errors: parseResult.error.flatten().fieldErrors 
+        });
       }
       
-      if (baselineHours > 100000) {
-        return res.status(400).json({ message: "Baseline hours seems unreasonably high" });
-      }
+      const { baselineHours } = parseResult.data;
       
       await storage.updateUser(currentUser.id, {
         irataBaselineHours: baselineHours.toString(),
