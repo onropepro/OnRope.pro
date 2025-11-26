@@ -288,13 +288,14 @@ export default function PropertyManager() {
       colors = [];
     }
 
-    if (colors.length === 0) {
+    if (colors.length === 0 || !colors[0]) {
       clearBrandingVars();
       return;
     }
 
     // Convert hex to HSL for CSS variables
-    const hexToHSL = (hex: string): string => {
+    const hexToHSL = (hex: string | undefined): string => {
+      if (!hex) return '240 10% 3.9%'; // fallback to default
       hex = hex.replace(/^#/, '');
       const r = parseInt(hex.substring(0, 2), 16) / 255;
       const g = parseInt(hex.substring(2, 4), 16) / 255;
