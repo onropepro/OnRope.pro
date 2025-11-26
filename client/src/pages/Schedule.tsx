@@ -438,6 +438,37 @@ export default function Schedule() {
     return dayEvents;
   });
 
+  // Add time-off events to the calendar
+  const timeOffEvents: EventInput[] = timeOffEntries.map((entry) => {
+    const employee = employees.find(e => e.id === entry.employeeId);
+    const employeeName = employee?.name || 'Employee';
+    const timeOffLabel = getTimeOffLabel(entry.timeOffType);
+    const timeOffColor = getTimeOffColor(entry.timeOffType);
+    
+    const entryDate = new Date(entry.date);
+    const endDate = new Date(entryDate);
+    endDate.setDate(endDate.getDate() + 1);
+    
+    return {
+      id: `timeoff-${entry.id}`,
+      title: `${timeOffLabel}\n${employeeName}`,
+      start: entryDate,
+      end: endDate,
+      allDay: true,
+      backgroundColor: timeOffColor,
+      borderColor: timeOffColor,
+      extendedProps: {
+        isTimeOff: true,
+        timeOffEntry: entry,
+        employeeName,
+        timeOffLabel,
+      },
+    };
+  });
+
+  // Combine job events and time-off events
+  const allCalendarEvents = [...events, ...timeOffEvents];
+
   // Handle date selection for creating new job
   const handleDateSelect = (selectInfo: DateSelectArg) => {
     setSelectedDates({
@@ -450,6 +481,15 @@ export default function Schedule() {
 
   // Handle event click for viewing details or quick assignment
   const handleEventClick = (clickInfo: EventClickArg) => {
+    // Handle time-off events - confirm deletion
+    if (clickInfo.event.extendedProps.isTimeOff) {
+      const { timeOffEntry, employeeName, timeOffLabel } = clickInfo.event.extendedProps;
+      if (window.confirm(`Remove ${timeOffLabel} for ${employeeName}?`)) {
+        deleteTimeOffMutation.mutate(timeOffEntry.id);
+      }
+      return;
+    }
+
     const job = clickInfo.event.extendedProps.job as ScheduledJobWithAssignments;
     
     // If dragging an employee, assign/unassign them
@@ -1070,7 +1110,7 @@ export default function Schedule() {
               selectMirror={true}
               dayMaxEvents={3}
               weekends={true}
-              events={events}
+              events={allCalendarEvents}
               select={handleDateSelect}
               eventClick={handleEventClick}
               eventDrop={handleEventDrop}
@@ -1080,10 +1120,43 @@ export default function Schedule() {
               eventDisplay="block"
               data-testid="calendar"
               eventDidMount={(info) => {
-                const job = info.event.extendedProps.job as ScheduledJobWithAssignments;
-                info.el.setAttribute('data-job-id', job.id);
+                if (info.event.extendedProps.isTimeOff) {
+                  info.el.setAttribute('data-timeoff-id', info.event.id);
+                } else {
+                  const job = info.event.extendedProps.job as ScheduledJobWithAssignments;
+                  info.el.setAttribute('data-job-id', job.id);
+                }
               }}
               eventContent={(eventInfo) => {
+                // Handle time-off events separately
+                if (eventInfo.event.extendedProps.isTimeOff) {
+                  const { employeeName, timeOffLabel, timeOffEntry } = eventInfo.event.extendedProps;
+                  return (
+                    <div 
+                      className="fc-event-main-frame" 
+                      style={{ 
+                        padding: '4px 6px', 
+                        overflow: 'hidden',
+                        cursor: 'pointer',
+                      }}
+                    >
+                      <div className="fc-event-title-container">
+                        <div className="fc-event-title" style={{ fontWeight: 600, fontSize: '0.875rem' }}>
+                          {timeOffLabel}
+                        </div>
+                        <div style={{ fontSize: '0.75rem', opacity: 0.95, marginTop: '2px', fontWeight: 500 }}>
+                          {employeeName}
+                        </div>
+                        {timeOffEntry.notes && (
+                          <div style={{ fontSize: '0.7rem', opacity: 0.85, marginTop: '2px', fontStyle: 'italic' }}>
+                            {timeOffEntry.notes}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  );
+                }
+
                 const job = eventInfo.event.extendedProps.job as ScheduledJobWithAssignments;
                 const employeesForThisDay = eventInfo.event.extendedProps.employeesForThisDay || [];
                 const isHighlighted = activeEmployeeId !== null;
