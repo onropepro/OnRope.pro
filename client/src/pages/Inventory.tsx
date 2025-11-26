@@ -1165,20 +1165,18 @@ export default function Inventory() {
                               
                               return (
                                 <td key={index} className="text-center p-3">
-                                  {hadSession ? (
-                                    isNotApplicable ? (
-                                      <span className="text-xs font-medium text-muted-foreground/60" title="Harness not applicable for this session">
-                                        N/A
-                                      </span>
-                                    ) : hasValidInspection ? (
-                                      <span className="material-icons text-green-500" title="Inspection submitted">
-                                        check_circle
-                                      </span>
-                                    ) : (
-                                      <span className="material-icons text-red-500" title="No inspection submitted">
-                                        cancel
-                                      </span>
-                                    )
+                                  {isNotApplicable ? (
+                                    <span className="text-xs font-medium text-muted-foreground/60" title="Harness not applicable for this session">
+                                      N/A
+                                    </span>
+                                  ) : hasValidInspection ? (
+                                    <span className="material-icons text-green-500" title="Inspection submitted">
+                                      check_circle
+                                    </span>
+                                  ) : hadSession ? (
+                                    <span className="material-icons text-red-500" title="No inspection submitted">
+                                      cancel
+                                    </span>
                                   ) : (
                                     <span className="text-muted-foreground/30" title="No work session">—</span>
                                   )}
