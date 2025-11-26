@@ -438,21 +438,34 @@ export default function Schedule() {
     return dayEvents;
   });
 
+  // Helper to add one day to a date string without timezone issues
+  const addOneDay = (dateStr: string): string => {
+    const [y, m, d] = dateStr.split('-').map(Number);
+    const dt = new Date(Date.UTC(y, m - 1, d));
+    dt.setUTCDate(dt.getUTCDate() + 1);
+    const y2 = dt.getUTCFullYear();
+    const m2 = String(dt.getUTCMonth() + 1).padStart(2, '0');
+    const d2 = String(dt.getUTCDate()).padStart(2, '0');
+    return `${y2}-${m2}-${d2}`;
+  };
+
   // Add time-off events to the calendar
+  // Use date-only strings (YYYY-MM-DD) to avoid timezone shifting
   const timeOffEvents: EventInput[] = timeOffEntries.map((entry) => {
     const employee = employees.find(e => e.id === entry.employeeId);
     const employeeName = employee?.name || 'Employee';
     const timeOffLabel = getTimeOffLabel(entry.timeOffType);
     const timeOffColor = getTimeOffColor(entry.timeOffType);
     
-    const entryDate = new Date(entry.date);
-    const endDate = new Date(entryDate);
-    endDate.setDate(endDate.getDate() + 1);
+    // Use the raw date string from database (YYYY-MM-DD format)
+    // FullCalendar treats date-only strings as local dates, avoiding UTC conversion
+    const startDate = String(entry.date).split('T')[0]; // Ensure YYYY-MM-DD format
+    const endDate = addOneDay(startDate); // Exclusive end date for allDay events
     
     return {
       id: `timeoff-${entry.id}`,
       title: `${timeOffLabel}\n${employeeName}`,
-      start: entryDate,
+      start: startDate,
       end: endDate,
       allDay: true,
       backgroundColor: timeOffColor,
