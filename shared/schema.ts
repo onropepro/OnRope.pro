@@ -107,6 +107,7 @@ export const users = pgTable("users", {
   irataIssuedDate: date("irata_issued_date"), // IRATA certification issue date
   irataExpirationDate: date("irata_expiration_date"), // IRATA certification expiration date
   irataDocuments: text("irata_documents").array().default(sql`ARRAY[]::text[]`), // Array of IRATA certification document URLs
+  irataBaselineHours: numeric("irata_baseline_hours", { precision: 10, scale: 2 }).default("0"), // Baseline logbook hours before using this system
   
   // Employee photo
   photoUrl: text("photo_url"), // Employee profile photo URL
