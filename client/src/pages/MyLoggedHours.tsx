@@ -112,15 +112,40 @@ export default function MyLoggedHours() {
     .sort(([, a], [, b]) => b - a)
     .slice(0, 5);
 
-  const groupedByMonth: Record<string, IrataTaskLog[]> = {};
+  // Group logs by project (building name)
+  const groupedByProject: Record<string, { 
+    buildingName: string; 
+    buildingAddress: string; 
+    logs: IrataTaskLog[];
+    totalHours: number;
+  }> = {};
+  
   logs.forEach((log: IrataTaskLog) => {
-    const date = parseLocalDate(log.workDate);
-    const monthKey = format(date, "MMMM yyyy");
-    if (!groupedByMonth[monthKey]) {
-      groupedByMonth[monthKey] = [];
+    const projectKey = log.buildingName || "Unknown Project";
+    if (!groupedByProject[projectKey]) {
+      groupedByProject[projectKey] = {
+        buildingName: log.buildingName || "Unknown Project",
+        buildingAddress: log.buildingAddress || "",
+        logs: [],
+        totalHours: 0,
+      };
     }
-    groupedByMonth[monthKey].push(log);
+    groupedByProject[projectKey].logs.push(log);
+    groupedByProject[projectKey].totalHours += parseFloat(log.hoursWorked || "0");
   });
+
+  // Sort logs within each project by date (newest first)
+  Object.values(groupedByProject).forEach((project) => {
+    project.logs.sort((a, b) => {
+      const dateA = parseLocalDate(a.workDate);
+      const dateB = parseLocalDate(b.workDate);
+      return dateB.getTime() - dateA.getTime();
+    });
+  });
+
+  // Sort projects by total hours (most hours first)
+  const sortedProjects = Object.entries(groupedByProject)
+    .sort(([, a], [, b]) => b.totalHours - a.totalHours);
 
   if (isLoading) {
     return (
@@ -280,7 +305,7 @@ export default function MyLoggedHours() {
           <CardHeader>
             <CardTitle className="text-lg flex items-center gap-2">
               <span className="material-icons">history</span>
-              Session History
+              Session History by Project
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -294,51 +319,50 @@ export default function MyLoggedHours() {
                 </p>
               </div>
             ) : (
-              <ScrollArea className="h-[500px] pr-4">
-                <Accordion type="multiple" className="w-full">
-                  {Object.entries(groupedByMonth).map(([month, monthLogs]) => {
-                    const monthHours = monthLogs.reduce((sum, log) => sum + parseFloat(log.hoursWorked || "0"), 0);
+              <ScrollArea className="h-[600px] pr-4">
+                <Accordion type="multiple" className="w-full" defaultValue={sortedProjects.map(([key]) => key)}>
+                  {sortedProjects.map(([projectKey, project]) => {
                     return (
-                      <AccordionItem key={month} value={month}>
+                      <AccordionItem key={projectKey} value={projectKey}>
                         <AccordionTrigger className="hover:no-underline">
-                          <div className="flex items-center justify-between w-full pr-4">
-                            <div className="flex items-center gap-2">
-                              <span className="material-icons text-sm">calendar_month</span>
-                              <span className="font-medium">{month}</span>
+                          <div className="flex flex-col sm:flex-row sm:items-center justify-between w-full pr-4 gap-2">
+                            <div className="flex flex-col items-start">
+                              <div className="flex items-center gap-2">
+                                <span className="material-icons text-sm text-primary">apartment</span>
+                                <span className="font-semibold">{project.buildingName}</span>
+                              </div>
+                              {project.buildingAddress && (
+                                <div className="text-xs text-muted-foreground flex items-center gap-1 ml-6">
+                                  <span className="material-icons text-xs">location_on</span>
+                                  {project.buildingAddress}
+                                </div>
+                              )}
                             </div>
                             <div className="flex items-center gap-3">
-                              <Badge variant="secondary">{monthLogs.length} session{monthLogs.length !== 1 ? "s" : ""}</Badge>
-                              <span className="text-sm text-muted-foreground">{monthHours.toFixed(1)} hrs</span>
+                              <Badge variant="secondary">
+                                {project.logs.length} day{project.logs.length !== 1 ? "s" : ""}
+                              </Badge>
+                              <Badge variant="default">
+                                {project.totalHours.toFixed(1)} hrs
+                              </Badge>
                             </div>
                           </div>
                         </AccordionTrigger>
                         <AccordionContent>
                           <div className="space-y-3 pl-6">
-                            {monthLogs.map((log) => (
+                            {project.logs.map((log) => (
                               <div
                                 key={log.id}
                                 className="p-4 rounded-md border bg-card hover-elevate"
                               >
-                                <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2 mb-3">
-                                  <div>
-                                    <div className="font-medium flex items-center gap-2">
-                                      <span className="material-icons text-sm">apartment</span>
-                                      {log.buildingName || "Unknown Building"}
-                                    </div>
-                                    {log.buildingAddress && (
-                                      <div className="text-xs text-muted-foreground mt-0.5 flex items-center gap-1">
-                                        <span className="material-icons text-xs">location_on</span>
-                                        {log.buildingAddress}
-                                      </div>
-                                    )}
+                                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-3">
+                                  <div className="flex items-center gap-2">
+                                    <span className="material-icons text-sm text-muted-foreground">event</span>
+                                    <span className="font-medium">
+                                      {format(parseLocalDate(log.workDate), "EEEE, MMMM d, yyyy")}
+                                    </span>
                                   </div>
-                                  <div className="flex items-center gap-3 text-sm">
-                                    <div className="flex items-center gap-1">
-                                      <span className="material-icons text-sm text-muted-foreground">event</span>
-                                      {format(parseLocalDate(log.workDate), "MMM d, yyyy")}
-                                    </div>
-                                    <Badge>{parseFloat(log.hoursWorked || "0").toFixed(1)} hrs</Badge>
-                                  </div>
+                                  <Badge>{parseFloat(log.hoursWorked || "0").toFixed(1)} hrs</Badge>
                                 </div>
 
                                 <div className="flex flex-wrap gap-1.5">
