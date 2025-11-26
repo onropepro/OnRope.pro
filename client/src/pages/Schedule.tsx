@@ -1135,20 +1135,21 @@ export default function Schedule() {
                     <div 
                       className="fc-event-main-frame" 
                       style={{ 
-                        padding: '4px 6px', 
+                        padding: '4px 8px', 
                         overflow: 'hidden',
                         cursor: 'pointer',
+                        color: 'white',
                       }}
                     >
                       <div className="fc-event-title-container">
-                        <div className="fc-event-title" style={{ fontWeight: 600, fontSize: '0.875rem' }}>
+                        <div className="fc-event-title" style={{ fontWeight: 700, fontSize: '0.875rem', color: 'white' }}>
                           {timeOffLabel}
                         </div>
-                        <div style={{ fontSize: '0.75rem', opacity: 0.95, marginTop: '2px', fontWeight: 500 }}>
+                        <div style={{ fontSize: '0.75rem', color: 'rgba(255,255,255,0.95)', marginTop: '2px', fontWeight: 600 }}>
                           {employeeName}
                         </div>
                         {timeOffEntry.notes && (
-                          <div style={{ fontSize: '0.7rem', opacity: 0.85, marginTop: '2px', fontStyle: 'italic' }}>
+                          <div style={{ fontSize: '0.7rem', color: 'rgba(255,255,255,0.85)', marginTop: '2px', fontStyle: 'italic' }}>
                             {timeOffEntry.notes}
                           </div>
                         )}
