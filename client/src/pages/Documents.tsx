@@ -1287,7 +1287,7 @@ export default function Documents() {
   return (
     <div className="min-h-screen bg-background p-4 pb-24">
       <div className="max-w-6xl mx-auto">
-        <div className="mb-8">
+        <div className="mb-6">
           <div className="flex items-center gap-3 mb-2">
             <Button
               variant="ghost"
@@ -1297,9 +1297,11 @@ export default function Documents() {
             >
               <ArrowLeft className="h-5 w-5" />
             </Button>
-            <h1 className="text-3xl font-bold">Documents & Records</h1>
+            <div className="flex-1 min-w-0">
+              <h1 className="text-xl sm:text-3xl font-bold truncate">Documents & Records</h1>
+              <p className="text-sm text-muted-foreground hidden sm:block mt-1">All company documents and safety records</p>
+            </div>
           </div>
-          <p className="text-muted-foreground ml-14">All company documents and safety records</p>
         </div>
 
         {/* Documentation Safety Rating */}
@@ -1403,17 +1405,22 @@ export default function Documents() {
         })()}
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-3 mb-6 max-w-xl">
-            <TabsTrigger value="health-safety" data-testid="tab-health-safety">
-              Health & Safety Manual
-            </TabsTrigger>
-            <TabsTrigger value="company-policy" data-testid="tab-company-policy">
-              Company Policy
-            </TabsTrigger>
-            <TabsTrigger value="inspections-safety" data-testid="tab-inspections-safety">
-              Inspections & Safety
-            </TabsTrigger>
-          </TabsList>
+          <div className="overflow-x-auto -mx-4 px-4 md:mx-0 md:px-0 mb-6">
+            <TabsList className="grid w-full min-w-[380px] md:min-w-0 grid-cols-3 max-w-xl gap-1">
+              <TabsTrigger value="health-safety" data-testid="tab-health-safety" className="text-xs md:text-sm px-2 md:px-4">
+                <span className="hidden md:inline">Health & Safety Manual</span>
+                <span className="md:hidden">Health/Safety</span>
+              </TabsTrigger>
+              <TabsTrigger value="company-policy" data-testid="tab-company-policy" className="text-xs md:text-sm px-2 md:px-4">
+                <span className="hidden md:inline">Company Policy</span>
+                <span className="md:hidden">Policy</span>
+              </TabsTrigger>
+              <TabsTrigger value="inspections-safety" data-testid="tab-inspections-safety" className="text-xs md:text-sm px-2 md:px-4">
+                <span className="hidden md:inline">Inspections & Safety</span>
+                <span className="md:hidden">Inspections</span>
+              </TabsTrigger>
+            </TabsList>
+          </div>
 
           {/* Health & Safety Manual Tab */}
           <TabsContent value="health-safety">

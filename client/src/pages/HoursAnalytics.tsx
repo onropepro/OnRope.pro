@@ -524,45 +524,48 @@ export default function HoursAnalytics() {
     <div className="min-h-screen page-gradient">
       <div className="max-w-7xl mx-auto p-6 sm:p-8 lg:p-10 space-y-8">
         {/* Header - Premium Style */}
-        <div className="flex items-center gap-4 mb-2">
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => setLocation("/dashboard")}
-            data-testid="button-back"
-            className="hover-elevate"
-          >
-            <ArrowLeft className="h-5 w-5" />
-          </Button>
-          <div className="flex-1">
-            <h1 className={`text-3xl font-bold ${hasCustomBranding ? 'text-primary' : 'gradient-text'}`}>{isManagement ? "Hours Analytics" : "My Hours"}</h1>
-            <p className="text-sm text-muted-foreground mt-1">
-              {isManagement ? "Billable vs Non-Billable Hours Breakdown" : "View your work hours and session history"}
-            </p>
+        <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 mb-2">
+          <div className="flex items-center gap-3 flex-1 min-w-0">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setLocation("/dashboard")}
+              data-testid="button-back"
+              className="flex-shrink-0"
+            >
+              <ArrowLeft className="h-5 w-5" />
+            </Button>
+            <div className="min-w-0 flex-1">
+              <h1 className={`text-xl sm:text-3xl font-bold truncate ${hasCustomBranding ? 'text-primary' : 'gradient-text'}`}>{isManagement ? "Hours Analytics" : "My Hours"}</h1>
+              <p className="text-xs sm:text-sm text-muted-foreground mt-1 hidden sm:block">
+                {isManagement ? "Billable vs Non-Billable Hours Breakdown" : "View your work hours and session history"}
+              </p>
+            </div>
           </div>
-          <div className="flex gap-2">
+          <div className="flex gap-2 pl-11 sm:pl-0 flex-shrink-0">
             <Button
               variant={isRearranging ? "default" : "outline"}
               size="sm"
               onClick={() => setIsRearranging(!isRearranging)}
-              className="gap-2"
+              className="gap-1 sm:gap-2 text-xs sm:text-sm"
               data-testid="button-rearrange-cards"
             >
               <span className="material-icons text-base">
                 {isRearranging ? "check" : "swap_vert"}
               </span>
-              {isRearranging ? "Done" : "Rearrange Cards"}
+              <span className="hidden sm:inline">{isRearranging ? "Done" : "Rearrange Cards"}</span>
+              <span className="sm:hidden">{isRearranging ? "Done" : "Rearrange"}</span>
             </Button>
             {isRearranging && (
               <Button
                 variant="outline"
                 size="sm"
                 onClick={resetCardOrder}
-                className="gap-2"
+                className="gap-1 sm:gap-2 text-xs sm:text-sm"
                 data-testid="button-reset-layout"
               >
                 <span className="material-icons text-base">restart_alt</span>
-                Reset
+                <span className="hidden sm:inline">Reset</span>
               </Button>
             )}
           </div>

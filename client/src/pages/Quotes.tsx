@@ -812,9 +812,9 @@ export default function Quotes() {
               </Button>
             </Link>
 
-            <div className="mb-8">
-              <h1 className="text-4xl font-bold text-foreground mb-2">Service Quotes</h1>
-              <p className="text-muted-foreground">Create and manage service quotes for buildings</p>
+            <div className="mb-6 sm:mb-8">
+              <h1 className="text-2xl sm:text-4xl font-bold text-foreground mb-2">Service Quotes</h1>
+              <p className="text-sm sm:text-base text-muted-foreground">Create and manage service quotes for buildings</p>
             </div>
 
             <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as "create" | "my-quotes")}>

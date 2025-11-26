@@ -72,7 +72,7 @@ export default function SafetyForms() {
   return (
     <div className="min-h-screen bg-background p-4 pb-24">
       <div className="max-w-4xl mx-auto">
-        <div className="flex items-center gap-3 mb-6">
+        <div className="flex items-center gap-3 mb-4">
           <Button
             variant="ghost"
             size="icon"
@@ -81,37 +81,41 @@ export default function SafetyForms() {
           >
             <ArrowLeft className="h-5 w-5" />
           </Button>
-          <div className="flex items-center gap-2">
-            <Shield className="h-6 w-6 text-primary" />
-            <h1 className="text-2xl font-bold">Safety Forms</h1>
+          <div className="flex items-center gap-2 min-w-0 flex-1">
+            <Shield className="h-5 w-5 sm:h-6 sm:w-6 text-primary flex-shrink-0" />
+            <h1 className="text-lg sm:text-2xl font-bold truncate">Safety Forms</h1>
           </div>
         </div>
 
-        <p className="text-muted-foreground mb-6">
+        <p className="text-sm sm:text-base text-muted-foreground mb-6 pl-11 sm:pl-0">
           Select a safety form to complete or view records
         </p>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {safetyFormCards.map((formCard) => {
             const IconComponent = formCard.icon;
+            const accentColorClass = formCard.borderColor.replace('border-l-', 'bg-');
             return (
               <Card
                 key={formCard.id}
-                className={`cursor-pointer hover-elevate active-elevate-2 border-l-4 ${formCard.borderColor}`}
+                className="cursor-pointer hover-elevate active-elevate-2 overflow-hidden"
                 onClick={formCard.onClick}
                 data-testid={formCard.testId}
               >
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-3">
-                    <div className={`p-2 rounded-lg bg-muted ${formCard.iconColor}`}>
-                      <IconComponent className="h-6 w-6" />
-                    </div>
-                    <span>{formCard.title}</span>
-                  </CardTitle>
-                  <CardDescription className="mt-2">
-                    {formCard.description}
-                  </CardDescription>
-                </CardHeader>
+                <div className="flex">
+                  <div className={`w-1 flex-shrink-0 ${accentColorClass}`} />
+                  <CardHeader className="flex-1">
+                    <CardTitle className="flex items-center gap-3">
+                      <div className={`p-2 rounded-lg bg-muted ${formCard.iconColor}`}>
+                        <IconComponent className="h-6 w-6" />
+                      </div>
+                      <span>{formCard.title}</span>
+                    </CardTitle>
+                    <CardDescription className="mt-2">
+                      {formCard.description}
+                    </CardDescription>
+                  </CardHeader>
+                </div>
               </Card>
             );
           })}

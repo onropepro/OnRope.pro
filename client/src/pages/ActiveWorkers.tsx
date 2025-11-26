@@ -194,24 +194,23 @@ export default function ActiveWorkers() {
     <div className="min-h-screen gradient-bg dot-pattern pb-6">
       {/* Header */}
       <div className="sticky top-0 z-50 bg-background/95 backdrop-blur-sm border-b shadow-sm">
-        <div className="max-w-4xl mx-auto p-4">
-          <div className="flex items-center gap-4">
+        <div className="max-w-4xl mx-auto p-3 sm:p-4">
+          <div className="flex items-center gap-3">
             <Button
               variant="ghost"
+              size="icon"
               onClick={() => setLocation("/dashboard")}
-              className="h-12 gap-2"
               data-testid="button-back"
             >
               <span className="material-icons">arrow_back</span>
-              Back
             </Button>
-            <div className="flex-1">
-              <h1 className="text-2xl font-bold">Active Workers</h1>
-              <p className="text-sm text-muted-foreground">
+            <div className="flex-1 min-w-0">
+              <h1 className="text-lg sm:text-2xl font-bold truncate">Active Workers</h1>
+              <p className="text-xs sm:text-sm text-muted-foreground hidden sm:block">
                 Real-time view of who's working where
               </p>
             </div>
-            <Badge variant="secondary" className="text-lg px-4 py-2">
+            <Badge variant="secondary" className="text-sm sm:text-lg px-3 sm:px-4 py-1 sm:py-2 flex-shrink-0">
               {activeWorkers.length} active
             </Badge>
           </div>

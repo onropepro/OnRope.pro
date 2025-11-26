@@ -509,7 +509,7 @@ export default function Payroll() {
 
   return (
     <div className="container mx-auto p-4 space-y-6">
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-3">
         <Button
           variant="ghost"
           size="icon"
@@ -518,31 +518,37 @@ export default function Payroll() {
         >
           <ArrowLeft className="h-5 w-5" />
         </Button>
-        <div className="flex-1">
-          <h1 className="text-3xl font-bold" data-testid="heading-payroll">Payroll Management</h1>
-          <p className="text-muted-foreground">Manage pay periods and employee hours</p>
+        <div className="flex-1 min-w-0">
+          <h1 className="text-xl md:text-3xl font-bold truncate" data-testid="heading-payroll">Payroll Management</h1>
+          <p className="text-sm text-muted-foreground hidden sm:block">Manage pay periods and employee hours</p>
         </div>
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
-        <TabsList className="grid w-full grid-cols-4">
-          <TabsTrigger value="hours" data-testid="tab-hours">
-            <Users className="w-4 h-4 mr-2" />
-            Employee Hours
-          </TabsTrigger>
-          <TabsTrigger value="add-hours" data-testid="tab-add-hours">
-            <Clock className="w-4 h-4 mr-2" />
-            Add Hours
-          </TabsTrigger>
-          <TabsTrigger value="past-periods" data-testid="tab-past-periods">
-            <Calendar className="w-4 h-4 mr-2" />
-            Past Periods
-          </TabsTrigger>
-          <TabsTrigger value="settings" data-testid="tab-settings">
-            <Settings className="w-4 h-4 mr-2" />
-            Settings
-          </TabsTrigger>
-        </TabsList>
+        <div className="overflow-x-auto -mx-4 px-4 md:mx-0 md:px-0">
+          <TabsList className="grid w-full min-w-[400px] md:min-w-0 grid-cols-4 gap-1">
+            <TabsTrigger value="hours" data-testid="tab-hours" className="text-xs md:text-sm px-2 md:px-4">
+              <Users className="w-4 h-4 md:mr-2 flex-shrink-0" />
+              <span className="hidden md:inline">Employee Hours</span>
+              <span className="md:hidden">Hours</span>
+            </TabsTrigger>
+            <TabsTrigger value="add-hours" data-testid="tab-add-hours" className="text-xs md:text-sm px-2 md:px-4">
+              <Clock className="w-4 h-4 md:mr-2 flex-shrink-0" />
+              <span className="hidden md:inline">Add Hours</span>
+              <span className="md:hidden">Add</span>
+            </TabsTrigger>
+            <TabsTrigger value="past-periods" data-testid="tab-past-periods" className="text-xs md:text-sm px-2 md:px-4">
+              <Calendar className="w-4 h-4 md:mr-2 flex-shrink-0" />
+              <span className="hidden md:inline">Past Periods</span>
+              <span className="md:hidden">Past</span>
+            </TabsTrigger>
+            <TabsTrigger value="settings" data-testid="tab-settings" className="text-xs md:text-sm px-2 md:px-4">
+              <Settings className="w-4 h-4 md:mr-2 flex-shrink-0" />
+              <span className="hidden md:inline">Settings</span>
+              <span className="md:hidden">Settings</span>
+            </TabsTrigger>
+          </TabsList>
+        </div>
 
         <TabsContent value="hours" className="space-y-4">
           <Card>
