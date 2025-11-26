@@ -3,6 +3,7 @@ import { useQuery, useMutation } from "@tanstack/react-query";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { useLocation } from "wouter";
 import FullCalendar from "@fullcalendar/react";
+import { toLocalDateString, parseLocalDate, nextDateOnly, addDaysToDateString, extractLocalDateFromISO } from "@/lib/dateUtils";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import timeGridPlugin from "@fullcalendar/timegrid";
 import interactionPlugin from "@fullcalendar/interaction";
@@ -296,10 +297,7 @@ export default function Schedule() {
   // Get employee assignments for a specific day (using local date to avoid timezone issues)
   const getEmployeeJobsForDay = (employeeId: string, date: Date) => {
     // Format date as YYYY-MM-DD in local timezone to avoid UTC conversion issues
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
-    const dateStr = `${year}-${month}-${day}`;
+    const dateStr = toLocalDateString(date);
     
     return jobs.filter(job => {
       // Check if employee is assigned to this job
@@ -307,8 +305,9 @@ export default function Schedule() {
         if (assignment.employee.id !== employeeId) return false;
         
         // Check if the date falls within the assignment's date range
-        const assignStart = String(assignment.startDate || job.startDate);
-        const assignEnd = String(assignment.endDate || job.endDate);
+        // Normalize both assignment dates to date-only format to ensure correct comparison
+        const assignStart = String(assignment.startDate || job.startDate).split('T')[0];
+        const assignEnd = String(assignment.endDate || job.endDate).split('T')[0];
         
         return dateStr >= assignStart && dateStr <= assignEnd;
       });
@@ -323,131 +322,87 @@ export default function Schedule() {
     return date.toDateString() === today.toDateString();
   };
 
-  // Transform jobs into FullCalendar events [UPDATED: Testing date filtering]
+  // Transform jobs into FullCalendar events
   // Create separate event blocks for each day in multi-day jobs
+  // Uses timezone-safe date utilities to prevent date shifting
   const events: EventInput[] = jobs.flatMap((job) => {
-    // DEBUG: Log the job data to see what we're getting
-    if (job.title?.includes("Dryer")) {
-      console.log("=== FRONTEND DEBUG: Dryer vent job ===");
-      console.log("employeeAssignments exists?", !!job.employeeAssignments);
-      console.log("employeeAssignments length:", job.employeeAssignments?.length);
-      if (job.employeeAssignments && job.employeeAssignments.length > 0) {
-        const first = job.employeeAssignments[0] as any;
-        console.log("First assignment:", {
-          name: first.employee?.name,
-          startDate: first.startDate,
-          endDate: first.endDate
-        });
-      }
-    }
-    
     const color = job.color || defaultJobColor;
     // Use project dates if job is linked to a project, otherwise use job dates
-    const startDate = job.project?.startDate || job.startDate;
-    const endDate = job.project?.endDate || job.endDate;
-    const start = new Date(startDate);
-    const end = new Date(endDate);
+    const rawStartDate = job.project?.startDate || job.startDate;
+    const rawEndDate = job.project?.endDate || job.endDate;
+    
+    // Extract date-only strings in local timezone
+    const startDateStr = String(rawStartDate).split('T')[0];
+    const endDateStr = String(rawEndDate).split('T')[0];
     
     // If same day, return single event
-    const startDay = new Date(start.getFullYear(), start.getMonth(), start.getDate());
-    const endDay = new Date(end.getFullYear(), end.getMonth(), end.getDate());
-    
-    if (startDay.getTime() === endDay.getTime()) {
+    if (startDateStr === endDateStr) {
       // For single-day jobs, filter employees by their assignment date range
-      const dayDateStr = startDay.toISOString().split('T')[0];
       const employeesForThisDay = job.employeeAssignments?.filter((assignment: any) => {
-        // Include employee if they're assigned for this specific day
-        if (!assignment.startDate && !assignment.endDate) return true; // No date range = full job duration
-        
-        const empStart = assignment.startDate ? new Date(assignment.startDate).toISOString().split('T')[0] : dayDateStr;
-        const empEnd = assignment.endDate ? new Date(assignment.endDate).toISOString().split('T')[0] : dayDateStr;
-        
-        return dayDateStr >= empStart && dayDateStr <= empEnd;
+        if (!assignment.startDate && !assignment.endDate) return true;
+        const empStart = String(assignment.startDate || startDateStr).split('T')[0];
+        const empEnd = String(assignment.endDate || endDateStr).split('T')[0];
+        return startDateStr >= empStart && startDateStr <= empEnd;
       }) || [];
       
       let displayTitle = job.project?.buildingName || job.title;
       if (employeesForThisDay.length > 0) {
         const employeeNames = employeesForThisDay.map((a: any) => `${a.employee.name} (${a.employee.role?.replace(/_/g, ' ') || 'Staff'})`).join(", ");
-        displayTitle = `${job.project?.buildingName || job.title}\n👥 ${employeeNames}`;
+        displayTitle = `${job.project?.buildingName || job.title}\n${employeeNames}`;
       }
       
       return [{
         id: job.id,
         title: displayTitle,
-        start: startDate,
-        end: endDate,
+        start: startDateStr,
+        end: nextDateOnly(startDateStr),
+        allDay: true,
         backgroundColor: color,
         borderColor: color,
         extendedProps: {
           job,
-          employeesForThisDay, // Pass filtered employees for this day
+          employeesForThisDay,
         },
       }];
     }
     
     // Multi-day: create separate all-day events for each day
     const dayEvents = [];
-    const currentDate = new Date(startDay);
+    let currentDateStr = startDateStr;
     
-    while (currentDate <= endDay) {
-      const eventStart = new Date(currentDate);
-      const eventEnd = new Date(currentDate);
-      eventEnd.setDate(eventEnd.getDate() + 1);
-      
+    while (currentDateStr <= endDateStr) {
       // Filter employees by their assignment date range for THIS specific day
-      const dayDateStr = currentDate.toISOString().split('T')[0];
       const employeesForThisDay = job.employeeAssignments?.filter((assignment: any) => {
-        // Include employee if they're assigned for this specific day
-        if (!assignment.startDate && !assignment.endDate) return true; // No date range = full job duration
-        
-        const empStart = assignment.startDate ? new Date(assignment.startDate).toISOString().split('T')[0] : dayDateStr;
-        const empEnd = assignment.endDate ? new Date(assignment.endDate).toISOString().split('T')[0] : dayDateStr;
-        
-        const isInRange = dayDateStr >= empStart && dayDateStr <= empEnd;
-        
-        // DEBUG
-        if (job.title.includes("Dryer")) {
-          console.log(`Day ${dayDateStr}: employee ${assignment.employee?.name}, range ${empStart} to ${empEnd}, inRange: ${isInRange}`);
-        }
-        
-        return isInRange;
+        if (!assignment.startDate && !assignment.endDate) return true;
+        const empStart = String(assignment.startDate || currentDateStr).split('T')[0];
+        const empEnd = String(assignment.endDate || currentDateStr).split('T')[0];
+        return currentDateStr >= empStart && currentDateStr <= empEnd;
       }) || [];
       
       let displayTitle = job.project?.buildingName || job.title;
       if (employeesForThisDay.length > 0) {
         const employeeNames = employeesForThisDay.map((a: any) => `${a.employee.name} (${a.employee.role?.replace(/_/g, ' ') || 'Staff'})`).join(", ");
-        displayTitle = `${job.project?.buildingName || job.title}\n👥 ${employeeNames}`;
+        displayTitle = `${job.project?.buildingName || job.title}\n${employeeNames}`;
       }
       
       dayEvents.push({
-        id: `${job.id}-${currentDate.toISOString().split('T')[0]}`,
+        id: `${job.id}-${currentDateStr}`,
         title: displayTitle,
-        start: eventStart,
-        end: eventEnd,
+        start: currentDateStr,
+        end: nextDateOnly(currentDateStr),
         allDay: true,
         backgroundColor: color,
         borderColor: color,
         extendedProps: {
           job,
-          employeesForThisDay, // Pass filtered employees for this specific day
+          employeesForThisDay,
         },
       });
-      currentDate.setDate(currentDate.getDate() + 1);
+      currentDateStr = addDaysToDateString(currentDateStr, 1);
     }
     
     return dayEvents;
   });
-
-  // Helper to add one day to a date string without timezone issues
-  const addOneDay = (dateStr: string): string => {
-    const [y, m, d] = dateStr.split('-').map(Number);
-    const dt = new Date(Date.UTC(y, m - 1, d));
-    dt.setUTCDate(dt.getUTCDate() + 1);
-    const y2 = dt.getUTCFullYear();
-    const m2 = String(dt.getUTCMonth() + 1).padStart(2, '0');
-    const d2 = String(dt.getUTCDate()).padStart(2, '0');
-    return `${y2}-${m2}-${d2}`;
-  };
 
   // Add time-off events to the calendar
   // Use date-only strings (YYYY-MM-DD) to avoid timezone shifting
@@ -460,7 +415,7 @@ export default function Schedule() {
     // Use the raw date string from database (YYYY-MM-DD format)
     // FullCalendar treats date-only strings as local dates, avoiding UTC conversion
     const startDate = String(entry.date).split('T')[0]; // Ensure YYYY-MM-DD format
-    const endDate = addOneDay(startDate); // Exclusive end date for allDay events
+    const endDate = nextDateOnly(startDate); // Exclusive end date for allDay events
     
     return {
       id: `timeoff-${entry.id}`,
@@ -588,21 +543,18 @@ export default function Schedule() {
     const job = dropInfo.event.extendedProps.job as ScheduledJobWithAssignments;
     const daysDelta = dropInfo.delta.days;
     
-    // Calculate new start and end dates
-    const oldStart = new Date(job.startDate);
-    const oldEnd = new Date(job.endDate);
+    // Get date-only strings and add the delta using timezone-safe utilities
+    const oldStartStr = String(job.startDate).split('T')[0];
+    const oldEndStr = String(job.endDate).split('T')[0];
     
-    const newStart = new Date(oldStart);
-    newStart.setDate(newStart.getDate() + daysDelta);
-    
-    const newEnd = new Date(oldEnd);
-    newEnd.setDate(newEnd.getDate() + daysDelta);
+    const newStartStr = addDaysToDateString(oldStartStr, daysDelta);
+    const newEndStr = addDaysToDateString(oldEndStr, daysDelta);
     
     // Update the job with new dates
     updateJobDatesMutation.mutate({
       jobId: job.id,
-      startDate: newStart.toISOString().split('T')[0],
-      endDate: newEnd.toISOString().split('T')[0],
+      startDate: newStartStr,
+      endDate: newEndStr,
     });
   };
 
@@ -754,9 +706,9 @@ export default function Schedule() {
       setJobForAssignment(job);
       setSelectedEmployeeForAssignment(employee);
       
-      // Initialize dates with job's full range
-      const jobStartDate = new Date(job.startDate).toISOString().slice(0, 10);
-      const jobEndDate = new Date(job.endDate).toISOString().slice(0, 10);
+      // Initialize dates with job's full range (use timezone-safe extraction)
+      const jobStartDate = String(job.startDate).split('T')[0];
+      const jobEndDate = String(job.endDate).split('T')[0];
       setAssignmentDates({ startDate: jobStartDate, endDate: jobEndDate });
       
       // Open the assignment dialog
@@ -2234,9 +2186,9 @@ function JobDetailDialog({
       return;
     }
     setSelectedEmployee(employee);
-    // Set default dates to job's date range
-    const startDate = new Date(job.startDate).toISOString().slice(0, 10);
-    const endDate = new Date(job.endDate).toISOString().slice(0, 10);
+    // Set default dates to job's date range (timezone-safe extraction)
+    const startDate = String(job.startDate).split('T')[0];
+    const endDate = String(job.endDate).split('T')[0];
     console.log("Setting dates:", startDate, endDate);
     setAssignmentDates({ startDate, endDate });
     console.log("Opening dialog");
@@ -2406,11 +2358,11 @@ function JobDetailDialog({
                             onClick={() => {
                               setSelectedEmployee(assignment.employee);
                               const startDate = assignment.startDate 
-                                ? new Date(assignment.startDate).toISOString().slice(0, 10)
-                                : new Date(job.startDate).toISOString().slice(0, 10);
+                                ? String(assignment.startDate).split('T')[0]
+                                : String(job.startDate).split('T')[0];
                               const endDate = assignment.endDate
-                                ? new Date(assignment.endDate).toISOString().slice(0, 10)
-                                : new Date(job.endDate).toISOString().slice(0, 10);
+                                ? String(assignment.endDate).split('T')[0]
+                                : String(job.endDate).split('T')[0];
                               setAssignmentDates({ startDate, endDate });
                               setAssignDialogOpen(true);
                             }}
@@ -2527,8 +2479,8 @@ function JobDetailDialog({
                 type="date"
                 value={assignmentDates.startDate}
                 onChange={(e) => setAssignmentDates({ ...assignmentDates, startDate: e.target.value })}
-                min={new Date(job.startDate).toISOString().slice(0, 10)}
-                max={new Date(job.endDate).toISOString().slice(0, 10)}
+                min={String(job.startDate).split('T')[0]}
+                max={String(job.endDate).split('T')[0]}
                 data-testid="input-assignment-start-date"
               />
             </div>
@@ -2539,8 +2491,8 @@ function JobDetailDialog({
                 type="date"
                 value={assignmentDates.endDate}
                 onChange={(e) => setAssignmentDates({ ...assignmentDates, endDate: e.target.value })}
-                min={assignmentDates.startDate || new Date(job.startDate).toISOString().slice(0, 10)}
-                max={new Date(job.endDate).toISOString().slice(0, 10)}
+                min={assignmentDates.startDate || String(job.startDate).split('T')[0]}
+                max={String(job.endDate).split('T')[0]}
                 data-testid="input-assignment-end-date"
               />
             </div>
