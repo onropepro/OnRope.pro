@@ -1,4 +1,19 @@
-// Centralized permission checking utilities
+/**
+ * Centralized Permission System
+ * 
+ * This file contains all permission-related utilities organized by category:
+ * - Types & Constants: User interface and role definitions
+ * - Role Helpers: Functions to check user role categories
+ * - Financial Permissions: Access to financial data, payroll, quotes
+ * - Operations Permissions: Employees, scheduling, analytics
+ * - Safety Permissions: Safety documents, CSR, inspections
+ * - Inventory Permissions: Gear and equipment management
+ * - Subscription: Read-only mode based on subscription status
+ */
+
+// ============================================================================
+// TYPES & CONSTANTS
+// ============================================================================
 
 export interface User {
   id: string;
@@ -6,168 +21,230 @@ export interface User {
   permissions?: string[];
   viewFinancialData?: boolean;
   companyId?: string;
-  subscriptionStatus?: string; // For company role: Stripe subscription status
-  companySubscriptionStatus?: string; // For employees: parent company's subscription status
+  subscriptionStatus?: string;
+  companySubscriptionStatus?: string;
 }
 
-// Management roles that have elevated privileges
-export const MANAGEMENT_ROLES = ['company', 'owner_ceo', 'human_resources', 'accounting', 'operations_manager', 'general_supervisor', 'rope_access_supervisor', 'account_manager'];
+/** Management roles with elevated privileges */
+export const MANAGEMENT_ROLES = [
+  'company',
+  'owner_ceo',
+  'human_resources',
+  'accounting',
+  'operations_manager',
+  'general_supervisor',
+  'rope_access_supervisor',
+  'account_manager'
+];
 
-// Worker roles
-export const WORKER_ROLES = ['rope_access_tech', 'manager', 'ground_crew', 'ground_crew_supervisor', 'labourer'];
+/** Worker/field roles */
+export const WORKER_ROLES = [
+  'rope_access_tech',
+  'manager',
+  'ground_crew',
+  'ground_crew_supervisor',
+  'labourer'
+];
 
-// All employee roles (management + workers) that should access the dashboard
+/** All employee roles that should access the dashboard */
 export const EMPLOYEE_ROLES = [...MANAGEMENT_ROLES, ...WORKER_ROLES];
 
-// Check if user has a management role
+/** Supervisor roles for safety and inventory access */
+const SUPERVISOR_ROLES = ['supervisor', 'general_supervisor', 'rope_access_supervisor'];
+
+// ============================================================================
+// BASE HELPERS (Internal)
+// ============================================================================
+
+/** Check if user exists and has company role (full access) */
+function isCompanyOwner(user: User | null | undefined): boolean {
+  return user?.role === 'company';
+}
+
+/** Check if user has a specific permission in their permissions array */
+function checkPermission(user: User | null | undefined, permission: string): boolean {
+  return user?.permissions?.includes(permission) || false;
+}
+
+/** Check if user has one of the specified roles */
+function hasRole(user: User | null | undefined, roles: string[]): boolean {
+  if (!user) return false;
+  return roles.includes(user.role);
+}
+
+// ============================================================================
+// ROLE HELPERS
+// ============================================================================
+
+/** Check if user has a management role */
 export function isManagement(user: User | null | undefined): boolean {
   if (!user) return false;
   return MANAGEMENT_ROLES.includes(user.role);
 }
 
-// Check if user has a worker role
+/** Check if user has a worker role */
 export function isWorker(user: User | null | undefined): boolean {
   if (!user) return false;
   return WORKER_ROLES.includes(user.role);
 }
 
-// Check if user has financial data access
+/** Check if user has a specific permission (company role has all permissions) */
+export function hasPermission(user: User | null | undefined, permission: string): boolean {
+  if (!user) return false;
+  if (isCompanyOwner(user)) return true;
+  return checkPermission(user, permission);
+}
+
+// ============================================================================
+// FINANCIAL PERMISSIONS
+// ============================================================================
+
+/** Check if user has financial data access */
 export function hasFinancialAccess(user: User | null | undefined): boolean {
   if (!user) return false;
-  
-  // Company role always has financial access
-  if (user.role === 'company') return true;
-  
-  // Check explicit permission flag
+  if (isCompanyOwner(user)) return true;
   if (user.viewFinancialData === true) return true;
-  
-  // Check permissions array
-  if (user.permissions?.includes('view_financial_data')) return true;
-  
-  return false;
+  return checkPermission(user, 'view_financial_data');
 }
 
-// Check if user can manage employees
-export function canManageEmployees(user: User | null | undefined): boolean {
-  if (!user) return false;
-  
-  // Company role always has access
-  if (user.role === 'company') return true;
-  
-  // Check granular permissions - role does NOT automatically grant permissions
-  return user.permissions?.includes('view_employees') || false;
-}
-
-// Check if user can view performance analytics
-export function canViewPerformance(user: User | null | undefined): boolean {
-  if (!user) return false;
-  
-  // Company role always has access
-  if (user.role === 'company') return true;
-  
-  // Check granular permissions - role does NOT automatically grant permissions
-  return user.permissions?.includes('view_analytics') || false;
-}
-
-// Check if user can access payroll
+/** Check if user can access payroll (delegates to financial access) */
 export function canAccessPayroll(user: User | null | undefined): boolean {
   return hasFinancialAccess(user);
 }
 
-// Check if user can view/manage job schedule
+// ============================================================================
+// OPERATIONS PERMISSIONS
+// ============================================================================
+
+/** Check if user can manage employees */
+export function canManageEmployees(user: User | null | undefined): boolean {
+  if (!user) return false;
+  if (isCompanyOwner(user)) return true;
+  return checkPermission(user, 'view_employees');
+}
+
+/** Check if user can view performance analytics */
+export function canViewPerformance(user: User | null | undefined): boolean {
+  if (!user) return false;
+  if (isCompanyOwner(user)) return true;
+  return checkPermission(user, 'view_analytics');
+}
+
+/** Check if user can view/manage job schedule */
 export function canViewSchedule(user: User | null | undefined): boolean {
   if (!user) return false;
-  
-  // Company role always has access
-  if (user.role === 'company') return true;
-  
-  // Check granular permissions - role does NOT automatically grant permissions
-  return user.permissions?.includes('view_schedule') || false;
+  if (isCompanyOwner(user)) return true;
+  return checkPermission(user, 'view_schedule');
 }
 
-// Check if user can view safety documents (incident reports, FLHA forms, rope access plans)
+// ============================================================================
+// SAFETY PERMISSIONS
+// ============================================================================
+
+/** 
+ * Check if user can view safety documents (incident reports, FLHA forms, rope access plans)
+ * - Company owners always have access
+ * - Operations managers always have access
+ * - Supervisors always have access
+ * - Other roles need 'view_safety_documents' permission
+ */
 export function canViewSafetyDocuments(user: User | null | undefined): boolean {
   if (!user) return false;
-  
-  // Company role always has access
-  if (user.role === 'company') return true;
-  
-  // Operations managers always have access to safety documents
+  if (isCompanyOwner(user)) return true;
   if (user.role === 'operations_manager') return true;
-  
-  // All supervisor roles always have access to safety documents
-  if (user.role === 'supervisor' || user.role === 'general_supervisor' || user.role === 'rope_access_supervisor') return true;
-  
-  // Check granular permissions - rope_access_tech and other roles need explicit permission
-  return user.permissions?.includes('view_safety_documents') || false;
+  if (hasRole(user, SUPERVISOR_ROLES)) return true;
+  return checkPermission(user, 'view_safety_documents');
 }
 
-// Check if user can view Company Safety Rating (CSR)
-// Only company owners and operations managers can view CSR by default
-// Other roles require explicit 'view_csr' permission
+/**
+ * Check if user can view Company Safety Rating (CSR)
+ * - Company owners always have access
+ * - Operations managers always have access
+ * - Other roles need 'view_csr' permission
+ */
 export function canViewCSR(user: User | null | undefined): boolean {
   if (!user) return false;
-  
-  // Company role always has access
-  if (user.role === 'company') return true;
-  
-  // Operations managers always have access to CSR
+  if (isCompanyOwner(user)) return true;
   if (user.role === 'operations_manager') return true;
-  
-  // Check granular permissions - other roles need explicit permission
-  return user.permissions?.includes('view_csr') || false;
+  return checkPermission(user, 'view_csr');
 }
 
-// Check if user has specific permission
-export function hasPermission(user: User | null | undefined, permission: string): boolean {
-  if (!user) return false;
-  
-  // Company role has all permissions
-  if (user.role === 'company') return true;
-  
-  // Check permissions array - role does NOT automatically grant permissions
-  return user.permissions?.includes(permission) || false;
-}
+// ============================================================================
+// INVENTORY PERMISSIONS
+// ============================================================================
 
-// Check if user can access inventory/gear management
+/**
+ * Check if user can access inventory/gear management
+ * - Company owners always have access
+ * - Operations managers always have access
+ * - Supervisors always have access
+ * - Other roles need 'view_inventory' permission
+ */
 export function canAccessInventory(user: User | null | undefined): boolean {
   if (!user) return false;
-  
-  // Company role always has access
-  if (user.role === 'company') return true;
-  
-  // Operations managers always have access to inventory
+  if (isCompanyOwner(user)) return true;
   if (user.role === 'operations_manager') return true;
-  
-  // Supervisors always have access to inventory
-  if (user.role === 'supervisor' || user.role === 'general_supervisor' || user.role === 'rope_access_supervisor') return true;
-  
-  // Check granular permissions - other roles need explicit permission
-  return user.permissions?.includes('view_inventory') || false;
+  if (hasRole(user, SUPERVISOR_ROLES)) return true;
+  return checkPermission(user, 'view_inventory');
 }
 
-// Check if user is in read-only mode
-// - For company role: check their Stripe subscription status
-// - For employees: check their parent company's subscription status
-// - Residents are NEVER in read-only mode
+// ============================================================================
+// SUBSCRIPTION / READ-ONLY MODE
+// ============================================================================
+
+/**
+ * Check if user is in read-only mode based on subscription status
+ * - Company role: check their Stripe subscription status
+ * - Employees: check their parent company's subscription status
+ * - Residents are NEVER in read-only mode
+ */
 export function isReadOnly(user: User | null | undefined): boolean {
   if (!user) return false;
   
-  // Residents are never in read-only mode
   if (user.role === 'resident') {
     return false;
   }
   
-  // For company role: check their Stripe subscription status
   if (user.role === 'company') {
-    // Allow full access if subscription is active or trialing
-    // If no subscription data exists, assume legacy user with full access
     if (!user.subscriptionStatus) return false;
     return !['active', 'trialing'].includes(user.subscriptionStatus);
   }
   
-  // For employees: check parent company's subscription status
-  // If companySubscriptionStatus is undefined, assume full access
   if (!user.companySubscriptionStatus) return false;
   return !['active', 'trialing'].includes(user.companySubscriptionStatus);
 }
+
+// ============================================================================
+// GROUPED PERMISSION OBJECTS (Alternative API)
+// ============================================================================
+
+/** 
+ * Grouped permission checks for cleaner imports
+ * Usage: permissions.financial.hasAccess(user) 
+ */
+export const permissions = {
+  roles: {
+    isManagement,
+    isWorker,
+    hasPermission,
+  },
+  financial: {
+    hasAccess: hasFinancialAccess,
+    canAccessPayroll,
+  },
+  operations: {
+    canManageEmployees,
+    canViewPerformance,
+    canViewSchedule,
+  },
+  safety: {
+    canViewDocuments: canViewSafetyDocuments,
+    canViewCSR,
+  },
+  inventory: {
+    canAccess: canAccessInventory,
+  },
+  subscription: {
+    isReadOnly,
+  },
+};
