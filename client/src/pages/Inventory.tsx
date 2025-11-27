@@ -68,12 +68,17 @@ export default function Inventory() {
   const [assignEmployeeId, setAssignEmployeeId] = useState<string>("");
   const [assignQuantity, setAssignQuantity] = useState<string>("1");
   const [assignSerialNumber, setAssignSerialNumber] = useState<string>("");
+  const [assignDateOfManufacture, setAssignDateOfManufacture] = useState<string>("");
+  const [assignDateInService, setAssignDateInService] = useState<string>("");
   
   // Team Gear state - for management view of all employee gear
   const [expandedEmployeeId, setExpandedEmployeeId] = useState<string | null>(null);
   const [editingAssignment, setEditingAssignment] = useState<GearAssignment | null>(null);
   const [showEditAssignmentDialog, setShowEditAssignmentDialog] = useState(false);
   const [editAssignmentQuantity, setEditAssignmentQuantity] = useState<string>("1");
+  const [editAssignmentSerialNumber, setEditAssignmentSerialNumber] = useState<string>("");
+  const [editAssignmentDateOfManufacture, setEditAssignmentDateOfManufacture] = useState<string>("");
+  const [editAssignmentDateInService, setEditAssignmentDateInService] = useState<string>("");
 
   // Fetch current user
   const { data: userData } = useQuery<{ user: any }>({
@@ -356,8 +361,13 @@ export default function Inventory() {
 
   // Update gear assignment mutation
   const updateAssignmentMutation = useMutation({
-    mutationFn: async (data: { id: string; quantity: number; serialNumber?: string }) => {
-      return apiRequest("PATCH", `/api/gear-assignments/${data.id}`, { quantity: data.quantity, serialNumber: data.serialNumber });
+    mutationFn: async (data: { id: string; quantity: number; serialNumber?: string; dateOfManufacture?: string; dateInService?: string }) => {
+      return apiRequest("PATCH", `/api/gear-assignments/${data.id}`, { 
+        quantity: data.quantity, 
+        serialNumber: data.serialNumber,
+        dateOfManufacture: data.dateOfManufacture,
+        dateInService: data.dateInService,
+      });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/gear-assignments"] });
@@ -367,6 +377,9 @@ export default function Inventory() {
       });
       setShowEditAssignmentDialog(false);
       setEditingAssignment(null);
+      setEditAssignmentSerialNumber("");
+      setEditAssignmentDateOfManufacture("");
+      setEditAssignmentDateInService("");
     },
     onError: (error: any) => {
       toast({
@@ -519,6 +532,8 @@ export default function Inventory() {
     setAssignEmployeeId(currentUser?.id || "");
     setAssignQuantity("1");
     setAssignSerialNumber("");
+    setAssignDateOfManufacture("");
+    setAssignDateInService("");
     setShowAssignDialog(true);
   };
   
@@ -559,6 +574,9 @@ export default function Inventory() {
       gearItemId: managingItem.id,
       employeeId: assignEmployeeId,
       quantity,
+      serialNumber: assignSerialNumber || undefined,
+      dateOfManufacture: assignDateOfManufacture || undefined,
+      dateInService: assignDateInService || undefined,
     });
   };
 
@@ -1041,6 +1059,20 @@ export default function Inventory() {
                                               S/N: {assignment.serialNumber}
                                             </div>
                                           )}
+                                          {(assignment.dateOfManufacture || assignment.dateInService) && (
+                                            <div className="flex flex-wrap gap-2 mt-1">
+                                              {assignment.dateOfManufacture && (
+                                                <span className="text-xs text-muted-foreground">
+                                                  Mfg: {new Date(assignment.dateOfManufacture).toLocaleDateString()}
+                                                </span>
+                                              )}
+                                              {assignment.dateInService && (
+                                                <span className="text-xs text-muted-foreground">
+                                                  In Service: {new Date(assignment.dateInService).toLocaleDateString()}
+                                                </span>
+                                              )}
+                                            </div>
+                                          )}
                                         </div>
                                       </div>
                                       <div className="flex items-center gap-2">
@@ -1054,6 +1086,9 @@ export default function Inventory() {
                                             e.stopPropagation();
                                             setEditingAssignment(assignment);
                                             setEditAssignmentQuantity(String(assignment.quantity || 1));
+                                            setEditAssignmentSerialNumber(assignment.serialNumber || "");
+                                            setEditAssignmentDateOfManufacture(assignment.dateOfManufacture || "");
+                                            setEditAssignmentDateInService(assignment.dateInService || "");
                                             setShowEditAssignmentDialog(true);
                                           }}
                                           data-testid={`button-edit-assignment-${assignment.id}`}
@@ -2407,6 +2442,28 @@ export default function Inventory() {
                     Enter the serial number of the specific gear item being assigned
                   </div>
                 </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="assign-date-of-manufacture">Date of Manufacture (Optional)</Label>
+                  <Input
+                    id="assign-date-of-manufacture"
+                    type="date"
+                    value={assignDateOfManufacture}
+                    onChange={(e) => setAssignDateOfManufacture(e.target.value)}
+                    data-testid="input-assign-date-of-manufacture"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="assign-date-in-service">Date In Service (Optional)</Label>
+                  <Input
+                    id="assign-date-in-service"
+                    type="date"
+                    value={assignDateInService}
+                    onChange={(e) => setAssignDateInService(e.target.value)}
+                    data-testid="input-assign-date-in-service"
+                  />
+                </div>
               </div>
             </div>
           )}
@@ -2421,6 +2478,8 @@ export default function Inventory() {
                 setAssignEmployeeId("");
                 setAssignQuantity("1");
                 setAssignSerialNumber("");
+                setAssignDateOfManufacture("");
+                setAssignDateInService("");
               }}
               data-testid="button-cancel-assign"
             >
@@ -2446,7 +2505,7 @@ export default function Inventory() {
               Edit Gear Assignment
             </DialogTitle>
             <DialogDescription>
-              Update the quantity for this gear assignment.
+              Update the details for this gear assignment.
             </DialogDescription>
           </DialogHeader>
           
@@ -2480,6 +2539,43 @@ export default function Inventory() {
                   data-testid="input-edit-assignment-quantity"
                 />
               </div>
+
+              {/* Serial Number */}
+              <div className="space-y-2">
+                <Label htmlFor="editSerialNumber">Serial Number (Optional)</Label>
+                <Input
+                  id="editSerialNumber"
+                  type="text"
+                  value={editAssignmentSerialNumber}
+                  onChange={(e) => setEditAssignmentSerialNumber(e.target.value)}
+                  placeholder="Enter serial number"
+                  data-testid="input-edit-assignment-serial-number"
+                />
+              </div>
+
+              {/* Date of Manufacture */}
+              <div className="space-y-2">
+                <Label htmlFor="editDateOfManufacture">Date of Manufacture (Optional)</Label>
+                <Input
+                  id="editDateOfManufacture"
+                  type="date"
+                  value={editAssignmentDateOfManufacture}
+                  onChange={(e) => setEditAssignmentDateOfManufacture(e.target.value)}
+                  data-testid="input-edit-assignment-date-of-manufacture"
+                />
+              </div>
+
+              {/* Date In Service */}
+              <div className="space-y-2">
+                <Label htmlFor="editDateInService">Date In Service (Optional)</Label>
+                <Input
+                  id="editDateInService"
+                  type="date"
+                  value={editAssignmentDateInService}
+                  onChange={(e) => setEditAssignmentDateInService(e.target.value)}
+                  data-testid="input-edit-assignment-date-in-service"
+                />
+              </div>
             </div>
           )}
 
@@ -2489,6 +2585,9 @@ export default function Inventory() {
               onClick={() => {
                 setShowEditAssignmentDialog(false);
                 setEditingAssignment(null);
+                setEditAssignmentSerialNumber("");
+                setEditAssignmentDateOfManufacture("");
+                setEditAssignmentDateInService("");
               }}
               data-testid="button-cancel-edit-assignment"
             >
@@ -2500,6 +2599,9 @@ export default function Inventory() {
                   updateAssignmentMutation.mutate({
                     id: editingAssignment.id,
                     quantity: parseInt(editAssignmentQuantity) || 1,
+                    serialNumber: editAssignmentSerialNumber || undefined,
+                    dateOfManufacture: editAssignmentDateOfManufacture || undefined,
+                    dateInService: editAssignmentDateInService || undefined,
                   });
                 }
               }}

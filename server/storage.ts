@@ -1041,8 +1041,29 @@ export class Storage {
   }
 
   // Gear assignment operations
-  async createGearAssignment(assignment: { gearItemId: string; companyId: string; employeeId: string; quantity: number; serialNumber?: string }): Promise<any> {
+  async createGearAssignment(assignment: { 
+    gearItemId: string; 
+    companyId: string; 
+    employeeId: string; 
+    quantity: number; 
+    serialNumber?: string;
+    dateOfManufacture?: string;
+    dateInService?: string;
+  }): Promise<any> {
     const result = await db.insert(gearAssignments).values(assignment).returning();
+    return result[0];
+  }
+  
+  async updateGearAssignment(id: string, updates: { 
+    quantity?: number; 
+    serialNumber?: string;
+    dateOfManufacture?: string;
+    dateInService?: string;
+  }): Promise<any> {
+    const result = await db.update(gearAssignments)
+      .set({ ...updates, updatedAt: new Date() })
+      .where(eq(gearAssignments.id, id))
+      .returning();
     return result[0];
   }
 

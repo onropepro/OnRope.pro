@@ -6292,6 +6292,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         employeeId: req.body.employeeId,
         quantity: parseInt(req.body.quantity),
         serialNumber: req.body.serialNumber || undefined,
+        dateOfManufacture: req.body.dateOfManufacture || undefined,
+        dateInService: req.body.dateInService || undefined,
       });
       
       console.log("Assignment created successfully:", assignment);
@@ -6383,6 +6385,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const updates: Partial<InsertGearAssignment> = {};
       if (req.body.employeeId !== undefined) updates.employeeId = req.body.employeeId;
       if (req.body.quantity !== undefined) updates.quantity = req.body.quantity;
+      if (req.body.serialNumber !== undefined) updates.serialNumber = req.body.serialNumber;
+      if (req.body.dateOfManufacture !== undefined) updates.dateOfManufacture = req.body.dateOfManufacture || null;
+      if (req.body.dateInService !== undefined) updates.dateInService = req.body.dateInService || null;
       
       const [assignment] = await db.update(gearAssignments)
         .set({ ...updates, updatedAt: new Date() })

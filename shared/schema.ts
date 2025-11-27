@@ -344,6 +344,8 @@ export const gearAssignments = pgTable("gear_assignments", {
   employeeId: varchar("employee_id").notNull().references(() => users.id, { onDelete: "cascade" }), // Employee who has this gear
   quantity: integer("quantity").notNull(), // How many of this item they have
   serialNumber: text("serial_number"), // Serial number of the assigned gear
+  dateOfManufacture: date("date_of_manufacture"), // Date of manufacture for this specific assigned item
+  dateInService: date("date_in_service"), // Date the assigned item was put in service
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 }, (table) => [
