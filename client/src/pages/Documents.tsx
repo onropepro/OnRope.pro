@@ -2062,8 +2062,14 @@ export default function Documents() {
           const hasHealthSafety = healthSafetyDocs.length > 0;
           const hasPolicy = policyDocs.length > 0;
           const hasInsurance = insuranceDocs.length > 0;
-          const docsCount = (hasHealthSafety ? 1 : 0) + (hasPolicy ? 1 : 0) + (hasInsurance ? 1 : 0);
-          const ratingPercent = docsCount === 3 ? 100 : docsCount === 2 ? 67 : docsCount === 1 ? 33 : 0;
+          
+          // For employees without permission, only count Health & Safety and Company Policy (2 docs max)
+          // For company owners/ops managers, count all 3 documents
+          const totalDocsRequired = canUploadDocuments ? 3 : 2;
+          const docsCount = canUploadDocuments 
+            ? (hasHealthSafety ? 1 : 0) + (hasPolicy ? 1 : 0) + (hasInsurance ? 1 : 0)
+            : (hasHealthSafety ? 1 : 0) + (hasPolicy ? 1 : 0);
+          const ratingPercent = totalDocsRequired > 0 ? Math.round((docsCount / totalDocsRequired) * 100) : 0;
           
           return (
             <Card className="mb-6 overflow-hidden">
@@ -2104,7 +2110,7 @@ export default function Documents() {
                     }`}>
                       {ratingPercent}%
                     </div>
-                    <div className="text-sm text-muted-foreground">{docsCount}/3 documents</div>
+                    <div className="text-sm text-muted-foreground">{docsCount}/{totalDocsRequired} documents</div>
                   </div>
                 </div>
               </CardHeader>
@@ -2142,22 +2148,24 @@ export default function Documents() {
                     )}
                     Company Policy
                   </div>
-                  <div className={`flex items-center gap-2 px-3 py-1.5 rounded-md text-sm ${
-                    hasInsurance 
-                      ? 'bg-emerald-500/10 text-emerald-700 dark:text-emerald-300' 
-                      : 'bg-muted text-muted-foreground'
-                  }`}>
-                    {hasInsurance ? (
-                      <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                      </svg>
-                    ) : (
-                      <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                      </svg>
-                    )}
-                    Certificate of Insurance
-                  </div>
+                  {canUploadDocuments && (
+                    <div className={`flex items-center gap-2 px-3 py-1.5 rounded-md text-sm ${
+                      hasInsurance 
+                        ? 'bg-emerald-500/10 text-emerald-700 dark:text-emerald-300' 
+                        : 'bg-muted text-muted-foreground'
+                    }`}>
+                      {hasInsurance ? (
+                        <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                        </svg>
+                      ) : (
+                        <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                      )}
+                      Certificate of Insurance
+                    </div>
+                  )}
                 </div>
                 <Progress 
                   value={ratingPercent} 
@@ -2176,7 +2184,7 @@ export default function Documents() {
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <div className="overflow-x-auto -mx-4 px-4 md:mx-0 md:px-0 mb-6">
-            <TabsList className="grid w-full min-w-[480px] md:min-w-0 grid-cols-4 max-w-2xl gap-1">
+            <TabsList className={`grid w-full min-w-[480px] md:min-w-0 ${canUploadDocuments ? 'grid-cols-4' : 'grid-cols-3'} max-w-2xl gap-1`}>
               <TabsTrigger value="health-safety" data-testid="tab-health-safety" className="text-xs md:text-sm px-2 md:px-4">
                 <span className="hidden md:inline">Health & Safety</span>
                 <span className="md:hidden">H&S</span>
@@ -2185,10 +2193,12 @@ export default function Documents() {
                 <span className="hidden md:inline">Company Policy</span>
                 <span className="md:hidden">Policy</span>
               </TabsTrigger>
-              <TabsTrigger value="insurance" data-testid="tab-insurance" className="text-xs md:text-sm px-2 md:px-4">
-                <span className="hidden md:inline">Insurance</span>
-                <span className="md:hidden">Insurance</span>
-              </TabsTrigger>
+              {canUploadDocuments && (
+                <TabsTrigger value="insurance" data-testid="tab-insurance" className="text-xs md:text-sm px-2 md:px-4">
+                  <span className="hidden md:inline">Insurance</span>
+                  <span className="md:hidden">Insurance</span>
+                </TabsTrigger>
+              )}
               <TabsTrigger value="inspections-safety" data-testid="tab-inspections-safety" className="text-xs md:text-sm px-2 md:px-4">
                 <span className="hidden md:inline">Inspections</span>
                 <span className="md:hidden">Inspect</span>
@@ -2390,102 +2400,100 @@ export default function Documents() {
         </Card>
           </TabsContent>
 
-          {/* Certificate of Insurance Tab */}
-          <TabsContent value="insurance">
-        <Card className="mb-6 overflow-hidden">
-          <CardHeader className="bg-gradient-to-br from-teal-500/10 via-teal-500/5 to-transparent pb-4">
-            <div className="flex items-start gap-4">
-              <div className="p-3 bg-teal-500/10 rounded-xl ring-1 ring-teal-500/20">
-                <FileCheck className="h-6 w-6 text-teal-600 dark:text-teal-400" />
-              </div>
-              <div className="flex-1">
-                <CardTitle className="text-xl mb-1">Certificate of Insurance</CardTitle>
-                <p className="text-sm text-muted-foreground">Proof of liability insurance coverage</p>
-              </div>
-              <Badge variant="secondary" className="text-base font-semibold px-3">
-                {insuranceDocs.length}
-              </Badge>
-            </div>
-          </CardHeader>
-          <CardContent className="pt-6">
-            {canUploadDocuments && (
-              <div className="mb-6 p-5 border-2 border-dashed rounded-xl bg-muted/30 hover-elevate">
-                <label htmlFor="insurance-upload" className="block mb-3 text-sm font-semibold flex items-center gap-2">
-                  <Upload className="h-4 w-4" />
-                  Upload Certificate of Insurance
-                </label>
-                <Input
-                  id="insurance-upload"
-                  type="file"
-                  accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
-                  disabled={uploadingInsurance}
-                  onChange={(e) => {
-                    const file = e.target.files?.[0];
-                    if (file) {
-                      handleDocumentUpload(file, 'certificate_of_insurance');
-                      e.target.value = '';
-                    }
-                  }}
-                  data-testid="input-insurance-upload"
-                />
-                {uploadingInsurance && (
-                  <p className="text-sm text-muted-foreground mt-2 flex items-center gap-2">
-                    <span className="inline-block h-4 w-4 border-2 border-primary border-t-transparent rounded-full animate-spin"></span>
-                    Uploading...
-                  </p>
-                )}
-              </div>
-            )}
-            
-            {insuranceDocs.length > 0 ? (
-              <div className="space-y-3">
-                {insuranceDocs.map((doc: any) => (
-                  <div key={doc.id} className="flex items-center gap-4 p-4 rounded-xl border bg-card hover-elevate active-elevate-2">
-                    <div className="p-2 bg-teal-500/10 rounded-lg">
-                      <FileCheck className="h-5 w-5 text-teal-600 dark:text-teal-400 flex-shrink-0" />
+          {/* Certificate of Insurance Tab - Only visible to company owners and operations managers */}
+          {canUploadDocuments && (
+            <TabsContent value="insurance">
+              <Card className="mb-6 overflow-hidden">
+                <CardHeader className="bg-gradient-to-br from-teal-500/10 via-teal-500/5 to-transparent pb-4">
+                  <div className="flex items-start gap-4">
+                    <div className="p-3 bg-teal-500/10 rounded-xl ring-1 ring-teal-500/20">
+                      <FileCheck className="h-6 w-6 text-teal-600 dark:text-teal-400" />
                     </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="font-semibold truncate">{doc.fileName}</div>
-                      <div className="text-sm text-muted-foreground">
-                        Uploaded by {doc.uploadedByName} • {new Date(doc.createdAt).toLocaleDateString()}
-                      </div>
+                    <div className="flex-1">
+                      <CardTitle className="text-xl mb-1">Certificate of Insurance</CardTitle>
+                      <p className="text-sm text-muted-foreground">Proof of liability insurance coverage</p>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => window.open(doc.fileUrl, '_blank')}
-                        data-testid={`download-insurance-${doc.id}`}
-                      >
-                        <Download className="h-4 w-4 mr-1" />
-                        View
-                      </Button>
-                      {canUploadDocuments && (
-                        <Button
-                          size="sm"
-                          variant="ghost"
-                          onClick={() => deleteDocumentMutation.mutate(doc.id)}
-                          data-testid={`delete-insurance-${doc.id}`}
-                        >
-                          <Trash2 className="h-4 w-4 text-destructive" />
-                        </Button>
-                      )}
-                    </div>
+                    <Badge variant="secondary" className="text-base font-semibold px-3">
+                      {insuranceDocs.length}
+                    </Badge>
                   </div>
-                ))}
-              </div>
-            ) : (
-              <div className="text-center py-12">
-                <div className="inline-flex p-4 bg-teal-500/5 rounded-full mb-4">
-                  <FileCheck className="h-8 w-8 text-teal-500/50" />
-                </div>
-                <p className="text-muted-foreground font-medium">No Certificate of Insurance uploaded yet</p>
-                <p className="text-sm text-muted-foreground mt-1">Upload your insurance certificate to demonstrate coverage</p>
-              </div>
-            )}
-          </CardContent>
-        </Card>
-          </TabsContent>
+                </CardHeader>
+                <CardContent className="pt-6">
+                  <div className="mb-6 p-5 border-2 border-dashed rounded-xl bg-muted/30 hover-elevate">
+                    <label htmlFor="insurance-upload" className="block mb-3 text-sm font-semibold flex items-center gap-2">
+                      <Upload className="h-4 w-4" />
+                      Upload Certificate of Insurance
+                    </label>
+                    <Input
+                      id="insurance-upload"
+                      type="file"
+                      accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
+                      disabled={uploadingInsurance}
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) {
+                          handleDocumentUpload(file, 'certificate_of_insurance');
+                          e.target.value = '';
+                        }
+                      }}
+                      data-testid="input-insurance-upload"
+                    />
+                    {uploadingInsurance && (
+                      <p className="text-sm text-muted-foreground mt-2 flex items-center gap-2">
+                        <span className="inline-block h-4 w-4 border-2 border-primary border-t-transparent rounded-full animate-spin"></span>
+                        Uploading...
+                      </p>
+                    )}
+                  </div>
+                  
+                  {insuranceDocs.length > 0 ? (
+                    <div className="space-y-3">
+                      {insuranceDocs.map((doc: any) => (
+                        <div key={doc.id} className="flex items-center gap-4 p-4 rounded-xl border bg-card hover-elevate active-elevate-2">
+                          <div className="p-2 bg-teal-500/10 rounded-lg">
+                            <FileCheck className="h-5 w-5 text-teal-600 dark:text-teal-400 flex-shrink-0" />
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <div className="font-semibold truncate">{doc.fileName}</div>
+                            <div className="text-sm text-muted-foreground">
+                              Uploaded by {doc.uploadedByName} • {new Date(doc.createdAt).toLocaleDateString()}
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => window.open(doc.fileUrl, '_blank')}
+                              data-testid={`download-insurance-${doc.id}`}
+                            >
+                              <Download className="h-4 w-4 mr-1" />
+                              View
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              onClick={() => deleteDocumentMutation.mutate(doc.id)}
+                              data-testid={`delete-insurance-${doc.id}`}
+                            >
+                              <Trash2 className="h-4 w-4 text-destructive" />
+                            </Button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="text-center py-12">
+                      <div className="inline-flex p-4 bg-teal-500/5 rounded-full mb-4">
+                        <FileCheck className="h-8 w-8 text-teal-500/50" />
+                      </div>
+                      <p className="text-muted-foreground font-medium">No Certificate of Insurance uploaded yet</p>
+                      <p className="text-sm text-muted-foreground mt-1">Upload your insurance certificate to demonstrate coverage</p>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            </TabsContent>
+          )}
 
           {/* Inspections & Safety Tab */}
           <TabsContent value="inspections-safety">
