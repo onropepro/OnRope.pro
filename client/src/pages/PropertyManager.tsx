@@ -897,6 +897,9 @@ export default function PropertyManager() {
                       <div className="font-mono text-sm bg-muted px-3 py-2 rounded-md mt-1" data-testid="text-vendor-detail-resident-code">
                         {selectedVendor.residentCode}
                       </div>
+                      <p className="text-[10px] text-muted-foreground mt-1">
+                        Share this code with building residents so they can access the resident portal to view project updates and submit complaints.
+                      </p>
                     </div>
                   )}
                   {selectedVendor.propertyManagerCode && (
