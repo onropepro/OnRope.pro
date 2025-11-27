@@ -814,11 +814,6 @@ export default function Inventory() {
                                 </div>
                               )}
                             </div>
-                            <div className="text-right">
-                              <div className="font-semibold text-lg">
-                                {item.quantity} {item.quantity === 1 ? 'item' : 'items'}
-                              </div>
-                            </div>
                           </div>
 
                           {/* Details Grid */}

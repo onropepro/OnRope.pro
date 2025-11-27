@@ -27,11 +27,11 @@ const EQUIPMENT_ICONS: Record<string, string> = {
 export default function MyGear() {
   const [, setLocation] = useLocation();
 
-  const { data: userData } = useQuery({
+  const { data: userData } = useQuery<{ user: any }>({
     queryKey: ["/api/user"],
   });
 
-  const { data: gearData, isLoading } = useQuery({
+  const { data: gearData, isLoading } = useQuery<{ items: any[] }>({
     queryKey: ["/api/gear-items"],
   });
 
