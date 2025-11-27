@@ -6582,11 +6582,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const projects = await storage.getProjectsByCompany(companyId);
       const meetings = await storage.getToolboxMeetingsByCompany(companyId);
       
+      console.log("PM CSR Debug - Projects found:", projects.length, projects.map(p => ({ id: p.id, status: p.status })));
+      console.log("PM CSR Debug - Meetings found:", meetings.length, meetings.map((m: any) => ({ projectId: m.projectId, date: m.meetingDate })));
+      
       const allWorkSessions: any[] = [];
       for (const project of projects) {
         const projectSessions = await storage.getWorkSessionsByProject(project.id, companyId);
         allWorkSessions.push(...projectSessions);
       }
+      
+      console.log("PM CSR Debug - Work sessions found:", allWorkSessions.length, allWorkSessions.map((s: any) => ({ projectId: s.projectId, date: s.workDate })));
       
       const workSessionDays = new Set<string>();
       allWorkSessions.forEach((session: any) => {
@@ -6607,6 +6612,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       });
       
+      console.log("PM CSR Debug - Work session days:", Array.from(workSessionDays));
+      console.log("PM CSR Debug - Toolbox meeting days:", Array.from(toolboxMeetingDays));
+      console.log("PM CSR Debug - Other meeting dates:", Array.from(otherMeetingDates));
+      
       let toolboxDaysWithMeeting = 0;
       let toolboxTotalDays = 0;
       workSessionDays.forEach((dayKey) => {
@@ -6616,6 +6625,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
           toolboxDaysWithMeeting++;
         }
       });
+      
+      console.log("PM CSR Debug - Result:", { toolboxTotalDays, toolboxDaysWithMeeting });
       
       const toolboxMeetingRating = toolboxTotalDays > 0 
         ? Math.round((toolboxDaysWithMeeting / toolboxTotalDays) * 100) 
