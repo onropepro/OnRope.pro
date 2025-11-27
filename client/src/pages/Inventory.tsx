@@ -17,7 +17,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { insertGearItemSchema, type InsertGearItem, type GearItem, type GearAssignment, type GearSerialNumber } from "@shared/schema";
 import { ArrowLeft, Plus, Pencil, X, Trash2, Shield, Cable, Link2, Gauge, TrendingUp, HardHat, Hand, Fuel, Scissors, PaintBucket, Droplets, CircleDot, Lock, Anchor, MoreHorizontal, Users } from "lucide-react";
 import { Label } from "@/components/ui/label";
-import { hasFinancialAccess } from "@/lib/permissions";
+import { hasFinancialAccess, isManagement } from "@/lib/permissions";
 import HarnessInspectionForm from "./HarnessInspectionForm";
 import { format } from "date-fns";
 
@@ -459,11 +459,15 @@ export default function Inventory() {
 
   const openAssignDialog = (item: GearItem) => {
     setManagingItem(item);
-    setAssignEmployeeId("");
+    // Auto-fill with current user's ID - employees can only assign to themselves by default
+    setAssignEmployeeId(currentUser?.id || "");
     setAssignQuantity("1");
     setAssignSerialNumber("");
     setShowAssignDialog(true);
   };
+  
+  // Check if user can assign gear to other employees (management only)
+  const canAssignToOthers = isManagement(currentUser);
 
   const handleAssignGear = () => {
     if (!managingItem || !assignEmployeeId) {
@@ -2138,20 +2142,32 @@ export default function Inventory() {
                 
                 <div className="space-y-2">
                   <Label htmlFor="assign-employee">Employee</Label>
-                  <Select value={assignEmployeeId} onValueChange={setAssignEmployeeId}>
-                    <SelectTrigger data-testid="select-assign-employee">
-                      <SelectValue placeholder="Select employee" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {activeEmployees
-                        .filter((emp: any) => emp.name && emp.name.trim() !== "")
-                        .map((emp: any) => (
-                          <SelectItem key={emp.id} value={emp.id}>
-                            {emp.name}
-                          </SelectItem>
-                        ))}
-                    </SelectContent>
-                  </Select>
+                  {canAssignToOthers ? (
+                    <Select value={assignEmployeeId} onValueChange={setAssignEmployeeId}>
+                      <SelectTrigger data-testid="select-assign-employee">
+                        <SelectValue placeholder="Select employee" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {activeEmployees
+                          .filter((emp: any) => emp.name && emp.name.trim() !== "")
+                          .map((emp: any) => (
+                            <SelectItem key={emp.id} value={emp.id}>
+                              {emp.name}
+                            </SelectItem>
+                          ))}
+                      </SelectContent>
+                    </Select>
+                  ) : (
+                    <div className="flex items-center gap-2 p-2 bg-muted/50 rounded-md border">
+                      <span className="text-sm font-medium">{currentUser?.name || currentUser?.email || "You"}</span>
+                      <Badge variant="secondary" className="text-xs">Yourself</Badge>
+                    </div>
+                  )}
+                  {!canAssignToOthers && (
+                    <p className="text-xs text-muted-foreground">
+                      You can only assign gear to yourself. Contact management to assign gear to other employees.
+                    </p>
+                  )}
                 </div>
 
                 <div className="space-y-2">
