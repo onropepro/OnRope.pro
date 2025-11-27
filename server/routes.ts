@@ -2459,6 +2459,78 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // SuperUser: Gift add-ons to an existing company
+  app.post("/api/superuser/companies/:id/gift-addons", requireAuth, async (req: Request, res: Response) => {
+    try {
+      // Only allow superuser to access this endpoint
+      if (req.session.userId !== 'superuser') {
+        return res.status(403).json({ message: "Access denied. SuperUser only." });
+      }
+
+      const companyId = req.params.id;
+      const { extraSeats, extraProjects, whiteLabel } = req.body;
+
+      console.log('[Gift-Addons] Gifting add-ons to company:', { companyId, extraSeats, extraProjects, whiteLabel });
+
+      // Fetch the company
+      const company = await storage.getUserById(companyId);
+      if (!company || company.role !== 'company') {
+        return res.status(404).json({ message: "Company not found" });
+      }
+
+      // Build update object
+      const updates: any = {};
+      
+      if (typeof extraSeats === 'number' && extraSeats >= 0) {
+        // Each seat add-on is 2 seats
+        updates.additionalSeatsCount = (company.additionalSeatsCount || 0) + (extraSeats * 2);
+      }
+      
+      if (typeof extraProjects === 'number' && extraProjects >= 0) {
+        updates.additionalProjectsCount = (company.additionalProjectsCount || 0) + extraProjects;
+      }
+      
+      if (whiteLabel === true) {
+        updates.whitelabelBrandingActive = true;
+      }
+
+      // Check if there's anything to update
+      if (Object.keys(updates).length === 0) {
+        return res.status(400).json({ message: "No add-ons specified to gift" });
+      }
+
+      // Update the company
+      await db.update(users)
+        .set(updates)
+        .where(eq(users.id, companyId));
+
+      // Fetch updated company
+      const updatedCompany = await storage.getUserById(companyId);
+
+      console.log('[Gift-Addons] Add-ons gifted successfully:', updates);
+
+      res.json({
+        success: true,
+        message: "Add-ons gifted successfully",
+        company: {
+          id: updatedCompany?.id,
+          companyName: updatedCompany?.companyName,
+          additionalSeatsCount: updatedCompany?.additionalSeatsCount,
+          additionalProjectsCount: updatedCompany?.additionalProjectsCount,
+          whitelabelBrandingActive: updatedCompany?.whitelabelBrandingActive,
+        },
+        gifted: {
+          seats: extraSeats ? extraSeats * 2 : 0,
+          projects: extraProjects || 0,
+          whiteLabel: whiteLabel || false,
+        },
+      });
+    } catch (error: any) {
+      console.error('[Gift-Addons] Error:', error);
+      res.status(500).json({ message: error.message || "Failed to gift add-ons" });
+    }
+  });
+
   // Update user profile
   app.patch("/api/user/profile", requireAuth, async (req: Request, res: Response) => {
     try {

@@ -1,14 +1,35 @@
-import { useQuery } from "@tanstack/react-query";
+import { useState } from "react";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import { useLocation, useRoute, Link } from "wouter";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { Checkbox } from "@/components/ui/checkbox";
+import { queryClient, apiRequest } from "@/lib/queryClient";
+import { useToast } from "@/hooks/use-toast";
+
+interface GiftAddonsForm {
+  extraSeats: number;
+  extraProjects: number;
+  whiteLabel: boolean;
+}
 
 export default function CompanyDetail() {
   const [, params] = useRoute("/superuser/companies/:id");
   const [, setLocation] = useLocation();
+  const { toast } = useToast();
   const companyId = params?.id;
+  
+  const [giftAddonsDialogOpen, setGiftAddonsDialogOpen] = useState(false);
+  const [addonsForm, setAddonsForm] = useState<GiftAddonsForm>({
+    extraSeats: 0,
+    extraProjects: 0,
+    whiteLabel: false,
+  });
 
   const { data: userData } = useQuery<{ user: any }>({
     queryKey: ["/api/user"],
@@ -25,7 +46,32 @@ export default function CompanyDetail() {
     enabled: !!companyId,
   });
 
-  // Redirect if not superuser
+  const giftAddonsMutation = useMutation({
+    mutationFn: async (data: GiftAddonsForm) => {
+      const response = await apiRequest('POST', `/api/superuser/companies/${companyId}/gift-addons`, data);
+      return await response.json();
+    },
+    onSuccess: (data) => {
+      toast({
+        title: "Add-ons Gifted",
+        description: data.message,
+      });
+      // Reset form and close dialog
+      setAddonsForm({ extraSeats: 0, extraProjects: 0, whiteLabel: false });
+      setGiftAddonsDialogOpen(false);
+      // Refresh company data
+      queryClient.invalidateQueries({ queryKey: ['/api/superuser/companies', companyId] });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to gift add-ons",
+        variant: "destructive",
+      });
+    },
+  });
+
+  // ProtectedRoute handles auth - but we still need to prevent render before data loads
   if (userData?.user?.role !== 'superuser') {
     setLocation('/');
     return null;
