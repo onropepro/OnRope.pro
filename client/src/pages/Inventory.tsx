@@ -68,6 +68,12 @@ export default function Inventory() {
   const [assignEmployeeId, setAssignEmployeeId] = useState<string>("");
   const [assignQuantity, setAssignQuantity] = useState<string>("1");
   const [assignSerialNumber, setAssignSerialNumber] = useState<string>("");
+  
+  // Team Gear state - for management view of all employee gear
+  const [expandedEmployeeId, setExpandedEmployeeId] = useState<string | null>(null);
+  const [editingAssignment, setEditingAssignment] = useState<GearAssignment | null>(null);
+  const [showEditAssignmentDialog, setShowEditAssignmentDialog] = useState(false);
+  const [editAssignmentQuantity, setEditAssignmentQuantity] = useState<string>("1");
 
   // Fetch current user
   const { data: userData } = useQuery<{ user: any }>({
@@ -316,6 +322,29 @@ export default function Inventory() {
       toast({
         title: "Error",
         description: error.message || "Failed to remove assignment",
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Update gear assignment mutation
+  const updateAssignmentMutation = useMutation({
+    mutationFn: async (data: { id: string; quantity: number; serialNumber?: string }) => {
+      return apiRequest("PATCH", `/api/gear-assignments/${data.id}`, { quantity: data.quantity, serialNumber: data.serialNumber });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/gear-assignments"] });
+      toast({
+        title: "Assignment Updated",
+        description: "Gear assignment has been updated.",
+      });
+      setShowEditAssignmentDialog(false);
+      setEditingAssignment(null);
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to update assignment",
         variant: "destructive",
       });
     },
@@ -734,8 +763,14 @@ export default function Inventory() {
 
       <div className="p-4 max-w-4xl mx-auto">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-4 mb-4">
+          <TabsList className={`grid w-full mb-4 ${isManagement(currentUser) ? 'grid-cols-5' : 'grid-cols-4'}`}>
             <TabsTrigger value="my-gear" data-testid="tab-my-gear">My Gear</TabsTrigger>
+            {isManagement(currentUser) && (
+              <TabsTrigger value="team-gear" data-testid="tab-team-gear">
+                <Users className="h-4 w-4 mr-1" />
+                Team Gear
+              </TabsTrigger>
+            )}
             <TabsTrigger value="manage" data-testid="tab-manage-gear">Manage Gear</TabsTrigger>
             <TabsTrigger value="inspections" data-testid="tab-inspections">Inspections</TabsTrigger>
             <TabsTrigger value="daily-harness" data-testid="tab-daily-harness">
@@ -872,6 +907,176 @@ export default function Inventory() {
               </div>
             )}
           </TabsContent>
+
+          {/* Team Gear Tab - Management only */}
+          {isManagement(currentUser) && (
+            <TabsContent value="team-gear" className="space-y-4">
+              <Card className="bg-primary/5 border-primary/20">
+                <CardContent className="p-4">
+                  <div className="flex items-center gap-3">
+                    <span className="material-icons text-primary text-2xl">groups</span>
+                    <div>
+                      <div className="font-semibold">Team Equipment Overview</div>
+                      <p className="text-sm text-muted-foreground">
+                        View and manage gear assigned to all employees
+                      </p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Employee List with Gear */}
+              {activeEmployees.length === 0 ? (
+                <Card>
+                  <CardContent className="py-12 text-center">
+                    <div className="flex flex-col items-center gap-3">
+                      <span className="material-icons text-5xl text-muted-foreground">people</span>
+                      <div>
+                        <div className="font-semibold text-lg">No Employees</div>
+                        <p className="text-sm text-muted-foreground mt-1">
+                          No employees found to display gear assignments.
+                        </p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              ) : (
+                <div className="space-y-3">
+                  {activeEmployees.map((employee: any) => {
+                    const employeeAssignments = (assignmentsData?.assignments || []).filter((a: GearAssignment) => a.employeeId === employee.id);
+                    const isExpanded = expandedEmployeeId === employee.id;
+                    const totalAssignedItems = employeeAssignments.reduce((sum: number, a: GearAssignment) => sum + (a.quantity || 1), 0);
+                    
+                    return (
+                      <Card key={employee.id} className="overflow-hidden">
+                        <CardContent className="p-0">
+                          {/* Employee Header - Clickable to expand */}
+                          <div
+                            className="p-4 flex items-center justify-between cursor-pointer hover-elevate"
+                            onClick={() => setExpandedEmployeeId(isExpanded ? null : employee.id)}
+                            data-testid={`employee-row-${employee.id}`}
+                          >
+                            <div className="flex items-center gap-3">
+                              <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center">
+                                <span className="material-icons text-primary">person</span>
+                              </div>
+                              <div>
+                                <div className="font-semibold">{employee.name}</div>
+                                <div className="text-sm text-muted-foreground">{employee.role || 'Employee'}</div>
+                              </div>
+                            </div>
+                            <div className="flex items-center gap-3">
+                              <Badge variant={employeeAssignments.length > 0 ? "default" : "secondary"}>
+                                {totalAssignedItems} {totalAssignedItems === 1 ? 'item' : 'items'}
+                              </Badge>
+                              <span className={`material-icons transition-transform ${isExpanded ? 'rotate-180' : ''}`}>
+                                expand_more
+                              </span>
+                            </div>
+                          </div>
+
+                          {/* Expanded Gear List */}
+                          {isExpanded && (
+                            <div className="border-t bg-muted/30 p-4 space-y-3">
+                              {employeeAssignments.length === 0 ? (
+                                <div className="text-center py-4 text-muted-foreground">
+                                  <span className="material-icons text-3xl mb-2">inventory_2</span>
+                                  <p className="text-sm">No gear assigned to this employee</p>
+                                </div>
+                              ) : (
+                                employeeAssignments.map((assignment: GearAssignment) => {
+                                  const gearItem = allGearItems.find(g => g.id === assignment.gearItemId);
+                                  if (!gearItem) return null;
+                                  
+                                  return (
+                                    <div
+                                      key={assignment.id}
+                                      className="flex items-center justify-between p-3 bg-background rounded-lg border"
+                                    >
+                                      <div className="flex items-center gap-3">
+                                        <div className="h-8 w-8 rounded-md bg-primary/10 flex items-center justify-center">
+                                          <span className="material-icons text-primary text-sm">
+                                            {gearItem.equipmentType === 'Harness' ? 'security' :
+                                             gearItem.equipmentType === 'Rope' ? 'architecture' :
+                                             gearItem.equipmentType === 'Helmet' ? 'sports_mma' :
+                                             'category'}
+                                          </span>
+                                        </div>
+                                        <div>
+                                          <div className="font-medium text-sm">{gearItem.equipmentType}</div>
+                                          {(gearItem.brand || gearItem.model) && (
+                                            <div className="text-xs text-muted-foreground">
+                                              {[gearItem.brand, gearItem.model].filter(Boolean).join(' - ')}
+                                            </div>
+                                          )}
+                                          {assignment.serialNumber && (
+                                            <div className="text-xs text-muted-foreground font-mono mt-1">
+                                              S/N: {assignment.serialNumber}
+                                            </div>
+                                          )}
+                                        </div>
+                                      </div>
+                                      <div className="flex items-center gap-2">
+                                        <Badge variant="secondary" className="text-xs">
+                                          Qty: {assignment.quantity || 1}
+                                        </Badge>
+                                        <Button
+                                          size="icon"
+                                          variant="ghost"
+                                          onClick={(e) => {
+                                            e.stopPropagation();
+                                            setEditingAssignment(assignment);
+                                            setEditAssignmentQuantity(String(assignment.quantity || 1));
+                                            setShowEditAssignmentDialog(true);
+                                          }}
+                                          data-testid={`button-edit-assignment-${assignment.id}`}
+                                        >
+                                          <Pencil className="h-4 w-4" />
+                                        </Button>
+                                        <Button
+                                          size="icon"
+                                          variant="ghost"
+                                          className="text-destructive"
+                                          onClick={(e) => {
+                                            e.stopPropagation();
+                                            if (confirm(`Remove this ${gearItem.equipmentType} from ${employee.name}?`)) {
+                                              deleteAssignmentMutation.mutate(assignment.id);
+                                            }
+                                          }}
+                                          data-testid={`button-delete-assignment-${assignment.id}`}
+                                        >
+                                          <Trash2 className="h-4 w-4" />
+                                        </Button>
+                                      </div>
+                                    </div>
+                                  );
+                                })
+                              )}
+                              
+                              {/* Add Gear Button */}
+                              <Button
+                                variant="outline"
+                                className="w-full"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setAssignEmployeeId(employee.id);
+                                  setActiveTab("manage");
+                                }}
+                                data-testid={`button-add-gear-${employee.id}`}
+                              >
+                                <Plus className="h-4 w-4 mr-2" />
+                                Assign Gear to {employee.name}
+                              </Button>
+                            </div>
+                          )}
+                        </CardContent>
+                      </Card>
+                    );
+                  })}
+                </div>
+              )}
+            </TabsContent>
+          )}
 
           {/* Manage Gear Tab */}
           <TabsContent value="manage" className="space-y-4">
@@ -2200,6 +2405,81 @@ export default function Inventory() {
               data-testid="button-submit-assign"
             >
               {createAssignmentMutation.isPending ? "Assigning..." : "Assign Gear"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Edit Assignment Dialog */}
+      <Dialog open={showEditAssignmentDialog} onOpenChange={setShowEditAssignmentDialog}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Pencil className="h-5 w-5" />
+              Edit Gear Assignment
+            </DialogTitle>
+            <DialogDescription>
+              Update the quantity for this gear assignment.
+            </DialogDescription>
+          </DialogHeader>
+          
+          {editingAssignment && (
+            <div className="space-y-4 py-4">
+              {/* Gear Info */}
+              <div className="p-3 bg-muted/50 rounded-lg">
+                <div className="text-sm text-muted-foreground">Assigned Gear</div>
+                <div className="font-medium">
+                  {allGearItems.find(g => g.id === editingAssignment.gearItemId)?.equipmentType || 'Unknown'}
+                </div>
+                {(() => {
+                  const item = allGearItems.find(g => g.id === editingAssignment.gearItemId);
+                  return item && (item.brand || item.model) ? (
+                    <div className="text-sm text-muted-foreground">
+                      {[item.brand, item.model].filter(Boolean).join(' - ')}
+                    </div>
+                  ) : null;
+                })()}
+              </div>
+
+              {/* Quantity */}
+              <div className="space-y-2">
+                <Label htmlFor="editQuantity">Quantity</Label>
+                <Input
+                  id="editQuantity"
+                  type="number"
+                  min={1}
+                  value={editAssignmentQuantity}
+                  onChange={(e) => setEditAssignmentQuantity(e.target.value)}
+                  data-testid="input-edit-assignment-quantity"
+                />
+              </div>
+            </div>
+          )}
+
+          <DialogFooter className="gap-2">
+            <Button
+              variant="outline"
+              onClick={() => {
+                setShowEditAssignmentDialog(false);
+                setEditingAssignment(null);
+              }}
+              data-testid="button-cancel-edit-assignment"
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={() => {
+                if (editingAssignment) {
+                  updateAssignmentMutation.mutate({
+                    id: editingAssignment.id,
+                    quantity: parseInt(editAssignmentQuantity) || 1,
+                  });
+                }
+              }}
+              disabled={updateAssignmentMutation.isPending}
+              data-testid="button-save-edit-assignment"
+            >
+              {updateAssignmentMutation.isPending ? "Saving..." : "Save Changes"}
             </Button>
           </DialogFooter>
         </DialogContent>
