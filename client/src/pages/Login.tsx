@@ -164,7 +164,7 @@ export default function Login() {
             Sign In
           </Button>
           <Button 
-            onClick={() => setLocation("/register")}
+            onClick={() => setLocation("/pricing")}
             data-testid="button-get-started-header"
           >
             Get Started
@@ -202,7 +202,7 @@ export default function Login() {
         <div className="flex flex-col sm:flex-row items-center gap-4">
           <Button 
             size="lg"
-            onClick={() => setLocation("/register")}
+            onClick={() => setLocation("/pricing")}
             className="gap-2 px-6"
             data-testid="button-get-started-free"
           >
