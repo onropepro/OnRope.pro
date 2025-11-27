@@ -2,7 +2,7 @@ import type { Express, Request, Response, NextFunction } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { db } from "./db";
-import { insertUserSchema, insertClientSchema, insertProjectSchema, insertDropLogSchema, insertComplaintSchema, insertComplaintNoteSchema, insertJobCommentSchema, insertHarnessInspectionSchema, insertToolboxMeetingSchema, insertFlhaFormSchema, insertIncidentReportSchema, insertMethodStatementSchema, insertPayPeriodConfigSchema, insertQuoteSchema, insertQuoteServiceSchema, insertGearItemSchema, insertGearAssignmentSchema, insertScheduledJobSchema, insertJobAssignmentSchema, updatePropertyManagerAccountSchema, normalizeStrataPlan, type InsertGearItem, type InsertGearAssignment, type Project, gearAssignments, jobAssignments, workSessions, nonBillableWorkSessions, licenseKeys, users, propertyManagerCompanyLinks, IRATA_TASK_TYPES } from "@shared/schema";
+import { insertUserSchema, insertClientSchema, insertProjectSchema, insertDropLogSchema, insertComplaintSchema, insertComplaintNoteSchema, insertJobCommentSchema, insertHarnessInspectionSchema, insertToolboxMeetingSchema, insertFlhaFormSchema, insertIncidentReportSchema, insertMethodStatementSchema, insertPayPeriodConfigSchema, insertQuoteSchema, insertQuoteServiceSchema, insertGearItemSchema, insertGearAssignmentSchema, insertGearSerialNumberSchema, insertScheduledJobSchema, insertJobAssignmentSchema, updatePropertyManagerAccountSchema, normalizeStrataPlan, type InsertGearItem, type InsertGearAssignment, type InsertGearSerialNumber, type Project, gearAssignments, gearSerialNumbers, jobAssignments, workSessions, nonBillableWorkSessions, licenseKeys, users, propertyManagerCompanyLinks, IRATA_TASK_TYPES } from "@shared/schema";
 import { eq, sql } from "drizzle-orm";
 import { z } from "zod";
 import bcrypt from "bcrypt";
@@ -5853,16 +5853,35 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       const items = await storage.getGearItemsByCompany(companyId);
       
+      // Fetch serial entries for all items
+      const itemIds = items.map(item => item.id);
+      const allSerialEntries = itemIds.length > 0 
+        ? await db.select().from(gearSerialNumbers).where(sql`${gearSerialNumbers.gearItemId} IN (${sql.join(itemIds.map(id => sql`${id}`), sql`, `)})`)
+        : [];
+      
+      // Group serial entries by gearItemId
+      const serialEntriesByItem: Record<string, any[]> = {};
+      for (const entry of allSerialEntries) {
+        if (!serialEntriesByItem[entry.gearItemId]) {
+          serialEntriesByItem[entry.gearItemId] = [];
+        }
+        serialEntriesByItem[entry.gearItemId].push(entry);
+      }
+      
       // Filter out financial data if user doesn't have permission
       const hasFinancialPermission = currentUser.role === "company" || 
         (currentUser.permissions && currentUser.permissions.includes("view_financial_data"));
       
       const filteredItems = items.map(item => {
+        const itemWithSerials = {
+          ...item,
+          serialEntries: serialEntriesByItem[item.id] || [],
+        };
         if (!hasFinancialPermission) {
-          const { itemPrice, ...rest } = item;
+          const { itemPrice, ...rest } = itemWithSerials;
           return rest;
         }
-        return item;
+        return itemWithSerials;
       });
       
       res.json({ items: filteredItems });
@@ -5910,6 +5929,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const item = await storage.createGearItem(itemData);
       console.log("Created gear item:", item.id);
       
+      // Save serial entries with per-item dates to the new gearSerialNumbers table
+      const serialEntries = req.body.serialEntries || [];
+      const savedSerialEntries = [];
+      for (const entry of serialEntries) {
+        if (entry.serialNumber) {
+          const serialData = {
+            gearItemId: item.id,
+            companyId,
+            serialNumber: entry.serialNumber,
+            dateOfManufacture: entry.dateOfManufacture || undefined,
+            dateInService: entry.dateInService || undefined,
+          };
+          const [savedEntry] = await db.insert(gearSerialNumbers)
+            .values(serialData)
+            .returning();
+          savedSerialEntries.push(savedEntry);
+        }
+      }
+      
       // If assignment info is provided, create the assignment
       if (req.body.assignEmployeeId && req.body.assignQuantity) {
         console.log("Assignment info provided - employeeId:", req.body.assignEmployeeId, "quantity:", req.body.assignQuantity);
@@ -5930,7 +5968,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         console.log("No assignment info provided");
       }
       
-      res.json({ item });
+      res.json({ item: { ...item, serialEntries: savedSerialEntries } });
     } catch (error) {
       if (error instanceof z.ZodError) {
         return res.status(400).json({ message: "Validation error", errors: error.errors });
@@ -6177,6 +6215,92 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({ success: true });
     } catch (error) {
       console.error("Delete gear assignment error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Gear serial numbers routes - per-item serial number tracking with dates
+  app.get("/api/gear-items/:id/serial-numbers", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      const companyId = currentUser.role === "company" ? currentUser.id : currentUser.companyId;
+      
+      if (!companyId) {
+        return res.status(400).json({ message: "Unable to determine company" });
+      }
+      
+      const serialNumbers = await db.select()
+        .from(gearSerialNumbers)
+        .where(eq(gearSerialNumbers.gearItemId, req.params.id));
+      
+      res.json({ serialNumbers });
+    } catch (error) {
+      console.error("Get gear serial numbers error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.post("/api/gear-items/:id/serial-numbers", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      const companyId = currentUser.role === "company" ? currentUser.id : currentUser.companyId;
+      
+      if (!companyId) {
+        return res.status(400).json({ message: "Unable to determine company" });
+      }
+      
+      const serialData = insertGearSerialNumberSchema.parse({
+        gearItemId: req.params.id,
+        companyId,
+        serialNumber: req.body.serialNumber,
+        dateOfManufacture: req.body.dateOfManufacture || undefined,
+        dateInService: req.body.dateInService || undefined,
+      });
+      
+      const [serialNumber] = await db.insert(gearSerialNumbers)
+        .values(serialData)
+        .returning();
+      
+      res.json({ serialNumber });
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Validation error", errors: error.errors });
+      }
+      console.error("Create gear serial number error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.delete("/api/gear-serial-numbers/:id", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      const companyId = currentUser.role === "company" ? currentUser.id : currentUser.companyId;
+      
+      if (!companyId) {
+        return res.status(400).json({ message: "Unable to determine company" });
+      }
+      
+      await db.delete(gearSerialNumbers)
+        .where(eq(gearSerialNumbers.id, req.params.id));
+      
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Delete gear serial number error:", error);
       res.status(500).json({ message: "Internal server error" });
     }
   });

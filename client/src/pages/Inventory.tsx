@@ -14,7 +14,7 @@ import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { insertGearItemSchema, type InsertGearItem, type GearItem, type GearAssignment } from "@shared/schema";
+import { insertGearItemSchema, type InsertGearItem, type GearItem, type GearAssignment, type GearSerialNumber } from "@shared/schema";
 import { ArrowLeft, Plus, Pencil, X, Trash2, Shield, Cable, Link2, Gauge, TrendingUp, HardHat, Hand, Fuel, Scissors, PaintBucket, Droplets, CircleDot, Lock, Anchor, MoreHorizontal, Users } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import { hasFinancialAccess } from "@/lib/permissions";
@@ -46,8 +46,15 @@ export default function Inventory() {
   const [showAddDialog, setShowAddDialog] = useState(false);
   const [showEditDialog, setShowEditDialog] = useState(false);
   const [editingItem, setEditingItem] = useState<GearItem | null>(null);
-  const [serialNumbers, setSerialNumbers] = useState<string[]>([]);
+  type SerialNumberEntry = {
+    serialNumber: string;
+    dateOfManufacture: string;
+    dateInService: string;
+  };
+  const [serialEntries, setSerialEntries] = useState<SerialNumberEntry[]>([]);
   const [currentSerialNumber, setCurrentSerialNumber] = useState("");
+  const [currentDateOfManufacture, setCurrentDateOfManufacture] = useState("");
+  const [currentDateInService, setCurrentDateInService] = useState("");
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [itemToDelete, setItemToDelete] = useState<GearItem | null>(null);
   const [customType, setCustomType] = useState("");
@@ -172,8 +179,10 @@ export default function Inventory() {
       setShowAddDialog(false);
       setAddItemStep(1);
       form.reset();
-      setSerialNumbers([]);
+      setSerialEntries([]);
       setCurrentSerialNumber("");
+      setCurrentDateOfManufacture("");
+      setCurrentDateInService("");
       setAssignEmployeeId("");
       setAssignQuantity("1");
     },
@@ -199,8 +208,10 @@ export default function Inventory() {
       setShowEditDialog(false);
       setEditingItem(null);
       form.reset();
-      setSerialNumbers([]);
+      setSerialEntries([]);
       setCurrentSerialNumber("");
+      setCurrentDateOfManufacture("");
+      setCurrentDateInService("");
     },
     onError: (error: any) => {
       toast({
@@ -234,10 +245,13 @@ export default function Inventory() {
   });
 
   const handleAddItem = (data: Partial<InsertGearItem>) => {
+    // Extract just the serial number strings for legacy compatibility
+    const serialNumberStrings = serialEntries.map(e => e.serialNumber);
     const finalData: any = {
       ...data,
-      equipmentType: customType || data.equipmentType, // Use custom type if provided
-      serialNumbers: serialNumbers.length > 0 ? serialNumbers : undefined,
+      equipmentType: customType || data.equipmentType,
+      serialNumbers: serialNumberStrings.length > 0 ? serialNumberStrings : undefined,
+      serialEntries: serialEntries.length > 0 ? serialEntries : undefined, // New per-item data
     };
     
     // Add assignment info if provided
@@ -251,10 +265,13 @@ export default function Inventory() {
 
   const handleEditItem = (data: Partial<InsertGearItem>) => {
     if (editingItem) {
+      // Extract just the serial number strings for legacy compatibility
+      const serialNumberStrings = serialEntries.map(e => e.serialNumber);
       const finalData = {
         ...data,
-        equipmentType: customType || data.equipmentType, // Use custom type if provided
-        serialNumbers: serialNumbers.length > 0 ? serialNumbers : undefined,
+        equipmentType: customType || data.equipmentType,
+        serialNumbers: serialNumberStrings.length > 0 ? serialNumberStrings : undefined,
+        serialEntries: serialEntries.length > 0 ? serialEntries : undefined, // New per-item data
       };
       updateItemMutation.mutate({ id: editingItem.id, data: finalData });
     }
@@ -318,7 +335,7 @@ export default function Inventory() {
     }
     
     // Check for duplicate serial number
-    if (serialNumbers.includes(currentSerialNumber.trim())) {
+    if (serialEntries.some(entry => entry.serialNumber === currentSerialNumber.trim())) {
       toast({
         title: "Duplicate Serial Number",
         description: "This serial number has already been added.",
@@ -336,7 +353,7 @@ export default function Inventory() {
       return;
     }
     
-    if (serialNumbers.length >= maxSerials) {
+    if (serialEntries.length >= maxSerials) {
       toast({
         title: "Limit Reached",
         description: `Cannot add more than ${maxSerials} serial numbers.`,
@@ -345,20 +362,27 @@ export default function Inventory() {
       return;
     }
     
-    // Add the serial number to the list
-    setSerialNumbers([...serialNumbers, currentSerialNumber.trim()]);
+    // Add the serial entry with all fields
+    const newEntry: SerialNumberEntry = {
+      serialNumber: currentSerialNumber.trim(),
+      dateOfManufacture: currentDateOfManufacture,
+      dateInService: currentDateInService,
+    };
+    setSerialEntries([...serialEntries, newEntry]);
     
-    // Clear the field for next entry
+    // Reset all fields for next entry
     setCurrentSerialNumber("");
+    setCurrentDateOfManufacture("");
+    setCurrentDateInService("");
     
     toast({
-      title: "Serial Number Added",
-      description: `Added: ${currentSerialNumber.trim()}. Enter another or save the item.`,
+      title: "Item Added",
+      description: `Added: ${currentSerialNumber.trim()}. Enter another or save.`,
     });
   };
 
-  const removeSerialNumber = (index: number) => {
-    setSerialNumbers(serialNumbers.filter((_, i) => i !== index));
+  const removeSerialEntry = (index: number) => {
+    setSerialEntries(serialEntries.filter((_, i) => i !== index));
   };
 
   const openAddDialog = () => {
@@ -376,8 +400,10 @@ export default function Inventory() {
       dateOutOfService: "",
       inService: true,
     });
-    setSerialNumbers([]);
+    setSerialEntries([]);
     setCurrentSerialNumber("");
+    setCurrentDateOfManufacture("");
+    setCurrentDateInService("");
     setCustomType("");
     setAddItemStep(1);
     setShowAddDialog(true);
@@ -400,8 +426,26 @@ export default function Inventory() {
       dateOutOfService: item.dateOutOfService || undefined,
       inService: item.inService,
     });
-    setSerialNumbers(item.serialNumbers || []);
+    // Load serial entries from item (prefer new serialEntries, fallback to legacy serialNumbers)
+    const itemSerialEntries = (item as any).serialEntries || [];
+    if (itemSerialEntries.length > 0) {
+      setSerialEntries(itemSerialEntries.map((entry: any) => ({
+        serialNumber: entry.serialNumber,
+        dateOfManufacture: entry.dateOfManufacture || "",
+        dateInService: entry.dateInService || "",
+      })));
+    } else {
+      // Fallback to legacy serial numbers without dates
+      const legacySerials = item.serialNumbers || [];
+      setSerialEntries(legacySerials.map(sn => ({
+        serialNumber: sn,
+        dateOfManufacture: "",
+        dateInService: "",
+      })));
+    }
     setCurrentSerialNumber("");
+    setCurrentDateOfManufacture("");
+    setCurrentDateInService("");
     // Check if type is a custom type (not in predefined list)
     const gearTypeNames = gearTypes.map(t => t.name);
     if (item.equipmentType && !gearTypeNames.includes(item.equipmentType)) {
@@ -1513,44 +1557,82 @@ export default function Inventory() {
               {/* All other gear types: show full details */}
               {form.watch("equipmentType") !== "Carabiner" && form.watch("equipmentType") !== "Rope" && (
                 <>
-                  {/* Serial Number Entry */}
+                  {/* Serial Number Entry with Per-Item Dates */}
                   <div className="space-y-3">
-                    <FormLabel>Serial Numbers (Optional)</FormLabel>
+                    <FormLabel>Add Individual Items (Optional)</FormLabel>
+                    <p className="text-xs text-muted-foreground">Enter serial number and dates for each item. All fields will reset after adding.</p>
                     
-                    <div className="space-y-2">
-                      <Input
-                        placeholder="Enter serial number"
-                        value={currentSerialNumber}
-                        onChange={(e) => setCurrentSerialNumber(e.target.value)}
-                        data-testid="input-current-serial"
-                      />
+                    <div className="space-y-3 p-3 bg-muted/20 rounded-md border border-dashed">
+                      <div>
+                        <Label className="text-xs">Serial Number</Label>
+                        <Input
+                          placeholder="Enter serial number"
+                          value={currentSerialNumber}
+                          onChange={(e) => setCurrentSerialNumber(e.target.value)}
+                          data-testid="input-current-serial"
+                        />
+                      </div>
+                      
+                      <div className="grid grid-cols-2 gap-2">
+                        <div>
+                          <Label className="text-xs">Date of Manufacture</Label>
+                          <Input
+                            type="date"
+                            value={currentDateOfManufacture}
+                            onChange={(e) => setCurrentDateOfManufacture(e.target.value)}
+                            data-testid="input-current-date-manufacture"
+                          />
+                        </div>
+                        <div>
+                          <Label className="text-xs">Date In Service</Label>
+                          <Input
+                            type="date"
+                            value={currentDateInService}
+                            onChange={(e) => setCurrentDateInService(e.target.value)}
+                            data-testid="input-current-date-service"
+                          />
+                        </div>
+                      </div>
                       
                       <Button
                         type="button"
                         variant="default"
                         onClick={handleAddSerialNumber}
-                        disabled={serialNumbers.length >= (form.watch("quantity") || 1)}
+                        disabled={serialEntries.length >= (form.watch("quantity") || 1)}
                         data-testid="button-add-serial"
                         className="w-full"
                       >
                         <Plus className="h-5 w-5 mr-2" />
-                        Add Serial Number ({serialNumbers.length}/{form.watch("quantity") || 1})
+                        Add Item ({serialEntries.length}/{form.watch("quantity") || 1})
                       </Button>
                     </div>
 
-                    {serialNumbers.length > 0 && (
-                      <div className="space-y-1 bg-muted/30 p-3 rounded-md">
-                        <div className="text-sm font-medium">Added Serial Numbers:</div>
-                        {serialNumbers.map((sn, index) => (
-                          <div key={index} className="flex items-center justify-between text-sm">
-                            <span>• {sn}</span>
+                    {serialEntries.length > 0 && (
+                      <div className="space-y-2 bg-muted/30 p-3 rounded-md">
+                        <div className="text-sm font-medium">Added Items:</div>
+                        {serialEntries.map((entry, index) => (
+                          <div key={index} className="flex items-start justify-between text-sm p-2 bg-background rounded border">
+                            <div className="flex-1">
+                              <div className="font-medium">{entry.serialNumber}</div>
+                              <div className="text-xs text-muted-foreground flex flex-wrap gap-2 mt-1">
+                                {entry.dateOfManufacture && (
+                                  <span>Mfg: {new Date(entry.dateOfManufacture).toLocaleDateString()}</span>
+                                )}
+                                {entry.dateInService && (
+                                  <span>In Service: {new Date(entry.dateInService).toLocaleDateString()}</span>
+                                )}
+                                {!entry.dateOfManufacture && !entry.dateInService && (
+                                  <span className="italic">No dates set</span>
+                                )}
+                              </div>
+                            </div>
                             <Button
                               type="button"
                               size="icon"
                               variant="ghost"
-                              onClick={() => removeSerialNumber(index)}
+                              onClick={() => removeSerialEntry(index)}
                               data-testid={`button-remove-serial-${index}`}
-                              className="h-6 w-6"
+                              className="h-6 w-6 ml-2"
                             >
                               <X className="h-3 w-3" />
                             </Button>
@@ -1559,44 +1641,6 @@ export default function Inventory() {
                       </div>
                     )}
                   </div>
-
-                  <FormField
-                    control={form.control}
-                    name="dateOfManufacture"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Date of Manufacture</FormLabel>
-                        <FormControl>
-                          <Input
-                            type="date"
-                            {...field}
-                            value={field.value || ""}
-                            data-testid="input-date-of-manufacture"
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    control={form.control}
-                    name="dateInService"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Date Placed In Service</FormLabel>
-                        <FormControl>
-                          <Input
-                            type="date"
-                            {...field}
-                            value={field.value || ""}
-                            data-testid="input-date-in-service"
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
 
                   <FormField
                     control={form.control}
@@ -1794,46 +1838,83 @@ export default function Inventory() {
                 )}
               />
 
-              {/* Serial Number Entry */}
+              {/* Serial Number Entry with Per-Item Dates */}
               <div className="space-y-3">
-                <FormLabel>Serial Numbers (Optional)</FormLabel>
+                <FormLabel>Add Individual Items (Optional)</FormLabel>
+                <p className="text-xs text-muted-foreground">Enter serial number and dates for each item. All fields will reset after adding.</p>
                 
-                {/* Current Serial Number Input */}
-                <div className="space-y-2">
-                  <Input
-                    placeholder="Enter serial number"
-                    value={currentSerialNumber}
-                    onChange={(e) => setCurrentSerialNumber(e.target.value)}
-                    data-testid="input-current-serial-edit"
-                  />
+                <div className="space-y-3 p-3 bg-muted/20 rounded-md border border-dashed">
+                  <div>
+                    <Label className="text-xs">Serial Number</Label>
+                    <Input
+                      placeholder="Enter serial number"
+                      value={currentSerialNumber}
+                      onChange={(e) => setCurrentSerialNumber(e.target.value)}
+                      data-testid="input-current-serial-edit"
+                    />
+                  </div>
+                  
+                  <div className="grid grid-cols-2 gap-2">
+                    <div>
+                      <Label className="text-xs">Date of Manufacture</Label>
+                      <Input
+                        type="date"
+                        value={currentDateOfManufacture}
+                        onChange={(e) => setCurrentDateOfManufacture(e.target.value)}
+                        data-testid="input-current-date-manufacture-edit"
+                      />
+                    </div>
+                    <div>
+                      <Label className="text-xs">Date In Service</Label>
+                      <Input
+                        type="date"
+                        value={currentDateInService}
+                        onChange={(e) => setCurrentDateInService(e.target.value)}
+                        data-testid="input-current-date-service-edit"
+                      />
+                    </div>
+                  </div>
                   
                   <Button
                     type="button"
                     variant="default"
                     onClick={handleAddSerialNumber}
-                    disabled={serialNumbers.length >= (form.watch("quantity") || 1)}
+                    disabled={serialEntries.length >= (form.watch("quantity") || 1)}
                     data-testid="button-add-serial-edit"
                     className="w-full"
                   >
                     <Plus className="h-5 w-5 mr-2" />
-                    Add Serial Number ({serialNumbers.length}/{form.watch("quantity") || 1})
+                    Add Item ({serialEntries.length}/{form.watch("quantity") || 1})
                   </Button>
                 </div>
 
-                {/* Added Serial Numbers List */}
-                {serialNumbers.length > 0 && (
-                  <div className="space-y-1 bg-muted/30 p-3 rounded-md">
-                    <div className="text-sm font-medium">Added Serial Numbers:</div>
-                    {serialNumbers.map((sn, index) => (
-                      <div key={index} className="flex items-center justify-between text-sm">
-                        <span>• {sn}</span>
+                {/* Added Items List */}
+                {serialEntries.length > 0 && (
+                  <div className="space-y-2 bg-muted/30 p-3 rounded-md">
+                    <div className="text-sm font-medium">Added Items:</div>
+                    {serialEntries.map((entry, index) => (
+                      <div key={index} className="flex items-start justify-between text-sm p-2 bg-background rounded border">
+                        <div className="flex-1">
+                          <div className="font-medium">{entry.serialNumber}</div>
+                          <div className="text-xs text-muted-foreground flex flex-wrap gap-2 mt-1">
+                            {entry.dateOfManufacture && (
+                              <span>Mfg: {new Date(entry.dateOfManufacture).toLocaleDateString()}</span>
+                            )}
+                            {entry.dateInService && (
+                              <span>In Service: {new Date(entry.dateInService).toLocaleDateString()}</span>
+                            )}
+                            {!entry.dateOfManufacture && !entry.dateInService && (
+                              <span className="italic">No dates set</span>
+                            )}
+                          </div>
+                        </div>
                         <Button
                           type="button"
                           size="icon"
                           variant="ghost"
-                          onClick={() => removeSerialNumber(index)}
+                          onClick={() => removeSerialEntry(index)}
                           data-testid={`button-remove-serial-edit-${index}`}
-                          className="h-6 w-6"
+                          className="h-6 w-6 ml-2"
                         >
                           <X className="h-3 w-3" />
                         </Button>

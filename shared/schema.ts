@@ -352,6 +352,22 @@ export const gearAssignments = pgTable("gear_assignments", {
   index("IDX_gear_assignments_company").on(table.companyId),
 ]);
 
+// Gear serial numbers table - individual serial number entries with per-item dates
+export const gearSerialNumbers = pgTable("gear_serial_numbers", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  gearItemId: varchar("gear_item_id").notNull().references(() => gearItems.id, { onDelete: "cascade" }),
+  companyId: varchar("company_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  serialNumber: text("serial_number").notNull(),
+  dateOfManufacture: date("date_of_manufacture"), // Per-item manufacture date
+  dateInService: date("date_in_service"), // Per-item in-service date
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+}, (table) => [
+  index("IDX_gear_serial_numbers_item").on(table.gearItemId),
+  index("IDX_gear_serial_numbers_company").on(table.companyId),
+  index("IDX_gear_serial_numbers_serial").on(table.serialNumber),
+]);
+
 // Complaints table
 export const complaints = pgTable("complaints", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
@@ -1341,6 +1357,12 @@ export const insertGearAssignmentSchema = createInsertSchema(gearAssignments).om
   updatedAt: true,
 });
 
+export const insertGearSerialNumberSchema = createInsertSchema(gearSerialNumbers).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
 export const insertComplaintSchema = createInsertSchema(complaints).omit({
   id: true,
   createdAt: true,
@@ -1542,6 +1564,9 @@ export type InsertGearItem = z.infer<typeof insertGearItemSchema>;
 
 export type GearAssignment = typeof gearAssignments.$inferSelect;
 export type InsertGearAssignment = z.infer<typeof insertGearAssignmentSchema>;
+
+export type GearSerialNumber = typeof gearSerialNumbers.$inferSelect;
+export type InsertGearSerialNumber = z.infer<typeof insertGearSerialNumberSchema>;
 
 export type Complaint = typeof complaints.$inferSelect;
 export type InsertComplaint = z.infer<typeof insertComplaintSchema>;
