@@ -39,6 +39,7 @@ import ResidentLink from "@/pages/ResidentLink";
 import PropertyManagerSettings from "@/pages/PropertyManagerSettings";
 import PropertyManager from "@/pages/PropertyManager";
 import MyLoggedHours from "@/pages/MyLoggedHours";
+import Changelog from "@/pages/Changelog";
 import NotFound from "@/pages/not-found";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import { EMPLOYEE_ROLES } from "@/lib/permissions";
@@ -199,6 +200,11 @@ function Router() {
       <Route path="/my-logged-hours">
         <ProtectedRoute allowedRoles={EMPLOYEE_ROLES}>
           <MyLoggedHours />
+        </ProtectedRoute>
+      </Route>
+      <Route path="/changelog">
+        <ProtectedRoute>
+          <Changelog />
         </ProtectedRoute>
       </Route>
       <Route component={NotFound} />
