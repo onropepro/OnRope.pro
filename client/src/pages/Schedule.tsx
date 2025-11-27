@@ -132,7 +132,8 @@ export default function Schedule() {
   // Time off dialog state
   const [timeOffDialogOpen, setTimeOffDialogOpen] = useState(false);
   const [selectedEmployeeForTimeOff, setSelectedEmployeeForTimeOff] = useState<string>("");
-  const [selectedTimeOffDate, setSelectedTimeOffDate] = useState<string>("");
+  const [selectedTimeOffStartDate, setSelectedTimeOffStartDate] = useState<string>("");
+  const [selectedTimeOffEndDate, setSelectedTimeOffEndDate] = useState<string>("");
   const [selectedTimeOffType, setSelectedTimeOffType] = useState<string>("day_off");
   const [timeOffNotes, setTimeOffNotes] = useState<string>("");
 
@@ -155,19 +156,6 @@ export default function Schedule() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/employee-time-off"] });
-      toast({
-        title: "Time Off Scheduled",
-        description: "Time off has been scheduled successfully.",
-      });
-      setTimeOffDialogOpen(false);
-      resetTimeOffForm();
-    },
-    onError: (error: Error) => {
-      toast({
-        title: "Error",
-        description: error.message || "Failed to schedule time off.",
-        variant: "destructive",
-      });
     },
   });
 
@@ -195,26 +183,66 @@ export default function Schedule() {
 
   const resetTimeOffForm = () => {
     setSelectedEmployeeForTimeOff("");
-    setSelectedTimeOffDate("");
+    setSelectedTimeOffStartDate("");
+    setSelectedTimeOffEndDate("");
     setSelectedTimeOffType("day_off");
     setTimeOffNotes("");
   };
 
-  const handleCreateTimeOff = () => {
-    if (!selectedEmployeeForTimeOff || !selectedTimeOffDate || !selectedTimeOffType) {
+  const handleCreateTimeOff = async () => {
+    if (!selectedEmployeeForTimeOff || !selectedTimeOffStartDate || !selectedTimeOffType) {
       toast({
         title: "Missing Information",
-        description: "Please select an employee, date, and time off type.",
+        description: "Please select an employee, start date, and time off type.",
         variant: "destructive",
       });
       return;
     }
-    createTimeOffMutation.mutate({
-      employeeId: selectedEmployeeForTimeOff,
-      date: selectedTimeOffDate,
-      timeOffType: selectedTimeOffType,
-      notes: timeOffNotes || undefined,
-    });
+    
+    const startDate = new Date(selectedTimeOffStartDate);
+    const endDate = selectedTimeOffEndDate ? new Date(selectedTimeOffEndDate) : startDate;
+    
+    if (endDate < startDate) {
+      toast({
+        title: "Invalid Date Range",
+        description: "End date cannot be before start date.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    const dates: string[] = [];
+    const currentDate = new Date(startDate);
+    while (currentDate <= endDate) {
+      const year = currentDate.getFullYear();
+      const month = String(currentDate.getMonth() + 1).padStart(2, '0');
+      const day = String(currentDate.getDate()).padStart(2, '0');
+      dates.push(`${year}-${month}-${day}`);
+      currentDate.setDate(currentDate.getDate() + 1);
+    }
+    
+    try {
+      for (const date of dates) {
+        await createTimeOffMutation.mutateAsync({
+          employeeId: selectedEmployeeForTimeOff,
+          date: date,
+          timeOffType: selectedTimeOffType,
+          notes: timeOffNotes || undefined,
+        });
+      }
+      setTimeOffDialogOpen(false);
+      resetTimeOffForm();
+      toast({
+        title: "Time Off Scheduled",
+        description: `Time off has been scheduled for ${dates.length} day${dates.length > 1 ? 's' : ''}.`,
+      });
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to schedule some time off entries.",
+        variant: "destructive",
+      });
+    }
   };
 
   // Get time off for a specific employee on a specific date
@@ -1453,7 +1481,7 @@ export default function Schedule() {
           <DialogHeader>
             <DialogTitle>Schedule Time Off</DialogTitle>
             <DialogDescription>
-              Schedule time off for a team member. This will block that day on their schedule.
+              Schedule time off for a team member. This will block the selected days on their schedule.
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4 py-4">
@@ -1476,15 +1504,42 @@ export default function Schedule() {
               </Select>
             </div>
             
-            <div className="space-y-2">
-              <Label>Date</Label>
-              <Input
-                type="date"
-                value={selectedTimeOffDate}
-                onChange={(e) => setSelectedTimeOffDate(e.target.value)}
-                data-testid="input-time-off-date"
-              />
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-2">
+                <Label>Start Date</Label>
+                <Input
+                  type="date"
+                  value={selectedTimeOffStartDate}
+                  onChange={(e) => {
+                    setSelectedTimeOffStartDate(e.target.value);
+                    if (!selectedTimeOffEndDate || e.target.value > selectedTimeOffEndDate) {
+                      setSelectedTimeOffEndDate(e.target.value);
+                    }
+                  }}
+                  data-testid="input-time-off-start-date"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>End Date</Label>
+                <Input
+                  type="date"
+                  value={selectedTimeOffEndDate}
+                  min={selectedTimeOffStartDate}
+                  onChange={(e) => setSelectedTimeOffEndDate(e.target.value)}
+                  data-testid="input-time-off-end-date"
+                />
+              </div>
             </div>
+            {selectedTimeOffStartDate && selectedTimeOffEndDate && selectedTimeOffStartDate <= selectedTimeOffEndDate && (
+              <p className="text-xs text-muted-foreground">
+                {(() => {
+                  const start = new Date(selectedTimeOffStartDate);
+                  const end = new Date(selectedTimeOffEndDate);
+                  const days = Math.floor((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24)) + 1;
+                  return `${days} day${days > 1 ? 's' : ''} selected`;
+                })()}
+              </p>
+            )}
             
             <div className="space-y-2">
               <Label>Type</Label>
