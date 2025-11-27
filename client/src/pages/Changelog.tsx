@@ -63,6 +63,82 @@ type PageCategory = {
   pages: PageLink[];
 };
 
+type ServiceItem = {
+  name: string;
+  description: string;
+  icon: string;
+  trackingType: string;
+};
+
+const servicesData: ServiceItem[] = [
+  { 
+    name: "Window Cleaning", 
+    description: "Rope access high-rise window cleaning with directional drop tracking",
+    icon: "window",
+    trackingType: "Drop-based (N/E/S/W)"
+  },
+  { 
+    name: "Exterior Dryer Vent Cleaning", 
+    description: "High-rise exterior dryer vent cleaning and maintenance",
+    icon: "air",
+    trackingType: "Drop-based (N/E/S/W)"
+  },
+  { 
+    name: "Building Wash / Pressure Washing", 
+    description: "Building exterior cleaning and pressure washing services",
+    icon: "water_drop",
+    trackingType: "Drop-based (N/E/S/W)"
+  },
+  { 
+    name: "General Pressure Washing", 
+    description: "Ground-level and general pressure washing services",
+    icon: "cleaning_services",
+    trackingType: "Hours-based"
+  },
+  { 
+    name: "Gutter Cleaning", 
+    description: "Gutter cleaning, maintenance, and debris removal",
+    icon: "home_repair_service",
+    trackingType: "Hours-based"
+  },
+  { 
+    name: "In-Suite Dryer Vent Cleaning", 
+    description: "Individual unit dryer vent cleaning with unit tracking",
+    icon: "meeting_room",
+    trackingType: "Unit-based"
+  },
+  { 
+    name: "Parkade Pressure Cleaning", 
+    description: "Parking structure pressure washing with stall tracking",
+    icon: "local_parking",
+    trackingType: "Stall-based"
+  },
+  { 
+    name: "Ground Window Cleaning", 
+    description: "Ground-level and low-rise window cleaning",
+    icon: "storefront",
+    trackingType: "Hours-based"
+  },
+  { 
+    name: "Painting", 
+    description: "Rope access painting and coating services",
+    icon: "format_paint",
+    trackingType: "Hours-based"
+  },
+  { 
+    name: "Inspection", 
+    description: "Building facade inspection and assessment",
+    icon: "fact_check",
+    trackingType: "Hours-based"
+  },
+  { 
+    name: "Custom Services", 
+    description: "Create and save custom job types for your company",
+    icon: "more_horiz",
+    trackingType: "Configurable"
+  },
+];
+
 const pagesData: PageCategory[] = [
   {
     category: "Public Pages",
@@ -574,10 +650,58 @@ export default function Changelog() {
                     <div className="text-sm text-muted-foreground">Pages & Views</div>
                   </div>
                 </div>
+                <div className="flex items-center gap-3">
+                  <div className="p-2 bg-orange-500/10 rounded-lg">
+                    <Wrench className="h-5 w-5 text-orange-600 dark:text-orange-400" />
+                  </div>
+                  <div>
+                    <div className="text-2xl font-bold">{servicesData.length}</div>
+                    <div className="text-sm text-muted-foreground">Service Types</div>
+                  </div>
+                </div>
               </div>
             </CardContent>
           </Card>
         </div>
+
+        <Card className="mb-8">
+          <CardHeader>
+            <div className="flex items-center gap-3">
+              <div className="p-2.5 rounded-xl bg-orange-500/10 ring-1 ring-orange-500/20">
+                <Wrench className="h-5 w-5 text-orange-600 dark:text-orange-400" />
+              </div>
+              <div>
+                <CardTitle className="text-xl">Services Managed</CardTitle>
+                <CardDescription>
+                  {servicesData.length} service types available for project management
+                </CardDescription>
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent className="pt-0">
+            <div className="grid gap-3 sm:grid-cols-2">
+              {servicesData.map((service, index) => (
+                <div 
+                  key={index}
+                  className="flex items-start gap-3 p-3 rounded-lg bg-muted/30"
+                >
+                  <div className="p-2 rounded-lg bg-background ring-1 ring-border/50 flex-shrink-0">
+                    <span className="material-icons text-lg text-muted-foreground">{service.icon}</span>
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span className="font-medium text-sm">{service.name}</span>
+                      <Badge variant="secondary" className="text-xs">{service.trackingType}</Badge>
+                    </div>
+                    <p className="text-xs text-muted-foreground mt-0.5">
+                      {service.description}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
 
         <Card className="mb-8">
           <CardHeader>
