@@ -105,7 +105,7 @@ export default function CompanyDetail() {
         {/* Company Info Card */}
         <Card>
           <CardContent className="p-6">
-            <div className="grid grid-cols-2 md:grid-cols-5 gap-6">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
               <div>
                 <p className="text-sm text-muted-foreground mb-1">Company ID</p>
                 <p className="font-mono text-xs">{company.id}</p>
@@ -119,12 +119,47 @@ export default function CompanyDetail() {
                 <p className="font-mono text-xs">{company.licenseKey || 'Not set'}</p>
               </div>
               <div>
-                <p className="text-sm text-muted-foreground mb-1">Subscription Status</p>
-                <p className="text-sm capitalize">{company.subscriptionStatus || "Inactive"}</p>
-              </div>
-              <div>
                 <p className="text-sm text-muted-foreground mb-1">Address</p>
                 <p className="text-sm">{company.streetAddress || 'N/A'}{company.province ? `, ${company.province}` : ''}</p>
+              </div>
+            </div>
+            
+            {/* Subscription Details */}
+            <div className="mt-6 pt-6 border-t">
+              <h3 className="text-sm font-semibold mb-4">Subscription Details</h3>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+                <div>
+                  <p className="text-sm text-muted-foreground mb-1">Subscription Tier</p>
+                  <p className="text-sm font-medium capitalize">{company.subscriptionTier || 'None'}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-muted-foreground mb-1">Status</p>
+                  <p className="text-sm capitalize">{company.subscriptionStatus || 'Inactive'}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-muted-foreground mb-1">Next Payment / Trial End</p>
+                  <p className="text-sm">{company.subscriptionEndDate ? new Date(company.subscriptionEndDate).toLocaleDateString() : 'N/A'}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-muted-foreground mb-1">Add-ons</p>
+                  <div className="flex flex-wrap gap-1">
+                    {(company.additionalSeatsCount > 0 || company.additionalProjectsCount > 0 || company.whitelabelBrandingActive) ? (
+                      <>
+                        {company.additionalSeatsCount > 0 && (
+                          <Badge variant="secondary" className="text-xs">+{company.additionalSeatsCount} Seats</Badge>
+                        )}
+                        {company.additionalProjectsCount > 0 && (
+                          <Badge variant="secondary" className="text-xs">+{company.additionalProjectsCount} Projects</Badge>
+                        )}
+                        {company.whitelabelBrandingActive && (
+                          <Badge variant="secondary" className="text-xs">White Label</Badge>
+                        )}
+                      </>
+                    ) : (
+                      <p className="text-sm text-muted-foreground">None</p>
+                    )}
+                  </div>
+                </div>
               </div>
             </div>
             
