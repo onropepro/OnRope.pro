@@ -105,30 +105,68 @@ const ROLE_OPTIONS = [
   { value: "labourer", label: "Labourer", icon: "handyman", category: "worker" },
 ] as const;
 
-// Available permissions for employees
-const AVAILABLE_PERMISSIONS = [
-  { id: "view_projects", label: "View Projects" },
-  { id: "create_projects", label: "Create Projects" },
-  { id: "edit_projects", label: "Edit Projects" },
-  { id: "delete_projects", label: "Delete Projects" },
-  { id: "view_employees", label: "View Employees" },
-  { id: "create_employees", label: "Create Employees" },
-  { id: "edit_employees", label: "Edit Employees" },
-  { id: "delete_employees", label: "Delete Employees" },
-  { id: "view_clients", label: "View Clients" },
-  { id: "manage_clients", label: "Manage Clients (Create/Edit/Delete)" },
-  { id: "view_inventory", label: "View Inventory & Gear" },
-  { id: "view_csr", label: "View Company Safety Rating (CSR)" },
-  { id: "log_drops", label: "Log Drops" },
-  { id: "view_complaints", label: "View Complaints" },
-  { id: "manage_complaints", label: "Manage Complaints" },
-  { id: "view_work_sessions", label: "View Work Sessions" },
-  { id: "manage_work_sessions", label: "Manage Work Sessions" },
-  { id: "view_work_history", label: "View Work History" },
-  { id: "view_analytics", label: "View Analytics" },
-  { id: "view_active_workers", label: "View Active Workers" },
-  { id: "view_financial_data", label: "View Financial Data (Labor Costs, Wages)" },
+// Available permissions for employees organized by category
+const PERMISSION_CATEGORIES = [
+  {
+    name: "Projects",
+    permissions: [
+      { id: "view_projects", label: "View Projects" },
+      { id: "create_projects", label: "Create Projects" },
+      { id: "edit_projects", label: "Edit Projects" },
+      { id: "delete_projects", label: "Delete Projects" },
+      { id: "log_drops", label: "Log Drops" },
+    ],
+  },
+  {
+    name: "Employees",
+    permissions: [
+      { id: "view_employees", label: "View Employees" },
+      { id: "create_employees", label: "Create Employees" },
+      { id: "edit_employees", label: "Edit Employees" },
+      { id: "delete_employees", label: "Delete Employees" },
+    ],
+  },
+  {
+    name: "Clients",
+    permissions: [
+      { id: "view_clients", label: "View Clients" },
+      { id: "manage_clients", label: "Manage Clients (Create/Edit/Delete)" },
+    ],
+  },
+  {
+    name: "Safety & Compliance",
+    permissions: [
+      { id: "view_csr", label: "View Company Safety Rating (CSR)" },
+      { id: "view_inventory", label: "View Inventory & Gear" },
+    ],
+  },
+  {
+    name: "Work Sessions",
+    permissions: [
+      { id: "view_work_sessions", label: "View Work Sessions" },
+      { id: "manage_work_sessions", label: "Manage Work Sessions" },
+      { id: "view_work_history", label: "View Work History" },
+      { id: "view_active_workers", label: "View Active Workers" },
+    ],
+  },
+  {
+    name: "Complaints",
+    permissions: [
+      { id: "view_complaints", label: "View Complaints" },
+      { id: "manage_complaints", label: "Manage Complaints" },
+    ],
+  },
+  {
+    name: "Analytics & Financial",
+    permissions: [
+      { id: "view_analytics", label: "View Analytics" },
+      { id: "view_financial_data", label: "View Financial Data (Labor Costs, Wages)" },
+    ],
+  },
 ] as const;
+
+// Flat list of all permissions for compatibility
+const AVAILABLE_PERMISSIONS = PERMISSION_CATEGORIES.flatMap(cat => cat.permissions);
 
 const employeeSchema = z.object({
   name: z.string().min(1, "Name is required"),
@@ -3897,40 +3935,47 @@ export default function Dashboard() {
                                 </Button>
                               </div>
                             </div>
-                            <div className="grid grid-cols-2 gap-2">
-                              {AVAILABLE_PERMISSIONS.map((permission) => (
-                                <FormField
-                                  key={permission.id}
-                                  control={employeeForm.control}
-                                  name="permissions"
-                                  render={({ field }) => {
-                                    return (
-                                      <FormItem
+                            <div className="space-y-4">
+                              {PERMISSION_CATEGORIES.map((category) => (
+                                <div key={category.name} className="space-y-2">
+                                  <h4 className="text-sm font-medium text-muted-foreground border-b pb-1">{category.name}</h4>
+                                  <div className="grid grid-cols-2 gap-2">
+                                    {category.permissions.map((permission) => (
+                                      <FormField
                                         key={permission.id}
-                                        className="flex flex-row items-start space-x-2 space-y-0 bg-muted/30 p-2 rounded-md"
-                                      >
-                                        <FormControl>
-                                          <Checkbox
-                                            checked={field.value?.includes(permission.id)}
-                                            onCheckedChange={(checked) => {
-                                              return checked
-                                                ? field.onChange([...field.value, permission.id])
-                                                : field.onChange(
-                                                    field.value?.filter(
-                                                      (value) => value !== permission.id
-                                                    )
-                                                  )
-                                            }}
-                                            data-testid={`checkbox-permission-${permission.id}`}
-                                          />
-                                        </FormControl>
-                                        <FormLabel className="text-xs font-normal leading-tight cursor-pointer">
-                                          {permission.label}
-                                        </FormLabel>
-                                      </FormItem>
-                                    )
-                                  }}
-                                />
+                                        control={employeeForm.control}
+                                        name="permissions"
+                                        render={({ field }) => {
+                                          return (
+                                            <FormItem
+                                              key={permission.id}
+                                              className="flex flex-row items-start space-x-2 space-y-0 bg-muted/30 p-2 rounded-md"
+                                            >
+                                              <FormControl>
+                                                <Checkbox
+                                                  checked={field.value?.includes(permission.id)}
+                                                  onCheckedChange={(checked) => {
+                                                    return checked
+                                                      ? field.onChange([...field.value, permission.id])
+                                                      : field.onChange(
+                                                          field.value?.filter(
+                                                            (value) => value !== permission.id
+                                                          )
+                                                        )
+                                                  }}
+                                                  data-testid={`checkbox-permission-${permission.id}`}
+                                                />
+                                              </FormControl>
+                                              <FormLabel className="text-xs font-normal leading-tight cursor-pointer">
+                                                {permission.label}
+                                              </FormLabel>
+                                            </FormItem>
+                                          )
+                                        }}
+                                      />
+                                    ))}
+                                  </div>
+                                </div>
                               ))}
                             </div>
                             <FormMessage />
@@ -5676,40 +5721,47 @@ export default function Dashboard() {
                           </Button>
                         </div>
                       </div>
-                      <div className="grid grid-cols-2 gap-2">
-                        {AVAILABLE_PERMISSIONS.map((permission) => (
-                          <FormField
-                            key={permission.id}
-                            control={editEmployeeForm.control}
-                            name="permissions"
-                            render={({ field }) => {
-                              return (
-                                <FormItem
+                      <div className="space-y-4">
+                        {PERMISSION_CATEGORIES.map((category) => (
+                          <div key={category.name} className="space-y-2">
+                            <h4 className="text-sm font-medium text-muted-foreground border-b pb-1">{category.name}</h4>
+                            <div className="grid grid-cols-2 gap-2">
+                              {category.permissions.map((permission) => (
+                                <FormField
                                   key={permission.id}
-                                  className="flex flex-row items-start space-x-2 space-y-0 bg-muted/30 p-2 rounded-md"
-                                >
-                                  <FormControl>
-                                    <Checkbox
-                                      checked={field.value?.includes(permission.id)}
-                                      onCheckedChange={(checked) => {
-                                        return checked
-                                          ? field.onChange([...field.value, permission.id])
-                                          : field.onChange(
-                                              field.value?.filter(
-                                                (value) => value !== permission.id
-                                              )
-                                            )
-                                      }}
-                                      data-testid={`checkbox-edit-permission-${permission.id}`}
-                                    />
-                                  </FormControl>
-                                  <FormLabel className="text-xs font-normal leading-tight cursor-pointer">
-                                    {permission.label}
-                                  </FormLabel>
-                                </FormItem>
-                              )
-                            }}
-                          />
+                                  control={editEmployeeForm.control}
+                                  name="permissions"
+                                  render={({ field }) => {
+                                    return (
+                                      <FormItem
+                                        key={permission.id}
+                                        className="flex flex-row items-start space-x-2 space-y-0 bg-muted/30 p-2 rounded-md"
+                                      >
+                                        <FormControl>
+                                          <Checkbox
+                                            checked={field.value?.includes(permission.id)}
+                                            onCheckedChange={(checked) => {
+                                              return checked
+                                                ? field.onChange([...field.value, permission.id])
+                                                : field.onChange(
+                                                    field.value?.filter(
+                                                      (value) => value !== permission.id
+                                                    )
+                                                  )
+                                            }}
+                                            data-testid={`checkbox-edit-permission-${permission.id}`}
+                                          />
+                                        </FormControl>
+                                        <FormLabel className="text-xs font-normal leading-tight cursor-pointer">
+                                          {permission.label}
+                                        </FormLabel>
+                                      </FormItem>
+                                    )
+                                  }}
+                                />
+                              ))}
+                            </div>
+                          </div>
                         ))}
                       </div>
                       <FormMessage />
