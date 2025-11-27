@@ -274,7 +274,7 @@ export async function reactivateSubscription(subscriptionId: string): Promise<vo
 export async function handleWebhookEvent(
   event: Stripe.Event,
   updateUserSubscription: (params: {
-    userId: number;
+    userId: string;
     stripeCustomerId: string;
     subscriptionId?: string;
     tier?: TierName;
@@ -340,7 +340,7 @@ export async function handleWebhookEvent(
 
         // Update user subscription in database
         await updateUserSubscription({
-          userId: parseInt(userId),
+          userId: userId,
           stripeCustomerId: customerId,
           subscriptionId: subscription.id,
           tier,
@@ -367,7 +367,7 @@ export async function handleWebhookEvent(
 
         // Mark subscription as canceled
         await updateUserSubscription({
-          userId: parseInt(userId),
+          userId: userId,
           stripeCustomerId: customerId,
           subscriptionId: undefined,
           tier: undefined,
