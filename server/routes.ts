@@ -6367,7 +6367,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const documentationRating = (hasHealthSafety && hasCompanyPolicy && hasInsurance) ? 100 : 0;
       const documentationPenalty = documentationRating === 100 ? 0 : 25;
       
-      // 2. Toolbox Meeting Compliance
+      // 2. Toolbox Meeting Compliance (with 7-day coverage window)
+      // A toolbox meeting covers its project for 7 days forward from the meeting date
+      // Meetings can occur outside of work sessions and still provide coverage
+      const TOOLBOX_COVERAGE_DAYS = 7;
+      
       const projects = await storage.getProjectsByCompany(companyId);
       const meetings = await storage.getToolboxMeetingsByCompany(companyId);
       
@@ -6378,25 +6382,54 @@ export async function registerRoutes(app: Express): Promise<Server> {
         allWorkSessions.push(...projectSessions);
       }
       
-      // Calculate toolbox meeting compliance
-      const workSessionDays = new Set<string>();
-      const workSessionDates = new Set<string>();
-      allWorkSessions.forEach((session: any) => {
-        if (session.projectId && session.workDate) {
-          workSessionDays.add(`${session.projectId}|${session.workDate}`);
-          workSessionDates.add(session.workDate);
+      // Build meeting coverage map: for each project, store meeting dates
+      const projectMeetingDates: Map<string, Date[]> = new Map();
+      const otherMeetingDates: Date[] = [];
+      
+      meetings.forEach((meeting: any) => {
+        if (meeting.meetingDate) {
+          const meetingDate = new Date(meeting.meetingDate);
+          if (meeting.projectId === 'other') {
+            otherMeetingDates.push(meetingDate);
+          } else if (meeting.projectId) {
+            if (!projectMeetingDates.has(meeting.projectId)) {
+              projectMeetingDates.set(meeting.projectId, []);
+            }
+            projectMeetingDates.get(meeting.projectId)!.push(meetingDate);
+          }
         }
       });
       
-      const toolboxMeetingDays = new Set<string>();
-      const otherMeetingDates = new Set<string>();
-      meetings.forEach((meeting: any) => {
-        if (meeting.meetingDate) {
-          if (meeting.projectId === 'other') {
-            otherMeetingDates.add(meeting.meetingDate);
-          } else if (meeting.projectId) {
-            toolboxMeetingDays.add(`${meeting.projectId}|${meeting.meetingDate}`);
+      // Helper function to check if a work date is covered by a meeting within the coverage window
+      const isDateCovered = (projectId: string, workDateStr: string): boolean => {
+        const workDate = new Date(workDateStr);
+        
+        // Check project-specific meetings
+        const projectMeetings = projectMeetingDates.get(projectId) || [];
+        for (const meetingDate of projectMeetings) {
+          const daysDiff = Math.abs(Math.floor((workDate.getTime() - meetingDate.getTime()) / (1000 * 60 * 60 * 24)));
+          // Meeting covers work if within 7 days in either direction
+          if (daysDiff <= TOOLBOX_COVERAGE_DAYS) {
+            return true;
           }
+        }
+        
+        // Check "other" meetings (cover all projects)
+        for (const meetingDate of otherMeetingDates) {
+          const daysDiff = Math.abs(Math.floor((workDate.getTime() - meetingDate.getTime()) / (1000 * 60 * 60 * 24)));
+          if (daysDiff <= TOOLBOX_COVERAGE_DAYS) {
+            return true;
+          }
+        }
+        
+        return false;
+      };
+      
+      // Calculate toolbox meeting compliance using coverage window
+      const workSessionDays = new Set<string>();
+      allWorkSessions.forEach((session: any) => {
+        if (session.projectId && session.workDate) {
+          workSessionDays.add(`${session.projectId}|${session.workDate}`);
         }
       });
       
@@ -6404,18 +6437,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
       let toolboxTotalDays = 0;
       workSessionDays.forEach((dayKey) => {
         toolboxTotalDays++;
-        const date = dayKey.split('|')[1];
-        if (toolboxMeetingDays.has(dayKey) || otherMeetingDates.has(date)) {
+        const [projectId, workDate] = dayKey.split('|');
+        if (isDateCovered(projectId, workDate)) {
           toolboxDaysWithMeeting++;
         }
       });
       
-      // If no work sessions, 100% compliance (nothing to comply with)
-      // Otherwise, calculate based on meeting coverage
+      // If no work sessions but have meetings, give full credit
+      // If no work sessions and no meetings, also full credit (nothing to comply with)
       const toolboxMeetingRating = toolboxTotalDays > 0 
         ? Math.round((toolboxDaysWithMeeting / toolboxTotalDays) * 100) 
         : 100;
-      // Penalty is proportional to missed meetings (max 25%)
+      // Penalty is proportional to missed coverage (max 25%)
       const toolboxPenalty = toolboxTotalDays > 0 
         ? Math.round(((toolboxTotalDays - toolboxDaysWithMeeting) / toolboxTotalDays) * 25)
         : 0;
@@ -6578,12 +6611,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const documentationRating = (hasHealthSafety && hasCompanyPolicy && hasInsurance) ? 100 : 0;
       const documentationPenalty = documentationRating === 100 ? 0 : 25;
       
-      // 2. Toolbox Meeting Compliance
+      // 2. Toolbox Meeting Compliance (with 7-day coverage window)
+      // A toolbox meeting covers its project for 7 days forward from the meeting date
+      // Meetings can occur outside of work sessions and still provide coverage
+      const TOOLBOX_COVERAGE_DAYS = 7;
+      
       const projects = await storage.getProjectsByCompany(companyId);
       const meetings = await storage.getToolboxMeetingsByCompany(companyId);
-      
-      console.log("PM CSR Debug - Projects found:", projects.length, projects.map(p => ({ id: p.id, status: p.status })));
-      console.log("PM CSR Debug - Meetings found:", meetings.length, meetings.map((m: any) => ({ projectId: m.projectId, date: m.meetingDate })));
       
       const allWorkSessions: any[] = [];
       for (const project of projects) {
@@ -6591,8 +6625,50 @@ export async function registerRoutes(app: Express): Promise<Server> {
         allWorkSessions.push(...projectSessions);
       }
       
-      console.log("PM CSR Debug - Work sessions found:", allWorkSessions.length, allWorkSessions.map((s: any) => ({ projectId: s.projectId, date: s.workDate })));
+      // Build meeting coverage map: for each project, store meeting dates
+      const projectMeetingDates: Map<string, Date[]> = new Map();
+      const otherMeetingDates: Date[] = [];
       
+      meetings.forEach((meeting: any) => {
+        if (meeting.meetingDate) {
+          const meetingDate = new Date(meeting.meetingDate);
+          if (meeting.projectId === 'other') {
+            otherMeetingDates.push(meetingDate);
+          } else if (meeting.projectId) {
+            if (!projectMeetingDates.has(meeting.projectId)) {
+              projectMeetingDates.set(meeting.projectId, []);
+            }
+            projectMeetingDates.get(meeting.projectId)!.push(meetingDate);
+          }
+        }
+      });
+      
+      // Helper function to check if a work date is covered by a meeting within the coverage window
+      const isDateCovered = (projectId: string, workDateStr: string): boolean => {
+        const workDate = new Date(workDateStr);
+        
+        // Check project-specific meetings
+        const projectMeetings = projectMeetingDates.get(projectId) || [];
+        for (const meetingDate of projectMeetings) {
+          const daysDiff = Math.abs(Math.floor((workDate.getTime() - meetingDate.getTime()) / (1000 * 60 * 60 * 24)));
+          // Meeting covers work if within 7 days in either direction
+          if (daysDiff <= TOOLBOX_COVERAGE_DAYS) {
+            return true;
+          }
+        }
+        
+        // Check "other" meetings (cover all projects)
+        for (const meetingDate of otherMeetingDates) {
+          const daysDiff = Math.abs(Math.floor((workDate.getTime() - meetingDate.getTime()) / (1000 * 60 * 60 * 24)));
+          if (daysDiff <= TOOLBOX_COVERAGE_DAYS) {
+            return true;
+          }
+        }
+        
+        return false;
+      };
+      
+      // Calculate toolbox meeting compliance using coverage window
       const workSessionDays = new Set<string>();
       allWorkSessions.forEach((session: any) => {
         if (session.projectId && session.workDate) {
@@ -6600,33 +6676,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       });
       
-      const toolboxMeetingDays = new Set<string>();
-      const otherMeetingDates = new Set<string>();
-      meetings.forEach((meeting: any) => {
-        if (meeting.meetingDate) {
-          if (meeting.projectId === 'other') {
-            otherMeetingDates.add(meeting.meetingDate);
-          } else if (meeting.projectId) {
-            toolboxMeetingDays.add(`${meeting.projectId}|${meeting.meetingDate}`);
-          }
-        }
-      });
-      
-      console.log("PM CSR Debug - Work session days:", Array.from(workSessionDays));
-      console.log("PM CSR Debug - Toolbox meeting days:", Array.from(toolboxMeetingDays));
-      console.log("PM CSR Debug - Other meeting dates:", Array.from(otherMeetingDates));
-      
       let toolboxDaysWithMeeting = 0;
       let toolboxTotalDays = 0;
       workSessionDays.forEach((dayKey) => {
         toolboxTotalDays++;
-        const date = dayKey.split('|')[1];
-        if (toolboxMeetingDays.has(dayKey) || otherMeetingDates.has(date)) {
+        const [projectId, workDate] = dayKey.split('|');
+        if (isDateCovered(projectId, workDate)) {
           toolboxDaysWithMeeting++;
         }
       });
-      
-      console.log("PM CSR Debug - Result:", { toolboxTotalDays, toolboxDaysWithMeeting });
       
       const toolboxMeetingRating = toolboxTotalDays > 0 
         ? Math.round((toolboxDaysWithMeeting / toolboxTotalDays) * 100) 
