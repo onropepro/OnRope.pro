@@ -499,8 +499,24 @@ export default function Login() {
 
       {/* Login Modal - Overlay when shown */}
       {showLoginForm && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <Card className="w-full max-w-md shadow-2xl border-2 relative">
+        <div 
+          className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+          onClick={() => setShowLoginForm(false)}
+        >
+          <Card 
+            className="w-full max-w-md shadow-2xl border-2 relative"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Close Button */}
+            <Button
+              variant="ghost"
+              size="icon"
+              className="absolute top-3 right-3 z-10"
+              onClick={() => setShowLoginForm(false)}
+              data-testid="button-close-login"
+            >
+              <span className="material-icons">close</span>
+            </Button>
           <CardHeader className="space-y-3 pb-6">
             <div className="flex items-center gap-3 md:hidden mb-2">
               <div className="h-12 w-12 rounded-xl bg-primary/10 flex items-center justify-center">
