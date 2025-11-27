@@ -53,13 +53,21 @@ function groupDocumentsByDate<T>(
   
   items.forEach(item => {
     const dateValue = getDateFn(item);
-    const date = typeof dateValue === 'string' ? new Date(dateValue) : dateValue;
+    let year: number, month: number, day: number;
     
-    if (isNaN(date.getTime())) return;
-    
-    const year = date.getFullYear();
-    const month = date.getMonth();
-    const day = date.getDate();
+    if (typeof dateValue === 'string') {
+      const dateStr = dateValue.split('T')[0];
+      const [y, m, d] = dateStr.split('-').map(Number);
+      if (isNaN(y) || isNaN(m) || isNaN(d)) return;
+      year = y;
+      month = m - 1;
+      day = d;
+    } else {
+      if (isNaN(dateValue.getTime())) return;
+      year = dateValue.getFullYear();
+      month = dateValue.getMonth();
+      day = dateValue.getDate();
+    }
     
     if (!grouped.has(year)) {
       grouped.set(year, new Map());
@@ -100,12 +108,14 @@ function groupDocumentsByDate<T>(
       
       for (const day of sortedDays) {
         const dayItems = monthMap.get(day)!;
-        const dateObj = new Date(year, month, day);
+        const paddedMonth = String(month + 1).padStart(2, '0');
+        const paddedDay = String(day).padStart(2, '0');
+        const localDateStr = `${year}-${paddedMonth}-${paddedDay}`;
         
         days.push({
           day,
-          date: dateObj.toISOString().split('T')[0],
-          formattedDate: dateObj.toLocaleDateString('en-US', { 
+          date: localDateStr,
+          formattedDate: new Date(year, month, day).toLocaleDateString('en-US', { 
             weekday: 'short', 
             month: 'short', 
             day: 'numeric' 
@@ -1945,8 +1955,8 @@ export default function Documents() {
                   <div className="space-y-2">
                     {groupDocumentsByDate(inspections, (i: any) => i.inspectionDate).map((yearGroup) => (
                       <Collapsible key={yearGroup.year} defaultOpen={yearGroup.year === new Date().getFullYear()}>
-                        <CollapsibleTrigger className="flex items-center gap-2 w-full p-3 rounded-lg bg-indigo-500/5 hover-elevate">
-                          <ChevronDown className="h-4 w-4 text-indigo-600 dark:text-indigo-400 transition-transform duration-200 [&[data-state=closed]>svg]:rotate-[-90deg]" />
+                        <CollapsibleTrigger className="group flex items-center gap-2 w-full p-3 rounded-lg bg-indigo-500/5 hover-elevate" data-testid={`toggle-inspections-year-${yearGroup.year}`}>
+                          <ChevronRight className="h-4 w-4 text-indigo-600 dark:text-indigo-400 transition-transform duration-200 rotate-0 group-data-[state=open]:rotate-90" />
                           <FolderOpen className="h-4 w-4 text-indigo-600 dark:text-indigo-400" />
                           <span className="font-semibold text-indigo-600 dark:text-indigo-400">{yearGroup.year}</span>
                           <Badge variant="secondary" className="ml-auto">{yearGroup.totalCount}</Badge>
@@ -1954,8 +1964,8 @@ export default function Documents() {
                         <CollapsibleContent className="pl-4 mt-2 space-y-2">
                           {yearGroup.months.map((monthGroup) => (
                             <Collapsible key={monthGroup.month} defaultOpen={yearGroup.year === new Date().getFullYear() && monthGroup.month === new Date().getMonth()}>
-                              <CollapsibleTrigger className="flex items-center gap-2 w-full p-2 rounded-md bg-indigo-500/5 hover-elevate">
-                                <ChevronDown className="h-3 w-3 text-muted-foreground transition-transform duration-200 [&[data-state=closed]>svg]:rotate-[-90deg]" />
+                              <CollapsibleTrigger className="group flex items-center gap-2 w-full p-2 rounded-md bg-indigo-500/5 hover-elevate" data-testid={`toggle-inspections-month-${yearGroup.year}-${monthGroup.month}`}>
+                                <ChevronRight className="h-3 w-3 text-muted-foreground transition-transform duration-200 rotate-0 group-data-[state=open]:rotate-90" />
                                 <span className="font-medium">{monthGroup.monthName}</span>
                                 <Badge variant="outline" className="ml-auto text-xs">{monthGroup.totalCount}</Badge>
                               </CollapsibleTrigger>
@@ -2029,8 +2039,8 @@ export default function Documents() {
                   <div className="space-y-2">
                     {groupDocumentsByDate(meetings, (m: any) => m.meetingDate).map((yearGroup) => (
                       <Collapsible key={yearGroup.year} defaultOpen={yearGroup.year === new Date().getFullYear()}>
-                        <CollapsibleTrigger className="flex items-center gap-2 w-full p-3 rounded-lg bg-cyan-500/5 hover-elevate">
-                          <ChevronDown className="h-4 w-4 text-cyan-600 dark:text-cyan-400 transition-transform duration-200 [&[data-state=closed]>svg]:rotate-[-90deg]" />
+                        <CollapsibleTrigger className="group flex items-center gap-2 w-full p-3 rounded-lg bg-cyan-500/5 hover-elevate" data-testid={`toggle-meetings-year-${yearGroup.year}`}>
+                          <ChevronRight className="h-4 w-4 text-cyan-600 dark:text-cyan-400 transition-transform duration-200 rotate-0 group-data-[state=open]:rotate-90" />
                           <FolderOpen className="h-4 w-4 text-cyan-600 dark:text-cyan-400" />
                           <span className="font-semibold text-cyan-600 dark:text-cyan-400">{yearGroup.year}</span>
                           <Badge variant="secondary" className="ml-auto">{yearGroup.totalCount}</Badge>
@@ -2038,8 +2048,8 @@ export default function Documents() {
                         <CollapsibleContent className="pl-4 mt-2 space-y-2">
                           {yearGroup.months.map((monthGroup) => (
                             <Collapsible key={monthGroup.month} defaultOpen={yearGroup.year === new Date().getFullYear() && monthGroup.month === new Date().getMonth()}>
-                              <CollapsibleTrigger className="flex items-center gap-2 w-full p-2 rounded-md bg-cyan-500/5 hover-elevate">
-                                <ChevronDown className="h-3 w-3 text-muted-foreground transition-transform duration-200 [&[data-state=closed]>svg]:rotate-[-90deg]" />
+                              <CollapsibleTrigger className="group flex items-center gap-2 w-full p-2 rounded-md bg-cyan-500/5 hover-elevate" data-testid={`toggle-meetings-month-${yearGroup.year}-${monthGroup.month}`}>
+                                <ChevronRight className="h-3 w-3 text-muted-foreground transition-transform duration-200 rotate-0 group-data-[state=open]:rotate-90" />
                                 <span className="font-medium">{monthGroup.monthName}</span>
                                 <Badge variant="outline" className="ml-auto text-xs">{monthGroup.totalCount}</Badge>
                               </CollapsibleTrigger>
@@ -2231,8 +2241,8 @@ export default function Documents() {
                 <div className="space-y-2">
                   {groupDocumentsByDate(flhaForms, (f: any) => f.assessmentDate).map((yearGroup) => (
                     <Collapsible key={yearGroup.year} defaultOpen={yearGroup.year === new Date().getFullYear()}>
-                      <CollapsibleTrigger className="flex items-center gap-2 w-full p-3 rounded-lg bg-orange-500/5 hover-elevate">
-                        <ChevronDown className="h-4 w-4 text-orange-600 dark:text-orange-400 transition-transform duration-200 [&[data-state=closed]>svg]:rotate-[-90deg]" />
+                      <CollapsibleTrigger className="group flex items-center gap-2 w-full p-3 rounded-lg bg-orange-500/5 hover-elevate" data-testid={`toggle-flha-year-${yearGroup.year}`}>
+                        <ChevronRight className="h-4 w-4 text-orange-600 dark:text-orange-400 transition-transform duration-200 rotate-0 group-data-[state=open]:rotate-90" />
                         <FolderOpen className="h-4 w-4 text-orange-600 dark:text-orange-400" />
                         <span className="font-semibold text-orange-600 dark:text-orange-400">{yearGroup.year}</span>
                         <Badge variant="secondary" className="ml-auto">{yearGroup.totalCount}</Badge>
@@ -2240,8 +2250,8 @@ export default function Documents() {
                       <CollapsibleContent className="pl-4 mt-2 space-y-2">
                         {yearGroup.months.map((monthGroup) => (
                           <Collapsible key={monthGroup.month} defaultOpen={yearGroup.year === new Date().getFullYear() && monthGroup.month === new Date().getMonth()}>
-                            <CollapsibleTrigger className="flex items-center gap-2 w-full p-2 rounded-md bg-orange-500/5 hover-elevate">
-                              <ChevronDown className="h-3 w-3 text-muted-foreground transition-transform duration-200 [&[data-state=closed]>svg]:rotate-[-90deg]" />
+                            <CollapsibleTrigger className="group flex items-center gap-2 w-full p-2 rounded-md bg-orange-500/5 hover-elevate" data-testid={`toggle-flha-month-${yearGroup.year}-${monthGroup.month}`}>
+                              <ChevronRight className="h-3 w-3 text-muted-foreground transition-transform duration-200 rotate-0 group-data-[state=open]:rotate-90" />
                               <span className="font-medium">{monthGroup.monthName}</span>
                               <Badge variant="outline" className="ml-auto text-xs">{monthGroup.totalCount}</Badge>
                             </CollapsibleTrigger>
@@ -2314,8 +2324,8 @@ export default function Documents() {
                 <div className="space-y-2">
                   {groupDocumentsByDate(incidentReports, (r: any) => r.incidentDate).map((yearGroup) => (
                     <Collapsible key={yearGroup.year} defaultOpen={yearGroup.year === new Date().getFullYear()}>
-                      <CollapsibleTrigger className="flex items-center gap-2 w-full p-3 rounded-lg bg-red-500/5 hover-elevate">
-                        <ChevronDown className="h-4 w-4 text-red-600 dark:text-red-400 transition-transform duration-200 [&[data-state=closed]>svg]:rotate-[-90deg]" />
+                      <CollapsibleTrigger className="group flex items-center gap-2 w-full p-3 rounded-lg bg-red-500/5 hover-elevate" data-testid={`toggle-incidents-year-${yearGroup.year}`}>
+                        <ChevronRight className="h-4 w-4 text-red-600 dark:text-red-400 transition-transform duration-200 rotate-0 group-data-[state=open]:rotate-90" />
                         <FolderOpen className="h-4 w-4 text-red-600 dark:text-red-400" />
                         <span className="font-semibold text-red-600 dark:text-red-400">{yearGroup.year}</span>
                         <Badge variant="secondary" className="ml-auto">{yearGroup.totalCount}</Badge>
@@ -2323,8 +2333,8 @@ export default function Documents() {
                       <CollapsibleContent className="pl-4 mt-2 space-y-2">
                         {yearGroup.months.map((monthGroup) => (
                           <Collapsible key={monthGroup.month} defaultOpen={yearGroup.year === new Date().getFullYear() && monthGroup.month === new Date().getMonth()}>
-                            <CollapsibleTrigger className="flex items-center gap-2 w-full p-2 rounded-md bg-red-500/5 hover-elevate">
-                              <ChevronDown className="h-3 w-3 text-muted-foreground transition-transform duration-200 [&[data-state=closed]>svg]:rotate-[-90deg]" />
+                            <CollapsibleTrigger className="group flex items-center gap-2 w-full p-2 rounded-md bg-red-500/5 hover-elevate" data-testid={`toggle-incidents-month-${yearGroup.year}-${monthGroup.month}`}>
+                              <ChevronRight className="h-3 w-3 text-muted-foreground transition-transform duration-200 rotate-0 group-data-[state=open]:rotate-90" />
                               <span className="font-medium">{monthGroup.monthName}</span>
                               <Badge variant="outline" className="ml-auto text-xs">{monthGroup.totalCount}</Badge>
                             </CollapsibleTrigger>
@@ -2411,38 +2421,61 @@ export default function Documents() {
           </CardHeader>
           <CardContent className="pt-6">
             {methodStatements.length > 0 ? (
-              <div className="space-y-3">
-                {methodStatements.map((statement) => (
-                  <div key={statement.id} className="flex items-center gap-4 p-4 rounded-xl border bg-card hover-elevate active-elevate-2">
-                    <div className="p-2 bg-emerald-500/10 rounded-lg">
-                      <FileText className="h-5 w-5 text-emerald-600 dark:text-emerald-400 flex-shrink-0" />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="font-semibold">
-                        {statement.location || 'Method Statement'}
-                      </div>
-                      <div className="text-sm text-muted-foreground">
-                        {new Date(statement.dateCreated).toLocaleDateString()} • Prepared by {statement.preparedByName}
-                      </div>
-                      {statement.workDescription && (
-                        <div className="text-sm text-muted-foreground mt-1 line-clamp-1">
-                          {statement.workDescription}
-                        </div>
-                      )}
-                    </div>
-                    <Badge variant={statement.status === 'approved' ? 'default' : 'secondary'}>
-                      {statement.status || 'draft'}
-                    </Badge>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() => downloadMethodStatement(statement, currentUser)}
-                      data-testid={`download-method-statement-${statement.id}`}
-                    >
-                      <Download className="h-4 w-4 mr-1" />
-                      Download
-                    </Button>
-                  </div>
+              <div className="space-y-2">
+                {groupDocumentsByDate(methodStatements, (s: any) => s.dateCreated).map((yearGroup) => (
+                  <Collapsible key={yearGroup.year} defaultOpen={yearGroup.year === new Date().getFullYear()}>
+                    <CollapsibleTrigger className="group flex items-center gap-2 w-full p-3 rounded-lg bg-emerald-500/5 hover-elevate" data-testid={`toggle-methods-year-${yearGroup.year}`}>
+                      <ChevronRight className="h-4 w-4 text-emerald-600 dark:text-emerald-400 transition-transform duration-200 rotate-0 group-data-[state=open]:rotate-90" />
+                      <FolderOpen className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
+                      <span className="font-semibold text-emerald-600 dark:text-emerald-400">{yearGroup.year}</span>
+                      <Badge variant="secondary" className="ml-auto">{yearGroup.totalCount}</Badge>
+                    </CollapsibleTrigger>
+                    <CollapsibleContent className="pl-4 mt-2 space-y-2">
+                      {yearGroup.months.map((monthGroup) => (
+                        <Collapsible key={monthGroup.month} defaultOpen={yearGroup.year === new Date().getFullYear() && monthGroup.month === new Date().getMonth()}>
+                          <CollapsibleTrigger className="group flex items-center gap-2 w-full p-2 rounded-md bg-emerald-500/5 hover-elevate" data-testid={`toggle-methods-month-${yearGroup.year}-${monthGroup.month}`}>
+                            <ChevronRight className="h-3 w-3 text-muted-foreground transition-transform duration-200 rotate-0 group-data-[state=open]:rotate-90" />
+                            <span className="font-medium">{monthGroup.monthName}</span>
+                            <Badge variant="outline" className="ml-auto text-xs">{monthGroup.totalCount}</Badge>
+                          </CollapsibleTrigger>
+                          <CollapsibleContent className="pl-4 mt-2 space-y-2">
+                            {monthGroup.days.map((dayGroup) => (
+                              <div key={dayGroup.date} className="space-y-2">
+                                <div className="flex items-center gap-2 text-sm text-muted-foreground py-1">
+                                  <Calendar className="h-3 w-3" />
+                                  <span className="font-medium">{dayGroup.formattedDate}</span>
+                                  <span className="text-xs">({dayGroup.items.length})</span>
+                                </div>
+                                <div className="space-y-2 pl-5">
+                                  {dayGroup.items.map((statement: any) => (
+                                    <div key={statement.id} className="flex items-center gap-4 p-3 rounded-lg border bg-card hover-elevate active-elevate-2">
+                                      <div className="p-2 bg-emerald-500/10 rounded-lg">
+                                        <FileText className="h-4 w-4 text-emerald-600 dark:text-emerald-400 flex-shrink-0" />
+                                      </div>
+                                      <div className="flex-1 min-w-0">
+                                        <div className="font-medium text-sm">{statement.location || 'Method Statement'}</div>
+                                        <div className="text-xs text-muted-foreground">Prepared by {statement.preparedByName}</div>
+                                        {statement.workDescription && (
+                                          <div className="text-xs text-muted-foreground line-clamp-1">{statement.workDescription}</div>
+                                        )}
+                                      </div>
+                                      <Badge variant={statement.status === 'approved' ? 'default' : 'secondary'} className="text-xs">
+                                        {statement.status || 'draft'}
+                                      </Badge>
+                                      <Button size="sm" variant="outline" onClick={() => downloadMethodStatement(statement, currentUser)} data-testid={`download-method-statement-${statement.id}`}>
+                                        <Download className="h-3 w-3 mr-1" />
+                                        PDF
+                                      </Button>
+                                    </div>
+                                  ))}
+                                </div>
+                              </div>
+                            ))}
+                          </CollapsibleContent>
+                        </Collapsible>
+                      ))}
+                    </CollapsibleContent>
+                  </Collapsible>
                 ))}
               </div>
             ) : (
