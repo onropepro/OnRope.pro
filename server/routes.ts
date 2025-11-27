@@ -2328,6 +2328,136 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // SuperUser: Gift a free company account
+  app.post("/api/superuser/gift-company", requireAuth, async (req: Request, res: Response) => {
+    try {
+      // Only allow superuser to access this endpoint
+      if (req.session.userId !== 'superuser') {
+        return res.status(403).json({ message: "Access denied. SuperUser only." });
+      }
+
+      const { companyName, email, password, tier } = req.body;
+
+      console.log('[Gift-Company] Creating gifted account:', { companyName, email, tier });
+
+      // Validation
+      if (!companyName || !email || !password || !tier) {
+        return res.status(400).json({ message: "Missing required fields: companyName, email, password, tier" });
+      }
+
+      // Validate tier
+      const validTiers = ['basic', 'starter', 'premium', 'enterprise'];
+      if (!validTiers.includes(tier)) {
+        return res.status(400).json({ message: "Invalid tier. Must be one of: basic, starter, premium, enterprise" });
+      }
+
+      // Get tier configuration
+      const tierConfig = TIER_CONFIG[tier as TierName];
+
+      // Generate a gift license key
+      // Format: GIFT-XXXXX-XXXXX-XXXXX-[TIER]
+      const generateRandomSegment = () => {
+        const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+        return Array(5).fill(0).map(() => chars[Math.floor(Math.random() * chars.length)]).join('');
+      };
+      const tierSuffix = tier === 'basic' ? '1' : tier === 'starter' ? '2' : tier === 'premium' ? '3' : '4';
+      const giftLicenseKey = `GIFT-${generateRandomSegment()}-${generateRandomSegment()}-${generateRandomSegment()}-${tierSuffix}`;
+      const timestamp = Date.now();
+
+      // Hash password before transaction
+      const passwordHash = await bcrypt.hash(password, 10);
+
+      // Use transaction for atomic user and license creation
+      const result = await db.transaction(async (tx) => {
+        // Check if user already exists (within transaction)
+        const existingUserByEmail = await tx.query.users.findFirst({
+          where: eq(users.email, email),
+        });
+
+        if (existingUserByEmail) {
+          throw new Error("Email already registered");
+        }
+
+        const existingUserByCompanyName = await tx.query.users.findFirst({
+          where: eq(users.companyName, companyName),
+        });
+
+        if (existingUserByCompanyName) {
+          throw new Error("Company name already taken");
+        }
+
+        // Create user with subscription data (active status since it's a gift)
+        const [user] = await tx.insert(users).values({
+          companyName,
+          email,
+          passwordHash,
+          role: 'company',
+          stripeCustomerId: `gift_${timestamp}`, // Placeholder for gift accounts
+          stripeSubscriptionId: `gift_sub_${timestamp}`, // Placeholder for gift accounts
+          subscriptionTier: tier,
+          subscriptionStatus: 'active', // Gift accounts are immediately active
+          licenseKey: giftLicenseKey,
+        }).returning();
+
+        if (!user) {
+          throw new Error("Failed to create user");
+        }
+
+        console.log('[Gift-Company] User created:', user.id);
+
+        // Store gift license key in database (within same transaction)
+        await tx.insert(licenseKeys).values({
+          licenseKey: giftLicenseKey,
+          stripeSessionId: `gift_session_${timestamp}`, // Placeholder for gift
+          stripeCustomerId: `gift_${timestamp}`,
+          stripeSubscriptionId: `gift_sub_${timestamp}`,
+          tier,
+          currency: 'usd',
+          used: true,
+          usedByUserId: user.id,
+          usedAt: new Date(),
+        });
+
+        console.log('[Gift-Company] Gift license key created:', giftLicenseKey);
+
+        return user;
+      });
+
+      // Create default payroll config (outside transaction - not critical)
+      try {
+        await storage.createPayPeriodConfig({
+          companyId: result.id,
+          periodType: 'semi-monthly',
+          firstPayDay: 1,
+          secondPayDay: 15,
+        });
+        await storage.generatePayPeriods(result.id, 6);
+        console.log('[Gift-Company] Payroll config created');
+      } catch (error) {
+        console.error('[Gift-Company] Payroll setup error:', error);
+        // Don't fail if payroll setup fails - account is already created
+      }
+
+      console.log('[Gift-Company] Gifted account created successfully:', email);
+
+      // Return user without password
+      const { passwordHash: _, ...userWithoutPassword } = result;
+      res.json({ 
+        success: true, 
+        message: `Company "${companyName}" created with ${tierConfig.name} tier access`,
+        user: userWithoutPassword,
+        licenseKey: giftLicenseKey,
+        tier: tierConfig.name,
+        maxProjects: tierConfig.maxProjects,
+        maxSeats: tierConfig.maxSeats,
+      });
+    } catch (error: any) {
+      console.error('[Gift-Company] Error:', error);
+      const message = error.message || "Failed to create gifted company account";
+      res.status(400).json({ message });
+    }
+  });
+
   // Update user profile
   app.patch("/api/user/profile", requireAuth, async (req: Request, res: Response) => {
     try {
