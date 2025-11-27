@@ -148,9 +148,9 @@ export default function Inventory() {
   
   // Helper function to calculate available quantity for an item
   const getAvailableQuantity = (item: GearItem) => {
-    const totalQuantity = item.quantity || 0;
+    const totalQuantity = Number(item.quantity) || 0;
     const assignments = getItemAssignments(item.id);
-    const assignedQuantity = assignments.reduce((sum, a) => sum + a.quantity, 0);
+    const assignedQuantity = assignments.reduce((sum, a) => sum + (Number(a.quantity) || 0), 0);
     return totalQuantity - assignedQuantity;
   };
 
