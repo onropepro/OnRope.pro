@@ -118,7 +118,7 @@ export default function CompanyDetail() {
     <div className="min-h-screen page-gradient p-6">
       <div className="max-w-7xl mx-auto space-y-6">
         {/* Header */}
-        <div className="flex items-center justify-between">
+        <div className="flex flex-wrap items-center justify-between gap-4">
           <div className="flex items-center gap-4">
             <Link href="/superuser/companies">
               <Button variant="outline" data-testid="button-back">
@@ -127,7 +127,7 @@ export default function CompanyDetail() {
               </Button>
             </Link>
             <div>
-              <div className="flex items-center gap-3">
+              <div className="flex flex-wrap items-center gap-3">
                 <h1 className="text-4xl font-bold gradient-text">{company.companyName || "Unnamed Company"}</h1>
                 {company.subscriptionStatus === 'active' || company.subscriptionStatus === 'trialing' ? (
                   <Badge className="bg-emerald-500/10 text-emerald-600 border-emerald-500/20" data-testid="badge-verified">
@@ -146,6 +146,13 @@ export default function CompanyDetail() {
               </p>
             </div>
           </div>
+          <Button 
+            onClick={() => setGiftAddonsDialogOpen(true)}
+            data-testid="button-gift-addons"
+          >
+            <span className="material-icons mr-2">card_giftcard</span>
+            Gift Add-ons
+          </Button>
         </div>
 
         {/* Company Info Card */}
@@ -293,6 +300,127 @@ export default function CompanyDetail() {
           </TabsContent>
         </Tabs>
       </div>
+
+      {/* Gift Add-ons Dialog */}
+      <Dialog open={giftAddonsDialogOpen} onOpenChange={setGiftAddonsDialogOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <span className="material-icons text-xl">card_giftcard</span>
+              Gift Add-ons
+            </DialogTitle>
+            <DialogDescription>
+              Gift free add-ons to {company.companyName || "this company"}. These add-ons will be added to their existing add-ons.
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="space-y-6 py-4">
+            {/* Current Add-ons Display */}
+            <div className="p-4 bg-muted/50 rounded-lg space-y-2">
+              <p className="text-sm font-medium">Current Add-ons</p>
+              <div className="flex flex-wrap gap-2">
+                {company.additionalSeatsCount > 0 && (
+                  <Badge variant="secondary">+{company.additionalSeatsCount} Seats</Badge>
+                )}
+                {company.additionalProjectsCount > 0 && (
+                  <Badge variant="secondary">+{company.additionalProjectsCount} Projects</Badge>
+                )}
+                {company.whitelabelBrandingActive && (
+                  <Badge variant="secondary">White Label Active</Badge>
+                )}
+                {!company.additionalSeatsCount && !company.additionalProjectsCount && !company.whitelabelBrandingActive && (
+                  <p className="text-sm text-muted-foreground">No add-ons</p>
+                )}
+              </div>
+            </div>
+
+            {/* Extra Seats */}
+            <div className="space-y-2">
+              <Label htmlFor="extraSeats">Extra Seat Packs (2 seats each)</Label>
+              <Input
+                id="extraSeats"
+                type="number"
+                min={0}
+                max={50}
+                value={addonsForm.extraSeats}
+                onChange={(e) => setAddonsForm(prev => ({ ...prev, extraSeats: parseInt(e.target.value) || 0 }))}
+                data-testid="input-extra-seats"
+              />
+              <p className="text-xs text-muted-foreground">
+                {addonsForm.extraSeats > 0 ? `Will add ${addonsForm.extraSeats * 2} seats` : 'Enter number of seat packs to gift'}
+              </p>
+            </div>
+
+            {/* Extra Projects */}
+            <div className="space-y-2">
+              <Label htmlFor="extraProjects">Extra Projects</Label>
+              <Input
+                id="extraProjects"
+                type="number"
+                min={0}
+                max={100}
+                value={addonsForm.extraProjects}
+                onChange={(e) => setAddonsForm(prev => ({ ...prev, extraProjects: parseInt(e.target.value) || 0 }))}
+                data-testid="input-extra-projects"
+              />
+              <p className="text-xs text-muted-foreground">
+                {addonsForm.extraProjects > 0 ? `Will add ${addonsForm.extraProjects} project slots` : 'Enter number of extra projects to gift'}
+              </p>
+            </div>
+
+            {/* White Label Branding */}
+            <div className="flex items-center space-x-3 p-3 rounded-lg border">
+              <Checkbox
+                id="whiteLabel"
+                checked={addonsForm.whiteLabel}
+                onCheckedChange={(checked) => setAddonsForm(prev => ({ ...prev, whiteLabel: checked === true }))}
+                disabled={company.whitelabelBrandingActive}
+                data-testid="checkbox-white-label"
+              />
+              <div className="flex-1">
+                <Label htmlFor="whiteLabel" className="cursor-pointer">
+                  White Label Branding
+                </Label>
+                <p className="text-xs text-muted-foreground">
+                  {company.whitelabelBrandingActive 
+                    ? 'Already active for this company' 
+                    : 'Enable custom branding for this company'}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <DialogFooter className="gap-2">
+            <Button 
+              variant="outline" 
+              onClick={() => {
+                setAddonsForm({ extraSeats: 0, extraProjects: 0, whiteLabel: false });
+                setGiftAddonsDialogOpen(false);
+              }}
+              data-testid="button-cancel-gift"
+            >
+              Cancel
+            </Button>
+            <Button 
+              onClick={() => giftAddonsMutation.mutate(addonsForm)}
+              disabled={giftAddonsMutation.isPending || (!addonsForm.extraSeats && !addonsForm.extraProjects && !addonsForm.whiteLabel)}
+              data-testid="button-confirm-gift"
+            >
+              {giftAddonsMutation.isPending ? (
+                <>
+                  <span className="material-icons animate-spin mr-2 text-sm">refresh</span>
+                  Gifting...
+                </>
+              ) : (
+                <>
+                  <span className="material-icons mr-2 text-sm">card_giftcard</span>
+                  Gift Add-ons
+                </>
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

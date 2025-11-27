@@ -2472,46 +2472,65 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       console.log('[Gift-Addons] Gifting add-ons to company:', { companyId, extraSeats, extraProjects, whiteLabel });
 
+      // Validate inputs - ensure non-negative integers
+      const parsedSeats = parseInt(extraSeats) || 0;
+      const parsedProjects = parseInt(extraProjects) || 0;
+      const parsedWhiteLabel = whiteLabel === true;
+
+      if (parsedSeats < 0 || parsedProjects < 0) {
+        return res.status(400).json({ message: "Add-on counts cannot be negative" });
+      }
+
+      if (parsedSeats === 0 && parsedProjects === 0 && !parsedWhiteLabel) {
+        return res.status(400).json({ message: "Please select at least one add-on to gift" });
+      }
+
       // Fetch the company
       const company = await storage.getUserById(companyId);
       if (!company || company.role !== 'company') {
         return res.status(404).json({ message: "Company not found" });
       }
 
-      // Build update object
+      // Build update object with validated values
       const updates: any = {};
       
-      if (typeof extraSeats === 'number' && extraSeats >= 0) {
-        // Each seat add-on is 2 seats
-        updates.additionalSeatsCount = (company.additionalSeatsCount || 0) + (extraSeats * 2);
+      if (parsedSeats > 0) {
+        // Each seat pack is 2 seats
+        updates.additionalSeatsCount = (company.additionalSeatsCount || 0) + (parsedSeats * 2);
       }
       
-      if (typeof extraProjects === 'number' && extraProjects >= 0) {
-        updates.additionalProjectsCount = (company.additionalProjectsCount || 0) + extraProjects;
+      if (parsedProjects > 0) {
+        updates.additionalProjectsCount = (company.additionalProjectsCount || 0) + parsedProjects;
       }
       
-      if (whiteLabel === true) {
+      if (parsedWhiteLabel && !company.whitelabelBrandingActive) {
         updates.whitelabelBrandingActive = true;
       }
 
       // Check if there's anything to update
       if (Object.keys(updates).length === 0) {
-        return res.status(400).json({ message: "No add-ons specified to gift" });
+        return res.status(400).json({ message: "No new add-ons to gift (white label may already be active)" });
       }
 
-      // Update the company
+      // Update the company in database
       await db.update(users)
         .set(updates)
         .where(eq(users.id, companyId));
 
-      // Fetch updated company
+      // Fetch updated company to confirm changes
       const updatedCompany = await storage.getUserById(companyId);
 
       console.log('[Gift-Addons] Add-ons gifted successfully:', updates);
 
+      // Build descriptive message
+      const giftedItems: string[] = [];
+      if (parsedSeats > 0) giftedItems.push(`${parsedSeats * 2} seats`);
+      if (parsedProjects > 0) giftedItems.push(`${parsedProjects} projects`);
+      if (parsedWhiteLabel && !company.whitelabelBrandingActive) giftedItems.push('white-label branding');
+
       res.json({
         success: true,
-        message: "Add-ons gifted successfully",
+        message: `Successfully gifted ${giftedItems.join(', ')} to ${company.companyName}`,
         company: {
           id: updatedCompany?.id,
           companyName: updatedCompany?.companyName,
@@ -2520,9 +2539,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
           whitelabelBrandingActive: updatedCompany?.whitelabelBrandingActive,
         },
         gifted: {
-          seats: extraSeats ? extraSeats * 2 : 0,
-          projects: extraProjects || 0,
-          whiteLabel: whiteLabel || false,
+          seats: parsedSeats * 2,
+          projects: parsedProjects,
+          whiteLabel: parsedWhiteLabel && !company.whitelabelBrandingActive,
         },
       });
     } catch (error: any) {
