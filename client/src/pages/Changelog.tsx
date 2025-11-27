@@ -1,4 +1,4 @@
-import { useLocation } from "wouter";
+import { useLocation, Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -30,7 +30,14 @@ import {
   Package,
   MessageSquare,
   Home,
-  Settings
+  Settings,
+  LayoutDashboard,
+  FolderOpen,
+  Receipt,
+  Timer,
+  CalendarDays,
+  ChevronRight,
+  ExternalLink
 } from "lucide-react";
 
 type ChangelogSection = {
@@ -41,6 +48,125 @@ type ChangelogSection = {
   features: string[];
   status: "complete" | "in-progress" | "planned";
 };
+
+type PageLink = {
+  name: string;
+  path: string;
+  description: string;
+  roles: string[];
+};
+
+type PageCategory = {
+  category: string;
+  icon: any;
+  iconColor: string;
+  pages: PageLink[];
+};
+
+const pagesData: PageCategory[] = [
+  {
+    category: "Public Pages",
+    icon: Globe,
+    iconColor: "text-green-600 dark:text-green-400",
+    pages: [
+      { name: "Login", path: "/login", description: "User authentication", roles: ["Public"] },
+      { name: "Register", path: "/register", description: "New company registration", roles: ["Public"] },
+      { name: "Get License", path: "/get-license", description: "Subscription pricing", roles: ["Public"] },
+      { name: "Resident/PM Linking", path: "/link", description: "Link account with company code", roles: ["Public"] },
+      { name: "Changelog", path: "/changelog", description: "Platform feature overview", roles: ["Public"] },
+    ]
+  },
+  {
+    category: "Employee Dashboard & Core",
+    icon: LayoutDashboard,
+    iconColor: "text-blue-600 dark:text-blue-400",
+    pages: [
+      { name: "Dashboard", path: "/dashboard", description: "Main employee dashboard with project cards", roles: ["Company", "Ops Manager", "Supervisor", "Technician"] },
+      { name: "Projects", path: "/projects", description: "Project management and creation", roles: ["Company", "Ops Manager", "Supervisor"] },
+      { name: "Employees", path: "/employees", description: "Employee management and onboarding", roles: ["Company", "Ops Manager", "Supervisor"] },
+      { name: "Clients", path: "/clients", description: "Client and building management", roles: ["Company", "Ops Manager", "Supervisor"] },
+      { name: "Settings", path: "/settings", description: "Account settings and preferences", roles: ["All Employees"] },
+    ]
+  },
+  {
+    category: "Safety & Compliance",
+    icon: Shield,
+    iconColor: "text-red-600 dark:text-red-400",
+    pages: [
+      { name: "Harness Inspection", path: "/harness-inspection", description: "Digital harness inspection forms", roles: ["All Employees"] },
+      { name: "Toolbox Meeting", path: "/toolbox-meeting", description: "Safety meeting documentation", roles: ["All Employees"] },
+      { name: "FLHA Form", path: "/flha", description: "Field Level Hazard Assessment", roles: ["All Employees"] },
+      { name: "Incident Report", path: "/incident-report", description: "Incident documentation and tracking", roles: ["All Employees"] },
+      { name: "Method Statement", path: "/method-statement", description: "Work method documentation", roles: ["All Employees"] },
+      { name: "Documents", path: "/documents", description: "Company documents and bulk export", roles: ["All Employees"] },
+    ]
+  },
+  {
+    category: "Time & Scheduling",
+    icon: Clock,
+    iconColor: "text-orange-600 dark:text-orange-400",
+    pages: [
+      { name: "Schedule", path: "/schedule", description: "Calendar and employee scheduling", roles: ["Company", "Ops Manager", "Supervisor"] },
+      { name: "Active Workers", path: "/active-workers", description: "Real-time worker tracking", roles: ["Company", "Ops Manager", "Supervisor"] },
+      { name: "My Logged Hours", path: "/my-logged-hours", description: "IRATA task logging history", roles: ["IRATA Technicians"] },
+      { name: "Non-Billable Hours", path: "/non-billable-hours", description: "Non-billable time entries", roles: ["All Employees"] },
+      { name: "Hours Analytics", path: "/hours-analytics", description: "Billable vs non-billable insights", roles: ["Company", "Ops Manager", "Supervisor"] },
+    ]
+  },
+  {
+    category: "Financial & Payroll",
+    icon: CreditCard,
+    iconColor: "text-emerald-600 dark:text-emerald-400",
+    pages: [
+      { name: "Payroll", path: "/payroll", description: "Timesheet and payroll management", roles: ["Company", "Ops Manager", "Supervisor"] },
+      { name: "Quotes", path: "/quotes", description: "Quote generation with labor costs", roles: ["Company", "Ops Manager", "Supervisor", "Technician"] },
+    ]
+  },
+  {
+    category: "Equipment & Inventory",
+    icon: Package,
+    iconColor: "text-purple-600 dark:text-purple-400",
+    pages: [
+      { name: "Inventory", path: "/inventory", description: "Gear and equipment tracking", roles: ["All Employees"] },
+    ]
+  },
+  {
+    category: "Resident Portal",
+    icon: Home,
+    iconColor: "text-cyan-600 dark:text-cyan-400",
+    pages: [
+      { name: "Resident Dashboard", path: "/resident", description: "Resident complaint and photo access", roles: ["Resident"] },
+    ]
+  },
+  {
+    category: "Property Manager Portal",
+    icon: Building2,
+    iconColor: "text-indigo-600 dark:text-indigo-400",
+    pages: [
+      { name: "My Vendors", path: "/property-manager", description: "Vendor management dashboard", roles: ["Property Manager"] },
+      { name: "PM Settings", path: "/property-manager/settings", description: "Property manager account settings", roles: ["Property Manager"] },
+    ]
+  },
+  {
+    category: "Communication",
+    icon: MessageSquare,
+    iconColor: "text-pink-600 dark:text-pink-400",
+    pages: [
+      { name: "Residents Management", path: "/residents", description: "Resident complaint management", roles: ["Company", "Ops Manager", "Supervisor"] },
+      { name: "Complaint Detail", path: "/complaints/:id", description: "Individual complaint view", roles: ["Company", "Ops Manager", "Supervisor", "Resident"] },
+    ]
+  },
+  {
+    category: "Administration",
+    icon: Settings,
+    iconColor: "text-gray-600 dark:text-gray-400",
+    pages: [
+      { name: "SuperUser Dashboard", path: "/superuser", description: "Platform administration", roles: ["SuperUser"] },
+      { name: "All Companies", path: "/superuser/companies", description: "Company oversight", roles: ["SuperUser"] },
+      { name: "Company Detail", path: "/superuser/companies/:id", description: "Individual company analytics", roles: ["SuperUser"] },
+    ]
+  },
+];
 
 const changelogData: ChangelogSection[] = [
   {
@@ -444,7 +570,7 @@ export default function Changelog() {
                     <Package className="h-5 w-5 text-purple-600 dark:text-purple-400" />
                   </div>
                   <div>
-                    <div className="text-2xl font-bold">22+</div>
+                    <div className="text-2xl font-bold">{pagesData.reduce((acc, cat) => acc + cat.pages.length, 0)}</div>
                     <div className="text-sm text-muted-foreground">Pages & Views</div>
                   </div>
                 </div>
@@ -452,6 +578,88 @@ export default function Changelog() {
             </CardContent>
           </Card>
         </div>
+
+        <Card className="mb-8">
+          <CardHeader>
+            <div className="flex items-center gap-3">
+              <div className="p-2.5 rounded-xl bg-primary/10 ring-1 ring-primary/20">
+                <FolderOpen className="h-5 w-5 text-primary" />
+              </div>
+              <div>
+                <CardTitle className="text-xl">All Pages & Views</CardTitle>
+                <CardDescription>
+                  {pagesData.reduce((acc, cat) => acc + cat.pages.length, 0)} pages organized by category
+                </CardDescription>
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent className="pt-0">
+            <div className="space-y-6">
+              {pagesData.map((category, catIndex) => {
+                const CatIcon = category.icon;
+                return (
+                  <div key={catIndex}>
+                    <div className="flex items-center gap-2 mb-3">
+                      <CatIcon className={`h-4 w-4 ${category.iconColor}`} />
+                      <h3 className="font-semibold text-sm">{category.category}</h3>
+                      <Badge variant="secondary" className="text-xs">{category.pages.length}</Badge>
+                    </div>
+                    <div className="grid gap-2">
+                      {category.pages.map((page, pageIndex) => {
+                        const isLinkable = !page.path.includes(':');
+                        return (
+                          <div 
+                            key={pageIndex}
+                            className="flex items-center justify-between p-3 rounded-lg bg-muted/30 hover-elevate"
+                          >
+                            <div className="flex items-center gap-3 flex-1 min-w-0">
+                              <ChevronRight className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+                              <div className="flex-1 min-w-0">
+                                <div className="flex items-center gap-2 flex-wrap">
+                                  <span className="font-medium text-sm">{page.name}</span>
+                                  <code className="text-xs px-1.5 py-0.5 rounded bg-muted text-muted-foreground">
+                                    {page.path}
+                                  </code>
+                                </div>
+                                <p className="text-xs text-muted-foreground mt-0.5 truncate">
+                                  {page.description}
+                                </p>
+                              </div>
+                            </div>
+                            <div className="flex items-center gap-2 ml-2 flex-shrink-0">
+                              <div className="hidden sm:flex flex-wrap gap-1 justify-end max-w-[200px]">
+                                {page.roles.slice(0, 2).map((role, roleIndex) => (
+                                  <Badge key={roleIndex} variant="outline" className="text-xs">
+                                    {role}
+                                  </Badge>
+                                ))}
+                                {page.roles.length > 2 && (
+                                  <Badge variant="outline" className="text-xs">
+                                    +{page.roles.length - 2}
+                                  </Badge>
+                                )}
+                              </div>
+                              {isLinkable && (
+                                <Link href={page.path}>
+                                  <Button variant="ghost" size="icon" className="h-8 w-8" data-testid={`link-page-${page.path.replace(/\//g, '-')}`}>
+                                    <ExternalLink className="h-4 w-4" />
+                                  </Button>
+                                </Link>
+                              )}
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                    {catIndex < pagesData.length - 1 && <Separator className="mt-4" />}
+                  </div>
+                );
+              })}
+            </div>
+          </CardContent>
+        </Card>
+
+        <h2 className="text-xl font-bold mb-4">Feature Changelog</h2>
 
         <div className="space-y-4">
           {changelogData.map((section, index) => {
