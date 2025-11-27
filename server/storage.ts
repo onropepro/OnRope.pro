@@ -1,6 +1,6 @@
 import { db } from "./db";
-import { users, clients, projects, customJobTypes, dropLogs, workSessions, nonBillableWorkSessions, complaints, complaintNotes, projectPhotos, jobComments, harnessInspections, toolboxMeetings, flhaForms, incidentReports, methodStatements, companyDocuments, payPeriodConfig, payPeriods, quotes, quoteServices, gearItems, gearAssignments, scheduledJobs, jobAssignments, userPreferences, propertyManagerCompanyLinks, irataTaskLogs, employeeTimeOff } from "@shared/schema";
-import type { User, InsertUser, Client, InsertClient, Project, InsertProject, CustomJobType, InsertCustomJobType, DropLog, InsertDropLog, WorkSession, InsertWorkSession, Complaint, InsertComplaint, ComplaintNote, InsertComplaintNote, ProjectPhoto, InsertProjectPhoto, JobComment, InsertJobComment, HarnessInspection, InsertHarnessInspection, ToolboxMeeting, InsertToolboxMeeting, FlhaForm, InsertFlhaForm, IncidentReport, InsertIncidentReport, MethodStatement, InsertMethodStatement, PayPeriodConfig, InsertPayPeriodConfig, PayPeriod, InsertPayPeriod, EmployeeHoursSummary, Quote, InsertQuote, QuoteService, InsertQuoteService, QuoteWithServices, GearItem, InsertGearItem, GearAssignment, InsertGearAssignment, ScheduledJob, InsertScheduledJob, JobAssignment, InsertJobAssignment, ScheduledJobWithAssignments, UserPreferences, InsertUserPreferences, PropertyManagerCompanyLink, InsertPropertyManagerCompanyLink, IrataTaskLog, InsertIrataTaskLog, EmployeeTimeOff, InsertEmployeeTimeOff } from "@shared/schema";
+import { users, clients, projects, customJobTypes, dropLogs, workSessions, nonBillableWorkSessions, complaints, complaintNotes, projectPhotos, jobComments, harnessInspections, toolboxMeetings, flhaForms, incidentReports, methodStatements, companyDocuments, payPeriodConfig, payPeriods, quotes, quoteServices, gearItems, gearAssignments, gearSerialNumbers, scheduledJobs, jobAssignments, userPreferences, propertyManagerCompanyLinks, irataTaskLogs, employeeTimeOff } from "@shared/schema";
+import type { User, InsertUser, Client, InsertClient, Project, InsertProject, CustomJobType, InsertCustomJobType, DropLog, InsertDropLog, WorkSession, InsertWorkSession, Complaint, InsertComplaint, ComplaintNote, InsertComplaintNote, ProjectPhoto, InsertProjectPhoto, JobComment, InsertJobComment, HarnessInspection, InsertHarnessInspection, ToolboxMeeting, InsertToolboxMeeting, FlhaForm, InsertFlhaForm, IncidentReport, InsertIncidentReport, MethodStatement, InsertMethodStatement, PayPeriodConfig, InsertPayPeriodConfig, PayPeriod, InsertPayPeriod, EmployeeHoursSummary, Quote, InsertQuote, QuoteService, InsertQuoteService, QuoteWithServices, GearItem, InsertGearItem, GearAssignment, InsertGearAssignment, GearSerialNumber, InsertGearSerialNumber, ScheduledJob, InsertScheduledJob, JobAssignment, InsertJobAssignment, ScheduledJobWithAssignments, UserPreferences, InsertUserPreferences, PropertyManagerCompanyLink, InsertPropertyManagerCompanyLink, IrataTaskLog, InsertIrataTaskLog, EmployeeTimeOff, InsertEmployeeTimeOff } from "@shared/schema";
 import { eq, and, or, desc, sql, isNull, isNotNull, not, gte, lte, between, inArray } from "drizzle-orm";
 import bcrypt from "bcrypt";
 
@@ -961,15 +961,60 @@ export class Storage {
   }
 
   // Gear items operations
-  async createGearItem(item: InsertGearItem): Promise<GearItem> {
+  async createGearItem(item: InsertGearItem, serialEntries?: Array<{serialNumber: string, dateOfManufacture?: string, dateInService?: string}>): Promise<GearItem & { serialEntries: GearSerialNumber[] }> {
     const result = await db.insert(gearItems).values(item).returning();
-    return result[0];
+    const gearItem = result[0];
+    
+    // Save serial entries to gearSerialNumbers table
+    const savedSerialEntries: GearSerialNumber[] = [];
+    if (serialEntries && serialEntries.length > 0) {
+      for (const entry of serialEntries) {
+        if (entry.serialNumber) {
+          const serialData = {
+            gearItemId: gearItem.id,
+            companyId: item.companyId,
+            serialNumber: entry.serialNumber,
+            dateOfManufacture: entry.dateOfManufacture || undefined,
+            dateInService: entry.dateInService || undefined,
+          };
+          const [savedEntry] = await db.insert(gearSerialNumbers)
+            .values(serialData)
+            .returning();
+          savedSerialEntries.push(savedEntry);
+        }
+      }
+    }
+    
+    return { ...gearItem, serialEntries: savedSerialEntries };
   }
 
-  async getGearItemsByCompany(companyId: string): Promise<GearItem[]> {
-    return db.select().from(gearItems)
+  async getGearItemsByCompany(companyId: string): Promise<(GearItem & { serialEntries: GearSerialNumber[] })[]> {
+    const items = await db.select().from(gearItems)
       .where(eq(gearItems.companyId, companyId))
       .orderBy(desc(gearItems.createdAt));
+    
+    // Fetch serial entries for all items
+    if (items.length === 0) return [];
+    
+    const itemIds = items.map(item => item.id);
+    const allSerialEntries = await db.select()
+      .from(gearSerialNumbers)
+      .where(inArray(gearSerialNumbers.gearItemId, itemIds));
+    
+    // Group serial entries by gearItemId
+    const serialEntriesByItem: Record<string, GearSerialNumber[]> = {};
+    for (const entry of allSerialEntries) {
+      if (!serialEntriesByItem[entry.gearItemId]) {
+        serialEntriesByItem[entry.gearItemId] = [];
+      }
+      serialEntriesByItem[entry.gearItemId].push(entry);
+    }
+    
+    // Attach serial entries to each item
+    return items.map(item => ({
+      ...item,
+      serialEntries: serialEntriesByItem[item.id] || [],
+    }));
   }
 
   async getGearItemsByEmployee(employeeId: string): Promise<GearItem[]> {

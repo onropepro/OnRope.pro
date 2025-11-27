@@ -5851,37 +5851,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Unable to determine company" });
       }
       
+      // Storage now returns items with serialEntries already attached
       const items = await storage.getGearItemsByCompany(companyId);
-      
-      // Fetch serial entries for all items
-      const itemIds = items.map(item => item.id);
-      const allSerialEntries = itemIds.length > 0 
-        ? await db.select().from(gearSerialNumbers).where(sql`${gearSerialNumbers.gearItemId} IN (${sql.join(itemIds.map(id => sql`${id}`), sql`, `)})`)
-        : [];
-      
-      // Group serial entries by gearItemId
-      const serialEntriesByItem: Record<string, any[]> = {};
-      for (const entry of allSerialEntries) {
-        if (!serialEntriesByItem[entry.gearItemId]) {
-          serialEntriesByItem[entry.gearItemId] = [];
-        }
-        serialEntriesByItem[entry.gearItemId].push(entry);
-      }
       
       // Filter out financial data if user doesn't have permission
       const hasFinancialPermission = currentUser.role === "company" || 
         (currentUser.permissions && currentUser.permissions.includes("view_financial_data"));
       
       const filteredItems = items.map(item => {
-        const itemWithSerials = {
-          ...item,
-          serialEntries: serialEntriesByItem[item.id] || [],
-        };
         if (!hasFinancialPermission) {
-          const { itemPrice, ...rest } = itemWithSerials;
+          const { itemPrice, ...rest } = item;
           return rest;
         }
-        return itemWithSerials;
+        return item;
       });
       
       res.json({ items: filteredItems });
@@ -5926,27 +5908,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         employeeId: req.session.userId,
       });
       
-      const item = await storage.createGearItem(itemData);
-      console.log("Created gear item:", item.id);
-      
-      // Save serial entries with per-item dates to the new gearSerialNumbers table
+      // Use storage method with serialEntries support
       const serialEntries = req.body.serialEntries || [];
-      const savedSerialEntries = [];
-      for (const entry of serialEntries) {
-        if (entry.serialNumber) {
-          const serialData = {
-            gearItemId: item.id,
-            companyId,
-            serialNumber: entry.serialNumber,
-            dateOfManufacture: entry.dateOfManufacture || undefined,
-            dateInService: entry.dateInService || undefined,
-          };
-          const [savedEntry] = await db.insert(gearSerialNumbers)
-            .values(serialData)
-            .returning();
-          savedSerialEntries.push(savedEntry);
-        }
-      }
+      const item = await storage.createGearItem(itemData, serialEntries);
+      console.log("Created gear item:", item.id);
       
       // If assignment info is provided, create the assignment
       if (req.body.assignEmployeeId && req.body.assignQuantity) {
@@ -5968,7 +5933,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         console.log("No assignment info provided");
       }
       
-      res.json({ item: { ...item, serialEntries: savedSerialEntries } });
+      res.json({ item });
     } catch (error) {
       if (error instanceof z.ZodError) {
         return res.status(400).json({ message: "Validation error", errors: error.errors });
