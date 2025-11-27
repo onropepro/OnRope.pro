@@ -202,11 +202,7 @@ function Router() {
           <MyLoggedHours />
         </ProtectedRoute>
       </Route>
-      <Route path="/changelog">
-        <ProtectedRoute>
-          <Changelog />
-        </ProtectedRoute>
-      </Route>
+      <Route path="/changelog" component={Changelog} />
       <Route component={NotFound} />
     </Switch>
   );
