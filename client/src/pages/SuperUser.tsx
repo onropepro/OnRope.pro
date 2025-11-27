@@ -7,9 +7,18 @@ import { queryClient } from "@/lib/queryClient";
 export default function SuperUser() {
   const [, setLocation] = useLocation();
   
-  const { data: userData } = useQuery<{ user: any }>({
+  const { data: userData, isLoading } = useQuery<{ user: any }>({
     queryKey: ["/api/user"],
   });
+  
+  // Show loading while checking auth
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
   
   // Redirect if not superuser
   if (userData?.user?.role !== 'superuser') {
