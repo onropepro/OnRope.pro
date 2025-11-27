@@ -17,7 +17,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { insertGearItemSchema, type InsertGearItem, type GearItem, type GearAssignment, type GearSerialNumber } from "@shared/schema";
 import { ArrowLeft, Plus, Pencil, X, Trash2, Shield, Cable, Link2, Gauge, TrendingUp, HardHat, Hand, Fuel, Scissors, PaintBucket, Droplets, CircleDot, Lock, Anchor, MoreHorizontal, Users } from "lucide-react";
 import { Label } from "@/components/ui/label";
-import { hasFinancialAccess, isManagement } from "@/lib/permissions";
+import { hasFinancialAccess, isManagement, canViewCSR } from "@/lib/permissions";
 import HarnessInspectionForm from "./HarnessInspectionForm";
 import { format } from "date-fns";
 
@@ -1132,43 +1132,45 @@ export default function Inventory() {
                 </div>
               </CardHeader>
               <CardContent className="space-y-6">
-                {/* Company Safety Rating */}
-                <Card className="border-2" style={{
-                  borderColor: companySafetyRating >= 90 ? 'hsl(142, 76%, 36%)' : 
-                               companySafetyRating >= 70 ? 'hsl(48, 96%, 53%)' : 
-                               'hsl(0, 84%, 60%)',
-                  backgroundColor: companySafetyRating >= 90 ? 'hsl(142, 76%, 96%)' : 
-                                   companySafetyRating >= 70 ? 'hsl(48, 96%, 95%)' : 
-                                   'hsl(0, 84%, 96%)'
-                }}>
-                  <CardContent className="p-6">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <div className="text-sm font-medium text-muted-foreground mb-1">
-                          Company Safety Rating
-                        </div>
-                        <div className="text-xs text-muted-foreground">
-                          {inspectionFilter === "week" ? "Last 7 Days" : 
-                           inspectionFilter === "month" ? "Last 30 Days" : 
-                           inspectionFilter === "all" ? "All Time" :
-                           "Combined Overall (7d + 30d + All)"}
-                        </div>
-                      </div>
-                      <div className="text-center">
-                        <div className="text-5xl font-bold" style={{
-                          color: companySafetyRating >= 90 ? 'hsl(142, 76%, 36%)' : 
+                {/* Company Safety Rating - Only visible to users with CSR permission */}
+                {canViewCSR(currentUser) && (
+                  <Card className="border-2" style={{
+                    borderColor: companySafetyRating >= 90 ? 'hsl(142, 76%, 36%)' : 
                                  companySafetyRating >= 70 ? 'hsl(48, 96%, 53%)' : 
-                                 'hsl(0, 84%, 60%)'
-                        }}>
-                          {companySafetyRating}%
+                                 'hsl(0, 84%, 60%)',
+                    backgroundColor: companySafetyRating >= 90 ? 'hsl(142, 76%, 96%)' : 
+                                     companySafetyRating >= 70 ? 'hsl(48, 96%, 95%)' : 
+                                     'hsl(0, 84%, 96%)'
+                  }}>
+                    <CardContent className="p-6">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <div className="text-sm font-medium text-muted-foreground mb-1">
+                            Company Safety Rating
+                          </div>
+                          <div className="text-xs text-muted-foreground">
+                            {inspectionFilter === "week" ? "Last 7 Days" : 
+                             inspectionFilter === "month" ? "Last 30 Days" : 
+                             inspectionFilter === "all" ? "All Time" :
+                             "Combined Overall (7d + 30d + All)"}
+                          </div>
                         </div>
-                        <div className="text-sm text-muted-foreground mt-1">
-                          Inspection Compliance
+                        <div className="text-center">
+                          <div className="text-5xl font-bold" style={{
+                            color: companySafetyRating >= 90 ? 'hsl(142, 76%, 36%)' : 
+                                   companySafetyRating >= 70 ? 'hsl(48, 96%, 53%)' : 
+                                   'hsl(0, 84%, 60%)'
+                          }}>
+                            {companySafetyRating}%
+                          </div>
+                          <div className="text-sm text-muted-foreground mt-1">
+                            Inspection Compliance
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  </CardContent>
-                </Card>
+                    </CardContent>
+                  </Card>
+                )}
 
                 {/* Inspection Grid */}
                 <div className="overflow-x-auto">
