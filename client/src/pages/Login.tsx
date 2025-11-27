@@ -797,40 +797,7 @@ export default function Login() {
                 PROPERTY MANAGER
               </Button>
 
-              <Button 
-                variant="destructive" 
-                className="h-10 text-xs col-span-2" 
-                onClick={async () => {
-                  try {
-                    const response = await fetch("/api/login", {
-                      method: "POST",
-                      headers: { "Content-Type": "application/json" },
-                      body: JSON.stringify({ identifier: "info@onrope.pro", password: "onropepro" }),
-                      credentials: "include",
-                    });
-                    const result = await response.json();
-                    if (response.ok) {
-                      window.location.href = "/superuser";
-                    } else {
-                      toast({
-                        title: "SuperUser Login Failed",
-                        description: result.message || "SuperUser access denied",
-                        variant: "destructive",
-                      });
-                    }
-                  } catch (error) {
-                    toast({
-                      title: "Login Error",
-                      description: "Network error. Please try manual login.",
-                      variant: "destructive",
-                    });
-                  }
-                }}
-                data-testid="button-quick-login-superuser"
-              >
-                <span className="material-icons mr-1 text-base">shield</span>
-                SuperUser
-              </Button>
+{/* SuperUser quick login button - hidden in production */}
             </div>
 
             <div className="relative">
