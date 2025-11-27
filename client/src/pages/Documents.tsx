@@ -7,13 +7,130 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Progress } from "@/components/ui/progress";
-import { FileText, Download, Calendar, DollarSign, Upload, Trash2, Shield, BookOpen, ArrowLeft, AlertTriangle, Plus, FileCheck } from "lucide-react";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { FileText, Download, Calendar, DollarSign, Upload, Trash2, Shield, BookOpen, ArrowLeft, AlertTriangle, Plus, FileCheck, ChevronDown, ChevronRight, FolderOpen } from "lucide-react";
 import { hasFinancialAccess, canViewSafetyDocuments } from "@/lib/permissions";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { jsPDF } from "jspdf";
 import { downloadMethodStatement } from "@/pages/MethodStatementForm";
 import { formatLocalDate, formatLocalDateLong, formatLocalDateMedium, parseLocalDate } from "@/lib/dateUtils";
+
+interface DateGroupedItem {
+  year: number;
+  month: number;
+  monthName: string;
+  day: number;
+  date: string;
+  items: any[];
+}
+
+interface YearGroup {
+  year: number;
+  months: MonthGroup[];
+  totalCount: number;
+}
+
+interface MonthGroup {
+  month: number;
+  monthName: string;
+  days: DayGroup[];
+  totalCount: number;
+}
+
+interface DayGroup {
+  day: number;
+  date: string;
+  formattedDate: string;
+  items: any[];
+}
+
+function groupDocumentsByDate<T>(
+  items: T[],
+  getDateFn: (item: T) => string | Date
+): YearGroup[] {
+  const grouped = new Map<number, Map<number, Map<number, T[]>>>();
+  
+  items.forEach(item => {
+    const dateValue = getDateFn(item);
+    const date = typeof dateValue === 'string' ? new Date(dateValue) : dateValue;
+    
+    if (isNaN(date.getTime())) return;
+    
+    const year = date.getFullYear();
+    const month = date.getMonth();
+    const day = date.getDate();
+    
+    if (!grouped.has(year)) {
+      grouped.set(year, new Map());
+    }
+    const yearMap = grouped.get(year)!;
+    
+    if (!yearMap.has(month)) {
+      yearMap.set(month, new Map());
+    }
+    const monthMap = yearMap.get(month)!;
+    
+    if (!monthMap.has(day)) {
+      monthMap.set(day, []);
+    }
+    monthMap.get(day)!.push(item);
+  });
+  
+  const monthNames = [
+    'January', 'February', 'March', 'April', 'May', 'June',
+    'July', 'August', 'September', 'October', 'November', 'December'
+  ];
+  
+  const result: YearGroup[] = [];
+  
+  const sortedYears = Array.from(grouped.keys()).sort((a, b) => b - a);
+  
+  for (const year of sortedYears) {
+    const yearMap = grouped.get(year)!;
+    const months: MonthGroup[] = [];
+    
+    const sortedMonths = Array.from(yearMap.keys()).sort((a, b) => b - a);
+    
+    for (const month of sortedMonths) {
+      const monthMap = yearMap.get(month)!;
+      const days: DayGroup[] = [];
+      
+      const sortedDays = Array.from(monthMap.keys()).sort((a, b) => b - a);
+      
+      for (const day of sortedDays) {
+        const dayItems = monthMap.get(day)!;
+        const dateObj = new Date(year, month, day);
+        
+        days.push({
+          day,
+          date: dateObj.toISOString().split('T')[0],
+          formattedDate: dateObj.toLocaleDateString('en-US', { 
+            weekday: 'short', 
+            month: 'short', 
+            day: 'numeric' 
+          }),
+          items: dayItems
+        });
+      }
+      
+      months.push({
+        month,
+        monthName: monthNames[month],
+        days,
+        totalCount: days.reduce((sum, d) => sum + d.items.length, 0)
+      });
+    }
+    
+    result.push({
+      year,
+      months,
+      totalCount: months.reduce((sum, m) => sum + m.totalCount, 0)
+    });
+  }
+  
+  return result;
+}
 
 export default function Documents() {
   const [, navigate] = useLocation();
@@ -1825,33 +1942,58 @@ export default function Documents() {
               </CardHeader>
               <CardContent className="pt-6">
                 {inspections.length > 0 ? (
-                  <div className="space-y-3">
-                    {inspections.map((inspection) => (
-                      <div key={inspection.id} className="flex items-center gap-4 p-4 rounded-xl border bg-card hover-elevate active-elevate-2">
-                        <div className="p-2 bg-indigo-500/10 rounded-lg">
-                          <Shield className="h-5 w-5 text-indigo-600 dark:text-indigo-400 flex-shrink-0" />
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <div className="font-semibold">
-                            {new Date(inspection.inspectionDate).toLocaleDateString()} - {inspection.inspectorName}
-                          </div>
-                          <div className="text-sm text-muted-foreground">
-                            {inspection.manufacturer || 'Equipment inspection'}
-                          </div>
-                        </div>
-                        <Badge variant={inspection.overallStatus === 'pass' ? 'default' : 'destructive'}>
-                          {inspection.overallStatus || 'N/A'}
-                        </Badge>
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() => downloadHarnessInspection(inspection)}
-                          data-testid={`download-inspection-tab-${inspection.id}`}
-                        >
-                          <Download className="h-4 w-4 mr-1" />
-                          Download
-                        </Button>
-                      </div>
+                  <div className="space-y-2">
+                    {groupDocumentsByDate(inspections, (i: any) => i.inspectionDate).map((yearGroup) => (
+                      <Collapsible key={yearGroup.year} defaultOpen={yearGroup.year === new Date().getFullYear()}>
+                        <CollapsibleTrigger className="flex items-center gap-2 w-full p-3 rounded-lg bg-indigo-500/5 hover-elevate">
+                          <ChevronDown className="h-4 w-4 text-indigo-600 dark:text-indigo-400 transition-transform duration-200 [&[data-state=closed]>svg]:rotate-[-90deg]" />
+                          <FolderOpen className="h-4 w-4 text-indigo-600 dark:text-indigo-400" />
+                          <span className="font-semibold text-indigo-600 dark:text-indigo-400">{yearGroup.year}</span>
+                          <Badge variant="secondary" className="ml-auto">{yearGroup.totalCount}</Badge>
+                        </CollapsibleTrigger>
+                        <CollapsibleContent className="pl-4 mt-2 space-y-2">
+                          {yearGroup.months.map((monthGroup) => (
+                            <Collapsible key={monthGroup.month} defaultOpen={yearGroup.year === new Date().getFullYear() && monthGroup.month === new Date().getMonth()}>
+                              <CollapsibleTrigger className="flex items-center gap-2 w-full p-2 rounded-md bg-indigo-500/5 hover-elevate">
+                                <ChevronDown className="h-3 w-3 text-muted-foreground transition-transform duration-200 [&[data-state=closed]>svg]:rotate-[-90deg]" />
+                                <span className="font-medium">{monthGroup.monthName}</span>
+                                <Badge variant="outline" className="ml-auto text-xs">{monthGroup.totalCount}</Badge>
+                              </CollapsibleTrigger>
+                              <CollapsibleContent className="pl-4 mt-2 space-y-2">
+                                {monthGroup.days.map((dayGroup) => (
+                                  <div key={dayGroup.date} className="space-y-2">
+                                    <div className="flex items-center gap-2 text-sm text-muted-foreground py-1">
+                                      <Calendar className="h-3 w-3" />
+                                      <span className="font-medium">{dayGroup.formattedDate}</span>
+                                      <span className="text-xs">({dayGroup.items.length})</span>
+                                    </div>
+                                    <div className="space-y-2 pl-5">
+                                      {dayGroup.items.map((inspection: any) => (
+                                        <div key={inspection.id} className="flex items-center gap-4 p-3 rounded-lg border bg-card hover-elevate active-elevate-2">
+                                          <div className="p-2 bg-indigo-500/10 rounded-lg">
+                                            <Shield className="h-4 w-4 text-indigo-600 dark:text-indigo-400 flex-shrink-0" />
+                                          </div>
+                                          <div className="flex-1 min-w-0">
+                                            <div className="font-medium text-sm">{inspection.inspectorName}</div>
+                                            <div className="text-xs text-muted-foreground">{inspection.manufacturer || 'Equipment inspection'}</div>
+                                          </div>
+                                          <Badge variant={inspection.overallStatus === 'pass' ? 'default' : 'destructive'} className="text-xs">
+                                            {inspection.overallStatus || 'N/A'}
+                                          </Badge>
+                                          <Button size="sm" variant="outline" onClick={() => downloadHarnessInspection(inspection)} data-testid={`download-inspection-tab-${inspection.id}`}>
+                                            <Download className="h-3 w-3 mr-1" />
+                                            PDF
+                                          </Button>
+                                        </div>
+                                      ))}
+                                    </div>
+                                  </div>
+                                ))}
+                              </CollapsibleContent>
+                            </Collapsible>
+                          ))}
+                        </CollapsibleContent>
+                      </Collapsible>
                     ))}
                   </div>
                 ) : (
