@@ -105,7 +105,7 @@ export default function CompanyDetail() {
         {/* Company Info Card */}
         <Card>
           <CardContent className="p-6">
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+            <div className="grid grid-cols-2 md:grid-cols-5 gap-6">
               <div>
                 <p className="text-sm text-muted-foreground mb-1">Company ID</p>
                 <p className="font-mono text-xs">{company.id}</p>
@@ -113,6 +113,10 @@ export default function CompanyDetail() {
               <div>
                 <p className="text-sm text-muted-foreground mb-1">Registration Date</p>
                 <p className="text-sm">{company.createdAt ? new Date(company.createdAt).toLocaleDateString() : 'N/A'}</p>
+              </div>
+              <div>
+                <p className="text-sm text-muted-foreground mb-1">License Key</p>
+                <p className="font-mono text-xs">{company.licenseKey || 'Not set'}</p>
               </div>
               <div>
                 <p className="text-sm text-muted-foreground mb-1">Subscription Status</p>
