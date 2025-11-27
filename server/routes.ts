@@ -6553,6 +6553,133 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Property Manager: Get CSR for a linked vendor company
+  app.get("/api/property-managers/vendors/:linkId/csr", requireAuth, requireRole("property_manager"), async (req: Request, res: Response) => {
+    try {
+      const { linkId } = req.params;
+      const propertyManagerId = req.session.userId!;
+      
+      // Verify the link belongs to this property manager
+      const links = await storage.getPropertyManagerCompanyLinks(propertyManagerId);
+      const ownedLink = links.find(link => link.id === linkId);
+      
+      if (!ownedLink) {
+        return res.status(403).json({ message: "Unauthorized: This vendor link does not belong to you" });
+      }
+      
+      const companyId = ownedLink.companyId;
+      
+      // 1. Documentation Safety Rating
+      const companyDocuments = await storage.getCompanyDocuments(companyId);
+      const hasHealthSafety = companyDocuments.some((doc: any) => doc.documentType === 'health_safety_manual');
+      const hasCompanyPolicy = companyDocuments.some((doc: any) => doc.documentType === 'company_policy');
+      const documentationRating = (hasHealthSafety && hasCompanyPolicy) ? 100 : 0;
+      const documentationPenalty = documentationRating === 100 ? 0 : 25;
+      
+      // 2. Toolbox Meeting Compliance
+      const projects = await storage.getProjectsByCompany(companyId);
+      const meetings = await storage.getToolboxMeetingsByCompany(companyId);
+      
+      const allWorkSessions: any[] = [];
+      for (const project of projects) {
+        const projectSessions = await storage.getWorkSessionsByProject(project.id, companyId);
+        allWorkSessions.push(...projectSessions);
+      }
+      
+      const workSessionDays = new Set<string>();
+      allWorkSessions.forEach((session: any) => {
+        if (session.projectId && session.workDate) {
+          workSessionDays.add(`${session.projectId}|${session.workDate}`);
+        }
+      });
+      
+      const toolboxMeetingDays = new Set<string>();
+      const otherMeetingDates = new Set<string>();
+      meetings.forEach((meeting: any) => {
+        if (meeting.meetingDate) {
+          if (meeting.projectId === 'other') {
+            otherMeetingDates.add(meeting.meetingDate);
+          } else if (meeting.projectId) {
+            toolboxMeetingDays.add(`${meeting.projectId}|${meeting.meetingDate}`);
+          }
+        }
+      });
+      
+      let toolboxDaysWithMeeting = 0;
+      let toolboxTotalDays = 0;
+      workSessionDays.forEach((dayKey) => {
+        toolboxTotalDays++;
+        const date = dayKey.split('|')[1];
+        if (toolboxMeetingDays.has(dayKey) || otherMeetingDates.has(date)) {
+          toolboxDaysWithMeeting++;
+        }
+      });
+      
+      const toolboxMeetingRating = toolboxTotalDays > 0 
+        ? Math.round((toolboxDaysWithMeeting / toolboxTotalDays) * 100) 
+        : 100;
+      const toolboxPenalty = toolboxTotalDays > 0 
+        ? Math.round(((toolboxTotalDays - toolboxDaysWithMeeting) / toolboxTotalDays) * 25)
+        : 0;
+      
+      // 3. Daily Harness Inspection Rating (last 30 days)
+      const harnessInspections = await storage.getHarnessInspectionsByCompany(companyId);
+      const today = new Date();
+      
+      let harnessRequiredInspections = 0;
+      let harnessCompletedInspections = 0;
+      
+      for (let i = 0; i < 30; i++) {
+        const checkDate = new Date(today);
+        checkDate.setDate(checkDate.getDate() - i);
+        const dateStr = `${checkDate.getFullYear()}-${String(checkDate.getMonth() + 1).padStart(2, '0')}-${String(checkDate.getDate()).padStart(2, '0')}`;
+        
+        const workersWithSessions = new Set<string>();
+        allWorkSessions.forEach((session: any) => {
+          if (session.employeeId && session.workDate === dateStr) {
+            workersWithSessions.add(session.employeeId);
+          }
+        });
+        
+        workersWithSessions.forEach((workerId) => {
+          const inspection = harnessInspections.find((insp: any) =>
+            insp.workerId === workerId && insp.inspectionDate === dateStr
+          );
+          
+          if (!inspection || inspection.overallStatus !== "not_applicable") {
+            harnessRequiredInspections++;
+            if (inspection && inspection.overallStatus !== "not_applicable") {
+              harnessCompletedInspections++;
+            }
+          }
+        });
+      }
+      
+      const harnessInspectionRating = harnessRequiredInspections > 0 
+        ? Math.round((harnessCompletedInspections / harnessRequiredInspections) * 100) 
+        : 100;
+      const harnessPenalty = harnessRequiredInspections > 0 
+        ? Math.round(((harnessRequiredInspections - harnessCompletedInspections) / harnessRequiredInspections) * 25)
+        : 0;
+      
+      // Calculate overall CSR
+      const totalPenalty = documentationPenalty + toolboxPenalty + harnessPenalty;
+      const overallCSR = Math.max(0, 100 - totalPenalty);
+      
+      res.json({
+        overallCSR,
+        breakdown: {
+          documentationRating,
+          toolboxMeetingRating,
+          harnessInspectionRating
+        }
+      });
+    } catch (error) {
+      console.error("Get vendor CSR error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
   // FLHA form routes
   app.post("/api/flha-forms", requireAuth, requireRole("rope_access_tech", "general_supervisor", "rope_access_supervisor", "supervisor", "operations_manager", "company"), async (req: Request, res: Response) => {
     try {

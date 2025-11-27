@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
-import { Building2, Plus, Mail, Phone, LogOut, Settings, FileText, Download, AlertCircle, CheckCircle2, Clock, Upload, FileCheck, Trash2, User } from "lucide-react";
+import { Building2, Plus, Mail, Phone, LogOut, Settings, FileText, Download, AlertCircle, CheckCircle2, Clock, Upload, FileCheck, Trash2, User, Shield } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Label } from "@/components/ui/label";
 import { useForm } from "react-hook-form";
@@ -223,6 +223,31 @@ export default function PropertyManager() {
       return data;
     },
     enabled: !!selectedVendor?.linkId && !!selectedProject?.id,
+    retry: false,
+  });
+
+  // Fetch CSR for selected vendor
+  const { data: vendorCSRData, isLoading: isLoadingCSR } = useQuery<{
+    overallCSR: number;
+    breakdown: {
+      documentationRating: number;
+      toolboxMeetingRating: number;
+      harnessInspectionRating: number;
+    };
+  }>({
+    queryKey: ["/api/property-managers/vendors", selectedVendor?.linkId, "csr"],
+    queryFn: async () => {
+      const response = await fetch(
+        `/api/property-managers/vendors/${selectedVendor!.linkId}/csr`,
+        { credentials: 'include' }
+      );
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.message || 'Failed to fetch CSR');
+      }
+      return data;
+    },
+    enabled: !!selectedVendor?.linkId,
     retry: false,
   });
 
@@ -697,6 +722,42 @@ export default function PropertyManager() {
             {selectedVendor && (
               <div className="flex-1 overflow-y-auto px-6 pb-6">
                 <div className="space-y-6 pt-4">
+                {/* Company Safety Rating */}
+                <div className="flex items-center justify-between border rounded-lg p-4 bg-muted/30">
+                  <div className="flex items-center gap-3">
+                    <Shield className="w-5 h-5 text-muted-foreground" />
+                    <div>
+                      <Label className="text-xs text-muted-foreground">Company Safety Rating</Label>
+                      <p className="text-xs text-muted-foreground mt-0.5">Combined safety compliance score</p>
+                    </div>
+                  </div>
+                  {isLoadingCSR ? (
+                    <Badge variant="outline" className="gap-1.5 px-3 py-1.5 animate-pulse" data-testid="badge-vendor-csr-loading">
+                      <Shield className="w-4 h-4" />
+                      <span className="text-sm font-medium">CSR: --</span>
+                    </Badge>
+                  ) : vendorCSRData ? (
+                    <Badge 
+                      variant="outline"
+                      className={`gap-1.5 px-3 py-1.5 no-default-hover-elevate no-default-active-elevate ${
+                        vendorCSRData.overallCSR >= 90 ? "bg-green-600 dark:bg-green-500 text-white border-green-700 dark:border-green-400" :
+                        vendorCSRData.overallCSR >= 70 ? "bg-yellow-500 dark:bg-yellow-500 text-black dark:text-black border-yellow-600 dark:border-yellow-400" :
+                        vendorCSRData.overallCSR >= 50 ? "bg-orange-500 dark:bg-orange-500 text-white border-orange-600 dark:border-orange-400" :
+                        "bg-red-600 dark:bg-red-500 text-white border-red-700 dark:border-red-400"
+                      }`}
+                      data-testid="badge-vendor-csr"
+                    >
+                      <Shield className="w-4 h-4" />
+                      <span className="text-sm font-semibold">CSR: {vendorCSRData.overallCSR}%</span>
+                    </Badge>
+                  ) : (
+                    <Badge variant="outline" className="gap-1.5 px-3 py-1.5" data-testid="badge-vendor-csr-unavailable">
+                      <Shield className="w-4 h-4" />
+                      <span className="text-sm font-medium">N/A</span>
+                    </Badge>
+                  )}
+                </div>
+
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <Label className="text-xs text-muted-foreground">Company Email</Label>
