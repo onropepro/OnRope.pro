@@ -723,38 +723,77 @@ export default function PropertyManager() {
               <div className="flex-1 overflow-y-auto px-6 pb-6">
                 <div className="space-y-6 pt-4">
                 {/* Company Safety Rating */}
-                <div className="flex items-center justify-between border rounded-lg p-4 bg-muted/30">
-                  <div className="flex items-center gap-3">
-                    <Shield className="w-5 h-5 text-muted-foreground" />
-                    <div>
-                      <Label className="text-xs text-muted-foreground">Company Safety Rating</Label>
-                      <p className="text-xs text-muted-foreground mt-0.5">Combined safety compliance score</p>
+                <div className="border rounded-lg p-4 bg-muted/30 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <Shield className="w-5 h-5 text-muted-foreground" />
+                      <div>
+                        <Label className="text-sm font-medium">Company Safety Rating (CSR)</Label>
+                        <p className="text-xs text-muted-foreground mt-0.5">Overall safety compliance score</p>
+                      </div>
                     </div>
+                    {isLoadingCSR ? (
+                      <Badge variant="outline" className="gap-1.5 px-3 py-1.5 animate-pulse" data-testid="badge-vendor-csr-loading">
+                        <Shield className="w-4 h-4" />
+                        <span className="text-sm font-medium">CSR: --</span>
+                      </Badge>
+                    ) : vendorCSRData ? (
+                      <Badge 
+                        variant="outline"
+                        className={`gap-1.5 px-3 py-1.5 no-default-hover-elevate no-default-active-elevate ${
+                          vendorCSRData.overallCSR >= 90 ? "bg-green-600 dark:bg-green-500 text-white border-green-700 dark:border-green-400" :
+                          vendorCSRData.overallCSR >= 70 ? "bg-yellow-500 dark:bg-yellow-500 text-black dark:text-black border-yellow-600 dark:border-yellow-400" :
+                          vendorCSRData.overallCSR >= 50 ? "bg-orange-500 dark:bg-orange-500 text-white border-orange-600 dark:border-orange-400" :
+                          "bg-red-600 dark:bg-red-500 text-white border-red-700 dark:border-red-400"
+                        }`}
+                        data-testid="badge-vendor-csr"
+                      >
+                        <Shield className="w-4 h-4" />
+                        <span className="text-sm font-semibold">CSR: {vendorCSRData.overallCSR}%</span>
+                      </Badge>
+                    ) : (
+                      <Badge variant="outline" className="gap-1.5 px-3 py-1.5" data-testid="badge-vendor-csr-unavailable">
+                        <Shield className="w-4 h-4" />
+                        <span className="text-sm font-medium">N/A</span>
+                      </Badge>
+                    )}
                   </div>
-                  {isLoadingCSR ? (
-                    <Badge variant="outline" className="gap-1.5 px-3 py-1.5 animate-pulse" data-testid="badge-vendor-csr-loading">
-                      <Shield className="w-4 h-4" />
-                      <span className="text-sm font-medium">CSR: --</span>
-                    </Badge>
-                  ) : vendorCSRData ? (
-                    <Badge 
-                      variant="outline"
-                      className={`gap-1.5 px-3 py-1.5 no-default-hover-elevate no-default-active-elevate ${
-                        vendorCSRData.overallCSR >= 90 ? "bg-green-600 dark:bg-green-500 text-white border-green-700 dark:border-green-400" :
-                        vendorCSRData.overallCSR >= 70 ? "bg-yellow-500 dark:bg-yellow-500 text-black dark:text-black border-yellow-600 dark:border-yellow-400" :
-                        vendorCSRData.overallCSR >= 50 ? "bg-orange-500 dark:bg-orange-500 text-white border-orange-600 dark:border-orange-400" :
-                        "bg-red-600 dark:bg-red-500 text-white border-red-700 dark:border-red-400"
-                      }`}
-                      data-testid="badge-vendor-csr"
-                    >
-                      <Shield className="w-4 h-4" />
-                      <span className="text-sm font-semibold">CSR: {vendorCSRData.overallCSR}%</span>
-                    </Badge>
-                  ) : (
-                    <Badge variant="outline" className="gap-1.5 px-3 py-1.5" data-testid="badge-vendor-csr-unavailable">
-                      <Shield className="w-4 h-4" />
-                      <span className="text-sm font-medium">N/A</span>
-                    </Badge>
+                  
+                  {/* CSR Breakdown */}
+                  {vendorCSRData && (
+                    <div className="pt-2 border-t space-y-2">
+                      <p className="text-xs text-muted-foreground font-medium">Safety Compliance Breakdown:</p>
+                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs">
+                        <div className="flex items-center justify-between bg-background rounded px-2 py-1.5">
+                          <span className="text-muted-foreground">Documentation</span>
+                          <span className={`font-medium ${
+                            vendorCSRData.breakdown.documentationRating === 100 ? "text-green-600 dark:text-green-400" :
+                            vendorCSRData.breakdown.documentationRating >= 50 ? "text-yellow-600 dark:text-yellow-400" :
+                            "text-red-600 dark:text-red-400"
+                          }`}>{vendorCSRData.breakdown.documentationRating}%</span>
+                        </div>
+                        <div className="flex items-center justify-between bg-background rounded px-2 py-1.5">
+                          <span className="text-muted-foreground">Toolbox Meetings</span>
+                          <span className={`font-medium ${
+                            vendorCSRData.breakdown.toolboxMeetingRating >= 90 ? "text-green-600 dark:text-green-400" :
+                            vendorCSRData.breakdown.toolboxMeetingRating >= 70 ? "text-yellow-600 dark:text-yellow-400" :
+                            "text-red-600 dark:text-red-400"
+                          }`}>{vendorCSRData.breakdown.toolboxMeetingRating}%</span>
+                        </div>
+                        <div className="flex items-center justify-between bg-background rounded px-2 py-1.5">
+                          <span className="text-muted-foreground">Harness Inspections</span>
+                          <span className={`font-medium ${
+                            vendorCSRData.breakdown.harnessInspectionRating >= 90 ? "text-green-600 dark:text-green-400" :
+                            vendorCSRData.breakdown.harnessInspectionRating >= 70 ? "text-yellow-600 dark:text-yellow-400" :
+                            "text-red-600 dark:text-red-400"
+                          }`}>{vendorCSRData.breakdown.harnessInspectionRating}%</span>
+                        </div>
+                      </div>
+                      <p className="text-[10px] text-muted-foreground">
+                        CSR measures vendor compliance with safety documentation, daily toolbox meetings, and equipment inspections.
+                        A score of 90%+ indicates excellent safety practices.
+                      </p>
+                    </div>
                   )}
                 </div>
 

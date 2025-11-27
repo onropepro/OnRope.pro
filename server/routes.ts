@@ -6358,12 +6358,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Unable to determine company" });
       }
       
-      // 1. Documentation Safety Rating (Health & Safety Manual + Company Policy)
-      // -25% penalty if either document is missing
+      // 1. Documentation Safety Rating (Health & Safety Manual + Company Policy + Certificate of Insurance)
+      // -25% penalty if any required document is missing
       const companyDocuments = await storage.getCompanyDocuments(companyId);
       const hasHealthSafety = companyDocuments.some((doc: any) => doc.documentType === 'health_safety_manual');
       const hasCompanyPolicy = companyDocuments.some((doc: any) => doc.documentType === 'company_policy');
-      const documentationRating = (hasHealthSafety && hasCompanyPolicy) ? 100 : 0;
+      const hasInsurance = companyDocuments.some((doc: any) => doc.documentType === 'certificate_of_insurance');
+      const documentationRating = (hasHealthSafety && hasCompanyPolicy && hasInsurance) ? 100 : 0;
       const documentationPenalty = documentationRating === 100 ? 0 : 25;
       
       // 2. Toolbox Meeting Compliance
@@ -6569,11 +6570,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       const companyId = ownedLink.companyId;
       
-      // 1. Documentation Safety Rating
+      // 1. Documentation Safety Rating (Health & Safety Manual + Company Policy + Certificate of Insurance)
       const companyDocuments = await storage.getCompanyDocuments(companyId);
       const hasHealthSafety = companyDocuments.some((doc: any) => doc.documentType === 'health_safety_manual');
       const hasCompanyPolicy = companyDocuments.some((doc: any) => doc.documentType === 'company_policy');
-      const documentationRating = (hasHealthSafety && hasCompanyPolicy) ? 100 : 0;
+      const hasInsurance = companyDocuments.some((doc: any) => doc.documentType === 'certificate_of_insurance');
+      const documentationRating = (hasHealthSafety && hasCompanyPolicy && hasInsurance) ? 100 : 0;
       const documentationPenalty = documentationRating === 100 ? 0 : 25;
       
       // 2. Toolbox Meeting Compliance
