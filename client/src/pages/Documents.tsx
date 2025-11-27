@@ -8,11 +8,14 @@ import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Progress } from "@/components/ui/progress";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
-import { FileText, Download, Calendar, DollarSign, Upload, Trash2, Shield, BookOpen, ArrowLeft, AlertTriangle, Plus, FileCheck, ChevronDown, ChevronRight, FolderOpen } from "lucide-react";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Calendar as CalendarComponent } from "@/components/ui/calendar";
+import { FileText, Download, Calendar, DollarSign, Upload, Trash2, Shield, BookOpen, ArrowLeft, AlertTriangle, Plus, FileCheck, ChevronDown, ChevronRight, FolderOpen, CalendarRange, Package, Loader2 } from "lucide-react";
 import { hasFinancialAccess, canViewSafetyDocuments } from "@/lib/permissions";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { jsPDF } from "jspdf";
+import JSZip from "jszip";
 import { downloadMethodStatement } from "@/pages/MethodStatementForm";
 import { formatLocalDate, formatLocalDateLong, formatLocalDateMedium, parseLocalDate } from "@/lib/dateUtils";
 
@@ -140,6 +143,195 @@ function groupDocumentsByDate<T>(
   }
   
   return result;
+}
+
+// Date range export state type
+interface DateRangeState {
+  from: Date | undefined;
+  to: Date | undefined;
+  isExporting: boolean;
+}
+
+// DateRangeExport component for each document section
+function DateRangeExport({
+  documents,
+  getDateFn,
+  generatePdf,
+  documentType,
+  colorClass,
+}: {
+  documents: any[];
+  getDateFn: (item: any) => string | Date;
+  generatePdf: (item: any) => Promise<{ blob: Blob; filename: string }>;
+  documentType: string;
+  colorClass: string;
+}) {
+  const [dateRange, setDateRange] = useState<DateRangeState>({
+    from: undefined,
+    to: undefined,
+    isExporting: false,
+  });
+  const { toast } = useToast();
+
+  const getDocumentsInRange = () => {
+    if (!dateRange.from || !dateRange.to) return [];
+    
+    return documents.filter((doc) => {
+      const dateValue = getDateFn(doc);
+      let docDate: Date;
+      
+      if (typeof dateValue === 'string') {
+        // Use parseLocalDate for string dates to handle timezone correctly
+        const parsed = parseLocalDate(dateValue);
+        if (!parsed || isNaN(parsed.getTime())) return false;
+        docDate = parsed;
+      } else {
+        // For Date objects, clone and use local date components
+        docDate = new Date(dateValue.getFullYear(), dateValue.getMonth(), dateValue.getDate());
+      }
+      
+      // Set time to start of day for comparison
+      const fromDate = new Date(dateRange.from!);
+      fromDate.setHours(0, 0, 0, 0);
+      const toDate = new Date(dateRange.to!);
+      toDate.setHours(23, 59, 59, 999);
+      docDate.setHours(12, 0, 0, 0);
+      
+      return docDate >= fromDate && docDate <= toDate;
+    });
+  };
+
+  const handleExport = async () => {
+    const docsInRange = getDocumentsInRange();
+    
+    if (docsInRange.length === 0) {
+      toast({
+        title: "No documents found",
+        description: "There are no documents in the selected date range.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setDateRange(prev => ({ ...prev, isExporting: true }));
+
+    try {
+      const zip = new JSZip();
+      
+      for (let i = 0; i < docsInRange.length; i++) {
+        const doc = docsInRange[i];
+        const { blob, filename } = await generatePdf(doc);
+        zip.file(filename, blob);
+      }
+
+      const zipBlob = await zip.generateAsync({ type: "blob" });
+      
+      // Create download link with local date formatting
+      const url = URL.createObjectURL(zipBlob);
+      const link = document.createElement('a');
+      link.href = url;
+      const formatDateForFilename = (date: Date) => {
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+      };
+      const fromStr = dateRange.from ? formatDateForFilename(dateRange.from) : '';
+      const toStr = dateRange.to ? formatDateForFilename(dateRange.to) : '';
+      link.download = `${documentType}_${fromStr}_to_${toStr}.zip`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+
+      toast({
+        title: "Export complete",
+        description: `Successfully exported ${docsInRange.length} ${documentType.toLowerCase()} documents.`,
+      });
+    } catch (error) {
+      console.error('Export error:', error);
+      toast({
+        title: "Export failed",
+        description: "There was an error generating the export. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setDateRange(prev => ({ ...prev, isExporting: false }));
+    }
+  };
+
+  const docsInRange = getDocumentsInRange();
+
+  return (
+    <div className="flex flex-wrap items-center gap-2 p-3 bg-muted/30 rounded-lg border border-dashed">
+      <div className="flex items-center gap-1 text-sm font-medium text-muted-foreground">
+        <CalendarRange className={`h-4 w-4 ${colorClass}`} />
+        <span>Export Range:</span>
+      </div>
+      
+      <Popover>
+        <PopoverTrigger asChild>
+          <Button variant="outline" size="sm" className="min-w-[120px] justify-start" data-testid={`export-${documentType.toLowerCase()}-from-date`}>
+            <Calendar className="h-3 w-3 mr-2" />
+            {dateRange.from ? dateRange.from.toLocaleDateString() : "From date"}
+          </Button>
+        </PopoverTrigger>
+        <PopoverContent className="w-auto p-0" align="start">
+          <CalendarComponent
+            mode="single"
+            selected={dateRange.from}
+            onSelect={(date) => setDateRange(prev => ({ ...prev, from: date }))}
+            initialFocus
+          />
+        </PopoverContent>
+      </Popover>
+
+      <span className="text-muted-foreground">to</span>
+
+      <Popover>
+        <PopoverTrigger asChild>
+          <Button variant="outline" size="sm" className="min-w-[120px] justify-start" data-testid={`export-${documentType.toLowerCase()}-to-date`}>
+            <Calendar className="h-3 w-3 mr-2" />
+            {dateRange.to ? dateRange.to.toLocaleDateString() : "To date"}
+          </Button>
+        </PopoverTrigger>
+        <PopoverContent className="w-auto p-0" align="start">
+          <CalendarComponent
+            mode="single"
+            selected={dateRange.to}
+            onSelect={(date) => setDateRange(prev => ({ ...prev, to: date }))}
+            initialFocus
+          />
+        </PopoverContent>
+      </Popover>
+
+      {dateRange.from && dateRange.to && (
+        <Badge variant="secondary" className="text-xs">
+          {docsInRange.length} document{docsInRange.length !== 1 ? 's' : ''}
+        </Badge>
+      )}
+
+      <Button 
+        size="sm" 
+        onClick={handleExport}
+        disabled={!dateRange.from || !dateRange.to || docsInRange.length === 0 || dateRange.isExporting}
+        className="ml-auto"
+        data-testid={`export-${documentType.toLowerCase()}-zip`}
+      >
+        {dateRange.isExporting ? (
+          <>
+            <Loader2 className="h-3 w-3 mr-2 animate-spin" />
+            Exporting...
+          </>
+        ) : (
+          <>
+            <Package className="h-3 w-3 mr-2" />
+            Export ZIP
+          </>
+        )}
+      </Button>
+    </div>
+  );
 }
 
 export default function Documents() {
@@ -1213,6 +1405,434 @@ export default function Documents() {
     doc.save(`Incident_Report_${new Date(report.incidentDate).toISOString().split('T')[0]}.pdf`);
   };
 
+  // ============ BULK EXPORT PDF GENERATORS (return blob instead of saving) ============
+  
+  const generateInspectionPdfBlob = async (inspection: any): Promise<{ blob: Blob; filename: string }> => {
+    const doc = new jsPDF();
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const pageHeight = doc.internal.pageSize.getHeight();
+    let yPosition = 20;
+
+    const addMultilineText = (lines: string[], currentY: number, lineHeight: number = 6): number => {
+      let y = currentY;
+      for (const line of lines) {
+        if (y > pageHeight - 30) {
+          doc.addPage();
+          y = 20;
+        }
+        doc.text(line, 20, y);
+        y += lineHeight;
+      }
+      return y;
+    };
+
+    // Header
+    doc.setFillColor(14, 165, 233);
+    const brandingHeight = addCompanyBranding(doc, pageWidth);
+    const headerHeight = 35 + brandingHeight;
+    doc.rect(0, 0, pageWidth, headerHeight, 'F');
+    
+    doc.setTextColor(255, 255, 255);
+    doc.setFontSize(20);
+    doc.setFont('helvetica', 'bold');
+    doc.text('ROPE ACCESS EQUIPMENT', pageWidth / 2, 15 + brandingHeight, { align: 'center' });
+    doc.text('INSPECTION RECORD', pageWidth / 2, 23 + brandingHeight, { align: 'center' });
+    doc.setFontSize(11);
+    doc.setFont('helvetica', 'normal');
+    doc.text('Official Safety Equipment Documentation', pageWidth / 2, 30 + brandingHeight, { align: 'center' });
+
+    yPosition = 45 + brandingHeight;
+
+    // Inspection Details
+    doc.setTextColor(0, 0, 0);
+    doc.setFontSize(11);
+    doc.setFont('helvetica', 'bold');
+    doc.text('Inspection Information', 20, yPosition);
+    yPosition += 8;
+
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(10);
+    doc.text(`Inspection Date: ${new Date(inspection.inspectionDate).toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}`, 20, yPosition);
+    yPosition += 6;
+    doc.text(`Inspector: ${inspection.inspectorName}`, 20, yPosition);
+    yPosition += 6;
+    doc.text(`Manufacturer: ${inspection.manufacturer || 'N/A'}`, 20, yPosition);
+    yPosition += 6;
+    doc.text(`Equipment ID: ${inspection.equipmentId || 'N/A'}`, 20, yPosition);
+    yPosition += 6;
+    doc.text(`Date in Service: ${inspection.dateInService || 'N/A'}`, 20, yPosition);
+    yPosition += 12;
+
+    // Result
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(12);
+    const resultText = `Overall Status: ${inspection.overallStatus?.toUpperCase() || 'N/A'}`;
+    doc.text(resultText, 20, yPosition);
+    yPosition += 10;
+
+    if (inspection.comments) {
+      doc.setFont('helvetica', 'bold');
+      doc.text('Comments:', 20, yPosition);
+      yPosition += 6;
+      doc.setFont('helvetica', 'normal');
+      const commentLines = doc.splitTextToSize(inspection.comments, pageWidth - 40);
+      yPosition = addMultilineText(commentLines, yPosition);
+    }
+
+    const filename = `Equipment_Inspection_${new Date(inspection.inspectionDate).toISOString().split('T')[0]}_${inspection.id}.pdf`;
+    const blob = doc.output('blob');
+    return { blob, filename };
+  };
+
+  const generateMeetingPdfBlob = async (meeting: any): Promise<{ blob: Blob; filename: string }> => {
+    const doc = new jsPDF();
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const pageHeight = doc.internal.pageSize.getHeight();
+    let yPosition = 20;
+
+    const addMultilineText = (lines: string[], currentY: number, lineHeight: number = 6): number => {
+      let y = currentY;
+      for (const line of lines) {
+        if (y > pageHeight - 30) {
+          doc.addPage();
+          y = 20;
+        }
+        doc.text(line, 20, y);
+        y += lineHeight;
+      }
+      return y;
+    };
+
+    // Header
+    doc.setFillColor(14, 165, 233);
+    const brandingHeight = addCompanyBranding(doc, pageWidth);
+    const headerHeight = 35 + brandingHeight;
+    doc.rect(0, 0, pageWidth, headerHeight, 'F');
+    
+    doc.setTextColor(255, 255, 255);
+    doc.setFontSize(22);
+    doc.setFont('helvetica', 'bold');
+    doc.text('DAILY TOOLBOX MEETING RECORD', pageWidth / 2, 15 + brandingHeight, { align: 'center' });
+    doc.setFontSize(12);
+    doc.setFont('helvetica', 'normal');
+    doc.text('Official Safety Meeting Documentation', pageWidth / 2, 25 + brandingHeight, { align: 'center' });
+
+    yPosition = 45 + brandingHeight;
+
+    // Meeting Details
+    doc.setTextColor(0, 0, 0);
+    doc.setFontSize(11);
+    doc.setFont('helvetica', 'bold');
+    doc.text('Meeting Information', 20, yPosition);
+    yPosition += 8;
+
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(10);
+    doc.text(`Date: ${formatLocalDate(meeting.meetingDate, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}`, 20, yPosition);
+    yPosition += 6;
+    doc.text(`Conducted By: ${meeting.conductedByName}`, 20, yPosition);
+    yPosition += 6;
+
+    const attendeesText = Array.isArray(meeting.attendees) ? meeting.attendees.join(', ') : meeting.attendees;
+    const attendeesLines = doc.splitTextToSize(`Attendees: ${attendeesText}`, pageWidth - 40);
+    yPosition = addMultilineText(attendeesLines, yPosition);
+    yPosition += 8;
+
+    // Topics
+    const topics = [];
+    if (meeting.topicFallProtection) topics.push('Fall Protection and Rescue Procedures');
+    if (meeting.topicAnchorPoints) topics.push('Anchor Point Selection and Inspection');
+    if (meeting.topicEquipmentInspection) topics.push('Equipment Inspection');
+    if (meeting.topicWeatherConditions) topics.push('Weather Conditions');
+    if (meeting.topicCommunication) topics.push('Communication Procedures');
+    if (meeting.topicEmergencyProcedures) topics.push('Emergency Procedures');
+    if (meeting.topicSiteHazards) topics.push('Site-Specific Hazards');
+    if (meeting.topicPpe) topics.push('PPE Requirements');
+
+    if (topics.length > 0) {
+      doc.setFont('helvetica', 'bold');
+      doc.text('Topics Discussed:', 20, yPosition);
+      yPosition += 6;
+      doc.setFont('helvetica', 'normal');
+      topics.forEach(topic => {
+        doc.text(`- ${topic}`, 25, yPosition);
+        yPosition += 5;
+      });
+      yPosition += 5;
+    }
+
+    if (meeting.otherTopics) {
+      doc.setFont('helvetica', 'bold');
+      doc.text('Additional Topics:', 20, yPosition);
+      yPosition += 6;
+      doc.setFont('helvetica', 'normal');
+      const otherLines = doc.splitTextToSize(meeting.otherTopics, pageWidth - 40);
+      yPosition = addMultilineText(otherLines, yPosition);
+    }
+
+    const filename = `Toolbox_Meeting_${meeting.meetingDate}_${meeting.id}.pdf`;
+    const blob = doc.output('blob');
+    return { blob, filename };
+  };
+
+  const generateFlhaPdfBlob = async (flha: any): Promise<{ blob: Blob; filename: string }> => {
+    const doc = new jsPDF();
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const pageHeight = doc.internal.pageSize.getHeight();
+    let yPosition = 20;
+
+    const addMultilineText = (lines: string[], currentY: number, lineHeight: number = 6): number => {
+      let y = currentY;
+      for (const line of lines) {
+        if (y > pageHeight - 30) {
+          doc.addPage();
+          y = 20;
+        }
+        doc.text(line, 20, y);
+        y += lineHeight;
+      }
+      return y;
+    };
+
+    // Header
+    doc.setFillColor(251, 146, 60);
+    const brandingHeight = addCompanyBranding(doc, pageWidth);
+    const headerHeight = 35 + brandingHeight;
+    doc.rect(0, 0, pageWidth, headerHeight, 'F');
+    
+    doc.setTextColor(255, 255, 255);
+    doc.setFontSize(20);
+    doc.setFont('helvetica', 'bold');
+    doc.text('FIELD LEVEL HAZARD ASSESSMENT', pageWidth / 2, 15 + brandingHeight, { align: 'center' });
+    doc.setFontSize(12);
+    doc.setFont('helvetica', 'normal');
+    doc.text('Rope Access Safety Documentation', pageWidth / 2, 25 + brandingHeight, { align: 'center' });
+
+    yPosition = 45 + brandingHeight;
+
+    // Assessment Details
+    doc.setTextColor(0, 0, 0);
+    doc.setFontSize(11);
+    doc.setFont('helvetica', 'bold');
+    doc.text('Assessment Information', 20, yPosition);
+    yPosition += 8;
+
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(10);
+    doc.text(`Date: ${new Date(flha.assessmentDate).toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}`, 20, yPosition);
+    yPosition += 6;
+    doc.text(`Assessor: ${flha.assessorName}`, 20, yPosition);
+    yPosition += 6;
+    doc.text(`Location: ${flha.location}`, 20, yPosition);
+    yPosition += 6;
+
+    if (flha.workArea) {
+      doc.text(`Work Area: ${flha.workArea}`, 20, yPosition);
+      yPosition += 6;
+    }
+    yPosition += 4;
+
+    // Job Description
+    doc.setFont('helvetica', 'bold');
+    doc.text('Job Description:', 20, yPosition);
+    yPosition += 6;
+    doc.setFont('helvetica', 'normal');
+    const jobDescLines = doc.splitTextToSize(flha.jobDescription, pageWidth - 40);
+    yPosition = addMultilineText(jobDescLines, yPosition);
+    yPosition += 10;
+
+    // Hazards
+    if (flha.identifiedHazards && flha.identifiedHazards.length > 0) {
+      doc.setFont('helvetica', 'bold');
+      doc.text('Identified Hazards:', 20, yPosition);
+      yPosition += 6;
+      doc.setFont('helvetica', 'normal');
+      flha.identifiedHazards.forEach((hazard: string) => {
+        doc.text(`- ${hazard}`, 25, yPosition);
+        yPosition += 5;
+      });
+    }
+
+    const filename = `FLHA_${new Date(flha.assessmentDate).toISOString().split('T')[0]}_${flha.id}.pdf`;
+    const blob = doc.output('blob');
+    return { blob, filename };
+  };
+
+  const generateIncidentPdfBlob = async (report: any): Promise<{ blob: Blob; filename: string }> => {
+    const doc = new jsPDF();
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const pageHeight = doc.internal.pageSize.getHeight();
+    let yPosition = 20;
+
+    const addMultilineText = (lines: string[], currentY: number, lineHeight: number = 6): number => {
+      let y = currentY;
+      for (const line of lines) {
+        if (y > pageHeight - 30) {
+          doc.addPage();
+          y = 20;
+        }
+        doc.text(line, 20, y);
+        y += lineHeight;
+      }
+      return y;
+    };
+
+    // Header
+    doc.setFillColor(239, 68, 68);
+    const brandingHeight = addCompanyBranding(doc, pageWidth);
+    const headerHeight = 35 + brandingHeight;
+    doc.rect(0, 0, pageWidth, headerHeight, 'F');
+    
+    doc.setTextColor(255, 255, 255);
+    doc.setFontSize(20);
+    doc.setFont('helvetica', 'bold');
+    doc.text('INCIDENT REPORT', pageWidth / 2, 15 + brandingHeight, { align: 'center' });
+    doc.setFontSize(11);
+    doc.setFont('helvetica', 'normal');
+    doc.text('Official Incident Documentation and Investigation', pageWidth / 2, 25 + brandingHeight, { align: 'center' });
+
+    yPosition = 45 + brandingHeight;
+
+    // Basic Information
+    doc.setTextColor(0, 0, 0);
+    doc.setFontSize(11);
+    doc.setFont('helvetica', 'bold');
+    doc.text('Incident Information', 20, yPosition);
+    yPosition += 8;
+
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(10);
+    doc.text(`Date: ${new Date(report.incidentDate).toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}`, 20, yPosition);
+    yPosition += 6;
+    doc.text(`Time: ${report.incidentTime || 'N/A'}`, 20, yPosition);
+    yPosition += 6;
+    doc.text(`Location: ${report.location || 'N/A'}`, 20, yPosition);
+    yPosition += 6;
+    if (report.projectName) {
+      doc.text(`Project: ${report.projectName}`, 20, yPosition);
+      yPosition += 6;
+    }
+    doc.text(`Reported By: ${report.reportedByName}`, 20, yPosition);
+    yPosition += 6;
+    doc.text(`Report Date: ${new Date(report.reportDate).toLocaleDateString()}`, 20, yPosition);
+    yPosition += 10;
+
+    // Description
+    if (report.description) {
+      doc.setFont('helvetica', 'bold');
+      doc.text('Incident Description:', 20, yPosition);
+      yPosition += 6;
+      doc.setFont('helvetica', 'normal');
+      const descLines = doc.splitTextToSize(report.description, pageWidth - 40);
+      yPosition = addMultilineText(descLines, yPosition);
+      yPosition += 8;
+    }
+
+    // Severity
+    if (report.severity) {
+      doc.setFont('helvetica', 'bold');
+      doc.text(`Severity: ${report.severity.toUpperCase()}`, 20, yPosition);
+      yPosition += 10;
+    }
+
+    const filename = `Incident_Report_${new Date(report.incidentDate).toISOString().split('T')[0]}_${report.id}.pdf`;
+    const blob = doc.output('blob');
+    return { blob, filename };
+  };
+
+  const generateMethodStatementPdfBlob = async (statement: any): Promise<{ blob: Blob; filename: string }> => {
+    const doc = new jsPDF();
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const pageHeight = doc.internal.pageSize.getHeight();
+    let yPosition = 20;
+
+    const addMultilineText = (lines: string[], currentY: number, lineHeight: number = 6): number => {
+      let y = currentY;
+      for (const line of lines) {
+        if (y > pageHeight - 30) {
+          doc.addPage();
+          y = 20;
+        }
+        doc.text(line, 20, y);
+        y += lineHeight;
+      }
+      return y;
+    };
+
+    // Header
+    doc.setFillColor(16, 185, 129);
+    const brandingHeight = addCompanyBranding(doc, pageWidth);
+    const headerHeight = 35 + brandingHeight;
+    doc.rect(0, 0, pageWidth, headerHeight, 'F');
+    
+    doc.setTextColor(255, 255, 255);
+    doc.setFontSize(20);
+    doc.setFont('helvetica', 'bold');
+    doc.text('METHOD STATEMENT', pageWidth / 2, 15 + brandingHeight, { align: 'center' });
+    doc.setFontSize(11);
+    doc.setFont('helvetica', 'normal');
+    doc.text('Rope Access Work Procedure', pageWidth / 2, 25 + brandingHeight, { align: 'center' });
+
+    yPosition = 45 + brandingHeight;
+
+    // Details
+    doc.setTextColor(0, 0, 0);
+    doc.setFontSize(11);
+    doc.setFont('helvetica', 'bold');
+    doc.text('Document Information', 20, yPosition);
+    yPosition += 8;
+
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(10);
+    doc.text(`Title: ${statement.title}`, 20, yPosition);
+    yPosition += 6;
+    doc.text(`Date Created: ${new Date(statement.dateCreated).toLocaleDateString()}`, 20, yPosition);
+    yPosition += 6;
+    if (statement.projectName) {
+      doc.text(`Project: ${statement.projectName}`, 20, yPosition);
+      yPosition += 6;
+    }
+    yPosition += 4;
+
+    // Scope
+    if (statement.scopeOfWork) {
+      doc.setFont('helvetica', 'bold');
+      doc.text('Scope of Work:', 20, yPosition);
+      yPosition += 6;
+      doc.setFont('helvetica', 'normal');
+      const scopeLines = doc.splitTextToSize(statement.scopeOfWork, pageWidth - 40);
+      yPosition = addMultilineText(scopeLines, yPosition);
+      yPosition += 8;
+    }
+
+    // Equipment
+    if (statement.equipmentRequired) {
+      doc.setFont('helvetica', 'bold');
+      doc.text('Equipment Required:', 20, yPosition);
+      yPosition += 6;
+      doc.setFont('helvetica', 'normal');
+      const equipLines = doc.splitTextToSize(statement.equipmentRequired, pageWidth - 40);
+      yPosition = addMultilineText(equipLines, yPosition);
+      yPosition += 8;
+    }
+
+    // Procedures
+    if (statement.workProcedures) {
+      doc.setFont('helvetica', 'bold');
+      doc.text('Work Procedures:', 20, yPosition);
+      yPosition += 6;
+      doc.setFont('helvetica', 'normal');
+      const procLines = doc.splitTextToSize(statement.workProcedures, pageWidth - 40);
+      yPosition = addMultilineText(procLines, yPosition);
+    }
+
+    const filename = `Method_Statement_${new Date(statement.dateCreated).toISOString().split('T')[0]}_${statement.id}.pdf`;
+    const blob = doc.output('blob');
+    return { blob, filename };
+  };
+
+  // ============ END BULK EXPORT PDF GENERATORS ============
+
   // Same professional HTML download function as Quotes.tsx
   const downloadQuote = (quote: any) => {
     const serviceNames: Record<string, string> = {
@@ -1951,6 +2571,17 @@ export default function Documents() {
                 </div>
               </CardHeader>
               <CardContent className="pt-6">
+                {inspections.length > 0 && (
+                  <div className="mb-4">
+                    <DateRangeExport
+                      documents={inspections}
+                      getDateFn={(i: any) => i.inspectionDate}
+                      generatePdf={generateInspectionPdfBlob}
+                      documentType="Inspections"
+                      colorClass="text-indigo-600 dark:text-indigo-400"
+                    />
+                  </div>
+                )}
                 {inspections.length > 0 ? (
                   <div className="space-y-2">
                     {groupDocumentsByDate(inspections, (i: any) => i.inspectionDate).map((yearGroup) => (
@@ -2035,6 +2666,17 @@ export default function Documents() {
                 </div>
               </CardHeader>
               <CardContent className="pt-6">
+                {meetings.length > 0 && (
+                  <div className="mb-4">
+                    <DateRangeExport
+                      documents={meetings}
+                      getDateFn={(m: any) => m.meetingDate}
+                      generatePdf={generateMeetingPdfBlob}
+                      documentType="Meetings"
+                      colorClass="text-cyan-600 dark:text-cyan-400"
+                    />
+                  </div>
+                )}
                 {meetings.length > 0 ? (
                   <div className="space-y-2">
                     {groupDocumentsByDate(meetings, (m: any) => m.meetingDate).map((yearGroup) => (
@@ -2237,6 +2879,17 @@ export default function Documents() {
               </div>
             </CardHeader>
             <CardContent className="pt-6">
+              {flhaForms.length > 0 && (
+                <div className="mb-4">
+                  <DateRangeExport
+                    documents={flhaForms}
+                    getDateFn={(f: any) => f.assessmentDate}
+                    generatePdf={generateFlhaPdfBlob}
+                    documentType="FLHA"
+                    colorClass="text-orange-600 dark:text-orange-400"
+                  />
+                </div>
+              )}
               {flhaForms.length > 0 ? (
                 <div className="space-y-2">
                   {groupDocumentsByDate(flhaForms, (f: any) => f.assessmentDate).map((yearGroup) => (
@@ -2320,6 +2973,17 @@ export default function Documents() {
               </div>
             </CardHeader>
             <CardContent className="pt-6">
+              {incidentReports.length > 0 && (
+                <div className="mb-4">
+                  <DateRangeExport
+                    documents={incidentReports}
+                    getDateFn={(r: any) => r.incidentDate}
+                    generatePdf={generateIncidentPdfBlob}
+                    documentType="Incidents"
+                    colorClass="text-red-600 dark:text-red-400"
+                  />
+                </div>
+              )}
               {incidentReports.length > 0 ? (
                 <div className="space-y-2">
                   {groupDocumentsByDate(incidentReports, (r: any) => r.incidentDate).map((yearGroup) => (
@@ -2420,6 +3084,17 @@ export default function Documents() {
             </div>
           </CardHeader>
           <CardContent className="pt-6">
+            {methodStatements.length > 0 && (
+              <div className="mb-4">
+                <DateRangeExport
+                  documents={methodStatements}
+                  getDateFn={(s: any) => s.dateCreated}
+                  generatePdf={generateMethodStatementPdfBlob}
+                  documentType="Methods"
+                  colorClass="text-emerald-600 dark:text-emerald-400"
+                />
+              </div>
+            )}
             {methodStatements.length > 0 ? (
               <div className="space-y-2">
                 {groupDocumentsByDate(methodStatements, (s: any) => s.dateCreated).map((yearGroup) => (
