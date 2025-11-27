@@ -2336,13 +2336,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(403).json({ message: "Access denied. SuperUser only." });
       }
 
-      const { companyName, email, password, tier } = req.body;
+      const { companyName, email, password, tier, licenseKey } = req.body;
 
-      console.log('[Gift-Company] Creating gifted account:', { companyName, email, tier });
+      console.log('[Gift-Company] Creating gifted account:', { companyName, email, tier, licenseKey });
 
       // Validation
-      if (!companyName || !email || !password || !tier) {
-        return res.status(400).json({ message: "Missing required fields: companyName, email, password, tier" });
+      if (!companyName || !email || !password || !tier || !licenseKey) {
+        return res.status(400).json({ message: "Missing required fields: companyName, email, password, tier, licenseKey" });
       }
 
       // Validate tier
@@ -2351,17 +2351,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Invalid tier. Must be one of: basic, starter, premium, enterprise" });
       }
 
+      // Validate license key format (GIFT-XXXXX-XXXXX-XXXXX-[1-4])
+      const expectedTierSuffix = tier === 'basic' ? '1' : tier === 'starter' ? '2' : tier === 'premium' ? '3' : '4';
+      const licenseKeyPattern = new RegExp(`^GIFT-[A-Z0-9]{5}-[A-Z0-9]{5}-[A-Z0-9]{5}-${expectedTierSuffix}$`);
+      if (!licenseKeyPattern.test(licenseKey)) {
+        return res.status(400).json({ message: "Invalid license key format or tier mismatch" });
+      }
+
       // Get tier configuration
       const tierConfig = TIER_CONFIG[tier as TierName];
 
-      // Generate a gift license key
-      // Format: GIFT-XXXXX-XXXXX-XXXXX-[TIER]
-      const generateRandomSegment = () => {
-        const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-        return Array(5).fill(0).map(() => chars[Math.floor(Math.random() * chars.length)]).join('');
-      };
-      const tierSuffix = tier === 'basic' ? '1' : tier === 'starter' ? '2' : tier === 'premium' ? '3' : '4';
-      const giftLicenseKey = `GIFT-${generateRandomSegment()}-${generateRandomSegment()}-${generateRandomSegment()}-${tierSuffix}`;
+      // Use the provided license key from frontend
+      const giftLicenseKey = licenseKey;
       const timestamp = Date.now();
 
       // Hash password before transaction

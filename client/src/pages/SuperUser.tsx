@@ -15,6 +15,15 @@ interface GiftCompanyForm {
   email: string;
   password: string;
   tier: string;
+  licenseKey: string;
+}
+
+// Generate a license key on the frontend for preview
+function generateLicenseKey(tier: string): string {
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+  const generateSegment = () => Array(5).fill(0).map(() => chars[Math.floor(Math.random() * chars.length)]).join('');
+  const tierSuffix = tier === 'basic' ? '1' : tier === 'starter' ? '2' : tier === 'premium' ? '3' : '4';
+  return `GIFT-${generateSegment()}-${generateSegment()}-${generateSegment()}-${tierSuffix}`;
 }
 
 interface GiftCompanyResponse {
@@ -37,7 +46,21 @@ export default function SuperUser() {
     email: '',
     password: '',
     tier: 'basic',
+    licenseKey: generateLicenseKey('basic'),
   });
+  
+  // Open dialog and generate a fresh license key
+  const openGiftDialog = () => {
+    const newLicenseKey = generateLicenseKey(formData.tier);
+    setFormData(prev => ({ ...prev, licenseKey: newLicenseKey }));
+    setGiftDialogOpen(true);
+  };
+  
+  // Regenerate license key when tier changes
+  const handleTierChange = (newTier: string) => {
+    const newLicenseKey = generateLicenseKey(newTier);
+    setFormData(prev => ({ ...prev, tier: newTier, licenseKey: newLicenseKey }));
+  };
   
   // User data is already verified by ProtectedRoute - no need to recheck
   const { data: userData } = useQuery<{ user: any }>({
@@ -55,8 +78,8 @@ export default function SuperUser() {
         title: "Account Created",
         description: data.message,
       });
-      // Reset form
-      setFormData({ companyName: '', email: '', password: '', tier: 'basic' });
+      // Reset form with new license key
+      setFormData({ companyName: '', email: '', password: '', tier: 'basic', licenseKey: generateLicenseKey('basic') });
       // Refresh companies list if needed
       queryClient.invalidateQueries({ queryKey: ['/api/superuser/companies'] });
     },
@@ -121,7 +144,7 @@ export default function SuperUser() {
 
           <Card 
             className="hover-elevate active-elevate-2 cursor-pointer transition-all"
-            onClick={() => setGiftDialogOpen(true)}
+            onClick={openGiftDialog}
             data-testid="card-gift-company"
           >
             <CardHeader>
@@ -251,7 +274,7 @@ export default function SuperUser() {
                 <Label htmlFor="tier">Subscription Tier</Label>
                 <Select
                   value={formData.tier}
-                  onValueChange={(value) => setFormData({ ...formData, tier: value })}
+                  onValueChange={handleTierChange}
                 >
                   <SelectTrigger data-testid="select-tier">
                     <SelectValue placeholder="Select tier" />
@@ -283,6 +306,32 @@ export default function SuperUser() {
                     </SelectItem>
                   </SelectContent>
                 </Select>
+              </div>
+
+              {/* License Key Preview */}
+              <div className="space-y-2">
+                <Label>License Key</Label>
+                <div className="flex items-center gap-2">
+                  <code className="flex-1 text-xs bg-muted p-2.5 rounded border font-mono" data-testid="text-license-key-preview">
+                    {formData.licenseKey}
+                  </code>
+                  <Button 
+                    type="button" 
+                    size="icon" 
+                    variant="outline"
+                    onClick={() => {
+                      const newKey = generateLicenseKey(formData.tier);
+                      setFormData(prev => ({ ...prev, licenseKey: newKey }));
+                    }}
+                    title="Generate new key"
+                    data-testid="button-regenerate-key"
+                  >
+                    <span className="material-icons text-lg">refresh</span>
+                  </Button>
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  This license key will be assigned to the new company
+                </p>
               </div>
 
               <DialogFooter className="gap-2">
