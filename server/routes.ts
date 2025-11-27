@@ -7184,7 +7184,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       const { documentType } = req.body;
       
-      if (!documentType || !['health_safety_manual', 'company_policy'].includes(documentType)) {
+      if (!documentType || !['health_safety_manual', 'company_policy', 'certificate_of_insurance'].includes(documentType)) {
         return res.status(400).json({ message: "Invalid document type" });
       }
 
