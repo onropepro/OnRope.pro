@@ -769,24 +769,6 @@ export default function Inventory() {
               </CardContent>
             </Card>
 
-            {/* Summary Cards */}
-            {canViewFinancials && (
-              <Card>
-                <CardHeader className="pb-3">
-                  <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
-                    <span className="material-icons text-lg">attach_money</span>
-                    Total Value
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-3xl font-bold">${totalMyValue.toFixed(2)}</div>
-                  <p className="text-xs text-muted-foreground mt-1">
-                    Equipment value
-                  </p>
-                </CardContent>
-              </Card>
-            )}
-
             {myGear.length === 0 ? (
               <Card>
                 <CardContent className="py-12 text-center">
@@ -836,11 +818,6 @@ export default function Inventory() {
                               <div className="font-semibold text-lg">
                                 {item.quantity} {item.quantity === 1 ? 'item' : 'items'}
                               </div>
-                              {canViewFinancials && item.itemPrice && (
-                                <div className="text-sm text-muted-foreground">
-                                  ${parseFloat(item.itemPrice).toFixed(2)} each
-                                </div>
-                              )}
                             </div>
                           </div>
 
