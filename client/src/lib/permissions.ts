@@ -129,6 +129,23 @@ export function hasPermission(user: User | null | undefined, permission: string)
   return user.permissions?.includes(permission) || false;
 }
 
+// Check if user can access inventory/gear management
+export function canAccessInventory(user: User | null | undefined): boolean {
+  if (!user) return false;
+  
+  // Company role always has access
+  if (user.role === 'company') return true;
+  
+  // Operations managers always have access to inventory
+  if (user.role === 'operations_manager') return true;
+  
+  // Supervisors always have access to inventory
+  if (user.role === 'supervisor' || user.role === 'general_supervisor' || user.role === 'rope_access_supervisor') return true;
+  
+  // Check granular permissions - other roles need explicit permission
+  return user.permissions?.includes('view_inventory') || false;
+}
+
 // Check if user is in read-only mode
 // - For company role: check their Stripe subscription status
 // - For employees: check their parent company's subscription status

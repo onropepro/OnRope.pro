@@ -15,9 +15,9 @@ import { useToast } from "@/hooks/use-toast";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { insertGearItemSchema, type InsertGearItem, type GearItem, type GearAssignment, type GearSerialNumber } from "@shared/schema";
-import { ArrowLeft, Plus, Pencil, X, Trash2, Shield, Cable, Link2, Gauge, TrendingUp, HardHat, Hand, Fuel, Scissors, PaintBucket, Droplets, CircleDot, Lock, Anchor, MoreHorizontal, Users } from "lucide-react";
+import { ArrowLeft, Plus, Pencil, X, Trash2, Shield, Cable, Link2, Gauge, TrendingUp, HardHat, Hand, Fuel, Scissors, PaintBucket, Droplets, CircleDot, Lock, Anchor, MoreHorizontal, Users, ShieldAlert } from "lucide-react";
 import { Label } from "@/components/ui/label";
-import { hasFinancialAccess, isManagement, canViewCSR } from "@/lib/permissions";
+import { hasFinancialAccess, isManagement, canViewCSR, canAccessInventory } from "@/lib/permissions";
 import HarnessInspectionForm from "./HarnessInspectionForm";
 import { format } from "date-fns";
 
@@ -82,6 +82,33 @@ export default function Inventory() {
 
   const currentUser = userData?.user;
   const canViewFinancials = hasFinancialAccess(currentUser);
+  const hasInventoryAccess = canAccessInventory(currentUser);
+
+  // Redirect users without inventory access permission
+  if (userData && !hasInventoryAccess) {
+    return (
+      <div className="p-6 max-w-4xl mx-auto">
+        <Card>
+          <CardContent className="py-12 text-center">
+            <div className="flex flex-col items-center gap-4">
+              <ShieldAlert className="w-12 h-12 text-muted-foreground" />
+              <h2 className="text-xl font-semibold">Access Restricted</h2>
+              <p className="text-muted-foreground">
+                You don't have permission to access the Inventory & Gear Management page.
+              </p>
+              <p className="text-sm text-muted-foreground">
+                Please contact your administrator if you need access.
+              </p>
+              <Button variant="outline" onClick={() => setLocation("/dashboard")}>
+                <ArrowLeft className="w-4 h-4 mr-2" />
+                Return to Dashboard
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   // Fetch all work sessions for inspection tracking
   const { data: allSessionsData } = useQuery<{ sessions: any[] }>({

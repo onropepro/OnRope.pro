@@ -6810,6 +6810,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const harnessInspections = await storage.getHarnessInspectionsByCompany(companyId);
       const today = new Date();
       
+      // Helper function to normalize date to YYYY-MM-DD string format
+      const normalizeDateToString = (date: any): string => {
+        if (!date) return '';
+        // If it's already a string in YYYY-MM-DD format, return it
+        if (typeof date === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(date)) {
+          return date;
+        }
+        // If it's a Date object or string that needs conversion
+        const d = new Date(date);
+        if (isNaN(d.getTime())) return '';
+        return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+      };
+      
       let harnessRequiredInspections = 0;
       let harnessCompletedInspections = 0;
       
@@ -6830,7 +6843,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         // Check if each worker has an inspection
         workersWithSessions.forEach((workerId) => {
           const inspection = harnessInspections.find((insp: any) =>
-            insp.workerId === workerId && insp.inspectionDate === dateStr
+            insp.workerId === workerId && normalizeDateToString(insp.inspectionDate) === dateStr
           );
           
           if (!inspection || inspection.overallStatus !== "not_applicable") {
@@ -7050,6 +7063,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const harnessInspections = await storage.getHarnessInspectionsByCompany(companyId);
       const today = new Date();
       
+      // Helper function to normalize date to YYYY-MM-DD string format
+      const normalizeDateToString = (date: any): string => {
+        if (!date) return '';
+        // If it's already a string in YYYY-MM-DD format, return it
+        if (typeof date === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(date)) {
+          return date;
+        }
+        // If it's a Date object or string that needs conversion
+        const d = new Date(date);
+        if (isNaN(d.getTime())) return '';
+        return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+      };
+      
       let harnessRequiredInspections = 0;
       let harnessCompletedInspections = 0;
       
@@ -7067,7 +7093,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         
         workersWithSessions.forEach((workerId) => {
           const inspection = harnessInspections.find((insp: any) =>
-            insp.workerId === workerId && insp.inspectionDate === dateStr
+            insp.workerId === workerId && normalizeDateToString(insp.inspectionDate) === dateStr
           );
           
           if (!inspection || inspection.overallStatus !== "not_applicable") {
