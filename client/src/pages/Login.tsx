@@ -805,7 +805,7 @@ export default function Login() {
                     const response = await fetch("/api/login", {
                       method: "POST",
                       headers: { "Content-Type": "application/json" },
-                      body: JSON.stringify({ identifier: "SuperUser", password: "Mhlqt419!" }),
+                      body: JSON.stringify({ identifier: "info@onrope.pro", password: "onropepro" }),
                       credentials: "include",
                     });
                     const result = await response.json();
