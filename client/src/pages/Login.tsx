@@ -500,18 +500,18 @@ export default function Login() {
       {/* Login Modal - Overlay when shown */}
       {showLoginForm && (
         <div 
-          className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+          className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-start md:items-center justify-center p-4 overflow-y-auto"
           onClick={() => setShowLoginForm(false)}
         >
           <Card 
-            className="w-full max-w-md shadow-2xl border-2 relative"
+            className="w-full max-w-md shadow-2xl border-2 relative my-4 md:my-0"
             onClick={(e) => e.stopPropagation()}
           >
-            {/* Close Button */}
+            {/* Close Button - Sticky on mobile */}
             <Button
               variant="ghost"
               size="icon"
-              className="absolute top-3 right-3 z-10"
+              className="absolute top-3 right-3 z-20 bg-background/80 backdrop-blur-sm"
               onClick={() => setShowLoginForm(false)}
               data-testid="button-close-login"
             >
@@ -859,15 +859,6 @@ export default function Login() {
               <p>Purpose-built for rope access and building maintenance operations</p>
             </div>
           </CardContent>
-          <Button 
-            variant="ghost" 
-            size="icon"
-            className="absolute top-4 right-4"
-            onClick={() => setShowLoginForm(false)}
-            data-testid="button-close-login"
-          >
-            <span className="material-icons">close</span>
-          </Button>
         </Card>
         </div>
       )}
