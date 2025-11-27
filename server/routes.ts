@@ -6381,15 +6381,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Unable to determine company" });
       }
       
-      // Validate that all attendees have signed
-      const { attendees, signatures } = req.body;
-      if (attendees && Array.isArray(attendees) && attendees.length > 0) {
-        const signatureNames = (signatures || []).map((sig: any) => sig.employeeName);
-        const unsignedAttendees = attendees.filter((name: string) => !signatureNames.includes(name));
+      // Validate that all attendees have signed (using IDs for reliable matching)
+      const { attendeeIds, signatures } = req.body;
+      if (attendeeIds && Array.isArray(attendeeIds) && attendeeIds.length > 0) {
+        // Validate signature content - ensure each signature has non-empty data
+        const validSignatures = (signatures || []).filter((sig: any) => 
+          sig && sig.employeeId && sig.signatureDataUrl && sig.signatureDataUrl.length > 0
+        );
+        const signatureEmployeeIds = validSignatures.map((sig: any) => sig.employeeId);
+        const unsignedAttendeeIds = attendeeIds.filter((id: string) => !signatureEmployeeIds.includes(id));
         
-        if (unsignedAttendees.length > 0) {
+        if (unsignedAttendeeIds.length > 0) {
+          // Get names from storage for accurate error message (don't trust client-provided names)
+          const unsignedNames: string[] = [];
+          for (const id of unsignedAttendeeIds) {
+            const employee = await storage.getUserById(id);
+            unsignedNames.push(employee?.name || `Employee ${id}`);
+          }
           return res.status(400).json({ 
-            message: `All attendees must sign. Missing signatures from: ${unsignedAttendees.join(", ")}` 
+            message: `All attendees must sign. Missing signatures from: ${unsignedNames.join(", ")}` 
           });
         }
       }

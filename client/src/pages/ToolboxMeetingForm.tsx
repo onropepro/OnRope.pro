@@ -157,13 +157,23 @@ export default function ToolboxMeetingForm() {
     }
   }, [currentUser, form]);
 
-  const toggleEmployee = (employeeName: string) => {
+  // Toggle employee by ID for reliable tracking
+  const toggleEmployee = (employeeId: string) => {
     setSelectedEmployees(prev => 
-      prev.includes(employeeName)
-        ? prev.filter(name => name !== employeeName)
-        : [...prev, employeeName]
+      prev.includes(employeeId)
+        ? prev.filter(id => id !== employeeId)
+        : [...prev, employeeId]
     );
   };
+
+  // Get employee name from ID
+  const getEmployeeName = (employeeId: string) => {
+    const employee = employees.find(e => e.id === employeeId);
+    return employee?.name || "Unknown";
+  };
+
+  // Get selected employee names for display and API
+  const selectedEmployeeNames = selectedEmployees.map(id => getEmployeeName(id));
 
   const handleAddSignature = () => {
     if (selectedEmployees.length === 0) {
@@ -238,14 +248,16 @@ export default function ToolboxMeetingForm() {
     mutationFn: async (data: ToolboxMeetingFormValues) => {
       console.log('[Toolbox Meeting] Submitting:', {
         ...data,
-        attendees: selectedEmployees,
+        attendees: selectedEmployeeNames,
+        attendeeIds: selectedEmployees,
         signatures,
       });
       
-      // Use selectedEmployees and signatures
+      // Send attendee names for database storage, IDs for validation
       const response = await apiRequest("POST", "/api/toolbox-meetings", {
         ...data,
-        attendees: selectedEmployees,
+        attendees: selectedEmployeeNames,
+        attendeeIds: selectedEmployees, // For backend validation
         signatures,
       });
       
@@ -272,17 +284,16 @@ export default function ToolboxMeetingForm() {
     },
   });
 
-  // Helper to get attendees who haven't signed yet
-  const getUnsignedAttendees = () => {
-    return selectedEmployees.filter(attendeeName => {
-      const employee = employees.find(e => e.name === attendeeName);
-      if (!employee) return true; // If can't find employee, consider unsigned
-      return !signatures.some(s => s.employeeId === employee.id);
+  // Helper to get attendee IDs who haven't signed yet (compare by ID for reliability)
+  const getUnsignedAttendeeIds = () => {
+    return selectedEmployees.filter(employeeId => {
+      return !signatures.some(s => s.employeeId === employeeId);
     });
   };
 
-  const unsignedAttendees = getUnsignedAttendees();
-  const allAttendeesSigned = selectedEmployees.length > 0 && unsignedAttendees.length === 0;
+  const unsignedAttendeeIds = getUnsignedAttendeeIds();
+  const unsignedAttendeeNames = unsignedAttendeeIds.map(id => getEmployeeName(id));
+  const allAttendeesSigned = selectedEmployees.length > 0 && unsignedAttendeeIds.length === 0;
 
   const onSubmit = async (data: ToolboxMeetingFormValues) => {
     if (selectedEmployees.length === 0) {
@@ -294,11 +305,11 @@ export default function ToolboxMeetingForm() {
       return;
     }
     
-    // Check if all attendees have signed
-    if (unsignedAttendees.length > 0) {
+    // Check if all attendees have signed (by ID for reliability)
+    if (unsignedAttendeeIds.length > 0) {
       toast({
         title: "Signatures Required",
-        description: `All attendees must sign. Missing signatures from: ${unsignedAttendees.join(", ")}`,
+        description: `All attendees must sign. Missing signatures from: ${unsignedAttendeeNames.join(", ")}`,
         variant: "destructive",
       });
       return;
@@ -455,14 +466,14 @@ export default function ToolboxMeetingForm() {
                         Selected ({selectedEmployees.length})
                       </div>
                       <div className="flex flex-wrap gap-2">
-                        {selectedEmployees.map((name, idx) => (
+                        {selectedEmployees.map((employeeId) => (
                           <Badge 
-                            key={idx} 
+                            key={employeeId} 
                             variant="secondary"
                             className="cursor-pointer hover-elevate"
-                            onClick={() => toggleEmployee(name)}
+                            onClick={() => toggleEmployee(employeeId)}
                           >
-                            {name} ×
+                            {getEmployeeName(employeeId)} ×
                           </Badge>
                         ))}
                       </div>
@@ -474,23 +485,23 @@ export default function ToolboxMeetingForm() {
                       <Card
                         key={employee.id}
                         className={`cursor-pointer hover-elevate transition-colors ${
-                          selectedEmployees.includes(employee.name)
+                          selectedEmployees.includes(employee.id)
                             ? 'bg-primary/10 border-primary'
                             : ''
                         }`}
-                        onClick={() => toggleEmployee(employee.name)}
+                        onClick={() => toggleEmployee(employee.id)}
                         data-testid={`employee-card-${employee.id}`}
                       >
                         <CardContent className="p-3">
                           <div className="flex items-center gap-2">
                             <div
                               className={`w-5 h-5 rounded border-2 flex items-center justify-center ${
-                                selectedEmployees.includes(employee.name)
+                                selectedEmployees.includes(employee.id)
                                   ? 'bg-primary border-primary'
                                   : 'border-muted-foreground'
                               }`}
                             >
-                              {selectedEmployees.includes(employee.name) && (
+                              {selectedEmployees.includes(employee.id) && (
                                 <span className="material-icons text-primary-foreground text-sm">
                                   check
                                 </span>
@@ -540,16 +551,16 @@ export default function ToolboxMeetingForm() {
                   </div>
 
                   {/* Show unsigned attendees warning */}
-                  {selectedEmployees.length > 0 && unsignedAttendees.length > 0 && (
+                  {selectedEmployees.length > 0 && unsignedAttendeeIds.length > 0 && (
                     <div className="bg-destructive/10 border border-destructive/20 rounded-md p-3">
                       <div className="flex items-start gap-2">
                         <span className="material-icons text-destructive text-base mt-0.5">warning</span>
                         <div>
                           <div className="text-sm font-medium text-destructive">
-                            {unsignedAttendees.length} attendee{unsignedAttendees.length > 1 ? 's' : ''} still need{unsignedAttendees.length === 1 ? 's' : ''} to sign:
+                            {unsignedAttendeeIds.length} attendee{unsignedAttendeeIds.length > 1 ? 's' : ''} still need{unsignedAttendeeIds.length === 1 ? 's' : ''} to sign:
                           </div>
                           <div className="text-sm text-destructive/80 mt-1">
-                            {unsignedAttendees.join(", ")}
+                            {unsignedAttendeeNames.join(", ")}
                           </div>
                         </div>
                       </div>
@@ -693,7 +704,7 @@ export default function ToolboxMeetingForm() {
                 >
                   {isSubmitting ? "Recording..." : 
                    selectedEmployees.length === 0 ? "Select Attendees to Continue" :
-                   !allAttendeesSigned ? `Collect ${unsignedAttendees.length} Missing Signature${unsignedAttendees.length > 1 ? 's' : ''}` :
+                   !allAttendeesSigned ? `Collect ${unsignedAttendeeIds.length} Missing Signature${unsignedAttendeeIds.length > 1 ? 's' : ''}` :
                    "Record Toolbox Meeting"}
                 </Button>
               </form>
@@ -718,14 +729,14 @@ export default function ToolboxMeetingForm() {
                     <SelectValue placeholder="Choose employee to sign" />
                   </SelectTrigger>
                   <SelectContent>
-                    {selectedEmployees.map((attendeeName) => {
-                      const employee = employees.find(e => e.name === attendeeName);
+                    {selectedEmployees.map((employeeId) => {
+                      const employee = employees.find(e => e.id === employeeId);
                       if (!employee) return null;
-                      const alreadySigned = signatures.some(s => s.employeeId === employee.id);
+                      const alreadySigned = signatures.some(s => s.employeeId === employeeId);
                       return (
                         <SelectItem 
-                          key={employee.id} 
-                          value={employee.id}
+                          key={employeeId} 
+                          value={employeeId}
                           disabled={alreadySigned}
                         >
                           {employee.name} {alreadySigned ? "(Already signed)" : ""}
