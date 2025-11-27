@@ -83,15 +83,15 @@ export default function CompanyDetail() {
             <div>
               <div className="flex items-center gap-3">
                 <h1 className="text-4xl font-bold gradient-text">{company.companyName || "Unnamed Company"}</h1>
-                {company.licenseVerified ? (
+                {company.subscriptionStatus === 'active' || company.subscriptionStatus === 'trialing' ? (
                   <Badge className="bg-emerald-500/10 text-emerald-600 border-emerald-500/20" data-testid="badge-verified">
                     <span className="material-icons text-sm mr-1">verified</span>
-                    Verified
+                    {company.subscriptionStatus === 'trialing' ? 'Trial' : 'Verified'}
                   </Badge>
                 ) : (
                   <Badge variant="destructive" data-testid="badge-unverified">
                     <span className="material-icons text-sm mr-1">warning</span>
-                    Not Verified
+                    {company.subscriptionStatus === 'canceled' ? 'Canceled' : 'Not Verified'}
                   </Badge>
                 )}
               </div>
@@ -115,8 +115,8 @@ export default function CompanyDetail() {
                 <p className="text-sm">{company.createdAt ? new Date(company.createdAt).toLocaleDateString() : 'N/A'}</p>
               </div>
               <div>
-                <p className="text-sm text-muted-foreground mb-1">License Status</p>
-                <p className="text-sm">{company.licenseVerified ? "Active" : "Inactive"}</p>
+                <p className="text-sm text-muted-foreground mb-1">Subscription Status</p>
+                <p className="text-sm capitalize">{company.subscriptionStatus || "Inactive"}</p>
               </div>
               <div>
                 <p className="text-sm text-muted-foreground mb-1">Address</p>

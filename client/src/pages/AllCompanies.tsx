@@ -70,15 +70,15 @@ export default function AllCompanies() {
                     <div className="flex-1">
                       <div className="flex items-center gap-3 mb-2">
                         <CardTitle className="text-2xl">{company.companyName || "Unnamed Company"}</CardTitle>
-                        {company.licenseVerified ? (
+                        {company.subscriptionStatus === 'active' || company.subscriptionStatus === 'trialing' ? (
                           <Badge className="bg-emerald-500/10 text-emerald-600 border-emerald-500/20" data-testid={`badge-verified-${company.id}`}>
                             <span className="material-icons text-sm mr-1">verified</span>
-                            Verified
+                            {company.subscriptionStatus === 'trialing' ? 'Trial' : 'Verified'}
                           </Badge>
                         ) : (
                           <Badge variant="destructive" data-testid={`badge-unverified-${company.id}`}>
                             <span className="material-icons text-sm mr-1">warning</span>
-                            Not Verified
+                            {company.subscriptionStatus === 'canceled' ? 'Canceled' : 'Not Verified'}
                           </Badge>
                         )}
                       </div>
@@ -123,7 +123,7 @@ export default function AllCompanies() {
                     </div>
                     <div>
                       <p className="text-muted-foreground">Status</p>
-                      <p>{company.licenseVerified ? "Active" : "Inactive"}</p>
+                      <p className="capitalize">{company.subscriptionStatus || "Inactive"}</p>
                     </div>
                   </div>
                 </CardContent>
