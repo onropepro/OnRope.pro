@@ -39,7 +39,8 @@ export default function SuperUser() {
     tier: 'basic',
   });
   
-  const { data: userData, isLoading } = useQuery<{ user: any }>({
+  // User data is already verified by ProtectedRoute - no need to recheck
+  const { data: userData } = useQuery<{ user: any }>({
     queryKey: ["/api/user"],
   });
 
@@ -68,20 +69,7 @@ export default function SuperUser() {
     },
   });
   
-  // Show loading while checking auth
-  if (isLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-      </div>
-    );
-  }
-  
-  // Redirect if not superuser
-  if (userData?.user?.role !== 'superuser') {
-    setLocation('/');
-    return null;
-  }
+  // ProtectedRoute already handles auth verification, so we can proceed directly
   
   const handleLogout = async () => {
     await fetch('/api/logout', { method: 'POST', credentials: 'include' });
