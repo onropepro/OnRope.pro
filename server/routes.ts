@@ -6682,6 +6682,42 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Property Manager: Get vendor company documents (for viewing Certificate of Insurance, etc.)
+  app.get("/api/property-managers/vendors/:linkId/documents", requireAuth, requireRole("property_manager"), async (req: Request, res: Response) => {
+    try {
+      const { linkId } = req.params;
+      const { documentType } = req.query;
+      const propertyManagerId = req.session.userId!;
+      
+      // Verify the link belongs to this property manager
+      const links = await storage.getPropertyManagerCompanyLinks(propertyManagerId);
+      const ownedLink = links.find(link => link.id === linkId);
+      
+      if (!ownedLink) {
+        return res.status(403).json({ message: "Unauthorized: This vendor link does not belong to you" });
+      }
+      
+      const companyId = ownedLink.companyId;
+      
+      // Get company documents - filter by type if specified
+      let documents;
+      if (documentType && typeof documentType === 'string') {
+        documents = await storage.getCompanyDocumentsByType(companyId, documentType);
+      } else {
+        documents = await storage.getCompanyDocuments(companyId);
+      }
+      
+      // Property managers can only see certain document types
+      const allowedTypes = ['certificate_of_insurance', 'health_safety_manual', 'company_policy'];
+      const filteredDocuments = documents.filter((doc: any) => allowedTypes.includes(doc.documentType));
+      
+      res.json({ documents: filteredDocuments });
+    } catch (error) {
+      console.error("Get vendor documents error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
   // FLHA form routes
   app.post("/api/flha-forms", requireAuth, requireRole("rope_access_tech", "general_supervisor", "rope_access_supervisor", "supervisor", "operations_manager", "company"), async (req: Request, res: Response) => {
     try {

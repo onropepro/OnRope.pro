@@ -251,6 +251,32 @@ export default function PropertyManager() {
     retry: false,
   });
 
+  // Fetch vendor documents (Certificate of Insurance, etc.)
+  const { data: vendorDocumentsData, isLoading: isLoadingDocuments } = useQuery<{
+    documents: Array<{
+      id: string;
+      documentType: string;
+      fileName: string;
+      fileUrl: string;
+      createdAt: string;
+    }>;
+  }>({
+    queryKey: ["/api/property-managers/vendors", selectedVendor?.linkId, "documents"],
+    queryFn: async () => {
+      const response = await fetch(
+        `/api/property-managers/vendors/${selectedVendor!.linkId}/documents`,
+        { credentials: 'include' }
+      );
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.message || 'Failed to fetch documents');
+      }
+      return data;
+    },
+    enabled: !!selectedVendor?.linkId,
+    retry: false,
+  });
+
   // SECURITY: Clear selectedProject if details fetch fails to prevent showing stale data
   useEffect(() => {
     if (projectDetailsError) {
@@ -794,6 +820,54 @@ export default function PropertyManager() {
                         A score of 90%+ indicates excellent safety practices.
                       </p>
                     </div>
+                  )}
+                </div>
+
+                {/* Safety Documents Section */}
+                <div className="space-y-3 border-t pt-4">
+                  <div className="flex items-center gap-2">
+                    <FileText className="w-5 h-5 text-muted-foreground" />
+                    <Label className="text-sm font-medium">Safety Documents</Label>
+                  </div>
+                  
+                  {isLoadingDocuments ? (
+                    <div className="text-sm text-muted-foreground">Loading documents...</div>
+                  ) : vendorDocumentsData?.documents && vendorDocumentsData.documents.length > 0 ? (
+                    <div className="space-y-2">
+                      {vendorDocumentsData.documents.map((doc) => {
+                        const docTypeLabels: Record<string, string> = {
+                          'certificate_of_insurance': 'Certificate of Insurance',
+                          'health_safety_manual': 'Health & Safety Manual',
+                          'company_policy': 'Company Policy',
+                        };
+                        return (
+                          <div key={doc.id} className="flex items-center justify-between bg-background rounded-md px-3 py-2 border">
+                            <div className="flex items-center gap-2">
+                              <FileCheck className="w-4 h-4 text-green-600 dark:text-green-400" />
+                              <div>
+                                <p className="text-sm font-medium">
+                                  {docTypeLabels[doc.documentType] || doc.documentType}
+                                </p>
+                                <p className="text-xs text-muted-foreground">{doc.fileName}</p>
+                              </div>
+                            </div>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => window.open(doc.fileUrl, '_blank')}
+                              data-testid={`button-view-document-${doc.id}`}
+                            >
+                              <Download className="w-4 h-4 mr-1" />
+                              View
+                            </Button>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  ) : (
+                    <p className="text-sm text-muted-foreground bg-muted/50 px-3 py-2 rounded-md">
+                      No safety documents available from this vendor.
+                    </p>
                   )}
                 </div>
 
