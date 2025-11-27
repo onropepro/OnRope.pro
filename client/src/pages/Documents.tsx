@@ -20,6 +20,7 @@ export default function Documents() {
   const { toast } = useToast();
   const [uploadingHealthSafety, setUploadingHealthSafety] = useState(false);
   const [uploadingPolicy, setUploadingPolicy] = useState(false);
+  const [uploadingInsurance, setUploadingInsurance] = useState(false);
   const [activeTab, setActiveTab] = useState("health-safety");
 
   const { data: userData } = useQuery<{ user: any }>({
@@ -77,6 +78,7 @@ export default function Documents() {
 
   const healthSafetyDocs = companyDocuments.filter((doc: any) => doc.documentType === 'health_safety_manual');
   const policyDocs = companyDocuments.filter((doc: any) => doc.documentType === 'company_policy');
+  const insuranceDocs = companyDocuments.filter((doc: any) => doc.documentType === 'certificate_of_insurance');
   const workSessions = workSessionsData?.sessions || [];
 
   // Calculate toolbox meeting compliance rating
