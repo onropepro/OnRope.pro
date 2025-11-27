@@ -115,7 +115,7 @@ export default function AllCompanies() {
                         {company.licenseKey === "BYPASSED" ? (
                           <Badge variant="outline">Bypassed</Badge>
                         ) : company.licenseKey ? (
-                          "••••••••"
+                          company.licenseKey
                         ) : (
                           "Not set"
                         )}
