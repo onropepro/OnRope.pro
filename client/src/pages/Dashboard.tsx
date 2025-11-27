@@ -118,6 +118,7 @@ const AVAILABLE_PERMISSIONS = [
   { id: "view_clients", label: "View Clients" },
   { id: "manage_clients", label: "Manage Clients (Create/Edit/Delete)" },
   { id: "view_inventory", label: "View Inventory & Gear" },
+  { id: "view_csr", label: "View Company Safety Rating (CSR)" },
   { id: "log_drops", label: "Log Drops" },
   { id: "view_complaints", label: "View Complaints" },
   { id: "manage_complaints", label: "Manage Complaints" },
