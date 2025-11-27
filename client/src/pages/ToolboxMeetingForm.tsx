@@ -272,11 +272,33 @@ export default function ToolboxMeetingForm() {
     },
   });
 
+  // Helper to get attendees who haven't signed yet
+  const getUnsignedAttendees = () => {
+    return selectedEmployees.filter(attendeeName => {
+      const employee = employees.find(e => e.name === attendeeName);
+      if (!employee) return true; // If can't find employee, consider unsigned
+      return !signatures.some(s => s.employeeId === employee.id);
+    });
+  };
+
+  const unsignedAttendees = getUnsignedAttendees();
+  const allAttendeesSigned = selectedEmployees.length > 0 && unsignedAttendees.length === 0;
+
   const onSubmit = async (data: ToolboxMeetingFormValues) => {
     if (selectedEmployees.length === 0) {
       toast({
         title: "Error",
         description: "Please select at least one attendee",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    // Check if all attendees have signed
+    if (unsignedAttendees.length > 0) {
+      toast({
+        title: "Signatures Required",
+        description: `All attendees must sign. Missing signatures from: ${unsignedAttendees.join(", ")}`,
         variant: "destructive",
       });
       return;
@@ -498,32 +520,65 @@ export default function ToolboxMeetingForm() {
                 </div>
 
                 <div className="space-y-3">
-                  <div className="flex items-center justify-between">
+                  <div className="flex items-center justify-between gap-2 flex-wrap">
                     <div>
-                      <Label>Digital Signatures</Label>
+                      <Label>Digital Signatures *</Label>
                       <p className="text-sm text-muted-foreground mt-1">
-                        Collect signatures from attendees
+                        All attendees must sign before submitting
                       </p>
                     </div>
                     <Button
                       type="button"
                       variant="outline"
                       onClick={handleAddSignature}
+                      disabled={selectedEmployees.length === 0 || allAttendeesSigned}
                       data-testid="button-add-signature"
                     >
                       <PenTool className="h-4 w-4 mr-2" />
-                      Add Signature
+                      {allAttendeesSigned ? "All Signed" : "Add Signature"}
                     </Button>
                   </div>
+
+                  {/* Show unsigned attendees warning */}
+                  {selectedEmployees.length > 0 && unsignedAttendees.length > 0 && (
+                    <div className="bg-destructive/10 border border-destructive/20 rounded-md p-3">
+                      <div className="flex items-start gap-2">
+                        <span className="material-icons text-destructive text-base mt-0.5">warning</span>
+                        <div>
+                          <div className="text-sm font-medium text-destructive">
+                            {unsignedAttendees.length} attendee{unsignedAttendees.length > 1 ? 's' : ''} still need{unsignedAttendees.length === 1 ? 's' : ''} to sign:
+                          </div>
+                          <div className="text-sm text-destructive/80 mt-1">
+                            {unsignedAttendees.join(", ")}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* All signed success message */}
+                  {allAttendeesSigned && (
+                    <div className="bg-green-500/10 border border-green-500/20 rounded-md p-3">
+                      <div className="flex items-center gap-2">
+                        <span className="material-icons text-green-600 dark:text-green-400 text-base">check_circle</span>
+                        <div className="text-sm font-medium text-green-600 dark:text-green-400">
+                          All {selectedEmployees.length} attendee{selectedEmployees.length > 1 ? 's have' : ' has'} signed
+                        </div>
+                      </div>
+                    </div>
+                  )}
 
                   {signatures.length > 0 && (
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                       {signatures.map((sig) => (
-                        <Card key={sig.employeeId} data-testid={`signature-card-${sig.employeeId}`}>
+                        <Card key={sig.employeeId} className="border-green-500/30" data-testid={`signature-card-${sig.employeeId}`}>
                           <CardContent className="p-3">
                             <div className="space-y-2">
-                              <div className="flex items-center justify-between">
-                                <div className="font-medium text-sm">{sig.employeeName}</div>
+                              <div className="flex items-center justify-between gap-2">
+                                <div className="flex items-center gap-2">
+                                  <span className="material-icons text-green-500 text-sm">verified</span>
+                                  <div className="font-medium text-sm">{sig.employeeName}</div>
+                                </div>
                                 <Button
                                   type="button"
                                   variant="ghost"
@@ -549,9 +604,15 @@ export default function ToolboxMeetingForm() {
                     </div>
                   )}
 
-                  {signatures.length === 0 && (
+                  {signatures.length === 0 && selectedEmployees.length > 0 && (
                     <p className="text-sm text-muted-foreground">
-                      No signatures collected yet
+                      Tap "Add Signature" to collect signatures from each attendee
+                    </p>
+                  )}
+
+                  {selectedEmployees.length === 0 && (
+                    <p className="text-sm text-muted-foreground">
+                      Select attendees above first, then collect their signatures
                     </p>
                   )}
                 </div>
@@ -627,10 +688,13 @@ export default function ToolboxMeetingForm() {
                 <Button
                   type="submit"
                   className="w-full"
-                  disabled={isSubmitting}
+                  disabled={isSubmitting || !allAttendeesSigned}
                   data-testid="button-submit"
                 >
-                  {isSubmitting ? "Recording..." : "Record Toolbox Meeting"}
+                  {isSubmitting ? "Recording..." : 
+                   selectedEmployees.length === 0 ? "Select Attendees to Continue" :
+                   !allAttendeesSigned ? `Collect ${unsignedAttendees.length} Missing Signature${unsignedAttendees.length > 1 ? 's' : ''}` :
+                   "Record Toolbox Meeting"}
                 </Button>
               </form>
             </Form>

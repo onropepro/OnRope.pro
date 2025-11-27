@@ -6381,6 +6381,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Unable to determine company" });
       }
       
+      // Validate that all attendees have signed
+      const { attendees, signatures } = req.body;
+      if (attendees && Array.isArray(attendees) && attendees.length > 0) {
+        const signatureNames = (signatures || []).map((sig: any) => sig.employeeName);
+        const unsignedAttendees = attendees.filter((name: string) => !signatureNames.includes(name));
+        
+        if (unsignedAttendees.length > 0) {
+          return res.status(400).json({ 
+            message: `All attendees must sign. Missing signatures from: ${unsignedAttendees.join(", ")}` 
+          });
+        }
+      }
+      
       const meetingData = insertToolboxMeetingSchema.parse({
         ...req.body,
         companyId,
