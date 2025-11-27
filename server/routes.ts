@@ -59,6 +59,20 @@ function canViewSafetyDocuments(user: any): boolean {
   return user.permissions?.includes('view_safety_documents') || false;
 }
 
+// Helper function to check if user can view Company Safety Rating (CSR)
+function canViewCSR(user: any): boolean {
+  if (!user) return false;
+  
+  // Company role always has access
+  if (user.role === 'company') return true;
+  
+  // Operations managers always have access to CSR
+  if (user.role === 'operations_manager') return true;
+  
+  // Check granular permissions - other roles need explicit permission
+  return user.permissions?.includes('view_csr') || false;
+}
+
 // Overtime calculation utility
 interface OvertimeBreakdown {
   regularHours: number;
@@ -6439,6 +6453,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       if (!currentUser) {
         return res.status(404).json({ message: "User not found" });
+      }
+      
+      // Check if user has permission to view CSR
+      if (!canViewCSR(currentUser)) {
+        return res.status(403).json({ message: "Forbidden - Insufficient permissions to view CSR" });
       }
       
       const companyId = currentUser.role === "company" ? currentUser.id : currentUser.companyId;

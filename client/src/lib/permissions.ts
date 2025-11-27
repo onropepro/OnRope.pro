@@ -102,6 +102,22 @@ export function canViewSafetyDocuments(user: User | null | undefined): boolean {
   return user.permissions?.includes('view_safety_documents') || false;
 }
 
+// Check if user can view Company Safety Rating (CSR)
+// Only company owners and operations managers can view CSR by default
+// Other roles require explicit 'view_csr' permission
+export function canViewCSR(user: User | null | undefined): boolean {
+  if (!user) return false;
+  
+  // Company role always has access
+  if (user.role === 'company') return true;
+  
+  // Operations managers always have access to CSR
+  if (user.role === 'operations_manager') return true;
+  
+  // Check granular permissions - other roles need explicit permission
+  return user.permissions?.includes('view_csr') || false;
+}
+
 // Check if user has specific permission
 export function hasPermission(user: User | null | undefined, permission: string): boolean {
   if (!user) return false;

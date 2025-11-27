@@ -2,6 +2,11 @@ import { useQuery } from "@tanstack/react-query";
 import { Badge } from "@/components/ui/badge";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { Shield, FileText, ClipboardCheck, HardHat, TrendingUp } from "lucide-react";
+import { canViewCSR, type User } from "@/lib/permissions";
+
+interface CSRBadgeProps {
+  user?: User | null;
+}
 
 interface CSRData {
   overallCSR: number;
@@ -55,10 +60,19 @@ function ColoredProgress({ value, rating }: { value: number; rating: number }) {
   );
 }
 
-export function CSRBadge() {
+export function CSRBadge({ user }: CSRBadgeProps) {
+  // Check permission before even fetching
+  const hasAccess = canViewCSR(user);
+  
   const { data: csrData, isLoading } = useQuery<CSRData>({
     queryKey: ['/api/company-safety-rating'],
+    enabled: hasAccess, // Only fetch if user has permission
   });
+
+  // Don't render anything if user doesn't have permission
+  if (!hasAccess) {
+    return null;
+  }
 
   if (isLoading) {
     return (

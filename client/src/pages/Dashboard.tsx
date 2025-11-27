@@ -2035,7 +2035,7 @@ export default function Dashboard() {
             </div>
           </div>
           <div className="flex items-center gap-1 sm:gap-3 flex-shrink-0">
-            <CSRBadge />
+            <CSRBadge user={currentUser} />
             <RefreshButton />
             <Button variant="ghost" size="icon" data-testid="button-profile" onClick={() => setLocation("/profile")}>
               <span className="material-icons text-xl sm:text-2xl">person</span>
