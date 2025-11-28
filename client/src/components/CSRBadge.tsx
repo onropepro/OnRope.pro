@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Shield, FileText, ClipboardCheck, HardHat, TrendingUp, AlertTriangle, CheckCircle2, Lightbulb, ScrollText } from "lucide-react";
+import { Shield, FileText, ClipboardCheck, HardHat, TrendingUp, AlertTriangle, CheckCircle2, Lightbulb, ScrollText, FileCheck } from "lucide-react";
 import { canViewCSR, type User } from "@/lib/permissions";
 
 interface CSRBadgeProps {
@@ -16,6 +16,7 @@ interface CSRData {
     toolboxMeetingRating: number;
     harnessInspectionRating: number;
     methodStatementRating: number;
+    documentReviewRating: number;
     projectCompletionRating: number;
   };
   details: {
@@ -28,6 +29,9 @@ interface CSRData {
     methodStatementsCovered: number;
     methodStatementsRequired: number;
     missingJobTypes: string[];
+    documentReviewsSigned: number;
+    documentReviewsPending: number;
+    documentReviewsTotal: number;
     projectCount: number;
     totalProjectProgress: number;
   };
@@ -136,6 +140,15 @@ function getImprovementTips(csrData: CSRData): { category: string; icon: any; ti
       icon: ScrollText,
       tip: `Missing method statements for ${missingCount} job type${missingCount > 1 ? 's' : ''}: ${missingNames}. Create a method statement for each job type to reach 100%.`,
       priority: breakdown.methodStatementRating < 50 ? 'high' : 'medium'
+    });
+  }
+
+  if (breakdown.documentReviewRating < 100 && details.documentReviewsTotal > 0) {
+    tips.push({
+      category: "Document Reviews",
+      icon: FileCheck,
+      tip: `${details.documentReviewsPending} document review${details.documentReviewsPending > 1 ? 's are' : ' is'} pending employee signature. Employees should view and sign required safety documents.`,
+      priority: breakdown.documentReviewRating < 80 ? 'medium' : 'low'
     });
   }
 
@@ -296,6 +309,22 @@ export function CSRBadge({ user }: CSRBadgeProps) {
                 <ColoredProgress value={breakdown.methodStatementRating} rating={breakdown.methodStatementRating} />
                 <p className="text-xs text-muted-foreground">
                   {details.methodStatementsCovered} of {details.methodStatementsRequired} job type{details.methodStatementsRequired !== 1 ? 's' : ''} covered
+                </p>
+              </div>
+
+              <div className="space-y-2">
+                <div className="flex items-center justify-between text-sm">
+                  <div className="flex items-center gap-2">
+                    <FileCheck className="w-4 h-4 text-muted-foreground" />
+                    <span>Document Reviews</span>
+                  </div>
+                  <span className={`font-semibold ${getRatingColor(breakdown.documentReviewRating)}`}>
+                    {breakdown.documentReviewRating}%
+                  </span>
+                </div>
+                <ColoredProgress value={breakdown.documentReviewRating} rating={breakdown.documentReviewRating} />
+                <p className="text-xs text-muted-foreground">
+                  {details.documentReviewsSigned} of {details.documentReviewsTotal} review{details.documentReviewsTotal !== 1 ? 's' : ''} signed
                 </p>
               </div>
 

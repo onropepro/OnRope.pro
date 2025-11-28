@@ -7209,10 +7209,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
         ? Math.round(((totalJobTypes - coveredJobTypesCount) / totalJobTypes) * 20)
         : 0;
       
+      // 6. Document Review Compliance Rating
+      // Tracks employee acknowledgment of safety documents (H&S Manual, Company Policy)
+      const documentReviews = await storage.getDocumentReviewSignaturesByCompany(companyId);
+      const totalReviews = documentReviews.length;
+      const signedReviews = documentReviews.filter((r: any) => r.signedAt).length;
+      const pendingReviews = totalReviews - signedReviews;
+      
+      // If no reviews exist, 100% compliance (nothing to comply with)
+      // If there are pending reviews, apply a proportional penalty (max 5%)
+      const documentReviewRating = totalReviews > 0 
+        ? Math.round((signedReviews / totalReviews) * 100) 
+        : 100;
+      const documentReviewPenalty = totalReviews > 0 
+        ? Math.round(((totalReviews - signedReviews) / totalReviews) * 5)
+        : 0;
+      
       // Calculate overall CSR: Start at 100%, subtract penalties
-      // Max penalty is 95% (25% docs, 25% toolbox, 25% harness, 20% method statements)
+      // Max penalty is 100% (25% docs, 25% toolbox, 25% harness, 20% method statements, 5% document reviews)
       // Project completion is shown but doesn't penalize
-      const totalPenalty = documentationPenalty + toolboxPenalty + harnessPenalty + methodStatementPenalty + projectPenalty;
+      const totalPenalty = documentationPenalty + toolboxPenalty + harnessPenalty + methodStatementPenalty + documentReviewPenalty + projectPenalty;
       const overallCSR = Math.max(0, 100 - totalPenalty);
       
       res.json({
@@ -7222,6 +7238,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           toolboxMeetingRating,
           harnessInspectionRating,
           methodStatementRating,
+          documentReviewRating,
           projectCompletionRating
         },
         details: {
@@ -7234,6 +7251,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
           methodStatementsCovered: coveredJobTypesCount,
           methodStatementsRequired: totalJobTypes,
           missingJobTypes: Array.from(activeJobTypes).filter(jt => !coveredJobTypes.has(jt)),
+          documentReviewsSigned: signedReviews,
+          documentReviewsPending: pendingReviews,
+          documentReviewsTotal: totalReviews,
           projectCount,
           totalProjectProgress: projectCount > 0 ? Math.round(totalProjectProgress / projectCount) : 100
         }
@@ -7403,8 +7423,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
         ? Math.round(((harnessRequiredInspections - harnessCompletedInspections) / harnessRequiredInspections) * 25)
         : 0;
       
+      // 6. Document Review Compliance Rating
+      const documentReviews = await storage.getDocumentReviewSignaturesByCompany(companyId);
+      const totalReviews = documentReviews.length;
+      const signedReviews = documentReviews.filter((r: any) => r.signedAt).length;
+      
+      const documentReviewRating = totalReviews > 0 
+        ? Math.round((signedReviews / totalReviews) * 100) 
+        : 100;
+      const documentReviewPenalty = totalReviews > 0 
+        ? Math.round(((totalReviews - signedReviews) / totalReviews) * 5)
+        : 0;
+      
       // Calculate overall CSR
-      const totalPenalty = documentationPenalty + toolboxPenalty + harnessPenalty;
+      const totalPenalty = documentationPenalty + toolboxPenalty + harnessPenalty + documentReviewPenalty;
       const overallCSR = Math.max(0, 100 - totalPenalty);
       
       res.json({
@@ -7412,7 +7444,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         breakdown: {
           documentationRating,
           toolboxMeetingRating,
-          harnessInspectionRating
+          harnessInspectionRating,
+          documentReviewRating
         }
       });
     } catch (error) {
