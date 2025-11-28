@@ -13,7 +13,8 @@ import { Calendar as CalendarComponent } from "@/components/ui/calendar";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { FileText, Download, Calendar, DollarSign, Upload, Trash2, Shield, BookOpen, ArrowLeft, AlertTriangle, Plus, FileCheck, ChevronDown, ChevronRight, FolderOpen, CalendarRange, Package, Loader2 } from "lucide-react";
+import { FileText, Download, Calendar, DollarSign, Upload, Trash2, Shield, BookOpen, ArrowLeft, AlertTriangle, Plus, FileCheck, ChevronDown, ChevronRight, FolderOpen, CalendarRange, Package, Loader2, Users, Eye, PenLine, Clock, CheckCircle2, AlertCircle } from "lucide-react";
+import { CardDescription } from "@/components/ui/card";
 import { hasFinancialAccess, canViewSafetyDocuments } from "@/lib/permissions";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
@@ -404,6 +405,12 @@ export default function Documents() {
 
   const { data: customJobTypesData } = useQuery<{ customJobTypes: { id: string; name: string }[] }>({
     queryKey: ["/api/custom-job-types"],
+  });
+
+  // Admin view: all document review signatures for the company
+  const { data: allDocumentReviewsData } = useQuery<{ reviews: any[] }>({
+    queryKey: ["/api/document-reviews"],
+    enabled: userData?.user?.role === 'company' || userData?.user?.role === 'operations_manager',
   });
 
   const customJobTypes = customJobTypesData?.customJobTypes || [];
@@ -2298,6 +2305,220 @@ export default function Documents() {
 
         {/* Document Reviews - for employees to review and sign required documents */}
         <DocumentReviews companyDocuments={[...healthSafetyDocs, ...policyDocs]} />
+
+        {/* Admin View: Employee Document Compliance Status */}
+        {canUploadDocuments && allDocumentReviewsData?.reviews && (
+          (() => {
+            const allReviews = allDocumentReviewsData.reviews || [];
+            
+            // Group reviews by employee
+            const employeeReviews = allReviews.reduce((acc: Record<string, any[]>, review: any) => {
+              const key = review.employeeId;
+              if (!acc[key]) acc[key] = [];
+              acc[key].push(review);
+              return acc;
+            }, {} as Record<string, any[]>);
+            
+            // Calculate stats for each employee
+            const employeeStats = Object.entries(employeeReviews).map(([employeeId, reviews]) => {
+              const signed = reviews.filter((r: any) => r.signedAt);
+              const pending = reviews.filter((r: any) => !r.signedAt);
+              const viewed = reviews.filter((r: any) => r.viewedAt && !r.signedAt);
+              const employeeName = reviews[0]?.employeeName || 'Unknown';
+              
+              return {
+                employeeId,
+                employeeName,
+                reviews,
+                signedCount: signed.length,
+                pendingCount: pending.length,
+                viewedCount: viewed.length,
+                totalCount: reviews.length,
+                isComplete: pending.length === 0,
+              };
+            }).sort((a, b) => {
+              // Sort: pending first, then by name
+              if (a.pendingCount > 0 && b.pendingCount === 0) return -1;
+              if (a.pendingCount === 0 && b.pendingCount > 0) return 1;
+              return a.employeeName.localeCompare(b.employeeName);
+            });
+            
+            const totalEmployees = employeeStats.length;
+            const completeEmployees = employeeStats.filter(e => e.isComplete).length;
+            const totalReviews = allReviews.length;
+            const signedReviews = allReviews.filter((r: any) => r.signedAt).length;
+            const compliancePercent = totalReviews > 0 ? Math.round((signedReviews / totalReviews) * 100) : 100;
+            
+            const formatDocType = (type: string) => {
+              switch (type) {
+                case 'health_safety_manual': return 'Health & Safety Manual';
+                case 'company_policy': return 'Company Policy';
+                case 'method_statement': return 'Method Statement';
+                default: return type;
+              }
+            };
+            
+            const formatTimestamp = (ts: string | null) => {
+              if (!ts) return null;
+              return formatLocalDateMedium(ts);
+            };
+            
+            return (
+              <Card className="mb-6">
+                <CardHeader className="bg-gradient-to-br from-violet-500/10 via-violet-500/5 to-transparent pb-4">
+                  <div className="flex items-start gap-4">
+                    <div className="p-3 bg-violet-500/10 rounded-xl ring-1 ring-violet-500/20">
+                      <Users className="h-6 w-6 text-violet-600 dark:text-violet-400" />
+                    </div>
+                    <div className="flex-1">
+                      <CardTitle className="text-xl mb-1">Employee Document Compliance</CardTitle>
+                      <CardDescription>
+                        Track which employees have reviewed and signed required documents
+                      </CardDescription>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Badge 
+                        variant={compliancePercent === 100 ? "default" : "secondary"} 
+                        className={`text-base font-semibold px-3 ${compliancePercent === 100 ? 'bg-emerald-500' : ''}`}
+                      >
+                        {compliancePercent}%
+                      </Badge>
+                    </div>
+                  </div>
+                </CardHeader>
+                <CardContent className="pt-6">
+                  {/* Summary Stats */}
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
+                    <div className="p-3 rounded-lg bg-muted/50">
+                      <div className="text-2xl font-bold">{totalEmployees}</div>
+                      <div className="text-sm text-muted-foreground">Total Employees</div>
+                    </div>
+                    <div className="p-3 rounded-lg bg-emerald-500/10">
+                      <div className="text-2xl font-bold text-emerald-600 dark:text-emerald-400">{completeEmployees}</div>
+                      <div className="text-sm text-muted-foreground">Fully Compliant</div>
+                    </div>
+                    <div className="p-3 rounded-lg bg-amber-500/10">
+                      <div className="text-2xl font-bold text-amber-600 dark:text-amber-400">{totalEmployees - completeEmployees}</div>
+                      <div className="text-sm text-muted-foreground">Pending Signatures</div>
+                    </div>
+                    <div className="p-3 rounded-lg bg-violet-500/10">
+                      <div className="text-2xl font-bold text-violet-600 dark:text-violet-400">{signedReviews}/{totalReviews}</div>
+                      <div className="text-sm text-muted-foreground">Documents Signed</div>
+                    </div>
+                  </div>
+                  
+                  <Progress 
+                    value={compliancePercent} 
+                    className={`h-2 mb-6 ${
+                      compliancePercent === 100 
+                        ? '[&>div]:bg-emerald-500' 
+                        : compliancePercent >= 50 
+                          ? '[&>div]:bg-amber-500'
+                          : '[&>div]:bg-red-500'
+                    }`} 
+                  />
+                  
+                  {/* Employee List */}
+                  {employeeStats.length > 0 ? (
+                    <div className="space-y-2">
+                      {employeeStats.map((employee) => (
+                        <Collapsible key={employee.employeeId} defaultOpen={false}>
+                          <CollapsibleTrigger 
+                            className="group flex items-center gap-3 w-full p-3 rounded-lg border bg-card hover-elevate"
+                            data-testid={`toggle-employee-docs-${employee.employeeId}`}
+                          >
+                            <ChevronRight className="h-4 w-4 text-muted-foreground transition-transform duration-200 rotate-0 group-data-[state=open]:rotate-90" />
+                            <div className="flex-1 text-left min-w-0">
+                              <span className="font-medium truncate">{employee.employeeName}</span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              {employee.isComplete ? (
+                                <Badge variant="default" className="bg-emerald-500 text-xs">
+                                  <CheckCircle2 className="h-3 w-3 mr-1" />
+                                  Complete
+                                </Badge>
+                              ) : (
+                                <Badge variant="secondary" className="bg-amber-500/20 text-amber-700 dark:text-amber-300 text-xs">
+                                  <AlertCircle className="h-3 w-3 mr-1" />
+                                  {employee.pendingCount} Pending
+                                </Badge>
+                              )}
+                              <Badge variant="outline" className="text-xs">
+                                {employee.signedCount}/{employee.totalCount}
+                              </Badge>
+                            </div>
+                          </CollapsibleTrigger>
+                          <CollapsibleContent className="pl-7 mt-2 space-y-2">
+                            {employee.reviews.map((review: any) => (
+                              <div 
+                                key={review.id} 
+                                className={`flex items-center gap-3 p-3 rounded-lg border ${
+                                  review.signedAt 
+                                    ? 'bg-emerald-500/5 border-emerald-500/20' 
+                                    : review.viewedAt 
+                                      ? 'bg-amber-500/5 border-amber-500/20'
+                                      : 'bg-muted/50'
+                                }`}
+                                data-testid={`doc-review-${review.id}`}
+                              >
+                                <div className={`p-2 rounded-lg ${
+                                  review.signedAt 
+                                    ? 'bg-emerald-500/10' 
+                                    : review.viewedAt 
+                                      ? 'bg-amber-500/10'
+                                      : 'bg-muted'
+                                }`}>
+                                  {review.signedAt ? (
+                                    <PenLine className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
+                                  ) : review.viewedAt ? (
+                                    <Eye className="h-4 w-4 text-amber-600 dark:text-amber-400" />
+                                  ) : (
+                                    <Clock className="h-4 w-4 text-muted-foreground" />
+                                  )}
+                                </div>
+                                <div className="flex-1 min-w-0">
+                                  <div className="font-medium text-sm truncate">{review.documentName}</div>
+                                  <div className="text-xs text-muted-foreground">{formatDocType(review.documentType)}</div>
+                                </div>
+                                <div className="text-right text-xs space-y-1">
+                                  {review.viewedAt && (
+                                    <div className="flex items-center gap-1 text-muted-foreground">
+                                      <Eye className="h-3 w-3" />
+                                      {formatTimestamp(review.viewedAt)}
+                                    </div>
+                                  )}
+                                  {review.signedAt && (
+                                    <div className="flex items-center gap-1 text-emerald-600 dark:text-emerald-400">
+                                      <PenLine className="h-3 w-3" />
+                                      {formatTimestamp(review.signedAt)}
+                                    </div>
+                                  )}
+                                  {!review.viewedAt && !review.signedAt && (
+                                    <div className="text-muted-foreground">Not viewed</div>
+                                  )}
+                                </div>
+                              </div>
+                            ))}
+                          </CollapsibleContent>
+                        </Collapsible>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="text-center py-8">
+                      <div className="inline-flex p-4 bg-violet-500/5 rounded-full mb-4">
+                        <Users className="h-8 w-8 text-violet-500/50" />
+                      </div>
+                      <p className="text-muted-foreground font-medium">No document reviews assigned</p>
+                      <p className="text-sm text-muted-foreground mt-1">
+                        Enroll employees in document reviews to track their compliance
+                      </p>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            );
+          })()
+        )}
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <div className="overflow-x-auto -mx-4 px-4 md:mx-0 md:px-0 mb-6">
