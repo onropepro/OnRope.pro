@@ -54,10 +54,13 @@ export default function MyGear() {
   const myGear = allGearItems.filter((item: any) => item.assignedTo === currentUser?.name);
 
   // Available gear items (inventory items that can be assigned)
-  const availableGear = allGearItems.filter((item: any) => 
-    item.inService !== false && 
-    (item.quantity || 0) > 0
-  );
+  // Calculate actual available quantity: total quantity minus assigned quantity
+  const availableGear = allGearItems.filter((item: any) => {
+    const totalQty = item.quantity || 0;
+    const assignedQty = item.assignedQuantity || 0;
+    const availableQty = totalQty - assignedQty;
+    return item.inService !== false && availableQty > 0;
+  });
 
   // Filter available gear based on search
   const filteredAvailableGear = availableGear.filter((item: any) => {
@@ -402,7 +405,7 @@ export default function MyGear() {
                       )}
                     </div>
                     <div className="text-right text-sm">
-                      <div className="font-medium">{item.quantity} available</div>
+                      <div className="font-medium">{(item.quantity || 0) - (item.assignedQuantity || 0)} available</div>
                     </div>
                   </div>
                 </div>
@@ -420,7 +423,7 @@ export default function MyGear() {
                     id="quantity"
                     type="number"
                     min={1}
-                    max={selectedGearItem.quantity || 1}
+                    max={(selectedGearItem.quantity || 0) - (selectedGearItem.assignedQuantity || 0)}
                     value={assignQuantity}
                     onChange={(e) => setAssignQuantity(Math.max(1, parseInt(e.target.value) || 1))}
                     className="mt-1"
@@ -429,7 +432,7 @@ export default function MyGear() {
                 </div>
                 <div className="flex-1 text-sm text-muted-foreground">
                   <div className="font-medium">{selectedGearItem.equipmentType}</div>
-                  <div>{selectedGearItem.quantity} available in inventory</div>
+                  <div>{(selectedGearItem.quantity || 0) - (selectedGearItem.assignedQuantity || 0)} available in inventory</div>
                 </div>
               </div>
               <div className="flex gap-2">
