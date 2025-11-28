@@ -3540,7 +3540,7 @@ export default function Dashboard() {
                     {employeesData?.seatInfo?.atSeatLimit ? 'Seat Limit Reached' : 'Add New Employee'}
                   </Button>
                 </DialogTrigger>
-                <DialogContent className={`${employeeFormStep === 2 ? 'max-w-2xl' : 'max-w-md'} p-0 max-h-[95vh] flex flex-col`}>
+                <DialogContent className="max-w-2xl p-0 max-h-[95vh] flex flex-col">
                   <div className="p-6 border-b">
                     <DialogHeader>
                       <DialogTitle>
@@ -5305,7 +5305,7 @@ export default function Dashboard() {
 
       {/* Edit Employee Dialog */}
       <Dialog open={showEditEmployeeDialog} onOpenChange={(open) => { setShowEditEmployeeDialog(open); if (!open) setEditEmployeeFormStep(1); }}>
-        <DialogContent className={`${editEmployeeFormStep === 2 ? 'max-w-2xl' : 'max-w-md'} p-0 max-h-[95vh] flex flex-col`}>
+        <DialogContent className="max-w-2xl p-0 max-h-[95vh] flex flex-col">
           <div className="p-6 border-b">
             <DialogHeader>
               <DialogTitle>
