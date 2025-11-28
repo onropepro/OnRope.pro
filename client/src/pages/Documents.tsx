@@ -3817,35 +3817,52 @@ export default function Documents() {
         )}
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <div className="overflow-x-auto -mx-4 px-4 md:mx-0 md:px-0 mb-6">
-            <TabsList className={`grid w-full min-w-[700px] md:min-w-0 ${canUploadDocuments ? 'grid-cols-6' : 'grid-cols-5'} max-w-4xl gap-1`}>
-              <TabsTrigger value="health-safety" data-testid="tab-health-safety" className="text-xs md:text-sm px-2 md:px-4">
-                <span className="hidden md:inline">Health & Safety</span>
-                <span className="md:hidden">H&S</span>
-              </TabsTrigger>
-              <TabsTrigger value="company-policy" data-testid="tab-company-policy" className="text-xs md:text-sm px-2 md:px-4">
-                <span className="hidden md:inline">Company Policy</span>
-                <span className="md:hidden">Policy</span>
-              </TabsTrigger>
-              {canUploadDocuments && (
-                <TabsTrigger value="insurance" data-testid="tab-insurance" className="text-xs md:text-sm px-2 md:px-4">
-                  <span className="hidden md:inline">Insurance</span>
-                  <span className="md:hidden">Insurance</span>
-                </TabsTrigger>
-              )}
-              <TabsTrigger value="swp-templates" data-testid="tab-swp-templates" className="text-xs md:text-sm px-2 md:px-4">
-                <span className="hidden md:inline">Safe Work Procedures</span>
-                <span className="md:hidden">SWP</span>
-              </TabsTrigger>
-              <TabsTrigger value="inspections-safety" data-testid="tab-inspections-safety" className="text-xs md:text-sm px-2 md:px-4">
-                <span className="hidden md:inline">Inspections</span>
-                <span className="md:hidden">Inspect</span>
-              </TabsTrigger>
-              <TabsTrigger value="damage-reports" data-testid="tab-damage-reports" className="text-xs md:text-sm px-2 md:px-4">
-                <span className="hidden md:inline">Damage Reports</span>
-                <span className="md:hidden">Damage</span>
-              </TabsTrigger>
-            </TabsList>
+          <div className="mb-6">
+            <Select value={activeTab} onValueChange={setActiveTab}>
+              <SelectTrigger className="w-full max-w-sm" data-testid="select-document-type">
+                <SelectValue placeholder="Select document type" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="health-safety" data-testid="option-health-safety">
+                  <div className="flex items-center gap-2">
+                    <Shield className="h-4 w-4" />
+                    Health & Safety Manual
+                  </div>
+                </SelectItem>
+                <SelectItem value="company-policy" data-testid="option-company-policy">
+                  <div className="flex items-center gap-2">
+                    <BookOpen className="h-4 w-4" />
+                    Company Policy
+                  </div>
+                </SelectItem>
+                {canUploadDocuments && (
+                  <SelectItem value="insurance" data-testid="option-insurance">
+                    <div className="flex items-center gap-2">
+                      <FileCheck className="h-4 w-4" />
+                      Certificate of Insurance
+                    </div>
+                  </SelectItem>
+                )}
+                <SelectItem value="swp-templates" data-testid="option-swp-templates">
+                  <div className="flex items-center gap-2">
+                    <FileText className="h-4 w-4" />
+                    Safe Work Procedures
+                  </div>
+                </SelectItem>
+                <SelectItem value="inspections-safety" data-testid="option-inspections-safety">
+                  <div className="flex items-center gap-2">
+                    <Package className="h-4 w-4" />
+                    Equipment Inspections
+                  </div>
+                </SelectItem>
+                <SelectItem value="damage-reports" data-testid="option-damage-reports">
+                  <div className="flex items-center gap-2">
+                    <AlertTriangle className="h-4 w-4" />
+                    Damage Reports
+                  </div>
+                </SelectItem>
+              </SelectContent>
+            </Select>
           </div>
 
           {/* Health & Safety Manual Tab */}
