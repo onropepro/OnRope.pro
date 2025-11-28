@@ -945,26 +945,19 @@ export default function Inventory() {
 
       <div className="p-4 max-w-4xl mx-auto">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className={`grid w-full mb-4 ${
-            (() => {
-              let cols = 3;
-              if (canViewGearAssignments(currentUser)) cols++;
-              if (canManageInventory(currentUser)) cols++;
-              return `grid-cols-${cols}`;
-            })()
-          }`}>
-            <TabsTrigger value="my-gear" data-testid="tab-my-gear">My Gear</TabsTrigger>
+          <TabsList className="flex flex-wrap w-full mb-4 h-auto gap-1 p-1">
+            <TabsTrigger value="my-gear" className="flex-1 min-w-fit" data-testid="tab-my-gear">My Gear</TabsTrigger>
             {canViewGearAssignments(currentUser) && (
-              <TabsTrigger value="team-gear" data-testid="tab-team-gear">
+              <TabsTrigger value="team-gear" className="flex-1 min-w-fit" data-testid="tab-team-gear">
                 <Users className="h-4 w-4 mr-1" />
                 Team Gear
               </TabsTrigger>
             )}
             {canManageInventory(currentUser) && (
-              <TabsTrigger value="manage" data-testid="tab-manage-gear">Manage Gear</TabsTrigger>
+              <TabsTrigger value="manage" className="flex-1 min-w-fit" data-testid="tab-manage-gear">Manage Gear</TabsTrigger>
             )}
-            <TabsTrigger value="inspections" data-testid="tab-inspections">Inspections</TabsTrigger>
-            <TabsTrigger value="daily-harness" data-testid="tab-daily-harness">
+            <TabsTrigger value="inspections" className="flex-1 min-w-fit" data-testid="tab-inspections">Inspections</TabsTrigger>
+            <TabsTrigger value="daily-harness" className="flex-1 min-w-fit" data-testid="tab-daily-harness">
               Daily Harness Inspection
             </TabsTrigger>
           </TabsList>
@@ -1036,7 +1029,9 @@ export default function Inventory() {
               </Card>
             ) : (
               <div className="space-y-4">
-                {myGear.map((item: any) => (
+                {myGear.map((item: any) => {
+                  const myAssignment = getItemAssignments(item.id).find(a => a.employeeId === currentUser?.id);
+                  return (
                   <Card key={item.id} className="overflow-hidden">
                     <CardContent className="p-4">
                       <div className="flex items-start gap-4">
@@ -1066,37 +1061,51 @@ export default function Inventory() {
                               )}
                             </div>
                             {/* Remove button */}
-                            {(() => {
-                              const myAssignment = getItemAssignments(item.id).find(a => a.employeeId === currentUser?.id);
-                              return myAssignment ? (
-                                <Button
-                                  size="icon"
-                                  variant="ghost"
-                                  onClick={() => removeSelfAssignedMutation.mutate(myAssignment.id)}
-                                  disabled={removeSelfAssignedMutation.isPending}
-                                  data-testid={`button-remove-gear-${item.id}`}
-                                >
-                                  <X className="h-4 w-4" />
-                                </Button>
-                              ) : null;
-                            })()}
+                            {myAssignment && (
+                              <Button
+                                size="icon"
+                                variant="ghost"
+                                onClick={() => removeSelfAssignedMutation.mutate(myAssignment.id)}
+                                disabled={removeSelfAssignedMutation.isPending}
+                                data-testid={`button-remove-gear-${item.id}`}
+                              >
+                                <X className="h-4 w-4" />
+                              </Button>
+                            )}
                           </div>
 
-                          {/* Details Grid */}
+                          {/* Serial Number - prominent display */}
+                          {myAssignment?.serialNumber && (
+                            <div className="mb-3">
+                              <Badge variant="secondary" className="font-mono text-sm px-3 py-1">
+                                S/N: {myAssignment.serialNumber}
+                              </Badge>
+                            </div>
+                          )}
+
+                          {/* Details Grid - from assignment data */}
                           <div className="grid grid-cols-2 gap-3 text-sm">
-                            {item.dateOfManufacture && (
+                            {myAssignment?.dateOfManufacture && (
                               <div>
-                                <span className="text-muted-foreground">Manufactured:</span>
+                                <span className="text-muted-foreground">Date of Manufacture:</span>
                                 <div className="font-medium mt-0.5">
-                                  {new Date(item.dateOfManufacture).toLocaleDateString()}
+                                  {new Date(myAssignment.dateOfManufacture).toLocaleDateString()}
                                 </div>
                               </div>
                             )}
-                            {item.dateInService && (
+                            {myAssignment?.dateInService && (
                               <div>
-                                <span className="text-muted-foreground">In Service:</span>
+                                <span className="text-muted-foreground">Date In Service:</span>
                                 <div className="font-medium mt-0.5">
-                                  {new Date(item.dateInService).toLocaleDateString()}
+                                  {new Date(myAssignment.dateInService).toLocaleDateString()}
+                                </div>
+                              </div>
+                            )}
+                            {myAssignment?.quantity && myAssignment.quantity > 1 && (
+                              <div>
+                                <span className="text-muted-foreground">Quantity:</span>
+                                <div className="font-medium mt-0.5">
+                                  {myAssignment.quantity}
                                 </div>
                               </div>
                             )}
@@ -1110,19 +1119,6 @@ export default function Inventory() {
                             )}
                           </div>
 
-                          {/* Assignment Serial Number */}
-                          {(() => {
-                            const myAssignment = getItemAssignments(item.id).find(a => a.employeeId === currentUser?.id);
-                            return myAssignment?.serialNumber ? (
-                              <div className="mt-3 pt-3 border-t">
-                                <div className="text-xs text-muted-foreground mb-2">Assigned Serial Number:</div>
-                                <Badge variant="secondary" className="text-xs font-mono">
-                                  {myAssignment.serialNumber}
-                                </Badge>
-                              </div>
-                            ) : null;
-                          })()}
-
                           {/* Notes */}
                           {item.notes && (
                             <div className="mt-3 pt-3 border-t">
@@ -1134,7 +1130,8 @@ export default function Inventory() {
                       </div>
                     </CardContent>
                   </Card>
-                ))}
+                  );
+                })}
               </div>
             )}
           </TabsContent>
