@@ -22,6 +22,7 @@ import { jsPDF } from "jspdf";
 import JSZip from "jszip";
 import { downloadMethodStatement } from "@/pages/MethodStatementForm";
 import { formatLocalDate, formatLocalDateLong, formatLocalDateMedium, parseLocalDate } from "@/lib/dateUtils";
+import { format } from "date-fns";
 import { DocumentReviews } from "@/components/DocumentReviews";
 
 // Standard job types for method statements
@@ -1189,7 +1190,13 @@ export default function Documents() {
     enabled: userData?.user?.role === 'company' || userData?.user?.role === 'operations_manager',
   });
 
+  // Fetch equipment damage reports
+  const { data: damageReportsData } = useQuery<{ reports: any[] }>({
+    queryKey: ["/api/equipment-damage-reports"],
+  });
+
   const customJobTypes = customJobTypesData?.customJobTypes || [];
+  const damageReports = damageReportsData?.reports || [];
   const currentUser = userData?.user;
   const canViewFinancials = hasFinancialAccess(currentUser);
   const canViewSafety = canViewSafetyDocuments(currentUser);
@@ -1283,6 +1290,191 @@ export default function Documents() {
     doc.text(companyName.toUpperCase(), pageWidth / 2, 8, { align: 'center' });
 
     return 5; // Return additional height used by branding
+  };
+
+  // PDF generation for damage reports
+  const downloadDamageReportPdf = (report: any) => {
+    const doc = new jsPDF();
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const pageHeight = doc.internal.pageSize.getHeight();
+    let yPosition = 20;
+
+    // Helper function to add multi-line text with pagination
+    const addMultilineText = (lines: string[], currentY: number, lineHeight: number = 6): number => {
+      let y = currentY;
+      for (const line of lines) {
+        if (y > pageHeight - 30) {
+          doc.addPage();
+          y = 20;
+        }
+        doc.text(line, 20, y);
+        y += lineHeight;
+      }
+      return y;
+    };
+
+    // Header - Orange for damage report
+    doc.setFillColor(251, 146, 60); // Orange
+    
+    // Add company branding if active (using shared helper)
+    const brandingHeight = addCompanyBranding(doc, pageWidth);
+    const headerHeight = 35 + brandingHeight;
+    doc.rect(0, 0, pageWidth, headerHeight, 'F');
+
+    doc.setTextColor(255, 255, 255);
+    doc.setFontSize(20);
+    doc.setFont('helvetica', 'bold');
+    doc.text('EQUIPMENT DAMAGE REPORT', pageWidth / 2, 15 + brandingHeight, { align: 'center' });
+    doc.setFontSize(11);
+    doc.setFont('helvetica', 'normal');
+    doc.text(report.equipmentRetired ? 'Equipment Retirement Document' : 'Damage Documentation Record', pageWidth / 2, 25 + brandingHeight, { align: 'center' });
+
+    yPosition = 45 + brandingHeight;
+
+    // Equipment Information Section
+    doc.setTextColor(0, 0, 0);
+    doc.setFontSize(12);
+    doc.setFont('helvetica', 'bold');
+    doc.text('Equipment Information', 20, yPosition);
+    yPosition += 8;
+
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(10);
+    doc.text(`Equipment Type: ${report.equipmentType || 'N/A'}`, 20, yPosition);
+    yPosition += 6;
+    doc.text(`Brand: ${report.equipmentBrand || 'N/A'}`, 20, yPosition);
+    yPosition += 6;
+    doc.text(`Model: ${report.equipmentModel || 'N/A'}`, 20, yPosition);
+    yPosition += 6;
+    if (report.serialNumber) {
+      doc.text(`Serial Number: ${report.serialNumber}`, 20, yPosition);
+      yPosition += 6;
+    }
+    yPosition += 4;
+
+    // Damage Details Section
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(12);
+    doc.text('Damage Details', 20, yPosition);
+    yPosition += 8;
+
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(10);
+    const discoveredDateStr = report.discoveredDate 
+      ? format(new Date(report.discoveredDate), 'MMMM d, yyyy') 
+      : 'N/A';
+    doc.text(`Date Discovered: ${discoveredDateStr}`, 20, yPosition);
+    yPosition += 6;
+    doc.text(`Reported By: ${report.reporterName || 'Unknown'}`, 20, yPosition);
+    yPosition += 6;
+    
+    // Severity badge
+    const severityColors: Record<string, [number, number, number]> = {
+      minor: [34, 197, 94],
+      moderate: [251, 191, 36],
+      severe: [249, 115, 22],
+      critical: [239, 68, 68]
+    };
+    const severityColor = severityColors[report.damageSeverity] || [100, 100, 100];
+    doc.setTextColor(severityColor[0], severityColor[1], severityColor[2]);
+    doc.setFont('helvetica', 'bold');
+    doc.text(`Severity: ${(report.damageSeverity || 'unknown').toUpperCase()}`, 20, yPosition);
+    yPosition += 8;
+
+    // Damage description
+    doc.setTextColor(0, 0, 0);
+    doc.setFont('helvetica', 'bold');
+    doc.text('Description of Damage:', 20, yPosition);
+    yPosition += 6;
+    doc.setFont('helvetica', 'normal');
+    const descLines = doc.splitTextToSize(report.damageDescription || 'No description provided.', pageWidth - 40);
+    yPosition = addMultilineText(descLines, yPosition);
+    yPosition += 4;
+
+    if (report.damageLocation) {
+      doc.setFont('helvetica', 'bold');
+      doc.text('Location on Equipment:', 20, yPosition);
+      yPosition += 6;
+      doc.setFont('helvetica', 'normal');
+      const locationLines = doc.splitTextToSize(report.damageLocation, pageWidth - 40);
+      yPosition = addMultilineText(locationLines, yPosition);
+      yPosition += 4;
+    }
+
+    if (report.correctiveAction) {
+      doc.setFont('helvetica', 'bold');
+      doc.text('Corrective Action Taken:', 20, yPosition);
+      yPosition += 6;
+      doc.setFont('helvetica', 'normal');
+      const actionLines = doc.splitTextToSize(report.correctiveAction, pageWidth - 40);
+      yPosition = addMultilineText(actionLines, yPosition);
+      yPosition += 4;
+    }
+
+    // Retirement Section (if applicable)
+    if (report.equipmentRetired) {
+      yPosition += 4;
+      doc.setFillColor(254, 226, 226); // Light red
+      doc.rect(15, yPosition - 5, pageWidth - 30, 30, 'F');
+      
+      doc.setTextColor(185, 28, 28);
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(12);
+      doc.text('EQUIPMENT RETIRED', 20, yPosition + 3);
+      yPosition += 10;
+      
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(10);
+      doc.setTextColor(0, 0, 0);
+      doc.text('Reason for Retirement:', 20, yPosition);
+      yPosition += 6;
+      const retireLines = doc.splitTextToSize(report.retirementReason || 'No reason provided.', pageWidth - 40);
+      yPosition = addMultilineText(retireLines, yPosition);
+      yPosition += 8;
+    }
+
+    if (report.notes) {
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(10);
+      doc.text('Additional Notes:', 20, yPosition);
+      yPosition += 6;
+      doc.setFont('helvetica', 'normal');
+      const notesLines = doc.splitTextToSize(report.notes, pageWidth - 40);
+      yPosition = addMultilineText(notesLines, yPosition);
+    }
+
+    // Footer
+    const pageCount = doc.getNumberOfPages();
+    for (let i = 1; i <= pageCount; i++) {
+      doc.setPage(i);
+      doc.setFontSize(8);
+      doc.setTextColor(100, 100, 100);
+      doc.text(
+        `Equipment Damage Report - Page ${i} of ${pageCount}`,
+        pageWidth / 2,
+        pageHeight - 10,
+        { align: 'center' }
+      );
+      doc.text(
+        `Generated: ${format(new Date(), 'MMM d, yyyy')}`,
+        pageWidth - 20,
+        pageHeight - 10,
+        { align: 'right' }
+      );
+    }
+
+    // Save
+    const dateStr = report.discoveredDate 
+      ? format(new Date(report.discoveredDate), 'yyyy-MM-dd')
+      : format(new Date(), 'yyyy-MM-dd');
+    const typeStr = (report.equipmentType || 'equipment').toLowerCase().replace(/\s+/g, '-');
+    const filename = `damage-report-${typeStr}-${dateStr}.pdf`;
+    doc.save(filename);
+
+    toast({
+      title: "PDF Downloaded",
+      description: "The damage report has been downloaded.",
+    });
   };
 
   const downloadToolboxMeeting = async (meeting: any) => {
@@ -3626,7 +3818,7 @@ export default function Documents() {
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <div className="overflow-x-auto -mx-4 px-4 md:mx-0 md:px-0 mb-6">
-            <TabsList className={`grid w-full min-w-[600px] md:min-w-0 ${canUploadDocuments ? 'grid-cols-5' : 'grid-cols-4'} max-w-3xl gap-1`}>
+            <TabsList className={`grid w-full min-w-[700px] md:min-w-0 ${canUploadDocuments ? 'grid-cols-6' : 'grid-cols-5'} max-w-4xl gap-1`}>
               <TabsTrigger value="health-safety" data-testid="tab-health-safety" className="text-xs md:text-sm px-2 md:px-4">
                 <span className="hidden md:inline">Health & Safety</span>
                 <span className="md:hidden">H&S</span>
@@ -3648,6 +3840,10 @@ export default function Documents() {
               <TabsTrigger value="inspections-safety" data-testid="tab-inspections-safety" className="text-xs md:text-sm px-2 md:px-4">
                 <span className="hidden md:inline">Inspections</span>
                 <span className="md:hidden">Inspect</span>
+              </TabsTrigger>
+              <TabsTrigger value="damage-reports" data-testid="tab-damage-reports" className="text-xs md:text-sm px-2 md:px-4">
+                <span className="hidden md:inline">Damage Reports</span>
+                <span className="md:hidden">Damage</span>
               </TabsTrigger>
             </TabsList>
           </div>
@@ -4589,6 +4785,99 @@ export default function Documents() {
                     </div>
                     <p className="text-muted-foreground font-medium">No toolbox meetings recorded yet</p>
                     <p className="text-sm text-muted-foreground mt-1">Safety meetings will be documented here</p>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Damage Reports Tab */}
+          <TabsContent value="damage-reports">
+            <Card className="mb-6 overflow-hidden">
+              <CardHeader className="bg-gradient-to-br from-primary/10 via-primary/5 to-transparent pb-4">
+                <div className="flex items-start gap-4">
+                  <div className="p-3 bg-primary/10 rounded-xl ring-1 ring-primary/20">
+                    <AlertTriangle className="h-6 w-6 text-primary" />
+                  </div>
+                  <div className="flex-1">
+                    <CardTitle className="text-xl mb-1">Equipment Damage Reports</CardTitle>
+                    <p className="text-sm text-muted-foreground">Documentation of equipment damage and retirements</p>
+                  </div>
+                  <Badge variant="secondary" className="text-base font-semibold px-3">
+                    {damageReports.length}
+                  </Badge>
+                </div>
+              </CardHeader>
+              <CardContent className="pt-6">
+                {damageReports.length > 0 ? (
+                  <div className="space-y-2">
+                    {groupDocumentsByDate(damageReports, (r: any) => r.discoveredDate || r.createdAt).map((yearGroup) => (
+                      <Collapsible key={yearGroup.year} defaultOpen={yearGroup.year === new Date().getFullYear()}>
+                        <CollapsibleTrigger className="group flex items-center gap-2 w-full p-3 rounded-lg bg-primary/5 hover-elevate" data-testid={`toggle-damage-year-${yearGroup.year}`}>
+                          <ChevronRight className="h-4 w-4 text-primary transition-transform duration-200 rotate-0 group-data-[state=open]:rotate-90" />
+                          <FolderOpen className="h-4 w-4 text-primary" />
+                          <span className="font-semibold text-primary">{yearGroup.year}</span>
+                          <Badge variant="secondary" className="ml-auto">{yearGroup.totalCount}</Badge>
+                        </CollapsibleTrigger>
+                        <CollapsibleContent className="pl-4 mt-2 space-y-2">
+                          {yearGroup.months.map((monthGroup) => (
+                            <Collapsible key={monthGroup.month} defaultOpen={false}>
+                              <CollapsibleTrigger className="group flex items-center gap-2 w-full p-2 rounded-md bg-primary/5 hover-elevate" data-testid={`toggle-damage-month-${yearGroup.year}-${monthGroup.month}`}>
+                                <ChevronRight className="h-3 w-3 text-muted-foreground transition-transform duration-200 rotate-0 group-data-[state=open]:rotate-90" />
+                                <span className="font-medium">{monthGroup.monthName}</span>
+                                <Badge variant="outline" className="ml-auto text-xs">{monthGroup.totalCount}</Badge>
+                              </CollapsibleTrigger>
+                              <CollapsibleContent className="pl-4 mt-2 space-y-2">
+                                {monthGroup.days.map((dayGroup) => (
+                                  <div key={dayGroup.date} className="space-y-2">
+                                    <div className="flex items-center gap-2 text-sm text-muted-foreground py-1">
+                                      <Calendar className="h-3 w-3" />
+                                      <span className="font-medium">{dayGroup.formattedDate}</span>
+                                      <span className="text-xs">({dayGroup.items.length})</span>
+                                    </div>
+                                    <div className="space-y-2 pl-5">
+                                      {dayGroup.items.map((report: any) => (
+                                        <div key={report.id} className="flex items-center gap-4 p-3 rounded-lg border bg-card hover-elevate active-elevate-2">
+                                          <div className="p-2 bg-primary/10 rounded-lg">
+                                            <AlertTriangle className="h-4 w-4 text-primary flex-shrink-0" />
+                                          </div>
+                                          <div className="flex-1 min-w-0">
+                                            <div className="flex items-center gap-2 flex-wrap">
+                                              <span className="font-medium text-sm">{report.equipmentType || 'Equipment'}</span>
+                                              <Badge variant="secondary" className="capitalize text-xs">
+                                                {report.damageSeverity}
+                                              </Badge>
+                                              {report.equipmentRetired && (
+                                                <Badge variant="destructive" className="text-xs">Retired</Badge>
+                                              )}
+                                            </div>
+                                            <div className="text-xs text-muted-foreground">
+                                              {report.equipmentBrand} {report.equipmentModel} - Reported by {report.reporterName}
+                                            </div>
+                                          </div>
+                                          <Button size="sm" variant="outline" onClick={() => downloadDamageReportPdf(report)} data-testid={`download-damage-report-${report.id}`}>
+                                            <Download className="h-3 w-3 mr-1" />
+                                            PDF
+                                          </Button>
+                                        </div>
+                                      ))}
+                                    </div>
+                                  </div>
+                                ))}
+                              </CollapsibleContent>
+                            </Collapsible>
+                          ))}
+                        </CollapsibleContent>
+                      </Collapsible>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-12">
+                    <div className="inline-flex p-4 bg-primary/5 rounded-full mb-4">
+                      <AlertTriangle className="h-8 w-8 text-primary/50" />
+                    </div>
+                    <p className="text-muted-foreground font-medium">No damage reports recorded yet</p>
+                    <p className="text-sm text-muted-foreground mt-1">Equipment damage reports will appear here once reported</p>
                   </div>
                 )}
               </CardContent>
