@@ -3145,8 +3145,8 @@ export default function Documents() {
             const allReviews = allDocumentReviewsData?.reviews || [];
             const allEmployees = employeesData?.employees || [];
             
-            // Required documents that employees must sign
-            const requiredDocTypes = ['health_safety_manual', 'company_policy'];
+            // Required documents that employees must sign (includes all safe work procedures)
+            const requiredDocTypes = ['health_safety_manual', 'company_policy', 'safe_work_procedure'];
             const requiredDocs = companyDocuments.filter((doc: any) => 
               requiredDocTypes.includes(doc.documentType)
             );
@@ -3202,11 +3202,12 @@ export default function Documents() {
               ? Math.round((signedReviews / totalRequiredSignatures) * 100) 
               : (requiredDocs.length === 0 ? 100 : 0);
             
-            const formatDocType = (type: string) => {
+            const formatDocType = (type: string, docName?: string) => {
               switch (type) {
                 case 'health_safety_manual': return 'Health & Safety Manual';
                 case 'company_policy': return 'Company Policy';
                 case 'method_statement': return 'Method Statement';
+                case 'safe_work_procedure': return docName || 'Safe Work Procedure';
                 default: return type;
               }
             };
