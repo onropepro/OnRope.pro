@@ -117,7 +117,7 @@ function getImprovementTips(csrData: CSRData): { category: string; icon: any; ti
     tips.push({
       category: "Document Reviews",
       icon: FileCheck,
-      tip: `${details.documentReviewsPending} document review${details.documentReviewsPending > 1 ? 's are' : ' is'} pending employee signature. Employees should view and sign required safety documents.`,
+      tip: `${details.documentReviewsPending} document signature${details.documentReviewsPending > 1 ? 's are' : ' is'} pending. All staff members (including the company owner) should view and sign required safety documents.`,
       priority: breakdown.documentReviewRating < 80 ? 'medium' : 'low'
     });
   }
@@ -281,7 +281,7 @@ export function CSRBadge({ user }: CSRBadgeProps) {
                   {details.documentReviewsSigned} of {details.documentReviewsTotal} document signature{details.documentReviewsTotal !== 1 ? 's' : ''} completed
                   {details.documentReviewsTotalEmployees && details.documentReviewsTotalDocs && (
                     <span className="block mt-0.5">
-                      ({details.documentReviewsTotalEmployees} employee{details.documentReviewsTotalEmployees !== 1 ? 's' : ''} × {details.documentReviewsTotalDocs} document{details.documentReviewsTotalDocs !== 1 ? 's' : ''})
+                      ({details.documentReviewsTotalEmployees} staff member{details.documentReviewsTotalEmployees !== 1 ? 's' : ''} × {details.documentReviewsTotalDocs} document{details.documentReviewsTotalDocs !== 1 ? 's' : ''})
                     </span>
                   )}
                 </p>
