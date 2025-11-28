@@ -85,6 +85,9 @@ export default function Inventory() {
   const [selfAssignItem, setSelfAssignItem] = useState<GearItem | null>(null);
   const [selfAssignQuantity, setSelfAssignQuantity] = useState<string>("1");
   const [selfAssignSearch, setSelfAssignSearch] = useState("");
+  const [selfAssignSerialNumber, setSelfAssignSerialNumber] = useState<string>("");
+  const [selfAssignDateOfManufacture, setSelfAssignDateOfManufacture] = useState<string>("");
+  const [selfAssignDateInService, setSelfAssignDateInService] = useState<string>("");
 
   // Fetch current user
   const { data: userData } = useQuery<{ user: any }>({
@@ -328,17 +331,28 @@ export default function Inventory() {
 
   // Create gear assignment mutation
   const createAssignmentMutation = useMutation({
-    mutationFn: async (data: { gearItemId: string; employeeId: string; quantity: number }) => {
+    mutationFn: async (data: { 
+      gearItemId: string; 
+      employeeId: string; 
+      quantity: number;
+      serialNumber?: string;
+      dateOfManufacture?: string;
+      dateInService?: string;
+    }) => {
       return apiRequest("POST", "/api/gear-assignments", data);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/gear-assignments"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/gear"] });
       toast({
         title: "Gear Assigned",
         description: "Gear has been assigned to the employee.",
       });
       setAssignEmployeeId("");
       setAssignQuantity("1");
+      setAssignSerialNumber("");
+      setAssignDateOfManufacture("");
+      setAssignDateInService("");
     },
     onError: (error: any) => {
       toast({
@@ -403,11 +417,18 @@ export default function Inventory() {
 
   // Self-assign gear mutation - allows any employee to assign gear to themselves
   const selfAssignMutation = useMutation({
-    mutationFn: async (data: { gearItemId: string; quantity: number }) => {
+    mutationFn: async (data: { 
+      gearItemId: string; 
+      quantity: number;
+      serialNumber?: string;
+      dateOfManufacture?: string;
+      dateInService?: string;
+    }) => {
       return apiRequest("POST", "/api/gear-assignments/self", data);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/gear-assignments"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/gear"] });
       toast({
         title: "Gear Added",
         description: "Gear has been added to your equipment.",
@@ -416,6 +437,9 @@ export default function Inventory() {
       setSelfAssignItem(null);
       setSelfAssignQuantity("1");
       setSelfAssignSearch("");
+      setSelfAssignSerialNumber("");
+      setSelfAssignDateOfManufacture("");
+      setSelfAssignDateInService("");
     },
     onError: (error: any) => {
       toast({
@@ -2775,9 +2799,12 @@ export default function Inventory() {
           setSelfAssignItem(null);
           setSelfAssignQuantity("1");
           setSelfAssignSearch("");
+          setSelfAssignSerialNumber("");
+          setSelfAssignDateOfManufacture("");
+          setSelfAssignDateInService("");
         }
       }}>
-        <DialogContent data-testid="dialog-self-assign-gear" className="max-w-lg max-h-[80vh] overflow-hidden flex flex-col">
+        <DialogContent data-testid="dialog-self-assign-gear" className="max-w-lg max-h-[85vh] overflow-hidden flex flex-col">
           <DialogHeader>
             <DialogTitle>Add Gear to My Equipment</DialogTitle>
             <DialogDescription>
@@ -2797,7 +2824,7 @@ export default function Inventory() {
             </div>
 
             {/* Available Items List */}
-            <div className="flex-1 overflow-y-auto space-y-2 pr-1">
+            <div className="flex-1 overflow-y-auto space-y-2 pr-1" style={{ maxHeight: selfAssignItem ? '150px' : '300px' }}>
               {(() => {
                 const availableItems = (gearData?.items || []).filter((item) => {
                   const available = getAvailableQuantity(item);
@@ -2827,6 +2854,9 @@ export default function Inventory() {
                       onClick={() => {
                         setSelfAssignItem(item);
                         setSelfAssignQuantity("1");
+                        setSelfAssignSerialNumber("");
+                        setSelfAssignDateOfManufacture("");
+                        setSelfAssignDateInService("");
                       }}
                       data-testid={`self-assign-item-${item.id}`}
                     >
@@ -2835,11 +2865,11 @@ export default function Inventory() {
                           <div className="flex items-center gap-3">
                             <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
                               <span className="material-icons text-primary">
-                                {EQUIPMENT_ICONS[item.equipmentType] || "category"}
+                                {(item.equipmentType && EQUIPMENT_ICONS[item.equipmentType]) || "category"}
                               </span>
                             </div>
                             <div>
-                              <div className="font-medium">{item.equipmentType}</div>
+                              <div className="font-medium">{item.equipmentType || "Unknown"}</div>
                               {(item.brand || item.model) && (
                                 <div className="text-xs text-muted-foreground">
                                   {[item.brand, item.model].filter(Boolean).join(" - ")}
@@ -2860,23 +2890,62 @@ export default function Inventory() {
 
             {/* Selected Item Form */}
             {selfAssignItem && (
-              <div className="border-t pt-4 space-y-3">
+              <div className="border-t pt-4 space-y-3 overflow-y-auto" style={{ maxHeight: '250px' }}>
                 <div className="flex items-center justify-between">
                   <div className="font-medium">Selected: {selfAssignItem.equipmentType}</div>
                   <Badge variant="outline">{getAvailableQuantity(selfAssignItem)} available</Badge>
                 </div>
                 
-                <div className="space-y-2">
-                  <Label htmlFor="self-assign-quantity">Quantity</Label>
-                  <Input
-                    id="self-assign-quantity"
-                    type="number"
-                    min="1"
-                    max={getAvailableQuantity(selfAssignItem)}
-                    value={selfAssignQuantity}
-                    onChange={(e) => setSelfAssignQuantity(e.target.value)}
-                    data-testid="input-self-assign-quantity"
-                  />
+                <div className="grid grid-cols-2 gap-3">
+                  {/* Quantity */}
+                  <div className="space-y-2">
+                    <Label htmlFor="self-assign-quantity">Quantity</Label>
+                    <Input
+                      id="self-assign-quantity"
+                      type="number"
+                      min="1"
+                      max={getAvailableQuantity(selfAssignItem)}
+                      value={selfAssignQuantity}
+                      onChange={(e) => setSelfAssignQuantity(e.target.value)}
+                      data-testid="input-self-assign-quantity"
+                    />
+                  </div>
+
+                  {/* Serial Number */}
+                  <div className="space-y-2">
+                    <Label htmlFor="self-assign-serial">Serial Number</Label>
+                    <Input
+                      id="self-assign-serial"
+                      placeholder="Enter serial number"
+                      value={selfAssignSerialNumber}
+                      onChange={(e) => setSelfAssignSerialNumber(e.target.value)}
+                      data-testid="input-self-assign-serial-number"
+                    />
+                  </div>
+
+                  {/* Date of Manufacture */}
+                  <div className="space-y-2">
+                    <Label htmlFor="self-assign-manufacture">Date of Manufacture</Label>
+                    <Input
+                      id="self-assign-manufacture"
+                      type="date"
+                      value={selfAssignDateOfManufacture}
+                      onChange={(e) => setSelfAssignDateOfManufacture(e.target.value)}
+                      data-testid="input-self-assign-date-manufacture"
+                    />
+                  </div>
+
+                  {/* Date In Service */}
+                  <div className="space-y-2">
+                    <Label htmlFor="self-assign-service">Date In Service</Label>
+                    <Input
+                      id="self-assign-service"
+                      type="date"
+                      value={selfAssignDateInService}
+                      onChange={(e) => setSelfAssignDateInService(e.target.value)}
+                      data-testid="input-self-assign-date-service"
+                    />
+                  </div>
                 </div>
               </div>
             )}
@@ -2890,6 +2959,9 @@ export default function Inventory() {
                 setSelfAssignItem(null);
                 setSelfAssignQuantity("1");
                 setSelfAssignSearch("");
+                setSelfAssignSerialNumber("");
+                setSelfAssignDateOfManufacture("");
+                setSelfAssignDateInService("");
               }}
               data-testid="button-cancel-self-assign"
             >
@@ -2901,6 +2973,9 @@ export default function Inventory() {
                   selfAssignMutation.mutate({
                     gearItemId: selfAssignItem.id,
                     quantity: parseInt(selfAssignQuantity) || 1,
+                    serialNumber: selfAssignSerialNumber || undefined,
+                    dateOfManufacture: selfAssignDateOfManufacture || undefined,
+                    dateInService: selfAssignDateInService || undefined,
                   });
                 }
               }}
