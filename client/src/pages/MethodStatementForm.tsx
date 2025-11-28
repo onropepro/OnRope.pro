@@ -33,7 +33,7 @@ const STANDARD_JOB_TYPES = [
 ];
 
 const methodStatementFormSchema = z.object({
-  projectId: z.string().min(1, "Project is required"),
+  projectId: z.string().optional(), // Optional - can be job type only without a project
   dateCreated: z.string().min(1, "Date is required"),
   preparedByName: z.string().min(1, "Your name is required"),
   jobType: z.string().min(1, "Job type is required"),
@@ -698,7 +698,12 @@ export default function MethodStatementForm() {
 
   const onSubmit = (data: MethodStatementFormValues) => {
     setIsSubmitting(true);
-    createMeetingMutation.mutate(data, {
+    // Handle "none" selection - convert to undefined for server
+    const submitData = {
+      ...data,
+      projectId: data.projectId === "none" ? undefined : data.projectId,
+    };
+    createMeetingMutation.mutate(submitData, {
       onSettled: () => setIsSubmitting(false),
     });
   };
@@ -793,14 +798,15 @@ export default function MethodStatementForm() {
                   name="projectId"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Project *</FormLabel>
-                      <Select onValueChange={field.onChange} value={field.value}>
+                      <FormLabel>Project (Optional)</FormLabel>
+                      <Select onValueChange={field.onChange} value={field.value || ""}>
                         <FormControl>
                           <SelectTrigger data-testid="select-project">
-                            <SelectValue placeholder="Select project" />
+                            <SelectValue placeholder="None - Job Type Only" />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
+                          <SelectItem value="none">None - Job Type Only</SelectItem>
                           {(projectsData?.projects || []).map((project) => (
                             <SelectItem key={project.id} value={project.id}>
                               {project.buildingName || `Project ${project.id.substring(0, 8)}`}
