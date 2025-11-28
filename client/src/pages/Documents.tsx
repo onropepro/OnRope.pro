@@ -1125,6 +1125,7 @@ export default function Documents() {
   const [uploadingHealthSafety, setUploadingHealthSafety] = useState(false);
   const [uploadingPolicy, setUploadingPolicy] = useState(false);
   const [uploadingInsurance, setUploadingInsurance] = useState(false);
+  const [uploadingSWP, setUploadingSWP] = useState(false);
   const [uploadingMethodStatement, setUploadingMethodStatement] = useState(false);
   const [methodStatementJobType, setMethodStatementJobType] = useState("");
   const [methodStatementCustomJobType, setMethodStatementCustomJobType] = useState("");
@@ -1199,6 +1200,7 @@ export default function Documents() {
   const policyDocs = companyDocuments.filter((doc: any) => doc.documentType === 'company_policy');
   const insuranceDocs = companyDocuments.filter((doc: any) => doc.documentType === 'certificate_of_insurance');
   const methodStatementDocs = companyDocuments.filter((doc: any) => doc.documentType === 'method_statement');
+  const safeWorkProcedureDocs = companyDocuments.filter((doc: any) => doc.documentType === 'safe_work_procedure');
   const workSessions = workSessionsData?.sessions || [];
 
   // Calculate toolbox meeting compliance rating
@@ -2776,12 +2778,14 @@ export default function Documents() {
     URL.revokeObjectURL(url);
   };
 
-  const handleDocumentUpload = async (file: File, documentType: 'health_safety_manual' | 'company_policy' | 'certificate_of_insurance') => {
+  const handleDocumentUpload = async (file: File, documentType: 'health_safety_manual' | 'company_policy' | 'certificate_of_insurance' | 'safe_work_procedure') => {
     const setUploading = documentType === 'health_safety_manual' 
       ? setUploadingHealthSafety 
       : documentType === 'company_policy' 
         ? setUploadingPolicy 
-        : setUploadingInsurance;
+        : documentType === 'certificate_of_insurance'
+          ? setUploadingInsurance
+          : setUploadingSWP;
     
     setUploading(true);
     try {
@@ -3763,6 +3767,112 @@ export default function Documents() {
 
           {/* Safe Work Procedures Templates Tab */}
           <TabsContent value="swp-templates">
+            {/* Custom Safe Work Procedures Upload Section */}
+            {canUploadDocuments && (
+              <Card className="mb-6 overflow-hidden">
+                <CardHeader className="bg-gradient-to-br from-emerald-500/10 via-emerald-500/5 to-transparent pb-4">
+                  <div className="flex items-start gap-4">
+                    <div className="p-3 bg-emerald-500/10 rounded-xl ring-1 ring-emerald-500/20">
+                      <Upload className="h-6 w-6 text-emerald-600 dark:text-emerald-400" />
+                    </div>
+                    <div className="flex-1">
+                      <CardTitle className="text-xl mb-1">Custom Safe Work Procedures</CardTitle>
+                      <p className="text-sm text-muted-foreground">
+                        Upload your own custom Safe Work Procedures specific to your company operations.
+                      </p>
+                    </div>
+                    <Badge variant="secondary" className="text-base font-semibold px-3">
+                      {safeWorkProcedureDocs.length}
+                    </Badge>
+                  </div>
+                </CardHeader>
+                <CardContent className="pt-6">
+                  <div className="flex flex-col items-center justify-center border-2 border-dashed border-muted-foreground/25 rounded-lg p-6 mb-6">
+                    <Upload className="h-10 w-10 text-muted-foreground/50 mb-3" />
+                    <p className="text-sm text-muted-foreground mb-3">
+                      Upload a PDF document with your custom Safe Work Procedure
+                    </p>
+                    <input
+                      type="file"
+                      accept=".pdf"
+                      className="hidden"
+                      id="swp-upload"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) {
+                          handleDocumentUpload(file, 'safe_work_procedure');
+                          e.target.value = '';
+                        }
+                      }}
+                      disabled={uploadingSWP}
+                      data-testid="input-swp-upload"
+                    />
+                    <Button asChild disabled={uploadingSWP}>
+                      <label htmlFor="swp-upload" className="cursor-pointer" data-testid="button-upload-swp">
+                        {uploadingSWP ? (
+                          <>
+                            <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                            Uploading...
+                          </>
+                        ) : (
+                          <>
+                            <Upload className="h-4 w-4 mr-2" />
+                            Upload Custom SWP
+                          </>
+                        )}
+                      </label>
+                    </Button>
+                    {uploadingSWP && (
+                      <p className="text-xs text-muted-foreground mt-2">This may take a moment...</p>
+                    )}
+                  </div>
+
+                  {safeWorkProcedureDocs.length > 0 ? (
+                    <div className="space-y-3">
+                      <h4 className="font-medium text-sm mb-3">Uploaded Documents</h4>
+                      {safeWorkProcedureDocs.map((doc: any) => (
+                        <div key={doc.id} className="flex items-center justify-between p-3 bg-muted/30 rounded-lg">
+                          <div className="flex items-center gap-3 min-w-0 flex-1">
+                            <FileCheck className="h-5 w-5 text-emerald-600 dark:text-emerald-400 flex-shrink-0" />
+                            <div className="min-w-0">
+                              <p className="font-medium text-sm truncate">{doc.fileName}</p>
+                              <p className="text-xs text-muted-foreground">
+                                Uploaded {new Date(doc.uploadedAt).toLocaleDateString()}
+                              </p>
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-2 flex-shrink-0">
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => window.open(`/api/company-documents/${doc.id}/download`, '_blank')}
+                              data-testid={`download-custom-swp-${doc.id}`}
+                            >
+                              <Download className="h-4 w-4 mr-1" />
+                              Download
+                            </Button>
+                            <Button
+                              size="icon"
+                              variant="ghost"
+                              onClick={() => handleDeleteDocument(doc.id)}
+                              data-testid={`delete-custom-swp-${doc.id}`}
+                            >
+                              <Trash2 className="h-4 w-4 text-destructive" />
+                            </Button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="text-center py-6">
+                      <p className="text-sm text-muted-foreground">No custom Safe Work Procedures uploaded yet</p>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Template Safe Work Procedures */}
             <Card className="mb-6 overflow-hidden">
               <CardHeader className="bg-gradient-to-br from-green-500/10 via-green-500/5 to-transparent pb-4">
                 <div className="flex items-start gap-4">
