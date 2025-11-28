@@ -3446,12 +3446,20 @@ export default function Documents() {
                         )}
                         Download Report
                       </Button>
-                      <Badge 
-                        variant={compliancePercent === 100 ? "default" : "secondary"} 
-                        className={`text-base font-semibold px-3 ${compliancePercent === 100 ? 'bg-emerald-500' : ''}`}
-                      >
-                        {compliancePercent}%
-                      </Badge>
+                      <div className="flex flex-col items-end gap-1">
+                        <Badge 
+                          variant={compliancePercent === 100 ? "default" : "secondary"} 
+                          className={`text-base font-semibold px-3 ${compliancePercent === 100 ? 'bg-emerald-500' : ''}`}
+                        >
+                          {compliancePercent}% Signed
+                        </Badge>
+                        {compliancePercent < 100 && (
+                          <span className="text-xs text-amber-600 dark:text-amber-400 flex items-center gap-1">
+                            <Shield className="h-3 w-3" />
+                            {Math.round((100 - compliancePercent) * 0.05)}% CSR penalty
+                          </span>
+                        )}
+                      </div>
                     </div>
                   </div>
                 </CardHeader>
