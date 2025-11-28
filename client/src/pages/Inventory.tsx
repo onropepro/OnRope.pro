@@ -70,6 +70,8 @@ export default function Inventory() {
   const [assignSerialNumber, setAssignSerialNumber] = useState<string>("");
   const [assignDateOfManufacture, setAssignDateOfManufacture] = useState<string>("");
   const [assignDateInService, setAssignDateInService] = useState<string>("");
+  const [assignSerialMode, setAssignSerialMode] = useState<"pick" | "new">("pick");
+  const [selectedAssignSerialEntry, setSelectedAssignSerialEntry] = useState<any | null>(null);
   
   // Team Gear state - for management view of all employee gear
   const [expandedEmployeeId, setExpandedEmployeeId] = useState<string | null>(null);
@@ -180,6 +182,20 @@ export default function Inventory() {
     enabled: !!selfAssignItem?.id,
   });
   
+  // Fetch serial numbers for manager assign dialog item
+  const { data: assignSerialNumbersData } = useQuery<{ serialNumbers: any[] }>({
+    queryKey: ["/api/gear-items", managingItem?.id, "serial-numbers"],
+    queryFn: async () => {
+      if (!managingItem?.id) return { serialNumbers: [] };
+      const response = await fetch(`/api/gear-items/${managingItem.id}/serial-numbers`, {
+        credentials: 'include',
+      });
+      if (!response.ok) return { serialNumbers: [] };
+      return response.json();
+    },
+    enabled: !!managingItem?.id,
+  });
+  
   // Filter for active employees only
   const activeEmployees = (employeesData?.employees || []);
   
@@ -188,10 +204,18 @@ export default function Inventory() {
     return (assignmentsData?.assignments || []).filter((a: GearAssignment) => a.gearItemId === itemId);
   };
   
-  // Get available serial numbers (not currently assigned to anyone)
+  // Get available serial numbers (not currently assigned to anyone) for self-assign
   const getAvailableSerialNumbers = () => {
     if (!selfAssignItem) return [];
     const allSerials = serialNumbersData?.serialNumbers || [];
+    // Filter to only show serial numbers that are NOT assigned to anyone
+    return allSerials.filter(s => !s.isAssigned);
+  };
+  
+  // Get available serial numbers for manager assign dialog
+  const getAvailableSerialNumbersForAssign = () => {
+    if (!managingItem) return [];
+    const allSerials = assignSerialNumbersData?.serialNumbers || [];
     // Filter to only show serial numbers that are NOT assigned to anyone
     return allSerials.filter(s => !s.isAssigned);
   };
@@ -375,6 +399,7 @@ export default function Inventory() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/gear-assignments"] });
       queryClient.invalidateQueries({ queryKey: ["/api/gear"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/gear-items", managingItem?.id, "serial-numbers"] });
       toast({
         title: "Gear Assigned",
         description: "Gear has been assigned to the employee.",
@@ -384,6 +409,8 @@ export default function Inventory() {
       setAssignSerialNumber("");
       setAssignDateOfManufacture("");
       setAssignDateInService("");
+      setAssignSerialMode("pick");
+      setSelectedAssignSerialEntry(null);
     },
     onError: (error: any) => {
       toast({
@@ -713,6 +740,8 @@ export default function Inventory() {
     setAssignSerialNumber("");
     setAssignDateOfManufacture("");
     setAssignDateInService("");
+    setAssignSerialMode("pick");
+    setSelectedAssignSerialEntry(null);
     setShowAssignDialog(true);
   };
   
@@ -2721,42 +2750,167 @@ export default function Inventory() {
                   </div>
                 </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="assign-serial-number">Serial Number (Optional)</Label>
-                  <Input
-                    id="assign-serial-number"
-                    type="text"
-                    value={assignSerialNumber}
-                    onChange={(e) => setAssignSerialNumber(e.target.value)}
-                    placeholder="Enter serial number of assigned gear"
-                    data-testid="input-assign-serial-number"
-                  />
-                  <div className="text-xs text-muted-foreground">
-                    Enter the serial number of the specific gear item being assigned
-                  </div>
-                </div>
+                {/* Serial Number Picker / Entry */}
+                {(() => {
+                  const availableSerials = getAvailableSerialNumbersForAssign();
+                  
+                  if (availableSerials.length > 0) {
+                    return (
+                      <div className="space-y-3">
+                        {/* Mode Toggle */}
+                        <div className="flex gap-2">
+                          <Button
+                            size="sm"
+                            variant={assignSerialMode === "pick" ? "default" : "outline"}
+                            onClick={() => {
+                              setAssignSerialMode("pick");
+                              setAssignSerialNumber("");
+                              setAssignDateOfManufacture("");
+                              setAssignDateInService("");
+                              setSelectedAssignSerialEntry(null);
+                            }}
+                            className="flex-1"
+                            data-testid="button-assign-serial-mode-pick"
+                          >
+                            Pick Existing ({availableSerials.length})
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant={assignSerialMode === "new" ? "default" : "outline"}
+                            onClick={() => {
+                              setAssignSerialMode("new");
+                              setSelectedAssignSerialEntry(null);
+                            }}
+                            className="flex-1"
+                            data-testid="button-assign-serial-mode-new"
+                          >
+                            Enter New
+                          </Button>
+                        </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="assign-date-of-manufacture">Date of Manufacture (Optional)</Label>
-                  <Input
-                    id="assign-date-of-manufacture"
-                    type="date"
-                    value={assignDateOfManufacture}
-                    onChange={(e) => setAssignDateOfManufacture(e.target.value)}
-                    data-testid="input-assign-date-of-manufacture"
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="assign-date-in-service">Date In Service (Optional)</Label>
-                  <Input
-                    id="assign-date-in-service"
-                    type="date"
-                    value={assignDateInService}
-                    onChange={(e) => setAssignDateInService(e.target.value)}
-                    data-testid="input-assign-date-in-service"
-                  />
-                </div>
+                        {assignSerialMode === "pick" ? (
+                          <div className="space-y-2">
+                            <Label>Available Serial Numbers</Label>
+                            <div className="space-y-1 max-h-32 overflow-y-auto border rounded-md p-2">
+                              {availableSerials.map((serial: any) => (
+                                <div
+                                  key={serial.id}
+                                  className={`p-2 rounded cursor-pointer hover-elevate ${
+                                    selectedAssignSerialEntry?.id === serial.id ? 'bg-primary/10 border border-primary' : 'bg-muted/50'
+                                  }`}
+                                  onClick={() => {
+                                    setSelectedAssignSerialEntry(serial);
+                                    setAssignSerialNumber(serial.serialNumber);
+                                    setAssignDateOfManufacture(serial.dateOfManufacture || "");
+                                    setAssignDateInService(serial.dateInService || "");
+                                    setAssignQuantity("1");
+                                  }}
+                                  data-testid={`assign-serial-option-${serial.id}`}
+                                >
+                                  <div className="flex items-center justify-between">
+                                    <div className="font-mono text-sm font-medium">{serial.serialNumber}</div>
+                                    {selectedAssignSerialEntry?.id === serial.id && (
+                                      <Badge variant="default" className="text-xs">Selected</Badge>
+                                    )}
+                                  </div>
+                                  {(serial.dateOfManufacture || serial.dateInService) && (
+                                    <div className="text-xs text-muted-foreground mt-1 flex gap-3">
+                                      {serial.dateOfManufacture && (
+                                        <span>Mfg: {new Date(serial.dateOfManufacture).toLocaleDateString()}</span>
+                                      )}
+                                      {serial.dateInService && (
+                                        <span>In Service: {new Date(serial.dateInService).toLocaleDateString()}</span>
+                                      )}
+                                    </div>
+                                  )}
+                                </div>
+                              ))}
+                            </div>
+                            {selectedAssignSerialEntry && (
+                              <div className="text-sm text-muted-foreground">
+                                Selected: <span className="font-mono font-medium">{selectedAssignSerialEntry.serialNumber}</span>
+                              </div>
+                            )}
+                          </div>
+                        ) : (
+                          <div className="space-y-3">
+                            <div className="space-y-2">
+                              <Label htmlFor="assign-serial-number">Serial Number (Optional)</Label>
+                              <Input
+                                id="assign-serial-number"
+                                type="text"
+                                value={assignSerialNumber}
+                                onChange={(e) => setAssignSerialNumber(e.target.value)}
+                                placeholder="Enter new serial number"
+                                data-testid="input-assign-serial-number"
+                              />
+                            </div>
+                            <div className="space-y-2">
+                              <Label htmlFor="assign-date-of-manufacture">Date of Manufacture (Optional)</Label>
+                              <Input
+                                id="assign-date-of-manufacture"
+                                type="date"
+                                value={assignDateOfManufacture}
+                                onChange={(e) => setAssignDateOfManufacture(e.target.value)}
+                                data-testid="input-assign-date-of-manufacture"
+                              />
+                            </div>
+                            <div className="space-y-2">
+                              <Label htmlFor="assign-date-in-service">Date In Service (Optional)</Label>
+                              <Input
+                                id="assign-date-in-service"
+                                type="date"
+                                value={assignDateInService}
+                                onChange={(e) => setAssignDateInService(e.target.value)}
+                                data-testid="input-assign-date-in-service"
+                              />
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    );
+                  }
+                  
+                  // No registered serials - show standard input fields
+                  return (
+                    <div className="space-y-3">
+                      <div className="space-y-2">
+                        <Label htmlFor="assign-serial-number">Serial Number (Optional)</Label>
+                        <Input
+                          id="assign-serial-number"
+                          type="text"
+                          value={assignSerialNumber}
+                          onChange={(e) => setAssignSerialNumber(e.target.value)}
+                          placeholder="Enter serial number of assigned gear"
+                          data-testid="input-assign-serial-number"
+                        />
+                        <div className="text-xs text-muted-foreground">
+                          Enter the serial number of the specific gear item being assigned
+                        </div>
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="assign-date-of-manufacture">Date of Manufacture (Optional)</Label>
+                        <Input
+                          id="assign-date-of-manufacture"
+                          type="date"
+                          value={assignDateOfManufacture}
+                          onChange={(e) => setAssignDateOfManufacture(e.target.value)}
+                          data-testid="input-assign-date-of-manufacture"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="assign-date-in-service">Date In Service (Optional)</Label>
+                        <Input
+                          id="assign-date-in-service"
+                          type="date"
+                          value={assignDateInService}
+                          onChange={(e) => setAssignDateInService(e.target.value)}
+                          data-testid="input-assign-date-in-service"
+                        />
+                      </div>
+                    </div>
+                  );
+                })()}
               </div>
             </div>
           )}
@@ -2773,6 +2927,8 @@ export default function Inventory() {
                 setAssignSerialNumber("");
                 setAssignDateOfManufacture("");
                 setAssignDateInService("");
+                setAssignSerialMode("pick");
+                setSelectedAssignSerialEntry(null);
               }}
               data-testid="button-cancel-assign"
             >
