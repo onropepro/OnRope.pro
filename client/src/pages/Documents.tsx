@@ -2926,6 +2926,31 @@ export default function Documents() {
     },
   });
 
+  // Bulk enroll all employees in document reviews
+  const enrollAllEmployeesMutation = useMutation({
+    mutationFn: async (doc: { type: string; name: string; fileUrl: string }) => {
+      const response = await apiRequest("POST", "/api/document-reviews/enroll-all", {
+        documents: [{ type: doc.type, name: doc.name, fileUrl: doc.fileUrl }]
+      });
+      return await response.json();
+    },
+    onSuccess: (data) => {
+      toast({
+        title: "Success",
+        description: `Document assigned to ${data.enrolledCount || 'all'} employees for review and signature`,
+      });
+      queryClient.invalidateQueries({ queryKey: ["/api/document-reviews"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/company-safety-rating"] });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to assign document to employees",
+        variant: "destructive",
+      });
+    },
+  });
+
   return (
     <div className="min-h-screen bg-background p-4 pb-24">
       <div className="max-w-6xl mx-auto">
@@ -3400,7 +3425,7 @@ export default function Documents() {
                                           Uploaded by {doc.uploadedByName}
                                         </div>
                                       </div>
-                                      <div className="flex items-center gap-2">
+                                      <div className="flex items-center gap-2 flex-wrap">
                                         <Button
                                           size="sm"
                                           variant="outline"
@@ -3411,14 +3436,30 @@ export default function Documents() {
                                           View
                                         </Button>
                                         {canUploadDocuments && (
-                                          <Button
-                                            size="sm"
-                                            variant="ghost"
-                                            onClick={() => deleteDocumentMutation.mutate(doc.id)}
-                                            data-testid={`delete-health-safety-${doc.id}`}
-                                          >
-                                            <Trash2 className="h-4 w-4 text-destructive" />
-                                          </Button>
+                                          <>
+                                            <Button
+                                              size="sm"
+                                              variant="default"
+                                              onClick={() => enrollAllEmployeesMutation.mutate({
+                                                type: 'health_safety_manual',
+                                                name: doc.fileName || 'Health & Safety Manual',
+                                                fileUrl: doc.fileUrl
+                                              })}
+                                              disabled={enrollAllEmployeesMutation.isPending}
+                                              data-testid={`assign-health-safety-${doc.id}`}
+                                            >
+                                              <Users className="h-4 w-4 mr-1" />
+                                              {enrollAllEmployeesMutation.isPending ? 'Assigning...' : 'Assign to All'}
+                                            </Button>
+                                            <Button
+                                              size="sm"
+                                              variant="ghost"
+                                              onClick={() => deleteDocumentMutation.mutate(doc.id)}
+                                              data-testid={`delete-health-safety-${doc.id}`}
+                                            >
+                                              <Trash2 className="h-4 w-4 text-destructive" />
+                                            </Button>
+                                          </>
                                         )}
                                       </div>
                                     </div>
@@ -3530,7 +3571,7 @@ export default function Documents() {
                                           Uploaded by {doc.uploadedByName}
                                         </div>
                                       </div>
-                                      <div className="flex items-center gap-2">
+                                      <div className="flex items-center gap-2 flex-wrap">
                                         <Button
                                           size="sm"
                                           variant="outline"
@@ -3541,14 +3582,30 @@ export default function Documents() {
                                           View
                                         </Button>
                                         {canUploadDocuments && (
-                                          <Button
-                                            size="sm"
-                                            variant="ghost"
-                                            onClick={() => deleteDocumentMutation.mutate(doc.id)}
-                                            data-testid={`delete-policy-${doc.id}`}
-                                          >
-                                            <Trash2 className="h-4 w-4 text-destructive" />
-                                          </Button>
+                                          <>
+                                            <Button
+                                              size="sm"
+                                              variant="default"
+                                              onClick={() => enrollAllEmployeesMutation.mutate({
+                                                type: 'company_policy',
+                                                name: doc.fileName || 'Company Policy',
+                                                fileUrl: doc.fileUrl
+                                              })}
+                                              disabled={enrollAllEmployeesMutation.isPending}
+                                              data-testid={`assign-policy-${doc.id}`}
+                                            >
+                                              <Users className="h-4 w-4 mr-1" />
+                                              {enrollAllEmployeesMutation.isPending ? 'Assigning...' : 'Assign to All'}
+                                            </Button>
+                                            <Button
+                                              size="sm"
+                                              variant="ghost"
+                                              onClick={() => deleteDocumentMutation.mutate(doc.id)}
+                                              data-testid={`delete-policy-${doc.id}`}
+                                            >
+                                              <Trash2 className="h-4 w-4 text-destructive" />
+                                            </Button>
+                                          </>
                                         )}
                                       </div>
                                     </div>

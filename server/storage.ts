@@ -1297,10 +1297,29 @@ export class Storage {
       .orderBy(desc(documentReviewSignatures.createdAt));
   }
 
-  async getDocumentReviewSignaturesByCompany(companyId: string): Promise<DocumentReviewSignature[]> {
-    return db.select().from(documentReviewSignatures)
+  async getDocumentReviewSignaturesByCompany(companyId: string): Promise<(DocumentReviewSignature & { employeeName: string })[]> {
+    const results = await db.select({
+      id: documentReviewSignatures.id,
+      companyId: documentReviewSignatures.companyId,
+      employeeId: documentReviewSignatures.employeeId,
+      documentType: documentReviewSignatures.documentType,
+      documentId: documentReviewSignatures.documentId,
+      documentName: documentReviewSignatures.documentName,
+      fileUrl: documentReviewSignatures.fileUrl,
+      viewedAt: documentReviewSignatures.viewedAt,
+      signedAt: documentReviewSignatures.signedAt,
+      signatureDataUrl: documentReviewSignatures.signatureDataUrl,
+      documentVersion: documentReviewSignatures.documentVersion,
+      createdAt: documentReviewSignatures.createdAt,
+      updatedAt: documentReviewSignatures.updatedAt,
+      employeeName: sql<string>`COALESCE(${users.firstName} || ' ' || ${users.lastName}, ${users.email})`.as('employee_name'),
+    })
+      .from(documentReviewSignatures)
+      .leftJoin(users, eq(documentReviewSignatures.employeeId, users.id))
       .where(eq(documentReviewSignatures.companyId, companyId))
-      .orderBy(desc(documentReviewSignatures.signedAt));
+      .orderBy(desc(documentReviewSignatures.createdAt));
+    
+    return results;
   }
 
   async getDocumentReviewSignature(employeeId: string, documentType: string, documentId?: string): Promise<DocumentReviewSignature | undefined> {
