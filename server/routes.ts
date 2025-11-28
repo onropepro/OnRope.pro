@@ -7839,6 +7839,38 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "User not found" });
       }
       
+      // Get the company ID
+      const companyId = currentUser.role === "company" ? currentUser.id : currentUser.companyId;
+      
+      if (companyId) {
+        // Auto-enroll: Check for required documents that the employee hasn't been enrolled for yet
+        const requiredDocTypes = ['health_safety_manual', 'company_policy'];
+        const existingReviews = await storage.getDocumentReviewSignaturesByEmployee(currentUser.id);
+        const existingDocIds = new Set(existingReviews.map(r => r.documentId).filter(Boolean));
+        
+        // Get all required company documents
+        for (const docType of requiredDocTypes) {
+          const docs = await storage.getCompanyDocumentsByType(companyId, docType);
+          for (const doc of docs) {
+            // If employee doesn't have a review for this document, create one
+            if (!existingDocIds.has(doc.id)) {
+              try {
+                await storage.enrollEmployeeInDocumentReviews(companyId, currentUser.id, [{
+                  type: docType,
+                  id: doc.id,
+                  name: doc.fileName,
+                  fileUrl: doc.fileUrl,
+                }]);
+              } catch (enrollErr) {
+                // Ignore duplicate errors - another request may have created it
+                console.log(`Auto-enroll skipped for ${doc.fileName}: ${enrollErr}`);
+              }
+            }
+          }
+        }
+      }
+      
+      // Now fetch all reviews (including newly created ones)
       const reviews = await storage.getDocumentReviewSignaturesByEmployee(currentUser.id);
       res.json({ reviews });
     } catch (error) {
@@ -8217,6 +8249,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
         uploadedByName: currentUser.name || currentUser.email || "Unknown User",
         ...(documentType === 'method_statement' && { jobType, customJobType }),
       });
+
+      // Auto-enroll all employees for Health & Safety Manual and Company Policy documents
+      if (documentType === 'health_safety_manual' || documentType === 'company_policy') {
+        try {
+          const employees = await storage.getAllEmployees(companyId);
+          const docToEnroll = [{
+            type: documentType,
+            id: document.id,
+            name: req.file.originalname,
+            fileUrl,
+          }];
+          
+          for (const employee of employees) {
+            await storage.enrollEmployeeInDocumentReviews(companyId, employee.id, docToEnroll);
+          }
+          console.log(`Auto-enrolled ${employees.length} employees for document: ${req.file.originalname}`);
+        } catch (enrollError) {
+          console.error("Auto-enrollment error (non-fatal):", enrollError);
+          // Continue - document was still uploaded successfully
+        }
+      }
 
       res.json({ document });
     } catch (error) {
