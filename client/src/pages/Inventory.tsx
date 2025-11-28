@@ -80,6 +80,12 @@ export default function Inventory() {
   const [editAssignmentDateOfManufacture, setEditAssignmentDateOfManufacture] = useState<string>("");
   const [editAssignmentDateInService, setEditAssignmentDateInService] = useState<string>("");
 
+  // Self-assign gear state
+  const [showSelfAssignDialog, setShowSelfAssignDialog] = useState(false);
+  const [selfAssignItem, setSelfAssignItem] = useState<GearItem | null>(null);
+  const [selfAssignQuantity, setSelfAssignQuantity] = useState<string>("1");
+  const [selfAssignSearch, setSelfAssignSearch] = useState("");
+
   // Fetch current user
   const { data: userData } = useQuery<{ user: any }>({
     queryKey: ["/api/user"],
@@ -390,6 +396,52 @@ export default function Inventory() {
       toast({
         title: "Error",
         description: error.message || "Failed to update assignment",
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Self-assign gear mutation - allows any employee to assign gear to themselves
+  const selfAssignMutation = useMutation({
+    mutationFn: async (data: { gearItemId: string; quantity: number }) => {
+      return apiRequest("POST", "/api/gear-assignments/self", data);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/gear-assignments"] });
+      toast({
+        title: "Gear Added",
+        description: "Gear has been added to your equipment.",
+      });
+      setShowSelfAssignDialog(false);
+      setSelfAssignItem(null);
+      setSelfAssignQuantity("1");
+      setSelfAssignSearch("");
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to add gear",
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Remove self-assigned gear mutation
+  const removeSelfAssignedMutation = useMutation({
+    mutationFn: async (assignmentId: string) => {
+      return apiRequest("DELETE", `/api/gear-assignments/self/${assignmentId}`, {});
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/gear-assignments"] });
+      toast({
+        title: "Gear Removed",
+        description: "Gear has been removed from your equipment.",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to remove gear",
         variant: "destructive",
       });
     },
@@ -869,6 +921,21 @@ export default function Inventory() {
 
           {/* My Gear Tab */}
           <TabsContent value="my-gear" className="space-y-4">
+            {/* Header with Add Gear Button */}
+            <div className="flex items-center justify-between gap-4">
+              <div>
+                <h2 className="text-lg font-semibold">My Equipment</h2>
+                <p className="text-sm text-muted-foreground">Equipment assigned to you</p>
+              </div>
+              <Button
+                onClick={() => setShowSelfAssignDialog(true)}
+                data-testid="button-add-my-gear"
+              >
+                <Plus className="h-4 w-4 mr-2" />
+                Add Gear
+              </Button>
+            </div>
+
             {/* Helpful Banner - only show for users who can manage inventory */}
             {canManageInventory(currentUser) && (
               <Card className="bg-primary/5 border-primary/20">
@@ -877,13 +944,14 @@ export default function Inventory() {
                     <div className="flex items-center gap-3">
                       <span className="material-icons text-primary text-2xl">info</span>
                       <div>
-                        <div className="font-semibold">Want to add new gear?</div>
+                        <div className="font-semibold">Want to add new items to company inventory?</div>
                         <p className="text-sm text-muted-foreground">
-                          Switch to the "Manage Gear" tab to add inventory items
+                          Switch to the "Manage Gear" tab to add new inventory items
                         </p>
                       </div>
                     </div>
                     <Button
+                      variant="outline"
                       onClick={() => setActiveTab("manage")}
                       data-testid="button-go-to-manage"
                     >
@@ -898,14 +966,21 @@ export default function Inventory() {
             {myGear.length === 0 ? (
               <Card>
                 <CardContent className="py-12 text-center">
-                  <div className="flex flex-col items-center gap-3">
+                  <div className="flex flex-col items-center gap-4">
                     <span className="material-icons text-5xl text-muted-foreground">inventory_2</span>
                     <div>
                       <div className="font-semibold text-lg">No Gear Assigned</div>
                       <p className="text-sm text-muted-foreground mt-1">
-                        You don't have any equipment assigned yet.
+                        You don't have any equipment assigned yet. Add gear from the company inventory.
                       </p>
                     </div>
+                    <Button
+                      onClick={() => setShowSelfAssignDialog(true)}
+                      data-testid="button-add-gear-empty"
+                    >
+                      <Plus className="h-4 w-4 mr-2" />
+                      Add Gear from Inventory
+                    </Button>
                   </div>
                 </CardContent>
               </Card>
@@ -940,6 +1015,21 @@ export default function Inventory() {
                                 </div>
                               )}
                             </div>
+                            {/* Remove button */}
+                            {(() => {
+                              const myAssignment = getItemAssignments(item.id).find(a => a.employeeId === currentUser?.id);
+                              return myAssignment ? (
+                                <Button
+                                  size="icon"
+                                  variant="ghost"
+                                  onClick={() => removeSelfAssignedMutation.mutate(myAssignment.id)}
+                                  disabled={removeSelfAssignedMutation.isPending}
+                                  data-testid={`button-remove-gear-${item.id}`}
+                                >
+                                  <X className="h-4 w-4" />
+                                </Button>
+                              ) : null;
+                            })()}
                           </div>
 
                           {/* Details Grid */}
@@ -2673,6 +2763,151 @@ export default function Inventory() {
               data-testid="button-save-edit-assignment"
             >
               {updateAssignmentMutation.isPending ? "Saving..." : "Save Changes"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Self-Assign Gear Dialog */}
+      <Dialog open={showSelfAssignDialog} onOpenChange={(open) => {
+        setShowSelfAssignDialog(open);
+        if (!open) {
+          setSelfAssignItem(null);
+          setSelfAssignQuantity("1");
+          setSelfAssignSearch("");
+        }
+      }}>
+        <DialogContent data-testid="dialog-self-assign-gear" className="max-w-lg max-h-[80vh] overflow-hidden flex flex-col">
+          <DialogHeader>
+            <DialogTitle>Add Gear to My Equipment</DialogTitle>
+            <DialogDescription>
+              Select gear from the company inventory to add to your equipment
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="flex-1 overflow-hidden flex flex-col space-y-4">
+            {/* Search */}
+            <div>
+              <Input
+                placeholder="Search inventory..."
+                value={selfAssignSearch}
+                onChange={(e) => setSelfAssignSearch(e.target.value)}
+                data-testid="input-self-assign-search"
+              />
+            </div>
+
+            {/* Available Items List */}
+            <div className="flex-1 overflow-y-auto space-y-2 pr-1">
+              {(() => {
+                const availableItems = (gearData?.items || []).filter((item) => {
+                  const available = getAvailableQuantity(item);
+                  const matchesSearch = !selfAssignSearch || 
+                    item.equipmentType?.toLowerCase().includes(selfAssignSearch.toLowerCase()) ||
+                    item.brand?.toLowerCase().includes(selfAssignSearch.toLowerCase()) ||
+                    item.model?.toLowerCase().includes(selfAssignSearch.toLowerCase());
+                  return available > 0 && matchesSearch;
+                });
+
+                if (availableItems.length === 0) {
+                  return (
+                    <div className="text-center py-8 text-muted-foreground">
+                      {selfAssignSearch ? "No matching items found" : "No items available in inventory"}
+                    </div>
+                  );
+                }
+
+                return availableItems.map((item) => {
+                  const available = getAvailableQuantity(item);
+                  const isSelected = selfAssignItem?.id === item.id;
+                  
+                  return (
+                    <Card 
+                      key={item.id} 
+                      className={`cursor-pointer hover-elevate ${isSelected ? 'border-primary border-2' : ''}`}
+                      onClick={() => {
+                        setSelfAssignItem(item);
+                        setSelfAssignQuantity("1");
+                      }}
+                      data-testid={`self-assign-item-${item.id}`}
+                    >
+                      <CardContent className="p-3">
+                        <div className="flex items-center justify-between gap-3">
+                          <div className="flex items-center gap-3">
+                            <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
+                              <span className="material-icons text-primary">
+                                {EQUIPMENT_ICONS[item.equipmentType] || "category"}
+                              </span>
+                            </div>
+                            <div>
+                              <div className="font-medium">{item.equipmentType}</div>
+                              {(item.brand || item.model) && (
+                                <div className="text-xs text-muted-foreground">
+                                  {[item.brand, item.model].filter(Boolean).join(" - ")}
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                          <Badge variant="secondary" className="text-xs">
+                            {available} available
+                          </Badge>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  );
+                });
+              })()}
+            </div>
+
+            {/* Selected Item Form */}
+            {selfAssignItem && (
+              <div className="border-t pt-4 space-y-3">
+                <div className="flex items-center justify-between">
+                  <div className="font-medium">Selected: {selfAssignItem.equipmentType}</div>
+                  <Badge variant="outline">{getAvailableQuantity(selfAssignItem)} available</Badge>
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="self-assign-quantity">Quantity</Label>
+                  <Input
+                    id="self-assign-quantity"
+                    type="number"
+                    min="1"
+                    max={getAvailableQuantity(selfAssignItem)}
+                    value={selfAssignQuantity}
+                    onChange={(e) => setSelfAssignQuantity(e.target.value)}
+                    data-testid="input-self-assign-quantity"
+                  />
+                </div>
+              </div>
+            )}
+          </div>
+
+          <DialogFooter className="gap-2 mt-4">
+            <Button
+              variant="outline"
+              onClick={() => {
+                setShowSelfAssignDialog(false);
+                setSelfAssignItem(null);
+                setSelfAssignQuantity("1");
+                setSelfAssignSearch("");
+              }}
+              data-testid="button-cancel-self-assign"
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={() => {
+                if (selfAssignItem) {
+                  selfAssignMutation.mutate({
+                    gearItemId: selfAssignItem.id,
+                    quantity: parseInt(selfAssignQuantity) || 1,
+                  });
+                }
+              }}
+              disabled={!selfAssignItem || selfAssignMutation.isPending}
+              data-testid="button-confirm-self-assign"
+            >
+              {selfAssignMutation.isPending ? "Adding..." : "Add to My Gear"}
             </Button>
           </DialogFooter>
         </DialogContent>
