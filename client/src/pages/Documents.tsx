@@ -36,6 +36,774 @@ const STANDARD_JOB_TYPES = [
   { value: 'other', label: 'Other' },
 ];
 
+// Safe Work Procedure Templates for each job type
+interface SafeWorkProcedure {
+  jobType: string;
+  title: string;
+  description: string;
+  scope: string;
+  hazards: string[];
+  controlMeasures: string[];
+  ppe: string[];
+  equipment: string[];
+  preWorkChecks: string[];
+  workProcedure: string[];
+  emergencyProcedures: string[];
+  competencyRequirements: string[];
+}
+
+const SAFE_WORK_PROCEDURES: SafeWorkProcedure[] = [
+  {
+    jobType: 'window_cleaning',
+    title: 'Window Cleaning - Rope Access',
+    description: 'Safe work procedure for exterior window cleaning using rope access techniques on high-rise buildings.',
+    scope: 'This procedure applies to all rope access window cleaning operations on building exteriors, including glass panels, frames, and surrounding surfaces.',
+    hazards: [
+      'Falls from height - primary hazard requiring rope access controls',
+      'Falling objects - tools, equipment, or debris dropping to lower levels',
+      'Chemical exposure - cleaning solutions and detergents',
+      'Weather conditions - wind, rain, lightning, extreme temperatures',
+      'Sharp edges - window frames, damaged glass, building protrusions',
+      'Electrical hazards - proximity to external electrical installations',
+      'Public interaction - pedestrians in work zone below',
+      'Structural failure - anchor points, building facade deterioration'
+    ],
+    controlMeasures: [
+      'Dual rope system with independent anchor points tested to minimum 15kN',
+      'Exclusion zones established at ground level with barriers and signage',
+      'Pre-use inspection of all PPE and equipment before each work session',
+      'Weather monitoring - cease work if wind exceeds 40km/h or during electrical storms',
+      'Tool lanyards on all equipment to prevent drops',
+      'Buddy system - minimum two technicians on site at all times',
+      'Communication devices (two-way radio) for all rope access personnel',
+      'Rescue plan in place with trained rescue team available'
+    ],
+    ppe: [
+      'Full body harness (IRATA approved, inspected within 12 months)',
+      'Helmet with chin strap (EN 397 rated)',
+      'Descender device (certified for rope access)',
+      'Back-up device (fall arrester)',
+      'Work positioning lanyard',
+      'Gloves (appropriate for rope work and cleaning)',
+      'Safety glasses or goggles',
+      'Safety footwear with non-slip soles',
+      'High visibility vest when working near traffic'
+    ],
+    equipment: [
+      'Static kernmantle ropes (minimum 10.5mm diameter)',
+      'Anchor straps and connectors (certified load rated)',
+      'Descender and ascender devices',
+      'Karabiners (screw-gate, minimum 25kN)',
+      'Rope protectors for edge work',
+      'Window cleaning solution (approved, biodegradable preferred)',
+      'Squeegees, scrubbers, and applicators',
+      'Water-fed pole system (if applicable)',
+      'Bucket or solution container with secure attachment',
+      'Drop sheets for ground protection'
+    ],
+    preWorkChecks: [
+      'Verify weather conditions are suitable for rope access work',
+      'Inspect all anchor points and confirm load ratings',
+      'Check rope condition - no cuts, abrasions, or chemical damage',
+      'Inspect harness webbing, stitching, and hardware',
+      'Test all mechanical devices (descenders, ascenders, back-up devices)',
+      'Confirm ground exclusion zone is properly established',
+      'Verify rescue equipment is available and accessible',
+      'Brief all team members on work plan and emergency procedures',
+      'Confirm communication devices are charged and working',
+      'Check chemical safety data sheets are available on site'
+    ],
+    workProcedure: [
+      '1. Establish ground-level exclusion zone with barriers and warning signs',
+      '2. Access roof/anchor location following building access protocols',
+      '3. Rig primary and secondary rope systems to approved anchor points',
+      '4. Conduct buddy-check of all PPE and attachments before going over edge',
+      '5. Descend in controlled manner maintaining three points of contact',
+      '6. Position at work area and secure work positioning system',
+      '7. Attach all tools and equipment with lanyards before use',
+      '8. Apply cleaning solution using appropriate applicator',
+      '9. Use squeegee with proper technique, collecting excess solution',
+      '10. Progress systematically across facade, maintaining rope management',
+      '11. Communicate with ground team regarding progress and any issues',
+      '12. Ascend using approved technique when section complete',
+      '13. De-rig equipment following proper procedures',
+      '14. Inspect and store all equipment appropriately'
+    ],
+    emergencyProcedures: [
+      'In case of technician suspension trauma: initiate rescue within 10 minutes',
+      'Rescue team to use pre-rigged rescue system or hauling technique',
+      'For medical emergency: lower casualty to safe location if possible',
+      'Contact emergency services immediately for serious injuries',
+      'Evacuate work area if structural concerns arise',
+      'In case of severe weather: immediate controlled ascent to safety',
+      'Report all incidents to supervisor and complete incident documentation'
+    ],
+    competencyRequirements: [
+      'IRATA Level 1 minimum (Level 2+ for complex operations)',
+      'Current first aid certification',
+      'Site-specific induction completed',
+      'Familiarity with building layout and anchor system',
+      'Training in specific cleaning chemicals being used'
+    ]
+  },
+  {
+    jobType: 'dryer_vent_cleaning',
+    title: 'Dryer Vent Cleaning - Rope Access',
+    description: 'Safe work procedure for cleaning dryer exhaust vents on building exteriors using rope access.',
+    scope: 'This procedure covers the inspection and cleaning of dryer vent terminations and accessible ductwork from building exteriors.',
+    hazards: [
+      'Falls from height during rope access operations',
+      'Falling debris - lint, vent covers, cleaning tools',
+      'Respiratory hazards - lint particles and accumulated dust',
+      'Fire risk - highly flammable lint accumulation',
+      'Sharp edges - metal vent covers and ductwork',
+      'Biological hazards - mold, bird nests, pest infestations',
+      'Weather conditions affecting safe rope access',
+      'Confined space hazards if accessing ductwork'
+    ],
+    controlMeasures: [
+      'Dual rope access system with tested anchor points',
+      'Ground exclusion zone to protect from falling debris',
+      'Respiratory protection when disturbing lint accumulation',
+      'Anti-static tools to minimize fire ignition risk',
+      'Secure containment for removed lint and debris',
+      'Pest assessment before accessing vents',
+      'Weather monitoring with defined work limits',
+      'Proper ventilation assessment before duct entry'
+    ],
+    ppe: [
+      'Full body harness (IRATA approved)',
+      'Safety helmet with chin strap',
+      'Descender and back-up device',
+      'Dust mask or respirator (P2 minimum)',
+      'Safety glasses with dust protection',
+      'Work gloves (cut resistant)',
+      'Safety footwear',
+      'Coveralls or disposable suit'
+    ],
+    equipment: [
+      'Rope access equipment (ropes, connectors, devices)',
+      'Rotary brush cleaning system',
+      'Vacuum system with HEPA filtration',
+      'Inspection camera/borescope',
+      'Hand brushes and scrapers',
+      'Collection bags for debris',
+      'Vent cover removal tools',
+      'Replacement vent covers and fasteners',
+      'Tool lanyards and equipment bags'
+    ],
+    preWorkChecks: [
+      'Review building vent layout and access requirements',
+      'Inspect rope access equipment and PPE',
+      'Confirm vacuum system is operational with clean filters',
+      'Verify ground exclusion zone is established',
+      'Check weather conditions are within safe limits',
+      'Brief team on specific vent locations and building features',
+      'Confirm fire extinguisher available on site',
+      'Verify communication systems are operational'
+    ],
+    workProcedure: [
+      '1. Set up ground exclusion zone with barriers and signage',
+      '2. Access anchor points and rig rope systems',
+      '3. Conduct pre-descent equipment and buddy checks',
+      '4. Descend to vent location maintaining rope control',
+      '5. Inspect vent condition and document with photos',
+      '6. Remove vent cover carefully, securing with lanyard',
+      '7. Vacuum loose lint before using brushes',
+      '8. Use rotary brush system to clean duct interior',
+      '9. Continue vacuuming while brushing to capture debris',
+      '10. Inspect cleaned duct with camera to confirm cleanliness',
+      '11. Replace or reinstall vent cover securely',
+      '12. Document work completed with photos',
+      '13. Progress to next vent or ascend when complete',
+      '14. Properly dispose of collected lint and debris'
+    ],
+    emergencyProcedures: [
+      'Suspend work immediately if fire is detected',
+      'Use fire extinguisher only if safe to do so',
+      'Evacuate area and alert building management',
+      'For rope access emergency: initiate rescue plan',
+      'Contact emergency services for fire or medical emergency',
+      'Report all incidents and near-misses'
+    ],
+    competencyRequirements: [
+      'IRATA Level 1 minimum certification',
+      'Training in dryer vent cleaning techniques',
+      'Understanding of fire hazards related to lint',
+      'Current first aid certification',
+      'Site-specific induction'
+    ]
+  },
+  {
+    jobType: 'building_wash',
+    title: 'Building Wash / Facade Cleaning - Rope Access',
+    description: 'Safe work procedure for pressure washing and cleaning building exteriors using rope access techniques.',
+    scope: 'This procedure covers exterior building washing including concrete, brick, metal cladding, and other facade materials using pressure washing equipment.',
+    hazards: [
+      'Falls from height during rope access',
+      'High pressure water injection injuries',
+      'Chemical exposure from cleaning agents',
+      'Electrical hazards - water near electrical installations',
+      'Falling debris dislodged by pressure washing',
+      'Slip hazards from wet surfaces',
+      'Noise exposure from pressure equipment',
+      'Building material damage from incorrect pressure',
+      'Weather conditions affecting operations'
+    ],
+    controlMeasures: [
+      'Dual rope system with appropriate anchor points',
+      'Pressure washer training and competency verification',
+      'Maximum pressure limits set for each surface type',
+      'Electrical isolation of external fittings if required',
+      'Extended ground exclusion zones for water spray',
+      'Chemical handling procedures and spill containment',
+      'Hearing protection when operating pressure equipment',
+      'Surface assessment before pressure application',
+      'Weather limits for wind and electrical storms'
+    ],
+    ppe: [
+      'Full body harness (IRATA approved)',
+      'Safety helmet with face shield option',
+      'Descender and back-up device',
+      'Waterproof coveralls or rain suit',
+      'Chemical resistant gloves',
+      'Safety boots (waterproof, non-slip)',
+      'Hearing protection',
+      'Safety glasses or goggles',
+      'Respirator if using chemical treatments'
+    ],
+    equipment: [
+      'Rope access equipment (full set)',
+      'Pressure washer with adjustable PSI',
+      'Various nozzle tips (15, 25, 40 degree)',
+      'Extension wands and lances',
+      'Chemical injection system',
+      'Approved cleaning solutions',
+      'Water supply hoses and connections',
+      'Spill containment materials',
+      'Ground protection sheeting'
+    ],
+    preWorkChecks: [
+      'Test pressure washer operation and adjust settings',
+      'Verify water supply is adequate and connected',
+      'Inspect all hoses for damage or wear',
+      'Confirm chemical dilution ratios are correct',
+      'Check rope access equipment condition',
+      'Establish extended exclusion zone for spray',
+      'Protect windows, vents, and electrical items',
+      'Brief team on surface types and pressure limits',
+      'Verify environmental controls in place'
+    ],
+    workProcedure: [
+      '1. Establish ground exclusion zone (larger than normal due to spray)',
+      '2. Protect adjacent areas, vehicles, and landscaping',
+      '3. Set up pressure washing equipment and test operation',
+      '4. Rig rope access systems at appropriate anchor points',
+      '5. Conduct buddy check and descend to work area',
+      '6. Begin washing from top of section, working down',
+      '7. Maintain consistent distance from surface (30-60cm typical)',
+      '8. Use appropriate nozzle angle for surface type',
+      '9. Apply detergent if required, allow dwell time',
+      '10. Rinse thoroughly from top to bottom',
+      '11. Check work quality before moving to next section',
+      '12. Manage hose runs to prevent tangles with ropes',
+      '13. Complete section systematically before repositioning',
+      '14. Shut down equipment properly when complete'
+    ],
+    emergencyProcedures: [
+      'Stop immediately if injection injury occurs - seek medical attention',
+      'Shut down equipment for any malfunction',
+      'Chemical spill - contain and neutralize per SDS',
+      'Initiate rope rescue for suspended casualty',
+      'Evacuate area if structural concerns arise',
+      'Report all incidents to supervisor'
+    ],
+    competencyRequirements: [
+      'IRATA Level 1 minimum (Level 2 for complex facades)',
+      'Pressure washer operation training',
+      'Chemical handling certification',
+      'Current first aid certification',
+      'Site-specific induction'
+    ]
+  },
+  {
+    jobType: 'in_suite_dryer_vent_cleaning',
+    title: 'In-Suite Dryer Vent Cleaning',
+    description: 'Safe work procedure for cleaning dryer vents from inside residential units, working with building residents.',
+    scope: 'This procedure covers interior access to dryer vents within residential units, including duct cleaning from the dryer connection to the exterior termination.',
+    hazards: [
+      'Electrical hazards - working near appliances',
+      'Fire risk - accumulated lint in ductwork',
+      'Respiratory hazards - dust and lint particles',
+      'Manual handling - moving appliances',
+      'Slip/trip hazards in residential spaces',
+      'Working in occupied premises - personal security',
+      'Damage to resident property',
+      'Biological hazards - mold or pest presence'
+    ],
+    controlMeasures: [
+      'Disconnect dryer from power before work begins',
+      'Use anti-static tools and equipment',
+      'Respiratory protection during cleaning',
+      'Two-person team for appliance handling',
+      'Protective floor coverings in work area',
+      'Professional conduct and identification',
+      'Document pre-existing conditions',
+      'Pest assessment before disturbing ducts'
+    ],
+    ppe: [
+      'Safety footwear (non-marking soles)',
+      'Dust mask or respirator (P2)',
+      'Safety glasses',
+      'Work gloves',
+      'Knee pads for floor work',
+      'Company uniform and ID badge'
+    ],
+    equipment: [
+      'Rotary brush cleaning system',
+      'Vacuum with HEPA filter',
+      'Inspection camera',
+      'Hand brushes and scrapers',
+      'Lint collection bags',
+      'Floor protection sheets',
+      'Basic hand tools for vent access',
+      'Appliance moving equipment if needed',
+      'Cleaning supplies for spills'
+    ],
+    preWorkChecks: [
+      'Confirm resident access and appointment time',
+      'Verify unit location and access requirements',
+      'Check equipment is clean and operational',
+      'Review building policies for contractor access',
+      'Ensure vehicle parking is arranged',
+      'Confirm team has required identification',
+      'Check emergency contact numbers available',
+      'Review any resident special requirements'
+    ],
+    workProcedure: [
+      '1. Introduce yourself and show identification to resident',
+      '2. Explain work to be performed and estimated duration',
+      '3. Lay protective covering on floor in work area',
+      '4. Photograph existing conditions before starting',
+      '5. Disconnect dryer from power (unplug or isolate)',
+      '6. Carefully move dryer away from wall if needed',
+      '7. Disconnect duct from dryer outlet',
+      '8. Inspect duct condition and document any damage',
+      '9. Vacuum loose lint from accessible areas',
+      '10. Use rotary brush system through duct length',
+      '11. Vacuum while brushing to capture all debris',
+      '12. Inspect with camera to confirm cleanliness',
+      '13. Reconnect duct ensuring secure, sealed connection',
+      '14. Move dryer back into position',
+      '15. Reconnect power and test operation briefly',
+      '16. Clean up work area and remove all debris',
+      '17. Have resident confirm satisfactory completion'
+    ],
+    emergencyProcedures: [
+      'If fire detected: evacuate unit immediately, call 911',
+      'For electrical shock: do not touch victim, isolate power, call for help',
+      'If pest infestation found: stop work, notify resident and supervisor',
+      'For injury: administer first aid, seek medical attention as needed',
+      'Report all incidents to supervisor and complete documentation'
+    ],
+    competencyRequirements: [
+      'Training in dryer vent cleaning procedures',
+      'Customer service skills',
+      'Basic electrical safety awareness',
+      'Manual handling training',
+      'Company policies and procedures training'
+    ]
+  },
+  {
+    jobType: 'parkade_pressure_cleaning',
+    title: 'Parkade / Parking Garage Pressure Cleaning',
+    description: 'Safe work procedure for pressure cleaning parking structures including floors, walls, and drainage systems.',
+    scope: 'This procedure covers pressure washing of parkade floors, walls, columns, and drainage infrastructure in underground or multi-level parking structures.',
+    hazards: [
+      'Vehicle traffic in active parking areas',
+      'Slip hazards on wet concrete surfaces',
+      'High pressure water injection injuries',
+      'Chemical exposure from degreasers and cleaners',
+      'Confined space conditions - limited ventilation',
+      'Carbon monoxide from vehicle exhaust',
+      'Electrical hazards from standing water',
+      'Noise exposure in enclosed spaces',
+      'Poor lighting in underground areas'
+    ],
+    controlMeasures: [
+      'Traffic management plan with barriers and signage',
+      'Section closure during cleaning operations',
+      'Non-slip footwear and controlled work pace',
+      'Pressure washer training and distance controls',
+      'Ventilation assessment and CO monitoring',
+      'GFCI protection on all electrical equipment',
+      'Hearing protection mandatory',
+      'Supplementary lighting if needed',
+      'Spill containment for chemical use'
+    ],
+    ppe: [
+      'Safety helmet',
+      'High visibility vest',
+      'Hearing protection',
+      'Safety glasses or face shield',
+      'Waterproof coveralls',
+      'Chemical resistant gloves',
+      'Non-slip safety boots (steel toe)',
+      'Respirator if using chemicals in enclosed area'
+    ],
+    equipment: [
+      'Commercial pressure washer',
+      'Surface cleaner attachment for floors',
+      'Various spray nozzles',
+      'Water reclamation/vacuum system if required',
+      'Degreaser and cleaning chemicals',
+      'Traffic cones and barrier tape',
+      'Warning signs (multiple languages)',
+      'Lighting equipment if needed',
+      'CO monitor for enclosed areas',
+      'Spill kit'
+    ],
+    preWorkChecks: [
+      'Coordinate with building management for section closures',
+      'Review traffic management plan with team',
+      'Test pressure washer and all attachments',
+      'Verify chemical supplies and dilutions',
+      'Check CO monitor is calibrated',
+      'Confirm drainage is clear and functional',
+      'Assess ventilation in work area',
+      'Establish equipment staging area',
+      'Brief team on communication signals'
+    ],
+    workProcedure: [
+      '1. Set up traffic barriers and warning signs',
+      '2. Notify building management work is commencing',
+      '3. Set up pressure washing equipment in safe location',
+      '4. Begin at highest point, working toward drains',
+      '5. Apply degreaser to oil-stained areas, allow dwell time',
+      '6. Use surface cleaner for large floor areas',
+      '7. Detail walls and columns with appropriate wand',
+      '8. Flush debris toward drains continuously',
+      '9. Monitor drainage to prevent flooding',
+      '10. Check air quality regularly with CO monitor',
+      '11. Complete each section before moving barriers',
+      '12. Allow adequate drying time before reopening',
+      '13. Final inspection for missed areas',
+      '14. Remove all equipment and barriers',
+      '15. Report any damage or issues to management'
+    ],
+    emergencyProcedures: [
+      'Vehicle incident: stop work, ensure scene safety, call emergency services',
+      'High pressure injection injury: seek immediate medical attention',
+      'CO alarm: evacuate area immediately, ventilate space',
+      'Chemical spill: contain with spill kit, ventilate area',
+      'Electrical issue: shut down equipment, report to electrician',
+      'Report all incidents and near-misses'
+    ],
+    competencyRequirements: [
+      'Pressure washer operation training',
+      'Traffic management awareness',
+      'Chemical handling certification',
+      'First aid certification',
+      'Site-specific induction'
+    ]
+  },
+  {
+    jobType: 'ground_window_cleaning',
+    title: 'Ground Level Window Cleaning',
+    description: 'Safe work procedure for cleaning windows at ground level and low heights using ladders or water-fed poles.',
+    scope: 'This procedure covers window cleaning at ground level and heights accessible by ladder (up to 6m) or water-fed pole systems.',
+    hazards: [
+      'Falls from ladders',
+      'Struck by ladder during setup/movement',
+      'Manual handling - carrying equipment',
+      'Traffic hazards when working near roadways',
+      'Chemical exposure from cleaning solutions',
+      'Slip hazards on wet surfaces',
+      'Public interaction - pedestrian traffic',
+      'Cuts from damaged glass or frames',
+      'Weather conditions'
+    ],
+    controlMeasures: [
+      'Ladder inspection before each use',
+      'Three points of contact maintained on ladders',
+      'Ladder footed by second person or secured',
+      'Traffic cones and barriers near roadways',
+      'Use of eco-friendly cleaning solutions',
+      'Wet floor signs around work area',
+      'Polite engagement with public, maintain clearance',
+      'Gloves when handling damaged elements',
+      'Weather assessment before starting work'
+    ],
+    ppe: [
+      'Safety footwear with non-slip soles',
+      'Work gloves',
+      'Safety glasses when required',
+      'High visibility vest near traffic',
+      'Sun protection (hat, sunscreen) in summer',
+      'Wet weather gear as needed'
+    ],
+    equipment: [
+      'Extension ladder (inspected, rated for use)',
+      'Water-fed pole system (if applicable)',
+      'Squeegees (various sizes)',
+      'Scrubbers and applicators',
+      'Bucket with secure carrying handle',
+      'Window cleaning solution',
+      'Microfiber cloths',
+      'Scrapers for stubborn deposits',
+      'Tool belt or apron',
+      'Drop sheets for interior work'
+    ],
+    preWorkChecks: [
+      'Inspect ladder for damage or defects',
+      'Check all cleaning equipment condition',
+      'Verify solution is properly diluted',
+      'Assess ground conditions for ladder setup',
+      'Identify any access restrictions',
+      'Note any damaged windows to report',
+      'Check weather conditions',
+      'Plan work sequence for efficiency',
+      'Confirm vehicle parking location'
+    ],
+    workProcedure: [
+      '1. Assess work area and identify any hazards',
+      '2. Set up ladder on firm, level ground at correct angle',
+      '3. Place wet floor signs and barriers as needed',
+      '4. Begin cleaning at highest accessible point',
+      '5. Wet window with solution using applicator',
+      '6. Scrub to remove dirt, pay attention to edges',
+      '7. Squeegee from top to bottom in overlapping strokes',
+      '8. Wipe edges and sills with cloth',
+      '9. Descend ladder safely before moving to next window',
+      '10. Reposition ladder ensuring stable placement',
+      '11. Continue systematic progression through all windows',
+      '12. For water-fed poles: rinse from top, allow to dry',
+      '13. Final check of all completed windows',
+      '14. Pack equipment and leave site clean'
+    ],
+    emergencyProcedures: [
+      'Fall from ladder: do not move casualty if spinal injury suspected, call 911',
+      'Cut injury: apply pressure, first aid, seek medical attention if serious',
+      'Chemical in eyes: flush with clean water for 15+ minutes, seek medical attention',
+      'Traffic incident: ensure safety, call emergency services',
+      'Report all incidents to supervisor'
+    ],
+    competencyRequirements: [
+      'Ladder safety training',
+      'Window cleaning technique training',
+      'Manual handling training',
+      'First aid awareness',
+      'Water-fed pole operation (if applicable)'
+    ]
+  },
+  {
+    jobType: 'general_pressure_washing',
+    title: 'General Pressure Washing',
+    description: 'Safe work procedure for pressure washing various surfaces including sidewalks, driveways, patios, and exterior surfaces.',
+    scope: 'This procedure covers ground-level pressure washing operations on horizontal and vertical surfaces at accessible heights.',
+    hazards: [
+      'High pressure water injection injuries',
+      'Slip hazards on wet surfaces',
+      'Flying debris dislodged by water pressure',
+      'Electrical hazards near water',
+      'Chemical exposure from cleaning agents',
+      'Noise exposure from equipment',
+      'Manual handling of heavy equipment',
+      'Surface damage from incorrect settings',
+      'Public safety - spray and debris'
+    ],
+    controlMeasures: [
+      'Maintain safe distance from spray nozzle (30cm minimum)',
+      'Never point wand at people or animals',
+      'Wear non-slip footwear, maintain stable stance',
+      'Safety glasses and face shield for close work',
+      'GFCI protection on all electrical connections',
+      'Chemical handling per safety data sheets',
+      'Hearing protection during operation',
+      'Correct lifting technique for equipment',
+      'Test pressure on inconspicuous area first',
+      'Barrier and signage for public areas'
+    ],
+    ppe: [
+      'Safety glasses or face shield',
+      'Hearing protection',
+      'Non-slip safety boots (waterproof)',
+      'Waterproof coveralls or rain suit',
+      'Chemical resistant gloves',
+      'High visibility vest in public areas'
+    ],
+    equipment: [
+      'Pressure washer (gas or electric)',
+      'Various nozzle tips (0-65 degree)',
+      'Surface cleaner attachment',
+      'Extension wands',
+      'Trigger gun with safety lock',
+      'High pressure hoses',
+      'Chemical injection system',
+      'Approved cleaning solutions',
+      'Warning signs and barriers',
+      'Water supply connections'
+    ],
+    preWorkChecks: [
+      'Inspect pressure washer for damage or leaks',
+      'Check all hose connections are secure',
+      'Verify fuel/oil levels for gas units',
+      'Test GFCI protection on electric units',
+      'Inspect nozzles for wear or damage',
+      'Confirm chemical dilution ratios',
+      'Assess work area for hazards',
+      'Protect adjacent areas and landscaping',
+      'Brief anyone in area about work being done'
+    ],
+    workProcedure: [
+      '1. Set up barriers and warning signs around work area',
+      '2. Connect water supply and test flow',
+      '3. Start pressure washer following manufacturer procedures',
+      '4. Select appropriate nozzle for surface type',
+      '5. Test pressure on small inconspicuous area',
+      '6. Adjust pressure/distance as needed for surface',
+      '7. Work systematically in overlapping passes',
+      '8. Apply detergent from bottom up if using',
+      '9. Allow dwell time for detergent to work',
+      '10. Rinse from top down thoroughly',
+      '11. Direct water toward drains or collection',
+      '12. Check work quality before moving on',
+      '13. Shut down equipment per procedures',
+      '14. Drain hoses and store equipment properly'
+    ],
+    emergencyProcedures: [
+      'High pressure injection injury: seek IMMEDIATE medical attention - life threatening',
+      'Electrical shock: do not touch victim if still in contact, isolate power, call 911',
+      'Chemical spill: contain, refer to SDS for cleanup procedures',
+      'Equipment malfunction: shut down immediately, do not attempt repairs',
+      'Public injury: provide first aid, call emergency services, report to supervisor'
+    ],
+    competencyRequirements: [
+      'Pressure washer operation training',
+      'Chemical handling awareness',
+      'First aid certification',
+      'Equipment maintenance basics',
+      'Customer service skills'
+    ]
+  }
+];
+
+// Generate PDF for Safe Work Procedure
+const generateSafeWorkProcedurePDF = (procedure: SafeWorkProcedure, companyName?: string): void => {
+  const doc = new jsPDF();
+  const pageWidth = doc.internal.pageSize.getWidth();
+  const pageHeight = doc.internal.pageSize.getHeight();
+  const margin = 20;
+  const contentWidth = pageWidth - (margin * 2);
+  let yPos = 20;
+
+  const checkPageBreak = (requiredSpace: number) => {
+    if (yPos + requiredSpace > pageHeight - 30) {
+      doc.addPage();
+      yPos = 20;
+    }
+  };
+
+  const addSection = (title: string, items: string[], bulletStyle: boolean = true) => {
+    checkPageBreak(30);
+    doc.setFontSize(12);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(34, 34, 34);
+    doc.text(title, margin, yPos);
+    yPos += 8;
+
+    doc.setFontSize(10);
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(60, 60, 60);
+
+    items.forEach((item, index) => {
+      const prefix = bulletStyle ? '  - ' : `  ${index + 1}. `;
+      const lines = doc.splitTextToSize(prefix + item, contentWidth - 10);
+      checkPageBreak(lines.length * 5 + 2);
+      lines.forEach((line: string) => {
+        doc.text(line, margin + 5, yPos);
+        yPos += 5;
+      });
+      yPos += 1;
+    });
+    yPos += 5;
+  };
+
+  // Header
+  doc.setFillColor(34, 197, 94);
+  doc.rect(0, 0, pageWidth, 40, 'F');
+  
+  // Company name if provided
+  if (companyName) {
+    doc.setTextColor(255, 255, 255);
+    doc.setFontSize(9);
+    doc.setFont('helvetica', 'bold');
+    doc.text(companyName.toUpperCase(), pageWidth / 2, 10, { align: 'center' });
+  }
+
+  doc.setTextColor(255, 255, 255);
+  doc.setFontSize(18);
+  doc.setFont('helvetica', 'bold');
+  doc.text('SAFE WORK PROCEDURE', pageWidth / 2, 22, { align: 'center' });
+  
+  doc.setFontSize(12);
+  doc.text(procedure.title, pageWidth / 2, 32, { align: 'center' });
+
+  yPos = 50;
+
+  // Description
+  doc.setFontSize(10);
+  doc.setFont('helvetica', 'normal');
+  doc.setTextColor(60, 60, 60);
+  const descLines = doc.splitTextToSize(procedure.description, contentWidth);
+  descLines.forEach((line: string) => {
+    doc.text(line, margin, yPos);
+    yPos += 5;
+  });
+  yPos += 5;
+
+  // Scope
+  checkPageBreak(20);
+  doc.setFontSize(12);
+  doc.setFont('helvetica', 'bold');
+  doc.setTextColor(34, 34, 34);
+  doc.text('Scope', margin, yPos);
+  yPos += 7;
+  doc.setFontSize(10);
+  doc.setFont('helvetica', 'normal');
+  doc.setTextColor(60, 60, 60);
+  const scopeLines = doc.splitTextToSize(procedure.scope, contentWidth);
+  scopeLines.forEach((line: string) => {
+    doc.text(line, margin, yPos);
+    yPos += 5;
+  });
+  yPos += 8;
+
+  // Sections
+  addSection('Hazards Identified', procedure.hazards);
+  addSection('Control Measures', procedure.controlMeasures);
+  addSection('Personal Protective Equipment (PPE)', procedure.ppe);
+  addSection('Equipment Required', procedure.equipment);
+  addSection('Pre-Work Checks', procedure.preWorkChecks);
+  addSection('Work Procedure', procedure.workProcedure, false);
+  addSection('Emergency Procedures', procedure.emergencyProcedures);
+  addSection('Competency Requirements', procedure.competencyRequirements);
+
+  // Footer on last page
+  const totalPages = doc.getNumberOfPages();
+  for (let i = 1; i <= totalPages; i++) {
+    doc.setPage(i);
+    doc.setFontSize(8);
+    doc.setTextColor(128, 128, 128);
+    doc.text(`Page ${i} of ${totalPages}`, pageWidth / 2, pageHeight - 10, { align: 'center' });
+    doc.text(`Generated: ${new Date().toLocaleDateString()}`, margin, pageHeight - 10);
+  }
+
+  // Download
+  const fileName = `SWP_${procedure.jobType.replace(/_/g, '_')}.pdf`;
+  doc.save(fileName);
+};
+
 interface DateGroupedItem {
   year: number;
   month: number;
@@ -2522,7 +3290,7 @@ export default function Documents() {
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <div className="overflow-x-auto -mx-4 px-4 md:mx-0 md:px-0 mb-6">
-            <TabsList className={`grid w-full min-w-[480px] md:min-w-0 ${canUploadDocuments ? 'grid-cols-4' : 'grid-cols-3'} max-w-2xl gap-1`}>
+            <TabsList className={`grid w-full min-w-[600px] md:min-w-0 ${canUploadDocuments ? 'grid-cols-5' : 'grid-cols-4'} max-w-3xl gap-1`}>
               <TabsTrigger value="health-safety" data-testid="tab-health-safety" className="text-xs md:text-sm px-2 md:px-4">
                 <span className="hidden md:inline">Health & Safety</span>
                 <span className="md:hidden">H&S</span>
@@ -2537,6 +3305,10 @@ export default function Documents() {
                   <span className="md:hidden">Insurance</span>
                 </TabsTrigger>
               )}
+              <TabsTrigger value="swp-templates" data-testid="tab-swp-templates" className="text-xs md:text-sm px-2 md:px-4">
+                <span className="hidden md:inline">Safe Work Procedures</span>
+                <span className="md:hidden">SWP</span>
+              </TabsTrigger>
               <TabsTrigger value="inspections-safety" data-testid="tab-inspections-safety" className="text-xs md:text-sm px-2 md:px-4">
                 <span className="hidden md:inline">Inspections</span>
                 <span className="md:hidden">Inspect</span>
@@ -2931,6 +3703,86 @@ export default function Documents() {
               </Card>
             </TabsContent>
           )}
+
+          {/* Safe Work Procedures Templates Tab */}
+          <TabsContent value="swp-templates">
+            <Card className="mb-6 overflow-hidden">
+              <CardHeader className="bg-gradient-to-br from-green-500/10 via-green-500/5 to-transparent pb-4">
+                <div className="flex items-start gap-4">
+                  <div className="p-3 bg-green-500/10 rounded-xl ring-1 ring-green-500/20">
+                    <FileCheck className="h-6 w-6 text-green-600 dark:text-green-400" />
+                  </div>
+                  <div className="flex-1">
+                    <CardTitle className="text-xl mb-1">Safe Work Procedure Templates</CardTitle>
+                    <p className="text-sm text-muted-foreground">
+                      Industry-standard safety procedures for rope access operations. Download as PDF for your records.
+                    </p>
+                  </div>
+                  <Badge variant="secondary" className="text-base font-semibold px-3">
+                    {SAFE_WORK_PROCEDURES.length}
+                  </Badge>
+                </div>
+              </CardHeader>
+              <CardContent className="pt-6">
+                <div className="grid gap-4 md:grid-cols-2">
+                  {SAFE_WORK_PROCEDURES.map((procedure) => {
+                    const jobTypeLabel = STANDARD_JOB_TYPES.find(jt => jt.value === procedure.jobType)?.label || procedure.title;
+                    
+                    return (
+                      <Card key={procedure.jobType} className="overflow-hidden hover-elevate">
+                        <CardContent className="p-4">
+                          <div className="flex items-start justify-between gap-3">
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-center gap-2 mb-2">
+                                <Shield className="h-4 w-4 text-green-600 dark:text-green-400 flex-shrink-0" />
+                                <h3 className="font-semibold text-sm truncate">{jobTypeLabel}</h3>
+                              </div>
+                              <p className="text-xs text-muted-foreground line-clamp-2 mb-3">
+                                {procedure.description}
+                              </p>
+                              <div className="flex flex-wrap gap-1.5">
+                                <Badge variant="outline" className="text-xs">
+                                  {procedure.hazards.length} Hazards
+                                </Badge>
+                                <Badge variant="outline" className="text-xs">
+                                  {procedure.controlMeasures.length} Controls
+                                </Badge>
+                                <Badge variant="outline" className="text-xs">
+                                  {procedure.ppe.length} PPE Items
+                                </Badge>
+                              </div>
+                            </div>
+                            <Button
+                              size="sm"
+                              onClick={() => generateSafeWorkProcedurePDF(procedure, currentUser?.companyName)}
+                              data-testid={`download-swp-${procedure.jobType}`}
+                            >
+                              <Download className="h-4 w-4 mr-1" />
+                              PDF
+                            </Button>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    );
+                  })}
+                </div>
+                
+                <div className="mt-6 p-4 bg-muted/50 rounded-lg">
+                  <div className="flex items-start gap-3">
+                    <AlertTriangle className="h-5 w-5 text-amber-500 flex-shrink-0 mt-0.5" />
+                    <div>
+                      <h4 className="font-medium text-sm mb-1">Template Notice</h4>
+                      <p className="text-xs text-muted-foreground">
+                        These are template Safe Work Procedures. Review and customize them to match your specific 
+                        site conditions, equipment, and company policies before use. Always conduct a site-specific 
+                        risk assessment for each job.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
 
           {/* Inspections & Safety Tab */}
           <TabsContent value="inspections-safety">
