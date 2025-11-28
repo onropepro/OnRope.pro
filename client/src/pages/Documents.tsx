@@ -2254,40 +2254,73 @@ export default function Documents() {
             )}
             
             {healthSafetyDocs.length > 0 ? (
-              <div className="space-y-3">
-                {healthSafetyDocs.map((doc: any) => (
-                  <div key={doc.id} className="flex items-center gap-4 p-4 rounded-xl border bg-card hover-elevate active-elevate-2">
-                    <div className="p-2 bg-primary/50/10 rounded-lg">
-                      <Shield className="h-5 w-5 text-primary dark:text-primary flex-shrink-0" />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="font-semibold truncate">{doc.fileName}</div>
-                      <div className="text-sm text-muted-foreground">
-                        Uploaded by {doc.uploadedByName} • {new Date(doc.createdAt).toLocaleDateString()}
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => window.open(doc.fileUrl, '_blank')}
-                        data-testid={`download-health-safety-${doc.id}`}
-                      >
-                        <Download className="h-4 w-4 mr-1" />
-                        View
-                      </Button>
-                      {canUploadDocuments && (
-                        <Button
-                          size="sm"
-                          variant="ghost"
-                          onClick={() => deleteDocumentMutation.mutate(doc.id)}
-                          data-testid={`delete-health-safety-${doc.id}`}
-                        >
-                          <Trash2 className="h-4 w-4 text-destructive" />
-                        </Button>
-                      )}
-                    </div>
-                  </div>
+              <div className="space-y-2">
+                {groupDocumentsByDate(healthSafetyDocs, (d: any) => d.createdAt).map((yearGroup) => (
+                  <Collapsible key={yearGroup.year} defaultOpen={yearGroup.year === new Date().getFullYear()}>
+                    <CollapsibleTrigger className="flex items-center gap-2 w-full p-2 rounded-lg hover-elevate">
+                      <ChevronRight className="h-4 w-4 transition-transform duration-200 [&[data-state=open]>svg]:rotate-90" />
+                      <span className="font-semibold">{yearGroup.year}</span>
+                      <Badge variant="secondary" size="sm">{yearGroup.count}</Badge>
+                    </CollapsibleTrigger>
+                    <CollapsibleContent className="pl-4 space-y-1 mt-1">
+                      {yearGroup.months.map((monthGroup) => (
+                        <Collapsible key={monthGroup.month} defaultOpen={monthGroup.month === format(new Date(), 'MMMM')}>
+                          <CollapsibleTrigger className="flex items-center gap-2 w-full p-2 rounded-lg hover-elevate">
+                            <ChevronRight className="h-4 w-4 transition-transform duration-200" />
+                            <span className="font-medium">{monthGroup.month}</span>
+                            <Badge variant="outline" size="sm">{monthGroup.count}</Badge>
+                          </CollapsibleTrigger>
+                          <CollapsibleContent className="pl-4 space-y-1 mt-1">
+                            {monthGroup.days.map((dayGroup) => (
+                              <Collapsible key={dayGroup.day}>
+                                <CollapsibleTrigger className="flex items-center gap-2 w-full p-2 rounded-lg hover-elevate">
+                                  <ChevronRight className="h-4 w-4 transition-transform duration-200" />
+                                  <span className="text-sm">{dayGroup.day}</span>
+                                  <Badge variant="outline" size="sm">{dayGroup.count}</Badge>
+                                </CollapsibleTrigger>
+                                <CollapsibleContent className="pl-4 space-y-2 mt-1">
+                                  {dayGroup.items.map((doc: any) => (
+                                    <div key={doc.id} className="flex items-center gap-4 p-4 rounded-xl border bg-card hover-elevate active-elevate-2">
+                                      <div className="p-2 bg-primary/50/10 rounded-lg">
+                                        <Shield className="h-5 w-5 text-primary dark:text-primary flex-shrink-0" />
+                                      </div>
+                                      <div className="flex-1 min-w-0">
+                                        <div className="font-semibold truncate">{doc.fileName}</div>
+                                        <div className="text-sm text-muted-foreground">
+                                          Uploaded by {doc.uploadedByName}
+                                        </div>
+                                      </div>
+                                      <div className="flex items-center gap-2">
+                                        <Button
+                                          size="sm"
+                                          variant="outline"
+                                          onClick={() => window.open(doc.fileUrl, '_blank')}
+                                          data-testid={`download-health-safety-${doc.id}`}
+                                        >
+                                          <Download className="h-4 w-4 mr-1" />
+                                          View
+                                        </Button>
+                                        {canUploadDocuments && (
+                                          <Button
+                                            size="sm"
+                                            variant="ghost"
+                                            onClick={() => deleteDocumentMutation.mutate(doc.id)}
+                                            data-testid={`delete-health-safety-${doc.id}`}
+                                          >
+                                            <Trash2 className="h-4 w-4 text-destructive" />
+                                          </Button>
+                                        )}
+                                      </div>
+                                    </div>
+                                  ))}
+                                </CollapsibleContent>
+                              </Collapsible>
+                            ))}
+                          </CollapsibleContent>
+                        </Collapsible>
+                      ))}
+                    </CollapsibleContent>
+                  </Collapsible>
                 ))}
               </div>
             ) : (
@@ -2351,40 +2384,73 @@ export default function Documents() {
             )}
             
             {policyDocs.length > 0 ? (
-              <div className="space-y-3">
-                {policyDocs.map((doc: any) => (
-                  <div key={doc.id} className="flex items-center gap-4 p-4 rounded-xl border bg-card hover-elevate active-elevate-2">
-                    <div className="p-2 bg-purple-500/10 rounded-lg">
-                      <BookOpen className="h-5 w-5 text-purple-600 dark:text-purple-400 flex-shrink-0" />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="font-semibold truncate">{doc.fileName}</div>
-                      <div className="text-sm text-muted-foreground">
-                        Uploaded by {doc.uploadedByName} • {new Date(doc.createdAt).toLocaleDateString()}
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => window.open(doc.fileUrl, '_blank')}
-                        data-testid={`download-policy-${doc.id}`}
-                      >
-                        <Download className="h-4 w-4 mr-1" />
-                        View
-                      </Button>
-                      {canUploadDocuments && (
-                        <Button
-                          size="sm"
-                          variant="ghost"
-                          onClick={() => deleteDocumentMutation.mutate(doc.id)}
-                          data-testid={`delete-policy-${doc.id}`}
-                        >
-                          <Trash2 className="h-4 w-4 text-destructive" />
-                        </Button>
-                      )}
-                    </div>
-                  </div>
+              <div className="space-y-2">
+                {groupDocumentsByDate(policyDocs, (d: any) => d.createdAt).map((yearGroup) => (
+                  <Collapsible key={yearGroup.year} defaultOpen={yearGroup.year === new Date().getFullYear()}>
+                    <CollapsibleTrigger className="flex items-center gap-2 w-full p-2 rounded-lg hover-elevate">
+                      <ChevronRight className="h-4 w-4 transition-transform duration-200 [&[data-state=open]>svg]:rotate-90" />
+                      <span className="font-semibold">{yearGroup.year}</span>
+                      <Badge variant="secondary" size="sm">{yearGroup.count}</Badge>
+                    </CollapsibleTrigger>
+                    <CollapsibleContent className="pl-4 space-y-1 mt-1">
+                      {yearGroup.months.map((monthGroup) => (
+                        <Collapsible key={monthGroup.month} defaultOpen={monthGroup.month === format(new Date(), 'MMMM')}>
+                          <CollapsibleTrigger className="flex items-center gap-2 w-full p-2 rounded-lg hover-elevate">
+                            <ChevronRight className="h-4 w-4 transition-transform duration-200" />
+                            <span className="font-medium">{monthGroup.month}</span>
+                            <Badge variant="outline" size="sm">{monthGroup.count}</Badge>
+                          </CollapsibleTrigger>
+                          <CollapsibleContent className="pl-4 space-y-1 mt-1">
+                            {monthGroup.days.map((dayGroup) => (
+                              <Collapsible key={dayGroup.day}>
+                                <CollapsibleTrigger className="flex items-center gap-2 w-full p-2 rounded-lg hover-elevate">
+                                  <ChevronRight className="h-4 w-4 transition-transform duration-200" />
+                                  <span className="text-sm">{dayGroup.day}</span>
+                                  <Badge variant="outline" size="sm">{dayGroup.count}</Badge>
+                                </CollapsibleTrigger>
+                                <CollapsibleContent className="pl-4 space-y-2 mt-1">
+                                  {dayGroup.items.map((doc: any) => (
+                                    <div key={doc.id} className="flex items-center gap-4 p-4 rounded-xl border bg-card hover-elevate active-elevate-2">
+                                      <div className="p-2 bg-purple-500/10 rounded-lg">
+                                        <BookOpen className="h-5 w-5 text-purple-600 dark:text-purple-400 flex-shrink-0" />
+                                      </div>
+                                      <div className="flex-1 min-w-0">
+                                        <div className="font-semibold truncate">{doc.fileName}</div>
+                                        <div className="text-sm text-muted-foreground">
+                                          Uploaded by {doc.uploadedByName}
+                                        </div>
+                                      </div>
+                                      <div className="flex items-center gap-2">
+                                        <Button
+                                          size="sm"
+                                          variant="outline"
+                                          onClick={() => window.open(doc.fileUrl, '_blank')}
+                                          data-testid={`download-policy-${doc.id}`}
+                                        >
+                                          <Download className="h-4 w-4 mr-1" />
+                                          View
+                                        </Button>
+                                        {canUploadDocuments && (
+                                          <Button
+                                            size="sm"
+                                            variant="ghost"
+                                            onClick={() => deleteDocumentMutation.mutate(doc.id)}
+                                            data-testid={`delete-policy-${doc.id}`}
+                                          >
+                                            <Trash2 className="h-4 w-4 text-destructive" />
+                                          </Button>
+                                        )}
+                                      </div>
+                                    </div>
+                                  ))}
+                                </CollapsibleContent>
+                              </Collapsible>
+                            ))}
+                          </CollapsibleContent>
+                        </Collapsible>
+                      ))}
+                    </CollapsibleContent>
+                  </Collapsible>
                 ))}
               </div>
             ) : (
@@ -2447,38 +2513,71 @@ export default function Documents() {
                   </div>
                   
                   {insuranceDocs.length > 0 ? (
-                    <div className="space-y-3">
-                      {insuranceDocs.map((doc: any) => (
-                        <div key={doc.id} className="flex items-center gap-4 p-4 rounded-xl border bg-card hover-elevate active-elevate-2">
-                          <div className="p-2 bg-teal-500/10 rounded-lg">
-                            <FileCheck className="h-5 w-5 text-teal-600 dark:text-teal-400 flex-shrink-0" />
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <div className="font-semibold truncate">{doc.fileName}</div>
-                            <div className="text-sm text-muted-foreground">
-                              Uploaded by {doc.uploadedByName} • {new Date(doc.createdAt).toLocaleDateString()}
-                            </div>
-                          </div>
-                          <div className="flex items-center gap-2">
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              onClick={() => window.open(doc.fileUrl, '_blank')}
-                              data-testid={`download-insurance-${doc.id}`}
-                            >
-                              <Download className="h-4 w-4 mr-1" />
-                              View
-                            </Button>
-                            <Button
-                              size="sm"
-                              variant="ghost"
-                              onClick={() => deleteDocumentMutation.mutate(doc.id)}
-                              data-testid={`delete-insurance-${doc.id}`}
-                            >
-                              <Trash2 className="h-4 w-4 text-destructive" />
-                            </Button>
-                          </div>
-                        </div>
+                    <div className="space-y-2">
+                      {groupDocumentsByDate(insuranceDocs, (d: any) => d.createdAt).map((yearGroup) => (
+                        <Collapsible key={yearGroup.year} defaultOpen={yearGroup.year === new Date().getFullYear()}>
+                          <CollapsibleTrigger className="flex items-center gap-2 w-full p-2 rounded-lg hover-elevate">
+                            <ChevronRight className="h-4 w-4 transition-transform duration-200 [&[data-state=open]>svg]:rotate-90" />
+                            <span className="font-semibold">{yearGroup.year}</span>
+                            <Badge variant="secondary" size="sm">{yearGroup.count}</Badge>
+                          </CollapsibleTrigger>
+                          <CollapsibleContent className="pl-4 space-y-1 mt-1">
+                            {yearGroup.months.map((monthGroup) => (
+                              <Collapsible key={monthGroup.month} defaultOpen={monthGroup.month === format(new Date(), 'MMMM')}>
+                                <CollapsibleTrigger className="flex items-center gap-2 w-full p-2 rounded-lg hover-elevate">
+                                  <ChevronRight className="h-4 w-4 transition-transform duration-200" />
+                                  <span className="font-medium">{monthGroup.month}</span>
+                                  <Badge variant="outline" size="sm">{monthGroup.count}</Badge>
+                                </CollapsibleTrigger>
+                                <CollapsibleContent className="pl-4 space-y-1 mt-1">
+                                  {monthGroup.days.map((dayGroup) => (
+                                    <Collapsible key={dayGroup.day}>
+                                      <CollapsibleTrigger className="flex items-center gap-2 w-full p-2 rounded-lg hover-elevate">
+                                        <ChevronRight className="h-4 w-4 transition-transform duration-200" />
+                                        <span className="text-sm">{dayGroup.day}</span>
+                                        <Badge variant="outline" size="sm">{dayGroup.count}</Badge>
+                                      </CollapsibleTrigger>
+                                      <CollapsibleContent className="pl-4 space-y-2 mt-1">
+                                        {dayGroup.items.map((doc: any) => (
+                                          <div key={doc.id} className="flex items-center gap-4 p-4 rounded-xl border bg-card hover-elevate active-elevate-2">
+                                            <div className="p-2 bg-teal-500/10 rounded-lg">
+                                              <FileCheck className="h-5 w-5 text-teal-600 dark:text-teal-400 flex-shrink-0" />
+                                            </div>
+                                            <div className="flex-1 min-w-0">
+                                              <div className="font-semibold truncate">{doc.fileName}</div>
+                                              <div className="text-sm text-muted-foreground">
+                                                Uploaded by {doc.uploadedByName}
+                                              </div>
+                                            </div>
+                                            <div className="flex items-center gap-2">
+                                              <Button
+                                                size="sm"
+                                                variant="outline"
+                                                onClick={() => window.open(doc.fileUrl, '_blank')}
+                                                data-testid={`download-insurance-${doc.id}`}
+                                              >
+                                                <Download className="h-4 w-4 mr-1" />
+                                                View
+                                              </Button>
+                                              <Button
+                                                size="sm"
+                                                variant="ghost"
+                                                onClick={() => deleteDocumentMutation.mutate(doc.id)}
+                                                data-testid={`delete-insurance-${doc.id}`}
+                                              >
+                                                <Trash2 className="h-4 w-4 text-destructive" />
+                                              </Button>
+                                            </div>
+                                          </div>
+                                        ))}
+                                      </CollapsibleContent>
+                                    </Collapsible>
+                                  ))}
+                                </CollapsibleContent>
+                              </Collapsible>
+                            ))}
+                          </CollapsibleContent>
+                        </Collapsible>
                       ))}
                     </div>
                   ) : (
@@ -3241,31 +3340,64 @@ export default function Documents() {
             </CardHeader>
             <CardContent className="pt-6">
               {quotes.length > 0 ? (
-                <div className="space-y-3">
-                  {quotes.map((quote) => (
-                    <div key={quote.id} className="flex items-center gap-4 p-4 rounded-xl border bg-card hover-elevate active-elevate-2">
-                      <div className="p-2 bg-amber-500/10 rounded-lg">
-                        <DollarSign className="h-5 w-5 text-amber-600 dark:text-amber-400 flex-shrink-0" />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="font-semibold">{quote.buildingName}</div>
-                        <div className="text-sm text-muted-foreground">
-                          {quote.strataPlanNumber} • {quote.createdAt ? new Date(quote.createdAt).toLocaleDateString() : ''}
-                        </div>
-                      </div>
-                      <Badge variant={quote.status === 'open' ? 'default' : 'secondary'}>
-                        {quote.status}
-                      </Badge>
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => downloadQuote(quote)}
-                        data-testid={`download-quote-${quote.id}`}
-                      >
-                        <Download className="h-4 w-4 mr-1" />
-                        Download
-                      </Button>
-                    </div>
+                <div className="space-y-2">
+                  {groupDocumentsByDate(quotes, (q: any) => q.createdAt).map((yearGroup) => (
+                    <Collapsible key={yearGroup.year} defaultOpen={yearGroup.year === new Date().getFullYear()}>
+                      <CollapsibleTrigger className="flex items-center gap-2 w-full p-2 rounded-lg hover-elevate">
+                        <ChevronRight className="h-4 w-4 transition-transform duration-200 [&[data-state=open]>svg]:rotate-90" />
+                        <span className="font-semibold">{yearGroup.year}</span>
+                        <Badge variant="secondary" size="sm">{yearGroup.count}</Badge>
+                      </CollapsibleTrigger>
+                      <CollapsibleContent className="pl-4 space-y-1 mt-1">
+                        {yearGroup.months.map((monthGroup) => (
+                          <Collapsible key={monthGroup.month} defaultOpen={monthGroup.month === format(new Date(), 'MMMM')}>
+                            <CollapsibleTrigger className="flex items-center gap-2 w-full p-2 rounded-lg hover-elevate">
+                              <ChevronRight className="h-4 w-4 transition-transform duration-200" />
+                              <span className="font-medium">{monthGroup.month}</span>
+                              <Badge variant="outline" size="sm">{monthGroup.count}</Badge>
+                            </CollapsibleTrigger>
+                            <CollapsibleContent className="pl-4 space-y-1 mt-1">
+                              {monthGroup.days.map((dayGroup) => (
+                                <Collapsible key={dayGroup.day}>
+                                  <CollapsibleTrigger className="flex items-center gap-2 w-full p-2 rounded-lg hover-elevate">
+                                    <ChevronRight className="h-4 w-4 transition-transform duration-200" />
+                                    <span className="text-sm">{dayGroup.day}</span>
+                                    <Badge variant="outline" size="sm">{dayGroup.count}</Badge>
+                                  </CollapsibleTrigger>
+                                  <CollapsibleContent className="pl-4 space-y-2 mt-1">
+                                    {dayGroup.items.map((quote: any) => (
+                                      <div key={quote.id} className="flex items-center gap-4 p-4 rounded-xl border bg-card hover-elevate active-elevate-2">
+                                        <div className="p-2 bg-amber-500/10 rounded-lg">
+                                          <DollarSign className="h-5 w-5 text-amber-600 dark:text-amber-400 flex-shrink-0" />
+                                        </div>
+                                        <div className="flex-1 min-w-0">
+                                          <div className="font-semibold">{quote.buildingName}</div>
+                                          <div className="text-sm text-muted-foreground">
+                                            {quote.strataPlanNumber}
+                                          </div>
+                                        </div>
+                                        <Badge variant={quote.status === 'open' ? 'default' : 'secondary'}>
+                                          {quote.status}
+                                        </Badge>
+                                        <Button
+                                          size="sm"
+                                          variant="outline"
+                                          onClick={() => downloadQuote(quote)}
+                                          data-testid={`download-quote-${quote.id}`}
+                                        >
+                                          <Download className="h-4 w-4 mr-1" />
+                                          Download
+                                        </Button>
+                                      </div>
+                                    ))}
+                                  </CollapsibleContent>
+                                </Collapsible>
+                              ))}
+                            </CollapsibleContent>
+                          </Collapsible>
+                        ))}
+                      </CollapsibleContent>
+                    </Collapsible>
                   ))}
                 </div>
               ) : (
