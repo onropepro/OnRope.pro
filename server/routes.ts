@@ -6601,11 +6601,30 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Unable to determine company" });
       }
       
+      // Get all serial numbers for this gear item
       const serialNumbers = await db.select()
         .from(gearSerialNumbers)
         .where(eq(gearSerialNumbers.gearItemId, req.params.id));
       
-      res.json({ serialNumbers });
+      // Get all assignments for this gear item to determine which serial numbers are taken
+      const itemAssignments = await db.select()
+        .from(gearAssignments)
+        .where(eq(gearAssignments.gearItemId, req.params.id));
+      
+      // Create a set of assigned serial numbers
+      const assignedSerialNumbers = new Set(
+        itemAssignments
+          .map(a => a.serialNumber)
+          .filter((sn): sn is string => sn !== null && sn !== undefined)
+      );
+      
+      // Add isAssigned flag to each serial number
+      const serialNumbersWithStatus = serialNumbers.map(sn => ({
+        ...sn,
+        isAssigned: assignedSerialNumbers.has(sn.serialNumber),
+      }));
+      
+      res.json({ serialNumbers: serialNumbersWithStatus, assignedSerialNumbers: Array.from(assignedSerialNumbers) });
     } catch (error) {
       console.error("Get gear serial numbers error:", error);
       res.status(500).json({ message: "Internal server error" });

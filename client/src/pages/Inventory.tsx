@@ -88,6 +88,8 @@ export default function Inventory() {
   const [selfAssignSerialNumber, setSelfAssignSerialNumber] = useState<string>("");
   const [selfAssignDateOfManufacture, setSelfAssignDateOfManufacture] = useState<string>("");
   const [selfAssignDateInService, setSelfAssignDateInService] = useState<string>("");
+  const [selfAssignSerialMode, setSelfAssignSerialMode] = useState<"pick" | "new">("pick");
+  const [selectedSerialEntry, setSelectedSerialEntry] = useState<any | null>(null);
 
   // Fetch current user
   const { data: userData } = useQuery<{ user: any }>({
@@ -157,12 +159,34 @@ export default function Inventory() {
     queryKey: ["/api/employees"],
   });
   
+  // Fetch serial numbers for selected self-assign item
+  const { data: serialNumbersData } = useQuery<{ serialNumbers: any[] }>({
+    queryKey: ["/api/gear-items", selfAssignItem?.id, "serial-numbers"],
+    queryFn: async () => {
+      if (!selfAssignItem?.id) return { serialNumbers: [] };
+      const response = await fetch(`/api/gear-items/${selfAssignItem.id}/serial-numbers`, {
+        credentials: 'include',
+      });
+      if (!response.ok) return { serialNumbers: [] };
+      return response.json();
+    },
+    enabled: !!selfAssignItem?.id,
+  });
+  
   // Filter for active employees only
   const activeEmployees = (employeesData?.employees || []);
   
   // Helper function to get assignments for an item
   const getItemAssignments = (itemId: string) => {
     return (assignmentsData?.assignments || []).filter((a: GearAssignment) => a.gearItemId === itemId);
+  };
+  
+  // Get available serial numbers (not currently assigned to anyone)
+  const getAvailableSerialNumbers = () => {
+    if (!selfAssignItem) return [];
+    const allSerials = serialNumbersData?.serialNumbers || [];
+    // Filter to only show serial numbers that are NOT assigned to anyone
+    return allSerials.filter(s => !s.isAssigned);
   };
   
   // Helper function to calculate available quantity for an item
@@ -440,6 +464,8 @@ export default function Inventory() {
       setSelfAssignSerialNumber("");
       setSelfAssignDateOfManufacture("");
       setSelfAssignDateInService("");
+      setSelfAssignSerialMode("pick");
+      setSelectedSerialEntry(null);
     },
     onError: (error: any) => {
       toast({
@@ -2802,6 +2828,8 @@ export default function Inventory() {
           setSelfAssignSerialNumber("");
           setSelfAssignDateOfManufacture("");
           setSelfAssignDateInService("");
+          setSelfAssignSerialMode("pick");
+          setSelectedSerialEntry(null);
         }
       }}>
         <DialogContent data-testid="dialog-self-assign-gear" className="max-w-lg max-h-[85vh] overflow-hidden flex flex-col">
@@ -2857,6 +2885,8 @@ export default function Inventory() {
                         setSelfAssignSerialNumber("");
                         setSelfAssignDateOfManufacture("");
                         setSelfAssignDateInService("");
+                        setSelfAssignSerialMode("pick");
+                        setSelectedSerialEntry(null);
                       }}
                       data-testid={`self-assign-item-${item.id}`}
                     >
@@ -2890,63 +2920,190 @@ export default function Inventory() {
 
             {/* Selected Item Form */}
             {selfAssignItem && (
-              <div className="border-t pt-4 space-y-3 overflow-y-auto" style={{ maxHeight: '250px' }}>
+              <div className="border-t pt-4 space-y-3 overflow-y-auto" style={{ maxHeight: '300px' }}>
                 <div className="flex items-center justify-between">
                   <div className="font-medium">Selected: {selfAssignItem.equipmentType}</div>
                   <Badge variant="outline">{getAvailableQuantity(selfAssignItem)} available</Badge>
                 </div>
                 
-                <div className="grid grid-cols-2 gap-3">
-                  {/* Quantity */}
-                  <div className="space-y-2">
-                    <Label htmlFor="self-assign-quantity">Quantity</Label>
-                    <Input
-                      id="self-assign-quantity"
-                      type="number"
-                      min="1"
-                      max={getAvailableQuantity(selfAssignItem)}
-                      value={selfAssignQuantity}
-                      onChange={(e) => setSelfAssignQuantity(e.target.value)}
-                      data-testid="input-self-assign-quantity"
-                    />
-                  </div>
+                {/* Show available serial numbers if any exist */}
+                {(() => {
+                  const availableSerials = getAvailableSerialNumbers();
+                  
+                  if (availableSerials.length > 0) {
+                    return (
+                      <div className="space-y-3">
+                        {/* Mode Toggle */}
+                        <div className="flex gap-2">
+                          <Button
+                            size="sm"
+                            variant={selfAssignSerialMode === "pick" ? "default" : "outline"}
+                            onClick={() => {
+                              setSelfAssignSerialMode("pick");
+                              setSelfAssignSerialNumber("");
+                              setSelfAssignDateOfManufacture("");
+                              setSelfAssignDateInService("");
+                            }}
+                            className="flex-1"
+                            data-testid="button-serial-mode-pick"
+                          >
+                            Pick Existing ({availableSerials.length})
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant={selfAssignSerialMode === "new" ? "default" : "outline"}
+                            onClick={() => {
+                              setSelfAssignSerialMode("new");
+                              setSelectedSerialEntry(null);
+                            }}
+                            className="flex-1"
+                            data-testid="button-serial-mode-new"
+                          >
+                            Enter New
+                          </Button>
+                        </div>
 
-                  {/* Serial Number */}
-                  <div className="space-y-2">
-                    <Label htmlFor="self-assign-serial">Serial Number</Label>
-                    <Input
-                      id="self-assign-serial"
-                      placeholder="Enter serial number"
-                      value={selfAssignSerialNumber}
-                      onChange={(e) => setSelfAssignSerialNumber(e.target.value)}
-                      data-testid="input-self-assign-serial-number"
-                    />
-                  </div>
-
-                  {/* Date of Manufacture */}
-                  <div className="space-y-2">
-                    <Label htmlFor="self-assign-manufacture">Date of Manufacture</Label>
-                    <Input
-                      id="self-assign-manufacture"
-                      type="date"
-                      value={selfAssignDateOfManufacture}
-                      onChange={(e) => setSelfAssignDateOfManufacture(e.target.value)}
-                      data-testid="input-self-assign-date-manufacture"
-                    />
-                  </div>
-
-                  {/* Date In Service */}
-                  <div className="space-y-2">
-                    <Label htmlFor="self-assign-service">Date In Service</Label>
-                    <Input
-                      id="self-assign-service"
-                      type="date"
-                      value={selfAssignDateInService}
-                      onChange={(e) => setSelfAssignDateInService(e.target.value)}
-                      data-testid="input-self-assign-date-service"
-                    />
-                  </div>
-                </div>
+                        {selfAssignSerialMode === "pick" ? (
+                          <div className="space-y-2">
+                            <Label>Available Serial Numbers</Label>
+                            <div className="space-y-1 max-h-32 overflow-y-auto border rounded-md p-2">
+                              {availableSerials.map((serial: any) => (
+                                <div
+                                  key={serial.id}
+                                  className={`p-2 rounded cursor-pointer hover-elevate ${
+                                    selectedSerialEntry?.id === serial.id ? 'bg-primary/10 border border-primary' : 'bg-muted/50'
+                                  }`}
+                                  onClick={() => {
+                                    setSelectedSerialEntry(serial);
+                                    setSelfAssignSerialNumber(serial.serialNumber);
+                                    setSelfAssignDateOfManufacture(serial.dateOfManufacture || "");
+                                    setSelfAssignDateInService(serial.dateInService || "");
+                                    setSelfAssignQuantity("1");
+                                  }}
+                                  data-testid={`serial-option-${serial.id}`}
+                                >
+                                  <div className="flex items-center justify-between">
+                                    <div className="font-mono text-sm font-medium">{serial.serialNumber}</div>
+                                    {selectedSerialEntry?.id === serial.id && (
+                                      <Badge variant="default" className="text-xs">Selected</Badge>
+                                    )}
+                                  </div>
+                                  {(serial.dateOfManufacture || serial.dateInService) && (
+                                    <div className="text-xs text-muted-foreground mt-1 flex gap-3">
+                                      {serial.dateOfManufacture && (
+                                        <span>Mfg: {new Date(serial.dateOfManufacture).toLocaleDateString()}</span>
+                                      )}
+                                      {serial.dateInService && (
+                                        <span>In Service: {new Date(serial.dateInService).toLocaleDateString()}</span>
+                                      )}
+                                    </div>
+                                  )}
+                                </div>
+                              ))}
+                            </div>
+                            {selectedSerialEntry && (
+                              <div className="text-sm text-muted-foreground">
+                                Selected: <span className="font-mono font-medium">{selectedSerialEntry.serialNumber}</span>
+                              </div>
+                            )}
+                          </div>
+                        ) : (
+                          <div className="grid grid-cols-2 gap-3">
+                            <div className="space-y-2">
+                              <Label htmlFor="self-assign-quantity">Quantity</Label>
+                              <Input
+                                id="self-assign-quantity"
+                                type="number"
+                                min="1"
+                                max={getAvailableQuantity(selfAssignItem)}
+                                value={selfAssignQuantity}
+                                onChange={(e) => setSelfAssignQuantity(e.target.value)}
+                                data-testid="input-self-assign-quantity"
+                              />
+                            </div>
+                            <div className="space-y-2">
+                              <Label htmlFor="self-assign-serial">Serial Number</Label>
+                              <Input
+                                id="self-assign-serial"
+                                placeholder="Enter new serial number"
+                                value={selfAssignSerialNumber}
+                                onChange={(e) => setSelfAssignSerialNumber(e.target.value)}
+                                data-testid="input-self-assign-serial-number"
+                              />
+                            </div>
+                            <div className="space-y-2">
+                              <Label htmlFor="self-assign-manufacture">Date of Manufacture</Label>
+                              <Input
+                                id="self-assign-manufacture"
+                                type="date"
+                                value={selfAssignDateOfManufacture}
+                                onChange={(e) => setSelfAssignDateOfManufacture(e.target.value)}
+                                data-testid="input-self-assign-date-manufacture"
+                              />
+                            </div>
+                            <div className="space-y-2">
+                              <Label htmlFor="self-assign-service">Date In Service</Label>
+                              <Input
+                                id="self-assign-service"
+                                type="date"
+                                value={selfAssignDateInService}
+                                onChange={(e) => setSelfAssignDateInService(e.target.value)}
+                                data-testid="input-self-assign-date-service"
+                              />
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    );
+                  }
+                  
+                  return (
+                    <div className="grid grid-cols-2 gap-3">
+                      <div className="space-y-2">
+                        <Label htmlFor="self-assign-quantity">Quantity</Label>
+                        <Input
+                          id="self-assign-quantity"
+                          type="number"
+                          min="1"
+                          max={getAvailableQuantity(selfAssignItem)}
+                          value={selfAssignQuantity}
+                          onChange={(e) => setSelfAssignQuantity(e.target.value)}
+                          data-testid="input-self-assign-quantity"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="self-assign-serial">Serial Number</Label>
+                        <Input
+                          id="self-assign-serial"
+                          placeholder="Enter serial number"
+                          value={selfAssignSerialNumber}
+                          onChange={(e) => setSelfAssignSerialNumber(e.target.value)}
+                          data-testid="input-self-assign-serial-number"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="self-assign-manufacture">Date of Manufacture</Label>
+                        <Input
+                          id="self-assign-manufacture"
+                          type="date"
+                          value={selfAssignDateOfManufacture}
+                          onChange={(e) => setSelfAssignDateOfManufacture(e.target.value)}
+                          data-testid="input-self-assign-date-manufacture"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="self-assign-service">Date In Service</Label>
+                        <Input
+                          id="self-assign-service"
+                          type="date"
+                          value={selfAssignDateInService}
+                          onChange={(e) => setSelfAssignDateInService(e.target.value)}
+                          data-testid="input-self-assign-date-service"
+                        />
+                      </div>
+                    </div>
+                  );
+                })()}
               </div>
             )}
           </div>
@@ -2962,6 +3119,8 @@ export default function Inventory() {
                 setSelfAssignSerialNumber("");
                 setSelfAssignDateOfManufacture("");
                 setSelfAssignDateInService("");
+                setSelfAssignSerialMode("pick");
+                setSelectedSerialEntry(null);
               }}
               data-testid="button-cancel-self-assign"
             >
