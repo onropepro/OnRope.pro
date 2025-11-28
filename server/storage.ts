@@ -1440,6 +1440,20 @@ export class Storage {
     await db.delete(companyDocuments).where(eq(companyDocuments.id, id));
   }
 
+  async getCompanyDocumentByTemplateId(companyId: string, templateId: string): Promise<any | undefined> {
+    const result = await db.select().from(companyDocuments)
+      .where(and(
+        eq(companyDocuments.companyId, companyId),
+        eq(companyDocuments.templateId, templateId)
+      ));
+    return result[0];
+  }
+
+  async deleteDocumentReviewsByDocumentId(documentId: string): Promise<void> {
+    await db.delete(documentReviewSignatures)
+      .where(eq(documentReviewSignatures.documentId, documentId));
+  }
+
   // Pay period configuration operations
   async getPayPeriodConfig(companyId: string): Promise<PayPeriodConfig | undefined> {
     const result = await db.select().from(payPeriodConfig)

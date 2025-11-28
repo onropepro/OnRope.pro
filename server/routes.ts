@@ -8220,7 +8220,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       const { documentType, jobType, customJobType } = req.body;
       
-      if (!documentType || !['health_safety_manual', 'company_policy', 'certificate_of_insurance', 'method_statement'].includes(documentType)) {
+      if (!documentType || !['health_safety_manual', 'company_policy', 'certificate_of_insurance', 'method_statement', 'safe_work_procedure'].includes(documentType)) {
         return res.status(400).json({ message: "Invalid document type" });
       }
 
@@ -8250,8 +8250,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         ...(documentType === 'method_statement' && { jobType, customJobType }),
       });
 
-      // Auto-enroll all employees for Health & Safety Manual and Company Policy documents
-      if (documentType === 'health_safety_manual' || documentType === 'company_policy') {
+      // Auto-enroll all employees for Health & Safety Manual, Company Policy, and Safe Work Procedure documents
+      if (documentType === 'health_safety_manual' || documentType === 'company_policy' || documentType === 'safe_work_procedure') {
         try {
           const employees = await storage.getAllEmployees(companyId);
           const docToEnroll = [{
@@ -8306,9 +8306,83 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { id } = req.params;
       await storage.deleteCompanyDocument(id);
+      
+      // Also delete any associated document review signatures
+      await storage.deleteDocumentReviewsByDocumentId(id);
+      
       res.json({ message: "Document deleted successfully" });
     } catch (error) {
       console.error("Delete company document error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Initialize template safe work procedures for a company
+  app.post("/api/company-documents/init-templates", requireAuth, requireRole("operations_manager", "company"), async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      const companyId = currentUser.role === "company" ? currentUser.id : currentUser.companyId;
+      
+      if (!companyId) {
+        return res.status(400).json({ message: "Unable to determine company" });
+      }
+
+      const { templates } = req.body;
+      
+      if (!templates || !Array.isArray(templates)) {
+        return res.status(400).json({ message: "Templates array is required" });
+      }
+
+      const createdDocs: any[] = [];
+      const employees = await storage.getAllEmployees(companyId);
+
+      for (const template of templates) {
+        // Check if template already exists for this company
+        const existing = await storage.getCompanyDocumentByTemplateId(companyId, template.templateId);
+        
+        if (!existing) {
+          // Create the template document
+          const document = await storage.createCompanyDocument({
+            companyId,
+            documentType: 'safe_work_procedure',
+            fileName: template.title,
+            fileUrl: '', // Template procedures are generated on-demand, no file URL
+            uploadedById: currentUser.id,
+            uploadedByName: 'System Template',
+            isTemplate: true,
+            templateId: template.templateId,
+            description: template.description,
+            jobType: template.jobType,
+          });
+
+          createdDocs.push(document);
+
+          // Auto-enroll all employees for this template
+          const docToEnroll = [{
+            type: 'safe_work_procedure',
+            id: document.id,
+            name: template.title,
+            fileUrl: '',
+          }];
+          
+          for (const employee of employees) {
+            await storage.enrollEmployeeInDocumentReviews(companyId, employee.id, docToEnroll);
+          }
+        }
+      }
+
+      res.json({ 
+        message: `Initialized ${createdDocs.length} template procedures`,
+        documents: createdDocs,
+        enrolledEmployees: employees.length
+      });
+    } catch (error) {
+      console.error("Initialize template procedures error:", error);
       res.status(500).json({ message: "Internal server error" });
     }
   });
