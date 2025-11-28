@@ -846,9 +846,9 @@ export default function Inventory() {
     const dateStr = format(date, 'yyyy-MM-dd');
     return allSessions.some((session: any) => {
       if (session.employeeId !== employeeId) return false;
-      const sessionDate = session.startTime ? new Date(session.startTime) : null;
-      if (!sessionDate) return false;
-      const sessionDateStr = format(sessionDate, 'yyyy-MM-dd');
+      // Use workDate field (YYYY-MM-DD string) or fall back to startTime
+      const sessionDateStr = session.workDate || (session.startTime ? format(new Date(session.startTime), 'yyyy-MM-dd') : null);
+      if (!sessionDateStr) return false;
       return sessionDateStr === dateStr;
     });
   };
@@ -871,8 +871,10 @@ export default function Inventory() {
       daysToShow = 30;
     } else if (inspectionFilter === "all" || inspectionFilter === "combined") {
       const earliestSession = allSessions.reduce((earliest: Date | null, session: any) => {
-        if (!session.startTime) return earliest;
-        const sessionDate = new Date(session.startTime);
+        // Use workDate field or fall back to startTime
+        const dateValue = session.workDate || session.startTime;
+        if (!dateValue) return earliest;
+        const sessionDate = new Date(dateValue);
         if (!earliest || sessionDate < earliest) return sessionDate;
         return earliest;
       }, null);
@@ -926,8 +928,9 @@ export default function Inventory() {
       // Find all employees who worked on this day
       const employeesWhoWorkedThisDay = new Set<string>();
       allSessions.forEach((session: any) => {
-        if (!session.startTime || !session.employeeId) return;
-        const sessionDateStr = normalizeDateStr(session.startTime);
+        if (!session.employeeId) return;
+        // Use workDate field (YYYY-MM-DD string) or fall back to startTime
+        const sessionDateStr = session.workDate || normalizeDateStr(session.startTime);
         if (sessionDateStr === dateStr) {
           employeesWhoWorkedThisDay.add(session.employeeId);
         }
@@ -970,8 +973,10 @@ export default function Inventory() {
       
       // Calculate all-time rating
       const earliestSession = allSessions.reduce((earliest: Date | null, session: any) => {
-        if (!session.startTime) return earliest;
-        const sessionDate = new Date(session.startTime);
+        // Use workDate field or fall back to startTime
+        const dateValue = session.workDate || session.startTime;
+        if (!dateValue) return earliest;
+        const sessionDate = new Date(dateValue);
         if (!earliest || sessionDate < earliest) return sessionDate;
         return earliest;
       }, null);
@@ -1001,8 +1006,9 @@ export default function Inventory() {
       // Find all employees who worked on this day
       const employeesWhoWorkedThisDay = new Set<string>();
       allSessions.forEach((session: any) => {
-        if (!session.startTime || !session.employeeId) return;
-        const sessionDateStr = normalizeDateStr(session.startTime);
+        if (!session.employeeId) return;
+        // Use workDate field (YYYY-MM-DD string) or fall back to startTime
+        const sessionDateStr = session.workDate || normalizeDateStr(session.startTime);
         if (sessionDateStr === dateStr) {
           employeesWhoWorkedThisDay.add(session.employeeId);
         }
