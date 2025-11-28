@@ -3377,10 +3377,24 @@ export default function Documents() {
               const signedDocIds = new Set(signed.map((r: any) => r.documentId));
               const allRequiredSigned = requiredDocs.every((doc: any) => signedDocIds.has(doc.id));
               
+              // Build complete document list with status for ALL required docs (not just ones with reviews)
+              const allDocumentStatuses = requiredDocs.map((doc: any) => {
+                const review = reviews.find((r: any) => r.documentId === doc.id);
+                return {
+                  id: review?.id || `pending-${doc.id}`,
+                  documentId: doc.id,
+                  documentName: doc.fileName || doc.documentType,
+                  documentType: doc.documentType,
+                  viewedAt: review?.viewedAt || null,
+                  signedAt: review?.signedAt || null,
+                  status: review?.signedAt ? 'signed' : (review?.viewedAt ? 'viewed' : 'pending'),
+                };
+              });
+              
               return {
                 employeeId: employee.id,
                 employeeName: employee.name || employee.email || 'Unknown',
-                reviews,
+                reviews: allDocumentStatuses, // Use complete list instead of just existing reviews
                 signedCount: signed.length,
                 pendingCount: requiredDocs.length - signed.length, // Pending = required docs not yet signed
                 viewedCount: viewed.length,
