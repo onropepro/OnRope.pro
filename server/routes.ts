@@ -7170,9 +7170,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // 5. Document Review Compliance Rating
       // Tracks employee acknowledgment of safety documents (H&S Manual, Company Policy, Safe Work Procedures)
-      // Calculate based on TOTAL REQUIRED signatures = employees × required documents
+      // Calculate based on TOTAL REQUIRED signatures = (employees + company owner) × required documents
       const documentReviews = await storage.getDocumentReviewSignaturesByCompany(companyId);
       const companyEmployees = await storage.getAllEmployees(companyId);
+      
+      // Include company owner in the count (owner also needs to sign documents)
+      const companyOwnerForCSR = await storage.getUserById(companyId);
+      const totalStaffCount = companyOwnerForCSR ? companyEmployees.length + 1 : companyEmployees.length;
       
       // Required document types that employees must sign
       const requiredDocTypes = ['health_safety_manual', 'company_policy', 'safe_work_procedure'];
@@ -7180,8 +7184,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         requiredDocTypes.includes(doc.documentType)
       );
       
-      // Total required = number of employees × number of required documents
-      const totalEmployees = companyEmployees.length;
+      // Total required = number of staff (owner + employees) × number of required documents
+      const totalEmployees = totalStaffCount;
       const totalRequiredDocs = requiredDocs.length;
       const totalRequiredSignatures = totalEmployees * totalRequiredDocs;
       
@@ -7395,9 +7399,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
         : 0;
       
       // 6. Document Review Compliance Rating
-      // Calculate based on TOTAL REQUIRED signatures = employees × required documents
+      // Calculate based on TOTAL REQUIRED signatures = (employees + owner) × required documents
       const documentReviews = await storage.getDocumentReviewSignaturesByCompany(companyId);
       const companyEmployees = await storage.getAllEmployees(companyId);
+      
+      // Include company owner in the count
+      const companyOwnerForPM = await storage.getUserById(companyId);
+      const totalStaffCount = companyOwnerForPM ? companyEmployees.length + 1 : companyEmployees.length;
       
       // Required document types that employees must sign
       const requiredDocTypes = ['health_safety_manual', 'company_policy', 'safe_work_procedure'];
@@ -7405,7 +7413,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         requiredDocTypes.includes(doc.documentType)
       );
       
-      const totalEmployees = companyEmployees.length;
+      const totalEmployees = totalStaffCount;
       const totalRequiredDocs = requiredDocs.length;
       const totalRequiredSignatures = totalEmployees * totalRequiredDocs;
       const signedReviews = documentReviews.filter((r: any) => r.signedAt).length;
@@ -8250,8 +8258,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       }
       
-      // Get all employees
+      // Get all employees AND the company owner
       const employees = await storage.getAllEmployees(companyId);
+      
+      // Also include the company owner in the compliance tracking
+      const companyOwner = await storage.getUserById(companyId);
+      const allStaff = companyOwner 
+        ? [companyOwner, ...employees] 
+        : employees;
       
       // Get all company documents
       const companyDocuments = await storage.getCompanyDocuments(companyId);
@@ -8265,8 +8279,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Get all document reviews
       const allReviews = await storage.getDocumentReviewSignaturesByCompany(companyId);
       
-      // Build compliance matrix
-      const employeeCompliance = employees.map((employee: any) => {
+      // Build compliance matrix (includes company owner + all employees)
+      const employeeCompliance = allStaff.map((employee: any) => {
         const employeeReviews = allReviews.filter((r: any) => r.employeeId === employee.id);
         
         const documentStatus = requiredDocs.map((doc: any) => {
@@ -8297,7 +8311,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
       
       // Summary stats
-      const totalSignatures = employees.length * requiredDocs.length;
+      const totalSignatures = allStaff.length * requiredDocs.length;
       const completedSignatures = employeeCompliance.reduce((sum, e) => sum + e.signedCount, 0);
       const overallCompliancePercent = totalSignatures > 0 
         ? Math.round((completedSignatures / totalSignatures) * 100) 
@@ -8307,7 +8321,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         companyName,
         generatedAt: new Date().toISOString(),
         summary: {
-          totalEmployees: employees.length,
+          totalEmployees: allStaff.length,
           totalDocuments: requiredDocs.length,
           totalSignaturesRequired: totalSignatures,
           completedSignatures,

@@ -3340,16 +3340,22 @@ export default function Documents() {
             const allReviews = allDocumentReviewsData?.reviews || [];
             const allEmployees = employeesData?.employees || [];
             
+            // Include company owner in the staff list for compliance tracking
+            const companyOwner = currentUser?.role === 'company' ? currentUser : null;
+            const allStaff = companyOwner 
+              ? [companyOwner, ...allEmployees.filter((e: any) => e.id !== companyOwner.id)]
+              : allEmployees;
+            
             // Required documents that employees must sign (includes all safe work procedures)
             const requiredDocTypes = ['health_safety_manual', 'company_policy', 'safe_work_procedure'];
             const requiredDocs = companyDocuments.filter((doc: any) => 
               requiredDocTypes.includes(doc.documentType)
             );
             
-            // Total employees (excluding company owner role if needed)
-            const totalEmployees = allEmployees.length;
+            // Total staff (company owner + employees)
+            const totalEmployees = allStaff.length;
             
-            // Total required signatures = employees * required documents
+            // Total required signatures = staff * required documents
             const totalRequiredSignatures = totalEmployees * requiredDocs.length;
             
             // Group reviews by employee
@@ -3360,8 +3366,8 @@ export default function Documents() {
               return acc;
             }, {} as Record<string, any[]>);
             
-            // Calculate stats for each employee (including those without any reviews yet)
-            const employeeStats = allEmployees.map((employee: any) => {
+            // Calculate stats for each staff member (including company owner and those without any reviews yet)
+            const employeeStats = allStaff.map((employee: any) => {
               const reviews = employeeReviews[employee.id] || [];
               const signed = reviews.filter((r: any) => r.signedAt);
               const pending = reviews.filter((r: any) => !r.signedAt);
