@@ -8222,10 +8222,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "No file uploaded" });
       }
 
-      const { documentType } = req.body;
+      const { documentType, jobType, customJobType } = req.body;
       
-      if (!documentType || !['health_safety_manual', 'company_policy', 'certificate_of_insurance'].includes(documentType)) {
+      if (!documentType || !['health_safety_manual', 'company_policy', 'certificate_of_insurance', 'method_statement'].includes(documentType)) {
         return res.status(400).json({ message: "Invalid document type" });
+      }
+
+      // For method_statement, require jobType
+      if (documentType === 'method_statement' && !jobType) {
+        return res.status(400).json({ message: "Job type is required for method statement documents" });
       }
 
       // Upload file to object storage
@@ -8246,6 +8251,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         fileUrl,
         uploadedById: currentUser.id,
         uploadedByName: currentUser.name || currentUser.email || "Unknown User",
+        ...(documentType === 'method_statement' && { jobType, customJobType }),
       });
 
       res.json({ document });

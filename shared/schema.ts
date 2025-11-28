@@ -863,7 +863,8 @@ export const methodStatements = pgTable("method_statements", {
   // Basic Information
   preparedByName: varchar("prepared_by_name").notNull(),
   dateCreated: date("date_created").notNull(),
-  jobTitle: varchar("job_title").notNull(),
+  jobTitle: varchar("job_title"), // Deprecated: use jobType instead
+  jobType: varchar("job_type").notNull().default('other'), // window_cleaning | dryer_vent_cleaning | building_wash | etc.
   location: varchar("location").notNull(),
   workDescription: text("work_description").notNull(),
   
@@ -942,17 +943,20 @@ export const methodStatements = pgTable("method_statements", {
 export const companyDocuments = pgTable("company_documents", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   companyId: varchar("company_id").notNull().references(() => users.id, { onDelete: "cascade" }),
-  documentType: varchar("document_type").notNull(), // 'health_safety_manual' | 'company_policy' | 'equipment_inspection'
+  documentType: varchar("document_type").notNull(), // 'health_safety_manual' | 'company_policy' | 'equipment_inspection' | 'method_statement'
   fileName: varchar("file_name").notNull(),
   fileUrl: text("file_url").notNull(),
   uploadedById: varchar("uploaded_by_id").notNull().references(() => users.id),
   uploadedByName: varchar("uploaded_by_name").notNull(),
   projectId: varchar("project_id").references(() => projects.id, { onDelete: "set null" }), // Optional: link to specific project (for equipment inspections)
+  jobType: varchar("job_type"), // For method_statement documents: window_cleaning | dryer_vent_cleaning | building_wash | etc.
+  customJobType: varchar("custom_job_type"), // Custom job type name when jobType is "other"
   createdAt: timestamp("created_at").defaultNow(),
 }, (table) => [
   index("IDX_company_docs_company").on(table.companyId),
   index("IDX_company_docs_type").on(table.companyId, table.documentType),
   index("IDX_company_docs_project").on(table.projectId),
+  index("IDX_company_docs_job_type").on(table.companyId, table.documentType, table.jobType),
 ]);
 
 // Pay period configuration table - one per company

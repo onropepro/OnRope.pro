@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -16,15 +16,27 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { ArrowLeft, FileCheck, PenTool, X, Shield, Plus, Trash2 } from "lucide-react";
-import type { Project } from "@shared/schema";
+import type { Project, User } from "@shared/schema";
 import SignatureCanvas from "react-signature-canvas";
 import { jsPDF } from "jspdf";
+
+// Standard job types for rope access work
+const STANDARD_JOB_TYPES = [
+  { value: "window_cleaning", label: "Window Cleaning" },
+  { value: "dryer_vent_cleaning", label: "Dryer Vent Cleaning" },
+  { value: "building_wash", label: "Building Wash" },
+  { value: "in_suite_dryer_vent_cleaning", label: "In-Suite Dryer Vent Cleaning" },
+  { value: "parkade_pressure_cleaning", label: "Parkade Pressure Cleaning" },
+  { value: "ground_window_cleaning", label: "Ground Window Cleaning" },
+  { value: "general_pressure_washing", label: "General Pressure Washing" },
+  { value: "other", label: "Other" },
+];
 
 const methodStatementFormSchema = z.object({
   projectId: z.string().min(1, "Project is required"),
   dateCreated: z.string().min(1, "Date is required"),
   preparedByName: z.string().min(1, "Your name is required"),
-  jobTitle: z.string().min(1, "Job title is required"),
+  jobType: z.string().min(1, "Job type is required"),
   location: z.string().min(1, "Location is required"),
   
   workDescription: z.string().min(1, "Work description is required"),
@@ -143,7 +155,23 @@ export const downloadMethodStatement = (statement: any, currentUser: any) => {
   yPosition += 6;
   doc.text(`Prepared By: ${statement.preparedByName}`, 20, yPosition);
   yPosition += 6;
-  doc.text(`Job Title: ${statement.jobTitle}`, 20, yPosition);
+  // Format job type for display
+  const formatJobType = (jobType: string) => {
+    if (!jobType) return 'N/A';
+    if (jobType.startsWith('custom:')) return jobType.replace('custom:', '');
+    const labels: Record<string, string> = {
+      'window_cleaning': 'Window Cleaning',
+      'dryer_vent_cleaning': 'Dryer Vent Cleaning',
+      'building_wash': 'Building Wash',
+      'in_suite_dryer_vent_cleaning': 'In-Suite Dryer Vent Cleaning',
+      'parkade_pressure_cleaning': 'Parkade Pressure Cleaning',
+      'ground_window_cleaning': 'Ground Window Cleaning',
+      'general_pressure_washing': 'General Pressure Washing',
+      'other': 'Other'
+    };
+    return labels[jobType] || jobType.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+  };
+  doc.text(`Job Type: ${formatJobType(statement.jobType || statement.jobTitle)}`, 20, yPosition);
   yPosition += 10;
 
   // Work Description Section
@@ -507,7 +535,16 @@ export default function MethodStatementForm() {
     queryKey: ["/api/employees"],
   });
 
+  const { data: currentUser } = useQuery<User>({
+    queryKey: ["/api/user"],
+  });
+
+  const { data: customJobTypesData } = useQuery<{ customJobTypes: { id: string; name: string }[] }>({
+    queryKey: ["/api/custom-job-types"],
+  });
+
   const employees = (employeesData?.employees || []);
+  const customJobTypes = customJobTypesData?.customJobTypes || [];
 
   // Helper for local date formatting
   const getLocalDateString = () => {
@@ -521,7 +558,7 @@ export default function MethodStatementForm() {
       projectId: "",
       dateCreated: getLocalDateString(),
       preparedByName: "",
-      jobTitle: "",
+      jobType: "",
       location: "",
       workDescription: "",
       scopeDetails: "",
@@ -541,6 +578,13 @@ export default function MethodStatementForm() {
       approvalDate: "",
     },
   });
+
+  // Auto-fill "Prepared By" with current user's name
+  useEffect(() => {
+    if (currentUser?.fullName && !form.getValues("preparedByName")) {
+      form.setValue("preparedByName", currentUser.fullName);
+    }
+  }, [currentUser, form]);
 
   const createMeetingMutation = useMutation({
     mutationFn: async (data: MethodStatementFormValues) => {
@@ -801,13 +845,36 @@ export default function MethodStatementForm() {
 
                 <FormField
                   control={form.control}
-                  name="jobTitle"
+                  name="jobType"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Job Title *</FormLabel>
-                      <FormControl>
-                        <Input {...field} placeholder="e.g. Window Cleaning, Building Wash" data-testid="input-job-title" />
-                      </FormControl>
+                      <FormLabel>Job Type *</FormLabel>
+                      <Select onValueChange={field.onChange} value={field.value}>
+                        <FormControl>
+                          <SelectTrigger data-testid="select-job-type">
+                            <SelectValue placeholder="Select job type" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {STANDARD_JOB_TYPES.map((jobType) => (
+                            <SelectItem key={jobType.value} value={jobType.value}>
+                              {jobType.label}
+                            </SelectItem>
+                          ))}
+                          {customJobTypes.length > 0 && (
+                            <>
+                              <div className="px-2 py-1.5 text-xs font-medium text-muted-foreground border-t mt-1 pt-2">
+                                Custom Job Types
+                              </div>
+                              {customJobTypes.map((customType) => (
+                                <SelectItem key={`custom:${customType.name}`} value={`custom:${customType.name}`}>
+                                  {customType.name}
+                                </SelectItem>
+                              ))}
+                            </>
+                          )}
+                        </SelectContent>
+                      </Select>
                       <FormMessage />
                     </FormItem>
                   )}

@@ -10,6 +10,9 @@ import { Progress } from "@/components/ui/progress";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Calendar as CalendarComponent } from "@/components/ui/calendar";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { FileText, Download, Calendar, DollarSign, Upload, Trash2, Shield, BookOpen, ArrowLeft, AlertTriangle, Plus, FileCheck, ChevronDown, ChevronRight, FolderOpen, CalendarRange, Package, Loader2 } from "lucide-react";
 import { hasFinancialAccess, canViewSafetyDocuments } from "@/lib/permissions";
 import { useToast } from "@/hooks/use-toast";
@@ -19,6 +22,18 @@ import JSZip from "jszip";
 import { downloadMethodStatement } from "@/pages/MethodStatementForm";
 import { formatLocalDate, formatLocalDateLong, formatLocalDateMedium, parseLocalDate } from "@/lib/dateUtils";
 import { DocumentReviews } from "@/components/DocumentReviews";
+
+// Standard job types for method statements
+const STANDARD_JOB_TYPES = [
+  { value: 'window_cleaning', label: 'Window Cleaning' },
+  { value: 'dryer_vent_cleaning', label: 'Dryer Vent Cleaning' },
+  { value: 'building_wash', label: 'Building Wash' },
+  { value: 'in_suite_dryer_vent_cleaning', label: 'In-Suite Dryer Vent Cleaning' },
+  { value: 'parkade_pressure_cleaning', label: 'Parkade Pressure Cleaning' },
+  { value: 'ground_window_cleaning', label: 'Ground Window Cleaning' },
+  { value: 'general_pressure_washing', label: 'General Pressure Washing' },
+  { value: 'other', label: 'Other' },
+];
 
 interface DateGroupedItem {
   year: number;
@@ -341,6 +356,10 @@ export default function Documents() {
   const [uploadingHealthSafety, setUploadingHealthSafety] = useState(false);
   const [uploadingPolicy, setUploadingPolicy] = useState(false);
   const [uploadingInsurance, setUploadingInsurance] = useState(false);
+  const [uploadingMethodStatement, setUploadingMethodStatement] = useState(false);
+  const [methodStatementJobType, setMethodStatementJobType] = useState("");
+  const [methodStatementCustomJobType, setMethodStatementCustomJobType] = useState("");
+  const [showMethodStatementUploadDialog, setShowMethodStatementUploadDialog] = useState(false);
   const [activeTab, setActiveTab] = useState("health-safety");
 
   const { data: userData } = useQuery<{ user: any }>({
@@ -383,6 +402,11 @@ export default function Documents() {
     queryKey: ["/api/all-work-sessions"],
   });
 
+  const { data: customJobTypesData } = useQuery<{ customJobTypes: { id: string; name: string }[] }>({
+    queryKey: ["/api/custom-job-types"],
+  });
+
+  const customJobTypes = customJobTypesData?.customJobTypes || [];
   const currentUser = userData?.user;
   const canViewFinancials = hasFinancialAccess(currentUser);
   const canViewSafety = canViewSafetyDocuments(currentUser);
@@ -399,6 +423,7 @@ export default function Documents() {
   const healthSafetyDocs = companyDocuments.filter((doc: any) => doc.documentType === 'health_safety_manual');
   const policyDocs = companyDocuments.filter((doc: any) => doc.documentType === 'company_policy');
   const insuranceDocs = companyDocuments.filter((doc: any) => doc.documentType === 'certificate_of_insurance');
+  const methodStatementDocs = companyDocuments.filter((doc: any) => doc.documentType === 'method_statement');
   const workSessions = workSessionsData?.sessions || [];
 
   // Calculate toolbox meeting compliance rating
@@ -2017,6 +2042,94 @@ export default function Documents() {
     }
   };
 
+  // Handle method statement document upload with job type
+  const handleMethodStatementUpload = async (file: File, jobType: string, customJobTypeName?: string) => {
+    if (!jobType) {
+      toast({
+        title: "Error",
+        description: "Please select a job type for this method statement",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // If job type is "other", require custom job type name
+    if (jobType === 'other' && !customJobTypeName?.trim()) {
+      toast({
+        title: "Error",
+        description: "Please enter a custom job type name",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setUploadingMethodStatement(true);
+    try {
+      const formData = new FormData();
+      formData.append('document', file);
+      formData.append('documentType', 'method_statement');
+      
+      // Handle custom job types from saved list (prefixed with custom:)
+      if (jobType.startsWith('custom:')) {
+        formData.append('jobType', 'other');
+        formData.append('customJobType', jobType.replace('custom:', ''));
+      } else if (jobType === 'other' && customJobTypeName) {
+        formData.append('jobType', 'other');
+        formData.append('customJobType', customJobTypeName.trim());
+      } else {
+        formData.append('jobType', jobType);
+      }
+
+      const response = await fetch('/api/company-documents', {
+        method: 'POST',
+        body: formData,
+        credentials: 'include',
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || 'Upload failed');
+      }
+
+      toast({
+        title: "Success",
+        description: `Method statement uploaded successfully`,
+      });
+
+      setShowMethodStatementUploadDialog(false);
+      setMethodStatementJobType("");
+      setMethodStatementCustomJobType("");
+      queryClient.invalidateQueries({ queryKey: ["/api/company-documents"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/csr"] });
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to upload method statement",
+        variant: "destructive",
+      });
+    } finally {
+      setUploadingMethodStatement(false);
+    }
+  };
+
+  // Format job type for display
+  const formatJobType = (jobType: string, customJobType?: string) => {
+    if (!jobType) return 'N/A';
+    if (jobType === 'other' && customJobType) return customJobType;
+    if (jobType.startsWith('custom:')) return jobType.replace('custom:', '');
+    const labels: Record<string, string> = {
+      'window_cleaning': 'Window Cleaning',
+      'dryer_vent_cleaning': 'Dryer Vent Cleaning',
+      'building_wash': 'Building Wash',
+      'in_suite_dryer_vent_cleaning': 'In-Suite Dryer Vent Cleaning',
+      'parkade_pressure_cleaning': 'Parkade Pressure Cleaning',
+      'ground_window_cleaning': 'Ground Window Cleaning',
+      'general_pressure_washing': 'General Pressure Washing',
+      'other': 'Other'
+    };
+    return labels[jobType] || jobType.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+  };
+
   const deleteDocumentMutation = useMutation({
     mutationFn: async (id: string) => {
       const response = await apiRequest("DELETE", `/api/company-documents/${id}`);
@@ -3239,11 +3352,78 @@ export default function Documents() {
                 <p className="text-sm text-muted-foreground">Work procedures and safety methods</p>
               </div>
               <Badge variant="secondary" className="text-base font-semibold px-3">
-                {methodStatements.length}
+                {methodStatements.length + methodStatementDocs.length}
               </Badge>
             </div>
           </CardHeader>
           <CardContent className="pt-6">
+            {/* Upload Method Statement Document */}
+            {canUploadDocuments && (
+              <div className="mb-6 p-5 border-2 border-dashed rounded-xl bg-emerald-500/5 hover-elevate">
+                <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
+                  <div className="flex-1">
+                    <label className="block mb-2 text-sm font-semibold flex items-center gap-2">
+                      <Upload className="h-4 w-4" />
+                      Upload Your Own Method Statement
+                    </label>
+                    <p className="text-xs text-muted-foreground">
+                      Upload your company's method statement document for a specific job type to satisfy compliance requirements.
+                    </p>
+                  </div>
+                  <Button
+                    variant="outline"
+                    onClick={() => setShowMethodStatementUploadDialog(true)}
+                    data-testid="button-upload-method-statement"
+                  >
+                    <Plus className="h-4 w-4 mr-2" />
+                    Upload Document
+                  </Button>
+                </div>
+              </div>
+            )}
+
+            {/* Uploaded Method Statement Documents by Job Type */}
+            {methodStatementDocs.length > 0 && (
+              <div className="mb-6">
+                <h4 className="text-sm font-semibold mb-3 flex items-center gap-2">
+                  <FileCheck className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
+                  Uploaded Method Statement Documents
+                </h4>
+                <div className="space-y-2">
+                  {methodStatementDocs.map((doc: any) => (
+                    <div key={doc.id} className="flex items-center gap-4 p-3 rounded-lg border bg-card hover-elevate active-elevate-2">
+                      <div className="p-2 bg-emerald-500/10 rounded-lg">
+                        <FileText className="h-4 w-4 text-emerald-600 dark:text-emerald-400 flex-shrink-0" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="font-medium text-sm">{doc.fileName}</div>
+                        <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                          <Badge variant="outline" className="text-xs">
+                            {formatJobType(doc.jobType, doc.customJobType)}
+                          </Badge>
+                          <span>Uploaded by {doc.uploadedByName}</span>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Button size="sm" variant="outline" onClick={() => window.open(doc.fileUrl, '_blank')} data-testid={`view-method-doc-${doc.id}`}>
+                          <Download className="h-3 w-3 mr-1" />
+                          View
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={() => deleteDocumentMutation.mutate(doc.id)}
+                          data-testid={`delete-method-doc-${doc.id}`}
+                        >
+                          <Trash2 className="h-4 w-4 text-destructive" />
+                        </Button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
             {methodStatements.length > 0 && (
               <div className="mb-4">
                 <DateRangeExport
@@ -3326,6 +3506,107 @@ export default function Documents() {
         </Card>
 
       </div>
+
+      {/* Method Statement Upload Dialog */}
+      <Dialog open={showMethodStatementUploadDialog} onOpenChange={(open) => {
+        setShowMethodStatementUploadDialog(open);
+        if (!open) {
+          setMethodStatementJobType("");
+          setMethodStatementCustomJobType("");
+        }
+      }}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Upload Method Statement Document</DialogTitle>
+            <DialogDescription>
+              Upload your company's method statement for a specific job type. This will count toward your CSR compliance for that job type.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label>Job Type *</Label>
+              <Select value={methodStatementJobType} onValueChange={(value) => {
+                setMethodStatementJobType(value);
+                if (value !== 'other') {
+                  setMethodStatementCustomJobType("");
+                }
+              }}>
+                <SelectTrigger data-testid="select-method-statement-job-type">
+                  <SelectValue placeholder="Select job type for this method statement" />
+                </SelectTrigger>
+                <SelectContent>
+                  {STANDARD_JOB_TYPES.map((jobType) => (
+                    <SelectItem key={jobType.value} value={jobType.value}>
+                      {jobType.label}
+                    </SelectItem>
+                  ))}
+                  {customJobTypes.length > 0 && (
+                    <>
+                      <div className="px-2 py-1.5 text-xs font-medium text-muted-foreground border-t mt-1 pt-2">
+                        Custom Job Types
+                      </div>
+                      {customJobTypes.map((customType) => (
+                        <SelectItem key={`custom:${customType.name}`} value={`custom:${customType.name}`}>
+                          {customType.name}
+                        </SelectItem>
+                      ))}
+                    </>
+                  )}
+                </SelectContent>
+              </Select>
+            </div>
+            {methodStatementJobType === 'other' && (
+              <div className="space-y-2">
+                <Label>Custom Job Type Name *</Label>
+                <Input
+                  type="text"
+                  placeholder="Enter custom job type name"
+                  value={methodStatementCustomJobType}
+                  onChange={(e) => setMethodStatementCustomJobType(e.target.value)}
+                  data-testid="input-custom-job-type"
+                />
+                <p className="text-xs text-muted-foreground">
+                  Enter a descriptive name for this custom job type
+                </p>
+              </div>
+            )}
+            <div className="space-y-2">
+              <Label>Document File *</Label>
+              <Input
+                type="file"
+                accept=".pdf,.doc,.docx"
+                disabled={uploadingMethodStatement || !methodStatementJobType || (methodStatementJobType === 'other' && !methodStatementCustomJobType.trim())}
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (file && methodStatementJobType) {
+                    handleMethodStatementUpload(file, methodStatementJobType, methodStatementCustomJobType);
+                    e.target.value = '';
+                  }
+                }}
+                data-testid="input-method-statement-upload"
+              />
+              <p className="text-xs text-muted-foreground">
+                Supported formats: PDF, DOC, DOCX
+              </p>
+            </div>
+            {uploadingMethodStatement && (
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <Loader2 className="h-4 w-4 animate-spin" />
+                Uploading document...
+              </div>
+            )}
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => {
+              setShowMethodStatementUploadDialog(false);
+              setMethodStatementJobType("");
+              setMethodStatementCustomJobType("");
+            }}>
+              Cancel
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
