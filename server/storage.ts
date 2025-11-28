@@ -1,6 +1,6 @@
 import { db } from "./db";
-import { users, clients, projects, customJobTypes, dropLogs, workSessions, nonBillableWorkSessions, complaints, complaintNotes, projectPhotos, jobComments, harnessInspections, toolboxMeetings, flhaForms, incidentReports, methodStatements, companyDocuments, payPeriodConfig, payPeriods, quotes, quoteServices, gearItems, gearAssignments, gearSerialNumbers, scheduledJobs, jobAssignments, userPreferences, propertyManagerCompanyLinks, irataTaskLogs, employeeTimeOff } from "@shared/schema";
-import type { User, InsertUser, Client, InsertClient, Project, InsertProject, CustomJobType, InsertCustomJobType, DropLog, InsertDropLog, WorkSession, InsertWorkSession, Complaint, InsertComplaint, ComplaintNote, InsertComplaintNote, ProjectPhoto, InsertProjectPhoto, JobComment, InsertJobComment, HarnessInspection, InsertHarnessInspection, ToolboxMeeting, InsertToolboxMeeting, FlhaForm, InsertFlhaForm, IncidentReport, InsertIncidentReport, MethodStatement, InsertMethodStatement, PayPeriodConfig, InsertPayPeriodConfig, PayPeriod, InsertPayPeriod, EmployeeHoursSummary, Quote, InsertQuote, QuoteService, InsertQuoteService, QuoteWithServices, GearItem, InsertGearItem, GearAssignment, InsertGearAssignment, GearSerialNumber, InsertGearSerialNumber, ScheduledJob, InsertScheduledJob, JobAssignment, InsertJobAssignment, ScheduledJobWithAssignments, UserPreferences, InsertUserPreferences, PropertyManagerCompanyLink, InsertPropertyManagerCompanyLink, IrataTaskLog, InsertIrataTaskLog, EmployeeTimeOff, InsertEmployeeTimeOff } from "@shared/schema";
+import { users, clients, projects, customJobTypes, dropLogs, workSessions, nonBillableWorkSessions, complaints, complaintNotes, projectPhotos, jobComments, harnessInspections, toolboxMeetings, flhaForms, incidentReports, methodStatements, companyDocuments, payPeriodConfig, payPeriods, quotes, quoteServices, gearItems, gearAssignments, gearSerialNumbers, scheduledJobs, jobAssignments, userPreferences, propertyManagerCompanyLinks, irataTaskLogs, employeeTimeOff, documentReviewSignatures } from "@shared/schema";
+import type { User, InsertUser, Client, InsertClient, Project, InsertProject, CustomJobType, InsertCustomJobType, DropLog, InsertDropLog, WorkSession, InsertWorkSession, Complaint, InsertComplaint, ComplaintNote, InsertComplaintNote, ProjectPhoto, InsertProjectPhoto, JobComment, InsertJobComment, HarnessInspection, InsertHarnessInspection, ToolboxMeeting, InsertToolboxMeeting, FlhaForm, InsertFlhaForm, IncidentReport, InsertIncidentReport, MethodStatement, InsertMethodStatement, PayPeriodConfig, InsertPayPeriodConfig, PayPeriod, InsertPayPeriod, EmployeeHoursSummary, Quote, InsertQuote, QuoteService, InsertQuoteService, QuoteWithServices, GearItem, InsertGearItem, GearAssignment, InsertGearAssignment, GearSerialNumber, InsertGearSerialNumber, ScheduledJob, InsertScheduledJob, JobAssignment, InsertJobAssignment, ScheduledJobWithAssignments, UserPreferences, InsertUserPreferences, PropertyManagerCompanyLink, InsertPropertyManagerCompanyLink, IrataTaskLog, InsertIrataTaskLog, EmployeeTimeOff, InsertEmployeeTimeOff, DocumentReviewSignature, InsertDocumentReviewSignature } from "@shared/schema";
 import { eq, and, or, desc, sql, isNull, isNotNull, not, gte, lte, between, inArray } from "drizzle-orm";
 import bcrypt from "bcrypt";
 
@@ -1283,6 +1283,117 @@ export class Storage {
 
   async deleteMethodStatement(id: string): Promise<void> {
     await db.delete(methodStatements).where(eq(methodStatements.id, id));
+  }
+
+  // Document Review Signature operations
+  async createDocumentReviewSignature(signature: InsertDocumentReviewSignature): Promise<DocumentReviewSignature> {
+    const result = await db.insert(documentReviewSignatures).values(signature).returning();
+    return result[0];
+  }
+
+  async getDocumentReviewSignaturesByEmployee(employeeId: string): Promise<DocumentReviewSignature[]> {
+    return db.select().from(documentReviewSignatures)
+      .where(eq(documentReviewSignatures.employeeId, employeeId))
+      .orderBy(desc(documentReviewSignatures.createdAt));
+  }
+
+  async getDocumentReviewSignaturesByCompany(companyId: string): Promise<DocumentReviewSignature[]> {
+    return db.select().from(documentReviewSignatures)
+      .where(eq(documentReviewSignatures.companyId, companyId))
+      .orderBy(desc(documentReviewSignatures.signedAt));
+  }
+
+  async getDocumentReviewSignature(employeeId: string, documentType: string, documentId?: string): Promise<DocumentReviewSignature | undefined> {
+    const conditions = [
+      eq(documentReviewSignatures.employeeId, employeeId),
+      eq(documentReviewSignatures.documentType, documentType),
+    ];
+    if (documentId) {
+      conditions.push(eq(documentReviewSignatures.documentId, documentId));
+    } else {
+      conditions.push(isNull(documentReviewSignatures.documentId));
+    }
+    const result = await db.select().from(documentReviewSignatures)
+      .where(and(...conditions))
+      .limit(1);
+    return result[0];
+  }
+
+  async getDocumentReviewSignatureById(id: string): Promise<DocumentReviewSignature | undefined> {
+    const result = await db.select().from(documentReviewSignatures)
+      .where(eq(documentReviewSignatures.id, id))
+      .limit(1);
+    return result[0];
+  }
+
+  async updateDocumentReviewSignature(id: string, updates: Partial<InsertDocumentReviewSignature>): Promise<DocumentReviewSignature> {
+    const result = await db.update(documentReviewSignatures)
+      .set({ ...updates, updatedAt: new Date() })
+      .where(eq(documentReviewSignatures.id, id))
+      .returning();
+    return result[0];
+  }
+
+  async markDocumentViewed(employeeId: string, documentType: string, documentId?: string): Promise<DocumentReviewSignature> {
+    const existing = await this.getDocumentReviewSignature(employeeId, documentType, documentId);
+    if (existing) {
+      if (!existing.viewedAt) {
+        return this.updateDocumentReviewSignature(existing.id, { viewedAt: new Date() });
+      }
+      return existing;
+    }
+    throw new Error("Document review signature not found");
+  }
+
+  async signDocument(id: string, signatureDataUrl: string): Promise<DocumentReviewSignature> {
+    return this.updateDocumentReviewSignature(id, {
+      signedAt: new Date(),
+      signatureDataUrl,
+    });
+  }
+
+  async getUnsignedDocumentsForEmployee(employeeId: string): Promise<DocumentReviewSignature[]> {
+    return db.select().from(documentReviewSignatures)
+      .where(and(
+        eq(documentReviewSignatures.employeeId, employeeId),
+        isNull(documentReviewSignatures.signedAt)
+      ))
+      .orderBy(desc(documentReviewSignatures.createdAt));
+  }
+
+  async getSignedDocumentsForEmployee(employeeId: string): Promise<DocumentReviewSignature[]> {
+    return db.select().from(documentReviewSignatures)
+      .where(and(
+        eq(documentReviewSignatures.employeeId, employeeId),
+        isNotNull(documentReviewSignatures.signedAt)
+      ))
+      .orderBy(desc(documentReviewSignatures.signedAt));
+  }
+
+  async enrollEmployeeInDocumentReviews(companyId: string, employeeId: string, documents: { type: string; id?: string; name: string; version?: string; fileUrl?: string }[]): Promise<DocumentReviewSignature[]> {
+    const results: DocumentReviewSignature[] = [];
+    for (const doc of documents) {
+      const existing = await this.getDocumentReviewSignature(employeeId, doc.type, doc.id);
+      if (!existing) {
+        const signature = await this.createDocumentReviewSignature({
+          companyId,
+          employeeId,
+          documentType: doc.type,
+          documentId: doc.id || null,
+          documentName: doc.name,
+          documentVersion: doc.version || null,
+          fileUrl: doc.fileUrl || null,
+        });
+        results.push(signature);
+      } else {
+        results.push(existing);
+      }
+    }
+    return results;
+  }
+
+  async deleteDocumentReviewSignature(id: string): Promise<void> {
+    await db.delete(documentReviewSignatures).where(eq(documentReviewSignatures.id, id));
   }
 
   // Company documents operations

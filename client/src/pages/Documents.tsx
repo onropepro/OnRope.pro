@@ -18,6 +18,7 @@ import { jsPDF } from "jspdf";
 import JSZip from "jszip";
 import { downloadMethodStatement } from "@/pages/MethodStatementForm";
 import { formatLocalDate, formatLocalDateLong, formatLocalDateMedium, parseLocalDate } from "@/lib/dateUtils";
+import { DocumentReviews } from "@/components/DocumentReviews";
 
 interface DateGroupedItem {
   year: number;
@@ -2181,6 +2182,9 @@ export default function Documents() {
             </Card>
           );
         })()}
+
+        {/* Document Reviews - for employees to review and sign required documents */}
+        <DocumentReviews companyDocuments={[...healthSafetyDocs, ...policyDocs]} />
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <div className="overflow-x-auto -mx-4 px-4 md:mx-0 md:px-0 mb-6">

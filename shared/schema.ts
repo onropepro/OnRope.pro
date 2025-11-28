@@ -1679,6 +1679,45 @@ export const IRATA_TASK_TYPES = [
 
 export type IrataTaskType = typeof IRATA_TASK_TYPES[number]['id'];
 
+// Document Review Signatures table - tracks employee acknowledgment of company documents
+export const documentReviewSignatures = pgTable("document_review_signatures", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  companyId: varchar("company_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  employeeId: varchar("employee_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  
+  // Document identification
+  documentType: varchar("document_type").notNull(), // health_safety_manual | company_policy | method_statement
+  documentId: varchar("document_id"), // For method statements, the ID of the specific method statement
+  documentName: varchar("document_name").notNull(), // Human-readable name for display
+  
+  // Document reference - for accessing the actual file
+  fileUrl: text("file_url"), // URL to the document file for viewing
+  
+  // Review tracking
+  viewedAt: timestamp("viewed_at"), // When the employee first opened the document
+  signedAt: timestamp("signed_at"), // When the employee signed the document
+  signatureDataUrl: text("signature_data_url"), // Digital signature image data URL
+  
+  // Versioning - to track if document has been updated since last review
+  documentVersion: varchar("document_version"), // Optional version identifier
+  
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+}, (table) => [
+  index("IDX_doc_review_company").on(table.companyId),
+  index("IDX_doc_review_employee").on(table.employeeId),
+  index("IDX_doc_review_document").on(table.documentType, table.documentId),
+]);
+
+export const insertDocumentReviewSignatureSchema = createInsertSchema(documentReviewSignatures).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type DocumentReviewSignature = typeof documentReviewSignatures.$inferSelect;
+export type InsertDocumentReviewSignature = z.infer<typeof insertDocumentReviewSignatureSchema>;
+
 // User preferences table
 export const userPreferences = pgTable("user_preferences", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),

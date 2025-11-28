@@ -7831,6 +7831,343 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // ==================== DOCUMENT REVIEW SIGNATURES ROUTES ====================
+
+  // Get current employee's document review requirements (pending and signed)
+  app.get("/api/document-reviews/my", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      const reviews = await storage.getDocumentReviewSignaturesByEmployee(currentUser.id);
+      res.json({ reviews });
+    } catch (error) {
+      console.error("Get my document reviews error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Get all document review signatures for company (admin view)
+  app.get("/api/document-reviews", requireAuth, requireRole("operations_manager", "company"), async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      const companyId = currentUser.role === "company" ? currentUser.id : currentUser.companyId;
+      
+      if (!companyId) {
+        return res.status(400).json({ message: "Unable to determine company" });
+      }
+      
+      const reviews = await storage.getDocumentReviewSignaturesByCompany(companyId);
+      res.json({ reviews });
+    } catch (error) {
+      console.error("Get company document reviews error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Enroll an employee in document reviews (creates pending review entries)
+  app.post("/api/document-reviews/enroll/:employeeId", requireAuth, requireRole("operations_manager", "company"), async (req: Request, res: Response) => {
+    try {
+      const { employeeId } = req.params;
+      const { documents } = req.body; // Array of { type, id?, name, version?, fileUrl? }
+      
+      // Validate documents array
+      if (!Array.isArray(documents) || documents.length === 0) {
+        return res.status(400).json({ message: "Documents array is required" });
+      }
+      
+      const validDocTypes = ['health_safety_manual', 'company_policy', 'method_statement'];
+      for (const doc of documents) {
+        if (!doc.type || !validDocTypes.includes(doc.type)) {
+          return res.status(400).json({ message: `Invalid document type: ${doc.type}` });
+        }
+        if (!doc.name || typeof doc.name !== 'string') {
+          return res.status(400).json({ message: "Document name is required" });
+        }
+      }
+      
+      const currentUser = await storage.getUserById(req.session.userId!);
+      
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      const companyId = currentUser.role === "company" ? currentUser.id : currentUser.companyId;
+      
+      if (!companyId) {
+        return res.status(400).json({ message: "Unable to determine company" });
+      }
+      
+      // Verify the employee belongs to this company
+      const employee = await storage.getUserById(employeeId);
+      if (!employee || employee.companyId !== companyId) {
+        return res.status(403).json({ message: "Employee not found or access denied" });
+      }
+      
+      // Resolve document references and validate fileUrls
+      const resolvedDocuments: { type: string; id?: string; name: string; version?: string; fileUrl?: string }[] = [];
+      
+      for (const doc of documents) {
+        let fileUrl = doc.fileUrl;
+        
+        // For health_safety_manual and company_policy, resolve from company documents
+        if ((doc.type === 'health_safety_manual' || doc.type === 'company_policy') && !fileUrl) {
+          const companyDocs = await storage.getCompanyDocumentsByType(companyId, doc.type);
+          if (companyDocs.length > 0) {
+            fileUrl = companyDocs[0].fileUrl;
+          }
+        }
+        
+        // For method_statement, resolve from method statements table
+        if (doc.type === 'method_statement' && doc.id && !fileUrl) {
+          const methodStatement = await storage.getMethodStatementById(doc.id);
+          if (methodStatement && methodStatement.companyId === companyId) {
+            // Method statements don't have file URLs since they're rendered in-app
+            // But we can still validate the reference exists
+            fileUrl = null; // Method statements are viewed in-app, not via file URL
+          } else {
+            return res.status(404).json({ message: `Method statement not found: ${doc.id}` });
+          }
+        }
+        
+        // Require fileUrl for health_safety_manual and company_policy
+        if ((doc.type === 'health_safety_manual' || doc.type === 'company_policy') && !fileUrl) {
+          return res.status(400).json({ message: `No ${doc.type.replace(/_/g, ' ')} document uploaded. Please upload the document first.` });
+        }
+        
+        resolvedDocuments.push({
+          type: doc.type,
+          id: doc.id,
+          name: doc.name,
+          version: doc.version,
+          fileUrl,
+        });
+      }
+      
+      const reviews = await storage.enrollEmployeeInDocumentReviews(companyId, employeeId, resolvedDocuments);
+      res.json({ reviews });
+    } catch (error) {
+      console.error("Enroll employee in document reviews error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Mark document as viewed
+  app.post("/api/document-reviews/:id/view", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      const currentUser = await storage.getUserById(req.session.userId!);
+      
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      // Get the review record directly by ID
+      const review = await storage.getDocumentReviewSignatureById(id);
+      
+      if (!review) {
+        return res.status(404).json({ message: "Document review not found" });
+      }
+      
+      // Verify ownership - employee can only view their own reviews
+      if (review.employeeId !== currentUser.id) {
+        return res.status(403).json({ message: "Access denied" });
+      }
+      
+      // Only update if not already viewed
+      if (!review.viewedAt) {
+        const updated = await storage.updateDocumentReviewSignature(id, { viewedAt: new Date() });
+        return res.json({ review: updated });
+      }
+      
+      res.json({ review });
+    } catch (error) {
+      console.error("Mark document viewed error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Sign a document (requires it to be viewed first)
+  app.post("/api/document-reviews/:id/sign", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      const { signatureDataUrl } = req.body;
+      
+      if (!signatureDataUrl || typeof signatureDataUrl !== 'string') {
+        return res.status(400).json({ message: "Valid signature data URL is required" });
+      }
+      
+      // Validate signature data URL format (base64 data URL)
+      if (!signatureDataUrl.startsWith('data:image/')) {
+        return res.status(400).json({ message: "Invalid signature format" });
+      }
+      
+      const currentUser = await storage.getUserById(req.session.userId!);
+      
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      // Get the review record directly by ID
+      const review = await storage.getDocumentReviewSignatureById(id);
+      
+      if (!review) {
+        return res.status(404).json({ message: "Document review not found" });
+      }
+      
+      // Verify ownership - employee can only sign their own reviews
+      if (review.employeeId !== currentUser.id) {
+        return res.status(403).json({ message: "Access denied" });
+      }
+      
+      // Ensure document was viewed before signing
+      if (!review.viewedAt) {
+        return res.status(400).json({ message: "Document must be viewed before signing" });
+      }
+      
+      // Prevent re-signing already signed documents
+      if (review.signedAt) {
+        return res.status(400).json({ message: "Document has already been signed" });
+      }
+      
+      const updated = await storage.signDocument(id, signatureDataUrl);
+      res.json({ review: updated });
+    } catch (error) {
+      console.error("Sign document error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Delete a document review requirement (admin only)
+  app.delete("/api/document-reviews/:id", requireAuth, requireRole("operations_manager", "company"), async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      const currentUser = await storage.getUserById(req.session.userId!);
+      
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      const companyId = currentUser.role === "company" ? currentUser.id : currentUser.companyId;
+      
+      if (!companyId) {
+        return res.status(400).json({ message: "Unable to determine company" });
+      }
+      
+      // Get the review record directly by ID
+      const review = await storage.getDocumentReviewSignatureById(id);
+      
+      if (!review) {
+        return res.status(404).json({ message: "Document review not found" });
+      }
+      
+      // Verify company ownership
+      if (review.companyId !== companyId) {
+        return res.status(403).json({ message: "Access denied" });
+      }
+      
+      await storage.deleteDocumentReviewSignature(id);
+      res.json({ message: "Document review deleted successfully" });
+    } catch (error) {
+      console.error("Delete document review error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Bulk enroll all employees in required document reviews (when a new document is uploaded)
+  app.post("/api/document-reviews/enroll-all", requireAuth, requireRole("operations_manager", "company"), async (req: Request, res: Response) => {
+    try {
+      const { documents } = req.body; // Array of { type, id?, name, version?, fileUrl? }
+      
+      // Validate documents array
+      if (!Array.isArray(documents) || documents.length === 0) {
+        return res.status(400).json({ message: "Documents array is required" });
+      }
+      
+      const validDocTypes = ['health_safety_manual', 'company_policy', 'method_statement'];
+      for (const doc of documents) {
+        if (!doc.type || !validDocTypes.includes(doc.type)) {
+          return res.status(400).json({ message: `Invalid document type: ${doc.type}` });
+        }
+        if (!doc.name || typeof doc.name !== 'string') {
+          return res.status(400).json({ message: "Document name is required" });
+        }
+      }
+      
+      const currentUser = await storage.getUserById(req.session.userId!);
+      
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      const companyId = currentUser.role === "company" ? currentUser.id : currentUser.companyId;
+      
+      if (!companyId) {
+        return res.status(400).json({ message: "Unable to determine company" });
+      }
+      
+      // Resolve document references and validate fileUrls
+      const resolvedDocuments: { type: string; id?: string; name: string; version?: string; fileUrl?: string }[] = [];
+      
+      for (const doc of documents) {
+        let fileUrl = doc.fileUrl;
+        
+        // For health_safety_manual and company_policy, resolve from company documents
+        if ((doc.type === 'health_safety_manual' || doc.type === 'company_policy') && !fileUrl) {
+          const companyDocs = await storage.getCompanyDocumentsByType(companyId, doc.type);
+          if (companyDocs.length > 0) {
+            fileUrl = companyDocs[0].fileUrl;
+          }
+        }
+        
+        // For method_statement, resolve from method statements table
+        if (doc.type === 'method_statement' && doc.id && !fileUrl) {
+          const methodStatement = await storage.getMethodStatementById(doc.id);
+          if (methodStatement && methodStatement.companyId === companyId) {
+            fileUrl = null; // Method statements are viewed in-app
+          } else {
+            return res.status(404).json({ message: `Method statement not found: ${doc.id}` });
+          }
+        }
+        
+        // Require fileUrl for health_safety_manual and company_policy
+        if ((doc.type === 'health_safety_manual' || doc.type === 'company_policy') && !fileUrl) {
+          return res.status(400).json({ message: `No ${doc.type.replace(/_/g, ' ')} document uploaded. Please upload the document first.` });
+        }
+        
+        resolvedDocuments.push({
+          type: doc.type,
+          id: doc.id,
+          name: doc.name,
+          version: doc.version,
+          fileUrl,
+        });
+      }
+      
+      // Get all employees
+      const employees = await storage.getUsersByCompanyId(companyId);
+      const results: any[] = [];
+      
+      for (const employee of employees) {
+        const reviews = await storage.enrollEmployeeInDocumentReviews(companyId, employee.id, resolvedDocuments);
+        results.push({ employeeId: employee.id, employeeName: employee.name, reviews });
+      }
+      
+      res.json({ enrollments: results });
+    } catch (error) {
+      console.error("Bulk enroll employees error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
   // ==================== COMPANY DOCUMENTS ROUTES ====================
 
   // Upload company document (Health & Safety Manual or Company Policy)
