@@ -2264,23 +2264,23 @@ export default function Documents() {
                     <CollapsibleTrigger className="flex items-center gap-2 w-full p-2 rounded-lg hover-elevate">
                       <ChevronRight className="h-4 w-4 transition-transform duration-200 [&[data-state=open]>svg]:rotate-90" />
                       <span className="font-semibold">{yearGroup.year}</span>
-                      <Badge variant="secondary" size="sm">{yearGroup.count}</Badge>
+                      <Badge variant="secondary">{yearGroup.totalCount}</Badge>
                     </CollapsibleTrigger>
                     <CollapsibleContent className="pl-4 space-y-1 mt-1">
                       {yearGroup.months.map((monthGroup) => (
-                        <Collapsible key={monthGroup.month} defaultOpen={monthGroup.month === format(new Date(), 'MMMM')}>
+                        <Collapsible key={monthGroup.month} defaultOpen={monthGroup.monthName === new Date().toLocaleDateString('en-US', { month: 'long' })}>
                           <CollapsibleTrigger className="flex items-center gap-2 w-full p-2 rounded-lg hover-elevate">
                             <ChevronRight className="h-4 w-4 transition-transform duration-200" />
-                            <span className="font-medium">{monthGroup.month}</span>
-                            <Badge variant="outline" size="sm">{monthGroup.count}</Badge>
+                            <span className="font-medium">{monthGroup.monthName}</span>
+                            <Badge variant="outline">{monthGroup.totalCount}</Badge>
                           </CollapsibleTrigger>
                           <CollapsibleContent className="pl-4 space-y-1 mt-1">
                             {monthGroup.days.map((dayGroup) => (
                               <Collapsible key={dayGroup.day}>
                                 <CollapsibleTrigger className="flex items-center gap-2 w-full p-2 rounded-lg hover-elevate">
                                   <ChevronRight className="h-4 w-4 transition-transform duration-200" />
-                                  <span className="text-sm">{dayGroup.day}</span>
-                                  <Badge variant="outline" size="sm">{dayGroup.count}</Badge>
+                                  <span className="text-sm">{dayGroup.formattedDate}</span>
+                                  <Badge variant="outline">{dayGroup.items.length}</Badge>
                                 </CollapsibleTrigger>
                                 <CollapsibleContent className="pl-4 space-y-2 mt-1">
                                   {dayGroup.items.map((doc: any) => (
@@ -2394,23 +2394,23 @@ export default function Documents() {
                     <CollapsibleTrigger className="flex items-center gap-2 w-full p-2 rounded-lg hover-elevate">
                       <ChevronRight className="h-4 w-4 transition-transform duration-200 [&[data-state=open]>svg]:rotate-90" />
                       <span className="font-semibold">{yearGroup.year}</span>
-                      <Badge variant="secondary" size="sm">{yearGroup.count}</Badge>
+                      <Badge variant="secondary">{yearGroup.totalCount}</Badge>
                     </CollapsibleTrigger>
                     <CollapsibleContent className="pl-4 space-y-1 mt-1">
                       {yearGroup.months.map((monthGroup) => (
-                        <Collapsible key={monthGroup.month} defaultOpen={monthGroup.month === format(new Date(), 'MMMM')}>
+                        <Collapsible key={monthGroup.month} defaultOpen={monthGroup.monthName === new Date().toLocaleDateString('en-US', { month: 'long' })}>
                           <CollapsibleTrigger className="flex items-center gap-2 w-full p-2 rounded-lg hover-elevate">
                             <ChevronRight className="h-4 w-4 transition-transform duration-200" />
-                            <span className="font-medium">{monthGroup.month}</span>
-                            <Badge variant="outline" size="sm">{monthGroup.count}</Badge>
+                            <span className="font-medium">{monthGroup.monthName}</span>
+                            <Badge variant="outline">{monthGroup.totalCount}</Badge>
                           </CollapsibleTrigger>
                           <CollapsibleContent className="pl-4 space-y-1 mt-1">
                             {monthGroup.days.map((dayGroup) => (
                               <Collapsible key={dayGroup.day}>
                                 <CollapsibleTrigger className="flex items-center gap-2 w-full p-2 rounded-lg hover-elevate">
                                   <ChevronRight className="h-4 w-4 transition-transform duration-200" />
-                                  <span className="text-sm">{dayGroup.day}</span>
-                                  <Badge variant="outline" size="sm">{dayGroup.count}</Badge>
+                                  <span className="text-sm">{dayGroup.formattedDate}</span>
+                                  <Badge variant="outline">{dayGroup.items.length}</Badge>
                                 </CollapsibleTrigger>
                                 <CollapsibleContent className="pl-4 space-y-2 mt-1">
                                   {dayGroup.items.map((doc: any) => (
@@ -2523,23 +2523,23 @@ export default function Documents() {
                           <CollapsibleTrigger className="flex items-center gap-2 w-full p-2 rounded-lg hover-elevate">
                             <ChevronRight className="h-4 w-4 transition-transform duration-200 [&[data-state=open]>svg]:rotate-90" />
                             <span className="font-semibold">{yearGroup.year}</span>
-                            <Badge variant="secondary" size="sm">{yearGroup.count}</Badge>
+                            <Badge variant="secondary">{yearGroup.totalCount}</Badge>
                           </CollapsibleTrigger>
                           <CollapsibleContent className="pl-4 space-y-1 mt-1">
                             {yearGroup.months.map((monthGroup) => (
-                              <Collapsible key={monthGroup.month} defaultOpen={monthGroup.month === format(new Date(), 'MMMM')}>
+                              <Collapsible key={monthGroup.month} defaultOpen={monthGroup.monthName === new Date().toLocaleDateString('en-US', { month: 'long' })}>
                                 <CollapsibleTrigger className="flex items-center gap-2 w-full p-2 rounded-lg hover-elevate">
                                   <ChevronRight className="h-4 w-4 transition-transform duration-200" />
-                                  <span className="font-medium">{monthGroup.month}</span>
-                                  <Badge variant="outline" size="sm">{monthGroup.count}</Badge>
+                                  <span className="font-medium">{monthGroup.monthName}</span>
+                                  <Badge variant="outline">{monthGroup.totalCount}</Badge>
                                 </CollapsibleTrigger>
                                 <CollapsibleContent className="pl-4 space-y-1 mt-1">
                                   {monthGroup.days.map((dayGroup) => (
                                     <Collapsible key={dayGroup.day}>
                                       <CollapsibleTrigger className="flex items-center gap-2 w-full p-2 rounded-lg hover-elevate">
                                         <ChevronRight className="h-4 w-4 transition-transform duration-200" />
-                                        <span className="text-sm">{dayGroup.day}</span>
-                                        <Badge variant="outline" size="sm">{dayGroup.count}</Badge>
+                                        <span className="text-sm">{dayGroup.formattedDate}</span>
+                                        <Badge variant="outline">{dayGroup.items.length}</Badge>
                                       </CollapsibleTrigger>
                                       <CollapsibleContent className="pl-4 space-y-2 mt-1">
                                         {dayGroup.items.map((doc: any) => (
