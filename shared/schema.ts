@@ -362,6 +362,8 @@ export const gearSerialNumbers = pgTable("gear_serial_numbers", {
   serialNumber: text("serial_number").notNull(),
   dateOfManufacture: date("date_of_manufacture"), // Per-item manufacture date
   dateInService: date("date_in_service"), // Per-item in-service date
+  isRetired: boolean("is_retired").notNull().default(false), // Whether this specific unit is retired
+  retiredAt: timestamp("retired_at"), // When this unit was retired
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 }, (table) => [
@@ -375,6 +377,7 @@ export const equipmentDamageReports = pgTable("equipment_damage_reports", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   companyId: varchar("company_id").notNull().references(() => users.id, { onDelete: "cascade" }),
   gearItemId: varchar("gear_item_id").notNull().references(() => gearItems.id, { onDelete: "cascade" }),
+  gearSerialNumberId: varchar("gear_serial_number_id").references(() => gearSerialNumbers.id, { onDelete: "set null" }), // Optional link to specific serial number
   reportedBy: varchar("reported_by").notNull().references(() => users.id, { onDelete: "cascade" }),
   reporterName: varchar("reporter_name").notNull(),
   equipmentCategory: varchar("equipment_category").notNull(),
@@ -395,6 +398,7 @@ export const equipmentDamageReports = pgTable("equipment_damage_reports", {
 }, (table) => [
   index("IDX_equipment_damage_reports_company").on(table.companyId),
   index("IDX_equipment_damage_reports_gear").on(table.gearItemId),
+  index("IDX_equipment_damage_reports_serial").on(table.gearSerialNumberId),
   index("IDX_equipment_damage_reports_reporter").on(table.reportedBy),
   index("IDX_equipment_damage_reports_date").on(table.discoveredDate),
 ]);

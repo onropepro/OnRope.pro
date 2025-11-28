@@ -6881,11 +6881,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       const report = await storage.createEquipmentDamageReport(reportData);
       
-      // If equipment was retired, update the gear item status
+      // If equipment was retired, handle retirement based on whether a specific serial number was selected
       if (report.equipmentRetired && report.gearItemId) {
-        await db.update(gearItems)
-          .set({ status: "retired", notes: `Retired due to damage: ${report.damageDescription}` })
-          .where(eq(gearItems.id, report.gearItemId));
+        if (report.gearSerialNumberId) {
+          // Retire only the specific serial number entry
+          await db.update(gearSerialNumbers)
+            .set({ 
+              isRetired: true, 
+              retiredAt: new Date(),
+            })
+            .where(eq(gearSerialNumbers.id, report.gearSerialNumberId));
+        } else {
+          // No specific serial number - decrement quantity by 1 (minimum 0)
+          const currentItem = gearItem[0];
+          const newQuantity = Math.max(0, (currentItem.quantity || 1) - 1);
+          await db.update(gearItems)
+            .set({ 
+              quantity: newQuantity,
+              inService: newQuantity > 0, // Mark as out of service if quantity is 0
+              notes: `${currentItem.notes || ''}\nRetired 1 unit due to damage: ${report.damageDescription}`.trim(),
+            })
+            .where(eq(gearItems.id, report.gearItemId));
+        }
       }
       
       res.json({ report });

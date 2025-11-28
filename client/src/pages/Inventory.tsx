@@ -106,6 +106,8 @@ export default function Inventory() {
   const [damageReportStep, setDamageReportStep] = useState(1);
   const [selectedDamageCategory, setSelectedDamageCategory] = useState("");
   const [selectedDamageItem, setSelectedDamageItem] = useState<GearItem | null>(null);
+  const [selectedDamageSerialEntry, setSelectedDamageSerialEntry] = useState<any | null>(null); // Selected specific unit
+  const [selectedDamageUnitIndex, setSelectedDamageUnitIndex] = useState<number | null>(null); // For items without serial numbers
   const [damageDescription, setDamageDescription] = useState("");
   const [damageLocation, setDamageLocation] = useState("");
   const [damageSeverity, setDamageSeverity] = useState<"minor" | "moderate" | "severe" | "critical">("moderate");
@@ -247,6 +249,8 @@ export default function Inventory() {
     setDamageReportStep(1);
     setSelectedDamageCategory("");
     setSelectedDamageItem(null);
+    setSelectedDamageSerialEntry(null);
+    setSelectedDamageUnitIndex(null);
     setDamageDescription("");
     setDamageLocation("");
     setDamageSeverity("moderate");
@@ -3994,11 +3998,11 @@ export default function Inventory() {
             </div>
           )}
 
-          {/* Step 2: Select Item */}
+          {/* Step 2: Select Specific Unit */}
           {damageReportStep === 2 && (
             <div className="space-y-4">
               {(() => {
-                const categoryItems = (gearData?.items || []).filter(
+                const categoryItems = ((gearData?.items || []) as any[]).filter(
                   item => item.equipmentType === selectedDamageCategory
                 );
                 
@@ -4014,30 +4018,91 @@ export default function Inventory() {
                   );
                 }
                 
+                // Build a list of all selectable units across all items
+                const allUnits: Array<{
+                  item: any;
+                  serialEntry?: any;
+                  unitIndex?: number;
+                  displayName: string;
+                  isRetired?: boolean;
+                }> = [];
+                
+                categoryItems.forEach((item) => {
+                  const serialEntries = (item.serialEntries || []).filter((s: any) => !s.isRetired);
+                  
+                  if (serialEntries.length > 0) {
+                    // Item has serial numbers - show each as a separate unit
+                    serialEntries.forEach((entry: any) => {
+                      allUnits.push({
+                        item,
+                        serialEntry: entry,
+                        displayName: `${item.brand || ''} ${item.model || ''} - SN: ${entry.serialNumber}`.trim(),
+                        isRetired: entry.isRetired,
+                      });
+                    });
+                  } else if (item.quantity > 0) {
+                    // No serial numbers but has quantity - show numbered units
+                    for (let i = 0; i < item.quantity; i++) {
+                      allUnits.push({
+                        item,
+                        unitIndex: i,
+                        displayName: `${item.brand || ''} ${item.model || ''} - Unit ${i + 1}`.trim(),
+                      });
+                    }
+                  }
+                });
+                
+                if (allUnits.length === 0) {
+                  return (
+                    <div className="text-center py-8 space-y-3">
+                      <Wrench className="h-12 w-12 mx-auto text-muted-foreground/50" />
+                      <p className="text-muted-foreground">No available {selectedDamageCategory} units in inventory</p>
+                      <Button variant="outline" onClick={() => setDamageReportStep(1)}>
+                        Choose Different Category
+                      </Button>
+                    </div>
+                  );
+                }
+                
                 return (
                   <div className="space-y-2 max-h-[50vh] overflow-y-auto">
-                    {categoryItems.map((item) => (
-                      <Card
-                        key={item.id}
-                        className={`cursor-pointer hover-elevate active-elevate-2 transition-all ${
-                          selectedDamageItem?.id === item.id ? "bg-primary/10 border-primary border-2" : ""
-                        }`}
-                        onClick={() => setSelectedDamageItem(item)}
-                        data-testid={`card-damage-item-${item.id}`}
-                      >
-                        <CardContent className="p-3 flex items-center justify-between gap-3">
-                          <div className="flex-1">
-                            <div className="font-medium">{item.brand} {item.model}</div>
-                            <div className="text-sm text-muted-foreground">
-                              Qty: {item.quantity}
+                    <p className="text-sm text-muted-foreground mb-3">
+                      Select the specific unit that was damaged:
+                    </p>
+                    {allUnits.map((unit, idx) => {
+                      const isSelected = selectedDamageItem?.id === unit.item.id && 
+                        ((unit.serialEntry && selectedDamageSerialEntry?.id === unit.serialEntry.id) ||
+                         (unit.unitIndex !== undefined && selectedDamageUnitIndex === unit.unitIndex));
+                      
+                      return (
+                        <Card
+                          key={`${unit.item.id}-${unit.serialEntry?.id || unit.unitIndex}`}
+                          className={`cursor-pointer hover-elevate active-elevate-2 transition-all ${
+                            isSelected ? "bg-primary/10 border-primary border-2" : ""
+                          }`}
+                          onClick={() => {
+                            setSelectedDamageItem(unit.item);
+                            setSelectedDamageSerialEntry(unit.serialEntry || null);
+                            setSelectedDamageUnitIndex(unit.unitIndex ?? null);
+                          }}
+                          data-testid={`card-damage-unit-${idx}`}
+                        >
+                          <CardContent className="p-3 flex items-center justify-between gap-3">
+                            <div className="flex-1">
+                              <div className="font-medium">{unit.displayName}</div>
+                              {unit.serialEntry?.dateOfManufacture && (
+                                <div className="text-xs text-muted-foreground">
+                                  Mfg: {unit.serialEntry.dateOfManufacture}
+                                </div>
+                              )}
                             </div>
-                          </div>
-                          {selectedDamageItem?.id === item.id && (
-                            <span className="material-icons text-primary">check_circle</span>
-                          )}
-                        </CardContent>
-                      </Card>
-                    ))}
+                            {isSelected && (
+                              <span className="material-icons text-primary">check_circle</span>
+                            )}
+                          </CardContent>
+                        </Card>
+                      );
+                    })}
                   </div>
                 );
               })()}
@@ -4072,7 +4137,11 @@ export default function Inventory() {
                     </div>
                     <div>
                       <div className="font-medium">{selectedDamageItem?.brand} {selectedDamageItem?.model}</div>
-                      <div className="text-sm text-muted-foreground">{selectedDamageCategory}</div>
+                      <div className="text-sm text-muted-foreground">
+                        {selectedDamageCategory}
+                        {selectedDamageSerialEntry && ` - SN: ${selectedDamageSerialEntry.serialNumber}`}
+                        {selectedDamageUnitIndex !== null && !selectedDamageSerialEntry && ` - Unit ${selectedDamageUnitIndex + 1}`}
+                      </div>
                     </div>
                   </div>
                 </CardContent>
@@ -4217,6 +4286,7 @@ export default function Inventory() {
                     
                     createDamageReportMutation.mutate({
                       gearItemId: selectedDamageItem?.id,
+                      gearSerialNumberId: selectedDamageSerialEntry?.id || null,
                       equipmentCategory: selectedDamageCategory,
                       damageDescription: damageDescription.trim(),
                       damageLocation: damageLocation.trim() || null,
@@ -4226,6 +4296,7 @@ export default function Inventory() {
                       retirementReason: retireEquipment ? retirementReason.trim() : null,
                       correctiveAction: correctiveAction.trim() || null,
                       notes: damageNotes.trim() || null,
+                      serialNumber: selectedDamageSerialEntry?.serialNumber || null,
                     });
                   }}
                   disabled={createDamageReportMutation.isPending}
