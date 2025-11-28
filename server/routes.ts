@@ -8149,8 +8149,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
       
-      // Get all employees
-      const employees = await storage.getUsersByCompanyId(companyId);
+      // Get all employees for this company
+      const employees = await storage.getAllEmployees(companyId);
       const results: any[] = [];
       
       for (const employee of employees) {
