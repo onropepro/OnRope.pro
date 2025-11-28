@@ -3148,7 +3148,7 @@ export default function Documents() {
               
               return {
                 employeeId: employee.id,
-                employeeName: employee.fullName || employee.username || 'Unknown',
+                employeeName: employee.name || employee.email || 'Unknown',
                 reviews,
                 signedCount: signed.length,
                 pendingCount: requiredDocs.length - signed.length, // Pending = required docs not yet signed
