@@ -7844,7 +7844,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       if (companyId) {
         // Auto-enroll: Check for required documents that the employee hasn't been enrolled for yet
-        const requiredDocTypes = ['health_safety_manual', 'company_policy'];
+        const requiredDocTypes = ['health_safety_manual', 'company_policy', 'safe_work_procedure'];
         const existingReviews = await storage.getDocumentReviewSignaturesByEmployee(currentUser.id);
         const existingDocIds = new Set(existingReviews.map(r => r.documentId).filter(Boolean));
         
