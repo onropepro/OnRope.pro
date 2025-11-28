@@ -15,11 +15,12 @@ import { useToast } from "@/hooks/use-toast";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { insertGearItemSchema, type InsertGearItem, type GearItem, type GearAssignment, type GearSerialNumber } from "@shared/schema";
-import { ArrowLeft, Plus, Pencil, X, Trash2, Shield, Cable, Link2, Gauge, TrendingUp, HardHat, Hand, Fuel, Scissors, PaintBucket, Droplets, CircleDot, Lock, Anchor, MoreHorizontal, Users, ShieldAlert } from "lucide-react";
+import { ArrowLeft, Plus, Pencil, X, Trash2, Shield, Cable, Link2, Gauge, TrendingUp, HardHat, Hand, Fuel, Scissors, PaintBucket, Droplets, CircleDot, Lock, Anchor, MoreHorizontal, Users, ShieldAlert, AlertTriangle, FileWarning, FileDown, Wrench } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import { hasFinancialAccess, canViewCSR, canAccessInventory, canManageInventory, canAssignGear, canViewGearAssignments } from "@/lib/permissions";
 import HarnessInspectionForm from "./HarnessInspectionForm";
 import { format } from "date-fns";
+import { jsPDF } from "jspdf";
 
 const gearTypes = [
   { name: "Harness", icon: Shield },
@@ -99,6 +100,20 @@ export default function Inventory() {
   const [editMySerialNumber, setEditMySerialNumber] = useState<string>("");
   const [editMyDateOfManufacture, setEditMyDateOfManufacture] = useState<string>("");
   const [editMyDateInService, setEditMyDateInService] = useState<string>("");
+
+  // Damage report state
+  const [showDamageReportDialog, setShowDamageReportDialog] = useState(false);
+  const [damageReportStep, setDamageReportStep] = useState(1);
+  const [selectedDamageCategory, setSelectedDamageCategory] = useState("");
+  const [selectedDamageItem, setSelectedDamageItem] = useState<GearItem | null>(null);
+  const [damageDescription, setDamageDescription] = useState("");
+  const [damageLocation, setDamageLocation] = useState("");
+  const [damageSeverity, setDamageSeverity] = useState<"minor" | "moderate" | "severe" | "critical">("moderate");
+  const [discoveredDate, setDiscoveredDate] = useState(format(new Date(), "yyyy-MM-dd"));
+  const [retireEquipment, setRetireEquipment] = useState(false);
+  const [retirementReason, setRetirementReason] = useState("");
+  const [correctiveAction, setCorrectiveAction] = useState("");
+  const [damageNotes, setDamageNotes] = useState("");
 
   // Fetch current user
   const { data: userData } = useQuery<{ user: any }>({
@@ -195,6 +210,243 @@ export default function Inventory() {
     },
     enabled: !!managingItem?.id,
   });
+
+  // Fetch equipment damage reports
+  const { data: damageReportsData, isLoading: damageReportsLoading } = useQuery<{ reports: any[] }>({
+    queryKey: ["/api/equipment-damage-reports"],
+  });
+
+  // Create damage report mutation
+  const createDamageReportMutation = useMutation({
+    mutationFn: async (data: any) => {
+      const response = await apiRequest("POST", "/api/equipment-damage-reports", data);
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/equipment-damage-reports"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/gear-items"] });
+      toast({
+        title: "Damage Report Submitted",
+        description: retireEquipment 
+          ? "The damage report has been created and the equipment has been retired." 
+          : "The damage report has been created successfully.",
+      });
+      resetDamageReportDialog();
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to create damage report",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const resetDamageReportDialog = () => {
+    setShowDamageReportDialog(false);
+    setDamageReportStep(1);
+    setSelectedDamageCategory("");
+    setSelectedDamageItem(null);
+    setDamageDescription("");
+    setDamageLocation("");
+    setDamageSeverity("moderate");
+    setDiscoveredDate(format(new Date(), "yyyy-MM-dd"));
+    setRetireEquipment(false);
+    setRetirementReason("");
+    setCorrectiveAction("");
+    setDamageNotes("");
+  };
+
+  // PDF generation for damage reports
+  const downloadDamageReportPdf = (report: any) => {
+    const doc = new jsPDF();
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const pageHeight = doc.internal.pageSize.getHeight();
+    let yPosition = 20;
+
+    // Helper function to add multi-line text
+    const addMultilineText = (text: string, x: number, currentY: number, maxWidth: number, lineHeight: number = 6): number => {
+      const lines = doc.splitTextToSize(text, maxWidth);
+      let y = currentY;
+      for (const line of lines) {
+        if (y > pageHeight - 30) {
+          doc.addPage();
+          y = 20;
+        }
+        doc.text(line, x, y);
+        y += lineHeight;
+      }
+      return y;
+    };
+
+    // Company branding if active
+    let brandingHeight = 0;
+    if (currentUser?.whitelabelBrandingActive && currentUser?.companyName) {
+      brandingHeight = 5;
+    }
+
+    // Header - Orange for damage report
+    doc.setFillColor(251, 146, 60); // Orange
+    const headerHeight = 35 + brandingHeight;
+    doc.rect(0, 0, pageWidth, headerHeight, 'F');
+
+    if (currentUser?.whitelabelBrandingActive && currentUser?.companyName) {
+      doc.setTextColor(255, 255, 255);
+      doc.setFontSize(9);
+      doc.setFont('helvetica', 'bold');
+      doc.text(currentUser.companyName.toUpperCase(), pageWidth / 2, 8, { align: 'center' });
+    }
+
+    doc.setTextColor(255, 255, 255);
+    doc.setFontSize(20);
+    doc.setFont('helvetica', 'bold');
+    doc.text('EQUIPMENT DAMAGE REPORT', pageWidth / 2, 15 + brandingHeight, { align: 'center' });
+    doc.setFontSize(11);
+    doc.setFont('helvetica', 'normal');
+    doc.text(report.equipmentRetired ? 'Equipment Retirement Document' : 'Damage Documentation Record', pageWidth / 2, 25 + brandingHeight, { align: 'center' });
+
+    yPosition = 45 + brandingHeight;
+
+    // Equipment Information Section
+    doc.setTextColor(0, 0, 0);
+    doc.setFontSize(12);
+    doc.setFont('helvetica', 'bold');
+    doc.text('Equipment Information', 20, yPosition);
+    yPosition += 8;
+
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(10);
+    doc.text(`Equipment Type: ${report.equipmentType || 'N/A'}`, 20, yPosition);
+    yPosition += 6;
+    doc.text(`Brand: ${report.equipmentBrand || 'N/A'}`, 20, yPosition);
+    yPosition += 6;
+    doc.text(`Model: ${report.equipmentModel || 'N/A'}`, 20, yPosition);
+    yPosition += 6;
+    if (report.serialNumber) {
+      doc.text(`Serial Number: ${report.serialNumber}`, 20, yPosition);
+      yPosition += 6;
+    }
+    yPosition += 4;
+
+    // Damage Details Section
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(12);
+    doc.text('Damage Details', 20, yPosition);
+    yPosition += 8;
+
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(10);
+    const discoveredDateStr = report.discoveredDate 
+      ? format(new Date(report.discoveredDate), 'MMMM d, yyyy') 
+      : 'N/A';
+    doc.text(`Date Discovered: ${discoveredDateStr}`, 20, yPosition);
+    yPosition += 6;
+    doc.text(`Reported By: ${report.reporterName || 'Unknown'}`, 20, yPosition);
+    yPosition += 6;
+    
+    // Severity badge
+    const severityColors: Record<string, [number, number, number]> = {
+      minor: [34, 197, 94],
+      moderate: [251, 191, 36],
+      severe: [249, 115, 22],
+      critical: [239, 68, 68]
+    };
+    const severityColor = severityColors[report.damageSeverity] || [100, 100, 100];
+    doc.setTextColor(severityColor[0], severityColor[1], severityColor[2]);
+    doc.setFont('helvetica', 'bold');
+    doc.text(`Severity: ${report.damageSeverity.toUpperCase()}`, 20, yPosition);
+    yPosition += 8;
+
+    // Damage description
+    doc.setTextColor(0, 0, 0);
+    doc.setFont('helvetica', 'bold');
+    doc.text('Description of Damage:', 20, yPosition);
+    yPosition += 6;
+    doc.setFont('helvetica', 'normal');
+    yPosition = addMultilineText(report.damageDescription || 'No description provided.', 20, yPosition, pageWidth - 40);
+    yPosition += 4;
+
+    if (report.damageLocation) {
+      doc.setFont('helvetica', 'bold');
+      doc.text('Location on Equipment:', 20, yPosition);
+      yPosition += 6;
+      doc.setFont('helvetica', 'normal');
+      yPosition = addMultilineText(report.damageLocation, 20, yPosition, pageWidth - 40);
+      yPosition += 4;
+    }
+
+    if (report.correctiveAction) {
+      doc.setFont('helvetica', 'bold');
+      doc.text('Corrective Action Taken:', 20, yPosition);
+      yPosition += 6;
+      doc.setFont('helvetica', 'normal');
+      yPosition = addMultilineText(report.correctiveAction, 20, yPosition, pageWidth - 40);
+      yPosition += 4;
+    }
+
+    // Retirement Section (if applicable)
+    if (report.equipmentRetired) {
+      yPosition += 4;
+      doc.setFillColor(254, 226, 226); // Light red
+      doc.rect(15, yPosition - 5, pageWidth - 30, 30, 'F');
+      
+      doc.setTextColor(185, 28, 28);
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(12);
+      doc.text('EQUIPMENT RETIRED', 20, yPosition + 3);
+      yPosition += 10;
+      
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(10);
+      doc.setTextColor(0, 0, 0);
+      doc.text('Reason for Retirement:', 20, yPosition);
+      yPosition += 6;
+      yPosition = addMultilineText(report.retirementReason || 'No reason provided.', 20, yPosition, pageWidth - 40);
+      yPosition += 8;
+    }
+
+    if (report.notes) {
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(10);
+      doc.text('Additional Notes:', 20, yPosition);
+      yPosition += 6;
+      doc.setFont('helvetica', 'normal');
+      yPosition = addMultilineText(report.notes, 20, yPosition, pageWidth - 40);
+    }
+
+    // Footer
+    const pageCount = doc.getNumberOfPages();
+    for (let i = 1; i <= pageCount; i++) {
+      doc.setPage(i);
+      doc.setFontSize(8);
+      doc.setTextColor(100, 100, 100);
+      doc.text(
+        `Equipment Damage Report - Page ${i} of ${pageCount}`,
+        pageWidth / 2,
+        pageHeight - 10,
+        { align: 'center' }
+      );
+      doc.text(
+        `Generated: ${format(new Date(), 'MMM d, yyyy')}`,
+        pageWidth - 20,
+        pageHeight - 10,
+        { align: 'right' }
+      );
+    }
+
+    // Save
+    const dateStr = report.discoveredDate 
+      ? format(new Date(report.discoveredDate), 'yyyy-MM-dd')
+      : format(new Date(), 'yyyy-MM-dd');
+    const typeStr = (report.equipmentType || 'equipment').toLowerCase().replace(/\s+/g, '-');
+    const filename = `damage-report-${typeStr}-${dateStr}.pdf`;
+    doc.save(filename);
+
+    toast({
+      title: "PDF Downloaded",
+      description: "The damage report has been downloaded.",
+    });
+  };
   
   // Filter for active employees only
   const activeEmployees = (employeesData?.employees || []);
@@ -1118,6 +1370,9 @@ export default function Inventory() {
             <TabsTrigger value="daily-harness" className="flex-1 min-w-fit" data-testid="tab-daily-harness">
               Daily Harness Inspection
             </TabsTrigger>
+            <TabsTrigger value="report-damage" className="flex-1 min-w-fit" data-testid="tab-report-damage">
+              Report Damage
+            </TabsTrigger>
           </TabsList>
 
           {/* My Gear Tab */}
@@ -1872,6 +2127,126 @@ export default function Inventory() {
                     );
                   })()}
                 </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Report Damage Tab */}
+          <TabsContent value="report-damage" className="space-y-4">
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between gap-4 flex-wrap">
+                <div>
+                  <CardTitle className="flex items-center gap-2">
+                    <AlertTriangle className="h-5 w-5 text-orange-500" />
+                    Equipment Damage Reports
+                  </CardTitle>
+                  <CardDescription>Report damaged equipment and track repairs or retirements</CardDescription>
+                </div>
+                <Button 
+                  onClick={() => setShowDamageReportDialog(true)}
+                  data-testid="button-report-damage"
+                >
+                  <Plus className="h-4 w-4 mr-2" />
+                  Report Damage
+                </Button>
+              </CardHeader>
+              <CardContent>
+                {damageReportsLoading ? (
+                  <div className="text-center py-8 text-muted-foreground">
+                    Loading damage reports...
+                  </div>
+                ) : (damageReportsData?.reports || []).length === 0 ? (
+                  <div className="text-center py-8 space-y-4">
+                    <div className="flex flex-col items-center gap-2">
+                      <FileWarning className="h-12 w-12 text-muted-foreground/50" />
+                      <p className="text-muted-foreground">No damage reports filed yet</p>
+                      <p className="text-sm text-muted-foreground/70">
+                        Use this feature to document any equipment damage and track repairs or retirements
+                      </p>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    {(damageReportsData?.reports || []).map((report: any) => (
+                      <Card key={report.id} className={report.equipmentRetired ? "border-red-200 dark:border-red-900/50" : ""}>
+                        <CardContent className="p-4">
+                          <div className="flex items-start justify-between gap-4 flex-wrap">
+                            <div className="space-y-1 flex-1 min-w-[200px]">
+                              <div className="flex items-center gap-2 flex-wrap">
+                                <span className="font-semibold">{report.equipmentType}</span>
+                                {report.equipmentBrand && (
+                                  <span className="text-muted-foreground">- {report.equipmentBrand}</span>
+                                )}
+                                {report.equipmentRetired && (
+                                  <Badge variant="destructive" className="text-xs">Retired</Badge>
+                                )}
+                              </div>
+                              <div className="text-sm text-muted-foreground">
+                                {report.serialNumber && <span>S/N: {report.serialNumber}</span>}
+                              </div>
+                              <div className="text-sm mt-2">
+                                <span className="font-medium">Damage: </span>
+                                {report.damageDescription}
+                              </div>
+                              {report.damageLocation && (
+                                <div className="text-sm text-muted-foreground">
+                                  <span className="font-medium">Location: </span>
+                                  {report.damageLocation}
+                                </div>
+                              )}
+                            </div>
+                            <div className="text-right space-y-1 min-w-[120px]">
+                              <Badge 
+                                variant={
+                                  report.damageSeverity === "critical" ? "destructive" :
+                                  report.damageSeverity === "severe" ? "destructive" :
+                                  report.damageSeverity === "moderate" ? "secondary" : "outline"
+                                }
+                              >
+                                {report.damageSeverity}
+                              </Badge>
+                              <div className="text-xs text-muted-foreground">
+                                {format(new Date(report.discoveredDate), "MMM d, yyyy")}
+                              </div>
+                              <div className="text-xs text-muted-foreground">
+                                by {report.reporterName}
+                              </div>
+                              <Button
+                                size="sm"
+                                variant="ghost"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  downloadDamageReportPdf(report);
+                                }}
+                                data-testid={`button-download-damage-report-${report.id}`}
+                                className="mt-2"
+                              >
+                                <FileDown className="h-4 w-4 mr-1" />
+                                PDF
+                              </Button>
+                            </div>
+                          </div>
+                          {(report.correctiveAction || report.retirementReason) && (
+                            <div className="mt-3 pt-3 border-t space-y-1">
+                              {report.correctiveAction && (
+                                <div className="text-sm">
+                                  <span className="font-medium">Corrective Action: </span>
+                                  {report.correctiveAction}
+                                </div>
+                              )}
+                              {report.retirementReason && (
+                                <div className="text-sm text-red-600 dark:text-red-400">
+                                  <span className="font-medium">Retirement Reason: </span>
+                                  {report.retirementReason}
+                                </div>
+                              )}
+                            </div>
+                          )}
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+                )}
               </CardContent>
             </Card>
           </TabsContent>
@@ -3554,6 +3929,319 @@ export default function Inventory() {
               {editMyGearMutation.isPending ? "Saving..." : "Save Details"}
             </Button>
           </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Report Equipment Damage Dialog */}
+      <Dialog open={showDamageReportDialog} onOpenChange={(open) => {
+        if (!open) resetDamageReportDialog();
+        else setShowDamageReportDialog(open);
+      }}>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto" data-testid="dialog-damage-report">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <AlertTriangle className="h-5 w-5 text-orange-500" />
+              {damageReportStep === 1 ? "Select Equipment Category" : 
+               damageReportStep === 2 ? "Select Equipment Item" :
+               "Report Damage Details"}
+            </DialogTitle>
+            <DialogDescription>
+              {damageReportStep === 1 ? "Choose the type of equipment that was damaged" :
+               damageReportStep === 2 ? "Select the specific item from your inventory" :
+               "Provide details about the damage"}
+            </DialogDescription>
+          </DialogHeader>
+
+          {/* Step 1: Select Category */}
+          {damageReportStep === 1 && (
+            <div className="space-y-4">
+              <div className="grid grid-cols-3 gap-3 max-h-[50vh] overflow-y-auto p-1">
+                {gearTypes.map((type) => {
+                  const IconComponent = type.icon;
+                  return (
+                    <Card
+                      key={type.name}
+                      className={`cursor-pointer hover-elevate active-elevate-2 transition-all ${
+                        selectedDamageCategory === type.name ? "bg-primary/10 border-primary border-2" : ""
+                      }`}
+                      onClick={() => setSelectedDamageCategory(type.name)}
+                      data-testid={`card-damage-category-${type.name.toLowerCase().replace(/\s+/g, "-")}`}
+                    >
+                      <CardContent className="p-4 flex flex-col items-center gap-2">
+                        <div className={`h-10 w-10 rounded-lg flex items-center justify-center ${
+                          selectedDamageCategory === type.name ? "bg-primary text-primary-foreground" : "bg-muted"
+                        }`}>
+                          <IconComponent className="h-5 w-5" />
+                        </div>
+                        <div className="text-xs text-center font-medium leading-tight">{type.name}</div>
+                      </CardContent>
+                    </Card>
+                  );
+                })}
+              </div>
+              <DialogFooter className="gap-2">
+                <Button variant="outline" onClick={resetDamageReportDialog} data-testid="button-cancel-damage-step1">
+                  Cancel
+                </Button>
+                <Button 
+                  onClick={() => setDamageReportStep(2)}
+                  disabled={!selectedDamageCategory}
+                  data-testid="button-continue-damage-step1"
+                >
+                  Continue
+                </Button>
+              </DialogFooter>
+            </div>
+          )}
+
+          {/* Step 2: Select Item */}
+          {damageReportStep === 2 && (
+            <div className="space-y-4">
+              {(() => {
+                const categoryItems = (gearData?.items || []).filter(
+                  item => item.equipmentType === selectedDamageCategory
+                );
+                
+                if (categoryItems.length === 0) {
+                  return (
+                    <div className="text-center py-8 space-y-3">
+                      <Wrench className="h-12 w-12 mx-auto text-muted-foreground/50" />
+                      <p className="text-muted-foreground">No {selectedDamageCategory} items in inventory</p>
+                      <Button variant="outline" onClick={() => setDamageReportStep(1)}>
+                        Choose Different Category
+                      </Button>
+                    </div>
+                  );
+                }
+                
+                return (
+                  <div className="space-y-2 max-h-[50vh] overflow-y-auto">
+                    {categoryItems.map((item) => (
+                      <Card
+                        key={item.id}
+                        className={`cursor-pointer hover-elevate active-elevate-2 transition-all ${
+                          selectedDamageItem?.id === item.id ? "bg-primary/10 border-primary border-2" : ""
+                        }`}
+                        onClick={() => setSelectedDamageItem(item)}
+                        data-testid={`card-damage-item-${item.id}`}
+                      >
+                        <CardContent className="p-3 flex items-center justify-between gap-3">
+                          <div className="flex-1">
+                            <div className="font-medium">{item.brand} {item.model}</div>
+                            <div className="text-sm text-muted-foreground">
+                              Qty: {item.quantity}
+                            </div>
+                          </div>
+                          {selectedDamageItem?.id === item.id && (
+                            <span className="material-icons text-primary">check_circle</span>
+                          )}
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+                );
+              })()}
+              <DialogFooter className="gap-2">
+                <Button variant="outline" onClick={() => setDamageReportStep(1)} data-testid="button-back-damage-step2">
+                  Back
+                </Button>
+                <Button 
+                  onClick={() => setDamageReportStep(3)}
+                  disabled={!selectedDamageItem}
+                  data-testid="button-continue-damage-step2"
+                >
+                  Continue
+                </Button>
+              </DialogFooter>
+            </div>
+          )}
+
+          {/* Step 3: Damage Details */}
+          {damageReportStep === 3 && (
+            <div className="space-y-4 max-h-[60vh] overflow-y-auto">
+              {/* Selected Equipment Summary */}
+              <Card className="bg-muted/50">
+                <CardContent className="p-3">
+                  <div className="flex items-center gap-3">
+                    <div className="h-10 w-10 rounded-lg bg-background flex items-center justify-center">
+                      {(() => {
+                        const gearType = gearTypes.find(t => t.name === selectedDamageCategory);
+                        const IconComponent = gearType?.icon || Shield;
+                        return <IconComponent className="h-5 w-5" />;
+                      })()}
+                    </div>
+                    <div>
+                      <div className="font-medium">{selectedDamageItem?.brand} {selectedDamageItem?.model}</div>
+                      <div className="text-sm text-muted-foreground">{selectedDamageCategory}</div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Damage Description */}
+              <div className="space-y-2">
+                <Label htmlFor="damage-description">Damage Description *</Label>
+                <Textarea
+                  id="damage-description"
+                  placeholder="Describe the damage in detail..."
+                  value={damageDescription}
+                  onChange={(e) => setDamageDescription(e.target.value)}
+                  className="min-h-[100px]"
+                  data-testid="textarea-damage-description"
+                />
+              </div>
+
+              {/* Damage Location */}
+              <div className="space-y-2">
+                <Label htmlFor="damage-location">Location on Equipment</Label>
+                <Input
+                  id="damage-location"
+                  placeholder="e.g., Left shoulder strap, buckle area..."
+                  value={damageLocation}
+                  onChange={(e) => setDamageLocation(e.target.value)}
+                  data-testid="input-damage-location"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                {/* Severity */}
+                <div className="space-y-2">
+                  <Label>Severity *</Label>
+                  <Select value={damageSeverity} onValueChange={(v: any) => setDamageSeverity(v)}>
+                    <SelectTrigger data-testid="select-damage-severity">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="minor">Minor - Cosmetic only</SelectItem>
+                      <SelectItem value="moderate">Moderate - Needs repair</SelectItem>
+                      <SelectItem value="severe">Severe - Safety concern</SelectItem>
+                      <SelectItem value="critical">Critical - Immediate retirement</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {/* Discovered Date */}
+                <div className="space-y-2">
+                  <Label htmlFor="discovered-date">Date Discovered *</Label>
+                  <Input
+                    id="discovered-date"
+                    type="date"
+                    value={discoveredDate}
+                    onChange={(e) => setDiscoveredDate(e.target.value)}
+                    data-testid="input-discovered-date"
+                  />
+                </div>
+              </div>
+
+              {/* Corrective Action */}
+              <div className="space-y-2">
+                <Label htmlFor="corrective-action">Corrective Action Taken</Label>
+                <Textarea
+                  id="corrective-action"
+                  placeholder="Describe any repairs or actions taken..."
+                  value={correctiveAction}
+                  onChange={(e) => setCorrectiveAction(e.target.value)}
+                  data-testid="textarea-corrective-action"
+                />
+              </div>
+
+              {/* Retire Equipment Section */}
+              <Card className={retireEquipment ? "border-red-500/50 bg-red-50/50 dark:bg-red-900/10" : ""}>
+                <CardContent className="p-4 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <AlertTriangle className={`h-5 w-5 ${retireEquipment ? "text-red-500" : "text-muted-foreground"}`} />
+                      <Label htmlFor="retire-equipment" className="cursor-pointer font-medium">
+                        Retire this equipment
+                      </Label>
+                    </div>
+                    <input
+                      id="retire-equipment"
+                      type="checkbox"
+                      checked={retireEquipment}
+                      onChange={(e) => setRetireEquipment(e.target.checked)}
+                      className="h-5 w-5 rounded border-gray-300"
+                      data-testid="checkbox-retire-equipment"
+                    />
+                  </div>
+                  {retireEquipment && (
+                    <div className="space-y-2">
+                      <Label htmlFor="retirement-reason">Retirement Reason *</Label>
+                      <Textarea
+                        id="retirement-reason"
+                        placeholder="Explain why this equipment needs to be retired..."
+                        value={retirementReason}
+                        onChange={(e) => setRetirementReason(e.target.value)}
+                        className="min-h-[80px]"
+                        data-testid="textarea-retirement-reason"
+                      />
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+
+              {/* Additional Notes */}
+              <div className="space-y-2">
+                <Label htmlFor="damage-notes">Additional Notes</Label>
+                <Textarea
+                  id="damage-notes"
+                  placeholder="Any other relevant information..."
+                  value={damageNotes}
+                  onChange={(e) => setDamageNotes(e.target.value)}
+                  data-testid="textarea-damage-notes"
+                />
+              </div>
+
+              <DialogFooter className="gap-2 pt-4">
+                <Button variant="outline" onClick={() => setDamageReportStep(2)} data-testid="button-back-damage-step3">
+                  Back
+                </Button>
+                <Button 
+                  onClick={() => {
+                    if (!damageDescription.trim()) {
+                      toast({
+                        title: "Description Required",
+                        description: "Please describe the damage.",
+                        variant: "destructive",
+                      });
+                      return;
+                    }
+                    if (retireEquipment && !retirementReason.trim()) {
+                      toast({
+                        title: "Retirement Reason Required",
+                        description: "Please provide a reason for retiring this equipment.",
+                        variant: "destructive",
+                      });
+                      return;
+                    }
+                    
+                    createDamageReportMutation.mutate({
+                      gearItemId: selectedDamageItem?.id,
+                      equipmentCategory: selectedDamageCategory,
+                      damageDescription: damageDescription.trim(),
+                      damageLocation: damageLocation.trim() || null,
+                      damageSeverity,
+                      discoveredDate,
+                      equipmentRetired: retireEquipment,
+                      retirementReason: retireEquipment ? retirementReason.trim() : null,
+                      correctiveAction: correctiveAction.trim() || null,
+                      notes: damageNotes.trim() || null,
+                    });
+                  }}
+                  disabled={createDamageReportMutation.isPending}
+                  variant={retireEquipment ? "destructive" : "default"}
+                  data-testid="button-submit-damage-report"
+                >
+                  {createDamageReportMutation.isPending 
+                    ? "Submitting..." 
+                    : retireEquipment 
+                      ? "Submit & Retire Equipment" 
+                      : "Submit Damage Report"
+                  }
+                </Button>
+              </DialogFooter>
+            </div>
+          )}
         </DialogContent>
       </Dialog>
     </div>

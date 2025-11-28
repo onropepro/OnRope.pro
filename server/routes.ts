@@ -6825,11 +6825,48 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "User not found" });
       }
       
-      // Any authenticated user in the company can report damage
+      // Require at least view inventory permission to report damage
+      if (!canViewInventory(currentUser)) {
+        return res.status(403).json({ message: "Access denied - Insufficient permissions to report equipment damage" });
+      }
+      
       const companyId = currentUser.role === "company" ? currentUser.id : currentUser.companyId;
       
       if (!companyId) {
         return res.status(400).json({ message: "Unable to determine company" });
+      }
+      
+      // Validate required fields
+      if (!req.body.gearItemId) {
+        return res.status(400).json({ message: "Gear item ID is required" });
+      }
+      if (!req.body.damageDescription || !req.body.damageDescription.trim()) {
+        return res.status(400).json({ message: "Damage description is required" });
+      }
+      if (!req.body.discoveredDate) {
+        return res.status(400).json({ message: "Discovered date is required" });
+      }
+      if (!req.body.damageSeverity) {
+        return res.status(400).json({ message: "Damage severity is required" });
+      }
+      
+      // Verify the gear item belongs to this company
+      const gearItem = await db.select()
+        .from(gearItems)
+        .where(eq(gearItems.id, req.body.gearItemId))
+        .limit(1);
+      
+      if (!gearItem[0]) {
+        return res.status(404).json({ message: "Gear item not found" });
+      }
+      
+      if (gearItem[0].companyId !== companyId) {
+        return res.status(403).json({ message: "Access denied - This equipment does not belong to your company" });
+      }
+      
+      // If retiring equipment, require retirement reason
+      if (req.body.equipmentRetired && (!req.body.retirementReason || !req.body.retirementReason.trim())) {
+        return res.status(400).json({ message: "Retirement reason is required when retiring equipment" });
       }
       
       const reportData = insertEquipmentDamageReportSchema.parse({
@@ -6837,6 +6874,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         companyId,
         reportedBy: req.session.userId,
         reporterName: currentUser.name || currentUser.email || "Unknown User",
+        equipmentType: gearItem[0].equipmentType,
+        equipmentBrand: gearItem[0].brand,
+        equipmentModel: gearItem[0].model,
       });
       
       const report = await storage.createEquipmentDamageReport(reportData);
