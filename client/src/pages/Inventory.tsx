@@ -3058,48 +3058,53 @@ export default function Inventory() {
                   }
                   
                   return (
-                    <div className="grid grid-cols-2 gap-3">
-                      <div className="space-y-2">
-                        <Label htmlFor="self-assign-quantity">Quantity</Label>
-                        <Input
-                          id="self-assign-quantity"
-                          type="number"
-                          min="1"
-                          max={getAvailableQuantity(selfAssignItem)}
-                          value={selfAssignQuantity}
-                          onChange={(e) => setSelfAssignQuantity(e.target.value)}
-                          data-testid="input-self-assign-quantity"
-                        />
+                    <div className="space-y-3">
+                      <div className="text-sm text-muted-foreground bg-muted/50 p-2 rounded-md">
+                        No serial numbers registered yet. Enter the details for this new equipment.
                       </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="self-assign-serial">Serial Number</Label>
-                        <Input
-                          id="self-assign-serial"
-                          placeholder="Enter serial number"
-                          value={selfAssignSerialNumber}
-                          onChange={(e) => setSelfAssignSerialNumber(e.target.value)}
-                          data-testid="input-self-assign-serial-number"
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="self-assign-manufacture">Date of Manufacture</Label>
-                        <Input
-                          id="self-assign-manufacture"
-                          type="date"
-                          value={selfAssignDateOfManufacture}
-                          onChange={(e) => setSelfAssignDateOfManufacture(e.target.value)}
-                          data-testid="input-self-assign-date-manufacture"
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="self-assign-service">Date In Service</Label>
-                        <Input
-                          id="self-assign-service"
-                          type="date"
-                          value={selfAssignDateInService}
-                          onChange={(e) => setSelfAssignDateInService(e.target.value)}
-                          data-testid="input-self-assign-date-service"
-                        />
+                      <div className="grid grid-cols-2 gap-3">
+                        <div className="space-y-2">
+                          <Label htmlFor="self-assign-quantity">Quantity</Label>
+                          <Input
+                            id="self-assign-quantity"
+                            type="number"
+                            min="1"
+                            max={getAvailableQuantity(selfAssignItem)}
+                            value={selfAssignQuantity}
+                            onChange={(e) => setSelfAssignQuantity(e.target.value)}
+                            data-testid="input-self-assign-quantity"
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="self-assign-serial">Serial Number</Label>
+                          <Input
+                            id="self-assign-serial"
+                            placeholder="Enter serial number"
+                            value={selfAssignSerialNumber}
+                            onChange={(e) => setSelfAssignSerialNumber(e.target.value)}
+                            data-testid="input-self-assign-serial-number"
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="self-assign-manufacture">Date of Manufacture</Label>
+                          <Input
+                            id="self-assign-manufacture"
+                            type="date"
+                            value={selfAssignDateOfManufacture}
+                            onChange={(e) => setSelfAssignDateOfManufacture(e.target.value)}
+                            data-testid="input-self-assign-date-manufacture"
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="self-assign-service">Date In Service</Label>
+                          <Input
+                            id="self-assign-service"
+                            type="date"
+                            value={selfAssignDateInService}
+                            onChange={(e) => setSelfAssignDateInService(e.target.value)}
+                            data-testid="input-self-assign-date-service"
+                          />
+                        </div>
                       </div>
                     </div>
                   );
