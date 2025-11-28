@@ -115,14 +115,19 @@ export default function Inventory() {
     );
   }
 
+  // Check if user can view all employees' harness inspections
+  const canViewAllInspections = currentUser?.role === 'company' || 
+    ['operations_manager', 'general_supervisor', 'rope_access_supervisor', 'supervisor'].includes(currentUser?.role);
+
   // Fetch all work sessions for inspection tracking
   const { data: allSessionsData } = useQuery<{ sessions: any[] }>({
     queryKey: ["/api/all-work-sessions"],
   });
 
-  // Fetch harness inspections
+  // Fetch harness inspections - use the appropriate endpoint based on permissions
   const { data: harnessInspectionsData } = useQuery<{ inspections: any[] }>({
-    queryKey: ["/api/harness-inspections"],
+    queryKey: [canViewAllInspections ? "/api/harness-inspections" : "/api/my-harness-inspections"],
+    enabled: !!currentUser,
   });
 
   const allSessions = allSessionsData?.sessions || [];
@@ -1463,6 +1468,13 @@ export default function Inventory() {
 
                 {/* Inspection Grid */}
                 <div className="overflow-x-auto">
+                  {(() => {
+                    // Filter employees: show all if has permission, otherwise only show current user
+                    const visibleEmployees = canViewAllInspections 
+                      ? (employeesData?.employees || [])
+                      : (employeesData?.employees || []).filter((emp: any) => emp.id === currentUser?.id);
+                    
+                    return (
                   <table className="w-full">
                     <thead>
                       <tr className="border-b">
@@ -1476,14 +1488,14 @@ export default function Inventory() {
                       </tr>
                     </thead>
                     <tbody>
-                      {(employeesData?.employees || []).length === 0 ? (
+                      {visibleEmployees.length === 0 ? (
                         <tr>
                           <td colSpan={inspectionDays.length + 1} className="text-center p-8 text-muted-foreground">
-                            No employees found
+                            No inspections found
                           </td>
                         </tr>
                       ) : (
-                        (employeesData?.employees || []).map((employee: any) => (
+                        visibleEmployees.map((employee: any) => (
                           <tr 
                             key={employee.id} 
                             className="border-b hover-elevate"
@@ -1527,6 +1539,8 @@ export default function Inventory() {
                       )}
                     </tbody>
                   </table>
+                    );
+                  })()}
                 </div>
               </CardContent>
             </Card>
