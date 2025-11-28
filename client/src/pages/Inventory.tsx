@@ -891,6 +891,20 @@ export default function Inventory() {
     return days;
   }, [inspectionFilter, allSessions]);
 
+  // Helper to normalize date to YYYY-MM-DD string
+  const normalizeDateStr = (date: any): string => {
+    if (!date) return '';
+    if (typeof date === 'string') {
+      // If already YYYY-MM-DD format, return as-is
+      if (/^\d{4}-\d{2}-\d{2}$/.test(date)) return date;
+      // Otherwise parse and format
+      const d = new Date(date);
+      if (isNaN(d.getTime())) return '';
+      return format(d, 'yyyy-MM-dd');
+    }
+    return format(date, 'yyyy-MM-dd');
+  };
+
   // Helper function to calculate rating for a specific number of days
   // Per-work-day compliance: every day an employee works, they need an inspection
   const calculateRatingForDays = (daysCount: number) => {
@@ -913,8 +927,7 @@ export default function Inventory() {
       const employeesWhoWorkedThisDay = new Set<string>();
       allSessions.forEach((session: any) => {
         if (!session.startTime || !session.employeeId) return;
-        const sessionDate = new Date(session.startTime);
-        const sessionDateStr = format(sessionDate, 'yyyy-MM-dd');
+        const sessionDateStr = normalizeDateStr(session.startTime);
         if (sessionDateStr === dateStr) {
           employeesWhoWorkedThisDay.add(session.employeeId);
         }
@@ -922,17 +935,23 @@ export default function Inventory() {
 
       // For each employee who worked this day, check if they have an inspection for this day
       employeesWhoWorkedThisDay.forEach((workerId) => {
-        totalWorkDays++;
-        
-        // Check if this worker has an inspection (pass or fail) for THIS specific day
-        const hasInspectionForDay = harnessInspections.some((inspection: any) => {
-          if (inspection.workerId !== workerId) return false;
-          const inspDate = new Date(inspection.inspectionDate);
-          const inspDateStr = format(inspDate, 'yyyy-MM-dd');
-          return inspDateStr === dateStr && (inspection.overallStatus === "pass" || inspection.overallStatus === "fail");
+        // Find any inspection for this worker on this day
+        const inspection = harnessInspections.find((insp: any) => {
+          if (insp.workerId !== workerId) return false;
+          const inspDateStr = normalizeDateStr(insp.inspectionDate);
+          return inspDateStr === dateStr;
         });
         
-        if (hasInspectionForDay) {
+        // If inspection is N/A, skip this work-day entirely (no harness used)
+        if (inspection?.overallStatus === "not_applicable") {
+          return;
+        }
+        
+        // Count this as a required work-day
+        totalWorkDays++;
+        
+        // Check if they have a completed inspection (pass or fail)
+        if (inspection && (inspection.overallStatus === "pass" || inspection.overallStatus === "fail")) {
           compliantWorkDays++;
         }
       });
@@ -983,8 +1002,7 @@ export default function Inventory() {
       const employeesWhoWorkedThisDay = new Set<string>();
       allSessions.forEach((session: any) => {
         if (!session.startTime || !session.employeeId) return;
-        const sessionDate = new Date(session.startTime);
-        const sessionDateStr = format(sessionDate, 'yyyy-MM-dd');
+        const sessionDateStr = normalizeDateStr(session.startTime);
         if (sessionDateStr === dateStr) {
           employeesWhoWorkedThisDay.add(session.employeeId);
         }
@@ -992,17 +1010,23 @@ export default function Inventory() {
 
       // For each employee who worked this day, check if they have an inspection for this day
       employeesWhoWorkedThisDay.forEach((workerId) => {
-        totalWorkDays++;
-        
-        // Check if this worker has an inspection (pass or fail) for THIS specific day
-        const hasInspectionForDay = harnessInspections.some((inspection: any) => {
-          if (inspection.workerId !== workerId) return false;
-          const inspDate = new Date(inspection.inspectionDate);
-          const inspDateStr = format(inspDate, 'yyyy-MM-dd');
-          return inspDateStr === dateStr && (inspection.overallStatus === "pass" || inspection.overallStatus === "fail");
+        // Find any inspection for this worker on this day
+        const inspection = harnessInspections.find((insp: any) => {
+          if (insp.workerId !== workerId) return false;
+          const inspDateStr = normalizeDateStr(insp.inspectionDate);
+          return inspDateStr === dateStr;
         });
         
-        if (hasInspectionForDay) {
+        // If inspection is N/A, skip this work-day entirely (no harness used)
+        if (inspection?.overallStatus === "not_applicable") {
+          return;
+        }
+        
+        // Count this as a required work-day
+        totalWorkDays++;
+        
+        // Check if they have a completed inspection (pass or fail)
+        if (inspection && (inspection.overallStatus === "pass" || inspection.overallStatus === "fail")) {
           compliantWorkDays++;
         }
       });
