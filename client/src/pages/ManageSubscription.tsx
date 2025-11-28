@@ -65,6 +65,9 @@ export default function ManageSubscription() {
   const [cancelTarget, setCancelTarget] = useState<'subscription' | 'whitelabel' | 'seats' | 'projects' | null>(null);
   const [cancelSeatPackNumber, setCancelSeatPackNumber] = useState<number>(0);
   const [cancelProjectNumber, setCancelProjectNumber] = useState<number>(0);
+  const [showAddSeatsDialog, setShowAddSeatsDialog] = useState(false);
+  const [showAddProjectDialog, setShowAddProjectDialog] = useState(false);
+  const [showAddBrandingDialog, setShowAddBrandingDialog] = useState(false);
 
   const { data: user } = useQuery({
     queryKey: ["/api/user"],
@@ -153,6 +156,72 @@ export default function ManageSubscription() {
         description: "Your extra projects have been cancelled and will be removed at the end of your billing period.",
       });
       setCancelTarget(null);
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
+
+  const addSeatsMutation = useMutation({
+    mutationFn: async () => {
+      return await apiRequest("POST", "/api/stripe/add-addon-seats");
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/user"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/subscription/details"] });
+      toast({
+        title: "Extra Seats Added",
+        description: "2 additional team seats have been added to your subscription.",
+      });
+      setShowAddSeatsDialog(false);
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
+
+  const addProjectMutation = useMutation({
+    mutationFn: async () => {
+      return await apiRequest("POST", "/api/stripe/add-addon-projects");
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/user"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/subscription/details"] });
+      toast({
+        title: "Extra Project Added",
+        description: "1 additional project has been added to your subscription.",
+      });
+      setShowAddProjectDialog(false);
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
+
+  const addBrandingMutation = useMutation({
+    mutationFn: async () => {
+      return await apiRequest("POST", "/api/stripe/add-whitelabel");
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/user"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/subscription/details"] });
+      toast({
+        title: "White Label Branding Added",
+        description: "White label branding has been added to your subscription.",
+      });
+      setShowAddBrandingDialog(false);
     },
     onError: (error: Error) => {
       toast({
@@ -488,16 +557,90 @@ export default function ManageSubscription() {
              subscriptionData.additionalProjectsCount === 0 && (
               <div className="text-center py-8">
                 <p className="text-muted-foreground">No active add-ons</p>
-                <Button
-                  variant="outline"
-                  onClick={() => setLocation("/profile")}
-                  className="mt-4"
-                  data-testid="button-browse-addons"
-                >
-                  Browse Add-ons
-                </Button>
               </div>
             )}
+          </CardContent>
+        </Card>
+
+        {/* Available Add-ons Section */}
+        <Card data-testid="card-available-addons">
+          <CardHeader className="flex flex-row items-center justify-between gap-4 flex-wrap">
+            <div>
+              <CardTitle className="flex items-center gap-2">
+                <Palette className="w-5 h-5" />
+                Available Add-ons
+              </CardTitle>
+              <CardDescription>Enhance your subscription with optional features</CardDescription>
+            </div>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {/* Extra Team Seats */}
+            <button
+              onClick={() => setShowAddSeatsDialog(true)}
+              className="w-full flex items-center justify-between p-4 border rounded-md hover-elevate active-elevate-2 text-left"
+              data-testid="button-add-seats"
+            >
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-primary/10 rounded-md">
+                  <CreditCard className="w-5 h-5 text-primary" />
+                </div>
+                <div>
+                  <h4 className="font-medium">Extra Team Seats</h4>
+                  <p className="text-sm text-muted-foreground">Add 2 additional seats to your plan</p>
+                </div>
+              </div>
+              <div className="text-right">
+                <p className="font-semibold">{currencySymbol}19/month</p>
+                <p className="text-xs text-muted-foreground">per pack</p>
+              </div>
+            </button>
+
+            {/* Extra Project */}
+            <button
+              onClick={() => setShowAddProjectDialog(true)}
+              className="w-full flex items-center justify-between p-4 border rounded-md hover-elevate active-elevate-2 text-left"
+              data-testid="button-add-project"
+            >
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-primary/10 rounded-md">
+                  <CreditCard className="w-5 h-5 text-primary" />
+                </div>
+                <div>
+                  <h4 className="font-medium">Extra Project</h4>
+                  <p className="text-sm text-muted-foreground">Add 1 additional active project</p>
+                </div>
+              </div>
+              <div className="text-right">
+                <p className="font-semibold">{currencySymbol}49/month</p>
+                <p className="text-xs text-muted-foreground">per project</p>
+              </div>
+            </button>
+
+            {/* White Label Branding */}
+            {!subscriptionData.whitelabelBrandingActive && (
+              <button
+                onClick={() => setShowAddBrandingDialog(true)}
+                className="w-full flex items-center justify-between p-4 border rounded-md hover-elevate active-elevate-2 text-left"
+                data-testid="button-add-branding"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="p-2 bg-primary/10 rounded-md">
+                    <Palette className="w-5 h-5 text-primary" />
+                  </div>
+                  <div>
+                    <h4 className="font-medium">White Label Branding</h4>
+                    <p className="text-sm text-muted-foreground">Custom logo and brand colors</p>
+                  </div>
+                </div>
+                <div className="text-right">
+                  <p className="font-semibold">{currencySymbol}49/month</p>
+                </div>
+              </button>
+            )}
+
+            <p className="text-sm text-muted-foreground italic">
+              Add-ons are billed immediately and prorated for the current billing cycle.
+            </p>
           </CardContent>
         </Card>
       </div>
@@ -613,6 +756,93 @@ export default function ManageSubscription() {
               data-testid="button-cancel-projects-yes"
             >
               {cancelProjectsMutation.isPending ? "Cancelling..." : "Yes, Cancel"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Add Extra Seats Dialog */}
+      <Dialog open={showAddSeatsDialog} onOpenChange={setShowAddSeatsDialog}>
+        <DialogContent data-testid="dialog-add-seats">
+          <DialogHeader>
+            <DialogTitle>Add Extra Team Seats</DialogTitle>
+            <DialogDescription>
+              Add 2 additional team seats to your subscription for {currencySymbol}19/month.
+              This will be prorated for your current billing period.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="gap-2">
+            <Button
+              variant="outline"
+              onClick={() => setShowAddSeatsDialog(false)}
+              data-testid="button-add-seats-cancel"
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={() => addSeatsMutation.mutate()}
+              disabled={addSeatsMutation.isPending}
+              data-testid="button-add-seats-confirm"
+            >
+              {addSeatsMutation.isPending ? "Adding..." : "Add Seats"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Add Extra Project Dialog */}
+      <Dialog open={showAddProjectDialog} onOpenChange={setShowAddProjectDialog}>
+        <DialogContent data-testid="dialog-add-project">
+          <DialogHeader>
+            <DialogTitle>Add Extra Project</DialogTitle>
+            <DialogDescription>
+              Add 1 additional active project to your subscription for {currencySymbol}49/month.
+              This will be prorated for your current billing period.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="gap-2">
+            <Button
+              variant="outline"
+              onClick={() => setShowAddProjectDialog(false)}
+              data-testid="button-add-project-cancel"
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={() => addProjectMutation.mutate()}
+              disabled={addProjectMutation.isPending}
+              data-testid="button-add-project-confirm"
+            >
+              {addProjectMutation.isPending ? "Adding..." : "Add Project"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Add White Label Branding Dialog */}
+      <Dialog open={showAddBrandingDialog} onOpenChange={setShowAddBrandingDialog}>
+        <DialogContent data-testid="dialog-add-branding">
+          <DialogHeader>
+            <DialogTitle>Add White Label Branding</DialogTitle>
+            <DialogDescription>
+              Add custom logo and brand colors to your platform for {currencySymbol}49/month.
+              This will be prorated for your current billing period.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="gap-2">
+            <Button
+              variant="outline"
+              onClick={() => setShowAddBrandingDialog(false)}
+              data-testid="button-add-branding-cancel"
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={() => addBrandingMutation.mutate()}
+              disabled={addBrandingMutation.isPending}
+              data-testid="button-add-branding-confirm"
+            >
+              {addBrandingMutation.isPending ? "Adding..." : "Add Branding"}
             </Button>
           </DialogFooter>
         </DialogContent>
