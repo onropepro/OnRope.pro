@@ -1,7 +1,8 @@
+import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Badge } from "@/components/ui/badge";
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
-import { Shield, FileText, ClipboardCheck, HardHat, TrendingUp } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Shield, FileText, ClipboardCheck, HardHat, TrendingUp, AlertTriangle, CheckCircle2, Lightbulb } from "lucide-react";
 import { canViewCSR, type User } from "@/lib/permissions";
 
 interface CSRBadgeProps {
@@ -51,7 +52,7 @@ function ColoredProgress({ value, rating }: { value: number; rating: number }) {
   };
 
   return (
-    <div className="h-1.5 w-full rounded-full bg-muted overflow-hidden">
+    <div className="h-2 w-full rounded-full bg-muted overflow-hidden">
       <div 
         className={`h-full rounded-full transition-all ${getBarColor()}`}
         style={{ width: `${Math.min(100, Math.max(0, value))}%` }}
@@ -60,16 +61,87 @@ function ColoredProgress({ value, rating }: { value: number; rating: number }) {
   );
 }
 
+function getImprovementTips(csrData: CSRData): { category: string; icon: any; tip: string; priority: 'high' | 'medium' | 'low' }[] {
+  const tips: { category: string; icon: any; tip: string; priority: 'high' | 'medium' | 'low' }[] = [];
+  const { breakdown, details } = csrData;
+
+  if (!details.hasHealthSafety) {
+    tips.push({
+      category: "Documentation",
+      icon: FileText,
+      tip: "Upload your Health & Safety Manual in Documents to add 50% to your documentation score.",
+      priority: breakdown.documentationRating < 50 ? 'high' : 'medium'
+    });
+  }
+
+  if (!details.hasCompanyPolicy) {
+    tips.push({
+      category: "Documentation",
+      icon: FileText,
+      tip: "Upload your Company Policy document to complete your documentation requirements.",
+      priority: breakdown.documentationRating < 50 ? 'high' : 'medium'
+    });
+  }
+
+  if (breakdown.toolboxMeetingRating < 100) {
+    const missingDays = details.toolboxTotalDays - details.toolboxDaysWithMeeting;
+    if (missingDays > 0) {
+      tips.push({
+        category: "Toolbox Meetings",
+        icon: ClipboardCheck,
+        tip: `You're missing toolbox meetings for ${missingDays} work day${missingDays > 1 ? 's' : ''} in the last 30 days. Record meetings for each work day to reach 100%.`,
+        priority: breakdown.toolboxMeetingRating < 50 ? 'high' : 'medium'
+      });
+    }
+  }
+
+  if (breakdown.harnessInspectionRating < 100) {
+    const missingInspections = details.harnessRequiredInspections - details.harnessCompletedInspections;
+    if (missingInspections > 0) {
+      tips.push({
+        category: "Harness Inspections",
+        icon: HardHat,
+        tip: `${missingInspections} harness inspection${missingInspections > 1 ? 's are' : ' is'} missing. Each employee should complete an inspection before starting work each day.`,
+        priority: breakdown.harnessInspectionRating < 50 ? 'high' : 'medium'
+      });
+    }
+  }
+
+  if (breakdown.projectCompletionRating < 100 && details.projectCount > 0) {
+    tips.push({
+      category: "Project Progress",
+      icon: TrendingUp,
+      tip: "Update work session progress on your projects. Completing more work sessions improves your project completion score.",
+      priority: breakdown.projectCompletionRating < 50 ? 'high' : 'low'
+    });
+  }
+
+  if (details.projectCount === 0) {
+    tips.push({
+      category: "Project Progress",
+      icon: TrendingUp,
+      tip: "Create and start working on projects to build your project completion score.",
+      priority: 'low'
+    });
+  }
+
+  tips.sort((a, b) => {
+    const priorityOrder = { high: 0, medium: 1, low: 2 };
+    return priorityOrder[a.priority] - priorityOrder[b.priority];
+  });
+
+  return tips;
+}
+
 export function CSRBadge({ user }: CSRBadgeProps) {
-  // Check permission before even fetching
+  const [open, setOpen] = useState(false);
   const hasAccess = canViewCSR(user);
   
   const { data: csrData, isLoading } = useQuery<CSRData>({
     queryKey: ['/api/company-safety-rating'],
-    enabled: hasAccess, // Only fetch if user has permission
+    enabled: hasAccess,
   });
 
-  // Don't render anything if user doesn't have permission
   if (!hasAccess) {
     return null;
   }
@@ -88,114 +160,165 @@ export function CSRBadge({ user }: CSRBadgeProps) {
   }
 
   const { overallCSR, breakdown, details } = csrData;
+  const improvementTips = getImprovementTips(csrData);
+  const hasImprovements = improvementTips.length > 0;
 
   return (
-    <Tooltip>
-      <TooltipTrigger asChild>
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
         <Badge 
           variant="outline" 
-          className={`gap-1.5 px-3 py-1.5 cursor-help no-default-hover-elevate no-default-active-elevate ${getBadgeColors(overallCSR)}`}
+          className={`gap-1.5 px-3 py-1.5 cursor-pointer ${getBadgeColors(overallCSR)}`}
           data-testid="badge-csr"
         >
           <Shield className="w-4 h-4" />
           <span className="text-sm font-semibold">CSR: {overallCSR}%</span>
         </Badge>
-      </TooltipTrigger>
-      <TooltipContent 
-        side="bottom" 
-        align="end" 
-        className="w-80 p-4 space-y-4"
-        data-testid="tooltip-csr-breakdown"
-      >
-        <div className="space-y-1">
-          <h4 className="font-semibold text-sm flex items-center gap-2">
-            <Shield className="w-4 h-4" />
+      </DialogTrigger>
+      <DialogContent className="max-w-lg max-h-[85vh] overflow-y-auto" data-testid="dialog-csr-details">
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-2">
+            <Shield className="w-5 h-5" />
             Company Safety Rating
-          </h4>
-          <p className="text-xs text-muted-foreground">
-            Combined safety compliance score
-          </p>
+          </DialogTitle>
+        </DialogHeader>
+
+        <div className="space-y-6">
+          <div className="flex items-center justify-center p-6 rounded-xl bg-muted/50">
+            <div className="text-center">
+              <div className={`text-5xl font-bold ${getRatingColor(overallCSR)}`}>
+                {overallCSR}%
+              </div>
+              <p className="text-sm text-muted-foreground mt-1">Overall Safety Score</p>
+            </div>
+          </div>
+
+          <div className="space-y-4">
+            <h4 className="font-semibold text-sm flex items-center gap-2">
+              Score Breakdown
+            </h4>
+
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <div className="flex items-center justify-between text-sm">
+                  <div className="flex items-center gap-2">
+                    <FileText className="w-4 h-4 text-muted-foreground" />
+                    <span>Documentation</span>
+                  </div>
+                  <span className={`font-semibold ${getRatingColor(breakdown.documentationRating)}`}>
+                    {breakdown.documentationRating}%
+                  </span>
+                </div>
+                <ColoredProgress value={breakdown.documentationRating} rating={breakdown.documentationRating} />
+                <p className="text-xs text-muted-foreground">
+                  {details.hasHealthSafety && details.hasCompanyPolicy 
+                    ? "Both manuals uploaded" 
+                    : details.hasHealthSafety || details.hasCompanyPolicy 
+                      ? "1 of 2 manuals uploaded" 
+                      : "No manuals uploaded"}
+                </p>
+              </div>
+
+              <div className="space-y-2">
+                <div className="flex items-center justify-between text-sm">
+                  <div className="flex items-center gap-2">
+                    <ClipboardCheck className="w-4 h-4 text-muted-foreground" />
+                    <span>Toolbox Meetings</span>
+                  </div>
+                  <span className={`font-semibold ${getRatingColor(breakdown.toolboxMeetingRating)}`}>
+                    {breakdown.toolboxMeetingRating}%
+                  </span>
+                </div>
+                <ColoredProgress value={breakdown.toolboxMeetingRating} rating={breakdown.toolboxMeetingRating} />
+                <p className="text-xs text-muted-foreground">
+                  {details.toolboxDaysWithMeeting} of {details.toolboxTotalDays} work days covered (last 30 days)
+                </p>
+              </div>
+
+              <div className="space-y-2">
+                <div className="flex items-center justify-between text-sm">
+                  <div className="flex items-center gap-2">
+                    <HardHat className="w-4 h-4 text-muted-foreground" />
+                    <span>Harness Inspections</span>
+                  </div>
+                  <span className={`font-semibold ${getRatingColor(breakdown.harnessInspectionRating)}`}>
+                    {breakdown.harnessInspectionRating}%
+                  </span>
+                </div>
+                <ColoredProgress value={breakdown.harnessInspectionRating} rating={breakdown.harnessInspectionRating} />
+                <p className="text-xs text-muted-foreground">
+                  {details.harnessCompletedInspections} of {details.harnessRequiredInspections} inspections completed (last 30 days)
+                </p>
+              </div>
+
+              <div className="space-y-2">
+                <div className="flex items-center justify-between text-sm">
+                  <div className="flex items-center gap-2">
+                    <TrendingUp className="w-4 h-4 text-muted-foreground" />
+                    <span>Project Progress</span>
+                  </div>
+                  <span className={`font-semibold ${getRatingColor(breakdown.projectCompletionRating)}`}>
+                    {breakdown.projectCompletionRating}%
+                  </span>
+                </div>
+                <ColoredProgress value={breakdown.projectCompletionRating} rating={breakdown.projectCompletionRating} />
+                <p className="text-xs text-muted-foreground">
+                  Average across {details.projectCount} project{details.projectCount !== 1 ? 's' : ''}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {hasImprovements ? (
+            <div className="space-y-3 pt-4 border-t">
+              <h4 className="font-semibold text-sm flex items-center gap-2">
+                <Lightbulb className="w-4 h-4 text-amber-500" />
+                Tips to Improve Your Score
+              </h4>
+              <div className="space-y-2">
+                {improvementTips.map((tip, index) => (
+                  <div 
+                    key={index}
+                    className={`flex gap-3 p-3 rounded-lg border ${
+                      tip.priority === 'high' 
+                        ? 'bg-red-50 dark:bg-red-950/30 border-red-200 dark:border-red-900' 
+                        : tip.priority === 'medium'
+                          ? 'bg-amber-50 dark:bg-amber-950/30 border-amber-200 dark:border-amber-900'
+                          : 'bg-muted/50 border-border'
+                    }`}
+                    data-testid={`tip-${index}`}
+                  >
+                    <div className="flex-shrink-0 mt-0.5">
+                      {tip.priority === 'high' ? (
+                        <AlertTriangle className="w-4 h-4 text-red-600 dark:text-red-400" />
+                      ) : (
+                        <tip.icon className="w-4 h-4 text-muted-foreground" />
+                      )}
+                    </div>
+                    <div className="space-y-1">
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs font-medium">{tip.category}</span>
+                        {tip.priority === 'high' && (
+                          <Badge variant="destructive" className="text-xs">High Priority</Badge>
+                        )}
+                      </div>
+                      <p className="text-sm text-muted-foreground">{tip.tip}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ) : (
+            <div className="flex items-center gap-3 p-4 rounded-lg bg-green-50 dark:bg-green-950/30 border border-green-200 dark:border-green-900">
+              <CheckCircle2 className="w-5 h-5 text-green-600 dark:text-green-400 flex-shrink-0" />
+              <div>
+                <p className="font-medium text-green-800 dark:text-green-200">Excellent work!</p>
+                <p className="text-sm text-green-700 dark:text-green-300">You're maintaining a perfect safety compliance score.</p>
+              </div>
+            </div>
+          )}
         </div>
-
-        <div className="space-y-3">
-          <div className="space-y-1.5">
-            <div className="flex items-center justify-between text-xs">
-              <div className="flex items-center gap-1.5">
-                <FileText className="w-3.5 h-3.5" />
-                <span>Documentation</span>
-              </div>
-              <span className={`font-medium ${getRatingColor(breakdown.documentationRating)}`}>
-                {breakdown.documentationRating}%
-              </span>
-            </div>
-            <ColoredProgress value={breakdown.documentationRating} rating={breakdown.documentationRating} />
-            <p className="text-[10px] text-muted-foreground">
-              {details.hasHealthSafety && details.hasCompanyPolicy 
-                ? "Both manuals uploaded" 
-                : details.hasHealthSafety || details.hasCompanyPolicy 
-                  ? "1 of 2 manuals uploaded" 
-                  : "No manuals uploaded"}
-            </p>
-          </div>
-
-          <div className="space-y-1.5">
-            <div className="flex items-center justify-between text-xs">
-              <div className="flex items-center gap-1.5">
-                <ClipboardCheck className="w-3.5 h-3.5" />
-                <span>Toolbox Meetings</span>
-              </div>
-              <span className={`font-medium ${getRatingColor(breakdown.toolboxMeetingRating)}`}>
-                {breakdown.toolboxMeetingRating}%
-              </span>
-            </div>
-            <ColoredProgress value={breakdown.toolboxMeetingRating} rating={breakdown.toolboxMeetingRating} />
-            <p className="text-[10px] text-muted-foreground">
-              {details.toolboxDaysWithMeeting} of {details.toolboxTotalDays} work days covered
-            </p>
-          </div>
-
-          <div className="space-y-1.5">
-            <div className="flex items-center justify-between text-xs">
-              <div className="flex items-center gap-1.5">
-                <HardHat className="w-3.5 h-3.5" />
-                <span>Harness Inspections</span>
-              </div>
-              <span className={`font-medium ${getRatingColor(breakdown.harnessInspectionRating)}`}>
-                {breakdown.harnessInspectionRating}%
-              </span>
-            </div>
-            <ColoredProgress value={breakdown.harnessInspectionRating} rating={breakdown.harnessInspectionRating} />
-            <p className="text-[10px] text-muted-foreground">
-              {details.harnessCompletedInspections} of {details.harnessRequiredInspections} inspections (30 days)
-            </p>
-          </div>
-
-          <div className="space-y-1.5">
-            <div className="flex items-center justify-between text-xs">
-              <div className="flex items-center gap-1.5">
-                <TrendingUp className="w-3.5 h-3.5" />
-                <span>Project Progress</span>
-              </div>
-              <span className={`font-medium ${getRatingColor(breakdown.projectCompletionRating)}`}>
-                {breakdown.projectCompletionRating}%
-              </span>
-            </div>
-            <ColoredProgress value={breakdown.projectCompletionRating} rating={breakdown.projectCompletionRating} />
-            <p className="text-[10px] text-muted-foreground">
-              Average across {details.projectCount} project{details.projectCount !== 1 ? 's' : ''}
-            </p>
-          </div>
-        </div>
-
-        <div className="pt-2 border-t">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-medium">Overall Score</span>
-            <span className={`text-lg font-bold ${getRatingColor(overallCSR)}`}>
-              {overallCSR}%
-            </span>
-          </div>
-        </div>
-      </TooltipContent>
-    </Tooltip>
+      </DialogContent>
+    </Dialog>
   );
 }
