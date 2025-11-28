@@ -892,6 +892,7 @@ export default function Inventory() {
   }, [inspectionFilter, allSessions]);
 
   // Helper function to calculate rating for a specific number of days
+  // Per-work-day compliance: every day an employee works, they need an inspection
   const calculateRatingForDays = (daysCount: number) => {
     const today = new Date();
     const days: Date[] = [];
@@ -901,41 +902,44 @@ export default function Inventory() {
       days.push(date);
     }
 
-    // Find all workers who worked in the period
-    const workersWhoWorked = new Set<string>();
+    // Count total work-days and compliant work-days
+    let totalWorkDays = 0;
+    let compliantWorkDays = 0;
+
     days.forEach((date) => {
       const dateStr = format(date, 'yyyy-MM-dd');
+      
+      // Find all employees who worked on this day
+      const employeesWhoWorkedThisDay = new Set<string>();
       allSessions.forEach((session: any) => {
         if (!session.startTime || !session.employeeId) return;
         const sessionDate = new Date(session.startTime);
         const sessionDateStr = format(sessionDate, 'yyyy-MM-dd');
         if (sessionDateStr === dateStr) {
-          workersWhoWorked.add(session.employeeId);
+          employeesWhoWorkedThisDay.add(session.employeeId);
+        }
+      });
+
+      // For each employee who worked this day, check if they have an inspection for this day
+      employeesWhoWorkedThisDay.forEach((workerId) => {
+        totalWorkDays++;
+        
+        // Check if this worker has an inspection (pass or fail) for THIS specific day
+        const hasInspectionForDay = harnessInspections.some((inspection: any) => {
+          if (inspection.workerId !== workerId) return false;
+          const inspDate = new Date(inspection.inspectionDate);
+          const inspDateStr = format(inspDate, 'yyyy-MM-dd');
+          return inspDateStr === dateStr && (inspection.overallStatus === "pass" || inspection.overallStatus === "fail");
+        });
+        
+        if (hasInspectionForDay) {
+          compliantWorkDays++;
         }
       });
     });
 
-    // For each worker who worked, check if they have at least one passing inspection in the period
-    let totalRequired = 0;
-    let totalCompliant = 0;
-
-    workersWhoWorked.forEach((workerId) => {
-      const hasPassingInspection = harnessInspections.some((inspection: any) => {
-        if (inspection.workerId !== workerId) return false;
-        const inspDate = new Date(inspection.inspectionDate);
-        const dateStr = format(inspDate, 'yyyy-MM-dd');
-        const isInPeriod = days.some(d => format(d, 'yyyy-MM-dd') === dateStr);
-        return isInPeriod && (inspection.overallStatus === "pass" || inspection.overallStatus === "fail");
-      });
-      
-      totalRequired++;
-      if (hasPassingInspection) {
-        totalCompliant++;
-      }
-    });
-
-    if (totalRequired === 0) return 0;
-    return Math.round((totalCompliant / totalRequired) * 100);
+    if (totalWorkDays === 0) return 0;
+    return Math.round((compliantWorkDays / totalWorkDays) * 100);
   };
 
   // Calculate company safety rating based on filter
@@ -966,48 +970,46 @@ export default function Inventory() {
     }
     
     // Regular calculation for single period
-    // Per-employee compliance: if employee worked in period AND has at least one passing inspection, they're compliant
+    // Per-work-day compliance: every day an employee works, they need an inspection
     
-    // Find all workers who worked in the period
-    const workersWhoWorked = new Set<string>();
-    const periodStart = inspectionDays[inspectionDays.length - 1];
-    const periodEnd = inspectionDays[0];
-    
+    // Count total work-days and compliant work-days
+    let totalWorkDays = 0;
+    let compliantWorkDays = 0;
+
     inspectionDays.forEach((date) => {
       const dateStr = format(date, 'yyyy-MM-dd');
+      
+      // Find all employees who worked on this day
+      const employeesWhoWorkedThisDay = new Set<string>();
       allSessions.forEach((session: any) => {
         if (!session.startTime || !session.employeeId) return;
         const sessionDate = new Date(session.startTime);
         const sessionDateStr = format(sessionDate, 'yyyy-MM-dd');
         if (sessionDateStr === dateStr) {
-          workersWhoWorked.add(session.employeeId);
+          employeesWhoWorkedThisDay.add(session.employeeId);
+        }
+      });
+
+      // For each employee who worked this day, check if they have an inspection for this day
+      employeesWhoWorkedThisDay.forEach((workerId) => {
+        totalWorkDays++;
+        
+        // Check if this worker has an inspection (pass or fail) for THIS specific day
+        const hasInspectionForDay = harnessInspections.some((inspection: any) => {
+          if (inspection.workerId !== workerId) return false;
+          const inspDate = new Date(inspection.inspectionDate);
+          const inspDateStr = format(inspDate, 'yyyy-MM-dd');
+          return inspDateStr === dateStr && (inspection.overallStatus === "pass" || inspection.overallStatus === "fail");
+        });
+        
+        if (hasInspectionForDay) {
+          compliantWorkDays++;
         }
       });
     });
 
-    // For each worker who worked, check if they have at least one passing inspection in the period
-    let totalRequired = 0;
-    let totalCompliant = 0;
-
-    workersWhoWorked.forEach((workerId) => {
-      // Check if this worker has any passing inspections in the period
-      const hasPassingInspection = harnessInspections.some((inspection: any) => {
-        if (inspection.workerId !== workerId) return false;
-        const inspDate = new Date(inspection.inspectionDate);
-        const dateStr = format(inspDate, 'yyyy-MM-dd');
-        // Check if inspection is within the period
-        const isInPeriod = inspectionDays.some(d => format(d, 'yyyy-MM-dd') === dateStr);
-        return isInPeriod && (inspection.overallStatus === "pass" || inspection.overallStatus === "fail");
-      });
-      
-      totalRequired++;
-      if (hasPassingInspection) {
-        totalCompliant++;
-      }
-    });
-
-    if (totalRequired === 0) return 0;
-    return Math.round((totalCompliant / totalRequired) * 100);
+    if (totalWorkDays === 0) return 0;
+    return Math.round((compliantWorkDays / totalWorkDays) * 100);
   }, [inspectionFilter, inspectionDays, allSessions, harnessInspections]);
 
   return (
