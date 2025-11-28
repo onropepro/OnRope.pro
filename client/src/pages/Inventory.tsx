@@ -455,6 +455,16 @@ export default function Inventory() {
   };
 
   const openAddDialog = () => {
+    // Guard: Only users with manage_inventory permission can add items
+    if (!canManageInventory(currentUser)) {
+      toast({
+        title: "Access Denied",
+        description: "You don't have permission to manage inventory",
+        variant: "destructive",
+      });
+      return;
+    }
+    
     setEditingItem(null);
     form.reset({
       equipmentType: "",
@@ -479,6 +489,16 @@ export default function Inventory() {
   };
 
   const openEditDialog = (item: GearItem) => {
+    // Guard: Only users with manage_inventory permission can edit items
+    if (!canManageInventory(currentUser)) {
+      toast({
+        title: "Access Denied",
+        description: "You don't have permission to manage inventory",
+        variant: "destructive",
+      });
+      return;
+    }
+    
     setEditingItem(item);
     form.reset({
       equipmentType: item.equipmentType || undefined,
@@ -527,6 +547,16 @@ export default function Inventory() {
   };
 
   const openAssignDialog = (item: GearItem) => {
+    // Guard: Only users with assign_gear permission can open the assign dialog
+    if (!canAssignGear(currentUser)) {
+      toast({
+        title: "Access Denied",
+        description: "You don't have permission to assign gear",
+        variant: "destructive",
+      });
+      return;
+    }
+    
     setManagingItem(item);
     // Auto-fill with current user's ID - employees can only assign to themselves by default
     setAssignEmployeeId(currentUser?.id || "");
@@ -808,7 +838,14 @@ export default function Inventory() {
 
       <div className="p-4 max-w-4xl mx-auto">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className={`grid w-full mb-4 ${canViewGearAssignments(currentUser) ? 'grid-cols-5' : 'grid-cols-4'}`}>
+          <TabsList className={`grid w-full mb-4 ${
+            (() => {
+              let cols = 3;
+              if (canViewGearAssignments(currentUser)) cols++;
+              if (canManageInventory(currentUser)) cols++;
+              return `grid-cols-${cols}`;
+            })()
+          }`}>
             <TabsTrigger value="my-gear" data-testid="tab-my-gear">My Gear</TabsTrigger>
             {canViewGearAssignments(currentUser) && (
               <TabsTrigger value="team-gear" data-testid="tab-team-gear">
@@ -816,7 +853,9 @@ export default function Inventory() {
                 Team Gear
               </TabsTrigger>
             )}
-            <TabsTrigger value="manage" data-testid="tab-manage-gear">Manage Gear</TabsTrigger>
+            {canManageInventory(currentUser) && (
+              <TabsTrigger value="manage" data-testid="tab-manage-gear">Manage Gear</TabsTrigger>
+            )}
             <TabsTrigger value="inspections" data-testid="tab-inspections">Inspections</TabsTrigger>
             <TabsTrigger value="daily-harness" data-testid="tab-daily-harness">
               Daily Harness Inspection
@@ -825,29 +864,31 @@ export default function Inventory() {
 
           {/* My Gear Tab */}
           <TabsContent value="my-gear" className="space-y-4">
-            {/* Helpful Banner */}
-            <Card className="bg-primary/5 border-primary/20">
-              <CardContent className="p-4">
-                <div className="flex items-center justify-between gap-4">
-                  <div className="flex items-center gap-3">
-                    <span className="material-icons text-primary text-2xl">info</span>
-                    <div>
-                      <div className="font-semibold">Want to add new gear?</div>
-                      <p className="text-sm text-muted-foreground">
-                        Switch to the "Manage Gear" tab to add inventory items
-                      </p>
+            {/* Helpful Banner - only show for users who can manage inventory */}
+            {canManageInventory(currentUser) && (
+              <Card className="bg-primary/5 border-primary/20">
+                <CardContent className="p-4">
+                  <div className="flex items-center justify-between gap-4">
+                    <div className="flex items-center gap-3">
+                      <span className="material-icons text-primary text-2xl">info</span>
+                      <div>
+                        <div className="font-semibold">Want to add new gear?</div>
+                        <p className="text-sm text-muted-foreground">
+                          Switch to the "Manage Gear" tab to add inventory items
+                        </p>
+                      </div>
                     </div>
+                    <Button
+                      onClick={() => setActiveTab("manage")}
+                      data-testid="button-go-to-manage"
+                    >
+                      <Plus className="h-4 w-4 mr-2" />
+                      Go to Manage Gear
+                    </Button>
                   </div>
-                  <Button
-                    onClick={() => setActiveTab("manage")}
-                    data-testid="button-go-to-manage"
-                  >
-                    <Plus className="h-4 w-4 mr-2" />
-                    Go to Manage Gear
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
+                </CardContent>
+              </Card>
+            )}
 
             {myGear.length === 0 ? (
               <Card>
@@ -1079,56 +1120,63 @@ export default function Inventory() {
                                         <Badge variant="secondary" className="text-xs">
                                           Qty: {assignment.quantity || 1}
                                         </Badge>
-                                        <Button
-                                          size="icon"
-                                          variant="ghost"
-                                          onClick={(e) => {
-                                            e.stopPropagation();
-                                            setEditingAssignment(assignment);
-                                            setEditAssignmentQuantity(String(assignment.quantity || 1));
-                                            setEditAssignmentSerialNumber(assignment.serialNumber || "");
-                                            setEditAssignmentDateOfManufacture(assignment.dateOfManufacture || "");
-                                            setEditAssignmentDateInService(assignment.dateInService || "");
-                                            setShowEditAssignmentDialog(true);
-                                          }}
-                                          data-testid={`button-edit-assignment-${assignment.id}`}
-                                        >
-                                          <Pencil className="h-4 w-4" />
-                                        </Button>
-                                        <Button
-                                          size="icon"
-                                          variant="ghost"
-                                          className="text-destructive"
-                                          onClick={(e) => {
-                                            e.stopPropagation();
-                                            if (confirm(`Remove this ${gearItem.equipmentType} from ${employee.name}?`)) {
-                                              deleteAssignmentMutation.mutate(assignment.id);
-                                            }
-                                          }}
-                                          data-testid={`button-delete-assignment-${assignment.id}`}
-                                        >
-                                          <Trash2 className="h-4 w-4" />
-                                        </Button>
+                                        {/* Only show edit/delete buttons for users with assign_gear permission */}
+                                        {canAssignGear(currentUser) && (
+                                          <>
+                                            <Button
+                                              size="icon"
+                                              variant="ghost"
+                                              onClick={(e) => {
+                                                e.stopPropagation();
+                                                setEditingAssignment(assignment);
+                                                setEditAssignmentQuantity(String(assignment.quantity || 1));
+                                                setEditAssignmentSerialNumber(assignment.serialNumber || "");
+                                                setEditAssignmentDateOfManufacture(assignment.dateOfManufacture || "");
+                                                setEditAssignmentDateInService(assignment.dateInService || "");
+                                                setShowEditAssignmentDialog(true);
+                                              }}
+                                              data-testid={`button-edit-assignment-${assignment.id}`}
+                                            >
+                                              <Pencil className="h-4 w-4" />
+                                            </Button>
+                                            <Button
+                                              size="icon"
+                                              variant="ghost"
+                                              className="text-destructive"
+                                              onClick={(e) => {
+                                                e.stopPropagation();
+                                                if (confirm(`Remove this ${gearItem.equipmentType} from ${employee.name}?`)) {
+                                                  deleteAssignmentMutation.mutate(assignment.id);
+                                                }
+                                              }}
+                                              data-testid={`button-delete-assignment-${assignment.id}`}
+                                            >
+                                              <Trash2 className="h-4 w-4" />
+                                            </Button>
+                                          </>
+                                        )}
                                       </div>
                                     </div>
                                   );
                                 })
                               )}
                               
-                              {/* Add Gear Button */}
-                              <Button
-                                variant="outline"
-                                className="w-full"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  setAssignEmployeeId(employee.id);
-                                  setActiveTab("manage");
-                                }}
-                                data-testid={`button-add-gear-${employee.id}`}
-                              >
-                                <Plus className="h-4 w-4 mr-2" />
-                                Assign Gear to {employee.name}
-                              </Button>
+                              {/* Add Gear Button - only for users with manage_inventory permission */}
+                              {canManageInventory(currentUser) && (
+                                <Button
+                                  variant="outline"
+                                  className="w-full"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    setAssignEmployeeId(employee.id);
+                                    setActiveTab("manage");
+                                  }}
+                                  data-testid={`button-add-gear-${employee.id}`}
+                                >
+                                  <Plus className="h-4 w-4 mr-2" />
+                                  Assign Gear to {employee.name}
+                                </Button>
+                              )}
                             </div>
                           )}
                         </CardContent>
@@ -1140,7 +1188,8 @@ export default function Inventory() {
             </TabsContent>
           )}
 
-          {/* Manage Gear Tab */}
+          {/* Manage Gear Tab - Requires manage_inventory permission */}
+          {canManageInventory(currentUser) && (
           <TabsContent value="manage" className="space-y-4">
             {/* Total Inventory Value Card - Only visible to users with financial permissions */}
             {canViewFinancials && (
@@ -1314,6 +1363,7 @@ export default function Inventory() {
               </CardContent>
             </Card>
           </TabsContent>
+          )}
 
           {/* Harness Inspections Tab */}
           <TabsContent value="inspections" className="space-y-4">
