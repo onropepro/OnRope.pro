@@ -2,6 +2,7 @@ import type { Express, Request, Response, NextFunction } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { db } from "./db";
+import { wsHub } from "./websocket-hub";
 import { insertUserSchema, insertClientSchema, insertProjectSchema, insertDropLogSchema, insertComplaintSchema, insertComplaintNoteSchema, insertJobCommentSchema, insertHarnessInspectionSchema, insertToolboxMeetingSchema, insertFlhaFormSchema, insertIncidentReportSchema, insertMethodStatementSchema, insertPayPeriodConfigSchema, insertQuoteSchema, insertQuoteServiceSchema, insertGearItemSchema, insertGearAssignmentSchema, insertGearSerialNumberSchema, insertScheduledJobSchema, insertJobAssignmentSchema, updatePropertyManagerAccountSchema, normalizeStrataPlan, type InsertGearItem, type InsertGearAssignment, type InsertGearSerialNumber, type Project, gearAssignments, gearSerialNumbers, jobAssignments, workSessions, nonBillableWorkSessions, licenseKeys, users, propertyManagerCompanyLinks, IRATA_TASK_TYPES } from "@shared/schema";
 import { eq, sql } from "drizzle-orm";
 import { z } from "zod";
@@ -2837,6 +2838,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         irataExpirationDate, terminatedDate, terminationReason, terminationNotes
       } = req.body;
       
+      // Check if permissions or role changed, or if employee is being terminated
+      const permissionsChanged = JSON.stringify(permissions || []) !== JSON.stringify(employee.permissions || []);
+      const roleChanged = role !== undefined && role !== employee.role;
+      const isBeingTerminated = terminatedDate !== undefined && terminatedDate !== null && !employee.terminatedDate;
+      
       // Update employee
       const updatedEmployee = await storage.updateUser(req.params.id, {
         name,
@@ -2863,6 +2869,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
         terminationReason: terminationReason !== undefined ? (terminationReason || null) : undefined,
         terminationNotes: terminationNotes !== undefined ? (terminationNotes || null) : undefined,
       });
+      
+      // Send real-time notifications for permission/role changes or termination
+      if (isBeingTerminated) {
+        // User is being terminated - invalidate their session and notify
+        await wsHub.terminateUser(req.params.id);
+      } else if (permissionsChanged || roleChanged) {
+        // Permissions or role changed - notify user to refresh their session
+        await wsHub.updateUserPermissions(req.params.id);
+      }
       
       const { passwordHash: _, ...employeeWithoutPassword } = updatedEmployee;
       res.json({ employee: employeeWithoutPassword });

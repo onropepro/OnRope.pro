@@ -4,6 +4,7 @@ import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider, useQuery } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { usePermissionSync } from "@/hooks/use-permission-sync";
 
 // Pages
 import Register from "@/pages/Register";
@@ -227,6 +228,9 @@ function BrandingProvider({ children }: { children: React.ReactNode }) {
   const { data: userData } = useQuery<{ user: any }>({
     queryKey: ["/api/user"],
   });
+  
+  // Real-time permission sync - notifies user when permissions change or they're terminated
+  usePermissionSync(userData?.user?.id);
 
   // NEVER apply branding on login/register/license pages
   const isPublicPage = location === '/' || location === '/login' || location === '/register' || location === '/link' || location === '/get-license' || location === '/complete-registration' || location.startsWith('/complete-registration?');
