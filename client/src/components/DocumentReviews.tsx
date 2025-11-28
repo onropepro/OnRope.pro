@@ -292,8 +292,8 @@ export function DocumentReviews({ companyDocuments = [], methodStatements = [] }
     }
   };
 
-  const handleOpenSignDialog = (review: DocumentReviewSignature) => {
-    if (!review.viewedAt) {
+  const handleOpenSignDialog = (review: DocumentReviewSignature, skipViewCheck = false) => {
+    if (!skipViewCheck && !review.viewedAt) {
       toast({
         variant: "destructive",
         title: "View Required",
@@ -682,7 +682,7 @@ export function DocumentReviews({ companyDocuments = [], methodStatements = [] }
               onClick={() => {
                 setIsSWPDialogOpen(false);
                 if (selectedReview) {
-                  handleOpenSignDialog(selectedReview);
+                  handleOpenSignDialog(selectedReview, true);
                 }
               }}
               data-testid="button-swp-proceed-sign"
