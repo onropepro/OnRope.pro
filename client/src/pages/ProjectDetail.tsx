@@ -111,6 +111,7 @@ export default function ProjectDetail() {
   const [showEndDayDialog, setShowEndDayDialog] = useState(false);
   const [activeSession, setActiveSession] = useState<any>(null);
   const [showHarnessInspectionDialog, setShowHarnessInspectionDialog] = useState(false);
+  const [showLogHoursPrompt, setShowLogHoursPrompt] = useState(false);
   const [showIrataTaskDialog, setShowIrataTaskDialog] = useState(false);
   const [selectedIrataTasks, setSelectedIrataTasks] = useState<string[]>([]);
   const [irataTaskNotes, setIrataTaskNotes] = useState("");
@@ -417,9 +418,9 @@ export default function ProjectDetail() {
       queryClient.invalidateQueries({ queryKey: ["/api/my-drops-today"] });
       endDayForm.reset();
       
-      // Show IRATA task dialog for rope access technicians to log their tasks
+      // Show log hours prompt for rope access technicians to log their tasks
       if (currentUser?.role === "rope_access_tech" || currentUser?.irataLevel) {
-        setShowIrataTaskDialog(true);
+        setShowLogHoursPrompt(true);
       } else {
         toast({ title: "Work session ended", description: "Great work today!" });
       }
@@ -463,6 +464,19 @@ export default function ProjectDetail() {
       tasksPerformed: selectedIrataTasks,
       notes: irataTaskNotes || undefined,
     });
+  };
+
+  // Confirm user wants to log hours - show task selection dialog
+  const handleConfirmLogHours = () => {
+    setShowLogHoursPrompt(false);
+    setShowIrataTaskDialog(true);
+  };
+
+  // User declines to log hours
+  const handleDeclineLogHours = () => {
+    setShowLogHoursPrompt(false);
+    setEndedSessionData(null);
+    toast({ title: "Work session ended", description: "Great work today!" });
   };
 
   // Skip IRATA task logging
@@ -3228,6 +3242,65 @@ export default function ProjectDetail() {
               </div>
             </form>
           </Form>
+        </DialogContent>
+      </Dialog>
+
+      {/* Log Hours Prompt Dialog */}
+      <Dialog open={showLogHoursPrompt} onOpenChange={setShowLogHoursPrompt}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <span className="material-icons text-primary">schedule</span>
+              Log Your Hours?
+            </DialogTitle>
+            <DialogDescription>
+              Would you like to log the tasks you performed during this work session? 
+              This helps fill your IRATA logbook for certification tracking.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="py-4">
+            {/* Session Summary */}
+            <div className="p-4 bg-muted rounded-md space-y-3">
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-muted-foreground">Hours Worked</span>
+                <span className="text-lg font-semibold text-primary">{endedSessionData?.hoursWorked.toFixed(1)} hrs</span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-muted-foreground">Date</span>
+                <span className="font-medium">
+                  {endedSessionData?.workDate ? format(parseLocalDate(endedSessionData.workDate), "MMM d, yyyy") : "-"}
+                </span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-muted-foreground">Building</span>
+                <span className="font-medium truncate max-w-[200px]">{endedSessionData?.buildingName || "-"}</span>
+              </div>
+            </div>
+
+            <p className="text-sm text-muted-foreground mt-4">
+              Your logged hours can be reviewed anytime in "My Logged Hours" from your dashboard.
+            </p>
+          </div>
+
+          <DialogFooter className="flex gap-2 sm:gap-2">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={handleDeclineLogHours}
+              data-testid="button-decline-log-hours"
+            >
+              Not Now
+            </Button>
+            <Button
+              type="button"
+              onClick={handleConfirmLogHours}
+              data-testid="button-confirm-log-hours"
+            >
+              <span className="material-icons mr-2 text-sm">edit_note</span>
+              Yes, Log Hours
+            </Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
 
