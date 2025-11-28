@@ -137,7 +137,15 @@ const PERMISSION_CATEGORIES = [
     name: "Safety & Compliance",
     permissions: [
       { id: "view_csr", label: "View Company Safety Rating (CSR)" },
-      { id: "view_inventory", label: "View Inventory & Gear" },
+    ],
+  },
+  {
+    name: "Inventory & Gear",
+    permissions: [
+      { id: "view_inventory", label: "View Inventory" },
+      { id: "manage_inventory", label: "Manage Inventory (Add/Edit/Delete)" },
+      { id: "assign_gear", label: "Assign Gear to Employees" },
+      { id: "view_gear_assignments", label: "View All Gear Assignments" },
     ],
   },
   {

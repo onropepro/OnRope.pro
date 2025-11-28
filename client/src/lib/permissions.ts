@@ -174,7 +174,7 @@ export function canViewCSR(user: User | null | undefined): boolean {
 // ============================================================================
 
 /**
- * Check if user can access inventory/gear management
+ * Check if user can access inventory/gear management (view)
  * - Company owners always have access
  * - Operations managers always have access
  * - Supervisors always have access
@@ -186,6 +186,47 @@ export function canAccessInventory(user: User | null | undefined): boolean {
   if (user.role === 'operations_manager') return true;
   if (hasRole(user, SUPERVISOR_ROLES)) return true;
   return checkPermission(user, 'view_inventory');
+}
+
+/**
+ * Check if user can manage inventory (add/edit/delete gear items)
+ * - Company owners always have access
+ * - Operations managers always have access
+ * - Other roles need 'manage_inventory' permission
+ */
+export function canManageInventory(user: User | null | undefined): boolean {
+  if (!user) return false;
+  if (isCompanyOwner(user)) return true;
+  if (user.role === 'operations_manager') return true;
+  return checkPermission(user, 'manage_inventory');
+}
+
+/**
+ * Check if user can assign gear to employees
+ * - Company owners always have access
+ * - Operations managers always have access
+ * - Supervisors always have access
+ * - Other roles need 'assign_gear' permission
+ */
+export function canAssignGear(user: User | null | undefined): boolean {
+  if (!user) return false;
+  if (isCompanyOwner(user)) return true;
+  if (user.role === 'operations_manager') return true;
+  if (hasRole(user, SUPERVISOR_ROLES)) return true;
+  return checkPermission(user, 'assign_gear');
+}
+
+/**
+ * Check if user can view all gear assignments (team gear tab)
+ * - Company owners always have access
+ * - Operations managers always have access
+ * - Other roles need 'view_gear_assignments' permission
+ */
+export function canViewGearAssignments(user: User | null | undefined): boolean {
+  if (!user) return false;
+  if (isCompanyOwner(user)) return true;
+  if (user.role === 'operations_manager') return true;
+  return checkPermission(user, 'view_gear_assignments');
 }
 
 // ============================================================================
@@ -243,6 +284,9 @@ export const permissions = {
   },
   inventory: {
     canAccess: canAccessInventory,
+    canManage: canManageInventory,
+    canAssignGear,
+    canViewAssignments: canViewGearAssignments,
   },
   subscription: {
     isReadOnly,
