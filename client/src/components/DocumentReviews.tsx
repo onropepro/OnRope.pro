@@ -376,72 +376,77 @@ export function DocumentReviews({ companyDocuments = [], methodStatements = [] }
       </CardHeader>
       <CardContent className="pt-6">
         {pendingReviews.length > 0 && (
-          <div className="mb-6">
-            <h3 className="text-sm font-semibold text-muted-foreground mb-3 flex items-center gap-2">
-              <AlertCircle className="h-4 w-4 text-amber-500" />
-              Awaiting Your Signature
-            </h3>
-            <div className="space-y-3">
-              {pendingReviews.map((review) => (
-                <div
-                  key={review.id}
-                  className="flex flex-col sm:flex-row sm:items-center gap-3 p-4 rounded-xl border bg-card"
-                  data-testid={`review-pending-${review.id}`}
-                >
-                  <div className="flex items-center gap-3 flex-1 min-w-0">
-                    <div className="p-2 bg-amber-500/10 rounded-lg shrink-0">
-                      <FileWarning className="h-5 w-5 text-amber-600 dark:text-amber-400" />
+          <Collapsible defaultOpen={false} className="mb-6">
+            <CollapsibleTrigger className="flex items-center gap-2 w-full p-2 rounded-lg hover-elevate mb-2 group">
+              <ChevronRight className="h-4 w-4 transition-transform duration-200 group-data-[state=open]:rotate-90" />
+              <h3 className="text-sm font-semibold text-muted-foreground flex items-center gap-2">
+                <AlertCircle className="h-4 w-4 text-amber-500" />
+                Awaiting Your Signature ({pendingReviews.length})
+              </h3>
+            </CollapsibleTrigger>
+            <CollapsibleContent>
+              <div className="space-y-3 pl-6">
+                {pendingReviews.map((review) => (
+                  <div
+                    key={review.id}
+                    className="flex flex-col sm:flex-row sm:items-center gap-3 p-4 rounded-xl border bg-card"
+                    data-testid={`review-pending-${review.id}`}
+                  >
+                    <div className="flex items-center gap-3 flex-1 min-w-0">
+                      <div className="p-2 bg-amber-500/10 rounded-lg shrink-0">
+                        <FileWarning className="h-5 w-5 text-amber-600 dark:text-amber-400" />
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <p className="font-medium truncate">{review.documentName}</p>
+                        <p className="text-sm text-muted-foreground">
+                          {getDocumentTypeLabel(review.documentType)}
+                          {review.viewedAt && (
+                            <span className="ml-2 text-emerald-600">
+                              <Eye className="h-3 w-3 inline mr-1" />
+                              Viewed
+                            </span>
+                          )}
+                        </p>
+                      </div>
                     </div>
-                    <div className="min-w-0 flex-1">
-                      <p className="font-medium truncate">{review.documentName}</p>
-                      <p className="text-sm text-muted-foreground">
-                        {getDocumentTypeLabel(review.documentType)}
-                        {review.viewedAt && (
-                          <span className="ml-2 text-emerald-600">
-                            <Eye className="h-3 w-3 inline mr-1" />
-                            Viewed
-                          </span>
-                        )}
-                      </p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-2 shrink-0 sm:ml-auto">
-                    {!review.viewedAt ? (
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => handleViewDocument(review)}
-                        data-testid={`button-view-${review.id}`}
-                      >
-                        <Eye className="h-4 w-4 mr-2" />
-                        View Document
-                      </Button>
-                    ) : (
-                      <>
+                    <div className="flex items-center gap-2 shrink-0 sm:ml-auto">
+                      {!review.viewedAt ? (
                         <Button
                           size="sm"
-                          variant="ghost"
+                          variant="outline"
                           onClick={() => handleViewDocument(review)}
-                          data-testid={`button-reread-${review.id}`}
+                          data-testid={`button-view-${review.id}`}
                         >
-                          <ExternalLink className="h-4 w-4 mr-2" />
-                          Re-read
+                          <Eye className="h-4 w-4 mr-2" />
+                          View Document
                         </Button>
-                        <Button
-                          size="sm"
-                          onClick={() => handleOpenSignDialog(review)}
-                          data-testid={`button-sign-${review.id}`}
-                        >
-                          <PenLine className="h-4 w-4 mr-2" />
-                          Sign
-                        </Button>
-                      </>
-                    )}
+                      ) : (
+                        <>
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            onClick={() => handleViewDocument(review)}
+                            data-testid={`button-reread-${review.id}`}
+                          >
+                            <ExternalLink className="h-4 w-4 mr-2" />
+                            Re-read
+                          </Button>
+                          <Button
+                            size="sm"
+                            onClick={() => handleOpenSignDialog(review)}
+                            data-testid={`button-sign-${review.id}`}
+                          >
+                            <PenLine className="h-4 w-4 mr-2" />
+                            Sign
+                          </Button>
+                        </>
+                      )}
+                    </div>
                   </div>
-                </div>
-              ))}
-            </div>
-          </div>
+                ))}
+              </div>
+            </CollapsibleContent>
+          </Collapsible>
         )}
 
         {signedReviews.length > 0 && (
