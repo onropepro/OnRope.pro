@@ -37,7 +37,7 @@ const methodStatementFormSchema = z.object({
   dateCreated: z.string().min(1, "Date is required"),
   preparedByName: z.string().min(1, "Your name is required"),
   jobType: z.string().min(1, "Job type is required"),
-  location: z.string().min(1, "Location is required"),
+  location: z.string().optional(), // Optional - not needed for job-type-only method statements
   
   workDescription: z.string().min(1, "Work description is required"),
   scopeDetails: z.string().min(1, "Scope details are required"),
@@ -892,9 +892,9 @@ export default function MethodStatementForm() {
                 name="location"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Location *</FormLabel>
+                    <FormLabel>Location (Optional)</FormLabel>
                     <FormControl>
-                      <Input {...field} placeholder="Work site address" data-testid="input-location" />
+                      <Input {...field} placeholder="Work site address (if applicable)" data-testid="input-location" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
