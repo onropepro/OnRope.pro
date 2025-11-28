@@ -844,13 +844,18 @@ export default function Inventory() {
   // Helper function to check if employee had a work session on a given date
   const hadWorkSession = (employeeId: string, date: Date): boolean => {
     const dateStr = format(date, 'yyyy-MM-dd');
-    return allSessions.some((session: any) => {
+    const found = allSessions.some((session: any) => {
       if (session.employeeId !== employeeId) return false;
       // Use workDate field (YYYY-MM-DD string) or fall back to startTime
       const sessionDateStr = session.workDate || (session.startTime ? format(new Date(session.startTime), 'yyyy-MM-dd') : null);
       if (!sessionDateStr) return false;
       return sessionDateStr === dateStr;
     });
+    // Debug log for specific dates
+    if (dateStr === '2025-11-26' || dateStr === '2025-11-22' || dateStr === '2025-11-25') {
+      console.log(`hadWorkSession(${employeeId.slice(0,8)}..., ${dateStr}) = ${found}`);
+    }
+    return found;
   };
 
   // Helper function to check if employee submitted harness inspection for a given date
@@ -966,6 +971,37 @@ export default function Inventory() {
 
   // Calculate company safety rating based on filter
   const companySafetyRating = useMemo(() => {
+    // DEBUG: Log data to understand what we're working with
+    console.log('=== COMPLIANCE CALCULATION DEBUG ===');
+    console.log('allSessions count:', allSessions.length);
+    console.log('harnessInspections count:', harnessInspections.length);
+    console.log('inspectionDays count:', inspectionDays.length);
+    
+    if (allSessions.length > 0) {
+      console.log('Sample session:', JSON.stringify(allSessions[0], null, 2));
+    }
+    if (harnessInspections.length > 0) {
+      console.log('Sample inspection:', JSON.stringify(harnessInspections[0], null, 2));
+    }
+    if (inspectionDays.length > 0) {
+      console.log('Sample inspectionDay (Date object):', inspectionDays[0]);
+      console.log('Sample inspectionDay formatted:', format(inspectionDays[0], 'yyyy-MM-dd'));
+    }
+    
+    // Collect all unique work dates from sessions
+    const uniqueWorkDates = new Set<string>();
+    allSessions.forEach((s: any) => {
+      if (s.workDate) uniqueWorkDates.add(s.workDate);
+    });
+    console.log('Unique work dates in sessions:', Array.from(uniqueWorkDates));
+    
+    // Collect all unique inspection dates
+    const uniqueInspDates = new Set<string>();
+    harnessInspections.forEach((i: any) => {
+      if (i.inspectionDate) uniqueInspDates.add(i.inspectionDate);
+    });
+    console.log('Unique inspection dates:', Array.from(uniqueInspDates));
+    
     if (inspectionFilter === "combined") {
       // Calculate average of week, month, and all-time ratings
       const weekRating = calculateRatingForDays(7);
@@ -1037,6 +1073,9 @@ export default function Inventory() {
         }
       });
     });
+
+    console.log('Final counts - totalWorkDays:', totalWorkDays, 'compliantWorkDays:', compliantWorkDays);
+    console.log('=== END DEBUG ===');
 
     if (totalWorkDays === 0) return 0;
     return Math.round((compliantWorkDays / totalWorkDays) * 100);
