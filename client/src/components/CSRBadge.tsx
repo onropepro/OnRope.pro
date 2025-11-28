@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Shield, FileText, ClipboardCheck, HardHat, TrendingUp, AlertTriangle, CheckCircle2, Lightbulb } from "lucide-react";
+import { Shield, FileText, ClipboardCheck, HardHat, TrendingUp, AlertTriangle, CheckCircle2, Lightbulb, ScrollText } from "lucide-react";
 import { canViewCSR, type User } from "@/lib/permissions";
 
 interface CSRBadgeProps {
@@ -15,6 +15,7 @@ interface CSRData {
     documentationRating: number;
     toolboxMeetingRating: number;
     harnessInspectionRating: number;
+    methodStatementRating: number;
     projectCompletionRating: number;
   };
   details: {
@@ -24,9 +25,29 @@ interface CSRData {
     toolboxTotalDays: number;
     harnessCompletedInspections: number;
     harnessRequiredInspections: number;
+    methodStatementsCovered: number;
+    methodStatementsRequired: number;
+    missingJobTypes: string[];
     projectCount: number;
     totalProjectProgress: number;
   };
+}
+
+function formatJobTypeName(jobType: string): string {
+  if (jobType.startsWith('custom:')) {
+    return jobType.replace('custom:', '');
+  }
+  const names: Record<string, string> = {
+    'window_cleaning': 'Window Cleaning',
+    'dryer_vent_cleaning': 'Dryer Vent Cleaning',
+    'building_wash': 'Building Wash',
+    'in_suite_dryer_vent_cleaning': 'In-Suite Dryer Vent',
+    'parkade_pressure_cleaning': 'Parkade Pressure Cleaning',
+    'ground_window_cleaning': 'Ground Window Cleaning',
+    'general_pressure_washing': 'General Pressure Washing',
+    'other': 'Other'
+  };
+  return names[jobType] || jobType.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
 }
 
 function getRatingColor(rating: number): string {
@@ -105,6 +126,17 @@ function getImprovementTips(csrData: CSRData): { category: string; icon: any; ti
         priority: breakdown.harnessInspectionRating < 50 ? 'high' : 'medium'
       });
     }
+  }
+
+  if (breakdown.methodStatementRating < 100 && details.methodStatementsRequired > 0) {
+    const missingCount = details.methodStatementsRequired - details.methodStatementsCovered;
+    const missingNames = details.missingJobTypes?.map(formatJobTypeName).join(', ') || '';
+    tips.push({
+      category: "Method Statements",
+      icon: ScrollText,
+      tip: `Missing method statements for ${missingCount} job type${missingCount > 1 ? 's' : ''}: ${missingNames}. Create a method statement for each job type to reach 100%.`,
+      priority: breakdown.methodStatementRating < 50 ? 'high' : 'medium'
+    });
   }
 
   if (breakdown.projectCompletionRating < 100 && details.projectCount > 0) {
@@ -248,6 +280,22 @@ export function CSRBadge({ user }: CSRBadgeProps) {
                 <ColoredProgress value={breakdown.harnessInspectionRating} rating={breakdown.harnessInspectionRating} />
                 <p className="text-xs text-muted-foreground">
                   {details.harnessCompletedInspections} of {details.harnessRequiredInspections} inspections completed (last 30 days)
+                </p>
+              </div>
+
+              <div className="space-y-2">
+                <div className="flex items-center justify-between text-sm">
+                  <div className="flex items-center gap-2">
+                    <ScrollText className="w-4 h-4 text-muted-foreground" />
+                    <span>Method Statements</span>
+                  </div>
+                  <span className={`font-semibold ${getRatingColor(breakdown.methodStatementRating)}`}>
+                    {breakdown.methodStatementRating}%
+                  </span>
+                </div>
+                <ColoredProgress value={breakdown.methodStatementRating} rating={breakdown.methodStatementRating} />
+                <p className="text-xs text-muted-foreground">
+                  {details.methodStatementsCovered} of {details.methodStatementsRequired} job type{details.methodStatementsRequired !== 1 ? 's' : ''} covered
                 </p>
               </div>
 
