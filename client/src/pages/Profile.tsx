@@ -1066,7 +1066,7 @@ export default function Profile() {
                           }
                         }}
                         data-testid="input-logo-upload"
-                        className="h-12"
+                        className="h-12 border-2 border-dashed border-border hover:border-primary/50 cursor-pointer file:mr-4 file:py-2 file:px-4 file:rounded-md file:border file:border-border file:bg-muted file:text-sm file:font-medium file:text-foreground hover:file:bg-accent"
                       />
                     </div>
                   </div>
