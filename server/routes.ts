@@ -7168,48 +7168,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // No penalty from projects - this is informational only
       const projectPenalty = 0;
       
-      // 5. Method Statement Coverage Rating
-      // Should have at least one method statement for each job type used in projects
-      const methodStatements = await storage.getMethodStatementsByCompany(companyId);
-      
-      // Get unique job types from all non-deleted projects
-      const activeJobTypes = new Set<string>();
-      for (const project of projects) {
-        if (project.status !== 'deleted' && project.jobType) {
-          // Use custom job type name if it's "other"
-          const jobTypeKey = project.jobType === 'other' && project.customJobType 
-            ? `custom:${project.customJobType}` 
-            : project.jobType;
-          activeJobTypes.add(jobTypeKey);
-        }
-      }
-      
-      // Get job types covered by method statements (check project's job type)
-      const coveredJobTypes = new Set<string>();
-      for (const statement of methodStatements) {
-        // Find the project this method statement belongs to
-        const project = projects.find((p: any) => p.id === statement.projectId);
-        if (project && project.jobType) {
-          const jobTypeKey = project.jobType === 'other' && project.customJobType 
-            ? `custom:${project.customJobType}` 
-            : project.jobType;
-          coveredJobTypes.add(jobTypeKey);
-        }
-      }
-      
-      const totalJobTypes = activeJobTypes.size;
-      const coveredJobTypesCount = Array.from(activeJobTypes).filter(jt => coveredJobTypes.has(jt)).length;
-      
-      // If no projects/job types, 100% compliance (nothing to comply with)
-      const methodStatementRating = totalJobTypes > 0 
-        ? Math.round((coveredJobTypesCount / totalJobTypes) * 100) 
-        : 100;
-      // Penalty is proportional to missing method statements (max 20%)
-      const methodStatementPenalty = totalJobTypes > 0 
-        ? Math.round(((totalJobTypes - coveredJobTypesCount) / totalJobTypes) * 20)
-        : 0;
-      
-      // 6. Document Review Compliance Rating
+      // 5. Document Review Compliance Rating
       // Tracks employee acknowledgment of safety documents (H&S Manual, Company Policy)
       const documentReviews = await storage.getDocumentReviewSignaturesByCompany(companyId);
       const totalReviews = documentReviews.length;
@@ -7226,9 +7185,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         : 0;
       
       // Calculate overall CSR: Start at 100%, subtract penalties
-      // Max penalty is 100% (25% docs, 25% toolbox, 25% harness, 20% method statements, 5% document reviews)
+      // Max penalty is 80% (25% docs, 25% toolbox, 25% harness, 5% document reviews)
       // Project completion is shown but doesn't penalize
-      const totalPenalty = documentationPenalty + toolboxPenalty + harnessPenalty + methodStatementPenalty + documentReviewPenalty + projectPenalty;
+      const totalPenalty = documentationPenalty + toolboxPenalty + harnessPenalty + documentReviewPenalty + projectPenalty;
       const overallCSR = Math.max(0, 100 - totalPenalty);
       
       res.json({
@@ -7237,7 +7196,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
           documentationRating,
           toolboxMeetingRating,
           harnessInspectionRating,
-          methodStatementRating,
           documentReviewRating,
           projectCompletionRating
         },
@@ -7248,9 +7206,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
           toolboxTotalDays,
           harnessCompletedInspections,
           harnessRequiredInspections,
-          methodStatementsCovered: coveredJobTypesCount,
-          methodStatementsRequired: totalJobTypes,
-          missingJobTypes: Array.from(activeJobTypes).filter(jt => !coveredJobTypes.has(jt)),
           documentReviewsSigned: signedReviews,
           documentReviewsPending: pendingReviews,
           documentReviewsTotal: totalReviews,
