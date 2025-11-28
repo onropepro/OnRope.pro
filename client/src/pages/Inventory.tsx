@@ -17,7 +17,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { insertGearItemSchema, type InsertGearItem, type GearItem, type GearAssignment, type GearSerialNumber } from "@shared/schema";
 import { ArrowLeft, Plus, Pencil, X, Trash2, Shield, Cable, Link2, Gauge, TrendingUp, HardHat, Hand, Fuel, Scissors, PaintBucket, Droplets, CircleDot, Lock, Anchor, MoreHorizontal, Users, ShieldAlert } from "lucide-react";
 import { Label } from "@/components/ui/label";
-import { hasFinancialAccess, isManagement, canViewCSR, canAccessInventory } from "@/lib/permissions";
+import { hasFinancialAccess, canViewCSR, canAccessInventory, canManageInventory, canAssignGear, canViewGearAssignments } from "@/lib/permissions";
 import HarnessInspectionForm from "./HarnessInspectionForm";
 import { format } from "date-fns";
 
@@ -537,8 +537,8 @@ export default function Inventory() {
     setShowAssignDialog(true);
   };
   
-  // Check if user can assign gear to other employees (management only)
-  const canAssignToOthers = isManagement(currentUser);
+  // Check if user can assign gear to other employees (requires assign_gear permission)
+  const canAssignToOthers = canAssignGear(currentUser);
 
   const handleAssignGear = () => {
     if (!managingItem || !assignEmployeeId) {
@@ -808,9 +808,9 @@ export default function Inventory() {
 
       <div className="p-4 max-w-4xl mx-auto">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className={`grid w-full mb-4 ${isManagement(currentUser) ? 'grid-cols-5' : 'grid-cols-4'}`}>
+          <TabsList className={`grid w-full mb-4 ${canViewGearAssignments(currentUser) ? 'grid-cols-5' : 'grid-cols-4'}`}>
             <TabsTrigger value="my-gear" data-testid="tab-my-gear">My Gear</TabsTrigger>
-            {isManagement(currentUser) && (
+            {canViewGearAssignments(currentUser) && (
               <TabsTrigger value="team-gear" data-testid="tab-team-gear">
                 <Users className="h-4 w-4 mr-1" />
                 Team Gear
@@ -953,8 +953,8 @@ export default function Inventory() {
             )}
           </TabsContent>
 
-          {/* Team Gear Tab - Management only */}
-          {isManagement(currentUser) && (
+          {/* Team Gear Tab - Requires view_gear_assignments permission */}
+          {canViewGearAssignments(currentUser) && (
             <TabsContent value="team-gear" className="space-y-4">
               <Card className="bg-primary/5 border-primary/20">
                 <CardContent className="p-4">
