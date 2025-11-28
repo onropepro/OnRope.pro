@@ -7729,8 +7729,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Unable to determine company" });
       }
       
+      // Sanitize empty strings to null for optional fields (especially dates)
+      const sanitizedBody = { ...req.body };
+      const optionalFields = ['reviewDate', 'approvalDate', 'projectId', 'location', 'workDuration', 'rescuePlan', 'emergencyContacts', 'weatherRestrictions', 'workingHeightRange', 'accessMethod', 'irataLevelRequired', 'communicationMethod', 'signalProtocol', 'reviewedByName', 'approvedByName'];
+      for (const field of optionalFields) {
+        if (sanitizedBody[field] === '' || sanitizedBody[field] === 'none') {
+          sanitizedBody[field] = null;
+        }
+      }
+      
       const statementData = insertMethodStatementSchema.parse({
-        ...req.body,
+        ...sanitizedBody,
         companyId,
         preparedById: req.session.userId,
       });
