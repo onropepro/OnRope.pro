@@ -370,6 +370,35 @@ export const gearSerialNumbers = pgTable("gear_serial_numbers", {
   index("IDX_gear_serial_numbers_serial").on(table.serialNumber),
 ]);
 
+// Equipment damage reports table - tracks reported damage to equipment
+export const equipmentDamageReports = pgTable("equipment_damage_reports", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  companyId: varchar("company_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  gearItemId: varchar("gear_item_id").notNull().references(() => gearItems.id, { onDelete: "cascade" }),
+  reportedBy: varchar("reported_by").notNull().references(() => users.id, { onDelete: "cascade" }),
+  reporterName: varchar("reporter_name").notNull(),
+  equipmentCategory: varchar("equipment_category").notNull(),
+  equipmentType: varchar("equipment_type").notNull(),
+  equipmentBrand: varchar("equipment_brand"),
+  equipmentModel: varchar("equipment_model"),
+  serialNumber: varchar("serial_number"),
+  damageDescription: text("damage_description").notNull(),
+  damageLocation: text("damage_location"),
+  damageSeverity: varchar("damage_severity").notNull(),
+  discoveredDate: date("discovered_date").notNull(),
+  equipmentRetired: boolean("equipment_retired").notNull().default(false),
+  retirementReason: text("retirement_reason"),
+  correctiveAction: text("corrective_action"),
+  notes: text("notes"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+}, (table) => [
+  index("IDX_equipment_damage_reports_company").on(table.companyId),
+  index("IDX_equipment_damage_reports_gear").on(table.gearItemId),
+  index("IDX_equipment_damage_reports_reporter").on(table.reportedBy),
+  index("IDX_equipment_damage_reports_date").on(table.discoveredDate),
+]);
+
 // Complaints table
 export const complaints = pgTable("complaints", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
@@ -1373,6 +1402,12 @@ export const insertGearSerialNumberSchema = createInsertSchema(gearSerialNumbers
   updatedAt: true,
 });
 
+export const insertEquipmentDamageReportSchema = createInsertSchema(equipmentDamageReports).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
 export const insertComplaintSchema = createInsertSchema(complaints).omit({
   id: true,
   createdAt: true,
@@ -1577,6 +1612,9 @@ export type InsertGearAssignment = z.infer<typeof insertGearAssignmentSchema>;
 
 export type GearSerialNumber = typeof gearSerialNumbers.$inferSelect;
 export type InsertGearSerialNumber = z.infer<typeof insertGearSerialNumberSchema>;
+
+export type EquipmentDamageReport = typeof equipmentDamageReports.$inferSelect;
+export type InsertEquipmentDamageReport = z.infer<typeof insertEquipmentDamageReportSchema>;
 
 export type Complaint = typeof complaints.$inferSelect;
 export type InsertComplaint = z.infer<typeof insertComplaintSchema>;
