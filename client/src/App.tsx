@@ -229,14 +229,14 @@ function BrandingProvider({ children }: { children: React.ReactNode }) {
     queryKey: ["/api/user"],
   });
   
-  // Real-time permission sync - notifies user when permissions change or they're terminated
-  usePermissionSync(userData?.user?.id);
-
   // NEVER apply branding on login/register/license pages
   const isPublicPage = location === '/' || location === '/login' || location === '/register' || location === '/link' || location === '/get-license' || location === '/complete-registration' || location.startsWith('/complete-registration?');
   
   // Only apply branding if user is authenticated AND not on public pages
   const isAuthenticated = !!userData?.user && !isPublicPage;
+  
+  // Real-time permission sync - notifies user when permissions change or they're terminated
+  usePermissionSync(isAuthenticated);
 
   // Determine company ID to fetch branding for
   // For company users: use their own ID

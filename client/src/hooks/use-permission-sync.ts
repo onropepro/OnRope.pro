@@ -3,18 +3,18 @@ import { useLocation } from 'wouter';
 import { queryClient } from '@/lib/queryClient';
 import { useToast } from '@/hooks/use-toast';
 
-export function usePermissionSync(userId: string | undefined) {
+export function usePermissionSync(isAuthenticated: boolean) {
   const wsRef = useRef<WebSocket | null>(null);
   const [, setLocation] = useLocation();
   const { toast } = useToast();
   const reconnectTimeoutRef = useRef<NodeJS.Timeout>();
 
   useEffect(() => {
-    if (!userId) return;
+    if (!isAuthenticated) return;
 
     const connect = () => {
       const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-      const wsUrl = `${protocol}//${window.location.host}/ws?userId=${userId}`;
+      const wsUrl = `${protocol}//${window.location.host}/ws`;
       
       const ws = new WebSocket(wsUrl);
       wsRef.current = ws;
@@ -54,7 +54,7 @@ export function usePermissionSync(userId: string | undefined) {
       ws.onclose = () => {
         console.log('Permission sync WebSocket disconnected');
         reconnectTimeoutRef.current = setTimeout(() => {
-          if (userId) {
+          if (isAuthenticated) {
             connect();
           }
         }, 5000);
@@ -76,5 +76,5 @@ export function usePermissionSync(userId: string | undefined) {
         wsRef.current = null;
       }
     };
-  }, [userId, setLocation, toast]);
+  }, [isAuthenticated, setLocation, toast]);
 }

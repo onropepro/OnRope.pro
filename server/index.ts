@@ -6,6 +6,7 @@ import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 import { runMigrations } from "./migrate";
 import { wsHub } from "./websocket-hub";
+import { SESSION_SECRET, SESSION_COOKIE_NAME } from "./session-config";
 
 const app = express();
 
@@ -20,7 +21,8 @@ app.use(session({
     tableName: "sessions",
     createTableIfMissing: true,
   }),
-  secret: process.env.SESSION_SECRET || "rope-access-management-secret-key-change-in-production",
+  name: SESSION_COOKIE_NAME,
+  secret: SESSION_SECRET,
   resave: false,
   saveUninitialized: false,
   cookie: {
