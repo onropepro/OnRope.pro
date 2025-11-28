@@ -203,7 +203,9 @@ export function DocumentReviews({ companyDocuments = [], methodStatements = [] }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/document-reviews/my'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/document-reviews'] });
       queryClient.invalidateQueries({ queryKey: ['/api/csr'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/company-safety-rating'] });
       setIsSignDialogOpen(false);
       setSelectedReview(null);
       toast({
