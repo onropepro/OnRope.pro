@@ -1215,8 +1215,9 @@ export default function Inventory() {
         // Count this as a required work-day
         totalWorkDays++;
         
-        // Check if they have a completed inspection (pass or fail)
-        if (inspection && (inspection.overallStatus === "pass" || inspection.overallStatus === "fail")) {
+        // Check if they have any inspection submitted (matches the green checkmark logic in the grid)
+        // An inspection is considered compliant if it exists and is not N/A
+        if (inspection) {
           compliantWorkDays++;
         }
       });
@@ -1324,8 +1325,9 @@ export default function Inventory() {
         // Count this as a required work-day
         totalWorkDays++;
         
-        // Check if they have a completed inspection (pass or fail)
-        if (inspection && (inspection.overallStatus === "pass" || inspection.overallStatus === "fail")) {
+        // Check if they have any inspection submitted (matches the green checkmark logic in the grid)
+        // An inspection is considered compliant if it exists and is not N/A
+        if (inspection) {
           compliantWorkDays++;
         }
       });
