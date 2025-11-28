@@ -50,13 +50,7 @@ function canViewSafetyDocuments(user: any): boolean {
   // Company role always has access
   if (user.role === 'company') return true;
   
-  // Operations managers always have access to safety documents
-  if (user.role === 'operations_manager') return true;
-  
-  // All supervisor roles always have access to safety documents
-  if (user.role === 'supervisor' || user.role === 'general_supervisor' || user.role === 'rope_access_supervisor') return true;
-  
-  // Check granular permissions - rope_access_tech and other roles need explicit permission
+  // All other roles need explicit permission
   return user.permissions?.includes('view_safety_documents') || false;
 }
 
@@ -67,11 +61,40 @@ function canViewCSR(user: any): boolean {
   // Company role always has access
   if (user.role === 'company') return true;
   
-  // Operations managers always have access to CSR
-  if (user.role === 'operations_manager') return true;
-  
-  // Check granular permissions - other roles need explicit permission
+  // All other roles need explicit permission
   return user.permissions?.includes('view_csr') || false;
+}
+
+// ============================================================================
+// INVENTORY PERMISSION HELPERS
+// ============================================================================
+
+// Helper function to check if user can view inventory
+function canViewInventory(user: any): boolean {
+  if (!user) return false;
+  if (user.role === 'company') return true;
+  return user.permissions?.includes('view_inventory') || false;
+}
+
+// Helper function to check if user can manage inventory (add/edit/delete)
+function canManageInventory(user: any): boolean {
+  if (!user) return false;
+  if (user.role === 'company') return true;
+  return user.permissions?.includes('manage_inventory') || false;
+}
+
+// Helper function to check if user can assign gear to employees
+function canAssignGear(user: any): boolean {
+  if (!user) return false;
+  if (user.role === 'company') return true;
+  return user.permissions?.includes('assign_gear') || false;
+}
+
+// Helper function to check if user can view all gear assignments
+function canViewGearAssignments(user: any): boolean {
+  if (!user) return false;
+  if (user.role === 'company') return true;
+  return user.permissions?.includes('view_gear_assignments') || false;
 }
 
 // Overtime calculation utility
@@ -6096,6 +6119,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "User not found" });
       }
       
+      // Check inventory view permission
+      if (!canViewInventory(currentUser)) {
+        return res.status(403).json({ message: "Access denied - Insufficient inventory permissions" });
+      }
+      
       const companyId = currentUser.role === "company" ? currentUser.id : currentUser.companyId;
       
       if (!companyId) {
@@ -6130,6 +6158,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       if (!currentUser) {
         return res.status(404).json({ message: "User not found" });
+      }
+      
+      // Check inventory manage permission
+      if (!canManageInventory(currentUser)) {
+        return res.status(403).json({ message: "Access denied - Insufficient inventory permissions" });
       }
       
       const companyId = currentUser.role === "company" ? currentUser.id : currentUser.companyId;
@@ -6202,6 +6235,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "User not found" });
       }
       
+      // Check inventory manage permission
+      if (!canManageInventory(currentUser)) {
+        return res.status(403).json({ message: "Access denied - Insufficient inventory permissions" });
+      }
+      
       const companyId = currentUser.role === "company" ? currentUser.id : currentUser.companyId;
       
       if (!companyId) {
@@ -6238,6 +6276,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "User not found" });
       }
       
+      // Check inventory manage permission
+      if (!canManageInventory(currentUser)) {
+        return res.status(403).json({ message: "Access denied - Insufficient inventory permissions" });
+      }
+      
       await storage.deleteGearItem(req.params.id);
       res.json({ success: true });
     } catch (error) {
@@ -6263,15 +6306,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Unable to determine company" });
       }
       
-      // For regular employees, only show their own assignments
-      // For managers/company, show all assignments
-      const isManagement = ["operations_manager", "general_supervisor", "rope_access_supervisor", "supervisor"].includes(currentUser.role);
+      // Everyone can see their own gear assignments
+      // But viewing ALL assignments requires view_gear_assignments permission
       let assignments;
-      if (currentUser.role === "company" || isManagement) {
+      if (canViewGearAssignments(currentUser)) {
+        // User has permission to view all gear assignments
         assignments = await db.select()
           .from(gearAssignments)
           .where(eq(gearAssignments.companyId, companyId));
       } else {
+        // Only show user's own gear assignments
         assignments = await db.select()
           .from(gearAssignments)
           .where(eq(gearAssignments.employeeId, currentUser.id));
@@ -6291,6 +6335,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       if (!currentUser) {
         return res.status(404).json({ message: "User not found" });
+      }
+      
+      // Check assign gear permission
+      if (!canAssignGear(currentUser)) {
+        return res.status(403).json({ message: "Access denied - Insufficient permissions to assign gear" });
       }
       
       const companyId = currentUser.role === "company" ? currentUser.id : currentUser.companyId;
@@ -6331,6 +6380,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "User not found" });
       }
       
+      // Check inventory view permission (needed to see gear item assignments)
+      if (!canViewInventory(currentUser)) {
+        return res.status(403).json({ message: "Access denied - Insufficient inventory permissions" });
+      }
+      
       const companyId = currentUser.role === "company" ? currentUser.id : currentUser.companyId;
       
       if (!companyId) {
@@ -6354,6 +6408,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       if (!currentUser) {
         return res.status(404).json({ message: "User not found" });
+      }
+      
+      // Check assign gear permission
+      if (!canAssignGear(currentUser)) {
+        return res.status(403).json({ message: "Access denied - Insufficient permissions to assign gear" });
       }
       
       const companyId = currentUser.role === "company" ? currentUser.id : currentUser.companyId;
@@ -6391,6 +6450,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "User not found" });
       }
       
+      // Check assign gear permission (needed to edit assignments)
+      if (!canAssignGear(currentUser)) {
+        return res.status(403).json({ message: "Access denied - Insufficient permissions to manage gear assignments" });
+      }
+      
       const companyId = currentUser.role === "company" ? currentUser.id : currentUser.companyId;
       
       if (!companyId) {
@@ -6424,6 +6488,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "User not found" });
       }
       
+      // Check assign gear permission (needed to delete assignments)
+      if (!canAssignGear(currentUser)) {
+        return res.status(403).json({ message: "Access denied - Insufficient permissions to manage gear assignments" });
+      }
+      
       const companyId = currentUser.role === "company" ? currentUser.id : currentUser.companyId;
       
       if (!companyId) {
@@ -6449,6 +6518,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "User not found" });
       }
       
+      // Check inventory view permission
+      if (!canViewInventory(currentUser)) {
+        return res.status(403).json({ message: "Access denied - Insufficient inventory permissions" });
+      }
+      
       const companyId = currentUser.role === "company" ? currentUser.id : currentUser.companyId;
       
       if (!companyId) {
@@ -6472,6 +6546,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       if (!currentUser) {
         return res.status(404).json({ message: "User not found" });
+      }
+      
+      // Check manage inventory permission
+      if (!canManageInventory(currentUser)) {
+        return res.status(403).json({ message: "Access denied - Insufficient inventory permissions" });
       }
       
       const companyId = currentUser.role === "company" ? currentUser.id : currentUser.companyId;
@@ -6508,6 +6587,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       if (!currentUser) {
         return res.status(404).json({ message: "User not found" });
+      }
+      
+      // Check manage inventory permission
+      if (!canManageInventory(currentUser)) {
+        return res.status(403).json({ message: "Access denied - Insufficient inventory permissions" });
       }
       
       const companyId = currentUser.role === "company" ? currentUser.id : currentUser.companyId;
