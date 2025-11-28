@@ -398,6 +398,7 @@ export default function Inventory() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/gear-assignments"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/gear-items"] });
       queryClient.invalidateQueries({ queryKey: ["/api/gear"] });
       queryClient.invalidateQueries({ queryKey: ["/api/gear-items", managingItem?.id, "serial-numbers"] });
       toast({
@@ -428,6 +429,7 @@ export default function Inventory() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/gear-assignments"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/gear-items"] });
       toast({
         title: "Assignment Removed",
         description: "Gear assignment has been removed.",
@@ -454,6 +456,7 @@ export default function Inventory() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/gear-assignments"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/gear-items"] });
       toast({
         title: "Assignment Updated",
         description: "Gear assignment has been updated.",
@@ -486,6 +489,7 @@ export default function Inventory() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/gear-assignments"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/gear-items"] });
       queryClient.invalidateQueries({ queryKey: ["/api/gear"] });
       toast({
         title: "Gear Added",
@@ -517,6 +521,7 @@ export default function Inventory() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/gear-assignments"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/gear-items"] });
       toast({
         title: "Gear Removed",
         description: "Gear has been removed from your equipment.",
@@ -547,6 +552,7 @@ export default function Inventory() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/gear-assignments"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/gear-items"] });
       toast({
         title: "Gear Updated",
         description: "Your gear details have been updated.",
