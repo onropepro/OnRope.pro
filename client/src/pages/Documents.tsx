@@ -1206,7 +1206,8 @@ export default function Documents() {
   const policyDocs = companyDocuments.filter((doc: any) => doc.documentType === 'company_policy');
   const insuranceDocs = companyDocuments.filter((doc: any) => doc.documentType === 'certificate_of_insurance');
   const methodStatementDocs = companyDocuments.filter((doc: any) => doc.documentType === 'method_statement');
-  const safeWorkProcedureDocs = companyDocuments.filter((doc: any) => doc.documentType === 'safe_work_procedure');
+  const safeWorkProcedureDocs = companyDocuments.filter((doc: any) => doc.documentType === 'safe_work_procedure' && !doc.isTemplate);
+  const templateSWPDocs = companyDocuments.filter((doc: any) => doc.documentType === 'safe_work_procedure' && doc.isTemplate);
   const workSessions = workSessionsData?.sessions || [];
 
   // Calculate toolbox meeting compliance rating
@@ -2926,6 +2927,8 @@ export default function Documents() {
         description: "Document deleted successfully",
       });
       queryClient.invalidateQueries({ queryKey: ["/api/company-documents"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/document-reviews"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/company-safety-rating"] });
     },
     onError: (error: Error) => {
       toast({
@@ -2935,6 +2938,58 @@ export default function Documents() {
       });
     },
   });
+
+  // Initialize template safe work procedures
+  const initTemplatesMutation = useMutation({
+    mutationFn: async (templates: { templateId: string; title: string; description: string; jobType: string }[]) => {
+      const response = await apiRequest("POST", "/api/company-documents/init-templates", { templates });
+      return await response.json();
+    },
+    onSuccess: (data) => {
+      if (data.documents?.length > 0) {
+        toast({
+          title: "Success",
+          description: `Added ${data.documents.length} safe work procedure(s)`,
+        });
+        queryClient.invalidateQueries({ queryKey: ["/api/company-documents"] });
+        queryClient.invalidateQueries({ queryKey: ["/api/document-reviews"] });
+      }
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to initialize templates",
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Check which templates are not yet added
+  const existingTemplateIds = new Set(templateSWPDocs.map((doc: any) => doc.templateId));
+  const availableTemplates = SAFE_WORK_PROCEDURES.filter(
+    (p) => !existingTemplateIds.has(`swp_${p.jobType}`)
+  );
+
+  // Add a single template procedure
+  const handleAddTemplate = (procedure: SafeWorkProcedure) => {
+    initTemplatesMutation.mutate([{
+      templateId: `swp_${procedure.jobType}`,
+      title: procedure.title,
+      description: procedure.description,
+      jobType: procedure.jobType,
+    }]);
+  };
+
+  // Add all available templates
+  const handleAddAllTemplates = () => {
+    const templates = availableTemplates.map(p => ({
+      templateId: `swp_${p.jobType}`,
+      title: p.title,
+      description: p.description,
+      jobType: p.jobType,
+    }));
+    initTemplatesMutation.mutate(templates);
+  };
 
   return (
     <div className="min-h-screen bg-background p-4 pb-24">
@@ -3841,83 +3896,197 @@ export default function Documents() {
               </Card>
             )}
 
-            {/* Template Safe Work Procedures */}
-            <Card className="mb-6 overflow-hidden">
-              <CardHeader className="bg-gradient-to-br from-green-500/10 via-green-500/5 to-transparent pb-4">
-                <div className="flex items-start gap-4">
-                  <div className="p-3 bg-green-500/10 rounded-xl ring-1 ring-green-500/20">
-                    <FileCheck className="h-6 w-6 text-green-600 dark:text-green-400" />
-                  </div>
-                  <div className="flex-1">
-                    <CardTitle className="text-xl mb-1">Safe Work Procedure Templates</CardTitle>
-                    <p className="text-sm text-muted-foreground">
-                      Industry-standard safety procedures for rope access operations. Download as PDF for your records.
-                    </p>
-                  </div>
-                  <Badge variant="secondary" className="text-base font-semibold px-3">
-                    {SAFE_WORK_PROCEDURES.length}
-                  </Badge>
-                </div>
-              </CardHeader>
-              <CardContent className="pt-6">
-                <div className="grid gap-4 md:grid-cols-2">
-                  {SAFE_WORK_PROCEDURES.map((procedure) => {
-                    const jobTypeLabel = STANDARD_JOB_TYPES.find(jt => jt.value === procedure.jobType)?.label || procedure.title;
-                    
-                    return (
-                      <Card key={procedure.jobType} className="overflow-hidden hover-elevate">
-                        <CardContent className="p-4">
-                          <div className="flex items-start justify-between gap-3">
-                            <div className="flex-1 min-w-0">
-                              <div className="flex items-center gap-2 mb-2">
-                                <Shield className="h-4 w-4 text-green-600 dark:text-green-400 flex-shrink-0" />
-                                <h3 className="font-semibold text-sm truncate">{jobTypeLabel}</h3>
-                              </div>
-                              <p className="text-xs text-muted-foreground line-clamp-2 mb-3">
-                                {procedure.description}
-                              </p>
-                              <div className="flex flex-wrap gap-1.5">
-                                <Badge variant="outline" className="text-xs">
-                                  {procedure.hazards.length} Hazards
-                                </Badge>
-                                <Badge variant="outline" className="text-xs">
-                                  {procedure.controlMeasures.length} Controls
-                                </Badge>
-                                <Badge variant="outline" className="text-xs">
-                                  {procedure.ppe.length} PPE Items
-                                </Badge>
-                              </div>
-                            </div>
-                            <Button
-                              size="sm"
-                              onClick={() => generateSafeWorkProcedurePDF(procedure, currentUser?.companyName)}
-                              data-testid={`download-swp-${procedure.jobType}`}
-                            >
-                              <Download className="h-4 w-4 mr-1" />
-                              PDF
-                            </Button>
-                          </div>
-                        </CardContent>
-                      </Card>
-                    );
-                  })}
-                </div>
-                
-                <div className="mt-6 p-4 bg-muted/50 rounded-lg">
-                  <div className="flex items-start gap-3">
-                    <AlertTriangle className="h-5 w-5 text-amber-500 flex-shrink-0 mt-0.5" />
-                    <div>
-                      <h4 className="font-medium text-sm mb-1">Template Notice</h4>
-                      <p className="text-xs text-muted-foreground">
-                        These are template Safe Work Procedures. Review and customize them to match your specific 
-                        site conditions, equipment, and company policies before use. Always conduct a site-specific 
-                        risk assessment for each job.
+            {/* Active Template Safe Work Procedures (from database - employees must sign) */}
+            {templateSWPDocs.length > 0 && (
+              <Card className="mb-6 overflow-hidden">
+                <CardHeader className="bg-gradient-to-br from-green-500/10 via-green-500/5 to-transparent pb-4">
+                  <div className="flex items-start gap-4">
+                    <div className="p-3 bg-green-500/10 rounded-xl ring-1 ring-green-500/20">
+                      <FileCheck className="h-6 w-6 text-green-600 dark:text-green-400" />
+                    </div>
+                    <div className="flex-1">
+                      <CardTitle className="text-xl mb-1">Active Safe Work Procedures</CardTitle>
+                      <p className="text-sm text-muted-foreground">
+                        These procedures require employee review and signature. All employees will be automatically enrolled.
                       </p>
                     </div>
+                    <Badge variant="secondary" className="text-base font-semibold px-3">
+                      {templateSWPDocs.length}
+                    </Badge>
                   </div>
+                </CardHeader>
+                <CardContent className="pt-6">
+                  <div className="grid gap-4 md:grid-cols-2">
+                    {templateSWPDocs.map((doc: any) => {
+                      const procedure = SAFE_WORK_PROCEDURES.find(p => `swp_${p.jobType}` === doc.templateId);
+                      const jobTypeLabel = procedure?.title || doc.fileName;
+                      
+                      return (
+                        <Card key={doc.id} className="overflow-hidden hover-elevate">
+                          <CardContent className="p-4">
+                            <div className="flex items-start justify-between gap-3">
+                              <div className="flex-1 min-w-0">
+                                <div className="flex items-center gap-2 mb-2">
+                                  <Shield className="h-4 w-4 text-green-600 dark:text-green-400 flex-shrink-0" />
+                                  <h3 className="font-semibold text-sm truncate">{jobTypeLabel}</h3>
+                                </div>
+                                <p className="text-xs text-muted-foreground line-clamp-2 mb-3">
+                                  {doc.description || procedure?.description}
+                                </p>
+                                {procedure && (
+                                  <div className="flex flex-wrap gap-1.5">
+                                    <Badge variant="outline" className="text-xs">
+                                      {procedure.hazards.length} Hazards
+                                    </Badge>
+                                    <Badge variant="outline" className="text-xs">
+                                      {procedure.controlMeasures.length} Controls
+                                    </Badge>
+                                    <Badge variant="outline" className="text-xs">
+                                      {procedure.ppe.length} PPE Items
+                                    </Badge>
+                                  </div>
+                                )}
+                              </div>
+                              <div className="flex flex-col gap-2">
+                                {procedure && (
+                                  <Button
+                                    size="sm"
+                                    variant="outline"
+                                    onClick={() => generateSafeWorkProcedurePDF(procedure, currentUser?.companyName)}
+                                    data-testid={`download-swp-${doc.id}`}
+                                  >
+                                    <Download className="h-4 w-4 mr-1" />
+                                    PDF
+                                  </Button>
+                                )}
+                                {canUploadDocuments && (
+                                  <Button
+                                    size="icon"
+                                    variant="ghost"
+                                    onClick={() => deleteDocumentMutation.mutate(doc.id)}
+                                    disabled={deleteDocumentMutation.isPending}
+                                    data-testid={`delete-swp-${doc.id}`}
+                                  >
+                                    <Trash2 className="h-4 w-4 text-destructive" />
+                                  </Button>
+                                )}
+                              </div>
+                            </div>
+                          </CardContent>
+                        </Card>
+                      );
+                    })}
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Available Template Safe Work Procedures (not yet added) */}
+            {canUploadDocuments && availableTemplates.length > 0 && (
+              <Card className="mb-6 overflow-hidden">
+                <CardHeader className="bg-gradient-to-br from-blue-500/10 via-blue-500/5 to-transparent pb-4">
+                  <div className="flex items-start gap-4">
+                    <div className="p-3 bg-blue-500/10 rounded-xl ring-1 ring-blue-500/20">
+                      <Plus className="h-6 w-6 text-blue-600 dark:text-blue-400" />
+                    </div>
+                    <div className="flex-1">
+                      <CardTitle className="text-xl mb-1">Available Templates</CardTitle>
+                      <p className="text-sm text-muted-foreground">
+                        Add these industry-standard procedures. Employees will be automatically enrolled to review and sign them.
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Badge variant="secondary" className="text-base font-semibold px-3">
+                        {availableTemplates.length}
+                      </Badge>
+                      <Button
+                        size="sm"
+                        onClick={handleAddAllTemplates}
+                        disabled={initTemplatesMutation.isPending}
+                        data-testid="button-add-all-templates"
+                      >
+                        {initTemplatesMutation.isPending ? (
+                          <Loader2 className="h-4 w-4 mr-1 animate-spin" />
+                        ) : (
+                          <Plus className="h-4 w-4 mr-1" />
+                        )}
+                        Add All
+                      </Button>
+                    </div>
+                  </div>
+                </CardHeader>
+                <CardContent className="pt-6">
+                  <div className="grid gap-4 md:grid-cols-2">
+                    {availableTemplates.map((procedure) => {
+                      const jobTypeLabel = STANDARD_JOB_TYPES.find(jt => jt.value === procedure.jobType)?.label || procedure.title;
+                      
+                      return (
+                        <Card key={procedure.jobType} className="overflow-hidden hover-elevate border-dashed">
+                          <CardContent className="p-4">
+                            <div className="flex items-start justify-between gap-3">
+                              <div className="flex-1 min-w-0">
+                                <div className="flex items-center gap-2 mb-2">
+                                  <Shield className="h-4 w-4 text-blue-600 dark:text-blue-400 flex-shrink-0" />
+                                  <h3 className="font-semibold text-sm truncate">{jobTypeLabel}</h3>
+                                </div>
+                                <p className="text-xs text-muted-foreground line-clamp-2 mb-3">
+                                  {procedure.description}
+                                </p>
+                                <div className="flex flex-wrap gap-1.5">
+                                  <Badge variant="outline" className="text-xs">
+                                    {procedure.hazards.length} Hazards
+                                  </Badge>
+                                  <Badge variant="outline" className="text-xs">
+                                    {procedure.controlMeasures.length} Controls
+                                  </Badge>
+                                  <Badge variant="outline" className="text-xs">
+                                    {procedure.ppe.length} PPE Items
+                                  </Badge>
+                                </div>
+                              </div>
+                              <div className="flex flex-col gap-2">
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  onClick={() => generateSafeWorkProcedurePDF(procedure, currentUser?.companyName)}
+                                  data-testid={`preview-swp-${procedure.jobType}`}
+                                >
+                                  <Eye className="h-4 w-4 mr-1" />
+                                  Preview
+                                </Button>
+                                <Button
+                                  size="sm"
+                                  onClick={() => handleAddTemplate(procedure)}
+                                  disabled={initTemplatesMutation.isPending}
+                                  data-testid={`add-swp-${procedure.jobType}`}
+                                >
+                                  <Plus className="h-4 w-4 mr-1" />
+                                  Add
+                                </Button>
+                              </div>
+                            </div>
+                          </CardContent>
+                        </Card>
+                      );
+                    })}
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+                
+            <div className="p-4 bg-muted/50 rounded-lg">
+              <div className="flex items-start gap-3">
+                <AlertTriangle className="h-5 w-5 text-amber-500 flex-shrink-0 mt-0.5" />
+                <div>
+                  <h4 className="font-medium text-sm mb-1">Template Notice</h4>
+                  <p className="text-xs text-muted-foreground">
+                    These are template Safe Work Procedures. Review and customize them to match your specific 
+                    site conditions, equipment, and company policies before use. Always conduct a site-specific 
+                    risk assessment for each job.
+                  </p>
                 </div>
-              </CardContent>
-            </Card>
+              </div>
+            </div>
           </TabsContent>
 
           {/* Inspections & Safety Tab */}
