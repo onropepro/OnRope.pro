@@ -943,7 +943,7 @@ export const methodStatements = pgTable("method_statements", {
 export const companyDocuments = pgTable("company_documents", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   companyId: varchar("company_id").notNull().references(() => users.id, { onDelete: "cascade" }),
-  documentType: varchar("document_type").notNull(), // 'health_safety_manual' | 'company_policy' | 'equipment_inspection' | 'method_statement'
+  documentType: varchar("document_type").notNull(), // 'health_safety_manual' | 'company_policy' | 'equipment_inspection' | 'method_statement' | 'safe_work_procedure'
   fileName: varchar("file_name").notNull(),
   fileUrl: text("file_url").notNull(),
   uploadedById: varchar("uploaded_by_id").notNull().references(() => users.id),
@@ -951,12 +951,16 @@ export const companyDocuments = pgTable("company_documents", {
   projectId: varchar("project_id").references(() => projects.id, { onDelete: "set null" }), // Optional: link to specific project (for equipment inspections)
   jobType: varchar("job_type"), // For method_statement documents: window_cleaning | dryer_vent_cleaning | building_wash | etc.
   customJobType: varchar("custom_job_type"), // Custom job type name when jobType is "other"
+  isTemplate: boolean("is_template").default(false), // True for system-provided template procedures
+  templateId: varchar("template_id"), // Unique identifier for template (e.g., 'swp_window_cleaning')
+  description: text("description"), // Description for safe work procedures
   createdAt: timestamp("created_at").defaultNow(),
 }, (table) => [
   index("IDX_company_docs_company").on(table.companyId),
   index("IDX_company_docs_type").on(table.companyId, table.documentType),
   index("IDX_company_docs_project").on(table.projectId),
   index("IDX_company_docs_job_type").on(table.companyId, table.documentType, table.jobType),
+  index("IDX_company_docs_template").on(table.companyId, table.templateId),
 ]);
 
 // Pay period configuration table - one per company
