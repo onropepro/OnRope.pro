@@ -2260,7 +2260,7 @@ export default function Documents() {
             {healthSafetyDocs.length > 0 ? (
               <div className="space-y-2">
                 {groupDocumentsByDate(healthSafetyDocs, (d: any) => d.createdAt).map((yearGroup) => (
-                  <Collapsible key={yearGroup.year} defaultOpen={yearGroup.year === new Date().getFullYear()}>
+                  <Collapsible key={yearGroup.year} defaultOpen={false}>
                     <CollapsibleTrigger className="flex items-center gap-2 w-full p-2 rounded-lg hover-elevate">
                       <ChevronRight className="h-4 w-4 transition-transform duration-200 [&[data-state=open]>svg]:rotate-90" />
                       <span className="font-semibold">{yearGroup.year}</span>
@@ -2268,7 +2268,7 @@ export default function Documents() {
                     </CollapsibleTrigger>
                     <CollapsibleContent className="pl-4 space-y-1 mt-1">
                       {yearGroup.months.map((monthGroup) => (
-                        <Collapsible key={monthGroup.month} defaultOpen={monthGroup.monthName === new Date().toLocaleDateString('en-US', { month: 'long' })}>
+                        <Collapsible key={monthGroup.month} defaultOpen={false}>
                           <CollapsibleTrigger className="flex items-center gap-2 w-full p-2 rounded-lg hover-elevate">
                             <ChevronRight className="h-4 w-4 transition-transform duration-200" />
                             <span className="font-medium">{monthGroup.monthName}</span>
@@ -2390,7 +2390,7 @@ export default function Documents() {
             {policyDocs.length > 0 ? (
               <div className="space-y-2">
                 {groupDocumentsByDate(policyDocs, (d: any) => d.createdAt).map((yearGroup) => (
-                  <Collapsible key={yearGroup.year} defaultOpen={yearGroup.year === new Date().getFullYear()}>
+                  <Collapsible key={yearGroup.year} defaultOpen={false}>
                     <CollapsibleTrigger className="flex items-center gap-2 w-full p-2 rounded-lg hover-elevate">
                       <ChevronRight className="h-4 w-4 transition-transform duration-200 [&[data-state=open]>svg]:rotate-90" />
                       <span className="font-semibold">{yearGroup.year}</span>
@@ -2398,7 +2398,7 @@ export default function Documents() {
                     </CollapsibleTrigger>
                     <CollapsibleContent className="pl-4 space-y-1 mt-1">
                       {yearGroup.months.map((monthGroup) => (
-                        <Collapsible key={monthGroup.month} defaultOpen={monthGroup.monthName === new Date().toLocaleDateString('en-US', { month: 'long' })}>
+                        <Collapsible key={monthGroup.month} defaultOpen={false}>
                           <CollapsibleTrigger className="flex items-center gap-2 w-full p-2 rounded-lg hover-elevate">
                             <ChevronRight className="h-4 w-4 transition-transform duration-200" />
                             <span className="font-medium">{monthGroup.monthName}</span>
@@ -2519,7 +2519,7 @@ export default function Documents() {
                   {insuranceDocs.length > 0 ? (
                     <div className="space-y-2">
                       {groupDocumentsByDate(insuranceDocs, (d: any) => d.createdAt).map((yearGroup) => (
-                        <Collapsible key={yearGroup.year} defaultOpen={yearGroup.year === new Date().getFullYear()}>
+                        <Collapsible key={yearGroup.year} defaultOpen={false}>
                           <CollapsibleTrigger className="flex items-center gap-2 w-full p-2 rounded-lg hover-elevate">
                             <ChevronRight className="h-4 w-4 transition-transform duration-200 [&[data-state=open]>svg]:rotate-90" />
                             <span className="font-semibold">{yearGroup.year}</span>
@@ -2527,7 +2527,7 @@ export default function Documents() {
                           </CollapsibleTrigger>
                           <CollapsibleContent className="pl-4 space-y-1 mt-1">
                             {yearGroup.months.map((monthGroup) => (
-                              <Collapsible key={monthGroup.month} defaultOpen={monthGroup.monthName === new Date().toLocaleDateString('en-US', { month: 'long' })}>
+                              <Collapsible key={monthGroup.month} defaultOpen={false}>
                                 <CollapsibleTrigger className="flex items-center gap-2 w-full p-2 rounded-lg hover-elevate">
                                   <ChevronRight className="h-4 w-4 transition-transform duration-200" />
                                   <span className="font-medium">{monthGroup.monthName}</span>
@@ -2696,7 +2696,7 @@ export default function Documents() {
                 {inspections.length > 0 ? (
                   <div className="space-y-2">
                     {groupDocumentsByDate(inspections, (i: any) => i.inspectionDate).map((yearGroup) => (
-                      <Collapsible key={yearGroup.year} defaultOpen={yearGroup.year === new Date().getFullYear()}>
+                      <Collapsible key={yearGroup.year} defaultOpen={false}>
                         <CollapsibleTrigger className="group flex items-center gap-2 w-full p-3 rounded-lg bg-indigo-500/5 hover-elevate" data-testid={`toggle-inspections-year-${yearGroup.year}`}>
                           <ChevronRight className="h-4 w-4 text-indigo-600 dark:text-indigo-400 transition-transform duration-200 rotate-0 group-data-[state=open]:rotate-90" />
                           <FolderOpen className="h-4 w-4 text-indigo-600 dark:text-indigo-400" />
@@ -2705,7 +2705,7 @@ export default function Documents() {
                         </CollapsibleTrigger>
                         <CollapsibleContent className="pl-4 mt-2 space-y-2">
                           {yearGroup.months.map((monthGroup) => (
-                            <Collapsible key={monthGroup.month} defaultOpen={yearGroup.year === new Date().getFullYear() && monthGroup.month === new Date().getMonth()}>
+                            <Collapsible key={monthGroup.month} defaultOpen={false}>
                               <CollapsibleTrigger className="group flex items-center gap-2 w-full p-2 rounded-md bg-indigo-500/5 hover-elevate" data-testid={`toggle-inspections-month-${yearGroup.year}-${monthGroup.month}`}>
                                 <ChevronRight className="h-3 w-3 text-muted-foreground transition-transform duration-200 rotate-0 group-data-[state=open]:rotate-90" />
                                 <span className="font-medium">{monthGroup.monthName}</span>
@@ -2791,7 +2791,7 @@ export default function Documents() {
                 {meetings.length > 0 ? (
                   <div className="space-y-2">
                     {groupDocumentsByDate(meetings, (m: any) => m.meetingDate).map((yearGroup) => (
-                      <Collapsible key={yearGroup.year} defaultOpen={yearGroup.year === new Date().getFullYear()}>
+                      <Collapsible key={yearGroup.year} defaultOpen={false}>
                         <CollapsibleTrigger className="group flex items-center gap-2 w-full p-3 rounded-lg bg-cyan-500/5 hover-elevate" data-testid={`toggle-meetings-year-${yearGroup.year}`}>
                           <ChevronRight className="h-4 w-4 text-cyan-600 dark:text-cyan-400 transition-transform duration-200 rotate-0 group-data-[state=open]:rotate-90" />
                           <FolderOpen className="h-4 w-4 text-cyan-600 dark:text-cyan-400" />
@@ -2800,7 +2800,7 @@ export default function Documents() {
                         </CollapsibleTrigger>
                         <CollapsibleContent className="pl-4 mt-2 space-y-2">
                           {yearGroup.months.map((monthGroup) => (
-                            <Collapsible key={monthGroup.month} defaultOpen={yearGroup.year === new Date().getFullYear() && monthGroup.month === new Date().getMonth()}>
+                            <Collapsible key={monthGroup.month} defaultOpen={false}>
                               <CollapsibleTrigger className="group flex items-center gap-2 w-full p-2 rounded-md bg-cyan-500/5 hover-elevate" data-testid={`toggle-meetings-month-${yearGroup.year}-${monthGroup.month}`}>
                                 <ChevronRight className="h-3 w-3 text-muted-foreground transition-transform duration-200 rotate-0 group-data-[state=open]:rotate-90" />
                                 <span className="font-medium">{monthGroup.monthName}</span>
@@ -2875,7 +2875,7 @@ export default function Documents() {
               {allDocuments.length > 0 ? (
                 <div className="space-y-2">
                   {groupDocumentsByDate(allDocuments, (d: any) => d.date).map((yearGroup) => (
-                    <Collapsible key={yearGroup.year} defaultOpen={yearGroup.year === new Date().getFullYear()}>
+                    <Collapsible key={yearGroup.year} defaultOpen={false}>
                       <CollapsibleTrigger className="group flex items-center gap-2 w-full p-3 rounded-lg bg-teal-500/5 hover-elevate" data-testid={`toggle-docs-year-${yearGroup.year}`}>
                         <ChevronRight className="h-4 w-4 text-teal-600 dark:text-teal-400 transition-transform duration-200 rotate-0 group-data-[state=open]:rotate-90" />
                         <FolderOpen className="h-4 w-4 text-teal-600 dark:text-teal-400" />
@@ -2884,7 +2884,7 @@ export default function Documents() {
                       </CollapsibleTrigger>
                       <CollapsibleContent className="pl-4 mt-2 space-y-2">
                         {yearGroup.months.map((monthGroup) => (
-                          <Collapsible key={monthGroup.month} defaultOpen={yearGroup.year === new Date().getFullYear() && monthGroup.month === new Date().getMonth()}>
+                          <Collapsible key={monthGroup.month} defaultOpen={false}>
                             <CollapsibleTrigger className="group flex items-center gap-2 w-full p-2 rounded-md bg-teal-500/5 hover-elevate" data-testid={`toggle-docs-month-${yearGroup.year}-${monthGroup.month}`}>
                               <ChevronRight className="h-3 w-3 text-muted-foreground transition-transform duration-200 rotate-0 group-data-[state=open]:rotate-90" />
                               <span className="font-medium">{monthGroup.monthName}</span>
@@ -2960,7 +2960,7 @@ export default function Documents() {
             {meetings.length > 0 ? (
               <div className="space-y-2">
                 {groupDocumentsByDate(meetings, (m: any) => m.meetingDate).map((yearGroup) => (
-                  <Collapsible key={yearGroup.year} defaultOpen={yearGroup.year === new Date().getFullYear()}>
+                  <Collapsible key={yearGroup.year} defaultOpen={false}>
                     <CollapsibleTrigger className="group flex items-center gap-2 w-full p-3 rounded-lg bg-cyan-500/5 hover-elevate" data-testid={`toggle-meetings-outer-year-${yearGroup.year}`}>
                       <ChevronRight className="h-4 w-4 text-cyan-600 dark:text-cyan-400 transition-transform duration-200 rotate-0 group-data-[state=open]:rotate-90" />
                       <FolderOpen className="h-4 w-4 text-cyan-600 dark:text-cyan-400" />
@@ -2969,7 +2969,7 @@ export default function Documents() {
                     </CollapsibleTrigger>
                     <CollapsibleContent className="pl-4 mt-2 space-y-2">
                       {yearGroup.months.map((monthGroup) => (
-                        <Collapsible key={monthGroup.month} defaultOpen={yearGroup.year === new Date().getFullYear() && monthGroup.month === new Date().getMonth()}>
+                        <Collapsible key={monthGroup.month} defaultOpen={false}>
                           <CollapsibleTrigger className="group flex items-center gap-2 w-full p-2 rounded-md bg-cyan-500/5 hover-elevate" data-testid={`toggle-meetings-outer-month-${yearGroup.year}-${monthGroup.month}`}>
                             <ChevronRight className="h-3 w-3 text-muted-foreground transition-transform duration-200 rotate-0 group-data-[state=open]:rotate-90" />
                             <span className="font-medium">{monthGroup.monthName}</span>
@@ -3053,7 +3053,7 @@ export default function Documents() {
               {flhaForms.length > 0 ? (
                 <div className="space-y-2">
                   {groupDocumentsByDate(flhaForms, (f: any) => f.assessmentDate).map((yearGroup) => (
-                    <Collapsible key={yearGroup.year} defaultOpen={yearGroup.year === new Date().getFullYear()}>
+                    <Collapsible key={yearGroup.year} defaultOpen={false}>
                       <CollapsibleTrigger className="group flex items-center gap-2 w-full p-3 rounded-lg bg-orange-500/5 hover-elevate" data-testid={`toggle-flha-year-${yearGroup.year}`}>
                         <ChevronRight className="h-4 w-4 text-orange-600 dark:text-orange-400 transition-transform duration-200 rotate-0 group-data-[state=open]:rotate-90" />
                         <FolderOpen className="h-4 w-4 text-orange-600 dark:text-orange-400" />
@@ -3062,7 +3062,7 @@ export default function Documents() {
                       </CollapsibleTrigger>
                       <CollapsibleContent className="pl-4 mt-2 space-y-2">
                         {yearGroup.months.map((monthGroup) => (
-                          <Collapsible key={monthGroup.month} defaultOpen={yearGroup.year === new Date().getFullYear() && monthGroup.month === new Date().getMonth()}>
+                          <Collapsible key={monthGroup.month} defaultOpen={false}>
                             <CollapsibleTrigger className="group flex items-center gap-2 w-full p-2 rounded-md bg-orange-500/5 hover-elevate" data-testid={`toggle-flha-month-${yearGroup.year}-${monthGroup.month}`}>
                               <ChevronRight className="h-3 w-3 text-muted-foreground transition-transform duration-200 rotate-0 group-data-[state=open]:rotate-90" />
                               <span className="font-medium">{monthGroup.monthName}</span>
@@ -3147,7 +3147,7 @@ export default function Documents() {
               {incidentReports.length > 0 ? (
                 <div className="space-y-2">
                   {groupDocumentsByDate(incidentReports, (r: any) => r.incidentDate).map((yearGroup) => (
-                    <Collapsible key={yearGroup.year} defaultOpen={yearGroup.year === new Date().getFullYear()}>
+                    <Collapsible key={yearGroup.year} defaultOpen={false}>
                       <CollapsibleTrigger className="group flex items-center gap-2 w-full p-3 rounded-lg bg-red-500/5 hover-elevate" data-testid={`toggle-incidents-year-${yearGroup.year}`}>
                         <ChevronRight className="h-4 w-4 text-red-600 dark:text-red-400 transition-transform duration-200 rotate-0 group-data-[state=open]:rotate-90" />
                         <FolderOpen className="h-4 w-4 text-red-600 dark:text-red-400" />
@@ -3156,7 +3156,7 @@ export default function Documents() {
                       </CollapsibleTrigger>
                       <CollapsibleContent className="pl-4 mt-2 space-y-2">
                         {yearGroup.months.map((monthGroup) => (
-                          <Collapsible key={monthGroup.month} defaultOpen={yearGroup.year === new Date().getFullYear() && monthGroup.month === new Date().getMonth()}>
+                          <Collapsible key={monthGroup.month} defaultOpen={false}>
                             <CollapsibleTrigger className="group flex items-center gap-2 w-full p-2 rounded-md bg-red-500/5 hover-elevate" data-testid={`toggle-incidents-month-${yearGroup.year}-${monthGroup.month}`}>
                               <ChevronRight className="h-3 w-3 text-muted-foreground transition-transform duration-200 rotate-0 group-data-[state=open]:rotate-90" />
                               <span className="font-medium">{monthGroup.monthName}</span>
@@ -3258,7 +3258,7 @@ export default function Documents() {
             {methodStatements.length > 0 ? (
               <div className="space-y-2">
                 {groupDocumentsByDate(methodStatements, (s: any) => s.dateCreated).map((yearGroup) => (
-                  <Collapsible key={yearGroup.year} defaultOpen={yearGroup.year === new Date().getFullYear()}>
+                  <Collapsible key={yearGroup.year} defaultOpen={false}>
                     <CollapsibleTrigger className="group flex items-center gap-2 w-full p-3 rounded-lg bg-emerald-500/5 hover-elevate" data-testid={`toggle-methods-year-${yearGroup.year}`}>
                       <ChevronRight className="h-4 w-4 text-emerald-600 dark:text-emerald-400 transition-transform duration-200 rotate-0 group-data-[state=open]:rotate-90" />
                       <FolderOpen className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
@@ -3267,7 +3267,7 @@ export default function Documents() {
                     </CollapsibleTrigger>
                     <CollapsibleContent className="pl-4 mt-2 space-y-2">
                       {yearGroup.months.map((monthGroup) => (
-                        <Collapsible key={monthGroup.month} defaultOpen={yearGroup.year === new Date().getFullYear() && monthGroup.month === new Date().getMonth()}>
+                        <Collapsible key={monthGroup.month} defaultOpen={false}>
                           <CollapsibleTrigger className="group flex items-center gap-2 w-full p-2 rounded-md bg-emerald-500/5 hover-elevate" data-testid={`toggle-methods-month-${yearGroup.year}-${monthGroup.month}`}>
                             <ChevronRight className="h-3 w-3 text-muted-foreground transition-transform duration-200 rotate-0 group-data-[state=open]:rotate-90" />
                             <span className="font-medium">{monthGroup.monthName}</span>
