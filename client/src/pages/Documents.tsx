@@ -3027,7 +3027,7 @@ export default function Documents() {
           
           return (
             <Card className="mb-6 overflow-hidden">
-              <CardHeader className="bg-gradient-to-br from-emerald-500/10 via-emerald-500/5 to-transparent pb-4">
+              <CardHeader className="bg-gradient-to-br from-primary/10 via-primary/5 to-transparent pb-4">
                 <div className="flex items-start gap-4">
                   <div className={`p-3 rounded-xl ring-1 ${
                     ratingPercent === 100 
@@ -3038,7 +3038,7 @@ export default function Documents() {
                   }`}>
                     <Shield className={`h-6 w-6 ${
                       ratingPercent === 100 
-                        ? 'text-emerald-600 dark:text-emerald-400' 
+                        ? 'text-primary' 
                         : ratingPercent >= 50 
                           ? 'text-amber-600 dark:text-amber-400'
                           : 'text-red-600 dark:text-red-400'
@@ -3057,7 +3057,7 @@ export default function Documents() {
                   <div className="text-right">
                     <div className={`text-3xl font-bold ${
                       ratingPercent === 100 
-                        ? 'text-emerald-600 dark:text-emerald-400' 
+                        ? 'text-primary' 
                         : ratingPercent >= 50 
                           ? 'text-amber-600 dark:text-amber-400'
                           : 'text-red-600 dark:text-red-400'
@@ -3218,10 +3218,10 @@ export default function Documents() {
             
             return (
               <Card className="mb-6">
-                <CardHeader className="bg-gradient-to-br from-violet-500/10 via-violet-500/5 to-transparent pb-4">
+                <CardHeader className="bg-gradient-to-br from-primary/10 via-primary/5 to-transparent pb-4">
                   <div className="flex items-start gap-4">
-                    <div className="p-3 bg-violet-500/10 rounded-xl ring-1 ring-violet-500/20">
-                      <Users className="h-6 w-6 text-violet-600 dark:text-violet-400" />
+                    <div className="p-3 bg-primary/10 rounded-xl ring-1 ring-primary/20">
+                      <Users className="h-6 w-6 text-primary" />
                     </div>
                     <div className="flex-1">
                       <CardTitle className="text-xl mb-1">Employee Document Compliance</CardTitle>
@@ -3247,15 +3247,15 @@ export default function Documents() {
                       <div className="text-sm text-muted-foreground">Total Employees</div>
                     </div>
                     <div className="p-3 rounded-lg bg-emerald-500/10">
-                      <div className="text-2xl font-bold text-emerald-600 dark:text-emerald-400">{completeEmployees}</div>
+                      <div className="text-2xl font-bold text-primary">{completeEmployees}</div>
                       <div className="text-sm text-muted-foreground">Fully Compliant</div>
                     </div>
                     <div className="p-3 rounded-lg bg-amber-500/10">
                       <div className="text-2xl font-bold text-amber-600 dark:text-amber-400">{totalEmployees - completeEmployees}</div>
                       <div className="text-sm text-muted-foreground">Pending Signatures</div>
                     </div>
-                    <div className="p-3 rounded-lg bg-violet-500/10">
-                      <div className="text-2xl font-bold text-violet-600 dark:text-violet-400">{signedReviews}/{totalRequiredSignatures}</div>
+                    <div className="p-3 rounded-lg bg-primary/10">
+                      <div className="text-2xl font-bold text-primary">{signedReviews}/{totalRequiredSignatures}</div>
                       <div className="text-sm text-muted-foreground">Documents Signed</div>
                     </div>
                   </div>
@@ -3322,7 +3322,7 @@ export default function Documents() {
                                       : 'bg-muted'
                                 }`}>
                                   {review.signedAt ? (
-                                    <PenLine className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
+                                    <PenLine className="h-4 w-4 text-primary" />
                                   ) : review.viewedAt ? (
                                     <Eye className="h-4 w-4 text-amber-600 dark:text-amber-400" />
                                   ) : (
@@ -3341,7 +3341,7 @@ export default function Documents() {
                                     </div>
                                   )}
                                   {review.signedAt && (
-                                    <div className="flex items-center gap-1 text-emerald-600 dark:text-emerald-400">
+                                    <div className="flex items-center gap-1 text-primary">
                                       <PenLine className="h-3 w-3" />
                                       {formatTimestamp(review.signedAt)}
                                     </div>
@@ -3358,8 +3358,8 @@ export default function Documents() {
                     </div>
                   ) : (
                     <div className="text-center py-8">
-                      <div className="inline-flex p-4 bg-violet-500/5 rounded-full mb-4">
-                        <Users className="h-8 w-8 text-violet-500/50" />
+                      <div className="inline-flex p-4 bg-primary/5 rounded-full mb-4">
+                        <Users className="h-8 w-8 text-primary/50" />
                       </div>
                       <p className="text-muted-foreground font-medium">No document reviews assigned</p>
                       <p className="text-sm text-muted-foreground mt-1">
@@ -3534,10 +3534,10 @@ export default function Documents() {
           {/* Company Policy Tab */}
           <TabsContent value="company-policy">
         <Card className="mb-6 overflow-hidden">
-          <CardHeader className="bg-gradient-to-br from-purple-500/10 via-purple-500/5 to-transparent pb-4">
+          <CardHeader className="bg-gradient-to-br from-primary/10 via-primary/5 to-transparent pb-4">
             <div className="flex items-start gap-4">
-              <div className="p-3 bg-purple-500/10 rounded-xl ring-1 ring-purple-500/20">
-                <BookOpen className="h-6 w-6 text-purple-600 dark:text-purple-400" />
+              <div className="p-3 bg-primary/10 rounded-xl ring-1 ring-primary/20">
+                <BookOpen className="h-6 w-6 text-primary" />
               </div>
               <div className="flex-1">
                 <CardTitle className="text-xl mb-1">Company Policies</CardTitle>
@@ -3606,8 +3606,8 @@ export default function Documents() {
                                 <CollapsibleContent className="pl-4 space-y-2 mt-1">
                                   {dayGroup.items.map((doc: any) => (
                                     <div key={doc.id} className="flex items-center gap-4 p-4 rounded-xl border bg-card hover-elevate active-elevate-2">
-                                      <div className="p-2 bg-purple-500/10 rounded-lg">
-                                        <BookOpen className="h-5 w-5 text-purple-600 dark:text-purple-400 flex-shrink-0" />
+                                      <div className="p-2 bg-primary/10 rounded-lg">
+                                        <BookOpen className="h-5 w-5 text-primary flex-shrink-0" />
                                       </div>
                                       <div className="flex-1 min-w-0">
                                         <div className="font-semibold truncate">{doc.fileName}</div>
@@ -3650,8 +3650,8 @@ export default function Documents() {
               </div>
             ) : (
               <div className="text-center py-12">
-                <div className="inline-flex p-4 bg-purple-500/5 rounded-full mb-4">
-                  <BookOpen className="h-8 w-8 text-purple-500/50" />
+                <div className="inline-flex p-4 bg-primary/5 rounded-full mb-4">
+                  <BookOpen className="h-8 w-8 text-primary/50" />
                 </div>
                 <p className="text-muted-foreground font-medium">No Company Policies uploaded yet</p>
                 <p className="text-sm text-muted-foreground mt-1">Upload your first policy document</p>
@@ -3665,10 +3665,10 @@ export default function Documents() {
           {canUploadDocuments && (
             <TabsContent value="insurance">
               <Card className="mb-6 overflow-hidden">
-                <CardHeader className="bg-gradient-to-br from-teal-500/10 via-teal-500/5 to-transparent pb-4">
+                <CardHeader className="bg-gradient-to-br from-primary/10 via-primary/5 to-transparent pb-4">
                   <div className="flex items-start gap-4">
-                    <div className="p-3 bg-teal-500/10 rounded-xl ring-1 ring-teal-500/20">
-                      <FileCheck className="h-6 w-6 text-teal-600 dark:text-teal-400" />
+                    <div className="p-3 bg-primary/10 rounded-xl ring-1 ring-primary/20">
+                      <FileCheck className="h-6 w-6 text-primary" />
                     </div>
                     <div className="flex-1">
                       <CardTitle className="text-xl mb-1">Certificate of Insurance</CardTitle>
@@ -3735,8 +3735,8 @@ export default function Documents() {
                                       <CollapsibleContent className="pl-4 space-y-2 mt-1">
                                         {dayGroup.items.map((doc: any) => (
                                           <div key={doc.id} className="flex items-center gap-4 p-4 rounded-xl border bg-card hover-elevate active-elevate-2">
-                                            <div className="p-2 bg-teal-500/10 rounded-lg">
-                                              <FileCheck className="h-5 w-5 text-teal-600 dark:text-teal-400 flex-shrink-0" />
+                                            <div className="p-2 bg-primary/10 rounded-lg">
+                                              <FileCheck className="h-5 w-5 text-primary flex-shrink-0" />
                                             </div>
                                             <div className="flex-1 min-w-0">
                                               <div className="font-semibold truncate">{doc.fileName}</div>
@@ -3777,8 +3777,8 @@ export default function Documents() {
                     </div>
                   ) : (
                     <div className="text-center py-12">
-                      <div className="inline-flex p-4 bg-teal-500/5 rounded-full mb-4">
-                        <FileCheck className="h-8 w-8 text-teal-500/50" />
+                      <div className="inline-flex p-4 bg-primary/5 rounded-full mb-4">
+                        <FileCheck className="h-8 w-8 text-primary/50" />
                       </div>
                       <p className="text-muted-foreground font-medium">No Certificate of Insurance uploaded yet</p>
                       <p className="text-sm text-muted-foreground mt-1">Upload your insurance certificate to demonstrate coverage</p>
@@ -3794,10 +3794,10 @@ export default function Documents() {
             {/* Custom Safe Work Procedures Upload Section */}
             {canUploadDocuments && (
               <Card className="mb-6 overflow-hidden">
-                <CardHeader className="bg-gradient-to-br from-emerald-500/10 via-emerald-500/5 to-transparent pb-4">
+                <CardHeader className="bg-gradient-to-br from-primary/10 via-primary/5 to-transparent pb-4">
                   <div className="flex items-start gap-4">
-                    <div className="p-3 bg-emerald-500/10 rounded-xl ring-1 ring-emerald-500/20">
-                      <Upload className="h-6 w-6 text-emerald-600 dark:text-emerald-400" />
+                    <div className="p-3 bg-primary/10 rounded-xl ring-1 ring-primary/20">
+                      <Upload className="h-6 w-6 text-primary" />
                     </div>
                     <div className="flex-1">
                       <CardTitle className="text-xl mb-1">Custom Safe Work Procedures</CardTitle>
@@ -3857,7 +3857,7 @@ export default function Documents() {
                       {safeWorkProcedureDocs.map((doc: any) => (
                         <div key={doc.id} className="flex items-center justify-between p-3 bg-muted/30 rounded-lg">
                           <div className="flex items-center gap-3 min-w-0 flex-1">
-                            <FileCheck className="h-5 w-5 text-emerald-600 dark:text-emerald-400 flex-shrink-0" />
+                            <FileCheck className="h-5 w-5 text-primary flex-shrink-0" />
                             <div className="min-w-0">
                               <p className="font-medium text-sm truncate">{doc.fileName}</p>
                               <p className="text-xs text-muted-foreground">
@@ -3899,10 +3899,10 @@ export default function Documents() {
             {/* Active Template Safe Work Procedures (from database - employees must sign) */}
             {templateSWPDocs.length > 0 && (
               <Card className="mb-6 overflow-hidden">
-                <CardHeader className="bg-gradient-to-br from-green-500/10 via-green-500/5 to-transparent pb-4">
+                <CardHeader className="bg-gradient-to-br from-primary/10 via-primary/5 to-transparent pb-4">
                   <div className="flex items-start gap-4">
-                    <div className="p-3 bg-green-500/10 rounded-xl ring-1 ring-green-500/20">
-                      <FileCheck className="h-6 w-6 text-green-600 dark:text-green-400" />
+                    <div className="p-3 bg-primary/10 rounded-xl ring-1 ring-primary/20">
+                      <FileCheck className="h-6 w-6 text-primary" />
                     </div>
                     <div className="flex-1">
                       <CardTitle className="text-xl mb-1">Active Safe Work Procedures</CardTitle>
@@ -3927,7 +3927,7 @@ export default function Documents() {
                             <div className="flex items-start justify-between gap-3">
                               <div className="flex-1 min-w-0">
                                 <div className="flex items-center gap-2 mb-2">
-                                  <Shield className="h-4 w-4 text-green-600 dark:text-green-400 flex-shrink-0" />
+                                  <Shield className="h-4 w-4 text-primary flex-shrink-0" />
                                   <h3 className="font-semibold text-sm truncate">{jobTypeLabel}</h3>
                                 </div>
                                 <p className="text-xs text-muted-foreground line-clamp-2 mb-3">
@@ -3984,10 +3984,10 @@ export default function Documents() {
             {/* Available Template Safe Work Procedures (not yet added) */}
             {canUploadDocuments && availableTemplates.length > 0 && (
               <Card className="mb-6 overflow-hidden">
-                <CardHeader className="bg-gradient-to-br from-blue-500/10 via-blue-500/5 to-transparent pb-4">
+                <CardHeader className="bg-gradient-to-br from-primary/10 via-primary/5 to-transparent pb-4">
                   <div className="flex items-start gap-4">
-                    <div className="p-3 bg-blue-500/10 rounded-xl ring-1 ring-blue-500/20">
-                      <Plus className="h-6 w-6 text-blue-600 dark:text-blue-400" />
+                    <div className="p-3 bg-primary/10 rounded-xl ring-1 ring-primary/20">
+                      <Plus className="h-6 w-6 text-primary" />
                     </div>
                     <div className="flex-1">
                       <CardTitle className="text-xl mb-1">Available Templates</CardTitle>
@@ -4026,7 +4026,7 @@ export default function Documents() {
                             <div className="flex items-start justify-between gap-3">
                               <div className="flex-1 min-w-0">
                                 <div className="flex items-center gap-2 mb-2">
-                                  <Shield className="h-4 w-4 text-blue-600 dark:text-blue-400 flex-shrink-0" />
+                                  <Shield className="h-4 w-4 text-primary flex-shrink-0" />
                                   <h3 className="font-semibold text-sm truncate">{jobTypeLabel}</h3>
                                 </div>
                                 <p className="text-xs text-muted-foreground line-clamp-2 mb-3">
@@ -4093,7 +4093,7 @@ export default function Documents() {
           <TabsContent value="inspections-safety">
             {/* Toolbox Meeting Safety Rating */}
             <Card className="mb-6 overflow-hidden">
-              <CardHeader className="bg-gradient-to-br from-orange-500/10 via-orange-500/5 to-transparent pb-4">
+              <CardHeader className="bg-gradient-to-br from-primary/10 via-primary/5 to-transparent pb-4">
                 <div className="flex items-start gap-4">
                   <div className={`p-3 rounded-xl ring-1 ${
                     toolboxMeetingCompliance.percentage >= 90 
@@ -4104,7 +4104,7 @@ export default function Documents() {
                   }`}>
                     <Calendar className={`h-6 w-6 ${
                       toolboxMeetingCompliance.percentage >= 90 
-                        ? 'text-emerald-600 dark:text-emerald-400' 
+                        ? 'text-primary' 
                         : toolboxMeetingCompliance.percentage >= 50 
                           ? 'text-amber-600 dark:text-amber-400'
                           : 'text-red-600 dark:text-red-400'
@@ -4125,7 +4125,7 @@ export default function Documents() {
                   <div className="text-right">
                     <div className={`text-3xl font-bold ${
                       toolboxMeetingCompliance.percentage >= 90 
-                        ? 'text-emerald-600 dark:text-emerald-400' 
+                        ? 'text-primary' 
                         : toolboxMeetingCompliance.percentage >= 50 
                           ? 'text-amber-600 dark:text-amber-400'
                           : 'text-red-600 dark:text-red-400'
@@ -4158,10 +4158,10 @@ export default function Documents() {
 
             {/* Harness Inspections */}
             <Card className="mb-6 overflow-hidden">
-              <CardHeader className="bg-gradient-to-br from-indigo-500/10 via-indigo-500/5 to-transparent pb-4">
+              <CardHeader className="bg-gradient-to-br from-primary/10 via-primary/5 to-transparent pb-4">
                 <div className="flex items-start gap-4">
-                  <div className="p-3 bg-indigo-500/10 rounded-xl ring-1 ring-indigo-500/20">
-                    <Shield className="h-6 w-6 text-indigo-600 dark:text-indigo-400" />
+                  <div className="p-3 bg-primary/10 rounded-xl ring-1 ring-primary/20">
+                    <Shield className="h-6 w-6 text-primary" />
                   </div>
                   <div className="flex-1">
                     <CardTitle className="text-xl mb-1">Equipment Inspection Records</CardTitle>
@@ -4180,7 +4180,7 @@ export default function Documents() {
                       getDateFn={(i: any) => i.inspectionDate}
                       generatePdf={generateInspectionPdfBlob}
                       documentType="Inspections"
-                      colorClass="text-indigo-600 dark:text-indigo-400"
+                      colorClass="text-primary"
                     />
                   </div>
                 )}
@@ -4188,16 +4188,16 @@ export default function Documents() {
                   <div className="space-y-2">
                     {groupDocumentsByDate(inspections, (i: any) => i.inspectionDate).map((yearGroup) => (
                       <Collapsible key={yearGroup.year} defaultOpen={false}>
-                        <CollapsibleTrigger className="group flex items-center gap-2 w-full p-3 rounded-lg bg-indigo-500/5 hover-elevate" data-testid={`toggle-inspections-year-${yearGroup.year}`}>
-                          <ChevronRight className="h-4 w-4 text-indigo-600 dark:text-indigo-400 transition-transform duration-200 rotate-0 group-data-[state=open]:rotate-90" />
-                          <FolderOpen className="h-4 w-4 text-indigo-600 dark:text-indigo-400" />
-                          <span className="font-semibold text-indigo-600 dark:text-indigo-400">{yearGroup.year}</span>
+                        <CollapsibleTrigger className="group flex items-center gap-2 w-full p-3 rounded-lg bg-primary/5 hover-elevate" data-testid={`toggle-inspections-year-${yearGroup.year}`}>
+                          <ChevronRight className="h-4 w-4 text-primary transition-transform duration-200 rotate-0 group-data-[state=open]:rotate-90" />
+                          <FolderOpen className="h-4 w-4 text-primary" />
+                          <span className="font-semibold text-primary">{yearGroup.year}</span>
                           <Badge variant="secondary" className="ml-auto">{yearGroup.totalCount}</Badge>
                         </CollapsibleTrigger>
                         <CollapsibleContent className="pl-4 mt-2 space-y-2">
                           {yearGroup.months.map((monthGroup) => (
                             <Collapsible key={monthGroup.month} defaultOpen={false}>
-                              <CollapsibleTrigger className="group flex items-center gap-2 w-full p-2 rounded-md bg-indigo-500/5 hover-elevate" data-testid={`toggle-inspections-month-${yearGroup.year}-${monthGroup.month}`}>
+                              <CollapsibleTrigger className="group flex items-center gap-2 w-full p-2 rounded-md bg-primary/5 hover-elevate" data-testid={`toggle-inspections-month-${yearGroup.year}-${monthGroup.month}`}>
                                 <ChevronRight className="h-3 w-3 text-muted-foreground transition-transform duration-200 rotate-0 group-data-[state=open]:rotate-90" />
                                 <span className="font-medium">{monthGroup.monthName}</span>
                                 <Badge variant="outline" className="ml-auto text-xs">{monthGroup.totalCount}</Badge>
@@ -4213,8 +4213,8 @@ export default function Documents() {
                                     <div className="space-y-2 pl-5">
                                       {dayGroup.items.map((inspection: any) => (
                                         <div key={inspection.id} className="flex items-center gap-4 p-3 rounded-lg border bg-card hover-elevate active-elevate-2">
-                                          <div className="p-2 bg-indigo-500/10 rounded-lg">
-                                            <Shield className="h-4 w-4 text-indigo-600 dark:text-indigo-400 flex-shrink-0" />
+                                          <div className="p-2 bg-primary/10 rounded-lg">
+                                            <Shield className="h-4 w-4 text-primary flex-shrink-0" />
                                           </div>
                                           <div className="flex-1 min-w-0">
                                             <div className="font-medium text-sm">{inspection.inspectorName}</div>
@@ -4241,8 +4241,8 @@ export default function Documents() {
                   </div>
                 ) : (
                   <div className="text-center py-12">
-                    <div className="inline-flex p-4 bg-indigo-500/5 rounded-full mb-4">
-                      <Shield className="h-8 w-8 text-indigo-500/50" />
+                    <div className="inline-flex p-4 bg-primary/5 rounded-full mb-4">
+                      <Shield className="h-8 w-8 text-primary/50" />
                     </div>
                     <p className="text-muted-foreground font-medium">No equipment inspections recorded yet</p>
                     <p className="text-sm text-muted-foreground mt-1">Inspections will be logged here</p>
@@ -4253,10 +4253,10 @@ export default function Documents() {
 
             {/* Toolbox Meetings List */}
             <Card className="mb-6 overflow-hidden">
-              <CardHeader className="bg-gradient-to-br from-cyan-500/10 via-cyan-500/5 to-transparent pb-4">
+              <CardHeader className="bg-gradient-to-br from-primary/10 via-primary/5 to-transparent pb-4">
                 <div className="flex items-start gap-4">
-                  <div className="p-3 bg-cyan-500/10 rounded-xl ring-1 ring-cyan-500/20">
-                    <Calendar className="h-6 w-6 text-cyan-600 dark:text-cyan-400" />
+                  <div className="p-3 bg-primary/10 rounded-xl ring-1 ring-primary/20">
+                    <Calendar className="h-6 w-6 text-primary" />
                   </div>
                   <div className="flex-1">
                     <CardTitle className="text-xl mb-1">Toolbox Meeting Records</CardTitle>
@@ -4275,7 +4275,7 @@ export default function Documents() {
                       getDateFn={(m: any) => m.meetingDate}
                       generatePdf={generateMeetingPdfBlob}
                       documentType="Meetings"
-                      colorClass="text-cyan-600 dark:text-cyan-400"
+                      colorClass="text-primary"
                     />
                   </div>
                 )}
@@ -4283,16 +4283,16 @@ export default function Documents() {
                   <div className="space-y-2">
                     {groupDocumentsByDate(meetings, (m: any) => m.meetingDate).map((yearGroup) => (
                       <Collapsible key={yearGroup.year} defaultOpen={false}>
-                        <CollapsibleTrigger className="group flex items-center gap-2 w-full p-3 rounded-lg bg-cyan-500/5 hover-elevate" data-testid={`toggle-meetings-year-${yearGroup.year}`}>
-                          <ChevronRight className="h-4 w-4 text-cyan-600 dark:text-cyan-400 transition-transform duration-200 rotate-0 group-data-[state=open]:rotate-90" />
-                          <FolderOpen className="h-4 w-4 text-cyan-600 dark:text-cyan-400" />
-                          <span className="font-semibold text-cyan-600 dark:text-cyan-400">{yearGroup.year}</span>
+                        <CollapsibleTrigger className="group flex items-center gap-2 w-full p-3 rounded-lg bg-primary/5 hover-elevate" data-testid={`toggle-meetings-year-${yearGroup.year}`}>
+                          <ChevronRight className="h-4 w-4 text-primary transition-transform duration-200 rotate-0 group-data-[state=open]:rotate-90" />
+                          <FolderOpen className="h-4 w-4 text-primary" />
+                          <span className="font-semibold text-primary">{yearGroup.year}</span>
                           <Badge variant="secondary" className="ml-auto">{yearGroup.totalCount}</Badge>
                         </CollapsibleTrigger>
                         <CollapsibleContent className="pl-4 mt-2 space-y-2">
                           {yearGroup.months.map((monthGroup) => (
                             <Collapsible key={monthGroup.month} defaultOpen={false}>
-                              <CollapsibleTrigger className="group flex items-center gap-2 w-full p-2 rounded-md bg-cyan-500/5 hover-elevate" data-testid={`toggle-meetings-month-${yearGroup.year}-${monthGroup.month}`}>
+                              <CollapsibleTrigger className="group flex items-center gap-2 w-full p-2 rounded-md bg-primary/5 hover-elevate" data-testid={`toggle-meetings-month-${yearGroup.year}-${monthGroup.month}`}>
                                 <ChevronRight className="h-3 w-3 text-muted-foreground transition-transform duration-200 rotate-0 group-data-[state=open]:rotate-90" />
                                 <span className="font-medium">{monthGroup.monthName}</span>
                                 <Badge variant="outline" className="ml-auto text-xs">{monthGroup.totalCount}</Badge>
@@ -4309,7 +4309,7 @@ export default function Documents() {
                                       {dayGroup.items.map((meeting: any) => (
                                         <div key={meeting.id} className="flex items-center gap-4 p-3 rounded-lg border bg-card hover-elevate active-elevate-2">
                                           <div className="p-2 bg-cyan-500/10 rounded-lg">
-                                            <Calendar className="h-4 w-4 text-cyan-600 dark:text-cyan-400 flex-shrink-0" />
+                                            <Calendar className="h-4 w-4 text-primary flex-shrink-0" />
                                           </div>
                                           <div className="flex-1 min-w-0">
                                             <div className="font-medium text-sm">{meeting.conductedByName}</div>
@@ -4333,8 +4333,8 @@ export default function Documents() {
                   </div>
                 ) : (
                   <div className="text-center py-12">
-                    <div className="inline-flex p-4 bg-cyan-500/5 rounded-full mb-4">
-                      <Calendar className="h-8 w-8 text-cyan-500/50" />
+                    <div className="inline-flex p-4 bg-primary/5 rounded-full mb-4">
+                      <Calendar className="h-8 w-8 text-primary/50" />
                     </div>
                     <p className="text-muted-foreground font-medium">No toolbox meetings recorded yet</p>
                     <p className="text-sm text-muted-foreground mt-1">Safety meetings will be documented here</p>
@@ -4348,10 +4348,10 @@ export default function Documents() {
         {/* Rope Access Plans - Only visible if user has safety document permission */}
         {canViewSafety && (
           <Card className="mb-6 overflow-hidden">
-            <CardHeader className="bg-gradient-to-br from-teal-500/10 via-teal-500/5 to-transparent pb-4">
+            <CardHeader className="bg-gradient-to-br from-primary/10 via-primary/5 to-transparent pb-4">
               <div className="flex items-start gap-4">
-                <div className="p-3 bg-teal-500/10 rounded-xl ring-1 ring-teal-500/20">
-                  <FileText className="h-6 w-6 text-teal-600 dark:text-teal-400" />
+                <div className="p-3 bg-primary/10 rounded-xl ring-1 ring-teal-500/20">
+                  <FileText className="h-6 w-6 text-primary" />
                 </div>
                 <div className="flex-1">
                   <CardTitle className="text-xl mb-1">Rope Access Plans</CardTitle>
@@ -4367,16 +4367,16 @@ export default function Documents() {
                 <div className="space-y-2">
                   {groupDocumentsByDate(allDocuments, (d: any) => d.date).map((yearGroup) => (
                     <Collapsible key={yearGroup.year} defaultOpen={false}>
-                      <CollapsibleTrigger className="group flex items-center gap-2 w-full p-3 rounded-lg bg-teal-500/5 hover-elevate" data-testid={`toggle-docs-year-${yearGroup.year}`}>
-                        <ChevronRight className="h-4 w-4 text-teal-600 dark:text-teal-400 transition-transform duration-200 rotate-0 group-data-[state=open]:rotate-90" />
-                        <FolderOpen className="h-4 w-4 text-teal-600 dark:text-teal-400" />
-                        <span className="font-semibold text-teal-600 dark:text-teal-400">{yearGroup.year}</span>
+                      <CollapsibleTrigger className="group flex items-center gap-2 w-full p-3 rounded-lg bg-primary/5 hover-elevate" data-testid={`toggle-docs-year-${yearGroup.year}`}>
+                        <ChevronRight className="h-4 w-4 text-primary transition-transform duration-200 rotate-0 group-data-[state=open]:rotate-90" />
+                        <FolderOpen className="h-4 w-4 text-primary" />
+                        <span className="font-semibold text-primary">{yearGroup.year}</span>
                         <Badge variant="secondary" className="ml-auto">{yearGroup.totalCount}</Badge>
                       </CollapsibleTrigger>
                       <CollapsibleContent className="pl-4 mt-2 space-y-2">
                         {yearGroup.months.map((monthGroup) => (
                           <Collapsible key={monthGroup.month} defaultOpen={false}>
-                            <CollapsibleTrigger className="group flex items-center gap-2 w-full p-2 rounded-md bg-teal-500/5 hover-elevate" data-testid={`toggle-docs-month-${yearGroup.year}-${monthGroup.month}`}>
+                            <CollapsibleTrigger className="group flex items-center gap-2 w-full p-2 rounded-md bg-primary/5 hover-elevate" data-testid={`toggle-docs-month-${yearGroup.year}-${monthGroup.month}`}>
                               <ChevronRight className="h-3 w-3 text-muted-foreground transition-transform duration-200 rotate-0 group-data-[state=open]:rotate-90" />
                               <span className="font-medium">{monthGroup.monthName}</span>
                               <Badge variant="outline" className="ml-auto text-xs">{monthGroup.totalCount}</Badge>
@@ -4394,8 +4394,8 @@ export default function Documents() {
                                       const filename = doc.url.split('/').pop() || 'Document';
                                       return (
                                         <div key={index} className="flex items-center gap-4 p-3 rounded-lg border bg-card hover-elevate active-elevate-2">
-                                          <div className="p-2 bg-teal-500/10 rounded-lg">
-                                            <FileText className="h-4 w-4 text-teal-600 dark:text-teal-400 flex-shrink-0" />
+                                          <div className="p-2 bg-primary/10 rounded-lg">
+                                            <FileText className="h-4 w-4 text-primary flex-shrink-0" />
                                           </div>
                                           <div className="flex-1 min-w-0">
                                             <div className="font-medium text-sm truncate">{doc.projectName}</div>
@@ -4420,8 +4420,8 @@ export default function Documents() {
                 </div>
               ) : (
                 <div className="text-center py-12">
-                  <div className="inline-flex p-4 bg-teal-500/5 rounded-full mb-4">
-                    <FileText className="h-8 w-8 text-teal-500/50" />
+                  <div className="inline-flex p-4 bg-primary/5 rounded-full mb-4">
+                    <FileText className="h-8 w-8 text-primary/50" />
                   </div>
                   <p className="text-muted-foreground font-medium">No rope access plans uploaded yet</p>
                   <p className="text-sm text-muted-foreground mt-1">Plans will appear here when added to projects</p>
@@ -4433,10 +4433,10 @@ export default function Documents() {
 
         {/* Toolbox Meetings */}
         <Card className="mb-6 overflow-hidden">
-          <CardHeader className="bg-gradient-to-br from-cyan-500/10 via-cyan-500/5 to-transparent pb-4">
+          <CardHeader className="bg-gradient-to-br from-primary/10 via-primary/5 to-transparent pb-4">
             <div className="flex items-start gap-4">
               <div className="p-3 bg-cyan-500/10 rounded-xl ring-1 ring-cyan-500/20">
-                <Calendar className="h-6 w-6 text-cyan-600 dark:text-cyan-400" />
+                <Calendar className="h-6 w-6 text-primary" />
               </div>
               <div className="flex-1">
                 <CardTitle className="text-xl mb-1">Toolbox Meeting Records</CardTitle>
@@ -4452,16 +4452,16 @@ export default function Documents() {
               <div className="space-y-2">
                 {groupDocumentsByDate(meetings, (m: any) => m.meetingDate).map((yearGroup) => (
                   <Collapsible key={yearGroup.year} defaultOpen={false}>
-                    <CollapsibleTrigger className="group flex items-center gap-2 w-full p-3 rounded-lg bg-cyan-500/5 hover-elevate" data-testid={`toggle-meetings-outer-year-${yearGroup.year}`}>
-                      <ChevronRight className="h-4 w-4 text-cyan-600 dark:text-cyan-400 transition-transform duration-200 rotate-0 group-data-[state=open]:rotate-90" />
-                      <FolderOpen className="h-4 w-4 text-cyan-600 dark:text-cyan-400" />
-                      <span className="font-semibold text-cyan-600 dark:text-cyan-400">{yearGroup.year}</span>
+                    <CollapsibleTrigger className="group flex items-center gap-2 w-full p-3 rounded-lg bg-primary/5 hover-elevate" data-testid={`toggle-meetings-outer-year-${yearGroup.year}`}>
+                      <ChevronRight className="h-4 w-4 text-primary transition-transform duration-200 rotate-0 group-data-[state=open]:rotate-90" />
+                      <FolderOpen className="h-4 w-4 text-primary" />
+                      <span className="font-semibold text-primary">{yearGroup.year}</span>
                       <Badge variant="secondary" className="ml-auto">{yearGroup.totalCount}</Badge>
                     </CollapsibleTrigger>
                     <CollapsibleContent className="pl-4 mt-2 space-y-2">
                       {yearGroup.months.map((monthGroup) => (
                         <Collapsible key={monthGroup.month} defaultOpen={false}>
-                          <CollapsibleTrigger className="group flex items-center gap-2 w-full p-2 rounded-md bg-cyan-500/5 hover-elevate" data-testid={`toggle-meetings-outer-month-${yearGroup.year}-${monthGroup.month}`}>
+                          <CollapsibleTrigger className="group flex items-center gap-2 w-full p-2 rounded-md bg-primary/5 hover-elevate" data-testid={`toggle-meetings-outer-month-${yearGroup.year}-${monthGroup.month}`}>
                             <ChevronRight className="h-3 w-3 text-muted-foreground transition-transform duration-200 rotate-0 group-data-[state=open]:rotate-90" />
                             <span className="font-medium">{monthGroup.monthName}</span>
                             <Badge variant="outline" className="ml-auto text-xs">{monthGroup.totalCount}</Badge>
@@ -4478,7 +4478,7 @@ export default function Documents() {
                                   {dayGroup.items.map((meeting: any) => (
                                     <div key={meeting.id} className="flex items-center gap-4 p-3 rounded-lg border bg-card hover-elevate active-elevate-2">
                                       <div className="p-2 bg-cyan-500/10 rounded-lg">
-                                        <Calendar className="h-4 w-4 text-cyan-600 dark:text-cyan-400 flex-shrink-0" />
+                                        <Calendar className="h-4 w-4 text-primary flex-shrink-0" />
                                       </div>
                                       <div className="flex-1 min-w-0">
                                         <div className="font-medium text-sm">{meeting.conductedByName}</div>
@@ -4502,8 +4502,8 @@ export default function Documents() {
               </div>
             ) : (
               <div className="text-center py-12">
-                <div className="inline-flex p-4 bg-cyan-500/5 rounded-full mb-4">
-                  <Calendar className="h-8 w-8 text-cyan-500/50" />
+                <div className="inline-flex p-4 bg-primary/5 rounded-full mb-4">
+                  <Calendar className="h-8 w-8 text-primary/50" />
                 </div>
                 <p className="text-muted-foreground font-medium">No toolbox meetings recorded yet</p>
                 <p className="text-sm text-muted-foreground mt-1">Safety meetings will appear here when conducted</p>
@@ -4515,7 +4515,7 @@ export default function Documents() {
         {/* FLHA Forms - Only visible to users with safety document permission */}
         {canViewSafety && (
           <Card className="mb-6 overflow-hidden">
-            <CardHeader className="bg-gradient-to-br from-orange-500/10 via-orange-500/5 to-transparent pb-4">
+            <CardHeader className="bg-gradient-to-br from-primary/10 via-primary/5 to-transparent pb-4">
               <div className="flex items-start gap-4">
                 <div className="p-3 bg-orange-500/10 rounded-xl ring-1 ring-orange-500/20">
                   <Calendar className="h-6 w-6 text-orange-600 dark:text-orange-400" />
@@ -4609,10 +4609,10 @@ export default function Documents() {
         {/* Incident Reports - Only visible to users with safety document permission */}
         {canViewSafety && (
           <Card className="mb-6 overflow-hidden">
-            <CardHeader className="bg-gradient-to-br from-red-500/10 via-red-500/5 to-transparent pb-4">
+            <CardHeader className="bg-gradient-to-br from-primary/10 via-primary/5 to-transparent pb-4">
               <div className="flex items-start gap-4">
-                <div className="p-3 bg-red-500/10 rounded-xl ring-1 ring-red-500/20">
-                  <AlertTriangle className="h-6 w-6 text-red-600 dark:text-red-400" />
+                <div className="p-3 bg-primary/10 rounded-xl ring-1 ring-primary/20">
+                  <AlertTriangle className="h-6 w-6 text-primary" />
                 </div>
                 <div className="flex-1">
                   <CardTitle className="text-xl mb-1">Incident Reports</CardTitle>
@@ -4720,10 +4720,10 @@ export default function Documents() {
 
         {/* Method Statements */}
         <Card className="mb-6 overflow-hidden">
-          <CardHeader className="bg-gradient-to-br from-emerald-500/10 via-emerald-500/5 to-transparent pb-4">
+          <CardHeader className="bg-gradient-to-br from-primary/10 via-primary/5 to-transparent pb-4">
             <div className="flex items-start gap-4">
-              <div className="p-3 bg-emerald-500/10 rounded-xl ring-1 ring-emerald-500/20">
-                <FileText className="h-6 w-6 text-emerald-600 dark:text-emerald-400" />
+              <div className="p-3 bg-primary/10 rounded-xl ring-1 ring-primary/20">
+                <FileText className="h-6 w-6 text-primary" />
               </div>
               <div className="flex-1">
                 <CardTitle className="text-xl mb-1">Method Statements</CardTitle>
@@ -4737,7 +4737,7 @@ export default function Documents() {
           <CardContent className="pt-6">
             {/* Upload Method Statement Document */}
             {canUploadDocuments && (
-              <div className="mb-6 p-5 border-2 border-dashed rounded-xl bg-emerald-500/5 hover-elevate">
+              <div className="mb-6 p-5 border-2 border-dashed rounded-xl bg-primary/5 hover-elevate">
                 <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
                   <div className="flex-1">
                     <label className="block mb-2 text-sm font-semibold flex items-center gap-2">
@@ -4764,14 +4764,14 @@ export default function Documents() {
             {methodStatementDocs.length > 0 && (
               <div className="mb-6">
                 <h4 className="text-sm font-semibold mb-3 flex items-center gap-2">
-                  <FileCheck className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
+                  <FileCheck className="h-4 w-4 text-primary" />
                   Uploaded Method Statement Documents
                 </h4>
                 <div className="space-y-2">
                   {methodStatementDocs.map((doc: any) => (
                     <div key={doc.id} className="flex items-center gap-4 p-3 rounded-lg border bg-card hover-elevate active-elevate-2">
-                      <div className="p-2 bg-emerald-500/10 rounded-lg">
-                        <FileText className="h-4 w-4 text-emerald-600 dark:text-emerald-400 flex-shrink-0" />
+                      <div className="p-2 bg-primary/10 rounded-lg">
+                        <FileText className="h-4 w-4 text-primary flex-shrink-0" />
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="font-medium text-sm">{doc.fileName}</div>
@@ -4809,7 +4809,7 @@ export default function Documents() {
                   getDateFn={(s: any) => s.dateCreated}
                   generatePdf={generateMethodStatementPdfBlob}
                   documentType="Methods"
-                  colorClass="text-emerald-600 dark:text-emerald-400"
+                  colorClass="text-primary"
                 />
               </div>
             )}
@@ -4817,16 +4817,16 @@ export default function Documents() {
               <div className="space-y-2">
                 {groupDocumentsByDate(methodStatements, (s: any) => s.dateCreated).map((yearGroup) => (
                   <Collapsible key={yearGroup.year} defaultOpen={false}>
-                    <CollapsibleTrigger className="group flex items-center gap-2 w-full p-3 rounded-lg bg-emerald-500/5 hover-elevate" data-testid={`toggle-methods-year-${yearGroup.year}`}>
-                      <ChevronRight className="h-4 w-4 text-emerald-600 dark:text-emerald-400 transition-transform duration-200 rotate-0 group-data-[state=open]:rotate-90" />
-                      <FolderOpen className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
-                      <span className="font-semibold text-emerald-600 dark:text-emerald-400">{yearGroup.year}</span>
+                    <CollapsibleTrigger className="group flex items-center gap-2 w-full p-3 rounded-lg bg-primary/5 hover-elevate" data-testid={`toggle-methods-year-${yearGroup.year}`}>
+                      <ChevronRight className="h-4 w-4 text-primary transition-transform duration-200 rotate-0 group-data-[state=open]:rotate-90" />
+                      <FolderOpen className="h-4 w-4 text-primary" />
+                      <span className="font-semibold text-primary">{yearGroup.year}</span>
                       <Badge variant="secondary" className="ml-auto">{yearGroup.totalCount}</Badge>
                     </CollapsibleTrigger>
                     <CollapsibleContent className="pl-4 mt-2 space-y-2">
                       {yearGroup.months.map((monthGroup) => (
                         <Collapsible key={monthGroup.month} defaultOpen={false}>
-                          <CollapsibleTrigger className="group flex items-center gap-2 w-full p-2 rounded-md bg-emerald-500/5 hover-elevate" data-testid={`toggle-methods-month-${yearGroup.year}-${monthGroup.month}`}>
+                          <CollapsibleTrigger className="group flex items-center gap-2 w-full p-2 rounded-md bg-primary/5 hover-elevate" data-testid={`toggle-methods-month-${yearGroup.year}-${monthGroup.month}`}>
                             <ChevronRight className="h-3 w-3 text-muted-foreground transition-transform duration-200 rotate-0 group-data-[state=open]:rotate-90" />
                             <span className="font-medium">{monthGroup.monthName}</span>
                             <Badge variant="outline" className="ml-auto text-xs">{monthGroup.totalCount}</Badge>
@@ -4842,8 +4842,8 @@ export default function Documents() {
                                 <div className="space-y-2 pl-5">
                                   {dayGroup.items.map((statement: any) => (
                                     <div key={statement.id} className="flex items-center gap-4 p-3 rounded-lg border bg-card hover-elevate active-elevate-2">
-                                      <div className="p-2 bg-emerald-500/10 rounded-lg">
-                                        <FileText className="h-4 w-4 text-emerald-600 dark:text-emerald-400 flex-shrink-0" />
+                                      <div className="p-2 bg-primary/10 rounded-lg">
+                                        <FileText className="h-4 w-4 text-primary flex-shrink-0" />
                                       </div>
                                       <div className="flex-1 min-w-0">
                                         <div className="font-medium text-sm">{statement.location || 'Method Statement'}</div>
@@ -4873,8 +4873,8 @@ export default function Documents() {
               </div>
             ) : (
               <div className="text-center py-12">
-                <div className="inline-flex p-4 bg-emerald-500/5 rounded-full mb-4">
-                  <FileText className="h-8 w-8 text-emerald-500/50" />
+                <div className="inline-flex p-4 bg-primary/5 rounded-full mb-4">
+                  <FileText className="h-8 w-8 text-primary/50" />
                 </div>
                 <p className="text-muted-foreground font-medium">No method statements recorded yet</p>
                 <p className="text-sm text-muted-foreground mt-1">Work procedures will be documented here</p>
