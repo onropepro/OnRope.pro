@@ -6133,16 +6133,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Storage now returns items with serialEntries already attached
       const items = await storage.getGearItemsByCompany(companyId);
       
+      // Get ALL assignments for this company to calculate assigned quantities
+      const allAssignments = await db.select()
+        .from(gearAssignments)
+        .where(eq(gearAssignments.companyId, companyId));
+      
+      // Calculate assigned quantity for each item
+      const assignedByItem = new Map<string, number>();
+      for (const assignment of allAssignments) {
+        const current = assignedByItem.get(assignment.gearItemId) || 0;
+        assignedByItem.set(assignment.gearItemId, current + (assignment.quantity || 0));
+      }
+      
       // Filter out financial data if user doesn't have permission
       const hasFinancialPermission = currentUser.role === "company" || 
         (currentUser.permissions && currentUser.permissions.includes("view_financial_data"));
       
       const filteredItems = items.map(item => {
+        const assignedQuantity = assignedByItem.get(item.id) || 0;
         if (!hasFinancialPermission) {
           const { itemPrice, ...rest } = item;
-          return rest;
+          return { ...rest, assignedQuantity };
         }
-        return item;
+        return { ...item, assignedQuantity };
       });
       
       res.json({ items: filteredItems });

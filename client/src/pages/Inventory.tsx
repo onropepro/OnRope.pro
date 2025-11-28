@@ -190,11 +190,11 @@ export default function Inventory() {
   };
   
   // Helper function to calculate available quantity for an item
-  const getAvailableQuantity = (item: GearItem) => {
+  // Uses assignedQuantity from the API which includes ALL assignments (not just user's own)
+  const getAvailableQuantity = (item: any) => {
     const totalQuantity = Number(item.quantity) || 0;
-    const assignments = getItemAssignments(item.id);
-    const assignedQuantity = assignments.reduce((sum, a) => sum + (Number(a.quantity) || 0), 0);
-    return totalQuantity - assignedQuantity;
+    const assignedQuantity = Number(item.assignedQuantity) || 0;
+    return Math.max(0, totalQuantity - assignedQuantity);
   };
 
   const form = useForm<Partial<InsertGearItem>>({
