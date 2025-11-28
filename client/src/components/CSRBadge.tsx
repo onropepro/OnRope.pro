@@ -28,6 +28,8 @@ interface CSRData {
     documentReviewsSigned: number;
     documentReviewsPending: number;
     documentReviewsTotal: number;
+    documentReviewsTotalEmployees?: number;
+    documentReviewsTotalDocs?: number;
     projectCount: number;
     totalProjectProgress: number;
   };
@@ -276,7 +278,12 @@ export function CSRBadge({ user }: CSRBadgeProps) {
                 </div>
                 <ColoredProgress value={breakdown.documentReviewRating} rating={breakdown.documentReviewRating} />
                 <p className="text-xs text-muted-foreground">
-                  {details.documentReviewsSigned} of {details.documentReviewsTotal} review{details.documentReviewsTotal !== 1 ? 's' : ''} signed
+                  {details.documentReviewsSigned} of {details.documentReviewsTotal} document signature{details.documentReviewsTotal !== 1 ? 's' : ''} completed
+                  {details.documentReviewsTotalEmployees && details.documentReviewsTotalDocs && (
+                    <span className="block mt-0.5">
+                      ({details.documentReviewsTotalEmployees} employee{details.documentReviewsTotalEmployees !== 1 ? 's' : ''} × {details.documentReviewsTotalDocs} document{details.documentReviewsTotalDocs !== 1 ? 's' : ''})
+                    </span>
+                  )}
                 </p>
               </div>
 

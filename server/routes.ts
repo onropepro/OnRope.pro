@@ -7169,19 +7169,33 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const projectPenalty = 0;
       
       // 5. Document Review Compliance Rating
-      // Tracks employee acknowledgment of safety documents (H&S Manual, Company Policy)
+      // Tracks employee acknowledgment of safety documents (H&S Manual, Company Policy, Safe Work Procedures)
+      // Calculate based on TOTAL REQUIRED signatures = employees × required documents
       const documentReviews = await storage.getDocumentReviewSignaturesByCompany(companyId);
-      const totalReviews = documentReviews.length;
-      const signedReviews = documentReviews.filter((r: any) => r.signedAt).length;
-      const pendingReviews = totalReviews - signedReviews;
+      const companyEmployees = await storage.getAllEmployees(companyId);
       
-      // If no reviews exist, 100% compliance (nothing to comply with)
-      // If there are pending reviews, apply a proportional penalty (max 5%)
-      const documentReviewRating = totalReviews > 0 
-        ? Math.round((signedReviews / totalReviews) * 100) 
+      // Required document types that employees must sign
+      const requiredDocTypes = ['health_safety_manual', 'company_policy', 'safe_work_procedure'];
+      const requiredDocs = companyDocuments.filter((doc: any) => 
+        requiredDocTypes.includes(doc.documentType)
+      );
+      
+      // Total required = number of employees × number of required documents
+      const totalEmployees = companyEmployees.length;
+      const totalRequiredDocs = requiredDocs.length;
+      const totalRequiredSignatures = totalEmployees * totalRequiredDocs;
+      
+      // Count actual signed reviews
+      const signedReviews = documentReviews.filter((r: any) => r.signedAt).length;
+      const pendingReviews = totalRequiredSignatures - signedReviews;
+      
+      // If no required documents or no employees, 100% compliance (nothing to comply with)
+      // Otherwise, calculate based on signed vs total required
+      const documentReviewRating = totalRequiredSignatures > 0 
+        ? Math.round((signedReviews / totalRequiredSignatures) * 100) 
         : 100;
-      const documentReviewPenalty = totalReviews > 0 
-        ? Math.round(((totalReviews - signedReviews) / totalReviews) * 5)
+      const documentReviewPenalty = totalRequiredSignatures > 0 
+        ? Math.round(((totalRequiredSignatures - signedReviews) / totalRequiredSignatures) * 5)
         : 0;
       
       // Calculate overall CSR: Start at 100%, subtract penalties
@@ -7208,7 +7222,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
           harnessRequiredInspections,
           documentReviewsSigned: signedReviews,
           documentReviewsPending: pendingReviews,
-          documentReviewsTotal: totalReviews,
+          documentReviewsTotal: totalRequiredSignatures,
+          documentReviewsTotalEmployees: totalEmployees,
+          documentReviewsTotalDocs: totalRequiredDocs,
           projectCount,
           totalProjectProgress: projectCount > 0 ? Math.round(totalProjectProgress / projectCount) : 100
         }
@@ -7379,15 +7395,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
         : 0;
       
       // 6. Document Review Compliance Rating
+      // Calculate based on TOTAL REQUIRED signatures = employees × required documents
       const documentReviews = await storage.getDocumentReviewSignaturesByCompany(companyId);
-      const totalReviews = documentReviews.length;
+      const companyEmployees = await storage.getAllEmployees(companyId);
+      
+      // Required document types that employees must sign
+      const requiredDocTypes = ['health_safety_manual', 'company_policy', 'safe_work_procedure'];
+      const requiredDocs = companyDocuments.filter((doc: any) => 
+        requiredDocTypes.includes(doc.documentType)
+      );
+      
+      const totalEmployees = companyEmployees.length;
+      const totalRequiredDocs = requiredDocs.length;
+      const totalRequiredSignatures = totalEmployees * totalRequiredDocs;
       const signedReviews = documentReviews.filter((r: any) => r.signedAt).length;
       
-      const documentReviewRating = totalReviews > 0 
-        ? Math.round((signedReviews / totalReviews) * 100) 
+      const documentReviewRating = totalRequiredSignatures > 0 
+        ? Math.round((signedReviews / totalRequiredSignatures) * 100) 
         : 100;
-      const documentReviewPenalty = totalReviews > 0 
-        ? Math.round(((totalReviews - signedReviews) / totalReviews) * 5)
+      const documentReviewPenalty = totalRequiredSignatures > 0 
+        ? Math.round(((totalRequiredSignatures - signedReviews) / totalRequiredSignatures) * 5)
         : 0;
       
       // Calculate overall CSR
