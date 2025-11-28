@@ -25,16 +25,8 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 
 type TierName = 'basic' | 'starter' | 'premium' | 'enterprise';
-type Currency = 'usd' | 'cad';
 
 interface SubscriptionStatus {
   hasActiveSubscription: boolean;
@@ -48,7 +40,7 @@ interface SubscriptionStatus {
 const TIER_INFO = {
   basic: {
     name: 'Basic',
-    price: { usd: 79, cad: 99 },
+    price: 79,
     projects: 2,
     seats: 4,
     color: 'bg-primary/50',
@@ -63,7 +55,7 @@ const TIER_INFO = {
   },
   starter: {
     name: 'Starter',
-    price: { usd: 299, cad: 399 },
+    price: 299,
     projects: 5,
     seats: 10,
     color: 'bg-purple-500',
@@ -77,7 +69,7 @@ const TIER_INFO = {
   },
   premium: {
     name: 'Premium',
-    price: { usd: 499, cad: 649 },
+    price: 499,
     projects: 9,
     seats: 18,
     color: 'bg-orange-500',
@@ -91,7 +83,7 @@ const TIER_INFO = {
   },
   enterprise: {
     name: 'Enterprise',
-    price: { usd: 899, cad: 1199 },
+    price: 899,
     projects: -1,
     seats: -1,
     color: 'bg-gradient-to-r from-yellow-400 to-orange-500',
@@ -109,7 +101,6 @@ const TIER_INFO = {
 export function SubscriptionManagement() {
   const { toast } = useToast();
   const [selectedTier, setSelectedTier] = useState<TierName | null>(null);
-  const [selectedCurrency, setSelectedCurrency] = useState<Currency>('usd');
   const [showCancelDialog, setShowCancelDialog] = useState(false);
   const [showUpgradeDialog, setShowUpgradeDialog] = useState(false);
   const [pendingUpgradeTier, setPendingUpgradeTier] = useState<TierName | null>(null);
@@ -139,8 +130,8 @@ export function SubscriptionManagement() {
 
   // Create checkout session mutation
   const createCheckoutMutation = useMutation({
-    mutationFn: async ({ tier, currency }: { tier: TierName, currency: Currency }) => {
-      const response = await apiRequest('POST', '/api/stripe/create-checkout-session', { tier, currency });
+    mutationFn: async (tier: TierName) => {
+      const response = await apiRequest('POST', '/api/stripe/create-checkout-session', { tier });
       return response.json();
     },
     onSuccess: (data) => {
@@ -320,7 +311,7 @@ export function SubscriptionManagement() {
       setShowUpgradeDialog(true);
     } else {
       // For new subscriptions, use checkout flow (Stripe handles confirmation)
-      createCheckoutMutation.mutate({ tier, currency: selectedCurrency });
+      createCheckoutMutation.mutate(tier);
     }
   };
 
@@ -432,20 +423,6 @@ export function SubscriptionManagement() {
         </Card>
       )}
 
-      {/* Currency Selector */}
-      <div className="flex items-center gap-4">
-        <label className="text-sm font-medium">Currency:</label>
-        <Select value={selectedCurrency} onValueChange={(value) => setSelectedCurrency(value as Currency)}>
-          <SelectTrigger className="w-32" data-testid="select-currency">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="usd">USD ($)</SelectItem>
-            <SelectItem value="cad">CAD ($)</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
-
       {/* Subscription Plans */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {Object.entries(TIER_INFO).map(([tier, info]) => {
@@ -473,8 +450,7 @@ export function SubscriptionManagement() {
                 <CardTitle>{info.name}</CardTitle>
                 <CardDescription>
                   <span className="text-2xl font-bold text-foreground">
-                    {selectedCurrency === 'usd' ? '$' : 'C$'}
-                    {info.price[selectedCurrency]}
+                    ${info.price}
                   </span>
                   <span className="text-muted-foreground">/month</span>
                 </CardDescription>
@@ -535,7 +511,7 @@ export function SubscriptionManagement() {
               <p className="text-sm text-muted-foreground">Add 2 additional seats to your plan</p>
             </div>
             <div className="text-right">
-              <p className="font-semibold">{selectedCurrency === 'usd' ? '$19' : 'C$24'}/month</p>
+              <p className="font-semibold">$19/month</p>
               <p className="text-xs text-muted-foreground">per pack</p>
             </div>
           </button>
@@ -551,7 +527,7 @@ export function SubscriptionManagement() {
               <p className="text-sm text-muted-foreground">Add 1 additional active project</p>
             </div>
             <div className="text-right">
-              <p className="font-semibold">{selectedCurrency === 'usd' ? '$49' : 'C$64'}/month</p>
+              <p className="font-semibold">$49/month</p>
               <p className="text-xs text-muted-foreground">per project</p>
             </div>
           </button>
@@ -616,7 +592,7 @@ export function SubscriptionManagement() {
           <DialogHeader>
             <DialogTitle>
               {pendingUpgradeTier && subStatus?.currentTier && 
-                TIER_INFO[pendingUpgradeTier].price[selectedCurrency] > TIER_INFO[subStatus.currentTier].price[selectedCurrency]
+                TIER_INFO[pendingUpgradeTier].price > TIER_INFO[subStatus.currentTier].price
                 ? 'Upgrade Subscription'
                 : 'Change Subscription'
               }
@@ -633,13 +609,13 @@ export function SubscriptionManagement() {
                     <div className="flex items-center justify-between text-sm">
                       <span className="text-muted-foreground">Current Price:</span>
                       <span className="font-medium line-through">
-                        {selectedCurrency === 'usd' ? '$' : 'C$'}{TIER_INFO[subStatus.currentTier].price[selectedCurrency]}/mo
+                        ${TIER_INFO[subStatus.currentTier].price}/mo
                       </span>
                     </div>
                     <div className="flex items-center justify-between">
                       <span className="font-semibold">New Price:</span>
                       <span className="text-lg font-bold text-primary">
-                        {selectedCurrency === 'usd' ? '$' : 'C$'}{TIER_INFO[pendingUpgradeTier].price[selectedCurrency]}/mo
+                        ${TIER_INFO[pendingUpgradeTier].price}/mo
                       </span>
                     </div>
                   </div>
@@ -723,7 +699,7 @@ export function SubscriptionManagement() {
               <div className="space-y-4 pt-4">
                 <div className="flex items-center justify-between">
                   <span className="text-sm">Price:</span>
-                  <span className="font-semibold text-base">{selectedCurrency === 'usd' ? '$19' : 'C$24'}/month</span>
+                  <span className="font-semibold text-base">$19/month</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <Check className="w-4 h-4 text-primary" />
@@ -765,7 +741,7 @@ export function SubscriptionManagement() {
               <div className="space-y-4 pt-4">
                 <div className="flex items-center justify-between">
                   <span className="text-sm">Price:</span>
-                  <span className="font-semibold text-base">{selectedCurrency === 'usd' ? '$49' : 'C$64'}/month</span>
+                  <span className="font-semibold text-base">$49/month</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <Check className="w-4 h-4 text-primary" />
