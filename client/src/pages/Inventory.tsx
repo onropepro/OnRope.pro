@@ -90,6 +90,13 @@ export default function Inventory() {
   const [selfAssignDateInService, setSelfAssignDateInService] = useState<string>("");
   const [selfAssignSerialMode, setSelfAssignSerialMode] = useState<"pick" | "new">("pick");
   const [selectedSerialEntry, setSelectedSerialEntry] = useState<any | null>(null);
+  
+  // Edit my gear state
+  const [showEditMyGearDialog, setShowEditMyGearDialog] = useState(false);
+  const [editingMyAssignment, setEditingMyAssignment] = useState<any | null>(null);
+  const [editMySerialNumber, setEditMySerialNumber] = useState<string>("");
+  const [editMyDateOfManufacture, setEditMyDateOfManufacture] = useState<string>("");
+  const [editMyDateInService, setEditMyDateInService] = useState<string>("");
 
   // Fetch current user
   const { data: userData } = useQuery<{ user: any }>({
@@ -492,6 +499,41 @@ export default function Inventory() {
       toast({
         title: "Error",
         description: error.message || "Failed to remove gear",
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Edit my own gear assignment mutation
+  const editMyGearMutation = useMutation({
+    mutationFn: async (data: { 
+      assignmentId: string;
+      serialNumber?: string;
+      dateOfManufacture?: string;
+      dateInService?: string;
+    }) => {
+      return apiRequest("PATCH", `/api/gear-assignments/self/${data.assignmentId}`, {
+        serialNumber: data.serialNumber,
+        dateOfManufacture: data.dateOfManufacture,
+        dateInService: data.dateInService,
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/gear-assignments"] });
+      toast({
+        title: "Gear Updated",
+        description: "Your gear details have been updated.",
+      });
+      setShowEditMyGearDialog(false);
+      setEditingMyAssignment(null);
+      setEditMySerialNumber("");
+      setEditMyDateOfManufacture("");
+      setEditMyDateInService("");
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to update gear details",
         variant: "destructive",
       });
     },
@@ -1060,26 +1102,61 @@ export default function Inventory() {
                                 </div>
                               )}
                             </div>
-                            {/* Remove button */}
+                            {/* Edit and Remove buttons */}
                             {myAssignment && (
-                              <Button
-                                size="icon"
-                                variant="ghost"
-                                onClick={() => removeSelfAssignedMutation.mutate(myAssignment.id)}
-                                disabled={removeSelfAssignedMutation.isPending}
-                                data-testid={`button-remove-gear-${item.id}`}
-                              >
-                                <X className="h-4 w-4" />
-                              </Button>
+                              <div className="flex items-center gap-1">
+                                <Button
+                                  size="icon"
+                                  variant="ghost"
+                                  onClick={() => {
+                                    setEditingMyAssignment({ ...myAssignment, gearItem: item });
+                                    setEditMySerialNumber(myAssignment.serialNumber || "");
+                                    setEditMyDateOfManufacture(myAssignment.dateOfManufacture || "");
+                                    setEditMyDateInService(myAssignment.dateInService || "");
+                                    setShowEditMyGearDialog(true);
+                                  }}
+                                  data-testid={`button-edit-gear-${item.id}`}
+                                >
+                                  <Pencil className="h-4 w-4" />
+                                </Button>
+                                <Button
+                                  size="icon"
+                                  variant="ghost"
+                                  onClick={() => removeSelfAssignedMutation.mutate(myAssignment.id)}
+                                  disabled={removeSelfAssignedMutation.isPending}
+                                  data-testid={`button-remove-gear-${item.id}`}
+                                >
+                                  <X className="h-4 w-4" />
+                                </Button>
+                              </div>
                             )}
                           </div>
 
                           {/* Serial Number - prominent display */}
-                          {myAssignment?.serialNumber && (
+                          {myAssignment?.serialNumber ? (
                             <div className="mb-3">
                               <Badge variant="secondary" className="font-mono text-sm px-3 py-1">
                                 S/N: {myAssignment.serialNumber}
                               </Badge>
+                            </div>
+                          ) : (
+                            <div className="mb-3">
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => {
+                                  setEditingMyAssignment({ ...myAssignment, gearItem: item });
+                                  setEditMySerialNumber("");
+                                  setEditMyDateOfManufacture("");
+                                  setEditMyDateInService("");
+                                  setShowEditMyGearDialog(true);
+                                }}
+                                className="text-xs"
+                                data-testid={`button-add-details-${item.id}`}
+                              >
+                                <Plus className="h-3 w-3 mr-1" />
+                                Add Serial Number & Dates
+                              </Button>
                             </div>
                           )}
 
@@ -3144,6 +3221,94 @@ export default function Inventory() {
               data-testid="button-confirm-self-assign"
             >
               {selfAssignMutation.isPending ? "Adding..." : "Add to My Gear"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Edit My Gear Dialog */}
+      <Dialog open={showEditMyGearDialog} onOpenChange={(open) => {
+        setShowEditMyGearDialog(open);
+        if (!open) {
+          setEditingMyAssignment(null);
+          setEditMySerialNumber("");
+          setEditMyDateOfManufacture("");
+          setEditMyDateInService("");
+        }
+      }}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Edit Gear Details</DialogTitle>
+            <DialogDescription>
+              Update the serial number and dates for your {editingMyAssignment?.gearItem?.equipmentType || "gear"}
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="edit-my-serial">Serial Number</Label>
+              <Input
+                id="edit-my-serial"
+                placeholder="Enter serial number"
+                value={editMySerialNumber}
+                onChange={(e) => setEditMySerialNumber(e.target.value)}
+                data-testid="input-edit-my-serial"
+              />
+            </div>
+            
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-2">
+                <Label htmlFor="edit-my-manufacture">Date of Manufacture</Label>
+                <Input
+                  id="edit-my-manufacture"
+                  type="date"
+                  value={editMyDateOfManufacture}
+                  onChange={(e) => setEditMyDateOfManufacture(e.target.value)}
+                  data-testid="input-edit-my-date-manufacture"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="edit-my-service">Date In Service</Label>
+                <Input
+                  id="edit-my-service"
+                  type="date"
+                  value={editMyDateInService}
+                  onChange={(e) => setEditMyDateInService(e.target.value)}
+                  data-testid="input-edit-my-date-service"
+                />
+              </div>
+            </div>
+          </div>
+
+          <DialogFooter className="gap-2">
+            <Button
+              variant="outline"
+              onClick={() => {
+                setShowEditMyGearDialog(false);
+                setEditingMyAssignment(null);
+                setEditMySerialNumber("");
+                setEditMyDateOfManufacture("");
+                setEditMyDateInService("");
+              }}
+              data-testid="button-cancel-edit-my-gear"
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={() => {
+                if (editingMyAssignment) {
+                  editMyGearMutation.mutate({
+                    assignmentId: editingMyAssignment.id,
+                    serialNumber: editMySerialNumber || undefined,
+                    dateOfManufacture: editMyDateOfManufacture || undefined,
+                    dateInService: editMyDateInService || undefined,
+                  });
+                }
+              }}
+              disabled={editMyGearMutation.isPending}
+              data-testid="button-save-my-gear"
+            >
+              {editMyGearMutation.isPending ? "Saving..." : "Save Details"}
             </Button>
           </DialogFooter>
         </DialogContent>

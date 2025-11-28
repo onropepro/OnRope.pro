@@ -6527,6 +6527,44 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Update your own gear assignment details
+  app.patch("/api/gear-assignments/self/:id", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      // Verify the assignment belongs to the current user
+      const existingAssignment = await db.select().from(gearAssignments).where(eq(gearAssignments.id, req.params.id)).limit(1);
+      
+      if (!existingAssignment.length) {
+        return res.status(404).json({ message: "Assignment not found" });
+      }
+      
+      if (existingAssignment[0].employeeId !== currentUser.id) {
+        return res.status(403).json({ message: "You can only edit your own gear assignments" });
+      }
+      
+      // Update the assignment
+      const updates: any = { updatedAt: new Date() };
+      if (req.body.serialNumber !== undefined) updates.serialNumber = req.body.serialNumber || null;
+      if (req.body.dateOfManufacture !== undefined) updates.dateOfManufacture = req.body.dateOfManufacture || null;
+      if (req.body.dateInService !== undefined) updates.dateInService = req.body.dateInService || null;
+      
+      const [assignment] = await db.update(gearAssignments)
+        .set(updates)
+        .where(eq(gearAssignments.id, req.params.id))
+        .returning();
+      
+      res.json({ assignment });
+    } catch (error) {
+      console.error("Update self-assigned gear error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
   app.patch("/api/gear-assignments/:id", requireAuth, async (req: Request, res: Response) => {
     try {
       const currentUser = await storage.getUserById(req.session.userId!);
