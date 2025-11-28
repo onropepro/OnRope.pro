@@ -1182,6 +1182,12 @@ export default function Documents() {
     enabled: userData?.user?.role === 'company' || userData?.user?.role === 'operations_manager',
   });
 
+  // Fetch all employees for document compliance calculation
+  const { data: employeesData } = useQuery<{ employees: any[] }>({
+    queryKey: ["/api/employees"],
+    enabled: userData?.user?.role === 'company' || userData?.user?.role === 'operations_manager',
+  });
+
   const customJobTypes = customJobTypesData?.customJobTypes || [];
   const currentUser = userData?.user;
   const canViewFinancials = hasFinancialAccess(currentUser);
@@ -3104,9 +3110,22 @@ export default function Documents() {
         <DocumentReviews companyDocuments={[...healthSafetyDocs, ...policyDocs]} />
 
         {/* Admin View: Employee Document Compliance Status */}
-        {canUploadDocuments && allDocumentReviewsData?.reviews && (
+        {canUploadDocuments && (
           (() => {
-            const allReviews = allDocumentReviewsData.reviews || [];
+            const allReviews = allDocumentReviewsData?.reviews || [];
+            const allEmployees = employeesData?.employees || [];
+            
+            // Required documents that employees must sign
+            const requiredDocTypes = ['health_safety_manual', 'company_policy'];
+            const requiredDocs = companyDocuments.filter((doc: any) => 
+              requiredDocTypes.includes(doc.documentType)
+            );
+            
+            // Total employees (excluding company owner role if needed)
+            const totalEmployees = allEmployees.length;
+            
+            // Total required signatures = employees * required documents
+            const totalRequiredSignatures = totalEmployees * requiredDocs.length;
             
             // Group reviews by employee
             const employeeReviews = allReviews.reduce((acc: Record<string, any[]>, review: any) => {
@@ -3116,35 +3135,42 @@ export default function Documents() {
               return acc;
             }, {} as Record<string, any[]>);
             
-            // Calculate stats for each employee
-            const employeeStats = Object.entries(employeeReviews).map(([employeeId, reviews]) => {
+            // Calculate stats for each employee (including those without any reviews yet)
+            const employeeStats = allEmployees.map((employee: any) => {
+              const reviews = employeeReviews[employee.id] || [];
               const signed = reviews.filter((r: any) => r.signedAt);
               const pending = reviews.filter((r: any) => !r.signedAt);
               const viewed = reviews.filter((r: any) => r.viewedAt && !r.signedAt);
-              const employeeName = reviews[0]?.employeeName || 'Unknown';
+              
+              // Check if all required documents are signed
+              const signedDocIds = new Set(signed.map((r: any) => r.documentId));
+              const allRequiredSigned = requiredDocs.every((doc: any) => signedDocIds.has(doc.id));
               
               return {
-                employeeId,
-                employeeName,
+                employeeId: employee.id,
+                employeeName: employee.fullName || employee.username || 'Unknown',
                 reviews,
                 signedCount: signed.length,
-                pendingCount: pending.length,
+                pendingCount: requiredDocs.length - signed.length, // Pending = required docs not yet signed
                 viewedCount: viewed.length,
-                totalCount: reviews.length,
-                isComplete: pending.length === 0,
+                totalCount: requiredDocs.length,
+                isComplete: allRequiredSigned && requiredDocs.length > 0,
               };
-            }).sort((a, b) => {
+            }).sort((a: any, b: any) => {
               // Sort: pending first, then by name
               if (a.pendingCount > 0 && b.pendingCount === 0) return -1;
               if (a.pendingCount === 0 && b.pendingCount > 0) return 1;
               return a.employeeName.localeCompare(b.employeeName);
             });
             
-            const totalEmployees = employeeStats.length;
-            const completeEmployees = employeeStats.filter(e => e.isComplete).length;
-            const totalReviews = allReviews.length;
             const signedReviews = allReviews.filter((r: any) => r.signedAt).length;
-            const compliancePercent = totalReviews > 0 ? Math.round((signedReviews / totalReviews) * 100) : 100;
+            const completeEmployees = employeeStats.filter((e: any) => e.isComplete).length;
+            const pendingEmployees = totalEmployees - completeEmployees;
+            
+            // Compliance = signed reviews / total required signatures
+            const compliancePercent = totalRequiredSignatures > 0 
+              ? Math.round((signedReviews / totalRequiredSignatures) * 100) 
+              : (requiredDocs.length === 0 ? 100 : 0);
             
             const formatDocType = (type: string) => {
               switch (type) {
@@ -3199,7 +3225,7 @@ export default function Documents() {
                       <div className="text-sm text-muted-foreground">Pending Signatures</div>
                     </div>
                     <div className="p-3 rounded-lg bg-violet-500/10">
-                      <div className="text-2xl font-bold text-violet-600 dark:text-violet-400">{signedReviews}/{totalReviews}</div>
+                      <div className="text-2xl font-bold text-violet-600 dark:text-violet-400">{signedReviews}/{totalRequiredSignatures}</div>
                       <div className="text-sm text-muted-foreground">Documents Signed</div>
                     </div>
                   </div>
@@ -3854,7 +3880,7 @@ export default function Documents() {
                             <Button
                               size="icon"
                               variant="ghost"
-                              onClick={() => handleDeleteDocument(doc.id)}
+                              onClick={() => deleteDocumentMutation.mutate(doc.id)}
                               data-testid={`delete-custom-swp-${doc.id}`}
                             >
                               <Trash2 className="h-4 w-4 text-destructive" />
