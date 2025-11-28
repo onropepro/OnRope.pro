@@ -8224,6 +8224,109 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Document Signature Compliance Report - get all employees and their document signature status
+  app.get("/api/document-reviews/compliance-report", requireAuth, requireRole("operations_manager", "company"), async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      const companyId = currentUser.role === "company" ? currentUser.id : currentUser.companyId;
+      
+      if (!companyId) {
+        return res.status(400).json({ message: "Unable to determine company" });
+      }
+      
+      // Get company info for header
+      let companyName = "Company";
+      if (currentUser.role === "company") {
+        companyName = currentUser.companyName || currentUser.name || "Company";
+      } else {
+        const company = await storage.getUserById(companyId);
+        if (company) {
+          companyName = company.companyName || company.name || "Company";
+        }
+      }
+      
+      // Get all employees
+      const employees = await storage.getAllEmployees(companyId);
+      
+      // Get all company documents
+      const companyDocuments = await storage.getCompanyDocuments(companyId);
+      
+      // Filter to required document types
+      const requiredDocTypes = ['health_safety_manual', 'company_policy', 'safe_work_procedure'];
+      const requiredDocs = companyDocuments.filter((doc: any) => 
+        requiredDocTypes.includes(doc.documentType)
+      );
+      
+      // Get all document reviews
+      const allReviews = await storage.getDocumentReviewSignaturesByCompany(companyId);
+      
+      // Build compliance matrix
+      const employeeCompliance = employees.map((employee: any) => {
+        const employeeReviews = allReviews.filter((r: any) => r.employeeId === employee.id);
+        
+        const documentStatus = requiredDocs.map((doc: any) => {
+          const review = employeeReviews.find((r: any) => r.documentId === doc.id);
+          
+          return {
+            documentId: doc.id,
+            documentName: doc.fileName || doc.documentType,
+            documentType: doc.documentType,
+            status: review?.signedAt ? 'signed' : (review?.viewedAt ? 'viewed' : 'pending'),
+            viewedAt: review?.viewedAt || null,
+            signedAt: review?.signedAt || null,
+          };
+        });
+        
+        const signedCount = documentStatus.filter(d => d.status === 'signed').length;
+        const totalCount = documentStatus.length;
+        
+        return {
+          employeeId: employee.id,
+          employeeName: employee.name || employee.email || 'Unknown',
+          email: employee.email,
+          documents: documentStatus,
+          signedCount,
+          totalCount,
+          compliancePercent: totalCount > 0 ? Math.round((signedCount / totalCount) * 100) : 100,
+        };
+      });
+      
+      // Summary stats
+      const totalSignatures = employees.length * requiredDocs.length;
+      const completedSignatures = employeeCompliance.reduce((sum, e) => sum + e.signedCount, 0);
+      const overallCompliancePercent = totalSignatures > 0 
+        ? Math.round((completedSignatures / totalSignatures) * 100) 
+        : 100;
+      
+      res.json({
+        companyName,
+        generatedAt: new Date().toISOString(),
+        summary: {
+          totalEmployees: employees.length,
+          totalDocuments: requiredDocs.length,
+          totalSignaturesRequired: totalSignatures,
+          completedSignatures,
+          pendingSignatures: totalSignatures - completedSignatures,
+          overallCompliancePercent,
+        },
+        documents: requiredDocs.map((doc: any) => ({
+          id: doc.id,
+          name: doc.fileName || doc.documentType,
+          type: doc.documentType,
+        })),
+        employees: employeeCompliance,
+      });
+    } catch (error) {
+      console.error("Get compliance report error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
   // ==================== COMPANY DOCUMENTS ROUTES ====================
 
   // Upload company document (Health & Safety Manual or Company Policy)

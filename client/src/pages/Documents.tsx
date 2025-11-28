@@ -1131,6 +1131,7 @@ export default function Documents() {
   const [methodStatementCustomJobType, setMethodStatementCustomJobType] = useState("");
   const [showMethodStatementUploadDialog, setShowMethodStatementUploadDialog] = useState(false);
   const [activeTab, setActiveTab] = useState("health-safety");
+  const [downloadingComplianceReport, setDownloadingComplianceReport] = useState(false);
 
   const { data: userData } = useQuery<{ user: any }>({
     queryKey: ["/api/user"],
@@ -2785,6 +2786,200 @@ export default function Documents() {
     URL.revokeObjectURL(url);
   };
 
+  // Download Document Signature Compliance Report as PDF
+  const downloadComplianceReport = async () => {
+    setDownloadingComplianceReport(true);
+    try {
+      const response = await fetch('/api/document-reviews/compliance-report', {
+        credentials: 'include',
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to fetch compliance data');
+      }
+      
+      const data = await response.json();
+      
+      // Create PDF
+      const doc = new jsPDF({
+        orientation: 'landscape',
+        unit: 'mm',
+        format: 'a4',
+      });
+      
+      const pageWidth = doc.internal.pageSize.getWidth();
+      const pageHeight = doc.internal.pageSize.getHeight();
+      const margin = 15;
+      let yPos = margin;
+      
+      // Header
+      doc.setFontSize(18);
+      doc.setFont('helvetica', 'bold');
+      doc.text('Document Signature Compliance Report', pageWidth / 2, yPos, { align: 'center' });
+      yPos += 10;
+      
+      doc.setFontSize(12);
+      doc.setFont('helvetica', 'normal');
+      doc.text(data.companyName, pageWidth / 2, yPos, { align: 'center' });
+      yPos += 6;
+      
+      doc.setFontSize(10);
+      doc.text(`Generated: ${new Date(data.generatedAt).toLocaleDateString()} at ${new Date(data.generatedAt).toLocaleTimeString()}`, pageWidth / 2, yPos, { align: 'center' });
+      yPos += 10;
+      
+      // Summary Box
+      doc.setFillColor(240, 240, 240);
+      doc.roundedRect(margin, yPos, pageWidth - (margin * 2), 20, 3, 3, 'F');
+      yPos += 5;
+      
+      doc.setFontSize(10);
+      doc.setFont('helvetica', 'bold');
+      const summaryY = yPos + 5;
+      doc.text(`Total Employees: ${data.summary.totalEmployees}`, margin + 10, summaryY);
+      doc.text(`Total Documents: ${data.summary.totalDocuments}`, margin + 70, summaryY);
+      doc.text(`Signatures Required: ${data.summary.totalSignaturesRequired}`, margin + 130, summaryY);
+      doc.text(`Completed: ${data.summary.completedSignatures}`, margin + 195, summaryY);
+      
+      // Compliance percentage with color
+      const compliancePercent = data.summary.overallCompliancePercent;
+      if (compliancePercent === 100) {
+        doc.setTextColor(0, 128, 0);
+      } else if (compliancePercent >= 70) {
+        doc.setTextColor(200, 150, 0);
+      } else {
+        doc.setTextColor(200, 0, 0);
+      }
+      doc.text(`Overall Compliance: ${compliancePercent}%`, pageWidth - margin - 10, summaryY, { align: 'right' });
+      doc.setTextColor(0, 0, 0);
+      
+      yPos += 25;
+      
+      // Table Header
+      const colWidths = {
+        employee: 50,
+        status: (pageWidth - margin * 2 - 50) / Math.max(data.documents.length, 1),
+      };
+      
+      doc.setFillColor(50, 50, 50);
+      doc.rect(margin, yPos, pageWidth - margin * 2, 8, 'F');
+      
+      doc.setTextColor(255, 255, 255);
+      doc.setFontSize(9);
+      doc.setFont('helvetica', 'bold');
+      doc.text('Employee', margin + 2, yPos + 5.5);
+      
+      // Document column headers (truncated if needed)
+      let xPos = margin + colWidths.employee;
+      data.documents.forEach((docItem: any) => {
+        let docName = docItem.name;
+        if (docItem.type === 'health_safety_manual') docName = 'H&S Manual';
+        else if (docItem.type === 'company_policy') docName = 'Company Policy';
+        else if (docName.length > 15) docName = docName.substring(0, 12) + '...';
+        
+        doc.text(docName, xPos + 2, yPos + 5.5, { maxWidth: colWidths.status - 4 });
+        xPos += colWidths.status;
+      });
+      
+      doc.setTextColor(0, 0, 0);
+      yPos += 10;
+      
+      // Employee rows
+      doc.setFont('helvetica', 'normal');
+      let rowIndex = 0;
+      
+      for (const employee of data.employees) {
+        // Check if we need a new page
+        if (yPos > pageHeight - 25) {
+          doc.addPage();
+          yPos = margin;
+          
+          // Re-draw header on new page
+          doc.setFillColor(50, 50, 50);
+          doc.rect(margin, yPos, pageWidth - margin * 2, 8, 'F');
+          
+          doc.setTextColor(255, 255, 255);
+          doc.setFont('helvetica', 'bold');
+          doc.text('Employee', margin + 2, yPos + 5.5);
+          
+          xPos = margin + colWidths.employee;
+          data.documents.forEach((docItem: any) => {
+            let docName = docItem.name;
+            if (docItem.type === 'health_safety_manual') docName = 'H&S Manual';
+            else if (docItem.type === 'company_policy') docName = 'Company Policy';
+            else if (docName.length > 15) docName = docName.substring(0, 12) + '...';
+            
+            doc.text(docName, xPos + 2, yPos + 5.5, { maxWidth: colWidths.status - 4 });
+            xPos += colWidths.status;
+          });
+          
+          doc.setTextColor(0, 0, 0);
+          doc.setFont('helvetica', 'normal');
+          yPos += 10;
+        }
+        
+        // Alternating row colors
+        if (rowIndex % 2 === 0) {
+          doc.setFillColor(248, 248, 248);
+          doc.rect(margin, yPos - 1, pageWidth - margin * 2, 8, 'F');
+        }
+        
+        // Employee name
+        doc.setFontSize(8);
+        let empName = employee.employeeName;
+        if (empName.length > 25) empName = empName.substring(0, 22) + '...';
+        doc.text(empName, margin + 2, yPos + 4);
+        
+        // Document status for each document
+        xPos = margin + colWidths.employee;
+        for (const docStatus of employee.documents) {
+          if (docStatus.status === 'signed') {
+            doc.setTextColor(0, 128, 0);
+            doc.text('SIGNED', xPos + 2, yPos + 4);
+            if (docStatus.signedAt) {
+              doc.setTextColor(100, 100, 100);
+              doc.setFontSize(6);
+              doc.text(new Date(docStatus.signedAt).toLocaleDateString(), xPos + 2, yPos + 7);
+              doc.setFontSize(8);
+            }
+          } else if (docStatus.status === 'viewed') {
+            doc.setTextColor(200, 150, 0);
+            doc.text('VIEWED', xPos + 2, yPos + 4);
+          } else {
+            doc.setTextColor(200, 0, 0);
+            doc.text('PENDING', xPos + 2, yPos + 4);
+          }
+          doc.setTextColor(0, 0, 0);
+          xPos += colWidths.status;
+        }
+        
+        yPos += 9;
+        rowIndex++;
+      }
+      
+      // Footer
+      yPos += 5;
+      doc.setFontSize(8);
+      doc.setTextColor(100, 100, 100);
+      doc.text('This document was generated automatically from the OnRopePro Document Management System.', pageWidth / 2, yPos, { align: 'center' });
+      
+      // Save the PDF
+      doc.save(`Document_Compliance_Report_${new Date().toISOString().split('T')[0]}.pdf`);
+      
+      toast({
+        title: "Success",
+        description: "Compliance report downloaded successfully",
+      });
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to download compliance report",
+        variant: "destructive",
+      });
+    } finally {
+      setDownloadingComplianceReport(false);
+    }
+  };
+
   const handleDocumentUpload = async (file: File, documentType: 'health_safety_manual' | 'company_policy' | 'certificate_of_insurance' | 'safe_work_procedure') => {
     const setUploading = documentType === 'health_safety_manual' 
       ? setUploadingHealthSafety 
@@ -3231,6 +3426,20 @@ export default function Documents() {
                       </CardDescription>
                     </div>
                     <div className="flex items-center gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={downloadComplianceReport}
+                        disabled={downloadingComplianceReport}
+                        data-testid="button-download-compliance-report"
+                      >
+                        {downloadingComplianceReport ? (
+                          <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                        ) : (
+                          <Download className="h-4 w-4 mr-2" />
+                        )}
+                        Download Report
+                      </Button>
                       <Badge 
                         variant={compliancePercent === 100 ? "default" : "secondary"} 
                         className={`text-base font-semibold px-3 ${compliancePercent === 100 ? 'bg-emerald-500' : ''}`}
