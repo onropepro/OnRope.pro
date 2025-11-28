@@ -3,7 +3,7 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { db } from "./db";
 import { wsHub } from "./websocket-hub";
-import { insertUserSchema, insertClientSchema, insertProjectSchema, insertDropLogSchema, insertComplaintSchema, insertComplaintNoteSchema, insertJobCommentSchema, insertHarnessInspectionSchema, insertToolboxMeetingSchema, insertFlhaFormSchema, insertIncidentReportSchema, insertMethodStatementSchema, insertPayPeriodConfigSchema, insertQuoteSchema, insertQuoteServiceSchema, insertGearItemSchema, insertGearAssignmentSchema, insertGearSerialNumberSchema, insertScheduledJobSchema, insertJobAssignmentSchema, updatePropertyManagerAccountSchema, normalizeStrataPlan, type InsertGearItem, type InsertGearAssignment, type InsertGearSerialNumber, type Project, gearAssignments, gearSerialNumbers, jobAssignments, workSessions, nonBillableWorkSessions, licenseKeys, users, propertyManagerCompanyLinks, IRATA_TASK_TYPES } from "@shared/schema";
+import { insertUserSchema, insertClientSchema, insertProjectSchema, insertDropLogSchema, insertComplaintSchema, insertComplaintNoteSchema, insertJobCommentSchema, insertHarnessInspectionSchema, insertToolboxMeetingSchema, insertFlhaFormSchema, insertIncidentReportSchema, insertMethodStatementSchema, insertPayPeriodConfigSchema, insertQuoteSchema, insertQuoteServiceSchema, insertGearItemSchema, insertGearAssignmentSchema, insertGearSerialNumberSchema, insertScheduledJobSchema, insertJobAssignmentSchema, updatePropertyManagerAccountSchema, normalizeStrataPlan, type InsertGearItem, type InsertGearAssignment, type InsertGearSerialNumber, type Project, gearAssignments, gearSerialNumbers, gearItems, jobAssignments, workSessions, nonBillableWorkSessions, licenseKeys, users, propertyManagerCompanyLinks, IRATA_TASK_TYPES } from "@shared/schema";
 import { eq, sql } from "drizzle-orm";
 import { z } from "zod";
 import bcrypt from "bcrypt";
@@ -6438,6 +6438,78 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Validation error", errors: error.errors });
       }
       console.error("Create gear assignment error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Self-assign gear - allows any employee to assign gear to themselves
+  app.post("/api/gear-assignments/self", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      const companyId = currentUser.role === "company" ? currentUser.id : currentUser.companyId;
+      
+      if (!companyId) {
+        return res.status(400).json({ message: "Unable to determine company" });
+      }
+      
+      // Verify the gear item belongs to the same company
+      const gearItem = await db.select().from(gearItems).where(eq(gearItems.id, req.body.gearItemId)).limit(1);
+      
+      if (!gearItem.length || gearItem[0].companyId !== companyId) {
+        return res.status(404).json({ message: "Gear item not found" });
+      }
+      
+      // Create assignment to self
+      const assignment = await storage.createGearAssignment({
+        gearItemId: req.body.gearItemId,
+        companyId,
+        employeeId: currentUser.id, // Always assign to self
+        quantity: parseInt(req.body.quantity) || 1,
+        serialNumber: req.body.serialNumber || undefined,
+        dateOfManufacture: req.body.dateOfManufacture || undefined,
+        dateInService: req.body.dateInService || undefined,
+      });
+      
+      res.json({ assignment });
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Validation error", errors: error.errors });
+      }
+      console.error("Self-assign gear error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Remove self-assigned gear
+  app.delete("/api/gear-assignments/self/:id", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      // Verify the assignment belongs to the current user
+      const assignment = await db.select().from(gearAssignments).where(eq(gearAssignments.id, req.params.id)).limit(1);
+      
+      if (!assignment.length) {
+        return res.status(404).json({ message: "Assignment not found" });
+      }
+      
+      if (assignment[0].employeeId !== currentUser.id) {
+        return res.status(403).json({ message: "You can only remove your own gear assignments" });
+      }
+      
+      await storage.deleteGearAssignment(req.params.id);
+      
+      res.json({ message: "Gear assignment removed" });
+    } catch (error) {
+      console.error("Remove self-assigned gear error:", error);
       res.status(500).json({ message: "Internal server error" });
     }
   });

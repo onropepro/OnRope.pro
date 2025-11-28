@@ -1,9 +1,15 @@
-import { useQuery } from "@tanstack/react-query";
+import { useState } from "react";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useLocation } from "wouter";
 import { hasFinancialAccess } from "@/lib/permissions";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { useToast } from "@/hooks/use-toast";
+import { queryClient, apiRequest } from "@/lib/queryClient";
 
 const EQUIPMENT_ICONS: Record<string, string> = {
   Harness: "security",
@@ -26,6 +32,11 @@ const EQUIPMENT_ICONS: Record<string, string> = {
 
 export default function MyGear() {
   const [, setLocation] = useLocation();
+  const { toast } = useToast();
+  const [showAddGearDialog, setShowAddGearDialog] = useState(false);
+  const [selectedGearItem, setSelectedGearItem] = useState<any>(null);
+  const [assignQuantity, setAssignQuantity] = useState(1);
+  const [searchQuery, setSearchQuery] = useState("");
 
   const { data: userData } = useQuery<{ user: any }>({
     queryKey: ["/api/user"],
@@ -42,6 +53,22 @@ export default function MyGear() {
   // Filter gear items assigned to current user
   const myGear = allGearItems.filter((item: any) => item.assignedTo === currentUser?.name);
 
+  // Available gear items (inventory items that can be assigned)
+  const availableGear = allGearItems.filter((item: any) => 
+    item.inService !== false && 
+    (item.quantity || 0) > 0
+  );
+
+  // Filter available gear based on search
+  const filteredAvailableGear = availableGear.filter((item: any) => {
+    const searchLower = searchQuery.toLowerCase();
+    return (
+      item.equipmentType?.toLowerCase().includes(searchLower) ||
+      item.brand?.toLowerCase().includes(searchLower) ||
+      item.model?.toLowerCase().includes(searchLower)
+    );
+  });
+
   // Calculate totals
   const totalItems = myGear.reduce((sum: number, item: any) => sum + (item.quantity || 0), 0);
   const totalValue = myGear.reduce((sum: number, item: any) => {
@@ -49,6 +76,61 @@ export default function MyGear() {
     const qty = item.quantity || 0;
     return sum + (price * qty);
   }, 0);
+
+  // Self-assign gear mutation
+  const assignGearMutation = useMutation({
+    mutationFn: async (data: { gearItemId: string; quantity: number }) => {
+      return apiRequest("POST", "/api/gear-assignments/self", data);
+    },
+    onSuccess: () => {
+      toast({
+        title: "Gear Added",
+        description: "Equipment has been added to your gear.",
+      });
+      queryClient.invalidateQueries({ queryKey: ["/api/gear-items"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/gear-assignments"] });
+      setShowAddGearDialog(false);
+      setSelectedGearItem(null);
+      setAssignQuantity(1);
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to add gear",
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Remove self-assigned gear mutation
+  const removeGearMutation = useMutation({
+    mutationFn: async (assignmentId: string) => {
+      return apiRequest("DELETE", `/api/gear-assignments/self/${assignmentId}`, {});
+    },
+    onSuccess: () => {
+      toast({
+        title: "Gear Removed",
+        description: "Equipment has been removed from your gear.",
+      });
+      queryClient.invalidateQueries({ queryKey: ["/api/gear-items"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/gear-assignments"] });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to remove gear",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const handleAssignGear = () => {
+    if (!selectedGearItem) return;
+    assignGearMutation.mutate({
+      gearItemId: selectedGearItem.id,
+      quantity: assignQuantity,
+    });
+  };
 
   if (isLoading) {
     return (
@@ -81,6 +163,13 @@ export default function MyGear() {
               </p>
             </div>
           </div>
+          <Button
+            onClick={() => setShowAddGearDialog(true)}
+            data-testid="button-add-gear"
+          >
+            <span className="material-icons text-sm mr-1">add</span>
+            Add Gear
+          </Button>
         </div>
       </header>
 
@@ -130,6 +219,14 @@ export default function MyGear() {
                   <p className="text-sm text-muted-foreground mt-1">
                     You don't have any equipment assigned yet.
                   </p>
+                  <Button
+                    className="mt-4"
+                    onClick={() => setShowAddGearDialog(true)}
+                    data-testid="button-add-gear-empty"
+                  >
+                    <span className="material-icons text-sm mr-1">add</span>
+                    Add Gear from Inventory
+                  </Button>
                 </div>
               </div>
             </CardContent>
@@ -165,14 +262,28 @@ export default function MyGear() {
                             </div>
                           )}
                         </div>
-                        <div className="text-right">
-                          <div className="font-semibold text-lg">
-                            {item.quantity} {item.quantity === 1 ? 'item' : 'items'}
-                          </div>
-                          {canSeeFinancials && item.itemPrice && (
-                            <div className="text-sm text-muted-foreground">
-                              ${parseFloat(item.itemPrice).toFixed(2)} each
+                        <div className="text-right flex items-start gap-2">
+                          <div>
+                            <div className="font-semibold text-lg">
+                              {item.quantity} {item.quantity === 1 ? 'item' : 'items'}
                             </div>
+                            {canSeeFinancials && item.itemPrice && (
+                              <div className="text-sm text-muted-foreground">
+                                ${parseFloat(item.itemPrice).toFixed(2)} each
+                              </div>
+                            )}
+                          </div>
+                          {item.assignmentId && (
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="text-destructive hover:text-destructive"
+                              onClick={() => removeGearMutation.mutate(item.assignmentId)}
+                              disabled={removeGearMutation.isPending}
+                              data-testid={`button-remove-gear-${item.id}`}
+                            >
+                              <span className="material-icons text-sm">close</span>
+                            </Button>
                           )}
                         </div>
                       </div>
@@ -234,6 +345,118 @@ export default function MyGear() {
           </div>
         )}
       </div>
+
+      {/* Add Gear Dialog */}
+      <Dialog open={showAddGearDialog} onOpenChange={setShowAddGearDialog}>
+        <DialogContent className="max-w-2xl max-h-[80vh] overflow-hidden flex flex-col">
+          <DialogHeader>
+            <DialogTitle>Add Gear to My Equipment</DialogTitle>
+            <DialogDescription>
+              Select equipment from the company inventory to add to your gear.
+            </DialogDescription>
+          </DialogHeader>
+
+          {/* Search */}
+          <div className="relative">
+            <span className="material-icons absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">search</span>
+            <Input
+              placeholder="Search equipment..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-9"
+              data-testid="input-search-gear"
+            />
+          </div>
+
+          {/* Gear List */}
+          <div className="flex-1 overflow-y-auto space-y-2 min-h-0">
+            {filteredAvailableGear.length === 0 ? (
+              <div className="text-center py-8 text-muted-foreground">
+                <span className="material-icons text-4xl mb-2 opacity-50">inventory_2</span>
+                <div>No equipment available</div>
+              </div>
+            ) : (
+              filteredAvailableGear.map((item: any) => (
+                <div
+                  key={item.id}
+                  className={`p-3 border rounded-lg cursor-pointer transition-colors hover-elevate ${
+                    selectedGearItem?.id === item.id
+                      ? "border-primary bg-primary/5"
+                      : "border-border"
+                  }`}
+                  onClick={() => setSelectedGearItem(item)}
+                  data-testid={`gear-item-${item.id}`}
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="h-10 w-10 rounded-lg bg-muted flex items-center justify-center flex-shrink-0">
+                      <span className="material-icons text-muted-foreground">
+                        {EQUIPMENT_ICONS[item.equipmentType] || "category"}
+                      </span>
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="font-medium">{item.equipmentType}</div>
+                      {(item.brand || item.model) && (
+                        <div className="text-sm text-muted-foreground">
+                          {[item.brand, item.model].filter(Boolean).join(" - ")}
+                        </div>
+                      )}
+                    </div>
+                    <div className="text-right text-sm">
+                      <div className="font-medium">{item.quantity} available</div>
+                    </div>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+
+          {/* Quantity and Confirm */}
+          {selectedGearItem && (
+            <div className="pt-4 border-t space-y-4">
+              <div className="flex items-center gap-4">
+                <div className="flex-1">
+                  <Label htmlFor="quantity">Quantity to assign</Label>
+                  <Input
+                    id="quantity"
+                    type="number"
+                    min={1}
+                    max={selectedGearItem.quantity || 1}
+                    value={assignQuantity}
+                    onChange={(e) => setAssignQuantity(Math.max(1, parseInt(e.target.value) || 1))}
+                    className="mt-1"
+                    data-testid="input-assign-quantity"
+                  />
+                </div>
+                <div className="flex-1 text-sm text-muted-foreground">
+                  <div className="font-medium">{selectedGearItem.equipmentType}</div>
+                  <div>{selectedGearItem.quantity} available in inventory</div>
+                </div>
+              </div>
+              <div className="flex gap-2">
+                <Button
+                  variant="outline"
+                  className="flex-1"
+                  onClick={() => {
+                    setSelectedGearItem(null);
+                    setShowAddGearDialog(false);
+                  }}
+                  data-testid="button-cancel-add-gear"
+                >
+                  Cancel
+                </Button>
+                <Button
+                  className="flex-1"
+                  onClick={handleAssignGear}
+                  disabled={assignGearMutation.isPending}
+                  data-testid="button-confirm-add-gear"
+                >
+                  {assignGearMutation.isPending ? "Adding..." : "Add to My Gear"}
+                </Button>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
