@@ -4209,6 +4209,35 @@ export default function Dashboard() {
                                 )}
                               </div>
                             )}
+
+                            {/* Permissions - show for non-company roles */}
+                            {employee.role !== "company" && (
+                              <div className="text-xs text-muted-foreground space-y-1 pt-2 border-t">
+                                <div className="flex items-center gap-2">
+                                  <span className="material-icons text-sm">security</span>
+                                  <span className="font-medium">Permissions</span>
+                                </div>
+                                {employee.permissions && employee.permissions.length > 0 ? (
+                                  <div className="ml-6 flex flex-wrap gap-1 mt-1">
+                                    {employee.permissions.map((permId: string) => {
+                                      const perm = AVAILABLE_PERMISSIONS.find(p => p.id === permId);
+                                      return perm ? (
+                                        <Badge 
+                                          key={permId} 
+                                          variant="outline" 
+                                          className="text-[10px] py-0 px-1.5"
+                                          data-testid={`badge-permission-${employee.id}-${permId}`}
+                                        >
+                                          {perm.label}
+                                        </Badge>
+                                      ) : null;
+                                    })}
+                                  </div>
+                                ) : (
+                                  <div className="ml-6 text-muted-foreground/60 italic">No permissions assigned</div>
+                                )}
+                              </div>
+                            )}
                           </div>
                         </CardContent>
                       </Card>
