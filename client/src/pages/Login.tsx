@@ -797,7 +797,41 @@ export default function Login() {
                 PROPERTY MANAGER
               </Button>
 
-{/* SuperUser quick login button - hidden in production */}
+              <Button
+                variant="outline"
+                size="sm"
+                className="text-xs bg-purple-600 hover:bg-purple-700 text-white border-purple-600"
+                onClick={async () => {
+                  try {
+                    const response = await fetch("/api/login", {
+                      method: "POST",
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify({ identifier: "superuser", password: "superuser123" }),
+                      credentials: "include",
+                    });
+                    const result = await response.json();
+                    if (response.ok) {
+                      window.location.href = "/superuser";
+                    } else {
+                      toast({
+                        title: "Quick Login Failed",
+                        description: result.message || "SuperUser account not found",
+                        variant: "destructive",
+                      });
+                    }
+                  } catch (error) {
+                    toast({
+                      title: "Login Error",
+                      description: "Network error. Please try manual login.",
+                      variant: "destructive",
+                    });
+                  }
+                }}
+                data-testid="button-quick-login-superuser"
+              >
+                <span className="material-icons mr-1 text-base">flash_on</span>
+                SUPERUSER
+              </Button>
             </div>
 
             <div className="relative">
