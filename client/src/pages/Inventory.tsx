@@ -850,18 +850,13 @@ export default function Inventory() {
   // Helper function to check if employee had a work session on a given date
   const hadWorkSession = (employeeId: string, date: Date): boolean => {
     const dateStr = format(date, 'yyyy-MM-dd');
-    const found = allSessions.some((session: any) => {
+    return allSessions.some((session: any) => {
       if (session.employeeId !== employeeId) return false;
       // Use workDate field (YYYY-MM-DD string) or fall back to startTime
       const sessionDateStr = session.workDate || (session.startTime ? format(new Date(session.startTime), 'yyyy-MM-dd') : null);
       if (!sessionDateStr) return false;
       return sessionDateStr === dateStr;
     });
-    // Debug log for specific dates
-    if (dateStr === '2025-11-26' || dateStr === '2025-11-22' || dateStr === '2025-11-25') {
-      console.log(`hadWorkSession(${employeeId.slice(0,8)}..., ${dateStr}) = ${found}`);
-    }
-    return found;
   };
 
   // Helper function to check if employee submitted harness inspection for a given date

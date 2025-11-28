@@ -2770,30 +2770,59 @@ export default function Documents() {
             </CardHeader>
             <CardContent className="pt-6">
               {allDocuments.length > 0 ? (
-                <div className="space-y-3">
-                  {allDocuments.map((doc, index) => {
-                    const filename = doc.url.split('/').pop() || 'Document';
-                    return (
-                      <div key={index} className="flex items-center gap-4 p-4 rounded-xl border bg-card hover-elevate active-elevate-2">
-                        <div className="p-2 bg-teal-500/10 rounded-lg">
-                          <FileText className="h-5 w-5 text-teal-600 dark:text-teal-400 flex-shrink-0" />
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <div className="font-semibold truncate">{doc.projectName}</div>
-                          <div className="text-sm text-muted-foreground truncate">{filename}</div>
-                        </div>
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() => window.open(doc.url, '_blank')}
-                          data-testid={`download-pdf-${index}`}
-                        >
-                          <Download className="h-4 w-4 mr-1" />
-                          Download
-                        </Button>
-                      </div>
-                    );
-                  })}
+                <div className="space-y-2">
+                  {groupDocumentsByDate(allDocuments, (d: any) => d.date).map((yearGroup) => (
+                    <Collapsible key={yearGroup.year} defaultOpen={yearGroup.year === new Date().getFullYear()}>
+                      <CollapsibleTrigger className="group flex items-center gap-2 w-full p-3 rounded-lg bg-teal-500/5 hover-elevate" data-testid={`toggle-docs-year-${yearGroup.year}`}>
+                        <ChevronRight className="h-4 w-4 text-teal-600 dark:text-teal-400 transition-transform duration-200 rotate-0 group-data-[state=open]:rotate-90" />
+                        <FolderOpen className="h-4 w-4 text-teal-600 dark:text-teal-400" />
+                        <span className="font-semibold text-teal-600 dark:text-teal-400">{yearGroup.year}</span>
+                        <Badge variant="secondary" className="ml-auto">{yearGroup.totalCount}</Badge>
+                      </CollapsibleTrigger>
+                      <CollapsibleContent className="pl-4 mt-2 space-y-2">
+                        {yearGroup.months.map((monthGroup) => (
+                          <Collapsible key={monthGroup.month} defaultOpen={yearGroup.year === new Date().getFullYear() && monthGroup.month === new Date().getMonth()}>
+                            <CollapsibleTrigger className="group flex items-center gap-2 w-full p-2 rounded-md bg-teal-500/5 hover-elevate" data-testid={`toggle-docs-month-${yearGroup.year}-${monthGroup.month}`}>
+                              <ChevronRight className="h-3 w-3 text-muted-foreground transition-transform duration-200 rotate-0 group-data-[state=open]:rotate-90" />
+                              <span className="font-medium">{monthGroup.monthName}</span>
+                              <Badge variant="outline" className="ml-auto text-xs">{monthGroup.totalCount}</Badge>
+                            </CollapsibleTrigger>
+                            <CollapsibleContent className="pl-4 mt-2 space-y-2">
+                              {monthGroup.days.map((dayGroup) => (
+                                <div key={dayGroup.date} className="space-y-2">
+                                  <div className="flex items-center gap-2 text-sm text-muted-foreground py-1">
+                                    <Calendar className="h-3 w-3" />
+                                    <span className="font-medium">{dayGroup.formattedDate}</span>
+                                    <span className="text-xs">({dayGroup.items.length})</span>
+                                  </div>
+                                  <div className="space-y-2 pl-5">
+                                    {dayGroup.items.map((doc: any, index: number) => {
+                                      const filename = doc.url.split('/').pop() || 'Document';
+                                      return (
+                                        <div key={index} className="flex items-center gap-4 p-3 rounded-lg border bg-card hover-elevate active-elevate-2">
+                                          <div className="p-2 bg-teal-500/10 rounded-lg">
+                                            <FileText className="h-4 w-4 text-teal-600 dark:text-teal-400 flex-shrink-0" />
+                                          </div>
+                                          <div className="flex-1 min-w-0">
+                                            <div className="font-medium text-sm truncate">{doc.projectName}</div>
+                                            <div className="text-xs text-muted-foreground truncate">{filename}</div>
+                                          </div>
+                                          <Button size="sm" variant="outline" onClick={() => window.open(doc.url, '_blank')} data-testid={`download-doc-${index}`}>
+                                            <Download className="h-3 w-3 mr-1" />
+                                            Download
+                                          </Button>
+                                        </div>
+                                      );
+                                    })}
+                                  </div>
+                                </div>
+                              ))}
+                            </CollapsibleContent>
+                          </Collapsible>
+                        ))}
+                      </CollapsibleContent>
+                    </Collapsible>
+                  ))}
                 </div>
               ) : (
                 <div className="text-center py-12">
@@ -2826,35 +2855,55 @@ export default function Documents() {
           </CardHeader>
           <CardContent className="pt-6">
             {meetings.length > 0 ? (
-              <div className="space-y-3">
-                {meetings.map((meeting) => (
-                  <div key={meeting.id} className="flex items-center gap-4 p-4 rounded-xl border bg-card hover-elevate active-elevate-2">
-                    <div className="p-2 bg-cyan-500/10 rounded-lg">
-                      <Calendar className="h-5 w-5 text-cyan-600 dark:text-cyan-400 flex-shrink-0" />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="font-semibold">
-                        {formatLocalDate(meeting.meetingDate, { 
-                          weekday: 'short', 
-                          year: 'numeric', 
-                          month: 'short', 
-                          day: 'numeric' 
-                        })}
-                      </div>
-                      <div className="text-sm text-muted-foreground">
-                        Conducted by {meeting.conductedByName}
-                      </div>
-                    </div>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() => downloadToolboxMeeting(meeting)}
-                      data-testid={`download-meeting-${meeting.id}`}
-                    >
-                      <Download className="h-4 w-4 mr-1" />
-                      Download
-                    </Button>
-                  </div>
+              <div className="space-y-2">
+                {groupDocumentsByDate(meetings, (m: any) => m.meetingDate).map((yearGroup) => (
+                  <Collapsible key={yearGroup.year} defaultOpen={yearGroup.year === new Date().getFullYear()}>
+                    <CollapsibleTrigger className="group flex items-center gap-2 w-full p-3 rounded-lg bg-cyan-500/5 hover-elevate" data-testid={`toggle-meetings-outer-year-${yearGroup.year}`}>
+                      <ChevronRight className="h-4 w-4 text-cyan-600 dark:text-cyan-400 transition-transform duration-200 rotate-0 group-data-[state=open]:rotate-90" />
+                      <FolderOpen className="h-4 w-4 text-cyan-600 dark:text-cyan-400" />
+                      <span className="font-semibold text-cyan-600 dark:text-cyan-400">{yearGroup.year}</span>
+                      <Badge variant="secondary" className="ml-auto">{yearGroup.totalCount}</Badge>
+                    </CollapsibleTrigger>
+                    <CollapsibleContent className="pl-4 mt-2 space-y-2">
+                      {yearGroup.months.map((monthGroup) => (
+                        <Collapsible key={monthGroup.month} defaultOpen={yearGroup.year === new Date().getFullYear() && monthGroup.month === new Date().getMonth()}>
+                          <CollapsibleTrigger className="group flex items-center gap-2 w-full p-2 rounded-md bg-cyan-500/5 hover-elevate" data-testid={`toggle-meetings-outer-month-${yearGroup.year}-${monthGroup.month}`}>
+                            <ChevronRight className="h-3 w-3 text-muted-foreground transition-transform duration-200 rotate-0 group-data-[state=open]:rotate-90" />
+                            <span className="font-medium">{monthGroup.monthName}</span>
+                            <Badge variant="outline" className="ml-auto text-xs">{monthGroup.totalCount}</Badge>
+                          </CollapsibleTrigger>
+                          <CollapsibleContent className="pl-4 mt-2 space-y-2">
+                            {monthGroup.days.map((dayGroup) => (
+                              <div key={dayGroup.date} className="space-y-2">
+                                <div className="flex items-center gap-2 text-sm text-muted-foreground py-1">
+                                  <Calendar className="h-3 w-3" />
+                                  <span className="font-medium">{dayGroup.formattedDate}</span>
+                                  <span className="text-xs">({dayGroup.items.length})</span>
+                                </div>
+                                <div className="space-y-2 pl-5">
+                                  {dayGroup.items.map((meeting: any) => (
+                                    <div key={meeting.id} className="flex items-center gap-4 p-3 rounded-lg border bg-card hover-elevate active-elevate-2">
+                                      <div className="p-2 bg-cyan-500/10 rounded-lg">
+                                        <Calendar className="h-4 w-4 text-cyan-600 dark:text-cyan-400 flex-shrink-0" />
+                                      </div>
+                                      <div className="flex-1 min-w-0">
+                                        <div className="font-medium text-sm">{meeting.conductedByName}</div>
+                                        <div className="text-xs text-muted-foreground">{meeting.projectName || 'Team meeting'}</div>
+                                      </div>
+                                      <Button size="sm" variant="outline" onClick={() => downloadToolboxMeeting(meeting)} data-testid={`download-meeting-outer-${meeting.id}`}>
+                                        <Download className="h-3 w-3 mr-1" />
+                                        Download
+                                      </Button>
+                                    </div>
+                                  ))}
+                                </div>
+                              </div>
+                            ))}
+                          </CollapsibleContent>
+                        </Collapsible>
+                      ))}
+                    </CollapsibleContent>
+                  </Collapsible>
                 ))}
               </div>
             ) : (

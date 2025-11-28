@@ -6145,12 +6145,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
         assignedByItem.set(assignment.gearItemId, current + (assignment.quantity || 0));
       }
       
-      // Debug log
-      console.log(`[DEBUG] Company ${companyId}: Found ${allAssignments.length} assignments`);
-      for (const [itemId, qty] of assignedByItem.entries()) {
-        console.log(`[DEBUG] Item ${itemId}: assignedQuantity = ${qty}`);
-      }
-      
       // Filter out financial data if user doesn't have permission
       const hasFinancialPermission = currentUser.role === "company" || 
         (currentUser.permissions && currentUser.permissions.includes("view_financial_data"));
