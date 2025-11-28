@@ -3935,11 +3935,11 @@ export default function Dashboard() {
                                 </Button>
                               </div>
                             </div>
-                            <div className="space-y-4">
+                            <div className="space-y-6">
                               {PERMISSION_CATEGORIES.map((category) => (
-                                <div key={category.name} className="space-y-2">
-                                  <h4 className="text-sm font-medium text-muted-foreground border-b pb-1">{category.name}</h4>
-                                  <div className="grid grid-cols-2 gap-2">
+                                <div key={category.name}>
+                                  <h4 className="text-xs font-semibold text-primary uppercase tracking-wider mb-3">{category.name}</h4>
+                                  <div className="grid grid-cols-2 gap-x-4 gap-y-2">
                                     {category.permissions.map((permission) => (
                                       <FormField
                                         key={permission.id}
@@ -3949,7 +3949,7 @@ export default function Dashboard() {
                                           return (
                                             <FormItem
                                               key={permission.id}
-                                              className="flex flex-row items-start space-x-2 space-y-0 bg-muted/30 p-2 rounded-md"
+                                              className="flex flex-row items-center space-x-2 space-y-0"
                                             >
                                               <FormControl>
                                                 <Checkbox
@@ -3966,7 +3966,7 @@ export default function Dashboard() {
                                                   data-testid={`checkbox-permission-${permission.id}`}
                                                 />
                                               </FormControl>
-                                              <FormLabel className="text-xs font-normal leading-tight cursor-pointer">
+                                              <FormLabel className="text-sm font-normal cursor-pointer">
                                                 {permission.label}
                                               </FormLabel>
                                             </FormItem>
@@ -5721,11 +5721,11 @@ export default function Dashboard() {
                           </Button>
                         </div>
                       </div>
-                      <div className="space-y-4">
+                      <div className="space-y-6">
                         {PERMISSION_CATEGORIES.map((category) => (
-                          <div key={category.name} className="space-y-2">
-                            <h4 className="text-sm font-medium text-muted-foreground border-b pb-1">{category.name}</h4>
-                            <div className="grid grid-cols-2 gap-2">
+                          <div key={category.name}>
+                            <h4 className="text-xs font-semibold text-primary uppercase tracking-wider mb-3">{category.name}</h4>
+                            <div className="grid grid-cols-2 gap-x-4 gap-y-2">
                               {category.permissions.map((permission) => (
                                 <FormField
                                   key={permission.id}
@@ -5735,7 +5735,7 @@ export default function Dashboard() {
                                     return (
                                       <FormItem
                                         key={permission.id}
-                                        className="flex flex-row items-start space-x-2 space-y-0 bg-muted/30 p-2 rounded-md"
+                                        className="flex flex-row items-center space-x-2 space-y-0"
                                       >
                                         <FormControl>
                                           <Checkbox
@@ -5752,7 +5752,7 @@ export default function Dashboard() {
                                             data-testid={`checkbox-edit-permission-${permission.id}`}
                                           />
                                         </FormControl>
-                                        <FormLabel className="text-xs font-normal leading-tight cursor-pointer">
+                                        <FormLabel className="text-sm font-normal cursor-pointer">
                                           {permission.label}
                                         </FormLabel>
                                       </FormItem>
