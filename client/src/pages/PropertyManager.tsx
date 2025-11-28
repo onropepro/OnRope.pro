@@ -832,43 +832,45 @@ export default function PropertyManager() {
                   
                   {isLoadingDocuments ? (
                     <div className="text-sm text-muted-foreground">Loading documents...</div>
-                  ) : vendorDocumentsData?.documents && vendorDocumentsData.documents.length > 0 ? (
-                    <div className="space-y-2">
-                      {vendorDocumentsData.documents.map((doc) => {
-                        const docTypeLabels: Record<string, string> = {
-                          'certificate_of_insurance': 'Certificate of Insurance',
-                          'health_safety_manual': 'Health & Safety Manual',
-                          'company_policy': 'Company Policy',
-                        };
-                        return (
-                          <div key={doc.id} className="flex items-center justify-between bg-background rounded-md px-3 py-2 border">
-                            <div className="flex items-center gap-2">
-                              <FileCheck className="w-4 h-4 text-green-600 dark:text-green-400" />
-                              <div>
-                                <p className="text-sm font-medium">
-                                  {docTypeLabels[doc.documentType] || doc.documentType}
-                                </p>
-                                <p className="text-xs text-muted-foreground">{doc.fileName}</p>
+                  ) : (() => {
+                    // Filter to only show Certificate of Insurance - exclude Company Policy and Health & Safety Manual
+                    const visibleDocs = (vendorDocumentsData?.documents || []).filter(
+                      (doc) => doc.documentType === 'certificate_of_insurance'
+                    );
+                    
+                    if (visibleDocs.length > 0) {
+                      return (
+                        <div className="space-y-2">
+                          {visibleDocs.map((doc) => (
+                            <div key={doc.id} className="flex items-center justify-between bg-background rounded-md px-3 py-2 border">
+                              <div className="flex items-center gap-2">
+                                <FileCheck className="w-4 h-4 text-green-600 dark:text-green-400" />
+                                <div>
+                                  <p className="text-sm font-medium">Certificate of Insurance</p>
+                                  <p className="text-xs text-muted-foreground">{doc.fileName}</p>
+                                </div>
                               </div>
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={() => window.open(doc.fileUrl, '_blank')}
+                                data-testid={`button-view-document-${doc.id}`}
+                              >
+                                <Download className="w-4 h-4 mr-1" />
+                                View
+                              </Button>
                             </div>
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              onClick={() => window.open(doc.fileUrl, '_blank')}
-                              data-testid={`button-view-document-${doc.id}`}
-                            >
-                              <Download className="w-4 h-4 mr-1" />
-                              View
-                            </Button>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  ) : (
-                    <p className="text-sm text-muted-foreground bg-muted/50 px-3 py-2 rounded-md">
-                      No safety documents available from this vendor.
-                    </p>
-                  )}
+                          ))}
+                        </div>
+                      );
+                    }
+                    
+                    return (
+                      <p className="text-sm text-muted-foreground bg-muted/50 px-3 py-2 rounded-md">
+                        No Certificate of Insurance available from this vendor.
+                      </p>
+                    );
+                  })()}
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
