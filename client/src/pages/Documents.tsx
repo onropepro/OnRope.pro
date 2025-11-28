@@ -2800,9 +2800,9 @@ export default function Documents() {
       
       const data = await response.json();
       
-      // Create PDF
+      // Create PDF - Portrait for better readability
       const doc = new jsPDF({
-        orientation: 'landscape',
+        orientation: 'portrait',
         unit: 'mm',
         format: 'a4',
       });
@@ -2812,155 +2812,168 @@ export default function Documents() {
       const margin = 15;
       let yPos = margin;
       
+      const checkNewPage = (neededSpace: number) => {
+        if (yPos + neededSpace > pageHeight - 20) {
+          doc.addPage();
+          yPos = margin;
+          return true;
+        }
+        return false;
+      };
+      
       // Header
-      doc.setFontSize(18);
+      doc.setFontSize(20);
       doc.setFont('helvetica', 'bold');
-      doc.text('Document Signature Compliance Report', pageWidth / 2, yPos, { align: 'center' });
-      yPos += 10;
+      doc.text('Document Compliance Report', pageWidth / 2, yPos, { align: 'center' });
+      yPos += 8;
       
       doc.setFontSize(12);
       doc.setFont('helvetica', 'normal');
+      doc.setTextColor(80, 80, 80);
       doc.text(data.companyName, pageWidth / 2, yPos, { align: 'center' });
-      yPos += 6;
-      
-      doc.setFontSize(10);
-      doc.text(`Generated: ${new Date(data.generatedAt).toLocaleDateString()} at ${new Date(data.generatedAt).toLocaleTimeString()}`, pageWidth / 2, yPos, { align: 'center' });
-      yPos += 10;
-      
-      // Summary Box
-      doc.setFillColor(240, 240, 240);
-      doc.roundedRect(margin, yPos, pageWidth - (margin * 2), 20, 3, 3, 'F');
       yPos += 5;
       
-      doc.setFontSize(10);
-      doc.setFont('helvetica', 'bold');
-      const summaryY = yPos + 5;
-      doc.text(`Total Employees: ${data.summary.totalEmployees}`, margin + 10, summaryY);
-      doc.text(`Total Documents: ${data.summary.totalDocuments}`, margin + 70, summaryY);
-      doc.text(`Signatures Required: ${data.summary.totalSignaturesRequired}`, margin + 130, summaryY);
-      doc.text(`Completed: ${data.summary.completedSignatures}`, margin + 195, summaryY);
-      
-      // Compliance percentage with color
-      const compliancePercent = data.summary.overallCompliancePercent;
-      if (compliancePercent === 100) {
-        doc.setTextColor(0, 128, 0);
-      } else if (compliancePercent >= 70) {
-        doc.setTextColor(200, 150, 0);
-      } else {
-        doc.setTextColor(200, 0, 0);
-      }
-      doc.text(`Overall Compliance: ${compliancePercent}%`, pageWidth - margin - 10, summaryY, { align: 'right' });
-      doc.setTextColor(0, 0, 0);
-      
-      yPos += 25;
-      
-      // Table Header
-      const colWidths = {
-        employee: 50,
-        status: (pageWidth - margin * 2 - 50) / Math.max(data.documents.length, 1),
-      };
-      
-      doc.setFillColor(50, 50, 50);
-      doc.rect(margin, yPos, pageWidth - margin * 2, 8, 'F');
-      
-      doc.setTextColor(255, 255, 255);
       doc.setFontSize(9);
-      doc.setFont('helvetica', 'bold');
-      doc.text('Employee', margin + 2, yPos + 5.5);
+      doc.text(`Generated: ${new Date(data.generatedAt).toLocaleDateString('en-US', { 
+        year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' 
+      })}`, pageWidth / 2, yPos, { align: 'center' });
+      doc.setTextColor(0, 0, 0);
+      yPos += 12;
       
-      // Document column headers (truncated if needed)
-      let xPos = margin + colWidths.employee;
-      data.documents.forEach((docItem: any) => {
-        let docName = docItem.name;
-        if (docItem.type === 'health_safety_manual') docName = 'H&S Manual';
-        else if (docItem.type === 'company_policy') docName = 'Company Policy';
-        else if (docName.length > 15) docName = docName.substring(0, 12) + '...';
+      // Summary Cards Row
+      const cardWidth = (pageWidth - margin * 2 - 15) / 4;
+      const cardHeight = 22;
+      const cards = [
+        { label: 'Staff Members', value: data.summary.totalEmployees.toString(), color: [59, 130, 246] },
+        { label: 'Documents', value: data.summary.totalDocuments.toString(), color: [139, 92, 246] },
+        { label: 'Signed', value: `${data.summary.completedSignatures}/${data.summary.totalSignaturesRequired}`, color: [34, 197, 94] },
+        { label: 'Compliance', value: `${data.summary.overallCompliancePercent}%`, color: data.summary.overallCompliancePercent >= 80 ? [34, 197, 94] : data.summary.overallCompliancePercent >= 50 ? [234, 179, 8] : [239, 68, 68] },
+      ];
+      
+      cards.forEach((card, idx) => {
+        const xStart = margin + idx * (cardWidth + 5);
+        doc.setFillColor(card.color[0], card.color[1], card.color[2]);
+        doc.roundedRect(xStart, yPos, cardWidth, cardHeight, 2, 2, 'F');
         
-        doc.text(docName, xPos + 2, yPos + 5.5, { maxWidth: colWidths.status - 4 });
-        xPos += colWidths.status;
+        doc.setTextColor(255, 255, 255);
+        doc.setFontSize(16);
+        doc.setFont('helvetica', 'bold');
+        doc.text(card.value, xStart + cardWidth / 2, yPos + 10, { align: 'center' });
+        
+        doc.setFontSize(8);
+        doc.setFont('helvetica', 'normal');
+        doc.text(card.label, xStart + cardWidth / 2, yPos + 17, { align: 'center' });
       });
       
       doc.setTextColor(0, 0, 0);
-      yPos += 10;
+      yPos += cardHeight + 12;
       
-      // Employee rows
-      doc.setFont('helvetica', 'normal');
-      let rowIndex = 0;
-      
+      // Employee Sections
       for (const employee of data.employees) {
-        // Check if we need a new page
-        if (yPos > pageHeight - 25) {
-          doc.addPage();
-          yPos = margin;
-          
-          // Re-draw header on new page
-          doc.setFillColor(50, 50, 50);
-          doc.rect(margin, yPos, pageWidth - margin * 2, 8, 'F');
-          
-          doc.setTextColor(255, 255, 255);
-          doc.setFont('helvetica', 'bold');
-          doc.text('Employee', margin + 2, yPos + 5.5);
-          
-          xPos = margin + colWidths.employee;
-          data.documents.forEach((docItem: any) => {
-            let docName = docItem.name;
-            if (docItem.type === 'health_safety_manual') docName = 'H&S Manual';
-            else if (docItem.type === 'company_policy') docName = 'Company Policy';
-            else if (docName.length > 15) docName = docName.substring(0, 12) + '...';
-            
-            doc.text(docName, xPos + 2, yPos + 5.5, { maxWidth: colWidths.status - 4 });
-            xPos += colWidths.status;
-          });
-          
-          doc.setTextColor(0, 0, 0);
-          doc.setFont('helvetica', 'normal');
-          yPos += 10;
+        const signedDocs = employee.documents.filter((d: any) => d.status === 'signed');
+        const pendingDocs = employee.documents.filter((d: any) => d.status !== 'signed');
+        const employeeBlockHeight = 18 + (employee.documents.length * 7);
+        
+        checkNewPage(employeeBlockHeight);
+        
+        // Employee Header
+        doc.setFillColor(245, 245, 245);
+        doc.roundedRect(margin, yPos, pageWidth - margin * 2, 14, 2, 2, 'F');
+        
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(11);
+        doc.text(employee.employeeName, margin + 4, yPos + 9);
+        
+        // Status badge
+        const isComplete = signedDocs.length === employee.documents.length;
+        const badgeText = isComplete ? 'COMPLETE' : `${signedDocs.length}/${employee.documents.length} Signed`;
+        const badgeWidth = doc.getTextWidth(badgeText) + 8;
+        const badgeX = pageWidth - margin - badgeWidth - 4;
+        
+        if (isComplete) {
+          doc.setFillColor(34, 197, 94);
+        } else {
+          doc.setFillColor(234, 179, 8);
         }
+        doc.roundedRect(badgeX, yPos + 3, badgeWidth, 8, 1.5, 1.5, 'F');
         
-        // Alternating row colors
-        if (rowIndex % 2 === 0) {
-          doc.setFillColor(248, 248, 248);
-          doc.rect(margin, yPos - 1, pageWidth - margin * 2, 8, 'F');
-        }
+        doc.setTextColor(255, 255, 255);
+        doc.setFontSize(7);
+        doc.setFont('helvetica', 'bold');
+        doc.text(badgeText, badgeX + badgeWidth / 2, yPos + 8.5, { align: 'center' });
+        doc.setTextColor(0, 0, 0);
         
-        // Employee name
-        doc.setFontSize(8);
-        let empName = employee.employeeName;
-        if (empName.length > 25) empName = empName.substring(0, 22) + '...';
-        doc.text(empName, margin + 2, yPos + 4);
+        yPos += 16;
         
-        // Document status for each document
-        xPos = margin + colWidths.employee;
-        for (const docStatus of employee.documents) {
-          if (docStatus.status === 'signed') {
-            doc.setTextColor(0, 128, 0);
-            doc.text('SIGNED', xPos + 2, yPos + 4);
-            if (docStatus.signedAt) {
-              doc.setTextColor(100, 100, 100);
-              doc.setFontSize(6);
-              doc.text(new Date(docStatus.signedAt).toLocaleDateString(), xPos + 2, yPos + 7);
-              doc.setFontSize(8);
-            }
-          } else if (docStatus.status === 'viewed') {
-            doc.setTextColor(200, 150, 0);
-            doc.text('VIEWED', xPos + 2, yPos + 4);
-          } else {
-            doc.setTextColor(200, 0, 0);
-            doc.text('PENDING', xPos + 2, yPos + 4);
+        // Document list with two columns
+        const colWidth = (pageWidth - margin * 2 - 10) / 2;
+        let leftCol = margin;
+        let rightCol = margin + colWidth + 10;
+        let currentCol = 'left';
+        let leftY = yPos;
+        let rightY = yPos;
+        
+        employee.documents.forEach((docItem: any, idx: number) => {
+          const xStart = currentCol === 'left' ? leftCol : rightCol;
+          const currentY = currentCol === 'left' ? leftY : rightY;
+          
+          // Check if we need new page
+          if (currentY > pageHeight - 20) {
+            doc.addPage();
+            yPos = margin;
+            leftY = margin;
+            rightY = margin;
           }
-          doc.setTextColor(0, 0, 0);
-          xPos += colWidths.status;
-        }
+          
+          // Status indicator
+          if (docItem.status === 'signed') {
+            doc.setFillColor(220, 252, 231);
+            doc.setDrawColor(34, 197, 94);
+          } else if (docItem.status === 'viewed') {
+            doc.setFillColor(254, 249, 195);
+            doc.setDrawColor(234, 179, 8);
+          } else {
+            doc.setFillColor(254, 226, 226);
+            doc.setDrawColor(239, 68, 68);
+          }
+          doc.roundedRect(xStart, currentY, colWidth, 6.5, 1, 1, 'FD');
+          
+          // Document name (truncate if needed)
+          let docName = docItem.documentName;
+          if (docItem.documentType === 'health_safety_manual') docName = 'Health & Safety Manual';
+          else if (docItem.documentType === 'company_policy') docName = 'Company Policy';
+          if (docName.length > 35) docName = docName.substring(0, 32) + '...';
+          
+          doc.setFont('helvetica', 'normal');
+          doc.setFontSize(7);
+          doc.setTextColor(50, 50, 50);
+          doc.text(docName, xStart + 2, currentY + 4.5);
+          
+          // Status text
+          const statusText = docItem.status === 'signed' 
+            ? `Signed ${new Date(docItem.signedAt).toLocaleDateString()}` 
+            : docItem.status === 'viewed' ? 'Viewed' : 'Pending';
+          doc.setFontSize(6);
+          doc.setTextColor(100, 100, 100);
+          doc.text(statusText, xStart + colWidth - 2, currentY + 4.5, { align: 'right' });
+          
+          // Alternate columns
+          if (currentCol === 'left') {
+            leftY += 7.5;
+            currentCol = 'right';
+          } else {
+            rightY += 7.5;
+            currentCol = 'left';
+          }
+        });
         
-        yPos += 9;
-        rowIndex++;
+        yPos = Math.max(leftY, rightY) + 6;
       }
       
-      // Footer
-      yPos += 5;
+      // Footer on last page
       doc.setFontSize(8);
-      doc.setTextColor(100, 100, 100);
-      doc.text('This document was generated automatically from the OnRopePro Document Management System.', pageWidth / 2, yPos, { align: 'center' });
+      doc.setTextColor(120, 120, 120);
+      doc.text('Generated by OnRopePro Document Management System', pageWidth / 2, pageHeight - 10, { align: 'center' });
       
       // Save the PDF
       doc.save(`Document_Compliance_Report_${new Date().toISOString().split('T')[0]}.pdf`);
