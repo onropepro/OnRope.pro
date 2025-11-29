@@ -663,7 +663,7 @@ export default function Dashboard() {
     s.endTime !== null && // Session is completed
     s.dailyDropTarget != null && // Has a drop target (excludes non-drop-based work)
     s.dailyDropTarget > 0 && // Target is meaningful
-    s.techName // Has a valid employee name (checking truthiness instead of != null)
+    s.employeeName // Has a valid employee name (API returns employeeName field)
   );
   const targetMetCount = completedSessions.filter((s: any) => s.dropsCompleted >= s.dailyDropTarget).length;
   const belowTargetCount = completedSessions.filter((s: any) => s.dropsCompleted < s.dailyDropTarget).length;
@@ -3223,11 +3223,11 @@ export default function Dashboard() {
                       {(() => {
                         // Group sessions by employee
                         const sessionsByEmployee = completedSessions.reduce((acc: any, session: any) => {
-                          const employeeName = session.techName || 'Unknown';
-                          if (!acc[employeeName]) {
-                            acc[employeeName] = [];
+                          const name = session.employeeName || 'Unknown';
+                          if (!acc[name]) {
+                            acc[name] = [];
                           }
-                          acc[employeeName].push(session);
+                          acc[name].push(session);
                           return acc;
                         }, {});
 
