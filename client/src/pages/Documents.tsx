@@ -10,7 +10,7 @@ import { Progress } from "@/components/ui/progress";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Calendar as CalendarComponent } from "@/components/ui/calendar";
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { FileText, Download, Calendar, DollarSign, Upload, Trash2, Shield, BookOpen, ArrowLeft, AlertTriangle, Plus, FileCheck, ChevronDown, ChevronRight, FolderOpen, CalendarRange, Package, Loader2, Users, Eye, PenLine, Clock, CheckCircle2, AlertCircle } from "lucide-react";
@@ -695,12 +695,33 @@ interface SafeWorkPractice {
   title: string;
   description: string;
   category: string;
+  icon: any;
   keyPrinciples: string[];
   requirements: string[];
   doList: string[];
   dontList: string[];
   emergencyActions: string[];
 }
+
+// Helper to get topics from a practice template
+const getPracticeTopics = (practice: SafeWorkPractice): string[] => {
+  return practice.keyPrinciples.slice(0, 5);
+};
+
+// Helper to generate content from a practice template
+const getPracticeContent = (practice: SafeWorkPractice): string => {
+  let content = `KEY PRINCIPLES:\n`;
+  practice.keyPrinciples.forEach(p => content += `- ${p}\n`);
+  content += `\nREQUIREMENTS:\n`;
+  practice.requirements.forEach(r => content += `- ${r}\n`);
+  content += `\nDO:\n`;
+  practice.doList.forEach(d => content += `- ${d}\n`);
+  content += `\nDON'T:\n`;
+  practice.dontList.forEach(d => content += `- ${d}\n`);
+  content += `\nEMERGENCY ACTIONS:\n`;
+  practice.emergencyActions.forEach(e => content += `- ${e}\n`);
+  return content;
+};
 
 // Safe Work Practice Templates
 const SAFE_WORK_PRACTICES: SafeWorkPractice[] = [
@@ -709,6 +730,7 @@ const SAFE_WORK_PRACTICES: SafeWorkPractice[] = [
     title: 'Personal Protective Equipment (PPE)',
     description: 'Guidelines for proper selection, use, and maintenance of personal protective equipment in rope access operations.',
     category: 'General Safety',
+    icon: Shield,
     keyPrinciples: [
       'PPE is the last line of defense - engineering controls come first',
       'All PPE must be inspected before each use',
@@ -752,6 +774,7 @@ const SAFE_WORK_PRACTICES: SafeWorkPractice[] = [
     title: 'Fall Protection',
     description: 'Essential practices for preventing falls from height during rope access operations.',
     category: 'Working at Heights',
+    icon: AlertTriangle,
     keyPrinciples: [
       'Falls from height are the leading cause of fatalities in construction',
       'Dual rope systems provide redundancy for safety',
@@ -794,6 +817,7 @@ const SAFE_WORK_PRACTICES: SafeWorkPractice[] = [
     title: 'Manual Handling',
     description: 'Safe practices for lifting, carrying, and moving materials during work operations.',
     category: 'Ergonomics',
+    icon: Package,
     keyPrinciples: [
       'Back injuries are often preventable with proper technique',
       'Use mechanical aids whenever possible',
@@ -835,6 +859,7 @@ const SAFE_WORK_PRACTICES: SafeWorkPractice[] = [
     title: 'Heat and Cold Stress Prevention',
     description: 'Managing environmental temperature extremes to protect worker health and safety.',
     category: 'Environmental',
+    icon: Calendar,
     keyPrinciples: [
       'Both heat and cold can cause serious medical emergencies',
       'Acclimatization takes time - build up exposure gradually',
@@ -876,6 +901,7 @@ const SAFE_WORK_PRACTICES: SafeWorkPractice[] = [
     title: 'Chemical Safety',
     description: 'Safe handling, storage, and use of cleaning chemicals and hazardous substances.',
     category: 'Hazardous Materials',
+    icon: AlertCircle,
     keyPrinciples: [
       'All chemicals can be hazardous if misused',
       'Safety Data Sheets (SDS) contain critical safety information',
@@ -917,6 +943,7 @@ const SAFE_WORK_PRACTICES: SafeWorkPractice[] = [
     title: 'Tool and Equipment Safety',
     description: 'Safe practices for using hand tools, power tools, and equipment at height.',
     category: 'Equipment',
+    icon: Package,
     keyPrinciples: [
       'Tools can become deadly projectiles if dropped from height',
       'All tools must be tethered when working at height',
@@ -958,6 +985,7 @@ const SAFE_WORK_PRACTICES: SafeWorkPractice[] = [
     title: 'Emergency Response',
     description: 'Procedures for responding to emergencies during rope access operations.',
     category: 'Emergency',
+    icon: AlertTriangle,
     keyPrinciples: [
       'Every site must have an emergency response plan',
       'All workers must know the rescue procedure',
@@ -1002,6 +1030,7 @@ const SAFE_WORK_PRACTICES: SafeWorkPractice[] = [
     title: 'Communication Protocols',
     description: 'Effective communication practices for safe rope access operations.',
     category: 'Operations',
+    icon: Users,
     keyPrinciples: [
       'Clear communication prevents accidents',
       'Standardized signals ensure understanding',
@@ -1043,6 +1072,7 @@ const SAFE_WORK_PRACTICES: SafeWorkPractice[] = [
     title: 'Fatigue and Wellbeing',
     description: 'Managing fatigue and maintaining physical and mental wellbeing for safe work.',
     category: 'Health',
+    icon: Clock,
     keyPrinciples: [
       'Fatigue significantly increases risk of accidents',
       'Physical and mental health affect work performance',
@@ -1084,6 +1114,7 @@ const SAFE_WORK_PRACTICES: SafeWorkPractice[] = [
     title: 'Worksite Housekeeping',
     description: 'Maintaining clean and organized work areas for safety and efficiency.',
     category: 'General Safety',
+    icon: FolderOpen,
     keyPrinciples: [
       'Good housekeeping prevents slips, trips, and falls',
       'Organized work areas improve efficiency',
@@ -3719,14 +3750,16 @@ export default function Documents() {
     }
   };
 
-  const handleDocumentUpload = async (file: File, documentType: 'health_safety_manual' | 'company_policy' | 'certificate_of_insurance' | 'safe_work_procedure') => {
+  const handleDocumentUpload = async (file: File, documentType: 'health_safety_manual' | 'company_policy' | 'certificate_of_insurance' | 'safe_work_procedure' | 'safe_work_practice') => {
     const setUploading = documentType === 'health_safety_manual' 
       ? setUploadingHealthSafety 
       : documentType === 'company_policy' 
         ? setUploadingPolicy 
         : documentType === 'certificate_of_insurance'
           ? setUploadingInsurance
-          : setUploadingSWP;
+          : documentType === 'safe_work_procedure'
+            ? setUploadingSWP
+            : setUploadingSWP; // Reuse SWP state for Safe Work Practices
     
     setUploading(true);
     try {
@@ -4381,6 +4414,12 @@ export default function Documents() {
                   <div className="flex items-center gap-2">
                     <FileText className="h-4 w-4" />
                     Safe Work Procedures
+                  </div>
+                </SelectItem>
+                <SelectItem value="safe-work-practices" data-testid="option-safe-work-practices">
+                  <div className="flex items-center gap-2">
+                    <Shield className="h-4 w-4" />
+                    Safe Work Practices
                   </div>
                 </SelectItem>
                 <SelectItem value="inspections-safety" data-testid="option-inspections-safety">
@@ -5081,6 +5120,216 @@ export default function Documents() {
                     These are template Safe Work Procedures. Review and customize them to match your specific 
                     site conditions, equipment, and company policies before use. Always conduct a site-specific 
                     risk assessment for each job.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </TabsContent>
+
+          {/* Safe Work Practices Tab */}
+          <TabsContent value="safe-work-practices">
+            <Card className="mb-6 overflow-hidden">
+              <CardHeader className="bg-gradient-to-br from-primary/10 via-primary/5 to-transparent pb-4">
+                <div className="flex items-start gap-4">
+                  <div className="p-3 bg-primary/10 rounded-xl ring-1 ring-primary/20">
+                    <Shield className="h-6 w-6 text-primary" />
+                  </div>
+                  <div className="flex-1">
+                    <CardTitle className="text-xl mb-1">Safe Work Practices</CardTitle>
+                    <p className="text-sm text-muted-foreground">
+                      General safety guidelines that apply across all rope access operations
+                    </p>
+                  </div>
+                  <Badge variant="secondary" className="text-base font-semibold px-3">
+                    {companyDocuments.filter((doc: any) => doc.documentType === 'safe_work_practice').length}
+                  </Badge>
+                </div>
+              </CardHeader>
+              <CardContent className="pt-6">
+                {canUploadDocuments && (
+                  <div className="mb-6 p-5 border-2 border-dashed rounded-xl bg-muted/30 hover-elevate">
+                    <label htmlFor="safe-work-practice-upload" className="block mb-3 text-sm font-semibold flex items-center gap-2">
+                      <Upload className="h-4 w-4" />
+                      Upload Safe Work Practice Document
+                    </label>
+                    <Input
+                      id="safe-work-practice-upload"
+                      type="file"
+                      accept=".pdf,.doc,.docx"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) {
+                          handleDocumentUpload(file, 'safe_work_practice');
+                          e.target.value = '';
+                        }
+                      }}
+                      data-testid="input-safe-work-practice-upload"
+                    />
+                    <p className="text-xs text-muted-foreground mt-2">
+                      Upload general safety practice documents. Employees will be automatically enrolled for review and signature.
+                    </p>
+                  </div>
+                )}
+                
+                {companyDocuments.filter((doc: any) => doc.documentType === 'safe_work_practice').length > 0 ? (
+                  <div className="space-y-3">
+                    {companyDocuments.filter((doc: any) => doc.documentType === 'safe_work_practice').map((doc: any) => (
+                      <div key={doc.id} className="flex items-center gap-4 p-4 rounded-xl border bg-card hover-elevate active-elevate-2">
+                        <div className="p-2 bg-primary/10 rounded-lg">
+                          <Shield className="h-5 w-5 text-primary flex-shrink-0" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="font-medium truncate">{doc.fileName}</div>
+                          <div className="text-xs text-muted-foreground">
+                            Uploaded by {doc.uploadedByName} on {formatLocalDate(doc.uploadedAt)}
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          {doc.fileUrl && (
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => window.open(doc.fileUrl, '_blank')}
+                              data-testid={`view-swpractice-${doc.id}`}
+                            >
+                              <Eye className="h-3 w-3 mr-1" />
+                              View
+                            </Button>
+                          )}
+                          {canUploadDocuments && (
+                            <Button
+                              size="sm"
+                              variant="destructive"
+                              onClick={() => handleDeleteDocument(doc.id)}
+                              data-testid={`delete-swpractice-${doc.id}`}
+                            >
+                              <Trash2 className="h-3 w-3" />
+                            </Button>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-12">
+                    <div className="inline-flex p-4 bg-primary/5 rounded-full mb-4">
+                      <Shield className="h-8 w-8 text-primary/50" />
+                    </div>
+                    <p className="text-muted-foreground font-medium">No Safe Work Practice documents uploaded</p>
+                    <p className="text-sm text-muted-foreground mt-1">
+                      Upload general safety practice documents that apply across all operations
+                    </p>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+
+            {/* Template Safe Work Practices */}
+            <Card className="mb-6 overflow-hidden">
+              <CardHeader className="bg-gradient-to-br from-amber-500/10 via-amber-500/5 to-transparent pb-4">
+                <div className="flex items-start gap-4">
+                  <div className="p-3 bg-amber-500/10 rounded-xl ring-1 ring-amber-500/20">
+                    <BookOpen className="h-6 w-6 text-amber-600 dark:text-amber-400" />
+                  </div>
+                  <div className="flex-1">
+                    <CardTitle className="text-xl mb-1">General Safety Practice Templates</CardTitle>
+                    <p className="text-sm text-muted-foreground">
+                      Pre-built templates covering essential safety topics for rope access operations
+                    </p>
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent className="pt-6">
+                <div className="grid gap-4 md:grid-cols-2">
+                  {SAFE_WORK_PRACTICES.map((practice) => (
+                    <Card key={practice.id} className="overflow-hidden">
+                      <CardHeader className="pb-2">
+                        <div className="flex items-start gap-3">
+                          <div className="p-2 bg-amber-500/10 rounded-lg">
+                            <practice.icon className="h-4 w-4 text-amber-600 dark:text-amber-400" />
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <CardTitle className="text-sm font-medium">{practice.title}</CardTitle>
+                            <CardDescription className="text-xs mt-1 line-clamp-2">
+                              {practice.description}
+                            </CardDescription>
+                          </div>
+                        </div>
+                      </CardHeader>
+                      <CardContent className="pt-2">
+                        <div className="flex flex-wrap gap-1 mb-3">
+                          {getPracticeTopics(practice).slice(0, 3).map((topic, idx) => (
+                            <Badge key={idx} variant="secondary" className="text-xs">
+                              {topic}
+                            </Badge>
+                          ))}
+                          {getPracticeTopics(practice).length > 3 && (
+                            <Badge variant="outline" className="text-xs">
+                              +{getPracticeTopics(practice).length - 3} more
+                            </Badge>
+                          )}
+                        </div>
+                        <div className="flex gap-2">
+                          <Dialog>
+                            <DialogTrigger asChild>
+                              <Button size="sm" variant="outline" className="flex-1" data-testid={`preview-swpractice-${practice.id}`}>
+                                <Eye className="h-3 w-3 mr-1" />
+                                Preview
+                              </Button>
+                            </DialogTrigger>
+                            <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+                              <DialogHeader>
+                                <DialogTitle className="flex items-center gap-2">
+                                  <practice.icon className="h-5 w-5 text-amber-600" />
+                                  {practice.title}
+                                </DialogTitle>
+                                <DialogDescription>{practice.description}</DialogDescription>
+                              </DialogHeader>
+                              <div className="space-y-4 mt-4">
+                                <div>
+                                  <h4 className="font-medium text-sm mb-2">Key Principles</h4>
+                                  <ul className="list-disc pl-5 text-sm text-muted-foreground space-y-1">
+                                    {practice.keyPrinciples.map((principle, idx) => (
+                                      <li key={idx}>{principle}</li>
+                                    ))}
+                                  </ul>
+                                </div>
+                                <div>
+                                  <h4 className="font-medium text-sm mb-2">Content</h4>
+                                  <div className="text-sm text-muted-foreground whitespace-pre-wrap bg-muted/30 p-4 rounded-lg">
+                                    {getPracticeContent(practice)}
+                                  </div>
+                                </div>
+                              </div>
+                              <DialogFooter className="mt-4">
+                                <Button variant="outline" onClick={() => generateSafeWorkPracticePDF(practice)} data-testid={`download-preview-swpractice-${practice.id}`}>
+                                  <Download className="h-4 w-4 mr-2" />
+                                  Download PDF
+                                </Button>
+                              </DialogFooter>
+                            </DialogContent>
+                          </Dialog>
+                          <Button size="sm" variant="default" onClick={() => generateSafeWorkPracticePDF(practice)} data-testid={`download-swpractice-${practice.id}`}>
+                            <Download className="h-3 w-3 mr-1" />
+                            PDF
+                          </Button>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+
+            <div className="p-4 bg-muted/50 rounded-lg">
+              <div className="flex items-start gap-3">
+                <AlertTriangle className="h-5 w-5 text-amber-500 flex-shrink-0 mt-0.5" />
+                <div>
+                  <h4 className="font-medium text-sm mb-1">Template Notice</h4>
+                  <p className="text-xs text-muted-foreground">
+                    These are template Safe Work Practices. Review and customize them to match your specific 
+                    company policies and operational requirements. Ensure all employees are trained and 
+                    acknowledge these practices before work commences.
                   </p>
                 </div>
               </div>
