@@ -4103,9 +4103,6 @@ export default function Documents() {
           );
         })()}
 
-        {/* Document Reviews - for employees to review and sign required documents */}
-        <DocumentReviews companyDocuments={[...healthSafetyDocs, ...policyDocs]} />
-
         {/* Admin View: Employee Document Compliance Status */}
         {canUploadDocuments && (
           (() => {
@@ -4382,6 +4379,9 @@ export default function Documents() {
             );
           })()
         )}
+
+        {/* Document Reviews - for employees to review and sign required documents */}
+        <DocumentReviews companyDocuments={[...healthSafetyDocs, ...policyDocs]} />
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <div className="mb-6">
