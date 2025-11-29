@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
+import { useTranslation } from "react-i18next";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -25,6 +26,7 @@ interface CompanyLink {
 }
 
 export default function PropertyManagerSettings() {
+  const { t } = useTranslation();
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [newCompanyCode, setNewCompanyCode] = useState("");
   const { toast } = useToast();
@@ -44,14 +46,14 @@ export default function PropertyManagerSettings() {
       setIsAddDialogOpen(false);
       setNewCompanyCode("");
       toast({
-        title: "Success",
-        description: "Company link added successfully",
+        title: t('propertyManagerSettings.successTitle', 'Success'),
+        description: t('propertyManagerSettings.companyAdded', 'Company link added successfully'),
       });
     },
     onError: (error: Error) => {
       toast({
-        title: "Error",
-        description: error.message || "Failed to add company link",
+        title: t('propertyManagerSettings.errorTitle', 'Error'),
+        description: error.message || t('propertyManagerSettings.failedToAddLink', 'Failed to add company link'),
         variant: "destructive",
       });
     },
@@ -65,14 +67,14 @@ export default function PropertyManagerSettings() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/property-manager/company-links"] });
       toast({
-        title: "Success",
-        description: "Company link removed successfully",
+        title: t('propertyManagerSettings.successTitle', 'Success'),
+        description: t('propertyManagerSettings.companyRemoved', 'Company link removed successfully'),
       });
     },
     onError: (error: Error) => {
       toast({
-        title: "Error",
-        description: error.message || "Failed to remove company link",
+        title: t('propertyManagerSettings.errorTitle', 'Error'),
+        description: error.message || t('propertyManagerSettings.failedToRemoveLink', 'Failed to remove company link'),
         variant: "destructive",
       });
     },
@@ -81,8 +83,8 @@ export default function PropertyManagerSettings() {
   const handleAddCompanyCode = () => {
     if (!newCompanyCode || newCompanyCode.length !== 10) {
       toast({
-        title: "Invalid Code",
-        description: "Company code must be exactly 10 characters",
+        title: t('propertyManagerSettings.invalidCodeTitle', 'Invalid Code'),
+        description: t('propertyManagerSettings.invalidCodeMessage', 'Company code must be exactly 10 characters'),
         variant: "destructive",
       });
       return;
@@ -92,7 +94,7 @@ export default function PropertyManagerSettings() {
   };
 
   const handleRemoveCompanyLink = (linkId: string, companyName: string) => {
-    if (window.confirm(`Are you sure you want to remove access to ${companyName}?`)) {
+    if (window.confirm(t('propertyManagerSettings.confirmRemove', 'Are you sure you want to remove access to {{companyName}}?', { companyName }))) {
       removeCompanyLinkMutation.mutate(linkId);
     }
   };
@@ -100,40 +102,40 @@ export default function PropertyManagerSettings() {
   return (
     <div className="container max-w-4xl mx-auto p-6 space-y-6">
       <div>
-        <h1 className="text-3xl font-bold">Company Access</h1>
+        <h1 className="text-3xl font-bold">{t('propertyManagerSettings.title', 'Company Access')}</h1>
         <p className="text-muted-foreground mt-2">
-          Manage your access to rope access companies
+          {t('propertyManagerSettings.subtitle', 'Manage your access to rope access companies')}
         </p>
       </div>
 
       <Card>
         <CardHeader className="flex flex-row items-center justify-between gap-2 space-y-0 pb-2">
           <div>
-            <CardTitle>Linked Companies</CardTitle>
+            <CardTitle>{t('propertyManagerSettings.linkedCompanies', 'Linked Companies')}</CardTitle>
             <CardDescription>
-              View buildings and projects from these companies
+              {t('propertyManagerSettings.linkedCompaniesDesc', 'View buildings and projects from these companies')}
             </CardDescription>
           </div>
           <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
             <DialogTrigger asChild>
               <Button data-testid="button-add-company">
                 <Plus className="h-4 w-4 mr-2" />
-                Add Company
+                {t('propertyManagerSettings.addCompany', 'Add Company')}
               </Button>
             </DialogTrigger>
             <DialogContent>
               <DialogHeader>
-                <DialogTitle>Add Company Access</DialogTitle>
+                <DialogTitle>{t('propertyManagerSettings.addCompanyAccess', 'Add Company Access')}</DialogTitle>
                 <DialogDescription>
-                  Enter the 10-character company code provided by the rope access company
+                  {t('propertyManagerSettings.addCompanyDesc', 'Enter the 10-character company code provided by the rope access company')}
                 </DialogDescription>
               </DialogHeader>
               <div className="space-y-4 mt-4">
                 <div className="space-y-2">
-                  <Label htmlFor="company-code">Company Code</Label>
+                  <Label htmlFor="company-code">{t('propertyManagerSettings.companyCode', 'Company Code')}</Label>
                   <Input
                     id="company-code"
-                    placeholder="ABC1234567"
+                    placeholder={t('propertyManagerSettings.companyCodePlaceholder', 'ABC1234567')}
                     value={newCompanyCode}
                     onChange={(e) => setNewCompanyCode(e.target.value.toUpperCase())}
                     maxLength={10}
@@ -147,7 +149,7 @@ export default function PropertyManagerSettings() {
                   className="w-full"
                   data-testid="button-submit-company-code"
                 >
-                  {addCompanyLinkMutation.isPending ? "Adding..." : "Add Company"}
+                  {addCompanyLinkMutation.isPending ? t('propertyManagerSettings.adding', 'Adding...') : t('propertyManagerSettings.addCompany', 'Add Company')}
                 </Button>
               </div>
             </DialogContent>
@@ -155,24 +157,24 @@ export default function PropertyManagerSettings() {
         </CardHeader>
         <CardContent>
           {isLoading ? (
-            <div className="text-center py-8 text-muted-foreground">Loading...</div>
+            <div className="text-center py-8 text-muted-foreground">{t('propertyManagerSettings.loading', 'Loading...')}</div>
           ) : error ? (
             <div className="text-center py-8">
               <p className="text-destructive font-medium mb-4">
-                Failed to load company links
+                {t('propertyManagerSettings.failedToLoad', 'Failed to load company links')}
               </p>
               <p className="text-sm text-muted-foreground mb-4">
-                {error instanceof Error ? error.message : "An unexpected error occurred"}
+                {error instanceof Error ? error.message : t('propertyManagerSettings.unexpectedError', 'An unexpected error occurred')}
               </p>
               <Button onClick={() => refetch()} variant="outline" data-testid="button-retry">
-                Retry
+                {t('propertyManagerSettings.retry', 'Retry')}
               </Button>
             </div>
           ) : !linksData?.links || linksData.links.length === 0 ? (
             <div className="text-center py-8 text-muted-foreground">
               <Building2 className="h-12 w-12 mx-auto mb-4 opacity-50" />
-              <p>No companies linked yet</p>
-              <p className="text-sm mt-2">Add a company code to view their buildings and projects</p>
+              <p>{t('propertyManagerSettings.noCompaniesLinked', 'No companies linked yet')}</p>
+              <p className="text-sm mt-2">{t('propertyManagerSettings.addCompanyCodeHint', 'Add a company code to view their buildings and projects')}</p>
             </div>
           ) : (
             <div className="space-y-3">
@@ -186,7 +188,7 @@ export default function PropertyManagerSettings() {
                           {link.companyName}
                         </p>
                         <p className="text-sm text-muted-foreground">
-                          Code: {link.companyCode}
+                          {t('propertyManagerSettings.codePrefix', 'Code:')} {link.companyCode}
                         </p>
                       </div>
                     </div>

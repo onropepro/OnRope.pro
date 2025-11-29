@@ -1,8 +1,10 @@
 import { useEffect } from 'react';
 import { useLocation } from 'wouter';
 import { useQuery } from '@tanstack/react-query';
+import { useTranslation } from 'react-i18next';
 
 export default function ResidentLink() {
+  const { t } = useTranslation();
   const [, setLocation] = useLocation();
 
   // Get user info to determine if they're logged in and their role
@@ -49,7 +51,7 @@ export default function ResidentLink() {
   return (
     <div className="flex items-center justify-center min-h-screen">
       <div className="animate-pulse text-muted-foreground">
-        Loading...
+        {t('residentLink.loading', 'Loading...')}
       </div>
     </div>
   );

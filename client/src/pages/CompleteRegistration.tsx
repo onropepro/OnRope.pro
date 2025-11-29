@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
+import { useTranslation } from "react-i18next";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -21,6 +22,7 @@ interface SessionData {
 }
 
 export default function CompleteRegistration() {
+  const { t } = useTranslation();
   const [, setLocation] = useLocation();
   const { toast } = useToast();
   const [sessionData, setSessionData] = useState<SessionData | null>(null);
@@ -42,8 +44,8 @@ export default function CompleteRegistration() {
     if (!sessionId) {
       setLoading(false); // Stop loading state
       toast({
-        title: "Missing Session ID",
-        description: "No checkout session found. Redirecting to license purchase...",
+        title: t('completeRegistration.missingSessionTitle', 'Missing Session ID'),
+        description: t('completeRegistration.missingSessionDesc', 'No checkout session found. Redirecting to license purchase...'),
         variant: "destructive",
       });
       setTimeout(() => setLocation('/get-license'), 3000);
@@ -70,8 +72,8 @@ export default function CompleteRegistration() {
     } catch (error: any) {
       console.error('[CompleteRegistration] Failed to fetch session:', error);
       toast({
-        title: "Error",
-        description: "Failed to retrieve checkout session. Please contact support.",
+        title: t('completeRegistration.errorTitle', 'Error'),
+        description: t('completeRegistration.failedToRetrieve', 'Failed to retrieve checkout session. Please contact support.'),
         variant: "destructive",
       });
       setLoading(false);
@@ -83,8 +85,8 @@ export default function CompleteRegistration() {
       navigator.clipboard.writeText(sessionData.licenseKey);
       setCopiedKey(true);
       toast({
-        title: "Copied!",
-        description: "License key copied to clipboard",
+        title: t('completeRegistration.copied', 'Copied!'),
+        description: t('completeRegistration.copiedDesc', 'License key copied to clipboard'),
       });
       setTimeout(() => setCopiedKey(false), 3000);
     }
@@ -95,8 +97,8 @@ export default function CompleteRegistration() {
 
     if (!sessionData) {
       toast({
-        title: "Error",
-        description: "Session data not available",
+        title: t('completeRegistration.errorTitle', 'Error'),
+        description: t('completeRegistration.sessionDataError', 'Session data not available'),
         variant: "destructive",
       });
       return;
@@ -105,8 +107,8 @@ export default function CompleteRegistration() {
     // Validation
     if (!companyName || !email || !password || !confirmPassword) {
       toast({
-        title: "Validation Error",
-        description: "Please fill in all fields",
+        title: t('completeRegistration.validationError', 'Validation Error'),
+        description: t('completeRegistration.fillAllFields', 'Please fill in all fields'),
         variant: "destructive",
       });
       return;
@@ -114,8 +116,8 @@ export default function CompleteRegistration() {
 
     if (password !== confirmPassword) {
       toast({
-        title: "Validation Error",
-        description: "Passwords do not match",
+        title: t('completeRegistration.validationError', 'Validation Error'),
+        description: t('completeRegistration.passwordsNoMatch', 'Passwords do not match'),
         variant: "destructive",
       });
       return;
@@ -123,8 +125,8 @@ export default function CompleteRegistration() {
 
     if (password.length < 8) {
       toast({
-        title: "Validation Error",
-        description: "Password must be at least 8 characters",
+        title: t('completeRegistration.validationError', 'Validation Error'),
+        description: t('completeRegistration.passwordMinLength', 'Password must be at least 8 characters'),
         variant: "destructive",
       });
       return;
@@ -154,8 +156,8 @@ export default function CompleteRegistration() {
       }
 
       toast({
-        title: "Success!",
-        description: "Your account has been created. Redirecting to your profile...",
+        title: t('completeRegistration.successTitle', 'Success!'),
+        description: t('completeRegistration.accountCreated', 'Your account has been created. Redirecting to your profile...'),
       });
 
       // Redirect to profile page to complete account details
@@ -163,8 +165,8 @@ export default function CompleteRegistration() {
     } catch (error: any) {
       console.error('[CompleteRegistration] Registration error:', error);
       toast({
-        title: "Registration Error",
-        description: error.message || "Failed to create account. Please try again.",
+        title: t('completeRegistration.registrationError', 'Registration Error'),
+        description: error.message || t('completeRegistration.registrationFailed', 'Failed to create account. Please try again.'),
         variant: "destructive",
       });
       setRegistering(false);
@@ -193,12 +195,12 @@ export default function CompleteRegistration() {
           <CardContent className="pt-6">
             <div className="text-center space-y-4">
               <span className="material-icons text-6xl text-destructive">error</span>
-              <h2 className="text-2xl font-bold">Session Not Found</h2>
+              <h2 className="text-2xl font-bold">{t('completeRegistration.sessionNotFound', 'Session Not Found')}</h2>
               <p className="text-muted-foreground">
-                Unable to retrieve checkout session. Please contact support.
+                {t('completeRegistration.sessionNotFoundDesc', 'Unable to retrieve checkout session. Please contact support.')}
               </p>
               <Button onClick={() => setLocation('/get-license')}>
-                Back to License Purchase
+                {t('completeRegistration.backToLicensePurchase', 'Back to License Purchase')}
               </Button>
             </div>
           </CardContent>
@@ -221,8 +223,8 @@ export default function CompleteRegistration() {
               <span className="material-icons text-2xl text-primary">apartment</span>
             </div>
             <div>
-              <h1 className="text-2xl font-bold">Rope Access Pro</h1>
-              <p className="text-sm text-muted-foreground">Complete Your Registration</p>
+              <h1 className="text-2xl font-bold">{t('completeRegistration.header.title', 'Rope Access Pro')}</h1>
+              <p className="text-sm text-muted-foreground">{t('completeRegistration.header.subtitle', 'Complete Your Registration')}</p>
             </div>
           </div>
         </div>
@@ -239,10 +241,10 @@ export default function CompleteRegistration() {
                   <span className="material-icons text-primary text-2xl">check_circle</span>
                 </div>
                 <div className="flex-1">
-                  <h3 className="font-semibold text-lg mb-2">Payment Successful!</h3>
+                  <h3 className="font-semibold text-lg mb-2">{t('completeRegistration.paymentSuccessTitle', 'Payment Successful!')}</h3>
                   <p className="text-sm text-muted-foreground">
-                    Your {sessionData.tierName} subscription has been activated with a 30-day free trial.
-                    {trialEndDate && ` Your trial ends on ${trialEndDate}.`}
+                    {t('completeRegistration.paymentSuccessDesc', 'Your {{tierName}} subscription has been activated with a 30-day free trial.', { tierName: sessionData.tierName })}
+                    {trialEndDate && ` ${t('completeRegistration.trialEnds', 'Your trial ends on {{date}}.', { date: trialEndDate })}`}
                   </p>
                 </div>
               </div>
@@ -254,10 +256,10 @@ export default function CompleteRegistration() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <span className="material-icons text-primary">vpn_key</span>
-                Your License Key
+                {t('completeRegistration.licenseKey', 'Your License Key')}
               </CardTitle>
               <CardDescription>
-                Save this key securely. You'll need it to verify your account in the future.
+                {t('completeRegistration.licenseKeyDesc', "Save this key securely. You'll need it to verify your account in the future.")}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -280,7 +282,7 @@ export default function CompleteRegistration() {
               {/* Subscription Details */}
               <div className="grid grid-cols-2 gap-4 pt-4">
                 <div>
-                  <Label className="text-xs text-muted-foreground">Subscription Tier</Label>
+                  <Label className="text-xs text-muted-foreground">{t('completeRegistration.subscriptionTier', 'Subscription Tier')}</Label>
                   <div className="mt-1">
                     <Badge variant="secondary" className="text-sm">
                       {sessionData.tierName}
@@ -288,22 +290,22 @@ export default function CompleteRegistration() {
                   </div>
                 </div>
                 <div>
-                  <Label className="text-xs text-muted-foreground">Max Projects</Label>
+                  <Label className="text-xs text-muted-foreground">{t('completeRegistration.maxProjects', 'Max Projects')}</Label>
                   <p className="text-sm font-semibold mt-1">
-                    {sessionData.maxProjects === -1 ? 'Unlimited' : sessionData.maxProjects}
+                    {sessionData.maxProjects === -1 ? t('completeRegistration.unlimited', 'Unlimited') : sessionData.maxProjects}
                   </p>
                 </div>
                 <div>
-                  <Label className="text-xs text-muted-foreground">Max Seats</Label>
+                  <Label className="text-xs text-muted-foreground">{t('completeRegistration.maxSeats', 'Max Seats')}</Label>
                   <p className="text-sm font-semibold mt-1">
-                    {sessionData.maxSeats === -1 ? 'Unlimited' : sessionData.maxSeats}
+                    {sessionData.maxSeats === -1 ? t('completeRegistration.unlimited', 'Unlimited') : sessionData.maxSeats}
                   </p>
                 </div>
                 <div>
-                  <Label className="text-xs text-muted-foreground">Trial Status</Label>
+                  <Label className="text-xs text-muted-foreground">{t('completeRegistration.currency', 'Currency')}</Label>
                   <div className="mt-1">
                     <Badge variant="outline" className="text-xs">
-                      30-Day Free Trial
+                      {sessionData.currency?.toUpperCase() || 'USD'}
                     </Badge>
                   </div>
                 </div>
@@ -314,60 +316,60 @@ export default function CompleteRegistration() {
           {/* Registration Form */}
           <Card>
             <CardHeader>
-              <CardTitle>Create Your Company Account</CardTitle>
+              <CardTitle>{t('completeRegistration.createAccountTitle', 'Create Your Account')}</CardTitle>
               <CardDescription>
-                Complete your registration to access your rope access management platform
+                {t('completeRegistration.createAccountDesc', 'Complete the form below to set up your company account')}
               </CardDescription>
             </CardHeader>
             <CardContent>
               <form onSubmit={handleRegister} className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="companyName">Company Name</Label>
+                  <Label htmlFor="companyName">{t('completeRegistration.companyName', 'Company Name')}</Label>
                   <Input
                     id="companyName"
                     type="text"
                     value={companyName}
                     onChange={(e) => setCompanyName(e.target.value)}
-                    placeholder="Enter your company name"
+                    placeholder={t('completeRegistration.companyNamePlaceholder', 'Your Company Name')}
                     required
                     data-testid="input-company-name"
                   />
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="email">Email Address</Label>
+                  <Label htmlFor="email">{t('completeRegistration.ownerEmail', 'Owner Email')}</Label>
                   <Input
                     id="email"
                     type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    placeholder="your@email.com"
+                    placeholder={t('completeRegistration.ownerEmailPlaceholder', 'owner@company.com')}
                     required
                     data-testid="input-email"
                   />
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="password">Password</Label>
+                  <Label htmlFor="password">{t('completeRegistration.password', 'Password')}</Label>
                   <Input
                     id="password"
                     type="password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    placeholder="Minimum 8 characters"
+                    placeholder={t('completeRegistration.passwordPlaceholder', 'Minimum 8 characters')}
                     required
                     data-testid="input-password"
                   />
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="confirmPassword">Confirm Password</Label>
+                  <Label htmlFor="confirmPassword">{t('completeRegistration.confirmPassword', 'Confirm Password')}</Label>
                   <Input
                     id="confirmPassword"
                     type="password"
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
-                    placeholder="Re-enter your password"
+                    placeholder={t('completeRegistration.confirmPasswordPlaceholder', 'Re-enter your password')}
                     required
                     data-testid="input-confirm-password"
                   />
@@ -383,12 +385,12 @@ export default function CompleteRegistration() {
                     {registering ? (
                       <>
                         <span className="material-icons mr-2 animate-spin">sync</span>
-                        Creating Account...
+                        {t('completeRegistration.creatingAccount', 'Creating Account...')}
                       </>
                     ) : (
                       <>
                         <span className="material-icons mr-2">check_circle</span>
-                        Complete Registration
+                        {t('completeRegistration.createAccountButton', 'Create Account')}
                       </>
                     )}
                   </Button>

@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -21,6 +22,7 @@ interface Resident {
 }
 
 export default function ResidentsManagement() {
+  const { t } = useTranslation();
   const [, setLocation] = useLocation();
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedResident, setSelectedResident] = useState<Resident | null>(null);
@@ -76,8 +78,8 @@ export default function ResidentsManagement() {
           <div className="flex items-center gap-3">
             <span className="material-icons text-3xl text-primary">people</span>
             <div>
-              <h1 className="text-2xl font-bold">Residents</h1>
-              <p className="text-sm text-muted-foreground">Manage building residents</p>
+              <h1 className="text-2xl font-bold">{t('residentsManagement.title', 'Residents')}</h1>
+              <p className="text-sm text-muted-foreground">{t('residentsManagement.subtitle', 'Manage building residents')}</p>
             </div>
           </div>
         </div>
@@ -92,15 +94,15 @@ export default function ResidentsManagement() {
               <div className="flex items-center gap-3">
                 <span className="material-icons text-primary">groups</span>
                 <div>
-                  <div className="font-medium">Resident Seats</div>
+                  <div className="font-medium">{t('residentsManagement.residentSeats', 'Resident Seats')}</div>
                   <div className="text-sm text-muted-foreground">
-                    Manage capacity for building residents
+                    {t('residentsManagement.residentSeatsDesc', 'Manage capacity for building residents')}
                   </div>
                 </div>
               </div>
               <Button size="sm" variant="outline" data-testid="button-add-resident-seats">
                 <span className="material-icons text-sm mr-1">add_shopping_cart</span>
-                Add more seats
+                {t('residentsManagement.addMoreSeats', 'Add more seats')}
               </Button>
             </div>
           </CardContent>
@@ -115,7 +117,7 @@ export default function ResidentsManagement() {
               </span>
               <Input
                 type="text"
-                placeholder="Search residents by name, email, or unit..."
+                placeholder={t('residentsManagement.searchPlaceholder', 'Search residents by name, email, or unit...')}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="pl-12 h-12 text-base"
@@ -129,7 +131,7 @@ export default function ResidentsManagement() {
         {isLoading ? (
           <div className="text-center py-12">
             <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-primary border-t-transparent"></div>
-            <p className="mt-4 text-muted-foreground">Loading residents...</p>
+            <p className="mt-4 text-muted-foreground">{t('residentsManagement.loading', 'Loading residents...')}</p>
           </div>
         ) : filteredResidents.length === 0 ? (
           <Card className="shadow-lg">
@@ -138,12 +140,12 @@ export default function ResidentsManagement() {
                 person_off
               </span>
               <h3 className="text-xl font-semibold mb-2">
-                {searchQuery ? "No residents found" : "No residents yet"}
+                {searchQuery ? t('residentsManagement.noResidentsFound', 'No residents found') : t('residentsManagement.noResidentsYet', 'No residents yet')}
               </h3>
               <p className="text-muted-foreground">
                 {searchQuery 
-                  ? "Try adjusting your search criteria" 
-                  : "Residents will appear here once they register"}
+                  ? t('residentsManagement.adjustSearch', 'Try adjusting your search criteria') 
+                  : t('residentsManagement.residentsWillAppear', 'Residents will appear here once they register')}
               </p>
             </CardContent>
           </Card>
@@ -168,13 +170,13 @@ export default function ResidentsManagement() {
                             </div>
                             <div>
                               <CardTitle className="text-lg">
-                                {strataPlanResidents[0]?.buildingName || `Strata Plan ${strataPlan}`}
+                                {strataPlanResidents[0]?.buildingName || `${t('residentsManagement.strataPlan', 'Strata Plan')} ${strataPlan}`}
                               </CardTitle>
                               <CardDescription>
                                 {strataPlanResidents[0]?.buildingName && (
-                                  <span className="text-xs">Strata Plan {strataPlan} • </span>
+                                  <span className="text-xs">{t('residentsManagement.strataPlan', 'Strata Plan')} {strataPlan} • </span>
                                 )}
-                                {strataPlanResidents.length} resident{strataPlanResidents.length !== 1 ? 's' : ''}
+                                {strataPlanResidents.length} {strataPlanResidents.length !== 1 ? t('residentsManagement.residents', 'residents') : t('residentsManagement.resident', 'resident')}
                               </CardDescription>
                             </div>
                           </div>
@@ -209,7 +211,7 @@ export default function ResidentsManagement() {
                                 {resident.unit && (
                                   <div className="flex items-center gap-2 text-sm">
                                     <span className="material-icons text-sm text-muted-foreground">home</span>
-                                    <span className="text-muted-foreground">Unit {resident.unit}</span>
+                                    <span className="text-muted-foreground">{t('residentsManagement.unit', 'Unit')} {resident.unit}</span>
                                   </div>
                                 )}
                                 {resident.phone && (
@@ -234,31 +236,31 @@ export default function ResidentsManagement() {
         {/* Stats card */}
         <Card className="shadow-lg">
           <CardHeader>
-            <CardTitle>Resident Statistics</CardTitle>
+            <CardTitle>{t('residentsManagement.statistics', 'Resident Statistics')}</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               <div className="text-center">
                 <div className="text-3xl font-bold text-primary">{residents.length}</div>
-                <div className="text-sm text-muted-foreground">Total Residents</div>
+                <div className="text-sm text-muted-foreground">{t('residentsManagement.totalResidents', 'Total Residents')}</div>
               </div>
               <div className="text-center">
                 <div className="text-3xl font-bold text-primary">
                   {residents.filter(r => r.unit).length}
                 </div>
-                <div className="text-sm text-muted-foreground">With Unit Info</div>
+                <div className="text-sm text-muted-foreground">{t('residentsManagement.withUnitInfo', 'With Unit Info')}</div>
               </div>
               <div className="text-center">
                 <div className="text-3xl font-bold text-primary">
                   {residents.filter(r => r.phone).length}
                 </div>
-                <div className="text-sm text-muted-foreground">With Phone</div>
+                <div className="text-sm text-muted-foreground">{t('residentsManagement.withPhone', 'With Phone')}</div>
               </div>
               <div className="text-center">
                 <div className="text-3xl font-bold text-primary">
                   {new Set(residents.map(r => r.buildingId).filter(Boolean)).size}
                 </div>
-                <div className="text-sm text-muted-foreground">Buildings</div>
+                <div className="text-sm text-muted-foreground">{t('residentsManagement.buildings', 'Buildings')}</div>
               </div>
             </div>
           </CardContent>
@@ -284,12 +286,12 @@ export default function ResidentsManagement() {
             <div className="space-y-6 pt-4">
               {/* Contact Information */}
               <div>
-                <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide mb-3">Contact Information</h3>
+                <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide mb-3">{t('residentsManagement.contactInformation', 'Contact Information')}</h3>
                 <div className="space-y-3">
                   <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
                     <span className="material-icons text-muted-foreground">email</span>
                     <div className="flex-1">
-                      <div className="text-xs text-muted-foreground">Email</div>
+                      <div className="text-xs text-muted-foreground">{t('residentsManagement.email', 'Email')}</div>
                       <div className="font-medium">{selectedResident.email}</div>
                     </div>
                   </div>
@@ -297,7 +299,7 @@ export default function ResidentsManagement() {
                     <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
                       <span className="material-icons text-muted-foreground">phone</span>
                       <div className="flex-1">
-                        <div className="text-xs text-muted-foreground">Phone Number</div>
+                        <div className="text-xs text-muted-foreground">{t('residentsManagement.phoneNumber', 'Phone Number')}</div>
                         <div className="font-medium">{selectedResident.phone}</div>
                       </div>
                     </div>
@@ -307,13 +309,13 @@ export default function ResidentsManagement() {
 
               {/* Property Information */}
               <div>
-                <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide mb-3">Property Information</h3>
+                <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide mb-3">{t('residentsManagement.propertyInformation', 'Property Information')}</h3>
                 <div className="space-y-3">
                   {selectedResident.buildingName && (
                     <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
                       <span className="material-icons text-muted-foreground">business</span>
                       <div className="flex-1">
-                        <div className="text-xs text-muted-foreground">Building Name</div>
+                        <div className="text-xs text-muted-foreground">{t('residentsManagement.buildingName', 'Building Name')}</div>
                         <div className="font-medium">{selectedResident.buildingName}</div>
                       </div>
                     </div>
@@ -322,7 +324,7 @@ export default function ResidentsManagement() {
                     <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
                       <span className="material-icons text-muted-foreground">apartment</span>
                       <div className="flex-1">
-                        <div className="text-xs text-muted-foreground">Strata Plan Number</div>
+                        <div className="text-xs text-muted-foreground">{t('residentsManagement.strataPlanNumber', 'Strata Plan Number')}</div>
                         <div className="font-medium">{selectedResident.strataPlan}</div>
                       </div>
                     </div>
@@ -331,7 +333,7 @@ export default function ResidentsManagement() {
                     <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
                       <span className="material-icons text-muted-foreground">home</span>
                       <div className="flex-1">
-                        <div className="text-xs text-muted-foreground">Unit Number</div>
+                        <div className="text-xs text-muted-foreground">{t('residentsManagement.unitNumber', 'Unit Number')}</div>
                         <div className="font-medium">{selectedResident.unit}</div>
                       </div>
                     </div>
@@ -340,14 +342,14 @@ export default function ResidentsManagement() {
                     <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
                       <span className="material-icons text-muted-foreground">local_parking</span>
                       <div className="flex-1">
-                        <div className="text-xs text-muted-foreground">Parking Stall</div>
+                        <div className="text-xs text-muted-foreground">{t('residentsManagement.parkingStall', 'Parking Stall')}</div>
                         <div className="font-medium">{selectedResident.parkingStall}</div>
                       </div>
                     </div>
                   )}
                   {!selectedResident.buildingName && !selectedResident.parkingStall && !selectedResident.unit && !selectedResident.strataPlan && (
                     <div className="text-sm text-muted-foreground text-center py-4">
-                      No property information available
+                      {t('residentsManagement.noPropertyInfo', 'No property information available')}
                     </div>
                   )}
                 </div>

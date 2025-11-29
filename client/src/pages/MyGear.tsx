@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
+import { useTranslation } from "react-i18next";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -31,6 +32,7 @@ const EQUIPMENT_ICONS: Record<string, string> = {
 };
 
 export default function MyGear() {
+  const { t } = useTranslation();
   const [, setLocation] = useLocation();
   const { toast } = useToast();
   const [showAddGearDialog, setShowAddGearDialog] = useState(false);
@@ -87,8 +89,8 @@ export default function MyGear() {
     },
     onSuccess: () => {
       toast({
-        title: "Gear Added",
-        description: "Equipment has been added to your gear.",
+        title: t('myGear.gearAdded', 'Gear Added'),
+        description: t('myGear.gearAddedDesc', 'Equipment has been added to your gear.'),
       });
       queryClient.invalidateQueries({ queryKey: ["/api/gear-items"] });
       queryClient.invalidateQueries({ queryKey: ["/api/gear-assignments"] });
@@ -98,8 +100,8 @@ export default function MyGear() {
     },
     onError: (error: any) => {
       toast({
-        title: "Error",
-        description: error.message || "Failed to add gear",
+        title: t('myGear.error', 'Error'),
+        description: error.message || t('myGear.failedToAddGear', 'Failed to add gear'),
         variant: "destructive",
       });
     },
@@ -112,16 +114,16 @@ export default function MyGear() {
     },
     onSuccess: () => {
       toast({
-        title: "Gear Removed",
-        description: "Equipment has been removed from your gear.",
+        title: t('myGear.gearRemoved', 'Gear Removed'),
+        description: t('myGear.gearRemovedDesc', 'Equipment has been removed from your gear.'),
       });
       queryClient.invalidateQueries({ queryKey: ["/api/gear-items"] });
       queryClient.invalidateQueries({ queryKey: ["/api/gear-assignments"] });
     },
     onError: (error: any) => {
       toast({
-        title: "Error",
-        description: error.message || "Failed to remove gear",
+        title: t('myGear.error', 'Error'),
+        description: error.message || t('myGear.failedToRemoveGear', 'Failed to remove gear'),
         variant: "destructive",
       });
     },
@@ -139,7 +141,7 @@ export default function MyGear() {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
-          <div className="text-lg font-medium">Loading your gear...</div>
+          <div className="text-lg font-medium">{t('myGear.loading', 'Loading your gear...')}</div>
         </div>
       </div>
     );
@@ -160,9 +162,9 @@ export default function MyGear() {
               <span className="material-icons">arrow_back</span>
             </Button>
             <div>
-              <h1 className="text-xl font-bold tracking-tight">My Gear</h1>
+              <h1 className="text-xl font-bold tracking-tight">{t('myGear.title', 'My Gear')}</h1>
               <p className="text-xs text-muted-foreground mt-0.5">
-                {currentUser?.name}'s assigned equipment
+                {t('myGear.subtitle', "{{name}}'s assigned equipment", { name: currentUser?.name })}
               </p>
             </div>
           </div>
@@ -171,7 +173,7 @@ export default function MyGear() {
             data-testid="button-add-gear"
           >
             <span className="material-icons text-sm mr-1">add</span>
-            Add Gear
+            {t('myGear.addGear', 'Add Gear')}
           </Button>
         </div>
       </header>
@@ -183,13 +185,13 @@ export default function MyGear() {
             <CardHeader className="pb-3">
               <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
                 <span className="material-icons text-lg">inventory_2</span>
-                Total Items
+                {t('myGear.totalItems', 'Total Items')}
               </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="text-3xl font-bold">{totalItems}</div>
               <p className="text-xs text-muted-foreground mt-1">
-                Across {myGear.length} {myGear.length === 1 ? 'category' : 'categories'}
+                {t('myGear.across', 'Across')} {myGear.length} {myGear.length === 1 ? t('myGear.category', 'category') : t('myGear.categories', 'categories')}
               </p>
             </CardContent>
           </Card>
@@ -199,13 +201,13 @@ export default function MyGear() {
               <CardHeader className="pb-3">
                 <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
                   <span className="material-icons text-lg">attach_money</span>
-                  Total Value
+                  {t('myGear.totalValue', 'Total Value')}
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="text-3xl font-bold">${totalValue.toFixed(2)}</div>
                 <p className="text-xs text-muted-foreground mt-1">
-                  Equipment value
+                  {t('myGear.equipmentValue', 'Equipment value')}
                 </p>
               </CardContent>
             </Card>
@@ -218,9 +220,9 @@ export default function MyGear() {
               <div className="flex flex-col items-center gap-3">
                 <span className="material-icons text-5xl text-muted-foreground">inventory_2</span>
                 <div>
-                  <div className="font-semibold text-lg">No Gear Assigned</div>
+                  <div className="font-semibold text-lg">{t('myGear.noGearAssigned', 'No Gear Assigned')}</div>
                   <p className="text-sm text-muted-foreground mt-1">
-                    You don't have any equipment assigned yet.
+                    {t('myGear.noEquipmentYet', "You don't have any equipment assigned yet.")}
                   </p>
                   <Button
                     className="mt-4"
@@ -228,7 +230,7 @@ export default function MyGear() {
                     data-testid="button-add-gear-empty"
                   >
                     <span className="material-icons text-sm mr-1">add</span>
-                    Add Gear from Inventory
+                    {t('myGear.addGearFromInventory', 'Add Gear from Inventory')}
                   </Button>
                 </div>
               </div>
@@ -255,7 +257,7 @@ export default function MyGear() {
                             {item.equipmentType}
                             {item.inService === false && (
                               <Badge variant="destructive" className="text-xs">
-                                Out of Service
+                                {t('myGear.outOfService', 'Out of Service')}
                               </Badge>
                             )}
                           </div>
@@ -268,11 +270,11 @@ export default function MyGear() {
                         <div className="text-right flex items-start gap-2">
                           <div>
                             <div className="font-semibold text-lg">
-                              {item.quantity} {item.quantity === 1 ? 'item' : 'items'}
+                              {item.quantity} {item.quantity === 1 ? t('myGear.item', 'item') : t('myGear.items', 'items')}
                             </div>
                             {canSeeFinancials && item.itemPrice && (
                               <div className="text-sm text-muted-foreground">
-                                ${parseFloat(item.itemPrice).toFixed(2)} each
+                                ${parseFloat(item.itemPrice).toFixed(2)} {t('myGear.each', 'each')}
                               </div>
                             )}
                           </div>
@@ -295,7 +297,7 @@ export default function MyGear() {
                       <div className="grid grid-cols-2 gap-3 text-sm">
                         {item.dateOfManufacture && (
                           <div>
-                            <span className="text-muted-foreground">Manufactured:</span>
+                            <span className="text-muted-foreground">{t('myGear.manufactured', 'Manufactured:')}</span>
                             <div className="font-medium mt-0.5">
                               {new Date(item.dateOfManufacture).toLocaleDateString()}
                             </div>
@@ -303,7 +305,7 @@ export default function MyGear() {
                         )}
                         {item.dateInService && (
                           <div>
-                            <span className="text-muted-foreground">In Service:</span>
+                            <span className="text-muted-foreground">{t('myGear.inService', 'In Service:')}</span>
                             <div className="font-medium mt-0.5">
                               {new Date(item.dateInService).toLocaleDateString()}
                             </div>
@@ -311,7 +313,7 @@ export default function MyGear() {
                         )}
                         {item.dateOutOfService && (
                           <div>
-                            <span className="text-muted-foreground">Out of Service:</span>
+                            <span className="text-muted-foreground">{t('myGear.outOfServiceDate', 'Out of Service:')}</span>
                             <div className="font-medium mt-0.5">
                               {new Date(item.dateOutOfService).toLocaleDateString()}
                             </div>
@@ -322,7 +324,7 @@ export default function MyGear() {
                       {/* Serial Numbers */}
                       {item.serialNumbers && item.serialNumbers.length > 0 && (
                         <div className="mt-3 pt-3 border-t">
-                          <div className="text-xs text-muted-foreground mb-2">Serial Numbers:</div>
+                          <div className="text-xs text-muted-foreground mb-2">{t('myGear.serialNumbers', 'Serial Numbers:')}</div>
                           <div className="flex flex-wrap gap-2">
                             {item.serialNumbers.map((serial: string, idx: number) => (
                               <Badge key={idx} variant="secondary" className="text-xs font-mono">
@@ -336,7 +338,7 @@ export default function MyGear() {
                       {/* Notes */}
                       {item.notes && (
                         <div className="mt-3 pt-3 border-t">
-                          <div className="text-xs text-muted-foreground mb-1">Notes:</div>
+                          <div className="text-xs text-muted-foreground mb-1">{t('myGear.notes', 'Notes:')}</div>
                           <div className="text-sm">{item.notes}</div>
                         </div>
                       )}
@@ -353,9 +355,9 @@ export default function MyGear() {
       <Dialog open={showAddGearDialog} onOpenChange={setShowAddGearDialog}>
         <DialogContent className="max-w-2xl max-h-[80vh] overflow-hidden flex flex-col">
           <DialogHeader>
-            <DialogTitle>Add Gear to My Equipment</DialogTitle>
+            <DialogTitle>{t('myGear.addGearTitle', 'Add Gear to My Equipment')}</DialogTitle>
             <DialogDescription>
-              Select equipment from the company inventory to add to your gear.
+              {t('myGear.addGearDesc', 'Select equipment from the company inventory to add to your gear.')}
             </DialogDescription>
           </DialogHeader>
 
@@ -363,7 +365,7 @@ export default function MyGear() {
           <div className="relative">
             <span className="material-icons absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">search</span>
             <Input
-              placeholder="Search equipment..."
+              placeholder={t('myGear.searchEquipment', 'Search equipment...')}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="pl-9"
@@ -376,7 +378,7 @@ export default function MyGear() {
             {filteredAvailableGear.length === 0 ? (
               <div className="text-center py-8 text-muted-foreground">
                 <span className="material-icons text-4xl mb-2 opacity-50">inventory_2</span>
-                <div>No equipment available</div>
+                <div>{t('myGear.noEquipmentAvailable', 'No equipment available')}</div>
               </div>
             ) : (
               filteredAvailableGear.map((item: any) => (
@@ -405,7 +407,7 @@ export default function MyGear() {
                       )}
                     </div>
                     <div className="text-right text-sm">
-                      <div className="font-medium">{(item.quantity || 0) - (item.assignedQuantity || 0)} available</div>
+                      <div className="font-medium">{(item.quantity || 0) - (item.assignedQuantity || 0)} {t('myGear.available', 'available')}</div>
                     </div>
                   </div>
                 </div>
@@ -418,7 +420,7 @@ export default function MyGear() {
             <div className="pt-4 border-t space-y-4">
               <div className="flex items-center gap-4">
                 <div className="flex-1">
-                  <Label htmlFor="quantity">Quantity to assign</Label>
+                  <Label htmlFor="quantity">{t('myGear.quantityToAssign', 'Quantity to assign')}</Label>
                   <Input
                     id="quantity"
                     type="number"
@@ -432,7 +434,7 @@ export default function MyGear() {
                 </div>
                 <div className="flex-1 text-sm text-muted-foreground">
                   <div className="font-medium">{selectedGearItem.equipmentType}</div>
-                  <div>{(selectedGearItem.quantity || 0) - (selectedGearItem.assignedQuantity || 0)} available in inventory</div>
+                  <div>{(selectedGearItem.quantity || 0) - (selectedGearItem.assignedQuantity || 0)} {t('myGear.availableInInventory', 'available in inventory')}</div>
                 </div>
               </div>
               <div className="flex gap-2">
@@ -445,7 +447,7 @@ export default function MyGear() {
                   }}
                   data-testid="button-cancel-add-gear"
                 >
-                  Cancel
+                  {t('myGear.cancel', 'Cancel')}
                 </Button>
                 <Button
                   className="flex-1"
@@ -453,7 +455,7 @@ export default function MyGear() {
                   disabled={assignGearMutation.isPending}
                   data-testid="button-confirm-add-gear"
                 >
-                  {assignGearMutation.isPending ? "Adding..." : "Add to My Gear"}
+                  {assignGearMutation.isPending ? t('myGear.adding', 'Adding...') : t('myGear.addToMyGear', 'Add to My Gear')}
                 </Button>
               </div>
             </div>

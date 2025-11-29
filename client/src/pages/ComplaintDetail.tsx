@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useLocation } from "wouter";
+import { useTranslation } from "react-i18next";
 import { queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { useForm } from "react-hook-form";
@@ -36,6 +37,7 @@ type ComplaintNote = {
 };
 
 export default function ComplaintDetail() {
+  const { t } = useTranslation();
   const { toast } = useToast();
   const [, setLocation] = useLocation();
   const complaintId = window.location.pathname.split("/complaints/")[1];
@@ -100,10 +102,10 @@ export default function ComplaintDetail() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/complaints", complaintId, "notes"] });
       form.reset();
-      toast({ title: "Note added successfully" });
+      toast({ title: t('complaintDetail.noteAdded', 'Note added successfully') });
     },
     onError: (error: Error) => {
-      toast({ title: "Error", description: error.message, variant: "destructive" });
+      toast({ title: t('complaintDetail.error', 'Error'), description: error.message, variant: "destructive" });
     },
   });
 
@@ -118,7 +120,7 @@ export default function ComplaintDetail() {
 
       if (!response.ok) {
         const error = await response.json();
-        throw new Error(error.message || "Failed to send reply");
+        throw new Error(error.message || t('complaintDetail.error', 'Failed to send reply'));
       }
 
       return response.json();
@@ -126,10 +128,10 @@ export default function ComplaintDetail() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/complaints", complaintId, "notes"] });
       residentReplyForm.reset();
-      toast({ title: "Reply sent successfully" });
+      toast({ title: t('complaintDetail.replySent', 'Reply sent successfully') });
     },
     onError: (error: Error) => {
-      toast({ title: "Error", description: error.message, variant: "destructive" });
+      toast({ title: t('complaintDetail.error', 'Error'), description: error.message, variant: "destructive" });
     },
   });
 
@@ -144,17 +146,17 @@ export default function ComplaintDetail() {
 
       if (!response.ok) {
         const error = await response.json();
-        throw new Error(error.message || "Failed to update status");
+        throw new Error(error.message || t('complaintDetail.error', 'Failed to update status'));
       }
 
       return response.json();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/complaints", complaintId] });
-      toast({ title: "Status updated successfully" });
+      toast({ title: t('complaintDetail.statusUpdated', 'Status updated successfully') });
     },
     onError: (error: Error) => {
-      toast({ title: "Error", description: error.message, variant: "destructive" });
+      toast({ title: t('complaintDetail.error', 'Error'), description: error.message, variant: "destructive" });
     },
   });
 
@@ -174,7 +176,7 @@ export default function ComplaintDetail() {
   if (isLoading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="text-lg font-medium">Loading...</div>
+        <div className="text-lg font-medium">{t('complaintDetail.loading', 'Loading...')}</div>
       </div>
     );
   }
@@ -185,7 +187,7 @@ export default function ComplaintDetail() {
         <Card className="w-full max-w-md text-center">
           <CardContent className="pt-12 pb-8">
             <span className="material-icons text-6xl text-muted-foreground mb-4">feedback</span>
-            <h2 className="text-xl font-bold mb-2">Feedback Not Found</h2>
+            <h2 className="text-xl font-bold mb-2">{t('complaintDetail.feedbackNotFound', 'Feedback Not Found')}</h2>
           </CardContent>
         </Card>
       </div>
@@ -210,7 +212,7 @@ export default function ComplaintDetail() {
           >
             <span className="material-icons">arrow_back</span>
           </Button>
-          <h1 className="text-lg font-bold flex-1">Feedback Details</h1>
+          <h1 className="text-lg font-bold flex-1">{t('complaintDetail.feedbackDetails', 'Feedback Details')}</h1>
           <Badge variant={complaint.status === "open" ? "default" : "secondary"} data-testid="badge-status">
             {complaint.status}
           </Badge>
@@ -223,20 +225,20 @@ export default function ComplaintDetail() {
           <CardHeader>
             <div className="flex items-start justify-between mb-2">
               <div>
-                <CardTitle className="text-base">Feedback Details</CardTitle>
+                <CardTitle className="text-base">{t('complaintDetail.feedbackDetails', 'Feedback Details')}</CardTitle>
                 <div className="text-sm text-muted-foreground mt-1">
-                  Submitted: {new Date(complaint.createdAt).toLocaleDateString()} at{" "}
+                  {t('complaintDetail.submitted', 'Submitted:')} {new Date(complaint.createdAt).toLocaleDateString()} {t('complaintDetail.at', 'at')}{" "}
                   {new Date(complaint.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                 </div>
                 {complaint.viewedAt && (
                   <div className="text-sm text-status-closed mt-1">
-                    ✓ Viewed by staff: {new Date(complaint.viewedAt).toLocaleDateString()} at{" "}
+                    {t('complaintDetail.viewedByStaff', 'Viewed by staff:')} {new Date(complaint.viewedAt).toLocaleDateString()} {t('complaintDetail.at', 'at')}{" "}
                     {new Date(complaint.viewedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                   </div>
                 )}
                 {!complaint.viewedAt && userData?.user?.role === "resident" && (
                   <div className="text-sm text-muted-foreground mt-1">
-                    ⏱ Pending review by staff
+                    {t('complaintDetail.pendingReview', 'Pending review by staff')}
                   </div>
                 )}
               </div>
@@ -245,24 +247,24 @@ export default function ComplaintDetail() {
           <CardContent className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <div className="text-xs text-muted-foreground mb-1">Resident</div>
+                <div className="text-xs text-muted-foreground mb-1">{t('complaintDetail.resident', 'Resident')}</div>
                 <div className="font-medium" data-testid="text-resident-name">{complaint.residentName}</div>
               </div>
               <div>
-                <div className="text-xs text-muted-foreground mb-1">Unit</div>
+                <div className="text-xs text-muted-foreground mb-1">{t('complaintDetail.unit', 'Unit')}</div>
                 <div className="font-medium" data-testid="text-unit-number">{complaint.unitNumber}</div>
               </div>
             </div>
 
             <div>
-              <div className="text-xs text-muted-foreground mb-1">Phone</div>
+              <div className="text-xs text-muted-foreground mb-1">{t('complaintDetail.phone', 'Phone')}</div>
               <div className="font-medium" data-testid="text-phone-number">{complaint.phoneNumber}</div>
             </div>
 
             <Separator />
 
             <div>
-              <div className="text-xs text-muted-foreground mb-2">Message</div>
+              <div className="text-xs text-muted-foreground mb-2">{t('complaintDetail.message', 'Message')}</div>
               <p className="text-sm" data-testid="text-message">{complaint.message}</p>
             </div>
 
@@ -270,10 +272,10 @@ export default function ComplaintDetail() {
               <>
                 <Separator />
                 <div>
-                  <div className="text-xs text-muted-foreground mb-2">Attached Photo</div>
+                  <div className="text-xs text-muted-foreground mb-2">{t('complaintDetail.attachedPhoto', 'Attached Photo')}</div>
                   <img 
                     src={complaint.photoUrl} 
-                    alt="Complaint attachment" 
+                    alt={t('complaintDetail.attachedPhoto', 'Complaint attachment')} 
                     className="rounded-lg max-w-full h-auto border"
                     data-testid="img-complaint-photo"
                   />
@@ -287,7 +289,7 @@ export default function ComplaintDetail() {
         {residentNotes.length > 0 && (
           <Card>
             <CardHeader>
-              <CardTitle className="text-base">Conversation</CardTitle>
+              <CardTitle className="text-base">{t('complaintDetail.conversation', 'Conversation')}</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-3">
@@ -309,11 +311,11 @@ export default function ComplaintDetail() {
                         <div className="flex items-center gap-2">
                           <div className="font-medium text-sm">{note.userName}</div>
                           {isResidentMessage && (
-                            <Badge variant="secondary" className="text-xs">You</Badge>
+                            <Badge variant="secondary" className="text-xs">{t('complaintDetail.you', 'You')}</Badge>
                           )}
                         </div>
                         <div className="text-xs text-muted-foreground">
-                          {new Date(note.createdAt).toLocaleDateString()} at{" "}
+                          {new Date(note.createdAt).toLocaleDateString()} {t('complaintDetail.at', 'at')}{" "}
                           {new Date(note.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                         </div>
                       </div>
@@ -330,7 +332,7 @@ export default function ComplaintDetail() {
         {!isStaff && (
           <Card>
             <CardHeader>
-              <CardTitle className="text-base">Reply to Staff</CardTitle>
+              <CardTitle className="text-base">{t('complaintDetail.replyToStaff', 'Reply to Staff')}</CardTitle>
             </CardHeader>
             <CardContent>
               <Form {...residentReplyForm}>
@@ -340,11 +342,11 @@ export default function ComplaintDetail() {
                     name="note"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Your Message</FormLabel>
+                        <FormLabel>{t('complaintDetail.yourMessage', 'Your Message')}</FormLabel>
                         <FormControl>
                           <Textarea
                             {...field}
-                            placeholder="Type your reply..."
+                            placeholder={t('complaintDetail.typeYourReply', 'Type your reply...')}
                             data-testid="input-resident-reply"
                             className="min-h-24 resize-none"
                           />
@@ -361,7 +363,7 @@ export default function ComplaintDetail() {
                     disabled={addResidentReplyMutation.isPending}
                   >
                     <span className="material-icons mr-2">send</span>
-                    {addResidentReplyMutation.isPending ? "Sending..." : "Send Reply"}
+                    {addResidentReplyMutation.isPending ? t('complaintDetail.sending', 'Sending...') : t('complaintDetail.sendReply', 'Send Reply')}
                   </Button>
                 </form>
               </Form>
@@ -374,7 +376,7 @@ export default function ComplaintDetail() {
           <>
             <Card>
               <CardHeader>
-                <CardTitle className="text-base">Internal Notes</CardTitle>
+                <CardTitle className="text-base">{t('complaintDetail.internalNotes', 'Internal Notes')}</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 {internalNotes.length > 0 ? (
@@ -394,7 +396,7 @@ export default function ComplaintDetail() {
                 ) : (
                   <div className="text-center py-8 text-muted-foreground text-sm">
                     <span className="material-icons text-4xl mb-2 opacity-50">note_add</span>
-                    <div>No internal notes yet</div>
+                    <div>{t('complaintDetail.noInternalNotes', 'No internal notes yet')}</div>
                   </div>
                 )}
 
@@ -408,11 +410,11 @@ export default function ComplaintDetail() {
                       name="note"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Add Note</FormLabel>
+                          <FormLabel>{t('complaintDetail.addNote', 'Add Note')}</FormLabel>
                           <FormControl>
                             <Textarea
                               {...field}
-                              placeholder="Enter your notes about this feedback..."
+                              placeholder={t('complaintDetail.enterNotes', 'Enter your notes about this feedback...')}
                               data-testid="input-note"
                               className="min-h-24 resize-none"
                             />
@@ -436,10 +438,10 @@ export default function ComplaintDetail() {
                           </FormControl>
                           <div className="space-y-1 leading-none">
                             <FormLabel className="text-orange-700 dark:text-orange-400 font-bold">
-                              ⚠️ Send this response to the resident
+                              {t('complaintDetail.sendToResident', 'Send this response to the resident')}
                             </FormLabel>
                             <FormDescription className="text-orange-600 dark:text-orange-300 text-xs">
-                              Checking this box will make your response visible to the resident. Only check this if you want the resident to see your comment.
+                              {t('complaintDetail.sendToResidentDesc', 'Checking this box will make your response visible to the resident. Only check this if you want the resident to see your comment.')}
                             </FormDescription>
                           </div>
                         </FormItem>
@@ -448,7 +450,7 @@ export default function ComplaintDetail() {
                     
                     <Button type="submit" className="w-full h-12" data-testid="button-add-note" disabled={addNoteMutation.isPending}>
                       <span className="material-icons mr-2">add_comment</span>
-                      {addNoteMutation.isPending ? "Adding..." : "Add Note"}
+                      {addNoteMutation.isPending ? t('complaintDetail.adding', 'Adding...') : t('complaintDetail.addNote', 'Add Note')}
                     </Button>
                   </form>
                 </Form>
@@ -470,7 +472,7 @@ export default function ComplaintDetail() {
               <span className="material-icons mr-2">
                 {complaint.status === "open" ? "check_circle" : "replay"}
               </span>
-              {toggleStatusMutation.isPending ? "Updating..." : (complaint.status === "open" ? "Mark as Closed" : "Reopen")}
+              {toggleStatusMutation.isPending ? t('complaintDetail.updating', 'Updating...') : (complaint.status === "open" ? t('complaintDetail.markAsClosed', 'Mark as Closed') : t('complaintDetail.reopen', 'Reopen'))}
             </Button>
           ) : (
             complaint.status === "closed" && (
@@ -482,7 +484,7 @@ export default function ComplaintDetail() {
                 disabled={toggleStatusMutation.isPending}
               >
                 <span className="material-icons mr-2">replay</span>
-                {toggleStatusMutation.isPending ? "Reopening..." : "Reopen Feedback"}
+                {toggleStatusMutation.isPending ? t('complaintDetail.reopening', 'Reopening...') : t('complaintDetail.reopenFeedback', 'Reopen Feedback')}
               </Button>
             )
           )}
