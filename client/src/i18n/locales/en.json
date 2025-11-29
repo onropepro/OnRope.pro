@@ -47,7 +47,97 @@
     },
     "features": {
       "title": "Juggling 10 Different Tools Is Costing You More Than Time",
-      "subtitle": "Replace scattered systems with one platform built specifically for rope access companies managing techs across multiple buildings. Time tracking, safety compliance, project visibility, payroll precision, resident communication - all within one intelligent platform."
+      "subtitle": "Replace scattered systems with one platform built specifically for rope access companies managing techs across multiple buildings. Time tracking, safety compliance, project visibility, payroll precision, resident communication - all within one intelligent platform.",
+      "cards": {
+        "projects": {
+          "category": "Projects (Active & Past)",
+          "title": "4-Elevation Building Visualization",
+          "tagline": "Stop Guessing. Start Knowing.",
+          "description": "Track all four sides (N/E/S/W) of every project with visual progress bars. Know instantly: \"West elevation 68% done. North finished. East behind schedule.\" Finally, stop guessing. Your crew knows. Your client knows. You know."
+        },
+        "workSessions": {
+          "category": "Work Session & Hours Tracker",
+          "title": "4 Hours or 30 Minutes?",
+          "tagline": "That's How Long Payroll Takes. Your Choice.",
+          "description": "Clock in. Clock out. System calculates hours down to the second. 8h 15m worked on Tower One. 6h 42m on Tower Five. Zero disputes. Zero spreadsheets. Zero \"I swear I worked 9 hours.\" 87-93% time savings. Your competitor? Still using Excel."
+        },
+        "nonBillable": {
+          "category": "Non-Billable Hour Tracker",
+          "title": "$12,600 Fell Through The Cracks",
+          "tagline": "Travel Time. Setup Time. You Paid. Client Didn't.",
+          "description": "Paid for 45 hours. Billed for 32 hours. That's 13 hours donated. Every. Single. Week. Track travel time, equipment setup, weather delays separately. See your billable ratio: 68%. Target: 75%+. Stop the bleed. Your margins thank you."
+        },
+        "employees": {
+          "category": "Employees",
+          "title": "Team Management & Permissions",
+          "tagline": "Supervisors Log Drops. They Don't See Pay Rates.",
+          "description": "Financial data stays private. IRATA levels tracked. 100% payroll accuracy. Hourly rates configured. Zero awkward conversations. Give supervisors job tools, not salary spreadsheets."
+        },
+        "inventory": {
+          "category": "Inventory & Inspections",
+          "title": "Equipment & Safety Compliance",
+          "tagline": "You Export 6 Months of Harness Inspections in 4 Minutes. Building Manager Swoons.",
+          "description": "Track personal safety equipment with serial numbers, employee assignments, inspection dates, and automated retirement workflows for failed gear. Daily inspections. Instant exports. Zero panic."
+        },
+        "toolbox": {
+          "category": "Toolbox Meetings",
+          "title": "Safety Briefings & Documentation",
+          "tagline": "The Lawsuit You'll Win Because You Did the Meeting. And You Can Prove It.",
+          "description": "Digital safety forms, PDF rope access plans. Comprehensive safety documentation management. Every meeting logged. Every inspection recorded. Every piece of equipment tracked. The lawyer asks \"prove it.\" You hand them 400 pages. Case dismissed."
+        },
+        "payroll": {
+          "category": "Payroll",
+          "title": "Employee Hours & Compensation",
+          "tagline": "Dave Worked 87.5 Hours - Including Overtime. Paid $2,887.50. Export. Done.",
+          "description": "Select pay period. System aggregates all hours across all projects. Regular hours. Overtime hours. Hourly rates applied. Gross pay calculated. Export to QuickBooks. 30 minutes. Your competitor? Still using Excel for 4 hours. Still making $1,200 mistakes."
+        },
+        "quoting": {
+          "category": "Multi-Service Quoting",
+          "title": "One Quote, Every Service",
+          "tagline": "Window Cleaning + Dryer Vents + Parkade + In-Suite. One Price.",
+          "description": "Create comprehensive quotes combining window cleaning, dryer vents, parkade maintenance, and in-suite work with individual service pricing and photo documentation. Cross-sell without looking desperate. Professional. Complete. Done in 30 minutes."
+        },
+        "tracking": {
+          "category": "Active Worker Tracking",
+          "title": "Real-Time Field Visibility",
+          "tagline": "Dave's on Tower One. Has Been Since 7:32am. Working 4h 18m.",
+          "description": "Monitor active workers, billable/non-billable hours, and performance analytics with live dashboards. Color-coded status. Green = working. Yellow = break. Red = check on them. Answer clients instantly: \"Crew's on-site right now.\""
+        },
+        "safety": {
+          "category": "Safety Compliance",
+          "title": "Safety Compliance",
+          "description": "Digital safety forms, PDF rope access plans, and comprehensive safety documentation management."
+        },
+        "complaints": {
+          "category": "Complaint Management",
+          "title": "Centralized. Organized. Done.",
+          "tagline": "70% Fewer Calls. 24-Hour Resolution",
+          "description": "Mrs. Henderson adds a photo: \"Missed my window.\" She is replied to in 4 minutes: \"On it tomorrow, 9am.\" She stops calling the building manager. They stop calling you. Everyone stops calling. Residents self-serve. You respond same-day. Your competitor? Still using paper."
+        },
+        "residents": {
+          "category": "Resident Portal",
+          "title": "Building Resident Management",
+          "tagline": "The Contract Renewal Machine. 240 Residents Watch Progress. Submit Complaints. Stop Calling.",
+          "description": "240 residents watch progress on their phones. Submit complaints that get fixed same-day. Tell their council \"these guys are professional.\" Your competitor? Still using paper. Contract renewal rate: 95%. Theirs: 60%. Math is simple."
+        },
+        "audit": {
+          "category": "IRATA & Insurance Audit Protection",
+          "title": "\"Show Me Your Inspection Logs\"",
+          "description": "Auditor asks for 6 months of harness inspections. You export PDF in 4 minutes. Every tech. Every day. Every piece of equipment. Building manager swoons."
+        },
+        "scheduling": {
+          "category": "Schedule Visibility",
+          "title": "Resource Scheduling & Calendar",
+          "tagline": "Sarah Is At Tower One Monday. Tower Three Tuesday. Confirmed.",
+          "description": "Visual calendar showing who's working where, when. Drag-and-drop scheduling. Conflict detection. Weather delay rescheduling. Client-facing calendar links. Answer \"when are you coming?\" with a link, not a phone call."
+        },
+        "clientDashboard": {
+          "category": "Client Dashboard Access",
+          "title": "Client Visibility Portal",
+          "tagline": "\"When Will You Be Done?\" Link. Click. See.",
+          "description": "Give property managers read-only access to their buildings. Progress bars. Photo documentation. Safety compliance scores. Schedule visibility. They stop calling to ask \"what's happening?\" because they can see it themselves."
+        }
+      }
     },
     "form": {
       "title": "Welcome",

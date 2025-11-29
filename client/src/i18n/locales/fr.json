@@ -47,7 +47,97 @@
     },
     "features": {
       "title": "Jongler avec 10 outils différents vous coûte plus que du temps",
-      "subtitle": "Remplacez les systèmes dispersés par une seule plateforme conçue spécifiquement pour les entreprises d'accès sur corde gérant des techniciens sur plusieurs bâtiments. Suivi du temps, conformité sécurité, visibilité des projets, précision de la paie, communication avec les résidents - le tout dans une seule plateforme intelligente."
+      "subtitle": "Remplacez les systèmes dispersés par une seule plateforme conçue spécifiquement pour les entreprises d'accès sur corde gérant des techniciens sur plusieurs bâtiments. Suivi du temps, conformité sécurité, visibilité des projets, précision de la paie, communication avec les résidents - le tout dans une seule plateforme intelligente.",
+      "cards": {
+        "projects": {
+          "category": "Projets (Actifs et passés)",
+          "title": "Visualisation des 4 élévations",
+          "tagline": "Arrêtez de deviner. Commencez à savoir.",
+          "description": "Suivez les quatre côtés (N/E/S/O) de chaque projet avec des barres de progression visuelles. Sachez instantanément: « Élévation ouest 68% terminée. Nord terminé. Est en retard. » Enfin, arrêtez de deviner. Votre équipe sait. Votre client sait. Vous savez."
+        },
+        "workSessions": {
+          "category": "Suivi des sessions et heures",
+          "title": "4 heures ou 30 minutes?",
+          "tagline": "C'est le temps que prend la paie. À vous de choisir.",
+          "description": "Pointez à l'arrivée. Pointez au départ. Le système calcule les heures à la seconde près. 8h 15m travaillées sur la Tour Un. 6h 42m sur la Tour Cinq. Zéro dispute. Zéro tableur. Zéro « Je jure que j'ai travaillé 9 heures. » 87-93% de gain de temps. Votre concurrent? Encore sur Excel."
+        },
+        "nonBillable": {
+          "category": "Suivi des heures non facturables",
+          "title": "12 600$ sont passés entre les mailles",
+          "tagline": "Temps de déplacement. Temps d'installation. Vous avez payé. Le client non.",
+          "description": "Payé pour 45 heures. Facturé 32 heures. C'est 13 heures données. Chaque. Semaine. Suivez le temps de déplacement, l'installation d'équipement, les délais météo séparément. Voyez votre ratio facturable: 68%. Cible: 75%+. Arrêtez l'hémorragie. Vos marges vous remercient."
+        },
+        "employees": {
+          "category": "Employés",
+          "title": "Gestion d'équipe et permissions",
+          "tagline": "Les superviseurs enregistrent les descentes. Ils ne voient pas les taux horaires.",
+          "description": "Les données financières restent privées. Niveaux IRATA suivis. 100% de précision de paie. Taux horaires configurés. Zéro conversation gênante. Donnez aux superviseurs des outils de travail, pas des tableurs de salaires."
+        },
+        "inventory": {
+          "category": "Inventaire et inspections",
+          "title": "Équipement et conformité sécurité",
+          "tagline": "Vous exportez 6 mois d'inspections de harnais en 4 minutes. Le gestionnaire d'immeuble est impressionné.",
+          "description": "Suivez l'équipement de sécurité personnel avec numéros de série, affectations d'employés, dates d'inspection et flux de retrait automatisés pour l'équipement défaillant. Inspections quotidiennes. Exports instantanés. Zéro panique."
+        },
+        "toolbox": {
+          "category": "Réunions de sécurité",
+          "title": "Briefings de sécurité et documentation",
+          "tagline": "Le procès que vous gagnerez parce que vous avez fait la réunion. Et vous pouvez le prouver.",
+          "description": "Formulaires de sécurité numériques, plans d'accès sur corde PDF. Gestion complète de la documentation de sécurité. Chaque réunion enregistrée. Chaque inspection documentée. Chaque équipement suivi. L'avocat demande « prouvez-le. » Vous lui remettez 400 pages. Affaire classée."
+        },
+        "payroll": {
+          "category": "Paie",
+          "title": "Heures et rémunération des employés",
+          "tagline": "David a travaillé 87,5 heures - incluant les heures supplémentaires. Payé 2 887,50$. Exporté. Terminé.",
+          "description": "Sélectionnez la période de paie. Le système agrège toutes les heures sur tous les projets. Heures régulières. Heures supplémentaires. Taux horaires appliqués. Salaire brut calculé. Exporté vers QuickBooks. 30 minutes. Votre concurrent? Encore sur Excel pendant 4 heures. Avec 1 200$ d'erreurs."
+        },
+        "quoting": {
+          "category": "Soumissions multi-services",
+          "title": "Une soumission, tous les services",
+          "tagline": "Nettoyage de vitres + Conduits de sécheuse + Stationnement + En suite. Un prix.",
+          "description": "Créez des soumissions complètes combinant nettoyage de vitres, conduits de sécheuse, entretien de stationnement et travaux en suite avec prix individuels et documentation photo. Ventes croisées sans avoir l'air désespéré. Professionnel. Complet. Terminé en 30 minutes."
+        },
+        "tracking": {
+          "category": "Suivi des travailleurs actifs",
+          "title": "Visibilité terrain en temps réel",
+          "tagline": "David est sur la Tour Un. Depuis 7h32. Travaille depuis 4h 18m.",
+          "description": "Surveillez les travailleurs actifs, les heures facturables/non facturables et les analyses de performance avec des tableaux de bord en direct. Statut par couleur. Vert = travaille. Jaune = pause. Rouge = vérifiez. Répondez instantanément aux clients: « L'équipe est sur place maintenant. »"
+        },
+        "safety": {
+          "category": "Conformité sécurité",
+          "title": "Conformité sécurité",
+          "description": "Formulaires de sécurité numériques, plans d'accès sur corde PDF et gestion complète de la documentation de sécurité."
+        },
+        "complaints": {
+          "category": "Gestion des plaintes",
+          "title": "Centralisé. Organisé. Terminé.",
+          "tagline": "70% moins d'appels. Résolution en 24 heures",
+          "description": "Mme Henderson ajoute une photo: « Fenêtre manquée. » On lui répond en 4 minutes: « On s'en occupe demain, 9h. » Elle arrête d'appeler le gestionnaire d'immeuble. Ils arrêtent de vous appeler. Tout le monde arrête d'appeler. Les résidents se servent eux-mêmes. Vous répondez le jour même. Votre concurrent? Encore sur papier."
+        },
+        "residents": {
+          "category": "Portail résident",
+          "title": "Gestion des résidents d'immeuble",
+          "tagline": "La machine à renouvellement de contrats. 240 résidents suivent la progression. Soumettent des plaintes. Arrêtent d'appeler.",
+          "description": "240 résidents suivent la progression sur leur téléphone. Soumettent des plaintes réglées le jour même. Disent au conseil « ces gars sont professionnels. » Votre concurrent? Encore sur papier. Taux de renouvellement: 95%. Le leur: 60%. Le calcul est simple."
+        },
+        "audit": {
+          "category": "Protection audits IRATA et assurance",
+          "title": "« Montrez-moi vos registres d'inspection »",
+          "description": "L'auditeur demande 6 mois d'inspections de harnais. Vous exportez le PDF en 4 minutes. Chaque technicien. Chaque jour. Chaque équipement. Le gestionnaire d'immeuble est impressionné."
+        },
+        "scheduling": {
+          "category": "Visibilité de l'horaire",
+          "title": "Planification des ressources et calendrier",
+          "tagline": "Sarah est à la Tour Un lundi. Tour Trois mardi. Confirmé.",
+          "description": "Calendrier visuel montrant qui travaille où, quand. Planification par glisser-déposer. Détection des conflits. Replanification des délais météo. Liens calendrier pour les clients. Répondez à « quand venez-vous? » avec un lien, pas un appel téléphonique."
+        },
+        "clientDashboard": {
+          "category": "Accès tableau de bord client",
+          "title": "Portail de visibilité client",
+          "tagline": "« Quand aurez-vous terminé? » Lien. Clic. Voyez.",
+          "description": "Donnez aux gestionnaires immobiliers un accès en lecture seule à leurs bâtiments. Barres de progression. Documentation photo. Scores de conformité sécurité. Visibilité de l'horaire. Ils arrêtent d'appeler pour demander « que se passe-t-il? » parce qu'ils peuvent le voir eux-mêmes."
+        }
+      }
     },
     "form": {
       "title": "Bienvenue",

@@ -336,11 +336,11 @@ export default function Login() {
               <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
                 <Building2 className="w-5 h-5 text-primary" />
               </div>
-              <p className="text-xs text-muted-foreground uppercase tracking-wide">Projects (Active & Past)</p>
-              <h3 className="font-bold">4-Elevation Building Visualization</h3>
-              <p className="text-sm text-primary font-medium">Stop Guessing. Start Knowing.</p>
+              <p className="text-xs text-muted-foreground uppercase tracking-wide">{t('login.features.cards.projects.category')}</p>
+              <h3 className="font-bold">{t('login.features.cards.projects.title')}</h3>
+              <p className="text-sm text-primary font-medium">{t('login.features.cards.projects.tagline')}</p>
               <p className="text-sm text-muted-foreground">
-                Track all four sides (N/E/S/W) of every project with visual progress bars. Know instantly: "West elevation 68% done. North finished. East behind schedule." Finally, stop guessing. Your crew knows. Your client knows. You know.
+                {t('login.features.cards.projects.description')}
               </p>
             </div>
 
@@ -349,11 +349,11 @@ export default function Login() {
               <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
                 <Clock className="w-5 h-5 text-primary" />
               </div>
-              <p className="text-xs text-muted-foreground uppercase tracking-wide">Work Session & Hours Tracker</p>
-              <h3 className="font-bold">4 Hours or 30 Minutes?</h3>
-              <p className="text-sm text-primary font-medium">That's How Long Payroll Takes. Your Choice.</p>
+              <p className="text-xs text-muted-foreground uppercase tracking-wide">{t('login.features.cards.workSessions.category')}</p>
+              <h3 className="font-bold">{t('login.features.cards.workSessions.title')}</h3>
+              <p className="text-sm text-primary font-medium">{t('login.features.cards.workSessions.tagline')}</p>
               <p className="text-sm text-muted-foreground">
-                Clock in. Clock out. System calculates hours down to the second. 8h 15m worked on Tower One. 6h 42m on Tower Five. Zero disputes. Zero spreadsheets. Zero "I swear I worked 9 hours." 87-93% time savings. Your competitor? Still using Excel.
+                {t('login.features.cards.workSessions.description')}
               </p>
             </div>
 
@@ -362,11 +362,11 @@ export default function Login() {
               <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
                 <DollarSign className="w-5 h-5 text-primary" />
               </div>
-              <p className="text-xs text-muted-foreground uppercase tracking-wide">Non-Billable Hour Tracker</p>
-              <h3 className="font-bold">$12,600 Fell Through The Cracks</h3>
-              <p className="text-sm text-primary font-medium">Travel Time. Setup Time. You Paid. Client Didn't.</p>
+              <p className="text-xs text-muted-foreground uppercase tracking-wide">{t('login.features.cards.nonBillable.category')}</p>
+              <h3 className="font-bold">{t('login.features.cards.nonBillable.title')}</h3>
+              <p className="text-sm text-primary font-medium">{t('login.features.cards.nonBillable.tagline')}</p>
               <p className="text-sm text-muted-foreground">
-                Paid for 45 hours. Billed for 32 hours. That's 13 hours donated. Every. Single. Week. Track travel time, equipment setup, weather delays separately. See your billable ratio: 68%. Target: 75%+. Stop the bleed. Your margins thank you.
+                {t('login.features.cards.nonBillable.description')}
               </p>
             </div>
 
@@ -375,11 +375,11 @@ export default function Login() {
               <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
                 <Users className="w-5 h-5 text-primary" />
               </div>
-              <p className="text-xs text-muted-foreground uppercase tracking-wide">Employees</p>
-              <h3 className="font-bold">Team Management & Permissions</h3>
-              <p className="text-sm text-primary font-medium">Supervisors Log Drops. They Don't See Pay Rates.</p>
+              <p className="text-xs text-muted-foreground uppercase tracking-wide">{t('login.features.cards.employees.category')}</p>
+              <h3 className="font-bold">{t('login.features.cards.employees.title')}</h3>
+              <p className="text-sm text-primary font-medium">{t('login.features.cards.employees.tagline')}</p>
               <p className="text-sm text-muted-foreground">
-                Financial data stays private. IRATA levels tracked. 100% payroll accuracy. Hourly rates configured. Zero awkward conversations. Give supervisors job tools, not salary spreadsheets.
+                {t('login.features.cards.employees.description')}
               </p>
             </div>
 
@@ -388,11 +388,11 @@ export default function Login() {
               <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
                 <Shield className="w-5 h-5 text-primary" />
               </div>
-              <p className="text-xs text-muted-foreground uppercase tracking-wide">Inventory & Inspections</p>
-              <h3 className="font-bold">Equipment & Safety Compliance</h3>
-              <p className="text-sm text-primary font-medium">You Export 6 Months of Harness Inspections in 4 Minutes. Building Manager Swoons.</p>
+              <p className="text-xs text-muted-foreground uppercase tracking-wide">{t('login.features.cards.inventory.category')}</p>
+              <h3 className="font-bold">{t('login.features.cards.inventory.title')}</h3>
+              <p className="text-sm text-primary font-medium">{t('login.features.cards.inventory.tagline')}</p>
               <p className="text-sm text-muted-foreground">
-                Track personal safety equipment with serial numbers, employee assignments, inspection dates, and automated retirement workflows for failed gear. Daily inspections. Instant exports. Zero panic.
+                {t('login.features.cards.inventory.description')}
               </p>
             </div>
 
@@ -401,11 +401,11 @@ export default function Login() {
               <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
                 <FileText className="w-5 h-5 text-primary" />
               </div>
-              <p className="text-xs text-muted-foreground uppercase tracking-wide">Toolbox Meetings</p>
-              <h3 className="font-bold">Safety Briefings & Documentation</h3>
-              <p className="text-sm text-primary font-medium">The Lawsuit You'll Win Because You Did the Meeting. And You Can Prove It.</p>
+              <p className="text-xs text-muted-foreground uppercase tracking-wide">{t('login.features.cards.toolbox.category')}</p>
+              <h3 className="font-bold">{t('login.features.cards.toolbox.title')}</h3>
+              <p className="text-sm text-primary font-medium">{t('login.features.cards.toolbox.tagline')}</p>
               <p className="text-sm text-muted-foreground">
-                Digital safety forms, PDF rope access plans. Comprehensive safety documentation management. Every meeting logged. Every inspection recorded. Every piece of equipment tracked. The lawyer asks "prove it." You hand them 400 pages. Case dismissed.
+                {t('login.features.cards.toolbox.description')}
               </p>
             </div>
 
@@ -414,11 +414,11 @@ export default function Login() {
               <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
                 <Calculator className="w-5 h-5 text-primary" />
               </div>
-              <p className="text-xs text-muted-foreground uppercase tracking-wide">Payroll</p>
-              <h3 className="font-bold">Employee Hours & Compensation</h3>
-              <p className="text-sm text-primary font-medium">Dave Worked 87.5 Hours - Including Overtime. Paid $2,887.50. Export. Done.</p>
+              <p className="text-xs text-muted-foreground uppercase tracking-wide">{t('login.features.cards.payroll.category')}</p>
+              <h3 className="font-bold">{t('login.features.cards.payroll.title')}</h3>
+              <p className="text-sm text-primary font-medium">{t('login.features.cards.payroll.tagline')}</p>
               <p className="text-sm text-muted-foreground">
-                Select pay period. System aggregates all hours across all projects. Regular hours. Overtime hours. Hourly rates applied. Gross pay calculated. Export to QuickBooks. 30 minutes. Your competitor? Still using Excel for 4 hours. Still making $1,200 mistakes.
+                {t('login.features.cards.payroll.description')}
               </p>
             </div>
 
@@ -427,11 +427,11 @@ export default function Login() {
               <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
                 <FileSpreadsheet className="w-5 h-5 text-primary" />
               </div>
-              <p className="text-xs text-muted-foreground uppercase tracking-wide">Multi-Service Quoting</p>
-              <h3 className="font-bold">One Quote, Every Service</h3>
-              <p className="text-sm text-primary font-medium">Window Cleaning + Dryer Vents + Parkade + In-Suite. One Price.</p>
+              <p className="text-xs text-muted-foreground uppercase tracking-wide">{t('login.features.cards.quoting.category')}</p>
+              <h3 className="font-bold">{t('login.features.cards.quoting.title')}</h3>
+              <p className="text-sm text-primary font-medium">{t('login.features.cards.quoting.tagline')}</p>
               <p className="text-sm text-muted-foreground">
-                Create comprehensive quotes combining window cleaning, dryer vents, parkade maintenance, and in-suite work with individual service pricing and photo documentation. Cross-sell without looking desperate. Professional. Complete. Done in 30 minutes.
+                {t('login.features.cards.quoting.description')}
               </p>
             </div>
 
@@ -440,11 +440,11 @@ export default function Login() {
               <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
                 <Radio className="w-5 h-5 text-primary" />
               </div>
-              <p className="text-xs text-muted-foreground uppercase tracking-wide">Active Worker Tracking</p>
-              <h3 className="font-bold">Real-Time Field Visibility</h3>
-              <p className="text-sm text-primary font-medium">Dave's on Tower One. Has Been Since 7:32am. Working 4h 18m.</p>
+              <p className="text-xs text-muted-foreground uppercase tracking-wide">{t('login.features.cards.tracking.category')}</p>
+              <h3 className="font-bold">{t('login.features.cards.tracking.title')}</h3>
+              <p className="text-sm text-primary font-medium">{t('login.features.cards.tracking.tagline')}</p>
               <p className="text-sm text-muted-foreground">
-                Monitor active workers, billable/non-billable hours, and performance analytics with live dashboards. Color-coded status. Green = working. Yellow = break. Red = check on them. Answer clients instantly: "Crew's on-site right now."
+                {t('login.features.cards.tracking.description')}
               </p>
             </div>
 
@@ -453,10 +453,10 @@ export default function Login() {
               <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
                 <ClipboardCheck className="w-5 h-5 text-primary" />
               </div>
-              <p className="text-xs text-muted-foreground uppercase tracking-wide">Safety Compliance</p>
-              <h3 className="font-bold">Safety Compliance</h3>
+              <p className="text-xs text-muted-foreground uppercase tracking-wide">{t('login.features.cards.safety.category')}</p>
+              <h3 className="font-bold">{t('login.features.cards.safety.title')}</h3>
               <p className="text-sm text-muted-foreground">
-                Digital safety forms, PDF rope access plans, and comprehensive safety documentation management.
+                {t('login.features.cards.safety.description')}
               </p>
             </div>
 
@@ -465,11 +465,11 @@ export default function Login() {
               <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
                 <MessageSquare className="w-5 h-5 text-primary" />
               </div>
-              <p className="text-xs text-muted-foreground uppercase tracking-wide">Complaint Management</p>
-              <h3 className="font-bold">Centralized. Organized. Done.</h3>
-              <p className="text-sm text-primary font-medium">70% Fewer Calls. 24-Hour Resolution</p>
+              <p className="text-xs text-muted-foreground uppercase tracking-wide">{t('login.features.cards.complaints.category')}</p>
+              <h3 className="font-bold">{t('login.features.cards.complaints.title')}</h3>
+              <p className="text-sm text-primary font-medium">{t('login.features.cards.complaints.tagline')}</p>
               <p className="text-sm text-muted-foreground">
-                Mrs. Henderson adds a photo: "Missed my window." She is replied to in 4 minutes: "On it tomorrow, 9am." She stops calling the building manager. They stop calling you. Everyone stops calling. Residents self-serve. You respond same-day. Your competitor? Still using paper.
+                {t('login.features.cards.complaints.description')}
               </p>
             </div>
 
@@ -478,11 +478,11 @@ export default function Login() {
               <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
                 <Home className="w-5 h-5 text-primary" />
               </div>
-              <p className="text-xs text-muted-foreground uppercase tracking-wide">Resident Portal</p>
-              <h3 className="font-bold">Building Resident Management</h3>
-              <p className="text-sm text-primary font-medium">The Contract Renewal Machine. 240 Residents Watch Progress. Submit Complaints. Stop Calling.</p>
+              <p className="text-xs text-muted-foreground uppercase tracking-wide">{t('login.features.cards.residents.category')}</p>
+              <h3 className="font-bold">{t('login.features.cards.residents.title')}</h3>
+              <p className="text-sm text-primary font-medium">{t('login.features.cards.residents.tagline')}</p>
               <p className="text-sm text-muted-foreground">
-                240 residents watch progress on their phones. Submit complaints that get fixed same-day. Tell their council "these guys are professional." Your competitor? Still using paper. Contract renewal rate: 95%. Theirs: 60%. Math is simple.
+                {t('login.features.cards.residents.description')}
               </p>
             </div>
 
@@ -491,10 +491,10 @@ export default function Login() {
               <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
                 <Award className="w-5 h-5 text-primary" />
               </div>
-              <p className="text-xs text-muted-foreground uppercase tracking-wide">IRATA & Insurance Audit Protection</p>
-              <h3 className="font-bold">"Show Me Your Inspection Logs"</h3>
+              <p className="text-xs text-muted-foreground uppercase tracking-wide">{t('login.features.cards.audit.category')}</p>
+              <h3 className="font-bold">{t('login.features.cards.audit.title')}</h3>
               <p className="text-sm text-muted-foreground">
-                Auditor asks for 6 months of harness inspections. You export PDF in 4 minutes. Every tech. Every day. Every piece of equipment. Building manager swoons.
+                {t('login.features.cards.audit.description')}
               </p>
             </div>
 
@@ -503,11 +503,11 @@ export default function Login() {
               <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
                 <Calendar className="w-5 h-5 text-primary" />
               </div>
-              <p className="text-xs text-muted-foreground uppercase tracking-wide">Job Scheduling</p>
-              <h3 className="font-bold">Visual Calendar & Resource Planning</h3>
-              <p className="text-sm text-primary font-medium">Dave's Assigned to Tower One AND Tower Five Tuesday?</p>
+              <p className="text-xs text-muted-foreground uppercase tracking-wide">{t('login.features.cards.scheduling.category')}</p>
+              <h3 className="font-bold">{t('login.features.cards.scheduling.title')}</h3>
+              <p className="text-sm text-primary font-medium">{t('login.features.cards.scheduling.tagline')}</p>
               <p className="text-sm text-muted-foreground">
-                Drag-and-drop calendar. See every project, every tech, every day. System catches conflicts: "Dave assigned to Tower One AND Tower Five Tuesday." Fix it before Monday. No confused crews. No angry clients. No 20-minute detective work.
+                {t('login.features.cards.scheduling.description')}
               </p>
             </div>
 
@@ -516,11 +516,11 @@ export default function Login() {
               <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
                 <FolderOpen className="w-5 h-5 text-primary" />
               </div>
-              <p className="text-xs text-muted-foreground uppercase tracking-wide">Documents</p>
-              <h3 className="font-bold">Centralized Safety & Project Repository</h3>
-              <p className="text-sm text-primary font-medium">Find That Certificate. 4 Minutes.</p>
+              <p className="text-xs text-muted-foreground uppercase tracking-wide">{t('login.features.cards.clientDashboard.category')}</p>
+              <h3 className="font-bold">{t('login.features.cards.clientDashboard.title')}</h3>
+              <p className="text-sm text-primary font-medium">{t('login.features.cards.clientDashboard.tagline')}</p>
               <p className="text-sm text-muted-foreground">
-                Insurance audit. Search "IRATA." Every certificate appears. Click. Download. Email. Done in 4 minutes. While your competitor digs through their truck. 5 categories. Instant search. Mobile upload. Cloud backup. Zero filing cabinets.
+                {t('login.features.cards.clientDashboard.description')}
               </p>
             </div>
           </div>
