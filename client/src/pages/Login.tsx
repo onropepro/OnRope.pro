@@ -4,6 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useLocation } from "wouter";
 import { useQuery } from "@tanstack/react-query";
+import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
@@ -20,27 +21,28 @@ const loginSchema = z.object({
 
 type LoginFormData = z.infer<typeof loginSchema>;
 
-const rotatingWords = [
-  "project",
-  "safety meeting",
-  "hour worked",
-  "drop",
-  "resident complaint",
-  "piece of gear",
-  "non-billable hour",
-  "job quote",
-  "safety document",
-  "hour scheduled",
-  "employee's performance level",
-  "job's progress"
-];
-
 export default function Login() {
+  const { t } = useTranslation();
   const { toast } = useToast();
   const [, setLocation] = useLocation();
   const [showLoginForm, setShowLoginForm] = useState(false);
   const [currentWordIndex, setCurrentWordIndex] = useState(0);
   const [isAnimating, setIsAnimating] = useState(false);
+
+  const rotatingWords = [
+    t('login.rotatingWords.project', 'project'),
+    t('login.rotatingWords.safetyMeeting', 'safety meeting'),
+    t('login.rotatingWords.hourWorked', 'hour worked'),
+    t('login.rotatingWords.drop', 'drop'),
+    t('login.rotatingWords.residentComplaint', 'resident complaint'),
+    t('login.rotatingWords.pieceOfGear', 'piece of gear'),
+    t('login.rotatingWords.nonBillableHour', 'non-billable hour'),
+    t('login.rotatingWords.jobQuote', 'job quote'),
+    t('login.rotatingWords.safetyDocument', 'safety document'),
+    t('login.rotatingWords.hourScheduled', 'hour scheduled'),
+    t('login.rotatingWords.employeePerformance', "employee's performance level"),
+    t('login.rotatingWords.jobProgress', "job's progress")
+  ];
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -161,13 +163,13 @@ export default function Login() {
             onClick={() => setShowLoginForm(true)}
             data-testid="button-sign-in-header"
           >
-            Sign In
+            {t('login.header.signIn', 'Sign In')}
           </Button>
           <Button 
             onClick={() => setLocation("/pricing")}
             data-testid="button-get-started-header"
           >
-            Get Started
+            {t('login.header.getStarted', 'Get Started')}
           </Button>
         </div>
       </header>
@@ -175,20 +177,20 @@ export default function Login() {
       {/* Hero Section */}
       <section className="flex flex-col items-center justify-center text-center px-6 py-16 md:py-24 bg-gradient-to-b from-primary/5 to-transparent">
         <p className="text-xs md:text-sm font-semibold tracking-widest text-muted-foreground uppercase mb-6">
-          Building Maintenance Management Software<br />
-          Built by a Level 3 IRATA Tech
+          {t('login.hero.subtitle', 'Building Maintenance Management Software')}<br />
+          {t('login.hero.builtBy', 'Built by a Level 3 IRATA Tech')}
         </p>
         
         <h1 className="text-2xl md:text-4xl font-medium text-primary mb-2">
-          Your competitors think they're organized.
+          {t('login.hero.tagline', "Your competitors think they're organized.")}
         </h1>
         
         <div className="text-5xl md:text-7xl lg:text-8xl font-black tracking-tight mb-6">
-          THEY'RE NOT
+          {t('login.hero.taglineBold', "THEY'RE NOT")}
         </div>
         
         <p className="text-base md:text-lg text-muted-foreground max-w-xl mb-8">
-          You track every{" "}
+          {t('login.hero.description', 'You track every')}{" "}
           <span 
             className={`inline-block font-semibold text-primary transition-all duration-300 ${
               isAnimating ? 'opacity-0 translate-y-2' : 'opacity-100 translate-y-0'
@@ -196,7 +198,7 @@ export default function Login() {
           >
             {rotatingWords[currentWordIndex]}
           </span>
-          , from a single platform that actually speaks rope access.
+          {t('login.hero.descriptionEnd', ', from a single platform that actually speaks rope access.')}
         </p>
         
         <div className="flex flex-col sm:flex-row items-center gap-4">
@@ -207,7 +209,7 @@ export default function Login() {
             data-testid="button-get-started-free"
           >
             <Rocket className="w-4 h-4" />
-            Get Started Free
+            {t('login.hero.getStartedFree', 'Get Started Free')}
           </Button>
           <Button 
             variant="outline"
@@ -216,7 +218,7 @@ export default function Login() {
             data-testid="button-watch-demo"
           >
             <Play className="w-4 h-4" />
-            Watch Demo
+            {t('login.hero.watchDemo', 'Watch Demo')}
           </Button>
         </div>
       </section>
@@ -225,33 +227,33 @@ export default function Login() {
       <section className="py-16 md:py-24 px-6">
         <div className="max-w-3xl mx-auto text-center">
           <h2 className="text-2xl md:text-4xl font-bold mb-12">
-            Your competitors think they're organized.<br />
-            <span className="font-normal">But in reality:</span>
+            {t('login.painPoints.title', "Your competitors think they're organized.")}<br />
+            <span className="font-normal">{t('login.painPoints.subtitle', 'But in reality:')}</span>
           </h2>
           
           <div className="space-y-4 md:space-y-5 text-base md:text-lg text-muted-foreground">
             <p>
-              They're losing <span className="font-semibold text-destructive">$40K/year</span> to payroll errors they don't see.
+              {t('login.painPoints.payrollErrors', "They're losing $40K/year to payroll errors they don't see.")}
             </p>
             <p>
-              They're spending <span className="font-semibold text-[#e84a6c]">80 hours monthly</span> on admin that should take 10.
+              {t('login.painPoints.adminTime', "They're spending 80 hours monthly on admin that should take 10.")}
             </p>
             <p>
-              They're underbidding <span className="font-semibold text-[#e84a6c]">25% of jobs</span> because they're guessing.
+              {t('login.painPoints.underbidding', "They're underbidding 25% of jobs because they're guessing.")}
             </p>
             <p>
-              They're <span className="font-semibold text-destructive">juggling resident complaints</span> between memory, emails, texts, phone calls, notes in a glovebox.
+              {t('login.painPoints.complaints', "They're juggling resident complaints between memory, emails, texts, phone calls, notes in a glovebox.")}
             </p>
             <p>
-              They're <span className="font-semibold text-destructive">one accident away</span> from a lawsuit they can't defend because their safety documentation is (maybe) under the driver's front seat.
+              {t('login.painPoints.lawsuit', "They're one accident away from a lawsuit they can't defend because their safety documentation is (maybe) under the driver's front seat.")}
             </p>
             <p>
-              They're losing contracts because they look like amateurs next to you.
+              {t('login.painPoints.losingContracts', "They're losing contracts because they look like amateurs next to you.")}
             </p>
           </div>
           
           <p className="text-xl md:text-2xl font-bold mt-12">
-            Let them keep thinking they're organized.
+            {t('login.painPoints.conclusion', "Let them keep thinking they're organized.")}
           </p>
         </div>
       </section>
@@ -260,10 +262,10 @@ export default function Login() {
       <section className="py-16 md:py-24 px-6 bg-muted/30">
         <div className="max-w-3xl mx-auto text-center">
           <h2 className="text-2xl md:text-4xl font-bold mb-4">
-            Ready to Streamline Your Rope Access Operations?
+            {t('login.cta.title', 'Ready to Streamline Your Rope Access Operations?')}
           </h2>
           <p className="text-muted-foreground mb-8">
-            Join rope access companies who've already ditched the spreadsheet chaos
+            {t('login.cta.subtitle', "Join rope access companies who've already ditched the spreadsheet chaos")}
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <Button 
@@ -273,7 +275,7 @@ export default function Login() {
               data-testid="button-start-free-trial"
             >
               <Rocket className="w-4 h-4" />
-              Start Free Trial
+              {t('login.cta.startFreeTrial', 'Start Free Trial')}
             </Button>
             <Button 
               variant="outline"
@@ -282,7 +284,7 @@ export default function Login() {
               data-testid="button-schedule-demo"
             >
               <span className="material-icons text-lg">calendar_today</span>
-              Schedule Demo
+              {t('login.cta.scheduleDemo', 'Schedule Demo')}
             </Button>
           </div>
         </div>
@@ -293,10 +295,10 @@ export default function Login() {
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-2xl md:text-4xl font-bold mb-4">
-              Juggling 10 Different Tools Is Costing You More Than Time
+              {t('login.features.title', 'Juggling 10 Different Tools Is Costing You More Than Time')}
             </h2>
             <p className="text-muted-foreground max-w-3xl mx-auto">
-              Replace scattered systems with one platform built specifically for rope access companies managing techs across multiple buildings. Time tracking, safety compliance, project visibility, payroll precision, resident communication - all within one intelligent platform.
+              {t('login.features.subtitle', 'Replace scattered systems with one platform built specifically for rope access companies managing techs across multiple buildings. Time tracking, safety compliance, project visibility, payroll precision, resident communication - all within one intelligent platform.')}
             </p>
           </div>
 
@@ -527,9 +529,9 @@ export default function Login() {
                 <CardDescription className="text-xs">Management Platform</CardDescription>
               </div>
             </div>
-            <CardTitle className="text-3xl font-bold">Welcome</CardTitle>
+            <CardTitle className="text-3xl font-bold">{t('login.form.title', 'Welcome')}</CardTitle>
             <CardDescription className="text-base">
-              Sign in to access your dashboard and manage operations
+              {t('login.form.subtitle', 'Sign in to access your dashboard and manage operations')}
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
@@ -540,7 +542,7 @@ export default function Login() {
                   name="identifier"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-sm font-medium">Email</FormLabel>
+                      <FormLabel className="text-sm font-medium">{t('login.form.email', 'Email')}</FormLabel>
                       <FormControl>
                         <div className="relative">
                           <span className="material-icons absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground text-xl">
@@ -548,7 +550,7 @@ export default function Login() {
                           </span>
                           <Input 
                             type="email"
-                            placeholder="your@email.com" 
+                            placeholder={t('login.form.emailPlaceholder', 'your@email.com')} 
                             {...field} 
                             data-testid="input-identifier" 
                             className="h-12 pl-12 text-base" 
@@ -565,7 +567,7 @@ export default function Login() {
                   name="password"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-sm font-medium">Password</FormLabel>
+                      <FormLabel className="text-sm font-medium">{t('login.form.password', 'Password')}</FormLabel>
                       <FormControl>
                         <div className="relative">
                           <span className="material-icons absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground text-xl">
@@ -573,7 +575,7 @@ export default function Login() {
                           </span>
                           <Input 
                             type="password" 
-                            placeholder="Enter your password" 
+                            placeholder={t('login.form.passwordPlaceholder', 'Enter your password')} 
                             {...field} 
                             data-testid="input-password" 
                             className="h-12 pl-12 text-base" 
@@ -591,7 +593,7 @@ export default function Login() {
                   data-testid="button-login"
                 >
                   <span className="material-icons mr-2">login</span>
-                  Sign In
+                  {t('login.form.signInButton', 'Sign In')}
                 </Button>
               </form>
             </Form>

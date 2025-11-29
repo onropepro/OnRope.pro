@@ -1,4 +1,71 @@
 {
+  "login": {
+    "header": {
+      "signIn": "Connexion",
+      "getStarted": "Commencer"
+    },
+    "hero": {
+      "subtitle": "Logiciel de gestion d'entretien de bâtiments",
+      "builtBy": "Créé par un technicien IRATA niveau 3",
+      "tagline": "Vos concurrents pensent être organisés.",
+      "taglineBold": "ILS NE LE SONT PAS",
+      "description": "Vous suivez chaque",
+      "descriptionEnd": ", depuis une seule plateforme qui parle vraiment accès sur corde.",
+      "getStartedFree": "Commencer gratuitement",
+      "watchDemo": "Voir la démo"
+    },
+    "rotatingWords": {
+      "project": "projet",
+      "safetyMeeting": "réunion de sécurité",
+      "hourWorked": "heure travaillée",
+      "drop": "descente",
+      "residentComplaint": "plainte de résident",
+      "pieceOfGear": "équipement",
+      "nonBillableHour": "heure non facturable",
+      "jobQuote": "soumission",
+      "safetyDocument": "document de sécurité",
+      "hourScheduled": "heure planifiée",
+      "employeePerformance": "niveau de performance d'employé",
+      "jobProgress": "progression du travail"
+    },
+    "painPoints": {
+      "title": "Vos concurrents pensent être organisés.",
+      "subtitle": "Mais en réalité:",
+      "payrollErrors": "Ils perdent 40K$/an à cause d'erreurs de paie qu'ils ne voient pas.",
+      "adminTime": "Ils passent 80 heures par mois sur l'administration qui devrait en prendre 10.",
+      "underbidding": "Ils sous-évaluent 25% des contrats parce qu'ils devinent.",
+      "complaints": "Ils jonglent avec les plaintes des résidents entre mémoire, courriels, textos, appels téléphoniques, notes dans la boîte à gants.",
+      "lawsuit": "Ils sont à un accident d'un procès qu'ils ne peuvent pas défendre parce que leur documentation de sécurité est (peut-être) sous le siège du conducteur.",
+      "losingContracts": "Ils perdent des contrats parce qu'ils ont l'air d'amateurs à côté de vous.",
+      "conclusion": "Laissez-les continuer à penser qu'ils sont organisés."
+    },
+    "cta": {
+      "title": "Prêt à optimiser vos opérations d'accès sur corde?",
+      "subtitle": "Rejoignez les entreprises d'accès sur corde qui ont déjà abandonné le chaos des tableurs",
+      "startFreeTrial": "Essai gratuit",
+      "scheduleDemo": "Planifier une démo"
+    },
+    "features": {
+      "title": "Jongler avec 10 outils différents vous coûte plus que du temps",
+      "subtitle": "Remplacez les systèmes dispersés par une seule plateforme conçue spécifiquement pour les entreprises d'accès sur corde gérant des techniciens sur plusieurs bâtiments. Suivi du temps, conformité sécurité, visibilité des projets, précision de la paie, communication avec les résidents - le tout dans une seule plateforme intelligente."
+    },
+    "form": {
+      "title": "Bienvenue",
+      "subtitle": "Connectez-vous pour accéder à votre tableau de bord et gérer les opérations",
+      "email": "Courriel",
+      "emailPlaceholder": "votre@courriel.com",
+      "password": "Mot de passe",
+      "passwordPlaceholder": "Entrez votre mot de passe",
+      "signInButton": "Connexion",
+      "noAccount": "Pas de compte?",
+      "createAccount": "Créez-en un",
+      "demoAccess": "Accès démo",
+      "superuserDemo": "Démo Super-utilisateur",
+      "ownerDemo": "Démo Propriétaire",
+      "residentDemo": "Démo Résident",
+      "propertyManagerDemo": "Démo Gestionnaire immobilier"
+    }
+  },
   "common": {
     "loading": "Chargement...",
     "save": "Enregistrer",

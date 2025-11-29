@@ -1,4 +1,71 @@
 {
+  "login": {
+    "header": {
+      "signIn": "Sign In",
+      "getStarted": "Get Started"
+    },
+    "hero": {
+      "subtitle": "Building Maintenance Management Software",
+      "builtBy": "Built by a Level 3 IRATA Tech",
+      "tagline": "Your competitors think they're organized.",
+      "taglineBold": "THEY'RE NOT",
+      "description": "You track every",
+      "descriptionEnd": ", from a single platform that actually speaks rope access.",
+      "getStartedFree": "Get Started Free",
+      "watchDemo": "Watch Demo"
+    },
+    "rotatingWords": {
+      "project": "project",
+      "safetyMeeting": "safety meeting",
+      "hourWorked": "hour worked",
+      "drop": "drop",
+      "residentComplaint": "resident complaint",
+      "pieceOfGear": "piece of gear",
+      "nonBillableHour": "non-billable hour",
+      "jobQuote": "job quote",
+      "safetyDocument": "safety document",
+      "hourScheduled": "hour scheduled",
+      "employeePerformance": "employee's performance level",
+      "jobProgress": "job's progress"
+    },
+    "painPoints": {
+      "title": "Your competitors think they're organized.",
+      "subtitle": "But in reality:",
+      "payrollErrors": "They're losing $40K/year to payroll errors they don't see.",
+      "adminTime": "They're spending 80 hours monthly on admin that should take 10.",
+      "underbidding": "They're underbidding 25% of jobs because they're guessing.",
+      "complaints": "They're juggling resident complaints between memory, emails, texts, phone calls, notes in a glovebox.",
+      "lawsuit": "They're one accident away from a lawsuit they can't defend because their safety documentation is (maybe) under the driver's front seat.",
+      "losingContracts": "They're losing contracts because they look like amateurs next to you.",
+      "conclusion": "Let them keep thinking they're organized."
+    },
+    "cta": {
+      "title": "Ready to Streamline Your Rope Access Operations?",
+      "subtitle": "Join rope access companies who've already ditched the spreadsheet chaos",
+      "startFreeTrial": "Start Free Trial",
+      "scheduleDemo": "Schedule Demo"
+    },
+    "features": {
+      "title": "Juggling 10 Different Tools Is Costing You More Than Time",
+      "subtitle": "Replace scattered systems with one platform built specifically for rope access companies managing techs across multiple buildings. Time tracking, safety compliance, project visibility, payroll precision, resident communication - all within one intelligent platform."
+    },
+    "form": {
+      "title": "Welcome",
+      "subtitle": "Sign in to access your dashboard and manage operations",
+      "email": "Email",
+      "emailPlaceholder": "your@email.com",
+      "password": "Password",
+      "passwordPlaceholder": "Enter your password",
+      "signInButton": "Sign In",
+      "noAccount": "Don't have an account?",
+      "createAccount": "Create one",
+      "demoAccess": "Demo Access",
+      "superuserDemo": "Superuser Demo",
+      "ownerDemo": "Owner Demo",
+      "residentDemo": "Resident Demo",
+      "propertyManagerDemo": "Property Manager Demo"
+    }
+  },
   "common": {
     "loading": "Loading...",
     "save": "Save",
