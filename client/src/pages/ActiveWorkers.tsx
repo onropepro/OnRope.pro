@@ -343,7 +343,7 @@ export default function ActiveWorkers() {
               <Card className="glass-card border-0 shadow-premium">
                 <CardContent className="p-4">
                   <div className="flex items-center justify-between">
-                    <div className="text-sm font-medium">Time Period</div>
+                    <div className="text-sm font-medium">{t('activeWorkers.timePeriod', 'Time Period')}</div>
                     <div className="flex gap-2">
                       <Button
                         variant={timeFilter === "today" ? "default" : "outline"}
@@ -352,7 +352,7 @@ export default function ActiveWorkers() {
                         data-testid="filter-today"
                       >
                         <span className="material-icons text-sm mr-1">today</span>
-                        Today
+                        {t('activeWorkers.filterToday', 'Today')}
                       </Button>
                       <Button
                         variant={timeFilter === "week" ? "default" : "outline"}
@@ -361,7 +361,7 @@ export default function ActiveWorkers() {
                         data-testid="filter-week"
                       >
                         <span className="material-icons text-sm mr-1">date_range</span>
-                        This Week
+                        {t('activeWorkers.filterThisWeek', 'This Week')}
                       </Button>
                     </div>
                   </div>
@@ -376,9 +376,9 @@ export default function ActiveWorkers() {
                       <span className="material-icons text-6xl text-muted-foreground mb-4">
                         location_off
                       </span>
-                      <h3 className="text-xl font-bold mb-2">No GPS Data</h3>
+                      <h3 className="text-xl font-bold mb-2">{t('activeWorkers.noGpsData', 'No GPS Data')}</h3>
                       <p className="text-muted-foreground">
-                        No work sessions with GPS locations for the selected time period
+                        {t('activeWorkers.noGpsMessage', 'No work sessions with GPS locations for the selected time period')}
                       </p>
                     </div>
                   ) : (
@@ -415,11 +415,11 @@ export default function ActiveWorkers() {
                                   </div>
                                   <div className="flex items-center gap-1">
                                     <span className="material-icons text-xs">{marker.type === 'start' ? 'play_arrow' : 'stop'}</span>
-                                    <span>{marker.type === 'start' ? 'Started' : 'Ended'}: {format(new Date(marker.type === 'start' ? marker.session.startTime : marker.session.endTime), 'MMM d, h:mm a')}</span>
+                                    <span>{marker.type === 'start' ? t('activeWorkers.started', 'Started') : t('activeWorkers.ended', 'Ended')}: {format(new Date(marker.type === 'start' ? marker.session.startTime : marker.session.endTime), 'MMM d, h:mm a')}</span>
                                   </div>
                                   <div className="flex items-center gap-1">
                                     <Badge variant={marker.session.endTime ? "secondary" : "default"} className="text-xs">
-                                      {marker.session.endTime ? 'Completed' : 'In Progress'}
+                                      {marker.session.endTime ? t('activeWorkers.completed', 'Completed') : t('activeWorkers.inProgressStatus', 'In Progress')}
                                     </Badge>
                                   </div>
                                 </div>
@@ -440,15 +440,15 @@ export default function ActiveWorkers() {
                     <div className="space-y-4">
                       {/* Marker Type Legend */}
                       <div>
-                        <div className="text-sm font-medium mb-3">Legend</div>
+                        <div className="text-sm font-medium mb-3">{t('activeWorkers.legend', 'Legend')}</div>
                         <div className="grid grid-cols-2 gap-4 text-sm">
                           <div className="flex items-center gap-2">
                             <div className="w-4 h-4 rounded-full border-2 border-primary bg-primary opacity-60"></div>
-                            <span>Start Location (Solid)</span>
+                            <span>{t('activeWorkers.startLocation', 'Start Location (Solid)')}</span>
                           </div>
                           <div className="flex items-center gap-2">
                             <div className="w-4 h-4 rounded-full border border-dashed border-primary bg-primary opacity-30"></div>
-                            <span>End Location (Dashed)</span>
+                            <span>{t('activeWorkers.endLocation', 'End Location (Dashed)')}</span>
                           </div>
                         </div>
                       </div>
@@ -456,7 +456,7 @@ export default function ActiveWorkers() {
                       {/* Employee Color Chart */}
                       {employeeColors.length > 0 && (
                         <div className="pt-4 border-t">
-                          <div className="text-sm font-medium mb-3">Employee Colors</div>
+                          <div className="text-sm font-medium mb-3">{t('activeWorkers.employeeColors', 'Employee Colors')}</div>
                           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                             {employeeColors.map((employee) => (
                               <div 

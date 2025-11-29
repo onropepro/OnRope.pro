@@ -1468,6 +1468,165 @@
       "checkoutFailed": "Échec du démarrage du processus de paiement. Veuillez réessayer."
     }
   },
+  "hoursAnalytics": {
+    "title": "Analyse des heures",
+    "myHours": "Mes heures",
+    "subtitle": "Répartition des heures facturables et non facturables",
+    "myHoursSubtitle": "Voir vos heures de travail et l'historique des sessions",
+    "loading": "Chargement des analyses...",
+    "rearrangeCards": "Réorganiser les cartes",
+    "rearrange": "Réorganiser",
+    "done": "Terminé",
+    "reset": "Réinitialiser",
+    "totalHoursThisMonth": "Heures totales ce mois",
+    "billable": "Facturable",
+    "yearToDate": "Depuis le début de l'année",
+    "billableHours": "Heures facturables",
+    "nonBillableHours": "Heures non facturables",
+    "thisMonth": "Ce mois",
+    "today": "Aujourd'hui",
+    "noDataToShow": "Aucune donnée à afficher",
+    "activeProjects": "Projets actifs",
+    "inProgress": "En cours",
+    "completedProjects": "Projets terminés",
+    "allTime": "Tout le temps",
+    "totalEmployees": "Total des employés",
+    "companyWide": "À l'échelle de l'entreprise",
+    "activeThisMonth": "Actifs ce mois",
+    "employees": "Employés",
+    "workSessions": "Sessions de travail",
+    "avgSessionDuration": "Durée moyenne de session",
+    "perSession": "Par session",
+    "totalDrops": "Total des descentes",
+    "avgDropsSession": "Moy. descentes/session",
+    "productivity": "Productivité",
+    "billableRate": "Taux facturable",
+    "avgHoursEmployee": "Moy. heures/employé",
+    "topPerformer": "Meilleur performeur",
+    "todaysHours": "Heures d'aujourd'hui",
+    "details": "Détails",
+    "close": "Fermer",
+    "months": {
+      "january": "Janvier",
+      "february": "Février",
+      "march": "Mars",
+      "april": "Avril",
+      "may": "Mai",
+      "june": "Juin",
+      "july": "Juillet",
+      "august": "Août",
+      "september": "Septembre",
+      "october": "Octobre",
+      "november": "Novembre",
+      "december": "Décembre"
+    }
+  },
+  "activeWorkers": {
+    "title": "Travailleurs actifs",
+    "subtitle": "Vue en temps réel de qui travaille où",
+    "active": "actifs",
+    "workers": "Travailleurs",
+    "gpsLocations": "Localisations GPS",
+    "noActiveWorkers": "Aucun travailleur actif",
+    "noWorkersMessage": "Personne n'est actuellement enregistré sur aucun projet",
+    "harnessCompleted": "Inspection du harnais terminée",
+    "harnessMissing": "Inspection du harnais manquante",
+    "inspected": "Inspecté",
+    "notInspected": "Non inspecté",
+    "activeStatus": "Actif",
+    "startedAt": "Commencé à",
+    "duration": "Durée",
+    "timePeriod": "Période",
+    "filterToday": "Aujourd'hui",
+    "filterThisWeek": "Cette semaine",
+    "noGpsData": "Aucune donnée GPS",
+    "noGpsMessage": "Aucune session de travail avec localisation GPS pour la période sélectionnée",
+    "legend": "Légende",
+    "startLocation": "Lieu de départ (Solide)",
+    "endLocation": "Lieu de fin (Pointillé)",
+    "employeeColors": "Couleurs des employés",
+    "sessionsShown": "sessions affichées de",
+    "session": "session",
+    "employee": "employé",
+    "started": "Commencé",
+    "ended": "Terminé",
+    "completed": "Terminé",
+    "inProgressStatus": "En cours"
+  },
+  "safetyForms": {
+    "title": "Formulaires de sécurité",
+    "subtitle": "Sélectionnez un formulaire de sécurité à compléter ou consulter",
+    "toolboxMeeting": {
+      "title": "Réunion de boîte à outils",
+      "description": "Briefing de sécurité quotidien et évaluation des dangers"
+    },
+    "flha": {
+      "title": "Évaluation des dangers sur le terrain",
+      "description": "FLHA complet pour les opérations sur corde"
+    },
+    "harnessInspection": {
+      "title": "Inspection du harnais",
+      "description": "Inspection quotidienne du harnais et des EPI"
+    },
+    "irataIcop": {
+      "title": "IRATA ICOP",
+      "description": "Code international de pratique (TC-102ENG)"
+    },
+    "incidentReport": {
+      "title": "Rapport d'incident",
+      "description": "Documenter les incidents et blessures au travail"
+    },
+    "methodStatement": {
+      "title": "Déclaration de méthode",
+      "description": "Procédures de travail sécuritaires et contrôles des risques"
+    },
+    "compliance": {
+      "title": "Conformité de sécurité",
+      "description": "Tous les formulaires de sécurité sont enregistrés numériquement et peuvent être exportés en documents PDF à des fins de conformité et d'audit."
+    }
+  },
+  "gearInventory": {
+    "title": "Construire mon équipement",
+    "subtitle": "Gérer votre inventaire d'équipement",
+    "tapToAdd": "Appuyez pour ajouter ou voir les détails",
+    "harness": {
+      "name": "Harnais",
+      "description": "Harnais complet"
+    },
+    "descender": {
+      "name": "Descendeur",
+      "description": "Dispositif de descente"
+    },
+    "ascender": {
+      "name": "Bloqueur",
+      "description": "Dispositif d'ascension"
+    },
+    "steelCarabiner": {
+      "name": "Mousqueton en acier",
+      "description": "Mousqueton à verrouillage en acier"
+    },
+    "aluminumCarabiner": {
+      "name": "Mousqueton en aluminium",
+      "description": "Mousqueton à verrouillage en aluminium"
+    },
+    "dialog": {
+      "description": "Entrez les détails de l'équipement (tous les champs sont facultatifs)",
+      "brand": "Marque",
+      "brandPlaceholder": "ex., Petzl",
+      "model": "Modèle",
+      "modelPlaceholder": "ex., Avao Bod",
+      "serialNumber": "Numéro de série",
+      "serialPlaceholder": "ex., SN123456",
+      "dateOfManufacture": "Date de fabrication",
+      "dateInService": "Date de mise en service",
+      "dateOutOfService": "Date de retrait du service",
+      "inService": "En service",
+      "quantity": "Quantité",
+      "itemPrice": "Prix de l'article",
+      "cancel": "Annuler",
+      "save": "Enregistrer"
+    }
+  },
   "complaintDetail": {
     "loading": "Chargement...",
     "feedbackNotFound": "Commentaire non trouvé",

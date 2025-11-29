@@ -1468,6 +1468,165 @@
       "checkoutFailed": "Failed to start checkout process. Please try again."
     }
   },
+  "hoursAnalytics": {
+    "title": "Hours Analytics",
+    "myHours": "My Hours",
+    "subtitle": "Billable vs Non-Billable Hours Breakdown",
+    "myHoursSubtitle": "View your work hours and session history",
+    "loading": "Loading analytics...",
+    "rearrangeCards": "Rearrange Cards",
+    "rearrange": "Rearrange",
+    "done": "Done",
+    "reset": "Reset",
+    "totalHoursThisMonth": "Total Hours This Month",
+    "billable": "Billable",
+    "yearToDate": "Year to Date",
+    "billableHours": "Billable Hours",
+    "nonBillableHours": "Non-Billable Hours",
+    "thisMonth": "This Month",
+    "today": "Today",
+    "noDataToShow": "No data to show",
+    "activeProjects": "Active Projects",
+    "inProgress": "In Progress",
+    "completedProjects": "Completed Projects",
+    "allTime": "All Time",
+    "totalEmployees": "Total Employees",
+    "companyWide": "Company Wide",
+    "activeThisMonth": "Active This Month",
+    "employees": "Employees",
+    "workSessions": "Work Sessions",
+    "avgSessionDuration": "Avg Session Duration",
+    "perSession": "Per Session",
+    "totalDrops": "Total Drops",
+    "avgDropsSession": "Avg Drops/Session",
+    "productivity": "Productivity",
+    "billableRate": "Billable Rate",
+    "avgHoursEmployee": "Avg Hours/Employee",
+    "topPerformer": "Top Performer",
+    "todaysHours": "Today's Hours",
+    "details": "Details",
+    "close": "Close",
+    "months": {
+      "january": "January",
+      "february": "February",
+      "march": "March",
+      "april": "April",
+      "may": "May",
+      "june": "June",
+      "july": "July",
+      "august": "August",
+      "september": "September",
+      "october": "October",
+      "november": "November",
+      "december": "December"
+    }
+  },
+  "activeWorkers": {
+    "title": "Active Workers",
+    "subtitle": "Real-time view of who's working where",
+    "active": "active",
+    "workers": "Workers",
+    "gpsLocations": "GPS Locations",
+    "noActiveWorkers": "No Active Workers",
+    "noWorkersMessage": "No one is currently clocked in on any projects",
+    "harnessCompleted": "Harness inspection completed",
+    "harnessMissing": "Harness inspection missing",
+    "inspected": "Inspected",
+    "notInspected": "Not Inspected",
+    "activeStatus": "Active",
+    "startedAt": "Started At",
+    "duration": "Duration",
+    "timePeriod": "Time Period",
+    "filterToday": "Today",
+    "filterThisWeek": "This Week",
+    "noGpsData": "No GPS Data",
+    "noGpsMessage": "No work sessions with GPS locations for the selected time period",
+    "legend": "Legend",
+    "startLocation": "Start Location (Solid)",
+    "endLocation": "End Location (Dashed)",
+    "employeeColors": "Employee Colors",
+    "sessionsShown": "sessions shown from",
+    "session": "session",
+    "employee": "employee",
+    "started": "Started",
+    "ended": "Ended",
+    "completed": "Completed",
+    "inProgressStatus": "In Progress"
+  },
+  "safetyForms": {
+    "title": "Safety Forms",
+    "subtitle": "Select a safety form to complete or view records",
+    "toolboxMeeting": {
+      "title": "Toolbox Meeting",
+      "description": "Daily safety briefing and hazard assessment"
+    },
+    "flha": {
+      "title": "Field Level Hazard Assessment",
+      "description": "Comprehensive FLHA for rope access operations"
+    },
+    "harnessInspection": {
+      "title": "Harness Inspection",
+      "description": "Daily harness and PPE safety inspection"
+    },
+    "irataIcop": {
+      "title": "IRATA ICOP",
+      "description": "International Code of Practice (TC-102ENG)"
+    },
+    "incidentReport": {
+      "title": "Incident Report",
+      "description": "Document workplace incidents and injuries"
+    },
+    "methodStatement": {
+      "title": "Method Statement",
+      "description": "Safe work procedures and risk controls"
+    },
+    "compliance": {
+      "title": "Safety Compliance",
+      "description": "All safety forms are digitally recorded and can be exported as PDF documents for compliance and auditing purposes."
+    }
+  },
+  "gearInventory": {
+    "title": "Build my Kit",
+    "subtitle": "Manage your equipment inventory",
+    "tapToAdd": "Tap to add or view details",
+    "harness": {
+      "name": "Harness",
+      "description": "Full body harness"
+    },
+    "descender": {
+      "name": "Descender",
+      "description": "Descending device"
+    },
+    "ascender": {
+      "name": "Ascender",
+      "description": "Ascending device"
+    },
+    "steelCarabiner": {
+      "name": "Steel Carabiner",
+      "description": "Steel locking carabiner"
+    },
+    "aluminumCarabiner": {
+      "name": "Aluminum Carabiner",
+      "description": "Aluminum locking carabiner"
+    },
+    "dialog": {
+      "description": "Enter equipment details (all fields are optional)",
+      "brand": "Brand",
+      "brandPlaceholder": "e.g., Petzl",
+      "model": "Model",
+      "modelPlaceholder": "e.g., Avao Bod",
+      "serialNumber": "Serial Number",
+      "serialPlaceholder": "e.g., SN123456",
+      "dateOfManufacture": "Date of Manufacture",
+      "dateInService": "Date In Service",
+      "dateOutOfService": "Date Out of Service",
+      "inService": "In Service",
+      "quantity": "Quantity",
+      "itemPrice": "Item Price",
+      "cancel": "Cancel",
+      "save": "Save"
+    }
+  },
   "complaintDetail": {
     "loading": "Loading...",
     "feedbackNotFound": "Feedback Not Found",

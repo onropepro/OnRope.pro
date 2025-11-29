@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useLocation } from "wouter";
+import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -27,6 +28,7 @@ const gearFormSchema = z.object({
 type GearFormData = z.infer<typeof gearFormSchema>;
 
 export default function GearInventory() {
+  const { t } = useTranslation();
   const [, setLocation] = useLocation();
   const [selectedEquipment, setSelectedEquipment] = useState<string | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -39,11 +41,11 @@ export default function GearInventory() {
   const canViewPrice = hasFinancialAccess(currentUser);
 
   const equipmentTypes = [
-    { id: "harness", name: "Harness", icon: "settings_accessibility", description: "Full body harness" },
-    { id: "descender", name: "Descender", icon: "arrow_downward", description: "Descending device" },
-    { id: "ascender", name: "Ascender", icon: "arrow_upward", description: "Ascending device" },
-    { id: "steel_carabiner", name: "Steel Carabiner", icon: "link", description: "Steel locking carabiner" },
-    { id: "aluminum_carabiner", name: "Aluminum Carabiner", icon: "link", description: "Aluminum locking carabiner" },
+    { id: "harness", name: t('gearInventory.harness.name', 'Harness'), icon: "settings_accessibility", description: t('gearInventory.harness.description', 'Full body harness') },
+    { id: "descender", name: t('gearInventory.descender.name', 'Descender'), icon: "arrow_downward", description: t('gearInventory.descender.description', 'Descending device') },
+    { id: "ascender", name: t('gearInventory.ascender.name', 'Ascender'), icon: "arrow_upward", description: t('gearInventory.ascender.description', 'Ascending device') },
+    { id: "steel_carabiner", name: t('gearInventory.steelCarabiner.name', 'Steel Carabiner'), icon: "link", description: t('gearInventory.steelCarabiner.description', 'Steel locking carabiner') },
+    { id: "aluminum_carabiner", name: t('gearInventory.aluminumCarabiner.name', 'Aluminum Carabiner'), icon: "link", description: t('gearInventory.aluminumCarabiner.description', 'Aluminum locking carabiner') },
   ];
 
   const form = useForm<GearFormData>({
@@ -79,7 +81,6 @@ export default function GearInventory() {
 
   const onSubmit = (data: GearFormData) => {
     console.log("Submitting gear item:", { equipmentType: selectedEquipment, ...data });
-    // TODO: Connect to backend API
     setIsDialogOpen(false);
   };
 
@@ -99,9 +100,9 @@ export default function GearInventory() {
             <span className="material-icons text-xl">arrow_back</span>
           </Button>
           <div className="flex-1">
-            <h1 className="text-xl font-bold tracking-tight">Build my Kit</h1>
+            <h1 className="text-xl font-bold tracking-tight">{t('gearInventory.title', 'Build my Kit')}</h1>
             <p className="text-xs text-muted-foreground mt-0.5">
-              Manage your equipment inventory
+              {t('gearInventory.subtitle', 'Manage your equipment inventory')}
             </p>
           </div>
         </div>
@@ -134,7 +135,7 @@ export default function GearInventory() {
               </CardHeader>
               <CardContent>
                 <p className="text-sm text-muted-foreground">
-                  Tap to add or view details
+                  {t('gearInventory.tapToAdd', 'Tap to add or view details')}
                 </p>
               </CardContent>
             </Card>
@@ -148,7 +149,7 @@ export default function GearInventory() {
           <DialogHeader>
             <DialogTitle>{selectedEquipmentData?.name}</DialogTitle>
             <DialogDescription>
-              Enter equipment details (all fields are optional)
+              {t('gearInventory.dialog.description', 'Enter equipment details (all fields are optional)')}
             </DialogDescription>
           </DialogHeader>
 
@@ -159,9 +160,9 @@ export default function GearInventory() {
                 name="brand"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Brand</FormLabel>
+                    <FormLabel>{t('gearInventory.dialog.brand', 'Brand')}</FormLabel>
                     <FormControl>
-                      <Input placeholder="e.g., Petzl" {...field} data-testid="input-brand" />
+                      <Input placeholder={t('gearInventory.dialog.brandPlaceholder', 'e.g., Petzl')} {...field} data-testid="input-brand" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -173,9 +174,9 @@ export default function GearInventory() {
                 name="model"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Model</FormLabel>
+                    <FormLabel>{t('gearInventory.dialog.model', 'Model')}</FormLabel>
                     <FormControl>
-                      <Input placeholder="e.g., Avao Bod" {...field} data-testid="input-model" />
+                      <Input placeholder={t('gearInventory.dialog.modelPlaceholder', 'e.g., Avao Bod')} {...field} data-testid="input-model" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -187,9 +188,9 @@ export default function GearInventory() {
                 name="serialNumber"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Serial Number</FormLabel>
+                    <FormLabel>{t('gearInventory.dialog.serialNumber', 'Serial Number')}</FormLabel>
                     <FormControl>
-                      <Input placeholder="e.g., SN123456" {...field} data-testid="input-serial" />
+                      <Input placeholder={t('gearInventory.dialog.serialPlaceholder', 'e.g., SN123456')} {...field} data-testid="input-serial" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -201,7 +202,7 @@ export default function GearInventory() {
                 name="dateOfManufacture"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Date of Manufacture</FormLabel>
+                    <FormLabel>{t('gearInventory.dialog.dateOfManufacture', 'Date of Manufacture')}</FormLabel>
                     <FormControl>
                       <Input type="date" {...field} data-testid="input-date-of-manufacture" />
                     </FormControl>
@@ -215,7 +216,7 @@ export default function GearInventory() {
                 name="dateInService"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Date In Service</FormLabel>
+                    <FormLabel>{t('gearInventory.dialog.dateInService', 'Date In Service')}</FormLabel>
                     <FormControl>
                       <Input type="date" {...field} data-testid="input-date-in-service" />
                     </FormControl>
@@ -229,7 +230,7 @@ export default function GearInventory() {
                 name="dateOutOfService"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Date Out of Service</FormLabel>
+                    <FormLabel>{t('gearInventory.dialog.dateOutOfService', 'Date Out of Service')}</FormLabel>
                     <FormControl>
                       <Input type="date" {...field} data-testid="input-date-out-of-service" />
                     </FormControl>
@@ -252,7 +253,7 @@ export default function GearInventory() {
                     </FormControl>
                     <div className="space-y-1 leading-none">
                       <FormLabel>
-                        In Service
+                        {t('gearInventory.dialog.inService', 'In Service')}
                       </FormLabel>
                     </div>
                   </FormItem>
@@ -264,7 +265,7 @@ export default function GearInventory() {
                 name="quantity"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Quantity</FormLabel>
+                    <FormLabel>{t('gearInventory.dialog.quantity', 'Quantity')}</FormLabel>
                     <FormControl>
                       <Input type="number" min="1" placeholder="1" {...field} data-testid="input-quantity" />
                     </FormControl>
@@ -279,7 +280,7 @@ export default function GearInventory() {
                   name="itemPrice"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Item Price</FormLabel>
+                      <FormLabel>{t('gearInventory.dialog.itemPrice', 'Item Price')}</FormLabel>
                       <FormControl>
                         <Input type="number" step="0.01" min="0" placeholder="0.00" {...field} data-testid="input-item-price" />
                       </FormControl>
@@ -297,14 +298,14 @@ export default function GearInventory() {
                   className="flex-1"
                   data-testid="button-cancel"
                 >
-                  Cancel
+                  {t('gearInventory.dialog.cancel', 'Cancel')}
                 </Button>
                 <Button
                   type="submit"
                   className="flex-1"
                   data-testid="button-save"
                 >
-                  Save
+                  {t('gearInventory.dialog.save', 'Save')}
                 </Button>
               </div>
             </form>

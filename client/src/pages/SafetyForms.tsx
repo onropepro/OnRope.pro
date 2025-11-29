@@ -1,16 +1,18 @@
 import { useLocation } from "wouter";
+import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { ArrowLeft, FileCheck, ClipboardList, Shield, AlertTriangle, FileWarning, BookOpen, FileText } from "lucide-react";
 
 export default function SafetyForms() {
+  const { t } = useTranslation();
   const [, navigate] = useLocation();
 
   const safetyFormCards = [
     {
       id: "toolbox-meeting",
-      title: "Toolbox Meeting",
-      description: "Daily safety briefing and hazard assessment",
+      title: t('safetyForms.toolboxMeeting.title', 'Toolbox Meeting'),
+      description: t('safetyForms.toolboxMeeting.description', 'Daily safety briefing and hazard assessment'),
       icon: FileCheck,
       onClick: () => navigate("/toolbox-meeting"),
       iconColor: "text-red-500",
@@ -19,8 +21,8 @@ export default function SafetyForms() {
     },
     {
       id: "flha-form",
-      title: "Field Level Hazard Assessment",
-      description: "Comprehensive FLHA for rope access operations",
+      title: t('safetyForms.flha.title', 'Field Level Hazard Assessment'),
+      description: t('safetyForms.flha.description', 'Comprehensive FLHA for rope access operations'),
       icon: AlertTriangle,
       onClick: () => navigate("/flha-form"),
       iconColor: "text-orange-500",
@@ -29,8 +31,8 @@ export default function SafetyForms() {
     },
     {
       id: "harness-inspection",
-      title: "Harness Inspection",
-      description: "Daily harness and PPE safety inspection",
+      title: t('safetyForms.harnessInspection.title', 'Harness Inspection'),
+      description: t('safetyForms.harnessInspection.description', 'Daily harness and PPE safety inspection'),
       icon: ClipboardList,
       onClick: () => navigate("/harness-inspection"),
       iconColor: "text-primary",
@@ -39,8 +41,8 @@ export default function SafetyForms() {
     },
     {
       id: "irata-icop",
-      title: "IRATA ICOP",
-      description: "International Code of Practice (TC-102ENG)",
+      title: t('safetyForms.irataIcop.title', 'IRATA ICOP'),
+      description: t('safetyForms.irataIcop.description', 'International Code of Practice (TC-102ENG)'),
       icon: BookOpen,
       onClick: () => window.open("https://irata.org/downloads/2055", "_blank", "noopener,noreferrer"),
       iconColor: "text-primary",
@@ -49,8 +51,8 @@ export default function SafetyForms() {
     },
     {
       id: "incident-report",
-      title: "Incident Report",
-      description: "Document workplace incidents and injuries",
+      title: t('safetyForms.incidentReport.title', 'Incident Report'),
+      description: t('safetyForms.incidentReport.description', 'Document workplace incidents and injuries'),
       icon: FileWarning,
       onClick: () => navigate("/incident-report"),
       iconColor: "text-destructive",
@@ -59,8 +61,8 @@ export default function SafetyForms() {
     },
     {
       id: "method-statement",
-      title: "Method Statement",
-      description: "Safe work procedures and risk controls",
+      title: t('safetyForms.methodStatement.title', 'Method Statement'),
+      description: t('safetyForms.methodStatement.description', 'Safe work procedures and risk controls'),
       icon: FileText,
       onClick: () => navigate("/method-statement"),
       iconColor: "text-green-500",
@@ -83,12 +85,12 @@ export default function SafetyForms() {
           </Button>
           <div className="flex items-center gap-2 min-w-0 flex-1">
             <Shield className="h-5 w-5 sm:h-6 sm:w-6 text-primary flex-shrink-0" />
-            <h1 className="text-lg sm:text-2xl font-bold truncate">Safety Forms</h1>
+            <h1 className="text-lg sm:text-2xl font-bold truncate">{t('safetyForms.title', 'Safety Forms')}</h1>
           </div>
         </div>
 
         <p className="text-sm sm:text-base text-muted-foreground mb-6 pl-11 sm:pl-0">
-          Select a safety form to complete or view records
+          {t('safetyForms.subtitle', 'Select a safety form to complete or view records')}
         </p>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -124,10 +126,10 @@ export default function SafetyForms() {
         <div className="mt-8 p-4 bg-muted/50 rounded-lg">
           <h2 className="font-semibold mb-2 flex items-center gap-2">
             <Shield className="h-4 w-4" />
-            Safety Compliance
+            {t('safetyForms.compliance.title', 'Safety Compliance')}
           </h2>
           <p className="text-sm text-muted-foreground">
-            All safety forms are digitally recorded and can be exported as PDF documents for compliance and auditing purposes.
+            {t('safetyForms.compliance.description', 'All safety forms are digitally recorded and can be exported as PDF documents for compliance and auditing purposes.')}
           </p>
         </div>
       </div>
