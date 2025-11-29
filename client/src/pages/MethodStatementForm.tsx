@@ -4,6 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useLocation } from "wouter";
+import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
@@ -20,16 +21,16 @@ import type { Project, User } from "@shared/schema";
 import SignatureCanvas from "react-signature-canvas";
 import { jsPDF } from "jspdf";
 
-// Standard job types for rope access work
+// Standard job types for rope access work - use translation keys
 const STANDARD_JOB_TYPES = [
-  { value: "window_cleaning", label: "Window Cleaning" },
-  { value: "dryer_vent_cleaning", label: "Dryer Vent Cleaning" },
-  { value: "building_wash", label: "Building Wash" },
-  { value: "in_suite_dryer_vent_cleaning", label: "In-Suite Dryer Vent Cleaning" },
-  { value: "parkade_pressure_cleaning", label: "Parkade Pressure Cleaning" },
-  { value: "ground_window_cleaning", label: "Ground Window Cleaning" },
-  { value: "general_pressure_washing", label: "General Pressure Washing" },
-  { value: "other", label: "Other" },
+  { value: "window_cleaning", labelKey: "dashboard.jobTypes.window_cleaning" },
+  { value: "dryer_vent_cleaning", labelKey: "dashboard.jobTypes.dryer_vent_cleaning" },
+  { value: "building_wash", labelKey: "dashboard.jobTypes.building_wash" },
+  { value: "in_suite_dryer_vent_cleaning", labelKey: "dashboard.jobTypes.in_suite_dryer_vent_cleaning" },
+  { value: "parkade_pressure_cleaning", labelKey: "dashboard.jobTypes.parkade_pressure_cleaning" },
+  { value: "ground_window_cleaning", labelKey: "dashboard.jobTypes.ground_window_cleaning" },
+  { value: "general_pressure_washing", labelKey: "dashboard.jobTypes.general_pressure_washing" },
+  { value: "other", labelKey: "dashboard.jobTypes.other" },
 ];
 
 const methodStatementFormSchema = z.object({
@@ -96,8 +97,106 @@ const addCompanyBranding = (doc: jsPDF, pageWidth: number, currentUser: any): nu
   return 5; // Return additional height used by branding
 };
 
+// Type for PDF translations
+type MethodStatementPDFTranslations = {
+  title: string;
+  subtitle: string;
+  documentInfo: string;
+  location: string;
+  dateCreated: string;
+  preparedBy: string;
+  jobType: string;
+  workDescription: string;
+  scopeDetails: string;
+  duration: string;
+  numberOfWorkers: string;
+  hazardsIdentified: string;
+  controlMeasures: string;
+  requiredEquipment: string;
+  requiredPPE: string;
+  emergencyProcedures: string;
+  rescuePlan: string;
+  emergencyContacts: string;
+  additionalInfo: string;
+  permitsRequired: string;
+  weatherRestrictions: string;
+  workingHeights: string;
+  accessMethod: string;
+  competencyRequirements: string;
+  irataLevelRequired: string;
+  communicationMethod: string;
+  signalProtocol: string;
+  teamMembers: string;
+  approvals: string;
+  reviewedBy: string;
+  reviewDate: string;
+  approvedBy: string;
+  approvalDate: string;
+  signatures: string;
+  signedBy: string;
+  role: string;
+  signedAt: string;
+  pageOf: (page: number, total: number) => string;
+  jobTypes: Record<string, string>;
+  na: string;
+};
+
+// Default English translations for fallback
+const defaultPDFTranslations: MethodStatementPDFTranslations = {
+  title: 'METHOD STATEMENT',
+  subtitle: 'Safe Work Procedure & Risk Control Document',
+  documentInfo: 'Document Information',
+  location: 'Location',
+  dateCreated: 'Date Created',
+  preparedBy: 'Prepared By',
+  jobType: 'Job Type',
+  workDescription: 'Work Description',
+  scopeDetails: 'Scope Details',
+  duration: 'Duration',
+  numberOfWorkers: 'Number of Workers',
+  hazardsIdentified: 'Hazards Identified',
+  controlMeasures: 'Control Measures',
+  requiredEquipment: 'Required Equipment',
+  requiredPPE: 'Required PPE',
+  emergencyProcedures: 'Emergency Procedures',
+  rescuePlan: 'Rescue Plan',
+  emergencyContacts: 'Emergency Contacts',
+  additionalInfo: 'Additional Information',
+  permitsRequired: 'Permits Required',
+  weatherRestrictions: 'Weather Restrictions',
+  workingHeights: 'Working Heights',
+  accessMethod: 'Access Method',
+  competencyRequirements: 'Competency Requirements',
+  irataLevelRequired: 'IRATA Level Required',
+  communicationMethod: 'Communication Method',
+  signalProtocol: 'Signal Protocol',
+  teamMembers: 'Team Members',
+  approvals: 'Approvals',
+  reviewedBy: 'Reviewed By',
+  reviewDate: 'Review Date',
+  approvedBy: 'Approved By',
+  approvalDate: 'Approval Date',
+  signatures: 'Signatures',
+  signedBy: 'Signed By',
+  role: 'Role',
+  signedAt: 'Signed At',
+  pageOf: (page: number, total: number) => `Page ${page} of ${total}`,
+  jobTypes: {
+    'window_cleaning': 'Window Cleaning',
+    'dryer_vent_cleaning': 'Dryer Vent Cleaning',
+    'building_wash': 'Building Wash',
+    'in_suite_dryer_vent_cleaning': 'In-Suite Dryer Vent Cleaning',
+    'parkade_pressure_cleaning': 'Parkade Pressure Cleaning',
+    'ground_window_cleaning': 'Ground Window Cleaning',
+    'general_pressure_washing': 'General Pressure Washing',
+    'other': 'Other'
+  },
+  na: 'N/A'
+};
+
 // Download Method Statement as PDF
-export const downloadMethodStatement = (statement: any, currentUser: any) => {
+export const downloadMethodStatement = (statement: any, currentUser: any, translations?: MethodStatementPDFTranslations) => {
+  const t = translations || defaultPDFTranslations;
   const doc = new jsPDF();
   const pageWidth = doc.internal.pageSize.getWidth();
   const pageHeight = doc.internal.pageSize.getHeight();
@@ -128,10 +227,10 @@ export const downloadMethodStatement = (statement: any, currentUser: any) => {
   doc.setTextColor(255, 255, 255);
   doc.setFontSize(20);
   doc.setFont('helvetica', 'bold');
-  doc.text('METHOD STATEMENT', pageWidth / 2, 15 + brandingHeight, { align: 'center' });
+  doc.text(t.title, pageWidth / 2, 15 + brandingHeight, { align: 'center' });
   doc.setFontSize(11);
   doc.setFont('helvetica', 'normal');
-  doc.text('Safe Work Procedure & Risk Control Document', pageWidth / 2, 25 + brandingHeight, { align: 'center' });
+  doc.text(t.subtitle, pageWidth / 2, 25 + brandingHeight, { align: 'center' });
 
   yPosition = 45 + brandingHeight;
 
@@ -139,39 +238,29 @@ export const downloadMethodStatement = (statement: any, currentUser: any) => {
   doc.setTextColor(0, 0, 0);
   doc.setFontSize(11);
   doc.setFont('helvetica', 'bold');
-  doc.text('Document Information', 20, yPosition);
+  doc.text(t.documentInfo, 20, yPosition);
   yPosition += 8;
 
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(10);
-  doc.text(`Location: ${statement.location || 'N/A'}`, 20, yPosition);
+  doc.text(`${t.location}: ${statement.location || t.na}`, 20, yPosition);
   yPosition += 6;
-  doc.text(`Date Created: ${new Date(statement.dateCreated).toLocaleDateString('en-US', {
+  doc.text(`${t.dateCreated}: ${new Date(statement.dateCreated).toLocaleDateString('en-US', {
     weekday: 'long',
     year: 'numeric',
     month: 'long',
     day: 'numeric'
   })}`, 20, yPosition);
   yPosition += 6;
-  doc.text(`Prepared By: ${statement.preparedByName}`, 20, yPosition);
+  doc.text(`${t.preparedBy}: ${statement.preparedByName}`, 20, yPosition);
   yPosition += 6;
   // Format job type for display
   const formatJobType = (jobType: string) => {
-    if (!jobType) return 'N/A';
+    if (!jobType) return t.na;
     if (jobType.startsWith('custom:')) return jobType.replace('custom:', '');
-    const labels: Record<string, string> = {
-      'window_cleaning': 'Window Cleaning',
-      'dryer_vent_cleaning': 'Dryer Vent Cleaning',
-      'building_wash': 'Building Wash',
-      'in_suite_dryer_vent_cleaning': 'In-Suite Dryer Vent Cleaning',
-      'parkade_pressure_cleaning': 'Parkade Pressure Cleaning',
-      'ground_window_cleaning': 'Ground Window Cleaning',
-      'general_pressure_washing': 'General Pressure Washing',
-      'other': 'Other'
-    };
-    return labels[jobType] || jobType.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+    return t.jobTypes[jobType] || jobType.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
   };
-  doc.text(`Job Type: ${formatJobType(statement.jobType || statement.jobTitle)}`, 20, yPosition);
+  doc.text(`${t.jobType}: ${formatJobType(statement.jobType || statement.jobTitle)}`, 20, yPosition);
   yPosition += 10;
 
   // Work Description Section
@@ -182,29 +271,29 @@ export const downloadMethodStatement = (statement: any, currentUser: any) => {
 
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(11);
-  doc.text('Work Description', 20, yPosition);
+  doc.text(t.workDescription, 20, yPosition);
   yPosition += 8;
 
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(10);
-  const workDescriptionLines = doc.splitTextToSize(statement.workDescription || 'N/A', pageWidth - 40);
+  const workDescriptionLines = doc.splitTextToSize(statement.workDescription || t.na, pageWidth - 40);
   yPosition = addMultilineText(workDescriptionLines, yPosition);
   yPosition += 6;
 
   doc.setFont('helvetica', 'bold');
-  doc.text('Scope Details:', 20, yPosition);
+  doc.text(`${t.scopeDetails}:`, 20, yPosition);
   yPosition += 6;
   doc.setFont('helvetica', 'normal');
-  const scopeLines = doc.splitTextToSize(statement.scopeDetails || 'N/A', pageWidth - 40);
+  const scopeLines = doc.splitTextToSize(statement.scopeDetails || t.na, pageWidth - 40);
   yPosition = addMultilineText(scopeLines, yPosition);
   yPosition += 6;
 
   if (statement.workDuration) {
-    doc.text(`Duration: ${statement.workDuration}`, 20, yPosition);
+    doc.text(`${t.duration}: ${statement.workDuration}`, 20, yPosition);
     yPosition += 6;
   }
   if (statement.numberOfWorkers) {
-    doc.text(`Number of Workers: ${statement.numberOfWorkers}`, 20, yPosition);
+    doc.text(`${t.numberOfWorkers}: ${statement.numberOfWorkers}`, 20, yPosition);
     yPosition += 6;
   }
   yPosition += 4;
@@ -217,7 +306,7 @@ export const downloadMethodStatement = (statement: any, currentUser: any) => {
 
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(11);
-  doc.text('Hazards Identified', 20, yPosition);
+  doc.text(t.hazardsIdentified, 20, yPosition);
   yPosition += 8;
 
   doc.setFont('helvetica', 'normal');
@@ -237,7 +326,7 @@ export const downloadMethodStatement = (statement: any, currentUser: any) => {
       yPosition += 2;
     });
   } else {
-    doc.text('No hazards specified', 20, yPosition);
+    doc.text(t.na, 20, yPosition);
     yPosition += 6;
   }
   yPosition += 6;
@@ -250,7 +339,7 @@ export const downloadMethodStatement = (statement: any, currentUser: any) => {
 
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(11);
-  doc.text('Control Measures', 20, yPosition);
+  doc.text(t.controlMeasures, 20, yPosition);
   yPosition += 8;
 
   doc.setFont('helvetica', 'normal');
@@ -270,7 +359,7 @@ export const downloadMethodStatement = (statement: any, currentUser: any) => {
       yPosition += 2;
     });
   } else {
-    doc.text('No control measures specified', 20, yPosition);
+    doc.text(t.na, 20, yPosition);
     yPosition += 6;
   }
   yPosition += 6;
@@ -283,7 +372,7 @@ export const downloadMethodStatement = (statement: any, currentUser: any) => {
 
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(11);
-  doc.text('Required Equipment', 20, yPosition);
+  doc.text(t.requiredEquipment, 20, yPosition);
   yPosition += 8;
 
   doc.setFont('helvetica', 'normal');
@@ -302,7 +391,7 @@ export const downloadMethodStatement = (statement: any, currentUser: any) => {
       yPosition += 6;
     });
   } else {
-    doc.text('No equipment specified', 20, yPosition);
+    doc.text(t.na, 20, yPosition);
     yPosition += 6;
   }
   yPosition += 6;
@@ -315,7 +404,7 @@ export const downloadMethodStatement = (statement: any, currentUser: any) => {
 
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(11);
-  doc.text('Required PPE', 20, yPosition);
+  doc.text(t.requiredPPE, 20, yPosition);
   yPosition += 8;
 
   doc.setFont('helvetica', 'normal');
@@ -334,7 +423,7 @@ export const downloadMethodStatement = (statement: any, currentUser: any) => {
       yPosition += 6;
     });
   } else {
-    doc.text('No PPE specified', 20, yPosition);
+    doc.text(t.na, 20, yPosition);
     yPosition += 6;
   }
   yPosition += 6;
@@ -347,18 +436,18 @@ export const downloadMethodStatement = (statement: any, currentUser: any) => {
 
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(11);
-  doc.text('Emergency Procedures', 20, yPosition);
+  doc.text(t.emergencyProcedures, 20, yPosition);
   yPosition += 8;
 
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(10);
-  const emergencyLines = doc.splitTextToSize(statement.emergencyProcedures || 'N/A', pageWidth - 40);
+  const emergencyLines = doc.splitTextToSize(statement.emergencyProcedures || t.na, pageWidth - 40);
   yPosition = addMultilineText(emergencyLines, yPosition);
   yPosition += 6;
 
   if (statement.rescuePlan) {
     doc.setFont('helvetica', 'bold');
-    doc.text('Rescue Plan:', 20, yPosition);
+    doc.text(`${t.rescuePlan}:`, 20, yPosition);
     yPosition += 6;
     doc.setFont('helvetica', 'normal');
     const rescueLines = doc.splitTextToSize(statement.rescuePlan, pageWidth - 40);
@@ -368,7 +457,7 @@ export const downloadMethodStatement = (statement: any, currentUser: any) => {
 
   if (statement.emergencyContacts) {
     doc.setFont('helvetica', 'bold');
-    doc.text('Emergency Contacts:', 20, yPosition);
+    doc.text(`${t.emergencyContacts}:`, 20, yPosition);
     yPosition += 6;
     doc.setFont('helvetica', 'normal');
     const contactsLines = doc.splitTextToSize(statement.emergencyContacts, pageWidth - 40);
@@ -386,14 +475,14 @@ export const downloadMethodStatement = (statement: any, currentUser: any) => {
 
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(11);
-    doc.text('Team & Competency Requirements', 20, yPosition);
+    doc.text(t.competencyRequirements, 20, yPosition);
     yPosition += 8;
 
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(10);
 
     if (statement.irataLevelRequired) {
-      doc.text(`IRATA Level Required: ${statement.irataLevelRequired}`, 20, yPosition);
+      doc.text(`${t.irataLevelRequired}: ${statement.irataLevelRequired}`, 20, yPosition);
       yPosition += 6;
     }
 
@@ -402,10 +491,6 @@ export const downloadMethodStatement = (statement: any, currentUser: any) => {
       : (statement.competencyRequirements ? [statement.competencyRequirements] : []);
     
     if (competencies.length > 0) {
-      doc.setFont('helvetica', 'bold');
-      doc.text('Competencies:', 20, yPosition);
-      yPosition += 6;
-      doc.setFont('helvetica', 'normal');
       competencies.forEach((comp: string) => {
         if (yPosition > pageHeight - 30) {
           doc.addPage();
@@ -422,7 +507,7 @@ export const downloadMethodStatement = (statement: any, currentUser: any) => {
     
     if (team.length > 0) {
       doc.setFont('helvetica', 'bold');
-      doc.text('Team Members:', 20, yPosition);
+      doc.text(`${t.teamMembers}:`, 20, yPosition);
       yPosition += 6;
       doc.setFont('helvetica', 'normal');
       team.forEach((member: string) => {
@@ -446,7 +531,7 @@ export const downloadMethodStatement = (statement: any, currentUser: any) => {
 
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(11);
-    doc.text('Approvals & Signatures', 20, yPosition);
+    doc.text(t.signatures, 20, yPosition);
     yPosition += 8;
 
     statement.signatures.forEach((sig: any) => {
@@ -457,15 +542,15 @@ export const downloadMethodStatement = (statement: any, currentUser: any) => {
 
       doc.setFont('helvetica', 'bold');
       doc.setFontSize(10);
-      doc.text(`${sig.role}:`, 20, yPosition);
+      doc.text(`${t.role}: ${sig.role}`, 20, yPosition);
       yPosition += 6;
 
       doc.setFont('helvetica', 'normal');
-      doc.text(`Name: ${sig.employeeName}`, 20, yPosition);
+      doc.text(`${t.signedBy}: ${sig.employeeName}`, 20, yPosition);
       yPosition += 6;
 
       if (sig.signedAt) {
-        doc.text(`Date: ${new Date(sig.signedAt).toLocaleDateString()}`, 20, yPosition);
+        doc.text(`${t.signedAt}: ${new Date(sig.signedAt).toLocaleDateString()}`, 20, yPosition);
         yPosition += 6;
       }
 
@@ -489,16 +574,10 @@ export const downloadMethodStatement = (statement: any, currentUser: any) => {
     doc.setFontSize(8);
     doc.setTextColor(100, 100, 100);
     doc.text(
-      `Method Statement - Page ${i} of ${pageCount}`,
+      `${t.title} - ${t.pageOf(i, pageCount)}`,
       pageWidth / 2,
       pageHeight - 10,
       { align: 'center' }
-    );
-    doc.text(
-      `Generated: ${new Date().toLocaleDateString()}`,
-      pageWidth - 20,
-      pageHeight - 10,
-      { align: 'right' }
     );
   }
 
@@ -510,6 +589,7 @@ export const downloadMethodStatement = (statement: any, currentUser: any) => {
 export default function MethodStatementForm() {
   const [, navigate] = useLocation();
   const { toast } = useToast();
+  const { t } = useTranslation();
   const [isSubmitting, setIsSubmitting] = useState(false);
   
   // Arrays for dynamic fields
@@ -607,16 +687,16 @@ export default function MethodStatementForm() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/method-statements"] });
       toast({
-        title: "Success",
-        description: "Method statement created successfully",
+        title: t('safetyForms.methodStatement.form.toasts.success', 'Success'),
+        description: t('safetyForms.methodStatement.form.toasts.methodStatementCreated', 'Method Statement created successfully'),
       });
       navigate("/safety-forms");
     },
     onError: (error: any) => {
       toast({
         variant: "destructive",
-        title: "Error",
-        description: error.message || "Failed to create method statement",
+        title: t('safetyForms.methodStatement.form.toasts.error', 'Error'),
+        description: error.message || t('safetyForms.methodStatement.form.toasts.failedToCreate', 'Failed to create Method Statement'),
       });
     },
   });
@@ -630,8 +710,8 @@ export default function MethodStatementForm() {
     if (!signatureCanvasRef.current || signatureCanvasRef.current.isEmpty()) {
       toast({
         variant: "destructive",
-        title: "Error",
-        description: "Please provide a signature",
+        title: t('safetyForms.methodStatement.form.toasts.error', 'Error'),
+        description: t('safetyForms.flha.pleaseProvideSignature', 'Please provide a signature'),
       });
       return;
     }
@@ -653,8 +733,8 @@ export default function MethodStatementForm() {
     if (!employeeName) {
       toast({
         variant: "destructive",
-        title: "Error",
-        description: `Please enter the ${signatureRole}'s name first`,
+        title: t('safetyForms.methodStatement.form.toasts.error', 'Error'),
+        description: t('safetyForms.flha.pleaseEnterName', 'Please enter the name first'),
       });
       return;
     }
@@ -674,8 +754,8 @@ export default function MethodStatementForm() {
     signatureCanvasRef.current.clear();
     
     toast({
-      title: "Success",
-      description: `${signatureRole.charAt(0).toUpperCase() + signatureRole.slice(1)} signature added`,
+      title: t('safetyForms.methodStatement.form.toasts.success', 'Success'),
+      description: `${signatureRole.charAt(0).toUpperCase() + signatureRole.slice(1)} ${t('safetyForms.methodStatement.form.toasts.signatureAdded', 'signature added')}`,
     });
   };
 
@@ -691,8 +771,8 @@ export default function MethodStatementForm() {
     }
     
     toast({
-      title: "Signature Removed",
-      description: `${role.charAt(0).toUpperCase() + role.slice(1)} signature cleared`,
+      title: t('safetyForms.methodStatement.form.toasts.signatureRemoved', 'Signature Removed'),
+      description: `${role.charAt(0).toUpperCase() + role.slice(1)} ${t('safetyForms.methodStatement.form.toasts.signatureCleared', 'signature cleared')}`,
     });
   };
 
@@ -756,7 +836,11 @@ export default function MethodStatementForm() {
         data-testid={`button-add-${label.toLowerCase().replace(/\s+/g, "-")}`}
       >
         <Plus className="h-4 w-4 mr-2" />
-        Add {label.toLowerCase().includes("hazard") ? "Hazard" : label.toLowerCase().includes("control") ? "Control" : "Item"}
+        {label.toLowerCase().includes("hazard") 
+          ? t('safetyForms.methodStatement.form.hazardsAndControls.addHazard', 'Add Hazard') 
+          : label.toLowerCase().includes("control") 
+            ? t('safetyForms.methodStatement.form.hazardsAndControls.addControl', 'Add Control') 
+            : t('safetyForms.methodStatement.form.hazardsAndControls.addItem', 'Add Item')}
       </Button>
     </div>
   );
@@ -775,12 +859,12 @@ export default function MethodStatementForm() {
           <ArrowLeft className="h-5 w-5" />
         </Button>
         <div className="flex-1">
-          <h1 className="text-3xl font-bold">Method Statement / Work Plan</h1>
-          <p className="text-muted-foreground">Document safe work procedures and risk controls</p>
+          <h1 className="text-3xl font-bold">{t('safetyForms.methodStatement.form.pageTitle', 'Method Statement / Work Plan')}</h1>
+          <p className="text-muted-foreground">{t('safetyForms.methodStatement.form.pageSubtitle', 'Document safe work procedures and risk controls')}</p>
         </div>
         <Badge variant="outline" className="gap-1">
           <Shield className="h-3 w-3" />
-          IRATA Compliant
+          {t('safetyForms.methodStatement.form.irataCompliant', 'IRATA Compliant')}
         </Badge>
       </div>
 
@@ -789,7 +873,7 @@ export default function MethodStatementForm() {
           {/* Basic Information */}
           <Card>
             <CardHeader>
-              <CardTitle>Basic Information</CardTitle>
+              <CardTitle>{t('safetyForms.methodStatement.form.basicInfo.title', 'Basic Information')}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -798,15 +882,15 @@ export default function MethodStatementForm() {
                   name="projectId"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Project (Optional)</FormLabel>
+                      <FormLabel>{t('safetyForms.methodStatement.form.basicInfo.projectOptional', 'Project (Optional)')}</FormLabel>
                       <Select onValueChange={field.onChange} value={field.value || ""}>
                         <FormControl>
                           <SelectTrigger data-testid="select-project">
-                            <SelectValue placeholder="None - Job Type Only" />
+                            <SelectValue placeholder={t('safetyForms.methodStatement.form.basicInfo.nonePlaceholder', 'None - Job Type Only')} />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          <SelectItem value="none">None - Job Type Only</SelectItem>
+                          <SelectItem value="none">{t('safetyForms.methodStatement.form.basicInfo.nonePlaceholder', 'None - Job Type Only')}</SelectItem>
                           {(projectsData?.projects || []).map((project) => (
                             <SelectItem key={project.id} value={project.id}>
                               {project.buildingName || `Project ${project.id.substring(0, 8)}`}
@@ -824,7 +908,7 @@ export default function MethodStatementForm() {
                   name="dateCreated"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Date Created *</FormLabel>
+                      <FormLabel>{t('safetyForms.methodStatement.form.basicInfo.dateCreated', 'Date Created')} *</FormLabel>
                       <FormControl>
                         <Input type="date" {...field} data-testid="input-date-created" />
                       </FormControl>
@@ -840,9 +924,9 @@ export default function MethodStatementForm() {
                   name="preparedByName"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Prepared By *</FormLabel>
+                      <FormLabel>{t('safetyForms.methodStatement.form.basicInfo.preparedBy', 'Prepared By')} *</FormLabel>
                       <FormControl>
-                        <Input {...field} placeholder="Your full name" data-testid="input-prepared-by" />
+                        <Input {...field} placeholder={t('safetyForms.methodStatement.form.basicInfo.preparedByPlaceholder', 'Your full name')} data-testid="input-prepared-by" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -854,23 +938,23 @@ export default function MethodStatementForm() {
                   name="jobType"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Job Type *</FormLabel>
+                      <FormLabel>{t('safetyForms.methodStatement.form.basicInfo.jobType', 'Job Type')} *</FormLabel>
                       <Select onValueChange={field.onChange} value={field.value}>
                         <FormControl>
                           <SelectTrigger data-testid="select-job-type">
-                            <SelectValue placeholder="Select job type" />
+                            <SelectValue placeholder={t('safetyForms.methodStatement.form.basicInfo.jobTypePlaceholder', 'Select job type')} />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
                           {STANDARD_JOB_TYPES.map((jobType) => (
-                            <SelectItem key={jobType.value} value={jobType.value}>
-                              {jobType.label}
+                            <SelectItem key={jobType.value} value={jobType.value} data-testid={`select-job-type-${jobType.value}`}>
+                              {t(jobType.labelKey, jobType.value.replace(/_/g, ' '))}
                             </SelectItem>
                           ))}
                           {customJobTypes.length > 0 && (
                             <>
                               <div className="px-2 py-1.5 text-xs font-medium text-muted-foreground border-t mt-1 pt-2">
-                                Custom Job Types
+                                {t('safetyForms.methodStatement.form.basicInfo.customJobTypes', 'Custom Job Types')}
                               </div>
                               {customJobTypes.map((customType) => (
                                 <SelectItem key={`custom:${customType.name}`} value={`custom:${customType.name}`}>
@@ -892,9 +976,9 @@ export default function MethodStatementForm() {
                 name="location"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Location (Optional)</FormLabel>
+                    <FormLabel>{t('safetyForms.methodStatement.form.basicInfo.locationOptional', 'Location (Optional)')}</FormLabel>
                     <FormControl>
-                      <Input {...field} placeholder="Work site address (if applicable)" data-testid="input-location" />
+                      <Input {...field} placeholder={t('safetyForms.methodStatement.form.basicInfo.locationPlaceholder', 'Work site address (if applicable)')} data-testid="input-location" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -906,7 +990,7 @@ export default function MethodStatementForm() {
           {/* Work Description */}
           <Card>
             <CardHeader>
-              <CardTitle>Work Description</CardTitle>
+              <CardTitle>{t('safetyForms.methodStatement.form.workDescription.title', 'Work Description')}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <FormField
@@ -914,11 +998,11 @@ export default function MethodStatementForm() {
                 name="workDescription"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Description of Work *</FormLabel>
+                    <FormLabel>{t('safetyForms.methodStatement.form.workDescription.description', 'Description of Work')} *</FormLabel>
                     <FormControl>
                       <Textarea
                         {...field}
-                        placeholder="Describe the work to be performed..."
+                        placeholder={t('safetyForms.methodStatement.form.workDescription.descriptionPlaceholder', 'Describe the work to be performed...')}
                         rows={4}
                         data-testid="textarea-work-description"
                       />
@@ -933,11 +1017,11 @@ export default function MethodStatementForm() {
                 name="scopeDetails"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Scope and Limitations *</FormLabel>
+                    <FormLabel>{t('safetyForms.methodStatement.form.workDescription.scopeAndLimitations', 'Scope and Limitations')} *</FormLabel>
                     <FormControl>
                       <Textarea
                         {...field}
-                        placeholder="Define the scope of work and any limitations..."
+                        placeholder={t('safetyForms.methodStatement.form.workDescription.scopePlaceholder', 'Define the scope of work and any limitations...')}
                         rows={3}
                         data-testid="textarea-scope-details"
                       />
@@ -953,9 +1037,9 @@ export default function MethodStatementForm() {
                   name="workDuration"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Estimated Duration</FormLabel>
+                      <FormLabel>{t('safetyForms.methodStatement.form.workDescription.estimatedDuration', 'Estimated Duration')}</FormLabel>
                       <FormControl>
-                        <Input {...field} placeholder="e.g. 2 days, 5 hours" data-testid="input-work-duration" />
+                        <Input {...field} placeholder={t('safetyForms.methodStatement.form.workDescription.durationPlaceholder', 'e.g. 2 days, 5 hours')} data-testid="input-work-duration" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -967,7 +1051,7 @@ export default function MethodStatementForm() {
                   name="numberOfWorkers"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Number of Workers</FormLabel>
+                      <FormLabel>{t('safetyForms.methodStatement.form.workDescription.numberOfWorkers', 'Number of Workers')}</FormLabel>
                       <FormControl>
                         <Input type="number" {...field} placeholder="0" data-testid="input-number-of-workers" />
                       </FormControl>
@@ -982,29 +1066,29 @@ export default function MethodStatementForm() {
           {/* Hazards and Controls */}
           <Card>
             <CardHeader>
-              <CardTitle>Hazards and Control Measures</CardTitle>
+              <CardTitle>{t('safetyForms.methodStatement.form.hazardsAndControls.title', 'Hazards and Control Measures')}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-6">
-              {renderArrayField("Hazards Identified", hazards, setHazards, "Describe hazard")}
-              {renderArrayField("Control Measures", controls, setControls, "Describe control measure")}
+              {renderArrayField(t('safetyForms.methodStatement.form.hazardsAndControls.hazardsIdentified', 'Hazards Identified'), hazards, setHazards, t('safetyForms.methodStatement.form.hazardsAndControls.hazardPlaceholder', 'Describe hazard'))}
+              {renderArrayField(t('safetyForms.methodStatement.form.hazardsAndControls.controlMeasures', 'Control Measures'), controls, setControls, t('safetyForms.methodStatement.form.hazardsAndControls.controlPlaceholder', 'Describe control measure'))}
             </CardContent>
           </Card>
 
           {/* Equipment and PPE */}
           <Card>
             <CardHeader>
-              <CardTitle>Equipment and PPE</CardTitle>
+              <CardTitle>{t('safetyForms.methodStatement.form.equipmentAndPpe.title', 'Equipment and PPE')}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-6">
-              {renderArrayField("Required Equipment", equipment, setEquipment, "Equipment item")}
-              {renderArrayField("Required PPE", ppe, setPpe, "PPE item")}
+              {renderArrayField(t('safetyForms.methodStatement.form.equipmentAndPpe.requiredEquipment', 'Required Equipment'), equipment, setEquipment, t('safetyForms.methodStatement.form.equipmentAndPpe.equipmentPlaceholder', 'Equipment item'))}
+              {renderArrayField(t('safetyForms.methodStatement.form.equipmentAndPpe.requiredPpe', 'Required PPE'), ppe, setPpe, t('safetyForms.methodStatement.form.equipmentAndPpe.ppePlaceholder', 'PPE item'))}
             </CardContent>
           </Card>
 
           {/* Emergency Procedures */}
           <Card>
             <CardHeader>
-              <CardTitle>Emergency Procedures</CardTitle>
+              <CardTitle>{t('safetyForms.methodStatement.form.emergency.title', 'Emergency Procedures')}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <FormField
@@ -1012,11 +1096,11 @@ export default function MethodStatementForm() {
                 name="emergencyProcedures"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Emergency Procedures *</FormLabel>
+                    <FormLabel>{t('safetyForms.methodStatement.form.emergency.procedures', 'Emergency Procedures')} *</FormLabel>
                     <FormControl>
                       <Textarea
                         {...field}
-                        placeholder="Outline emergency response procedures..."
+                        placeholder={t('safetyForms.methodStatement.form.emergency.proceduresPlaceholder', 'Outline emergency response procedures...')}
                         rows={4}
                         data-testid="textarea-emergency-procedures"
                       />
@@ -1031,11 +1115,11 @@ export default function MethodStatementForm() {
                 name="rescuePlan"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Rescue Plan</FormLabel>
+                    <FormLabel>{t('safetyForms.methodStatement.form.emergency.rescuePlan', 'Rescue Plan')}</FormLabel>
                     <FormControl>
                       <Textarea
                         {...field}
-                        placeholder="Describe rescue procedures and equipment..."
+                        placeholder={t('safetyForms.methodStatement.form.emergency.rescuePlanPlaceholder', 'Describe rescue procedures and equipment...')}
                         rows={3}
                         data-testid="textarea-rescue-plan"
                       />
@@ -1050,11 +1134,11 @@ export default function MethodStatementForm() {
                 name="emergencyContacts"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Emergency Contacts</FormLabel>
+                    <FormLabel>{t('safetyForms.methodStatement.form.emergency.contacts', 'Emergency Contacts')}</FormLabel>
                     <FormControl>
                       <Textarea
                         {...field}
-                        placeholder="List emergency contact numbers and personnel..."
+                        placeholder={t('safetyForms.methodStatement.form.emergency.contactsPlaceholder', 'List emergency contact numbers and personnel...')}
                         rows={2}
                         data-testid="textarea-emergency-contacts"
                       />
@@ -1069,21 +1153,21 @@ export default function MethodStatementForm() {
           {/* Work Environment */}
           <Card>
             <CardHeader>
-              <CardTitle>Work Environment</CardTitle>
+              <CardTitle>{t('safetyForms.methodStatement.form.workEnvironment.title', 'Work Environment')}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              {renderArrayField("Permits Required", permits, setPermits, "Permit type")}
+              {renderArrayField(t('safetyForms.methodStatement.form.workEnvironment.permitsRequired', 'Permits Required'), permits, setPermits, t('safetyForms.methodStatement.form.workEnvironment.permitPlaceholder', 'Permit type'))}
 
               <FormField
                 control={form.control}
                 name="weatherRestrictions"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Weather Restrictions</FormLabel>
+                    <FormLabel>{t('safetyForms.methodStatement.form.workEnvironment.weatherRestrictions', 'Weather Restrictions')}</FormLabel>
                     <FormControl>
                       <Textarea
                         {...field}
-                        placeholder="Describe weather conditions that would stop work..."
+                        placeholder={t('safetyForms.methodStatement.form.workEnvironment.weatherPlaceholder', 'Describe weather conditions that would stop work...')}
                         rows={2}
                         data-testid="textarea-weather-restrictions"
                       />
@@ -1099,9 +1183,9 @@ export default function MethodStatementForm() {
                   name="workingHeightRange"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Working Height Range</FormLabel>
+                      <FormLabel>{t('safetyForms.methodStatement.form.workEnvironment.workingHeightRange', 'Working Height Range')}</FormLabel>
                       <FormControl>
-                        <Input {...field} placeholder="e.g. 10m - 50m" data-testid="input-working-height-range" />
+                        <Input {...field} placeholder={t('safetyForms.methodStatement.form.workEnvironment.heightPlaceholder', 'e.g. 10m - 50m')} data-testid="input-working-height-range" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -1113,9 +1197,9 @@ export default function MethodStatementForm() {
                   name="accessMethod"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Access Method</FormLabel>
+                      <FormLabel>{t('safetyForms.methodStatement.form.workEnvironment.accessMethod', 'Access Method')}</FormLabel>
                       <FormControl>
-                        <Input {...field} placeholder="e.g. Rope descent, bosun's chair" data-testid="input-access-method" />
+                        <Input {...field} placeholder={t('safetyForms.methodStatement.form.workEnvironment.accessPlaceholder', 'e.g. Rope descent, bosun\'s chair')} data-testid="input-access-method" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -1128,28 +1212,28 @@ export default function MethodStatementForm() {
           {/* Competency and Communication */}
           <Card>
             <CardHeader>
-              <CardTitle>Competency and Communication</CardTitle>
+              <CardTitle>{t('safetyForms.methodStatement.form.competency.title', 'Competency and Communication')}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              {renderArrayField("Competency Requirements", competencies, setCompetencies, "Required competency")}
+              {renderArrayField(t('safetyForms.methodStatement.form.competency.requirements', 'Competency Requirements'), competencies, setCompetencies, t('safetyForms.methodStatement.form.competency.competencyPlaceholder', 'Required competency'))}
 
               <FormField
                 control={form.control}
                 name="irataLevelRequired"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>IRATA Level Required</FormLabel>
+                    <FormLabel>{t('safetyForms.methodStatement.form.competency.irataLevel', 'IRATA Level Required')}</FormLabel>
                     <Select onValueChange={field.onChange} value={field.value}>
                       <FormControl>
                         <SelectTrigger data-testid="select-irata-level">
-                          <SelectValue placeholder="Select IRATA level" />
+                          <SelectValue placeholder={t('safetyForms.methodStatement.form.competency.irataPlaceholder', 'Select IRATA level')} />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        <SelectItem value="level-1">Level 1</SelectItem>
-                        <SelectItem value="level-2">Level 2</SelectItem>
-                        <SelectItem value="level-3">Level 3</SelectItem>
-                        <SelectItem value="varies">Varies by task</SelectItem>
+                        <SelectItem value="level-1">{t('safetyForms.methodStatement.form.competency.level1', 'Level 1')}</SelectItem>
+                        <SelectItem value="level-2">{t('safetyForms.methodStatement.form.competency.level2', 'Level 2')}</SelectItem>
+                        <SelectItem value="level-3">{t('safetyForms.methodStatement.form.competency.level3', 'Level 3')}</SelectItem>
+                        <SelectItem value="varies">{t('safetyForms.methodStatement.form.competency.variesByTask', 'Varies by task')}</SelectItem>
                       </SelectContent>
                     </Select>
                     <FormMessage />
@@ -1163,9 +1247,9 @@ export default function MethodStatementForm() {
                   name="communicationMethod"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Communication Method</FormLabel>
+                      <FormLabel>{t('safetyForms.methodStatement.form.competency.communicationMethod', 'Communication Method')}</FormLabel>
                       <FormControl>
-                        <Input {...field} placeholder="e.g. Two-way radio, hand signals" data-testid="input-communication-method" />
+                        <Input {...field} placeholder={t('safetyForms.methodStatement.form.competency.communicationPlaceholder', 'e.g. Two-way radio, hand signals')} data-testid="input-communication-method" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -1177,9 +1261,9 @@ export default function MethodStatementForm() {
                   name="signalProtocol"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Signal Protocol</FormLabel>
+                      <FormLabel>{t('safetyForms.methodStatement.form.competency.signalProtocol', 'Signal Protocol')}</FormLabel>
                       <FormControl>
-                        <Input {...field} placeholder="e.g. Standard IRATA signals" data-testid="input-signal-protocol" />
+                        <Input {...field} placeholder={t('safetyForms.methodStatement.form.competency.signalPlaceholder', 'e.g. Standard IRATA signals')} data-testid="input-signal-protocol" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -1187,26 +1271,26 @@ export default function MethodStatementForm() {
                 />
               </div>
 
-              {renderArrayField("Team Members", teamMembers, setTeamMembers, "Team member name")}
+              {renderArrayField(t('safetyForms.methodStatement.form.competency.teamMembers', 'Team Members'), teamMembers, setTeamMembers, t('safetyForms.methodStatement.form.competency.teamMemberPlaceholder', 'Team member name'))}
             </CardContent>
           </Card>
 
           {/* Review and Approval */}
           <Card>
             <CardHeader>
-              <CardTitle>Review and Approval</CardTitle>
+              <CardTitle>{t('safetyForms.methodStatement.form.reviewAndApproval.title', 'Review and Approval')}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-6">
               {/* Preparer Signature */}
               <div className="space-y-3">
-                <Label>Prepared By (Signature) *</Label>
+                <Label>{t('safetyForms.methodStatement.form.reviewAndApproval.preparedBySignature', 'Prepared By (Signature)')} *</Label>
                 {getSignature("preparer") ? (
                   <div className="border rounded-md p-4 space-y-2">
                     <div className="flex justify-between items-start">
                       <div>
                         <p className="font-medium">{getSignature("preparer")!.employeeName}</p>
                         <p className="text-sm text-muted-foreground">
-                          Signed: {new Date(getSignature("preparer")!.signedAt).toLocaleString()}
+                          {t('safetyForms.methodStatement.form.reviewAndApproval.signed', 'Signed')}: {new Date(getSignature("preparer")!.signedAt).toLocaleString()}
                         </p>
                       </div>
                       <Button
@@ -1234,7 +1318,7 @@ export default function MethodStatementForm() {
                     data-testid="button-add-preparer-signature"
                   >
                     <PenTool className="h-4 w-4 mr-2" />
-                    Add Signature
+                    {t('safetyForms.methodStatement.form.signatures.addSignature', 'Add Signature')}
                   </Button>
                 )}
               </div>
@@ -1246,9 +1330,9 @@ export default function MethodStatementForm() {
                   name="reviewedByName"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Reviewed By (Name)</FormLabel>
+                      <FormLabel>{t('safetyForms.methodStatement.form.reviewAndApproval.reviewedByName', 'Reviewed By (Name)')}</FormLabel>
                       <FormControl>
-                        <Input {...field} placeholder="Reviewer name" data-testid="input-reviewed-by" />
+                        <Input {...field} placeholder={t('safetyForms.methodStatement.form.reviewAndApproval.reviewerPlaceholder', 'Reviewer name')} data-testid="input-reviewed-by" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -1260,7 +1344,7 @@ export default function MethodStatementForm() {
                   name="reviewDate"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Review Date</FormLabel>
+                      <FormLabel>{t('safetyForms.methodStatement.form.reviewAndApproval.reviewDate', 'Review Date')}</FormLabel>
                       <FormControl>
                         <Input type="date" {...field} data-testid="input-review-date" />
                       </FormControl>
@@ -1272,14 +1356,14 @@ export default function MethodStatementForm() {
 
               {form.getValues("reviewedByName") && (
                 <div className="space-y-3">
-                  <Label>Reviewer Signature</Label>
+                  <Label>{t('safetyForms.methodStatement.form.reviewAndApproval.reviewerSignature', 'Reviewer Signature')}</Label>
                   {getSignature("reviewer") ? (
                     <div className="border rounded-md p-4 space-y-2">
                       <div className="flex justify-between items-start">
                         <div>
                           <p className="font-medium">{getSignature("reviewer")!.employeeName}</p>
                           <p className="text-sm text-muted-foreground">
-                            Signed: {new Date(getSignature("reviewer")!.signedAt).toLocaleString()}
+                            {t('safetyForms.methodStatement.form.reviewAndApproval.signed', 'Signed')}: {new Date(getSignature("reviewer")!.signedAt).toLocaleString()}
                           </p>
                         </div>
                         <Button
@@ -1307,7 +1391,7 @@ export default function MethodStatementForm() {
                       data-testid="button-add-reviewer-signature"
                     >
                       <PenTool className="h-4 w-4 mr-2" />
-                      Add Reviewer Signature
+                      {t('safetyForms.methodStatement.form.signatures.addReviewerSignature', 'Add Reviewer Signature')}
                     </Button>
                   )}
                 </div>
@@ -1320,9 +1404,9 @@ export default function MethodStatementForm() {
                   name="approvedByName"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Approved By (Name)</FormLabel>
+                      <FormLabel>{t('safetyForms.methodStatement.form.reviewAndApproval.approvedByName', 'Approved By (Name)')}</FormLabel>
                       <FormControl>
-                        <Input {...field} placeholder="Approver name" data-testid="input-approved-by" />
+                        <Input {...field} placeholder={t('safetyForms.methodStatement.form.reviewAndApproval.approverPlaceholder', 'Approver name')} data-testid="input-approved-by" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -1334,7 +1418,7 @@ export default function MethodStatementForm() {
                   name="approvalDate"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Approval Date</FormLabel>
+                      <FormLabel>{t('safetyForms.methodStatement.form.reviewAndApproval.approvalDate', 'Approval Date')}</FormLabel>
                       <FormControl>
                         <Input type="date" {...field} data-testid="input-approval-date" />
                       </FormControl>
@@ -1346,14 +1430,14 @@ export default function MethodStatementForm() {
 
               {form.getValues("approvedByName") && (
                 <div className="space-y-3">
-                  <Label>Approver Signature</Label>
+                  <Label>{t('safetyForms.methodStatement.form.reviewAndApproval.approverSignature', 'Approver Signature')}</Label>
                   {getSignature("approver") ? (
                     <div className="border rounded-md p-4 space-y-2">
                       <div className="flex justify-between items-start">
                         <div>
                           <p className="font-medium">{getSignature("approver")!.employeeName}</p>
                           <p className="text-sm text-muted-foreground">
-                            Signed: {new Date(getSignature("approver")!.signedAt).toLocaleString()}
+                            {t('safetyForms.methodStatement.form.reviewAndApproval.signed', 'Signed')}: {new Date(getSignature("approver")!.signedAt).toLocaleString()}
                           </p>
                         </div>
                         <Button
@@ -1381,7 +1465,7 @@ export default function MethodStatementForm() {
                       data-testid="button-add-approver-signature"
                     >
                       <PenTool className="h-4 w-4 mr-2" />
-                      Add Approver Signature
+                      {t('safetyForms.methodStatement.form.signatures.addApproverSignature', 'Add Approver Signature')}
                     </Button>
                   )}
                 </div>
@@ -1397,7 +1481,7 @@ export default function MethodStatementForm() {
               onClick={() => navigate("/safety-forms")}
               data-testid="button-cancel"
             >
-              Cancel
+              {t('safetyForms.methodStatement.form.buttons.cancel', 'Cancel')}
             </Button>
             <Button
               type="submit"
@@ -1405,7 +1489,7 @@ export default function MethodStatementForm() {
               data-testid="button-submit"
             >
               <FileCheck className="h-4 w-4 mr-2" />
-              {isSubmitting ? "Creating..." : "Create Method Statement"}
+              {isSubmitting ? t('safetyForms.methodStatement.form.buttons.creating', 'Creating...') : t('safetyForms.methodStatement.form.buttons.createMethodStatement', 'Create Method Statement')}
             </Button>
           </div>
         </form>
@@ -1415,9 +1499,9 @@ export default function MethodStatementForm() {
       <Dialog open={showSignatureDialog} onOpenChange={setShowSignatureDialog}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle>Add Signature</DialogTitle>
+            <DialogTitle>{t('safetyForms.methodStatement.form.signatures.addSignature', 'Add Signature')}</DialogTitle>
             <DialogDescription>
-              Sign below using your mouse or touchscreen
+              {t('safetyForms.methodStatement.form.signatures.signBelow', 'Sign below using your mouse or touchscreen')}
             </DialogDescription>
           </DialogHeader>
           
@@ -1437,14 +1521,14 @@ export default function MethodStatementForm() {
               onClick={() => signatureCanvasRef.current?.clear()}
               data-testid="button-clear-canvas"
             >
-              Clear
+              {t('safetyForms.methodStatement.form.signatures.clear', 'Clear')}
             </Button>
             <Button
               type="button"
               onClick={handleSaveSignature}
               data-testid="button-save-signature"
             >
-              Save Signature
+              {t('safetyForms.methodStatement.form.signatures.saveSignature', 'Save Signature')}
             </Button>
           </DialogFooter>
         </DialogContent>

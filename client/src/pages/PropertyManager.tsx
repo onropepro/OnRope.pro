@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useLocation } from "wouter";
+import { useTranslation } from "react-i18next";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -42,6 +43,7 @@ type VendorSummary = {
 };
 
 export default function PropertyManager() {
+  const { t } = useTranslation();
   const { toast } = useToast();
   const [, setLocation] = useLocation();
   const [addCodeOpen, setAddCodeOpen] = useState(false);
@@ -86,13 +88,13 @@ export default function PropertyManager() {
       setLocation("/login");
       
       toast({
-        title: "Logged Out",
-        description: "You have been successfully logged out.",
+        title: t('propertyManager.toasts.loggedOut', 'Logged Out'),
+        description: t('propertyManager.toasts.loggedOutDesc', 'You have been successfully logged out.'),
       });
     } catch (error) {
       toast({
-        title: "Logout Failed",
-        description: "An error occurred while logging out. Please try again.",
+        title: t('propertyManager.toasts.logoutFailed', 'Logout Failed'),
+        description: t('propertyManager.toasts.logoutFailedDesc', 'An error occurred while logging out. Please try again.'),
         variant: "destructive",
       });
     }
@@ -105,16 +107,16 @@ export default function PropertyManager() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/property-managers/me/vendors"] });
       toast({
-        title: "Vendor Added",
-        description: "The company has been successfully added to your vendors list.",
+        title: t('propertyManager.toasts.vendorAdded', 'Vendor Added'),
+        description: t('propertyManager.toasts.vendorAddedDesc', 'The company has been successfully added to your vendors list.'),
       });
       setCompanyCode("");
       setAddCodeOpen(false);
     },
     onError: (error: any) => {
       toast({
-        title: "Failed to Add Vendor",
-        description: error.message || "Invalid company code. Please check with the rope access company.",
+        title: t('propertyManager.toasts.failedToAddVendor', 'Failed to Add Vendor'),
+        description: error.message || t('propertyManager.toasts.invalidCompanyCode', 'Invalid company code. Please check with the rope access company.'),
         variant: "destructive",
       });
     },
@@ -127,15 +129,15 @@ export default function PropertyManager() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/property-managers/me/vendors"] });
       toast({
-        title: "Vendor Removed",
-        description: "The vendor has been successfully removed from your list.",
+        title: t('propertyManager.toasts.vendorRemoved', 'Vendor Removed'),
+        description: t('propertyManager.toasts.vendorRemovedDesc', 'The vendor has been successfully removed from your list.'),
       });
       setVendorToRemove(null);
     },
     onError: (error: any) => {
       toast({
-        title: "Failed to Remove Vendor",
-        description: error.message || "Failed to remove vendor. Please try again.",
+        title: t('propertyManager.toasts.failedToRemoveVendor', 'Failed to Remove Vendor'),
+        description: error.message || t('propertyManager.toasts.failedToRemoveVendor', 'Failed to remove vendor. Please try again.'),
         variant: "destructive",
       });
     },
@@ -148,16 +150,16 @@ export default function PropertyManager() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/user"] });
       toast({
-        title: "Account Updated",
-        description: "Your account settings have been successfully updated.",
+        title: t('propertyManager.toasts.accountUpdated', 'Account Updated'),
+        description: t('propertyManager.toasts.accountUpdatedDesc', 'Your account settings have been successfully updated.'),
       });
       accountForm.reset();
       setSettingsOpen(false);
     },
     onError: (error: any) => {
       toast({
-        title: "Update Failed",
-        description: error.message || "Failed to update account settings.",
+        title: t('propertyManager.toasts.updateFailed', 'Update Failed'),
+        description: error.message || t('propertyManager.toasts.updateFailedDesc', 'Failed to update account settings.'),
         variant: "destructive",
       });
     },
@@ -180,14 +182,14 @@ export default function PropertyManager() {
       }
       
       toast({
-        title: "Strata Number Updated",
-        description: "The strata number has been saved successfully.",
+        title: t('propertyManager.toasts.strataUpdated', 'Strata Number Updated'),
+        description: t('propertyManager.toasts.strataUpdatedDesc', 'The strata number has been saved successfully.'),
       });
     },
     onError: (error: any) => {
       toast({
-        title: "Update Failed",
-        description: error.message || "Failed to update strata number.",
+        title: t('propertyManager.toasts.updateFailed', 'Update Failed'),
+        description: error.message || t('propertyManager.toasts.strataUpdateFailed', 'Failed to update strata number.'),
         variant: "destructive",
       });
     },
@@ -281,14 +283,14 @@ export default function PropertyManager() {
   useEffect(() => {
     if (projectDetailsError) {
       toast({
-        title: "Unable to Load Project Details",
-        description: (projectDetailsError as Error).message || "Please try again.",
+        title: t('propertyManager.toasts.unableToLoadDetails', 'Unable to Load Project Details'),
+        description: (projectDetailsError as Error).message || t('common.tryAgain', 'Please try again.'),
         variant: "destructive",
       });
       // Close dialog and clear selection to prevent stale data display
       setSelectedProject(null);
     }
-  }, [projectDetailsError, toast]);
+  }, [projectDetailsError, toast, t]);
 
   useEffect(() => {
     // Only show toast once when error first appears
@@ -297,13 +299,13 @@ export default function PropertyManager() {
       // Don't show toast for "strata required" errors - those are handled in UI
       if (!errorMessage?.includes('Strata number required')) {
         toast({
-          title: "Failed to Load Projects",
-          description: errorMessage || "Unable to load projects. Please try again.",
+          title: t('propertyManager.toasts.failedToLoadProjects', 'Failed to Load Projects'),
+          description: errorMessage || t('propertyManager.toasts.unableToLoadProjects', 'Unable to load projects. Please try again.'),
           variant: "destructive",
         });
       }
     }
-  }, [projectsError]);
+  }, [projectsError, t]);
 
   useEffect(() => {
     if (selectedVendor) {
@@ -402,8 +404,8 @@ export default function PropertyManager() {
   const handleAddVendor = () => {
     if (companyCode.trim().length !== 10) {
       toast({
-        title: "Invalid Code",
-        description: "Company code must be exactly 10 characters.",
+        title: t('propertyManager.toasts.invalidCode', 'Invalid Code'),
+        description: t('propertyManager.toasts.codeMustBe10Chars', 'Company code must be exactly 10 characters.'),
         variant: "destructive",
       });
       return;
@@ -436,8 +438,8 @@ export default function PropertyManager() {
       }
 
       toast({
-        title: "Success",
-        description: "Anchor inspection document uploaded successfully",
+        title: t('propertyManager.toasts.uploadSuccess', 'Success'),
+        description: t('propertyManager.toasts.anchorInspectionUploaded', 'Anchor inspection document uploaded successfully'),
       });
 
       // Refresh project details to show the new document
@@ -446,8 +448,8 @@ export default function PropertyManager() {
       });
     } catch (error: any) {
       toast({
-        title: "Error",
-        description: error.message || "Failed to upload document",
+        title: t('propertyManager.toasts.uploadError', 'Error'),
+        description: error.message || t('propertyManager.toasts.uploadFailed', 'Failed to upload document'),
         variant: "destructive",
       });
     } finally {
@@ -473,8 +475,8 @@ export default function PropertyManager() {
 
     if (Object.keys(updateData).length === 0) {
       toast({
-        title: "No Changes",
-        description: "No changes were made to your account.",
+        title: t('propertyManager.toasts.noChanges', 'No Changes'),
+        description: t('propertyManager.toasts.noChangesDesc', 'No changes were made to your account.'),
       });
       return;
     }
@@ -489,9 +491,9 @@ export default function PropertyManager() {
       <div className="max-w-6xl mx-auto p-4 md:p-6 pb-20">
         <div className="mb-6 flex flex-wrap items-start justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-bold mb-2" data-testid="text-page-title">My Vendors</h1>
+            <h1 className="text-3xl font-bold mb-2" data-testid="text-page-title">{t('propertyManager.title', 'My Vendors')}</h1>
             <p className="text-muted-foreground" data-testid="text-page-description">
-              Manage your connected rope access companies and view their information
+              {t('propertyManager.description', 'Manage your connected rope access companies and view their information')}
             </p>
           </div>
           <DropdownMenu>
@@ -519,7 +521,7 @@ export default function PropertyManager() {
                 data-testid="menu-account-settings"
               >
                 <Settings className="w-4 h-4 mr-2" />
-                Account Settings
+                {t('propertyManager.menu.accountSettings', 'Account Settings')}
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem 
@@ -527,7 +529,7 @@ export default function PropertyManager() {
                 data-testid="menu-logout"
               >
                 <LogOut className="w-4 h-4 mr-2" />
-                Log Out
+                {t('propertyManager.menu.logout', 'Log Out')}
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -536,11 +538,13 @@ export default function PropertyManager() {
         <Card className="mb-6" data-testid="card-my-vendors">
           <CardHeader className="flex flex-row flex-wrap items-center justify-between gap-2 space-y-0 pb-4">
             <div>
-              <CardTitle data-testid="text-vendors-title">Connected Vendors</CardTitle>
+              <CardTitle data-testid="text-vendors-title">{t('propertyManager.connectedVendors', 'Connected Vendors')}</CardTitle>
               <CardDescription data-testid="text-vendors-description">
                 {vendors.length === 0 
-                  ? "No vendors connected yet. Add a company code to get started." 
-                  : `You have access to ${vendors.length} rope access ${vendors.length === 1 ? 'company' : 'companies'}`}
+                  ? t('propertyManager.noVendorsYet', 'No vendors connected yet. Add a company code to get started.')
+                  : vendors.length === 1 
+                    ? t('propertyManager.vendorCount', 'You have access to {{count}} rope access company', { count: vendors.length })
+                    : t('propertyManager.vendorCountPlural', 'You have access to {{count}} rope access companies', { count: vendors.length })}
               </CardDescription>
             </div>
             <Button 
@@ -548,20 +552,20 @@ export default function PropertyManager() {
               data-testid="button-add-vendor"
             >
               <Plus className="w-4 h-4 mr-2" />
-              Add Vendor
+              {t('propertyManager.addVendor', 'Add Vendor')}
             </Button>
           </CardHeader>
           <CardContent>
             {isLoading ? (
               <div className="text-center py-8 text-muted-foreground" data-testid="text-loading">
-                Loading vendors...
+                {t('propertyManager.loadingVendors', 'Loading vendors...')}
               </div>
             ) : vendors.length === 0 ? (
               <div className="text-center py-12">
                 <Building2 className="w-16 h-16 mx-auto mb-4 text-muted-foreground" />
-                <p className="text-lg font-semibold mb-2" data-testid="text-no-vendors">No Vendors Yet</p>
+                <p className="text-lg font-semibold mb-2" data-testid="text-no-vendors">{t('propertyManager.noVendorsTitle', 'No Vendors Yet')}</p>
                 <p className="text-sm text-muted-foreground mb-4" data-testid="text-no-vendors-description">
-                  Request a company code from your rope access company and add it above
+                  {t('propertyManager.noVendorsDescription', 'Request a company code from your rope access company and add it above')}
                 </p>
               </div>
             ) : (
@@ -679,17 +683,17 @@ export default function PropertyManager() {
         <Dialog open={addCodeOpen} onOpenChange={setAddCodeOpen}>
           <DialogContent data-testid="dialog-add-vendor">
             <DialogHeader>
-              <DialogTitle data-testid="text-dialog-title">Add Vendor Company</DialogTitle>
+              <DialogTitle data-testid="text-dialog-title">{t('propertyManager.addVendorDialog.title', 'Add Vendor Company')}</DialogTitle>
               <DialogDescription data-testid="text-dialog-description">
-                Enter the 10-character company code provided by your rope access company
+                {t('propertyManager.addVendorDialog.description', 'Enter the 10-character company code provided by your rope access company')}
               </DialogDescription>
             </DialogHeader>
             <div className="space-y-4 pt-4">
               <div className="space-y-2">
-                <Label htmlFor="companyCode">Company Code</Label>
+                <Label htmlFor="companyCode">{t('propertyManager.addVendorDialog.companyCode', 'Company Code')}</Label>
                 <Input
                   id="companyCode"
-                  placeholder="Enter 10-character code"
+                  placeholder={t('propertyManager.addVendorDialog.placeholder', 'Enter 10-character code')}
                   value={companyCode}
                   onChange={(e) => setCompanyCode(e.target.value.toUpperCase())}
                   maxLength={10}
@@ -705,14 +709,14 @@ export default function PropertyManager() {
                   }}
                   data-testid="button-cancel-add-vendor"
                 >
-                  Cancel
+                  {t('propertyManager.addVendorDialog.cancel', 'Cancel')}
                 </Button>
                 <Button
                   onClick={handleAddVendor}
                   disabled={companyCode.trim().length !== 10 || addVendorMutation.isPending}
                   data-testid="button-submit-add-vendor"
                 >
-                  {addVendorMutation.isPending ? "Adding..." : "Add Vendor"}
+                  {addVendorMutation.isPending ? t('propertyManager.addVendorDialog.adding', 'Adding...') : t('propertyManager.addVendorDialog.add', 'Add Vendor')}
                 </Button>
               </div>
             </div>
@@ -742,7 +746,7 @@ export default function PropertyManager() {
                 {selectedVendor?.companyName}
               </DialogTitle>
               <DialogDescription data-testid="text-vendor-details-description">
-                Vendor company information
+                {t('propertyManager.vendorDetails.description', 'Vendor company information')}
               </DialogDescription>
             </DialogHeader>
             {selectedVendor && (
@@ -754,8 +758,8 @@ export default function PropertyManager() {
                     <div className="flex items-center gap-3">
                       <Shield className="w-5 h-5 text-muted-foreground" />
                       <div>
-                        <Label className="text-sm font-medium">Company Safety Rating (CSR)</Label>
-                        <p className="text-xs text-muted-foreground mt-0.5">Overall safety compliance score</p>
+                        <Label className="text-sm font-medium">{t('propertyManager.vendorDetails.csr.title', 'Company Safety Rating (CSR)')}</Label>
+                        <p className="text-xs text-muted-foreground mt-0.5">{t('propertyManager.vendorDetails.csr.description', 'Overall safety compliance score')}</p>
                       </div>
                     </div>
                     {isLoadingCSR ? (
@@ -780,7 +784,7 @@ export default function PropertyManager() {
                     ) : (
                       <Badge variant="outline" className="gap-1.5 px-3 py-1.5" data-testid="badge-vendor-csr-unavailable">
                         <Shield className="w-4 h-4" />
-                        <span className="text-sm font-medium">N/A</span>
+                        <span className="text-sm font-medium">{t('propertyManager.vendorDetails.csr.notAvailable', 'N/A')}</span>
                       </Badge>
                     )}
                   </div>
@@ -788,10 +792,10 @@ export default function PropertyManager() {
                   {/* CSR Breakdown */}
                   {vendorCSRData && (
                     <div className="pt-2 border-t space-y-2">
-                      <p className="text-xs text-muted-foreground font-medium">Safety Compliance Breakdown:</p>
+                      <p className="text-xs text-muted-foreground font-medium">{t('propertyManager.vendorDetails.csr.breakdown', 'Safety Compliance Breakdown:')}</p>
                       <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs">
                         <div className="flex items-center justify-between bg-background rounded px-2 py-1.5">
-                          <span className="text-muted-foreground">Documentation</span>
+                          <span className="text-muted-foreground">{t('propertyManager.vendorDetails.csr.documentation', 'Documentation')}</span>
                           <span className={`font-medium ${
                             vendorCSRData.breakdown.documentationRating === 100 ? "text-green-600 dark:text-green-400" :
                             vendorCSRData.breakdown.documentationRating >= 50 ? "text-yellow-600 dark:text-yellow-400" :
@@ -799,7 +803,7 @@ export default function PropertyManager() {
                           }`}>{vendorCSRData.breakdown.documentationRating}%</span>
                         </div>
                         <div className="flex items-center justify-between bg-background rounded px-2 py-1.5">
-                          <span className="text-muted-foreground">Toolbox Meetings</span>
+                          <span className="text-muted-foreground">{t('propertyManager.vendorDetails.csr.toolboxMeetings', 'Toolbox Meetings')}</span>
                           <span className={`font-medium ${
                             vendorCSRData.breakdown.toolboxMeetingRating >= 90 ? "text-green-600 dark:text-green-400" :
                             vendorCSRData.breakdown.toolboxMeetingRating >= 70 ? "text-yellow-600 dark:text-yellow-400" :
@@ -807,7 +811,7 @@ export default function PropertyManager() {
                           }`}>{vendorCSRData.breakdown.toolboxMeetingRating}%</span>
                         </div>
                         <div className="flex items-center justify-between bg-background rounded px-2 py-1.5">
-                          <span className="text-muted-foreground">Harness Inspections</span>
+                          <span className="text-muted-foreground">{t('propertyManager.vendorDetails.csr.harnessInspections', 'Harness Inspections')}</span>
                           <span className={`font-medium ${
                             vendorCSRData.breakdown.harnessInspectionRating >= 90 ? "text-green-600 dark:text-green-400" :
                             vendorCSRData.breakdown.harnessInspectionRating >= 70 ? "text-yellow-600 dark:text-yellow-400" :
@@ -816,8 +820,7 @@ export default function PropertyManager() {
                         </div>
                       </div>
                       <p className="text-[10px] text-muted-foreground">
-                        CSR measures vendor compliance with safety documentation, daily toolbox meetings, and equipment inspections.
-                        A score of 90%+ indicates excellent safety practices.
+                        {t('propertyManager.vendorDetails.csr.helpText', 'CSR measures vendor compliance with safety documentation, daily toolbox meetings, and equipment inspections. A score of 90%+ indicates excellent safety practices.')}
                       </p>
                     </div>
                   )}
@@ -827,11 +830,11 @@ export default function PropertyManager() {
                 <div className="space-y-3 border-t pt-4">
                   <div className="flex items-center gap-2">
                     <FileText className="w-5 h-5 text-muted-foreground" />
-                    <Label className="text-sm font-medium">Safety Documents</Label>
+                    <Label className="text-sm font-medium">{t('propertyManager.vendorDetails.safetyDocuments', 'Safety Documents')}</Label>
                   </div>
                   
                   {isLoadingDocuments ? (
-                    <div className="text-sm text-muted-foreground">Loading documents...</div>
+                    <div className="text-sm text-muted-foreground">{t('propertyManager.vendorDetails.loadingDocuments', 'Loading documents...')}</div>
                   ) : (() => {
                     // Filter to only show Certificate of Insurance - exclude Company Policy and Health & Safety Manual
                     const visibleDocs = (vendorDocumentsData?.documents || []).filter(
@@ -846,7 +849,7 @@ export default function PropertyManager() {
                               <div className="flex items-center gap-2">
                                 <FileCheck className="w-4 h-4 text-green-600 dark:text-green-400" />
                                 <div>
-                                  <p className="text-sm font-medium">Certificate of Insurance</p>
+                                  <p className="text-sm font-medium">{t('propertyManager.vendorDetails.certificateOfInsurance', 'Certificate of Insurance')}</p>
                                   <p className="text-xs text-muted-foreground">{doc.fileName}</p>
                                 </div>
                               </div>
@@ -857,7 +860,7 @@ export default function PropertyManager() {
                                 data-testid={`button-view-document-${doc.id}`}
                               >
                                 <Download className="w-4 h-4 mr-1" />
-                                View
+                                {t('propertyManager.viewDetails', 'View Details')}
                               </Button>
                             </div>
                           ))}
@@ -867,7 +870,7 @@ export default function PropertyManager() {
                     
                     return (
                       <p className="text-sm text-muted-foreground bg-muted/50 px-3 py-2 rounded-md">
-                        No Certificate of Insurance available from this vendor.
+                        {t('propertyManager.vendorDetails.noCertificate', 'No Certificate of Insurance available from this vendor.')}
                       </p>
                     );
                   })()}
@@ -875,7 +878,7 @@ export default function PropertyManager() {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <Label className="text-xs text-muted-foreground">Company Email</Label>
+                    <Label className="text-xs text-muted-foreground">{t('propertyManager.vendorDetails.companyEmail', 'Company Email')}</Label>
                     <div className="flex items-center gap-2 mt-1">
                       <Mail className="w-4 h-4 text-muted-foreground" />
                       <span data-testid="text-vendor-detail-email">{selectedVendor.email}</span>
@@ -883,7 +886,7 @@ export default function PropertyManager() {
                   </div>
                   {selectedVendor.phone && (
                     <div>
-                      <Label className="text-xs text-muted-foreground">Phone Number</Label>
+                      <Label className="text-xs text-muted-foreground">{t('propertyManager.vendorDetails.phoneNumber', 'Phone Number')}</Label>
                       <div className="flex items-center gap-2 mt-1">
                         <Phone className="w-4 h-4 text-muted-foreground" />
                         <span data-testid="text-vendor-detail-phone">{selectedVendor.phone}</span>
@@ -895,18 +898,18 @@ export default function PropertyManager() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {selectedVendor.residentCode && (
                     <div>
-                      <Label className="text-xs text-muted-foreground">Resident Access Code</Label>
+                      <Label className="text-xs text-muted-foreground">{t('propertyManager.vendorDetails.residentAccessCode', 'Resident Access Code')}</Label>
                       <div className="font-mono text-sm bg-muted px-3 py-2 rounded-md mt-1" data-testid="text-vendor-detail-resident-code">
                         {selectedVendor.residentCode}
                       </div>
                       <p className="text-[10px] text-muted-foreground mt-1">
-                        Share this code with building residents so they can access the resident portal to view project updates and submit complaints.
+                        {t('propertyManager.vendorDetails.residentCodeHelp', 'Share this code with building residents so they can access the resident portal to view project updates and submit complaints.')}
                       </p>
                     </div>
                   )}
                   {selectedVendor.propertyManagerCode && (
                     <div>
-                      <Label className="text-xs text-muted-foreground">Property Manager Code</Label>
+                      <Label className="text-xs text-muted-foreground">{t('propertyManager.vendorDetails.propertyManagerCode', 'Property Manager Code')}</Label>
                       <div className="font-mono text-sm bg-muted px-3 py-2 rounded-md mt-1" data-testid="text-vendor-detail-pm-code">
                         {selectedVendor.propertyManagerCode}
                       </div>
@@ -915,13 +918,13 @@ export default function PropertyManager() {
                 </div>
 
                 <div className="space-y-3 border-t pt-4">
-                  <Label className="text-sm font-medium">Strata/Building Number (Required)</Label>
+                  <Label className="text-sm font-medium">{t('propertyManager.vendorDetails.strataNumber.label', 'Strata/Building Number (Required)')}</Label>
                   <p className="text-xs text-muted-foreground">
-                    Enter your strata/building number to access projects for your building. This field is required.
+                    {t('propertyManager.vendorDetails.strataNumber.description', 'Enter your strata/building number to access projects for your building. This field is required.')}
                   </p>
                   <div className="flex gap-2">
                     <Input
-                      placeholder="e.g., LMS1234 or EPS 1234"
+                      placeholder={t('propertyManager.vendorDetails.strataNumber.placeholder', 'e.g., LMS1234 or EPS 1234')}
                       value={strataNumber}
                       onChange={(e) => setStrataNumber(e.target.value)}
                       maxLength={100}
@@ -932,29 +935,29 @@ export default function PropertyManager() {
                       disabled={updateStrataMutation.isPending || !strataNumber.trim()}
                       data-testid="button-save-strata"
                     >
-                      {updateStrataMutation.isPending ? "Saving..." : "Save"}
+                      {updateStrataMutation.isPending ? t('propertyManager.vendorDetails.strataNumber.saving', 'Saving...') : t('propertyManager.vendorDetails.strataNumber.save', 'Save')}
                     </Button>
                   </div>
                   {!strataNumber.trim() && (
                     <p className="text-xs text-destructive">
-                      Strata number cannot be empty
+                      {t('propertyManager.vendorDetails.strataNumber.emptyError', 'Strata number cannot be empty')}
                     </p>
                   )}
                 </div>
 
                 <div className="space-y-3 border-t pt-4">
-                  <Label className="text-sm font-medium">Projects for Your Building</Label>
+                  <Label className="text-sm font-medium">{t('propertyManager.vendorDetails.projects.title', 'Projects for Your Building')}</Label>
                   {!selectedVendor.strataNumber ? (
                     <div className="text-sm text-muted-foreground bg-muted/50 p-4 rounded-md" data-testid="text-strata-required">
-                      <strong>Strata number required:</strong> Please enter and save your strata/building number above to view projects for your building.
+                      <strong>{t('propertyManager.vendorDetails.projects.strataRequired', 'Strata number required:')}</strong> {t('propertyManager.vendorDetails.projects.strataRequiredDesc', 'Please enter and save your strata/building number above to view projects for your building.')}
                     </div>
                   ) : projectsError ? (
                     <div className="text-sm text-muted-foreground bg-muted/50 p-4 rounded-md" data-testid="text-projects-error">
-                      <strong>Unable to load projects:</strong> {(projectsError as Error).message || "Please try again or contact support."}
+                      <strong>{t('propertyManager.vendorDetails.projects.unableToLoad', 'Unable to load projects:')}</strong> {(projectsError as Error).message || t('common.tryAgain', 'Please try again or contact support.')}
                     </div>
                   ) : isLoadingProjects ? (
                     <div className="text-sm text-muted-foreground" data-testid="text-loading-projects">
-                      Loading projects...
+                      {t('propertyManager.vendorDetails.projects.loading', 'Loading projects...')}
                     </div>
                   ) : projectsData?.projects && projectsData.projects.length > 0 ? (
                     <div className="space-y-4 max-h-96 overflow-y-auto">
@@ -968,7 +971,7 @@ export default function PropertyManager() {
                               <div className="space-y-2">
                                 <div className="flex items-center gap-2">
                                   <Clock className="w-4 h-4 text-primary" />
-                                  <h4 className="text-sm font-medium">Active Projects ({activeProjects.length})</h4>
+                                  <h4 className="text-sm font-medium">{t('propertyManager.vendorDetails.projects.activeProjects', 'Active Projects')} ({activeProjects.length})</h4>
                                 </div>
                                 <div className="space-y-2">
                                   {activeProjects.map((project: any) => (
@@ -982,14 +985,14 @@ export default function PropertyManager() {
                                         <div className="flex items-start justify-between gap-2">
                                           <div className="space-y-1 flex-1">
                                             <div className="font-medium" data-testid={`text-project-name-${project.id}`}>
-                                              {project.buildingName || project.projectName || 'Unnamed Project'}
+                                              {project.buildingName || project.projectName || t('propertyManager.vendorDetails.projects.unnamedProject', 'Unnamed Project')}
                                             </div>
                                             <div className="text-xs text-muted-foreground">
                                               {project.jobType?.replace(/_/g, ' ')}
                                             </div>
                                           </div>
                                           <Badge variant="default" className="text-xs">
-                                            Active
+                                            {t('propertyManager.vendorDetails.projects.active', 'Active')}
                                           </Badge>
                                         </div>
                                       </CardContent>
@@ -1003,7 +1006,7 @@ export default function PropertyManager() {
                               <div className="space-y-2">
                                 <div className="flex items-center gap-2">
                                   <CheckCircle2 className="w-4 h-4 text-green-500" />
-                                  <h4 className="text-sm font-medium">Completed Projects ({completedProjects.length})</h4>
+                                  <h4 className="text-sm font-medium">{t('propertyManager.vendorDetails.projects.completedProjects', 'Completed Projects')} ({completedProjects.length})</h4>
                                 </div>
                                 <div className="space-y-2">
                                   {completedProjects.map((project: any) => (
@@ -1017,14 +1020,14 @@ export default function PropertyManager() {
                                         <div className="flex items-start justify-between gap-2">
                                           <div className="space-y-1 flex-1">
                                             <div className="font-medium" data-testid={`text-project-name-${project.id}`}>
-                                              {project.buildingName || project.projectName || 'Unnamed Project'}
+                                              {project.buildingName || project.projectName || t('propertyManager.vendorDetails.projects.unnamedProject', 'Unnamed Project')}
                                             </div>
                                             <div className="text-xs text-muted-foreground">
                                               {project.jobType?.replace(/_/g, ' ')}
                                             </div>
                                           </div>
                                           <Badge variant="secondary" className="text-xs">
-                                            Completed
+                                            {t('propertyManager.vendorDetails.projects.completed', 'Completed')}
                                           </Badge>
                                         </div>
                                       </CardContent>
@@ -1039,7 +1042,7 @@ export default function PropertyManager() {
                     </div>
                   ) : (
                     <div className="text-sm text-muted-foreground" data-testid="text-no-projects">
-                      No projects found for strata number "{selectedVendor.strataNumber}". Please verify your strata number is correct.
+                      {t('propertyManager.vendorDetails.projects.noProjectsFound', 'No projects found for strata number "{{strataNumber}}". Please verify your strata number is correct.', { strataNumber: selectedVendor.strataNumber })}
                     </div>
                   )}
                 </div>
@@ -1050,7 +1053,7 @@ export default function PropertyManager() {
                     onClick={() => setSelectedVendor(null)}
                     data-testid="button-close-vendor-details"
                   >
-                    Close
+                    {t('propertyManager.close', 'Close')}
                   </Button>
                 </div>
                 </div>
@@ -1062,9 +1065,9 @@ export default function PropertyManager() {
         <Dialog open={settingsOpen} onOpenChange={setSettingsOpen}>
           <DialogContent className="max-w-2xl" data-testid="dialog-account-settings">
             <DialogHeader>
-              <DialogTitle data-testid="text-settings-title">Account Settings</DialogTitle>
+              <DialogTitle data-testid="text-settings-title">{t('propertyManager.accountSettings.title', 'Account Settings')}</DialogTitle>
               <DialogDescription data-testid="text-settings-description">
-                Update your account information and password
+                {t('propertyManager.accountSettings.description', 'Update your account information and password')}
               </DialogDescription>
             </DialogHeader>
             <Form {...accountForm}>
@@ -1074,10 +1077,10 @@ export default function PropertyManager() {
                   name="name"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Name</FormLabel>
+                      <FormLabel>{t('propertyManager.accountSettings.name', 'Name')}</FormLabel>
                       <FormControl>
                         <Input
-                          placeholder="Your full name"
+                          placeholder={t('propertyManager.accountSettings.namePlaceholder', 'Your full name')}
                           {...field}
                           data-testid="input-account-name"
                         />
@@ -1091,11 +1094,11 @@ export default function PropertyManager() {
                   name="email"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Email Address</FormLabel>
+                      <FormLabel>{t('propertyManager.accountSettings.email', 'Email Address')}</FormLabel>
                       <FormControl>
                         <Input
                           type="email"
-                          placeholder="your.email@example.com"
+                          placeholder={t('propertyManager.accountSettings.emailPlaceholder', 'your.email@example.com')}
                           {...field}
                           data-testid="input-account-email"
                         />
@@ -1106,18 +1109,18 @@ export default function PropertyManager() {
                 />
 
                 <div className="border-t pt-4 mt-4">
-                  <h4 className="font-semibold mb-4">Change Password (Optional)</h4>
+                  <h4 className="font-semibold mb-4">{t('propertyManager.accountSettings.changePassword', 'Change Password (Optional)')}</h4>
                   <div className="space-y-4">
                     <FormField
                       control={accountForm.control}
                       name="currentPassword"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Current Password</FormLabel>
+                          <FormLabel>{t('propertyManager.accountSettings.currentPassword', 'Current Password')}</FormLabel>
                           <FormControl>
                             <Input
                               type="password"
-                              placeholder="Enter current password"
+                              placeholder={t('propertyManager.accountSettings.currentPasswordPlaceholder', 'Enter current password')}
                               {...field}
                               data-testid="input-current-password"
                             />
@@ -1131,11 +1134,11 @@ export default function PropertyManager() {
                       name="newPassword"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>New Password</FormLabel>
+                          <FormLabel>{t('propertyManager.accountSettings.newPassword', 'New Password')}</FormLabel>
                           <FormControl>
                             <Input
                               type="password"
-                              placeholder="Enter new password (min 6 characters)"
+                              placeholder={t('propertyManager.accountSettings.newPasswordPlaceholder', 'Enter new password (min 6 characters)')}
                               {...field}
                               data-testid="input-new-password"
                             />
@@ -1157,14 +1160,14 @@ export default function PropertyManager() {
                     }}
                     data-testid="button-cancel-settings"
                   >
-                    Cancel
+                    {t('propertyManager.accountSettings.cancel', 'Cancel')}
                   </Button>
                   <Button
                     type="submit"
                     disabled={updateAccountMutation.isPending}
                     data-testid="button-save-settings"
                   >
-                    {updateAccountMutation.isPending ? "Saving..." : "Save Changes"}
+                    {updateAccountMutation.isPending ? t('propertyManager.accountSettings.saving', 'Saving...') : t('propertyManager.accountSettings.saveChanges', 'Save Changes')}
                   </Button>
                 </div>
               </form>
@@ -1179,10 +1182,10 @@ export default function PropertyManager() {
                 <DialogHeader className="p-6 pb-4 shrink-0">
                   <DialogTitle className="flex items-center gap-2" data-testid="text-project-details-title">
                     <Building2 className="w-5 h-5" />
-                    {selectedProject.buildingName || selectedProject.projectName || 'Project Details'}
+                    {selectedProject.buildingName || selectedProject.projectName || t('propertyManager.projectDetails.title', 'Project Details')}
                   </DialogTitle>
                   <DialogDescription data-testid="text-project-details-description">
-                    View project information, progress, and complaint history
+                    {t('propertyManager.projectDetails.description', 'View project information, progress, and complaint history')}
                   </DialogDescription>
                 </DialogHeader>
                 
@@ -1190,7 +1193,7 @@ export default function PropertyManager() {
 
                 {isLoadingProjectDetails ? (
                   <div className="text-sm text-muted-foreground text-center py-8" data-testid="text-loading-details">
-                    Loading project details...
+                    {t('propertyManager.projectDetails.loading', 'Loading project details...')}
                   </div>
                 ) : projectDetailsData ? (
                   <div className="space-y-4 pt-4">
@@ -1198,33 +1201,33 @@ export default function PropertyManager() {
                     <Card data-testid="card-project-info">
                       <CardHeader>
                         <div className="flex items-center justify-between gap-2">
-                          <CardTitle className="text-lg">Project Information</CardTitle>
+                          <CardTitle className="text-lg">{t('propertyManager.projectDetails.projectInfo', 'Project Information')}</CardTitle>
                           <Badge variant={projectDetailsData.project.status === 'active' ? 'default' : 'secondary'}>
-                            {projectDetailsData.project.status}
+                            {projectDetailsData.project.status === 'active' ? t('propertyManager.projectDetails.active', 'Active') : t('propertyManager.projectDetails.completed', 'Completed')}
                           </Badge>
                         </div>
                       </CardHeader>
                       <CardContent className="space-y-3">
                         <div className="grid grid-cols-2 gap-3 text-sm">
                           <div>
-                            <Label className="text-xs text-muted-foreground">Job Type</Label>
+                            <Label className="text-xs text-muted-foreground">{t('propertyManager.projectDetails.jobType', 'Job Type')}</Label>
                             <p className="font-medium capitalize">{projectDetailsData.project.jobType?.replace(/_/g, ' ')}</p>
                           </div>
                           {projectDetailsData.project.startDate && (
                             <div>
-                              <Label className="text-xs text-muted-foreground">Start Date</Label>
+                              <Label className="text-xs text-muted-foreground">{t('propertyManager.projectDetails.startDate', 'Start Date')}</Label>
                               <p className="font-medium">{new Date(projectDetailsData.project.startDate).toLocaleDateString()}</p>
                             </div>
                           )}
                           {projectDetailsData.project.endDate && (
                             <div>
-                              <Label className="text-xs text-muted-foreground">End Date</Label>
+                              <Label className="text-xs text-muted-foreground">{t('propertyManager.projectDetails.endDate', 'End Date')}</Label>
                               <p className="font-medium">{new Date(projectDetailsData.project.endDate).toLocaleDateString()}</p>
                             </div>
                           )}
                           {projectDetailsData.project.buildingAddress && (
                             <div className="col-span-2">
-                              <Label className="text-xs text-muted-foreground">Address</Label>
+                              <Label className="text-xs text-muted-foreground">{t('propertyManager.projectDetails.address', 'Address')}</Label>
                               <p className="font-medium">{projectDetailsData.project.buildingAddress}</p>
                             </div>
                           )}
@@ -1263,8 +1266,8 @@ export default function PropertyManager() {
                               <div className="text-center space-y-4">
                                 <div>
                                   <h3 className="text-5xl font-bold mb-2">{progressPercent}%</h3>
-                                  <p className="text-base font-medium text-foreground">Project Completion</p>
-                                  <p className="text-xs text-muted-foreground mt-1">Hours-based tracking</p>
+                                  <p className="text-base font-medium text-foreground">{t('propertyManager.projectDetails.progress.projectCompletion', 'Project Completion')}</p>
+                                  <p className="text-xs text-muted-foreground mt-1">{t('propertyManager.projectDetails.progress.hoursBased', 'Hours-based tracking')}</p>
                                 </div>
                                 <Progress value={progressPercent} className="h-3" />
                               </div>
@@ -1287,9 +1290,9 @@ export default function PropertyManager() {
                               <div className="text-center space-y-4">
                                 <div>
                                   <h3 className="text-5xl font-bold mb-2">{progressPercent}%</h3>
-                                  <p className="text-base font-medium text-foreground">Project Completion</p>
+                                  <p className="text-base font-medium text-foreground">{t('propertyManager.projectDetails.progress.projectCompletion', 'Project Completion')}</p>
                                   <p className="text-xs text-muted-foreground mt-1">
-                                    {completedSuites} of {totalSuites} units completed
+                                    {t('propertyManager.projectDetails.progress.unitsCompleted', '{{completed}} of {{total}} units completed', { completed: completedSuites, total: totalSuites })}
                                   </p>
                                 </div>
                                 <Progress value={progressPercent} className="h-3" />
@@ -1313,9 +1316,9 @@ export default function PropertyManager() {
                               <div className="text-center space-y-4">
                                 <div>
                                   <h3 className="text-5xl font-bold mb-2">{progressPercent}%</h3>
-                                  <p className="text-base font-medium text-foreground">Project Completion</p>
+                                  <p className="text-base font-medium text-foreground">{t('propertyManager.projectDetails.progress.projectCompletion', 'Project Completion')}</p>
                                   <p className="text-xs text-muted-foreground mt-1">
-                                    {completedStalls} of {totalStalls} stalls completed
+                                    {t('propertyManager.projectDetails.progress.stallsCompleted', '{{completed}} of {{total}} stalls completed', { completed: completedStalls, total: totalStalls })}
                                   </p>
                                 </div>
                                 <Progress value={progressPercent} className="h-3" />
@@ -1332,9 +1335,9 @@ export default function PropertyManager() {
                     {!['in_suite_dryer_vent_cleaning', 'parkade_pressure_cleaning', 'ground_window_cleaning', 'general_pressure_washing'].includes(projectDetailsData.project.jobType) && (
                       <Card data-testid="card-building-progress">
                         <CardHeader>
-                          <CardTitle className="text-lg">Building Progress</CardTitle>
+                          <CardTitle className="text-lg">{t('propertyManager.projectDetails.buildingProgress.title', 'Building Progress')}</CardTitle>
                           <CardDescription>
-                            Visual representation of work completed across all four elevations
+                            {t('propertyManager.projectDetails.buildingProgress.description', 'Visual representation of work completed across all four elevations')}
                           </CardDescription>
                         </CardHeader>
                         <CardContent>
@@ -1376,12 +1379,12 @@ export default function PropertyManager() {
                                 {/* Overall Progress Bar */}
                                 <div className="mt-6 space-y-2">
                                   <div className="flex items-center justify-between text-sm">
-                                    <span className="text-muted-foreground">Overall Progress</span>
+                                    <span className="text-muted-foreground">{t('propertyManager.projectDetails.buildingProgress.overallProgress', 'Overall Progress')}</span>
                                     <span className="font-medium">{progressPercent}%</span>
                                   </div>
                                   <Progress value={progressPercent} className="h-2" />
                                   <div className="text-xs text-muted-foreground text-center">
-                                    {completedDrops} of {totalDrops} drops completed
+                                    {t('propertyManager.projectDetails.buildingProgress.dropsCompleted', '{{completed}} of {{total}} drops completed', { completed: completedDrops, total: totalDrops })}
                                   </div>
                                 </div>
                               </>
@@ -1397,7 +1400,7 @@ export default function PropertyManager() {
                         <CardHeader>
                           <CardTitle className="text-lg flex items-center gap-2">
                             <FileText className="w-5 h-5" />
-                            Rope Access Plan
+                            {t('propertyManager.projectDetails.ropeAccessPlan.title', 'Rope Access Plan')}
                           </CardTitle>
                         </CardHeader>
                         <CardContent>
@@ -1408,7 +1411,7 @@ export default function PropertyManager() {
                             data-testid="button-download-rope-access-plan"
                           >
                             <Download className="w-4 h-4 mr-2" />
-                            View/Download Rope Access Plan
+                            {t('propertyManager.projectDetails.ropeAccessPlan.viewDownload', 'View/Download Rope Access Plan')}
                           </Button>
                         </CardContent>
                       </Card>
@@ -1419,10 +1422,10 @@ export default function PropertyManager() {
                       <CardHeader>
                         <CardTitle className="text-lg flex items-center gap-2">
                           <FileCheck className="w-5 h-5" />
-                          Anchor Inspection Document
+                          {t('propertyManager.projectDetails.anchorInspection.title', 'Anchor Inspection Document')}
                         </CardTitle>
                         <CardDescription>
-                          Upload anchor inspection certificate for this project
+                          {t('propertyManager.projectDetails.anchorInspection.description', 'Upload anchor inspection certificate for this project')}
                         </CardDescription>
                       </CardHeader>
                       <CardContent className="space-y-3">
@@ -1430,7 +1433,7 @@ export default function PropertyManager() {
                           <div className="space-y-2">
                             <div className="flex items-center gap-2 text-sm text-muted-foreground">
                               <CheckCircle2 className="w-4 h-4 text-green-500" />
-                              <span>Anchor inspection document uploaded</span>
+                              <span>{t('propertyManager.projectDetails.anchorInspection.uploaded', 'Anchor inspection document uploaded')}</span>
                             </div>
                             <Button
                               variant="outline"
@@ -1439,12 +1442,12 @@ export default function PropertyManager() {
                               data-testid="button-view-anchor-inspection"
                             >
                               <Download className="w-4 h-4 mr-2" />
-                              View/Download Document
+                              {t('propertyManager.projectDetails.anchorInspection.viewDownload', 'View/Download Document')}
                             </Button>
                           </div>
                         ) : (
                           <div className="text-sm text-muted-foreground">
-                            No anchor inspection document uploaded yet
+                            {t('propertyManager.projectDetails.anchorInspection.notUploaded', 'No anchor inspection document uploaded yet')}
                           </div>
                         )}
                         
@@ -1467,7 +1470,7 @@ export default function PropertyManager() {
                             data-testid="button-upload-anchor-inspection"
                           >
                             <Upload className="w-4 h-4 mr-2" />
-                            {uploadingAnchorInspection ? 'Uploading...' : (projectDetailsData.project.anchorInspectionCertificateUrl ? 'Upload New Document' : 'Upload Document')}
+                            {uploadingAnchorInspection ? t('propertyManager.projectDetails.anchorInspection.uploading', 'Uploading...') : (projectDetailsData.project.anchorInspectionCertificateUrl ? t('propertyManager.projectDetails.anchorInspection.uploadNew', 'Upload New Document') : t('propertyManager.projectDetails.anchorInspection.upload', 'Upload Document'))}
                           </Button>
                         </div>
                       </CardContent>
@@ -1478,7 +1481,7 @@ export default function PropertyManager() {
                       <CardHeader>
                         <CardTitle className="text-lg flex items-center gap-2">
                           <AlertCircle className="w-5 h-5" />
-                          Complaints History
+                          {t('propertyManager.projectDetails.complaints.title', 'Complaints History')}
                           {projectDetailsData.complaints.length > 0 && (
                             <Badge variant="secondary">{projectDetailsData.complaints.length}</Badge>
                           )}
@@ -1487,7 +1490,7 @@ export default function PropertyManager() {
                       <CardContent>
                         {projectDetailsData.complaints.length === 0 ? (
                           <div className="text-sm text-muted-foreground text-center py-4" data-testid="text-no-complaints">
-                            No complaints recorded for this project
+                            {t('propertyManager.projectDetails.complaints.none', 'No complaints recorded for this project')}
                           </div>
                         ) : (
                           <div className="space-y-3 max-h-60 overflow-y-auto">
@@ -1502,14 +1505,14 @@ export default function PropertyManager() {
                                   <div className="space-y-2">
                                     <div className="flex items-start justify-between gap-2">
                                       <div className="flex-1">
-                                        <p className="text-sm font-medium">{complaint.subject || 'No Subject'}</p>
+                                        <p className="text-sm font-medium">{complaint.subject || t('propertyManager.projectDetails.complaints.noSubject', 'No Subject')}</p>
                                         <p className="text-xs text-muted-foreground mt-1">
-                                          {new Date(complaint.createdAt).toLocaleDateString()} at{' '}
+                                          {new Date(complaint.createdAt).toLocaleDateString()} {t('propertyManager.projectDetails.complaints.at', 'at')}{' '}
                                           {new Date(complaint.createdAt).toLocaleTimeString()}
                                         </p>
                                       </div>
                                       <Badge variant={complaint.status === 'resolved' ? 'default' : 'secondary'} className="text-xs">
-                                        {complaint.status}
+                                        {complaint.status === 'resolved' ? t('propertyManager.projectDetails.complaints.resolved', 'resolved') : t('propertyManager.projectDetails.complaints.pending', 'pending')}
                                       </Badge>
                                     </div>
                                     {complaint.description && (
@@ -1532,13 +1535,13 @@ export default function PropertyManager() {
                         onClick={() => setSelectedProject(null)}
                         data-testid="button-close-project-details"
                       >
-                        Close
+                        {t('propertyManager.close', 'Close')}
                       </Button>
                     </div>
                   </div>
                 ) : (
                   <div className="text-sm text-muted-foreground text-center py-8" data-testid="text-error-loading-details">
-                    Failed to load project details
+                    {t('propertyManager.projectDetails.errorLoading', 'Failed to load project details')}
                   </div>
                 )}
                 </div>
@@ -1551,9 +1554,9 @@ export default function PropertyManager() {
         <Dialog open={vendorToRemove !== null} onOpenChange={(open) => !open && setVendorToRemove(null)}>
           <DialogContent data-testid="dialog-remove-vendor">
             <DialogHeader>
-              <DialogTitle data-testid="text-remove-vendor-title">Remove Vendor?</DialogTitle>
+              <DialogTitle data-testid="text-remove-vendor-title">{t('propertyManager.removeVendor.title', 'Remove Vendor?')}</DialogTitle>
               <DialogDescription data-testid="text-remove-vendor-description">
-                Are you sure you want to remove {vendorToRemove?.companyName} from your vendors list? This action cannot be undone.
+                {t('propertyManager.removeVendor.description', 'Are you sure you want to remove {{companyName}} from your vendors list? This action cannot be undone.', { companyName: vendorToRemove?.companyName })}
               </DialogDescription>
             </DialogHeader>
             <div className="flex gap-2 justify-end pt-4">
@@ -1562,7 +1565,7 @@ export default function PropertyManager() {
                 onClick={() => setVendorToRemove(null)}
                 data-testid="button-cancel-remove-vendor"
               >
-                Cancel
+                {t('propertyManager.removeVendor.cancel', 'Cancel')}
               </Button>
               <Button
                 variant="destructive"
@@ -1574,7 +1577,7 @@ export default function PropertyManager() {
                 disabled={removeVendorMutation.isPending}
                 data-testid="button-confirm-remove-vendor"
               >
-                {removeVendorMutation.isPending ? "Removing..." : "Remove Vendor"}
+                {removeVendorMutation.isPending ? t('propertyManager.removeVendor.removing', 'Removing...') : t('propertyManager.removeVendor.remove', 'Remove Vendor')}
               </Button>
             </div>
           </DialogContent>
@@ -1585,10 +1588,10 @@ export default function PropertyManager() {
           <DialogContent className="h-[90vh] flex flex-col p-0 max-w-2xl" data-testid="dialog-complaint-details">
             <DialogHeader className="shrink-0 px-6 pt-6 pb-4 border-b">
               <DialogTitle data-testid="text-complaint-title">
-                {selectedComplaint?.subject || 'No Subject'}
+                {selectedComplaint?.subject || t('propertyManager.complaintDetails.noSubject', 'No Subject')}
               </DialogTitle>
               <DialogDescription data-testid="text-complaint-timestamp">
-                Submitted on {selectedComplaint ? new Date(selectedComplaint.createdAt).toLocaleDateString() : ''} at{' '}
+                {t('propertyManager.complaintDetails.submittedOn', 'Submitted on')} {selectedComplaint ? new Date(selectedComplaint.createdAt).toLocaleDateString() : ''} {t('propertyManager.complaintDetails.at', 'at')}{' '}
                 {selectedComplaint ? new Date(selectedComplaint.createdAt).toLocaleTimeString() : ''}
               </DialogDescription>
             </DialogHeader>
@@ -1597,22 +1600,22 @@ export default function PropertyManager() {
               <div className="space-y-6">
                 {/* Status Badge */}
                 <div className="flex items-center gap-2">
-                  <span className="text-sm font-medium">Status:</span>
+                  <span className="text-sm font-medium">{t('propertyManager.complaintDetails.status', 'Status:')}</span>
                   <Badge variant={selectedComplaint?.status === 'resolved' ? 'default' : 'secondary'}>
-                    {selectedComplaint?.status}
+                    {selectedComplaint?.status === 'resolved' ? t('propertyManager.complaintDetails.resolved', 'resolved') : t('propertyManager.complaintDetails.pending', 'pending')}
                   </Badge>
                 </div>
 
                 {/* Resident Information */}
                 <div className="space-y-2">
-                  <h4 className="text-sm font-semibold">Resident Information</h4>
+                  <h4 className="text-sm font-semibold">{t('propertyManager.complaintDetails.residentInfo', 'Resident Information')}</h4>
                   <div className="bg-muted/50 rounded-lg p-3 space-y-1 text-sm">
-                    <div><span className="font-medium">Name:</span> {selectedComplaint?.residentName || 'N/A'}</div>
+                    <div><span className="font-medium">{t('propertyManager.complaintDetails.name', 'Name:')}</span> {selectedComplaint?.residentName || t('propertyManager.complaintDetails.notAvailable', 'N/A')}</div>
                     {selectedComplaint?.unitNumber && (
-                      <div><span className="font-medium">Unit:</span> {selectedComplaint.unitNumber}</div>
+                      <div><span className="font-medium">{t('propertyManager.complaintDetails.unit', 'Unit:')}</span> {selectedComplaint.unitNumber}</div>
                     )}
                     {selectedComplaint?.phoneNumber && (
-                      <div><span className="font-medium">Phone:</span> {selectedComplaint.phoneNumber}</div>
+                      <div><span className="font-medium">{t('propertyManager.complaintDetails.phone', 'Phone:')}</span> {selectedComplaint.phoneNumber}</div>
                     )}
                   </div>
                 </div>
@@ -1620,7 +1623,7 @@ export default function PropertyManager() {
                 {/* Description */}
                 {selectedComplaint?.description && (
                   <div className="space-y-2">
-                    <h4 className="text-sm font-semibold">Description</h4>
+                    <h4 className="text-sm font-semibold">{t('propertyManager.complaintDetails.description', 'Description')}</h4>
                     <div className="bg-muted/50 rounded-lg p-3 text-sm whitespace-pre-wrap">
                       {selectedComplaint.description}
                     </div>
@@ -1630,11 +1633,11 @@ export default function PropertyManager() {
                 {/* Photo */}
                 {selectedComplaint?.photoUrl && (
                   <div className="space-y-2">
-                    <h4 className="text-sm font-semibold">Attached Photo</h4>
+                    <h4 className="text-sm font-semibold">{t('propertyManager.complaintDetails.attachedPhoto', 'Attached Photo')}</h4>
                     <div className="bg-muted/50 rounded-lg p-3">
                       <img 
                         src={selectedComplaint.photoUrl} 
-                        alt="Complaint photo" 
+                        alt={t('propertyManager.complaintDetails.photoAlt', 'Complaint photo')} 
                         className="w-full h-auto rounded-md"
                         data-testid="img-complaint-photo"
                       />
@@ -1645,7 +1648,7 @@ export default function PropertyManager() {
                 {/* Notes (visible to resident) */}
                 {selectedComplaint?.notes && selectedComplaint.notes.length > 0 && (
                   <div className="space-y-2">
-                    <h4 className="text-sm font-semibold">Communication History</h4>
+                    <h4 className="text-sm font-semibold">{t('propertyManager.complaintDetails.communicationHistory', 'Communication History')}</h4>
                     <div className="space-y-2">
                       {selectedComplaint.notes
                         .filter((note: any) => note.visibleToResident)
@@ -1672,7 +1675,7 @@ export default function PropertyManager() {
                 onClick={() => setSelectedComplaint(null)}
                 data-testid="button-close-complaint-details"
               >
-                Close
+                {t('propertyManager.close', 'Close')}
               </Button>
             </div>
           </DialogContent>

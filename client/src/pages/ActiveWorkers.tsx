@@ -259,10 +259,10 @@ export default function ActiveWorkers() {
                         <div className="flex-1">
                           <CardTitle className="text-lg flex items-center gap-2">
                             <span className="material-icons text-primary">person</span>
-                            {session.techName || 'Unknown Worker'}
+                            {session.techName || t('activeWorkers.unknownWorker', 'Unknown Worker')}
                           </CardTitle>
                           <CardDescription className="mt-1">
-                            {session.projectName || 'Unknown Project'}
+                            {session.projectName || t('activeWorkers.unknownProject', 'Unknown Project')}
                           </CardDescription>
                         </div>
                         <div className="flex gap-2">
@@ -406,12 +406,12 @@ export default function ActiveWorkers() {
                                   <span className="material-icons text-sm" style={{ color: marker.color }}>
                                     person
                                   </span>
-                                  {marker.session.employeeName || 'Unknown'}
+                                  {marker.session.employeeName || t('activeWorkers.unknown', 'Unknown')}
                                 </div>
                                 <div className="text-sm space-y-1">
                                   <div className="flex items-center gap-1">
                                     <span className="material-icons text-xs">business</span>
-                                    <span className="font-medium">{marker.session.projectName || 'Unknown Project'}</span>
+                                    <span className="font-medium">{marker.session.projectName || t('activeWorkers.unknownProject', 'Unknown Project')}</span>
                                   </div>
                                   <div className="flex items-center gap-1">
                                     <span className="material-icons text-xs">{marker.type === 'start' ? 'play_arrow' : 'stop'}</span>
@@ -476,7 +476,12 @@ export default function ActiveWorkers() {
                       )}
 
                       <div className="text-xs text-muted-foreground pt-4 border-t">
-                        {filteredSessions.length} session{filteredSessions.length !== 1 ? 's' : ''} shown from {employeeColors.length} employee{employeeColors.length !== 1 ? 's' : ''}.
+                        {t('activeWorkers.sessionsSummary', '{{sessionCount}} {{sessionLabel}} shown from {{employeeCount}} {{employeeLabel}}.', {
+                          sessionCount: filteredSessions.length,
+                          sessionLabel: filteredSessions.length !== 1 ? t('activeWorkers.sessions', 'sessions') : t('activeWorkers.session', 'session'),
+                          employeeCount: employeeColors.length,
+                          employeeLabel: employeeColors.length !== 1 ? t('activeWorkers.employees', 'employees') : t('activeWorkers.employee', 'employee')
+                        })}
                       </div>
                     </div>
                   </CardContent>

@@ -92,7 +92,7 @@ export default function WorkSessionHistory() {
         <div className="max-w-4xl mx-auto">
           <Card>
             <CardContent className="p-6">
-              <p className="text-center text-muted-foreground">Loading...</p>
+              <p className="text-center text-muted-foreground">{t('common.loading', 'Loading...')}</p>
             </CardContent>
           </Card>
         </div>
@@ -132,8 +132,8 @@ export default function WorkSessionHistory() {
   }).length;
   
   const pieData = [
-    { name: "Target Met", value: targetMetCount, color: "hsl(var(--primary))" },
-    { name: "Below Target", value: belowTargetCount, color: "hsl(var(--destructive))" },
+    { name: t('workHistory.targetMet', 'Target Met'), value: targetMetCount, color: "hsl(var(--primary))" },
+    { name: t('workHistory.belowTarget', 'Below Target'), value: belowTargetCount, color: "hsl(var(--destructive))" },
   ];
 
   // Calculate billable vs non-billable hours
@@ -155,8 +155,8 @@ export default function WorkSessionHistory() {
   }, 0);
 
   const hoursData = [
-    { name: "Billable Hours", value: parseFloat(billableHours.toFixed(2)), color: "hsl(var(--primary))" },
-    { name: "Non-Billable Hours", value: parseFloat(nonBillableHours.toFixed(2)), color: "hsl(var(--chart-2))" },
+    { name: t('workHistory.billableHours', 'Billable Hours'), value: parseFloat(billableHours.toFixed(2)), color: "hsl(var(--primary))" },
+    { name: t('workHistory.nonBillableHours', 'Non-Billable Hours'), value: parseFloat(nonBillableHours.toFixed(2)), color: "hsl(var(--chart-2))" },
   ];
 
   // Generate sample sessions mutation (company only)
@@ -169,20 +169,20 @@ export default function WorkSessionHistory() {
       });
       if (!response.ok) {
         const error = await response.json();
-        throw new Error(error.message || "Failed to generate sample sessions");
+        throw new Error(error.message || t('workHistory.failedToGenerate', 'Failed to generate sample sessions'));
       }
       return response.json();
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ["/api/projects", projectId, "work-sessions"] });
       toast({
-        title: "Sample data generated",
-        description: `Created ${data.count} sample work sessions across multiple years`,
+        title: t('workHistory.sampleDataGenerated', 'Sample data generated'),
+        description: t('workHistory.sampleDataCreated', 'Created {{count}} sample work sessions across multiple years', { count: data.count }),
       });
     },
     onError: (error: Error) => {
       toast({
-        title: "Error",
+        title: t('common.error', 'Error'),
         description: error.message,
         variant: "destructive",
       });

@@ -3,6 +3,7 @@ import { useQuery, useMutation } from "@tanstack/react-query";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { useLocation, useSearch } from "wouter";
+import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -34,6 +35,7 @@ const inspectionFormSchema = z.object({
 type InspectionFormData = z.infer<typeof inspectionFormSchema>;
 
 export default function HarnessInspectionForm() {
+  const { t } = useTranslation();
   const { toast } = useToast();
   const [, setLocation] = useLocation();
   const searchString = useSearch();
@@ -157,8 +159,8 @@ export default function HarnessInspectionForm() {
     handleGearSelection(harness.id);
     setShowHarnessPicker(false);
     toast({
-      title: "Harness selected",
-      description: `${harness.equipmentType} details loaded`,
+      title: t('harnessInspection.toast.harnessSelected', 'Harness selected'),
+      description: t('harnessInspection.toast.detailsLoaded', '{{type}} details loaded', { type: harness.equipmentType }),
     });
   };
 
@@ -254,8 +256,8 @@ export default function HarnessInspectionForm() {
     },
     onSuccess: () => {
       toast({ 
-        title: "Inspection submitted", 
-        description: "Your rope access equipment inspection has been recorded successfully." 
+        title: t('harnessInspection.toast.submitted', 'Inspection submitted'), 
+        description: t('harnessInspection.toast.submittedDescription', 'Your rope access equipment inspection has been recorded successfully.') 
       });
       queryClient.invalidateQueries({ queryKey: ["/api/my-harness-inspections"] });
       queryClient.invalidateQueries({ queryKey: ["/api/harness-inspections"] });
@@ -263,7 +265,7 @@ export default function HarnessInspectionForm() {
     },
     onError: (error: Error) => {
       toast({ 
-        title: "Submission failed", 
+        title: t('harnessInspection.toast.failed', 'Submission failed'), 
         description: error.message, 
         variant: "destructive" 
       });
@@ -291,8 +293,8 @@ export default function HarnessInspectionForm() {
           <div className="flex items-center gap-3">
             <ClipboardCheck className="h-8 w-8 text-primary" />
             <div>
-              <h1 className="text-2xl font-semibold">Rope Access Equipment Inspection</h1>
-              <p className="text-sm text-muted-foreground">Daily pre-work safety inspection</p>
+              <h1 className="text-2xl font-semibold">{t('harnessInspection.title', 'Rope Access Equipment Inspection')}</h1>
+              <p className="text-sm text-muted-foreground">{t('harnessInspection.subtitle', 'Daily pre-work safety inspection')}</p>
             </div>
           </div>
         </div>
@@ -301,13 +303,12 @@ export default function HarnessInspectionForm() {
           <CardHeader>
             <div className="flex items-center gap-2">
               <Shield className="h-5 w-5 text-primary" />
-              <CardTitle className="text-lg">IRATA International Code of Practice (ICOP)</CardTitle>
+              <CardTitle className="text-lg">{t('harnessInspection.icop.title', 'IRATA International Code of Practice (ICOP)')}</CardTitle>
             </div>
           </CardHeader>
           <CardContent className="space-y-3">
             <p className="text-sm text-muted-foreground">
-              All rope access operations must comply with the IRATA International Code of Practice for Industrial Rope Access (TC-102ENG).
-              This document outlines mandatory safety requirements, technical procedures, and best practices for rope access work.
+              {t('harnessInspection.icop.description', 'All rope access operations must comply with the IRATA International Code of Practice for Industrial Rope Access (TC-102ENG). This document outlines mandatory safety requirements, technical procedures, and best practices for rope access work.')}
             </p>
             <div className="flex flex-wrap gap-2">
               <Badge variant="outline" className="text-xs">
@@ -318,7 +319,7 @@ export default function HarnessInspectionForm() {
                   className="flex items-center gap-1 hover:text-primary"
                   data-testid="link-irata-icop"
                 >
-                  Download Official ICOP Document
+                  {t('harnessInspection.icop.downloadDocument', 'Download Official ICOP Document')}
                 </a>
               </Badge>
               <Badge variant="outline" className="text-xs">
@@ -329,7 +330,7 @@ export default function HarnessInspectionForm() {
                   className="flex items-center gap-1 hover:text-primary"
                   data-testid="link-irata-icop-info"
                 >
-                  View IRATA ICOP Information
+                  {t('harnessInspection.icop.viewInfo', 'View IRATA ICOP Information')}
                 </a>
               </Badge>
             </div>
@@ -342,7 +343,7 @@ export default function HarnessInspectionForm() {
             <AlertTriangle className="h-5 w-5" />
             <AlertDescription>
               <div className="font-semibold mb-2">
-                {failedItems} failed item{failedItems !== 1 ? 's' : ''} detected across {failedCategories.length} categor{failedCategories.length !== 1 ? 'ies' : 'y'}
+                {t('harnessInspection.failureSummary', '{{count}} failed item(s) detected across {{categories}} category(ies)', { count: failedItems, categories: failedCategories.length })}
               </div>
               <ul className="text-sm space-y-1">
                 {failedCategories.map((cat, idx) => (
@@ -359,8 +360,8 @@ export default function HarnessInspectionForm() {
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
             <Card>
               <CardHeader>
-                <CardTitle>Basic Information</CardTitle>
-                <CardDescription>Inspection details and equipment information</CardDescription>
+                <CardTitle>{t('harnessInspection.basicInfo.title', 'Basic Information')}</CardTitle>
+                <CardDescription>{t('harnessInspection.basicInfo.description', 'Inspection details and equipment information')}</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 {/* Gear Picker Button - Always Visible */}
@@ -373,14 +374,14 @@ export default function HarnessInspectionForm() {
                       data-testid="button-pick-harness"
                     >
                       <Package className="mr-2 h-5 w-5" />
-                      Pick Equipment from Inventory
+                      {t('harnessInspection.pickEquipment', 'Pick Equipment from Inventory')}
                     </Button>
                   </DialogTrigger>
                   <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
                     <DialogHeader>
-                      <DialogTitle>Select Equipment from Inventory</DialogTitle>
+                      <DialogTitle>{t('harnessInspection.selectEquipment.title', 'Select Equipment from Inventory')}</DialogTitle>
                       <DialogDescription>
-                        Choose equipment to auto-fill inspection details
+                        {t('harnessInspection.selectEquipment.description', 'Choose equipment to auto-fill inspection details')}
                       </DialogDescription>
                     </DialogHeader>
                     <div className="grid gap-3 py-4">
@@ -406,12 +407,12 @@ export default function HarnessInspectionForm() {
                                   )}
                                   {harness.serialNumbers && harness.serialNumbers.length > 0 && (
                                     <div className="text-sm font-mono bg-muted px-2 py-1 rounded inline-block">
-                                      S/N: {harness.serialNumbers[0]}
+                                      {t('harnessInspection.serialNumber', 'S/N')}: {harness.serialNumbers[0]}
                                     </div>
                                   )}
                                   {harness.dateInService && (
                                     <div className="text-xs text-muted-foreground mt-1">
-                                      In service: {new Date(harness.dateInService).toLocaleDateString()}
+                                      {t('harnessInspection.inService', 'In service')}: {new Date(harness.dateInService).toLocaleDateString()}
                                     </div>
                                   )}
                                 </div>
@@ -424,10 +425,10 @@ export default function HarnessInspectionForm() {
                         <div className="text-center py-8">
                           <Package className="mx-auto h-12 w-12 text-muted-foreground mb-3" />
                           <p className="text-sm text-muted-foreground">
-                            No equipment in inventory yet.
+                            {t('harnessInspection.noEquipment', 'No equipment in inventory yet.')}
                           </p>
                           <p className="text-sm text-muted-foreground mt-1">
-                            Add harnesses to your inventory to inspect them.
+                            {t('harnessInspection.addHarnesses', 'Add harnesses to your inventory to inspect them.')}
                           </p>
                         </div>
                       )}
@@ -441,16 +442,16 @@ export default function HarnessInspectionForm() {
                     <div className="flex items-start gap-3">
                       <span className="material-icons text-primary mt-0.5">auto_awesome</span>
                       <div className="flex-1">
-                        <div className="font-semibold mb-1">Quick Fill from Inventory</div>
+                        <div className="font-semibold mb-1">{t('harnessInspection.quickFill.title', 'Quick Fill from Inventory')}</div>
                         <p className="text-sm text-muted-foreground mb-3">
-                          Select equipment from inventory to auto-fill details
+                          {t('harnessInspection.quickFill.description', 'Select equipment from inventory to auto-fill details')}
                         </p>
                         <Select onValueChange={handleGearSelection} value={selectedGearId}>
                           <SelectTrigger data-testid="select-my-gear" className="bg-background">
-                            <SelectValue placeholder="Choose gear to autofill..." />
+                            <SelectValue placeholder={t('harnessInspection.quickFill.placeholder', 'Choose gear to autofill...')} />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="none">None (enter manually)</SelectItem>
+                            <SelectItem value="none">{t('harnessInspection.quickFill.none', 'None (enter manually)')}</SelectItem>
                             {availableHarnesses.map((item: any) => (
                               <SelectItem key={item.id} value={item.id}>
                                 {item.equipmentType} {item.brand ? `- ${item.brand}` : ""} {item.model ? item.model : ""} 
@@ -470,7 +471,7 @@ export default function HarnessInspectionForm() {
                     name="inspectionDate"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Inspection Date</FormLabel>
+                        <FormLabel>{t('harnessInspection.fields.inspectionDate', 'Inspection Date')}</FormLabel>
                         <FormControl>
                           <Input type="date" {...field} data-testid="input-inspection-date" />
                         </FormControl>
@@ -484,9 +485,9 @@ export default function HarnessInspectionForm() {
                     name="inspectorName"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Inspector Name</FormLabel>
+                        <FormLabel>{t('harnessInspection.fields.inspectorName', 'Inspector Name')}</FormLabel>
                         <FormControl>
-                          <Input {...field} placeholder="Enter your full name" data-testid="input-inspector-name" readOnly className="bg-muted" />
+                          <Input {...field} placeholder={t('harnessInspection.placeholders.fullName', 'Enter your full name')} data-testid="input-inspector-name" readOnly className="bg-muted" />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -500,9 +501,9 @@ export default function HarnessInspectionForm() {
                     name="manufacturer"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Primary Manufacturer</FormLabel>
+                        <FormLabel>{t('harnessInspection.fields.manufacturer', 'Primary Manufacturer')}</FormLabel>
                         <FormControl>
-                          <Input {...field} placeholder="e.g., Petzl, Kong, CMC" data-testid="input-manufacturer" />
+                          <Input {...field} placeholder={t('harnessInspection.placeholders.manufacturer', 'e.g., Petzl, Kong, CMC')} data-testid="input-manufacturer" />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -514,9 +515,9 @@ export default function HarnessInspectionForm() {
                     name="equipmentId"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Equipment ID / Serial Number</FormLabel>
+                        <FormLabel>{t('harnessInspection.fields.equipmentId', 'Equipment ID / Serial Number')}</FormLabel>
                         <FormControl>
-                          <Input {...field} placeholder="Serial or ID number" data-testid="input-equipment-id" />
+                          <Input {...field} placeholder={t('harnessInspection.placeholders.serialNumber', 'Serial or ID number')} data-testid="input-equipment-id" />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -530,15 +531,15 @@ export default function HarnessInspectionForm() {
                     name="projectId"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Project (Optional)</FormLabel>
+                        <FormLabel>{t('harnessInspection.fields.project', 'Project (Optional)')}</FormLabel>
                         <Select onValueChange={field.onChange} value={field.value}>
                           <FormControl>
                             <SelectTrigger data-testid="select-project">
-                              <SelectValue placeholder="Select project" />
+                              <SelectValue placeholder={t('harnessInspection.placeholders.selectProject', 'Select project')} />
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                            <SelectItem value="none">No project</SelectItem>
+                            <SelectItem value="none">{t('harnessInspection.noProject', 'No project')}</SelectItem>
                             {projects.map((project: any) => (
                               <SelectItem key={project.id} value={project.id}>
                                 {project.buildingName}
@@ -556,7 +557,7 @@ export default function HarnessInspectionForm() {
                     name="dateInService"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Date Placed in Service</FormLabel>
+                        <FormLabel>{t('harnessInspection.fields.dateInService', 'Date Placed in Service')}</FormLabel>
                         <FormControl>
                           <Input type="date" {...field} data-testid="input-date-in-service" />
                         </FormControl>
@@ -571,9 +572,9 @@ export default function HarnessInspectionForm() {
             {/* Equipment Categories */}
             <Card>
               <CardHeader>
-                <CardTitle>Equipment Inspection</CardTitle>
+                <CardTitle>{t('harnessInspection.equipmentInspection.title', 'Equipment Inspection')}</CardTitle>
                 <CardDescription>
-                  Inspect each equipment category. Mark items as Pass, Fail, or Not Applicable.
+                  {t('harnessInspection.equipmentInspection.description', 'Inspect each equipment category. Mark items as Pass, Fail, or Not Applicable.')}
                 </CardDescription>
               </CardHeader>
               <CardContent>
@@ -615,19 +616,19 @@ export default function HarnessInspectionForm() {
                                     <div className="flex items-center space-x-2">
                                       <RadioGroupItem value="pass" id={`${categoryKey}-${item.key}-pass`} data-testid={`radio-${categoryKey}-${item.key}-pass`} />
                                       <label htmlFor={`${categoryKey}-${item.key}-pass`} className="text-sm font-medium cursor-pointer">
-                                        Pass
+                                        {t('harnessInspection.status.pass', 'Pass')}
                                       </label>
                                     </div>
                                     <div className="flex items-center space-x-2">
                                       <RadioGroupItem value="fail" id={`${categoryKey}-${item.key}-fail`} data-testid={`radio-${categoryKey}-${item.key}-fail`} />
                                       <label htmlFor={`${categoryKey}-${item.key}-fail`} className="text-sm font-medium cursor-pointer text-destructive">
-                                        Fail
+                                        {t('harnessInspection.status.fail', 'Fail')}
                                       </label>
                                     </div>
                                     <div className="flex items-center space-x-2">
                                       <RadioGroupItem value="not_applicable" id={`${categoryKey}-${item.key}-na`} data-testid={`radio-${categoryKey}-${item.key}-na`} />
                                       <label htmlFor={`${categoryKey}-${item.key}-na`} className="text-sm font-medium cursor-pointer text-muted-foreground">
-                                        N/A
+                                        {t('harnessInspection.status.notApplicable', 'N/A')}
                                       </label>
                                     </div>
                                   </div>
@@ -635,7 +636,7 @@ export default function HarnessInspectionForm() {
 
                                 {result === "fail" && (
                                   <Textarea
-                                    placeholder="Describe the issue..."
+                                    placeholder={t('harnessInspection.placeholders.describeIssue', 'Describe the issue...')}
                                     value={notes}
                                     onChange={(e) => setItemNotes(categoryKey, item.key, e.target.value)}
                                     className="min-h-20"
@@ -655,8 +656,8 @@ export default function HarnessInspectionForm() {
 
             <Card>
               <CardHeader>
-                <CardTitle>General Comments</CardTitle>
-                <CardDescription>Any additional notes or observations about the inspection</CardDescription>
+                <CardTitle>{t('harnessInspection.comments.title', 'General Comments')}</CardTitle>
+                <CardDescription>{t('harnessInspection.comments.description', 'Any additional notes or observations about the inspection')}</CardDescription>
               </CardHeader>
               <CardContent>
                 <FormField
@@ -667,7 +668,7 @@ export default function HarnessInspectionForm() {
                       <FormControl>
                         <Textarea
                           {...field}
-                          placeholder="Enter any additional comments or notes..."
+                          placeholder={t('harnessInspection.placeholders.comments', 'Enter any additional comments or notes...')}
                           className="min-h-24"
                           data-testid="textarea-comments"
                         />
@@ -687,7 +688,7 @@ export default function HarnessInspectionForm() {
                 className="flex-1"
                 data-testid="button-cancel"
               >
-                Cancel
+                {t('common.cancel', 'Cancel')}
               </Button>
               <Button
                 type="submit"
@@ -695,7 +696,7 @@ export default function HarnessInspectionForm() {
                 disabled={isSubmitting}
                 data-testid="button-submit-inspection"
               >
-                {isSubmitting ? "Submitting..." : "Submit Inspection"}
+                {isSubmitting ? t('harnessInspection.submitting', 'Submitting...') : t('harnessInspection.submitInspection', 'Submit Inspection')}
               </Button>
             </div>
           </form>

@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
+import { useTranslation } from 'react-i18next';
 import SignatureCanvas from "react-signature-canvas";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -168,6 +169,7 @@ interface DocumentReviewsProps {
 }
 
 export function DocumentReviews({ companyDocuments = [], methodStatements = [] }: DocumentReviewsProps) {
+  const { t } = useTranslation();
   const { toast } = useToast();
   const signatureRef = useRef<SignatureCanvas>(null);
   const [selectedReview, setSelectedReview] = useState<DocumentReviewSignature | null>(null);
@@ -364,14 +366,14 @@ export function DocumentReviews({ companyDocuments = [], methodStatements = [] }
             <FileCheck className="h-6 w-6 text-amber-600 dark:text-amber-400" />
           </div>
           <div className="flex-1">
-            <CardTitle className="text-xl mb-1">Document Reviews Required</CardTitle>
+            <CardTitle className="text-xl mb-1">{t('documents.reviewsRequired', 'Document Reviews Required')}</CardTitle>
             <CardDescription>
-              Review and sign the following documents to acknowledge receipt and understanding
+              {t('documents.reviewAndSign', 'Review and sign the following documents to acknowledge receipt and understanding')}
             </CardDescription>
           </div>
           {pendingReviews.length > 0 && (
             <Badge variant="destructive" className="text-base font-semibold px-3">
-              {pendingReviews.length} Pending
+              {pendingReviews.length} {t('documents.pending', 'Pending')}
             </Badge>
           )}
         </div>
@@ -383,7 +385,7 @@ export function DocumentReviews({ companyDocuments = [], methodStatements = [] }
               <ChevronRight className="h-4 w-4 transition-transform duration-200 group-data-[state=open]:rotate-90" />
               <h3 className="text-sm font-semibold text-muted-foreground flex items-center gap-2">
                 <AlertCircle className="h-4 w-4 text-amber-500" />
-                Awaiting Your Signature ({pendingReviews.length})
+                {t('documents.awaitingSignature', 'Awaiting Your Signature')} ({pendingReviews.length})
               </h3>
             </CollapsibleTrigger>
             <CollapsibleContent>
@@ -405,7 +407,7 @@ export function DocumentReviews({ companyDocuments = [], methodStatements = [] }
                           {review.viewedAt && (
                             <span className="ml-2 text-emerald-600">
                               <Eye className="h-3 w-3 inline mr-1" />
-                              Viewed
+                              {t('documents.viewed', 'Viewed')}
                             </span>
                           )}
                         </p>
@@ -420,7 +422,7 @@ export function DocumentReviews({ companyDocuments = [], methodStatements = [] }
                           data-testid={`button-view-${review.id}`}
                         >
                           <Eye className="h-4 w-4 mr-2" />
-                          View Document
+                          {t('documents.viewDocument', 'View Document')}
                         </Button>
                       ) : (
                         <>
@@ -431,7 +433,7 @@ export function DocumentReviews({ companyDocuments = [], methodStatements = [] }
                             data-testid={`button-reread-${review.id}`}
                           >
                             <ExternalLink className="h-4 w-4 mr-2" />
-                            Re-read
+                            {t('documents.reread', 'Re-read')}
                           </Button>
                           <Button
                             size="sm"
@@ -439,7 +441,7 @@ export function DocumentReviews({ companyDocuments = [], methodStatements = [] }
                             data-testid={`button-sign-${review.id}`}
                           >
                             <PenLine className="h-4 w-4 mr-2" />
-                            Sign
+                            {t('documents.sign', 'Sign')}
                           </Button>
                         </>
                       )}
@@ -457,7 +459,7 @@ export function DocumentReviews({ companyDocuments = [], methodStatements = [] }
               <ChevronRight className="h-4 w-4 transition-transform duration-200 group-data-[state=open]:rotate-90" />
               <h3 className="text-sm font-semibold text-muted-foreground flex items-center gap-2">
                 <Check className="h-4 w-4 text-emerald-500" />
-                Signed Documents ({signedReviews.length})
+                {t('documents.signedDocuments', 'Signed Documents')} ({signedReviews.length})
               </h3>
             </CollapsibleTrigger>
             <CollapsibleContent>
@@ -480,7 +482,7 @@ export function DocumentReviews({ companyDocuments = [], methodStatements = [] }
                       </div>
                     </div>
                     <div className="text-xs text-muted-foreground shrink-0">
-                      Signed: {formatDate(review.signedAt)}
+                      {t('documents.signed', 'Signed')}: {formatDate(review.signedAt)}
                     </div>
                   </div>
                 ))}
@@ -493,7 +495,7 @@ export function DocumentReviews({ companyDocuments = [], methodStatements = [] }
       <Dialog open={isSignDialogOpen} onOpenChange={setIsSignDialogOpen}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle>Sign Document</DialogTitle>
+            <DialogTitle>{t('documents.signDocument', 'Sign Document')}</DialogTitle>
             <DialogDescription>
               {selectedReview?.documentName}
             </DialogDescription>
@@ -501,7 +503,7 @@ export function DocumentReviews({ companyDocuments = [], methodStatements = [] }
           
           <div className="space-y-4">
             <p className="text-sm text-muted-foreground">
-              By signing below, you acknowledge that you have read and understood the document.
+              {t('documents.signingAcknowledgment', 'By signing below, you acknowledge that you have read and understood the document.')}
             </p>
             
             <div className="border rounded-lg p-2 bg-white">
@@ -523,10 +525,10 @@ export function DocumentReviews({ companyDocuments = [], methodStatements = [] }
                 onClick={handleClearSignature}
                 data-testid="button-clear-signature"
               >
-                Clear
+                {t('common.clear', 'Clear')}
               </Button>
               <p className="text-xs text-muted-foreground">
-                Sign with your mouse or touch
+                {t('documents.signWithMouse', 'Sign with your mouse or touch')}
               </p>
             </div>
           </div>
@@ -537,7 +539,7 @@ export function DocumentReviews({ companyDocuments = [], methodStatements = [] }
               onClick={() => setIsSignDialogOpen(false)}
               data-testid="button-cancel-sign"
             >
-              Cancel
+              {t('common.cancel', 'Cancel')}
             </Button>
             <Button
               onClick={handleSignDocument}
@@ -547,12 +549,12 @@ export function DocumentReviews({ companyDocuments = [], methodStatements = [] }
               {signDocumentMutation.isPending ? (
                 <>
                   <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                  Signing...
+                  {t('documents.signing', 'Signing...')}
                 </>
               ) : (
                 <>
                   <PenLine className="h-4 w-4 mr-2" />
-                  Submit Signature
+                  {t('documents.submitSignature', 'Submit Signature')}
                 </>
               )}
             </Button>
@@ -565,7 +567,7 @@ export function DocumentReviews({ companyDocuments = [], methodStatements = [] }
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <Shield className="h-5 w-5 text-primary" />
-              {selectedSWP?.title || 'Safe Work Procedure'}
+              {selectedSWP?.title || t('documents.safeWorkProcedure', 'Safe Work Procedure')}
             </DialogTitle>
             <DialogDescription>
               {selectedSWP?.description}
@@ -576,7 +578,7 @@ export function DocumentReviews({ companyDocuments = [], methodStatements = [] }
             {selectedSWP && (
               <div className="space-y-6">
                 <div>
-                  <h4 className="font-semibold text-sm mb-2">Scope</h4>
+                  <h4 className="font-semibold text-sm mb-2">{t('documents.scope', 'Scope')}</h4>
                   <p className="text-sm text-muted-foreground">{selectedSWP.scope}</p>
                 </div>
 
@@ -585,7 +587,7 @@ export function DocumentReviews({ companyDocuments = [], methodStatements = [] }
                 <div>
                   <h4 className="font-semibold text-sm mb-2 flex items-center gap-2">
                     <AlertTriangle className="h-4 w-4 text-amber-500" />
-                    Hazards Identified
+                    {t('documents.hazardsIdentified', 'Hazards Identified')}
                   </h4>
                   <ul className="text-sm text-muted-foreground space-y-1 list-disc list-inside">
                     {selectedSWP.hazards.map((hazard, idx) => (
@@ -597,7 +599,7 @@ export function DocumentReviews({ companyDocuments = [], methodStatements = [] }
                 <div>
                   <h4 className="font-semibold text-sm mb-2 flex items-center gap-2">
                     <Shield className="h-4 w-4 text-emerald-500" />
-                    Control Measures
+                    {t('documents.controlMeasures', 'Control Measures')}
                   </h4>
                   <ul className="text-sm text-muted-foreground space-y-1 list-disc list-inside">
                     {selectedSWP.controlMeasures.map((measure, idx) => (
@@ -609,7 +611,7 @@ export function DocumentReviews({ companyDocuments = [], methodStatements = [] }
                 <div>
                   <h4 className="font-semibold text-sm mb-2 flex items-center gap-2">
                     <HardHat className="h-4 w-4 text-blue-500" />
-                    Personal Protective Equipment (PPE)
+                    {t('documents.ppe', 'Personal Protective Equipment (PPE)')}
                   </h4>
                   <ul className="text-sm text-muted-foreground space-y-1 list-disc list-inside">
                     {selectedSWP.ppe.map((item, idx) => (
@@ -621,7 +623,7 @@ export function DocumentReviews({ companyDocuments = [], methodStatements = [] }
                 <div>
                   <h4 className="font-semibold text-sm mb-2 flex items-center gap-2">
                     <Wrench className="h-4 w-4 text-gray-500" />
-                    Equipment Required
+                    {t('documents.equipmentRequired', 'Equipment Required')}
                   </h4>
                   <ul className="text-sm text-muted-foreground space-y-1 list-disc list-inside">
                     {selectedSWP.equipment.map((item, idx) => (
@@ -633,7 +635,7 @@ export function DocumentReviews({ companyDocuments = [], methodStatements = [] }
                 <div>
                   <h4 className="font-semibold text-sm mb-2 flex items-center gap-2">
                     <ClipboardList className="h-4 w-4 text-purple-500" />
-                    Pre-Work Checks
+                    {t('documents.preWorkChecks', 'Pre-Work Checks')}
                   </h4>
                   <ul className="text-sm text-muted-foreground space-y-1 list-disc list-inside">
                     {selectedSWP.preWorkChecks.map((check, idx) => (
@@ -645,7 +647,7 @@ export function DocumentReviews({ companyDocuments = [], methodStatements = [] }
                 <div>
                   <h4 className="font-semibold text-sm mb-2 flex items-center gap-2">
                     <FileText className="h-4 w-4 text-primary" />
-                    Work Procedure
+                    {t('documents.workProcedure', 'Work Procedure')}
                   </h4>
                   <ol className="text-sm text-muted-foreground space-y-1 list-decimal list-inside">
                     {selectedSWP.workProcedure.map((step, idx) => (
@@ -657,7 +659,7 @@ export function DocumentReviews({ companyDocuments = [], methodStatements = [] }
                 <div>
                   <h4 className="font-semibold text-sm mb-2 flex items-center gap-2">
                     <Phone className="h-4 w-4 text-red-500" />
-                    Emergency Procedures
+                    {t('documents.emergencyProcedures', 'Emergency Procedures')}
                   </h4>
                   <ul className="text-sm text-muted-foreground space-y-1 list-disc list-inside">
                     {selectedSWP.emergencyProcedures.map((procedure, idx) => (
@@ -669,7 +671,7 @@ export function DocumentReviews({ companyDocuments = [], methodStatements = [] }
                 <div>
                   <h4 className="font-semibold text-sm mb-2 flex items-center gap-2">
                     <GraduationCap className="h-4 w-4 text-indigo-500" />
-                    Competency Requirements
+                    {t('documents.competencyRequirements', 'Competency Requirements')}
                   </h4>
                   <ul className="text-sm text-muted-foreground space-y-1 list-disc list-inside">
                     {selectedSWP.competencyRequirements.map((req, idx) => (
@@ -683,7 +685,7 @@ export function DocumentReviews({ companyDocuments = [], methodStatements = [] }
 
           <DialogFooter className="flex-col sm:flex-row gap-2">
             <p className="text-xs text-muted-foreground flex-1">
-              Review this document carefully before signing to acknowledge receipt and understanding.
+              {t('documents.reviewBeforeSigning', 'Review this document carefully before signing to acknowledge receipt and understanding.')}
             </p>
             <Button
               onClick={() => {
@@ -695,7 +697,7 @@ export function DocumentReviews({ companyDocuments = [], methodStatements = [] }
               data-testid="button-swp-proceed-sign"
             >
               <PenLine className="h-4 w-4 mr-2" />
-              Proceed to Sign
+              {t('documents.proceedToSign', 'Proceed to Sign')}
             </Button>
           </DialogFooter>
         </DialogContent>

@@ -4,6 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useLocation } from "wouter";
+import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
@@ -70,6 +71,7 @@ type Signature = {
 };
 
 export default function IncidentReportForm() {
+  const { t } = useTranslation();
   const [, navigate] = useLocation();
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -145,8 +147,8 @@ export default function IncidentReportForm() {
   const handleAddPerson = () => {
     if (!currentPerson.name || !currentPerson.role) {
       toast({
-        title: "Required Fields Missing",
-        description: "Please enter name and role",
+        title: t('incidentReport.toasts.requiredFieldsMissing', 'Required Fields Missing'),
+        description: t('incidentReport.toasts.enterNameAndRole', 'Please enter name and role'),
         variant: "destructive",
       });
       return;
@@ -163,8 +165,8 @@ export default function IncidentReportForm() {
     setShowAddPersonDialog(false);
 
     toast({
-      title: "Person Added",
-      description: "Person has been added to the report",
+      title: t('incidentReport.toasts.personAdded', 'Person Added'),
+      description: t('incidentReport.toasts.personAddedDesc', 'Person has been added to the report'),
     });
   };
 
@@ -176,8 +178,8 @@ export default function IncidentReportForm() {
   const handleAddAction = () => {
     if (!currentAction.action || !currentAction.assignedTo || !currentAction.dueDate) {
       toast({
-        title: "Required Fields Missing",
-        description: "Please fill in all required fields",
+        title: t('incidentReport.toasts.requiredFieldsMissing', 'Required Fields Missing'),
+        description: t('incidentReport.toasts.fillRequiredFields', 'Please fill in all required fields'),
         variant: "destructive",
       });
       return;
@@ -193,8 +195,8 @@ export default function IncidentReportForm() {
     setShowAddActionDialog(false);
 
     toast({
-      title: "Action Added",
-      description: "Corrective action has been added",
+      title: t('incidentReport.toasts.actionAdded', 'Action Added'),
+      description: t('incidentReport.toasts.actionAddedDesc', 'Corrective action has been added'),
     });
   };
 
@@ -210,8 +212,8 @@ export default function IncidentReportForm() {
   const handleSaveSignature = () => {
     if (!signatureRole || !signatureName) {
       toast({
-        title: "Missing Information",
-        description: "Please enter role and name",
+        title: t('incidentReport.toasts.missingInfo', 'Missing Information'),
+        description: t('incidentReport.toasts.enterRoleAndName', 'Please enter role and name'),
         variant: "destructive",
       });
       return;
@@ -219,8 +221,8 @@ export default function IncidentReportForm() {
 
     if (signatureCanvasRef.current?.isEmpty()) {
       toast({
-        title: "No Signature",
-        description: "Please draw a signature before saving",
+        title: t('incidentReport.toasts.noSignature', 'No Signature'),
+        description: t('incidentReport.toasts.drawSignatureFirst', 'Please draw a signature before saving'),
         variant: "destructive",
       });
       return;
@@ -234,8 +236,8 @@ export default function IncidentReportForm() {
     setShowSignatureDialog(false);
 
     toast({
-      title: "Signature Added",
-      description: `Signature for ${signatureRole} saved successfully`,
+      title: t('incidentReport.toasts.signatureAdded', 'Signature Added'),
+      description: t('incidentReport.toasts.signatureSavedFor', 'Signature for {{role}} saved successfully', { role: signatureRole }),
     });
   };
 
@@ -257,14 +259,14 @@ export default function IncidentReportForm() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/incident-reports"] });
       toast({
-        title: "Report Saved",
-        description: "Incident report has been saved successfully",
+        title: t('incidentReport.toasts.reportSaved', 'Report Saved'),
+        description: t('incidentReport.toasts.reportSavedDesc', 'Incident report has been saved successfully'),
       });
       navigate("/documents");
     },
     onError: (error: Error) => {
       toast({
-        title: "Error Saving Report",
+        title: t('incidentReport.toasts.errorSaving', 'Error Saving Report'),
         description: error.message,
         variant: "destructive",
       });
@@ -274,8 +276,8 @@ export default function IncidentReportForm() {
   const onSubmit = (values: IncidentReportFormValues) => {
     if (peopleInvolved.length === 0) {
       toast({
-        title: "No People Involved",
-        description: "Please add at least one person involved in the incident",
+        title: t('incidentReport.toasts.noPeopleInvolved', 'No People Involved'),
+        description: t('incidentReport.toasts.addAtLeastOnePerson', 'Please add at least one person involved in the incident'),
         variant: "destructive",
       });
       return;
@@ -296,14 +298,14 @@ export default function IncidentReportForm() {
             data-testid="back-to-documents"
           >
             <ArrowLeft className="h-4 w-4 mr-2" />
-            Back to Documents
+            {t('incidentReport.backToDocuments', 'Back to Documents')}
           </Button>
           <div className="flex items-center gap-3">
             <AlertTriangle className="h-8 w-8 text-destructive" />
             <div>
-              <h1 className="text-3xl font-bold">Incident Report</h1>
+              <h1 className="text-3xl font-bold">{t('incidentReport.title', 'Incident Report')}</h1>
               <p className="text-muted-foreground">
-                Official incident documentation and investigation
+                {t('incidentReport.subtitle', 'Official incident documentation and investigation')}
               </p>
             </div>
           </div>
@@ -314,7 +316,7 @@ export default function IncidentReportForm() {
             {/* Basic Information */}
             <Card>
               <CardHeader>
-                <CardTitle>Basic Information</CardTitle>
+                <CardTitle>{t('incidentReport.basicInformation', 'Basic Information')}</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -323,7 +325,7 @@ export default function IncidentReportForm() {
                     name="incidentDate"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Incident Date *</FormLabel>
+                        <FormLabel>{t('incidentReport.incidentDate', 'Incident Date')} *</FormLabel>
                         <FormControl>
                           <Input type="date" {...field} data-testid="input-incident-date" />
                         </FormControl>
@@ -337,7 +339,7 @@ export default function IncidentReportForm() {
                     name="incidentTime"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Time</FormLabel>
+                        <FormLabel>{t('incidentReport.incidentTime', 'Time')}</FormLabel>
                         <FormControl>
                           <Input type="time" {...field} data-testid="input-incident-time" />
                         </FormControl>
@@ -352,9 +354,9 @@ export default function IncidentReportForm() {
                   name="location"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Location *</FormLabel>
+                      <FormLabel>{t('incidentReport.location', 'Location')} *</FormLabel>
                       <FormControl>
-                        <Input placeholder="Specific location of incident" {...field} data-testid="input-location" />
+                        <Input placeholder={t('incidentReport.locationPlaceholder', 'Specific location of incident')} {...field} data-testid="input-location" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -366,11 +368,11 @@ export default function IncidentReportForm() {
                   name="projectId"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Related Project (Optional)</FormLabel>
+                      <FormLabel>{t('incidentReport.relatedProject', 'Related Project (Optional)')}</FormLabel>
                       <Select onValueChange={field.onChange} value={field.value}>
                         <FormControl>
                           <SelectTrigger data-testid="select-project">
-                            <SelectValue placeholder="Select a project (if applicable)" />
+                            <SelectValue placeholder={t('incidentReport.selectProject', 'Select a project (if applicable)')} />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
@@ -392,9 +394,9 @@ export default function IncidentReportForm() {
                     name="reportedByName"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Reported By *</FormLabel>
+                        <FormLabel>{t('incidentReport.reportedBy', 'Reported By')} *</FormLabel>
                         <FormControl>
-                          <Input placeholder="Your name" {...field} data-testid="input-reported-by" />
+                          <Input placeholder={t('incidentReport.reportedByPlaceholder', 'Your name')} {...field} data-testid="input-reported-by" />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -406,7 +408,7 @@ export default function IncidentReportForm() {
                     name="reportDate"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Report Date *</FormLabel>
+                        <FormLabel>{t('incidentReport.reportDate', 'Report Date')} *</FormLabel>
                         <FormControl>
                           <Input type="date" {...field} data-testid="input-report-date" />
                         </FormControl>
@@ -421,10 +423,10 @@ export default function IncidentReportForm() {
                   name="description"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Incident Description *</FormLabel>
+                      <FormLabel>{t('incidentReport.incidentDescription', 'Incident Description')} *</FormLabel>
                       <FormControl>
                         <Textarea
-                          placeholder="Detailed description of what happened"
+                          placeholder={t('incidentReport.incidentDescriptionPlaceholder', 'Detailed description of what happened')}
                           className="min-h-[120px]"
                           {...field}
                           data-testid="textarea-description"
@@ -441,7 +443,7 @@ export default function IncidentReportForm() {
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center justify-between">
-                  People Involved
+                  {t('incidentReport.peopleInvolved.title', 'People Involved')}
                   <Button
                     type="button"
                     size="sm"
@@ -449,7 +451,7 @@ export default function IncidentReportForm() {
                     data-testid="add-person-button"
                   >
                     <Plus className="h-4 w-4 mr-1" />
-                    Add Person
+                    {t('incidentReport.peopleInvolved.addPerson', 'Add Person')}
                   </Button>
                 </CardTitle>
               </CardHeader>
@@ -463,12 +465,12 @@ export default function IncidentReportForm() {
                           <div className="text-sm text-muted-foreground">
                             {person.role}
                             {person.injuryType && person.injuryType !== "none" && (
-                              <> • Injury: {person.injuryType}</>
+                              <> • {t('incidentReport.peopleInvolved.injury', 'Injury')}: {person.injuryType}</>
                             )}
                           </div>
                           {person.bodyPartAffected && (
                             <div className="text-sm text-muted-foreground">
-                              Body Part: {person.bodyPartAffected}
+                              {t('incidentReport.peopleInvolved.bodyPart', 'Body Part')}: {person.bodyPartAffected}
                             </div>
                           )}
                         </div>
@@ -486,7 +488,7 @@ export default function IncidentReportForm() {
                   </div>
                 ) : (
                   <p className="text-center py-6 text-muted-foreground">
-                    No people added yet. Click "Add Person" to add someone involved.
+                    {t('incidentReport.peopleInvolved.noPeople', 'No people added yet. Click "Add Person" to add someone involved.')}
                   </p>
                 )}
               </CardContent>
@@ -495,7 +497,7 @@ export default function IncidentReportForm() {
             {/* Incident Classification */}
             <Card>
               <CardHeader>
-                <CardTitle>Incident Classification</CardTitle>
+                <CardTitle>{t('incidentReport.incidentClassification.title', 'Incident Classification')}</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 <FormField
@@ -503,21 +505,21 @@ export default function IncidentReportForm() {
                   name="incidentType"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Incident Type</FormLabel>
+                      <FormLabel>{t('incidentReport.incidentClassification.incidentType', 'Incident Type')}</FormLabel>
                       <Select onValueChange={field.onChange} value={field.value}>
                         <FormControl>
                           <SelectTrigger data-testid="select-incident-type">
-                            <SelectValue placeholder="Select incident type" />
+                            <SelectValue placeholder={t('incidentReport.incidentClassification.selectIncidentType', 'Select incident type')} />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          <SelectItem value="injury">Injury</SelectItem>
-                          <SelectItem value="near_miss">Near Miss</SelectItem>
-                          <SelectItem value="property_damage">Property Damage</SelectItem>
-                          <SelectItem value="equipment_failure">Equipment Failure</SelectItem>
-                          <SelectItem value="environmental">Environmental</SelectItem>
-                          <SelectItem value="security">Security</SelectItem>
-                          <SelectItem value="other">Other</SelectItem>
+                          <SelectItem value="injury">{t('incidentReport.incidentClassification.types.injury', 'Injury')}</SelectItem>
+                          <SelectItem value="near_miss">{t('incidentReport.incidentClassification.types.nearMiss', 'Near Miss')}</SelectItem>
+                          <SelectItem value="property_damage">{t('incidentReport.incidentClassification.types.propertyDamage', 'Property Damage')}</SelectItem>
+                          <SelectItem value="equipment_failure">{t('incidentReport.incidentClassification.types.equipmentFailure', 'Equipment Failure')}</SelectItem>
+                          <SelectItem value="environmental">{t('incidentReport.incidentClassification.types.environmental', 'Environmental')}</SelectItem>
+                          <SelectItem value="security">{t('incidentReport.incidentClassification.types.security', 'Security')}</SelectItem>
+                          <SelectItem value="other">{t('incidentReport.incidentClassification.types.other', 'Other')}</SelectItem>
                         </SelectContent>
                       </Select>
                       <FormMessage />
@@ -530,18 +532,18 @@ export default function IncidentReportForm() {
                   name="severity"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Severity Level</FormLabel>
+                      <FormLabel>{t('incidentReport.incidentClassification.severity', 'Severity Level')}</FormLabel>
                       <Select onValueChange={field.onChange} value={field.value}>
                         <FormControl>
                           <SelectTrigger data-testid="select-severity">
-                            <SelectValue placeholder="Select severity" />
+                            <SelectValue placeholder={t('incidentReport.incidentClassification.selectSeverity', 'Select severity')} />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          <SelectItem value="minor">Minor</SelectItem>
-                          <SelectItem value="moderate">Moderate</SelectItem>
-                          <SelectItem value="major">Major</SelectItem>
-                          <SelectItem value="critical">Critical</SelectItem>
+                          <SelectItem value="minor">{t('incidentReport.incidentClassification.severityLevels.minor', 'Minor')}</SelectItem>
+                          <SelectItem value="moderate">{t('incidentReport.incidentClassification.severityLevels.moderate', 'Moderate')}</SelectItem>
+                          <SelectItem value="major">{t('incidentReport.incidentClassification.severityLevels.major', 'Major')}</SelectItem>
+                          <SelectItem value="critical">{t('incidentReport.incidentClassification.severityLevels.critical', 'Critical')}</SelectItem>
                         </SelectContent>
                       </Select>
                       <FormMessage />
@@ -554,20 +556,20 @@ export default function IncidentReportForm() {
                   name="immediateCause"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Immediate Cause</FormLabel>
+                      <FormLabel>{t('incidentReport.incidentClassification.immediateCause', 'Immediate Cause')}</FormLabel>
                       <Select onValueChange={field.onChange} value={field.value}>
                         <FormControl>
                           <SelectTrigger data-testid="select-immediate-cause">
-                            <SelectValue placeholder="Select immediate cause" />
+                            <SelectValue placeholder={t('incidentReport.incidentClassification.selectImmediateCause', 'Select immediate cause')} />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          <SelectItem value="unsafe_act">Unsafe Act</SelectItem>
-                          <SelectItem value="unsafe_condition">Unsafe Condition</SelectItem>
-                          <SelectItem value="equipment_malfunction">Equipment Malfunction</SelectItem>
-                          <SelectItem value="procedural_failure">Procedural Failure</SelectItem>
-                          <SelectItem value="environmental_factor">Environmental Factor</SelectItem>
-                          <SelectItem value="other">Other</SelectItem>
+                          <SelectItem value="unsafe_act">{t('incidentReport.incidentClassification.causes.unsafeAct', 'Unsafe Act')}</SelectItem>
+                          <SelectItem value="unsafe_condition">{t('incidentReport.incidentClassification.causes.unsafeCondition', 'Unsafe Condition')}</SelectItem>
+                          <SelectItem value="equipment_malfunction">{t('incidentReport.incidentClassification.causes.equipmentMalfunction', 'Equipment Malfunction')}</SelectItem>
+                          <SelectItem value="procedural_failure">{t('incidentReport.incidentClassification.causes.proceduralFailure', 'Procedural Failure')}</SelectItem>
+                          <SelectItem value="environmental_factor">{t('incidentReport.incidentClassification.causes.environmentalFactor', 'Environmental Factor')}</SelectItem>
+                          <SelectItem value="other">{t('incidentReport.incidentClassification.causes.other', 'Other')}</SelectItem>
                         </SelectContent>
                       </Select>
                       <FormMessage />
@@ -580,7 +582,7 @@ export default function IncidentReportForm() {
             {/* Root Cause Analysis */}
             <Card>
               <CardHeader>
-                <CardTitle>Root Cause Analysis</CardTitle>
+                <CardTitle>{t('incidentReport.rootCauseAnalysis.title', 'Root Cause Analysis')}</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 <FormField
@@ -588,10 +590,10 @@ export default function IncidentReportForm() {
                   name="rootCause"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Root Cause</FormLabel>
+                      <FormLabel>{t('incidentReport.rootCauseAnalysis.rootCause', 'Root Cause')}</FormLabel>
                       <FormControl>
                         <Textarea
-                          placeholder="Detailed root cause analysis"
+                          placeholder={t('incidentReport.rootCauseAnalysis.rootCausePlaceholder', 'Detailed root cause analysis')}
                           className="min-h-[100px]"
                           {...field}
                           data-testid="textarea-root-cause"
@@ -607,10 +609,10 @@ export default function IncidentReportForm() {
                   name="contributingFactors"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Contributing Factors</FormLabel>
+                      <FormLabel>{t('incidentReport.rootCauseAnalysis.contributingFactors', 'Contributing Factors')}</FormLabel>
                       <FormControl>
                         <Textarea
-                          placeholder="Additional contributing factors"
+                          placeholder={t('incidentReport.rootCauseAnalysis.contributingFactorsPlaceholder', 'Additional contributing factors')}
                           className="min-h-[80px]"
                           {...field}
                           data-testid="textarea-contributing-factors"
@@ -627,7 +629,7 @@ export default function IncidentReportForm() {
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center justify-between">
-                  Corrective Actions
+                  {t('incidentReport.correctiveActions.title', 'Corrective Actions')}
                   <Button
                     type="button"
                     size="sm"
@@ -635,7 +637,7 @@ export default function IncidentReportForm() {
                     data-testid="add-action-button"
                   >
                     <Plus className="h-4 w-4 mr-1" />
-                    Add Action
+                    {t('incidentReport.correctiveActions.addAction', 'Add Action')}
                   </Button>
                 </CardTitle>
               </CardHeader>
@@ -647,7 +649,7 @@ export default function IncidentReportForm() {
                         <div className="flex-1">
                           <div className="font-medium">{action.action}</div>
                           <div className="text-sm text-muted-foreground">
-                            Assigned to: {action.assignedTo} • Due: {new Date(action.dueDate).toLocaleDateString()}
+                            {t('incidentReport.correctiveActions.assignedTo', 'Assigned to')}: {action.assignedTo} • {t('incidentReport.correctiveActions.due', 'Due')}: {new Date(action.dueDate).toLocaleDateString()}
                           </div>
                           <Badge variant="secondary" className="mt-1">
                             {action.status}
@@ -667,7 +669,7 @@ export default function IncidentReportForm() {
                   </div>
                 ) : (
                   <p className="text-center py-6 text-muted-foreground">
-                    No corrective actions added yet.
+                    {t('incidentReport.correctiveActions.noActions', 'No corrective actions added yet.')}
                   </p>
                 )}
               </CardContent>
@@ -676,7 +678,7 @@ export default function IncidentReportForm() {
             {/* Regulatory Reporting */}
             <Card>
               <CardHeader>
-                <CardTitle>Regulatory Reporting</CardTitle>
+                <CardTitle>{t('incidentReport.regulatoryReporting.title', 'Regulatory Reporting')}</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 <FormField
@@ -693,7 +695,7 @@ export default function IncidentReportForm() {
                       </FormControl>
                       <div className="space-y-1 leading-none">
                         <FormLabel>
-                          This incident is reportable to regulatory authorities
+                          {t('incidentReport.regulatoryReporting.reportableCheckbox', 'This incident is reportable to regulatory authorities')}
                         </FormLabel>
                       </div>
                     </FormItem>
@@ -707,7 +709,7 @@ export default function IncidentReportForm() {
                       name="regulatorNotificationDate"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Notification Date</FormLabel>
+                          <FormLabel>{t('incidentReport.regulatoryReporting.notificationDate', 'Notification Date')}</FormLabel>
                           <FormControl>
                             <Input type="date" {...field} data-testid="input-notification-date" />
                           </FormControl>
@@ -721,9 +723,9 @@ export default function IncidentReportForm() {
                       name="regulatorReferenceNumber"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Reference Number</FormLabel>
+                          <FormLabel>{t('incidentReport.regulatoryReporting.referenceNumber', 'Reference Number')}</FormLabel>
                           <FormControl>
-                            <Input placeholder="Regulator's reference number" {...field} data-testid="input-reference-number" />
+                            <Input placeholder={t('incidentReport.regulatoryReporting.referenceNumberPlaceholder', "Regulator's reference number")} {...field} data-testid="input-reference-number" />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -737,7 +739,7 @@ export default function IncidentReportForm() {
             {/* Supervisor Review */}
             <Card>
               <CardHeader>
-                <CardTitle>Supervisor Review</CardTitle>
+                <CardTitle>{t('incidentReport.supervisorReview.title', 'Supervisor Review')}</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -746,9 +748,9 @@ export default function IncidentReportForm() {
                     name="supervisorReviewedBy"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Reviewed By</FormLabel>
+                        <FormLabel>{t('incidentReport.supervisorReview.reviewedBy', 'Reviewed By')}</FormLabel>
                         <FormControl>
-                          <Input placeholder="Supervisor name" {...field} data-testid="input-supervisor-name" />
+                          <Input placeholder={t('incidentReport.supervisorReview.reviewedByPlaceholder', 'Supervisor name')} {...field} data-testid="input-supervisor-name" />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -760,7 +762,7 @@ export default function IncidentReportForm() {
                     name="supervisorReviewDate"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Review Date</FormLabel>
+                        <FormLabel>{t('incidentReport.supervisorReview.reviewDate', 'Review Date')}</FormLabel>
                         <FormControl>
                           <Input type="date" {...field} data-testid="input-supervisor-date" />
                         </FormControl>
@@ -775,10 +777,10 @@ export default function IncidentReportForm() {
                   name="supervisorComments"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Supervisor Comments</FormLabel>
+                      <FormLabel>{t('incidentReport.supervisorReview.comments', 'Supervisor Comments')}</FormLabel>
                       <FormControl>
                         <Textarea
-                          placeholder="Supervisor's review comments"
+                          placeholder={t('incidentReport.supervisorReview.commentsPlaceholder', "Supervisor's review comments")}
                           className="min-h-[80px]"
                           {...field}
                           data-testid="textarea-supervisor-comments"
@@ -794,7 +796,7 @@ export default function IncidentReportForm() {
             {/* Management Review */}
             <Card>
               <CardHeader>
-                <CardTitle>Management Review</CardTitle>
+                <CardTitle>{t('incidentReport.managementReview.title', 'Management Review')}</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -803,9 +805,9 @@ export default function IncidentReportForm() {
                     name="managementReviewedBy"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Reviewed By</FormLabel>
+                        <FormLabel>{t('incidentReport.managementReview.reviewedBy', 'Reviewed By')}</FormLabel>
                         <FormControl>
-                          <Input placeholder="Management representative" {...field} data-testid="input-management-name" />
+                          <Input placeholder={t('incidentReport.managementReview.reviewedByPlaceholder', 'Management representative')} {...field} data-testid="input-management-name" />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -817,7 +819,7 @@ export default function IncidentReportForm() {
                     name="managementReviewDate"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Review Date</FormLabel>
+                        <FormLabel>{t('incidentReport.managementReview.reviewDate', 'Review Date')}</FormLabel>
                         <FormControl>
                           <Input type="date" {...field} data-testid="input-management-date" />
                         </FormControl>
@@ -832,10 +834,10 @@ export default function IncidentReportForm() {
                   name="managementComments"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Management Comments</FormLabel>
+                      <FormLabel>{t('incidentReport.managementReview.comments', 'Management Comments')}</FormLabel>
                       <FormControl>
                         <Textarea
-                          placeholder="Management's review comments"
+                          placeholder={t('incidentReport.managementReview.commentsPlaceholder', "Management's review comments")}
                           className="min-h-[80px]"
                           {...field}
                           data-testid="textarea-management-comments"
@@ -852,7 +854,7 @@ export default function IncidentReportForm() {
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center justify-between">
-                  Signatures
+                  {t('incidentReport.signatures.title', 'Signatures')}
                   <Button
                     type="button"
                     size="sm"
@@ -860,7 +862,7 @@ export default function IncidentReportForm() {
                     data-testid="add-signature-button"
                   >
                     <PenTool className="h-4 w-4 mr-1" />
-                    Add Signature
+                    {t('incidentReport.signatures.addSignature', 'Add Signature')}
                   </Button>
                 </CardTitle>
               </CardHeader>
@@ -892,7 +894,7 @@ export default function IncidentReportForm() {
                   </div>
                 ) : (
                   <p className="text-center py-6 text-muted-foreground">
-                    No signatures added yet.
+                    {t('incidentReport.signatures.noSignatures', 'No signatures added yet.')}
                   </p>
                 )}
               </CardContent>
@@ -906,7 +908,7 @@ export default function IncidentReportForm() {
                 onClick={() => navigate("/documents")}
                 data-testid="cancel-button"
               >
-                Cancel
+                {t('incidentReport.buttons.cancel', 'Cancel')}
               </Button>
               <Button
                 type="submit"
@@ -915,7 +917,7 @@ export default function IncidentReportForm() {
                 data-testid="submit-button"
               >
                 <AlertTriangle className="h-4 w-4 mr-2" />
-                {isSubmitting || mutation.isPending ? "Saving..." : "Save Incident Report"}
+                {isSubmitting || mutation.isPending ? t('incidentReport.buttons.saving', 'Saving...') : t('incidentReport.buttons.saveIncidentReport', 'Save Incident Report')}
               </Button>
             </div>
           </form>
@@ -925,58 +927,58 @@ export default function IncidentReportForm() {
         <Dialog open={showAddPersonDialog} onOpenChange={setShowAddPersonDialog}>
           <DialogContent>
             <DialogHeader>
-              <DialogTitle>Add Person Involved</DialogTitle>
+              <DialogTitle>{t('incidentReport.dialogs.addPerson.title', 'Add Person Involved')}</DialogTitle>
               <DialogDescription>
-                Enter details about the person involved in this incident
+                {t('incidentReport.dialogs.addPerson.description', 'Enter details about the person involved in this incident')}
               </DialogDescription>
             </DialogHeader>
             <div className="space-y-4 py-4">
               <div className="space-y-2">
-                <label className="text-sm font-medium">Name *</label>
+                <label className="text-sm font-medium">{t('incidentReport.dialogs.addPerson.name', 'Name')} *</label>
                 <Input
                   value={currentPerson.name}
                   onChange={(e) => setCurrentPerson({ ...currentPerson, name: e.target.value })}
-                  placeholder="Full name"
+                  placeholder={t('incidentReport.dialogs.addPerson.namePlaceholder', 'Full name')}
                   data-testid="dialog-input-person-name"
                 />
               </div>
 
               <div className="space-y-2">
-                <label className="text-sm font-medium">Role *</label>
+                <label className="text-sm font-medium">{t('incidentReport.dialogs.addPerson.role', 'Role')} *</label>
                 <Select
                   value={currentPerson.role}
                   onValueChange={(value) => setCurrentPerson({ ...currentPerson, role: value })}
                 >
                   <SelectTrigger data-testid="dialog-select-person-role">
-                    <SelectValue placeholder="Select role" />
+                    <SelectValue placeholder={t('incidentReport.dialogs.addPerson.selectRole', 'Select role')} />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="employee">Employee</SelectItem>
-                    <SelectItem value="contractor">Contractor</SelectItem>
-                    <SelectItem value="visitor">Visitor</SelectItem>
-                    <SelectItem value="supervisor">Supervisor</SelectItem>
-                    <SelectItem value="witness">Witness</SelectItem>
-                    <SelectItem value="other">Other</SelectItem>
+                    <SelectItem value="employee">{t('incidentReport.dialogs.addPerson.roles.employee', 'Employee')}</SelectItem>
+                    <SelectItem value="contractor">{t('incidentReport.dialogs.addPerson.roles.contractor', 'Contractor')}</SelectItem>
+                    <SelectItem value="visitor">{t('incidentReport.dialogs.addPerson.roles.visitor', 'Visitor')}</SelectItem>
+                    <SelectItem value="supervisor">{t('incidentReport.dialogs.addPerson.roles.supervisor', 'Supervisor')}</SelectItem>
+                    <SelectItem value="witness">{t('incidentReport.dialogs.addPerson.roles.witness', 'Witness')}</SelectItem>
+                    <SelectItem value="other">{t('incidentReport.dialogs.addPerson.roles.other', 'Other')}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
 
               <div className="space-y-2">
-                <label className="text-sm font-medium">Injury Type</label>
+                <label className="text-sm font-medium">{t('incidentReport.dialogs.addPerson.injuryType', 'Injury Type')}</label>
                 <Select
                   value={currentPerson.injuryType}
                   onValueChange={(value) => setCurrentPerson({ ...currentPerson, injuryType: value })}
                 >
                   <SelectTrigger data-testid="dialog-select-injury-type">
-                    <SelectValue placeholder="Select injury type" />
+                    <SelectValue placeholder={t('incidentReport.dialogs.addPerson.selectInjuryType', 'Select injury type')} />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="none">No Injury</SelectItem>
-                    <SelectItem value="minor">Minor Injury</SelectItem>
-                    <SelectItem value="first_aid">First Aid Required</SelectItem>
-                    <SelectItem value="medical">Medical Treatment Required</SelectItem>
-                    <SelectItem value="lost_time">Lost Time Injury</SelectItem>
-                    <SelectItem value="serious">Serious Injury</SelectItem>
+                    <SelectItem value="none">{t('incidentReport.dialogs.addPerson.injuryTypes.none', 'No Injury')}</SelectItem>
+                    <SelectItem value="minor">{t('incidentReport.dialogs.addPerson.injuryTypes.minor', 'Minor Injury')}</SelectItem>
+                    <SelectItem value="first_aid">{t('incidentReport.dialogs.addPerson.injuryTypes.firstAid', 'First Aid Required')}</SelectItem>
+                    <SelectItem value="medical">{t('incidentReport.dialogs.addPerson.injuryTypes.medical', 'Medical Treatment Required')}</SelectItem>
+                    <SelectItem value="lost_time">{t('incidentReport.dialogs.addPerson.injuryTypes.lostTime', 'Lost Time Injury')}</SelectItem>
+                    <SelectItem value="serious">{t('incidentReport.dialogs.addPerson.injuryTypes.serious', 'Serious Injury')}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -984,21 +986,21 @@ export default function IncidentReportForm() {
               {currentPerson.injuryType && currentPerson.injuryType !== "none" && (
                 <>
                   <div className="space-y-2">
-                    <label className="text-sm font-medium">Body Part Affected</label>
+                    <label className="text-sm font-medium">{t('incidentReport.dialogs.addPerson.bodyPartAffected', 'Body Part Affected')}</label>
                     <Input
                       value={currentPerson.bodyPartAffected}
                       onChange={(e) => setCurrentPerson({ ...currentPerson, bodyPartAffected: e.target.value })}
-                      placeholder="e.g., Left hand, right leg"
+                      placeholder={t('incidentReport.dialogs.addPerson.bodyPartPlaceholder', 'e.g., Left hand, right leg')}
                       data-testid="dialog-input-body-part"
                     />
                   </div>
 
                   <div className="space-y-2">
-                    <label className="text-sm font-medium">Medical Treatment</label>
+                    <label className="text-sm font-medium">{t('incidentReport.dialogs.addPerson.medicalTreatment', 'Medical Treatment')}</label>
                     <Textarea
                       value={currentPerson.medicalTreatment}
                       onChange={(e) => setCurrentPerson({ ...currentPerson, medicalTreatment: e.target.value })}
-                      placeholder="Describe medical treatment received"
+                      placeholder={t('incidentReport.dialogs.addPerson.medicalTreatmentPlaceholder', 'Describe medical treatment received')}
                       data-testid="dialog-textarea-medical-treatment"
                     />
                   </div>
@@ -1007,10 +1009,10 @@ export default function IncidentReportForm() {
             </div>
             <DialogFooter>
               <Button variant="outline" onClick={() => setShowAddPersonDialog(false)}>
-                Cancel
+                {t('incidentReport.buttons.cancel', 'Cancel')}
               </Button>
               <Button onClick={handleAddPerson} data-testid="dialog-save-person">
-                Add Person
+                {t('incidentReport.dialogs.addPerson.addButton', 'Add Person')}
               </Button>
             </DialogFooter>
           </DialogContent>
@@ -1020,34 +1022,34 @@ export default function IncidentReportForm() {
         <Dialog open={showAddActionDialog} onOpenChange={setShowAddActionDialog}>
           <DialogContent>
             <DialogHeader>
-              <DialogTitle>Add Corrective Action</DialogTitle>
+              <DialogTitle>{t('incidentReport.dialogs.addAction.title', 'Add Corrective Action')}</DialogTitle>
               <DialogDescription>
-                Define an action to prevent recurrence
+                {t('incidentReport.dialogs.addAction.description', 'Define an action to prevent recurrence')}
               </DialogDescription>
             </DialogHeader>
             <div className="space-y-4 py-4">
               <div className="space-y-2">
-                <label className="text-sm font-medium">Action *</label>
+                <label className="text-sm font-medium">{t('incidentReport.dialogs.addAction.action', 'Action')} *</label>
                 <Textarea
                   value={currentAction.action}
                   onChange={(e) => setCurrentAction({ ...currentAction, action: e.target.value })}
-                  placeholder="Describe the corrective action"
+                  placeholder={t('incidentReport.dialogs.addAction.actionPlaceholder', 'Describe the corrective action')}
                   data-testid="dialog-textarea-action"
                 />
               </div>
 
               <div className="space-y-2">
-                <label className="text-sm font-medium">Assigned To *</label>
+                <label className="text-sm font-medium">{t('incidentReport.dialogs.addAction.assignedTo', 'Assigned To')} *</label>
                 <Input
                   value={currentAction.assignedTo}
                   onChange={(e) => setCurrentAction({ ...currentAction, assignedTo: e.target.value })}
-                  placeholder="Person responsible"
+                  placeholder={t('incidentReport.dialogs.addAction.assignedToPlaceholder', 'Person responsible')}
                   data-testid="dialog-input-assigned-to"
                 />
               </div>
 
               <div className="space-y-2">
-                <label className="text-sm font-medium">Due Date *</label>
+                <label className="text-sm font-medium">{t('incidentReport.dialogs.addAction.dueDate', 'Due Date')} *</label>
                 <Input
                   type="date"
                   value={currentAction.dueDate}
@@ -1057,29 +1059,29 @@ export default function IncidentReportForm() {
               </div>
 
               <div className="space-y-2">
-                <label className="text-sm font-medium">Status *</label>
+                <label className="text-sm font-medium">{t('incidentReport.dialogs.addAction.status', 'Status')} *</label>
                 <Select
                   value={currentAction.status}
                   onValueChange={(value) => setCurrentAction({ ...currentAction, status: value })}
                 >
                   <SelectTrigger data-testid="dialog-select-status">
-                    <SelectValue placeholder="Select status" />
+                    <SelectValue placeholder={t('incidentReport.dialogs.addAction.selectStatus', 'Select status')} />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="pending">Pending</SelectItem>
-                    <SelectItem value="in_progress">In Progress</SelectItem>
-                    <SelectItem value="completed">Completed</SelectItem>
-                    <SelectItem value="cancelled">Cancelled</SelectItem>
+                    <SelectItem value="pending">{t('incidentReport.dialogs.addAction.statuses.pending', 'Pending')}</SelectItem>
+                    <SelectItem value="in_progress">{t('incidentReport.dialogs.addAction.statuses.inProgress', 'In Progress')}</SelectItem>
+                    <SelectItem value="completed">{t('incidentReport.dialogs.addAction.statuses.completed', 'Completed')}</SelectItem>
+                    <SelectItem value="cancelled">{t('incidentReport.dialogs.addAction.statuses.cancelled', 'Cancelled')}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
             </div>
             <DialogFooter>
               <Button variant="outline" onClick={() => setShowAddActionDialog(false)}>
-                Cancel
+                {t('incidentReport.buttons.cancel', 'Cancel')}
               </Button>
               <Button onClick={handleAddAction} data-testid="dialog-save-action">
-                Add Action
+                {t('incidentReport.dialogs.addAction.addButton', 'Add Action')}
               </Button>
             </DialogFooter>
           </DialogContent>
@@ -1089,34 +1091,34 @@ export default function IncidentReportForm() {
         <Dialog open={showSignatureDialog} onOpenChange={setShowSignatureDialog}>
           <DialogContent className="max-w-lg">
             <DialogHeader>
-              <DialogTitle>Add Signature</DialogTitle>
+              <DialogTitle>{t('incidentReport.dialogs.addSignature.title', 'Add Signature')}</DialogTitle>
               <DialogDescription>
-                Draw your signature below to authenticate this report
+                {t('incidentReport.dialogs.addSignature.description', 'Draw your signature below to authenticate this report')}
               </DialogDescription>
             </DialogHeader>
             <div className="space-y-4 py-4">
               <div className="space-y-2">
-                <label className="text-sm font-medium">Role *</label>
+                <label className="text-sm font-medium">{t('incidentReport.dialogs.addSignature.role', 'Role')} *</label>
                 <Input
                   value={signatureRole}
                   onChange={(e) => setSignatureRole(e.target.value)}
-                  placeholder="e.g., Reporter, Supervisor, Manager"
+                  placeholder={t('incidentReport.dialogs.addSignature.rolePlaceholder', 'e.g., Reporter, Supervisor, Manager')}
                   data-testid="dialog-input-signature-role"
                 />
               </div>
 
               <div className="space-y-2">
-                <label className="text-sm font-medium">Name *</label>
+                <label className="text-sm font-medium">{t('incidentReport.dialogs.addSignature.name', 'Name')} *</label>
                 <Input
                   value={signatureName}
                   onChange={(e) => setSignatureName(e.target.value)}
-                  placeholder="Full name"
+                  placeholder={t('incidentReport.dialogs.addSignature.namePlaceholder', 'Full name')}
                   data-testid="dialog-input-signature-name"
                 />
               </div>
 
               <div className="space-y-2">
-                <label className="text-sm font-medium">Signature *</label>
+                <label className="text-sm font-medium">{t('incidentReport.dialogs.addSignature.signature', 'Signature')} *</label>
                 <div className="border rounded-md">
                   <SignatureCanvas
                     ref={signatureCanvasRef}
@@ -1132,16 +1134,16 @@ export default function IncidentReportForm() {
                   onClick={() => signatureCanvasRef.current?.clear()}
                   data-testid="dialog-clear-signature"
                 >
-                  Clear
+                  {t('incidentReport.dialogs.addSignature.clear', 'Clear')}
                 </Button>
               </div>
             </div>
             <DialogFooter>
               <Button variant="outline" onClick={() => setShowSignatureDialog(false)}>
-                Cancel
+                {t('incidentReport.buttons.cancel', 'Cancel')}
               </Button>
               <Button onClick={handleSaveSignature} data-testid="dialog-save-signature">
-                Save Signature
+                {t('incidentReport.dialogs.addSignature.saveButton', 'Save Signature')}
               </Button>
             </DialogFooter>
           </DialogContent>

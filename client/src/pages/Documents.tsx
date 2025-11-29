@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useLocation } from "wouter";
+import { useTranslation } from 'react-i18next';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -25,16 +26,16 @@ import { formatLocalDate, formatLocalDateLong, formatLocalDateMedium, parseLocal
 import { format } from "date-fns";
 import { DocumentReviews } from "@/components/DocumentReviews";
 
-// Standard job types for method statements
+// Standard job types for method statements - use translation keys
 const STANDARD_JOB_TYPES = [
-  { value: 'window_cleaning', label: 'Window Cleaning' },
-  { value: 'dryer_vent_cleaning', label: 'Dryer Vent Cleaning' },
-  { value: 'building_wash', label: 'Building Wash' },
-  { value: 'in_suite_dryer_vent_cleaning', label: 'In-Suite Dryer Vent Cleaning' },
-  { value: 'parkade_pressure_cleaning', label: 'Parkade Pressure Cleaning' },
-  { value: 'ground_window_cleaning', label: 'Ground Window Cleaning' },
-  { value: 'general_pressure_washing', label: 'General Pressure Washing' },
-  { value: 'other', label: 'Other' },
+  { value: 'window_cleaning', labelKey: 'dashboard.jobTypes.window_cleaning' },
+  { value: 'dryer_vent_cleaning', labelKey: 'dashboard.jobTypes.dryer_vent_cleaning' },
+  { value: 'building_wash', labelKey: 'dashboard.jobTypes.building_wash' },
+  { value: 'in_suite_dryer_vent_cleaning', labelKey: 'dashboard.jobTypes.in_suite_dryer_vent_cleaning' },
+  { value: 'parkade_pressure_cleaning', labelKey: 'dashboard.jobTypes.parkade_pressure_cleaning' },
+  { value: 'ground_window_cleaning', labelKey: 'dashboard.jobTypes.ground_window_cleaning' },
+  { value: 'general_pressure_washing', labelKey: 'dashboard.jobTypes.general_pressure_washing' },
+  { value: 'other', labelKey: 'dashboard.jobTypes.other' },
 ];
 
 // Safe Work Procedure Templates for each job type
@@ -1152,14 +1153,41 @@ const SAFE_WORK_PRACTICES: SafeWorkPractice[] = [
   }
 ];
 
-// Generate PDF for Safe Work Practice
-const generateSafeWorkPracticePDF = (practice: SafeWorkPractice, companyName?: string): void => {
+// Generate PDF for Safe Work Practice with translation support
+const generateSafeWorkPracticePDF = (
+  practice: SafeWorkPractice, 
+  companyName?: string, 
+  translations?: {
+    header: string;
+    category: string;
+    keyPrinciples: string;
+    requirements: string;
+    do: string;
+    doNot: string;
+    emergencyActions: string;
+    pageOf: (page: number, total: number) => string;
+    generated: string;
+  }
+): void => {
   const doc = new jsPDF();
   const pageWidth = doc.internal.pageSize.getWidth();
   const pageHeight = doc.internal.pageSize.getHeight();
   const margin = 20;
   const contentWidth = pageWidth - (margin * 2);
   let yPos = 20;
+
+  // Default translations for fallback
+  const t = translations || {
+    header: 'SAFE WORK PRACTICE',
+    category: 'Category',
+    keyPrinciples: 'Key Principles',
+    requirements: 'Requirements',
+    do: 'Do',
+    doNot: 'Do Not',
+    emergencyActions: 'Emergency Actions',
+    pageOf: (page: number, total: number) => `Page ${page} of ${total}`,
+    generated: 'Generated'
+  };
 
   const checkPageBreak = (requiredSpace: number) => {
     if (yPos + requiredSpace > pageHeight - 30) {
@@ -1208,7 +1236,7 @@ const generateSafeWorkPracticePDF = (practice: SafeWorkPractice, companyName?: s
   doc.setTextColor(255, 255, 255);
   doc.setFontSize(18);
   doc.setFont('helvetica', 'bold');
-  doc.text('SAFE WORK PRACTICE', pageWidth / 2, 22, { align: 'center' });
+  doc.text(t.header, pageWidth / 2, 22, { align: 'center' });
   
   doc.setFontSize(12);
   doc.text(practice.title, pageWidth / 2, 32, { align: 'center' });
@@ -1218,7 +1246,7 @@ const generateSafeWorkPracticePDF = (practice: SafeWorkPractice, companyName?: s
   // Category badge
   doc.setFontSize(9);
   doc.setTextColor(100, 100, 100);
-  doc.text(`Category: ${practice.category}`, margin, yPos);
+  doc.text(`${t.category}: ${practice.category}`, margin, yPos);
   yPos += 10;
 
   // Description
@@ -1233,11 +1261,11 @@ const generateSafeWorkPracticePDF = (practice: SafeWorkPractice, companyName?: s
   yPos += 10;
 
   // Sections
-  addSection('Key Principles', practice.keyPrinciples);
-  addSection('Requirements', practice.requirements);
-  addSection('Do', practice.doList);
-  addSection('Do Not', practice.dontList);
-  addSection('Emergency Actions', practice.emergencyActions);
+  addSection(t.keyPrinciples, practice.keyPrinciples);
+  addSection(t.requirements, practice.requirements);
+  addSection(t.do, practice.doList);
+  addSection(t.doNot, practice.dontList);
+  addSection(t.emergencyActions, practice.emergencyActions);
 
   // Footer on all pages
   const totalPages = doc.getNumberOfPages();
@@ -1245,8 +1273,8 @@ const generateSafeWorkPracticePDF = (practice: SafeWorkPractice, companyName?: s
     doc.setPage(i);
     doc.setFontSize(8);
     doc.setTextColor(150, 150, 150);
-    doc.text(`Page ${i} of ${totalPages}`, pageWidth / 2, pageHeight - 10, { align: 'center' });
-    doc.text(`Generated: ${new Date().toLocaleDateString()}`, margin, pageHeight - 10);
+    doc.text(t.pageOf(i, totalPages), pageWidth / 2, pageHeight - 10, { align: 'center' });
+    doc.text(`${t.generated}: ${new Date().toLocaleDateString()}`, margin, pageHeight - 10);
   }
 
   // Download
@@ -1254,14 +1282,47 @@ const generateSafeWorkPracticePDF = (practice: SafeWorkPractice, companyName?: s
   doc.save(fileName);
 };
 
-// Generate PDF for Safe Work Procedure
-const generateSafeWorkProcedurePDF = (procedure: SafeWorkProcedure, companyName?: string): void => {
+// Generate PDF for Safe Work Procedure with translation support
+const generateSafeWorkProcedurePDF = (
+  procedure: SafeWorkProcedure, 
+  companyName?: string,
+  translations?: {
+    header: string;
+    scope: string;
+    hazardsIdentified: string;
+    controlMeasures: string;
+    ppe: string;
+    equipmentRequired: string;
+    preWorkChecks: string;
+    workProcedure: string;
+    emergencyProcedures: string;
+    competencyRequirements: string;
+    pageOf: (page: number, total: number) => string;
+    generated: string;
+  }
+): void => {
   const doc = new jsPDF();
   const pageWidth = doc.internal.pageSize.getWidth();
   const pageHeight = doc.internal.pageSize.getHeight();
   const margin = 20;
   const contentWidth = pageWidth - (margin * 2);
   let yPos = 20;
+
+  // Default translations for fallback
+  const t = translations || {
+    header: 'SAFE WORK PROCEDURE',
+    scope: 'Scope',
+    hazardsIdentified: 'Hazards Identified',
+    controlMeasures: 'Control Measures',
+    ppe: 'Personal Protective Equipment (PPE)',
+    equipmentRequired: 'Equipment Required',
+    preWorkChecks: 'Pre-Work Checks',
+    workProcedure: 'Work Procedure',
+    emergencyProcedures: 'Emergency Procedures',
+    competencyRequirements: 'Competency Requirements',
+    pageOf: (page: number, total: number) => `Page ${page} of ${total}`,
+    generated: 'Generated'
+  };
 
   const checkPageBreak = (requiredSpace: number) => {
     if (yPos + requiredSpace > pageHeight - 30) {
@@ -1310,7 +1371,7 @@ const generateSafeWorkProcedurePDF = (procedure: SafeWorkProcedure, companyName?
   doc.setTextColor(255, 255, 255);
   doc.setFontSize(18);
   doc.setFont('helvetica', 'bold');
-  doc.text('SAFE WORK PROCEDURE', pageWidth / 2, 22, { align: 'center' });
+  doc.text(t.header, pageWidth / 2, 22, { align: 'center' });
   
   doc.setFontSize(12);
   doc.text(procedure.title, pageWidth / 2, 32, { align: 'center' });
@@ -1333,7 +1394,7 @@ const generateSafeWorkProcedurePDF = (procedure: SafeWorkProcedure, companyName?
   doc.setFontSize(12);
   doc.setFont('helvetica', 'bold');
   doc.setTextColor(34, 34, 34);
-  doc.text('Scope', margin, yPos);
+  doc.text(t.scope, margin, yPos);
   yPos += 7;
   doc.setFontSize(10);
   doc.setFont('helvetica', 'normal');
@@ -1346,14 +1407,14 @@ const generateSafeWorkProcedurePDF = (procedure: SafeWorkProcedure, companyName?
   yPos += 8;
 
   // Sections
-  addSection('Hazards Identified', procedure.hazards);
-  addSection('Control Measures', procedure.controlMeasures);
-  addSection('Personal Protective Equipment (PPE)', procedure.ppe);
-  addSection('Equipment Required', procedure.equipment);
-  addSection('Pre-Work Checks', procedure.preWorkChecks);
-  addSection('Work Procedure', procedure.workProcedure, false);
-  addSection('Emergency Procedures', procedure.emergencyProcedures);
-  addSection('Competency Requirements', procedure.competencyRequirements);
+  addSection(t.hazardsIdentified, procedure.hazards);
+  addSection(t.controlMeasures, procedure.controlMeasures);
+  addSection(t.ppe, procedure.ppe);
+  addSection(t.equipmentRequired, procedure.equipment);
+  addSection(t.preWorkChecks, procedure.preWorkChecks);
+  addSection(t.workProcedure, procedure.workProcedure, false);
+  addSection(t.emergencyProcedures, procedure.emergencyProcedures);
+  addSection(t.competencyRequirements, procedure.competencyRequirements);
 
   // Footer on last page
   const totalPages = doc.getNumberOfPages();
@@ -1361,8 +1422,8 @@ const generateSafeWorkProcedurePDF = (procedure: SafeWorkProcedure, companyName?
     doc.setPage(i);
     doc.setFontSize(8);
     doc.setTextColor(128, 128, 128);
-    doc.text(`Page ${i} of ${totalPages}`, pageWidth / 2, pageHeight - 10, { align: 'center' });
-    doc.text(`Generated: ${new Date().toLocaleDateString()}`, margin, pageHeight - 10);
+    doc.text(t.pageOf(i, totalPages), pageWidth / 2, pageHeight - 10, { align: 'center' });
+    doc.text(`${t.generated}: ${new Date().toLocaleDateString()}`, margin, pageHeight - 10);
   }
 
   // Download
@@ -1686,6 +1747,7 @@ function DateRangeExport({
 }
 
 export default function Documents() {
+  const { t } = useTranslation();
   const [, navigate] = useLocation();
   const { toast } = useToast();
   const [uploadingHealthSafety, setUploadingHealthSafety] = useState(false);
@@ -4209,9 +4271,9 @@ export default function Documents() {
                       <Users className="h-6 w-6 text-primary" />
                     </div>
                     <div className="flex-1">
-                      <CardTitle className="text-xl mb-1">Employee Document Compliance</CardTitle>
+                      <CardTitle className="text-xl mb-1">{t('documents.employeeDocumentCompliance', 'Employee Document Compliance')}</CardTitle>
                       <CardDescription>
-                        Track which employees have reviewed and signed required documents
+                        {t('documents.trackEmployeesReviewed', 'Track which employees have reviewed and signed required documents')}
                       </CardDescription>
                     </div>
                     <div className="flex items-center gap-2">
@@ -4227,19 +4289,19 @@ export default function Documents() {
                         ) : (
                           <Download className="h-4 w-4 mr-2" />
                         )}
-                        Download Report
+                        {t('documents.downloadReport', 'Download Report')}
                       </Button>
                       <div className="flex flex-col items-end gap-1">
                         <Badge 
                           variant={compliancePercent === 100 ? "default" : "secondary"} 
                           className={`text-base font-semibold px-3 ${compliancePercent === 100 ? 'bg-emerald-500' : ''}`}
                         >
-                          {compliancePercent}% Signed
+                          {compliancePercent}% {t('documents.signed', 'Signed')}
                         </Badge>
                         {compliancePercent < 100 && (
                           <span className="text-xs text-amber-600 dark:text-amber-400 flex items-center gap-1">
                             <Shield className="h-3 w-3" />
-                            {Math.round((100 - compliancePercent) * 0.05)}% CSR penalty
+                            {Math.round((100 - compliancePercent) * 0.05)}% {t('documents.csrPenalty', 'CSR penalty')}
                           </span>
                         )}
                       </div>
@@ -4251,19 +4313,19 @@ export default function Documents() {
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
                     <div className="p-3 rounded-lg bg-muted/50">
                       <div className="text-2xl font-bold">{totalEmployees}</div>
-                      <div className="text-sm text-muted-foreground">Total Employees</div>
+                      <div className="text-sm text-muted-foreground">{t('documents.totalEmployees', 'Total Employees')}</div>
                     </div>
                     <div className="p-3 rounded-lg bg-emerald-500/10">
                       <div className="text-2xl font-bold text-primary">{completeEmployees}</div>
-                      <div className="text-sm text-muted-foreground">Fully Compliant</div>
+                      <div className="text-sm text-muted-foreground">{t('documents.fullyCompliant', 'Fully Compliant')}</div>
                     </div>
                     <div className="p-3 rounded-lg bg-amber-500/10">
                       <div className="text-2xl font-bold text-amber-600 dark:text-amber-400">{totalEmployees - completeEmployees}</div>
-                      <div className="text-sm text-muted-foreground">Pending Signatures</div>
+                      <div className="text-sm text-muted-foreground">{t('documents.pendingSignatures', 'Pending Signatures')}</div>
                     </div>
                     <div className="p-3 rounded-lg bg-primary/10">
                       <div className="text-2xl font-bold text-primary">{signedReviews}/{totalRequiredSignatures}</div>
-                      <div className="text-sm text-muted-foreground">Documents Signed</div>
+                      <div className="text-sm text-muted-foreground">{t('documents.documentsSigned', 'Documents Signed')}</div>
                     </div>
                   </div>
                   
@@ -4295,12 +4357,12 @@ export default function Documents() {
                               {employee.isComplete ? (
                                 <Badge variant="default" className="bg-emerald-500 text-xs">
                                   <CheckCircle2 className="h-3 w-3 mr-1" />
-                                  Complete
+                                  {t('documents.complete', 'Complete')}
                                 </Badge>
                               ) : (
                                 <Badge variant="secondary" className="bg-amber-500/20 text-amber-700 dark:text-amber-300 text-xs">
                                   <AlertCircle className="h-3 w-3 mr-1" />
-                                  {employee.pendingCount} Pending
+                                  {employee.pendingCount} {t('documents.pending', 'Pending')}
                                 </Badge>
                               )}
                               <Badge variant="outline" className="text-xs">
@@ -4354,7 +4416,7 @@ export default function Documents() {
                                     </div>
                                   )}
                                   {!review.viewedAt && !review.signedAt && (
-                                    <div className="text-muted-foreground">Not viewed</div>
+                                    <div className="text-muted-foreground">{t('documents.notViewed', 'Not viewed')}</div>
                                   )}
                                 </div>
                               </div>
@@ -4368,9 +4430,9 @@ export default function Documents() {
                       <div className="inline-flex p-4 bg-primary/5 rounded-full mb-4">
                         <Users className="h-8 w-8 text-primary/50" />
                       </div>
-                      <p className="text-muted-foreground font-medium">No document reviews assigned</p>
+                      <p className="text-muted-foreground font-medium">{t('documents.noDocumentReviewsAssigned', 'No document reviews assigned')}</p>
                       <p className="text-sm text-muted-foreground mt-1">
-                        Enroll employees in document reviews to track their compliance
+                        {t('documents.enrollEmployees', 'Enroll employees in document reviews to track their compliance')}
                       </p>
                     </div>
                   )}
@@ -4393,45 +4455,45 @@ export default function Documents() {
                 <SelectItem value="health-safety" data-testid="option-health-safety">
                   <div className="flex items-center gap-2">
                     <Shield className="h-4 w-4" />
-                    Health & Safety Manual
+                    {t('documents.healthSafetyManual', 'Health & Safety Manual')}
                   </div>
                 </SelectItem>
                 <SelectItem value="company-policy" data-testid="option-company-policy">
                   <div className="flex items-center gap-2">
                     <BookOpen className="h-4 w-4" />
-                    Company Policy
+                    {t('documents.companyPolicies', 'Company Policies')}
                   </div>
                 </SelectItem>
                 {canUploadDocuments && (
                   <SelectItem value="insurance" data-testid="option-insurance">
                     <div className="flex items-center gap-2">
                       <FileCheck className="h-4 w-4" />
-                      Certificate of Insurance
+                      {t('documents.certificateOfInsurance', 'Certificate of Insurance')}
                     </div>
                   </SelectItem>
                 )}
                 <SelectItem value="swp-templates" data-testid="option-swp-templates">
                   <div className="flex items-center gap-2">
                     <FileText className="h-4 w-4" />
-                    Safe Work Procedures
+                    {t('documents.safeWorkProcedures', 'Safe Work Procedures')}
                   </div>
                 </SelectItem>
                 <SelectItem value="safe-work-practices" data-testid="option-safe-work-practices">
                   <div className="flex items-center gap-2">
                     <Shield className="h-4 w-4" />
-                    Safe Work Practices
+                    {t('documents.safeWorkPractices', 'Safe Work Practices')}
                   </div>
                 </SelectItem>
                 <SelectItem value="inspections-safety" data-testid="option-inspections-safety">
                   <div className="flex items-center gap-2">
                     <Package className="h-4 w-4" />
-                    Equipment Inspections
+                    {t('documents.equipmentInspections', 'Equipment Inspections')}
                   </div>
                 </SelectItem>
                 <SelectItem value="damage-reports" data-testid="option-damage-reports">
                   <div className="flex items-center gap-2">
                     <AlertTriangle className="h-4 w-4" />
-                    Damage Reports
+                    {t('documents.damageReports', 'Damage Reports')}
                   </div>
                 </SelectItem>
               </SelectContent>
@@ -4447,8 +4509,8 @@ export default function Documents() {
                 <Shield className="h-6 w-6 text-primary dark:text-primary" />
               </div>
               <div className="flex-1">
-                <CardTitle className="text-xl mb-1">Health & Safety Manual</CardTitle>
-                <p className="text-sm text-muted-foreground">Essential workplace safety documentation</p>
+                <CardTitle className="text-xl mb-1">{t('documents.healthSafetyManual', 'Health & Safety Manual')}</CardTitle>
+                <p className="text-sm text-muted-foreground">{t('documents.essentialWorkplaceSafety', 'Essential workplace safety documentation')}</p>
               </div>
               <Badge variant="secondary" className="text-base font-semibold px-3">
                 {healthSafetyDocs.length}
@@ -4460,7 +4522,7 @@ export default function Documents() {
               <div className="mb-6 p-5 border-2 border-dashed rounded-xl bg-muted/30 hover-elevate">
                 <label htmlFor="health-safety-upload" className="block mb-3 text-sm font-semibold flex items-center gap-2">
                   <Upload className="h-4 w-4" />
-                  Upload New Manual
+                  {t('documents.uploadNewManual', 'Upload New Manual')}
                 </label>
                 <Input
                   id="health-safety-upload"
@@ -4479,7 +4541,7 @@ export default function Documents() {
                 {uploadingHealthSafety && (
                   <p className="text-sm text-muted-foreground mt-2 flex items-center gap-2">
                     <span className="inline-block h-4 w-4 border-2 border-primary border-t-transparent rounded-full animate-spin"></span>
-                    Uploading...
+                    {t('documents.uploading', 'Uploading...')}
                   </p>
                 )}
               </div>
@@ -4519,7 +4581,7 @@ export default function Documents() {
                                       <div className="flex-1 min-w-0">
                                         <div className="font-semibold truncate">{doc.fileName}</div>
                                         <div className="text-sm text-muted-foreground">
-                                          Uploaded by {doc.uploadedByName}
+                                          {t('documents.uploadedBy', 'Uploaded by {{name}}', { name: doc.uploadedByName })}
                                         </div>
                                       </div>
                                       <div className="flex items-center gap-2 flex-wrap">
@@ -4530,7 +4592,7 @@ export default function Documents() {
                                           data-testid={`download-health-safety-${doc.id}`}
                                         >
                                           <Download className="h-4 w-4 mr-1" />
-                                          View
+                                          {t('documents.view', 'View')}
                                         </Button>
                                         {canUploadDocuments && (
                                           <Button
@@ -4560,8 +4622,8 @@ export default function Documents() {
                 <div className="inline-flex p-4 bg-primary/50/5 rounded-full mb-4">
                   <Shield className="h-8 w-8 text-primary/50" />
                 </div>
-                <p className="text-muted-foreground font-medium">No Health & Safety Manual uploaded yet</p>
-                <p className="text-sm text-muted-foreground mt-1">Upload your first document to get started</p>
+                <p className="text-muted-foreground font-medium">{t('documents.noHealthSafetyManual', 'No Health & Safety Manual uploaded yet')}</p>
+                <p className="text-sm text-muted-foreground mt-1">{t('documents.uploadFirstDocument', 'Upload your first document to get started')}</p>
               </div>
             )}
           </CardContent>
@@ -4577,8 +4639,8 @@ export default function Documents() {
                 <BookOpen className="h-6 w-6 text-primary" />
               </div>
               <div className="flex-1">
-                <CardTitle className="text-xl mb-1">Company Policies</CardTitle>
-                <p className="text-sm text-muted-foreground">Operational guidelines and procedures</p>
+                <CardTitle className="text-xl mb-1">{t('documents.companyPolicies', 'Company Policies')}</CardTitle>
+                <p className="text-sm text-muted-foreground">{t('documents.generalSafetyGuidelines', 'General safety guidelines')}</p>
               </div>
               <Badge variant="secondary" className="text-base font-semibold px-3">
                 {policyDocs.length}
@@ -4590,7 +4652,7 @@ export default function Documents() {
               <div className="mb-6 p-5 border-2 border-dashed rounded-xl bg-muted/30 hover-elevate">
                 <label htmlFor="policy-upload" className="block mb-3 text-sm font-semibold flex items-center gap-2">
                   <Upload className="h-4 w-4" />
-                  Upload New Policy
+                  {t('documents.uploadPolicy', 'Upload New Policy')}
                 </label>
                 <Input
                   id="policy-upload"
@@ -4609,7 +4671,7 @@ export default function Documents() {
                 {uploadingPolicy && (
                   <p className="text-sm text-muted-foreground mt-2 flex items-center gap-2">
                     <span className="inline-block h-4 w-4 border-2 border-primary border-t-transparent rounded-full animate-spin"></span>
-                    Uploading...
+                    {t('documents.uploading', 'Uploading...')}
                   </p>
                 )}
               </div>
@@ -4649,7 +4711,7 @@ export default function Documents() {
                                       <div className="flex-1 min-w-0">
                                         <div className="font-semibold truncate">{doc.fileName}</div>
                                         <div className="text-sm text-muted-foreground">
-                                          Uploaded by {doc.uploadedByName}
+                                          {t('documents.uploadedBy', 'Uploaded by {{name}}', { name: doc.uploadedByName })}
                                         </div>
                                       </div>
                                       <div className="flex items-center gap-2 flex-wrap">
@@ -4660,7 +4722,7 @@ export default function Documents() {
                                           data-testid={`download-policy-${doc.id}`}
                                         >
                                           <Download className="h-4 w-4 mr-1" />
-                                          View
+                                          {t('documents.view', 'View')}
                                         </Button>
                                         {canUploadDocuments && (
                                           <Button
@@ -4690,8 +4752,8 @@ export default function Documents() {
                 <div className="inline-flex p-4 bg-primary/5 rounded-full mb-4">
                   <BookOpen className="h-8 w-8 text-primary/50" />
                 </div>
-                <p className="text-muted-foreground font-medium">No Company Policies uploaded yet</p>
-                <p className="text-sm text-muted-foreground mt-1">Upload your first policy document</p>
+                <p className="text-muted-foreground font-medium">{t('documents.noCompanyPolicies', 'No Company Policies uploaded yet')}</p>
+                <p className="text-sm text-muted-foreground mt-1">{t('documents.uploadFirstPolicy', 'Upload your first policy document')}</p>
               </div>
             )}
           </CardContent>
@@ -4708,8 +4770,8 @@ export default function Documents() {
                       <FileCheck className="h-6 w-6 text-primary" />
                     </div>
                     <div className="flex-1">
-                      <CardTitle className="text-xl mb-1">Certificate of Insurance</CardTitle>
-                      <p className="text-sm text-muted-foreground">Proof of liability insurance coverage</p>
+                      <CardTitle className="text-xl mb-1">{t('documents.certificateOfInsurance', 'Certificate of Insurance')}</CardTitle>
+                      <p className="text-sm text-muted-foreground">{t('documents.proofOfLiability', 'Proof of liability insurance coverage')}</p>
                     </div>
                     <Badge variant="secondary" className="text-base font-semibold px-3">
                       {insuranceDocs.length}
@@ -4720,7 +4782,7 @@ export default function Documents() {
                   <div className="mb-6 p-5 border-2 border-dashed rounded-xl bg-muted/30 hover-elevate">
                     <label htmlFor="insurance-upload" className="block mb-3 text-sm font-semibold flex items-center gap-2">
                       <Upload className="h-4 w-4" />
-                      Upload Certificate of Insurance
+                      {t('documents.uploadCertificateInsurance', 'Upload Certificate of Insurance')}
                     </label>
                     <Input
                       id="insurance-upload"
@@ -4739,7 +4801,7 @@ export default function Documents() {
                     {uploadingInsurance && (
                       <p className="text-sm text-muted-foreground mt-2 flex items-center gap-2">
                         <span className="inline-block h-4 w-4 border-2 border-primary border-t-transparent rounded-full animate-spin"></span>
-                        Uploading...
+                        {t('documents.uploading', 'Uploading...')}
                       </p>
                     )}
                   </div>
@@ -4778,7 +4840,7 @@ export default function Documents() {
                                             <div className="flex-1 min-w-0">
                                               <div className="font-semibold truncate">{doc.fileName}</div>
                                               <div className="text-sm text-muted-foreground">
-                                                Uploaded by {doc.uploadedByName}
+                                                {t('documents.uploadedBy', 'Uploaded by {{name}}', { name: doc.uploadedByName })}
                                               </div>
                                             </div>
                                             <div className="flex items-center gap-2">
@@ -4789,7 +4851,7 @@ export default function Documents() {
                                                 data-testid={`download-insurance-${doc.id}`}
                                               >
                                                 <Download className="h-4 w-4 mr-1" />
-                                                View
+                                                {t('documents.view', 'View')}
                                               </Button>
                                               <Button
                                                 size="sm"
@@ -4817,8 +4879,8 @@ export default function Documents() {
                       <div className="inline-flex p-4 bg-primary/5 rounded-full mb-4">
                         <FileCheck className="h-8 w-8 text-primary/50" />
                       </div>
-                      <p className="text-muted-foreground font-medium">No Certificate of Insurance uploaded yet</p>
-                      <p className="text-sm text-muted-foreground mt-1">Upload your insurance certificate to demonstrate coverage</p>
+                      <p className="text-muted-foreground font-medium">{t('documents.noCertificateInsurance', 'No Certificate of Insurance uploaded yet')}</p>
+                      <p className="text-sm text-muted-foreground mt-1">{t('documents.uploadCertificateDesc', 'Upload your insurance certificate to demonstrate coverage')}</p>
                     </div>
                   )}
                 </CardContent>
@@ -4837,9 +4899,9 @@ export default function Documents() {
                       <Upload className="h-6 w-6 text-primary" />
                     </div>
                     <div className="flex-1">
-                      <CardTitle className="text-xl mb-1">Custom Safe Work Procedures</CardTitle>
+                      <CardTitle className="text-xl mb-1">{t('documents.customSWP', 'Custom Safe Work Procedures')}</CardTitle>
                       <p className="text-sm text-muted-foreground">
-                        Upload your own custom Safe Work Procedures specific to your company operations.
+                        {t('documents.customSWPDesc', 'Upload your own custom Safe Work Procedures specific to your company operations.')}
                       </p>
                     </div>
                     <Badge variant="secondary" className="text-base font-semibold px-3">
@@ -4890,7 +4952,7 @@ export default function Documents() {
 
                   {safeWorkProcedureDocs.length > 0 ? (
                     <div className="space-y-3">
-                      <h4 className="font-medium text-sm mb-3">Uploaded Documents</h4>
+                      <h4 className="font-medium text-sm mb-3">{t('documents.uploadedDocuments', 'Uploaded Documents')}</h4>
                       {safeWorkProcedureDocs.map((doc: any) => (
                         <div key={doc.id} className="flex items-center justify-between p-3 bg-muted/30 rounded-lg">
                           <div className="flex items-center gap-3 min-w-0 flex-1">
@@ -4910,7 +4972,7 @@ export default function Documents() {
                               data-testid={`download-custom-swp-${doc.id}`}
                             >
                               <Download className="h-4 w-4 mr-1" />
-                              Download
+                              {t('documents.download', 'Download')}
                             </Button>
                             <Button
                               size="icon"
@@ -4926,7 +4988,7 @@ export default function Documents() {
                     </div>
                   ) : (
                     <div className="text-center py-6">
-                      <p className="text-sm text-muted-foreground">No custom Safe Work Procedures uploaded yet</p>
+                      <p className="text-sm text-muted-foreground">{t('documents.noCustomSWP', 'No custom Safe Work Procedures uploaded yet')}</p>
                     </div>
                   )}
                 </CardContent>
@@ -4942,7 +5004,7 @@ export default function Documents() {
                       <FileCheck className="h-6 w-6 text-primary" />
                     </div>
                     <div className="flex-1">
-                      <CardTitle className="text-xl mb-1">Active Safe Work Procedures</CardTitle>
+                      <CardTitle className="text-xl mb-1">{t('documents.activeSWP', 'Active Safe Work Procedures')}</CardTitle>
                       <p className="text-sm text-muted-foreground">
                         These procedures require employee review and signature. All employees will be automatically enrolled.
                       </p>
@@ -5055,7 +5117,8 @@ export default function Documents() {
                 <CardContent className="pt-6">
                   <div className="grid gap-4 md:grid-cols-2">
                     {availableTemplates.map((procedure) => {
-                      const jobTypeLabel = STANDARD_JOB_TYPES.find(jt => jt.value === procedure.jobType)?.label || procedure.title;
+                      const jobTypeEntry = STANDARD_JOB_TYPES.find(jt => jt.value === procedure.jobType);
+                      const jobTypeLabel = jobTypeEntry ? t(jobTypeEntry.labelKey, procedure.title) : procedure.title;
                       
                       return (
                         <Card key={procedure.jobType} className="overflow-hidden hover-elevate border-dashed">
@@ -5181,7 +5244,7 @@ export default function Documents() {
                         <div className="flex-1 min-w-0">
                           <div className="font-medium truncate">{doc.fileName}</div>
                           <div className="text-xs text-muted-foreground">
-                            Uploaded by {doc.uploadedByName} on {formatLocalDate(doc.uploadedAt)}
+                            {t('documents.uploadedByOn', 'Uploaded by {{name}} on {{date}}', { name: doc.uploadedByName, date: formatLocalDate(doc.uploadedAt) })}
                           </div>
                         </div>
                         <div className="flex items-center gap-2">
@@ -5193,7 +5256,7 @@ export default function Documents() {
                               data-testid={`view-swpractice-${doc.id}`}
                             >
                               <Eye className="h-3 w-3 mr-1" />
-                              View
+                              {t('documents.view', 'View')}
                             </Button>
                           )}
                           {canUploadDocuments && (
@@ -6126,13 +6189,13 @@ export default function Documents() {
                           <Badge variant="outline" className="text-xs">
                             {formatJobType(doc.jobType, doc.customJobType)}
                           </Badge>
-                          <span>Uploaded by {doc.uploadedByName}</span>
+                          <span>{t('documents.uploadedBy', 'Uploaded by {{name}}', { name: doc.uploadedByName })}</span>
                         </div>
                       </div>
                       <div className="flex items-center gap-2">
                         <Button size="sm" variant="outline" onClick={() => window.open(doc.fileUrl, '_blank')} data-testid={`view-method-doc-${doc.id}`}>
                           <Download className="h-3 w-3 mr-1" />
-                          View
+                          {t('documents.view', 'View')}
                         </Button>
                         <Button
                           size="sm"
@@ -6261,8 +6324,8 @@ export default function Documents() {
                 </SelectTrigger>
                 <SelectContent>
                   {STANDARD_JOB_TYPES.map((jobType) => (
-                    <SelectItem key={jobType.value} value={jobType.value}>
-                      {jobType.label}
+                    <SelectItem key={jobType.value} value={jobType.value} data-testid={`select-job-type-${jobType.value}`}>
+                      {t(jobType.labelKey, jobType.value.replace(/_/g, ' '))}
                     </SelectItem>
                   ))}
                   {customJobTypes.length > 0 && (

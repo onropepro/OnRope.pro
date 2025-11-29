@@ -1,6 +1,7 @@
 import { useState, useMemo } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useLocation } from "wouter";
+import { useTranslation } from "react-i18next";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -42,6 +43,7 @@ const gearTypes = [
 ];
 
 export default function Inventory() {
+  const { t } = useTranslation();
   const { toast } = useToast();
   const [, setLocation] = useLocation();
   const [showAddDialog, setShowAddDialog] = useState(false);
@@ -134,16 +136,16 @@ export default function Inventory() {
           <CardContent className="py-12 text-center">
             <div className="flex flex-col items-center gap-4">
               <ShieldAlert className="w-12 h-12 text-muted-foreground" />
-              <h2 className="text-xl font-semibold">Access Restricted</h2>
+              <h2 className="text-xl font-semibold">{t('common.accessRestricted', 'Access Restricted')}</h2>
               <p className="text-muted-foreground">
-                You don't have permission to access the Inventory & Gear Management page.
+                {t('inventory.accessDenied', "You don't have permission to access the Inventory & Gear Management page.")}
               </p>
               <p className="text-sm text-muted-foreground">
-                Please contact your administrator if you need access.
+                {t('common.contactAdmin', 'Please contact your administrator if you need access.')}
               </p>
               <Button variant="outline" onClick={() => setLocation("/dashboard")}>
                 <ArrowLeft className="w-4 h-4 mr-2" />
-                Return to Dashboard
+                {t('common.backToDashboard', 'Return to Dashboard')}
               </Button>
             </div>
           </CardContent>
@@ -228,17 +230,17 @@ export default function Inventory() {
       queryClient.invalidateQueries({ queryKey: ["/api/equipment-damage-reports"] });
       queryClient.invalidateQueries({ queryKey: ["/api/gear-items"] });
       toast({
-        title: "Damage Report Submitted",
+        title: t('inventory.toast.damageReportSuccess', 'Damage Report Submitted'),
         description: retireEquipment 
-          ? "The damage report has been created and the equipment has been retired." 
-          : "The damage report has been created successfully.",
+          ? t('inventory.damageReport.reportWithRetirement', 'The damage report has been created and the equipment has been retired.')
+          : t('inventory.damageReport.reportSubmitted', 'The damage report has been created successfully.'),
       });
       resetDamageReportDialog();
     },
     onError: (error: any) => {
       toast({
-        title: "Error",
-        description: error.message || "Failed to create damage report",
+        title: t('common.error', 'Error'),
+        description: error.message || t('inventory.toast.damageReportError', 'Failed to create damage report'),
         variant: "destructive",
       });
     },
@@ -447,8 +449,8 @@ export default function Inventory() {
     doc.save(filename);
 
     toast({
-      title: "PDF Downloaded",
-      description: "The damage report has been downloaded.",
+      title: t('inventory.toast.pdfDownloaded', 'PDF Downloaded'),
+      description: t('inventory.damageReport.pdfDownloaded', 'The damage report has been downloaded.'),
     });
   };
   
@@ -521,21 +523,21 @@ export default function Inventory() {
             });
             queryClient.invalidateQueries({ queryKey: ["/api/gear-assignments"] });
             toast({
-              title: "Item Added & Assigned",
-              description: "The gear item has been added and assigned to employee.",
+              title: t('inventory.toast.addAndAssignSuccess', 'Item Added & Assigned'),
+              description: t('inventory.toast.addAndAssignDescription', 'The gear item has been added and assigned to employee.'),
             });
           } catch (error) {
             toast({
-              title: "Item Added",
-              description: "Item added but assignment failed. You can assign it manually.",
+              title: t('inventory.toast.addSuccess', 'Item Added'),
+              description: t('inventory.toast.addButAssignFailed', 'Item added but assignment failed. You can assign it manually.'),
               variant: "destructive",
             });
           }
         }
       } else {
         toast({
-          title: "Item Added",
-          description: "The gear item has been added to inventory.",
+          title: t('inventory.toast.addSuccess', 'Item Added'),
+          description: t('inventory.toast.addDescription', 'The gear item has been added to inventory.'),
         });
       }
       
@@ -551,8 +553,8 @@ export default function Inventory() {
     },
     onError: (error: any) => {
       toast({
-        title: "Error",
-        description: error.message || "Failed to add item",
+        title: t('common.error', 'Error'),
+        description: error.message || t('inventory.toast.addError', 'Failed to add item'),
         variant: "destructive",
       });
     },
@@ -565,8 +567,8 @@ export default function Inventory() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/gear-items"] });
       toast({
-        title: "Item Updated",
-        description: "The gear item has been updated.",
+        title: t('inventory.toast.updateSuccess', 'Item Updated'),
+        description: t('inventory.toast.updateDescription', 'The gear item has been updated.'),
       });
       setShowEditDialog(false);
       setEditingItem(null);
@@ -578,8 +580,8 @@ export default function Inventory() {
     },
     onError: (error: any) => {
       toast({
-        title: "Error",
-        description: error.message || "Failed to update item",
+        title: t('common.error', 'Error'),
+        description: error.message || t('inventory.toast.updateError', 'Failed to update item'),
         variant: "destructive",
       });
     },
@@ -592,16 +594,16 @@ export default function Inventory() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/gear-items"] });
       toast({
-        title: "Item Deleted",
-        description: "The gear item has been removed from inventory.",
+        title: t('inventory.toast.deleteSuccess', 'Item Deleted'),
+        description: t('inventory.toast.deleteDescription', 'The gear item has been removed from inventory.'),
       });
       setShowDeleteDialog(false);
       setItemToDelete(null);
     },
     onError: (error: any) => {
       toast({
-        title: "Error",
-        description: error.message || "Failed to delete item",
+        title: t('common.error', 'Error'),
+        description: error.message || t('inventory.toast.deleteError', 'Failed to delete item'),
         variant: "destructive",
       });
     },
@@ -658,8 +660,8 @@ export default function Inventory() {
       queryClient.invalidateQueries({ queryKey: ["/api/gear"] });
       queryClient.invalidateQueries({ queryKey: ["/api/gear-items", managingItem?.id, "serial-numbers"] });
       toast({
-        title: "Gear Assigned",
-        description: "Gear has been assigned to the employee.",
+        title: t('inventory.toast.assignSuccess', 'Gear Assigned'),
+        description: t('inventory.toast.assignDescription', 'Gear has been assigned to the employee.'),
       });
       setAssignEmployeeId("");
       setAssignQuantity("1");
@@ -671,8 +673,8 @@ export default function Inventory() {
     },
     onError: (error: any) => {
       toast({
-        title: "Error",
-        description: error.message || "Failed to assign gear",
+        title: t('common.error', 'Error'),
+        description: error.message || t('inventory.toast.assignError', 'Failed to assign gear'),
         variant: "destructive",
       });
     },
@@ -687,14 +689,14 @@ export default function Inventory() {
       queryClient.invalidateQueries({ queryKey: ["/api/gear-assignments"] });
       queryClient.invalidateQueries({ queryKey: ["/api/gear-items"] });
       toast({
-        title: "Assignment Removed",
-        description: "Gear assignment has been removed.",
+        title: t('inventory.toast.unassignSuccess', 'Assignment Removed'),
+        description: t('inventory.toast.unassignDescription', 'Gear assignment has been removed.'),
       });
     },
     onError: (error: any) => {
       toast({
-        title: "Error",
-        description: error.message || "Failed to remove assignment",
+        title: t('common.error', 'Error'),
+        description: error.message || t('inventory.toast.unassignError', 'Failed to remove assignment'),
         variant: "destructive",
       });
     },
@@ -714,8 +716,8 @@ export default function Inventory() {
       queryClient.invalidateQueries({ queryKey: ["/api/gear-assignments"] });
       queryClient.invalidateQueries({ queryKey: ["/api/gear-items"] });
       toast({
-        title: "Assignment Updated",
-        description: "Gear assignment has been updated.",
+        title: t('inventory.toast.assignmentUpdated', 'Assignment Updated'),
+        description: t('inventory.toast.assignmentUpdatedDescription', 'Gear assignment has been updated.'),
       });
       setShowEditAssignmentDialog(false);
       setEditingAssignment(null);
@@ -725,8 +727,8 @@ export default function Inventory() {
     },
     onError: (error: any) => {
       toast({
-        title: "Error",
-        description: error.message || "Failed to update assignment",
+        title: t('common.error', 'Error'),
+        description: error.message || t('inventory.toast.assignmentUpdateError', 'Failed to update assignment'),
         variant: "destructive",
       });
     },
@@ -748,8 +750,8 @@ export default function Inventory() {
       queryClient.invalidateQueries({ queryKey: ["/api/gear-items"] });
       queryClient.invalidateQueries({ queryKey: ["/api/gear"] });
       toast({
-        title: "Gear Added",
-        description: "Gear has been added to your equipment.",
+        title: t('inventory.toast.selfAssignSuccess', 'Gear Added'),
+        description: t('inventory.toast.selfAssignDescription', 'Gear has been added to your equipment.'),
       });
       setShowSelfAssignDialog(false);
       setSelfAssignItem(null);
@@ -763,8 +765,8 @@ export default function Inventory() {
     },
     onError: (error: any) => {
       toast({
-        title: "Error",
-        description: error.message || "Failed to add gear",
+        title: t('common.error', 'Error'),
+        description: error.message || t('inventory.toast.selfAssignError', 'Failed to add gear'),
         variant: "destructive",
       });
     },
@@ -779,14 +781,14 @@ export default function Inventory() {
       queryClient.invalidateQueries({ queryKey: ["/api/gear-assignments"] });
       queryClient.invalidateQueries({ queryKey: ["/api/gear-items"] });
       toast({
-        title: "Gear Removed",
-        description: "Gear has been removed from your equipment.",
+        title: t('inventory.toast.gearRemoved', 'Gear Removed'),
+        description: t('inventory.toast.gearRemovedDescription', 'Gear has been removed from your equipment.'),
       });
     },
     onError: (error: any) => {
       toast({
-        title: "Error",
-        description: error.message || "Failed to remove gear",
+        title: t('common.error', 'Error'),
+        description: error.message || t('inventory.toast.gearRemoveError', 'Failed to remove gear'),
         variant: "destructive",
       });
     },
@@ -810,8 +812,8 @@ export default function Inventory() {
       queryClient.invalidateQueries({ queryKey: ["/api/gear-assignments"] });
       queryClient.invalidateQueries({ queryKey: ["/api/gear-items"] });
       toast({
-        title: "Gear Updated",
-        description: "Your gear details have been updated.",
+        title: t('inventory.toast.gearUpdated', 'Gear Updated'),
+        description: t('inventory.toast.gearUpdatedDescription', 'Your gear details have been updated.'),
       });
       setShowEditMyGearDialog(false);
       setEditingMyAssignment(null);
@@ -821,8 +823,8 @@ export default function Inventory() {
     },
     onError: (error: any) => {
       toast({
-        title: "Error",
-        description: error.message || "Failed to update gear details",
+        title: t('common.error', 'Error'),
+        description: error.message || t('inventory.toast.gearUpdateError', 'Failed to update gear details'),
         variant: "destructive",
       });
     },
@@ -834,8 +836,8 @@ export default function Inventory() {
     
     if (!currentSerialNumber.trim()) {
       toast({
-        title: "Empty Serial Number",
-        description: "Please enter a serial number before adding.",
+        title: t('inventory.validation.emptySerialNumber', 'Empty Serial Number'),
+        description: t('inventory.validation.enterSerialNumber', 'Please enter a serial number before adding.'),
         variant: "destructive",
       });
       return;
@@ -844,8 +846,8 @@ export default function Inventory() {
     // Check for duplicate serial number
     if (serialEntries.some(entry => entry.serialNumber === currentSerialNumber.trim())) {
       toast({
-        title: "Duplicate Serial Number",
-        description: "This serial number has already been added.",
+        title: t('inventory.validation.duplicateSerialNumber', 'Duplicate Serial Number'),
+        description: t('inventory.validation.serialAlreadyAdded', 'This serial number has already been added.'),
         variant: "destructive",
       });
       return;
@@ -853,8 +855,8 @@ export default function Inventory() {
     
     if (maxSerials === 0) {
       toast({
-        title: "No Stock",
-        description: "Quantity is 0. Cannot add serial numbers.",
+        title: t('inventory.validation.noStock', 'No Stock'),
+        description: t('inventory.validation.quantityZero', 'Quantity is 0. Cannot add serial numbers.'),
         variant: "destructive",
       });
       return;
@@ -862,8 +864,8 @@ export default function Inventory() {
     
     if (serialEntries.length >= maxSerials) {
       toast({
-        title: "Limit Reached",
-        description: `Cannot add more than ${maxSerials} serial numbers.`,
+        title: t('inventory.validation.limitReached', 'Limit Reached'),
+        description: t('inventory.validation.maxSerialNumbers', 'Cannot add more than {{max}} serial numbers.', { max: maxSerials }),
         variant: "destructive",
       });
       return;
@@ -883,8 +885,8 @@ export default function Inventory() {
     setCurrentDateInService("");
     
     toast({
-      title: "Item Added",
-      description: `Added: ${currentSerialNumber.trim()}. Enter another or save.`,
+      title: t('inventory.toast.serialAdded', 'Item Added'),
+      description: t('inventory.toast.serialAddedDescription', 'Added: {{serial}}. Enter another or save.', { serial: currentSerialNumber.trim() }),
     });
   };
 
@@ -896,8 +898,8 @@ export default function Inventory() {
     // Guard: Only users with manage_inventory permission can add items
     if (!canManageInventory(currentUser)) {
       toast({
-        title: "Access Denied",
-        description: "You don't have permission to manage inventory",
+        title: t('common.accessDenied', 'Access Denied'),
+        description: t('inventory.permissions.noManageInventory', "You don't have permission to manage inventory"),
         variant: "destructive",
       });
       return;
@@ -930,8 +932,8 @@ export default function Inventory() {
     // Guard: Only users with manage_inventory permission can edit items
     if (!canManageInventory(currentUser)) {
       toast({
-        title: "Access Denied",
-        description: "You don't have permission to manage inventory",
+        title: t('common.accessDenied', 'Access Denied'),
+        description: t('inventory.permissions.noManageInventory', "You don't have permission to manage inventory"),
         variant: "destructive",
       });
       return;
@@ -988,8 +990,8 @@ export default function Inventory() {
     // Guard: Only users with assign_gear permission can open the assign dialog
     if (!canAssignGear(currentUser)) {
       toast({
-        title: "Access Denied",
-        description: "You don't have permission to assign gear",
+        title: t('common.accessDenied', 'Access Denied'),
+        description: t('inventory.permissions.noAssignGear', "You don't have permission to assign gear"),
         variant: "destructive",
       });
       return;
@@ -1013,8 +1015,8 @@ export default function Inventory() {
   const handleAssignGear = () => {
     if (!managingItem || !assignEmployeeId) {
       toast({
-        title: "Validation Error",
-        description: "Please select an employee",
+        title: t('common.validationError', 'Validation Error'),
+        description: t('inventory.validation.selectEmployee', 'Please select an employee'),
         variant: "destructive",
       });
       return;
@@ -1023,8 +1025,8 @@ export default function Inventory() {
     const quantity = parseInt(assignQuantity) || 0;
     if (quantity <= 0) {
       toast({
-        title: "Validation Error",
-        description: "Quantity must be greater than 0",
+        title: t('common.validationError', 'Validation Error'),
+        description: t('inventory.validation.quantityGreaterThanZero', 'Quantity must be greater than 0'),
         variant: "destructive",
       });
       return;
@@ -1033,8 +1035,8 @@ export default function Inventory() {
     const available = getAvailableQuantity(managingItem);
     if (quantity > available) {
       toast({
-        title: "Validation Error",
-        description: `Only ${available} items available`,
+        title: t('common.validationError', 'Validation Error'),
+        description: t('inventory.validation.onlyAvailable', 'Only {{count}} items available', { count: available }),
         variant: "destructive",
       });
       return;
@@ -1354,7 +1356,7 @@ export default function Inventory() {
             >
               <ArrowLeft className="h-5 w-5" />
             </Button>
-            <h1 className="text-xl font-bold tracking-tight">Inventory & Inspections</h1>
+            <h1 className="text-xl font-bold tracking-tight">{t('inventory.title', 'Inventory & Inspections')}</h1>
           </div>
         </div>
       </header>
@@ -1362,22 +1364,22 @@ export default function Inventory() {
       <div className="p-4 max-w-4xl mx-auto">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <TabsList className="flex flex-wrap w-full mb-4 h-auto gap-1 p-1">
-            <TabsTrigger value="my-gear" className="flex-1 min-w-fit" data-testid="tab-my-gear">My Gear</TabsTrigger>
+            <TabsTrigger value="my-gear" className="flex-1 min-w-fit" data-testid="tab-my-gear">{t('inventory.tabs.myGear', 'My Gear')}</TabsTrigger>
             {canViewGearAssignments(currentUser) && (
               <TabsTrigger value="team-gear" className="flex-1 min-w-fit" data-testid="tab-team-gear">
                 <Users className="h-4 w-4 mr-1" />
-                Team Gear
+                {t('inventory.tabs.teamGear', 'Team Gear')}
               </TabsTrigger>
             )}
             {canManageInventory(currentUser) && (
-              <TabsTrigger value="manage" className="flex-1 min-w-fit" data-testid="tab-manage-gear">Manage Gear</TabsTrigger>
+              <TabsTrigger value="manage" className="flex-1 min-w-fit" data-testid="tab-manage-gear">{t('inventory.tabs.manageGear', 'Manage Gear')}</TabsTrigger>
             )}
-            <TabsTrigger value="inspections" className="flex-1 min-w-fit" data-testid="tab-inspections">Inspections</TabsTrigger>
+            <TabsTrigger value="inspections" className="flex-1 min-w-fit" data-testid="tab-inspections">{t('inventory.tabs.inspections', 'Inspections')}</TabsTrigger>
             <TabsTrigger value="daily-harness" className="flex-1 min-w-fit" data-testid="tab-daily-harness">
-              Daily Harness Inspection
+              {t('inventory.tabs.dailyHarnessInspection', 'Daily Harness Inspection')}
             </TabsTrigger>
             <TabsTrigger value="report-damage" className="flex-1 min-w-fit" data-testid="tab-report-damage">
-              Report Damage
+              {t('inventory.tabs.reportDamage', 'Report Damage')}
             </TabsTrigger>
           </TabsList>
 
@@ -1386,15 +1388,15 @@ export default function Inventory() {
             {/* Header with Add Gear Button */}
             <div className="flex items-center justify-between gap-4">
               <div>
-                <h2 className="text-lg font-semibold">My Equipment</h2>
-                <p className="text-sm text-muted-foreground">Equipment assigned to you</p>
+                <h2 className="text-lg font-semibold">{t('inventory.myEquipment', 'My Equipment')}</h2>
+                <p className="text-sm text-muted-foreground">{t('inventory.equipmentAssignedToYou', 'Equipment assigned to you')}</p>
               </div>
               <Button
                 onClick={() => setShowSelfAssignDialog(true)}
                 data-testid="button-add-my-gear"
               >
                 <Plus className="h-4 w-4 mr-2" />
-                Add Gear
+                {t('inventory.addGear', 'Add Gear')}
               </Button>
             </div>
 
@@ -1406,9 +1408,9 @@ export default function Inventory() {
                     <div className="flex items-center gap-3">
                       <span className="material-icons text-primary text-2xl">info</span>
                       <div>
-                        <div className="font-semibold">Want to add new items to company inventory?</div>
+                        <div className="font-semibold">{t('inventory.wantToAddNew', 'Want to add new items to company inventory?')}</div>
                         <p className="text-sm text-muted-foreground">
-                          Switch to the "Manage Gear" tab to add new inventory items
+                          {t('inventory.switchToManageGear', 'Switch to the "Manage Gear" tab to add new inventory items')}
                         </p>
                       </div>
                     </div>
@@ -1418,7 +1420,7 @@ export default function Inventory() {
                       data-testid="button-go-to-manage"
                     >
                       <Plus className="h-4 w-4 mr-2" />
-                      Go to Manage Gear
+                      {t('inventory.goToManageGear', 'Go to Manage Gear')}
                     </Button>
                   </div>
                 </CardContent>
@@ -1431,9 +1433,9 @@ export default function Inventory() {
                   <div className="flex flex-col items-center gap-4">
                     <span className="material-icons text-5xl text-muted-foreground">inventory_2</span>
                     <div>
-                      <div className="font-semibold text-lg">No Gear Assigned</div>
+                      <div className="font-semibold text-lg">{t('inventory.empty.myGear', 'No Gear Assigned')}</div>
                       <p className="text-sm text-muted-foreground mt-1">
-                        You don't have any equipment assigned yet. Add gear from the company inventory.
+                        {t('inventory.empty.myGearDescription', "You don't have any equipment assigned yet. Add gear from the company inventory.")}
                       </p>
                     </div>
                     <Button
@@ -1441,7 +1443,7 @@ export default function Inventory() {
                       data-testid="button-add-gear-empty"
                     >
                       <Plus className="h-4 w-4 mr-2" />
-                      Add Gear from Inventory
+                      {t('inventory.addFromInventory', 'Add Gear from Inventory')}
                     </Button>
                   </div>
                 </CardContent>
@@ -1469,7 +1471,7 @@ export default function Inventory() {
                                 {item.equipmentType}
                                 {item.inService === false && (
                                   <Badge variant="destructive" className="text-xs">
-                                    Out of Service
+                                    {t('inventory.outOfService', 'Out of Service')}
                                   </Badge>
                                 )}
                               </div>
@@ -1532,7 +1534,7 @@ export default function Inventory() {
                                 data-testid={`button-add-details-${item.id}`}
                               >
                                 <Plus className="h-3 w-3 mr-1" />
-                                Add Serial Number & Dates
+                                {t('inventory.addSerialAndDates', 'Add Serial Number & Dates')}
                               </Button>
                             </div>
                           )}
@@ -1541,7 +1543,7 @@ export default function Inventory() {
                           <div className="grid grid-cols-2 gap-3 text-sm">
                             {myAssignment?.dateOfManufacture && (
                               <div>
-                                <span className="text-muted-foreground">Date of Manufacture:</span>
+                                <span className="text-muted-foreground">{t('inventory.dateOfManufacture', 'Date of Manufacture')}:</span>
                                 <div className="font-medium mt-0.5">
                                   {new Date(myAssignment.dateOfManufacture).toLocaleDateString()}
                                 </div>
@@ -1549,7 +1551,7 @@ export default function Inventory() {
                             )}
                             {myAssignment?.dateInService && (
                               <div>
-                                <span className="text-muted-foreground">Date In Service:</span>
+                                <span className="text-muted-foreground">{t('inventory.dateInService', 'Date In Service')}:</span>
                                 <div className="font-medium mt-0.5">
                                   {new Date(myAssignment.dateInService).toLocaleDateString()}
                                 </div>
@@ -1557,7 +1559,7 @@ export default function Inventory() {
                             )}
                             {myAssignment?.quantity && myAssignment.quantity > 1 && (
                               <div>
-                                <span className="text-muted-foreground">Quantity:</span>
+                                <span className="text-muted-foreground">{t('inventory.quantity', 'Quantity')}:</span>
                                 <div className="font-medium mt-0.5">
                                   {myAssignment.quantity}
                                 </div>
@@ -1565,7 +1567,7 @@ export default function Inventory() {
                             )}
                             {item.dateOutOfService && (
                               <div>
-                                <span className="text-muted-foreground">Out of Service:</span>
+                                <span className="text-muted-foreground">{t('inventory.outOfServiceDate', 'Out of Service')}:</span>
                                 <div className="font-medium mt-0.5">
                                   {new Date(item.dateOutOfService).toLocaleDateString()}
                                 </div>
@@ -1576,7 +1578,7 @@ export default function Inventory() {
                           {/* Notes */}
                           {item.notes && (
                             <div className="mt-3 pt-3 border-t">
-                              <div className="text-xs text-muted-foreground mb-1">Notes:</div>
+                              <div className="text-xs text-muted-foreground mb-1">{t('inventory.notes', 'Notes')}:</div>
                               <div className="text-sm">{item.notes}</div>
                             </div>
                           )}
@@ -1598,9 +1600,9 @@ export default function Inventory() {
                   <div className="flex items-center gap-3">
                     <span className="material-icons text-primary text-2xl">groups</span>
                     <div>
-                      <div className="font-semibold">Team Equipment Overview</div>
+                      <div className="font-semibold">{t('inventory.teamEquipmentOverview', 'Team Equipment Overview')}</div>
                       <p className="text-sm text-muted-foreground">
-                        View and manage gear assigned to all employees
+                        {t('inventory.teamEquipmentDescription', 'View and manage gear assigned to all employees')}
                       </p>
                     </div>
                   </div>
@@ -1614,9 +1616,9 @@ export default function Inventory() {
                     <div className="flex flex-col items-center gap-3">
                       <span className="material-icons text-5xl text-muted-foreground">people</span>
                       <div>
-                        <div className="font-semibold text-lg">No Employees</div>
+                        <div className="font-semibold text-lg">{t('inventory.noEmployees', 'No Employees')}</div>
                         <p className="text-sm text-muted-foreground mt-1">
-                          No employees found to display gear assignments.
+                          {t('inventory.noEmployeesDescription', 'No employees found to display gear assignments.')}
                         </p>
                       </div>
                     </div>
@@ -1644,12 +1646,12 @@ export default function Inventory() {
                               </div>
                               <div>
                                 <div className="font-semibold">{employee.name}</div>
-                                <div className="text-sm text-muted-foreground">{employee.role || 'Employee'}</div>
+                                <div className="text-sm text-muted-foreground">{employee.role || t('common.employee', 'Employee')}</div>
                               </div>
                             </div>
                             <div className="flex items-center gap-3">
                               <Badge variant={employeeAssignments.length > 0 ? "default" : "secondary"}>
-                                {totalAssignedItems} {totalAssignedItems === 1 ? 'item' : 'items'}
+                                {totalAssignedItems} {totalAssignedItems === 1 ? t('inventory.item', 'item') : t('inventory.items', 'items')}
                               </Badge>
                               <span className={`material-icons transition-transform ${isExpanded ? 'rotate-180' : ''}`}>
                                 expand_more
@@ -1663,7 +1665,7 @@ export default function Inventory() {
                               {employeeAssignments.length === 0 ? (
                                 <div className="text-center py-4 text-muted-foreground">
                                   <span className="material-icons text-3xl mb-2">inventory_2</span>
-                                  <p className="text-sm">No gear assigned to this employee</p>
+                                  <p className="text-sm">{t('inventory.noGearAssignedToEmployee', 'No gear assigned to this employee')}</p>
                                 </div>
                               ) : (
                                 employeeAssignments.map((assignment: GearAssignment) => {
@@ -1700,12 +1702,12 @@ export default function Inventory() {
                                             <div className="flex flex-wrap gap-2 mt-1">
                                               {assignment.dateOfManufacture && (
                                                 <span className="text-xs text-muted-foreground">
-                                                  Mfg: {new Date(assignment.dateOfManufacture).toLocaleDateString()}
+                                                  {t('inventory.mfg', 'Mfg')}: {new Date(assignment.dateOfManufacture).toLocaleDateString()}
                                                 </span>
                                               )}
                                               {assignment.dateInService && (
                                                 <span className="text-xs text-muted-foreground">
-                                                  In Service: {new Date(assignment.dateInService).toLocaleDateString()}
+                                                  {t('inventory.inService', 'In Service')}: {new Date(assignment.dateInService).toLocaleDateString()}
                                                 </span>
                                               )}
                                             </div>
@@ -1770,7 +1772,7 @@ export default function Inventory() {
                                   data-testid={`button-add-gear-${employee.id}`}
                                 >
                                   <Plus className="h-4 w-4 mr-2" />
-                                  Assign Gear to {employee.name}
+                                  {t('inventory.assignGearTo', 'Assign Gear to {{name}}', { name: employee.name })}
                                 </Button>
                               )}
                             </div>
@@ -1794,13 +1796,13 @@ export default function Inventory() {
                   <CardHeader className="pb-3">
                     <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
                       <span className="material-icons text-lg">inventory_2</span>
-                      Total Items
+                      {t('inventory.totalItems', 'Total Items')}
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
                     <div className="text-3xl font-bold">{totalAllItems}</div>
                     <p className="text-xs text-muted-foreground mt-1">
-                      Items in inventory
+                      {t('inventory.itemsInInventory', 'Items in inventory')}
                     </p>
                   </CardContent>
                 </Card>
@@ -1808,13 +1810,13 @@ export default function Inventory() {
                   <CardHeader className="pb-3">
                     <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
                       <span className="material-icons text-lg">attach_money</span>
-                      Total Value
+                      {t('inventory.totalValue', 'Total Value')}
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
                     <div className="text-3xl font-bold">${totalAllValue.toFixed(2)}</div>
                     <p className="text-xs text-muted-foreground mt-1">
-                      All inventory value
+                      {t('inventory.allInventoryValue', 'All inventory value')}
                     </p>
                   </CardContent>
                 </Card>
@@ -1829,8 +1831,8 @@ export default function Inventory() {
                     <Plus className="h-6 w-6 text-primary" />
                   </div>
                   <div>
-                    <CardTitle>Add Inventory Item</CardTitle>
-                    <CardDescription>Add new gear to the inventory system</CardDescription>
+                    <CardTitle>{t('inventory.addInventoryItem', 'Add Inventory Item')}</CardTitle>
+                    <CardDescription>{t('inventory.addInventoryDescription', 'Add new gear to the inventory system')}</CardDescription>
                   </div>
                 </div>
               </CardHeader>
@@ -1839,15 +1841,15 @@ export default function Inventory() {
             {/* View Inventory Section */}
             <Card>
               <CardHeader>
-                <CardTitle>All Inventory Items</CardTitle>
-                <CardDescription>View all gear items in the system</CardDescription>
+                <CardTitle>{t('inventory.allInventoryItems', 'All Inventory Items')}</CardTitle>
+                <CardDescription>{t('inventory.viewAllItems', 'View all gear items in the system')}</CardDescription>
               </CardHeader>
               <CardContent>
             {isLoading ? (
-              <div className="text-center py-8 text-muted-foreground">Loading inventory...</div>
+              <div className="text-center py-8 text-muted-foreground">{t('inventory.loading', 'Loading inventory...')}</div>
             ) : !gearData?.items || gearData.items.length === 0 ? (
               <div className="text-center py-8 text-muted-foreground">
-                No items in inventory yet. Click "Add Item to Inventory" to get started.
+                {t('inventory.empty.manageGear', 'No items in inventory yet. Click "Add Item to Inventory" to get started.')}
               </div>
             ) : (
               <div className="space-y-2">
@@ -1859,17 +1861,17 @@ export default function Inventory() {
                           <div>
                             <div className="font-semibold mb-1">{item.equipmentType || "Gear Item"}</div>
                             {item.brand && (
-                              <div className="text-sm text-muted-foreground">Brand: {item.brand}</div>
+                              <div className="text-sm text-muted-foreground">{t('inventory.brand', 'Brand')}: {item.brand}</div>
                             )}
                             {item.model && (
-                              <div className="text-sm text-muted-foreground">Model: {item.model}</div>
+                              <div className="text-sm text-muted-foreground">{t('inventory.model', 'Model')}: {item.model}</div>
                             )}
                             <div className="text-sm font-medium text-foreground mt-1">
-                              Quantity: {item.quantity || 1}
+                              {t('inventory.quantity', 'Quantity')}: {item.quantity || 1}
                             </div>
                             {item.serialNumbers && item.serialNumbers.length > 0 && (
                               <div className="text-sm text-muted-foreground space-y-0.5">
-                                <div className="font-medium">Serial Numbers:</div>
+                                <div className="font-medium">{t('inventory.serialNumbers', 'Serial Numbers')}:</div>
                                 {item.serialNumbers.map((sn, idx) => (
                                   <div key={idx} className="pl-2">• {sn}</div>
                                 ))}
@@ -1877,11 +1879,11 @@ export default function Inventory() {
                             )}
                             <div className="text-sm mt-2">
                               <div className="font-medium text-foreground">
-                                Available: {getAvailableQuantity(item)} / {item.quantity || 0}
+                                {t('inventory.available', 'Available')}: {getAvailableQuantity(item)} / {item.quantity || 0}
                               </div>
                               {getItemAssignments(item.id).length > 0 && (
                                 <div className="mt-1 space-y-1">
-                                  <div className="text-xs text-muted-foreground">Assigned:</div>
+                                  <div className="text-xs text-muted-foreground">{t('inventory.assigned', 'Assigned')}:</div>
                                   {getItemAssignments(item.id).map((assignment) => {
                                     const employee = activeEmployees.find(e => e.id === assignment.employeeId);
                                     return (
@@ -1918,7 +1920,7 @@ export default function Inventory() {
                             )}
                             {item.notes && (
                               <div className="text-sm text-muted-foreground">
-                                Notes: {item.notes}
+                                {t('inventory.notes', 'Notes')}: {item.notes}
                               </div>
                             )}
                           </div>
@@ -1974,10 +1976,10 @@ export default function Inventory() {
                   <div>
                     <CardTitle className="flex items-center gap-2">
                       <span className="material-icons">verified</span>
-                      Harness Inspection Tracking
+                      {t('inventory.harnessInspectionTracking', 'Harness Inspection Tracking')}
                     </CardTitle>
                     <CardDescription>
-                      Daily inspections for employees with work sessions
+                      {t('inventory.dailyInspectionsDescription', 'Daily inspections for employees with work sessions')}
                     </CardDescription>
                   </div>
                   <div className="flex gap-2">
@@ -1987,7 +1989,7 @@ export default function Inventory() {
                       onClick={() => setInspectionFilter("week")}
                       data-testid="filter-week-inspections"
                     >
-                      7 Days
+                      {t('inventory.filter.week', '7 Days')}
                     </Button>
                     <Button
                       variant={inspectionFilter === "month" ? "default" : "outline"}
@@ -1995,7 +1997,7 @@ export default function Inventory() {
                       onClick={() => setInspectionFilter("month")}
                       data-testid="filter-month-inspections"
                     >
-                      30 Days
+                      {t('inventory.filter.month', '30 Days')}
                     </Button>
                     <Button
                       variant={inspectionFilter === "all" ? "default" : "outline"}
@@ -2003,7 +2005,7 @@ export default function Inventory() {
                       onClick={() => setInspectionFilter("all")}
                       data-testid="filter-all-inspections"
                     >
-                      All Time
+                      {t('inventory.filter.allTime', 'All Time')}
                     </Button>
                     <Button
                       variant={inspectionFilter === "combined" ? "default" : "outline"}
@@ -2011,7 +2013,7 @@ export default function Inventory() {
                       onClick={() => setInspectionFilter("combined")}
                       data-testid="filter-combined-inspections"
                     >
-                      Overall
+                      {t('inventory.filter.overall', 'Overall')}
                     </Button>
                   </div>
                 </div>
@@ -2031,13 +2033,13 @@ export default function Inventory() {
                       <div className="flex items-center justify-between">
                         <div>
                           <div className="text-sm font-medium text-muted-foreground mb-1">
-                            Company Safety Rating
+                            {t('inventory.companySafetyRating', 'Company Safety Rating')}
                           </div>
                           <div className="text-xs text-muted-foreground">
-                            {inspectionFilter === "week" ? "Last 7 Days" : 
-                             inspectionFilter === "month" ? "Last 30 Days" : 
-                             inspectionFilter === "all" ? "All Time" :
-                             "Combined Overall (7d + 30d + All)"}
+                            {inspectionFilter === "week" ? t('inventory.filter.last7Days', 'Last 7 Days') : 
+                             inspectionFilter === "month" ? t('inventory.filter.last30Days', 'Last 30 Days') : 
+                             inspectionFilter === "all" ? t('inventory.filter.allTime', 'All Time') :
+                             t('inventory.filter.combinedOverall', 'Combined Overall (7d + 30d + All)')}
                           </div>
                         </div>
                         <div className="text-center">
@@ -2049,7 +2051,7 @@ export default function Inventory() {
                             {companySafetyRating}%
                           </div>
                           <div className="text-sm text-muted-foreground mt-1">
-                            Inspection Compliance
+                            {t('inventory.inspectionCompliance', 'Inspection Compliance')}
                           </div>
                         </div>
                       </div>
@@ -2069,7 +2071,7 @@ export default function Inventory() {
                   <table className="w-full">
                     <thead>
                       <tr className="border-b">
-                        <th className="text-left p-3 font-medium text-sm">Employee</th>
+                        <th className="text-left p-3 font-medium text-sm">{t('common.employee', 'Employee')}</th>
                         {inspectionDays.map((date, index) => (
                           <th key={index} className="text-center p-3 font-medium text-sm">
                             <div>{format(date, 'EEE')}</div>
@@ -2082,7 +2084,7 @@ export default function Inventory() {
                       {visibleEmployees.length === 0 ? (
                         <tr>
                           <td colSpan={inspectionDays.length + 1} className="text-center p-8 text-muted-foreground">
-                            No inspections found
+                            {t('inventory.noInspectionsFound', 'No inspections found')}
                           </td>
                         </tr>
                       ) : (
@@ -2144,30 +2146,30 @@ export default function Inventory() {
                 <div>
                   <CardTitle className="flex items-center gap-2">
                     <AlertTriangle className="h-5 w-5 text-orange-500" />
-                    Equipment Damage Reports
+                    {t('inventory.equipmentDamageReports', 'Equipment Damage Reports')}
                   </CardTitle>
-                  <CardDescription>Report damaged equipment and track repairs or retirements</CardDescription>
+                  <CardDescription>{t('inventory.damageReportsDescription', 'Report damaged equipment and track repairs or retirements')}</CardDescription>
                 </div>
                 <Button 
                   onClick={() => setShowDamageReportDialog(true)}
                   data-testid="button-report-damage"
                 >
                   <Plus className="h-4 w-4 mr-2" />
-                  Report Damage
+                  {t('inventory.reportDamage', 'Report Damage')}
                 </Button>
               </CardHeader>
               <CardContent>
                 {damageReportsLoading ? (
                   <div className="text-center py-8 text-muted-foreground">
-                    Loading damage reports...
+                    {t('inventory.loadingDamageReports', 'Loading damage reports...')}
                   </div>
                 ) : (damageReportsData?.reports || []).length === 0 ? (
                   <div className="text-center py-8 space-y-4">
                     <div className="flex flex-col items-center gap-2">
                       <FileWarning className="h-12 w-12 text-muted-foreground/50" />
-                      <p className="text-muted-foreground">No damage reports filed yet</p>
+                      <p className="text-muted-foreground">{t('inventory.empty.damageReports', 'No damage reports filed yet')}</p>
                       <p className="text-sm text-muted-foreground/70">
-                        Use this feature to document any equipment damage and track repairs or retirements
+                        {t('inventory.empty.damageReportsDescription', 'Use this feature to document any equipment damage and track repairs or retirements')}
                       </p>
                     </div>
                   </div>
@@ -2184,19 +2186,19 @@ export default function Inventory() {
                                   <span className="text-muted-foreground">- {report.equipmentBrand}</span>
                                 )}
                                 {report.equipmentRetired && (
-                                  <Badge variant="destructive" className="text-xs">Retired</Badge>
+                                  <Badge variant="destructive" className="text-xs">{t('inventory.retired', 'Retired')}</Badge>
                                 )}
                               </div>
                               <div className="text-sm text-muted-foreground">
                                 {report.serialNumber && <span>S/N: {report.serialNumber}</span>}
                               </div>
                               <div className="text-sm mt-2">
-                                <span className="font-medium">Damage: </span>
+                                <span className="font-medium">{t('inventory.damage', 'Damage')}: </span>
                                 {report.damageDescription}
                               </div>
                               {report.damageLocation && (
                                 <div className="text-sm text-muted-foreground">
-                                  <span className="font-medium">Location: </span>
+                                  <span className="font-medium">{t('inventory.location', 'Location')}: </span>
                                   {report.damageLocation}
                                 </div>
                               )}
@@ -2236,13 +2238,13 @@ export default function Inventory() {
                             <div className="mt-3 pt-3 border-t space-y-1">
                               {report.correctiveAction && (
                                 <div className="text-sm">
-                                  <span className="font-medium">Corrective Action: </span>
+                                  <span className="font-medium">{t('inventory.correctiveAction', 'Corrective Action')}: </span>
                                   {report.correctiveAction}
                                 </div>
                               )}
                               {report.retirementReason && (
                                 <div className="text-sm text-red-600 dark:text-red-400">
-                                  <span className="font-medium">Retirement Reason: </span>
+                                  <span className="font-medium">{t('inventory.retirementReason', 'Retirement Reason')}: </span>
                                   {report.retirementReason}
                                 </div>
                               )}
@@ -2263,9 +2265,9 @@ export default function Inventory() {
       <Dialog open={showAddDialog} onOpenChange={setShowAddDialog}>
         <DialogContent data-testid="dialog-add-item" className="max-w-2xl">
           <DialogHeader>
-            <DialogTitle>{addItemStep === 1 ? "Select Item Type" : "Add Item Details"}</DialogTitle>
+            <DialogTitle>{addItemStep === 1 ? t('inventory.dialog.selectItemType', 'Select Item Type') : t('inventory.dialog.addItemDetails', 'Add Item Details')}</DialogTitle>
             <DialogDescription>
-              {addItemStep === 1 ? "Choose the type of gear you're adding" : "Fill in the item information"}
+              {addItemStep === 1 ? t('inventory.dialog.chooseGearType', "Choose the type of gear you're adding") : t('inventory.dialog.fillItemInfo', 'Fill in the item information')}
             </DialogDescription>
           </DialogHeader>
           <Form {...form}>
@@ -2314,9 +2316,9 @@ export default function Inventory() {
 
                   {(form.watch("equipmentType") === "Other" || customType) && (
                     <div className="space-y-2">
-                      <FormLabel>Custom Type Name</FormLabel>
+                      <FormLabel>{t('inventory.customTypeName', 'Custom Type Name')}</FormLabel>
                       <Input
-                        placeholder="Enter custom gear type"
+                        placeholder={t('inventory.enterCustomGearType', 'Enter custom gear type')}
                         value={customType}
                         onChange={(e) => {
                           setCustomType(e.target.value);
@@ -2334,15 +2336,15 @@ export default function Inventory() {
                       className="flex-1"
                       data-testid="button-cancel-step1"
                     >
-                      Cancel
+                      {t('common.cancel', 'Cancel')}
                     </Button>
                     <Button
                       type="button"
                       onClick={() => {
                         if (!form.getValues("equipmentType")) {
                           toast({
-                            title: "Type Required",
-                            description: "Please select a gear type to continue.",
+                            title: t('inventory.validation.typeRequired', 'Type Required'),
+                            description: t('inventory.validation.selectGearType', 'Please select a gear type to continue.'),
                             variant: "destructive",
                           });
                           return;
@@ -2352,7 +2354,7 @@ export default function Inventory() {
                       className="flex-1"
                       data-testid="button-continue-step1"
                     >
-                      Continue
+                      {t('common.continue', 'Continue')}
                     </Button>
                   </div>
                 </>
@@ -2367,9 +2369,9 @@ export default function Inventory() {
                 name="brand"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Brand</FormLabel>
+                    <FormLabel>{t('inventory.brand', 'Brand')}</FormLabel>
                     <FormControl>
-                      <Input placeholder="e.g., Petzl" {...field} value={field.value || ""} data-testid="input-brand" />
+                      <Input placeholder={t('inventory.placeholders.brand', 'e.g., Petzl')} {...field} value={field.value || ""} data-testid="input-brand" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -2381,9 +2383,9 @@ export default function Inventory() {
                 name="model"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Model</FormLabel>
+                    <FormLabel>{t('inventory.model', 'Model')}</FormLabel>
                     <FormControl>
-                      <Input placeholder="e.g., I'D S" {...field} value={field.value || ""} data-testid="input-model" />
+                      <Input placeholder={t('inventory.placeholders.model', "e.g., I'D S")} {...field} value={field.value || ""} data-testid="input-model" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -2395,12 +2397,12 @@ export default function Inventory() {
                 name="quantity"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Quantity</FormLabel>
+                    <FormLabel>{t('inventory.quantity', 'Quantity')}</FormLabel>
                     <FormControl>
                       <Input
                         type="number"
                         min="0"
-                        placeholder="Enter quantity"
+                        placeholder={t('inventory.placeholders.quantity', 'Enter quantity')}
                         {...field}
                         value={field.value !== undefined && field.value !== null ? field.value : ""}
                         onChange={(e) => {
@@ -2423,13 +2425,13 @@ export default function Inventory() {
                     name="ropeLength"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Rope Length (feet)</FormLabel>
+                        <FormLabel>{t('inventory.ropeLength', 'Rope Length (feet)')}</FormLabel>
                         <FormControl>
                           <Input
                             type="number"
                             min="0"
                             step="0.01"
-                            placeholder="Enter rope length"
+                            placeholder={t('inventory.placeholders.ropeLength', 'Enter rope length')}
                             {...field}
                             value={field.value || ""}
                             data-testid="input-rope-length"
@@ -2445,13 +2447,13 @@ export default function Inventory() {
                     name="pricePerFeet"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Price Per Foot</FormLabel>
+                        <FormLabel>{t('inventory.pricePerFoot', 'Price Per Foot')}</FormLabel>
                         <FormControl>
                           <Input
                             type="number"
                             min="0"
                             step="0.01"
-                            placeholder="Enter price per foot"
+                            placeholder={t('inventory.placeholders.pricePerFoot', 'Enter price per foot')}
                             {...field}
                             value={field.value || ""}
                             data-testid="input-price-per-feet"
@@ -2463,14 +2465,14 @@ export default function Inventory() {
                   />
 
                   <div className="border-t pt-4 mt-4">
-                    <div className="text-sm font-medium mb-3">Assign to Employee (Optional)</div>
+                    <div className="text-sm font-medium mb-3">{t('inventory.assignToEmployee', 'Assign to Employee (Optional)')}</div>
                     
                     <div className="space-y-3">
                       <div className="space-y-2">
-                        <Label>Employee</Label>
+                        <Label>{t('common.employee', 'Employee')}</Label>
                         <Select value={assignEmployeeId} onValueChange={setAssignEmployeeId}>
                           <SelectTrigger data-testid="select-assign-employee-add">
-                            <SelectValue placeholder="Select employee" />
+                            <SelectValue placeholder={t('inventory.placeholders.selectEmployee', 'Select employee')} />
                           </SelectTrigger>
                           <SelectContent>
                             {activeEmployees
@@ -2486,18 +2488,18 @@ export default function Inventory() {
 
                       {assignEmployeeId && (
                         <div className="space-y-2">
-                          <Label>How Many to Assign</Label>
+                          <Label>{t('inventory.howManyToAssign', 'How Many to Assign')}</Label>
                           <Input
                             type="number"
                             min="1"
                             max={form.watch("quantity") || 1}
                             value={assignQuantity}
                             onChange={(e) => setAssignQuantity(e.target.value)}
-                            placeholder="Enter quantity"
+                            placeholder={t('inventory.placeholders.quantity', 'Enter quantity')}
                             data-testid="input-assign-quantity-add"
                           />
                           <div className="text-xs text-muted-foreground">
-                            Max: {form.watch("quantity") || 0}
+                            {t('inventory.max', 'Max')}: {form.watch("quantity") || 0}
                           </div>
                         </div>
                       )}
@@ -2514,12 +2516,12 @@ export default function Inventory() {
                     name="itemPrice"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Price</FormLabel>
+                        <FormLabel>{t('inventory.price', 'Price')}</FormLabel>
                         <FormControl>
                           <Input
                             type="number"
                             step="0.01"
-                            placeholder="0.00"
+                            placeholder={t('inventory.placeholders.price', '0.00')}
                             {...field}
                             value={field.value || ""}
                             data-testid="input-price"
@@ -2531,14 +2533,14 @@ export default function Inventory() {
                   />
 
                   <div className="border-t pt-4 mt-4">
-                    <div className="text-sm font-medium mb-3">Assign to Employee (Optional)</div>
+                    <div className="text-sm font-medium mb-3">{t('inventory.assignToEmployee', 'Assign to Employee (Optional)')}</div>
                     
                     <div className="space-y-3">
                       <div className="space-y-2">
-                        <Label>Employee</Label>
+                        <Label>{t('common.employee', 'Employee')}</Label>
                         <Select value={assignEmployeeId} onValueChange={setAssignEmployeeId}>
                           <SelectTrigger data-testid="select-assign-employee-add">
-                            <SelectValue placeholder="Select employee" />
+                            <SelectValue placeholder={t('inventory.placeholders.selectEmployee', 'Select employee')} />
                           </SelectTrigger>
                           <SelectContent>
                             {activeEmployees
@@ -2554,18 +2556,18 @@ export default function Inventory() {
 
                       {assignEmployeeId && (
                         <div className="space-y-2">
-                          <Label>How Many to Assign</Label>
+                          <Label>{t('inventory.howManyToAssign', 'How Many to Assign')}</Label>
                           <Input
                             type="number"
                             min="1"
                             max={form.watch("quantity") || 1}
                             value={assignQuantity}
                             onChange={(e) => setAssignQuantity(e.target.value)}
-                            placeholder="Enter quantity"
+                            placeholder={t('inventory.placeholders.quantity', 'Enter quantity')}
                             data-testid="input-assign-quantity-add"
                           />
                           <div className="text-xs text-muted-foreground">
-                            Max: {form.watch("quantity") || 0}
+                            {t('inventory.max', 'Max')}: {form.watch("quantity") || 0}
                           </div>
                         </div>
                       )}
@@ -2579,14 +2581,14 @@ export default function Inventory() {
                 <>
                   {/* Serial Number Entry with Per-Item Dates */}
                   <div className="space-y-3">
-                    <FormLabel>Add Individual Items (Optional)</FormLabel>
-                    <p className="text-xs text-muted-foreground">Enter serial number and dates for each item. All fields will reset after adding.</p>
+                    <FormLabel>{t('inventory.addIndividualItems', 'Add Individual Items (Optional)')}</FormLabel>
+                    <p className="text-xs text-muted-foreground">{t('inventory.addIndividualItemsDescription', 'Enter serial number and dates for each item. All fields will reset after adding.')}</p>
                     
                     <div className="space-y-3 p-3 bg-muted/20 rounded-md border border-dashed">
                       <div>
-                        <Label className="text-xs">Serial Number</Label>
+                        <Label className="text-xs">{t('inventory.serialNumber', 'Serial Number')}</Label>
                         <Input
-                          placeholder="Enter serial number"
+                          placeholder={t('inventory.placeholders.serialNumber', 'Enter serial number')}
                           value={currentSerialNumber}
                           onChange={(e) => setCurrentSerialNumber(e.target.value)}
                           data-testid="input-current-serial"
@@ -2595,7 +2597,7 @@ export default function Inventory() {
                       
                       <div className="grid grid-cols-2 gap-2">
                         <div>
-                          <Label className="text-xs">Date of Manufacture</Label>
+                          <Label className="text-xs">{t('inventory.dateOfManufacture', 'Date of Manufacture')}</Label>
                           <Input
                             type="date"
                             value={currentDateOfManufacture}
@@ -2604,7 +2606,7 @@ export default function Inventory() {
                           />
                         </div>
                         <div>
-                          <Label className="text-xs">Date In Service</Label>
+                          <Label className="text-xs">{t('inventory.dateInService', 'Date In Service')}</Label>
                           <Input
                             type="date"
                             value={currentDateInService}
@@ -2623,26 +2625,26 @@ export default function Inventory() {
                         className="w-full"
                       >
                         <Plus className="h-5 w-5 mr-2" />
-                        Add Item ({serialEntries.length}/{form.watch("quantity") || 1})
+                        {t('inventory.addItemCount', 'Add Item')} ({serialEntries.length}/{form.watch("quantity") || 1})
                       </Button>
                     </div>
 
                     {serialEntries.length > 0 && (
                       <div className="space-y-2 bg-muted/30 p-3 rounded-md">
-                        <div className="text-sm font-medium">Added Items:</div>
+                        <div className="text-sm font-medium">{t('inventory.addedItems', 'Added Items')}:</div>
                         {serialEntries.map((entry, index) => (
                           <div key={index} className="flex items-start justify-between text-sm p-2 bg-background rounded border">
                             <div className="flex-1">
                               <div className="font-medium">{entry.serialNumber}</div>
                               <div className="text-xs text-muted-foreground flex flex-wrap gap-2 mt-1">
                                 {entry.dateOfManufacture && (
-                                  <span>Mfg: {new Date(entry.dateOfManufacture).toLocaleDateString()}</span>
+                                  <span>{t('inventory.mfgAbbrev', 'Mfg')}: {new Date(entry.dateOfManufacture).toLocaleDateString()}</span>
                                 )}
                                 {entry.dateInService && (
-                                  <span>In Service: {new Date(entry.dateInService).toLocaleDateString()}</span>
+                                  <span>{t('inventory.inService', 'In Service')}: {new Date(entry.dateInService).toLocaleDateString()}</span>
                                 )}
                                 {!entry.dateOfManufacture && !entry.dateInService && (
-                                  <span className="italic">No dates set</span>
+                                  <span className="italic">{t('inventory.noDatesSet', 'No dates set')}</span>
                                 )}
                               </div>
                             </div>
@@ -2667,9 +2669,9 @@ export default function Inventory() {
                     name="notes"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Notes</FormLabel>
+                        <FormLabel>{t('inventory.notes', 'Notes')}</FormLabel>
                         <FormControl>
-                          <Textarea placeholder="Additional information..." {...field} value={field.value || ""} data-testid="textarea-notes" />
+                          <Textarea placeholder={t('inventory.placeholders.additionalInfo', 'Additional information...')} {...field} value={field.value || ""} data-testid="textarea-notes" />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -2682,12 +2684,12 @@ export default function Inventory() {
                       name="itemPrice"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Price</FormLabel>
+                          <FormLabel>{t('inventory.price', 'Price')}</FormLabel>
                           <FormControl>
                             <Input
                               type="number"
                               step="0.01"
-                              placeholder="0.00"
+                              placeholder={t('inventory.placeholders.price', '0.00')}
                               {...field}
                               value={field.value || ""}
                               data-testid="input-price"
@@ -2709,10 +2711,10 @@ export default function Inventory() {
                       onClick={() => setAddItemStep(1)}
                       data-testid="button-back-step2"
                     >
-                      Back
+                      {t('common.back', 'Back')}
                     </Button>
                     <Button type="submit" disabled={addItemMutation.isPending} data-testid="button-submit" className="flex-1">
-                      {addItemMutation.isPending ? "Adding..." : "Add Item"}
+                      {addItemMutation.isPending ? t('inventory.adding', 'Adding...') : t('inventory.addItem', 'Add Item')}
                     </Button>
                   </div>
                 </>
@@ -2726,8 +2728,8 @@ export default function Inventory() {
       <Dialog open={showEditDialog} onOpenChange={setShowEditDialog}>
         <DialogContent data-testid="dialog-edit-item">
           <DialogHeader>
-            <DialogTitle>Edit Inventory Item</DialogTitle>
-            <DialogDescription>Update the item details.</DialogDescription>
+            <DialogTitle>{t('inventory.dialog.editInventoryItem', 'Edit Inventory Item')}</DialogTitle>
+            <DialogDescription>{t('inventory.dialog.updateItemDetails', 'Update the item details.')}</DialogDescription>
           </DialogHeader>
           <Form {...form}>
             <form onSubmit={form.handleSubmit(handleEditItem)} className="space-y-4 max-h-[70vh] overflow-y-auto px-1">
@@ -2736,7 +2738,7 @@ export default function Inventory() {
                 name="equipmentType"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Type</FormLabel>
+                    <FormLabel>{t('inventory.type', 'Type')}</FormLabel>
                     <Select 
                       onValueChange={(value) => {
                         field.onChange(value);
@@ -2748,7 +2750,7 @@ export default function Inventory() {
                     >
                       <FormControl>
                         <SelectTrigger data-testid="select-item-type-edit">
-                          <SelectValue placeholder="Select gear type" />
+                          <SelectValue placeholder={t('inventory.placeholders.selectGearType', 'Select gear type')} />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
@@ -2766,9 +2768,9 @@ export default function Inventory() {
 
               {(form.watch("equipmentType") === "Other" || customType) && (
                 <div className="space-y-2">
-                  <FormLabel>Custom Type Name</FormLabel>
+                  <FormLabel>{t('inventory.customTypeName', 'Custom Type Name')}</FormLabel>
                   <Input
-                    placeholder="Enter custom gear type"
+                    placeholder={t('inventory.enterCustomGearType', 'Enter custom gear type')}
                     value={customType}
                     onChange={(e) => {
                       setCustomType(e.target.value);
@@ -2783,9 +2785,9 @@ export default function Inventory() {
                 name="brand"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Brand</FormLabel>
+                    <FormLabel>{t('inventory.brand', 'Brand')}</FormLabel>
                     <FormControl>
-                      <Input placeholder="e.g., Petzl" {...field} value={field.value || ""} data-testid="input-brand-edit" />
+                      <Input placeholder={t('inventory.placeholders.brand', 'e.g., Petzl')} {...field} value={field.value || ""} data-testid="input-brand-edit" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -2797,9 +2799,9 @@ export default function Inventory() {
                 name="model"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Model</FormLabel>
+                    <FormLabel>{t('inventory.model', 'Model')}</FormLabel>
                     <FormControl>
-                      <Input placeholder="e.g., I'D S" {...field} value={field.value || ""} data-testid="input-model-edit" />
+                      <Input placeholder={t('inventory.placeholders.model', "e.g., I'D S")} {...field} value={field.value || ""} data-testid="input-model-edit" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -2811,7 +2813,7 @@ export default function Inventory() {
                 name="quantity"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Quantity</FormLabel>
+                    <FormLabel>{t('inventory.quantity', 'Quantity')}</FormLabel>
                     <FormControl>
                       <Input
                         type="number"
@@ -2837,15 +2839,15 @@ export default function Inventory() {
                 name="assignedTo"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Assigned To</FormLabel>
+                    <FormLabel>{t('inventory.assignedTo', 'Assigned To')}</FormLabel>
                     <Select onValueChange={field.onChange} value={field.value || "Not in use"}>
                       <FormControl>
                         <SelectTrigger data-testid="select-assigned-to-edit">
-                          <SelectValue placeholder="Select employee or Not in use" />
+                          <SelectValue placeholder={t('inventory.placeholders.selectEmployeeOrNone', 'Select employee or Not in use')} />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        <SelectItem value="Not in use">Not in use</SelectItem>
+                        <SelectItem value="Not in use">{t('inventory.notInUse', 'Not in use')}</SelectItem>
                         {activeEmployees.filter((emp: any) => emp.name && emp.name.trim() !== "").map((emp: any) => (
                           <SelectItem key={emp.id} value={emp.name}>
                             {emp.name}
@@ -2860,14 +2862,14 @@ export default function Inventory() {
 
               {/* Serial Number Entry with Per-Item Dates */}
               <div className="space-y-3">
-                <FormLabel>Add Individual Items (Optional)</FormLabel>
-                <p className="text-xs text-muted-foreground">Enter serial number and dates for each item. All fields will reset after adding.</p>
+                <FormLabel>{t('inventory.addIndividualItems', 'Add Individual Items (Optional)')}</FormLabel>
+                <p className="text-xs text-muted-foreground">{t('inventory.addIndividualItemsDescription', 'Enter serial number and dates for each item. All fields will reset after adding.')}</p>
                 
                 <div className="space-y-3 p-3 bg-muted/20 rounded-md border border-dashed">
                   <div>
-                    <Label className="text-xs">Serial Number</Label>
+                    <Label className="text-xs">{t('inventory.serialNumber', 'Serial Number')}</Label>
                     <Input
-                      placeholder="Enter serial number"
+                      placeholder={t('inventory.placeholders.serialNumber', 'Enter serial number')}
                       value={currentSerialNumber}
                       onChange={(e) => setCurrentSerialNumber(e.target.value)}
                       data-testid="input-current-serial-edit"
@@ -2876,7 +2878,7 @@ export default function Inventory() {
                   
                   <div className="grid grid-cols-2 gap-2">
                     <div>
-                      <Label className="text-xs">Date of Manufacture</Label>
+                      <Label className="text-xs">{t('inventory.dateOfManufacture', 'Date of Manufacture')}</Label>
                       <Input
                         type="date"
                         value={currentDateOfManufacture}
@@ -2885,7 +2887,7 @@ export default function Inventory() {
                       />
                     </div>
                     <div>
-                      <Label className="text-xs">Date In Service</Label>
+                      <Label className="text-xs">{t('inventory.dateInService', 'Date In Service')}</Label>
                       <Input
                         type="date"
                         value={currentDateInService}
@@ -2904,27 +2906,27 @@ export default function Inventory() {
                     className="w-full"
                   >
                     <Plus className="h-5 w-5 mr-2" />
-                    Add Item ({serialEntries.length}/{form.watch("quantity") || 1})
+                    {t('inventory.addItemCount', 'Add Item')} ({serialEntries.length}/{form.watch("quantity") || 1})
                   </Button>
                 </div>
 
                 {/* Added Items List */}
                 {serialEntries.length > 0 && (
                   <div className="space-y-2 bg-muted/30 p-3 rounded-md">
-                    <div className="text-sm font-medium">Added Items:</div>
+                    <div className="text-sm font-medium">{t('inventory.addedItems', 'Added Items')}:</div>
                     {serialEntries.map((entry, index) => (
                       <div key={index} className="flex items-start justify-between text-sm p-2 bg-background rounded border">
                         <div className="flex-1">
                           <div className="font-medium">{entry.serialNumber}</div>
                           <div className="text-xs text-muted-foreground flex flex-wrap gap-2 mt-1">
                             {entry.dateOfManufacture && (
-                              <span>Mfg: {new Date(entry.dateOfManufacture).toLocaleDateString()}</span>
+                              <span>{t('inventory.mfgAbbrev', 'Mfg')}: {new Date(entry.dateOfManufacture).toLocaleDateString()}</span>
                             )}
                             {entry.dateInService && (
-                              <span>In Service: {new Date(entry.dateInService).toLocaleDateString()}</span>
+                              <span>{t('inventory.inService', 'In Service')}: {new Date(entry.dateInService).toLocaleDateString()}</span>
                             )}
                             {!entry.dateOfManufacture && !entry.dateInService && (
-                              <span className="italic">No dates set</span>
+                              <span className="italic">{t('inventory.noDatesSet', 'No dates set')}</span>
                             )}
                           </div>
                         </div>
@@ -2949,9 +2951,9 @@ export default function Inventory() {
                 name="notes"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Notes</FormLabel>
+                    <FormLabel>{t('inventory.notes', 'Notes')}</FormLabel>
                     <FormControl>
-                      <Textarea placeholder="Additional information..." {...field} value={field.value || ""} data-testid="textarea-notes-edit" />
+                      <Textarea placeholder={t('inventory.placeholders.additionalInfo', 'Additional information...')} {...field} value={field.value || ""} data-testid="textarea-notes-edit" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -2966,13 +2968,13 @@ export default function Inventory() {
                       name="ropeLength"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Rope Length (feet)</FormLabel>
+                          <FormLabel>{t('inventory.ropeLength', 'Rope Length (feet)')}</FormLabel>
                           <FormControl>
                             <Input
                               type="number"
                               min="0"
                               step="0.01"
-                              placeholder="Enter rope length"
+                              placeholder={t('inventory.placeholders.ropeLength', 'Enter rope length')}
                               {...field}
                               value={field.value || ""}
                               data-testid="input-rope-length-edit"
@@ -2988,13 +2990,13 @@ export default function Inventory() {
                       name="pricePerFeet"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Price Per Foot</FormLabel>
+                          <FormLabel>{t('inventory.pricePerFoot', 'Price Per Foot')}</FormLabel>
                           <FormControl>
                             <Input
                               type="number"
                               min="0"
                               step="0.01"
-                              placeholder="Enter price per foot"
+                              placeholder={t('inventory.placeholders.pricePerFoot', 'Enter price per foot')}
                               {...field}
                               value={field.value || ""}
                               data-testid="input-price-per-feet-edit"
@@ -3011,12 +3013,12 @@ export default function Inventory() {
                     name="itemPrice"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Price</FormLabel>
+                        <FormLabel>{t('inventory.price', 'Price')}</FormLabel>
                         <FormControl>
                           <Input
                             type="number"
                             step="0.01"
-                            placeholder="0.00"
+                            placeholder={t('inventory.placeholders.price', '0.00')}
                             {...field}
                             value={field.value || ""}
                             data-testid="input-price-edit"
@@ -3040,10 +3042,10 @@ export default function Inventory() {
                   }}
                   data-testid="button-cancel-edit"
                 >
-                  Cancel
+                  {t('common.cancel', 'Cancel')}
                 </Button>
                 <Button type="submit" disabled={updateItemMutation.isPending} data-testid="button-submit-edit">
-                  {updateItemMutation.isPending ? "Updating..." : "Update Item"}
+                  {updateItemMutation.isPending ? t('inventory.updating', 'Updating...') : t('inventory.updateItem', 'Update Item')}
                 </Button>
               </DialogFooter>
             </form>
@@ -3055,18 +3057,18 @@ export default function Inventory() {
       <Dialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
         <DialogContent data-testid="dialog-delete-item">
           <DialogHeader>
-            <DialogTitle>Delete Item</DialogTitle>
+            <DialogTitle>{t('inventory.dialog.deleteItem', 'Delete Item')}</DialogTitle>
             <DialogDescription>
-              Are you sure you want to delete this item from inventory? This action cannot be undone.
+              {t('inventory.dialog.deleteItemConfirmation', 'Are you sure you want to delete this item from inventory? This action cannot be undone.')}
             </DialogDescription>
           </DialogHeader>
           {itemToDelete && (
             <div className="py-4">
               <div className="space-y-1">
-                <div className="font-medium">{itemToDelete.equipmentType || "Gear Item"}</div>
-                {itemToDelete.brand && <div className="text-sm text-muted-foreground">Brand: {itemToDelete.brand}</div>}
-                {itemToDelete.model && <div className="text-sm text-muted-foreground">Model: {itemToDelete.model}</div>}
-                <div className="text-sm text-muted-foreground">Quantity: {itemToDelete.quantity || 1}</div>
+                <div className="font-medium">{itemToDelete.equipmentType || t('inventory.gearItem', 'Gear Item')}</div>
+                {itemToDelete.brand && <div className="text-sm text-muted-foreground">{t('inventory.brand', 'Brand')}: {itemToDelete.brand}</div>}
+                {itemToDelete.model && <div className="text-sm text-muted-foreground">{t('inventory.model', 'Model')}: {itemToDelete.model}</div>}
+                <div className="text-sm text-muted-foreground">{t('inventory.quantity', 'Quantity')}: {itemToDelete.quantity || 1}</div>
               </div>
             </div>
           )}
@@ -3080,7 +3082,7 @@ export default function Inventory() {
               }}
               data-testid="button-cancel-delete"
             >
-              Cancel
+              {t('common.cancel', 'Cancel')}
             </Button>
             <Button
               variant="destructive"
@@ -3088,7 +3090,7 @@ export default function Inventory() {
               disabled={deleteItemMutation.isPending}
               data-testid="button-confirm-delete"
             >
-              {deleteItemMutation.isPending ? "Deleting..." : "Delete Item"}
+              {deleteItemMutation.isPending ? t('inventory.deleting', 'Deleting...') : t('inventory.dialog.deleteItem', 'Delete Item')}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -3098,9 +3100,9 @@ export default function Inventory() {
       <Dialog open={showAssignDialog} onOpenChange={setShowAssignDialog}>
         <DialogContent data-testid="dialog-assign-gear">
           <DialogHeader>
-            <DialogTitle>Assign Gear to Employee</DialogTitle>
+            <DialogTitle>{t('inventory.dialog.assignGear', 'Assign Gear to Employee')}</DialogTitle>
             <DialogDescription>
-              Manage who this gear item is assigned to
+              {t('inventory.dialog.assignGearDescription', 'Manage who this gear item is assigned to')}
             </DialogDescription>
           </DialogHeader>
           
@@ -3115,22 +3117,22 @@ export default function Inventory() {
                   </div>
                 )}
                 <div className="text-sm text-muted-foreground mt-1">
-                  Available: {getAvailableQuantity(managingItem)} / {managingItem.quantity || 0}
+                  {t('inventory.available', 'Available')}: {getAvailableQuantity(managingItem)} / {managingItem.quantity || 0}
                 </div>
               </div>
 
               {/* Current Assignments */}
               {getItemAssignments(managingItem.id).length > 0 && (
                 <div>
-                  <div className="text-sm font-medium mb-2">Current Assignments:</div>
+                  <div className="text-sm font-medium mb-2">{t('inventory.currentAssignments', 'Current Assignments')}:</div>
                   <div className="space-y-2">
                     {getItemAssignments(managingItem.id).map((assignment) => {
                       const employee = activeEmployees.find(e => e.id === assignment.employeeId);
                       return (
                         <div key={assignment.id} className="flex items-center justify-between p-2 bg-muted/30 rounded">
                           <div className="text-sm">
-                            <div className="font-medium">{employee?.name || "Unknown"}</div>
-                            <div className="text-xs text-muted-foreground">Quantity: {assignment.quantity}</div>
+                            <div className="font-medium">{employee?.name || t('common.unknown', 'Unknown')}</div>
+                            <div className="text-xs text-muted-foreground">{t('inventory.quantity', 'Quantity')}: {assignment.quantity}</div>
                             {assignment.serialNumber && (
                               <div className="text-xs text-muted-foreground">S/N: {assignment.serialNumber}</div>
                             )}
@@ -3143,7 +3145,7 @@ export default function Inventory() {
                             data-testid={`button-remove-assignment-${assignment.id}`}
                           >
                             <Trash2 className="h-3 w-3 mr-1" />
-                            Remove
+                            {t('common.remove', 'Remove')}
                           </Button>
                         </div>
                       );
@@ -3154,14 +3156,14 @@ export default function Inventory() {
 
               {/* Add Assignment Form */}
               <div className="border-t pt-4 space-y-3">
-                <div className="text-sm font-medium">Assign to New Employee:</div>
+                <div className="text-sm font-medium">{t('inventory.assignToNewEmployee', 'Assign to New Employee')}:</div>
                 
                 <div className="space-y-2">
-                  <Label htmlFor="assign-employee">Employee</Label>
+                  <Label htmlFor="assign-employee">{t('common.employee', 'Employee')}</Label>
                   {canAssignToOthers ? (
                     <Select value={assignEmployeeId} onValueChange={setAssignEmployeeId}>
                       <SelectTrigger data-testid="select-assign-employee">
-                        <SelectValue placeholder="Select employee" />
+                        <SelectValue placeholder={t('inventory.placeholders.selectEmployee', 'Select employee')} />
                       </SelectTrigger>
                       <SelectContent>
                         {activeEmployees
@@ -3175,19 +3177,19 @@ export default function Inventory() {
                     </Select>
                   ) : (
                     <div className="flex items-center gap-2 p-2 bg-muted/50 rounded-md border">
-                      <span className="text-sm font-medium">{currentUser?.name || currentUser?.email || "You"}</span>
-                      <Badge variant="secondary" className="text-xs">Yourself</Badge>
+                      <span className="text-sm font-medium">{currentUser?.name || currentUser?.email || t('common.you', 'You')}</span>
+                      <Badge variant="secondary" className="text-xs">{t('inventory.yourself', 'Yourself')}</Badge>
                     </div>
                   )}
                   {!canAssignToOthers && (
                     <p className="text-xs text-muted-foreground">
-                      You can only assign gear to yourself. Contact management to assign gear to other employees.
+                      {t('inventory.canOnlyAssignToSelf', 'You can only assign gear to yourself. Contact management to assign gear to other employees.')}
                     </p>
                   )}
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="assign-quantity">Quantity</Label>
+                  <Label htmlFor="assign-quantity">{t('inventory.quantity', 'Quantity')}</Label>
                   <Input
                     id="assign-quantity"
                     type="number"
@@ -3195,11 +3197,11 @@ export default function Inventory() {
                     max={getAvailableQuantity(managingItem)}
                     value={assignQuantity}
                     onChange={(e) => setAssignQuantity(e.target.value)}
-                    placeholder="Enter quantity"
+                    placeholder={t('inventory.placeholders.quantity', 'Enter quantity')}
                     data-testid="input-assign-quantity"
                   />
                   <div className="text-xs text-muted-foreground">
-                    Max available: {getAvailableQuantity(managingItem)}
+                    {t('inventory.maxAvailable', 'Max available')}: {getAvailableQuantity(managingItem)}
                   </div>
                 </div>
 
@@ -3225,7 +3227,7 @@ export default function Inventory() {
                             className="flex-1"
                             data-testid="button-assign-serial-mode-pick"
                           >
-                            Pick Existing ({availableSerials.length})
+                            {t('inventory.pickExisting', 'Pick Existing')} ({availableSerials.length})
                           </Button>
                           <Button
                             size="sm"
@@ -3237,13 +3239,13 @@ export default function Inventory() {
                             className="flex-1"
                             data-testid="button-assign-serial-mode-new"
                           >
-                            Enter New
+                            {t('inventory.enterNew', 'Enter New')}
                           </Button>
                         </div>
 
                         {assignSerialMode === "pick" ? (
                           <div className="space-y-2">
-                            <Label>Available Serial Numbers</Label>
+                            <Label>{t('inventory.availableSerialNumbers', 'Available Serial Numbers')}</Label>
                             <div className="space-y-1 max-h-32 overflow-y-auto border rounded-md p-2">
                               {availableSerials.map((serial: any) => (
                                 <div
@@ -3263,7 +3265,7 @@ export default function Inventory() {
                                   <div className="flex items-center justify-between">
                                     <div className="font-mono text-sm font-medium">{serial.serialNumber}</div>
                                     {selectedAssignSerialEntry?.id === serial.id && (
-                                      <Badge variant="default" className="text-xs">Selected</Badge>
+                                      <Badge variant="default" className="text-xs">{t('inventory.selected', 'Selected')}</Badge>
                                     )}
                                   </div>
                                   {(serial.dateOfManufacture || serial.dateInService) && (
@@ -3281,25 +3283,25 @@ export default function Inventory() {
                             </div>
                             {selectedAssignSerialEntry && (
                               <div className="text-sm text-muted-foreground">
-                                Selected: <span className="font-mono font-medium">{selectedAssignSerialEntry.serialNumber}</span>
+                                {t('inventory.selected', 'Selected')}: <span className="font-mono font-medium">{selectedAssignSerialEntry.serialNumber}</span>
                               </div>
                             )}
                           </div>
                         ) : (
                           <div className="space-y-3">
                             <div className="space-y-2">
-                              <Label htmlFor="assign-serial-number">Serial Number (Optional)</Label>
+                              <Label htmlFor="assign-serial-number">{t('inventory.serialNumberOptional', 'Serial Number (Optional)')}</Label>
                               <Input
                                 id="assign-serial-number"
                                 type="text"
                                 value={assignSerialNumber}
                                 onChange={(e) => setAssignSerialNumber(e.target.value)}
-                                placeholder="Enter new serial number"
+                                placeholder={t('inventory.placeholders.enterNewSerialNumber', 'Enter new serial number')}
                                 data-testid="input-assign-serial-number"
                               />
                             </div>
                             <div className="space-y-2">
-                              <Label htmlFor="assign-date-of-manufacture">Date of Manufacture (Optional)</Label>
+                              <Label htmlFor="assign-date-of-manufacture">{t('inventory.dateOfManufactureOptional', 'Date of Manufacture (Optional)')}</Label>
                               <Input
                                 id="assign-date-of-manufacture"
                                 type="date"
@@ -3309,7 +3311,7 @@ export default function Inventory() {
                               />
                             </div>
                             <div className="space-y-2">
-                              <Label htmlFor="assign-date-in-service">Date In Service (Optional)</Label>
+                              <Label htmlFor="assign-date-in-service">{t('inventory.dateInServiceOptional', 'Date In Service (Optional)')}</Label>
                               <Input
                                 id="assign-date-in-service"
                                 type="date"
@@ -3328,21 +3330,21 @@ export default function Inventory() {
                   return (
                     <div className="space-y-3">
                       <div className="space-y-2">
-                        <Label htmlFor="assign-serial-number">Serial Number (Optional)</Label>
+                        <Label htmlFor="assign-serial-number">{t('inventory.serialNumberOptional', 'Serial Number (Optional)')}</Label>
                         <Input
                           id="assign-serial-number"
                           type="text"
                           value={assignSerialNumber}
                           onChange={(e) => setAssignSerialNumber(e.target.value)}
-                          placeholder="Enter serial number of assigned gear"
+                          placeholder={t('inventory.placeholders.enterSerialNumber', 'Enter serial number of assigned gear')}
                           data-testid="input-assign-serial-number"
                         />
                         <div className="text-xs text-muted-foreground">
-                          Enter the serial number of the specific gear item being assigned
+                          {t('inventory.enterSerialNumberHelp', 'Enter the serial number of the specific gear item being assigned')}
                         </div>
                       </div>
                       <div className="space-y-2">
-                        <Label htmlFor="assign-date-of-manufacture">Date of Manufacture (Optional)</Label>
+                        <Label htmlFor="assign-date-of-manufacture">{t('inventory.dateOfManufactureOptional', 'Date of Manufacture (Optional)')}</Label>
                         <Input
                           id="assign-date-of-manufacture"
                           type="date"
@@ -3352,7 +3354,7 @@ export default function Inventory() {
                         />
                       </div>
                       <div className="space-y-2">
-                        <Label htmlFor="assign-date-in-service">Date In Service (Optional)</Label>
+                        <Label htmlFor="assign-date-in-service">{t('inventory.dateInServiceOptional', 'Date In Service (Optional)')}</Label>
                         <Input
                           id="assign-date-in-service"
                           type="date"
@@ -3385,14 +3387,14 @@ export default function Inventory() {
               }}
               data-testid="button-cancel-assign"
             >
-              Close
+              {t('common.close', 'Close')}
             </Button>
             <Button
               onClick={handleAssignGear}
               disabled={createAssignmentMutation.isPending || !assignEmployeeId}
               data-testid="button-submit-assign"
             >
-              {createAssignmentMutation.isPending ? "Assigning..." : "Assign Gear"}
+              {createAssignmentMutation.isPending ? t('inventory.assigning', 'Assigning...') : t('inventory.assignGear', 'Assign Gear')}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -3404,10 +3406,10 @@ export default function Inventory() {
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <Pencil className="h-5 w-5" />
-              Edit Gear Assignment
+              {t('inventory.dialog.editGearAssignment', 'Edit Gear Assignment')}
             </DialogTitle>
             <DialogDescription>
-              Update the details for this gear assignment.
+              {t('inventory.dialog.updateAssignmentDetails', 'Update the details for this gear assignment.')}
             </DialogDescription>
           </DialogHeader>
           
@@ -3415,9 +3417,9 @@ export default function Inventory() {
             <div className="space-y-4 py-4">
               {/* Gear Info */}
               <div className="p-3 bg-muted/50 rounded-lg">
-                <div className="text-sm text-muted-foreground">Assigned Gear</div>
+                <div className="text-sm text-muted-foreground">{t('inventory.assignedGear', 'Assigned Gear')}</div>
                 <div className="font-medium">
-                  {allGearItems.find(g => g.id === editingAssignment.gearItemId)?.equipmentType || 'Unknown'}
+                  {allGearItems.find(g => g.id === editingAssignment.gearItemId)?.equipmentType || t('common.unknown', 'Unknown')}
                 </div>
                 {(() => {
                   const item = allGearItems.find(g => g.id === editingAssignment.gearItemId);
@@ -3431,7 +3433,7 @@ export default function Inventory() {
 
               {/* Quantity */}
               <div className="space-y-2">
-                <Label htmlFor="editQuantity">Quantity</Label>
+                <Label htmlFor="editQuantity">{t('inventory.quantity', 'Quantity')}</Label>
                 <Input
                   id="editQuantity"
                   type="number"
@@ -3444,20 +3446,20 @@ export default function Inventory() {
 
               {/* Serial Number */}
               <div className="space-y-2">
-                <Label htmlFor="editSerialNumber">Serial Number (Optional)</Label>
+                <Label htmlFor="editSerialNumber">{t('inventory.serialNumberOptional', 'Serial Number (Optional)')}</Label>
                 <Input
                   id="editSerialNumber"
                   type="text"
                   value={editAssignmentSerialNumber}
                   onChange={(e) => setEditAssignmentSerialNumber(e.target.value)}
-                  placeholder="Enter serial number"
+                  placeholder={t('inventory.placeholders.serialNumber', 'Enter serial number')}
                   data-testid="input-edit-assignment-serial-number"
                 />
               </div>
 
               {/* Date of Manufacture */}
               <div className="space-y-2">
-                <Label htmlFor="editDateOfManufacture">Date of Manufacture (Optional)</Label>
+                <Label htmlFor="editDateOfManufacture">{t('inventory.dateOfManufactureOptional', 'Date of Manufacture (Optional)')}</Label>
                 <Input
                   id="editDateOfManufacture"
                   type="date"
@@ -3469,7 +3471,7 @@ export default function Inventory() {
 
               {/* Date In Service */}
               <div className="space-y-2">
-                <Label htmlFor="editDateInService">Date In Service (Optional)</Label>
+                <Label htmlFor="editDateInService">{t('inventory.dateInServiceOptional', 'Date In Service (Optional)')}</Label>
                 <Input
                   id="editDateInService"
                   type="date"
@@ -3493,7 +3495,7 @@ export default function Inventory() {
               }}
               data-testid="button-cancel-edit-assignment"
             >
-              Cancel
+              {t('common.cancel', 'Cancel')}
             </Button>
             <Button
               onClick={() => {
@@ -3510,7 +3512,7 @@ export default function Inventory() {
               disabled={updateAssignmentMutation.isPending}
               data-testid="button-save-edit-assignment"
             >
-              {updateAssignmentMutation.isPending ? "Saving..." : "Save Changes"}
+              {updateAssignmentMutation.isPending ? t('common.saving', 'Saving...') : t('common.saveChanges', 'Save Changes')}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -3532,9 +3534,9 @@ export default function Inventory() {
       }}>
         <DialogContent data-testid="dialog-self-assign-gear" className="max-w-lg max-h-[85vh] overflow-hidden flex flex-col">
           <DialogHeader>
-            <DialogTitle>Add Gear to My Equipment</DialogTitle>
+            <DialogTitle>{t('inventory.dialog.addGearToMyEquipment', 'Add Gear to My Equipment')}</DialogTitle>
             <DialogDescription>
-              Select gear from the company inventory to add to your equipment
+              {t('inventory.dialog.selectGearFromInventory', 'Select gear from the company inventory to add to your equipment')}
             </DialogDescription>
           </DialogHeader>
           
@@ -3542,7 +3544,7 @@ export default function Inventory() {
             {/* Search */}
             <div>
               <Input
-                placeholder="Search inventory..."
+                placeholder={t('inventory.placeholders.searchInventory', 'Search inventory...')}
                 value={selfAssignSearch}
                 onChange={(e) => setSelfAssignSearch(e.target.value)}
                 data-testid="input-self-assign-search"
@@ -3564,7 +3566,7 @@ export default function Inventory() {
                 if (availableItems.length === 0) {
                   return (
                     <div className="text-center py-8 text-muted-foreground">
-                      {selfAssignSearch ? "No matching items found" : "No items available in inventory"}
+                      {selfAssignSearch ? t('inventory.noMatchingItemsFound', 'No matching items found') : t('inventory.noItemsAvailable', 'No items available in inventory')}
                     </div>
                   );
                 }

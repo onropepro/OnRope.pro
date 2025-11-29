@@ -1,5 +1,6 @@
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useParams, useLocation } from "wouter";
+import { useTranslation } from "react-i18next";
 import { queryClient } from "@/lib/queryClient";
 import { hasFinancialAccess, isManagement as checkIsManagement, hasPermission, canViewSafetyDocuments } from "@/lib/permissions";
 import { Button } from "@/components/ui/button";
@@ -50,6 +51,7 @@ export default function ProjectDetail() {
   const { id } = useParams();
   const [, setLocation] = useLocation();
   const { toast } = useToast();
+  const { t } = useTranslation();
   const [renderError, setRenderError] = useState<Error | null>(null);
 
   // Catch any render errors
@@ -67,13 +69,13 @@ export default function ProjectDetail() {
     return (
       <div className="min-h-screen bg-red-50 p-4">
         <div className="max-w-4xl mx-auto bg-white rounded-lg shadow-lg p-6">
-          <h1 className="text-2xl font-bold text-red-600 mb-4">🚨 Error Detected</h1>
+          <h1 className="text-2xl font-bold text-red-600 mb-4">{t('projectDetail.error.detected', 'Error Detected')}</h1>
           <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
-            <p className="font-bold">Error Message:</p>
+            <p className="font-bold">{t('projectDetail.error.message', 'Error Message:')}</p>
             <p className="font-mono text-sm">{renderError.message}</p>
           </div>
           <div className="bg-muted p-4 rounded">
-            <p className="font-bold mb-2">Stack Trace:</p>
+            <p className="font-bold mb-2">{t('projectDetail.error.stackTrace', 'Stack Trace:')}</p>
             <pre className="text-xs overflow-auto">{renderError.stack}</pre>
           </div>
           <button
@@ -83,7 +85,7 @@ export default function ProjectDetail() {
             }}
             className="mt-4 bg-primary text-white px-4 py-2 rounded hover:bg-primary/90"
           >
-            Reload Page
+            {t('projectDetail.error.reloadPage', 'Reload Page')}
           </button>
         </div>
       </div>
@@ -184,12 +186,12 @@ export default function ProjectDetail() {
   useEffect(() => {
     if (photosError) {
       toast({
-        title: "Failed to load photos",
-        description: photosErrorMsg instanceof Error ? photosErrorMsg.message : "Could not load project photos",
+        title: t('projectDetail.toasts.failedToLoadPhotos', 'Failed to load photos'),
+        description: photosErrorMsg instanceof Error ? photosErrorMsg.message : t('projectDetail.toasts.failedToLoadPhotos', 'Could not load project photos'),
         variant: "destructive"
       });
     }
-  }, [photosError, photosErrorMsg, toast]);
+  }, [photosError, photosErrorMsg, toast, t]);
 
   // Fetch toolbox meetings for this project
   const { data: toolboxMeetingsData } = useQuery({
@@ -293,8 +295,8 @@ export default function ProjectDetail() {
       } catch (error) {
         console.warn("⚠️ Could not get location for clock-in:", error);
         toast({ 
-          title: "Location Unavailable", 
-          description: "Could not capture your location for clock-in. Session will be saved without GPS data.",
+          title: t('projectDetail.toasts.locationUnavailable', 'Location Unavailable'), 
+          description: t('projectDetail.toasts.locationUnavailableDesc', 'Could not capture your location for clock-in/clock-out. Location tracking may be limited.'),
           variant: "destructive"
         });
         // Continue without location if unavailable
@@ -328,10 +330,10 @@ export default function ProjectDetail() {
       queryClient.invalidateQueries({ queryKey: ["/api/projects", id] });
       queryClient.invalidateQueries({ queryKey: ["/api/projects", id, "work-sessions"] });
       queryClient.invalidateQueries({ queryKey: ["/api/my-drops-today"] });
-      toast({ title: "Work session started", description: "Good luck today!" });
+      toast({ title: t('projectDetail.toasts.sessionStarted', 'Work session started'), description: t('projectDetail.toasts.goodLuck', 'Good luck today!') });
     },
     onError: (error: Error) => {
-      toast({ title: "Error", description: error.message, variant: "destructive" });
+      toast({ title: t('projectDetail.toasts.error', 'Error'), description: error.message, variant: "destructive" });
     },
   });
 
@@ -351,8 +353,8 @@ export default function ProjectDetail() {
       } catch (error) {
         console.warn("⚠️ Could not get location for clock-out:", error);
         toast({ 
-          title: "Location Unavailable", 
-          description: "Could not capture your location for clock-out. Session will be saved without GPS data.",
+          title: t('projectDetail.toasts.locationUnavailable', 'Location Unavailable'), 
+          description: t('projectDetail.toasts.locationUnavailableDesc', 'Could not capture your location for clock-in/clock-out. Location tracking may be limited.'),
           variant: "destructive"
         });
         // Continue without location if unavailable
@@ -422,11 +424,11 @@ export default function ProjectDetail() {
       if (currentUser?.role === "rope_access_tech" || currentUser?.irataLevel) {
         setShowLogHoursPrompt(true);
       } else {
-        toast({ title: "Work session ended", description: "Great work today!" });
+        toast({ title: t('projectDetail.toasts.sessionEnded', 'Work session ended'), description: t('projectDetail.toasts.greatWork', 'Great work today!') });
       }
     },
     onError: (error: Error) => {
-      toast({ title: "Error", description: error.message, variant: "destructive" });
+      toast({ title: t('projectDetail.toasts.error', 'Error'), description: error.message, variant: "destructive" });
     },
   });
 
@@ -445,17 +447,17 @@ export default function ProjectDetail() {
       setSelectedIrataTasks([]);
       setIrataTaskNotes("");
       setEndedSessionData(null);
-      toast({ title: "Work session ended", description: "Your IRATA tasks have been logged!" });
+      toast({ title: t('projectDetail.toasts.sessionEnded', 'Work session ended'), description: t('projectDetail.toasts.irataTasksLogged', 'IRATA tasks logged successfully') });
     },
     onError: (error: Error) => {
-      toast({ title: "Error saving tasks", description: error.message, variant: "destructive" });
+      toast({ title: t('projectDetail.toasts.error', 'Error'), description: error.message, variant: "destructive" });
     },
   });
 
   // Handle IRATA task log submission
   const handleSaveIrataTasks = () => {
     if (!endedSessionData || selectedIrataTasks.length === 0) {
-      toast({ title: "Select tasks", description: "Please select at least one task you performed", variant: "destructive" });
+      toast({ title: t('projectDetail.toasts.error', 'Error'), description: t('projectDetail.dialogs.irataTask.selectTasks', 'Select Tasks Performed'), variant: "destructive" });
       return;
     }
     
@@ -476,7 +478,7 @@ export default function ProjectDetail() {
   const handleDeclineLogHours = () => {
     setShowLogHoursPrompt(false);
     setEndedSessionData(null);
-    toast({ title: "Work session ended", description: "Great work today!" });
+    toast({ title: t('projectDetail.toasts.sessionEnded', 'Work session ended'), description: t('projectDetail.toasts.greatWork', 'Great work today!') });
   };
 
   // Skip IRATA task logging
@@ -485,7 +487,7 @@ export default function ProjectDetail() {
     setSelectedIrataTasks([]);
     setIrataTaskNotes("");
     setEndedSessionData(null);
-    toast({ title: "Work session ended", description: "Great work today!" });
+    toast({ title: t('projectDetail.toasts.sessionEnded', 'Work session ended'), description: t('projectDetail.toasts.greatWork', 'Great work today!') });
   };
 
   // Toggle IRATA task selection
@@ -556,11 +558,11 @@ export default function ProjectDetail() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/projects"] });
-      toast({ title: "Project deleted successfully" });
+      toast({ title: t('projectDetail.toasts.projectDeleted', 'Project deleted successfully') });
       setLocation("/dashboard");
     },
     onError: (error: Error) => {
-      toast({ title: "Error", description: error.message, variant: "destructive" });
+      toast({ title: t('projectDetail.toasts.error', 'Error'), description: error.message, variant: "destructive" });
     },
   });
 
@@ -583,10 +585,10 @@ export default function ProjectDetail() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/projects"] });
       queryClient.invalidateQueries({ queryKey: ["/api/projects", id] });
-      toast({ title: "Project marked as completed" });
+      toast({ title: t('projectDetail.toasts.projectCompleted', 'Project completed successfully') });
     },
     onError: (error: Error) => {
-      toast({ title: "Error", description: error.message, variant: "destructive" });
+      toast({ title: t('projectDetail.toasts.error', 'Error'), description: error.message, variant: "destructive" });
     },
   });
 
@@ -609,10 +611,10 @@ export default function ProjectDetail() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/projects"] });
       queryClient.invalidateQueries({ queryKey: ["/api/projects", id] });
-      toast({ title: "Project reopened successfully" });
+      toast({ title: t('projectDetail.toasts.projectReopened', 'Project reopened successfully') });
     },
     onError: (error: Error) => {
-      toast({ title: "Error", description: error.message, variant: "destructive" });
+      toast({ title: t('projectDetail.toasts.error', 'Error'), description: error.message, variant: "destructive" });
     },
   });
 
@@ -635,10 +637,10 @@ export default function ProjectDetail() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/projects", id, "comments"] });
       setNewComment("");
-      toast({ title: "Comment posted successfully" });
+      toast({ title: t('projectDetail.toasts.commentPosted', 'Comment posted successfully') });
     },
     onError: (error: Error) => {
-      toast({ title: "Error", description: error.message, variant: "destructive" });
+      toast({ title: t('projectDetail.toasts.error', 'Error'), description: error.message, variant: "destructive" });
     },
   });
 
@@ -706,11 +708,11 @@ export default function ProjectDetail() {
       
       queryClient.invalidateQueries({ queryKey: ["/api/projects", id] });
       queryClient.invalidateQueries({ queryKey: ["/api/projects"] });
-      toast({ title: "PDF uploaded successfully" });
+      toast({ title: t('projectDetail.documents.pdfUploadedSuccess', 'PDF uploaded successfully') });
     } catch (error) {
       toast({ 
-        title: "Upload failed", 
-        description: error instanceof Error ? error.message : "Failed to upload PDF", 
+        title: t('projectDetail.documents.uploadFailed', 'Upload failed'), 
+        description: error instanceof Error ? error.message : t('projectDetail.documents.uploadFailed', 'Failed to upload PDF'), 
         variant: "destructive" 
       });
     } finally {
@@ -740,11 +742,11 @@ export default function ProjectDetail() {
       
       queryClient.invalidateQueries({ queryKey: ["/api/projects", id] });
       queryClient.invalidateQueries({ queryKey: ["/api/projects"] });
-      toast({ title: "Anchor inspection certificate uploaded successfully" });
+      toast({ title: t('projectDetail.documents.pdfUploadedSuccess', 'PDF uploaded successfully') });
     } catch (error) {
       toast({ 
-        title: "Upload failed", 
-        description: error instanceof Error ? error.message : "Failed to upload anchor inspection certificate", 
+        title: t('projectDetail.documents.uploadFailed', 'Upload failed'), 
+        description: error instanceof Error ? error.message : t('projectDetail.documents.uploadFailed', 'Failed to upload anchor inspection certificate'), 
         variant: "destructive" 
       });
     } finally {
@@ -763,8 +765,8 @@ export default function ProjectDetail() {
     // Validate missed unit fields
     if (isMissedUnit && !missedUnitNumber.trim()) {
       toast({
-        title: "Missing unit number",
-        description: "Please enter a unit number for the missed unit",
+        title: t('projectDetail.toasts.error', 'Error'),
+        description: t('projectDetail.dialogs.uploadPhoto.enterMissedUnitNumber', 'Enter the unit number for the missed unit'),
         variant: "destructive"
       });
       return;
@@ -773,8 +775,8 @@ export default function ProjectDetail() {
     // Validate missed stall fields
     if (isMissedStall && !missedStallNumber.trim()) {
       toast({
-        title: "Missing stall number",
-        description: "Please enter a stall number for the missed stall",
+        title: t('projectDetail.toasts.error', 'Error'),
+        description: t('projectDetail.dialogs.uploadPhoto.enterMissedStallNumber', 'Enter the stall number for the missed parking stall'),
         variant: "destructive"
       });
       return;
@@ -812,10 +814,7 @@ export default function ProjectDetail() {
       queryClient.invalidateQueries({ queryKey: ["/api/projects", id, "photos"] });
       queryClient.invalidateQueries({ queryKey: ["/api/projects", id] });
       queryClient.invalidateQueries({ queryKey: ["/api/all-project-photos"] });
-      const successMessage = isMissedUnit ? "Missed unit photo uploaded successfully" : 
-                            isMissedStall ? "Missed stall photo uploaded successfully" : 
-                            "Photo uploaded successfully";
-      toast({ title: successMessage });
+      toast({ title: t('projectDetail.documents.photoUploadedSuccess', 'Photo uploaded successfully') });
       
       // Reset form
       setSelectedFile(null);
@@ -827,8 +826,8 @@ export default function ProjectDetail() {
       setMissedStallNumber("");
     } catch (error) {
       toast({ 
-        title: "Upload failed", 
-        description: error instanceof Error ? error.message : "Failed to upload photo", 
+        title: t('projectDetail.documents.uploadFailed', 'Upload failed'), 
+        description: error instanceof Error ? error.message : t('projectDetail.documents.uploadFailed', 'Failed to upload photo'), 
         variant: "destructive" 
       });
     } finally {
@@ -849,7 +848,7 @@ export default function ProjectDetail() {
     return (
       <div className="min-h-screen page-gradient p-4">
         <div className="max-w-2xl mx-auto">
-          <div className="text-center py-8">Loading...</div>
+          <div className="text-center py-8">{t('common.loading', 'Loading...')}</div>
         </div>
       </div>
     );
@@ -859,7 +858,7 @@ export default function ProjectDetail() {
     return (
       <div className="min-h-screen page-gradient p-4">
         <div className="max-w-2xl mx-auto">
-          <div className="text-center py-8">Project not found</div>
+          <div className="text-center py-8">{t('projectDetail.notFound', 'Project not found')}</div>
         </div>
       </div>
     );
@@ -931,8 +930,8 @@ export default function ProjectDetail() {
   }).length;
   
   const pieData = [
-    { name: "Target Met", value: targetMetCount, color: "hsl(var(--primary))" },
-    { name: "Below Target", value: belowTargetCount, color: "hsl(var(--destructive))" },
+    { name: t('projectDetail.progress.targetMet', 'Target Met'), value: targetMetCount, color: "hsl(var(--primary))" },
+    { name: t('projectDetail.progress.belowTarget', 'Below Target'), value: belowTargetCount, color: "hsl(var(--destructive))" },
   ];
 
   return (
@@ -948,7 +947,7 @@ export default function ProjectDetail() {
               data-testid="button-back"
             >
               <span className="material-icons">arrow_back</span>
-              Back
+              {t('common.back', 'Back')}
             </Button>
             <div className="flex-1">
               <h1 className="text-xl font-bold">{project.buildingName}</h1>
@@ -977,7 +976,7 @@ export default function ProjectDetail() {
                 data-testid="button-start-day"
               >
                 <span className="material-icons mr-2 text-base">play_circle</span>
-                Start Work Session
+                {t('projectDetail.workSession.startSession', 'Start Work Session')}
               </Button>
             )}
             {/* End Day Button - Shown when there IS an active session */}
@@ -989,7 +988,7 @@ export default function ProjectDetail() {
                 data-testid="button-end-day"
               >
                 <span className="material-icons mr-2 text-base">stop_circle</span>
-                End Day
+                {t('projectDetail.workSession.endSession', 'End Day')}
               </Button>
             )}
           </div>
@@ -1000,7 +999,7 @@ export default function ProjectDetail() {
         {/* Progress Card */}
         <Card className="glass-card border-0 shadow-premium">
           <CardHeader>
-            <CardTitle className="text-base">Progress</CardTitle>
+            <CardTitle className="text-base">{t('projectDetail.progress.title', 'Progress')}</CardTitle>
           </CardHeader>
           <CardContent className="space-y-6">
             {/* Building Visualization */}
@@ -1009,9 +1008,9 @@ export default function ProjectDetail() {
                 {/* Header with progress */}
                 <div className="text-center">
                   <h3 className="text-5xl font-bold mb-2">{progressPercent}%</h3>
-                  <p className="text-base font-medium text-foreground">Project Completion</p>
+                  <p className="text-base font-medium text-foreground">{t('projectDetail.progress.completionPercentage', 'Project Completion')}</p>
                   <p className="text-sm text-muted-foreground mt-1">
-                    Manual percentage tracking
+                    {t('projectDetail.progress.completionPercentage', 'Manual percentage tracking')}
                   </p>
                 </div>
 
@@ -1107,11 +1106,11 @@ export default function ProjectDetail() {
                         <div className="flex items-center justify-center gap-6 mt-6 pt-4 border-t border-border/30">
                           <div className="flex items-center gap-2 px-3 py-1.5 bg-success/10 rounded-full">
                             <div className="w-3 h-3 rounded-full bg-success"></div>
-                            <span className="text-xs font-semibold text-success">Completed</span>
+                            <span className="text-xs font-semibold text-success">{t('common.completed', 'Completed')}</span>
                           </div>
                           <div className="flex items-center gap-2 px-3 py-1.5 bg-muted rounded-full">
                             <div className="w-3 h-3 rounded-full bg-muted-foreground/40 border border-border"></div>
-                            <span className="text-xs font-semibold text-muted-foreground">Remaining</span>
+                            <span className="text-xs font-semibold text-muted-foreground">{t('projectDetail.progress.remaining', 'Remaining')}</span>
                           </div>
                         </div>
                       </>
@@ -1165,12 +1164,12 @@ export default function ProjectDetail() {
                 {/* Progress Stats */}
                 <div className="space-y-2">
                   <div className="flex justify-between text-sm">
-                    <span className="text-muted-foreground">Overall Progress</span>
+                    <span className="text-muted-foreground">{t('projectDetail.progress.title', 'Overall Progress')}</span>
                     <span className="font-medium">{progressPercent}%</span>
                   </div>
                   <Progress value={progressPercent} className="h-2" />
                   <p className="text-xs text-muted-foreground text-center">
-                    {completedDrops} of {totalDrops} drops completed
+                    {completedDrops} {t('common.of', 'of')} {totalDrops} {t('projectDetail.progress.dropsCompleted', 'drops completed')}
                   </p>
                 </div>
               </>
@@ -1189,10 +1188,10 @@ export default function ProjectDetail() {
                   </div>
                   <div className="text-sm text-muted-foreground mt-1">
                     {project.jobType === "in_suite_dryer_vent_cleaning" 
-                      ? "Expected Suites/Day" 
+                      ? t('projectDetail.progress.unitsPerDay', 'Expected Suites/Day') 
                       : project.jobType === "parkade_pressure_cleaning" 
-                      ? "Expected Stalls/Day" 
-                      : "Daily Target"}
+                      ? t('projectDetail.progress.stallsPerDay', 'Expected Stalls/Day') 
+                      : t('projectDetail.progress.dailyTarget', 'Daily Target')}
                   </div>
                 </div>
                 <div className="text-center p-4 bg-muted/50 rounded-lg">
@@ -1209,7 +1208,7 @@ export default function ProjectDetail() {
                         })()
                       : "N/A"}
                   </div>
-                  <div className="text-sm text-muted-foreground mt-1">Days Remaining</div>
+                  <div className="text-sm text-muted-foreground mt-1">{t('projectDetail.progress.remaining', 'Days Remaining')}</div>
                 </div>
               </div>
             )}
@@ -1223,7 +1222,7 @@ export default function ProjectDetail() {
                 <div className="pt-4 border-t">
                   <div className="flex items-center gap-2 mb-3">
                     <span className="material-icons text-sm text-primary">groups</span>
-                    <h3 className="text-sm font-medium">Currently Working</h3>
+                    <h3 className="text-sm font-medium">{t('projectDetail.workSession.currentlyWorking', 'Currently Working')}</h3>
                   </div>
                   <div className="space-y-2">
                     {activeWorkers.map((session: any) => (
@@ -1253,19 +1252,19 @@ export default function ProjectDetail() {
         {(isManagement || canViewWorkHistory) && (
           <Card className="glass-card border-0 shadow-premium">
             <CardHeader>
-              <CardTitle>Analytics</CardTitle>
+              <CardTitle>{t('projectDetail.analytics.title', 'Analytics')}</CardTitle>
             </CardHeader>
             <CardContent>
               <Tabs defaultValue={isManagement && completedSessions.length > 0 ? "performance" : canViewFinancialData && project.estimatedHours ? "budget" : "history"} className="w-full">
                 <TabsList className="grid grid-cols-3 w-full h-auto p-1 gap-1 bg-muted/50 rounded-lg">
                   {isManagement && completedSessions.length > 0 && (
-                    <TabsTrigger value="performance" className="text-xs py-3 px-2 rounded-md" data-testid="tab-performance">Target Performance</TabsTrigger>
+                    <TabsTrigger value="performance" className="text-xs py-3 px-2 rounded-md" data-testid="tab-performance">{t('projectDetail.analytics.tabs.targetPerformance', 'Target Performance')}</TabsTrigger>
                   )}
                   {canViewFinancialData && project.estimatedHours && (
-                    <TabsTrigger value="budget" className="text-xs py-3 px-2 rounded-md" data-testid="tab-budget">Hours & Budget</TabsTrigger>
+                    <TabsTrigger value="budget" className="text-xs py-3 px-2 rounded-md" data-testid="tab-budget">{t('projectDetail.analytics.tabs.hoursBudget', 'Hours & Budget')}</TabsTrigger>
                   )}
                   {canViewWorkHistory && (
-                    <TabsTrigger value="history" className="text-xs py-3 px-2 rounded-md" data-testid="tab-history">Work History</TabsTrigger>
+                    <TabsTrigger value="history" className="text-xs py-3 px-2 rounded-md" data-testid="tab-history">{t('projectDetail.analytics.tabs.workHistory', 'Work History')}</TabsTrigger>
                   )}
                 </TabsList>
                 
@@ -1297,11 +1296,11 @@ export default function ProjectDetail() {
                       <div className="grid grid-cols-2 gap-4 mt-4 w-full max-w-sm">
                         <div className="text-center">
                           <div className="text-2xl font-bold text-primary">{targetMetCount}</div>
-                          <div className="text-sm text-muted-foreground">Target Met</div>
+                          <div className="text-sm text-muted-foreground">{t('projectDetail.progress.targetMet', 'Target Met')}</div>
                         </div>
                         <div className="text-center">
                           <div className="text-2xl font-bold text-destructive">{belowTargetCount}</div>
-                          <div className="text-sm text-muted-foreground">Below Target</div>
+                          <div className="text-sm text-muted-foreground">{t('projectDetail.progress.belowTarget', 'Below Target')}</div>
                         </div>
                       </div>
                     </div>
@@ -1441,7 +1440,7 @@ export default function ProjectDetail() {
                   <TabsContent value="history" className="mt-4">
                     {workSessions.length === 0 ? (
                       <p className="text-center text-muted-foreground py-8">
-                        No work sessions recorded yet
+                        {t('projectDetail.workSession.noActiveSession', 'No work sessions recorded yet')}
                       </p>
                     ) : (() => {
                       // Organize sessions by year -> month -> day
@@ -1537,10 +1536,10 @@ export default function ProjectDetail() {
                                                           </div>
                                                           {isCompleted ? (
                                                             <Badge variant={metTarget ? "default" : "destructive"} className="text-xs" data-testid={`badge-${metTarget ? "met" : "below"}-target`}>
-                                                              {metTarget ? "Target Met" : "Below Target"}
+                                                              {metTarget ? t('projectDetail.progress.targetMet', 'Target Met') : t('projectDetail.progress.belowTarget', 'Below Target')}
                                                             </Badge>
                                                           ) : (
-                                                            <Badge variant="outline" className="text-xs">In Progress</Badge>
+                                                            <Badge variant="outline" className="text-xs">{t('common.inProgress', 'In Progress')}</Badge>
                                                           )}
                                                         </div>
                                                       );
@@ -1571,7 +1570,7 @@ export default function ProjectDetail() {
         {/* Project Documents and Photos - Combined Card */}
         <Card className="glass-card border-0 shadow-premium">
           <CardHeader>
-            <CardTitle className="text-base">Project Documents & Photos</CardTitle>
+            <CardTitle className="text-base">{t('projectDetail.documents.title', 'Project Documents & Photos')}</CardTitle>
           </CardHeader>
           <CardContent className="space-y-6">
             
@@ -1581,7 +1580,7 @@ export default function ProjectDetail() {
                 <div className="space-y-3">
                   <div className="flex items-center gap-2">
                     <span className="material-icons text-primary">description</span>
-                    <h3 className="font-medium">Rope Access Plan</h3>
+                    <h3 className="font-medium">{t('projectDetail.documents.ropeAccessPlan', 'Rope Access Plan')}</h3>
                   </div>
                   {project.ropeAccessPlanUrl ? (
                     <div className="flex gap-2">
@@ -1592,7 +1591,7 @@ export default function ProjectDetail() {
                         data-testid="button-view-pdf"
                       >
                         <span className="material-icons text-lg">description</span>
-                        View Current PDF
+                        {t('projectDetail.documents.viewCurrentPdf', 'View Current PDF')}
                       </Button>
                       <Button
                         variant="outline"
@@ -1602,7 +1601,7 @@ export default function ProjectDetail() {
                         data-testid="button-replace-pdf"
                       >
                         <span className="material-icons text-lg">upload</span>
-                        {uploadingPdf ? "Uploading..." : "Replace"}
+                        {uploadingPdf ? t('projectDetail.documents.uploading', 'Uploading...') : t('projectDetail.documents.replace', 'Replace')}
                       </Button>
                     </div>
                   ) : (
@@ -1614,7 +1613,7 @@ export default function ProjectDetail() {
                       data-testid="button-upload-pdf"
                     >
                       <span className="material-icons text-lg">upload</span>
-                      {uploadingPdf ? "Uploading..." : "Upload PDF"}
+                      {uploadingPdf ? t('projectDetail.documents.uploading', 'Uploading...') : t('projectDetail.documents.uploadPdf', 'Upload PDF')}
                     </Button>
                   )}
                   <input
@@ -1640,7 +1639,7 @@ export default function ProjectDetail() {
             <div className="space-y-3">
               <div className="flex items-center gap-2">
                 <span className="material-icons text-primary">verified</span>
-                <h3 className="font-medium">Anchor Inspection Certificate</h3>
+                <h3 className="font-medium">{t('projectDetail.documents.anchorCertificate', 'Anchor Inspection Certificate')}</h3>
               </div>
               {project.anchorInspectionCertificateUrl ? (
                 <div className="flex gap-2">
@@ -1651,7 +1650,7 @@ export default function ProjectDetail() {
                     data-testid="button-view-anchor-certificate"
                   >
                     <span className="material-icons text-lg">description</span>
-                    View Certificate
+                    {t('projectDetail.documents.viewCertificate', 'View Certificate')}
                   </Button>
                   <Button
                     variant="outline"
@@ -1661,7 +1660,7 @@ export default function ProjectDetail() {
                     data-testid="button-replace-anchor-certificate"
                   >
                     <span className="material-icons text-lg">upload</span>
-                    {uploadingAnchorCertificate ? "Uploading..." : "Replace"}
+                    {uploadingAnchorCertificate ? t('projectDetail.documents.uploading', 'Uploading...') : t('projectDetail.documents.replace', 'Replace')}
                   </Button>
                 </div>
               ) : (
@@ -1673,7 +1672,7 @@ export default function ProjectDetail() {
                   data-testid="button-upload-anchor-certificate"
                 >
                   <span className="material-icons text-lg">upload</span>
-                  {uploadingAnchorCertificate ? "Uploading..." : "Upload Certificate"}
+                  {uploadingAnchorCertificate ? t('projectDetail.documents.uploading', 'Uploading...') : t('projectDetail.documents.uploadCertificate', 'Upload Certificate')}
                 </Button>
               )}
               <input
@@ -1700,10 +1699,10 @@ export default function ProjectDetail() {
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
                       <span className="material-icons text-primary">folder_open</span>
-                      <h3 className="font-medium">Documents</h3>
+                      <h3 className="font-medium">{t('projectDetail.documents.documentsTitle', 'Documents')}</h3>
                     </div>
                     <Badge variant="secondary" className="text-xs">
-                      {project.documentUrls.length} {project.documentUrls.length === 1 ? 'document' : 'documents'}
+                      {project.documentUrls.length} {project.documentUrls.length === 1 ? t('projectDetail.documents.document', 'document') : t('projectDetail.documents.documentsPlural', 'documents')}
                     </Badge>
                   </div>
                   
@@ -1717,7 +1716,7 @@ export default function ProjectDetail() {
                           <span className="material-icons text-primary">description</span>
                           <div className="flex-1 min-w-0">
                             <div className="text-sm font-medium truncate">{displayName}</div>
-                            <div className="text-xs text-muted-foreground">PDF Document</div>
+                            <div className="text-xs text-muted-foreground">{t('projectDetail.documents.pdfDocument', 'PDF Document')}</div>
                           </div>
                           <Button
                             variant="outline"
@@ -1726,7 +1725,7 @@ export default function ProjectDetail() {
                             data-testid={`button-download-document-${index}`}
                           >
                             <span className="material-icons text-sm">download</span>
-                            Download
+                            {t('common.download', 'Download')}
                           </Button>
                         </div>
                       );
@@ -1743,10 +1742,10 @@ export default function ProjectDetail() {
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <span className="material-icons text-primary">photo_library</span>
-                  <h3 className="font-medium">Project Photos</h3>
+                  <h3 className="font-medium">{t('projectDetail.documents.projectPhotos', 'Project Photos')}</h3>
                 </div>
                 <Badge variant="secondary" className="text-xs">
-                  {photos.length} {photos.length === 1 ? 'photo' : 'photos'}
+                  {photos.length} {photos.length === 1 ? t('projectDetail.documents.photo', 'photo') : t('projectDetail.documents.photosPlural', 'photos')}
                 </Badge>
               </div>
               
@@ -1769,7 +1768,7 @@ export default function ProjectDetail() {
                           <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-end p-2">
                             {photo.unitNumber && (
                               <div className="text-xs font-medium text-white">
-                                Unit {photo.unitNumber}
+                                {t('projectDetail.documents.unit', 'Unit')} {photo.unitNumber}
                               </div>
                             )}
                             {photo.comment && (
@@ -1794,7 +1793,7 @@ export default function ProjectDetail() {
                   data-testid="button-take-photo"
                 >
                   <span className="material-icons text-lg">photo_camera</span>
-                  {uploadingImage ? "Uploading..." : "Take Photo"}
+                  {uploadingImage ? t('projectDetail.documents.uploading', 'Uploading...') : t('projectDetail.documents.takePhoto', 'Take Photo')}
                 </Button>
                 <Button
                   variant="outline"
@@ -1804,7 +1803,7 @@ export default function ProjectDetail() {
                   data-testid="button-upload-from-library"
                 >
                   <span className="material-icons text-lg">photo_library</span>
-                  {uploadingImage ? "Uploading..." : "From Library"}
+                  {uploadingImage ? t('projectDetail.documents.uploading', 'Uploading...') : t('projectDetail.documents.fromLibrary', 'From Library')}
                 </Button>
               </div>
               
@@ -1850,16 +1849,16 @@ export default function ProjectDetail() {
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2">
                         <span className="material-icons text-orange-600">warning</span>
-                        <h3 className="font-medium">Missed Units</h3>
+                        <h3 className="font-medium">{t('projectDetail.documents.missedUnits', 'Missed Units')}</h3>
                       </div>
                       <Badge variant="destructive" className="text-xs">
-                        {missedUnitPhotos.length} {missedUnitPhotos.length === 1 ? 'unit' : 'units'}
+                        {missedUnitPhotos.length} {missedUnitPhotos.length === 1 ? t('projectDetail.documents.unit', 'unit') : t('projectDetail.documents.unitsPlural', 'units')}
                       </Badge>
                     </div>
                     
                     <div className="p-3 bg-orange-50 border border-orange-200 rounded-lg">
                       <p className="text-sm text-muted-foreground">
-                        Photos of units that were missed during the initial sweep and need to be addressed
+                        {t('projectDetail.documents.missedUnitsDescription', 'Photos of units that were missed during the initial sweep and need to be addressed')}
                       </p>
                     </div>
                     
@@ -1882,12 +1881,12 @@ export default function ProjectDetail() {
                             />
                             <div className="absolute top-2 right-2">
                               <Badge variant="destructive" className="font-bold shadow-lg">
-                                Unit {photo.missedUnitNumber}
+                                {t('projectDetail.documents.unit', 'Unit')} {photo.missedUnitNumber}
                               </Badge>
                             </div>
                           </div>
                           <div className="p-3 border-t border-orange-200 bg-orange-50">
-                            <div className="font-medium text-sm">Unit {photo.missedUnitNumber}</div>
+                            <div className="font-medium text-sm">{t('projectDetail.documents.unit', 'Unit')} {photo.missedUnitNumber}</div>
                             {photo.comment && (
                               <div className="text-xs text-muted-foreground mt-1 line-clamp-2">
                                 {photo.comment}
@@ -1915,16 +1914,16 @@ export default function ProjectDetail() {
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2">
                         <span className="material-icons text-orange-600">warning</span>
-                        <h3 className="font-medium">Missed Stalls</h3>
+                        <h3 className="font-medium">{t('projectDetail.documents.missedStalls', 'Missed Stalls')}</h3>
                       </div>
                       <Badge variant="destructive" className="text-xs">
-                        {missedStallPhotos.length} {missedStallPhotos.length === 1 ? 'stall' : 'stalls'}
+                        {missedStallPhotos.length} {missedStallPhotos.length === 1 ? t('projectDetail.documents.stall', 'stall') : t('projectDetail.documents.stallsPlural', 'stalls')}
                       </Badge>
                     </div>
                     
                     <div className="p-3 bg-orange-50 border border-orange-200 rounded-lg">
                       <p className="text-sm text-muted-foreground">
-                        Photos of parking stalls that were missed during the initial sweep and need to be addressed
+                        {t('projectDetail.documents.missedStallsDescription', 'Photos of parking stalls that were missed during the initial sweep and need to be addressed')}
                       </p>
                     </div>
                     
@@ -1947,12 +1946,12 @@ export default function ProjectDetail() {
                             />
                             <div className="absolute top-2 right-2">
                               <Badge variant="destructive" className="font-bold shadow-lg">
-                                Stall {photo.missedStallNumber}
+                                {t('projectDetail.documents.stall', 'Stall')} {photo.missedStallNumber}
                               </Badge>
                             </div>
                           </div>
                           <div className="p-3 border-t border-orange-200 bg-orange-50">
-                            <div className="font-medium text-sm">Stall {photo.missedStallNumber}</div>
+                            <div className="font-medium text-sm">{t('projectDetail.documents.stall', 'Stall')} {photo.missedStallNumber}</div>
                             {photo.comment && (
                               <div className="text-xs text-muted-foreground mt-1 line-clamp-2">
                                 {photo.comment}
@@ -1977,10 +1976,10 @@ export default function ProjectDetail() {
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <span className="material-icons text-primary">assignment</span>
-                  <h3 className="font-medium">Toolbox Meetings</h3>
+                  <h3 className="font-medium">{t('projectDetail.toolbox.title', 'Toolbox Meetings')}</h3>
                 </div>
                 <Badge variant="secondary" className="text-xs">
-                  {toolboxMeetings.length} {toolboxMeetings.length === 1 ? 'meeting' : 'meetings'}
+                  {toolboxMeetings.length} {toolboxMeetings.length === 1 ? t('projectDetail.toolbox.meeting', 'meeting') : t('projectDetail.toolbox.meetingsPlural', 'meetings')}
                 </Badge>
               </div>
 
@@ -2001,16 +2000,16 @@ export default function ProjectDetail() {
                               {format(parseLocalDate(meeting.meetingDate), 'MMMM d, yyyy')}
                             </div>
                             <div className="text-xs text-muted-foreground">
-                              Conducted by: {meeting.conductedByName}
+                              {t('projectDetail.toolbox.conductedBy', 'Conducted by')}: {meeting.conductedByName}
                             </div>
                           </div>
                           <Badge variant="secondary" className="text-xs">
-                            {meeting.attendees?.length || 0} attendees
+                            {meeting.attendees?.length || 0} {t('projectDetail.toolbox.attendees', 'attendees')}
                           </Badge>
                         </div>
                         {meeting.customTopic && (
                           <p className="text-xs text-muted-foreground mt-1">
-                            Custom: {meeting.customTopic}
+                            {t('projectDetail.toolbox.custom', 'Custom')}: {meeting.customTopic}
                           </p>
                         )}
                       </CardContent>
@@ -2027,7 +2026,7 @@ export default function ProjectDetail() {
                 data-testid="button-create-toolbox-meeting"
               >
                 <span className="material-icons text-lg">assignment</span>
-                Conduct Toolbox Meeting
+                {t('projectDetail.toolbox.conductMeeting', 'Conduct Toolbox Meeting')}
               </Button>
             </div>
           </CardContent>
@@ -2037,9 +2036,9 @@ export default function ProjectDetail() {
         <Card className="glass-card border-0 shadow-premium">
           <CardHeader>
             <div className="flex items-center justify-between">
-              <CardTitle className="text-base">Resident Feedback</CardTitle>
+              <CardTitle className="text-base">{t('projectDetail.feedback.title', 'Resident Feedback')}</CardTitle>
               <Badge variant="secondary" className="text-xs">
-                {complaints.length} {complaints.length === 1 ? 'complaint' : 'complaints'}
+                {complaints.length} {complaints.length === 1 ? t('projectDetail.feedback.complaint', 'complaint') : t('projectDetail.feedback.complaintsPlural', 'complaints')}
               </Badge>
             </div>
           </CardHeader>
@@ -2047,7 +2046,7 @@ export default function ProjectDetail() {
               
               {complaints.length === 0 ? (
                 <div className="text-center py-6 text-muted-foreground text-sm border rounded-lg">
-                  No feedback received yet
+                  {t('projectDetail.feedback.noFeedback', 'No feedback received yet')}
                 </div>
               ) : (
                 <div className="space-y-2">
@@ -2057,11 +2056,11 @@ export default function ProjectDetail() {
                     
                     let statusBadge;
                     if (status === 'closed') {
-                      statusBadge = <Badge variant="secondary" className="bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/20 text-xs">Closed</Badge>;
+                      statusBadge = <Badge variant="secondary" className="bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/20 text-xs">{t('projectDetail.feedback.closed', 'Closed')}</Badge>;
                     } else if (isViewed) {
-                      statusBadge = <Badge variant="secondary" className="bg-primary/50/10 text-primary dark:text-primary border-primary/50/20 text-xs">Viewed</Badge>;
+                      statusBadge = <Badge variant="secondary" className="bg-primary/50/10 text-primary dark:text-primary border-primary/50/20 text-xs">{t('projectDetail.feedback.viewed', 'Viewed')}</Badge>;
                     } else {
-                      statusBadge = <Badge variant="secondary" className="bg-orange-500/10 text-orange-700 dark:text-orange-400 border-orange-500/20 text-xs">New</Badge>;
+                      statusBadge = <Badge variant="secondary" className="bg-orange-500/10 text-orange-700 dark:text-orange-400 border-orange-500/20 text-xs">{t('projectDetail.feedback.new', 'New')}</Badge>;
                     }
                     
                     return (
@@ -2075,7 +2074,7 @@ export default function ProjectDetail() {
                           <div className="flex items-start justify-between gap-2 mb-2">
                             <div className="flex-1 min-w-0">
                               <div className="text-sm font-medium">{complaint.residentName}</div>
-                              <div className="text-xs text-muted-foreground">Unit {complaint.unitNumber}</div>
+                              <div className="text-xs text-muted-foreground">{t('projectDetail.documents.unit', 'Unit')} {complaint.unitNumber}</div>
                             </div>
                             {statusBadge}
                           </div>
@@ -2105,9 +2104,9 @@ export default function ProjectDetail() {
         <Card className="glass-card border-0 shadow-premium">
           <CardHeader>
             <div className="flex items-center justify-between">
-              <CardTitle className="text-base">Job Comments</CardTitle>
+              <CardTitle className="text-base">{t('projectDetail.comments.title', 'Job Comments')}</CardTitle>
               <Badge variant="secondary" className="text-xs">
-                {jobComments.length} {jobComments.length === 1 ? 'comment' : 'comments'}
+                {jobComments.length} {jobComments.length === 1 ? t('projectDetail.comments.comment', 'comment') : t('projectDetail.comments.commentsPlural', 'comments')}
               </Badge>
             </div>
           </CardHeader>
@@ -2116,7 +2115,7 @@ export default function ProjectDetail() {
               {/* Comment Form */}
               <div className="space-y-2">
                 <Textarea
-                  placeholder="Add a comment about this project..."
+                  placeholder={t('projectDetail.comments.placeholder', 'Add a comment about this project...')}
                   value={newComment}
                   onChange={(e) => setNewComment(e.target.value)}
                   className="min-h-20"
@@ -2132,14 +2131,14 @@ export default function ProjectDetail() {
                   className="w-full h-12"
                   data-testid="button-post-comment"
                 >
-                  {createCommentMutation.isPending ? "Posting..." : "Post Comment"}
+                  {createCommentMutation.isPending ? t('projectDetail.comments.posting', 'Posting...') : t('projectDetail.comments.postComment', 'Post Comment')}
                 </Button>
               </div>
 
               {/* Comments List */}
               {jobComments.length === 0 ? (
                 <div className="text-center py-6 text-muted-foreground text-sm border rounded-lg">
-                  No comments yet. Be the first to comment!
+                  {t('projectDetail.comments.noComments', 'No comments yet. Be the first to comment!')}
                 </div>
               ) : (
                 <div className="space-y-2">
@@ -2167,12 +2166,12 @@ export default function ProjectDetail() {
         {isManagement && (
           <Card className="glass-card border-0 shadow-premium">
             <CardHeader>
-              <CardTitle>Residents linked to project {project?.strataPlanNumber}</CardTitle>
+              <CardTitle>{t('projectDetail.residents.title', 'Residents linked to project')} {project?.strataPlanNumber}</CardTitle>
             </CardHeader>
             <CardContent>
               {residents.length === 0 ? (
                 <p className="text-center text-muted-foreground py-8">
-                  No residents linked to this project
+                  {t('projectDetail.residents.noResidents', 'No residents linked to this project')}
                 </p>
               ) : (
                 <div className="space-y-3">
@@ -2216,13 +2215,13 @@ export default function ProjectDetail() {
         {canDeleteProject && (
           <Card className="glass-card border-0 shadow-premium">
             <CardHeader>
-              <CardTitle className="text-base">Project Actions</CardTitle>
+              <CardTitle className="text-base">{t('projectDetail.actions.title', 'Project Actions')}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
               <div>
-                <div className="text-sm text-muted-foreground mb-2">Status</div>
+                <div className="text-sm text-muted-foreground mb-2">{t('common.status', 'Status')}</div>
                 <Badge variant={project.status === "active" ? "default" : "secondary"} className="capitalize">
-                  {project.status}
+                  {project.status === 'active' ? t('common.active', 'Active') : project.status === 'completed' ? t('common.completed', 'Completed') : project.status}
                 </Badge>
               </div>
 
@@ -2237,7 +2236,7 @@ export default function ProjectDetail() {
                   data-testid="button-edit-project-action"
                 >
                   <span className="material-icons mr-2">edit</span>
-                  Edit Project
+                  {t('projectDetail.actions.editProject', 'Edit Project')}
                 </Button>
 
                 {project.status === "active" && (
@@ -2249,7 +2248,7 @@ export default function ProjectDetail() {
                     disabled={completeProjectMutation.isPending}
                   >
                     <span className="material-icons mr-2">check_circle</span>
-                    {completeProjectMutation.isPending ? "Completing..." : "Complete Project"}
+                    {completeProjectMutation.isPending ? t('projectDetail.actions.completing', 'Completing...') : t('projectDetail.actions.completeProject', 'Complete Project')}
                   </Button>
                 )}
 
@@ -2262,7 +2261,7 @@ export default function ProjectDetail() {
                     disabled={reopenProjectMutation.isPending}
                   >
                     <span className="material-icons mr-2">restart_alt</span>
-                    {reopenProjectMutation.isPending ? "Reopening..." : "Reopen Project"}
+                    {reopenProjectMutation.isPending ? t('projectDetail.actions.reopening', 'Reopening...') : t('projectDetail.actions.reopenProject', 'Reopen Project')}
                   </Button>
                 )}
 
@@ -2273,7 +2272,7 @@ export default function ProjectDetail() {
                   data-testid="button-delete-project"
                 >
                   <span className="material-icons mr-2">delete</span>
-                  Delete Project
+                  {t('projectDetail.actions.deleteProject', 'Delete Project')}
                 </Button>
               </div>
             </CardContent>
@@ -2286,19 +2285,19 @@ export default function ProjectDetail() {
       <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Delete Project</AlertDialogTitle>
+            <AlertDialogTitle>{t('projectDetail.dialogs.deleteProject.title', 'Delete Project')}</AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to delete this project? This will permanently remove all associated work sessions, drop logs, and complaints. This action cannot be undone.
+              {t('projectDetail.dialogs.deleteProject.description', 'Are you sure you want to delete this project? This will permanently remove all associated work sessions, drop logs, and complaints. This action cannot be undone.')}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel data-testid="button-cancel-delete-project">Cancel</AlertDialogCancel>
+            <AlertDialogCancel data-testid="button-cancel-delete-project">{t('common.cancel', 'Cancel')}</AlertDialogCancel>
             <AlertDialogAction
               onClick={() => deleteProjectMutation.mutate(project.id)}
               data-testid="button-confirm-delete-project"
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
-              Delete Project
+              {t('projectDetail.actions.deleteProject', 'Delete Project')}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
@@ -2308,9 +2307,9 @@ export default function ProjectDetail() {
       <AlertDialog open={showHarnessInspectionDialog} onOpenChange={setShowHarnessInspectionDialog}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Daily Harness Inspection Complete?</AlertDialogTitle>
+            <AlertDialogTitle>{t('projectDetail.dialogs.harnessInspection.title', 'Daily Harness Inspection Complete?')}</AlertDialogTitle>
             <AlertDialogDescription>
-              Before starting your work session, please confirm if your daily harness inspection has been completed.
+              {t('projectDetail.dialogs.harnessInspection.description', 'Before starting your work session, please confirm if your daily harness inspection has been completed.')}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter className="flex-col sm:flex-row gap-2">
@@ -2320,7 +2319,7 @@ export default function ProjectDetail() {
               disabled={createNotApplicableInspectionMutation.isPending}
               data-testid="button-harness-not-applicable"
             >
-              {createNotApplicableInspectionMutation.isPending ? "Recording..." : "Not Applicable"}
+              {createNotApplicableInspectionMutation.isPending ? t('projectDetail.dialogs.harnessInspection.recording', 'Recording...') : t('projectDetail.dialogs.harnessInspection.notApplicable', 'Not Applicable')}
             </Button>
             <Button
               variant="destructive"
@@ -2330,7 +2329,7 @@ export default function ProjectDetail() {
               }}
               data-testid="button-harness-no"
             >
-              No
+              {t('common.no', 'No')}
             </Button>
             <Button
               variant="default"
@@ -2340,7 +2339,7 @@ export default function ProjectDetail() {
               }}
               data-testid="button-harness-yes"
             >
-              Yes
+              {t('common.yes', 'Yes')}
             </Button>
           </AlertDialogFooter>
         </AlertDialogContent>
@@ -2350,13 +2349,13 @@ export default function ProjectDetail() {
       <AlertDialog open={showStartDayDialog} onOpenChange={setShowStartDayDialog}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Start Work Session?</AlertDialogTitle>
+            <AlertDialogTitle>{t('projectDetail.dialogs.startSession.title', 'Start Work Session?')}</AlertDialogTitle>
             <AlertDialogDescription>
-              This will begin tracking your work session for {project.buildingName}. You can log drops throughout the day and end your session when finished.
+              {t('projectDetail.dialogs.startSession.description', 'This will begin tracking your work session for {{buildingName}}. You can log drops throughout the day and end your session when finished.', { buildingName: project.buildingName })}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel data-testid="button-cancel-start-day">Cancel</AlertDialogCancel>
+            <AlertDialogCancel data-testid="button-cancel-start-day">{t('common.cancel', 'Cancel')}</AlertDialogCancel>
             <AlertDialogAction
               onClick={() => {
                 if (id) {
@@ -2367,7 +2366,7 @@ export default function ProjectDetail() {
               disabled={startDayMutation.isPending}
               className="bg-primary text-primary-foreground hover:bg-primary/90"
             >
-              {startDayMutation.isPending ? "Starting..." : "Start Work Session"}
+              {startDayMutation.isPending ? t('projectDetail.workSession.starting', 'Starting...') : t('projectDetail.workSession.startSession', 'Start Work Session')}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
@@ -2377,11 +2376,11 @@ export default function ProjectDetail() {
       <Dialog open={showPhotoDialog} onOpenChange={(open) => !open && handlePhotoDialogCancel()}>
         <DialogContent className="sm:max-w-md" data-testid="dialog-photo-upload">
           <DialogHeader>
-            <DialogTitle>Upload Photo</DialogTitle>
+            <DialogTitle>{t('projectDetail.dialogs.uploadPhoto.title', 'Upload Photo')}</DialogTitle>
             <DialogDescription>
               {project.jobType === 'parkade_pressure_cleaning' 
-                ? 'Add parking stall number and comment to help residents identify their work.'
-                : 'Add unit number and comment to help residents identify their work.'}
+                ? t('projectDetail.dialogs.uploadPhoto.parkadeDescription', 'Add parking stall number and comment to help residents identify their work.')
+                : t('projectDetail.dialogs.uploadPhoto.unitDescription', 'Add unit number and comment to help residents identify their work.')}
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4 py-4">
@@ -2398,10 +2397,10 @@ export default function ProjectDetail() {
                     htmlFor="missedUnit"
                     className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
                   >
-                    Mark as Missed Unit
+                    {t('projectDetail.dialogs.uploadPhoto.markAsMissedUnit', 'Mark as Missed Unit')}
                   </Label>
                   <p className="text-xs text-muted-foreground">
-                    Check this if the photo shows a unit that was missed during the initial sweep
+                    {t('projectDetail.dialogs.uploadPhoto.missedUnitHint', 'Check this if the photo shows a unit that was missed during the initial sweep')}
                   </p>
                 </div>
               </div>
@@ -2409,16 +2408,16 @@ export default function ProjectDetail() {
             
             {isMissedUnit && project.jobType === 'in_suite_dryer_vent_cleaning' && (
               <div className="space-y-2 p-3 rounded-lg bg-orange-50 border border-orange-200">
-                <Label htmlFor="missedUnitNumber">Missed Unit Number *</Label>
+                <Label htmlFor="missedUnitNumber">{t('projectDetail.dialogs.uploadPhoto.missedUnitNumber', 'Missed Unit Number')} *</Label>
                 <Input
                   id="missedUnitNumber"
-                  placeholder="e.g., 301, 1205"
+                  placeholder={t('projectDetail.dialogs.uploadPhoto.unitNumberPlaceholder', 'e.g., 301, 1205')}
                   value={missedUnitNumber}
                   onChange={(e) => setMissedUnitNumber(e.target.value)}
                   data-testid="input-missed-unit-number"
                 />
                 <p className="text-xs text-muted-foreground">
-                  Enter the unit number for the missed unit
+                  {t('projectDetail.dialogs.uploadPhoto.enterMissedUnitNumber', 'Enter the unit number for the missed unit')}
                 </p>
               </div>
             )}
@@ -2436,10 +2435,10 @@ export default function ProjectDetail() {
                     htmlFor="missedStall"
                     className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
                   >
-                    Mark as Missed Stall
+                    {t('projectDetail.dialogs.uploadPhoto.markAsMissedStall', 'Mark as Missed Stall')}
                   </Label>
                   <p className="text-xs text-muted-foreground">
-                    Check this if the photo shows a stall that was missed during the initial sweep
+                    {t('projectDetail.dialogs.uploadPhoto.missedStallHint', 'Check this if the photo shows a stall that was missed during the initial sweep')}
                   </p>
                 </div>
               </div>
@@ -2447,16 +2446,16 @@ export default function ProjectDetail() {
             
             {isMissedStall && project.jobType === 'parkade_pressure_cleaning' && (
               <div className="space-y-2 p-3 rounded-lg bg-orange-50 border border-orange-200">
-                <Label htmlFor="missedStallNumber">Missed Stall Number *</Label>
+                <Label htmlFor="missedStallNumber">{t('projectDetail.dialogs.uploadPhoto.missedStallNumber', 'Missed Stall Number')} *</Label>
                 <Input
                   id="missedStallNumber"
-                  placeholder="e.g., 42, 101, A-5"
+                  placeholder={t('projectDetail.dialogs.uploadPhoto.stallNumberPlaceholder', 'e.g., 42, 101, A-5')}
                   value={missedStallNumber}
                   onChange={(e) => setMissedStallNumber(e.target.value)}
                   data-testid="input-missed-stall-number"
                 />
                 <p className="text-xs text-muted-foreground">
-                  Enter the stall number for the missed parking stall
+                  {t('projectDetail.dialogs.uploadPhoto.enterMissedStallNumber', 'Enter the stall number for the missed parking stall')}
                 </p>
               </div>
             )}
@@ -2464,34 +2463,34 @@ export default function ProjectDetail() {
             {!isMissedUnit && !isMissedStall && (
               <div className="space-y-2">
                 <Label htmlFor="unitNumber">
-                  {project.jobType === 'parkade_pressure_cleaning' ? 'Parking Stall Number (Optional)' : 'Unit Number (Optional)'}
+                  {project.jobType === 'parkade_pressure_cleaning' ? t('projectDetail.dialogs.uploadPhoto.parkingStallNumber', 'Parking Stall Number (Optional)') : t('projectDetail.dialogs.uploadPhoto.unitNumber', 'Unit Number (Optional)')}
                 </Label>
                 <Input
                   id="unitNumber"
-                  placeholder={project.jobType === 'parkade_pressure_cleaning' ? 'e.g., 42, A-5, P1-23' : 'e.g., 301, 1205'}
+                  placeholder={project.jobType === 'parkade_pressure_cleaning' ? t('projectDetail.dialogs.uploadPhoto.parkingStallPlaceholder', 'e.g., 42, A-5, P1-23') : t('projectDetail.dialogs.uploadPhoto.unitPlaceholder', 'e.g., 301, 1205')}
                   value={photoUnitNumber}
                   onChange={(e) => setPhotoUnitNumber(e.target.value)}
                   data-testid="input-unit-number"
                 />
                 <p className="text-xs text-muted-foreground">
                   {project.jobType === 'parkade_pressure_cleaning' 
-                    ? 'Enter the parking stall number if this photo is specific to a resident\'s stall.'
-                    : 'Enter the unit number if this photo is specific to a resident\'s suite.'}
+                    ? t('projectDetail.dialogs.uploadPhoto.parkingStallHelp', 'Enter the parking stall number if this photo is specific to a resident\'s stall.')
+                    : t('projectDetail.dialogs.uploadPhoto.unitHelp', 'Enter the unit number if this photo is specific to a resident\'s suite.')}
                 </p>
               </div>
             )}
             <div className="space-y-2">
-              <Label htmlFor="comment">Comment (Optional)</Label>
+              <Label htmlFor="comment">{t('projectDetail.dialogs.uploadPhoto.comment', 'Comment (Optional)')}</Label>
               <Textarea
                 id="comment"
-                placeholder="e.g., Before cleaning, After cleaning, Window detail"
+                placeholder={t('projectDetail.dialogs.uploadPhoto.commentPlaceholder', 'e.g., Before cleaning, After cleaning, Window detail')}
                 value={photoComment}
                 onChange={(e) => setPhotoComment(e.target.value)}
                 rows={3}
                 data-testid="input-photo-comment"
               />
               <p className="text-xs text-muted-foreground">
-                Add a description or note about this photo.
+                {t('projectDetail.dialogs.uploadPhoto.commentHelp', 'Add a description or note about this photo.')}
               </p>
             </div>
           </div>
@@ -2501,14 +2500,14 @@ export default function ProjectDetail() {
               onClick={handlePhotoDialogCancel}
               data-testid="button-cancel-upload"
             >
-              Cancel
+              {t('common.cancel', 'Cancel')}
             </Button>
             <Button
               onClick={handlePhotoDialogSubmit}
               disabled={!selectedFile}
               data-testid="button-submit-upload"
             >
-              Upload Photo
+              {t('projectDetail.dialogs.uploadPhoto.upload', 'Upload Photo')}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -2546,13 +2545,13 @@ export default function ProjectDetail() {
               {(selectedPhoto.unitNumber || selectedPhoto.comment) && (
                 <div className="bg-black/70 text-white p-4 space-y-1">
                   {selectedPhoto.unitNumber && (
-                    <div className="font-medium">Unit {selectedPhoto.unitNumber}</div>
+                    <div className="font-medium">{t('projectDetail.documents.unit', 'Unit')} {selectedPhoto.unitNumber}</div>
                   )}
                   {selectedPhoto.comment && (
                     <div className="text-sm text-white/90">{selectedPhoto.comment}</div>
                   )}
                   <div className="text-xs text-white/70">
-                    Uploaded {format(new Date(selectedPhoto.createdAt), "MMM d, yyyy 'at' h:mm a")}
+                    {t('projectDetail.dialogs.photoViewer.uploaded', 'Uploaded')} {format(new Date(selectedPhoto.createdAt), "MMM d, yyyy 'at' h:mm a")}
                   </div>
                 </div>
               )}
@@ -2567,10 +2566,10 @@ export default function ProjectDetail() {
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <span className="material-icons">edit</span>
-              Edit Project
+              {t('projectDetail.dialogs.editProject.title', 'Edit Project')}
             </DialogTitle>
             <DialogDescription>
-              Update project details
+              {t('projectDetail.dialogs.editProject.description', 'Update project details')}
             </DialogDescription>
           </DialogHeader>
           {project && (
@@ -2624,19 +2623,19 @@ export default function ProjectDetail() {
                 if (!response.ok) throw new Error('Failed to update project');
                 
                 queryClient.invalidateQueries({ queryKey: ["/api/projects", id] });
-                toast({ title: "Project updated successfully" });
+                toast({ title: t('projectDetail.dialogs.editProject.updateSuccess', 'Project updated successfully') });
                 setShowEditDialog(false);
               } catch (error) {
                 toast({ 
-                  title: "Update failed", 
-                  description: error instanceof Error ? error.message : "Failed to update project",
+                  title: t('projectDetail.dialogs.editProject.updateFailed', 'Update failed'), 
+                  description: error instanceof Error ? error.message : t('projectDetail.toasts.error', 'Failed to update project'),
                   variant: "destructive" 
                 });
               }
             }}>
               <div className="space-y-4 py-4">
                 <div>
-                  <Label htmlFor="buildingName">Building Name</Label>
+                  <Label htmlFor="buildingName">{t('projectDetail.dialogs.editProject.buildingName', 'Building Name')}</Label>
                   <Input
                     id="buildingName"
                     name="buildingName"
@@ -2647,7 +2646,7 @@ export default function ProjectDetail() {
                 </div>
                 
                 <div>
-                  <Label htmlFor="buildingAddress">Building Address</Label>
+                  <Label htmlFor="buildingAddress">{t('projectDetail.dialogs.editProject.buildingAddress', 'Building Address')}</Label>
                   <Input
                     id="buildingAddress"
                     name="buildingAddress"
@@ -2657,7 +2656,7 @@ export default function ProjectDetail() {
                 </div>
                 
                 <div>
-                  <Label htmlFor="strataPlanNumber">Strata Plan Number</Label>
+                  <Label htmlFor="strataPlanNumber">{t('projectDetail.dialogs.editProject.strataPlanNumber', 'Strata Plan Number')}</Label>
                   <Input
                     id="strataPlanNumber"
                     name="strataPlanNumber"
@@ -2666,12 +2665,12 @@ export default function ProjectDetail() {
                     data-testid="input-edit-strata-plan"
                   />
                   <p className="text-xs text-muted-foreground mt-1">
-                    Links residents to this project
+                    {t('projectDetail.dialogs.editProject.strataPlanHelp', 'Links residents to this project')}
                   </p>
                 </div>
                 
                 <div>
-                  <Label htmlFor="jobType">Job Type</Label>
+                  <Label htmlFor="jobType">{t('projectDetail.dialogs.editProject.jobType', 'Job Type')}</Label>
                   <select
                     id="jobType"
                     name="jobType"
@@ -2681,12 +2680,12 @@ export default function ProjectDetail() {
                     className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
                     data-testid="select-edit-job-type"
                   >
-                    <option value="window_cleaning">Window Cleaning (4-Elevation)</option>
-                    <option value="building_wash">Building Wash - Pressure washing (4-Elevation)</option>
-                    <option value="dryer_vent_cleaning">Dryer Vent Cleaning (4-Elevation)</option>
-                    <option value="in_suite_dryer_vent_cleaning">In-Suite Dryer Vent Cleaning</option>
-                    <option value="parkade_pressure_cleaning">Parkade Pressure Cleaning</option>
-                    <option value="ground_window_cleaning">Ground Level Window Cleaning</option>
+                    <option value="window_cleaning">{t('projectDetail.jobTypes.windowCleaning', 'Window Cleaning (4-Elevation)')}</option>
+                    <option value="building_wash">{t('projectDetail.jobTypes.buildingWash', 'Building Wash - Pressure washing (4-Elevation)')}</option>
+                    <option value="dryer_vent_cleaning">{t('projectDetail.jobTypes.dryerVentCleaning', 'Dryer Vent Cleaning (4-Elevation)')}</option>
+                    <option value="in_suite_dryer_vent_cleaning">{t('projectDetail.jobTypes.inSuiteDryerVent', 'In-Suite Dryer Vent Cleaning')}</option>
+                    <option value="parkade_pressure_cleaning">{t('projectDetail.jobTypes.parkadePressureCleaning', 'Parkade Pressure Cleaning')}</option>
+                    <option value="ground_window_cleaning">{t('projectDetail.jobTypes.groundWindowCleaning', 'Ground Level Window Cleaning')}</option>
                   </select>
                 </div>
                 
@@ -2695,7 +2694,7 @@ export default function ProjectDetail() {
                   <>
                     <div className="grid grid-cols-2 gap-3">
                       <div>
-                        <Label htmlFor="totalDropsNorth">North Drops</Label>
+                        <Label htmlFor="totalDropsNorth">{t('projectDetail.directions.northDrops', 'North Drops')}</Label>
                         <Input
                           id="totalDropsNorth"
                           name="totalDropsNorth"
@@ -2707,7 +2706,7 @@ export default function ProjectDetail() {
                         />
                       </div>
                       <div>
-                        <Label htmlFor="totalDropsEast">East Drops</Label>
+                        <Label htmlFor="totalDropsEast">{t('projectDetail.directions.eastDrops', 'East Drops')}</Label>
                         <Input
                           id="totalDropsEast"
                           name="totalDropsEast"
@@ -2719,7 +2718,7 @@ export default function ProjectDetail() {
                         />
                       </div>
                       <div>
-                        <Label htmlFor="totalDropsSouth">South Drops</Label>
+                        <Label htmlFor="totalDropsSouth">{t('projectDetail.directions.southDrops', 'South Drops')}</Label>
                         <Input
                           id="totalDropsSouth"
                           name="totalDropsSouth"
@@ -2731,7 +2730,7 @@ export default function ProjectDetail() {
                         />
                       </div>
                       <div>
-                        <Label htmlFor="totalDropsWest">West Drops</Label>
+                        <Label htmlFor="totalDropsWest">{t('projectDetail.directions.westDrops', 'West Drops')}</Label>
                         <Input
                           id="totalDropsWest"
                           name="totalDropsWest"
@@ -2745,7 +2744,7 @@ export default function ProjectDetail() {
                     </div>
                     
                     <div>
-                      <Label htmlFor="dailyDropTarget">Daily Drop Target</Label>
+                      <Label htmlFor="dailyDropTarget">{t('projectDetail.dialogs.editProject.dailyDropTarget', 'Daily Drop Target')}</Label>
                       <Input
                         id="dailyDropTarget"
                         name="dailyDropTarget"
@@ -2756,7 +2755,7 @@ export default function ProjectDetail() {
                         data-testid="input-edit-daily-target"
                       />
                       <p className="text-xs text-muted-foreground mt-1">
-                        Drops per technician per day
+                        {t('projectDetail.dialogs.editProject.dailyDropTargetHelp', 'Drops per technician per day')}
                       </p>
                     </div>
                   </>
@@ -2766,7 +2765,7 @@ export default function ProjectDetail() {
                 {(!editJobType ? project.jobType === 'in_suite_dryer_vent_cleaning' : editJobType === 'in_suite_dryer_vent_cleaning') && (
                   <>
                     <div>
-                      <Label htmlFor="totalFloors">Total Floors</Label>
+                      <Label htmlFor="totalFloors">{t('projectDetail.progress.totalFloors', 'Total Floors')}</Label>
                       <Input
                         id="totalFloors"
                         name="totalFloors"
@@ -2778,7 +2777,7 @@ export default function ProjectDetail() {
                       />
                     </div>
                     <div>
-                      <Label htmlFor="floorsPerDay">Floors Per Day Target</Label>
+                      <Label htmlFor="floorsPerDay">{t('projectDetail.progress.floorsPerDay', 'Floors Per Day Target')}</Label>
                       <Input
                         id="floorsPerDay"
                         name="floorsPerDay"
@@ -2795,7 +2794,7 @@ export default function ProjectDetail() {
                 {(!editJobType ? project.jobType === 'parkade_pressure_cleaning' : editJobType === 'parkade_pressure_cleaning') && (
                   <>
                     <div>
-                      <Label htmlFor="totalStalls">Total Stalls</Label>
+                      <Label htmlFor="totalStalls">{t('projectDetail.progress.totalStalls', 'Total Stalls')}</Label>
                       <Input
                         id="totalStalls"
                         name="totalStalls"
@@ -2807,7 +2806,7 @@ export default function ProjectDetail() {
                       />
                     </div>
                     <div>
-                      <Label htmlFor="stallsPerDay">Stalls Per Day Target</Label>
+                      <Label htmlFor="stallsPerDay">{t('projectDetail.progress.stallsPerDay', 'Stalls Per Day Target')}</Label>
                       <Input
                         id="stallsPerDay"
                         name="stallsPerDay"
@@ -2821,7 +2820,7 @@ export default function ProjectDetail() {
                 )}
                 
                 <div>
-                  <Label htmlFor="targetCompletionDate">Target Completion Date</Label>
+                  <Label htmlFor="targetCompletionDate">{t('projectDetail.dialogs.editProject.targetCompletionDate', 'Target Completion Date')}</Label>
                   <Input
                     id="targetCompletionDate"
                     name="targetCompletionDate"
@@ -2832,24 +2831,24 @@ export default function ProjectDetail() {
                 </div>
                 
                 <div>
-                  <Label htmlFor="estimatedHours">Estimated Hours</Label>
+                  <Label htmlFor="estimatedHours">{t('projectDetail.dialogs.editProject.estimatedHours', 'Estimated Hours')}</Label>
                   <Input
                     id="estimatedHours"
                     name="estimatedHours"
                     type="number"
                     min="1"
-                    placeholder="Total estimated hours"
+                    placeholder={t('projectDetail.dialogs.editProject.estimatedHoursPlaceholder', 'Total estimated hours')}
                     defaultValue={project.estimatedHours || ""}
                     data-testid="input-edit-estimated-hours"
                   />
                   <p className="text-xs text-muted-foreground mt-1">
-                    Total hours estimated for the entire project
+                    {t('projectDetail.dialogs.editProject.estimatedHoursHelp', 'Total hours estimated for the entire project')}
                   </p>
                 </div>
                 
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <Label htmlFor="startDate">Start Date</Label>
+                    <Label htmlFor="startDate">{t('projectDetail.dialogs.editProject.startDate', 'Start Date')}</Label>
                     <Input
                       id="startDate"
                       name="startDate"
@@ -2859,7 +2858,7 @@ export default function ProjectDetail() {
                     />
                   </div>
                   <div>
-                    <Label htmlFor="endDate">End Date</Label>
+                    <Label htmlFor="endDate">{t('projectDetail.dialogs.editProject.endDate', 'End Date')}</Label>
                     <Input
                       id="endDate"
                       name="endDate"
@@ -2873,10 +2872,10 @@ export default function ProjectDetail() {
               
               <DialogFooter>
                 <Button type="button" variant="outline" onClick={() => setShowEditDialog(false)}>
-                  Cancel
+                  {t('common.cancel', 'Cancel')}
                 </Button>
                 <Button type="submit" data-testid="button-save-project">
-                  Save Changes
+                  {t('projectDetail.dialogs.editProject.save', 'Save Changes')}
                 </Button>
               </DialogFooter>
             </form>
@@ -2890,27 +2889,27 @@ export default function ProjectDetail() {
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <span className="material-icons">assignment</span>
-              Toolbox Meeting Details
+              {t('projectDetail.toolboxMeetings.detailsTitle', 'Toolbox Meeting Details')}
             </DialogTitle>
           </DialogHeader>
           {selectedMeeting && (
             <div className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <div className="text-sm font-medium text-muted-foreground">Date</div>
+                  <div className="text-sm font-medium text-muted-foreground">{t('projectDetail.toolboxMeetings.date', 'Date')}</div>
                   <div className="text-base">
                     {format(parseLocalDate(selectedMeeting.meetingDate), 'EEEE, MMMM d, yyyy')}
                   </div>
                 </div>
                 <div>
-                  <div className="text-sm font-medium text-muted-foreground">Conducted By</div>
+                  <div className="text-sm font-medium text-muted-foreground">{t('projectDetail.toolboxMeetings.conductedBy', 'Conducted By')}</div>
                   <div className="text-base">{selectedMeeting.conductedByName}</div>
                 </div>
               </div>
 
               {selectedMeeting.customTopic && (
                 <div>
-                  <div className="text-sm font-medium text-muted-foreground mb-1">Custom Topic</div>
+                  <div className="text-sm font-medium text-muted-foreground mb-1">{t('projectDetail.toolboxMeetings.customTopic', 'Custom Topic')}</div>
                   <div className="text-base bg-muted p-3 rounded-md">
                     {selectedMeeting.customTopic}
                   </div>
@@ -2918,34 +2917,34 @@ export default function ProjectDetail() {
               )}
 
               <div>
-                <div className="text-sm font-medium text-muted-foreground mb-2">Topics Covered</div>
+                <div className="text-sm font-medium text-muted-foreground mb-2">{t('projectDetail.toolboxMeetings.topicsCovered', 'Topics Covered')}</div>
                 <div className="flex flex-wrap gap-2">
-                  {selectedMeeting.topicFallProtection && <Badge>Fall Protection Systems</Badge>}
-                  {selectedMeeting.topicAnchorPoints && <Badge>Anchor Point Selection</Badge>}
-                  {selectedMeeting.topicRopeInspection && <Badge>Rope Inspection</Badge>}
-                  {selectedMeeting.topicKnotTying && <Badge>Knot Tying Techniques</Badge>}
-                  {selectedMeeting.topicPPECheck && <Badge>PPE Inspection</Badge>}
-                  {selectedMeeting.topicWeatherConditions && <Badge>Weather Assessment</Badge>}
-                  {selectedMeeting.topicCommunication && <Badge>Communication Protocols</Badge>}
-                  {selectedMeeting.topicEmergencyEvacuation && <Badge>Emergency Procedures</Badge>}
-                  {selectedMeeting.topicHazardAssessment && <Badge>Hazard Assessment</Badge>}
-                  {selectedMeeting.topicLoadCalculations && <Badge>Load Calculations</Badge>}
-                  {selectedMeeting.topicEquipmentCompatibility && <Badge>Equipment Compatibility</Badge>}
-                  {selectedMeeting.topicDescenderAscender && <Badge>Descender/Ascender Use</Badge>}
-                  {selectedMeeting.topicEdgeProtection && <Badge>Edge Protection</Badge>}
-                  {selectedMeeting.topicSwingFall && <Badge>Swing Fall Hazards</Badge>}
-                  {selectedMeeting.topicMedicalFitness && <Badge>Medical Fitness</Badge>}
-                  {selectedMeeting.topicToolDropPrevention && <Badge>Tool Drop Prevention</Badge>}
-                  {selectedMeeting.topicRegulations && <Badge>Working at Heights Regulations</Badge>}
-                  {selectedMeeting.topicRescueProcedures && <Badge>Rescue Procedures</Badge>}
-                  {selectedMeeting.topicSiteHazards && <Badge>Site-Specific Hazards</Badge>}
-                  {selectedMeeting.topicBuddySystem && <Badge>Buddy System</Badge>}
+                  {selectedMeeting.topicFallProtection && <Badge>{t('projectDetail.toolboxMeetings.topics.fallProtection', 'Fall Protection Systems')}</Badge>}
+                  {selectedMeeting.topicAnchorPoints && <Badge>{t('projectDetail.toolboxMeetings.topics.anchorPoints', 'Anchor Point Selection')}</Badge>}
+                  {selectedMeeting.topicRopeInspection && <Badge>{t('projectDetail.toolboxMeetings.topics.ropeInspection', 'Rope Inspection')}</Badge>}
+                  {selectedMeeting.topicKnotTying && <Badge>{t('projectDetail.toolboxMeetings.topics.knotTying', 'Knot Tying Techniques')}</Badge>}
+                  {selectedMeeting.topicPPECheck && <Badge>{t('projectDetail.toolboxMeetings.topics.ppeCheck', 'PPE Inspection')}</Badge>}
+                  {selectedMeeting.topicWeatherConditions && <Badge>{t('projectDetail.toolboxMeetings.topics.weatherConditions', 'Weather Assessment')}</Badge>}
+                  {selectedMeeting.topicCommunication && <Badge>{t('projectDetail.toolboxMeetings.topics.communication', 'Communication Protocols')}</Badge>}
+                  {selectedMeeting.topicEmergencyEvacuation && <Badge>{t('projectDetail.toolboxMeetings.topics.emergencyEvacuation', 'Emergency Procedures')}</Badge>}
+                  {selectedMeeting.topicHazardAssessment && <Badge>{t('projectDetail.toolboxMeetings.topics.hazardAssessment', 'Hazard Assessment')}</Badge>}
+                  {selectedMeeting.topicLoadCalculations && <Badge>{t('projectDetail.toolboxMeetings.topics.loadCalculations', 'Load Calculations')}</Badge>}
+                  {selectedMeeting.topicEquipmentCompatibility && <Badge>{t('projectDetail.toolboxMeetings.topics.equipmentCompatibility', 'Equipment Compatibility')}</Badge>}
+                  {selectedMeeting.topicDescenderAscender && <Badge>{t('projectDetail.toolboxMeetings.topics.descenderAscender', 'Descender/Ascender Use')}</Badge>}
+                  {selectedMeeting.topicEdgeProtection && <Badge>{t('projectDetail.toolboxMeetings.topics.edgeProtection', 'Edge Protection')}</Badge>}
+                  {selectedMeeting.topicSwingFall && <Badge>{t('projectDetail.toolboxMeetings.topics.swingFall', 'Swing Fall Hazards')}</Badge>}
+                  {selectedMeeting.topicMedicalFitness && <Badge>{t('projectDetail.toolboxMeetings.topics.medicalFitness', 'Medical Fitness')}</Badge>}
+                  {selectedMeeting.topicToolDropPrevention && <Badge>{t('projectDetail.toolboxMeetings.topics.toolDropPrevention', 'Tool Drop Prevention')}</Badge>}
+                  {selectedMeeting.topicRegulations && <Badge>{t('projectDetail.toolboxMeetings.topics.regulations', 'Working at Heights Regulations')}</Badge>}
+                  {selectedMeeting.topicRescueProcedures && <Badge>{t('projectDetail.toolboxMeetings.topics.rescueProcedures', 'Rescue Procedures')}</Badge>}
+                  {selectedMeeting.topicSiteHazards && <Badge>{t('projectDetail.toolboxMeetings.topics.siteHazards', 'Site-Specific Hazards')}</Badge>}
+                  {selectedMeeting.topicBuddySystem && <Badge>{t('projectDetail.toolboxMeetings.topics.buddySystem', 'Buddy System')}</Badge>}
                 </div>
               </div>
 
               <div>
                 <div className="text-sm font-medium text-muted-foreground mb-2">
-                  Attendees ({selectedMeeting.attendees?.length || 0})
+                  {t('projectDetail.toolboxMeetings.attendees', 'Attendees')} ({selectedMeeting.attendees?.length || 0})
                 </div>
                 <div className="bg-muted p-3 rounded-md">
                   {selectedMeeting.attendees?.map((attendee: string, idx: number) => (
@@ -2958,7 +2957,7 @@ export default function ProjectDetail() {
 
               {selectedMeeting.additionalNotes && (
                 <div>
-                  <div className="text-sm font-medium text-muted-foreground mb-1">Additional Notes</div>
+                  <div className="text-sm font-medium text-muted-foreground mb-1">{t('projectDetail.toolboxMeetings.additionalNotes', 'Additional Notes')}</div>
                   <div className="text-base bg-muted p-3 rounded-md">
                     {selectedMeeting.additionalNotes}
                   </div>
@@ -2973,19 +2972,19 @@ export default function ProjectDetail() {
       <AlertDialog open={showStartDayDialog} onOpenChange={setShowStartDayDialog}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Start Work Session?</AlertDialogTitle>
+            <AlertDialogTitle>{t('projectDetail.dialogs.startSession.title', 'Start Work Session?')}</AlertDialogTitle>
             <AlertDialogDescription>
-              This will begin tracking your work session for {project.buildingName}. You can end your session later when finished.
+              {t('projectDetail.dialogs.startSession.descriptionSimple', 'This will begin tracking your work session for {{buildingName}}. You can end your session later when finished.', { buildingName: project.buildingName })}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel data-testid="button-cancel-start-day">Cancel</AlertDialogCancel>
+            <AlertDialogCancel data-testid="button-cancel-start-day">{t('common.cancel', 'Cancel')}</AlertDialogCancel>
             <AlertDialogAction
               onClick={confirmStartDay}
               data-testid="button-confirm-start-day"
               disabled={startDayMutation.isPending}
             >
-              {startDayMutation.isPending ? "Starting..." : "Start Work Session"}
+              {startDayMutation.isPending ? t('projectDetail.workSession.starting', 'Starting...') : t('projectDetail.workSession.startSession', 'Start Work Session')}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
@@ -2995,15 +2994,15 @@ export default function ProjectDetail() {
       <Dialog open={showEndDayDialog} onOpenChange={setShowEndDayDialog}>
         <DialogContent className="max-w-md">
           <DialogHeader>
-            <DialogTitle>End Your Work Day</DialogTitle>
+            <DialogTitle>{t('projectDetail.dialogs.endDay.title', 'End Your Work Day')}</DialogTitle>
             <DialogDescription>
               {isHoursBased
-                ? `Enter the completion percentage (0-100%) for your work on ${project.buildingName}.`
+                ? t('projectDetail.dialogs.endDay.descriptionHours', 'Enter the completion percentage (0-100%) for your work on {{buildingName}}.', { buildingName: project.buildingName })
                 : project.jobType === "in_suite_dryer_vent_cleaning" 
-                ? `Enter the number of units you completed today for ${project.buildingName}.`
+                ? t('projectDetail.dialogs.endDay.descriptionUnits', 'Enter the number of units you completed today for {{buildingName}}.', { buildingName: project.buildingName })
                 : project.jobType === "parkade_pressure_cleaning"
-                ? `Enter the number of stalls you cleaned today for ${project.buildingName}.`
-                : `Enter the number of drops you completed today for ${project.buildingName}.`}
+                ? t('projectDetail.dialogs.endDay.descriptionStalls', 'Enter the number of stalls you cleaned today for {{buildingName}}.', { buildingName: project.buildingName })
+                : t('projectDetail.dialogs.endDay.descriptionDrops', 'Enter the number of drops you completed today for {{buildingName}}.', { buildingName: project.buildingName })}
             </DialogDescription>
           </DialogHeader>
 
@@ -3015,7 +3014,7 @@ export default function ProjectDetail() {
                   name="manualCompletionPercentage"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Completion Percentage (%)</FormLabel>
+                      <FormLabel>{t('projectDetail.dialogs.endDay.completionPercentage', 'Completion Percentage (%)')}</FormLabel>
                       <FormControl>
                         <Input
                           type="number"
@@ -3029,7 +3028,7 @@ export default function ProjectDetail() {
                         />
                       </FormControl>
                       <FormDescription>
-                        Enter how much of this job you completed (0-100%)
+                        {t('projectDetail.dialogs.endDay.completionPercentageHelp', 'Enter how much of this job you completed (0-100%)')}
                       </FormDescription>
                       <FormMessage />
                     </FormItem>
@@ -3041,7 +3040,7 @@ export default function ProjectDetail() {
                   name="dropsCompletedNorth"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Units Completed</FormLabel>
+                      <FormLabel>{t('projectDetail.dialogs.endDay.unitsCompleted', 'Units Completed')}</FormLabel>
                       <FormControl>
                         <Input
                           type="number"
@@ -3063,7 +3062,7 @@ export default function ProjectDetail() {
                   name="dropsCompletedNorth"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Stalls Completed</FormLabel>
+                      <FormLabel>{t('projectDetail.dialogs.endDay.stallsCompleted', 'Stalls Completed')}</FormLabel>
                       <FormControl>
                         <Input
                           type="number"
@@ -3086,7 +3085,7 @@ export default function ProjectDetail() {
                   name="dropsCompletedNorth"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>North</FormLabel>
+                      <FormLabel>{t('projectDetail.directions.north', 'North')}</FormLabel>
                       <FormControl>
                         <Input
                           type="number"
@@ -3108,7 +3107,7 @@ export default function ProjectDetail() {
                   name="dropsCompletedEast"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>East</FormLabel>
+                      <FormLabel>{t('projectDetail.directions.east', 'East')}</FormLabel>
                       <FormControl>
                         <Input
                           type="number"
@@ -3130,7 +3129,7 @@ export default function ProjectDetail() {
                   name="dropsCompletedSouth"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>South</FormLabel>
+                      <FormLabel>{t('projectDetail.directions.south', 'South')}</FormLabel>
                       <FormControl>
                         <Input
                           type="number"
@@ -3152,7 +3151,7 @@ export default function ProjectDetail() {
                   name="dropsCompletedWest"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>West</FormLabel>
+                      <FormLabel>{t('projectDetail.directions.west', 'West')}</FormLabel>
                       <FormControl>
                         <Input
                           type="number"
@@ -3187,7 +3186,7 @@ export default function ProjectDetail() {
                   <>
                     {!isInSuite && !isParkade && !isHoursBasedLocal && (
                       <div className="p-3 bg-muted rounded-md">
-                        <div className="text-sm text-muted-foreground">Total Drops</div>
+                        <div className="text-sm text-muted-foreground">{t('projectDetail.progress.totalDrops', 'Total Drops')}</div>
                         <div className="text-2xl font-bold">{totalDrops}</div>
                       </div>
                     )}
@@ -3198,10 +3197,10 @@ export default function ProjectDetail() {
                         name="shortfallReason"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Shortfall Reason (Required)</FormLabel>
+                            <FormLabel>{t('projectDetail.dialogs.endDay.shortfallReason', 'Shortfall Reason (Required)')}</FormLabel>
                             <FormControl>
                               <Textarea
-                                placeholder="Explain why the daily target wasn't met..."
+                                placeholder={t('projectDetail.dialogs.endDay.shortfallPlaceholder', 'Explain why the daily target wasn\'t met...')}
                                 {...field}
                                 data-testid="input-shortfall-reason"
                                 className="min-h-24"
@@ -3227,7 +3226,7 @@ export default function ProjectDetail() {
                   }}
                   data-testid="button-cancel-end-day"
                 >
-                  Cancel
+                  {t('common.cancel', 'Cancel')}
                 </Button>
                 <Button
                   type="submit"
@@ -3237,7 +3236,7 @@ export default function ProjectDetail() {
                   disabled={endDayMutation.isPending}
                 >
                   <span className="material-icons mr-2">stop_circle</span>
-                  {endDayMutation.isPending ? "Ending..." : "End Day"}
+                  {endDayMutation.isPending ? t('projectDetail.workSession.ending', 'Ending...') : t('projectDetail.dialogs.endDay.confirm', 'End Day')}
                 </Button>
               </div>
             </form>
@@ -3251,11 +3250,10 @@ export default function ProjectDetail() {
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <span className="material-icons text-primary">schedule</span>
-              Log Your Hours?
+              {t('projectDetail.dialogs.logHoursPrompt.title', 'Log Your Hours?')}
             </DialogTitle>
             <DialogDescription>
-              Would you like to log the tasks you performed during this work session? 
-              This helps fill your IRATA logbook for certification tracking.
+              {t('projectDetail.dialogs.logHoursPrompt.description', 'Would you like to log the tasks you performed during this work session? This helps fill your IRATA logbook for certification tracking.')}
             </DialogDescription>
           </DialogHeader>
 
@@ -3263,23 +3261,23 @@ export default function ProjectDetail() {
             {/* Session Summary */}
             <div className="p-4 bg-muted rounded-md space-y-3">
               <div className="flex items-center justify-between">
-                <span className="text-sm text-muted-foreground">Hours Worked</span>
+                <span className="text-sm text-muted-foreground">{t('projectDetail.dialogs.logHoursPrompt.hoursWorked', 'Hours Worked')}</span>
                 <span className="text-lg font-semibold text-primary">{endedSessionData?.hoursWorked.toFixed(1)} hrs</span>
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-sm text-muted-foreground">Date</span>
+                <span className="text-sm text-muted-foreground">{t('projectDetail.dialogs.logHoursPrompt.date', 'Date')}</span>
                 <span className="font-medium">
                   {endedSessionData?.workDate ? format(parseLocalDate(endedSessionData.workDate), "MMM d, yyyy") : "-"}
                 </span>
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-sm text-muted-foreground">Building</span>
+                <span className="text-sm text-muted-foreground">{t('projectDetail.dialogs.logHoursPrompt.building', 'Building')}</span>
                 <span className="font-medium truncate max-w-[200px]">{endedSessionData?.buildingName || "-"}</span>
               </div>
             </div>
 
             <p className="text-sm text-muted-foreground mt-4">
-              Your logged hours can be reviewed anytime in "My Logged Hours" from your dashboard.
+              {t('projectDetail.dialogs.logHoursPrompt.reviewNote', 'Your logged hours can be reviewed anytime in "My Logged Hours" from your dashboard.')}
             </p>
           </div>
 
@@ -3290,7 +3288,7 @@ export default function ProjectDetail() {
               onClick={handleDeclineLogHours}
               data-testid="button-decline-log-hours"
             >
-              Not Now
+              {t('projectDetail.dialogs.logHoursPrompt.notNow', 'Not Now')}
             </Button>
             <Button
               type="button"
@@ -3298,7 +3296,7 @@ export default function ProjectDetail() {
               data-testid="button-confirm-log-hours"
             >
               <span className="material-icons mr-2 text-sm">edit_note</span>
-              Yes, Log Hours
+              {t('projectDetail.dialogs.logHoursPrompt.yesLogHours', 'Yes, Log Hours')}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -3312,11 +3310,10 @@ export default function ProjectDetail() {
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <span className="material-icons text-primary">assignment</span>
-              Log Your IRATA Tasks
+              {t('projectDetail.dialogs.irataTask.title', 'Log Your IRATA Tasks')}
             </DialogTitle>
             <DialogDescription>
-              Select all the rope access tasks you performed during this session at {endedSessionData?.buildingName || "this building"}. 
-              This helps track your IRATA logbook hours for certification progression.
+              {t('projectDetail.dialogs.irataTask.description', 'Select all the rope access tasks you performed during this session at {{buildingName}}. This helps track your IRATA logbook hours for certification progression.', { buildingName: endedSessionData?.buildingName || t('projectDetail.dialogs.irataTask.thisBuilding', 'this building') })}
             </DialogDescription>
           </DialogHeader>
 
@@ -3324,24 +3321,24 @@ export default function ProjectDetail() {
             {/* Session Info */}
             <div className="flex flex-wrap gap-4 p-3 bg-muted rounded-md">
               <div>
-                <div className="text-xs text-muted-foreground">Hours Worked</div>
+                <div className="text-xs text-muted-foreground">{t('projectDetail.dialogs.logHoursPrompt.hoursWorked', 'Hours Worked')}</div>
                 <div className="text-lg font-semibold">{endedSessionData?.hoursWorked.toFixed(1)} hrs</div>
               </div>
               <div>
-                <div className="text-xs text-muted-foreground">Date</div>
+                <div className="text-xs text-muted-foreground">{t('projectDetail.dialogs.logHoursPrompt.date', 'Date')}</div>
                 <div className="text-lg font-semibold">
                   {endedSessionData?.workDate ? format(parseLocalDate(endedSessionData.workDate), "MMM d, yyyy") : "-"}
                 </div>
               </div>
               <div className="flex-1">
-                <div className="text-xs text-muted-foreground">Building</div>
+                <div className="text-xs text-muted-foreground">{t('projectDetail.dialogs.logHoursPrompt.building', 'Building')}</div>
                 <div className="text-sm font-medium truncate">{endedSessionData?.buildingName || "-"}</div>
               </div>
             </div>
 
             {/* Task Selection Grid */}
             <div>
-              <Label className="text-sm font-medium mb-3 block">Select Tasks Performed (click to select)</Label>
+              <Label className="text-sm font-medium mb-3 block">{t('projectDetail.dialogs.irataTask.selectTasks', 'Select Tasks Performed (click to select)')}</Label>
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
                 {IRATA_TASK_TYPES.map((task) => {
                   const isSelected = selectedIrataTasks.includes(task.id);
@@ -3384,16 +3381,18 @@ export default function ProjectDetail() {
             {selectedIrataTasks.length > 0 && (
               <div className="p-2 bg-primary/10 rounded-md text-center">
                 <span className="text-sm font-medium text-primary">
-                  {selectedIrataTasks.length} task{selectedIrataTasks.length !== 1 ? "s" : ""} selected
+                  {selectedIrataTasks.length === 1 
+                    ? t('projectDetail.dialogs.irataTask.tasksSelected', '{{count}} task selected', { count: selectedIrataTasks.length })
+                    : t('projectDetail.dialogs.irataTask.tasksSelectedPlural', '{{count}} tasks selected', { count: selectedIrataTasks.length })}
                 </span>
               </div>
             )}
 
             {/* Notes */}
             <div>
-              <Label className="text-sm font-medium mb-2 block">Additional Notes (Optional)</Label>
+              <Label className="text-sm font-medium mb-2 block">{t('projectDetail.dialogs.irataTask.additionalNotes', 'Additional Notes (Optional)')}</Label>
               <Textarea
-                placeholder="Any additional details about the work performed..."
+                placeholder={t('projectDetail.dialogs.irataTask.additionalNotesPlaceholder', 'Any additional details about the work performed...')}
                 value={irataTaskNotes}
                 onChange={(e) => setIrataTaskNotes(e.target.value)}
                 className="min-h-20"
@@ -3409,7 +3408,7 @@ export default function ProjectDetail() {
               onClick={handleSkipIrataTasks}
               data-testid="button-skip-irata-tasks"
             >
-              Skip for Now
+              {t('projectDetail.dialogs.irataTask.skip', 'Skip for Now')}
             </Button>
             <Button
               type="button"
@@ -3418,7 +3417,7 @@ export default function ProjectDetail() {
               data-testid="button-save-irata-tasks"
             >
               <span className="material-icons mr-2 text-sm">save</span>
-              {saveIrataTaskLogMutation.isPending ? "Saving..." : "Save to Logbook"}
+              {saveIrataTaskLogMutation.isPending ? t('projectDetail.dialogs.irataTask.saving', 'Saving...') : t('projectDetail.dialogs.irataTask.save', 'Save to Logbook')}
             </Button>
           </DialogFooter>
         </DialogContent>

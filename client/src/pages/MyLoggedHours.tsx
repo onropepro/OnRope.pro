@@ -15,9 +15,9 @@ import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 
-const getTaskLabel = (taskId: string): string => {
+const getTaskLabel = (taskId: string, t: (key: string, fallback: string) => string): string => {
   const task = IRATA_TASK_TYPES.find(t => t.id === taskId);
-  return task?.label || taskId;
+  return t(`loggedHours.irataTaskTypes.${taskId}`, task?.label || taskId);
 };
 
 const getTaskIcon = (taskId: string): string => {
@@ -80,17 +80,17 @@ export default function MyLoggedHours() {
       queryClient.invalidateQueries({ queryKey: ["/api/user"] });
       refetchUser();
       setShowBaselineDialog(false);
-      toast({ title: "Success", description: "Baseline hours updated successfully" });
+      toast({ title: t('loggedHours.success', 'Success'), description: t('loggedHours.baselineUpdated', 'Baseline hours updated successfully') });
     },
     onError: (error: Error) => {
-      toast({ title: "Error", description: error.message, variant: "destructive" });
+      toast({ title: t('loggedHours.error', 'Error'), description: error.message, variant: "destructive" });
     },
   });
 
   const handleSaveBaselineHours = () => {
     const hours = parseFloat(baselineInput);
     if (isNaN(hours) || hours < 0) {
-      toast({ title: "Invalid input", description: "Please enter a valid number of hours", variant: "destructive" });
+      toast({ title: t('loggedHours.invalidInput', 'Invalid input'), description: t('loggedHours.enterValidHours', 'Please enter a valid number of hours'), variant: "destructive" });
       return;
     }
     updateBaselineHoursMutation.mutate(hours);
@@ -123,10 +123,11 @@ export default function MyLoggedHours() {
   }> = {};
   
   logs.forEach((log: IrataTaskLog) => {
-    const projectKey = log.buildingName || "Unknown Project";
+    const unknownProjectLabel = t('loggedHours.unknownProject', 'Unknown Project');
+    const projectKey = log.buildingName || unknownProjectLabel;
     if (!groupedByProject[projectKey]) {
       groupedByProject[projectKey] = {
-        buildingName: log.buildingName || "Unknown Project",
+        buildingName: log.buildingName || unknownProjectLabel,
         buildingAddress: log.buildingAddress || "",
         logs: [],
         totalHours: 0,
@@ -274,7 +275,7 @@ export default function MyLoggedHours() {
                 <div className="space-y-1">
                   {sortedTasks.slice(0, 3).map(([taskId, count]) => (
                     <div key={taskId} className="flex items-center justify-between gap-2">
-                      <span className="text-sm truncate">{getTaskLabel(taskId)}</span>
+                      <span className="text-sm truncate">{getTaskLabel(taskId, t)}</span>
                       <Badge variant="secondary" className="text-xs">{count}</Badge>
                     </div>
                   ))}
@@ -305,7 +306,7 @@ export default function MyLoggedHours() {
                       className="flex items-center gap-1 px-3 py-1.5"
                     >
                       <span className="material-icons text-sm">{getTaskIcon(taskId)}</span>
-                      <span>{getTaskLabel(taskId)}</span>
+                      <span>{getTaskLabel(taskId, t)}</span>
                       <span className="ml-1 px-1.5 rounded-full bg-muted text-xs font-semibold">
                         {count}
                       </span>
@@ -354,10 +355,10 @@ export default function MyLoggedHours() {
                             </div>
                             <div className="flex items-center gap-3">
                               <Badge variant="secondary">
-                                {project.logs.length} day{project.logs.length !== 1 ? "s" : ""}
+                                {project.logs.length} {project.logs.length !== 1 ? t('loggedHours.days', 'days') : t('loggedHours.day', 'day')}
                               </Badge>
                               <Badge variant="default">
-                                {project.totalHours.toFixed(1)} hrs
+                                {project.totalHours.toFixed(1)} {t('loggedHours.hrs', 'hrs')}
                               </Badge>
                             </div>
                           </div>
@@ -376,7 +377,7 @@ export default function MyLoggedHours() {
                                       {format(parseLocalDate(log.workDate), "EEEE, MMMM d, yyyy")}
                                     </span>
                                   </div>
-                                  <Badge>{parseFloat(log.hoursWorked || "0").toFixed(1)} hrs</Badge>
+                                  <Badge>{parseFloat(log.hoursWorked || "0").toFixed(1)} {t('loggedHours.hrs', 'hrs')}</Badge>
                                 </div>
 
                                 <div className="flex flex-wrap gap-1.5">
@@ -387,7 +388,7 @@ export default function MyLoggedHours() {
                                       className="text-xs flex items-center gap-1"
                                     >
                                       <span className="material-icons text-xs">{getTaskIcon(taskId)}</span>
-                                      {getTaskLabel(taskId)}
+                                      {getTaskLabel(taskId, t)}
                                     </Badge>
                                   ))}
                                 </div>

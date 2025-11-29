@@ -4,6 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useLocation } from "wouter";
+import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
@@ -64,32 +65,32 @@ const flhaFormSchema = z.object({
 
 type FlhaFormValues = z.infer<typeof flhaFormSchema>;
 
-const hazards = [
-  { id: "hazardFalling", label: "Falls from Height" },
-  { id: "hazardSwingFall", label: "Swing Fall Hazard" },
-  { id: "hazardSuspendedRescue", label: "Suspension Trauma / Rescue Required" },
-  { id: "hazardWeather", label: "Adverse Weather Conditions" },
-  { id: "hazardElectrical", label: "Electrical Hazards" },
-  { id: "hazardFallingObjects", label: "Falling Tools/Objects" },
-  { id: "hazardChemical", label: "Chemical Exposure" },
-  { id: "hazardConfined", label: "Confined Spaces" },
-  { id: "hazardSharpEdges", label: "Sharp Edges / Rope Damage" },
-  { id: "hazardUnstableAnchors", label: "Unstable Anchor Points" },
-  { id: "hazardPowerTools", label: "Power Tool Operation at Height" },
-  { id: "hazardPublic", label: "Public Interaction / Access" },
+const hazardKeys = [
+  { id: "hazardFalling", labelKey: "safetyForms.flha.hazards.fallsFromHeight" },
+  { id: "hazardSwingFall", labelKey: "safetyForms.flha.hazards.swingFallHazard" },
+  { id: "hazardSuspendedRescue", labelKey: "safetyForms.flha.hazards.suspensionTrauma" },
+  { id: "hazardWeather", labelKey: "safetyForms.flha.hazards.adverseWeather" },
+  { id: "hazardElectrical", labelKey: "safetyForms.flha.hazards.electricalHazards" },
+  { id: "hazardFallingObjects", labelKey: "safetyForms.flha.hazards.fallingObjects" },
+  { id: "hazardChemical", labelKey: "safetyForms.flha.hazards.chemicalExposure" },
+  { id: "hazardConfined", labelKey: "safetyForms.flha.hazards.confinedSpaces" },
+  { id: "hazardSharpEdges", labelKey: "safetyForms.flha.hazards.sharpEdges" },
+  { id: "hazardUnstableAnchors", labelKey: "safetyForms.flha.hazards.unstableAnchors" },
+  { id: "hazardPowerTools", labelKey: "safetyForms.flha.hazards.powerTools" },
+  { id: "hazardPublic", labelKey: "safetyForms.flha.hazards.publicInteraction" },
 ];
 
-const controls = [
-  { id: "controlPPE", label: "Proper PPE (Harness, Helmet, etc.)" },
-  { id: "controlBackupSystem", label: "Backup Safety Systems" },
-  { id: "controlEdgeProtection", label: "Edge Protection Installed" },
-  { id: "controlBarricades", label: "Barricades / Signage" },
-  { id: "controlWeatherMonitoring", label: "Weather Monitoring" },
-  { id: "controlRescuePlan", label: "Emergency Rescue Plan" },
-  { id: "controlCommunication", label: "Communication System" },
-  { id: "controlToolTethering", label: "Tool Tethering / Drop Prevention" },
-  { id: "controlPermits", label: "Work Permits Obtained" },
-  { id: "controlInspections", label: "Pre-work Equipment Inspections" },
+const controlKeys = [
+  { id: "controlPPE", labelKey: "safetyForms.flha.controls.properPPE" },
+  { id: "controlBackupSystem", labelKey: "safetyForms.flha.controls.backupSystems" },
+  { id: "controlEdgeProtection", labelKey: "safetyForms.flha.controls.edgeProtection" },
+  { id: "controlBarricades", labelKey: "safetyForms.flha.controls.barricades" },
+  { id: "controlWeatherMonitoring", labelKey: "safetyForms.flha.controls.weatherMonitoring" },
+  { id: "controlRescuePlan", labelKey: "safetyForms.flha.controls.rescuePlan" },
+  { id: "controlCommunication", labelKey: "safetyForms.flha.controls.communication" },
+  { id: "controlToolTethering", labelKey: "safetyForms.flha.controls.toolTethering" },
+  { id: "controlPermits", labelKey: "safetyForms.flha.controls.permits" },
+  { id: "controlInspections", labelKey: "safetyForms.flha.controls.inspections" },
 ];
 
 type Signature = {
@@ -101,6 +102,7 @@ type Signature = {
 export default function FlhaForm() {
   const [, navigate] = useLocation();
   const { toast } = useToast();
+  const { t } = useTranslation();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [selectedEmployees, setSelectedEmployees] = useState<string[]>([]);
   const [signatures, setSignatures] = useState<Signature[]>([]);
@@ -185,8 +187,8 @@ export default function FlhaForm() {
   const saveSignature = () => {
     if (!signatureCanvasRef.current || signatureCanvasRef.current.isEmpty()) {
       toast({
-        title: "Error",
-        description: "Please provide a signature",
+        title: t('safetyForms.flha.toasts.error', 'Error'),
+        description: t('safetyForms.flha.toasts.pleaseProvideSignature', 'Please provide a signature'),
         variant: "destructive",
       });
       return;
@@ -211,8 +213,8 @@ export default function FlhaForm() {
     signatureCanvasRef.current.clear();
 
     toast({
-      title: "Success",
-      description: `Signature captured for ${employee.name}`,
+      title: t('safetyForms.flha.toasts.success', 'Success'),
+      description: `${t('safetyForms.flha.toasts.signatureCaptured', 'Signature captured for')} ${employee.name}`,
     });
   };
 
@@ -237,16 +239,16 @@ export default function FlhaForm() {
     },
     onSuccess: () => {
       toast({
-        title: "Success",
-        description: "FLHA form submitted successfully",
+        title: t('safetyForms.flha.toasts.success', 'Success'),
+        description: t('safetyForms.flha.toasts.flhaSubmitted', 'FLHA form submitted successfully'),
       });
       queryClient.invalidateQueries({ queryKey: ["/api/flha-forms"] });
       navigate("/dashboard");
     },
     onError: (error: Error) => {
       toast({
-        title: "Error",
-        description: error.message || "Failed to submit FLHA form",
+        title: t('safetyForms.flha.toasts.error', 'Error'),
+        description: error.message || t('safetyForms.flha.toasts.failedToSubmit', 'Failed to submit FLHA form'),
         variant: "destructive",
       });
     },
@@ -255,8 +257,8 @@ export default function FlhaForm() {
   const onSubmit = async (data: FlhaFormValues) => {
     if (selectedEmployees.length === 0) {
       toast({
-        title: "Error",
-        description: "Please select at least one team member",
+        title: t('safetyForms.flha.toasts.error', 'Error'),
+        description: t('safetyForms.flha.toasts.selectTeamMember', 'Please select at least one team member'),
         variant: "destructive",
       });
       return;
@@ -284,7 +286,7 @@ export default function FlhaForm() {
           </Button>
           <div className="flex items-center gap-2">
             <AlertTriangle className="h-6 w-6 text-primary" />
-            <h1 className="text-2xl font-bold">Field Level Hazard Assessment</h1>
+            <h1 className="text-2xl font-bold">{t('safetyForms.flha.title', 'Field Level Hazard Assessment')}</h1>
           </div>
         </div>
 
@@ -292,13 +294,12 @@ export default function FlhaForm() {
           <CardHeader>
             <div className="flex items-center gap-2">
               <Shield className="h-5 w-5 text-primary" />
-              <CardTitle className="text-lg">IRATA International Code of Practice (ICOP)</CardTitle>
+              <CardTitle className="text-lg">{t('safetyForms.flha.icopTitle', 'IRATA International Code of Practice (ICOP)')}</CardTitle>
             </div>
           </CardHeader>
           <CardContent className="space-y-3">
             <p className="text-sm text-muted-foreground">
-              All rope access operations must comply with the IRATA International Code of Practice for Industrial Rope Access (TC-102ENG).
-              This document outlines mandatory safety requirements, technical procedures, and best practices for rope access work.
+              {t('safetyForms.flha.icopDescription', 'All rope access operations must comply with the IRATA International Code of Practice for Industrial Rope Access (TC-102ENG). This document outlines mandatory safety requirements, technical procedures, and best practices for rope access work.')}
             </p>
             <div className="flex flex-wrap gap-2">
               <Badge variant="outline" className="text-xs">
@@ -309,7 +310,7 @@ export default function FlhaForm() {
                   className="flex items-center gap-1 hover:text-primary"
                   data-testid="link-irata-icop"
                 >
-                  Download Official ICOP Document
+                  {t('safetyForms.flha.downloadICOP', 'Download Official ICOP Document')}
                 </a>
               </Badge>
               <Badge variant="outline" className="text-xs">
@@ -320,7 +321,7 @@ export default function FlhaForm() {
                   className="flex items-center gap-1 hover:text-primary"
                   data-testid="link-irata-icop-info"
                 >
-                  View IRATA ICOP Information
+                  {t('safetyForms.flha.viewICOPInfo', 'View IRATA ICOP Information')}
                 </a>
               </Badge>
             </div>
@@ -329,7 +330,7 @@ export default function FlhaForm() {
 
         <Card>
           <CardHeader>
-            <CardTitle>FLHA Form - Rope Access</CardTitle>
+            <CardTitle>{t('safetyForms.flha.formTitle', 'FLHA Form - Rope Access')}</CardTitle>
           </CardHeader>
           <CardContent>
             <Form {...form}>
@@ -339,11 +340,11 @@ export default function FlhaForm() {
                   name="projectId"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Project *</FormLabel>
+                      <FormLabel>{t('safetyForms.flha.project', 'Project')} *</FormLabel>
                       <Select onValueChange={field.onChange} value={field.value}>
                         <FormControl>
                           <SelectTrigger data-testid="select-project">
-                            <SelectValue placeholder="Select project" />
+                            <SelectValue placeholder={t('safetyForms.flha.selectProject', 'Select project')} />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
@@ -364,7 +365,7 @@ export default function FlhaForm() {
                   name="assessmentDate"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Assessment Date *</FormLabel>
+                      <FormLabel>{t('safetyForms.flha.assessmentDate', 'Assessment Date')} *</FormLabel>
                       <FormControl>
                         <Input
                           type="date"
@@ -383,11 +384,11 @@ export default function FlhaForm() {
                   name="assessorName"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Assessor Name *</FormLabel>
+                      <FormLabel>{t('safetyForms.flha.assessorName', 'Assessor Name')} *</FormLabel>
                       <FormControl>
                         <Input
                           {...field}
-                          placeholder="Your full name"
+                          placeholder={t('safetyForms.flha.yourFullName', 'Your full name')}
                           data-testid="input-assessor-name"
                         />
                       </FormControl>
@@ -401,11 +402,11 @@ export default function FlhaForm() {
                   name="jobDescription"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Job Description *</FormLabel>
+                      <FormLabel>{t('safetyForms.flha.jobDescription', 'Job Description')} *</FormLabel>
                       <FormControl>
                         <Textarea
                           {...field}
-                          placeholder="Describe the work to be performed..."
+                          placeholder={t('safetyForms.flha.describeWork', 'Describe the work to be performed...')}
                           data-testid="input-job-description"
                         />
                       </FormControl>
@@ -419,11 +420,11 @@ export default function FlhaForm() {
                   name="location"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Location *</FormLabel>
+                      <FormLabel>{t('safetyForms.flha.location', 'Location')} *</FormLabel>
                       <FormControl>
                         <Input
                           {...field}
-                          placeholder="Building/Site location"
+                          placeholder={t('safetyForms.flha.buildingSiteLocation', 'Building/Site location')}
                           data-testid="input-location"
                         />
                       </FormControl>
@@ -437,11 +438,11 @@ export default function FlhaForm() {
                   name="workArea"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Specific Work Area</FormLabel>
+                      <FormLabel>{t('safetyForms.flha.specificWorkArea', 'Specific Work Area')}</FormLabel>
                       <FormControl>
                         <Input
                           {...field}
-                          placeholder="e.g., East elevation, Roof, Parkade Level 2"
+                          placeholder={t('safetyForms.flha.workAreaPlaceholder', 'e.g., East elevation, Roof, Parkade Level 2')}
                           data-testid="input-work-area"
                         />
                       </FormControl>
@@ -454,10 +455,10 @@ export default function FlhaForm() {
                 <div className="space-y-4 border-t pt-4">
                   <h3 className="text-lg font-semibold flex items-center gap-2">
                     <AlertTriangle className="h-5 w-5 text-red-500" />
-                    Identified Hazards
+                    {t('safetyForms.flha.identifiedHazards', 'Identified Hazards')}
                   </h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                    {hazards.map((hazard) => (
+                    {hazardKeys.map((hazard) => (
                       <FormField
                         key={hazard.id}
                         control={form.control}
@@ -472,7 +473,7 @@ export default function FlhaForm() {
                               />
                             </FormControl>
                             <FormLabel className="font-normal cursor-pointer">
-                              {hazard.label}
+                              {t(hazard.labelKey)}
                             </FormLabel>
                           </FormItem>
                         )}
@@ -485,11 +486,11 @@ export default function FlhaForm() {
                     name="additionalHazards"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Additional Hazards</FormLabel>
+                        <FormLabel>{t('safetyForms.flha.additionalHazards', 'Additional Hazards')}</FormLabel>
                         <FormControl>
                           <Textarea
                             {...field}
-                            placeholder="Describe any additional hazards not listed above..."
+                            placeholder={t('safetyForms.flha.additionalHazardsPlaceholder', 'Describe any additional hazards not listed above...')}
                             data-testid="input-additional-hazards"
                           />
                         </FormControl>
@@ -503,10 +504,10 @@ export default function FlhaForm() {
                 <div className="space-y-4 border-t pt-4">
                   <h3 className="text-lg font-semibold flex items-center gap-2">
                     <Shield className="h-5 w-5 text-green-500" />
-                    Controls Implemented
+                    {t('safetyForms.flha.controlsImplemented', 'Controls Implemented')}
                   </h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                    {controls.map((control) => (
+                    {controlKeys.map((control) => (
                       <FormField
                         key={control.id}
                         control={form.control}
@@ -521,7 +522,7 @@ export default function FlhaForm() {
                               />
                             </FormControl>
                             <FormLabel className="font-normal cursor-pointer">
-                              {control.label}
+                              {t(control.labelKey)}
                             </FormLabel>
                           </FormItem>
                         )}
@@ -534,11 +535,11 @@ export default function FlhaForm() {
                     name="additionalControls"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Additional Controls</FormLabel>
+                        <FormLabel>{t('safetyForms.flha.additionalControls', 'Additional Controls')}</FormLabel>
                         <FormControl>
                           <Textarea
                             {...field}
-                            placeholder="Describe any additional controls not listed above..."
+                            placeholder={t('safetyForms.flha.additionalControlsPlaceholder', 'Describe any additional controls not listed above...')}
                             data-testid="input-additional-controls"
                           />
                         </FormControl>
@@ -550,25 +551,25 @@ export default function FlhaForm() {
 
                 {/* Risk Assessment */}
                 <div className="space-y-4 border-t pt-4">
-                  <h3 className="text-lg font-semibold">Risk Assessment</h3>
+                  <h3 className="text-lg font-semibold">{t('safetyForms.flha.riskAssessment', 'Risk Assessment')}</h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <FormField
                       control={form.control}
                       name="riskLevelBefore"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Risk Level (Before Controls)</FormLabel>
+                          <FormLabel>{t('safetyForms.flha.riskLevelBefore', 'Risk Level (Before Controls)')}</FormLabel>
                           <Select onValueChange={field.onChange} value={field.value}>
                             <FormControl>
                               <SelectTrigger data-testid="select-risk-before">
-                                <SelectValue placeholder="Select risk level" />
+                                <SelectValue placeholder={t('safetyForms.flha.selectRiskLevel', 'Select risk level')} />
                               </SelectTrigger>
                             </FormControl>
                             <SelectContent>
-                              <SelectItem value="low">Low</SelectItem>
-                              <SelectItem value="medium">Medium</SelectItem>
-                              <SelectItem value="high">High</SelectItem>
-                              <SelectItem value="extreme">Extreme</SelectItem>
+                              <SelectItem value="low">{t('safetyForms.flha.low', 'Low')}</SelectItem>
+                              <SelectItem value="medium">{t('safetyForms.flha.medium', 'Medium')}</SelectItem>
+                              <SelectItem value="high">{t('safetyForms.flha.high', 'High')}</SelectItem>
+                              <SelectItem value="extreme">{t('safetyForms.flha.extreme', 'Extreme')}</SelectItem>
                             </SelectContent>
                           </Select>
                           <FormMessage />
@@ -581,18 +582,18 @@ export default function FlhaForm() {
                       name="riskLevelAfter"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Risk Level (After Controls)</FormLabel>
+                          <FormLabel>{t('safetyForms.flha.riskLevelAfter', 'Risk Level (After Controls)')}</FormLabel>
                           <Select onValueChange={field.onChange} value={field.value}>
                             <FormControl>
                               <SelectTrigger data-testid="select-risk-after">
-                                <SelectValue placeholder="Select risk level" />
+                                <SelectValue placeholder={t('safetyForms.flha.selectRiskLevel', 'Select risk level')} />
                               </SelectTrigger>
                             </FormControl>
                             <SelectContent>
-                              <SelectItem value="low">Low</SelectItem>
-                              <SelectItem value="medium">Medium</SelectItem>
-                              <SelectItem value="high">High</SelectItem>
-                              <SelectItem value="extreme">Extreme</SelectItem>
+                              <SelectItem value="low">{t('safetyForms.flha.low', 'Low')}</SelectItem>
+                              <SelectItem value="medium">{t('safetyForms.flha.medium', 'Medium')}</SelectItem>
+                              <SelectItem value="high">{t('safetyForms.flha.high', 'High')}</SelectItem>
+                              <SelectItem value="extreme">{t('safetyForms.flha.extreme', 'Extreme')}</SelectItem>
                             </SelectContent>
                           </Select>
                           <FormMessage />
@@ -607,11 +608,11 @@ export default function FlhaForm() {
                   name="emergencyContacts"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Emergency Contacts</FormLabel>
+                      <FormLabel>{t('safetyForms.flha.emergencyContacts', 'Emergency Contacts')}</FormLabel>
                       <FormControl>
                         <Textarea
                           {...field}
-                          placeholder="List emergency contacts and phone numbers..."
+                          placeholder={t('safetyForms.flha.emergencyContactsPlaceholder', 'List emergency contacts and phone numbers...')}
                           data-testid="input-emergency-contacts"
                         />
                       </FormControl>
@@ -623,9 +624,9 @@ export default function FlhaForm() {
                 {/* Team Members */}
                 <div className="space-y-3">
                   <div>
-                    <FormLabel>Team Members *</FormLabel>
+                    <FormLabel>{t('safetyForms.flha.teamMembers', 'Team Members')} *</FormLabel>
                     <p className="text-sm text-muted-foreground mt-1">
-                      Select all team members involved in this work
+                      {t('safetyForms.flha.selectTeamMembers', 'Select all team members involved in this work')}
                     </p>
                   </div>
                   <div className="grid grid-cols-2 gap-2 max-h-64 overflow-y-auto border rounded-md p-3">
@@ -655,9 +656,9 @@ export default function FlhaForm() {
                 {selectedEmployees.length > 0 && (
                   <div className="space-y-4 border-t pt-4">
                     <div className="flex items-center justify-between">
-                      <h3 className="text-lg font-semibold">Team Signatures</h3>
+                      <h3 className="text-lg font-semibold">{t('safetyForms.flha.teamSignatures', 'Team Signatures')}</h3>
                       <Badge variant="secondary">
-                        {signatures.length} of {selectedEmployees.length} signed
+                        {signatures.length} {t('safetyForms.flha.ofSigned', 'of')} {selectedEmployees.length} {t('safetyForms.flha.signed', 'signed').toLowerCase()}
                       </Badge>
                     </div>
 
@@ -678,7 +679,7 @@ export default function FlhaForm() {
                               <div className="flex items-center gap-2">
                                 <Badge variant="default" className="gap-1">
                                   <PenTool className="h-3 w-3" />
-                                  Signed
+                                  {t('safetyForms.flha.signed', 'Signed')}
                                 </Badge>
                                 <Button
                                   type="button"
@@ -699,7 +700,7 @@ export default function FlhaForm() {
                                 data-testid={`button-sign-${employeeId}`}
                               >
                                 <PenTool className="h-4 w-4 mr-2" />
-                                Sign
+                                {t('safetyForms.flha.sign', 'Sign')}
                               </Button>
                             )}
                           </div>
@@ -716,7 +717,7 @@ export default function FlhaForm() {
                     onClick={() => navigate("/safety-forms")}
                     data-testid="button-cancel"
                   >
-                    Cancel
+                    {t('safetyForms.flha.cancel', 'Cancel')}
                   </Button>
                   <Button
                     type="submit"
@@ -724,7 +725,7 @@ export default function FlhaForm() {
                     data-testid="button-submit"
                     className="flex-1"
                   >
-                    {isSubmitting ? "Submitting..." : "Submit FLHA"}
+                    {isSubmitting ? t('safetyForms.flha.submitting', 'Submitting...') : t('safetyForms.flha.submitFlha', 'Submit FLHA')}
                   </Button>
                 </div>
               </form>
@@ -737,7 +738,7 @@ export default function FlhaForm() {
       <Dialog open={showSignatureDialog} onOpenChange={setShowSignatureDialog}>
         <DialogContent className="max-w-2xl">
           <DialogHeader>
-            <DialogTitle>Provide Signature</DialogTitle>
+            <DialogTitle>{t('safetyForms.flha.provideSignature', 'Provide Signature')}</DialogTitle>
             <DialogDescription>
               {selectedSignatureEmployee && employees.find(e => e.id === selectedSignatureEmployee)?.name}
             </DialogDescription>
@@ -755,7 +756,7 @@ export default function FlhaForm() {
               />
             </div>
             <p className="text-sm text-muted-foreground text-center">
-              Sign above using your mouse or touch screen
+              {t('safetyForms.flha.signAbove', 'Sign above using your mouse or touch screen')}
             </p>
           </div>
 
@@ -766,14 +767,14 @@ export default function FlhaForm() {
               onClick={clearSignature}
               data-testid="button-clear-signature"
             >
-              Clear
+              {t('safetyForms.flha.clear', 'Clear')}
             </Button>
             <Button
               type="button"
               onClick={saveSignature}
               data-testid="button-save-signature"
             >
-              Save Signature
+              {t('safetyForms.flha.saveSignature', 'Save Signature')}
             </Button>
           </DialogFooter>
         </DialogContent>

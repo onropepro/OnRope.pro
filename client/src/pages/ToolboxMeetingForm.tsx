@@ -4,6 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useLocation } from "wouter";
+import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
@@ -24,9 +25,8 @@ const toolboxMeetingFormSchema = z.object({
   projectId: z.string().min(1, "Project is required"),
   meetingDate: z.string().min(1, "Date is required"),
   conductedByName: z.string().min(1, "Your name is required"),
-  attendees: z.union([z.string(), z.array(z.string())]).optional(), // Can be string or array, handled in mutation
+  attendees: z.union([z.string(), z.array(z.string())]).optional(),
   
-  // Topics
   topicFallProtection: z.boolean().default(false),
   topicAnchorPoints: z.boolean().default(false),
   topicRopeInspection: z.boolean().default(false),
@@ -54,29 +54,6 @@ const toolboxMeetingFormSchema = z.object({
 
 type ToolboxMeetingFormValues = z.infer<typeof toolboxMeetingFormSchema>;
 
-const topics = [
-  { id: "topicFallProtection", label: "Fall Protection and Rescue Procedures" },
-  { id: "topicAnchorPoints", label: "Anchor Point Selection and Inspection" },
-  { id: "topicRopeInspection", label: "Rope Inspection and Maintenance" },
-  { id: "topicKnotTying", label: "Knot Tying and Verification" },
-  { id: "topicPPECheck", label: "Personal Protective Equipment (PPE) Check" },
-  { id: "topicWeatherConditions", label: "Weather Conditions and Work Stoppage" },
-  { id: "topicCommunication", label: "Communication Signals and Procedures" },
-  { id: "topicEmergencyEvacuation", label: "Emergency Evacuation Procedures" },
-  { id: "topicHazardAssessment", label: "Work Area Hazard Assessment" },
-  { id: "topicLoadCalculations", label: "Load Calculations and Weight Limits" },
-  { id: "topicEquipmentCompatibility", label: "Equipment Compatibility Check" },
-  { id: "topicDescenderAscender", label: "Descender and Ascender Use" },
-  { id: "topicEdgeProtection", label: "Edge Protection Requirements" },
-  { id: "topicSwingFall", label: "Swing Fall Hazards" },
-  { id: "topicMedicalFitness", label: "Medical Fitness and Fatigue Management" },
-  { id: "topicToolDropPrevention", label: "Tool Drop Prevention" },
-  { id: "topicRegulations", label: "Working at Heights Regulations" },
-  { id: "topicRescueProcedures", label: "Rescue Procedures and Equipment" },
-  { id: "topicSiteHazards", label: "Site-Specific Hazards" },
-  { id: "topicBuddySystem", label: "Buddy System and Supervision" },
-];
-
 type Signature = {
   employeeId: string;
   employeeName: string;
@@ -86,12 +63,36 @@ type Signature = {
 export default function ToolboxMeetingForm() {
   const [, navigate] = useLocation();
   const { toast } = useToast();
+  const { t } = useTranslation();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [selectedEmployees, setSelectedEmployees] = useState<string[]>([]);
   const [signatures, setSignatures] = useState<Signature[]>([]);
   const [showSignatureDialog, setShowSignatureDialog] = useState(false);
   const [selectedSignatureEmployee, setSelectedSignatureEmployee] = useState<string>("");
   const signatureCanvasRef = useRef<SignatureCanvas>(null);
+
+  const topics = [
+    { id: "topicFallProtection", label: t('safetyForms.toolbox.topics.fallProtection', 'Fall Protection and Rescue Procedures') },
+    { id: "topicAnchorPoints", label: t('safetyForms.toolbox.topics.anchorPoints', 'Anchor Point Selection and Inspection') },
+    { id: "topicRopeInspection", label: t('safetyForms.toolbox.topics.ropeInspection', 'Rope Inspection and Maintenance') },
+    { id: "topicKnotTying", label: t('safetyForms.toolbox.topics.knotTying', 'Knot Tying and Verification') },
+    { id: "topicPPECheck", label: t('safetyForms.toolbox.topics.ppeCheck', 'Personal Protective Equipment (PPE) Check') },
+    { id: "topicWeatherConditions", label: t('safetyForms.toolbox.topics.weatherConditions', 'Weather Conditions and Work Stoppage') },
+    { id: "topicCommunication", label: t('safetyForms.toolbox.topics.communication', 'Communication Signals and Procedures') },
+    { id: "topicEmergencyEvacuation", label: t('safetyForms.toolbox.topics.emergencyEvacuation', 'Emergency Evacuation Procedures') },
+    { id: "topicHazardAssessment", label: t('safetyForms.toolbox.topics.hazardAssessment', 'Work Area Hazard Assessment') },
+    { id: "topicLoadCalculations", label: t('safetyForms.toolbox.topics.loadCalculations', 'Load Calculations and Weight Limits') },
+    { id: "topicEquipmentCompatibility", label: t('safetyForms.toolbox.topics.equipmentCompatibility', 'Equipment Compatibility Check') },
+    { id: "topicDescenderAscender", label: t('safetyForms.toolbox.topics.descenderAscender', 'Descender and Ascender Use') },
+    { id: "topicEdgeProtection", label: t('safetyForms.toolbox.topics.edgeProtection', 'Edge Protection Requirements') },
+    { id: "topicSwingFall", label: t('safetyForms.toolbox.topics.swingFall', 'Swing Fall Hazards') },
+    { id: "topicMedicalFitness", label: t('safetyForms.toolbox.topics.medicalFitness', 'Medical Fitness and Fatigue Management') },
+    { id: "topicToolDropPrevention", label: t('safetyForms.toolbox.topics.toolDropPrevention', 'Tool Drop Prevention') },
+    { id: "topicRegulations", label: t('safetyForms.toolbox.topics.regulations', 'Working at Heights Regulations') },
+    { id: "topicRescueProcedures", label: t('safetyForms.toolbox.topics.rescueProcedures', 'Rescue Procedures and Equipment') },
+    { id: "topicSiteHazards", label: t('safetyForms.toolbox.topics.siteHazards', 'Site-Specific Hazards') },
+    { id: "topicBuddySystem", label: t('safetyForms.toolbox.topics.buddySystem', 'Buddy System and Supervision') },
+  ];
 
   const { data: projectsData } = useQuery<{ projects: Project[] }>({
     queryKey: ["/api/projects"],
@@ -101,15 +102,12 @@ export default function ToolboxMeetingForm() {
     queryKey: ["/api/employees"],
   });
 
-  // Get current user to auto-fill the "Conducted By" field
   const { data: currentUser } = useQuery<{ id: number; firstName: string; lastName: string; fullName?: string }>({
     queryKey: ["/api/user"],
   });
 
-  // Filter out terminated employees
   const employees = (employeesData?.employees || []);
 
-  // Helper for local date formatting
   const getLocalDateString = () => {
     const d = new Date();
     return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
@@ -147,7 +145,6 @@ export default function ToolboxMeetingForm() {
     },
   });
 
-  // Auto-fill the current user's name when data loads
   useEffect(() => {
     if (currentUser) {
       const fullName = currentUser.fullName || `${currentUser.firstName || ''} ${currentUser.lastName || ''}`.trim();
@@ -157,7 +154,6 @@ export default function ToolboxMeetingForm() {
     }
   }, [currentUser, form]);
 
-  // Toggle employee by ID for reliable tracking
   const toggleEmployee = (employeeId: string) => {
     setSelectedEmployees(prev => 
       prev.includes(employeeId)
@@ -166,20 +162,18 @@ export default function ToolboxMeetingForm() {
     );
   };
 
-  // Get employee name from ID
   const getEmployeeName = (employeeId: string) => {
     const employee = employees.find(e => e.id === employeeId);
-    return employee?.name || "Unknown";
+    return employee?.name || t('common.unknown', 'Unknown');
   };
 
-  // Get selected employee names for display and API
   const selectedEmployeeNames = selectedEmployees.map(id => getEmployeeName(id));
 
   const handleAddSignature = () => {
     if (selectedEmployees.length === 0) {
       toast({
-        title: "No Attendees Selected",
-        description: "Please select attendees first before collecting signatures",
+        title: t('safetyForms.toolbox.toasts.noAttendeesSelected', 'No Attendees Selected'),
+        description: t('safetyForms.toolbox.toasts.selectAttendeesFirst', 'Please select attendees first before collecting signatures'),
         variant: "destructive",
       });
       return;
@@ -190,8 +184,8 @@ export default function ToolboxMeetingForm() {
   const handleSaveSignature = () => {
     if (!selectedSignatureEmployee) {
       toast({
-        title: "Select Employee",
-        description: "Please select an employee for this signature",
+        title: t('safetyForms.toolbox.toasts.selectEmployee', 'Select Employee'),
+        description: t('safetyForms.toolbox.toasts.selectEmployeeForSignature', 'Please select an employee for this signature'),
         variant: "destructive",
       });
       return;
@@ -199,8 +193,8 @@ export default function ToolboxMeetingForm() {
 
     if (signatureCanvasRef.current?.isEmpty()) {
       toast({
-        title: "No Signature",
-        description: "Please draw a signature before saving",
+        title: t('safetyForms.toolbox.toasts.noSignature', 'No Signature'),
+        description: t('safetyForms.toolbox.toasts.drawSignatureFirst', 'Please draw a signature before saving'),
         variant: "destructive",
       });
       return;
@@ -211,11 +205,10 @@ export default function ToolboxMeetingForm() {
 
     const signatureDataUrl = signatureCanvasRef.current?.toDataURL() || "";
     
-    // Check if employee already signed
     if (signatures.some(s => s.employeeId === selectedSignatureEmployee)) {
       toast({
-        title: "Already Signed",
-        description: `${employee.name} has already signed`,
+        title: t('safetyForms.toolbox.toasts.alreadySigned', 'Already Signed'),
+        description: `${employee.name} ${t('safetyForms.toolbox.toasts.hasAlreadySigned', 'has already signed')}`,
         variant: "destructive",
       });
       return;
@@ -228,8 +221,8 @@ export default function ToolboxMeetingForm() {
     }]);
 
     toast({
-      title: "Signature Added",
-      description: `Signature for ${employee.name} has been saved`,
+      title: t('safetyForms.toolbox.toasts.signatureAdded', 'Signature Added'),
+      description: `${t('safetyForms.toolbox.toasts.signatureSaved', 'Signature for')} ${employee.name} ${t('common.saved', 'has been saved')}`,
     });
 
     setShowSignatureDialog(false);
@@ -240,7 +233,7 @@ export default function ToolboxMeetingForm() {
   const removeSignature = (employeeId: string) => {
     setSignatures(prev => prev.filter(s => s.employeeId !== employeeId));
     toast({
-      description: "Signature removed",
+      description: t('safetyForms.toolbox.toasts.signatureRemoved', 'Signature removed'),
     });
   };
 
@@ -253,11 +246,10 @@ export default function ToolboxMeetingForm() {
         signatures,
       });
       
-      // Send attendee names for database storage, IDs for validation
       const response = await apiRequest("POST", "/api/toolbox-meetings", {
         ...data,
         attendees: selectedEmployeeNames,
-        attendeeIds: selectedEmployees, // For backend validation
+        attendeeIds: selectedEmployees,
         signatures,
       });
       
@@ -268,8 +260,8 @@ export default function ToolboxMeetingForm() {
     onSuccess: (data) => {
       console.log('[Toolbox Meeting] Navigating to dashboard');
       toast({
-        title: "Success",
-        description: "Toolbox meeting recorded successfully",
+        title: t('safetyForms.toolbox.toasts.success', 'Success'),
+        description: t('safetyForms.toolbox.toasts.meetingRecorded', 'Toolbox meeting recorded successfully'),
       });
       queryClient.invalidateQueries({ queryKey: ["/api/toolbox-meetings"] });
       navigate("/dashboard");
@@ -277,14 +269,13 @@ export default function ToolboxMeetingForm() {
     onError: (error: Error) => {
       console.error('[Toolbox Meeting] Error:', error);
       toast({
-        title: "Error",
-        description: error.message || "Failed to record toolbox meeting",
+        title: t('safetyForms.toolbox.toasts.error', 'Error'),
+        description: error.message || t('safetyForms.toolbox.toasts.failedToRecord', 'Failed to record toolbox meeting'),
         variant: "destructive",
       });
     },
   });
 
-  // Helper to get attendee IDs who haven't signed yet (compare by ID for reliability)
   const getUnsignedAttendeeIds = () => {
     return selectedEmployees.filter(employeeId => {
       return !signatures.some(s => s.employeeId === employeeId);
@@ -298,18 +289,17 @@ export default function ToolboxMeetingForm() {
   const onSubmit = async (data: ToolboxMeetingFormValues) => {
     if (selectedEmployees.length === 0) {
       toast({
-        title: "Error",
-        description: "Please select at least one attendee",
+        title: t('safetyForms.toolbox.toasts.error', 'Error'),
+        description: t('safetyForms.toolbox.toasts.selectAtLeastOne', 'Please select at least one attendee'),
         variant: "destructive",
       });
       return;
     }
     
-    // Check if all attendees have signed (by ID for reliability)
     if (unsignedAttendeeIds.length > 0) {
       toast({
-        title: "Signatures Required",
-        description: `All attendees must sign. Missing signatures from: ${unsignedAttendeeNames.join(", ")}`,
+        title: t('safetyForms.toolbox.toasts.signaturesRequired', 'Signatures Required'),
+        description: `${t('safetyForms.toolbox.toasts.missingSignaturesFrom', 'All attendees must sign. Missing signatures from:')} ${unsignedAttendeeNames.join(", ")}`,
         variant: "destructive",
       });
       return;
@@ -337,7 +327,7 @@ export default function ToolboxMeetingForm() {
           </Button>
           <div className="flex items-center gap-2">
             <FileCheck className="h-6 w-6 text-primary" />
-            <h1 className="text-2xl font-bold">Daily Toolbox Meeting</h1>
+            <h1 className="text-2xl font-bold">{t('safetyForms.toolbox.title', 'Daily Toolbox Meeting')}</h1>
           </div>
         </div>
 
@@ -345,13 +335,12 @@ export default function ToolboxMeetingForm() {
           <CardHeader>
             <div className="flex items-center gap-2">
               <Shield className="h-5 w-5 text-primary" />
-              <CardTitle className="text-lg">IRATA International Code of Practice (ICOP)</CardTitle>
+              <CardTitle className="text-lg">{t('safetyForms.toolbox.icopTitle', 'IRATA International Code of Practice (ICOP)')}</CardTitle>
             </div>
           </CardHeader>
           <CardContent className="space-y-3">
             <p className="text-sm text-muted-foreground">
-              All rope access operations must comply with the IRATA International Code of Practice for Industrial Rope Access (TC-102ENG).
-              This document outlines mandatory safety requirements, technical procedures, and best practices for rope access work.
+              {t('safetyForms.toolbox.icopDescription', 'All rope access operations must comply with the IRATA International Code of Practice for Industrial Rope Access (TC-102ENG). This document outlines mandatory safety requirements, technical procedures, and best practices for rope access work.')}
             </p>
             <div className="flex flex-wrap gap-2">
               <Badge variant="outline" className="text-xs">
@@ -362,7 +351,7 @@ export default function ToolboxMeetingForm() {
                   className="flex items-center gap-1 hover:text-primary"
                   data-testid="link-irata-icop"
                 >
-                  Download Official ICOP Document
+                  {t('safetyForms.toolbox.downloadICOP', 'Download Official ICOP Document')}
                 </a>
               </Badge>
               <Badge variant="outline" className="text-xs">
@@ -373,7 +362,7 @@ export default function ToolboxMeetingForm() {
                   className="flex items-center gap-1 hover:text-primary"
                   data-testid="link-irata-icop-info"
                 >
-                  View IRATA ICOP Information
+                  {t('safetyForms.toolbox.viewICOPInfo', 'View IRATA ICOP Information')}
                 </a>
               </Badge>
             </div>
@@ -382,7 +371,7 @@ export default function ToolboxMeetingForm() {
 
         <Card>
           <CardHeader>
-            <CardTitle>Meeting Information</CardTitle>
+            <CardTitle>{t('safetyForms.toolbox.meetingInformation', 'Meeting Information')}</CardTitle>
           </CardHeader>
           <CardContent>
             <Form {...form}>
@@ -392,16 +381,16 @@ export default function ToolboxMeetingForm() {
                   name="projectId"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Project *</FormLabel>
+                      <FormLabel>{t('safetyForms.toolbox.project', 'Project')} *</FormLabel>
                       <Select onValueChange={field.onChange} value={field.value}>
                         <FormControl>
                           <SelectTrigger data-testid="select-project">
-                            <SelectValue placeholder="Select project" />
+                            <SelectValue placeholder={t('safetyForms.toolbox.selectProject', 'Select project')} />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
                           <SelectItem value="other">
-                            Other / Off-site (Office, Training, etc.)
+                            {t('safetyForms.toolbox.otherOffsite', 'Other / Off-site (Office, Training, etc.)')}
                           </SelectItem>
                           {projectsData?.projects.map((project) => (
                             <SelectItem key={project.id} value={project.id}>
@@ -420,7 +409,7 @@ export default function ToolboxMeetingForm() {
                   name="meetingDate"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Meeting Date *</FormLabel>
+                      <FormLabel>{t('safetyForms.toolbox.meetingDate', 'Meeting Date')} *</FormLabel>
                       <FormControl>
                         <Input
                           type="date"
@@ -439,11 +428,11 @@ export default function ToolboxMeetingForm() {
                   name="conductedByName"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Conducted By (Your Name) *</FormLabel>
+                      <FormLabel>{t('safetyForms.toolbox.conductedBy', 'Conducted By (Your Name)')} *</FormLabel>
                       <FormControl>
                         <Input
                           {...field}
-                          placeholder="Your full name"
+                          placeholder={t('safetyForms.toolbox.yourFullName', 'Your full name')}
                           data-testid="input-conducted-by"
                         />
                       </FormControl>
@@ -454,16 +443,16 @@ export default function ToolboxMeetingForm() {
 
                 <div className="space-y-3">
                   <div>
-                    <FormLabel>Attendees *</FormLabel>
+                    <FormLabel>{t('safetyForms.toolbox.attendees', 'Attendees')} *</FormLabel>
                     <p className="text-sm text-muted-foreground mt-1">
-                      Tap employees to select attendees
+                      {t('safetyForms.toolbox.tapToSelect', 'Tap employees to select attendees')}
                     </p>
                   </div>
                   
                   {selectedEmployees.length > 0 && (
                     <div className="bg-muted p-3 rounded-md">
                       <div className="text-sm font-medium mb-2">
-                        Selected ({selectedEmployees.length})
+                        {t('safetyForms.toolbox.selected', 'Selected')} ({selectedEmployees.length})
                       </div>
                       <div className="flex flex-wrap gap-2">
                         {selectedEmployees.map((employeeId) => (
@@ -525,7 +514,7 @@ export default function ToolboxMeetingForm() {
                   
                   {selectedEmployees.length === 0 && (
                     <p className="text-sm text-destructive">
-                      Please select at least one attendee
+                      {t('safetyForms.toolbox.toasts.selectAtLeastOne', 'Please select at least one attendee')}
                     </p>
                   )}
                 </div>
@@ -533,9 +522,9 @@ export default function ToolboxMeetingForm() {
                 <div className="space-y-3">
                   <div className="flex items-center justify-between gap-2 flex-wrap">
                     <div>
-                      <Label>Digital Signatures *</Label>
+                      <Label>{t('safetyForms.toolbox.digitalSignatures', 'Digital Signatures')} *</Label>
                       <p className="text-sm text-muted-foreground mt-1">
-                        All attendees must sign before submitting
+                        {t('safetyForms.toolbox.allMustSign', 'All attendees must sign before submitting')}
                       </p>
                     </div>
                     <Button
@@ -546,18 +535,17 @@ export default function ToolboxMeetingForm() {
                       data-testid="button-add-signature"
                     >
                       <PenTool className="h-4 w-4 mr-2" />
-                      {allAttendeesSigned ? "All Signed" : "Add Signature"}
+                      {allAttendeesSigned ? t('safetyForms.toolbox.allSigned', 'All Signed') : t('safetyForms.toolbox.addSignature', 'Add Signature')}
                     </Button>
                   </div>
 
-                  {/* Show unsigned attendees warning */}
                   {selectedEmployees.length > 0 && unsignedAttendeeIds.length > 0 && (
                     <div className="bg-destructive/10 border border-destructive/20 rounded-md p-3">
                       <div className="flex items-start gap-2">
                         <span className="material-icons text-destructive text-base mt-0.5">warning</span>
                         <div>
                           <div className="text-sm font-medium text-destructive">
-                            {unsignedAttendeeIds.length} attendee{unsignedAttendeeIds.length > 1 ? 's' : ''} still need{unsignedAttendeeIds.length === 1 ? 's' : ''} to sign:
+                            {unsignedAttendeeIds.length} {t('safetyForms.toolbox.attendeesNeedToSign', 'attendee(s) still need(s) to sign:')}
                           </div>
                           <div className="text-sm text-destructive/80 mt-1">
                             {unsignedAttendeeNames.join(", ")}
@@ -567,13 +555,12 @@ export default function ToolboxMeetingForm() {
                     </div>
                   )}
 
-                  {/* All signed success message */}
                   {allAttendeesSigned && (
                     <div className="bg-green-500/10 border border-green-500/20 rounded-md p-3">
                       <div className="flex items-center gap-2">
                         <span className="material-icons text-green-600 dark:text-green-400 text-base">check_circle</span>
                         <div className="text-sm font-medium text-green-600 dark:text-green-400">
-                          All {selectedEmployees.length} attendee{selectedEmployees.length > 1 ? 's have' : ' has'} signed
+                          {t('safetyForms.toolbox.allAttendeesSigned', 'All attendees have signed')} ({selectedEmployees.length})
                         </div>
                       </div>
                     </div>
@@ -603,7 +590,7 @@ export default function ToolboxMeetingForm() {
                               <div className="border rounded-md bg-background p-2">
                                 <img 
                                   src={sig.signatureDataUrl} 
-                                  alt={`Signature of ${sig.employeeName}`}
+                                  alt={`${t('safetyForms.toolbox.signature', 'Signature')} - ${sig.employeeName}`}
                                   className="w-full h-16 object-contain"
                                   data-testid={`signature-image-${sig.employeeId}`}
                                 />
@@ -617,21 +604,21 @@ export default function ToolboxMeetingForm() {
 
                   {signatures.length === 0 && selectedEmployees.length > 0 && (
                     <p className="text-sm text-muted-foreground">
-                      Tap "Add Signature" to collect signatures from each attendee
+                      {t('safetyForms.toolbox.tapAddSignature', 'Tap "Add Signature" to collect signatures from each attendee')}
                     </p>
                   )}
 
                   {selectedEmployees.length === 0 && (
                     <p className="text-sm text-muted-foreground">
-                      Select attendees above first, then collect their signatures
+                      {t('safetyForms.toolbox.selectAttendeesFirst', 'Select attendees above first, then collect their signatures')}
                     </p>
                   )}
                 </div>
 
                 <div className="space-y-4">
-                  <h3 className="font-semibold text-lg">Topics Discussed</h3>
+                  <h3 className="font-semibold text-lg">{t('safetyForms.toolbox.topicsDiscussed', 'Topics Discussed')}</h3>
                   <p className="text-sm text-muted-foreground">
-                    Select all topics that were covered in this meeting
+                    {t('safetyForms.toolbox.selectTopics', 'Select all topics that were covered in this meeting')}
                   </p>
                   
                   <div className="grid grid-cols-1 gap-4">
@@ -664,11 +651,11 @@ export default function ToolboxMeetingForm() {
                   name="customTopic"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Custom Topic (Optional)</FormLabel>
+                      <FormLabel>{t('safetyForms.toolbox.customTopic', 'Custom Topic (Optional)')}</FormLabel>
                       <FormControl>
                         <Input
                           {...field}
-                          placeholder="Enter any additional topic discussed"
+                          placeholder={t('safetyForms.toolbox.customTopicPlaceholder', 'Enter any additional topic discussed')}
                           data-testid="input-custom-topic"
                         />
                       </FormControl>
@@ -682,11 +669,11 @@ export default function ToolboxMeetingForm() {
                   name="additionalNotes"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Additional Notes (Optional)</FormLabel>
+                      <FormLabel>{t('safetyForms.toolbox.additionalNotes', 'Additional Notes (Optional)')}</FormLabel>
                       <FormControl>
                         <Textarea
                           {...field}
-                          placeholder="Any additional information or discussion points..."
+                          placeholder={t('safetyForms.toolbox.additionalNotesPlaceholder', 'Any additional information or discussion points...')}
                           className="min-h-24"
                           data-testid="input-notes"
                         />
@@ -702,10 +689,10 @@ export default function ToolboxMeetingForm() {
                   disabled={isSubmitting || !allAttendeesSigned}
                   data-testid="button-submit"
                 >
-                  {isSubmitting ? "Recording..." : 
-                   selectedEmployees.length === 0 ? "Select Attendees to Continue" :
-                   !allAttendeesSigned ? `Collect ${unsignedAttendeeIds.length} Missing Signature${unsignedAttendeeIds.length > 1 ? 's' : ''}` :
-                   "Record Toolbox Meeting"}
+                  {isSubmitting ? t('safetyForms.toolbox.recording', 'Recording...') : 
+                   selectedEmployees.length === 0 ? t('safetyForms.toolbox.selectAttendeesToContinue', 'Select Attendees to Continue') :
+                   !allAttendeesSigned ? `${t('safetyForms.toolbox.collectMissingSignatures', 'Collect Missing Signatures')} (${unsignedAttendeeIds.length})` :
+                   t('safetyForms.toolbox.recordMeeting', 'Record Toolbox Meeting')}
                 </Button>
               </form>
             </Form>
@@ -715,18 +702,18 @@ export default function ToolboxMeetingForm() {
         <Dialog open={showSignatureDialog} onOpenChange={setShowSignatureDialog}>
           <DialogContent className="max-w-lg">
             <DialogHeader>
-              <DialogTitle>Collect Digital Signature</DialogTitle>
+              <DialogTitle>{t('safetyForms.toolbox.collectSignature', 'Collect Digital Signature')}</DialogTitle>
               <DialogDescription>
-                Select an employee and capture their signature on the device
+                {t('safetyForms.toolbox.selectEmployeeCapture', 'Select an employee and capture their signature on the device')}
               </DialogDescription>
             </DialogHeader>
 
             <div className="space-y-4">
               <div>
-                <Label>Select Employee *</Label>
+                <Label>{t('safetyForms.toolbox.selectEmployee', 'Select Employee')} *</Label>
                 <Select value={selectedSignatureEmployee} onValueChange={setSelectedSignatureEmployee}>
                   <SelectTrigger data-testid="select-signature-employee">
-                    <SelectValue placeholder="Choose employee to sign" />
+                    <SelectValue placeholder={t('safetyForms.toolbox.chooseEmployeeToSign', 'Choose employee to sign')} />
                   </SelectTrigger>
                   <SelectContent>
                     {selectedEmployees.map((employeeId) => {
@@ -739,7 +726,7 @@ export default function ToolboxMeetingForm() {
                           value={employeeId}
                           disabled={alreadySigned}
                         >
-                          {employee.name} {alreadySigned ? "(Already signed)" : ""}
+                          {employee.name} {alreadySigned ? `(${t('safetyForms.toolbox.alreadySigned', 'Already signed')})` : ""}
                         </SelectItem>
                       );
                     })}
@@ -748,7 +735,7 @@ export default function ToolboxMeetingForm() {
               </div>
 
               <div>
-                <Label>Signature *</Label>
+                <Label>{t('safetyForms.toolbox.signature', 'Signature')} *</Label>
                 <div className="border-2 border-dashed rounded-md p-2 bg-background">
                   <SignatureCanvas
                     ref={signatureCanvasRef}
@@ -758,7 +745,7 @@ export default function ToolboxMeetingForm() {
                   />
                 </div>
                 <p className="text-xs text-muted-foreground mt-2">
-                  Draw signature with finger or stylus
+                  {t('safetyForms.toolbox.drawSignature', 'Draw signature with finger or stylus')}
                 </p>
               </div>
             </div>
@@ -770,14 +757,14 @@ export default function ToolboxMeetingForm() {
                 onClick={() => signatureCanvasRef.current?.clear()}
                 data-testid="button-clear-signature"
               >
-                Clear
+                {t('safetyForms.toolbox.clear', 'Clear')}
               </Button>
               <Button
                 type="button"
                 onClick={handleSaveSignature}
                 data-testid="button-save-signature"
               >
-                Save Signature
+                {t('safetyForms.toolbox.saveSignature', 'Save Signature')}
               </Button>
             </DialogFooter>
           </DialogContent>

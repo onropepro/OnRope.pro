@@ -90,89 +90,101 @@ const projectSchema = z.object({
   path: ["customJobType"],
 });
 
-// Role definitions with icons
+// Role definitions with icons - labels are translation keys
 const ROLE_OPTIONS = [
-  { value: "owner_ceo", label: "Owner/CEO", icon: "business_center", category: "management" },
-  { value: "operations_manager", label: "Operations Manager", icon: "engineering", category: "management" },
-  { value: "human_resources", label: "Human Resources", icon: "badge", category: "management" },
-  { value: "accounting", label: "Accounting", icon: "account_balance", category: "management" },
-  { value: "account_manager", label: "Account Manager", icon: "person_search", category: "management" },
-  { value: "general_supervisor", label: "General Supervisor", icon: "admin_panel_settings", category: "management" },
-  { value: "rope_access_supervisor", label: "Rope Access Supervisor", icon: "height", category: "management" },
-  { value: "manager", label: "Manager", icon: "manage_accounts", category: "management" },
-  { value: "rope_access_tech", label: "Rope Access Technician", icon: "construction", category: "worker" },
-  { value: "ground_crew_supervisor", label: "Ground Crew Supervisor", icon: "groups", category: "worker" },
-  { value: "ground_crew", label: "Ground Crew", icon: "engineering", category: "worker" },
-  { value: "labourer", label: "Labourer", icon: "handyman", category: "worker" },
+  { value: "owner_ceo", labelKey: "dashboard.roles.owner_ceo", icon: "business_center", category: "management" },
+  { value: "operations_manager", labelKey: "dashboard.roles.operations_manager", icon: "engineering", category: "management" },
+  { value: "human_resources", labelKey: "dashboard.roles.human_resources", icon: "badge", category: "management" },
+  { value: "accounting", labelKey: "dashboard.roles.accounting", icon: "account_balance", category: "management" },
+  { value: "account_manager", labelKey: "dashboard.roles.account_manager", icon: "person_search", category: "management" },
+  { value: "general_supervisor", labelKey: "dashboard.roles.general_supervisor", icon: "admin_panel_settings", category: "management" },
+  { value: "rope_access_supervisor", labelKey: "dashboard.roles.rope_access_supervisor", icon: "height", category: "management" },
+  { value: "manager", labelKey: "dashboard.roles.manager", icon: "manage_accounts", category: "management" },
+  { value: "rope_access_tech", labelKey: "dashboard.roles.rope_access_tech", icon: "construction", category: "worker" },
+  { value: "ground_crew_supervisor", labelKey: "dashboard.roles.ground_crew_supervisor", icon: "groups", category: "worker" },
+  { value: "ground_crew", labelKey: "dashboard.roles.ground_crew", icon: "engineering", category: "worker" },
+  { value: "labourer", labelKey: "dashboard.roles.labourer", icon: "handyman", category: "worker" },
 ] as const;
 
-// Available permissions for employees organized by category
+// Helper function to get translated role label
+const getRoleLabel = (t: (key: string) => string, value: string): string => {
+  const role = ROLE_OPTIONS.find(r => r.value === value);
+  return role ? t(role.labelKey) : value;
+};
+
+// Available permissions for employees organized by category - using translation keys
 const PERMISSION_CATEGORIES = [
   {
-    name: "Projects",
+    nameKey: "dashboard.permissions.categories.projects",
     permissions: [
-      { id: "view_projects", label: "View Projects" },
-      { id: "create_projects", label: "Create Projects" },
-      { id: "edit_projects", label: "Edit Projects" },
-      { id: "delete_projects", label: "Delete Projects" },
-      { id: "log_drops", label: "Log Drops" },
+      { id: "view_projects", labelKey: "dashboard.permissions.viewProjects" },
+      { id: "create_projects", labelKey: "dashboard.permissions.createProjects" },
+      { id: "edit_projects", labelKey: "dashboard.permissions.editProjects" },
+      { id: "delete_projects", labelKey: "dashboard.permissions.deleteProjects" },
+      { id: "log_drops", labelKey: "dashboard.permissions.logDrops" },
     ],
   },
   {
-    name: "Employees",
+    nameKey: "dashboard.permissions.categories.employees",
     permissions: [
-      { id: "view_employees", label: "View Employees" },
-      { id: "create_employees", label: "Create Employees" },
-      { id: "edit_employees", label: "Edit Employees" },
-      { id: "delete_employees", label: "Delete Employees" },
+      { id: "view_employees", labelKey: "dashboard.permissions.viewEmployees" },
+      { id: "create_employees", labelKey: "dashboard.permissions.createEmployees" },
+      { id: "edit_employees", labelKey: "dashboard.permissions.editEmployees" },
+      { id: "delete_employees", labelKey: "dashboard.permissions.deleteEmployees" },
     ],
   },
   {
-    name: "Clients",
+    nameKey: "dashboard.permissions.categories.clients",
     permissions: [
-      { id: "view_clients", label: "View Clients" },
-      { id: "manage_clients", label: "Manage Clients (Create/Edit/Delete)" },
+      { id: "view_clients", labelKey: "dashboard.permissions.viewClients" },
+      { id: "manage_clients", labelKey: "dashboard.permissions.manageClients" },
     ],
   },
   {
-    name: "Safety & Compliance",
+    nameKey: "dashboard.permissions.categories.safetyCompliance",
     permissions: [
-      { id: "view_csr", label: "View Company Safety Rating (CSR)" },
+      { id: "view_csr", labelKey: "dashboard.permissions.viewCsr" },
     ],
   },
   {
-    name: "Inventory & Gear",
+    nameKey: "dashboard.permissions.categories.inventoryGear",
     permissions: [
-      { id: "view_inventory", label: "View Inventory" },
-      { id: "manage_inventory", label: "Manage Inventory (Add/Edit/Delete)" },
-      { id: "assign_gear", label: "Assign Gear to Employees" },
-      { id: "view_gear_assignments", label: "View All Gear Assignments" },
+      { id: "view_inventory", labelKey: "dashboard.permissions.viewInventory" },
+      { id: "manage_inventory", labelKey: "dashboard.permissions.manageInventory" },
+      { id: "assign_gear", labelKey: "dashboard.permissions.assignGear" },
+      { id: "view_gear_assignments", labelKey: "dashboard.permissions.viewGearAssignments" },
     ],
   },
   {
-    name: "Work Sessions",
+    nameKey: "dashboard.permissions.categories.workSessions",
     permissions: [
-      { id: "view_work_sessions", label: "View Work Sessions" },
-      { id: "manage_work_sessions", label: "Manage Work Sessions" },
-      { id: "view_work_history", label: "View Work History" },
-      { id: "view_active_workers", label: "View Active Workers" },
+      { id: "view_work_sessions", labelKey: "dashboard.permissions.viewWorkSessions" },
+      { id: "manage_work_sessions", labelKey: "dashboard.permissions.manageWorkSessions" },
+      { id: "view_work_history", labelKey: "dashboard.permissions.viewWorkHistory" },
+      { id: "view_active_workers", labelKey: "dashboard.permissions.viewActiveWorkers" },
     ],
   },
   {
-    name: "Complaints",
+    nameKey: "dashboard.permissions.categories.complaints",
     permissions: [
-      { id: "view_complaints", label: "View Complaints" },
-      { id: "manage_complaints", label: "Manage Complaints" },
+      { id: "view_complaints", labelKey: "dashboard.permissions.viewComplaints" },
+      { id: "manage_complaints", labelKey: "dashboard.permissions.manageComplaints" },
     ],
   },
   {
-    name: "Analytics & Financial",
+    nameKey: "dashboard.permissions.categories.analyticsFinancial",
     permissions: [
-      { id: "view_analytics", label: "View Analytics" },
-      { id: "view_financial_data", label: "View Financial Data (Labor Costs, Wages)" },
+      { id: "view_analytics", labelKey: "dashboard.permissions.viewAnalytics" },
+      { id: "view_financial_data", labelKey: "dashboard.permissions.viewFinancialData" },
     ],
   },
 ] as const;
+
+// Helper function to get translated job type label
+const getJobTypeLabel = (t: (key: string) => string, jobType: string): string => {
+  const jobTypeKey = `dashboard.jobTypes.${jobType}`;
+  return t(jobTypeKey);
+};
 
 // Flat list of all permissions for compatibility
 const AVAILABLE_PERMISSIONS = PERMISSION_CATEGORIES.flatMap(cat => cat.permissions);
@@ -369,6 +381,7 @@ function SortableCard({ card, isRearranging, colorIndex, brandColors }: { card: 
 
 // Deleted Projects Tab Component
 function DeletedProjectsTab() {
+  const { t } = useTranslation();
   const { toast } = useToast();
   const queryClient = useQueryClient();
   
@@ -386,17 +399,17 @@ function DeletedProjectsTab() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/projects/deleted/list"] });
       queryClient.invalidateQueries({ queryKey: ["/api/projects"] });
-      toast({ title: "Project restored successfully" });
+      toast({ title: t('dashboard.deletedProjects.restored', 'Project restored successfully') });
     },
     onError: () => {
-      toast({ title: "Failed to restore project", variant: "destructive" });
+      toast({ title: t('dashboard.deletedProjects.restoreFailed', 'Failed to restore project'), variant: "destructive" });
     },
   });
   
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-8">
-        <div className="text-muted-foreground">Loading...</div>
+        <div className="text-muted-foreground">{t('common.loading', 'Loading...')}</div>
       </div>
     );
   }
@@ -407,7 +420,7 @@ function DeletedProjectsTab() {
         <Card>
           <CardContent className="p-8 text-center text-muted-foreground">
             <span className="material-icons text-4xl mb-2 opacity-50">delete</span>
-            <div>No deleted projects</div>
+            <div>{t('dashboard.deletedProjects.noDeleted', 'No deleted projects')}</div>
           </CardContent>
         </Card>
       ) : (
@@ -425,19 +438,19 @@ function DeletedProjectsTab() {
                     <div className="text-sm font-medium text-muted-foreground mb-1">{project.strataPlanNumber}</div>
                     <div className="text-sm text-muted-foreground capitalize flex items-center gap-2">
                       <span className="material-icons text-base text-destructive">delete</span>
-                      {project.jobType.replace(/_/g, ' ')}
+                      {getJobTypeLabel(t, project.jobType)}
                     </div>
                     {project.updatedAt && (
                       <div className="text-xs text-muted-foreground mt-1 flex items-center gap-1">
                         <span className="material-icons text-xs">event</span>
-                        Deleted {new Date(project.updatedAt).toLocaleDateString()}
+                        {t('dashboard.deletedProjects.deleted', 'Deleted')} {new Date(project.updatedAt).toLocaleDateString()}
                       </div>
                     )}
                   </div>
                   <div className="flex flex-col gap-2">
                     <Badge variant="destructive" className="flex items-center gap-1">
                       <span className="material-icons text-xs">delete</span>
-                      Deleted
+                      {t('dashboard.deletedProjects.deleted', 'Deleted')}
                     </Badge>
                     <Button
                       size="sm"
@@ -448,7 +461,7 @@ function DeletedProjectsTab() {
                       className="w-full"
                     >
                       <span className="material-icons text-sm mr-1">restore</span>
-                      Restore
+                      {t('dashboard.deletedProjects.restore', 'Restore')}
                     </Button>
                   </div>
                 </div>
@@ -671,8 +684,8 @@ export default function Dashboard() {
   const belowTargetCount = completedSessions.filter((s: any) => s.dropsCompleted < s.dailyDropTarget).length;
   
   const performancePieData = [
-    { name: "Target Met", value: targetMetCount, color: "hsl(var(--primary))" },
-    { name: "Below Target", value: belowTargetCount, color: "hsl(var(--destructive))" },
+    { name: t('dashboard.performance.targetMet', 'Target Met'), value: targetMetCount, color: "hsl(var(--primary))" },
+    { name: t('dashboard.performance.belowTarget', 'Below Target'), value: belowTargetCount, color: "hsl(var(--destructive))" },
   ];
 
   const projectForm = useForm<ProjectFormData>({
@@ -959,7 +972,7 @@ export default function Dashboard() {
       setShowOtherElevationFields(false);
       isManualEntryRef.current = false;
       
-      toast({ title: "Project created successfully" });
+      toast({ title: t('dashboard.toast.projectCreated', 'Project created successfully') });
       
       // If manual entry, show save dialog after a brief delay
       if (wasManualEntry) {
@@ -970,7 +983,7 @@ export default function Dashboard() {
       }
     },
     onError: (error: Error) => {
-      toast({ title: "Error", description: error.message, variant: "destructive" });
+      toast({ title: t('dashboard.toast.error', 'Error'), description: error.message, variant: "destructive" });
     },
   });
 
@@ -996,11 +1009,11 @@ export default function Dashboard() {
       setEmployeeFormStep(1); // Reset to step 1
       employeeForm.reset();
       toast({
-        title: "Employee created successfully",
+        title: t('dashboard.toast.employeeCreated', 'Employee created successfully'),
       });
     },
     onError: (error: Error) => {
-      toast({ title: "Error", description: error.message, variant: "destructive" });
+      toast({ title: t('dashboard.toast.error', 'Error'), description: error.message, variant: "destructive" });
     },
   });
 
@@ -1049,11 +1062,11 @@ export default function Dashboard() {
       setEmployeeToEdit(null);
       editEmployeeForm.reset();
       toast({
-        title: "Employee updated successfully",
+        title: t('dashboard.toast.employeeUpdated', 'Employee updated successfully'),
       });
     },
     onError: (error: Error) => {
-      toast({ title: "Error", description: error.message, variant: "destructive" });
+      toast({ title: t('dashboard.toast.error', 'Error'), description: error.message, variant: "destructive" });
     },
   });
 
@@ -1299,11 +1312,11 @@ export default function Dashboard() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/employees/all"] });
       toast({
-        title: "Employee reactivated successfully",
+        title: t('dashboard.toast.employeeReactivated', 'Employee reactivated successfully'),
       });
     },
     onError: (error: Error) => {
-      toast({ title: "Error", description: error.message, variant: "destructive" });
+      toast({ title: t('dashboard.toast.error', 'Error'), description: error.message, variant: "destructive" });
     },
   });
 
@@ -1329,10 +1342,10 @@ export default function Dashboard() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/employees/all"] });
       setEmployeeToDelete(null);
-      toast({ title: "Employee deleted successfully" });
+      toast({ title: t('dashboard.toast.employeeDeleted', 'Employee deleted successfully') });
     },
     onError: (error: Error) => {
-      toast({ title: "Error", description: error.message, variant: "destructive" });
+      toast({ title: t('dashboard.toast.error', 'Error'), description: error.message, variant: "destructive" });
     },
   });
 
@@ -1347,10 +1360,10 @@ export default function Dashboard() {
       setShowChangePasswordDialog(false);
       setEmployeeToChangePassword(null);
       setNewPassword("");
-      toast({ title: "Password changed successfully" });
+      toast({ title: t('dashboard.toast.passwordChanged', 'Password changed successfully') });
     },
     onError: (error: Error) => {
-      toast({ title: "Error", description: error.message, variant: "destructive" });
+      toast({ title: t('dashboard.toast.error', 'Error'), description: error.message, variant: "destructive" });
     },
   });
 
@@ -1369,10 +1382,10 @@ export default function Dashboard() {
       clientForm.reset();
       setLmsNumbers([{ number: "", address: "" }]);
       setSameAsAddress(false);
-      toast({ title: "Client created successfully" });
+      toast({ title: t('dashboard.toast.clientCreated', 'Client created successfully') });
     },
     onError: (error: Error) => {
-      toast({ title: "Error", description: error.message, variant: "destructive" });
+      toast({ title: t('dashboard.toast.error', 'Error'), description: error.message, variant: "destructive" });
     },
   });
 
@@ -1391,10 +1404,10 @@ export default function Dashboard() {
       editClientForm.reset();
       setEditLmsNumbers([{ number: "", address: "" }]);
       setEditSameAsAddress(false);
-      toast({ title: "Client updated successfully" });
+      toast({ title: t('dashboard.toast.clientUpdated', 'Client updated successfully') });
     },
     onError: (error: Error) => {
-      toast({ title: "Error", description: error.message, variant: "destructive" });
+      toast({ title: t('dashboard.toast.error', 'Error'), description: error.message, variant: "destructive" });
     },
   });
 
@@ -1406,10 +1419,10 @@ export default function Dashboard() {
       queryClient.invalidateQueries({ queryKey: ["/api/clients"] });
       setShowDeleteClientDialog(false);
       setClientToDelete(null);
-      toast({ title: "Client deleted successfully" });
+      toast({ title: t('dashboard.toast.clientDeleted', 'Client deleted successfully') });
     },
     onError: (error: Error) => {
-      toast({ title: "Error", description: error.message, variant: "destructive" });
+      toast({ title: t('dashboard.toast.error', 'Error'), description: error.message, variant: "destructive" });
     },
   });
 
@@ -1466,10 +1479,10 @@ export default function Dashboard() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/harness-inspections"] });
       setSelectedInspection(null);
-      toast({ title: "Harness inspection deleted successfully" });
+      toast({ title: t('dashboard.toast.inspectionDeleted', 'Harness inspection deleted successfully') });
     },
     onError: (error: Error) => {
-      toast({ title: "Error", description: error.message, variant: "destructive" });
+      toast({ title: t('dashboard.toast.error', 'Error'), description: error.message, variant: "destructive" });
     },
   });
 
@@ -1490,10 +1503,10 @@ export default function Dashboard() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/toolbox-meetings"] });
       setSelectedMeeting(null);
-      toast({ title: "Toolbox meeting deleted successfully" });
+      toast({ title: t('dashboard.toast.meetingDeleted', 'Toolbox meeting deleted successfully') });
     },
     onError: (error: Error) => {
-      toast({ title: "Error", description: error.message, variant: "destructive" });
+      toast({ title: t('dashboard.toast.error', 'Error'), description: error.message, variant: "destructive" });
     },
   });
 
@@ -1527,10 +1540,10 @@ export default function Dashboard() {
       });
       setShowDropDialog(false);
       setDropProject(null);
-      toast({ title: "Drops logged successfully" });
+      toast({ title: t('dashboard.toast.dropsLogged', 'Drops logged successfully') });
     },
     onError: (error: Error) => {
-      toast({ title: "Error", description: error.message, variant: "destructive" });
+      toast({ title: t('dashboard.toast.error', 'Error'), description: error.message, variant: "destructive" });
     },
   });
 
@@ -1540,8 +1553,8 @@ export default function Dashboard() {
       if (!navigator.geolocation) {
         console.warn("Geolocation is not supported by this browser");
         toast({ 
-          title: "Location Not Available", 
-          description: "Your browser doesn't support location tracking",
+          title: t('dashboard.workSession.locationNotAvailable', 'Location Not Available'), 
+          description: t('dashboard.workSession.browserNotSupported', "Your browser doesn't support location tracking"),
           variant: "destructive" 
         });
         resolve(null);
@@ -1562,13 +1575,13 @@ export default function Dashboard() {
           console.warn("Failed to get location:", error.message);
           if (error.code === error.PERMISSION_DENIED) {
             toast({ 
-              title: "Location Permission Denied", 
-              description: "Location tracking is optional but helps verify work site attendance",
+              title: t('dashboard.workSession.locationPermissionDenied', 'Location Permission Denied'), 
+              description: t('dashboard.workSession.locationOptional', 'Location tracking is optional but helps verify work site attendance'),
             });
           } else if (error.code === error.TIMEOUT) {
             toast({ 
-              title: "Location Timeout", 
-              description: "Could not determine location in time. Session will continue without location data.",
+              title: t('dashboard.workSession.locationTimeout', 'Location Timeout'), 
+              description: t('dashboard.workSession.locationTimeoutDesc', 'Could not determine location in time. Session will continue without location data.'),
             });
           }
           resolve(null);
@@ -1601,14 +1614,14 @@ export default function Dashboard() {
       queryClient.invalidateQueries({ queryKey: ["/api/my-drops-today"] });
       const hasLocation = data.session?.startLatitude && data.session?.startLongitude;
       toast({ 
-        title: "Work session started", 
+        title: t('dashboard.toast.workSessionStarted', 'Work session started'), 
         description: hasLocation 
-          ? "Good luck today! Location recorded." 
-          : "Good luck today! (Location not recorded)"
+          ? t('dashboard.toast.goodLuckLocation', 'Good luck today! Location recorded.') 
+          : t('dashboard.toast.goodLuckNoLocation', 'Good luck today! (Location not recorded)')
       });
     },
     onError: (error: Error) => {
-      toast({ title: "Error", description: error.message, variant: "destructive" });
+      toast({ title: t('dashboard.toast.error', 'Error'), description: error.message, variant: "destructive" });
     },
   });
 
@@ -1634,14 +1647,14 @@ export default function Dashboard() {
       endDayForm.reset();
       const hasLocation = data?.session?.endLatitude && data?.session?.endLongitude;
       toast({ 
-        title: "Work session ended", 
+        title: t('dashboard.toast.workSessionEnded', 'Work session ended'), 
         description: hasLocation 
-          ? "Great work today! Location recorded." 
-          : "Great work today! (Location not recorded)"
+          ? t('dashboard.toast.greatWorkLocation', 'Great work today! Location recorded.') 
+          : t('dashboard.toast.greatWorkNoLocation', 'Great work today! (Location not recorded)')
       });
     },
     onError: (error: Error) => {
-      toast({ title: "Error", description: error.message, variant: "destructive" });
+      toast({ title: t('dashboard.toast.error', 'Error'), description: error.message, variant: "destructive" });
     },
   });
 
@@ -1655,7 +1668,7 @@ export default function Dashboard() {
       queryClient.clear();
       setLocation("/login");
     } catch (error) {
-      toast({ title: "Error", description: "Failed to logout", variant: "destructive" });
+      toast({ title: t('dashboard.toast.error', 'Error'), description: t('dashboard.toast.logoutFailed', 'Failed to logout'), variant: "destructive" });
     }
   };
 
@@ -2007,21 +2020,21 @@ export default function Dashboard() {
     // Save to backend
     updatePreferencesMutation.mutate({ dashboardCardOrder: defaultOrder });
     
-    toast({ title: "Layout reset", description: "Dashboard cards restored to default order" });
+    toast({ title: t('dashboard.layoutReset', 'Layout reset'), description: t('dashboard.layoutResetDesc', 'Dashboard cards restored to default order') });
   };
 
   // Get page title based on active tab
   const getPageTitle = () => {
     switch (activeTab) {
-      case "": return "Dashboard";
-      case "projects": return "Projects";
-      case "past-projects": return "Past Projects";
-      case "performance": return "Performance";
-      case "complaints": return "Complaints";
-      case "employees": return "Employees";
-      case "documents": return "Documents";
-      case "clients": return "Clients";
-      default: return "Dashboard";
+      case "": return t('dashboard.pageTitle.dashboard', 'Dashboard');
+      case "projects": return t('dashboard.pageTitle.projects', 'Projects');
+      case "past-projects": return t('dashboard.pageTitle.pastProjects', 'Past Projects');
+      case "performance": return t('dashboard.pageTitle.performance', 'Performance');
+      case "complaints": return t('dashboard.pageTitle.complaints', 'Complaints');
+      case "employees": return t('dashboard.pageTitle.employees', 'Employees');
+      case "documents": return t('dashboard.pageTitle.documents', 'Documents');
+      case "clients": return t('dashboard.pageTitle.clients', 'Clients');
+      default: return t('dashboard.pageTitle.dashboard', 'Dashboard');
     }
   };
 
@@ -2029,7 +2042,7 @@ export default function Dashboard() {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
-          <div className="text-lg font-medium">Loading...</div>
+          <div className="text-lg font-medium">{t('common.loading', 'Loading...')}</div>
         </div>
       </div>
     );
@@ -2066,7 +2079,7 @@ export default function Dashboard() {
                 <div className="hidden lg:flex flex-col gap-0.5 text-xs">
                   {currentUser?.residentCode && (
                     <div className="flex items-center gap-1.5">
-                      <span className="text-muted-foreground font-medium">Resident:</span>
+                      <span className="text-muted-foreground font-medium">{t('dashboard.header.resident', 'Resident:')}</span>
                       <Badge variant="outline" className="font-mono text-xs px-2 py-0.5" data-testid="badge-resident-code">
                         {currentUser.residentCode}
                       </Badge>
@@ -2074,7 +2087,7 @@ export default function Dashboard() {
                   )}
                   {currentUser?.propertyManagerCode && (
                     <div className="flex items-center gap-1.5">
-                      <span className="text-muted-foreground font-medium">Property Mgr:</span>
+                      <span className="text-muted-foreground font-medium">{t('dashboard.header.propertyMgr', 'Property Mgr:')}</span>
                       <Badge variant="outline" className="font-mono text-xs px-2 py-0.5" data-testid="badge-property-manager-code">
                         {currentUser.propertyManagerCode}
                       </Badge>
@@ -2102,9 +2115,9 @@ export default function Dashboard() {
         <Alert className="mx-4 mt-4 border-yellow-500/50 bg-yellow-500/10">
           <AlertCircle className="h-4 w-4 text-yellow-600 dark:text-yellow-500" />
           <div className="flex-1">
-            <AlertTitle className="text-yellow-700 dark:text-yellow-400">Read-Only Mode</AlertTitle>
+            <AlertTitle className="text-yellow-700 dark:text-yellow-400">{t('dashboard.readOnlyMode.title', 'Read-Only Mode')}</AlertTitle>
             <AlertDescription className="text-yellow-600 dark:text-yellow-500 mb-3">
-              Your account is in read-only mode. Verify your license to create, edit, or delete data.
+              {t('dashboard.readOnlyMode.description', 'Your account is in read-only mode. Verify your license to create, edit, or delete data.')}
             </AlertDescription>
             <Button
               onClick={() => setLocation("/license-verification")}
@@ -2113,7 +2126,7 @@ export default function Dashboard() {
               data-testid="button-verify-license"
             >
               <span className="material-icons text-sm mr-1">verified_user</span>
-              Verify License Key
+              {t('dashboard.readOnlyMode.verifyLicense', 'Verify License Key')}
             </Button>
           </div>
         </Alert>
@@ -2137,7 +2150,7 @@ export default function Dashboard() {
                     <span className="material-icons text-base">
                       {isRearranging ? "check" : "swap_vert"}
                     </span>
-                    {isRearranging ? "Done" : "Rearrange Cards"}
+                    {isRearranging ? t('dashboard.done', 'Done') : t('dashboard.rearrangeCards', 'Rearrange Cards')}
                   </Button>
                   {isRearranging && (
                     <Button
@@ -2148,7 +2161,7 @@ export default function Dashboard() {
                       data-testid="button-reset-layout"
                     >
                       <span className="material-icons text-base">restart_alt</span>
-                      Reset
+                      {t('dashboard.reset', 'Reset')}
                     </Button>
                   )}
                 </div>
@@ -2185,7 +2198,7 @@ export default function Dashboard() {
               className="gap-2 text-primary"
             >
               <span className="material-icons">arrow_back</span>
-              Back to Dashboard
+              {t('dashboard.backToDashboard', 'Back to Dashboard')}
             </Button>
           </div>
         )}
@@ -2200,7 +2213,7 @@ export default function Dashboard() {
                     <div className="flex items-center gap-3">
                       <span className="material-icons text-primary">apartment</span>
                       <div>
-                        <div className="font-medium">Projects</div>
+                        <div className="font-medium">{t('dashboard.projects.title', 'Projects')}</div>
                         <div className="text-sm text-muted-foreground">
                           {projectsData.projectInfo.tier && projectsData.projectInfo.tier !== 'none'
                             ? (() => {
@@ -2208,14 +2221,20 @@ export default function Dashboard() {
                                   ? '∞' 
                                   : Math.max(0, projectsData.projectInfo.projectLimit - projectsData.projectInfo.projectsUsed);
                                 const additionalInfo = projectsData.projectInfo.additionalProjects > 0 
-                                  ? ` (${projectsData.projectInfo.baseProjectLimit} base + ${projectsData.projectInfo.additionalProjects} additional)` 
+                                  ? ` (${projectsData.projectInfo.baseProjectLimit} ${t('dashboard.projects.base', 'base')} + ${projectsData.projectInfo.additionalProjects} ${t('dashboard.projects.additional', 'additional')})` 
                                   : '';
                                 
                                 return projectsData.projectInfo.projectLimit === -1
-                                  ? `${projectsData.projectInfo.projectsUsed} projects used • Unlimited available`
-                                  : `${projectsData.projectInfo.projectsUsed} of ${projectsData.projectInfo.projectLimit} used • ${projectsRemaining} ${projectsRemaining === 1 ? 'project' : 'projects'} remaining${additionalInfo}`;
+                                  ? t('dashboard.projects.usageUnlimited', '{{used}} projects used • Unlimited available', { used: projectsData.projectInfo.projectsUsed })
+                                  : t('dashboard.projects.usage', '{{used}} of {{total}} used • {{remaining}} {{projectLabel}} remaining{{additionalInfo}}', { 
+                                      used: projectsData.projectInfo.projectsUsed, 
+                                      total: projectsData.projectInfo.projectLimit, 
+                                      remaining: projectsRemaining, 
+                                      projectLabel: projectsRemaining === 1 ? t('dashboard.projects.project', 'project') : t('dashboard.projects.projectsLabel', 'projects'),
+                                      additionalInfo
+                                    });
                               })()
-                            : 'Manage your project capacity'
+                            : t('dashboard.projects.manageCapacity', 'Manage your project capacity')
                           }
                         </div>
                       </div>
@@ -2234,9 +2253,9 @@ export default function Dashboard() {
                       <div className="flex items-start gap-2">
                         <span className="material-icons text-destructive text-sm mt-0.5">warning</span>
                         <div className="flex-1">
-                          <div className="text-sm font-medium text-destructive">Project Limit Reached</div>
+                          <div className="text-sm font-medium text-destructive">{t('dashboard.projects.limitReached', 'Project Limit Reached')}</div>
                           <div className="text-xs text-muted-foreground mt-1">
-                            You've reached your {projectsData.projectInfo.projectLimit}-project limit. Visit Profile → Subscription to upgrade your tier or add more projects.
+                            {t('dashboard.projects.limitReachedDesc', "You've reached your {{limit}}-project limit. Visit Profile → Subscription to upgrade your tier or add more projects.", { limit: projectsData.projectInfo.projectLimit })}
                           </div>
                         </div>
                       </div>
@@ -2248,7 +2267,7 @@ export default function Dashboard() {
                         onClick={() => window.location.href = "/profile"}
                       >
                         <span className="material-icons text-sm mr-1">settings</span>
-                        Manage Subscription
+                        {t('dashboard.projects.manageSubscription', 'Manage Subscription')}
                       </Button>
                     </div>
                   )}
@@ -2263,7 +2282,7 @@ export default function Dashboard() {
                     search
                   </span>
                   <Input
-                    placeholder="Search by strata plan number..."
+                    placeholder={t('dashboard.projects.searchPlaceholder', 'Search by strata plan number...')}
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     className="h-14 pl-12 text-base shadow-sm border-2 focus-visible:ring-2"
@@ -2278,25 +2297,25 @@ export default function Dashboard() {
                       disabled={userIsReadOnly || (projectsData?.projectInfo?.atProjectLimit ?? false)}
                     >
                       <span className="material-icons text-xl text-primary-foreground">add_circle</span>
-                      <span className="hidden sm:inline">{projectsData?.projectInfo?.atProjectLimit ? 'Project Limit Reached' : 'New Project'}</span>
+                      <span className="hidden sm:inline">{projectsData?.projectInfo?.atProjectLimit ? t('dashboard.projects.limitReached', 'Project Limit Reached') : t('dashboard.projects.newProject', 'New Project')}</span>
                     </Button>
                   </DialogTrigger>
                   <DialogContent className="max-w-md p-0 max-h-[95vh] flex flex-col gap-0">
                     <div className="p-6 border-b bg-card">
                       <DialogHeader>
-                        <DialogTitle className="text-xl">Create New Project</DialogTitle>
-                        <DialogDescription>Add a new building maintenance project</DialogDescription>
+                        <DialogTitle className="text-xl">{t('dashboard.projects.createTitle', 'Create New Project')}</DialogTitle>
+                        <DialogDescription>{t('dashboard.projects.createDescription', 'Add a new building maintenance project')}</DialogDescription>
                       </DialogHeader>
                     </div>
                     <div className="overflow-y-auto flex-1 p-6">
                       <Form {...projectForm}>
                         {Object.keys(projectForm.formState.errors).length > 0 && (
                           <div className="mb-4 p-4 bg-destructive/10 border border-destructive rounded-md">
-                            <div className="font-semibold text-destructive mb-2">Form Errors:</div>
+                            <div className="font-semibold text-destructive mb-2">{t('dashboard.form.errors', 'Form Errors:')}</div>
                             <div className="text-sm space-y-1">
                               {Object.entries(projectForm.formState.errors).map(([key, error]: [string, any]) => (
                                 <div key={key} className="text-destructive">
-                                  • {key}: {error?.message || 'Invalid'}
+                                  • {key}: {error?.message || t('dashboard.form.invalid', 'Invalid')}
                                 </div>
                               ))}
                             </div>
@@ -2305,13 +2324,13 @@ export default function Dashboard() {
                         <form onSubmit={projectForm.handleSubmit(onProjectSubmit, (errors) => {
                           console.log("Form validation errors:", errors);
                           toast({ 
-                            title: "Form validation failed", 
-                            description: "Please check all required fields", 
+                            title: t('dashboard.form.validationFailed', 'Form validation failed'), 
+                            description: t('dashboard.form.checkFields', 'Please check all required fields'), 
                             variant: "destructive" 
                           });
                         })} className="space-y-4">
                         <div className="mb-4">
-                          <label className="text-sm font-medium mb-2 block">Quick Fill from Client Database</label>
+                          <label className="text-sm font-medium mb-2 block">{t('dashboard.projects.quickFill', 'Quick Fill from Client Database')}</label>
                           <Popover open={clientDropdownOpen} onOpenChange={setClientDropdownOpen}>
                             <PopoverTrigger asChild>
                               <Button
@@ -2329,18 +2348,18 @@ export default function Dashboard() {
                                       return strata ? `${strata.number} - ${client.firstName} ${client.lastName}` : "Select a building...";
                                     })()
                                   : selectedStrataForProject === "manual"
-                                  ? "Enter Details Manually"
-                                  : "Select a building..."}
+                                  ? t('dashboard.projects.enterManually', 'Enter Details Manually')
+                                  : t('dashboard.projects.selectBuilding', 'Select a building...')}
                                 <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                               </Button>
                             </PopoverTrigger>
                             <PopoverContent className="w-[400px] p-0">
                               <Command>
-                                <CommandInput placeholder="Search by client, strata, or address..." />
+                                <CommandInput placeholder={t('dashboard.projects.searchClientPlaceholder', 'Search by client, strata, or address...')} />
                                 <CommandList>
                                   <CommandEmpty>
                                     <div className="py-6 text-center">
-                                      <p className="text-sm text-muted-foreground mb-3">No clients found.</p>
+                                      <p className="text-sm text-muted-foreground mb-3">{t('dashboard.projects.noClientsFound', 'No clients found.')}</p>
                                       <Button
                                         className="bg-primary text-primary-foreground hover:bg-primary/90"
                                         size="default"
@@ -2351,7 +2370,7 @@ export default function Dashboard() {
                                         data-testid="button-manual-entry-empty"
                                       >
                                         <span className="material-icons mr-2">edit</span>
-                                        Enter Details Manually
+                                        {t('dashboard.projects.enterManually', 'Enter Details Manually')}
                                       </Button>
                                     </div>
                                   </CommandEmpty>
@@ -2365,7 +2384,7 @@ export default function Dashboard() {
                                       className="!bg-primary !text-primary-foreground font-medium hover:!bg-primary/90 rounded-xl mx-2 my-1"
                                     >
                                       <span className="material-icons mr-2 text-sm">edit</span>
-                                      Enter Details Manually
+                                      {t('dashboard.projects.enterManually', 'Enter Details Manually')}
                                     </CommandItem>
                                     {clientsData && clientsData.length > 0 && clientsData.flatMap((client) =>
                                       client.lmsNumbers && client.lmsNumbers.length > 0
@@ -2418,9 +2437,9 @@ export default function Dashboard() {
                           name="buildingName"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>Building Name</FormLabel>
+                              <FormLabel>{t('dashboard.createProject.buildingName', 'Building Name')}</FormLabel>
                               <FormControl>
-                                <Input placeholder="Harbour View Towers" {...field} data-testid="input-building-name" className="h-12" />
+                                <Input placeholder={t('dashboard.createProject.buildingNamePlaceholder', 'Harbour View Towers')} {...field} data-testid="input-building-name" className="h-12" />
                               </FormControl>
                               <FormMessage />
                             </FormItem>
@@ -2432,12 +2451,12 @@ export default function Dashboard() {
                           name="buildingAddress"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>Building Address</FormLabel>
+                              <FormLabel>{t('dashboard.createProject.buildingAddress', 'Building Address')}</FormLabel>
                               <FormControl>
-                                <Input placeholder="123 Main St, Vancouver, BC" {...field} data-testid="input-building-address" className="h-12" />
+                                <Input placeholder={t('dashboard.createProject.buildingAddressPlaceholder', '123 Main St, Vancouver, BC')} {...field} data-testid="input-building-address" className="h-12" />
                               </FormControl>
                               <FormDescription className="text-xs">
-                                Visible to all employees
+                                {t('dashboard.createProject.visibleToEmployees', 'Visible to all employees')}
                               </FormDescription>
                               <FormMessage />
                             </FormItem>
@@ -2449,21 +2468,21 @@ export default function Dashboard() {
                           name="jobType"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>Job Type</FormLabel>
+                              <FormLabel>{t('dashboard.createProject.jobType', 'Job Type')}</FormLabel>
                               <FormControl>
                                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                                   {[
-                                    { value: "window_cleaning", label: "Window Cleaning", icon: "window" },
-                                    { value: "dryer_vent_cleaning", label: "Exterior Dryer Vent", icon: "air" },
-                                    { value: "building_wash", label: "Building Wash - Pressure washing", icon: "water_drop" },
-                                    { value: "general_pressure_washing", label: "General Pressure Washing", icon: "cleaning_services" },
-                                    { value: "gutter_cleaning", label: "Gutter Cleaning", icon: "home_repair_service" },
-                                    { value: "in_suite_dryer_vent_cleaning", label: "In-Suite Dryer Vent", icon: "meeting_room" },
-                                    { value: "parkade_pressure_cleaning", label: "Parkade Pressure", icon: "local_parking" },
-                                    { value: "ground_window_cleaning", label: "Ground Window", icon: "storefront" },
-                                    { value: "painting", label: "Painting", icon: "format_paint" },
-                                    { value: "inspection", label: "Inspection", icon: "fact_check" },
-                                    { value: "other", label: "Other", icon: "more_horiz" },
+                                    { value: "window_cleaning", labelKey: "dashboard.jobTypes.window_cleaning", label: "Window Cleaning", icon: "window" },
+                                    { value: "dryer_vent_cleaning", labelKey: "dashboard.jobTypes.dryer_vent_cleaning_exterior", label: "Exterior Dryer Vent", icon: "air" },
+                                    { value: "building_wash", labelKey: "dashboard.jobTypes.building_wash_pressure", label: "Building Wash - Pressure washing", icon: "water_drop" },
+                                    { value: "general_pressure_washing", labelKey: "dashboard.jobTypes.general_pressure_washing", label: "General Pressure Washing", icon: "cleaning_services" },
+                                    { value: "gutter_cleaning", labelKey: "dashboard.jobTypes.gutter_cleaning", label: "Gutter Cleaning", icon: "home_repair_service" },
+                                    { value: "in_suite_dryer_vent_cleaning", labelKey: "dashboard.jobTypes.in_suite_dryer_vent_cleaning", label: "In-Suite Dryer Vent", icon: "meeting_room" },
+                                    { value: "parkade_pressure_cleaning", labelKey: "dashboard.jobTypes.parkade_pressure_cleaning", label: "Parkade Pressure", icon: "local_parking" },
+                                    { value: "ground_window_cleaning", labelKey: "dashboard.jobTypes.ground_window_cleaning", label: "Ground Window", icon: "storefront" },
+                                    { value: "painting", labelKey: "dashboard.jobTypes.painting", label: "Painting", icon: "format_paint" },
+                                    { value: "inspection", labelKey: "dashboard.jobTypes.inspection", label: "Inspection", icon: "fact_check" },
+                                    { value: "other", labelKey: "dashboard.jobTypes.other", label: "Other", icon: "more_horiz" },
                                   ].map((jobType) => (
                                     <button
                                       key={jobType.value}
@@ -2479,7 +2498,7 @@ export default function Dashboard() {
                                       `}
                                     >
                                       <span className="material-icons text-3xl">{jobType.icon}</span>
-                                      <span className="text-xs font-medium text-center leading-tight">{jobType.label}</span>
+                                      <span className="text-xs font-medium text-center leading-tight">{t(jobType.labelKey, jobType.label)}</span>
                                     </button>
                                   ))}
                                 </div>
@@ -2496,12 +2515,12 @@ export default function Dashboard() {
                               name="customJobType"
                               render={({ field }) => {
                                 const customJobTypes = customJobTypesData?.customJobTypes || [];
-                                const savedTypes = customJobTypes.map(t => t.jobTypeName);
+                                const savedTypes = customJobTypes.map(cjt => cjt.jobTypeName);
                                 const isNewType = field.value && !savedTypes.includes(field.value);
                                 
                                 return (
                                   <FormItem>
-                                    <FormLabel>Custom Job Type</FormLabel>
+                                    <FormLabel>{t('projects.jobTypes.custom', 'Custom Job Type')}</FormLabel>
                                     <FormControl>
                                       <div className="space-y-2">
                                         {savedTypes.length > 0 && (
@@ -2516,7 +2535,7 @@ export default function Dashboard() {
                                             }}
                                           >
                                             <SelectTrigger className="h-12" data-testid="select-custom-job-type">
-                                              <SelectValue placeholder="Select a saved type or enter new" />
+                                              <SelectValue placeholder={t('dashboard.projectForm.selectSavedType', 'Select a saved type or enter new')} />
                                             </SelectTrigger>
                                             <SelectContent>
                                               {savedTypes.map((typeName) => (
@@ -2524,13 +2543,13 @@ export default function Dashboard() {
                                                   {typeName}
                                                 </SelectItem>
                                               ))}
-                                              <SelectItem value="__new__">+ Enter new custom type</SelectItem>
+                                              <SelectItem value="__new__">{t('dashboard.projectForm.enterNewCustomType', '+ Enter new custom type')}</SelectItem>
                                             </SelectContent>
                                           </Select>
                                         )}
                                         {(savedTypes.length === 0 || isNewType || field.value === "") && (
                                           <Input 
-                                            placeholder="Enter custom job type" 
+                                            placeholder={t('dashboard.projectForm.enterCustomJobType', 'Enter custom job type')} 
                                             value={field.value} 
                                             onChange={(e) => field.onChange(e.target.value)}
                                             className="h-12" 
@@ -2554,7 +2573,7 @@ export default function Dashboard() {
                                 data-testid="button-enter-elevation"
                               >
                                 <span className="material-icons mr-2 text-primary">apartment</span>
-                                Enter Elevation
+                                {t('dashboard.projectForm.enterElevation', 'Enter Elevation')}
                               </Button>
                             )}
                           </>
@@ -2567,7 +2586,7 @@ export default function Dashboard() {
                               name="suitesPerDay"
                               render={({ field }) => (
                                 <FormItem>
-                                  <FormLabel>Expected completed suite per day</FormLabel>
+                                  <FormLabel>{t('dashboard.projectForm.suitesPerDay', 'Expected completed suite per day')}</FormLabel>
                                   <FormControl>
                                     <Input type="number" min="0" placeholder="e.g., 10" {...field} data-testid="input-suites-per-day" className="h-12" />
                                   </FormControl>
@@ -2580,12 +2599,12 @@ export default function Dashboard() {
                               name="buildingFloors"
                               render={({ field }) => (
                                 <FormItem>
-                                  <FormLabel>Building Floors</FormLabel>
+                                  <FormLabel>{t('dashboard.projectForm.buildingFloors', 'Building Floors')}</FormLabel>
                                   <FormControl>
-                                    <Input type="number" min="1" placeholder="Total floors in building" {...field} data-testid="input-building-floors" className="h-12" />
+                                    <Input type="number" min="1" placeholder={t('common.totalFloorsInBuilding', 'Total floors in building')} {...field} data-testid="input-building-floors" className="h-12" />
                                   </FormControl>
                                   <FormDescription className="text-xs">
-                                    How many floors does the building have?
+                                    {t('dashboard.projectForm.buildingFloorsDesc', 'How many floors does the building have?')}
                                   </FormDescription>
                                   <FormMessage />
                                 </FormItem>
@@ -2600,7 +2619,7 @@ export default function Dashboard() {
                             name="stallsPerDay"
                             render={({ field }) => (
                               <FormItem>
-                                <FormLabel>Stalls per Day</FormLabel>
+                                <FormLabel>{t('dashboard.projectForm.stallsPerDay', 'Stalls per Day')}</FormLabel>
                                 <FormControl>
                                   <Input type="number" min="0" placeholder="e.g., 20" {...field} data-testid="input-stalls-per-day" className="h-12" />
                                 </FormControl>
@@ -2620,10 +2639,10 @@ export default function Dashboard() {
                               <FormItem>
                                 <FormLabel>
                                   {projectForm.watch("jobType") === "parkade_pressure_cleaning" 
-                                    ? "Stall Count" 
+                                    ? t('dashboard.projectForm.stallCount', 'Stall Count') 
                                     : projectForm.watch("jobType") === "in_suite_dryer_vent_cleaning"
-                                    ? "Unit Count"
-                                    : "Floor Count"}
+                                    ? t('dashboard.projectForm.unitCount', 'Unit Count')
+                                    : t('dashboard.projectForm.floorCount', 'Floor Count')}
                                 </FormLabel>
                                 <FormControl>
                                   <Input type="number" min="1" {...field} data-testid="input-floor-count" className="h-12" />
@@ -2640,14 +2659,14 @@ export default function Dashboard() {
                           (projectForm.watch("jobType") === "other" && showOtherElevationFields)) && (
                           <>
                             <div className="space-y-2">
-                              <label className="text-sm font-medium">Total Drops per Elevation</label>
+                              <label className="text-sm font-medium">{t('dashboard.projectForm.totalDropsPerElevation', 'Total Drops per Elevation')}</label>
                               <div className="grid grid-cols-2 gap-4">
                                 <FormField
                                   control={projectForm.control}
                                   name="totalDropsNorth"
                                   render={({ field }) => (
                                     <FormItem>
-                                      <FormLabel>North</FormLabel>
+                                      <FormLabel>{t('dashboard.projectForm.north', 'North')}</FormLabel>
                                       <FormControl>
                                         <Input type="number" min="1" {...field} data-testid="input-total-drops-north" className="h-12" />
                                       </FormControl>
@@ -2660,7 +2679,7 @@ export default function Dashboard() {
                                   name="totalDropsEast"
                                   render={({ field }) => (
                                     <FormItem>
-                                      <FormLabel>East</FormLabel>
+                                      <FormLabel>{t('dashboard.projectForm.east', 'East')}</FormLabel>
                                       <FormControl>
                                         <Input type="number" min="1" {...field} data-testid="input-total-drops-east" className="h-12" />
                                       </FormControl>
@@ -2673,7 +2692,7 @@ export default function Dashboard() {
                                   name="totalDropsSouth"
                                   render={({ field }) => (
                                     <FormItem>
-                                      <FormLabel>South</FormLabel>
+                                      <FormLabel>{t('dashboard.projectForm.south', 'South')}</FormLabel>
                                       <FormControl>
                                         <Input type="number" min="1" {...field} data-testid="input-total-drops-south" className="h-12" />
                                       </FormControl>
@@ -2686,7 +2705,7 @@ export default function Dashboard() {
                                   name="totalDropsWest"
                                   render={({ field }) => (
                                     <FormItem>
-                                      <FormLabel>West</FormLabel>
+                                      <FormLabel>{t('dashboard.projectForm.west', 'West')}</FormLabel>
                                       <FormControl>
                                         <Input type="number" min="1" {...field} data-testid="input-total-drops-west" className="h-12" />
                                       </FormControl>
@@ -2702,12 +2721,12 @@ export default function Dashboard() {
                               name="dailyDropTarget"
                               render={({ field }) => (
                                 <FormItem>
-                                  <FormLabel>Daily Drop Target</FormLabel>
+                                  <FormLabel>{t('dashboard.projectForm.dailyDropTarget', 'Daily Drop Target')}</FormLabel>
                                   <FormControl>
                                     <Input type="number" min="1" {...field} data-testid="input-daily-target" className="h-12" />
                                   </FormControl>
                                   <FormDescription className="text-xs">
-                                    Visible to rope access techs
+                                    {t('dashboard.projectForm.dailyDropTargetDesc', 'Visible to rope access techs')}
                                   </FormDescription>
                                   <FormMessage />
                                 </FormItem>
@@ -2723,7 +2742,7 @@ export default function Dashboard() {
                               name="startDate"
                               render={({ field }) => (
                                 <FormItem>
-                                  <FormLabel>Start Date</FormLabel>
+                                  <FormLabel>{t('dashboard.projectForm.startDate', 'Start Date')}</FormLabel>
                                   <FormControl>
                                     <Input type="date" {...field} data-testid="input-start-date" className="h-12" />
                                   </FormControl>
@@ -2736,7 +2755,7 @@ export default function Dashboard() {
                               name="endDate"
                               render={({ field }) => (
                                 <FormItem>
-                                  <FormLabel>End Date</FormLabel>
+                                  <FormLabel>{t('dashboard.projectForm.endDate', 'End Date')}</FormLabel>
                                   <FormControl>
                                     <Input type="date" {...field} data-testid="input-end-date" className="h-12" />
                                   </FormControl>
@@ -2746,7 +2765,7 @@ export default function Dashboard() {
                             />
                           </div>
                           <p className="text-xs text-muted-foreground">
-                            Add dates to display this project on the calendar
+                            {t('dashboard.projectForm.dateCalendarHint', 'Add dates to display this project on the calendar')}
                           </p>
                         </div>
 
@@ -2755,7 +2774,7 @@ export default function Dashboard() {
                           name="targetCompletionDate"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>Target Completion Date</FormLabel>
+                              <FormLabel>{t('dashboard.projectForm.targetCompletionDate', 'Target Completion Date')}</FormLabel>
                               <FormControl>
                                 <Input type="date" {...field} data-testid="input-target-date" className="h-12" />
                               </FormControl>
@@ -2769,12 +2788,12 @@ export default function Dashboard() {
                           name="estimatedHours"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>Estimated Hours</FormLabel>
+                              <FormLabel>{t('dashboard.projectForm.estimatedHours', 'Estimated Hours')}</FormLabel>
                               <FormControl>
-                                <Input type="number" min="1" placeholder="Total estimated hours for entire building" {...field} data-testid="input-estimated-hours" className="h-12" />
+                                <Input type="number" min="1" placeholder={t('dashboard.projectForm.estimatedHoursPlaceholder', 'Total estimated hours for entire building')} {...field} data-testid="input-estimated-hours" className="h-12" />
                               </FormControl>
                               <FormDescription className="text-xs">
-                                Total hours estimated for the entire project
+                                {t('dashboard.projectForm.estimatedHoursDesc', 'Total hours estimated for the entire project')}
                               </FormDescription>
                               <FormMessage />
                             </FormItem>
@@ -2786,7 +2805,7 @@ export default function Dashboard() {
                           name="calendarColor"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>Calendar Color</FormLabel>
+                              <FormLabel>{t('dashboard.projectForm.calendarColor', 'Calendar Color')}</FormLabel>
                               <FormControl>
                                 <div className="flex items-center gap-3">
                                   <Input 
@@ -2799,7 +2818,7 @@ export default function Dashboard() {
                                 </div>
                               </FormControl>
                               <FormDescription className="text-xs">
-                                Choose the color this project appears on the calendar
+                                {t('dashboard.projectForm.calendarColorDesc', 'Choose the color this project appears on the calendar')}
                               </FormDescription>
                               <FormMessage />
                             </FormItem>
@@ -2811,13 +2830,13 @@ export default function Dashboard() {
                           name="assignedEmployees"
                           render={() => (
                             <FormItem>
-                              <FormLabel>Assign Employees</FormLabel>
+                              <FormLabel>{t('dashboard.projectForm.assignEmployees', 'Assign Employees')}</FormLabel>
                               <FormDescription className="text-xs mb-3">
-                                Select employees to assign to this project for calendar display
+                                {t('dashboard.projectForm.assignEmployeesDesc', 'Select employees to assign to this project for calendar display')}
                               </FormDescription>
                               <div className="space-y-2 max-h-40 overflow-y-auto border rounded-md p-3">
                                 {employees.length === 0 ? (
-                                  <p className="text-sm text-muted-foreground">No employees available</p>
+                                  <p className="text-sm text-muted-foreground">{t('dashboard.projectForm.noEmployeesAvailable', 'No employees available')}</p>
                                 ) : (
                                   employees.map((employee: any) => (
                                     <FormField
@@ -2861,7 +2880,7 @@ export default function Dashboard() {
                         />
 
                         <div className="space-y-2">
-                          <label className="text-sm font-medium">Fall Protection Plan (PDF)</label>
+                          <label className="text-sm font-medium">{t('dashboard.projectForm.fallProtectionPlan', 'Fall Protection Plan (PDF)')}</label>
                           <Input
                             type="file"
                             accept=".pdf"
@@ -2869,7 +2888,7 @@ export default function Dashboard() {
                               const file = e.target.files?.[0];
                               if (file) {
                                 if (file.type !== 'application/pdf') {
-                                  toast({ title: "Invalid file", description: "Please select a PDF file", variant: "destructive" });
+                                  toast({ title: t('common.invalidFile', 'Invalid file'), description: t('common.selectPdfFile', 'Please select a PDF file'), variant: "destructive" });
                                   e.target.value = '';
                                   return;
                                 }
@@ -2895,12 +2914,12 @@ export default function Dashboard() {
                             </div>
                           )}
                           <FormDescription className="text-xs">
-                            Optional: Upload the rope access/fall protection plan PDF
+                            {t('dashboard.projectForm.fallProtectionPlanDesc', 'Optional: Upload the rope access/fall protection plan PDF')}
                           </FormDescription>
                         </div>
 
                         <div className="space-y-2">
-                          <label className="text-sm font-medium">Anchor Inspection Certificate (PDF)</label>
+                          <label className="text-sm font-medium">{t('dashboard.projectForm.anchorInspectionCert', 'Anchor Inspection Certificate (PDF)')}</label>
                           <Input
                             type="file"
                             accept=".pdf"
@@ -2908,7 +2927,7 @@ export default function Dashboard() {
                               const file = e.target.files?.[0];
                               if (file) {
                                 if (file.type !== 'application/pdf') {
-                                  toast({ title: "Invalid file", description: "Please select a PDF file", variant: "destructive" });
+                                  toast({ title: t('common.invalidFile', 'Invalid file'), description: t('common.selectPdfFile', 'Please select a PDF file'), variant: "destructive" });
                                   e.target.value = '';
                                   return;
                                 }
@@ -2934,7 +2953,7 @@ export default function Dashboard() {
                             </div>
                           )}
                           <FormDescription className="text-xs">
-                            Optional: Upload the anchor inspection certificate PDF
+                            {t('dashboard.projectForm.anchorInspectionCertDesc', 'Optional: Upload the anchor inspection certificate PDF')}
                           </FormDescription>
                         </div>
 
@@ -2944,7 +2963,7 @@ export default function Dashboard() {
                           data-testid="button-submit-project"
                           disabled={isUploadingPlan || isUploadingAnchorCert}
                         >
-                          {isUploadingPlan || isUploadingAnchorCert ? "Uploading..." : "Create Project"}
+                          {isUploadingPlan || isUploadingAnchorCert ? t('common.uploading', 'Uploading...') : t('projects.createProject', 'Create Project')}
                         </Button>
                       </form>
                     </Form>
@@ -2957,14 +2976,14 @@ export default function Dashboard() {
               <div>
                 <div className="flex items-center gap-2 mb-6 mt-8">
                   <div className="h-8 w-1 bg-primary rounded-full"></div>
-                  <h2 className="text-xl font-bold">Active Projects</h2>
+                  <h2 className="text-xl font-bold">{t('dashboard.projects.activeProjects', 'Active Projects')}</h2>
                 </div>
                 <div className="space-y-4">
                   {filteredProjects.filter((p: Project) => p.status === "active").length === 0 ? (
                     <Card>
                       <CardContent className="p-8 text-center text-muted-foreground">
                         <span className="material-icons text-4xl mb-2 opacity-50">apartment</span>
-                        <div>No active projects yet</div>
+                        <div>{t('dashboard.projects.noActiveProjects', 'No active projects yet')}</div>
                       </CardContent>
                     </Card>
                   ) : (
@@ -2993,19 +3012,19 @@ export default function Dashboard() {
                         completed = project.completedDrops || 0;
                         total = project.floorCount || 0;
                         progressPercent = total > 0 ? (completed / total) * 100 : 0;
-                        unitLabel = "suites";
+                        unitLabel = t('dashboard.projects.suites', 'suites');
                       } else if (isParkade) {
                         // Stall-based tracking (Parkade)
                         completed = project.completedDrops || 0;
                         total = project.totalStalls || project.floorCount || 0;
                         progressPercent = total > 0 ? (completed / total) * 100 : 0;
-                        unitLabel = "stalls";
+                        unitLabel = t('dashboard.projects.stalls', 'stalls');
                       } else {
                         // Drop-based tracking (Window Cleaning, Building Wash, etc.)
                         completed = project.completedDrops || 0;
                         total = project.totalDrops || 0;
                         progressPercent = total > 0 ? (completed / total) * 100 : 0;
-                        unitLabel = "drops";
+                        unitLabel = t('dashboard.projects.drops', 'drops');
                       }
 
                       return (
@@ -3027,7 +3046,7 @@ export default function Dashboard() {
                                 {project.createdAt && (
                                   <div className="text-xs text-muted-foreground mt-1 flex items-center gap-1">
                                     <span className="material-icons text-xs text-primary/70">event</span>
-                                    Created {new Date(project.createdAt).toLocaleDateString()}
+                                    {t('dashboard.projects.created', 'Created')} {new Date(project.createdAt).toLocaleDateString()}
                                   </div>
                                 )}
                               </div>
@@ -3043,19 +3062,19 @@ export default function Dashboard() {
                                 {/* Safety Documents Status - Stacked Vertically */}
                                 <div className="flex flex-col items-end gap-0.5">
                                   {/* Anchor Inspection Certificate */}
-                                  <div className="flex items-center gap-1.5" title={project.anchorInspectionCertificateUrl ? "Anchor inspection uploaded" : "Anchor inspection missing"}>
+                                  <div className="flex items-center gap-1.5" title={project.anchorInspectionCertificateUrl ? t('dashboard.projects.anchorInspectionUploaded', 'Anchor inspection uploaded') : t('dashboard.projects.anchorInspectionMissing', 'Anchor inspection missing')}>
                                     <span className={`material-icons text-lg ${project.anchorInspectionCertificateUrl ? 'text-green-500' : 'text-red-500'}`}>
                                       {project.anchorInspectionCertificateUrl ? 'check_circle' : 'cancel'}
                                     </span>
-                                    <span className="text-base text-muted-foreground">Anchor Inspection</span>
+                                    <span className="text-base text-muted-foreground">{t('dashboard.projects.anchorInspection', 'Anchor Inspection')}</span>
                                   </div>
                                   
                                   {/* Rope Access Plan */}
-                                  <div className="flex items-center gap-1.5" title={project.ropeAccessPlanUrl ? "Rope access plan uploaded" : "Rope access plan missing"}>
+                                  <div className="flex items-center gap-1.5" title={project.ropeAccessPlanUrl ? t('dashboard.projects.ropeAccessPlanUploaded', 'Rope access plan uploaded') : t('dashboard.projects.ropeAccessPlanMissing', 'Rope access plan missing')}>
                                     <span className={`material-icons text-lg ${project.ropeAccessPlanUrl ? 'text-green-500' : 'text-red-500'}`}>
                                       {project.ropeAccessPlanUrl ? 'check_circle' : 'cancel'}
                                     </span>
-                                    <span className="text-base text-muted-foreground">Rope Access Plan</span>
+                                    <span className="text-base text-muted-foreground">{t('dashboard.projects.ropeAccessPlan', 'Rope Access Plan')}</span>
                                   </div>
                                   
                                   {/* Toolbox Meetings */}
@@ -3063,11 +3082,11 @@ export default function Dashboard() {
                                     const projectMeetings = toolboxMeetings.filter((m: any) => m.projectId === project.id);
                                     const hasMeetings = projectMeetings.length > 0;
                                     return (
-                                      <div className="flex items-center gap-1.5" title={hasMeetings ? `${projectMeetings.length} toolbox meeting(s)` : "No toolbox meetings"}>
+                                      <div className="flex items-center gap-1.5" title={hasMeetings ? `${projectMeetings.length} ${t('dashboard.projects.toolboxMeetings', 'toolbox meeting(s)')}` : t('dashboard.projects.noToolboxMeetings', 'No toolbox meetings')}>
                                         <span className={`material-icons text-lg ${hasMeetings ? 'text-green-500' : 'text-red-500'}`}>
                                           {hasMeetings ? 'check_circle' : 'cancel'}
                                         </span>
-                                        <span className="text-base text-muted-foreground">Toolbox Meeting</span>
+                                        <span className="text-base text-muted-foreground">{t('dashboard.projects.toolboxMeeting', 'Toolbox Meeting')}</span>
                                       </div>
                                     );
                                   })()}
@@ -3078,7 +3097,7 @@ export default function Dashboard() {
                             <div className="space-y-3">
                               
                               <div className="flex items-center justify-between">
-                                <span className="text-sm text-muted-foreground">Progress</span>
+                                <span className="text-sm text-muted-foreground">{t('dashboard.projects.progress', 'Progress')}</span>
                                 <span className="text-2xl font-bold">{Math.round(progressPercent)}%</span>
                               </div>
                               <Progress value={progressPercent} className="h-3" />
@@ -3103,16 +3122,16 @@ export default function Dashboard() {
               <div className="flex items-center justify-between mb-6">
                 <div className="flex items-center gap-2">
                   <div className="h-8 w-1 bg-success rounded-full"></div>
-                  <h2 className="text-xl font-bold">Past Projects</h2>
+                  <h2 className="text-xl font-bold">{t('dashboard.projects.pastProjects', 'Past Projects')}</h2>
                 </div>
                 <TabsList>
                   <TabsTrigger value="completed" data-testid="tab-completed-projects">
                     <span className="material-icons text-sm mr-1">done_all</span>
-                    Completed
+                    {t('dashboard.projects.completed', 'Completed')}
                   </TabsTrigger>
                   <TabsTrigger value="deleted" data-testid="tab-deleted-projects">
                     <span className="material-icons text-sm mr-1">delete</span>
-                    Deleted
+                    {t('dashboard.projects.deleted', 'Deleted')}
                   </TabsTrigger>
                 </TabsList>
               </div>
@@ -3122,7 +3141,7 @@ export default function Dashboard() {
                 <Card>
                   <CardContent className="p-8 text-center text-muted-foreground">
                     <span className="material-icons text-4xl mb-2 opacity-50">done_all</span>
-                    <div>No completed projects yet</div>
+                    <div>{t('dashboard.projects.noCompletedProjects', 'No completed projects yet')}</div>
                   </CardContent>
                 </Card>
               ) : (
@@ -3146,13 +3165,13 @@ export default function Dashboard() {
                             {project.createdAt && (
                               <div className="text-xs text-muted-foreground mt-1 flex items-center gap-1">
                                 <span className="material-icons text-xs">event</span>
-                                Created {new Date(project.createdAt).toLocaleDateString()}
+                                {t('dashboard.projects.created', 'Created')} {new Date(project.createdAt).toLocaleDateString()}
                               </div>
                             )}
                           </div>
                           <Badge variant="default" className="bg-success hover:bg-success text-white">
                             <span className="material-icons text-xs mr-1">done_all</span>
-                            Complete
+                            {t('dashboard.projects.complete', 'Complete')}
                           </Badge>
                         </div>
                       </CardContent>
@@ -3177,8 +3196,8 @@ export default function Dashboard() {
                   {/* Overall Performance */}
                   <Card>
                     <CardHeader>
-                      <CardTitle>Overall Target Performance</CardTitle>
-                      <CardDescription>Across all projects and work sessions</CardDescription>
+                      <CardTitle>{t('dashboard.performance.overallTargetPerformance', 'Overall Target Performance')}</CardTitle>
+                      <CardDescription>{t('dashboard.performance.acrossAllProjects', 'Across all projects and work sessions')}</CardDescription>
                     </CardHeader>
                     <CardContent>
                       <div className="flex flex-col items-center">
@@ -3207,11 +3226,11 @@ export default function Dashboard() {
                         <div className="grid grid-cols-2 gap-4 mt-2 w-full max-w-xs">
                           <div className="text-center">
                             <div className="text-2xl font-bold text-primary" data-testid="performance-target-met">{targetMetCount}</div>
-                            <div className="text-xs text-muted-foreground">Target Met</div>
+                            <div className="text-xs text-muted-foreground">{t('dashboard.performance.targetMet', 'Target Met')}</div>
                           </div>
                           <div className="text-center">
                             <div className="text-2xl font-bold text-destructive" data-testid="performance-below-target">{belowTargetCount}</div>
-                            <div className="text-xs text-muted-foreground">Below Target</div>
+                            <div className="text-xs text-muted-foreground">{t('dashboard.performance.belowTarget', 'Below Target')}</div>
                           </div>
                         </div>
                       </div>
@@ -3220,7 +3239,7 @@ export default function Dashboard() {
 
                   {/* Per-Employee Performance */}
                   <div>
-                    <h3 className="text-sm font-medium text-muted-foreground mb-3">Performance by Employee</h3>
+                    <h3 className="text-sm font-medium text-muted-foreground mb-3">{t('dashboard.performance.performanceByEmployee', 'Performance by Employee')}</h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       {(() => {
                         // Group sessions by employee
@@ -3238,15 +3257,15 @@ export default function Dashboard() {
                           const employeeBelowTarget = sessions.filter((s: any) => s.dropsCompleted < s.dailyDropTarget).length;
                           
                           const employeePieData = [
-                            { name: "Target Met", value: employeeTargetMet, color: "hsl(var(--primary))" },
-                            { name: "Below Target", value: employeeBelowTarget, color: "hsl(var(--destructive))" },
+                            { name: t('dashboard.performance.targetMet', 'Target Met'), value: employeeTargetMet, color: "hsl(var(--primary))" },
+                            { name: t('dashboard.performance.belowTarget', 'Below Target'), value: employeeBelowTarget, color: "hsl(var(--destructive))" },
                           ];
 
                           return (
                             <Card key={employeeName}>
                               <CardHeader>
                                 <CardTitle className="text-base">{employeeName}</CardTitle>
-                                <CardDescription className="text-xs">{sessions.length} work session{sessions.length !== 1 ? 's' : ''}</CardDescription>
+                                <CardDescription className="text-xs">{sessions.length} {t('dashboard.performance.workSessions', 'work sessions')}</CardDescription>
                               </CardHeader>
                               <CardContent>
                                 <div className="flex flex-col items-center">
@@ -3274,11 +3293,11 @@ export default function Dashboard() {
                                   <div className="grid grid-cols-2 gap-2 mt-2 w-full text-center">
                                     <div>
                                       <div className="text-lg font-bold text-primary">{employeeTargetMet}</div>
-                                      <div className="text-xs text-muted-foreground">Met</div>
+                                      <div className="text-xs text-muted-foreground">{t('dashboard.performance.met', 'Met')}</div>
                                     </div>
                                     <div>
                                       <div className="text-lg font-bold text-destructive">{employeeBelowTarget}</div>
-                                      <div className="text-xs text-muted-foreground">Below</div>
+                                      <div className="text-xs text-muted-foreground">{t('dashboard.performance.below', 'Below')}</div>
                                     </div>
                                   </div>
                                 </div>
@@ -3298,9 +3317,9 @@ export default function Dashboard() {
                   >
                     <CardHeader className="flex flex-row items-center justify-between gap-4 space-y-0 pb-2">
                       <div className="flex-1 min-w-0">
-                        <CardTitle className="text-lg">Hours Analytics</CardTitle>
+                        <CardTitle className="text-lg">{t('dashboard.performance.hoursAnalytics', 'Hours Analytics')}</CardTitle>
                         <CardDescription className="text-sm">
-                          View billable vs non-billable hours breakdown
+                          {t('dashboard.performance.hoursAnalyticsDesc', 'View billable vs non-billable hours breakdown')}
                         </CardDescription>
                       </div>
                       <div className="flex-shrink-0">
@@ -3311,7 +3330,7 @@ export default function Dashboard() {
                     </CardHeader>
                     <CardContent>
                       <p className="text-sm text-muted-foreground">
-                        Analyze time allocation across all projects
+                        {t('dashboard.performance.analyzeTimeAllocation', 'Analyze time allocation across all projects')}
                       </p>
                     </CardContent>
                   </Card>
@@ -3325,9 +3344,9 @@ export default function Dashboard() {
                     >
                       <CardHeader className="flex flex-row items-center justify-between gap-4 space-y-0 pb-2">
                         <div className="flex-1 min-w-0">
-                          <CardTitle className="text-lg">Job Schedule</CardTitle>
+                          <CardTitle className="text-lg">{t('dashboard.performance.jobSchedule', 'Job Schedule')}</CardTitle>
                           <CardDescription className="text-sm">
-                            Manage team assignments and job scheduling
+                            {t('dashboard.performance.jobScheduleDesc', 'Manage team assignments and job scheduling')}
                           </CardDescription>
                         </div>
                         <div className="flex-shrink-0">
@@ -3338,7 +3357,7 @@ export default function Dashboard() {
                       </CardHeader>
                       <CardContent>
                         <p className="text-sm text-muted-foreground">
-                          Schedule jobs and assign employees to tasks
+                          {t('dashboard.performance.scheduleJobs', 'Schedule jobs and assign employees to tasks')}
                         </p>
                       </CardContent>
                     </Card>
@@ -3348,8 +3367,8 @@ export default function Dashboard() {
                 <Card>
                   <CardContent className="p-8 text-center text-muted-foreground">
                     <span className="material-icons text-4xl mb-2 opacity-50">analytics</span>
-                    <div>No completed work sessions yet</div>
-                    <div className="text-sm mt-1">Performance data will appear after completing work sessions</div>
+                    <div>{t('dashboard.performance.noCompletedSessions', 'No completed work sessions yet')}</div>
+                    <div className="text-sm mt-1">{t('dashboard.performance.performanceDataAppear', 'Performance data will appear after completing work sessions')}</div>
                   </CardContent>
                 </Card>
               )}
@@ -3363,16 +3382,16 @@ export default function Dashboard() {
             <div className="space-y-4">
               <Card>
                 <CardHeader>
-                  <CardTitle>All Complaints</CardTitle>
+                  <CardTitle>{t('dashboard.complaints.allComplaints', 'All Complaints')}</CardTitle>
                   <CardDescription>
-                    View and manage resident feedback across all projects
+                    {t('dashboard.complaints.viewManageFeedback', 'View and manage resident feedback across all projects')}
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
                   {complaintsLoading ? (
-                    <div className="text-center py-8 text-muted-foreground">Loading complaints...</div>
+                    <div className="text-center py-8 text-muted-foreground">{t('dashboard.complaints.loadingComplaints', 'Loading complaints...')}</div>
                   ) : complaints.length === 0 ? (
-                    <div className="text-center py-8 text-muted-foreground">No complaints yet</div>
+                    <div className="text-center py-8 text-muted-foreground">{t('dashboard.complaints.noComplaints', 'No complaints yet')}</div>
                   ) : (() => {
                     // Group complaints by strata plan number
                     const groupedComplaints = complaints.reduce((acc: any, complaint: any) => {
@@ -3380,7 +3399,7 @@ export default function Dashboard() {
                       if (!acc[key]) {
                         acc[key] = {
                           strataPlanNumber: key,
-                          buildingName: complaint.buildingName || 'Unknown Building',
+                          buildingName: complaint.buildingName || t('common.unknownBuilding', 'Unknown Building'),
                           complaints: []
                         };
                       }
@@ -3410,11 +3429,11 @@ export default function Dashboard() {
                                   <div className="flex items-center gap-3">
                                     {openCount > 0 && (
                                       <Badge variant="default" className="text-xs">
-                                        {openCount} open
+                                        {openCount} {t('dashboard.complaints.open', 'open')}
                                       </Badge>
                                     )}
                                     <Badge variant="secondary" className="text-xs">
-                                      {building.complaints.length} total
+                                      {building.complaints.length} {t('dashboard.complaints.total', 'total')}
                                     </Badge>
                                   </div>
                                 </div>
@@ -3474,7 +3493,7 @@ export default function Dashboard() {
                       <div className="flex items-center gap-3">
                         <span className="material-icons text-primary">groups</span>
                         <div>
-                          <div className="font-medium">Employee Seats</div>
+                          <div className="font-medium">{t('dashboard.employeeSeats.title', 'Employee Seats')}</div>
                           <div className="text-sm text-muted-foreground">
                             {employeesData.seatInfo.tier && employeesData.seatInfo.tier !== 'none'
                               ? (() => {
@@ -3486,10 +3505,10 @@ export default function Dashboard() {
                                     : '';
                                   
                                   return employeesData.seatInfo.seatLimit === -1
-                                    ? `${employeesData.seatInfo.seatsUsed} seats used • Unlimited available`
-                                    : `${employeesData.seatInfo.seatsUsed} of ${employeesData.seatInfo.seatLimit} used • ${seatsRemaining} ${seatsRemaining === 1 ? 'seat' : 'seats'} remaining${additionalInfo}`;
+                                    ? `${employeesData.seatInfo.seatsUsed} ${t('dashboard.employeeSeats.seatsUsed', 'seats used')} • ${t('dashboard.employeeSeats.unlimited', 'Unlimited available')}`
+                                    : `${t('dashboard.employeeSeats.used', '{{used}} of {{total}} used', { used: employeesData.seatInfo.seatsUsed, total: employeesData.seatInfo.seatLimit })} • ${t('dashboard.employeeSeats.seatsRemaining', '{{count}} seat(s) remaining', { count: seatsRemaining })}${additionalInfo}`;
                                 })()
-                              : 'Manage your employee capacity'
+                              : t('dashboard.employeeSeats.manageCapacity', 'Manage your employee capacity')
                             }
                           </div>
                         </div>
@@ -3508,9 +3527,9 @@ export default function Dashboard() {
                         <div className="flex items-start gap-2">
                           <span className="material-icons text-destructive text-sm mt-0.5">warning</span>
                           <div className="flex-1">
-                            <div className="text-sm font-medium text-destructive">Seat Limit Reached</div>
+                            <div className="text-sm font-medium text-destructive">{t('dashboard.employeeSeats.seatLimitReached', 'Seat Limit Reached')}</div>
                             <div className="text-xs text-muted-foreground mt-1">
-                              You've reached your {employeesData.seatInfo.seatLimit}-employee limit. Visit Profile → Subscription to upgrade your tier or add more seats.
+                              {t('dashboard.employeeSeats.seatLimitReachedDesc', "You've reached your {{limit}}-employee limit. Visit Profile → Subscription to upgrade your tier or add more seats.", { limit: employeesData.seatInfo.seatLimit })}
                             </div>
                           </div>
                         </div>
@@ -3522,7 +3541,7 @@ export default function Dashboard() {
                           onClick={() => window.location.href = "/profile"}
                         >
                           <span className="material-icons text-sm mr-1">settings</span>
-                          Manage Subscription
+                          {t('dashboard.employeeSeats.manageSubscription', 'Manage Subscription')}
                         </Button>
                       </div>
                     )}
@@ -3539,17 +3558,17 @@ export default function Dashboard() {
                     disabled={userIsReadOnly || (employeesData?.seatInfo?.atSeatLimit ?? false)}
                   >
                     <span className="material-icons">person_add</span>
-                    {employeesData?.seatInfo?.atSeatLimit ? 'Seat Limit Reached' : 'Add New Employee'}
+                    {employeesData?.seatInfo?.atSeatLimit ? t('dashboard.employeeSeats.seatLimitReached', 'Seat Limit Reached') : t('dashboard.employeeSeats.addNewEmployee', 'Add New Employee')}
                   </Button>
                 </DialogTrigger>
                 <DialogContent className="max-w-2xl p-0 max-h-[95vh] flex flex-col">
                   <div className="p-6 border-b">
                     <DialogHeader>
                       <DialogTitle>
-                        {employeeFormStep === 1 ? "Employee Information" : "Permissions"}
+                        {employeeFormStep === 1 ? t('dashboard.employeeForm.title', 'Employee Information') : t('dashboard.employeeForm.permissionsTitle', 'Permissions')}
                       </DialogTitle>
                       <DialogDescription>
-                        {employeeFormStep === 1 ? "Step 1 of 2: Enter employee details" : "Step 2 of 2: Configure access permissions"}
+                        {employeeFormStep === 1 ? t('dashboard.employeeForm.step1', 'Step 1 of 2: Enter employee details') : t('dashboard.employeeForm.step2', 'Step 2 of 2: Configure access permissions')}
                       </DialogDescription>
                     </DialogHeader>
                   </div>
@@ -3563,7 +3582,7 @@ export default function Dashboard() {
                         name="name"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Full Name</FormLabel>
+                            <FormLabel>{t('dashboard.employeeForm.fullName', 'Full Name')}</FormLabel>
                             <FormControl>
                               <Input placeholder="John Doe" {...field} data-testid="input-employee-name" className="h-12" />
                             </FormControl>
@@ -3577,12 +3596,12 @@ export default function Dashboard() {
                         name="email"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Email Address</FormLabel>
+                            <FormLabel>{t('dashboard.employeeForm.emailAddress', 'Email Address')}</FormLabel>
                             <FormControl>
                               <Input type="email" placeholder="employee@company.com" {...field} data-testid="input-employee-email" className="h-12" />
                             </FormControl>
                             <FormDescription className="text-xs">
-                              Will be used as username
+                              {t('dashboard.employeeForm.emailDescription', 'Will be used as username')}
                             </FormDescription>
                             <FormMessage />
                           </FormItem>
@@ -3594,12 +3613,12 @@ export default function Dashboard() {
                         name="password"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Temporary Password</FormLabel>
+                            <FormLabel>{t('dashboard.employeeForm.temporaryPassword', 'Temporary Password')}</FormLabel>
                             <FormControl>
                               <Input type="text" placeholder="Enter temporary password" {...field} data-testid="input-employee-password" className="h-12" />
                             </FormControl>
                             <FormDescription className="text-xs">
-                              Give this password to the employee
+                              {t('dashboard.employeeForm.passwordDescription', 'Give this password to the employee')}
                             </FormDescription>
                             <FormMessage />
                           </FormItem>
@@ -3611,7 +3630,7 @@ export default function Dashboard() {
                         name="role"
                         render={({ field }) => (
                           <FormItem className="space-y-3">
-                            <FormLabel>Role</FormLabel>
+                            <FormLabel>{t('dashboard.employeeForm.role', 'Role')}</FormLabel>
                             <FormControl>
                               <RadioGroup
                                 onValueChange={field.onChange}
@@ -3636,7 +3655,7 @@ export default function Dashboard() {
                                             {role.icon}
                                           </span>
                                           <span className="text-xs font-medium text-center leading-tight">
-                                            {role.label}
+                                            {t(role.labelKey, role.label)}
                                           </span>
                                         </FormLabel>
                                       </div>
@@ -3655,7 +3674,7 @@ export default function Dashboard() {
                         name="hourlyRate"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Hourly Rate ($/hr)</FormLabel>
+                            <FormLabel>{t('dashboard.employeeForm.hourlyRate', 'Hourly Rate ($/hr)')}</FormLabel>
                             <FormControl>
                               <Input 
                                 type="number" 
@@ -3668,7 +3687,7 @@ export default function Dashboard() {
                               />
                             </FormControl>
                             <FormDescription className="text-xs">
-                              Optional - for labor cost calculations
+                              {t('dashboard.employeeForm.hourlyRateDescription', 'Optional - for labor cost calculations')}
                             </FormDescription>
                             <FormMessage />
                           </FormItem>
@@ -3676,7 +3695,7 @@ export default function Dashboard() {
                       />
 
                       <div className="border-t pt-4 mt-6">
-                        <h3 className="text-sm font-medium mb-4">Personal Details (Optional)</h3>
+                        <h3 className="text-sm font-medium mb-4">{t('dashboard.employeeForm.personalDetails', 'Personal Details (Optional)')}</h3>
                         
                         <div className="space-y-4">
                           <FormField
@@ -3684,7 +3703,7 @@ export default function Dashboard() {
                             name="startDate"
                             render={({ field }) => (
                               <FormItem>
-                                <FormLabel>Start Date</FormLabel>
+                                <FormLabel>{t('dashboard.employeeForm.startDate', 'Start Date')}</FormLabel>
                                 <FormControl>
                                   <Input type="date" {...field} data-testid="input-employee-start-date" className="h-12" />
                                 </FormControl>
@@ -3698,7 +3717,7 @@ export default function Dashboard() {
                             name="birthday"
                             render={({ field }) => (
                               <FormItem>
-                                <FormLabel>Birthday</FormLabel>
+                                <FormLabel>{t('dashboard.employeeForm.birthday', 'Birthday')}</FormLabel>
                                 <FormControl>
                                   <Input type="date" {...field} data-testid="input-employee-birthday" className="h-12" />
                                 </FormControl>
@@ -3712,7 +3731,7 @@ export default function Dashboard() {
                             name="socialInsuranceNumber"
                             render={({ field }) => (
                               <FormItem>
-                                <FormLabel>Social Insurance Number</FormLabel>
+                                <FormLabel>{t('dashboard.employeeForm.socialInsuranceNumber', 'Social Insurance Number')}</FormLabel>
                                 <FormControl>
                                   <Input placeholder="XXX-XXX-XXX" {...field} data-testid="input-employee-sin" className="h-12" />
                                 </FormControl>
@@ -3726,7 +3745,7 @@ export default function Dashboard() {
                             name="driversLicenseNumber"
                             render={({ field }) => (
                               <FormItem>
-                                <FormLabel>Driver's License Number</FormLabel>
+                                <FormLabel>{t('dashboard.employeeForm.driversLicenseNumber', "Driver's License Number")}</FormLabel>
                                 <FormControl>
                                   <Input placeholder="License number" {...field} data-testid="input-employee-dl-number" className="h-12" />
                                 </FormControl>
@@ -3740,7 +3759,7 @@ export default function Dashboard() {
                             name="driversLicenseProvince"
                             render={({ field }) => (
                               <FormItem>
-                                <FormLabel>Driver's License Province/State</FormLabel>
+                                <FormLabel>{t('dashboard.employeeForm.driversLicenseProvince', "Driver's License Province/State")}</FormLabel>
                                 <FormControl>
                                   <Input placeholder="BC, AB, etc." {...field} data-testid="input-employee-dl-province" className="h-12" />
                                 </FormControl>
@@ -3753,8 +3772,8 @@ export default function Dashboard() {
                             documents={employeeForm.watch("driversLicenseDocuments") || []}
                             onDocumentsChange={(docs) => employeeForm.setValue("driversLicenseDocuments", docs)}
                             maxDocuments={5}
-                            label="Driver's License Documents"
-                            description="Upload driver's license photos, abstracts, or related documents"
+                            label={t('dashboard.employeeForm.driversLicenseDocuments', "Driver's License Documents")}
+                            description={t('dashboard.employeeForm.driversLicenseDocsDescription', 'Upload driver\'s license photos, abstracts, or related documents')}
                           />
 
                           <FormField
@@ -3762,7 +3781,7 @@ export default function Dashboard() {
                             name="homeAddress"
                             render={({ field }) => (
                               <FormItem>
-                                <FormLabel>Home Address</FormLabel>
+                                <FormLabel>{t('dashboard.employeeForm.homeAddress', 'Home Address')}</FormLabel>
                                 <FormControl>
                                   <Input placeholder="Street address" {...field} data-testid="input-employee-address" className="h-12" />
                                 </FormControl>
@@ -3776,7 +3795,7 @@ export default function Dashboard() {
                             name="employeePhoneNumber"
                             render={({ field }) => (
                               <FormItem>
-                                <FormLabel>Phone Number</FormLabel>
+                                <FormLabel>{t('dashboard.employeeForm.phoneNumber', 'Phone Number')}</FormLabel>
                                 <FormControl>
                                   <Input type="tel" placeholder="(604) 555-1234" {...field} data-testid="input-employee-phone" className="h-12" />
                                 </FormControl>
@@ -3790,7 +3809,7 @@ export default function Dashboard() {
                             name="emergencyContactName"
                             render={({ field }) => (
                               <FormItem>
-                                <FormLabel>Emergency Contact Name</FormLabel>
+                                <FormLabel>{t('dashboard.employeeForm.emergencyContactName', 'Emergency Contact Name')}</FormLabel>
                                 <FormControl>
                                   <Input placeholder="Contact name" {...field} data-testid="input-employee-emergency-name" className="h-12" />
                                 </FormControl>
@@ -3804,7 +3823,7 @@ export default function Dashboard() {
                             name="emergencyContactPhone"
                             render={({ field }) => (
                               <FormItem>
-                                <FormLabel>Emergency Contact Phone</FormLabel>
+                                <FormLabel>{t('dashboard.employeeForm.emergencyContactPhone', 'Emergency Contact Phone')}</FormLabel>
                                 <FormControl>
                                   <Input type="tel" placeholder="(604) 555-1234" {...field} data-testid="input-employee-emergency-phone" className="h-12" />
                                 </FormControl>
@@ -3818,7 +3837,7 @@ export default function Dashboard() {
                             name="specialMedicalConditions"
                             render={({ field }) => (
                               <FormItem>
-                                <FormLabel>Special Medical Conditions</FormLabel>
+                                <FormLabel>{t('dashboard.employeeForm.specialMedicalConditions', 'Special Medical Conditions')}</FormLabel>
                                 <FormControl>
                                   <Input placeholder="Medical conditions to be aware of" {...field} data-testid="input-employee-medical" className="h-12" />
                                 </FormControl>
@@ -3828,18 +3847,18 @@ export default function Dashboard() {
                           />
 
                           <div className="border-t pt-4 mt-4">
-                            <h4 className="text-sm font-medium mb-4">IRATA Certification (Optional)</h4>
+                            <h4 className="text-sm font-medium mb-4">{t('dashboard.employeeForm.irataCertification', 'IRATA Certification (Optional)')}</h4>
                             <div className="space-y-4">
                               <FormField
                                 control={employeeForm.control}
                                 name="irataLevel"
                                 render={({ field }) => (
                                   <FormItem>
-                                    <FormLabel>IRATA Level</FormLabel>
+                                    <FormLabel>{t('dashboard.employeeForm.irataLevel', 'IRATA Level')}</FormLabel>
                                     <Select onValueChange={field.onChange} value={field.value}>
                                       <FormControl>
                                         <SelectTrigger className="h-12" data-testid="select-irata-level">
-                                          <SelectValue placeholder="Select level" />
+                                          <SelectValue placeholder={t('dashboard.employeeForm.selectLevel', 'Select level')} />
                                         </SelectTrigger>
                                       </FormControl>
                                       <SelectContent>
@@ -3860,7 +3879,7 @@ export default function Dashboard() {
                                     name="irataLicenseNumber"
                                     render={({ field }) => (
                                       <FormItem>
-                                        <FormLabel>IRATA License Number</FormLabel>
+                                        <FormLabel>{t('dashboard.employeeForm.irataLicenseNumber', 'IRATA License Number')}</FormLabel>
                                         <FormControl>
                                           <Input placeholder="License number" {...field} data-testid="input-irata-license" className="h-12" />
                                         </FormControl>
@@ -3874,7 +3893,7 @@ export default function Dashboard() {
                                     name="irataIssuedDate"
                                     render={({ field }) => (
                                       <FormItem>
-                                        <FormLabel>IRATA Issued Date</FormLabel>
+                                        <FormLabel>{t('dashboard.employeeForm.irataIssuedDate', 'IRATA Issued Date')}</FormLabel>
                                         <FormControl>
                                           <Input type="date" {...field} data-testid="input-irata-issued" className="h-12" />
                                         </FormControl>
@@ -3888,7 +3907,7 @@ export default function Dashboard() {
                                     name="irataExpirationDate"
                                     render={({ field }) => (
                                       <FormItem>
-                                        <FormLabel>IRATA Expiration Date</FormLabel>
+                                        <FormLabel>{t('dashboard.employeeForm.irataExpirationDate', 'IRATA Expiration Date')}</FormLabel>
                                         <FormControl>
                                           <Input type="date" {...field} data-testid="input-irata-expiration" className="h-12" />
                                         </FormControl>
@@ -3909,7 +3928,7 @@ export default function Dashboard() {
                         onClick={() => setEmployeeFormStep(2)}
                         data-testid="button-continue-to-permissions"
                       >
-                        Continue to Permissions
+                        {t('dashboard.employeeForm.continueToPermissions', 'Continue to Permissions')}
                       </Button>
                       </>
                       )}
@@ -3924,9 +3943,9 @@ export default function Dashboard() {
                             <div className="mb-4">
                               <div className="flex items-center justify-between">
                                 <div>
-                                  <FormLabel className="text-base">Permissions</FormLabel>
+                                  <FormLabel className="text-base">{t('dashboard.employeeForm.accessPermissions', 'Access Permissions')}</FormLabel>
                                   <FormDescription className="text-xs">
-                                    Select which features this employee can access
+                                    {t('dashboard.employeeForm.selectPermissions', 'Select the permissions this employee should have')}
                                   </FormDescription>
                                 </div>
                                 <Button
@@ -3941,14 +3960,14 @@ export default function Dashboard() {
                                   }}
                                   data-testid="button-select-all-permissions"
                                 >
-                                  Select All
+                                  {t('dashboard.employeeForm.selectAll', 'Select All')}
                                 </Button>
                               </div>
                             </div>
                             <div className="grid grid-cols-2 gap-4">
                               {PERMISSION_CATEGORIES.map((category) => (
-                                <div key={category.name} className="border rounded-lg p-4 bg-muted/20">
-                                  <h4 className="text-xs font-semibold text-primary uppercase tracking-wider mb-3 pb-2 border-b">{category.name}</h4>
+                                <div key={category.nameKey} className="border rounded-lg p-4 bg-muted/20">
+                                  <h4 className="text-xs font-semibold text-primary uppercase tracking-wider mb-3 pb-2 border-b">{t(category.nameKey, category.nameKey)}</h4>
                                   <div className="space-y-2">
                                     {category.permissions.map((permission) => (
                                       <FormField
@@ -3977,7 +3996,7 @@ export default function Dashboard() {
                                                 />
                                               </FormControl>
                                               <FormLabel className="text-sm font-normal cursor-pointer">
-                                                {permission.label}
+                                                {t(permission.labelKey, permission.label)}
                                               </FormLabel>
                                             </FormItem>
                                           )
@@ -4001,10 +4020,10 @@ export default function Dashboard() {
                           onClick={() => setEmployeeFormStep(1)}
                           data-testid="button-back-to-info"
                         >
-                          Back
+                          {t('dashboard.employeeForm.back', 'Back')}
                         </Button>
                         <Button type="submit" className="w-full h-12" data-testid="button-submit-employee" disabled={createEmployeeMutation.isPending}>
-                          {createEmployeeMutation.isPending ? "Creating..." : "Create Employee"}
+                          {createEmployeeMutation.isPending ? t('dashboard.employees.creating', 'Creating...') : t('dashboard.employees.createEmployee', 'Create Employee')}
                         </Button>
                       </div>
                       </>
@@ -4019,7 +4038,7 @@ export default function Dashboard() {
               <div className="space-y-6">
                 {/* Active Employees */}
                 <div className="space-y-2">
-                  <h3 className="text-lg font-medium">Active Employees</h3>
+                  <h3 className="text-lg font-medium">{t('dashboard.employees.activeEmployees', 'Active Employees')}</h3>
                   {(() => {
                     const activeEmployees = employees.filter((emp: any) => !emp.terminatedDate);
                     
@@ -4028,7 +4047,7 @@ export default function Dashboard() {
                         <Card>
                           <CardContent className="p-8 text-center text-muted-foreground">
                             <span className="material-icons text-4xl mb-2 opacity-50">people</span>
-                            <div>No active employees yet</div>
+                            <div>{t('dashboard.employees.noActiveEmployees', 'No active employees yet')}</div>
                           </CardContent>
                         </Card>
                       );
@@ -4070,13 +4089,13 @@ export default function Dashboard() {
                                   {irataStatus === 'expired' && (
                                     <Badge variant="destructive" className="text-xs flex items-center gap-1" data-testid={`badge-irata-expired-${employee.id}`}>
                                       <span className="material-icons text-xs">error</span>
-                                      IRATA Expired
+                                      {t('dashboard.employees.irataExpired', 'IRATA Expired')}
                                     </Badge>
                                   )}
                                   {irataStatus === 'expiring-soon' && (
                                     <Badge variant="outline" className="text-xs flex items-center gap-1 bg-yellow-500/10 border-yellow-500 text-yellow-700 dark:text-yellow-400" data-testid={`badge-irata-warning-${employee.id}`}>
                                       <span className="material-icons text-xs">warning</span>
-                                      IRATA Expiring Soon
+                                      {t('dashboard.employees.irataExpiringSoon', 'IRATA Expiring Soon')}
                                     </Badge>
                                   )}
                                 </div>
@@ -4148,7 +4167,7 @@ export default function Dashboard() {
                             <div className="flex flex-wrap gap-2">
                               {employee.startDate && (
                                 <Badge variant="outline" className="text-xs">
-                                  Started: {new Date(employee.startDate).toLocaleDateString()}
+                                  {t('dashboard.employees.started', 'Started:')} {new Date(employee.startDate).toLocaleDateString()}
                                 </Badge>
                               )}
                               {employee.hourlyRate && hasFinancialAccess(user) && (
@@ -4168,14 +4187,14 @@ export default function Dashboard() {
                               <div className="text-xs text-muted-foreground space-y-1 pt-2 border-t">
                                 <div className="flex items-center gap-2">
                                   <span className="material-icons text-sm">workspace_premium</span>
-                                  <span>IRATA Level {employee.irataLevel}</span>
+                                  <span>{t('dashboard.employees.irataLevel', 'IRATA Level')} {employee.irataLevel}</span>
                                 </div>
                                 {employee.irataLicenseNumber && (
-                                  <div className="ml-6">License: {employee.irataLicenseNumber}</div>
+                                  <div className="ml-6">{t('dashboard.employees.license', 'License:')} {employee.irataLicenseNumber}</div>
                                 )}
                                 {employee.irataExpirationDate && (
                                   <div className="ml-6">
-                                    Expires: {new Date(employee.irataExpirationDate).toLocaleDateString()}
+                                    {t('dashboard.employees.expires', 'Expires:')} {new Date(employee.irataExpirationDate).toLocaleDateString()}
                                   </div>
                                 )}
                               </div>
@@ -4187,13 +4206,13 @@ export default function Dashboard() {
                                 <div className="flex items-center gap-2">
                                   <span className="material-icons text-sm">badge</span>
                                   <span>
-                                    Driver's License: {employee.driversLicenseNumber || 'N/A'}
+                                    {t('dashboard.employees.driversLicense', "Driver's License")}: {employee.driversLicenseNumber || 'N/A'}
                                     {employee.driversLicenseProvince && ` (${employee.driversLicenseProvince})`}
                                   </span>
                                 </div>
                                 {employee.driversLicenseDocuments && employee.driversLicenseDocuments.length > 0 && (
                                   <div className="ml-6">
-                                    {employee.driversLicenseDocuments.length} document(s) on file
+                                    {t('dashboard.employees.documentsOnFile', '{{count}} document(s) on file', { count: employee.driversLicenseDocuments.length })}
                                   </div>
                                 )}
                               </div>
@@ -4204,7 +4223,7 @@ export default function Dashboard() {
                               <div className="text-xs text-muted-foreground space-y-1 pt-2 border-t">
                                 <div className="flex items-center gap-2">
                                   <span className="material-icons text-sm">contact_emergency</span>
-                                  <span>Emergency: {employee.emergencyContactName}</span>
+                                  <span>{t('dashboard.employees.emergency', 'Emergency:')} {employee.emergencyContactName}</span>
                                 </div>
                                 {employee.emergencyContactPhone && (
                                   <div className="ml-6">{employee.emergencyContactPhone}</div>
@@ -4217,7 +4236,7 @@ export default function Dashboard() {
                               <div className="text-xs text-muted-foreground space-y-1 pt-2 border-t">
                                 <div className="flex items-center gap-2">
                                   <span className="material-icons text-sm">security</span>
-                                  <span className="font-medium">Permissions</span>
+                                  <span className="font-medium">{t('employees.permissions', 'Permissions')}</span>
                                 </div>
                                 {employee.permissions && employee.permissions.length > 0 ? (
                                   <div className="ml-6 flex flex-wrap gap-1 mt-1">
@@ -4236,7 +4255,7 @@ export default function Dashboard() {
                                     })}
                                   </div>
                                 ) : (
-                                  <div className="ml-6 text-muted-foreground/60 italic">No permissions assigned</div>
+                                  <div className="ml-6 text-muted-foreground/60 italic">{t('dashboard.employees.noPermissions', 'No permissions assigned')}</div>
                                 )}
                               </div>
                             )}
@@ -4255,7 +4274,7 @@ export default function Dashboard() {
                   if (terminatedEmployees.length > 0) {
                     return (
                       <div className="space-y-2">
-                        <h3 className="text-lg font-medium text-muted-foreground">Terminated Employees</h3>
+                        <h3 className="text-lg font-medium text-muted-foreground">{t('dashboard.employees.terminatedEmployees', 'Terminated Employees')}</h3>
                         {terminatedEmployees.map((employee: any) => (
                           <Card key={employee.id} data-testid={`terminated-employee-card-${employee.id}`} className="opacity-60">
                             <CardContent className="p-4">
@@ -4269,7 +4288,7 @@ export default function Dashboard() {
                                     </Badge>
                                     {employee.terminatedDate && (
                                       <div className="text-xs text-destructive mt-2">
-                                        Terminated: {new Date(employee.terminatedDate).toLocaleDateString()}
+                                        {t('dashboard.employees.terminated', 'Terminated:')} {new Date(employee.terminatedDate).toLocaleDateString()}
                                       </div>
                                     )}
                                   </div>
@@ -4283,7 +4302,7 @@ export default function Dashboard() {
                                       disabled={userIsReadOnly}
                                     >
                                       <span className="material-icons text-sm mr-1">refresh</span>
-                                      Reactivate
+                                      {t('dashboard.employees.reactivate', 'Reactivate')}
                                     </Button>
                                     <Button
                                       variant="ghost"
@@ -4311,7 +4330,7 @@ export default function Dashboard() {
                                 {/* Termination Details */}
                                 {employee.terminationReason && (
                                   <div className="text-xs text-muted-foreground pt-2 border-t">
-                                    <div className="font-medium">Termination Reason: {employee.terminationReason}</div>
+                                    <div className="font-medium">{t('dashboard.employees.terminationReason', 'Termination Reason:')} {employee.terminationReason}</div>
                                     {employee.terminationNotes && (
                                       <div className="mt-1">{employee.terminationNotes}</div>
                                     )}
@@ -4336,7 +4355,7 @@ export default function Dashboard() {
                                 <div className="flex flex-wrap gap-2">
                                   {employee.startDate && (
                                     <Badge variant="outline" className="text-xs">
-                                      Started: {new Date(employee.startDate).toLocaleDateString()}
+                                      {t('dashboard.employees.started', 'Started:')} {new Date(employee.startDate).toLocaleDateString()}
                                     </Badge>
                                   )}
                                   {employee.hourlyRate && hasFinancialAccess(user) && (
@@ -4371,19 +4390,19 @@ export default function Dashboard() {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <span className="material-icons">verified_user</span>
-                  Harness Safety Inspections
+                  {t('dashboard.documents.harnessInspections', 'Harness Safety Inspections')}
                 </CardTitle>
                 <CardDescription>
-                  Daily harness inspection records - {harnessInspections.length} total
+                  {t('dashboard.documents.inspectionRecords', 'Daily harness inspection records - {{count}} total', { count: harnessInspections.length })}
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 {harnessInspections.length === 0 ? (
                   <div className="text-center py-12 text-muted-foreground">
                     <span className="material-icons text-5xl mb-4 opacity-50">folder_open</span>
-                    <div className="text-lg mb-2">No Inspections Yet</div>
+                    <div className="text-lg mb-2">{t('dashboard.documents.noInspections', 'No Inspections Yet')}</div>
                     <div className="text-sm">
-                      Harness inspections will appear here once submitted
+                      {t('dashboard.documents.inspectionsAppear', 'Harness inspections will appear here once submitted')}
                     </div>
                   </div>
                 ) : (
@@ -4409,7 +4428,7 @@ export default function Dashboard() {
                               </div>
                               {inspection.manufacturer && (
                                 <div className="text-xs text-muted-foreground mt-1">
-                                  Manufacturer: {inspection.manufacturer}
+                                  {t('dashboard.documents.manufacturer', 'Manufacturer:')} {inspection.manufacturer}
                                 </div>
                               )}
                             </div>
@@ -4433,19 +4452,19 @@ export default function Dashboard() {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <span className="material-icons">assignment</span>
-                  Toolbox Meetings
+                  {t('dashboard.documents.toolboxMeetings', 'Toolbox Meetings')}
                 </CardTitle>
                 <CardDescription>
-                  Safety meeting records - {toolboxMeetings.length} total
+                  {t('dashboard.documents.meetingRecords', 'Safety meeting records - {{count}} total', { count: toolboxMeetings.length })}
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 {toolboxMeetings.length === 0 ? (
                   <div className="text-center py-12 text-muted-foreground">
                     <span className="material-icons text-5xl mb-4 opacity-50">folder_open</span>
-                    <div className="text-lg mb-2">No Meetings Yet</div>
+                    <div className="text-lg mb-2">{t('dashboard.documents.noMeetings', 'No Meetings Yet')}</div>
                     <div className="text-sm">
-                      Toolbox meeting records will appear here once submitted
+                      {t('dashboard.documents.meetingsAppear', 'Toolbox meeting records will appear here once submitted')}
                     </div>
                   </div>
                 ) : (
@@ -4469,17 +4488,17 @@ export default function Dashboard() {
                                 })}
                               </div>
                               <div className="text-sm text-muted-foreground">
-                                Conducted by: {meeting.conductedByName}
+                                {t('dashboard.documents.conductedBy', 'Conducted by:')} {meeting.conductedByName}
                               </div>
                               {meeting.customTopic && (
                                 <div className="text-xs text-muted-foreground mt-1">
-                                  Custom Topic: {meeting.customTopic}
+                                  {t('dashboard.documents.customTopic', 'Custom Topic:')} {meeting.customTopic}
                                 </div>
                               )}
                             </div>
                             <div className="flex items-center gap-2">
                               <Badge variant="secondary" className="text-xs">
-                                {meeting.attendees?.length || 0} attendees
+                                {t('dashboard.documents.attendeesCount', '{{count}} attendees', { count: meeting.attendees?.length || 0 })}
                               </Badge>
                               <span className="material-icons text-muted-foreground">chevron_right</span>
                             </div>
@@ -4506,13 +4525,13 @@ export default function Dashboard() {
                     disabled={userIsReadOnly || !hasPermission(currentUser, "manage_clients")}
                   >
                     <span className="material-icons">business</span>
-                    Add New Client
+                    {t('dashboard.clientDatabase.addNewClient', 'Add New Client')}
                   </Button>
                 </DialogTrigger>
                 <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto">
                   <DialogHeader className="pb-4">
-                    <DialogTitle>Add New Client</DialogTitle>
-                    <DialogDescription>Enter property manager or building owner details</DialogDescription>
+                    <DialogTitle>{t('dashboard.clientDatabase.addNewClient', 'Add New Client')}</DialogTitle>
+                    <DialogDescription>{t('dashboard.clientDatabase.clientDescription', 'Enter property manager or building owner details')}</DialogDescription>
                   </DialogHeader>
                   <Form {...clientForm}>
                     <form onSubmit={clientForm.handleSubmit(onClientSubmit)} className="space-y-4">
@@ -4521,7 +4540,7 @@ export default function Dashboard() {
                         name="firstName"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>First Name</FormLabel>
+                            <FormLabel>{t('dashboard.clientForm.firstName', 'First Name')}</FormLabel>
                             <FormControl>
                               <Input placeholder="John" {...field} className="h-12" data-testid="input-client-firstname" />
                             </FormControl>
@@ -4535,7 +4554,7 @@ export default function Dashboard() {
                         name="lastName"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Last Name</FormLabel>
+                            <FormLabel>{t('dashboard.clientForm.lastName', 'Last Name')}</FormLabel>
                             <FormControl>
                               <Input placeholder="Smith" {...field} className="h-12" data-testid="input-client-lastname" />
                             </FormControl>
@@ -4549,7 +4568,7 @@ export default function Dashboard() {
                         name="company"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Company (Optional)</FormLabel>
+                            <FormLabel>{t('dashboard.clientForm.companyOptional', 'Company (Optional)')}</FormLabel>
                             <FormControl>
                               <Input placeholder="ABC Property Management" {...field} className="h-12" data-testid="input-client-company" />
                             </FormControl>
@@ -4563,7 +4582,7 @@ export default function Dashboard() {
                         name="phoneNumber"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Phone Number (Optional)</FormLabel>
+                            <FormLabel>{t('dashboard.clientForm.phoneOptional', 'Phone Number (Optional)')}</FormLabel>
                             <FormControl>
                               <Input placeholder="(604) 555-1234" {...field} className="h-12" data-testid="input-client-phone" />
                             </FormControl>
@@ -4577,7 +4596,7 @@ export default function Dashboard() {
                         name="address"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Address (Optional)</FormLabel>
+                            <FormLabel>{t('dashboard.clientForm.addressOptional', 'Address (Optional)')}</FormLabel>
                             <FormControl>
                               <Textarea 
                                 placeholder="123 Main St, Vancouver, BC" 
@@ -4597,13 +4616,13 @@ export default function Dashboard() {
                       />
 
                       <div className="space-y-3">
-                        <label className="text-sm font-medium">Strata Plan Numbers & Addresses</label>
+                        <label className="text-sm font-medium">{t('dashboard.clientForm.strataPlanNumbers', 'Strata Plan Numbers & Addresses')}</label>
                         {lmsNumbers.map((lms, index) => (
                           <Card key={index} className="p-3">
                             <div className="space-y-3">
                               <div className="flex gap-2 items-start">
                                 <div className="flex-1">
-                                  <label className="text-xs text-muted-foreground mb-1 block">Strata Number</label>
+                                  <label className="text-xs text-muted-foreground mb-1 block">{t('dashboard.clientForm.strataNumber', 'Strata Number')}</label>
                                   <Input
                                     placeholder="LMS1234 or VR5678"
                                     value={lms.number}
@@ -4633,7 +4652,7 @@ export default function Dashboard() {
                                 )}
                               </div>
                               <div>
-                                <label className="text-xs text-muted-foreground mb-1 block">Building Name (Optional)</label>
+                                <label className="text-xs text-muted-foreground mb-1 block">{t('dashboard.clientForm.buildingName', 'Building Name (Optional)')}</label>
                                 <Input
                                   placeholder="Harbour View Towers"
                                   value={lms.buildingName || ""}
@@ -4647,7 +4666,7 @@ export default function Dashboard() {
                                 />
                               </div>
                               <div>
-                                <label className="text-xs text-muted-foreground mb-1 block">Building Address</label>
+                                <label className="text-xs text-muted-foreground mb-1 block">{t('dashboard.clientForm.buildingAddress', 'Building Address')}</label>
                                 <Textarea
                                   placeholder="123 Main St, Vancouver, BC"
                                   value={lms.address}
@@ -4662,7 +4681,7 @@ export default function Dashboard() {
                               </div>
                               <div className="grid grid-cols-2 gap-2">
                                 <div>
-                                  <label className="text-xs text-muted-foreground mb-1 block">Stories</label>
+                                  <label className="text-xs text-muted-foreground mb-1 block">{t('dashboard.clientForm.stories', 'Stories')}</label>
                                   <Input
                                     type="number"
                                     placeholder="20"
@@ -4677,7 +4696,7 @@ export default function Dashboard() {
                                   />
                                 </div>
                                 <div>
-                                  <label className="text-xs text-muted-foreground mb-1 block">Units</label>
+                                  <label className="text-xs text-muted-foreground mb-1 block">{t('dashboard.clientForm.units', 'Units')}</label>
                                   <Input
                                     type="number"
                                     placeholder="150"
@@ -4692,7 +4711,7 @@ export default function Dashboard() {
                                   />
                                 </div>
                                 <div>
-                                  <label className="text-xs text-muted-foreground mb-1 block">Parking Stalls</label>
+                                  <label className="text-xs text-muted-foreground mb-1 block">{t('dashboard.clientForm.parkingStalls', 'Parking Stalls')}</label>
                                   <Input
                                     type="number"
                                     placeholder="80"
@@ -4707,7 +4726,7 @@ export default function Dashboard() {
                                   />
                                 </div>
                                 <div>
-                                  <label className="text-xs text-muted-foreground mb-1 block">Daily Drop Target</label>
+                                  <label className="text-xs text-muted-foreground mb-1 block">{t('dashboard.clientForm.dailyDropTarget', 'Daily Drop Target')}</label>
                                   <Input
                                     type="number"
                                     placeholder="40"
@@ -4723,10 +4742,10 @@ export default function Dashboard() {
                                 </div>
                               </div>
                               <div className="mt-3">
-                                <label className="text-xs text-muted-foreground mb-2 block">Total Drops per Elevation</label>
+                                <label className="text-xs text-muted-foreground mb-2 block">{t('dashboard.clientForm.totalDropsPerElevation', 'Total Drops per Elevation')}</label>
                                 <div className="grid grid-cols-2 gap-2">
                                   <div>
-                                    <label className="text-xs text-muted-foreground mb-1 block">North</label>
+                                    <label className="text-xs text-muted-foreground mb-1 block">{t('dashboard.clientForm.north', 'North')}</label>
                                     <Input
                                       type="number"
                                       placeholder="0"
@@ -4741,7 +4760,7 @@ export default function Dashboard() {
                                     />
                                   </div>
                                   <div>
-                                    <label className="text-xs text-muted-foreground mb-1 block">East</label>
+                                    <label className="text-xs text-muted-foreground mb-1 block">{t('dashboard.clientForm.east', 'East')}</label>
                                     <Input
                                       type="number"
                                       placeholder="0"
@@ -4756,7 +4775,7 @@ export default function Dashboard() {
                                     />
                                   </div>
                                   <div>
-                                    <label className="text-xs text-muted-foreground mb-1 block">South</label>
+                                    <label className="text-xs text-muted-foreground mb-1 block">{t('dashboard.clientForm.south', 'South')}</label>
                                     <Input
                                       type="number"
                                       placeholder="0"
@@ -4771,7 +4790,7 @@ export default function Dashboard() {
                                     />
                                   </div>
                                   <div>
-                                    <label className="text-xs text-muted-foreground mb-1 block">West</label>
+                                    <label className="text-xs text-muted-foreground mb-1 block">{t('dashboard.clientForm.west', 'West')}</label>
                                     <Input
                                       type="number"
                                       placeholder="0"
@@ -4799,7 +4818,7 @@ export default function Dashboard() {
                           data-testid="button-add-lms"
                         >
                           <span className="material-icons text-sm mr-1">add</span>
-                          Add Another Strata Number
+                          {t('dashboard.clientForm.addAnotherStrata', 'Add Another Strata Number')}
                         </Button>
                       </div>
 
@@ -4822,7 +4841,7 @@ export default function Dashboard() {
                             htmlFor="sameAsAddress"
                             className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                           >
-                            Billing address same as address
+                            {t('dashboard.clientForm.billingSameAsAddress', 'Billing address same as address')}
                           </label>
                         </div>
 
@@ -4831,7 +4850,7 @@ export default function Dashboard() {
                           name="billingAddress"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>Billing Address (Optional)</FormLabel>
+                              <FormLabel>{t('dashboard.clientForm.billingAddressOptional', 'Billing Address (Optional)')}</FormLabel>
                               <FormControl>
                                 <Textarea 
                                   placeholder="456 Billing Ave, Vancouver, BC" 
@@ -4847,7 +4866,7 @@ export default function Dashboard() {
                       </div>
 
                       <Button type="submit" className="w-full h-12" disabled={createClientMutation.isPending} data-testid="button-submit-client">
-                        {createClientMutation.isPending ? "Creating..." : "Create Client"}
+                        {createClientMutation.isPending ? t('dashboard.clientForm.creating', 'Creating...') : t('dashboard.clientForm.createClient', 'Create Client')}
                       </Button>
                     </form>
                   </Form>
@@ -4859,15 +4878,15 @@ export default function Dashboard() {
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <span className="material-icons text-primary">business</span>
-                    Client Database
+                    {t('dashboard.clientDatabase.title', 'Client Database')}
                   </CardTitle>
-                  <CardDescription>Property managers and building contacts</CardDescription>
+                  <CardDescription>{t('dashboard.clientDatabase.description', 'Property managers and building contacts')}</CardDescription>
                   <div className="mt-4 relative">
                     <span className="material-icons absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">
                       search
                     </span>
                     <Input
-                      placeholder="Search by name, company, strata number, or address..."
+                      placeholder={t('dashboard.clientDatabase.searchPlaceholder', 'Search by name, company, strata number, or address...')}
                       value={clientSearchQuery}
                       onChange={(e) => setClientSearchQuery(e.target.value)}
                       className="h-10 pl-10"
@@ -4877,9 +4896,9 @@ export default function Dashboard() {
                 </CardHeader>
                 <CardContent>
                   {clientsLoading ? (
-                    <p className="text-sm text-muted-foreground">Loading clients...</p>
+                    <p className="text-sm text-muted-foreground">{t('dashboard.clientDatabase.loading', 'Loading clients...')}</p>
                   ) : !clientsData || clientsData.length === 0 ? (
-                    <p className="text-sm text-muted-foreground">No clients yet. Add your first client to get started.</p>
+                    <p className="text-sm text-muted-foreground">{t('dashboard.clientDatabase.noClients', 'No clients yet. Add your first client to get started.')}</p>
                   ) : (
                     <div className="space-y-3">
                       {clientsData
@@ -4969,8 +4988,8 @@ export default function Dashboard() {
       <Dialog open={showEditClientDialog} onOpenChange={setShowEditClientDialog}>
         <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto">
           <DialogHeader className="pb-4">
-            <DialogTitle>Edit Client</DialogTitle>
-            <DialogDescription>Update property manager or building owner details</DialogDescription>
+            <DialogTitle>{t('dashboard.clientForm.editClient', 'Edit Client')}</DialogTitle>
+            <DialogDescription>{t('dashboard.clientForm.editClientDescription', 'Update property manager or building owner details')}</DialogDescription>
           </DialogHeader>
           <Form {...editClientForm}>
             <form onSubmit={editClientForm.handleSubmit(onEditClientSubmit)} className="space-y-4">
@@ -4979,7 +4998,7 @@ export default function Dashboard() {
                 name="firstName"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>First Name</FormLabel>
+                    <FormLabel>{t('dashboard.clientForm.firstName', 'First Name')}</FormLabel>
                     <FormControl>
                       <Input placeholder="John" {...field} className="h-12" data-testid="input-edit-client-firstname" />
                     </FormControl>
@@ -4993,7 +5012,7 @@ export default function Dashboard() {
                 name="lastName"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Last Name</FormLabel>
+                    <FormLabel>{t('dashboard.clientForm.lastName', 'Last Name')}</FormLabel>
                     <FormControl>
                       <Input placeholder="Smith" {...field} className="h-12" data-testid="input-edit-client-lastname" />
                     </FormControl>
@@ -5007,7 +5026,7 @@ export default function Dashboard() {
                 name="company"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Company (Optional)</FormLabel>
+                    <FormLabel>{t('dashboard.clientForm.companyOptional', 'Company (Optional)')}</FormLabel>
                     <FormControl>
                       <Input placeholder="ABC Property Management" {...field} className="h-12" data-testid="input-edit-client-company" />
                     </FormControl>
@@ -5021,7 +5040,7 @@ export default function Dashboard() {
                 name="phoneNumber"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Phone Number (Optional)</FormLabel>
+                    <FormLabel>{t('dashboard.clientForm.phoneOptional', 'Phone Number (Optional)')}</FormLabel>
                     <FormControl>
                       <Input placeholder="(604) 555-1234" {...field} className="h-12" data-testid="input-edit-client-phone" />
                     </FormControl>
@@ -5035,7 +5054,7 @@ export default function Dashboard() {
                 name="address"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Address (Optional)</FormLabel>
+                    <FormLabel>{t('dashboard.clientForm.addressOptional', 'Address (Optional)')}</FormLabel>
                     <FormControl>
                       <Textarea 
                         placeholder="123 Main St, Vancouver, BC" 
@@ -5055,13 +5074,13 @@ export default function Dashboard() {
               />
 
               <div className="space-y-3">
-                <label className="text-sm font-medium">Strata Plan Numbers & Addresses</label>
+                <label className="text-sm font-medium">{t('dashboard.clientForm.strataPlanNumbers', 'Strata Plan Numbers & Addresses')}</label>
                 {editLmsNumbers.map((lms, index) => (
                   <Card key={index} className="p-3">
                     <div className="space-y-3">
                       <div className="flex gap-2 items-start">
                         <div className="flex-1">
-                          <label className="text-xs text-muted-foreground mb-1 block">Strata Number</label>
+                          <label className="text-xs text-muted-foreground mb-1 block">{t('dashboard.clientForm.strataNumber', 'Strata Number')}</label>
                           <Input
                             placeholder="LMS1234 or VR5678"
                             value={lms.number}
@@ -5091,7 +5110,7 @@ export default function Dashboard() {
                         )}
                       </div>
                       <div>
-                        <label className="text-xs text-muted-foreground mb-1 block">Building Name (Optional)</label>
+                        <label className="text-xs text-muted-foreground mb-1 block">{t('dashboard.clientForm.buildingNameOptional', 'Building Name (Optional)')}</label>
                         <Input
                           placeholder="Harbour View Towers"
                           value={lms.buildingName || ""}
@@ -5105,7 +5124,7 @@ export default function Dashboard() {
                         />
                       </div>
                       <div>
-                        <label className="text-xs text-muted-foreground mb-1 block">Building Address</label>
+                        <label className="text-xs text-muted-foreground mb-1 block">{t('dashboard.clientForm.buildingAddress', 'Building Address')}</label>
                         <Textarea
                           placeholder="123 Main St, Vancouver, BC"
                           value={lms.address}
@@ -5120,7 +5139,7 @@ export default function Dashboard() {
                       </div>
                       <div className="grid grid-cols-3 gap-2">
                         <div>
-                          <label className="text-xs text-muted-foreground mb-1 block">Stories</label>
+                          <label className="text-xs text-muted-foreground mb-1 block">{t('dashboard.clientForm.stories', 'Stories')}</label>
                           <Input
                             type="number"
                             placeholder="20"
@@ -5135,7 +5154,7 @@ export default function Dashboard() {
                           />
                         </div>
                         <div>
-                          <label className="text-xs text-muted-foreground mb-1 block">Units</label>
+                          <label className="text-xs text-muted-foreground mb-1 block">{t('dashboard.clientForm.units', 'Units')}</label>
                           <Input
                             type="number"
                             placeholder="150"
@@ -5150,7 +5169,7 @@ export default function Dashboard() {
                           />
                         </div>
                         <div>
-                          <label className="text-xs text-muted-foreground mb-1 block">Parking Stalls</label>
+                          <label className="text-xs text-muted-foreground mb-1 block">{t('dashboard.clientForm.parkingStalls', 'Parking Stalls')}</label>
                           <Input
                             type="number"
                             placeholder="80"
@@ -5166,7 +5185,7 @@ export default function Dashboard() {
                         </div>
                       </div>
                       <div>
-                        <label className="text-xs text-muted-foreground mb-1 block">Daily Drop Target</label>
+                        <label className="text-xs text-muted-foreground mb-1 block">{t('dashboard.clientForm.dailyDropTarget', 'Daily Drop Target')}</label>
                         <Input
                           type="number"
                           placeholder="40"
@@ -5181,10 +5200,10 @@ export default function Dashboard() {
                         />
                       </div>
                       <div className="mt-3">
-                        <label className="text-xs text-muted-foreground mb-2 block">Total Drops per Elevation</label>
+                        <label className="text-xs text-muted-foreground mb-2 block">{t('dashboard.clientForm.totalDropsPerElevation', 'Total Drops per Elevation')}</label>
                         <div className="grid grid-cols-2 gap-2">
                           <div>
-                            <label className="text-xs text-muted-foreground mb-1 block">North</label>
+                            <label className="text-xs text-muted-foreground mb-1 block">{t('dashboard.clientForm.north', 'North')}</label>
                             <Input
                               type="number"
                               placeholder="0"
@@ -5199,7 +5218,7 @@ export default function Dashboard() {
                             />
                           </div>
                           <div>
-                            <label className="text-xs text-muted-foreground mb-1 block">East</label>
+                            <label className="text-xs text-muted-foreground mb-1 block">{t('dashboard.clientForm.east', 'East')}</label>
                             <Input
                               type="number"
                               placeholder="0"
@@ -5214,7 +5233,7 @@ export default function Dashboard() {
                             />
                           </div>
                           <div>
-                            <label className="text-xs text-muted-foreground mb-1 block">South</label>
+                            <label className="text-xs text-muted-foreground mb-1 block">{t('dashboard.clientForm.south', 'South')}</label>
                             <Input
                               type="number"
                               placeholder="0"
@@ -5229,7 +5248,7 @@ export default function Dashboard() {
                             />
                           </div>
                           <div>
-                            <label className="text-xs text-muted-foreground mb-1 block">West</label>
+                            <label className="text-xs text-muted-foreground mb-1 block">{t('dashboard.clientForm.west', 'West')}</label>
                             <Input
                               type="number"
                               placeholder="0"
@@ -5257,7 +5276,7 @@ export default function Dashboard() {
                   data-testid="button-edit-add-lms"
                 >
                   <span className="material-icons text-sm mr-1">add</span>
-                  Add Another Strata Number
+                  {t('dashboard.clientForm.addAnotherStrata', 'Add Another Strata Number')}
                 </Button>
               </div>
 
@@ -5280,7 +5299,7 @@ export default function Dashboard() {
                     htmlFor="editSameAsAddress"
                     className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                   >
-                    Billing address same as address
+                    {t('dashboard.clientForm.billingSameAsAddress', 'Billing address same as address')}
                   </label>
                 </div>
 
@@ -5289,7 +5308,7 @@ export default function Dashboard() {
                   name="billingAddress"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Billing Address (Optional)</FormLabel>
+                      <FormLabel>{t('dashboard.clientForm.billingAddressOptional', 'Billing Address (Optional)')}</FormLabel>
                       <FormControl>
                         <Textarea 
                           placeholder="456 Billing Ave, Vancouver, BC" 
@@ -5305,7 +5324,7 @@ export default function Dashboard() {
               </div>
 
               <Button type="submit" className="w-full h-12" disabled={editClientMutation.isPending} data-testid="button-submit-edit-client">
-                {editClientMutation.isPending ? "Updating..." : "Update Client"}
+                {editClientMutation.isPending ? t('common.updating', 'Updating...') : t('dashboard.clientForm.updateClient', 'Update Client')}
               </Button>
             </form>
           </Form>
@@ -5316,19 +5335,19 @@ export default function Dashboard() {
       <AlertDialog open={showDeleteClientDialog} onOpenChange={setShowDeleteClientDialog}>
         <AlertDialogContent data-testid="dialog-delete-client">
           <AlertDialogHeader>
-            <AlertDialogTitle>Delete Client</AlertDialogTitle>
+            <AlertDialogTitle>{t('dashboard.clientForm.deleteClient', 'Delete Client')}</AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to delete {clientToDelete?.firstName} {clientToDelete?.lastName}? This action cannot be undone.
+              {t('dashboard.clientForm.deleteConfirmation', 'Are you sure you want to delete {{firstName}} {{lastName}}? This action cannot be undone.', { firstName: clientToDelete?.firstName, lastName: clientToDelete?.lastName })}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel data-testid="button-cancel-delete-client">Cancel</AlertDialogCancel>
+            <AlertDialogCancel data-testid="button-cancel-delete-client">{t('common.cancel', 'Cancel')}</AlertDialogCancel>
             <AlertDialogAction 
               onClick={confirmDeleteClient}
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
               data-testid="button-confirm-delete-client"
             >
-              {deleteClientMutation.isPending ? "Deleting..." : "Delete"}
+              {deleteClientMutation.isPending ? t('common.deleting', 'Deleting...') : t('common.delete', 'Delete')}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
@@ -5340,10 +5359,10 @@ export default function Dashboard() {
           <div className="p-6 border-b">
             <DialogHeader>
               <DialogTitle>
-                {editEmployeeFormStep === 1 ? "Employee Information" : "Permissions"}
+                {editEmployeeFormStep === 1 ? t('dashboard.employeeForm.title', 'Employee Information') : t('dashboard.employeeForm.permissionsTitle', 'Permissions')}
               </DialogTitle>
               <DialogDescription>
-                {editEmployeeFormStep === 1 ? "Step 1 of 2: Update employee details" : "Step 2 of 2: Configure access permissions"}
+                {editEmployeeFormStep === 1 ? t('dashboard.employeeForm.step1Edit', 'Step 1 of 2: Update employee details') : t('dashboard.employeeForm.step2', 'Step 2 of 2: Configure access permissions')}
               </DialogDescription>
             </DialogHeader>
           </div>
@@ -5356,7 +5375,7 @@ export default function Dashboard() {
                   name="name"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Full Name</FormLabel>
+                      <FormLabel>{t('dashboard.employeeForm.fullName', 'Full Name')}</FormLabel>
                       <FormControl>
                         <Input placeholder="John Doe" {...field} className="h-12" data-testid="input-edit-employee-name" />
                       </FormControl>
@@ -5370,7 +5389,7 @@ export default function Dashboard() {
                   name="email"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Email</FormLabel>
+                      <FormLabel>{t('dashboard.employeeForm.emailAddress', 'Email Address')}</FormLabel>
                       <FormControl>
                         <Input type="email" placeholder="john@example.com" {...field} className="h-12" data-testid="input-edit-employee-email" />
                       </FormControl>
@@ -5384,7 +5403,7 @@ export default function Dashboard() {
                   name="role"
                   render={({ field }) => (
                     <FormItem className="space-y-3">
-                      <FormLabel>Role</FormLabel>
+                      <FormLabel>{t('dashboard.employeeForm.role', 'Role')}</FormLabel>
                       <FormControl>
                         <RadioGroup
                           onValueChange={field.onChange}
@@ -5409,7 +5428,7 @@ export default function Dashboard() {
                                       {role.icon}
                                     </span>
                                     <span className="text-xs font-medium text-center leading-tight">
-                                      {role.label}
+                                      {t(role.labelKey, role.label)}
                                     </span>
                                   </FormLabel>
                                 </div>
@@ -5429,17 +5448,17 @@ export default function Dashboard() {
                     name="techLevel"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>IRATA Level</FormLabel>
+                        <FormLabel>{t('dashboard.employeeForm.irataLevel', 'IRATA Level')}</FormLabel>
                         <Select onValueChange={field.onChange} value={field.value}>
                           <FormControl>
                             <SelectTrigger className="h-12" data-testid="select-edit-tech-level">
-                              <SelectValue placeholder="Select IRATA level" />
+                              <SelectValue placeholder={t('dashboard.employeeForm.selectLevel', 'Select level')} />
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                            <SelectItem value="Level 1">Level 1</SelectItem>
-                            <SelectItem value="Level 2">Level 2</SelectItem>
-                            <SelectItem value="Level 3">Level 3</SelectItem>
+                            <SelectItem value="Level 1">{t('employees.irataLevels.level1Short', 'Level 1')}</SelectItem>
+                            <SelectItem value="Level 2">{t('employees.irataLevels.level2Short', 'Level 2')}</SelectItem>
+                            <SelectItem value="Level 3">{t('employees.irataLevels.level3Short', 'Level 3')}</SelectItem>
                           </SelectContent>
                         </Select>
                         <FormMessage />
@@ -5453,7 +5472,7 @@ export default function Dashboard() {
                   name="hourlyRate"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Hourly Rate ($/hr)</FormLabel>
+                      <FormLabel>{t('dashboard.employeeForm.hourlyRate', 'Hourly Rate ($/hr)')}</FormLabel>
                       <FormControl>
                         <Input 
                           type="number" 
@@ -5466,7 +5485,7 @@ export default function Dashboard() {
                         />
                       </FormControl>
                       <FormDescription className="text-xs">
-                        Optional - for labor cost calculations
+                        {t('dashboard.employeeForm.hourlyRateDescription', 'Optional - for labor cost calculations')}
                       </FormDescription>
                       <FormMessage />
                     </FormItem>
@@ -5474,7 +5493,7 @@ export default function Dashboard() {
                 />
 
                 <div className="border-t pt-4 mt-6">
-                  <h3 className="text-sm font-medium mb-4">Personal Details (Optional)</h3>
+                  <h3 className="text-sm font-medium mb-4">{t('dashboard.employeeForm.personalDetails', 'Personal Details (Optional)')}</h3>
                   
                   <div className="space-y-4">
                     <FormField
@@ -5482,7 +5501,7 @@ export default function Dashboard() {
                       name="startDate"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Start Date</FormLabel>
+                          <FormLabel>{t('dashboard.employeeForm.startDate', 'Start Date')}</FormLabel>
                           <FormControl>
                             <Input type="date" {...field} data-testid="input-edit-employee-start-date" className="h-12" />
                           </FormControl>
@@ -5496,7 +5515,7 @@ export default function Dashboard() {
                       name="birthday"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Birthday</FormLabel>
+                          <FormLabel>{t('dashboard.employeeForm.birthday', 'Birthday')}</FormLabel>
                           <FormControl>
                             <Input type="date" {...field} data-testid="input-edit-employee-birthday" className="h-12" />
                           </FormControl>
@@ -5510,7 +5529,7 @@ export default function Dashboard() {
                       name="socialInsuranceNumber"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Social Insurance Number</FormLabel>
+                          <FormLabel>{t('dashboard.employeeForm.socialInsuranceNumber', 'Social Insurance Number')}</FormLabel>
                           <FormControl>
                             <Input placeholder="XXX-XXX-XXX" {...field} data-testid="input-edit-employee-sin" className="h-12" />
                           </FormControl>
@@ -5524,7 +5543,7 @@ export default function Dashboard() {
                       name="driversLicenseNumber"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Driver's License Number</FormLabel>
+                          <FormLabel>{t('dashboard.employeeForm.driversLicenseNumber', "Driver's License Number")}</FormLabel>
                           <FormControl>
                             <Input placeholder="License number" {...field} data-testid="input-edit-employee-dl-number" className="h-12" />
                           </FormControl>
@@ -5538,7 +5557,7 @@ export default function Dashboard() {
                       name="driversLicenseProvince"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Driver's License Province/State</FormLabel>
+                          <FormLabel>{t('dashboard.employeeForm.driversLicenseProvince', "Driver's License Province/State")}</FormLabel>
                           <FormControl>
                             <Input placeholder="BC, AB, etc." {...field} data-testid="input-edit-employee-dl-province" className="h-12" />
                           </FormControl>
@@ -5551,8 +5570,8 @@ export default function Dashboard() {
                       documents={editEmployeeForm.watch("driversLicenseDocuments") || []}
                       onDocumentsChange={(docs) => editEmployeeForm.setValue("driversLicenseDocuments", docs)}
                       maxDocuments={5}
-                      label="Driver's License Documents"
-                      description="Upload driver's license photos, abstracts, or related documents"
+                      label={t('dashboard.employeeForm.driversLicenseDocuments', "Driver's License Documents")}
+                      description={t('dashboard.employeeForm.driversLicenseDocsDescription', 'Upload driver\'s license photos, abstracts, or related documents')}
                     />
 
                     <FormField
@@ -5560,7 +5579,7 @@ export default function Dashboard() {
                       name="homeAddress"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Home Address</FormLabel>
+                          <FormLabel>{t('dashboard.employeeForm.homeAddress', 'Home Address')}</FormLabel>
                           <FormControl>
                             <Input placeholder="Street address" {...field} data-testid="input-edit-employee-address" className="h-12" />
                           </FormControl>
@@ -5574,7 +5593,7 @@ export default function Dashboard() {
                       name="employeePhoneNumber"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Phone Number</FormLabel>
+                          <FormLabel>{t('dashboard.employeeForm.phoneNumber', 'Phone Number')}</FormLabel>
                           <FormControl>
                             <Input type="tel" placeholder="(604) 555-1234" {...field} data-testid="input-edit-employee-phone" className="h-12" />
                           </FormControl>
@@ -5588,7 +5607,7 @@ export default function Dashboard() {
                       name="emergencyContactName"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Emergency Contact Name</FormLabel>
+                          <FormLabel>{t('dashboard.employeeForm.emergencyContactName', 'Emergency Contact Name')}</FormLabel>
                           <FormControl>
                             <Input placeholder="Contact name" {...field} data-testid="input-edit-employee-emergency-name" className="h-12" />
                           </FormControl>
@@ -5602,7 +5621,7 @@ export default function Dashboard() {
                       name="emergencyContactPhone"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Emergency Contact Phone</FormLabel>
+                          <FormLabel>{t('dashboard.employeeForm.emergencyContactPhone', 'Emergency Contact Phone')}</FormLabel>
                           <FormControl>
                             <Input type="tel" placeholder="(604) 555-1234" {...field} data-testid="input-edit-employee-emergency-phone" className="h-12" />
                           </FormControl>
@@ -5616,7 +5635,7 @@ export default function Dashboard() {
                       name="specialMedicalConditions"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Special Medical Conditions</FormLabel>
+                          <FormLabel>{t('dashboard.employeeForm.specialMedicalConditions', 'Special Medical Conditions')}</FormLabel>
                           <FormControl>
                             <Input placeholder="Medical conditions to be aware of" {...field} data-testid="input-edit-employee-medical" className="h-12" />
                           </FormControl>
@@ -5626,18 +5645,18 @@ export default function Dashboard() {
                     />
 
                     <div className="border-t pt-4 mt-4">
-                      <h4 className="text-sm font-medium mb-4">IRATA Certification (Optional)</h4>
+                      <h4 className="text-sm font-medium mb-4">{t('dashboard.employeeForm.irataCertification', 'IRATA Certification (Optional)')}</h4>
                       <div className="space-y-4">
                         <FormField
                           control={editEmployeeForm.control}
                           name="irataLevel"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>IRATA Level</FormLabel>
+                              <FormLabel>{t('dashboard.employeeForm.irataLevel', 'IRATA Level')}</FormLabel>
                               <Select onValueChange={field.onChange} value={field.value}>
                                 <FormControl>
                                   <SelectTrigger className="h-12" data-testid="select-edit-irata-level">
-                                    <SelectValue placeholder="Select level" />
+                                    <SelectValue placeholder={t('dashboard.employeeForm.selectLevel', 'Select level')} />
                                   </SelectTrigger>
                                 </FormControl>
                                 <SelectContent>
@@ -5658,7 +5677,7 @@ export default function Dashboard() {
                               name="irataLicenseNumber"
                               render={({ field }) => (
                                 <FormItem>
-                                  <FormLabel>IRATA License Number</FormLabel>
+                                  <FormLabel>{t('dashboard.employeeForm.irataLicenseNumber', 'IRATA License Number')}</FormLabel>
                                   <FormControl>
                                     <Input placeholder="License number" {...field} data-testid="input-edit-irata-license" className="h-12" />
                                   </FormControl>
@@ -5672,7 +5691,7 @@ export default function Dashboard() {
                               name="irataIssuedDate"
                               render={({ field }) => (
                                 <FormItem>
-                                  <FormLabel>IRATA Issued Date</FormLabel>
+                                  <FormLabel>{t('dashboard.employeeForm.irataIssuedDate', 'IRATA Issued Date')}</FormLabel>
                                   <FormControl>
                                     <Input type="date" {...field} data-testid="input-edit-irata-issued" className="h-12" />
                                   </FormControl>
@@ -5686,7 +5705,7 @@ export default function Dashboard() {
                               name="irataExpirationDate"
                               render={({ field }) => (
                                 <FormItem>
-                                  <FormLabel>IRATA Expiration Date</FormLabel>
+                                  <FormLabel>{t('dashboard.employeeForm.irataExpirationDate', 'IRATA Expiration Date')}</FormLabel>
                                   <FormControl>
                                     <Input type="date" {...field} data-testid="input-edit-irata-expiration" className="h-12" />
                                   </FormControl>
@@ -5705,12 +5724,12 @@ export default function Dashboard() {
                         name="terminatedDate"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Termination Date</FormLabel>
+                            <FormLabel>{t('dashboard.employeeForm.terminationDate', 'Termination Date')}</FormLabel>
                             <FormControl>
                               <Input type="date" {...field} data-testid="input-edit-employee-terminated-date" className="h-12" />
                             </FormControl>
                             <FormDescription className="text-xs text-destructive">
-                              Setting a termination date will move this employee to terminated status
+                              {t('dashboard.employeeForm.terminationDateDesc', 'Setting a termination date will move this employee to terminated status')}
                             </FormDescription>
                             <FormMessage />
                           </FormItem>
@@ -5726,7 +5745,7 @@ export default function Dashboard() {
                   onClick={() => setEditEmployeeFormStep(2)}
                   data-testid="button-edit-continue-to-permissions"
                 >
-                  Continue to Permissions
+                  {t('dashboard.employeeForm.continueToPermissions', 'Continue to Permissions')}
                 </Button>
                 </div>
 
@@ -5739,9 +5758,9 @@ export default function Dashboard() {
                       <div className="mb-4">
                         <div className="flex items-center justify-between">
                           <div>
-                            <FormLabel className="text-base">Permissions</FormLabel>
+                            <FormLabel className="text-base">{t('dashboard.employeeForm.accessPermissions', 'Access Permissions')}</FormLabel>
                             <FormDescription className="text-xs">
-                              Select which features this employee can access
+                              {t('dashboard.employeeForm.selectPermissions', 'Select the permissions this employee should have')}
                             </FormDescription>
                           </div>
                           <Button
@@ -5756,14 +5775,14 @@ export default function Dashboard() {
                             }}
                             data-testid="button-edit-select-all-permissions"
                           >
-                            Select All
+                            {t('dashboard.employeeForm.selectAll', 'Select All')}
                           </Button>
                         </div>
                       </div>
                       <div className="grid grid-cols-2 gap-4">
                         {PERMISSION_CATEGORIES.map((category) => (
-                          <div key={category.name} className="border rounded-lg p-4 bg-muted/20">
-                            <h4 className="text-xs font-semibold text-primary uppercase tracking-wider mb-3 pb-2 border-b">{category.name}</h4>
+                          <div key={category.nameKey} className="border rounded-lg p-4 bg-muted/20">
+                            <h4 className="text-xs font-semibold text-primary uppercase tracking-wider mb-3 pb-2 border-b">{t(category.nameKey, category.name)}</h4>
                             <div className="space-y-2">
                               {category.permissions.map((permission) => (
                                 <FormField
@@ -5792,7 +5811,7 @@ export default function Dashboard() {
                                           />
                                         </FormControl>
                                         <FormLabel className="text-sm font-normal cursor-pointer">
-                                          {permission.label}
+                                          {t(permission.labelKey, permission.label)}
                                         </FormLabel>
                                       </FormItem>
                                     )
@@ -5816,7 +5835,7 @@ export default function Dashboard() {
                     onClick={() => setEditEmployeeFormStep(1)}
                     data-testid="button-edit-back-to-info"
                   >
-                    Back
+                    {t('dashboard.employeeForm.back', 'Back')}
                   </Button>
                   <Button 
                     type="button" 
@@ -5828,7 +5847,7 @@ export default function Dashboard() {
                       onEditEmployeeSubmit(data);
                     }}
                   >
-                    {editEmployeeMutation.isPending ? "Updating..." : "Update Employee"}
+                    {editEmployeeMutation.isPending ? t('common.updating', 'Updating...') : t('dashboard.employeeForm.updateEmployee', 'Update Employee')}
                   </Button>
                 </div>
                 </div>
@@ -5845,9 +5864,9 @@ export default function Dashboard() {
             {employeeToView && (
               <>
                 <DialogHeader className="p-6 border-b sticky top-0 bg-background z-10">
-                  <DialogTitle>Employee Details</DialogTitle>
+                  <DialogTitle>{t('dashboard.employeeDetails.title', 'Employee Details')}</DialogTitle>
                   <DialogDescription>
-                    View complete employee information, documents, and certifications
+                    {t('dashboard.employeeDetails.subtitle', 'View complete employee information, documents, and certifications')}
                   </DialogDescription>
                 </DialogHeader>
 
@@ -5872,7 +5891,7 @@ export default function Dashboard() {
                       </Badge>
                       {employeeToView.terminatedDate && (
                         <Badge variant="destructive" className="mt-1 ml-2">
-                          Terminated: {new Date(employeeToView.terminatedDate).toLocaleDateString()}
+                          {t('dashboard.employeeDetails.terminated', 'Terminated')}: {new Date(employeeToView.terminatedDate).toLocaleDateString()}
                         </Badge>
                       )}
                     </div>
@@ -5883,7 +5902,7 @@ export default function Dashboard() {
                     <CardHeader>
                       <CardTitle className="text-base flex items-center gap-2">
                         <span className="material-icons text-lg">contact_mail</span>
-                        Contact Information
+                        {t('dashboard.employeeDetails.contactInfo', 'Contact Information')}
                       </CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-2">
@@ -5905,25 +5924,25 @@ export default function Dashboard() {
                     <CardHeader>
                       <CardTitle className="text-base flex items-center gap-2">
                         <span className="material-icons text-lg">work</span>
-                        Employment Details
+                        {t('dashboard.employeeDetails.employmentDetails', 'Employment Details')}
                       </CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-3">
                       {employeeToView.startDate && (
                         <div>
-                          <div className="text-xs text-muted-foreground">Start Date</div>
+                          <div className="text-xs text-muted-foreground">{t('dashboard.employeeDetails.startDate', 'Start Date')}</div>
                           <div className="text-sm font-medium">{new Date(employeeToView.startDate).toLocaleDateString()}</div>
                         </div>
                       )}
                       {employeeToView.hourlyRate && hasFinancialAccess(user) && (
                         <div>
-                          <div className="text-xs text-muted-foreground">Hourly Rate</div>
+                          <div className="text-xs text-muted-foreground">{t('dashboard.employeeDetails.hourlyRate', 'Hourly Rate')}</div>
                           <div className="text-sm font-medium">${employeeToView.hourlyRate}/hr</div>
                         </div>
                       )}
                       {employeeToView.techLevel && (
                         <div>
-                          <div className="text-xs text-muted-foreground">Tech Level</div>
+                          <div className="text-xs text-muted-foreground">{t('dashboard.employeeDetails.techLevel', 'Tech Level')}</div>
                           <div className="text-sm font-medium">IRATA {employeeToView.techLevel}</div>
                         </div>
                       )}
@@ -5936,35 +5955,35 @@ export default function Dashboard() {
                       <CardHeader>
                         <CardTitle className="text-base flex items-center gap-2">
                           <span className="material-icons text-lg">workspace_premium</span>
-                          IRATA Certification
+                          {t('dashboard.employeeDetails.irataCertification', 'IRATA Certification')}
                         </CardTitle>
                       </CardHeader>
                       <CardContent className="space-y-3">
                         <div>
-                          <div className="text-xs text-muted-foreground">Level</div>
-                          <div className="text-sm font-medium">Level {employeeToView.irataLevel}</div>
+                          <div className="text-xs text-muted-foreground">{t('dashboard.employeeDetails.level', 'Level')}</div>
+                          <div className="text-sm font-medium">{t('dashboard.employeeDetails.levelValue', 'Level')} {employeeToView.irataLevel}</div>
                         </div>
                         {employeeToView.irataLicenseNumber && (
                           <div>
-                            <div className="text-xs text-muted-foreground">License Number</div>
+                            <div className="text-xs text-muted-foreground">{t('dashboard.employeeDetails.licenseNumber', 'License Number')}</div>
                             <div className="text-sm font-medium">{employeeToView.irataLicenseNumber}</div>
                           </div>
                         )}
                         {employeeToView.irataExpirationDate && (
                           <div>
-                            <div className="text-xs text-muted-foreground">Expiration Date</div>
+                            <div className="text-xs text-muted-foreground">{t('dashboard.employeeDetails.expirationDate', 'Expiration Date')}</div>
                             <div className="text-sm font-medium">
                               {new Date(employeeToView.irataExpirationDate).toLocaleDateString()}
                               {(() => {
                                 const expirationDate = new Date(employeeToView.irataExpirationDate);
                                 const today = new Date();
                                 if (expirationDate < today) {
-                                  return <Badge variant="destructive" className="ml-2">Expired</Badge>;
+                                  return <Badge variant="destructive" className="ml-2">{t('dashboard.employeeDetails.expired', 'Expired')}</Badge>;
                                 }
                                 const thirtyDaysFromNow = new Date();
                                 thirtyDaysFromNow.setDate(today.getDate() + 30);
                                 if (expirationDate <= thirtyDaysFromNow) {
-                                  return <Badge variant="outline" className="ml-2 bg-yellow-500/10 border-yellow-500 text-yellow-700 dark:text-yellow-400">Expiring Soon</Badge>;
+                                  return <Badge variant="outline" className="ml-2 bg-yellow-500/10 border-yellow-500 text-yellow-700 dark:text-yellow-400">{t('dashboard.employeeDetails.expiringSoon', 'Expiring Soon')}</Badge>;
                                 }
                                 return null;
                               })()}
@@ -5973,7 +5992,7 @@ export default function Dashboard() {
                         )}
                         {employeeToView.irataDocuments && employeeToView.irataDocuments.length > 0 && (
                           <div>
-                            <div className="text-xs text-muted-foreground mb-2">Documents</div>
+                            <div className="text-xs text-muted-foreground mb-2">{t('dashboard.employeeDetails.documents', 'Documents')}</div>
                             <div className="space-y-1">
                               {employeeToView.irataDocuments.map((doc: string, idx: number) => (
                                 <a 
@@ -5984,7 +6003,7 @@ export default function Dashboard() {
                                   className="flex items-center gap-2 text-sm text-primary hover:underline"
                                 >
                                   <span className="material-icons text-sm">description</span>
-                                  Document {idx + 1}
+                                  {t('dashboard.employeeDetails.document', 'Document')} {idx + 1}
                                 </a>
                               ))}
                             </div>
@@ -6000,25 +6019,25 @@ export default function Dashboard() {
                       <CardHeader>
                         <CardTitle className="text-base flex items-center gap-2">
                           <span className="material-icons text-lg">badge</span>
-                          Driver's License
+                          {t('dashboard.employeeDetails.driversLicense', "Driver's License")}
                         </CardTitle>
                       </CardHeader>
                       <CardContent className="space-y-3">
                         {employeeToView.driversLicenseNumber && (
                           <div>
-                            <div className="text-xs text-muted-foreground">License Number</div>
+                            <div className="text-xs text-muted-foreground">{t('dashboard.employeeDetails.licenseNumber', 'License Number')}</div>
                             <div className="text-sm font-medium">{employeeToView.driversLicenseNumber}</div>
                           </div>
                         )}
                         {employeeToView.driversLicenseProvince && (
                           <div>
-                            <div className="text-xs text-muted-foreground">Province/State</div>
+                            <div className="text-xs text-muted-foreground">{t('dashboard.employeeDetails.provinceState', 'Province/State')}</div>
                             <div className="text-sm font-medium">{employeeToView.driversLicenseProvince}</div>
                           </div>
                         )}
                         {employeeToView.driversLicenseDocuments && employeeToView.driversLicenseDocuments.length > 0 && (
                           <div>
-                            <div className="text-xs text-muted-foreground mb-2">Documents</div>
+                            <div className="text-xs text-muted-foreground mb-2">{t('dashboard.employeeDetails.documents', 'Documents')}</div>
                             <div className="space-y-1">
                               {employeeToView.driversLicenseDocuments.map((doc: string, idx: number) => (
                                 <a 
@@ -6029,7 +6048,7 @@ export default function Dashboard() {
                                   className="flex items-center gap-2 text-sm text-primary hover:underline"
                                 >
                                   <span className="material-icons text-sm">description</span>
-                                  Document {idx + 1}
+                                  {t('dashboard.employeeDetails.document', 'Document')} {idx + 1}
                                 </a>
                               ))}
                             </div>
@@ -6045,17 +6064,17 @@ export default function Dashboard() {
                       <CardHeader>
                         <CardTitle className="text-base flex items-center gap-2">
                           <span className="material-icons text-lg">contact_emergency</span>
-                          Emergency Contact
+                          {t('dashboard.employeeDetails.emergencyContact', 'Emergency Contact')}
                         </CardTitle>
                       </CardHeader>
                       <CardContent className="space-y-3">
                         <div>
-                          <div className="text-xs text-muted-foreground">Name</div>
+                          <div className="text-xs text-muted-foreground">{t('dashboard.employeeDetails.name', 'Name')}</div>
                           <div className="text-sm font-medium">{employeeToView.emergencyContactName}</div>
                         </div>
                         {employeeToView.emergencyContactPhone && (
                           <div>
-                            <div className="text-xs text-muted-foreground">Phone</div>
+                            <div className="text-xs text-muted-foreground">{t('dashboard.employeeDetails.phone', 'Phone')}</div>
                             <div className="text-sm font-medium">{employeeToView.emergencyContactPhone}</div>
                           </div>
                         )}
@@ -6068,7 +6087,7 @@ export default function Dashboard() {
                     <CardHeader>
                       <CardTitle className="text-base flex items-center gap-2">
                         <span className="material-icons text-lg">admin_panel_settings</span>
-                        Permissions
+                        {t('dashboard.employeeDetails.permissions', 'Permissions')}
                       </CardTitle>
                     </CardHeader>
                     <CardContent>
@@ -6079,7 +6098,7 @@ export default function Dashboard() {
                           ) : (
                             <span className="material-icons text-sm text-muted-foreground">cancel</span>
                           )}
-                          <span className="text-sm">Create Projects</span>
+                          <span className="text-sm">{t('dashboard.employeeDetails.createProjects', 'Create Projects')}</span>
                         </div>
                         <div className="flex items-center gap-2">
                           {employeeToView.canViewAllProjects ? (
@@ -6087,7 +6106,7 @@ export default function Dashboard() {
                           ) : (
                             <span className="material-icons text-sm text-muted-foreground">cancel</span>
                           )}
-                          <span className="text-sm">View All Projects</span>
+                          <span className="text-sm">{t('dashboard.employeeDetails.viewAllProjects', 'View All Projects')}</span>
                         </div>
                         <div className="flex items-center gap-2">
                           {employeeToView.canManageEmployees ? (
@@ -6095,7 +6114,7 @@ export default function Dashboard() {
                           ) : (
                             <span className="material-icons text-sm text-muted-foreground">cancel</span>
                           )}
-                          <span className="text-sm">Manage Employees</span>
+                          <span className="text-sm">{t('dashboard.employeeDetails.manageEmployees', 'Manage Employees')}</span>
                         </div>
                         <div className="flex items-center gap-2">
                           {employeeToView.canAccessFinancials ? (
@@ -6103,7 +6122,7 @@ export default function Dashboard() {
                           ) : (
                             <span className="material-icons text-sm text-muted-foreground">cancel</span>
                           )}
-                          <span className="text-sm">Access Financials</span>
+                          <span className="text-sm">{t('dashboard.employeeDetails.accessFinancials', 'Access Financials')}</span>
                         </div>
                         <div className="flex items-center gap-2">
                           {employeeToView.canGenerateReports ? (
@@ -6111,7 +6130,7 @@ export default function Dashboard() {
                           ) : (
                             <span className="material-icons text-sm text-muted-foreground">cancel</span>
                           )}
-                          <span className="text-sm">Generate Reports</span>
+                          <span className="text-sm">{t('dashboard.employeeDetails.generateReports', 'Generate Reports')}</span>
                         </div>
                         <div className="flex items-center gap-2">
                           {employeeToView.canManageClients ? (
@@ -6119,7 +6138,7 @@ export default function Dashboard() {
                           ) : (
                             <span className="material-icons text-sm text-muted-foreground">cancel</span>
                           )}
-                          <span className="text-sm">Manage Clients</span>
+                          <span className="text-sm">{t('dashboard.employeeDetails.manageClients', 'Manage Clients')}</span>
                         </div>
                         <div className="flex items-center gap-2">
                           {employeeToView.canApproveHours ? (
@@ -6127,7 +6146,7 @@ export default function Dashboard() {
                           ) : (
                             <span className="material-icons text-sm text-muted-foreground">cancel</span>
                           )}
-                          <span className="text-sm">Approve Hours</span>
+                          <span className="text-sm">{t('dashboard.employeeDetails.approveHours', 'Approve Hours')}</span>
                         </div>
                         <div className="flex items-center gap-2">
                           {employeeToView.canManageCompliance ? (
@@ -6135,7 +6154,7 @@ export default function Dashboard() {
                           ) : (
                             <span className="material-icons text-sm text-muted-foreground">cancel</span>
                           )}
-                          <span className="text-sm">Manage Compliance</span>
+                          <span className="text-sm">{t('dashboard.employeeDetails.manageCompliance', 'Manage Compliance')}</span>
                         </div>
                       </div>
                     </CardContent>
@@ -6151,19 +6170,19 @@ export default function Dashboard() {
       <AlertDialog open={employeeToDelete !== null} onOpenChange={(open) => !open && setEmployeeToDelete(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Delete Employee</AlertDialogTitle>
+            <AlertDialogTitle>{t('dashboard.deleteEmployee.title', 'Delete Employee')}</AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to delete this employee? This action cannot be undone.
+              {t('dashboard.deleteEmployee.description', 'Are you sure you want to delete this employee? This action cannot be undone.')}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel data-testid="button-cancel-delete">Cancel</AlertDialogCancel>
+            <AlertDialogCancel data-testid="button-cancel-delete">{t('common.cancel', 'Cancel')}</AlertDialogCancel>
             <AlertDialogAction
               onClick={() => employeeToDelete && deleteEmployeeMutation.mutate(employeeToDelete)}
               data-testid="button-confirm-delete"
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
-              Delete
+              {t('common.delete', 'Delete')}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
@@ -6179,27 +6198,27 @@ export default function Dashboard() {
       }}>
         <DialogContent className="max-w-md">
           <DialogHeader>
-            <DialogTitle>Change Employee Password</DialogTitle>
+            <DialogTitle>{t('dashboard.changePassword.title', 'Change Employee Password')}</DialogTitle>
             <DialogDescription>
-              Set a new password for {employeeToChangePassword?.name || employeeToChangePassword?.email}
+              {t('dashboard.changePassword.description', 'Set a new password for')} {employeeToChangePassword?.name || employeeToChangePassword?.email}
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4 py-4">
             <div className="space-y-2">
               <label htmlFor="new-password" className="text-sm font-medium">
-                New Password
+                {t('dashboard.changePassword.newPassword', 'New Password')}
               </label>
               <Input
                 id="new-password"
                 type="password"
-                placeholder="Enter new password (min 6 characters)"
+                placeholder={t('dashboard.changePassword.placeholder', 'Enter new password (min 6 characters)')}
                 value={newPassword}
                 onChange={(e) => setNewPassword(e.target.value)}
                 data-testid="input-new-password"
                 className="h-12"
               />
               <p className="text-xs text-muted-foreground">
-                Give this password to the employee. They can change it later from their profile.
+                {t('dashboard.changePassword.hint', 'Give this password to the employee. They can change it later from their profile.')}
               </p>
             </div>
           </div>
@@ -6214,15 +6233,15 @@ export default function Dashboard() {
               className="flex-1"
               data-testid="button-cancel-password-change"
             >
-              Cancel
+              {t('common.cancel', 'Cancel')}
             </Button>
             <Button
               onClick={() => {
                 if (!employeeToChangePassword) return;
                 if (!newPassword || newPassword.length < 6) {
                   toast({ 
-                    title: "Invalid Password", 
-                    description: "Password must be at least 6 characters long",
+                    title: t('dashboard.changePassword.invalidPassword', 'Invalid Password'), 
+                    description: t('dashboard.changePassword.minLength', 'Password must be at least 6 characters long'),
                     variant: "destructive" 
                   });
                   return;
@@ -6236,7 +6255,7 @@ export default function Dashboard() {
               disabled={changePasswordMutation.isPending || !newPassword || newPassword.length < 6}
               data-testid="button-confirm-password-change"
             >
-              {changePasswordMutation.isPending ? "Changing..." : "Change Password"}
+              {changePasswordMutation.isPending ? t('dashboard.changePassword.changing', 'Changing...') : t('dashboard.changePassword.changePassword', 'Change Password')}
             </Button>
           </div>
         </DialogContent>
@@ -6246,17 +6265,17 @@ export default function Dashboard() {
       <AlertDialog open={showInspectionCheckDialog} onOpenChange={setShowInspectionCheckDialog}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Have you completed your harness inspection?</AlertDialogTitle>
+            <AlertDialogTitle>{t('dashboard.inspectionCheck.title', 'Have you completed your harness inspection?')}</AlertDialogTitle>
             <AlertDialogDescription>
-              Before starting your work day, you must complete a daily rope access equipment inspection to ensure all gear is safe and ready for use.
+              {t('dashboard.inspectionCheck.description', 'Before starting your work day, you must complete a daily rope access equipment inspection to ensure all gear is safe and ready for use.')}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel onClick={handleGoToInspection} data-testid="button-no-inspection">
-              No, take me to inspection
+              {t('dashboard.inspectionCheck.noTakeMe', 'No, take me to inspection')}
             </AlertDialogCancel>
             <AlertDialogAction onClick={handleInspectionComplete} data-testid="button-yes-inspection">
-              Yes, continue
+              {t('dashboard.inspectionCheck.yesContinue', 'Yes, continue')}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
@@ -6266,19 +6285,19 @@ export default function Dashboard() {
       <AlertDialog open={showStartDayDialog} onOpenChange={setShowStartDayDialog}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Start Work Session?</AlertDialogTitle>
+            <AlertDialogTitle>{t('dashboard.startDay.title', 'Start Work Session?')}</AlertDialogTitle>
             <AlertDialogDescription>
-              This will begin tracking your work session for today. You can log drops throughout the day and end your session when finished.
+              {t('dashboard.startDay.description', 'This will begin tracking your work session for today. You can log drops throughout the day and end your session when finished.')}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel data-testid="button-cancel-start-day">Cancel</AlertDialogCancel>
+            <AlertDialogCancel data-testid="button-cancel-start-day">{t('common.cancel', 'Cancel')}</AlertDialogCancel>
             <AlertDialogAction
               onClick={confirmStartDay}
               data-testid="button-confirm-start-day"
               disabled={startDayMutation.isPending}
             >
-              {startDayMutation.isPending ? "Starting..." : "Start Work Session"}
+              {startDayMutation.isPending ? t('dashboard.startDay.starting', 'Starting...') : t('dashboard.startDay.startSession', 'Start Work Session')}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
@@ -6288,19 +6307,19 @@ export default function Dashboard() {
       <Dialog open={showEndDayDialog} onOpenChange={setShowEndDayDialog}>
         <DialogContent className="max-w-md">
           <DialogHeader>
-            <DialogTitle>End Your Work Day</DialogTitle>
+            <DialogTitle>{t('dashboard.endDay.title', 'End Your Work Day')}</DialogTitle>
             <DialogDescription>
               {(() => {
                 const activeProject = projects.find(p => p.id === activeSession?.projectId);
                 const isHoursBased = activeProject?.jobType === "general_pressure_washing" || activeProject?.jobType === "ground_window_cleaning";
                 if (isHoursBased) {
-                  return "Enter the current completion percentage for this project (0-100%).";
+                  return t('dashboard.endDay.completionPercentage', 'Enter the current completion percentage for this project (0-100%).');
                 } else if (activeProject?.jobType === "parkade_pressure_cleaning") {
-                  return "Enter the number of parking stalls you completed today.";
+                  return t('dashboard.endDay.parkingStalls', 'Enter the number of parking stalls you completed today.');
                 } else if (activeProject?.jobType === "in_suite_dryer_vent_cleaning") {
-                  return "Enter the number of suites you completed today.";
+                  return t('dashboard.endDay.suites', 'Enter the number of suites you completed today.');
                 } else {
-                  return "Enter the number of drops you completed today for each elevation.";
+                  return t('dashboard.endDay.drops', 'Enter the number of drops you completed today for each elevation.');
                 }
               })()}
             </DialogDescription>
@@ -6321,7 +6340,7 @@ export default function Dashboard() {
                       name="dropsNorth"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Project Completion Percentage</FormLabel>
+                          <FormLabel>{t('dashboard.endDay.projectCompletionLabel', 'Project Completion Percentage')}</FormLabel>
                           <FormControl>
                             <Input
                               type="number"
@@ -6335,7 +6354,7 @@ export default function Dashboard() {
                             />
                           </FormControl>
                           <FormDescription className="text-xs">
-                            Enter a value between 0-100% representing the overall project completion
+                            {t('dashboard.endDay.completionHint', 'Enter a value between 0-100% representing the overall project completion')}
                           </FormDescription>
                           <FormMessage />
                         </FormItem>
@@ -6349,7 +6368,7 @@ export default function Dashboard() {
                       name="dropsNorth"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Parking Stalls Completed</FormLabel>
+                          <FormLabel>{t('dashboard.endDay.parkingStallsLabel', 'Parking Stalls Completed')}</FormLabel>
                           <FormControl>
                             <Input
                               type="number"
@@ -6372,7 +6391,7 @@ export default function Dashboard() {
                       name="dropsNorth"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Suites Completed</FormLabel>
+                          <FormLabel>{t('dashboard.endDay.suitesLabel', 'Suites Completed')}</FormLabel>
                           <FormControl>
                             <Input
                               type="number"
@@ -6397,7 +6416,7 @@ export default function Dashboard() {
                         name="dropsNorth"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>North Elevation</FormLabel>
+                            <FormLabel>{t('dashboard.endDay.northElevation', 'North Elevation')}</FormLabel>
                             <FormControl>
                               <Input
                                 type="number"
@@ -6419,7 +6438,7 @@ export default function Dashboard() {
                         name="dropsEast"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>East Elevation</FormLabel>
+                            <FormLabel>{t('dashboard.endDay.eastElevation', 'East Elevation')}</FormLabel>
                             <FormControl>
                               <Input
                                 type="number"
@@ -6441,7 +6460,7 @@ export default function Dashboard() {
                         name="dropsSouth"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>South Elevation</FormLabel>
+                            <FormLabel>{t('dashboard.endDay.southElevation', 'South Elevation')}</FormLabel>
                             <FormControl>
                               <Input
                                 type="number"
@@ -6463,7 +6482,7 @@ export default function Dashboard() {
                         name="dropsWest"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>West Elevation</FormLabel>
+                            <FormLabel>{t('dashboard.endDay.westElevation', 'West Elevation')}</FormLabel>
                             <FormControl>
                               <Input
                                 type="number"
@@ -6497,10 +6516,10 @@ export default function Dashboard() {
                   name="shortfallReason"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Shortfall Reason (Required)</FormLabel>
+                      <FormLabel>{t('dashboard.endDay.shortfallReason', 'Shortfall Reason (Required)')}</FormLabel>
                       <FormControl>
                         <Textarea
-                          placeholder="Explain why the daily target wasn't met..."
+                          placeholder={t('dashboard.endDay.shortfallPlaceholder', "Explain why the daily target wasn't met...")}
                           {...field}
                           data-testid="input-shortfall-reason"
                           className="min-h-24"
@@ -6523,7 +6542,7 @@ export default function Dashboard() {
                   }}
                   data-testid="button-cancel-end-day"
                 >
-                  Cancel
+                  {t('common.cancel', 'Cancel')}
                 </Button>
                 <Button
                   type="submit"
@@ -6533,7 +6552,7 @@ export default function Dashboard() {
                   disabled={endDayMutation.isPending}
                 >
                   <span className="material-icons mr-2">stop_circle</span>
-                  {endDayMutation.isPending ? "Ending..." : "End Day"}
+                  {endDayMutation.isPending ? t('dashboard.endDay.ending', 'Ending...') : t('dashboard.endDay.endDay', 'End Day')}
                 </Button>
               </div>
             </form>
@@ -6548,7 +6567,7 @@ export default function Dashboard() {
             <DialogTitle className="flex items-center justify-between gap-2">
               <div className="flex items-center gap-2">
                 <span className="material-icons">verified_user</span>
-                Rope Access Equipment Inspection
+                {t('dashboard.inspection.title', 'Rope Access Equipment Inspection')}
               </div>
               <Button
                 variant="outline"
@@ -7084,7 +7103,7 @@ export default function Dashboard() {
               
               {selectedInspection.comments && (
                 <div className="mt-4">
-                  <div className="text-sm font-medium text-muted-foreground mb-2">Additional Notes</div>
+                  <div className="text-sm font-medium text-muted-foreground mb-2">{t('dashboard.inspection.additionalNotes', 'Additional Notes')}</div>
                   <div className="text-base bg-muted p-4 rounded-md whitespace-pre-wrap">
                     {selectedInspection.comments}
                   </div>
@@ -7101,14 +7120,14 @@ export default function Dashboard() {
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <span className="material-icons">assignment</span>
-              Toolbox Meeting Details
+              {t('dashboard.toolboxMeeting.title', 'Toolbox Meeting Details')}
             </DialogTitle>
           </DialogHeader>
           {selectedMeeting && (
             <div className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <div className="text-sm font-medium text-muted-foreground">Date</div>
+                  <div className="text-sm font-medium text-muted-foreground">{t('dashboard.toolboxMeeting.date', 'Date')}</div>
                   <div className="text-base">
                     {formatLocalDate(selectedMeeting.meetingDate, { 
                       weekday: 'long', 
@@ -7119,14 +7138,14 @@ export default function Dashboard() {
                   </div>
                 </div>
                 <div>
-                  <div className="text-sm font-medium text-muted-foreground">Conducted By</div>
+                  <div className="text-sm font-medium text-muted-foreground">{t('dashboard.toolboxMeeting.conductedBy', 'Conducted By')}</div>
                   <div className="text-base">{selectedMeeting.conductedByName}</div>
                 </div>
               </div>
 
               {selectedMeeting.customTopic && (
                 <div>
-                  <div className="text-sm font-medium text-muted-foreground mb-1">Custom Topic</div>
+                  <div className="text-sm font-medium text-muted-foreground mb-1">{t('dashboard.toolboxMeeting.customTopic', 'Custom Topic')}</div>
                   <div className="text-base bg-muted p-3 rounded-md">
                     {selectedMeeting.customTopic}
                   </div>
@@ -7134,7 +7153,7 @@ export default function Dashboard() {
               )}
 
               <div>
-                <div className="text-sm font-medium text-muted-foreground mb-2">Topics Covered</div>
+                <div className="text-sm font-medium text-muted-foreground mb-2">{t('dashboard.toolboxMeeting.topicsCovered', 'Topics Covered')}</div>
                 <div className="flex flex-wrap gap-2">
                   {selectedMeeting.topicFallProtection && <Badge>Fall Protection Systems</Badge>}
                   {selectedMeeting.topicAnchorPoints && <Badge>Anchor Point Selection</Badge>}
@@ -7161,7 +7180,7 @@ export default function Dashboard() {
 
               <div>
                 <div className="text-sm font-medium text-muted-foreground mb-2">
-                  Attendees ({selectedMeeting.attendees?.length || 0})
+                  {t('dashboard.toolboxMeeting.attendees', 'Attendees')} ({selectedMeeting.attendees?.length || 0})
                 </div>
                 <div className="bg-muted p-3 rounded-md">
                   {selectedMeeting.attendees?.map((attendee: string, idx: number) => (
@@ -7174,7 +7193,7 @@ export default function Dashboard() {
 
               {selectedMeeting.additionalNotes && (
                 <div>
-                  <div className="text-sm font-medium text-muted-foreground mb-1">Additional Notes</div>
+                  <div className="text-sm font-medium text-muted-foreground mb-1">{t('dashboard.toolboxMeeting.additionalNotes', 'Additional Notes')}</div>
                   <div className="text-base bg-muted p-3 rounded-md">
                     {selectedMeeting.additionalNotes}
                   </div>
@@ -7189,15 +7208,15 @@ export default function Dashboard() {
       <AlertDialog open={showLogoutDialog} onOpenChange={setShowLogoutDialog}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Confirm Logout</AlertDialogTitle>
+            <AlertDialogTitle>{t('dashboard.logout.title', 'Confirm Logout')}</AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to logout?
+              {t('dashboard.logout.description', 'Are you sure you want to logout?')}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel data-testid="button-cancel-logout">Cancel</AlertDialogCancel>
+            <AlertDialogCancel data-testid="button-cancel-logout">{t('common.cancel', 'Cancel')}</AlertDialogCancel>
             <AlertDialogAction onClick={confirmLogout} data-testid="button-confirm-logout">
-              Logout
+              {t('dashboard.logout.logout', 'Logout')}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
@@ -7214,28 +7233,28 @@ export default function Dashboard() {
       }}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Termination Details</DialogTitle>
+            <DialogTitle>{t('dashboard.termination.title', 'Termination Details')}</DialogTitle>
             <DialogDescription>
-              Please provide the reason for termination and any additional notes.
+              {t('dashboard.termination.description', 'Please provide the reason for termination and any additional notes.')}
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4">
             <div>
-              <label className="text-sm font-medium">Reason for Termination *</label>
+              <label className="text-sm font-medium">{t('dashboard.termination.reasonLabel', 'Reason for Termination *')}</label>
               <Input
                 value={terminationData.reason}
                 onChange={(e) => setTerminationData({ ...terminationData, reason: e.target.value })}
-                placeholder="e.g., Voluntary resignation, Performance issues, etc."
+                placeholder={t('dashboard.termination.reasonPlaceholder', 'e.g., Voluntary resignation, Performance issues, etc.')}
                 className="mt-1"
                 data-testid="input-termination-reason"
               />
             </div>
             <div>
-              <label className="text-sm font-medium">Additional Notes</label>
+              <label className="text-sm font-medium">{t('dashboard.termination.notesLabel', 'Additional Notes')}</label>
               <Textarea
                 value={terminationData.notes}
                 onChange={(e) => setTerminationData({ ...terminationData, notes: e.target.value })}
-                placeholder="Any additional information about the termination..."
+                placeholder={t('dashboard.termination.notesPlaceholder', 'Any additional information about the termination...')}
                 className="mt-1"
                 rows={4}
                 data-testid="input-termination-notes"
@@ -7252,14 +7271,14 @@ export default function Dashboard() {
               }}
               data-testid="button-cancel-termination"
             >
-              Cancel
+              {t('common.cancel', 'Cancel')}
             </Button>
             <Button
               onClick={handleTerminationSubmit}
               disabled={!terminationData.reason.trim()}
               data-testid="button-submit-termination"
             >
-              Continue
+              {t('common.continue', 'Continue')}
             </Button>
           </div>
         </DialogContent>
@@ -7269,9 +7288,9 @@ export default function Dashboard() {
       <AlertDialog open={showSaveAsClientDialog} onOpenChange={setShowSaveAsClientDialog}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Save Building as Client?</AlertDialogTitle>
+            <AlertDialogTitle>{t('dashboard.saveAsClient.title', 'Save Building as Client?')}</AlertDialogTitle>
             <AlertDialogDescription>
-              Would you like to save this building information in your client database? This will make it easier to create future projects for this property.
+              {t('dashboard.saveAsClient.description', 'Would you like to save this building information in your client database? This will make it easier to create future projects for this property.')}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
@@ -7282,7 +7301,7 @@ export default function Dashboard() {
               }}
               data-testid="button-cancel-save-client"
             >
-              No, Thanks
+              {t('dashboard.saveAsClient.noThanks', 'No, Thanks')}
             </AlertDialogCancel>
             <AlertDialogAction
               onClick={handleSaveProjectAsClient}
@@ -7290,7 +7309,7 @@ export default function Dashboard() {
               data-testid="button-confirm-save-client"
             >
               <span className="material-icons mr-2 text-sm">person_add</span>
-              Yes, Add to Clients
+              {t('dashboard.saveAsClient.yesAdd', 'Yes, Add to Clients')}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
