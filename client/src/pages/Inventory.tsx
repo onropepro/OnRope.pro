@@ -2107,7 +2107,9 @@ export default function Inventory() {
                               
                               return (
                                 <td key={index} className="text-center p-3">
-                                  {isNotApplicable ? (
+                                  {!hadSession ? (
+                                    <span className="text-muted-foreground/30" title="No work session">—</span>
+                                  ) : isNotApplicable ? (
                                     <span className="text-xs font-medium text-muted-foreground/60" title="Harness not applicable for this session">
                                       N/A
                                     </span>
@@ -2115,12 +2117,10 @@ export default function Inventory() {
                                     <span className="material-icons text-green-500" title="Inspection submitted">
                                       check_circle
                                     </span>
-                                  ) : hadSession ? (
-                                    <span className="material-icons text-red-500" title="No inspection submitted">
+                                  ) : (
+                                    <span className="material-icons text-red-500" title="No inspection submitted - required for work sessions">
                                       cancel
                                     </span>
-                                  ) : (
-                                    <span className="text-muted-foreground/30" title="No work session">—</span>
                                   )}
                                 </td>
                               );
