@@ -22,7 +22,7 @@ i18n
     },
     detection: {
       order: ['localStorage', 'navigator'],
-      lookupLocalStorage: 'preferredLanguage',
+      lookupLocalStorage: 'i18nextLng',
       caches: ['localStorage']
     }
   });
