@@ -3,7 +3,7 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { db } from "./db";
 import { wsHub } from "./websocket-hub";
-import { insertUserSchema, insertClientSchema, insertProjectSchema, insertDropLogSchema, insertComplaintSchema, insertComplaintNoteSchema, insertJobCommentSchema, insertHarnessInspectionSchema, insertToolboxMeetingSchema, insertFlhaFormSchema, insertIncidentReportSchema, insertMethodStatementSchema, insertPayPeriodConfigSchema, insertQuoteSchema, insertQuoteServiceSchema, insertGearItemSchema, insertGearAssignmentSchema, insertGearSerialNumberSchema, insertEquipmentDamageReportSchema, insertScheduledJobSchema, insertJobAssignmentSchema, updatePropertyManagerAccountSchema, normalizeStrataPlan, type InsertGearItem, type InsertGearAssignment, type InsertGearSerialNumber, type Project, gearAssignments, gearSerialNumbers, gearItems, jobAssignments, workSessions, nonBillableWorkSessions, licenseKeys, users, propertyManagerCompanyLinks, IRATA_TASK_TYPES } from "@shared/schema";
+import { insertUserSchema, insertClientSchema, insertProjectSchema, insertDropLogSchema, insertComplaintSchema, insertComplaintNoteSchema, insertJobCommentSchema, insertHarnessInspectionSchema, insertToolboxMeetingSchema, insertFlhaFormSchema, insertIncidentReportSchema, insertMethodStatementSchema, insertPayPeriodConfigSchema, insertQuoteSchema, insertQuoteServiceSchema, insertGearItemSchema, insertGearAssignmentSchema, insertGearSerialNumberSchema, insertEquipmentDamageReportSchema, insertScheduledJobSchema, insertJobAssignmentSchema, updatePropertyManagerAccountSchema, insertFeatureRequestSchema, insertFeatureRequestMessageSchema, normalizeStrataPlan, type InsertGearItem, type InsertGearAssignment, type InsertGearSerialNumber, type Project, gearAssignments, gearSerialNumbers, gearItems, jobAssignments, workSessions, nonBillableWorkSessions, licenseKeys, users, propertyManagerCompanyLinks, IRATA_TASK_TYPES } from "@shared/schema";
 import { eq, sql } from "drizzle-orm";
 import { z } from "zod";
 import bcrypt from "bcrypt";
@@ -10206,6 +10206,169 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({ success: true });
     } catch (error) {
       console.error("Delete employee time off error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // ============================================================================
+  // FEATURE REQUEST ROUTES
+  // ============================================================================
+
+  // Get all feature requests for a company (company owners only)
+  app.get("/api/feature-requests", requireAuth, requireRole("company", "superuser"), async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      let requests;
+      if (currentUser.role === "superuser") {
+        // Superusers see all requests
+        requests = await storage.getFeatureRequestsWithMessages();
+      } else {
+        // Company owners see only their own requests
+        requests = await storage.getFeatureRequestsWithMessages(currentUser.id);
+      }
+
+      res.json({ requests });
+    } catch (error) {
+      console.error("Get feature requests error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Get unread message count (MUST be before /:id route)
+  app.get("/api/feature-requests/unread-count", requireAuth, requireRole("company", "superuser"), async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      const count = await storage.getUnreadFeatureRequestMessageCount(
+        currentUser.role === "superuser" ? undefined : currentUser.id
+      );
+
+      res.json({ count });
+    } catch (error) {
+      console.error("Get unread count error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Get single feature request with messages
+  app.get("/api/feature-requests/:id", requireAuth, requireRole("company", "superuser"), async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      const request = await storage.getFeatureRequestWithMessages(req.params.id);
+      if (!request) {
+        return res.status(404).json({ message: "Feature request not found" });
+      }
+
+      // Verify ownership or superuser access
+      if (currentUser.role !== "superuser" && request.companyId !== currentUser.id) {
+        return res.status(403).json({ message: "Access denied" });
+      }
+
+      // Mark messages as read
+      await storage.markFeatureRequestMessagesAsRead(req.params.id, currentUser.id);
+
+      res.json({ request });
+    } catch (error) {
+      console.error("Get feature request error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Create new feature request (company owners only)
+  app.post("/api/feature-requests", requireAuth, requireRole("company"), async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      const requestData = insertFeatureRequestSchema.parse({
+        ...req.body,
+        companyId: currentUser.id,
+        contactName: currentUser.name || currentUser.email || "Unknown",
+        contactEmail: currentUser.email,
+        companyName: currentUser.companyName || "Unknown Company",
+      });
+
+      const request = await storage.createFeatureRequest(requestData);
+      res.json({ request });
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Validation error", errors: error.errors });
+      }
+      console.error("Create feature request error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Update feature request status (superusers only)
+  app.patch("/api/feature-requests/:id", requireAuth, requireRole("superuser"), async (req: Request, res: Response) => {
+    try {
+      const { status } = req.body;
+      
+      const validStatuses = ["pending", "reviewing", "in_progress", "completed", "declined"];
+      if (!validStatuses.includes(status)) {
+        return res.status(400).json({ message: "Invalid status" });
+      }
+
+      const updates: any = { status };
+      if (status === "completed" || status === "declined") {
+        updates.resolvedAt = new Date();
+      }
+
+      const request = await storage.updateFeatureRequest(req.params.id, updates);
+      res.json({ request });
+    } catch (error) {
+      console.error("Update feature request error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Add message to feature request
+  app.post("/api/feature-requests/:id/messages", requireAuth, requireRole("company", "superuser"), async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      const request = await storage.getFeatureRequestById(req.params.id);
+      if (!request) {
+        return res.status(404).json({ message: "Feature request not found" });
+      }
+
+      // Verify ownership or superuser access
+      if (currentUser.role !== "superuser" && request.companyId !== currentUser.id) {
+        return res.status(403).json({ message: "Access denied" });
+      }
+
+      const messageData = insertFeatureRequestMessageSchema.parse({
+        requestId: req.params.id,
+        senderId: currentUser.id,
+        senderRole: currentUser.role === "superuser" ? "superuser" : "company",
+        senderName: currentUser.name || currentUser.email || "Unknown",
+        message: req.body.message,
+        isRead: false,
+      });
+
+      const message = await storage.createFeatureRequestMessage(messageData);
+      res.json({ message });
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Validation error", errors: error.errors });
+      }
+      console.error("Create feature request message error:", error);
       res.status(500).json({ message: "Internal server error" });
     }
   });

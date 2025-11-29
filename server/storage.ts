@@ -1,6 +1,6 @@
 import { db } from "./db";
-import { users, clients, projects, customJobTypes, dropLogs, workSessions, nonBillableWorkSessions, complaints, complaintNotes, projectPhotos, jobComments, harnessInspections, toolboxMeetings, flhaForms, incidentReports, methodStatements, companyDocuments, payPeriodConfig, payPeriods, quotes, quoteServices, gearItems, gearAssignments, gearSerialNumbers, scheduledJobs, jobAssignments, userPreferences, propertyManagerCompanyLinks, irataTaskLogs, employeeTimeOff, documentReviewSignatures, equipmentDamageReports } from "@shared/schema";
-import type { User, InsertUser, Client, InsertClient, Project, InsertProject, CustomJobType, InsertCustomJobType, DropLog, InsertDropLog, WorkSession, InsertWorkSession, Complaint, InsertComplaint, ComplaintNote, InsertComplaintNote, ProjectPhoto, InsertProjectPhoto, JobComment, InsertJobComment, HarnessInspection, InsertHarnessInspection, ToolboxMeeting, InsertToolboxMeeting, FlhaForm, InsertFlhaForm, IncidentReport, InsertIncidentReport, MethodStatement, InsertMethodStatement, PayPeriodConfig, InsertPayPeriodConfig, PayPeriod, InsertPayPeriod, EmployeeHoursSummary, Quote, InsertQuote, QuoteService, InsertQuoteService, QuoteWithServices, GearItem, InsertGearItem, GearAssignment, InsertGearAssignment, GearSerialNumber, InsertGearSerialNumber, ScheduledJob, InsertScheduledJob, JobAssignment, InsertJobAssignment, ScheduledJobWithAssignments, UserPreferences, InsertUserPreferences, PropertyManagerCompanyLink, InsertPropertyManagerCompanyLink, IrataTaskLog, InsertIrataTaskLog, EmployeeTimeOff, InsertEmployeeTimeOff, DocumentReviewSignature, InsertDocumentReviewSignature, EquipmentDamageReport, InsertEquipmentDamageReport } from "@shared/schema";
+import { users, clients, projects, customJobTypes, dropLogs, workSessions, nonBillableWorkSessions, complaints, complaintNotes, projectPhotos, jobComments, harnessInspections, toolboxMeetings, flhaForms, incidentReports, methodStatements, companyDocuments, payPeriodConfig, payPeriods, quotes, quoteServices, gearItems, gearAssignments, gearSerialNumbers, scheduledJobs, jobAssignments, userPreferences, propertyManagerCompanyLinks, irataTaskLogs, employeeTimeOff, documentReviewSignatures, equipmentDamageReports, featureRequests, featureRequestMessages } from "@shared/schema";
+import type { User, InsertUser, Client, InsertClient, Project, InsertProject, CustomJobType, InsertCustomJobType, DropLog, InsertDropLog, WorkSession, InsertWorkSession, Complaint, InsertComplaint, ComplaintNote, InsertComplaintNote, ProjectPhoto, InsertProjectPhoto, JobComment, InsertJobComment, HarnessInspection, InsertHarnessInspection, ToolboxMeeting, InsertToolboxMeeting, FlhaForm, InsertFlhaForm, IncidentReport, InsertIncidentReport, MethodStatement, InsertMethodStatement, PayPeriodConfig, InsertPayPeriodConfig, PayPeriod, InsertPayPeriod, EmployeeHoursSummary, Quote, InsertQuote, QuoteService, InsertQuoteService, QuoteWithServices, GearItem, InsertGearItem, GearAssignment, InsertGearAssignment, GearSerialNumber, InsertGearSerialNumber, ScheduledJob, InsertScheduledJob, JobAssignment, InsertJobAssignment, ScheduledJobWithAssignments, UserPreferences, InsertUserPreferences, PropertyManagerCompanyLink, InsertPropertyManagerCompanyLink, IrataTaskLog, InsertIrataTaskLog, EmployeeTimeOff, InsertEmployeeTimeOff, DocumentReviewSignature, InsertDocumentReviewSignature, EquipmentDamageReport, InsertEquipmentDamageReport, FeatureRequest, InsertFeatureRequest, FeatureRequestMessage, InsertFeatureRequestMessage, FeatureRequestWithMessages } from "@shared/schema";
 import { eq, and, or, desc, sql, isNull, isNotNull, not, gte, lte, between, inArray } from "drizzle-orm";
 import bcrypt from "bcrypt";
 
@@ -2611,6 +2611,125 @@ export class Storage {
       .from(equipmentDamageReports)
       .where(eq(equipmentDamageReports.gearItemId, gearItemId))
       .orderBy(desc(equipmentDamageReports.createdAt));
+  }
+
+  // Feature Request operations
+  async createFeatureRequest(request: InsertFeatureRequest): Promise<FeatureRequest> {
+    const [result] = await db.insert(featureRequests).values(request).returning();
+    return result;
+  }
+
+  async getFeatureRequestById(requestId: string): Promise<FeatureRequest | undefined> {
+    const [result] = await db.select()
+      .from(featureRequests)
+      .where(eq(featureRequests.id, requestId))
+      .limit(1);
+    return result;
+  }
+
+  async getFeatureRequestsByCompany(companyId: string): Promise<FeatureRequest[]> {
+    return db.select()
+      .from(featureRequests)
+      .where(eq(featureRequests.companyId, companyId))
+      .orderBy(desc(featureRequests.createdAt));
+  }
+
+  async getAllFeatureRequests(): Promise<FeatureRequest[]> {
+    return db.select()
+      .from(featureRequests)
+      .orderBy(desc(featureRequests.createdAt));
+  }
+
+  async updateFeatureRequest(requestId: string, updates: Partial<InsertFeatureRequest> & { resolvedAt?: Date }): Promise<FeatureRequest> {
+    const [result] = await db.update(featureRequests)
+      .set({ ...updates, updatedAt: new Date() })
+      .where(eq(featureRequests.id, requestId))
+      .returning();
+    return result;
+  }
+
+  async getFeatureRequestWithMessages(requestId: string): Promise<FeatureRequestWithMessages | undefined> {
+    const request = await this.getFeatureRequestById(requestId);
+    if (!request) return undefined;
+
+    const messages = await this.getFeatureRequestMessages(requestId);
+    const unreadCount = messages.filter(m => !m.isRead).length;
+
+    return {
+      ...request,
+      messages,
+      unreadCount,
+    };
+  }
+
+  async getFeatureRequestsWithMessages(companyId?: string): Promise<FeatureRequestWithMessages[]> {
+    const requests = companyId 
+      ? await this.getFeatureRequestsByCompany(companyId)
+      : await this.getAllFeatureRequests();
+
+    const results: FeatureRequestWithMessages[] = [];
+    for (const request of requests) {
+      const messages = await this.getFeatureRequestMessages(request.id);
+      const unreadCount = messages.filter(m => !m.isRead).length;
+      results.push({
+        ...request,
+        messages,
+        unreadCount,
+      });
+    }
+
+    return results;
+  }
+
+  // Feature Request Message operations
+  async createFeatureRequestMessage(message: InsertFeatureRequestMessage): Promise<FeatureRequestMessage> {
+    const [result] = await db.insert(featureRequestMessages).values(message).returning();
+    return result;
+  }
+
+  async getFeatureRequestMessages(requestId: string): Promise<FeatureRequestMessage[]> {
+    return db.select()
+      .from(featureRequestMessages)
+      .where(eq(featureRequestMessages.requestId, requestId))
+      .orderBy(featureRequestMessages.createdAt);
+  }
+
+  async markFeatureRequestMessagesAsRead(requestId: string, readerId: string): Promise<void> {
+    // Mark all messages as read where the reader is NOT the sender
+    await db.update(featureRequestMessages)
+      .set({ isRead: true })
+      .where(and(
+        eq(featureRequestMessages.requestId, requestId),
+        not(eq(featureRequestMessages.senderId, readerId))
+      ));
+  }
+
+  async getUnreadFeatureRequestMessageCount(companyId?: string): Promise<number> {
+    if (companyId) {
+      // For company owners - count unread messages from superusers
+      const requests = await this.getFeatureRequestsByCompany(companyId);
+      let count = 0;
+      for (const request of requests) {
+        const messages = await db.select()
+          .from(featureRequestMessages)
+          .where(and(
+            eq(featureRequestMessages.requestId, request.id),
+            eq(featureRequestMessages.senderRole, 'superuser'),
+            eq(featureRequestMessages.isRead, false)
+          ));
+        count += messages.length;
+      }
+      return count;
+    } else {
+      // For superusers - count unread messages from companies
+      const messages = await db.select()
+        .from(featureRequestMessages)
+        .where(and(
+          eq(featureRequestMessages.senderRole, 'company'),
+          eq(featureRequestMessages.isRead, false)
+        ));
+      return messages.length;
+    }
   }
 }
 

@@ -171,6 +171,470 @@ function BrandColorsSection({ user }: { user: any }) {
   );
 }
 
+// Feature Request Category Options
+const FEATURE_CATEGORIES = [
+  { value: 'feature', label: 'New Feature' },
+  { value: 'job_type', label: 'New Job Type' },
+  { value: 'improvement', label: 'Improvement' },
+  { value: 'bug', label: 'Bug Report' },
+  { value: 'other', label: 'Other' },
+];
+
+const PRIORITY_OPTIONS = [
+  { value: 'low', label: 'Low' },
+  { value: 'normal', label: 'Normal' },
+  { value: 'high', label: 'High' },
+  { value: 'urgent', label: 'Urgent' },
+];
+
+const featureRequestSchema = z.object({
+  title: z.string().min(1, "Title is required").max(200),
+  category: z.string().min(1, "Category is required"),
+  description: z.string().min(10, "Description must be at least 10 characters"),
+  priority: z.string().default('normal'),
+});
+
+type FeatureRequestFormData = z.infer<typeof featureRequestSchema>;
+
+function FeatureRequestsSection({ userId, userName }: { userId: string; userName: string }) {
+  const { toast } = useToast();
+  const [selectedRequest, setSelectedRequest] = useState<any>(null);
+  const [newMessage, setNewMessage] = useState("");
+  const [showThankYouDialog, setShowThankYouDialog] = useState(false);
+  const [showNewRequestForm, setShowNewRequestForm] = useState(false);
+
+  // Fetch feature requests
+  const { data: requestsData, isLoading, refetch } = useQuery<{ requests: any[] }>({
+    queryKey: ["/api/feature-requests"],
+  });
+
+  const requests = requestsData?.requests || [];
+
+  // Form for creating new requests
+  const form = useForm<FeatureRequestFormData>({
+    resolver: zodResolver(featureRequestSchema),
+    defaultValues: {
+      title: "",
+      category: "",
+      description: "",
+      priority: "normal",
+    },
+  });
+
+  // Create feature request mutation
+  const createMutation = useMutation({
+    mutationFn: async (data: FeatureRequestFormData) => {
+      return apiRequest('POST', '/api/feature-requests', data);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/feature-requests"] });
+      form.reset();
+      setShowNewRequestForm(false);
+      setShowThankYouDialog(true);
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: "Failed to submit feature request",
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Send message mutation
+  const sendMessageMutation = useMutation({
+    mutationFn: async ({ requestId, message }: { requestId: string; message: string }) => {
+      return apiRequest('POST', `/api/feature-requests/${requestId}/messages`, { message });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/feature-requests"] });
+      setNewMessage("");
+      refetch();
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: "Failed to send message",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const onSubmit = (data: FeatureRequestFormData) => {
+    createMutation.mutate(data);
+  };
+
+  const handleSendMessage = () => {
+    if (!selectedRequest || !newMessage.trim()) return;
+    sendMessageMutation.mutate({
+      requestId: selectedRequest.id,
+      message: newMessage.trim(),
+    });
+  };
+
+  const getStatusBadge = (status: string) => {
+    const styles: Record<string, string> = {
+      pending: "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400",
+      reviewing: "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400",
+      in_progress: "bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400",
+      completed: "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400",
+      declined: "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400",
+    };
+    return styles[status] || styles.pending;
+  };
+
+  const getCategoryLabel = (value: string) => {
+    return FEATURE_CATEGORIES.find(c => c.value === value)?.label || value;
+  };
+
+  if (isLoading) {
+    return (
+      <Card>
+        <CardContent className="p-6">
+          <div className="flex items-center justify-center h-32">
+            <span className="material-icons animate-spin text-3xl text-muted-foreground">autorenew</span>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  // View single request with messages
+  if (selectedRequest) {
+    const currentRequest = requests.find(r => r.id === selectedRequest.id) || selectedRequest;
+    return (
+      <Card>
+        <CardHeader>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setSelectedRequest(null)}
+              data-testid="button-back-to-requests"
+            >
+              <span className="material-icons">arrow_back</span>
+            </Button>
+            <div className="flex-1">
+              <CardTitle className="text-lg">{currentRequest.title}</CardTitle>
+              <div className="flex items-center gap-2 mt-1">
+                <Badge className={getStatusBadge(currentRequest.status)}>
+                  {currentRequest.status.replace('_', ' ')}
+                </Badge>
+                <span className="text-xs text-muted-foreground">
+                  {getCategoryLabel(currentRequest.category)}
+                </span>
+              </div>
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {/* Original Description */}
+          <div className="p-4 bg-muted/50 rounded-lg">
+            <p className="text-sm text-muted-foreground mb-1">Original Request:</p>
+            <p className="text-sm whitespace-pre-wrap">{currentRequest.description}</p>
+            <p className="text-xs text-muted-foreground mt-2">
+              Submitted {format(new Date(currentRequest.createdAt), 'MMM d, yyyy h:mm a')}
+            </p>
+          </div>
+
+          {/* Messages */}
+          {currentRequest.messages && currentRequest.messages.length > 0 && (
+            <div className="space-y-3">
+              <p className="text-sm font-medium">Conversation:</p>
+              {currentRequest.messages.map((msg: any) => (
+                <div
+                  key={msg.id}
+                  className={`p-3 rounded-lg ${
+                    msg.senderRole === 'company'
+                      ? 'bg-primary/10 ml-8'
+                      : 'bg-muted mr-8'
+                  }`}
+                >
+                  <div className="flex items-center justify-between gap-2 mb-1">
+                    <span className="text-xs font-medium">
+                      {msg.senderRole === 'company' ? 'You' : 'OnRopePro Team'}
+                    </span>
+                    <span className="text-xs text-muted-foreground">
+                      {format(new Date(msg.createdAt), 'MMM d, h:mm a')}
+                    </span>
+                  </div>
+                  <p className="text-sm whitespace-pre-wrap">{msg.message}</p>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* Reply Form */}
+          {currentRequest.status !== 'completed' && currentRequest.status !== 'declined' && (
+            <div className="space-y-2 pt-4 border-t">
+              <textarea
+                value={newMessage}
+                onChange={(e) => setNewMessage(e.target.value)}
+                placeholder="Type your message..."
+                className="w-full min-h-[100px] p-3 border rounded-lg bg-background resize-none focus:ring-2 focus:ring-primary/20"
+                data-testid="textarea-reply-message"
+              />
+              <Button
+                onClick={handleSendMessage}
+                disabled={!newMessage.trim() || sendMessageMutation.isPending}
+                className="h-12"
+                data-testid="button-send-reply"
+              >
+                {sendMessageMutation.isPending ? (
+                  <span className="material-icons animate-spin mr-2">autorenew</span>
+                ) : (
+                  <span className="material-icons mr-2 text-lg">send</span>
+                )}
+                Send Reply
+              </Button>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+    );
+  }
+
+  // New request form
+  if (showNewRequestForm) {
+    return (
+      <Card>
+        <CardHeader>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setShowNewRequestForm(false)}
+              data-testid="button-cancel-new-request"
+            >
+              <span className="material-icons">arrow_back</span>
+            </Button>
+            <div>
+              <CardTitle>Submit Feature Request</CardTitle>
+              <CardDescription>Share your ideas to help us improve OnRopePro</CardDescription>
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent>
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+              <FormField
+                control={form.control}
+                name="title"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Title</FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder="Brief summary of your request"
+                        {...field}
+                        data-testid="input-request-title"
+                        className="h-12"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="category"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Category</FormLabel>
+                    <FormControl>
+                      <select
+                        {...field}
+                        className="w-full h-12 px-3 rounded-lg border bg-background"
+                        data-testid="select-request-category"
+                      >
+                        <option value="">Select a category...</option>
+                        {FEATURE_CATEGORIES.map((cat) => (
+                          <option key={cat.value} value={cat.value}>
+                            {cat.label}
+                          </option>
+                        ))}
+                      </select>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="priority"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Priority</FormLabel>
+                    <FormControl>
+                      <select
+                        {...field}
+                        className="w-full h-12 px-3 rounded-lg border bg-background"
+                        data-testid="select-request-priority"
+                      >
+                        {PRIORITY_OPTIONS.map((opt) => (
+                          <option key={opt.value} value={opt.value}>
+                            {opt.label}
+                          </option>
+                        ))}
+                      </select>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="description"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Description</FormLabel>
+                    <FormControl>
+                      <textarea
+                        {...field}
+                        placeholder="Please describe your feature request in detail. Include any specific use cases or examples that would help us understand your needs."
+                        className="w-full min-h-[150px] p-3 border rounded-lg bg-background resize-none focus:ring-2 focus:ring-primary/20"
+                        data-testid="textarea-request-description"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <div className="flex gap-2 pt-4">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setShowNewRequestForm(false)}
+                  className="h-12"
+                  data-testid="button-cancel-submit"
+                >
+                  Cancel
+                </Button>
+                <Button
+                  type="submit"
+                  disabled={createMutation.isPending}
+                  className="h-12 flex-1"
+                  data-testid="button-submit-request"
+                >
+                  {createMutation.isPending ? (
+                    <span className="material-icons animate-spin mr-2">autorenew</span>
+                  ) : (
+                    <span className="material-icons mr-2 text-lg">send</span>
+                  )}
+                  Submit Request
+                </Button>
+              </div>
+            </form>
+          </Form>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  // List view
+  return (
+    <>
+      <Card>
+        <CardHeader>
+          <div className="flex items-center justify-between gap-2">
+            <div>
+              <CardTitle>Feature Requests</CardTitle>
+              <CardDescription>Share feedback and suggestions with the OnRopePro team</CardDescription>
+            </div>
+            <Button
+              onClick={() => setShowNewRequestForm(true)}
+              className="h-12"
+              data-testid="button-new-request"
+            >
+              <span className="material-icons mr-2 text-lg">add</span>
+              New Request
+            </Button>
+          </div>
+        </CardHeader>
+        <CardContent>
+          {requests.length === 0 ? (
+            <div className="text-center py-12">
+              <span className="material-icons text-5xl text-muted-foreground mb-4">lightbulb</span>
+              <p className="text-muted-foreground mb-4">You haven't submitted any feature requests yet</p>
+              <Button
+                onClick={() => setShowNewRequestForm(true)}
+                variant="outline"
+                className="h-12"
+                data-testid="button-first-request"
+              >
+                <span className="material-icons mr-2">add</span>
+                Submit Your First Request
+              </Button>
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {requests.map((request) => (
+                <div
+                  key={request.id}
+                  onClick={() => setSelectedRequest(request)}
+                  className="p-4 border rounded-lg hover-elevate cursor-pointer"
+                  data-testid={`request-item-${request.id}`}
+                >
+                  <div className="flex items-start justify-between gap-2 mb-2">
+                    <h3 className="font-medium text-sm">{request.title}</h3>
+                    <div className="flex items-center gap-2 shrink-0">
+                      {request.unreadCount > 0 && (
+                        <Badge variant="destructive" className="text-xs">
+                          {request.unreadCount} new
+                        </Badge>
+                      )}
+                      <Badge className={getStatusBadge(request.status)}>
+                        {request.status.replace('_', ' ')}
+                      </Badge>
+                    </div>
+                  </div>
+                  <p className="text-xs text-muted-foreground line-clamp-2">{request.description}</p>
+                  <div className="flex items-center justify-between gap-2 mt-2">
+                    <span className="text-xs text-muted-foreground">
+                      {getCategoryLabel(request.category)}
+                    </span>
+                    <span className="text-xs text-muted-foreground">
+                      {format(new Date(request.createdAt), 'MMM d, yyyy')}
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Thank You Dialog */}
+      <AlertDialog open={showThankYouDialog} onOpenChange={setShowThankYouDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <div className="flex justify-center mb-4">
+              <span className="material-icons text-5xl text-primary">check_circle</span>
+            </div>
+            <AlertDialogTitle className="text-center">Thank You!</AlertDialogTitle>
+            <AlertDialogDescription className="text-center">
+              Your feature request has been submitted successfully. We appreciate your feedback and will review it carefully. You'll be notified when we respond.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter className="flex justify-center">
+            <AlertDialogAction
+              onClick={() => setShowThankYouDialog(false)}
+              className="h-12"
+              data-testid="button-close-thank-you"
+            >
+              Got it
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </>
+  );
+}
+
 export default function Profile() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
@@ -478,10 +942,11 @@ export default function Profile() {
       <div className="p-4 max-w-2xl mx-auto space-y-4">
         {user?.role === "company" ? (
           <Tabs defaultValue="profile" className="w-full">
-            <TabsList className="grid w-full grid-cols-3">
+            <TabsList className="grid w-full grid-cols-4">
               <TabsTrigger value="profile" data-testid="tab-profile">Profile</TabsTrigger>
               <TabsTrigger value="subscription" data-testid="tab-subscription">Subscription</TabsTrigger>
               <TabsTrigger value="branding" data-testid="tab-branding">Branding</TabsTrigger>
+              <TabsTrigger value="feature-requests" data-testid="tab-feature-requests">Feedback</TabsTrigger>
             </TabsList>
 
             <TabsContent value="profile" className="space-y-4 mt-4">
@@ -1140,6 +1605,10 @@ export default function Profile() {
                   )}
                 </CardContent>
               </Card>
+            </TabsContent>
+
+            <TabsContent value="feature-requests" className="space-y-4 mt-4">
+              <FeatureRequestsSection userId={user.id} userName={user.name || user.email || "Company Owner"} />
             </TabsContent>
           </Tabs>
         ) : (
