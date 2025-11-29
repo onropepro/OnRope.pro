@@ -3982,6 +3982,7 @@
         "title": "Start Work Session?",
         "description": "This will begin tracking your work session for {{buildingName}}. You can log drops throughout the day and end your session when finished.",
         "descriptionSimple": "This will begin tracking your work session for {{buildingName}}. You can end your session later when finished.",
+        "harnessInspectionDone": "Harness inspection already completed today",
         "cancel": "Cancel",
         "confirm": "Start Work Session"
       },

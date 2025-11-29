@@ -205,6 +205,13 @@ export default function ProjectDetail() {
     enabled: !!id,
   });
 
+  // Check if user has done a harness inspection today (any project)
+  const { data: harnessInspectionTodayData } = useQuery({
+    queryKey: ["/api/harness-inspection-today"],
+  });
+
+  const hasHarnessInspectionToday = harnessInspectionTodayData?.hasInspectionToday ?? false;
+
   // Check for active work session on this project
   useEffect(() => {
     const checkActiveSession = async () => {
@@ -971,7 +978,14 @@ export default function ProjectDetail() {
             {/* Start Work Session Button - Available to all users when no active session exists */}
             {!activeSession && project.status === "active" && (
               <Button
-                onClick={() => setShowHarnessInspectionDialog(true)}
+                onClick={() => {
+                  // If user already did harness inspection today, skip the dialog
+                  if (hasHarnessInspectionToday) {
+                    setShowStartDayDialog(true);
+                  } else {
+                    setShowHarnessInspectionDialog(true);
+                  }
+                }}
                 className="h-10 bg-primary text-primary-foreground hover:bg-primary/90"
                 data-testid="button-start-day"
               >
@@ -2400,8 +2414,16 @@ export default function ProjectDetail() {
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>{t('projectDetail.dialogs.startSession.title', 'Start Work Session?')}</AlertDialogTitle>
-            <AlertDialogDescription>
-              {t('projectDetail.dialogs.startSession.description', 'This will begin tracking your work session for {{buildingName}}. You can log drops throughout the day and end your session when finished.', { buildingName: project.buildingName })}
+            <AlertDialogDescription className="space-y-2">
+              <span className="block">
+                {t('projectDetail.dialogs.startSession.description', 'This will begin tracking your work session for {{buildingName}}. You can log drops throughout the day and end your session when finished.', { buildingName: project.buildingName })}
+              </span>
+              {hasHarnessInspectionToday && (
+                <span className="flex items-center gap-2 text-green-600 dark:text-green-400 font-medium">
+                  <span className="material-icons text-sm">check_circle</span>
+                  {t('projectDetail.dialogs.startSession.harnessInspectionDone', 'Harness inspection already completed today')}
+                </span>
+              )}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

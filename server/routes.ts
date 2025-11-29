@@ -7113,6 +7113,30 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Check if user has done a harness inspection today (any project)
+  app.get("/api/harness-inspection-today", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const userId = req.session.userId!;
+      const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD format
+      
+      const inspections = await storage.getHarnessInspectionsByWorker(userId);
+      
+      // Check if any inspection was done today (full inspection, not just "not applicable")
+      const todayInspection = inspections.find((inspection: any) => {
+        const inspectionDate = inspection.inspectionDate?.split('T')[0];
+        return inspectionDate === today;
+      });
+      
+      res.json({ 
+        hasInspectionToday: !!todayInspection,
+        inspection: todayInspection || null
+      });
+    } catch (error) {
+      console.error("Check harness inspection today error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
   app.delete("/api/harness-inspections/:id", requireAuth, requireRole("operations_manager", "general_supervisor", "rope_access_supervisor", "supervisor", "company"), async (req: Request, res: Response) => {
     try {
       const { id } = req.params;

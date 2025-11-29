@@ -3982,6 +3982,7 @@
         "title": "Démarrer la session de travail ?",
         "description": "Cela commencera le suivi de votre session de travail pour {{buildingName}}. Vous pourrez enregistrer les descentes tout au long de la journée et terminer votre session une fois terminé.",
         "descriptionSimple": "Cela commencera le suivi de votre session de travail pour {{buildingName}}. Vous pourrez terminer votre session plus tard.",
+        "harnessInspectionDone": "Inspection du harnais déjà effectuée aujourd'hui",
         "cancel": "Annuler",
         "confirm": "Démarrer la session de travail"
       },
