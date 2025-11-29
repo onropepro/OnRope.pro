@@ -2574,6 +2574,105 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // SuperUser: Get all feature requests with messages
+  app.get("/api/superuser/feature-requests", requireAuth, async (req: Request, res: Response) => {
+    try {
+      if (req.session.userId !== 'superuser') {
+        return res.status(403).json({ message: "Access denied. SuperUser only." });
+      }
+
+      const requestsWithMessages = await storage.getFeatureRequestsWithMessages();
+      
+      // Enrich with company information
+      const enrichedRequests = await Promise.all(
+        requestsWithMessages.map(async (request) => {
+          const company = await storage.getUserById(request.companyId);
+          return {
+            ...request,
+            companyName: company?.companyName || 'Unknown Company',
+            userName: company?.name || company?.email || 'Unknown',
+          };
+        })
+      );
+
+      // Sort by creation date (newest first) and then by priority
+      enrichedRequests.sort((a, b) => {
+        // Priority order: urgent, high, normal, low
+        const priorityOrder: Record<string, number> = { urgent: 0, high: 1, normal: 2, low: 3 };
+        const priorityDiff = (priorityOrder[a.priority] || 2) - (priorityOrder[b.priority] || 2);
+        if (priorityDiff !== 0) return priorityDiff;
+        return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+      });
+
+      res.json({ requests: enrichedRequests });
+    } catch (error) {
+      console.error('[SuperUser] Get feature requests error:', error);
+      res.status(500).json({ message: "Failed to fetch feature requests" });
+    }
+  });
+
+  // SuperUser: Update feature request status
+  app.patch("/api/superuser/feature-requests/:id", requireAuth, async (req: Request, res: Response) => {
+    try {
+      if (req.session.userId !== 'superuser') {
+        return res.status(403).json({ message: "Access denied. SuperUser only." });
+      }
+
+      const requestId = req.params.id;
+      const { status } = req.body;
+
+      const validStatuses = ['pending', 'reviewing', 'in_progress', 'completed', 'declined'];
+      if (!validStatuses.includes(status)) {
+        return res.status(400).json({ message: "Invalid status" });
+      }
+
+      const updates: any = { status };
+      if (status === 'completed' || status === 'declined') {
+        updates.resolvedAt = new Date();
+      }
+
+      const updated = await storage.updateFeatureRequest(requestId, updates);
+      res.json({ request: updated });
+    } catch (error) {
+      console.error('[SuperUser] Update feature request error:', error);
+      res.status(500).json({ message: "Failed to update feature request" });
+    }
+  });
+
+  // SuperUser: Send message on feature request
+  app.post("/api/superuser/feature-requests/:id/messages", requireAuth, async (req: Request, res: Response) => {
+    try {
+      if (req.session.userId !== 'superuser') {
+        return res.status(403).json({ message: "Access denied. SuperUser only." });
+      }
+
+      const requestId = req.params.id;
+      const { message } = req.body;
+
+      if (!message?.trim()) {
+        return res.status(400).json({ message: "Message is required" });
+      }
+
+      // Verify the request exists
+      const request = await storage.getFeatureRequestById(requestId);
+      if (!request) {
+        return res.status(404).json({ message: "Feature request not found" });
+      }
+
+      const newMessage = await storage.createFeatureRequestMessage({
+        requestId,
+        senderId: 'superuser',
+        senderRole: 'superuser',
+        message: message.trim(),
+      });
+
+      res.json({ message: newMessage });
+    } catch (error) {
+      console.error('[SuperUser] Send message error:', error);
+      res.status(500).json({ message: "Failed to send message" });
+    }
+  });
+
   // Update user profile
   app.patch("/api/user/profile", requireAuth, async (req: Request, res: Response) => {
     try {

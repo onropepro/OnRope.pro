@@ -164,6 +164,29 @@ export default function SuperUser() {
               </p>
             </CardContent>
           </Card>
+
+          <Card 
+            className="hover-elevate active-elevate-2 cursor-pointer transition-all"
+            onClick={() => setLocation('/superuser/feature-requests')}
+            data-testid="card-feature-requests"
+          >
+            <CardHeader>
+              <div className="flex items-center gap-3">
+                <div className="h-12 w-12 rounded-full bg-purple-500/10 flex items-center justify-center">
+                  <span className="material-icons text-purple-500 text-2xl">lightbulb</span>
+                </div>
+                <div>
+                  <CardTitle className="text-xl">Feature Requests</CardTitle>
+                  <CardDescription>Review and respond to company feedback</CardDescription>
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <p className="text-sm text-muted-foreground">
+                View feature requests, bug reports, and communicate with company owners
+              </p>
+            </CardContent>
+          </Card>
         </div>
       </div>
 

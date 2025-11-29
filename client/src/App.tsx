@@ -34,6 +34,7 @@ import Schedule from "@/pages/Schedule";
 import SuperUser from "@/pages/SuperUser";
 import AllCompanies from "@/pages/AllCompanies";
 import CompanyDetail from "@/pages/CompanyDetail";
+import SuperUserFeatureRequests from "@/pages/SuperUserFeatureRequests";
 import ResidentsManagement from "@/pages/ResidentsManagement";
 import Documents from "@/pages/Documents";
 import ResidentLink from "@/pages/ResidentLink";
@@ -71,6 +72,11 @@ function Router() {
       <Route path="/superuser/companies/:id">
         <ProtectedRoute allowedRoles={["superuser"]}>
           <CompanyDetail />
+        </ProtectedRoute>
+      </Route>
+      <Route path="/superuser/feature-requests">
+        <ProtectedRoute allowedRoles={["superuser"]}>
+          <SuperUserFeatureRequests />
         </ProtectedRoute>
       </Route>
       <Route path="/superuser/companies">
