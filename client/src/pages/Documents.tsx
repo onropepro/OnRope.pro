@@ -5224,102 +5224,109 @@ export default function Documents() {
               </CardContent>
             </Card>
 
-            {/* Template Safe Work Practices */}
-            <Card className="mb-6 overflow-hidden">
-              <CardHeader className="bg-gradient-to-br from-amber-500/10 via-amber-500/5 to-transparent pb-4">
-                <div className="flex items-start gap-4">
-                  <div className="p-3 bg-amber-500/10 rounded-xl ring-1 ring-amber-500/20">
-                    <BookOpen className="h-6 w-6 text-amber-600 dark:text-amber-400" />
-                  </div>
-                  <div className="flex-1">
-                    <CardTitle className="text-xl mb-1">General Safety Practice Templates</CardTitle>
-                    <p className="text-sm text-muted-foreground">
-                      Pre-built templates covering essential safety topics for rope access operations
-                    </p>
-                  </div>
-                </div>
-              </CardHeader>
-              <CardContent className="pt-6">
-                <div className="grid gap-4 md:grid-cols-2">
-                  {SAFE_WORK_PRACTICES.map((practice) => (
-                    <Card key={practice.id} className="overflow-hidden">
-                      <CardHeader className="pb-2">
-                        <div className="flex items-start gap-3">
-                          <div className="p-2 bg-amber-500/10 rounded-lg">
-                            <practice.icon className="h-4 w-4 text-amber-600 dark:text-amber-400" />
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <CardTitle className="text-sm font-medium">{practice.title}</CardTitle>
-                            <CardDescription className="text-xs mt-1 line-clamp-2">
-                              {practice.description}
-                            </CardDescription>
-                          </div>
-                        </div>
-                      </CardHeader>
-                      <CardContent className="pt-2">
-                        <div className="flex flex-wrap gap-1 mb-3">
-                          {getPracticeTopics(practice).slice(0, 3).map((topic, idx) => (
-                            <Badge key={idx} variant="secondary" className="text-xs">
-                              {topic}
-                            </Badge>
-                          ))}
-                          {getPracticeTopics(practice).length > 3 && (
-                            <Badge variant="outline" className="text-xs">
-                              +{getPracticeTopics(practice).length - 3} more
-                            </Badge>
-                          )}
-                        </div>
-                        <div className="flex gap-2">
-                          <Dialog>
-                            <DialogTrigger asChild>
-                              <Button size="sm" variant="outline" className="flex-1" data-testid={`preview-swpractice-${practice.id}`}>
-                                <Eye className="h-3 w-3 mr-1" />
-                                Preview
-                              </Button>
-                            </DialogTrigger>
-                            <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
-                              <DialogHeader>
-                                <DialogTitle className="flex items-center gap-2">
-                                  <practice.icon className="h-5 w-5 text-amber-600" />
-                                  {practice.title}
-                                </DialogTitle>
-                                <DialogDescription>{practice.description}</DialogDescription>
-                              </DialogHeader>
-                              <div className="space-y-4 mt-4">
-                                <div>
-                                  <h4 className="font-medium text-sm mb-2">Key Principles</h4>
-                                  <ul className="list-disc pl-5 text-sm text-muted-foreground space-y-1">
-                                    {practice.keyPrinciples.map((principle, idx) => (
-                                      <li key={idx}>{principle}</li>
-                                    ))}
-                                  </ul>
-                                </div>
-                                <div>
-                                  <h4 className="font-medium text-sm mb-2">Content</h4>
-                                  <div className="text-sm text-muted-foreground whitespace-pre-wrap bg-muted/30 p-4 rounded-lg">
-                                    {getPracticeContent(practice)}
-                                  </div>
-                                </div>
+            {/* Template Safe Work Practices - Collapsible */}
+            <Collapsible defaultOpen={false} className="group">
+              <Card className="mb-6 overflow-visible">
+                <CollapsibleTrigger className="w-full text-left" data-testid="toggle-safety-practice-templates">
+                  <CardHeader className="bg-gradient-to-br from-amber-500/10 via-amber-500/5 to-transparent pb-4 cursor-pointer hover-elevate rounded-t-lg">
+                    <div className="flex items-start gap-4">
+                      <div className="p-3 bg-amber-500/10 rounded-xl ring-1 ring-amber-500/20">
+                        <BookOpen className="h-6 w-6 text-amber-600 dark:text-amber-400" />
+                      </div>
+                      <div className="flex-1">
+                        <CardTitle className="text-xl mb-1">General Safety Practice Templates</CardTitle>
+                        <p className="text-sm text-muted-foreground">
+                          Pre-built templates covering essential safety topics for rope access operations
+                        </p>
+                      </div>
+                      <ChevronDown className="h-5 w-5 text-muted-foreground transition-transform duration-200 group-data-[state=open]:rotate-180 mt-2" />
+                    </div>
+                  </CardHeader>
+                </CollapsibleTrigger>
+                <CollapsibleContent>
+                  <CardContent className="pt-6">
+                    <div className="grid gap-4 md:grid-cols-2">
+                      {SAFE_WORK_PRACTICES.map((practice) => (
+                        <Card key={practice.id} className="overflow-hidden">
+                          <CardHeader className="pb-2">
+                            <div className="flex items-start gap-3">
+                              <div className="p-2 bg-amber-500/10 rounded-lg">
+                                <practice.icon className="h-4 w-4 text-amber-600 dark:text-amber-400" />
                               </div>
-                              <DialogFooter className="mt-4">
-                                <Button variant="outline" onClick={() => generateSafeWorkPracticePDF(practice)} data-testid={`download-preview-swpractice-${practice.id}`}>
-                                  <Download className="h-4 w-4 mr-2" />
-                                  Download PDF
-                                </Button>
-                              </DialogFooter>
-                            </DialogContent>
-                          </Dialog>
-                          <Button size="sm" variant="default" onClick={() => generateSafeWorkPracticePDF(practice)} data-testid={`download-swpractice-${practice.id}`}>
-                            <Download className="h-3 w-3 mr-1" />
-                            PDF
-                          </Button>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
+                              <div className="flex-1 min-w-0">
+                                <CardTitle className="text-sm font-medium">{practice.title}</CardTitle>
+                                <CardDescription className="text-xs mt-1 line-clamp-2">
+                                  {practice.description}
+                                </CardDescription>
+                              </div>
+                            </div>
+                          </CardHeader>
+                          <CardContent className="pt-2">
+                            <div className="flex flex-wrap gap-1 mb-3">
+                              {getPracticeTopics(practice).slice(0, 3).map((topic, idx) => (
+                                <Badge key={idx} variant="secondary" className="text-xs">
+                                  {topic}
+                                </Badge>
+                              ))}
+                              {getPracticeTopics(practice).length > 3 && (
+                                <Badge variant="outline" className="text-xs">
+                                  +{getPracticeTopics(practice).length - 3} more
+                                </Badge>
+                              )}
+                            </div>
+                            <div className="flex gap-2">
+                              <Dialog>
+                                <DialogTrigger asChild>
+                                  <Button size="sm" variant="outline" className="flex-1" data-testid={`preview-swpractice-${practice.id}`}>
+                                    <Eye className="h-3 w-3 mr-1" />
+                                    Preview
+                                  </Button>
+                                </DialogTrigger>
+                                <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+                                  <DialogHeader>
+                                    <DialogTitle className="flex items-center gap-2">
+                                      <practice.icon className="h-5 w-5 text-amber-600" />
+                                      {practice.title}
+                                    </DialogTitle>
+                                    <DialogDescription>{practice.description}</DialogDescription>
+                                  </DialogHeader>
+                                  <div className="space-y-4 mt-4">
+                                    <div>
+                                      <h4 className="font-medium text-sm mb-2">Key Principles</h4>
+                                      <ul className="list-disc pl-5 text-sm text-muted-foreground space-y-1">
+                                        {practice.keyPrinciples.map((principle, idx) => (
+                                          <li key={idx}>{principle}</li>
+                                        ))}
+                                      </ul>
+                                    </div>
+                                    <div>
+                                      <h4 className="font-medium text-sm mb-2">Content</h4>
+                                      <div className="text-sm text-muted-foreground whitespace-pre-wrap bg-muted/30 p-4 rounded-lg">
+                                        {getPracticeContent(practice)}
+                                      </div>
+                                    </div>
+                                  </div>
+                                  <DialogFooter className="mt-4">
+                                    <Button variant="outline" onClick={() => generateSafeWorkPracticePDF(practice)} data-testid={`download-preview-swpractice-${practice.id}`}>
+                                      <Download className="h-4 w-4 mr-2" />
+                                      Download PDF
+                                    </Button>
+                                  </DialogFooter>
+                                </DialogContent>
+                              </Dialog>
+                              <Button size="sm" variant="default" onClick={() => generateSafeWorkPracticePDF(practice)} data-testid={`download-swpractice-${practice.id}`}>
+                                <Download className="h-3 w-3 mr-1" />
+                                PDF
+                              </Button>
+                            </div>
+                          </CardContent>
+                        </Card>
+                      ))}
+                    </div>
+                  </CardContent>
+                </CollapsibleContent>
+              </Card>
+            </Collapsible>
 
             <div className="p-4 bg-muted/50 rounded-lg">
               <div className="flex items-start gap-3">
