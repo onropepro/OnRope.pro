@@ -1787,6 +1787,80 @@ export const insertUserPreferencesSchema = createInsertSchema(userPreferences).o
 export type UserPreferences = typeof userPreferences.$inferSelect;
 export type InsertUserPreferences = z.infer<typeof insertUserPreferencesSchema>;
 
+// Feature Requests - allows company owners to submit feature requests
+export const featureRequests = pgTable("feature_requests", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  companyId: varchar("company_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  
+  // Request details
+  title: varchar("title").notNull(), // Short title for the request
+  category: varchar("category").notNull(), // feature | job_type | improvement | bug | other
+  description: text("description").notNull(), // Detailed description
+  priority: varchar("priority").default('normal'), // low | normal | high | urgent
+  
+  // Status tracking
+  status: varchar("status").default('pending').notNull(), // pending | reviewing | in_progress | completed | declined
+  
+  // Contact info (auto-filled from company)
+  contactName: varchar("contact_name").notNull(),
+  contactEmail: varchar("contact_email").notNull(),
+  companyName: varchar("company_name").notNull(),
+  
+  // Timestamps
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+  resolvedAt: timestamp("resolved_at"),
+}, (table) => [
+  index("IDX_feature_request_company").on(table.companyId),
+  index("IDX_feature_request_status").on(table.status),
+]);
+
+export const insertFeatureRequestSchema = createInsertSchema(featureRequests).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+  resolvedAt: true,
+});
+
+export type FeatureRequest = typeof featureRequests.$inferSelect;
+export type InsertFeatureRequest = z.infer<typeof insertFeatureRequestSchema>;
+
+// Feature Request Messages - back-and-forth messaging between company and developer
+export const featureRequestMessages = pgTable("feature_request_messages", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  requestId: varchar("request_id").notNull().references(() => featureRequests.id, { onDelete: "cascade" }),
+  
+  // Sender info
+  senderId: varchar("sender_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  senderRole: varchar("sender_role").notNull(), // company | superuser
+  senderName: varchar("sender_name").notNull(),
+  
+  // Message content
+  message: text("message").notNull(),
+  
+  // Read status
+  isRead: boolean("is_read").default(false),
+  
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+}, (table) => [
+  index("IDX_feature_msg_request").on(table.requestId),
+  index("IDX_feature_msg_sender").on(table.senderId),
+]);
+
+export const insertFeatureRequestMessageSchema = createInsertSchema(featureRequestMessages).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type FeatureRequestMessage = typeof featureRequestMessages.$inferSelect;
+export type InsertFeatureRequestMessage = z.infer<typeof insertFeatureRequestMessageSchema>;
+
+// Extended type for feature request with messages
+export type FeatureRequestWithMessages = FeatureRequest & {
+  messages: FeatureRequestMessage[];
+  unreadCount?: number;
+};
+
 // Extended types for frontend use with relations
 export type QuoteWithServices = Quote & {
   services: QuoteService[];
