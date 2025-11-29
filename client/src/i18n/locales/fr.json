@@ -3517,9 +3517,18 @@
     },
     "pickEquipment": "Choisir l'équipement de l'inventaire",
     "selectEquipment": {
-      "title": "Sélectionner l'équipement de l'inventaire",
-      "description": "Choisissez l'équipement pour remplir automatiquement les détails de l'inspection"
+      "title": "Sélectionner l'équipement",
+      "description": "Choisissez l'équipement de votre kit ou de l'inventaire pour remplir automatiquement les détails de l'inspection"
     },
+    "myKit": {
+      "title": "Mon Kit",
+      "description": "Votre équipement personnel assigné",
+      "badge": "Mon Kit"
+    },
+    "inventory": {
+      "title": "Inventaire de l'entreprise"
+    },
+    "orFromInventory": "ou sélectionner de l'inventaire",
     "serialNumber": "N/S",
     "inService": "En service",
     "noEquipment": "Aucun équipement dans l'inventaire.",

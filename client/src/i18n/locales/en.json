@@ -3517,9 +3517,18 @@
     },
     "pickEquipment": "Pick Equipment from Inventory",
     "selectEquipment": {
-      "title": "Select Equipment from Inventory",
-      "description": "Choose equipment to auto-fill inspection details"
+      "title": "Select Equipment",
+      "description": "Choose equipment from your kit or inventory to auto-fill inspection details"
     },
+    "myKit": {
+      "title": "My Kit",
+      "description": "Your personal assigned equipment",
+      "badge": "My Kit"
+    },
+    "inventory": {
+      "title": "Company Inventory"
+    },
+    "orFromInventory": "or select from inventory",
     "serialNumber": "S/N",
     "inService": "In service",
     "noEquipment": "No equipment in inventory yet.",

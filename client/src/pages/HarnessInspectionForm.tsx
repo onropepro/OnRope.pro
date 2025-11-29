@@ -78,10 +78,21 @@ export default function HarnessInspectionForm() {
     queryKey: ["/api/gear-items"],
   });
 
+  // Fetch user's personal kit (assigned gear)
+  const { data: myKitData } = useQuery<{ kit: any[] }>({
+    queryKey: ["/api/my-kit"],
+  });
+
   const allGearItems = gearData?.items || [];
+  const myKit = myKitData?.kit || [];
   
   // Show ALL company inventory items (not just assigned ones) - users can inspect any equipment
   const availableHarnesses = allGearItems.filter((item: any) => 
+    item.equipmentType?.toLowerCase().includes('harness') && item.inService !== false
+  );
+
+  // Filter my kit to show harnesses for inspection
+  const myKitHarnesses = myKit.filter((item: any) => 
     item.equipmentType?.toLowerCase().includes('harness') && item.inService !== false
   );
 
@@ -379,49 +390,117 @@ export default function HarnessInspectionForm() {
                   </DialogTrigger>
                   <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
                     <DialogHeader>
-                      <DialogTitle>{t('harnessInspection.selectEquipment.title', 'Select Equipment from Inventory')}</DialogTitle>
+                      <DialogTitle>{t('harnessInspection.selectEquipment.title', 'Select Equipment')}</DialogTitle>
                       <DialogDescription>
-                        {t('harnessInspection.selectEquipment.description', 'Choose equipment to auto-fill inspection details')}
+                        {t('harnessInspection.selectEquipment.description', 'Choose equipment from your kit or inventory to auto-fill inspection details')}
                       </DialogDescription>
                     </DialogHeader>
-                    <div className="grid gap-3 py-4">
-                      {availableHarnesses.length > 0 ? (
-                        availableHarnesses.map((harness: any) => (
-                          <Card 
-                            key={harness.id}
-                            className="hover-elevate active-elevate-2 cursor-pointer"
-                            onClick={() => handleHarnessSelection(harness)}
-                            data-testid={`harness-card-${harness.id}`}
-                          >
-                            <CardContent className="p-4">
-                              <div className="flex items-start gap-3">
-                                <span className="material-icons text-primary text-3xl mt-1">safety_check</span>
-                                <div className="flex-1 min-w-0">
-                                  <div className="font-semibold text-base mb-1">
-                                    {harness.equipmentType}
+                    <div className="space-y-4 py-4">
+                      {/* My Kit Section */}
+                      {myKitHarnesses.length > 0 && (
+                        <div className="space-y-3">
+                          <div className="flex items-center gap-2 text-primary">
+                            <Shield className="h-5 w-5" />
+                            <h3 className="font-semibold">{t('harnessInspection.myKit.title', 'My Kit')}</h3>
+                            <Badge variant="secondary" className="ml-auto">{myKitHarnesses.length}</Badge>
+                          </div>
+                          <p className="text-sm text-muted-foreground">
+                            {t('harnessInspection.myKit.description', 'Your personal assigned equipment')}
+                          </p>
+                          <div className="grid gap-2">
+                            {myKitHarnesses.map((item: any) => (
+                              <Card 
+                                key={`kit-${item.assignmentId}`}
+                                className="hover-elevate active-elevate-2 cursor-pointer border-primary/30 bg-primary/5"
+                                onClick={() => handleHarnessSelection({
+                                  id: item.gearItemId,
+                                  equipmentType: item.equipmentType,
+                                  brand: item.brand,
+                                  model: item.model,
+                                  serialNumbers: item.serialNumbers,
+                                  dateInService: item.dateInService,
+                                })}
+                                data-testid={`kit-item-${item.assignmentId}`}
+                              >
+                                <CardContent className="p-3">
+                                  <div className="flex items-center gap-3">
+                                    <span className="material-icons text-primary text-2xl">verified_user</span>
+                                    <div className="flex-1 min-w-0">
+                                      <div className="font-medium text-sm">
+                                        {item.equipmentType}
+                                        {(item.brand || item.model) && (
+                                          <span className="text-muted-foreground font-normal"> - {item.brand} {item.model}</span>
+                                        )}
+                                      </div>
+                                      {item.serialNumber && (
+                                        <div className="text-xs font-mono text-muted-foreground">
+                                          {t('harnessInspection.serialNumber', 'S/N')}: {item.serialNumber}
+                                        </div>
+                                      )}
+                                    </div>
+                                    <Badge variant="outline" className="text-xs bg-primary/10">{t('harnessInspection.myKit.badge', 'My Kit')}</Badge>
                                   </div>
-                                  {(harness.brand || harness.model) && (
-                                    <div className="text-sm text-muted-foreground mb-1">
-                                      {harness.brand} {harness.model}
+                                </CardContent>
+                              </Card>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Divider if both sections have items */}
+                      {myKitHarnesses.length > 0 && availableHarnesses.length > 0 && (
+                        <div className="relative py-2">
+                          <div className="absolute inset-0 flex items-center">
+                            <span className="w-full border-t" />
+                          </div>
+                          <div className="relative flex justify-center text-xs uppercase">
+                            <span className="bg-background px-2 text-muted-foreground">
+                              {t('harnessInspection.orFromInventory', 'or select from inventory')}
+                            </span>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Full Inventory Section */}
+                      {availableHarnesses.length > 0 ? (
+                        <div className="space-y-3">
+                          <div className="flex items-center gap-2">
+                            <Package className="h-5 w-5 text-muted-foreground" />
+                            <h3 className="font-semibold text-muted-foreground">{t('harnessInspection.inventory.title', 'Company Inventory')}</h3>
+                            <Badge variant="outline" className="ml-auto">{availableHarnesses.length}</Badge>
+                          </div>
+                          <div className="grid gap-2">
+                            {availableHarnesses.map((harness: any) => (
+                              <Card 
+                                key={harness.id}
+                                className="hover-elevate active-elevate-2 cursor-pointer"
+                                onClick={() => handleHarnessSelection(harness)}
+                                data-testid={`harness-card-${harness.id}`}
+                              >
+                                <CardContent className="p-3">
+                                  <div className="flex items-center gap-3">
+                                    <span className="material-icons text-muted-foreground text-2xl">safety_check</span>
+                                    <div className="flex-1 min-w-0">
+                                      <div className="font-medium text-sm">
+                                        {harness.equipmentType}
+                                        {(harness.brand || harness.model) && (
+                                          <span className="text-muted-foreground font-normal"> - {harness.brand} {harness.model}</span>
+                                        )}
+                                      </div>
+                                      {harness.serialNumbers && harness.serialNumbers.length > 0 && (
+                                        <div className="text-xs font-mono text-muted-foreground">
+                                          {t('harnessInspection.serialNumber', 'S/N')}: {harness.serialNumbers[0]}
+                                        </div>
+                                      )}
                                     </div>
-                                  )}
-                                  {harness.serialNumbers && harness.serialNumbers.length > 0 && (
-                                    <div className="text-sm font-mono bg-muted px-2 py-1 rounded inline-block">
-                                      {t('harnessInspection.serialNumber', 'S/N')}: {harness.serialNumbers[0]}
-                                    </div>
-                                  )}
-                                  {harness.dateInService && (
-                                    <div className="text-xs text-muted-foreground mt-1">
-                                      {t('harnessInspection.inService', 'In service')}: {new Date(harness.dateInService).toLocaleDateString()}
-                                    </div>
-                                  )}
-                                </div>
-                                <CheckCircle2 className="h-5 w-5 text-success flex-shrink-0" />
-                              </div>
-                            </CardContent>
-                          </Card>
-                        ))
-                      ) : (
+                                    <CheckCircle2 className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+                                  </div>
+                                </CardContent>
+                              </Card>
+                            ))}
+                          </div>
+                        </div>
+                      ) : myKitHarnesses.length === 0 ? (
                         <div className="text-center py-8">
                           <Package className="mx-auto h-12 w-12 text-muted-foreground mb-3" />
                           <p className="text-sm text-muted-foreground">
@@ -431,7 +510,7 @@ export default function HarnessInspectionForm() {
                             {t('harnessInspection.addHarnesses', 'Add harnesses to your inventory to inspect them.')}
                           </p>
                         </div>
-                      )}
+                      ) : null}
                     </div>
                   </DialogContent>
                 </Dialog>

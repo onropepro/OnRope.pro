@@ -6582,6 +6582,71 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get current user's kit (their assigned gear with full details)
+  app.get("/api/my-kit", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      const companyId = currentUser.role === "company" ? currentUser.id : currentUser.companyId;
+      
+      if (!companyId) {
+        return res.status(400).json({ message: "Unable to determine company" });
+      }
+      
+      // Get all gear assignments for the current user
+      const userAssignments = await db
+        .select()
+        .from(gearAssignments)
+        .where(eq(gearAssignments.employeeId, currentUser.id));
+      
+      // Get full gear item details for each assignment
+      const kitItems = await Promise.all(
+        userAssignments.map(async (assignment) => {
+          const [gearItem] = await db
+            .select()
+            .from(gearItems)
+            .where(eq(gearItems.id, assignment.gearItemId));
+          
+          // Get serial numbers for this item
+          const serialNumbers = await db
+            .select()
+            .from(gearSerialNumbers)
+            .where(eq(gearSerialNumbers.gearItemId, assignment.gearItemId));
+          
+          return {
+            assignmentId: assignment.id,
+            gearItemId: gearItem?.id,
+            equipmentType: gearItem?.equipmentType,
+            brand: gearItem?.brand,
+            model: gearItem?.model,
+            quantity: assignment.quantity,
+            serialNumber: assignment.serialNumber || (serialNumbers.length > 0 ? serialNumbers[0].serialNumber : null),
+            serialNumbers: serialNumbers.map(sn => sn.serialNumber),
+            dateInService: assignment.dateInService || gearItem?.dateInService,
+            dateOfManufacture: assignment.dateOfManufacture || gearItem?.dateOfManufacture,
+            inService: gearItem?.inService,
+          };
+        })
+      );
+      
+      // Filter out any items where gear wasn't found
+      const validKitItems = kitItems.filter(item => item.gearItemId);
+      
+      res.json({ 
+        kit: validKitItems,
+        employeeName: currentUser.name,
+        employeeId: currentUser.id
+      });
+    } catch (error) {
+      console.error("Get my kit error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
   // Self-assign gear - allows any employee to assign gear to themselves
   app.post("/api/gear-assignments/self", requireAuth, async (req: Request, res: Response) => {
     try {
