@@ -3956,6 +3956,13 @@
       "reopening": "Reopening...",
       "deleteProject": "Delete Project"
     },
+    "quickActions": {
+      "title": "Quick Actions",
+      "harnessInspection": "Harness Inspection",
+      "toolboxMeeting": "Toolbox Meeting",
+      "flha": "FLHA Form",
+      "incidentReport": "Incident Report"
+    },
     "dialogs": {
       "deleteProject": {
         "title": "Delete Project",

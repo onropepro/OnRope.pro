@@ -3956,6 +3956,13 @@
       "reopening": "Réouverture...",
       "deleteProject": "Supprimer le projet"
     },
+    "quickActions": {
+      "title": "Actions rapides",
+      "harnessInspection": "Inspection du harnais",
+      "toolboxMeeting": "Réunion de boîte à outils",
+      "flha": "Formulaire AERT",
+      "incidentReport": "Rapport d'incident"
+    },
     "dialogs": {
       "deleteProject": {
         "title": "Supprimer le projet",
