@@ -11,7 +11,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { queryClient } from "@/lib/queryClient";
-import { Rocket, Play, Building2, Clock, DollarSign, Users, Shield, FileText, Calculator, FileSpreadsheet, Radio, ClipboardCheck, MessageSquare, Home, Award, Calendar, FolderOpen } from "lucide-react";
+import { Rocket, Play, Building2, Clock, DollarSign, Users, Shield, FileText, Calculator, FileSpreadsheet, Radio, ClipboardCheck, MessageSquare, Home, Award, Calendar, FolderOpen, Globe } from "lucide-react";
 import ropeAccessProLogo from "@assets/generated_images/Blue_rope_access_worker_logo_ac1aa8fd.png";
 
 const loginSchema = z.object({
@@ -22,12 +22,30 @@ const loginSchema = z.object({
 type LoginFormData = z.infer<typeof loginSchema>;
 
 export default function Login() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { toast } = useToast();
   const [, setLocation] = useLocation();
   const [showLoginForm, setShowLoginForm] = useState(false);
   const [currentWordIndex, setCurrentWordIndex] = useState(0);
   const [isAnimating, setIsAnimating] = useState(false);
+  const [landingLanguage, setLandingLanguage] = useState<'en' | 'fr'>('en');
+
+  // Initialize landing page language from its own storage key (separate from user preference)
+  useEffect(() => {
+    const savedLandingLang = localStorage.getItem('landingPageLang') as 'en' | 'fr' | null;
+    // Default to English for landing page, only use French if explicitly set
+    const lang = savedLandingLang || 'en';
+    setLandingLanguage(lang);
+    i18n.changeLanguage(lang);
+  }, [i18n]);
+
+  // Toggle language for landing page only
+  const toggleLandingLanguage = () => {
+    const newLang = landingLanguage === 'en' ? 'fr' : 'en';
+    setLandingLanguage(newLang);
+    localStorage.setItem('landingPageLang', newLang);
+    i18n.changeLanguage(newLang);
+  };
 
   const rotatingWords = [
     t('login.rotatingWords.project', 'project'),
@@ -158,6 +176,16 @@ export default function Login() {
           <span className="font-bold text-lg">OnRopePro</span>
         </div>
         <div className="flex items-center gap-3">
+          <Button 
+            variant="ghost"
+            size="sm"
+            onClick={toggleLandingLanguage}
+            className="gap-1.5"
+            data-testid="button-language-toggle"
+          >
+            <Globe className="w-4 h-4" />
+            {landingLanguage === 'en' ? 'FR' : 'EN'}
+          </Button>
           <Button 
             variant="ghost"
             onClick={() => setShowLoginForm(true)}

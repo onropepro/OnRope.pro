@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { useLocation } from "wouter";
 import { useState, useMemo, useEffect, useRef } from "react";
+import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -64,6 +65,7 @@ function FitBounds({ markers }: { markers: any[] }) {
 }
 
 export default function ActiveWorkers() {
+  const { t } = useTranslation();
   const [, setLocation] = useLocation();
   const [timeFilter, setTimeFilter] = useState<"today" | "week">("today");
 
@@ -184,7 +186,7 @@ export default function ActiveWorkers() {
     return (
       <div className="min-h-screen gradient-bg dot-pattern flex items-center justify-center">
         <div className="text-center">
-          <div className="text-lg font-medium">Loading...</div>
+          <div className="text-lg font-medium">{t('common.loading', 'Loading...')}</div>
         </div>
       </div>
     );
@@ -205,13 +207,13 @@ export default function ActiveWorkers() {
               <span className="material-icons">arrow_back</span>
             </Button>
             <div className="flex-1 min-w-0">
-              <h1 className="text-lg sm:text-2xl font-bold truncate">Active Workers</h1>
+              <h1 className="text-lg sm:text-2xl font-bold truncate">{t('activeWorkers.title', 'Active Workers')}</h1>
               <p className="text-xs sm:text-sm text-muted-foreground hidden sm:block">
-                Real-time view of who's working where
+                {t('activeWorkers.subtitle', "Real-time view of who's working where")}
               </p>
             </div>
             <Badge variant="secondary" className="text-sm sm:text-lg px-3 sm:px-4 py-1 sm:py-2 flex-shrink-0">
-              {activeWorkers.length} active
+              {activeWorkers.length} {t('activeWorkers.active', 'active')}
             </Badge>
           </div>
         </div>
@@ -222,11 +224,11 @@ export default function ActiveWorkers() {
           <TabsList className="grid w-full max-w-2xl mx-auto grid-cols-2 mb-6">
             <TabsTrigger value="workers" data-testid="tab-workers">
               <span className="material-icons text-sm mr-2">people</span>
-              Workers
+              {t('activeWorkers.workers', 'Workers')}
             </TabsTrigger>
             <TabsTrigger value="locations" data-testid="tab-locations">
               <span className="material-icons text-sm mr-2">map</span>
-              GPS Locations
+              {t('activeWorkers.gpsLocations', 'GPS Locations')}
             </TabsTrigger>
           </TabsList>
 
@@ -237,9 +239,9 @@ export default function ActiveWorkers() {
                   <span className="material-icons text-6xl text-muted-foreground mb-4">
                     work_off
                   </span>
-                  <h3 className="text-xl font-bold mb-2">No Active Workers</h3>
+                  <h3 className="text-xl font-bold mb-2">{t('activeWorkers.noActiveWorkers', 'No Active Workers')}</h3>
                   <p className="text-muted-foreground">
-                    No one is currently clocked in on any projects
+                    {t('activeWorkers.noWorkersMessage', 'No one is currently clocked in on any projects')}
                   </p>
                 </CardContent>
               </Card>
@@ -272,18 +274,18 @@ export default function ActiveWorkers() {
                               <Badge 
                                 variant={hasTodayInspection ? "default" : "destructive"}
                                 className="flex items-center gap-1"
-                                title={hasTodayInspection ? "Harness inspection completed" : "Harness inspection missing"}
+                                title={hasTodayInspection ? t('activeWorkers.harnessCompleted', 'Harness inspection completed') : t('activeWorkers.harnessMissing', 'Harness inspection missing')}
                               >
                                 <span className="material-icons text-xs">
                                   {hasTodayInspection ? 'verified' : 'warning'}
                                 </span>
-                                {hasTodayInspection ? 'Inspected' : 'Not Inspected'}
+                                {hasTodayInspection ? t('activeWorkers.inspected', 'Inspected') : t('activeWorkers.notInspected', 'Not Inspected')}
                               </Badge>
                             );
                           })()}
                           <Badge variant="default" className="bg-primary">
                             <span className="material-icons text-xs mr-1">schedule</span>
-                            Active
+                            {t('activeWorkers.activeStatus', 'Active')}
                           </Badge>
                         </div>
                       </div>
@@ -292,7 +294,7 @@ export default function ActiveWorkers() {
                       <div className="grid grid-cols-2 gap-4">
                         <div>
                           <div className="text-sm font-medium text-muted-foreground mb-1">
-                            Started At
+                            {t('activeWorkers.startedAt', 'Started At')}
                           </div>
                           <div className="text-base font-medium flex items-center gap-1">
                             <span className="material-icons text-sm">login</span>
@@ -301,7 +303,7 @@ export default function ActiveWorkers() {
                         </div>
                         <div>
                           <div className="text-sm font-medium text-muted-foreground mb-1">
-                            Duration
+                            {t('activeWorkers.duration', 'Duration')}
                           </div>
                           <div className="text-base font-medium flex items-center gap-1">
                             <span className="material-icons text-sm">timer</span>

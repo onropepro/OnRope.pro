@@ -1238,6 +1238,11 @@
     "ropeAccessPlan": "Plan d'accès sur corde",
     "toolboxMeeting": "Réunion de sécurité"
   },
+  "notFound": {
+    "title": "Page non trouvée",
+    "description": "La page que vous recherchez n'existe pas.",
+    "goHome": "Retour à l'accueil"
+  },
   "workHistory": {
     "title": "Historique de travail",
     "backToDashboard": "Retour au tableau de bord",

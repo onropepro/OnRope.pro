@@ -10,7 +10,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage, FormDescription } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Globe } from "lucide-react";
 import { Link } from "wouter";
 
 const residentSchema = z.object({
@@ -64,9 +64,27 @@ type CompanyFormData = z.infer<typeof companySchema>;
 type PropertyManagerFormData = z.infer<typeof propertyManagerSchema>;
 
 export default function Register() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [activeTab, setActiveTab] = useState<"resident" | "company" | "property_manager">("resident");
   const [, setLocation] = useLocation();
+  const [landingLanguage, setLandingLanguage] = useState<'en' | 'fr'>('en');
+
+  // Initialize landing page language from its own storage key (separate from user preference)
+  useEffect(() => {
+    const savedLandingLang = localStorage.getItem('landingPageLang') as 'en' | 'fr' | null;
+    // Default to English for landing page, only use French if explicitly set
+    const lang = savedLandingLang || 'en';
+    setLandingLanguage(lang);
+    i18n.changeLanguage(lang);
+  }, [i18n]);
+
+  // Toggle language for landing page only
+  const toggleLandingLanguage = () => {
+    const newLang = landingLanguage === 'en' ? 'fr' : 'en';
+    setLandingLanguage(newLang);
+    localStorage.setItem('landingPageLang', newLang);
+    i18n.changeLanguage(newLang);
+  };
 
   // Check if user is already logged in and redirect appropriately
   const { data: userData, isLoading: isCheckingAuth, error: authError } = useQuery<{ user: any }>({
@@ -233,12 +251,22 @@ export default function Register() {
     <div className="min-h-screen bg-background flex items-center justify-center p-4">
       <Card className="w-full max-w-md">
         <CardHeader className="space-y-2">
-          <div className="flex items-center gap-2 mb-2">
+          <div className="flex items-center justify-between mb-2">
             <Link href="/login">
               <Button variant="ghost" size="icon" data-testid="button-back">
                 <ArrowLeft className="h-5 w-5" />
               </Button>
             </Link>
+            <Button 
+              variant="ghost"
+              size="sm"
+              onClick={toggleLandingLanguage}
+              className="gap-1.5"
+              data-testid="button-language-toggle"
+            >
+              <Globe className="w-4 h-4" />
+              {landingLanguage === 'en' ? 'FR' : 'EN'}
+            </Button>
           </div>
           <CardTitle className="text-2xl font-bold text-center">{t('register.title', 'Create Account')}</CardTitle>
           <CardDescription className="text-center">{t('register.subtitle', 'Choose your account type to get started')}</CardDescription>
