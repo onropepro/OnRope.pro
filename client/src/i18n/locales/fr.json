@@ -1228,9 +1228,24 @@
     "filterByDate": "Filtrer par date",
     "allProjects": "Tous les projets",
     "allEmployees": "Tous les employés",
-    "noSessions": "Aucune session de travail trouvée",
+    "noSessions": "Aucune session de travail enregistrée",
     "hours": "heures",
-    "drops": "descentes",
-    "date": "Date"
+    "drops": "Descentes",
+    "date": "Date",
+    "generateSampleData": "Générer des données d'exemple",
+    "projectProgress": "Progression du projet",
+    "overallProgress": "Progression globale",
+    "dropsCompleted": "{{completed}} sur {{total}} descentes complétées",
+    "targetPerformance": "Performance par rapport à l'objectif",
+    "targetMet": "Objectif atteint",
+    "belowTarget": "Sous l'objectif",
+    "hoursBreakdown": "Répartition des heures",
+    "billableHours": "Heures facturables",
+    "nonBillableHours": "Heures non facturables",
+    "totalHours": "Total des heures",
+    "sessionHistory": "Historique des sessions",
+    "tech": "Tech",
+    "gpsAvailable": "Localisation GPS disponible",
+    "target": "objectif"
   }
 }

@@ -1228,9 +1228,24 @@
     "filterByDate": "Filter by Date",
     "allProjects": "All Projects",
     "allEmployees": "All Employees",
-    "noSessions": "No work sessions found",
+    "noSessions": "No work sessions recorded yet",
     "hours": "hours",
-    "drops": "drops",
-    "date": "Date"
+    "drops": "Drops",
+    "date": "Date",
+    "generateSampleData": "Generate Sample Data",
+    "projectProgress": "Project Progress",
+    "overallProgress": "Overall Progress",
+    "dropsCompleted": "{{completed}} of {{total}} drops completed",
+    "targetPerformance": "Target Performance",
+    "targetMet": "Target Met",
+    "belowTarget": "Below Target",
+    "hoursBreakdown": "Hours Breakdown",
+    "billableHours": "Billable Hours",
+    "nonBillableHours": "Non-Billable Hours",
+    "totalHours": "Total Hours",
+    "sessionHistory": "Session History",
+    "tech": "Tech",
+    "gpsAvailable": "GPS location available",
+    "target": "target"
   }
 }

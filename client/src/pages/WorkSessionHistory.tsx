@@ -1,5 +1,6 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useLocation, useRoute } from "wouter";
+import { useTranslation } from "react-i18next";
 import { hasFinancialAccess } from "@/lib/permissions";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -16,6 +17,7 @@ import { useToast } from "@/hooks/use-toast";
 import { SessionDetailsDialog } from "@/components/SessionDetailsDialog";
 
 export default function WorkSessionHistory() {
+  const { t } = useTranslation();
   const [, params] = useRoute("/projects/:id/work-sessions");
   const [, setLocation] = useLocation();
   const projectId = params?.id;
@@ -202,7 +204,7 @@ export default function WorkSessionHistory() {
           </Button>
           <div className="flex-1">
             <h1 className="text-2xl font-bold">{project.buildingName || project.strataPlanNumber}</h1>
-            <p className="text-sm text-muted-foreground">Work Session History</p>
+            <p className="text-sm text-muted-foreground">{t('workHistory.workSessionHistory', 'Work Session History')}</p>
           </div>
           {user?.role === "company" && (
             <Button
@@ -213,7 +215,7 @@ export default function WorkSessionHistory() {
               data-testid="button-generate-sample"
             >
               <Sparkles className="h-4 w-4 mr-2" />
-              {generateSampleMutation.isPending ? "Generating..." : "Generate Sample Data"}
+              {generateSampleMutation.isPending ? t('common.generating', 'Generating...') : t('workHistory.generateSampleData', 'Generate Sample Data')}
             </Button>
           )}
         </div>
@@ -221,7 +223,7 @@ export default function WorkSessionHistory() {
         {/* Project Overview */}
         <Card>
           <CardHeader>
-            <CardTitle>Project Progress</CardTitle>
+            <CardTitle>{t('workHistory.projectProgress', 'Project Progress')}</CardTitle>
           </CardHeader>
           <CardContent className="space-y-6">
             {/* Building Visualization */}
@@ -242,12 +244,12 @@ export default function WorkSessionHistory() {
             {/* Progress Stats */}
             <div className="space-y-2">
               <div className="flex justify-between text-sm">
-                <span className="text-muted-foreground">Overall Progress</span>
+                <span className="text-muted-foreground">{t('workHistory.overallProgress', 'Overall Progress')}</span>
                 <span className="font-medium">{progressPercent}%</span>
               </div>
               <Progress value={progressPercent} className="h-2" />
               <p className="text-xs text-muted-foreground text-center">
-                {completedDrops} of {totalDrops} drops completed
+                {t('workHistory.dropsCompleted', '{{completed}} of {{total}} drops completed', { completed: completedDrops, total: totalDrops })}
               </p>
             </div>
           </CardContent>
@@ -257,7 +259,7 @@ export default function WorkSessionHistory() {
         {isManagement && completedSessions.length > 0 && (
           <Card>
             <CardHeader>
-              <CardTitle>Target Performance</CardTitle>
+              <CardTitle>{t('workHistory.targetPerformance', 'Target Performance')}</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="flex flex-col items-center">
@@ -286,11 +288,11 @@ export default function WorkSessionHistory() {
                 <div className="grid grid-cols-2 gap-4 mt-4 w-full max-w-sm">
                   <div className="text-center">
                     <div className="text-2xl font-bold text-primary">{targetMetCount}</div>
-                    <div className="text-sm text-muted-foreground">Target Met</div>
+                    <div className="text-sm text-muted-foreground">{t('workHistory.targetMet', 'Target Met')}</div>
                   </div>
                   <div className="text-center">
                     <div className="text-2xl font-bold text-destructive">{belowTargetCount}</div>
-                    <div className="text-sm text-muted-foreground">Below Target</div>
+                    <div className="text-sm text-muted-foreground">{t('workHistory.belowTarget', 'Below Target')}</div>
                   </div>
                 </div>
               </div>
@@ -302,7 +304,7 @@ export default function WorkSessionHistory() {
         {isManagement && (billableHours > 0 || nonBillableHours > 0) && (
           <Card>
             <CardHeader>
-              <CardTitle>Hours Breakdown</CardTitle>
+              <CardTitle>{t('workHistory.hoursBreakdown', 'Hours Breakdown')}</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="flex flex-col items-center">
@@ -331,15 +333,15 @@ export default function WorkSessionHistory() {
                 <div className="grid grid-cols-2 gap-4 mt-4 w-full max-w-sm">
                   <div className="text-center">
                     <div className="text-2xl font-bold text-primary">{billableHours.toFixed(2)}h</div>
-                    <div className="text-sm text-muted-foreground">Billable Hours</div>
+                    <div className="text-sm text-muted-foreground">{t('workHistory.billableHours', 'Billable Hours')}</div>
                   </div>
                   <div className="text-center">
                     <div className="text-2xl font-bold" style={{ color: "hsl(var(--chart-2))" }}>{nonBillableHours.toFixed(2)}h</div>
-                    <div className="text-sm text-muted-foreground">Non-Billable Hours</div>
+                    <div className="text-sm text-muted-foreground">{t('workHistory.nonBillableHours', 'Non-Billable Hours')}</div>
                   </div>
                 </div>
                 <div className="mt-4 text-center">
-                  <div className="text-lg font-semibold">Total Hours: {(billableHours + nonBillableHours).toFixed(2)}h</div>
+                  <div className="text-lg font-semibold">{t('workHistory.totalHours', 'Total Hours')}: {(billableHours + nonBillableHours).toFixed(2)}h</div>
                 </div>
               </div>
             </CardContent>
@@ -349,12 +351,12 @@ export default function WorkSessionHistory() {
         {/* Work Sessions List - Organized by Year/Month/Day */}
         <Card>
           <CardHeader>
-            <CardTitle>Session History ({allWorkSessions.length} total)</CardTitle>
+            <CardTitle>{t('workHistory.sessionHistory', 'Session History')} ({allWorkSessions.length} {t('common.total', 'total')})</CardTitle>
           </CardHeader>
           <CardContent>
             {allWorkSessions.length === 0 ? (
               <p className="text-center text-muted-foreground py-8">
-                No work sessions recorded yet
+                {t('workHistory.noSessions', 'No work sessions recorded yet')}
               </p>
             ) : (
               <div className="space-y-4">
@@ -458,23 +460,23 @@ export default function WorkSessionHistory() {
                                               <div className="space-y-1">
                                                 <div className="flex items-center gap-2 flex-wrap">
                                                   <p className="font-medium text-sm">
-                                                    Tech: {session.techName || "Unknown"}
+                                                    {t('workHistory.tech', 'Tech')}: {session.techName || t('common.unknown', 'Unknown')}
                                                   </p>
                                                   {hasLocation && (
-                                                    <MapPin className="h-4 w-4 text-primary" title="GPS location available" />
+                                                    <MapPin className="h-4 w-4 text-primary" title={t('workHistory.gpsAvailable', 'GPS location available')} />
                                                   )}
                                                   {isCompleted ? (
                                                     <Badge variant={metTarget ? "default" : "destructive"} data-testid={`badge-${metTarget ? "met" : "below"}-target`}>
-                                                      {metTarget ? "Target Met" : "Below Target"}
+                                                      {metTarget ? t('workHistory.targetMet', 'Target Met') : t('workHistory.belowTarget', 'Below Target')}
                                                     </Badge>
                                                   ) : (
-                                                    <Badge variant="outline">In Progress</Badge>
+                                                    <Badge variant="outline">{t('common.inProgress', 'In Progress')}</Badge>
                                                   )}
                                                 </div>
                                                 {isCompleted && (
                                                   <>
                                                     <p className="text-sm">
-                                                      Drops: {sessionDrops} / {project.dailyDropTarget} target
+                                                      {t('workHistory.drops', 'Drops')}: {sessionDrops} / {project.dailyDropTarget} {t('workHistory.target', 'target')}
                                                     </p>
                                                     <p className="text-xs text-muted-foreground">
                                                       {format(new Date(session.startTime), "h:mm a")} -{" "}
@@ -482,7 +484,7 @@ export default function WorkSessionHistory() {
                                                     </p>
                                                     {session.shortfallReason && (
                                                       <p className="text-sm text-muted-foreground italic">
-                                                        Note: {session.shortfallReason}
+                                                        {t('common.note', 'Note')}: {session.shortfallReason}
                                                       </p>
                                                     )}
                                                   </>
