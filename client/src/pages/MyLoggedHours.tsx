@@ -13,6 +13,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, Di
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 
 const getTaskLabel = (taskId: string): string => {
   const task = IRATA_TASK_TYPES.find(t => t.id === taskId);
@@ -46,6 +47,7 @@ const getTaskIcon = (taskId: string): string => {
 };
 
 export default function MyLoggedHours() {
+  const { t } = useTranslation();
   const [, setLocation] = useLocation();
   const { toast } = useToast();
   const [showBaselineDialog, setShowBaselineDialog] = useState(false);
@@ -151,7 +153,7 @@ export default function MyLoggedHours() {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
-          <div className="text-lg font-medium">Loading your logged hours...</div>
+          <div className="text-lg font-medium">{t('loggedHours.loading', 'Loading your logged hours...')}</div>
         </div>
       </div>
     );
@@ -171,9 +173,9 @@ export default function MyLoggedHours() {
               <span className="material-icons">arrow_back</span>
             </Button>
             <div>
-              <h1 className="text-lg sm:text-xl font-bold tracking-tight">My Logged Hours</h1>
+              <h1 className="text-lg sm:text-xl font-bold tracking-tight">{t('loggedHours.title', 'My Logged Hours')}</h1>
               <p className="text-xs text-muted-foreground mt-0.5">
-                IRATA Logbook
+                {t('loggedHours.subtitle', 'IRATA Logbook')}
               </p>
             </div>
           </div>
@@ -184,14 +186,14 @@ export default function MyLoggedHours() {
               {currentUser?.irataLevel && (
                 <Badge variant="outline" className="flex items-center gap-1 text-xs">
                   <span className="material-icons text-xs">verified</span>
-                  Level {currentUser.irataLevel}
+                  {t('loggedHours.level', 'Level')} {currentUser.irataLevel}
                 </Badge>
               )}
             </div>
             {currentUser?.irataLicenseNumber && (
               <div className="flex items-center gap-1.5 text-xs sm:text-sm text-muted-foreground">
                 <span className="material-icons text-xs">badge</span>
-                <span>License:</span>
+                <span>{t('loggedHours.license', 'License')}:</span>
                 <span className="font-medium text-foreground" data-testid="text-irata-license">{currentUser.irataLicenseNumber}</span>
               </div>
             )}
@@ -205,18 +207,18 @@ export default function MyLoggedHours() {
             <CardHeader className="pb-3">
               <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
                 <span className="material-icons text-lg text-primary">schedule</span>
-                Total Logbook Hours
+                {t('loggedHours.totalLogbookHours', 'Total Logbook Hours')}
               </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="text-3xl font-bold text-primary">{totalHours.toFixed(1)}</div>
               <div className="text-xs text-muted-foreground mt-2 space-y-0.5">
                 <div className="flex items-center justify-between">
-                  <span>Prior logbook hours:</span>
+                  <span>{t('loggedHours.priorLogbookHoursLabel', 'Prior logbook hours')}:</span>
                   <span className="font-medium">{baselineHours.toFixed(1)}</span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span>Hours from this system:</span>
+                  <span>{t('loggedHours.hoursFromSystem', 'Hours from this system')}:</span>
                   <span className="font-medium">{loggedHours.toFixed(1)}</span>
                 </div>
               </div>
@@ -227,7 +229,7 @@ export default function MyLoggedHours() {
             <CardHeader className="pb-3">
               <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
                 <span className="material-icons text-lg">book</span>
-                Prior Logbook Hours
+                {t('loggedHours.priorLogbookHours', 'Prior Logbook Hours')}
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -240,7 +242,7 @@ export default function MyLoggedHours() {
                 data-testid="button-set-baseline-hours"
               >
                 <span className="material-icons text-sm mr-1">edit</span>
-                {baselineHours > 0 ? "Update" : "Set"} Hours
+                {baselineHours > 0 ? t('loggedHours.updateHours', 'Update Hours') : t('loggedHours.setHours', 'Set Hours')}
               </Button>
             </CardContent>
           </Card>
@@ -249,13 +251,13 @@ export default function MyLoggedHours() {
             <CardHeader className="pb-3">
               <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
                 <span className="material-icons text-lg">assignment_turned_in</span>
-                Work Sessions
+                {t('loggedHours.workSessions', 'Work Sessions')}
               </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="text-3xl font-bold">{totalSessions}</div>
               <p className="text-xs text-muted-foreground mt-1">
-                Sessions logged in this system
+                {t('loggedHours.sessionsLogged', 'Sessions logged in this system')}
               </p>
             </CardContent>
           </Card>
@@ -264,7 +266,7 @@ export default function MyLoggedHours() {
             <CardHeader className="pb-3">
               <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
                 <span className="material-icons text-lg">trending_up</span>
-                Top Tasks
+                {t('loggedHours.topTasks', 'Top Tasks')}
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -278,7 +280,7 @@ export default function MyLoggedHours() {
                   ))}
                 </div>
               ) : (
-                <p className="text-sm text-muted-foreground">No tasks logged yet</p>
+                <p className="text-sm text-muted-foreground">{t('loggedHours.noTasksYet', 'No tasks logged yet')}</p>
               )}
             </CardContent>
           </Card>
@@ -289,7 +291,7 @@ export default function MyLoggedHours() {
             <CardHeader>
               <CardTitle className="text-lg flex items-center gap-2">
                 <span className="material-icons">bar_chart</span>
-                Task Breakdown
+                {t('loggedHours.taskBreakdown', 'Task Breakdown')}
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -318,17 +320,16 @@ export default function MyLoggedHours() {
           <CardHeader>
             <CardTitle className="text-lg flex items-center gap-2">
               <span className="material-icons">history</span>
-              Session History by Project
+              {t('loggedHours.sessionHistoryByProject', 'Session History by Project')}
             </CardTitle>
           </CardHeader>
           <CardContent>
             {logs.length === 0 ? (
               <div className="text-center py-12">
                 <span className="material-icons text-6xl text-muted-foreground/30">assignment</span>
-                <h3 className="text-lg font-medium mt-4">No logged hours yet</h3>
+                <h3 className="text-lg font-medium mt-4">{t('loggedHours.noLoggedHoursYet', 'No logged hours yet')}</h3>
                 <p className="text-sm text-muted-foreground mt-2 max-w-md mx-auto">
-                  When you end a work session, you'll be prompted to log the IRATA tasks you performed. 
-                  Your logged hours will appear here for your IRATA certification logbook.
+                  {t('loggedHours.noLoggedHoursDesc', "When you end a work session, you'll be prompted to log the IRATA tasks you performed. Your logged hours will appear here for your IRATA certification logbook.")}
                 </p>
               </div>
             ) : (
@@ -415,24 +416,24 @@ export default function MyLoggedHours() {
             <CardHeader>
               <CardTitle className="text-lg flex items-center gap-2">
                 <span className="material-icons">info</span>
-                IRATA Certification Info
+                {t('loggedHours.irataCertInfo', 'IRATA Certification Info')}
               </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
                 <div>
-                  <div className="text-xs text-muted-foreground">Current Level</div>
+                  <div className="text-xs text-muted-foreground">{t('loggedHours.currentLevel', 'Current Level')}</div>
                   <div className="font-semibold">{currentUser.irataLevel}</div>
                 </div>
                 {currentUser.irataLicenseNumber && (
                   <div>
-                    <div className="text-xs text-muted-foreground">License Number</div>
+                    <div className="text-xs text-muted-foreground">{t('loggedHours.licenseNumber', 'License Number')}</div>
                     <div className="font-semibold">{currentUser.irataLicenseNumber}</div>
                   </div>
                 )}
                 {currentUser.irataIssuedDate && (
                   <div>
-                    <div className="text-xs text-muted-foreground">Issued Date</div>
+                    <div className="text-xs text-muted-foreground">{t('loggedHours.issuedDate', 'Issued Date')}</div>
                     <div className="font-semibold">
                       {format(parseLocalDate(currentUser.irataIssuedDate), "MMM d, yyyy")}
                     </div>
@@ -440,7 +441,7 @@ export default function MyLoggedHours() {
                 )}
                 {currentUser.irataExpirationDate && (
                   <div>
-                    <div className="text-xs text-muted-foreground">Expires</div>
+                    <div className="text-xs text-muted-foreground">{t('loggedHours.expires', 'Expires')}</div>
                     <div className="font-semibold">
                       {format(parseLocalDate(currentUser.irataExpirationDate), "MMM d, yyyy")}
                     </div>
@@ -457,28 +458,28 @@ export default function MyLoggedHours() {
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <span className="material-icons">book</span>
-              Set Prior Logbook Hours
+              {t('loggedHours.setPriorHoursTitle', 'Set Prior Logbook Hours')}
             </DialogTitle>
             <DialogDescription>
-              Enter the total number of hours you have recorded in your IRATA logbook before using this system. This will be added to your hours logged here to show your complete total.
+              {t('loggedHours.setPriorHoursDesc', 'Enter the total number of hours you have recorded in your IRATA logbook before using this system. This will be added to your hours logged here to show your complete total.')}
             </DialogDescription>
           </DialogHeader>
           
           <div className="py-4">
             <label className="text-sm font-medium block mb-2">
-              Total hours from your existing logbook
+              {t('loggedHours.totalHoursFromLogbook', 'Total hours from your existing logbook')}
             </label>
             <Input
               type="number"
               step="0.5"
               min="0"
-              placeholder="e.g., 250"
+              placeholder={t('loggedHours.hoursPlaceholder', 'e.g., 250')}
               value={baselineInput}
               onChange={(e) => setBaselineInput(e.target.value)}
               data-testid="input-baseline-hours"
             />
             <p className="text-xs text-muted-foreground mt-2">
-              This is the total number of hours you have accumulated before starting to use this system.
+              {t('loggedHours.hoursAccumulatedNote', 'This is the total number of hours you have accumulated before starting to use this system.')}
             </p>
           </div>
 
@@ -488,7 +489,7 @@ export default function MyLoggedHours() {
               onClick={() => setShowBaselineDialog(false)}
               data-testid="button-cancel-baseline"
             >
-              Cancel
+              {t('common.cancel', 'Cancel')}
             </Button>
             <Button 
               onClick={handleSaveBaselineHours}
@@ -498,12 +499,12 @@ export default function MyLoggedHours() {
               {updateBaselineHoursMutation.isPending ? (
                 <>
                   <span className="material-icons animate-spin text-sm mr-1">refresh</span>
-                  Saving...
+                  {t('common.saving', 'Saving...')}
                 </>
               ) : (
                 <>
                   <span className="material-icons text-sm mr-1">save</span>
-                  Save Hours
+                  {t('loggedHours.saveHours', 'Save Hours')}
                 </>
               )}
             </Button>

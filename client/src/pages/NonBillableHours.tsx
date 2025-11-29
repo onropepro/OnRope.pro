@@ -9,8 +9,10 @@ import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { queryClient, apiRequest } from "@/lib/queryClient";
+import { useTranslation } from "react-i18next";
 
 export default function NonBillableHours() {
+  const { t } = useTranslation();
   const [, setLocation] = useLocation();
   const { toast } = useToast();
   const [description, setDescription] = useState("");
@@ -46,13 +48,13 @@ export default function NonBillableHours() {
       queryClient.invalidateQueries({ queryKey: ["/api/non-billable-sessions/active"] });
       setDescription("");
       toast({
-        title: "Non-billable session started",
-        description: "Your non-billable work session has been started",
+        title: t('nonBillable.sessionStarted', 'Non-billable session started'),
+        description: t('nonBillable.sessionStartedDesc', 'Your non-billable work session has been started'),
       });
     },
     onError: (error: Error) => {
       toast({
-        title: "Error",
+        title: t('common.error', 'Error'),
         description: error.message,
         variant: "destructive",
       });
@@ -67,13 +69,13 @@ export default function NonBillableHours() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/non-billable-sessions/active"] });
       toast({
-        title: "Session ended",
-        description: "Your non-billable work session has been ended",
+        title: t('nonBillable.sessionEnded', 'Session ended'),
+        description: t('nonBillable.sessionEndedDesc', 'Your non-billable work session has been ended'),
       });
     },
     onError: (error: Error) => {
       toast({
-        title: "Error",
+        title: t('common.error', 'Error'),
         description: error.message,
         variant: "destructive",
       });
@@ -83,8 +85,8 @@ export default function NonBillableHours() {
   const handleStartSession = () => {
     if (!description.trim()) {
       toast({
-        title: "Error",
-        description: "Please describe what you're working on",
+        title: t('common.error', 'Error'),
+        description: t('nonBillable.describeWork', "Please describe what you're working on"),
         variant: "destructive",
       });
       return;
@@ -127,9 +129,9 @@ export default function NonBillableHours() {
             <span className="material-icons text-xl">arrow_back</span>
           </Button>
           <div className="flex-1">
-            <h1 className="text-xl font-bold">Non-Billable Hours</h1>
+            <h1 className="text-xl font-bold">{t('nonBillable.title', 'Non-Billable Hours')}</h1>
             <p className="text-xs text-primary-foreground/90">
-              Track errands, training, and other non-project work
+              {t('nonBillable.subtitle', 'Track errands, training, and other non-project work')}
             </p>
           </div>
         </div>
@@ -144,7 +146,7 @@ export default function NonBillableHours() {
                 <div>
                   <CardTitle className="flex items-center gap-2">
                     <span className="material-icons text-primary animate-pulse">schedule</span>
-                    Active Session
+                    {t('nonBillable.activeSession', 'Active Session')}
                   </CardTitle>
                   <CardDescription className="mt-2">
                     {activeSession.description}
@@ -159,7 +161,7 @@ export default function NonBillableHours() {
               <div className="space-y-3">
                 <div className="flex items-center gap-2 text-sm text-muted-foreground">
                   <span className="material-icons text-base">today</span>
-                  <span>Started: {new Date(activeSession.startTime).toLocaleString()}</span>
+                  <span>{t('nonBillable.started', 'Started')}: {new Date(activeSession.startTime).toLocaleString()}</span>
                 </div>
                 
                 <Button
@@ -170,7 +172,7 @@ export default function NonBillableHours() {
                   data-testid="button-end-session"
                 >
                   <span className="material-icons mr-2">stop_circle</span>
-                  {endSessionMutation.isPending ? "Ending..." : "End Session"}
+                  {endSessionMutation.isPending ? t('nonBillable.ending', 'Ending...') : t('nonBillable.endSession', 'End Session')}
                 </Button>
               </div>
             </CardContent>
@@ -180,18 +182,18 @@ export default function NonBillableHours() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <span className="material-icons text-primary">add_circle</span>
-                Start New Session
+                {t('nonBillable.startNewSession', 'Start New Session')}
               </CardTitle>
               <CardDescription>
-                Log non-billable work like errands, training, meetings, or administrative tasks
+                {t('nonBillable.logDescription', 'Log non-billable work like errands, training, meetings, or administrative tasks')}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="description">What are you working on?</Label>
+                <Label htmlFor="description">{t('nonBillable.whatWorking', 'What are you working on?')}</Label>
                 <Textarea
                   id="description"
-                  placeholder="e.g., Picking up supplies, training, office work..."
+                  placeholder={t('nonBillable.placeholder', 'e.g., Picking up supplies, training, office work...')}
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
                   className="min-h-[100px]"
@@ -207,7 +209,7 @@ export default function NonBillableHours() {
                 data-testid="button-start-session"
               >
                 <span className="material-icons mr-2">play_circle</span>
-                {startSessionMutation.isPending ? "Starting..." : "Start Session"}
+                {startSessionMutation.isPending ? t('nonBillable.starting', 'Starting...') : t('nonBillable.startSession', 'Start Session')}
               </Button>
             </CardContent>
           </Card>
@@ -220,10 +222,9 @@ export default function NonBillableHours() {
               <div className="flex items-start gap-3">
                 <span className="material-icons text-primary mt-0.5">info</span>
                 <div>
-                  <p className="font-medium mb-1">About Non-Billable Hours</p>
+                  <p className="font-medium mb-1">{t('nonBillable.aboutTitle', 'About Non-Billable Hours')}</p>
                   <p className="text-sm text-muted-foreground">
-                    These hours are included in payroll but don't count toward project performance analytics.
-                    Use this for any work that isn't directly tied to a specific project.
+                    {t('nonBillable.aboutDescription', "These hours are included in payroll but don't count toward project performance analytics. Use this for any work that isn't directly tied to a specific project.")}
                   </p>
                 </div>
               </div>
@@ -231,10 +232,9 @@ export default function NonBillableHours() {
               <div className="flex items-start gap-3">
                 <span className="material-icons text-primary mt-0.5">schedule</span>
                 <div>
-                  <p className="font-medium mb-1">Time Tracking</p>
+                  <p className="font-medium mb-1">{t('nonBillable.timeTrackingTitle', 'Time Tracking')}</p>
                   <p className="text-sm text-muted-foreground">
-                    Your session time is tracked automatically from start to finish.
-                    Remember to end your session when you're done.
+                    {t('nonBillable.timeTrackingDescription', "Your session time is tracked automatically from start to finish. Remember to end your session when you're done.")}
                   </p>
                 </div>
               </div>
