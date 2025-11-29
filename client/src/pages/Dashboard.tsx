@@ -1,6 +1,7 @@
 // GPS Location Tracking - v2.0 - CACHE BUST
 import { useState, useEffect, useMemo, useRef, useContext } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useTranslation } from "react-i18next";
 import { BrandingContext } from "@/App";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { Button } from "@/components/ui/button";
@@ -461,6 +462,7 @@ function DeletedProjectsTab() {
 }
 
 export default function Dashboard() {
+  const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState("");
   
   const { brandColors: contextBrandColors, brandingActive } = useContext(BrandingContext);
@@ -1786,8 +1788,8 @@ export default function Dashboard() {
   const dashboardCards = useMemo(() => [
     {
       id: "projects",
-      label: "Projects",
-      description: "Active projects",
+      label: t('dashboard.cards.projects.label', 'Projects'),
+      description: t('dashboard.cards.projects.description', 'Active projects'),
       icon: "apartment",
       onClick: () => handleTabChange("projects"),
       testId: "button-nav-projects",
@@ -1796,8 +1798,8 @@ export default function Dashboard() {
     },
     {
       id: "non-billable-hours",
-      label: "Non-Billable Hours",
-      description: "Errands & training",
+      label: t('dashboard.cards.nonBillableHours.label', 'Non-Billable Hours'),
+      description: t('dashboard.cards.nonBillableHours.description', 'Errands & training'),
       icon: "schedule",
       onClick: () => setLocation("/non-billable-hours"),
       testId: "button-non-billable-hours",
@@ -1806,8 +1808,8 @@ export default function Dashboard() {
     },
     {
       id: "my-logged-hours",
-      label: "My Logged Hours",
-      description: "IRATA logbook",
+      label: t('dashboard.cards.myLoggedHours.label', 'My Logged Hours'),
+      description: t('dashboard.cards.myLoggedHours.description', 'IRATA logbook'),
       icon: "assignment",
       onClick: () => setLocation("/my-logged-hours"),
       testId: "button-my-logged-hours",
@@ -1816,8 +1818,8 @@ export default function Dashboard() {
     },
     {
       id: "past-projects",
-      label: "Past Projects",
-      description: "Completed work",
+      label: t('dashboard.cards.pastProjects.label', 'Past Projects'),
+      description: t('dashboard.cards.pastProjects.description', 'Completed work'),
       icon: "done_all",
       onClick: () => handleTabChange("past-projects"),
       testId: "button-nav-past-projects",
@@ -1826,8 +1828,8 @@ export default function Dashboard() {
     },
     {
       id: "employees",
-      label: "Employees",
-      description: "Manage team",
+      label: t('dashboard.cards.employees.label', 'Employees'),
+      description: t('dashboard.cards.employees.description', 'Manage team'),
       icon: "people",
       onClick: () => handleTabChange("employees"),
       testId: "button-nav-employees",
@@ -1836,8 +1838,8 @@ export default function Dashboard() {
     },
     {
       id: "clients",
-      label: "Clients",
-      description: "Property managers",
+      label: t('dashboard.cards.clients.label', 'Clients'),
+      description: t('dashboard.cards.clients.description', 'Property managers'),
       icon: "business",
       onClick: () => handleTabChange("clients"),
       testId: "button-nav-clients",
@@ -1846,8 +1848,8 @@ export default function Dashboard() {
     },
     {
       id: "performance",
-      label: "Performance",
-      description: "View analytics",
+      label: t('dashboard.cards.performance.label', 'Performance'),
+      description: t('dashboard.cards.performance.description', 'View analytics'),
       icon: "analytics",
       onClick: () => handleTabChange("performance"),
       testId: "button-nav-performance",
@@ -1856,8 +1858,8 @@ export default function Dashboard() {
     },
     {
       id: "active-workers",
-      label: "Active Workers",
-      description: "Who's working",
+      label: t('dashboard.cards.activeWorkers.label', 'Active Workers'),
+      description: t('dashboard.cards.activeWorkers.description', "Who's working"),
       icon: "work_history",
       onClick: () => setLocation("/active-workers"),
       testId: "button-active-workers",
@@ -1866,8 +1868,8 @@ export default function Dashboard() {
     },
     {
       id: "complaints",
-      label: "Complaints",
-      description: "Resident feedback",
+      label: t('dashboard.cards.complaints.label', 'Complaints'),
+      description: t('dashboard.cards.complaints.description', 'Resident feedback'),
       icon: "feedback",
       onClick: () => handleTabChange("complaints"),
       testId: "button-nav-complaints",
@@ -1876,8 +1878,8 @@ export default function Dashboard() {
     },
     {
       id: "inventory",
-      label: "Inventory & Inspections",
-      description: "Gear & safety checks",
+      label: t('dashboard.cards.inventory.label', 'Inventory & Inspections'),
+      description: t('dashboard.cards.inventory.description', 'Gear & safety checks'),
       icon: "inventory_2",
       onClick: () => setLocation("/inventory"),
       testId: "button-inventory",
@@ -1886,8 +1888,8 @@ export default function Dashboard() {
     },
     {
       id: "safety-forms",
-      label: "Safety Forms",
-      description: "Safety meeting",
+      label: t('dashboard.cards.safetyForms.label', 'Safety Forms'),
+      description: t('dashboard.cards.safetyForms.description', 'Safety meeting'),
       icon: "group",
       onClick: () => setLocation("/safety-forms"),
       testId: "button-safety-forms",
@@ -1896,8 +1898,8 @@ export default function Dashboard() {
     },
     {
       id: "payroll",
-      label: "Payroll",
-      description: "Employee hours",
+      label: t('dashboard.cards.payroll.label', 'Payroll'),
+      description: t('dashboard.cards.payroll.description', 'Employee hours'),
       icon: "payments",
       onClick: () => setLocation("/payroll"),
       testId: "button-payroll",
@@ -1906,8 +1908,8 @@ export default function Dashboard() {
     },
     {
       id: "quotes",
-      label: "Quotes",
-      description: "Service quotes",
+      label: t('dashboard.cards.quotes.label', 'Quotes'),
+      description: t('dashboard.cards.quotes.description', 'Service quotes'),
       icon: "request_quote",
       onClick: () => setLocation("/quotes"),
       testId: "button-quotes",
@@ -1916,8 +1918,8 @@ export default function Dashboard() {
     },
     {
       id: "schedule",
-      label: "Job Schedule",
-      description: "Team assignments",
+      label: t('dashboard.cards.schedule.label', 'Job Schedule'),
+      description: t('dashboard.cards.schedule.description', 'Team assignments'),
       icon: "event",
       onClick: () => setLocation("/schedule"),
       testId: "button-schedule",
@@ -1926,8 +1928,8 @@ export default function Dashboard() {
     },
     {
       id: "documents",
-      label: "Documents",
-      description: "All company files",
+      label: t('dashboard.cards.documents.label', 'Documents'),
+      description: t('dashboard.cards.documents.description', 'All company files'),
       icon: "folder_open",
       onClick: () => setLocation("/documents"),
       testId: "button-documents",
@@ -1936,8 +1938,8 @@ export default function Dashboard() {
     },
     {
       id: "residents",
-      label: "Residents",
-      description: "Building residents",
+      label: t('dashboard.cards.residents.label', 'Residents'),
+      description: t('dashboard.cards.residents.description', 'Building residents'),
       icon: "people",
       onClick: () => setLocation("/residents"),
       testId: "button-residents",
@@ -1951,7 +1953,7 @@ export default function Dashboard() {
       console.error('Error filtering card:', card.id, e);
       return false;
     }
-  }), [currentUser]); // useMemo dependency - only recreate when currentUser changes
+  }), [currentUser, t]); // useMemo dependency - recreate when currentUser or language changes
 
   // Load saved card order from localStorage
   // Load saved card order from backend preferences

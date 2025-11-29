@@ -207,7 +207,74 @@
     "companySafetyRating": "Cote de sécurité de l'entreprise",
     "csrScore": "Score CSE",
     "workSessionsToday": "Sessions de travail aujourd'hui",
-    "dropsToday": "Descentes aujourd'hui"
+    "dropsToday": "Descentes aujourd'hui",
+    "cards": {
+      "projects": {
+        "label": "Projets",
+        "description": "Projets actifs"
+      },
+      "nonBillableHours": {
+        "label": "Heures non facturables",
+        "description": "Courses et formation"
+      },
+      "myLoggedHours": {
+        "label": "Mes heures enregistrées",
+        "description": "Carnet IRATA"
+      },
+      "pastProjects": {
+        "label": "Projets passés",
+        "description": "Travaux terminés"
+      },
+      "employees": {
+        "label": "Employés",
+        "description": "Gérer l'équipe"
+      },
+      "clients": {
+        "label": "Clients",
+        "description": "Gestionnaires immobiliers"
+      },
+      "performance": {
+        "label": "Performance",
+        "description": "Voir les analyses"
+      },
+      "activeWorkers": {
+        "label": "Travailleurs actifs",
+        "description": "Qui travaille"
+      },
+      "complaints": {
+        "label": "Plaintes",
+        "description": "Commentaires des résidents"
+      },
+      "inventory": {
+        "label": "Inventaire et inspections",
+        "description": "Équipement et vérifications"
+      },
+      "safetyForms": {
+        "label": "Formulaires de sécurité",
+        "description": "Réunion de sécurité"
+      },
+      "payroll": {
+        "label": "Paie",
+        "description": "Heures des employés"
+      },
+      "quotes": {
+        "label": "Soumissions",
+        "description": "Devis de service"
+      },
+      "schedule": {
+        "label": "Calendrier",
+        "description": "Affectations d'équipe"
+      },
+      "documents": {
+        "label": "Documents",
+        "description": "Tous les fichiers"
+      },
+      "residents": {
+        "label": "Résidents",
+        "description": "Résidents de l'immeuble"
+      }
+    },
+    "backToDashboard": "Retour au tableau de bord"
   },
   "projects": {
     "title": "Projets",

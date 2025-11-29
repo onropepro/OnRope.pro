@@ -207,7 +207,74 @@
     "companySafetyRating": "Company Safety Rating",
     "csrScore": "CSR Score",
     "workSessionsToday": "Work Sessions Today",
-    "dropsToday": "Drops Today"
+    "dropsToday": "Drops Today",
+    "cards": {
+      "projects": {
+        "label": "Projects",
+        "description": "Active projects"
+      },
+      "nonBillableHours": {
+        "label": "Non-Billable Hours",
+        "description": "Errands & training"
+      },
+      "myLoggedHours": {
+        "label": "My Logged Hours",
+        "description": "IRATA logbook"
+      },
+      "pastProjects": {
+        "label": "Past Projects",
+        "description": "Completed work"
+      },
+      "employees": {
+        "label": "Employees",
+        "description": "Manage team"
+      },
+      "clients": {
+        "label": "Clients",
+        "description": "Property managers"
+      },
+      "performance": {
+        "label": "Performance",
+        "description": "View analytics"
+      },
+      "activeWorkers": {
+        "label": "Active Workers",
+        "description": "Who's working"
+      },
+      "complaints": {
+        "label": "Complaints",
+        "description": "Resident feedback"
+      },
+      "inventory": {
+        "label": "Inventory & Inspections",
+        "description": "Gear & safety checks"
+      },
+      "safetyForms": {
+        "label": "Safety Forms",
+        "description": "Safety meeting"
+      },
+      "payroll": {
+        "label": "Payroll",
+        "description": "Employee hours"
+      },
+      "quotes": {
+        "label": "Quotes",
+        "description": "Service quotes"
+      },
+      "schedule": {
+        "label": "Job Schedule",
+        "description": "Team assignments"
+      },
+      "documents": {
+        "label": "Documents",
+        "description": "All company files"
+      },
+      "residents": {
+        "label": "Residents",
+        "description": "Building residents"
+      }
+    },
+    "backToDashboard": "Back to Dashboard"
   },
   "projects": {
     "title": "Projects",
