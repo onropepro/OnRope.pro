@@ -140,6 +140,9 @@ export const users = pgTable("users", {
   brandingLogoUrl: text("branding_logo_url"), // Custom logo URL for resident portal
   brandingColors: text("branding_colors").array().default(sql`ARRAY[]::text[]`), // Array of brand colors (hex codes)
   
+  // Language preference (all roles)
+  preferredLanguage: varchar("preferred_language").default('en'), // en | fr - user's preferred language
+  
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
