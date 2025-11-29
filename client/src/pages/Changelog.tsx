@@ -333,14 +333,18 @@ const changelogData: ChangelogSection[] = [
     title: "Company Safety Rating (CSR)",
     icon: Star,
     iconColor: "text-amber-600 dark:text-amber-400",
-    description: "Penalty-based safety compliance scoring system",
+    description: "Penalty-based safety compliance scoring system starting at 100%",
     features: [
-      "Starts at 100% with proportional penalties for non-compliance",
-      "Documentation component: Certificate of Insurance, Health & Safety Manual, Company Policy",
-      "Toolbox Meeting compliance with 7-day bidirectional coverage window",
-      "Harness Inspection completion tracking",
+      "Starts at 100% with proportional penalties (max 80% total penalty)",
+      "Documentation penalty (25%): Missing Certificate of Insurance, Health & Safety Manual, or Company Policy",
+      "Toolbox Meeting penalty (25% max): Based on work session coverage ratio",
+      "Harness Inspection penalty (25% max): Based on inspection completion rate",
+      "Document Review penalty (5% max): Based on unsigned employee document acknowledgments",
+      "Project Completion tracking (informational only, no penalty)",
+      "7-day bidirectional coverage window for toolbox meetings",
       "Detailed CSR breakdown visible to property managers",
-      "Real-time compliance status indicators"
+      "Real-time compliance status indicators on dashboard",
+      "Color-coded progress bars for each compliance component"
     ],
     status: "complete"
   },
