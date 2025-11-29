@@ -19,6 +19,8 @@ import { SubscriptionManagement } from "@/components/SubscriptionManagement";
 import { useState, useEffect } from "react";
 import { format } from "date-fns";
 import { QRCodeSVG } from 'qrcode.react';
+import { useTranslation } from "react-i18next";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 const profileSchema = z.object({
   name: z.string().min(1, "Name is required"),
@@ -168,6 +170,89 @@ function BrandColorsSection({ user }: { user: any }) {
         </Button>
       </div>
     </div>
+  );
+}
+
+function LanguagePreferenceCard() {
+  const { t, i18n } = useTranslation();
+  const { toast } = useToast();
+  const [isUpdating, setIsUpdating] = useState(false);
+
+  const { data: userData } = useQuery<{ user: any }>({
+    queryKey: ["/api/user"],
+  });
+
+  const currentLanguage = userData?.user?.preferredLanguage || i18n.language || 'en';
+
+  const handleLanguageChange = async (language: string) => {
+    try {
+      setIsUpdating(true);
+      await i18n.changeLanguage(language);
+      localStorage.setItem('i18nextLng', language);
+      
+      await apiRequest('PATCH', '/api/user/language', { language });
+      await queryClient.invalidateQueries({ queryKey: ["/api/user"] });
+      
+      toast({
+        title: language === 'en' ? "Language Updated" : "Langue mise à jour",
+        description: language === 'en' 
+          ? "Your language preference has been saved." 
+          : "Votre préférence de langue a été enregistrée.",
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to update language preference",
+        variant: "destructive",
+      });
+    } finally {
+      setIsUpdating(false);
+    }
+  };
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2">
+          <span className="material-icons text-xl">language</span>
+          {t('profile.languagePreference', 'Language Preference')}
+        </CardTitle>
+        <CardDescription>
+          {t('profile.languageDescription', 'Choose your preferred language for the application')}
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        <div className="space-y-4">
+          <div className="grid grid-cols-2 gap-3">
+            <Button
+              variant={currentLanguage === 'en' ? 'default' : 'outline'}
+              className="h-14 flex flex-col items-center justify-center gap-1"
+              onClick={() => handleLanguageChange('en')}
+              disabled={isUpdating}
+              data-testid="button-language-english"
+            >
+              <span className="text-lg">English</span>
+              <span className="text-xs opacity-70">English</span>
+            </Button>
+            <Button
+              variant={currentLanguage === 'fr' ? 'default' : 'outline'}
+              className="h-14 flex flex-col items-center justify-center gap-1"
+              onClick={() => handleLanguageChange('fr')}
+              disabled={isUpdating}
+              data-testid="button-language-french"
+            >
+              <span className="text-lg">Français</span>
+              <span className="text-xs opacity-70">French</span>
+            </Button>
+          </div>
+          {isUpdating && (
+            <div className="text-center text-sm text-muted-foreground">
+              {t('common.loading', 'Loading...')}
+            </div>
+          )}
+        </div>
+      </CardContent>
+    </Card>
   );
 }
 
@@ -1397,6 +1482,11 @@ export default function Profile() {
 
               <Separator />
               
+              {/* Language Preference */}
+              <LanguagePreferenceCard />
+
+              <Separator />
+              
               {/* Delete Account */}
               <Card className="border-destructive">
                 <CardHeader>
@@ -1855,6 +1945,11 @@ export default function Profile() {
             </Form>
           </CardContent>
         </Card>
+
+        <Separator />
+
+        {/* Language Preference for non-company users */}
+        <LanguagePreferenceCard />
           </>
         )}
       </div>

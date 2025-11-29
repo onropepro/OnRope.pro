@@ -2796,6 +2796,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Update language preference
+  app.patch("/api/user/language", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const { language } = req.body;
+      
+      if (!language || !['en', 'fr'].includes(language)) {
+        return res.status(400).json({ message: "Invalid language. Must be 'en' or 'fr'" });
+      }
+      
+      const user = await storage.getUserById(req.session.userId!);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      await storage.updateUser(user.id, { preferredLanguage: language });
+      
+      res.json({ message: "Language preference updated successfully", language });
+    } catch (error) {
+      console.error("Update language error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
   // Delete company account (company role only)
   app.delete("/api/user/account", requireAuth, requireRole("company"), async (req: Request, res: Response) => {
     try {
