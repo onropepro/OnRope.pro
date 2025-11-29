@@ -10,6 +10,8 @@ import timeGridPlugin from "@fullcalendar/timegrid";
 import interactionPlugin from "@fullcalendar/interaction";
 import resourceTimelinePlugin from "@fullcalendar/resource-timeline";
 import type { EventInput, DateSelectArg, EventClickArg } from "@fullcalendar/core";
+import frLocale from "@fullcalendar/core/locales/fr";
+import enLocale from "@fullcalendar/core/locales/en-gb";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription, SheetFooter } from "@/components/ui/sheet";
@@ -32,8 +34,11 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip
 import { BrandingContext } from "@/App";
 
 export default function Schedule() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { toast } = useToast();
+  
+  // Get the appropriate FullCalendar locale based on current language
+  const calendarLocale = i18n.language?.startsWith('fr') ? frLocale : enLocale;
   const [, setLocation] = useLocation();
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
@@ -1095,6 +1100,7 @@ export default function Schedule() {
             <FullCalendar
               plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
               initialView="dayGridMonth"
+              locale={calendarLocale}
               headerToolbar={{
                 left: "prev,next today",
                 center: "title",
@@ -1259,7 +1265,7 @@ export default function Schedule() {
                       data-testid="button-today"
                       className="px-2"
                     >
-                      Today
+                      {t('schedule.today', 'Today')}
                     </Button>
                   )}
                 </div>
@@ -1289,7 +1295,7 @@ export default function Schedule() {
                 className="w-full md:w-auto md:absolute md:top-0 md:right-0"
               >
                 <Calendar className="h-4 w-4 mr-2" />
-                Schedule Time Off
+                {t('schedule.scheduleTimeOff', 'Schedule Time Off')}
               </Button>
             </div>
 
@@ -1298,7 +1304,7 @@ export default function Schedule() {
               <div className="min-w-[700px] md:min-w-0">
                 {/* Day Headers */}
                 <div className="grid grid-cols-8 gap-1 mb-2">
-                  <div className="font-medium text-xs md:text-sm text-muted-foreground px-2 flex items-center">Team</div>
+                  <div className="font-medium text-xs md:text-sm text-muted-foreground px-2 flex items-center">{t('schedule.team', 'Team')}</div>
                   {getWeekDates.map((date, idx) => (
                     <div 
                       key={idx}
@@ -1309,7 +1315,7 @@ export default function Schedule() {
                       }`}
                     >
                       <div className="text-[10px] md:text-xs uppercase">
-                        {date.toLocaleDateString('en-US', { weekday: 'short' })}
+                        {date.toLocaleDateString(i18n.language?.startsWith('fr') ? 'fr-CA' : 'en-US', { weekday: 'short' })}
                       </div>
                       <div className="text-sm md:text-lg">
                         {date.getDate()}

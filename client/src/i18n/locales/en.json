@@ -2923,6 +2923,8 @@
     "assignmentRemoved": "Assignment removed successfully",
     "error": "Error",
     "today": "Today",
+    "team": "Team",
+    "scheduleTimeOff": "Schedule Time Off",
     "week": "Week",
     "month": "Month",
     "previousWeek": "Previous Week",
