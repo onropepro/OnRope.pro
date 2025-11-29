@@ -4,6 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useQuery } from "@tanstack/react-query";
 import { useLocation } from "wouter";
+import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage, FormDescription } from "@/components/ui/form";
@@ -63,6 +64,7 @@ type CompanyFormData = z.infer<typeof companySchema>;
 type PropertyManagerFormData = z.infer<typeof propertyManagerSchema>;
 
 export default function Register() {
+  const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState<"resident" | "company" | "property_manager">("resident");
   const [, setLocation] = useLocation();
 
@@ -238,14 +240,14 @@ export default function Register() {
               </Button>
             </Link>
           </div>
-          <CardTitle className="text-2xl font-bold text-center">Create Account</CardTitle>
-          <CardDescription className="text-center">Choose your account type to get started</CardDescription>
+          <CardTitle className="text-2xl font-bold text-center">{t('register.title', 'Create Account')}</CardTitle>
+          <CardDescription className="text-center">{t('register.subtitle', 'Choose your account type to get started')}</CardDescription>
         </CardHeader>
         <CardContent>
           <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as "resident" | "property_manager")}>
             <TabsList className="grid w-full grid-cols-2 mb-6">
-              <TabsTrigger value="resident" data-testid="tab-resident">Resident</TabsTrigger>
-              <TabsTrigger value="property_manager" data-testid="tab-property-manager">Property Manager</TabsTrigger>
+              <TabsTrigger value="resident" data-testid="tab-resident">{t('register.tabs.resident', 'Resident')}</TabsTrigger>
+              <TabsTrigger value="property_manager" data-testid="tab-property-manager">{t('register.tabs.propertyManager', 'Property Manager')}</TabsTrigger>
             </TabsList>
 
             <TabsContent value="resident">
@@ -256,9 +258,9 @@ export default function Register() {
                     name="name"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Full Name</FormLabel>
+                        <FormLabel>{t('register.resident.fullName', 'Full Name')}</FormLabel>
                         <FormControl>
-                          <Input placeholder="John Doe" {...field} data-testid="input-name" className="h-12" />
+                          <Input placeholder={t('register.resident.fullNamePlaceholder', 'John Doe')} {...field} data-testid="input-name" className="h-12" />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -270,9 +272,9 @@ export default function Register() {
                     name="email"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Email</FormLabel>
+                        <FormLabel>{t('register.resident.email', 'Email')}</FormLabel>
                         <FormControl>
-                          <Input type="email" placeholder="you@example.com" {...field} data-testid="input-email" className="h-12" />
+                          <Input type="email" placeholder={t('register.resident.emailPlaceholder', 'you@example.com')} {...field} data-testid="input-email" className="h-12" />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -284,9 +286,9 @@ export default function Register() {
                     name="phoneNumber"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Phone Number</FormLabel>
+                        <FormLabel>{t('register.resident.phoneNumber', 'Phone Number')}</FormLabel>
                         <FormControl>
-                          <Input type="tel" placeholder="604-123-4567" {...field} data-testid="input-phone-number" className="h-12" />
+                          <Input type="tel" placeholder={t('register.resident.phoneNumberPlaceholder', '604-123-4567')} {...field} data-testid="input-phone-number" className="h-12" />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -298,9 +300,9 @@ export default function Register() {
                     name="strataPlanNumber"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Strata Plan Number</FormLabel>
+                        <FormLabel>{t('register.resident.strataPlan', 'Strata Plan Number')}</FormLabel>
                         <FormControl>
-                          <Input placeholder="LMS2345" {...field} data-testid="input-strata-plan" className="h-12" />
+                          <Input placeholder={t('register.resident.strataPlanPlaceholder', 'LMS1234')} {...field} data-testid="input-strata-plan" className="h-12" />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -312,9 +314,9 @@ export default function Register() {
                     name="unitNumber"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Unit Number</FormLabel>
+                        <FormLabel>{t('register.resident.unitNumber', 'Unit Number')}</FormLabel>
                         <FormControl>
-                          <Input placeholder="1205" {...field} data-testid="input-unit-number" className="h-12" />
+                          <Input placeholder={t('register.resident.unitNumberPlaceholder', '101')} {...field} data-testid="input-unit-number" className="h-12" />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -326,9 +328,9 @@ export default function Register() {
                     name="parkingStallNumber"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Parking Stall Number (Optional)</FormLabel>
+                        <FormLabel>{t('register.resident.parkingStall', 'Parking Stall Number (Optional)')}</FormLabel>
                         <FormControl>
-                          <Input placeholder="P-42" {...field} data-testid="input-parking-stall" className="h-12" />
+                          <Input placeholder={t('register.resident.parkingStallPlaceholder', 'P1-25')} {...field} data-testid="input-parking-stall" className="h-12" />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -340,7 +342,7 @@ export default function Register() {
                     name="password"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Password</FormLabel>
+                        <FormLabel>{t('register.resident.password', 'Password')}</FormLabel>
                         <FormControl>
                           <Input type="password" placeholder="••••••••" {...field} data-testid="input-password" className="h-12" />
                         </FormControl>
@@ -354,7 +356,7 @@ export default function Register() {
                     name="confirmPassword"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Confirm Password</FormLabel>
+                        <FormLabel>{t('register.resident.confirmPassword', 'Confirm Password')}</FormLabel>
                         <FormControl>
                           <Input type="password" placeholder="••••••••" {...field} data-testid="input-confirm-password" className="h-12" />
                         </FormControl>
@@ -364,7 +366,7 @@ export default function Register() {
                   />
 
                   <Button type="submit" className="w-full h-12" data-testid="button-register-resident">
-                    Create Resident/Property Manager Account
+                    {t('register.resident.submit', 'Create Resident Account')}
                   </Button>
                 </form>
               </Form>
@@ -379,9 +381,9 @@ export default function Register() {
                       name="firstName"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>First Name</FormLabel>
+                          <FormLabel>{t('register.propertyManager.firstName', 'First Name')}</FormLabel>
                           <FormControl>
-                            <Input placeholder="John" {...field} data-testid="input-first-name" className="h-12" />
+                            <Input placeholder={t('register.propertyManager.firstNamePlaceholder', 'Jane')} {...field} data-testid="input-first-name" className="h-12" />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -393,9 +395,9 @@ export default function Register() {
                       name="lastName"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Last Name</FormLabel>
+                          <FormLabel>{t('register.propertyManager.lastName', 'Last Name')}</FormLabel>
                           <FormControl>
-                            <Input placeholder="Doe" {...field} data-testid="input-last-name" className="h-12" />
+                            <Input placeholder={t('register.propertyManager.lastNamePlaceholder', 'Smith')} {...field} data-testid="input-last-name" className="h-12" />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -408,9 +410,9 @@ export default function Register() {
                     name="propertyManagementCompany"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Property Management Company</FormLabel>
+                        <FormLabel>{t('register.propertyManager.company', 'Property Management Company')}</FormLabel>
                         <FormControl>
-                          <Input placeholder="ABC Property Management Inc." {...field} data-testid="input-property-management-company" className="h-12" />
+                          <Input placeholder={t('register.propertyManager.companyPlaceholder', 'ABC Property Management')} {...field} data-testid="input-property-management-company" className="h-12" />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -422,12 +424,12 @@ export default function Register() {
                     name="companyCode"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Company Code</FormLabel>
+                        <FormLabel>{t('register.propertyManager.companyCode', 'Company Code')}</FormLabel>
                         <FormControl>
-                          <Input placeholder="ABC1234567" {...field} data-testid="input-company-code" className="h-12" maxLength={10} />
+                          <Input placeholder={t('register.propertyManager.companyCodePlaceholder', 'Enter the code from your rope access provider')} {...field} data-testid="input-company-code" className="h-12" maxLength={10} />
                         </FormControl>
                         <FormDescription className="text-muted-foreground text-sm">
-                          Enter the 10-character code provided by the rope access company
+                          {t('register.propertyManager.companyCodeDescription', 'Get this 10-character code from your rope access service provider')}
                         </FormDescription>
                         <FormMessage />
                       </FormItem>
@@ -439,9 +441,9 @@ export default function Register() {
                     name="email"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Email</FormLabel>
+                        <FormLabel>{t('register.propertyManager.email', 'Email')}</FormLabel>
                         <FormControl>
-                          <Input type="email" placeholder="you@propertymanagement.com" {...field} data-testid="input-property-manager-email" className="h-12" />
+                          <Input type="email" placeholder={t('register.propertyManager.emailPlaceholder', 'you@example.com')} {...field} data-testid="input-property-manager-email" className="h-12" />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -453,7 +455,7 @@ export default function Register() {
                     name="password"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Password</FormLabel>
+                        <FormLabel>{t('register.propertyManager.password', 'Password')}</FormLabel>
                         <FormControl>
                           <Input type="password" placeholder="••••••••" {...field} data-testid="input-property-manager-password" className="h-12" />
                         </FormControl>
@@ -467,7 +469,7 @@ export default function Register() {
                     name="confirmPassword"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Confirm Password</FormLabel>
+                        <FormLabel>{t('register.propertyManager.confirmPassword', 'Confirm Password')}</FormLabel>
                         <FormControl>
                           <Input type="password" placeholder="••••••••" {...field} data-testid="input-property-manager-confirm-password" className="h-12" />
                         </FormControl>
@@ -477,7 +479,7 @@ export default function Register() {
                   />
 
                   <Button type="submit" className="w-full h-12" data-testid="button-register-property-manager">
-                    Create Property Manager Account
+                    {t('register.propertyManager.submit', 'Create Property Manager Account')}
                   </Button>
                 </form>
               </Form>
@@ -485,9 +487,9 @@ export default function Register() {
           </Tabs>
 
           <div className="mt-6 text-center text-sm text-muted-foreground">
-            Already have an account?{" "}
+            {t('register.haveAccount', 'Already have an account?')}{" "}
             <a href="/login" className="text-primary font-medium hover:underline" data-testid="link-login">
-              Sign in
+              {t('register.signIn', 'Sign in')}
             </a>
           </div>
         </CardContent>
