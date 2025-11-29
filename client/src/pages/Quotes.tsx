@@ -33,7 +33,8 @@ import {
   Edit,
   Image,
   Search,
-  Download
+  Download,
+  Paintbrush
 } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
@@ -99,6 +100,13 @@ const SERVICE_TYPES = [
     requiresElevation: false
   },
   { 
+    id: "painting", 
+    name: "Painting", 
+    icon: Paintbrush,
+    description: "Building exterior painting services",
+    requiresElevation: true
+  },
+  { 
     id: "custom", 
     name: "Custom Service", 
     icon: Plus,
@@ -120,6 +128,7 @@ const buildingInfoSchema = z.object({
 const serviceFormSchema = z.object({
   serviceType: z.string(),
   customServiceName: z.string().optional(), // For custom services
+  customServiceJobType: z.enum(["rope", "ground"]).optional(), // For custom services - rope vs ground work
   // Elevation-based fields
   dropsNorth: z.coerce.number().optional(),
   dropsEast: z.coerce.number().optional(),
@@ -496,6 +505,8 @@ export default function Quotes() {
     
     serviceForm.reset({
       serviceType: serviceId,
+      customServiceName: existingConfig?.customServiceName,
+      customServiceJobType: existingConfig?.customServiceJobType,
       dropsNorth: existingConfig?.dropsNorth,
       dropsEast: existingConfig?.dropsEast,
       dropsSouth: existingConfig?.dropsSouth,
@@ -524,6 +535,16 @@ export default function Quotes() {
 
     const service = SERVICE_TYPES.find(s => s.id === serviceBeingConfigured);
     if (!service) return;
+
+    // Validate custom service requires job type selection
+    if (serviceBeingConfigured === "custom" && !data.customServiceJobType) {
+      toast({
+        title: "Job Type Required",
+        description: "Please select whether this is a rope access or ground work job.",
+        variant: "destructive",
+      });
+      return;
+    }
 
     // Calculate totals
     let totalHours: number | undefined = 0;
@@ -557,10 +578,25 @@ export default function Quotes() {
     } else if (serviceBeingConfigured === "ground_windows") {
       totalHours = data.groundWindowHours || 0;
       totalCost = totalHours * (data.pricePerHour || 0);
-    } else if (serviceBeingConfigured === "general_pressure_washing" || serviceBeingConfigured === "gutter_cleaning" || serviceBeingConfigured === "custom") {
-      // Simple services (including custom): hours + price per hour
+    } else if (serviceBeingConfigured === "general_pressure_washing" || serviceBeingConfigured === "gutter_cleaning") {
+      // Simple ground services: hours + price per hour
       totalHours = data.simpleServiceHours || 0;
       totalCost = totalHours * (data.pricePerHour || 0);
+    } else if (serviceBeingConfigured === "custom") {
+      // Custom service - check if rope or ground job
+      if (data.customServiceJobType === "rope") {
+        // Rope job uses elevation drop logic like window cleaning
+        const totalDrops = (data.dropsNorth || 0) + (data.dropsEast || 0) + 
+                          (data.dropsSouth || 0) + (data.dropsWest || 0);
+        const dropsPerDay = data.dropsPerDay || 1;
+        const days = totalDrops / dropsPerDay;
+        totalHours = days * 8;
+        totalCost = totalHours * (data.pricePerHour || 0);
+      } else {
+        // Ground job uses simple hours
+        totalHours = data.simpleServiceHours || 0;
+        totalCost = totalHours * (data.pricePerHour || 0);
+      }
     } else if (serviceBeingConfigured === "in_suite") {
       if (data.floorsPerDay) {
         const days = (buildingInfo?.floorCount || 1) / data.floorsPerDay;
@@ -593,15 +629,41 @@ export default function Quotes() {
         dryerVentPricePerUnit: data.dryerVentPricePerUnit,
         totalCost,
       } as ServiceFormData;
-    } else if (serviceBeingConfigured === "general_pressure_washing" || serviceBeingConfigured === "gutter_cleaning" || serviceBeingConfigured === "custom") {
+    } else if (serviceBeingConfigured === "general_pressure_washing" || serviceBeingConfigured === "gutter_cleaning") {
       configData = {
         serviceType: data.serviceType,
-        customServiceName: data.customServiceName, // Include custom service name
         simpleServiceHours: data.simpleServiceHours,
         pricePerHour: data.pricePerHour,
         totalHours,
         totalCost,
       } as ServiceFormData;
+    } else if (serviceBeingConfigured === "custom") {
+      // Custom service - include job type and relevant fields
+      if (data.customServiceJobType === "rope") {
+        configData = {
+          serviceType: data.serviceType,
+          customServiceName: data.customServiceName,
+          customServiceJobType: data.customServiceJobType,
+          dropsNorth: data.dropsNorth,
+          dropsEast: data.dropsEast,
+          dropsSouth: data.dropsSouth,
+          dropsWest: data.dropsWest,
+          dropsPerDay: data.dropsPerDay,
+          pricePerHour: data.pricePerHour,
+          totalHours,
+          totalCost,
+        } as ServiceFormData;
+      } else {
+        configData = {
+          serviceType: data.serviceType,
+          customServiceName: data.customServiceName,
+          customServiceJobType: data.customServiceJobType,
+          simpleServiceHours: data.simpleServiceHours,
+          pricePerHour: data.pricePerHour,
+          totalHours,
+          totalCost,
+        } as ServiceFormData;
+      }
     } else {
       // For all other services (elevation-based, ground_windows, in_suite)
       configData = {
@@ -642,6 +704,7 @@ export default function Quotes() {
       parkade: "Parkade Cleaning",
       ground_windows: "Ground Windows",
       in_suite: "In-Suite Dryer Vent",
+      painting: "Painting",
       custom: "Custom Service"
     };
 
@@ -2485,31 +2548,62 @@ export default function Quotes() {
             <CardContent className="p-8 pt-0">
               <Form {...serviceForm}>
                 <form onSubmit={serviceForm.handleSubmit(handleServiceFormSubmit)} className="space-y-6">
-                  {/* Custom Service Name Input */}
+                  {/* Custom Service Name and Job Type Input */}
                   {serviceBeingConfigured === "custom" && (
-                    <FormField
-                      control={serviceForm.control}
-                      name="customServiceName"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Service Name</FormLabel>
-                          <FormControl>
-                            <Input
-                              {...field}
-                              placeholder="e.g., Roof Inspection, Caulking, etc."
-                              className="h-12"
-                              data-testid="input-custom-service-name"
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
+                    <>
+                      <FormField
+                        control={serviceForm.control}
+                        name="customServiceName"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Service Name</FormLabel>
+                            <FormControl>
+                              <Input
+                                {...field}
+                                placeholder="e.g., Roof Inspection, Caulking, etc."
+                                className="h-12"
+                                data-testid="input-custom-service-name"
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      
+                      <FormField
+                        control={serviceForm.control}
+                        name="customServiceJobType"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Job Type</FormLabel>
+                            <FormControl>
+                              <RadioGroup
+                                onValueChange={field.onChange}
+                                defaultValue={field.value}
+                                className="flex gap-4"
+                              >
+                                <div className="flex items-center space-x-2">
+                                  <RadioGroupItem value="rope" id="job-type-rope" data-testid="radio-job-type-rope" />
+                                  <Label htmlFor="job-type-rope">Rope Access (Elevation)</Label>
+                                </div>
+                                <div className="flex items-center space-x-2">
+                                  <RadioGroupItem value="ground" id="job-type-ground" data-testid="radio-job-type-ground" />
+                                  <Label htmlFor="job-type-ground">Ground Work</Label>
+                                </div>
+                              </RadioGroup>
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </>
                   )}
                   
-                  {service.requiresElevation && 
-                   (serviceBeingConfigured !== "dryer_vent_cleaning" || 
-                    serviceForm.watch("dryerVentPricingType") === "per_hour") && (
+                  {/* Elevation fields for rope access services OR custom rope services */}
+                  {((service.requiresElevation && serviceBeingConfigured !== "dryer_vent_cleaning") ||
+                    (service.requiresElevation && serviceBeingConfigured === "dryer_vent_cleaning" && 
+                     serviceForm.watch("dryerVentPricingType") === "per_hour") ||
+                    (serviceBeingConfigured === "custom" && serviceForm.watch("customServiceJobType") === "rope")) && (
                     <>
                       <div className="grid grid-cols-2 gap-4">
                         <FormField
@@ -2815,7 +2909,10 @@ export default function Quotes() {
                     </>
                   )}
 
-                  {(serviceBeingConfigured === "general_pressure_washing" || serviceBeingConfigured === "gutter_cleaning") && (
+                  {/* Simple service hours for ground services */}
+                  {(serviceBeingConfigured === "general_pressure_washing" || 
+                    serviceBeingConfigured === "gutter_cleaning" ||
+                    (serviceBeingConfigured === "custom" && serviceForm.watch("customServiceJobType") === "ground")) && (
                     <FormField
                       control={serviceForm.control}
                       name="simpleServiceHours"
