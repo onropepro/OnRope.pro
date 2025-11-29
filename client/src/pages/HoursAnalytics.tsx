@@ -1,5 +1,6 @@
 import { useState, useEffect, useContext } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
+import { useTranslation } from "react-i18next";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { hasFinancialAccess } from "@/lib/permissions";
 import { useLocation } from "wouter";
@@ -30,7 +31,7 @@ import {
 import { CSS } from '@dnd-kit/utilities';
 
 // Sortable Stats Card Component
-function SortableStatsCard({ card, isRearranging }: { card: any; isRearranging: boolean }) {
+function SortableStatsCard({ card, isRearranging, t }: { card: any; isRearranging: boolean; t: (key: string) => string }) {
   const {
     attributes,
     listeners,
@@ -83,6 +84,7 @@ function SortableStatsCard({ card, isRearranging }: { card: any; isRearranging: 
 }
 
 export default function HoursAnalytics() {
+  const { t } = useTranslation();
   const [, setLocation] = useLocation();
   const [modalOpen, setModalOpen] = useState<string | null>(null);
   const [statsCardOrder, setStatsCardOrder] = useState<string[]>([]);
@@ -165,7 +167,7 @@ export default function HoursAnalytics() {
       <div className="min-h-screen page-gradient flex items-center justify-center">
         <Card>
           <CardContent className="pt-6">
-            <p className="text-muted-foreground">Loading...</p>
+            <p className="text-muted-foreground">{t("hoursAnalytics.loading")}</p>
           </CardContent>
         </Card>
       </div>
@@ -228,21 +230,26 @@ export default function HoursAnalytics() {
   const dayNonBillable = calculateHours(nonBillableSessions, dayStart, dayEnd);
 
   const yearData = [
-    { name: "Billable Hours", value: parseFloat(yearBillable.toFixed(2)), color: "hsl(var(--primary))" },
-    { name: "Non-Billable Hours", value: parseFloat(yearNonBillable.toFixed(2)), color: "hsl(var(--chart-2))" },
+    { name: t("hoursAnalytics.billableHours"), value: parseFloat(yearBillable.toFixed(2)), color: "hsl(var(--primary))" },
+    { name: t("hoursAnalytics.nonBillableHours"), value: parseFloat(yearNonBillable.toFixed(2)), color: "hsl(var(--chart-2))" },
   ];
 
   const monthData = [
-    { name: "Billable Hours", value: parseFloat(monthBillable.toFixed(2)), color: "hsl(var(--primary))" },
-    { name: "Non-Billable Hours", value: parseFloat(monthNonBillable.toFixed(2)), color: "hsl(var(--chart-2))" },
+    { name: t("hoursAnalytics.billableHours"), value: parseFloat(monthBillable.toFixed(2)), color: "hsl(var(--primary))" },
+    { name: t("hoursAnalytics.nonBillableHours"), value: parseFloat(monthNonBillable.toFixed(2)), color: "hsl(var(--chart-2))" },
   ];
 
   const dayData = [
-    { name: "Billable Hours", value: parseFloat(dayBillable.toFixed(2)), color: "hsl(var(--primary))" },
-    { name: "Non-Billable Hours", value: parseFloat(dayNonBillable.toFixed(2)), color: "hsl(var(--chart-2))" },
+    { name: t("hoursAnalytics.billableHours"), value: parseFloat(dayBillable.toFixed(2)), color: "hsl(var(--primary))" },
+    { name: t("hoursAnalytics.nonBillableHours"), value: parseFloat(dayNonBillable.toFixed(2)), color: "hsl(var(--chart-2))" },
   ];
 
-  const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+  const monthNames = [
+    t("hoursAnalytics.months.january"), t("hoursAnalytics.months.february"), t("hoursAnalytics.months.march"),
+    t("hoursAnalytics.months.april"), t("hoursAnalytics.months.may"), t("hoursAnalytics.months.june"),
+    t("hoursAnalytics.months.july"), t("hoursAnalytics.months.august"), t("hoursAnalytics.months.september"),
+    t("hoursAnalytics.months.october"), t("hoursAnalytics.months.november"), t("hoursAnalytics.months.december")
+  ];
 
   // Calculate comprehensive statistics
   const activeProjects = projects.filter((p: any) => p.status === 'active').length;
@@ -341,8 +348,8 @@ export default function HoursAnalytics() {
       bgColor: 'bg-primary/10',
       iconColor: 'text-primary',
       value: activeProjects,
-      label: 'Active Projects',
-      subtitle: 'In Progress',
+      label: t("hoursAnalytics.activeProjects"),
+      subtitle: t("hoursAnalytics.inProgress"),
       onClick: () => setModalOpen('activeProjects'),
       testId: 'card-active-projects'
     },
@@ -352,8 +359,8 @@ export default function HoursAnalytics() {
       bgColor: 'bg-success/10',
       iconColor: 'text-success',
       value: completedProjects,
-      label: 'Completed Projects',
-      subtitle: 'All Time',
+      label: t("hoursAnalytics.completedProjects"),
+      subtitle: t("hoursAnalytics.allTime"),
       onClick: () => setModalOpen('completedProjects'),
       testId: 'card-completed-projects'
     },
@@ -363,8 +370,8 @@ export default function HoursAnalytics() {
       bgColor: 'bg-primary/10',
       iconColor: 'text-primary',
       value: totalEmployees,
-      label: 'Total Employees',
-      subtitle: 'Company Wide',
+      label: t("hoursAnalytics.totalEmployees"),
+      subtitle: t("hoursAnalytics.companyWide"),
       onClick: () => setModalOpen('totalEmployees'),
       testId: 'card-total-employees'
     },
@@ -374,8 +381,8 @@ export default function HoursAnalytics() {
       bgColor: 'bg-primary/10',
       iconColor: 'text-primary',
       value: uniqueEmployeesThisMonth,
-      label: 'Active This Month',
-      subtitle: 'Employees',
+      label: t("hoursAnalytics.activeThisMonth"),
+      subtitle: t("hoursAnalytics.employees"),
       onClick: () => setModalOpen('activeEmployees'),
       testId: 'card-active-employees'
     },
@@ -385,8 +392,8 @@ export default function HoursAnalytics() {
       bgColor: 'bg-chart-2/10',
       iconColor: 'text-chart-2',
       value: totalSessionsThisMonth,
-      label: 'Work Sessions',
-      subtitle: 'This Month',
+      label: t("hoursAnalytics.workSessions"),
+      subtitle: t("hoursAnalytics.thisMonth"),
       onClick: () => setModalOpen('workSessions'),
       testId: 'card-work-sessions'
     },
@@ -396,8 +403,8 @@ export default function HoursAnalytics() {
       bgColor: 'bg-primary/10',
       iconColor: 'text-primary',
       value: `${avgSessionDuration}h`,
-      label: 'Avg Session Duration',
-      subtitle: 'Per Session',
+      label: t("hoursAnalytics.avgSessionDuration"),
+      subtitle: t("hoursAnalytics.perSession"),
       onClick: () => setModalOpen('avgDuration'),
       testId: 'card-avg-duration'
     },
@@ -407,8 +414,8 @@ export default function HoursAnalytics() {
       bgColor: 'bg-warning/10',
       iconColor: 'text-warning',
       value: totalDropsThisMonth,
-      label: 'Total Drops',
-      subtitle: 'This Month',
+      label: t("hoursAnalytics.totalDrops"),
+      subtitle: t("hoursAnalytics.thisMonth"),
       onClick: () => setModalOpen('totalDrops'),
       testId: 'card-total-drops'
     },
@@ -418,8 +425,8 @@ export default function HoursAnalytics() {
       bgColor: 'bg-primary/10',
       iconColor: 'text-primary',
       value: avgDropsPerSession,
-      label: 'Avg Drops/Session',
-      subtitle: 'Productivity',
+      label: t("hoursAnalytics.avgDropsSession"),
+      subtitle: t("hoursAnalytics.productivity"),
       onClick: () => setModalOpen('avgDrops'),
       testId: 'card-avg-drops'
     },
@@ -429,8 +436,8 @@ export default function HoursAnalytics() {
       bgColor: 'bg-success/10',
       iconColor: 'text-success',
       value: `${billablePercentage}%`,
-      label: 'Billable Rate',
-      subtitle: 'This Month',
+      label: t("hoursAnalytics.billableRate"),
+      subtitle: t("hoursAnalytics.thisMonth"),
       onClick: () => {},
       testId: 'card-billable-rate'
     },
@@ -440,8 +447,8 @@ export default function HoursAnalytics() {
       bgColor: 'bg-primary/10',
       iconColor: 'text-primary',
       value: `${avgHoursPerEmployee}h`,
-      label: 'Avg Hours/Employee',
-      subtitle: 'This Month',
+      label: t("hoursAnalytics.avgHoursEmployee"),
+      subtitle: t("hoursAnalytics.thisMonth"),
       onClick: () => {},
       testId: 'card-avg-hours-employee'
     },
@@ -451,7 +458,7 @@ export default function HoursAnalytics() {
       bgColor: 'bg-yellow-100',
       iconColor: 'text-yellow-600',
       value: topEmployee.hours > 0 ? `${topEmployee.hours.toFixed(0)}h` : '0h',
-      label: 'Top Performer',
+      label: t("hoursAnalytics.topPerformer"),
       subtitle: topEmployee.name,
       onClick: () => {},
       testId: 'card-top-performer'
@@ -462,8 +469,8 @@ export default function HoursAnalytics() {
       bgColor: 'bg-primary/10',
       iconColor: 'text-primary',
       value: `${(dayBillable + dayNonBillable).toFixed(1)}h`,
-      label: "Today's Hours",
-      subtitle: `${dayBillable.toFixed(1)}h billable`,
+      label: t("hoursAnalytics.todaysHours"),
+      subtitle: `${dayBillable.toFixed(1)}h ${t("hoursAnalytics.billable").toLowerCase()}`,
       onClick: () => {},
       testId: 'card-todays-hours'
     },
@@ -536,9 +543,9 @@ export default function HoursAnalytics() {
               <ArrowLeft className="h-5 w-5" />
             </Button>
             <div className="min-w-0 flex-1">
-              <h1 className={`text-xl sm:text-3xl font-bold truncate ${hasCustomBranding ? 'text-primary' : 'gradient-text'}`}>{isManagement ? "Hours Analytics" : "My Hours"}</h1>
+              <h1 className={`text-xl sm:text-3xl font-bold truncate ${hasCustomBranding ? 'text-primary' : 'gradient-text'}`}>{isManagement ? t("hoursAnalytics.title") : t("hoursAnalytics.myHours")}</h1>
               <p className="text-xs sm:text-sm text-muted-foreground mt-1 hidden sm:block">
-                {isManagement ? "Billable vs Non-Billable Hours Breakdown" : "View your work hours and session history"}
+                {isManagement ? t("hoursAnalytics.subtitle") : t("hoursAnalytics.myHoursSubtitle")}
               </p>
             </div>
           </div>
@@ -553,8 +560,8 @@ export default function HoursAnalytics() {
               <span className="material-icons text-base">
                 {isRearranging ? "check" : "swap_vert"}
               </span>
-              <span className="hidden sm:inline">{isRearranging ? "Done" : "Rearrange Cards"}</span>
-              <span className="sm:hidden">{isRearranging ? "Done" : "Rearrange"}</span>
+              <span className="hidden sm:inline">{isRearranging ? t("hoursAnalytics.done") : t("hoursAnalytics.rearrangeCards")}</span>
+              <span className="sm:hidden">{isRearranging ? t("hoursAnalytics.done") : t("hoursAnalytics.rearrange")}</span>
             </Button>
             {isRearranging && (
               <Button
@@ -565,7 +572,7 @@ export default function HoursAnalytics() {
                 data-testid="button-reset-layout"
               >
                 <span className="material-icons text-base">restart_alt</span>
-                <span className="hidden sm:inline">Reset</span>
+                <span className="hidden sm:inline">{t("hoursAnalytics.reset")}</span>
               </Button>
             )}
           </div>
@@ -574,7 +581,7 @@ export default function HoursAnalytics() {
         {isLoading ? (
           <Card className="shadow-premium">
             <CardContent className="pt-6">
-              <p className="text-center text-muted-foreground">Loading analytics...</p>
+              <p className="text-center text-muted-foreground">{t("hoursAnalytics.loading")}</p>
             </CardContent>
           </Card>
         ) : (
@@ -588,14 +595,14 @@ export default function HoursAnalytics() {
                   <div className="relative z-10">
                     <div className="flex items-center gap-2 mb-6">
                       <span className="material-icons text-primary-foreground/80">event_note</span>
-                      <div className="text-sm font-semibold text-primary-foreground/80 uppercase tracking-wide">Total Hours This Month</div>
+                      <div className="text-sm font-semibold text-primary-foreground/80 uppercase tracking-wide">{t("hoursAnalytics.totalHoursThisMonth")}</div>
                     </div>
                     <div className="text-6xl font-bold text-primary-foreground mb-4">
                       {(monthBillable + monthNonBillable).toFixed(1).replace('.', ',')}
                     </div>
                     <div className="flex items-center gap-2 text-primary-foreground/90">
                       <span className="material-icons">trending_up</span>
-                      <span className="text-lg">{((monthBillable / (monthBillable + monthNonBillable || 1)) * 100).toFixed(0)}% Billable</span>
+                      <span className="text-lg">{((monthBillable / (monthBillable + monthNonBillable || 1)) * 100).toFixed(0)}% {t("hoursAnalytics.billable")}</span>
                     </div>
                   </div>
                   {/* Decorative circles */}
@@ -608,7 +615,7 @@ export default function HoursAnalytics() {
               <div className="lg:col-span-1">
                 <Card className="shadow-xl h-full rounded-3xl border-0">
                   <CardHeader className="pb-2">
-                    <CardTitle className="text-base font-semibold text-muted-foreground">Hours Breakdown</CardTitle>
+                    <CardTitle className="text-base font-semibold text-muted-foreground">{t("hoursAnalytics.hoursBreakdown")}</CardTitle>
                   </CardHeader>
                   <CardContent className="flex flex-col items-center justify-center">
                     <ResponsiveContainer width="100%" height={200}>
@@ -634,7 +641,7 @@ export default function HoursAnalytics() {
                       <div className="text-4xl font-bold text-primary">
                         {((monthBillable / (monthBillable + monthNonBillable || 1)) * 100).toFixed(0)}%
                       </div>
-                      <div className="text-sm text-muted-foreground mt-1">Billable Rate</div>
+                      <div className="text-sm text-muted-foreground mt-1">{t("hoursAnalytics.billableRate")}</div>
                     </div>
                   </CardContent>
                 </Card>
@@ -644,19 +651,19 @@ export default function HoursAnalytics() {
               <div className="lg:col-span-1 grid gap-6">
                 <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-primary/90 to-primary p-6 shadow-xl">
                   <div className="relative z-10">
-                    <div className="text-sm font-semibold text-primary-foreground/80 mb-2">Year Efficiency</div>
+                    <div className="text-sm font-semibold text-primary-foreground/80 mb-2">{t("hoursAnalytics.yearEfficiency")}</div>
                     <div className="text-4xl font-bold text-primary-foreground mb-1">{((yearBillable / (yearBillable + yearNonBillable || 1)) * 100).toFixed(0)}%</div>
-                    <div className="text-primary-foreground/70 text-sm">Completion</div>
-                    <div className="text-primary-foreground/70 text-xs mt-2">{yearBillable.toFixed(1)}h billable</div>
+                    <div className="text-primary-foreground/70 text-sm">{t("hoursAnalytics.completion")}</div>
+                    <div className="text-primary-foreground/70 text-xs mt-2">{yearBillable.toFixed(1)}h {t("hoursAnalytics.billable").toLowerCase()}</div>
                   </div>
                 </div>
                 
                 <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-primary/90 to-primary p-6 shadow-xl">
                   <div className="relative z-10">
-                    <div className="text-sm font-semibold text-primary-foreground/80 mb-2">Today's Hours</div>
+                    <div className="text-sm font-semibold text-primary-foreground/80 mb-2">{t("hoursAnalytics.todaysHours")}</div>
                     <div className="text-4xl font-bold text-primary-foreground mb-1">{(dayBillable + dayNonBillable).toFixed(1).replace('.', ',')}</div>
-                    <div className="text-primary-foreground/70 text-sm">{dayBillable.toFixed(1)}h billable</div>
-                    <div className="text-primary-foreground/70 text-xs mt-2">{dayNonBillable.toFixed(1)}h non-billable</div>
+                    <div className="text-primary-foreground/70 text-sm">{dayBillable.toFixed(1)}h {t("hoursAnalytics.billable").toLowerCase()}</div>
+                    <div className="text-primary-foreground/70 text-xs mt-2">{dayNonBillable.toFixed(1)}h {t("hoursAnalytics.nonBillable").toLowerCase()}</div>
                   </div>
                 </div>
               </div>
@@ -665,12 +672,12 @@ export default function HoursAnalytics() {
             {/* Team Performance Bar Chart Section */}
             <Card className="shadow-xl rounded-3xl border-0 mt-6">
               <CardHeader>
-                <CardTitle className="text-lg font-bold">Team Performance</CardTitle>
-                <p className="text-sm text-muted-foreground">Hours Logged This Month</p>
+                <CardTitle className="text-lg font-bold">{t("hoursAnalytics.teamPerformance")}</CardTitle>
+                <p className="text-sm text-muted-foreground">{t("hoursAnalytics.hoursLoggedThisMonth")}</p>
               </CardHeader>
               <CardContent>
                 {employees.length === 0 ? (
-                  <p className="text-center text-muted-foreground py-12">No employees to display</p>
+                  <p className="text-center text-muted-foreground py-12">{t("hoursAnalytics.noEmployeesToDisplay")}</p>
                 ) : (
                   <div className="h-64 flex items-end gap-4 justify-center overflow-x-auto pb-2">
                     {employees.slice(0, 10).map((employee: any) => {
@@ -756,7 +763,7 @@ export default function HoursAnalytics() {
               >
                 <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 mt-6">
                   {sortedStatsCards.map((card: any) => (
-                    <SortableStatsCard key={card.id} card={card} isRearranging={isRearranging} />
+                    <SortableStatsCard key={card.id} card={card} isRearranging={isRearranging} t={t} />
                   ))}
                 </div>
               </SortableContext>
@@ -765,7 +772,7 @@ export default function HoursAnalytics() {
             {/* Task Status Breakdown - Donut Chart */}
             <Card className="shadow-xl rounded-3xl border-0 mt-6">
               <CardHeader>
-                <CardTitle className="text-lg font-bold">Task Status Breakdown</CardTitle>
+                <CardTitle className="text-lg font-bold">{t("hoursAnalytics.taskStatusBreakdown")}</CardTitle>
               </CardHeader>
               <CardContent className="flex justify-center">
                 <ResponsiveContainer width="100%" height={300}>
@@ -805,12 +812,12 @@ export default function HoursAnalytics() {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <span className="material-icons text-primary">calendar_today</span>
-                  Current Year - {currentYear}
+                  {t("hoursAnalytics.currentYear")} - {currentYear}
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 {yearBillable + yearNonBillable === 0 ? (
-                  <p className="text-center text-muted-foreground py-12">No hours recorded this year</p>
+                  <p className="text-center text-muted-foreground py-12">{t("hoursAnalytics.noHoursThisYear")}</p>
                 ) : (
                   <div className="flex flex-col items-center">
                     <ResponsiveContainer width="100%" height={350}>
@@ -838,15 +845,15 @@ export default function HoursAnalytics() {
                     <div className="grid grid-cols-2 gap-4 mt-4 w-full max-w-sm">
                       <div className="text-center">
                         <div className="text-2xl font-bold text-primary">{yearBillable.toFixed(2)}h</div>
-                        <div className="text-sm text-muted-foreground">Billable</div>
+                        <div className="text-sm text-muted-foreground">{t("hoursAnalytics.billable")}</div>
                       </div>
                       <div className="text-center">
                         <div className="text-2xl font-bold" style={{ color: "hsl(var(--chart-2))" }}>{yearNonBillable.toFixed(2)}h</div>
-                        <div className="text-sm text-muted-foreground">Non-Billable</div>
+                        <div className="text-sm text-muted-foreground">{t("hoursAnalytics.nonBillable")}</div>
                       </div>
                     </div>
                     <div className="mt-4 text-center">
-                      <div className="text-lg font-semibold">Total: {(yearBillable + yearNonBillable).toFixed(2)}h</div>
+                      <div className="text-lg font-semibold">{t("hoursAnalytics.total")}: {(yearBillable + yearNonBillable).toFixed(2)}h</div>
                     </div>
                   </div>
                 )}
@@ -858,12 +865,12 @@ export default function HoursAnalytics() {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <span className="material-icons text-primary">event</span>
-                  Current Month - {monthNames[currentMonth]} {currentYear}
+                  {t("hoursAnalytics.currentMonth")} - {monthNames[currentMonth]} {currentYear}
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 {monthBillable + monthNonBillable === 0 ? (
-                  <p className="text-center text-muted-foreground py-12">No hours recorded this month</p>
+                  <p className="text-center text-muted-foreground py-12">{t("hoursAnalytics.noHoursThisMonth")}</p>
                 ) : (
                   <div className="flex flex-col items-center">
                     <ResponsiveContainer width="100%" height={350}>
@@ -891,15 +898,15 @@ export default function HoursAnalytics() {
                     <div className="grid grid-cols-2 gap-4 mt-4 w-full max-w-sm">
                       <div className="text-center">
                         <div className="text-2xl font-bold text-primary">{monthBillable.toFixed(2)}h</div>
-                        <div className="text-sm text-muted-foreground">Billable</div>
+                        <div className="text-sm text-muted-foreground">{t("hoursAnalytics.billable")}</div>
                       </div>
                       <div className="text-center">
                         <div className="text-2xl font-bold" style={{ color: "hsl(var(--chart-2))" }}>{monthNonBillable.toFixed(2)}h</div>
-                        <div className="text-sm text-muted-foreground">Non-Billable</div>
+                        <div className="text-sm text-muted-foreground">{t("hoursAnalytics.nonBillable")}</div>
                       </div>
                     </div>
                     <div className="mt-4 text-center">
-                      <div className="text-lg font-semibold">Total: {(monthBillable + monthNonBillable).toFixed(2)}h</div>
+                      <div className="text-lg font-semibold">{t("hoursAnalytics.total")}: {(monthBillable + monthNonBillable).toFixed(2)}h</div>
                     </div>
                   </div>
                 )}
@@ -911,12 +918,12 @@ export default function HoursAnalytics() {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <span className="material-icons text-primary">today</span>
-                  Today - {now.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })}
+                  {t("hoursAnalytics.today")} - {now.toLocaleDateString()}
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 {dayBillable + dayNonBillable === 0 ? (
-                  <p className="text-center text-muted-foreground py-12">No hours recorded today</p>
+                  <p className="text-center text-muted-foreground py-12">{t("hoursAnalytics.noHoursToday")}</p>
                 ) : (
                   <div className="flex flex-col items-center">
                     <ResponsiveContainer width="100%" height={350}>
@@ -944,15 +951,15 @@ export default function HoursAnalytics() {
                     <div className="grid grid-cols-2 gap-4 mt-4 w-full max-w-sm">
                       <div className="text-center">
                         <div className="text-2xl font-bold text-primary">{dayBillable.toFixed(2)}h</div>
-                        <div className="text-sm text-muted-foreground">Billable</div>
+                        <div className="text-sm text-muted-foreground">{t("hoursAnalytics.billable")}</div>
                       </div>
                       <div className="text-center">
                         <div className="text-2xl font-bold" style={{ color: "hsl(var(--chart-2))" }}>{dayNonBillable.toFixed(2)}h</div>
-                        <div className="text-sm text-muted-foreground">Non-Billable</div>
+                        <div className="text-sm text-muted-foreground">{t("hoursAnalytics.nonBillable")}</div>
                       </div>
                     </div>
                     <div className="mt-4 text-center">
-                      <div className="text-lg font-semibold">Total: {(dayBillable + dayNonBillable).toFixed(2)}h</div>
+                      <div className="text-lg font-semibold">{t("hoursAnalytics.total")}: {(dayBillable + dayNonBillable).toFixed(2)}h</div>
                     </div>
                   </div>
                 )}
@@ -967,13 +974,13 @@ export default function HoursAnalytics() {
             <DialogHeader>
               <DialogTitle className="flex items-center gap-2">
                 <span className="material-icons text-primary">assignment</span>
-                Active Projects
+                {t("hoursAnalytics.activeProjects")}
               </DialogTitle>
-              <DialogDescription>Currently in-progress projects</DialogDescription>
+              <DialogDescription>{t("hoursAnalytics.currentlyInProgress")}</DialogDescription>
             </DialogHeader>
             <ScrollArea className="max-h-[60vh]">
               {projects.filter((p: any) => p.status === 'active').length === 0 ? (
-                <p className="text-center text-muted-foreground py-8">No active projects</p>
+                <p className="text-center text-muted-foreground py-8">{t("hoursAnalytics.noActiveProjects")}</p>
               ) : (
                 <div className="space-y-3">
                   {projects.filter((p: any) => p.status === 'active').map((project: any) => (
@@ -999,13 +1006,13 @@ export default function HoursAnalytics() {
             <DialogHeader>
               <DialogTitle className="flex items-center gap-2">
                 <span className="material-icons text-emerald-600">check_circle</span>
-                Completed Projects
+                {t("hoursAnalytics.completedProjects")}
               </DialogTitle>
-              <DialogDescription>All-time completed projects</DialogDescription>
+              <DialogDescription>{t("hoursAnalytics.allTimeCompleted")}</DialogDescription>
             </DialogHeader>
             <ScrollArea className="max-h-[60vh]">
               {projects.filter((p: any) => p.status === 'completed').length === 0 ? (
-                <p className="text-center text-muted-foreground py-8">No completed projects</p>
+                <p className="text-center text-muted-foreground py-8">{t("hoursAnalytics.noCompletedProjects")}</p>
               ) : (
                 <div className="space-y-3">
                   {projects.filter((p: any) => p.status === 'completed').map((project: any) => (
@@ -1026,13 +1033,13 @@ export default function HoursAnalytics() {
             <DialogHeader>
               <DialogTitle className="flex items-center gap-2">
                 <span className="material-icons text-primary">group</span>
-                All Employees
+                {t("hoursAnalytics.allEmployees")}
               </DialogTitle>
-              <DialogDescription>{totalEmployees} total employees company-wide</DialogDescription>
+              <DialogDescription>{totalEmployees} {t("hoursAnalytics.totalEmployeesCompanyWide")}</DialogDescription>
             </DialogHeader>
             <ScrollArea className="max-h-[60vh]">
               {employees.length === 0 ? (
-                <p className="text-center text-muted-foreground py-8">No employees</p>
+                <p className="text-center text-muted-foreground py-8">{t("hoursAnalytics.noEmployees")}</p>
               ) : (
                 <div className="space-y-3">
                   {employees.map((employee: any) => (
@@ -1059,13 +1066,13 @@ export default function HoursAnalytics() {
             <DialogHeader>
               <DialogTitle className="flex items-center gap-2">
                 <span className="material-icons text-primary">people</span>
-                Active Employees This Month
+                {t("hoursAnalytics.activeEmployeesThisMonth")}
               </DialogTitle>
-              <DialogDescription>{uniqueEmployeesThisMonth} employees worked this month</DialogDescription>
+              <DialogDescription>{uniqueEmployeesThisMonth} {t("hoursAnalytics.employeesWorkedThisMonth")}</DialogDescription>
             </DialogHeader>
             <ScrollArea className="max-h-[60vh]">
               {monthSessions.length === 0 ? (
-                <p className="text-center text-muted-foreground py-8">No active employees this month</p>
+                <p className="text-center text-muted-foreground py-8">{t("hoursAnalytics.noActiveEmployeesThisMonth")}</p>
               ) : (
                 <div className="space-y-3">
                   {Array.from(new Set(monthSessions.map((s: any) => s.employeeId))).map((empId: any) => {
@@ -1084,7 +1091,7 @@ export default function HoursAnalytics() {
                           <div className="font-semibold">{empName}</div>
                           <div className="text-lg font-bold text-primary">{empHours.toFixed(1)}h</div>
                         </div>
-                        <div className="text-sm text-muted-foreground mt-1">{empSessions.length} sessions</div>
+                        <div className="text-sm text-muted-foreground mt-1">{empSessions.length} {t("hoursAnalytics.sessions")}</div>
                       </Card>
                     );
                   })}
@@ -1099,13 +1106,13 @@ export default function HoursAnalytics() {
             <DialogHeader>
               <DialogTitle className="flex items-center gap-2">
                 <span className="material-icons text-purple-600">calendar_month</span>
-                Work Sessions This Month
+                {t("hoursAnalytics.workSessionsThisMonth")}
               </DialogTitle>
-              <DialogDescription>{totalSessionsThisMonth} total sessions completed</DialogDescription>
+              <DialogDescription>{totalSessionsThisMonth} {t("hoursAnalytics.totalSessionsCompleted")}</DialogDescription>
             </DialogHeader>
             <ScrollArea className="max-h-[60vh]">
               {monthSessions.length === 0 ? (
-                <p className="text-center text-muted-foreground py-8">No work sessions this month</p>
+                <p className="text-center text-muted-foreground py-8">{t("hoursAnalytics.noWorkSessionsThisMonth")}</p>
               ) : (
                 <div className="space-y-3">
                   {monthSessions.slice(0, 20).map((session: any) => {
@@ -1133,7 +1140,7 @@ export default function HoursAnalytics() {
                           <div className="text-right">
                             <div className="font-bold text-primary">{duration}h</div>
                             <div className="text-xs text-muted-foreground">
-                              {session.description || 'Billable work'}
+                              {session.description || t("hoursAnalytics.billableWork")}
                             </div>
                           </div>
                         </div>
@@ -1142,7 +1149,7 @@ export default function HoursAnalytics() {
                   })}
                   {monthSessions.length > 20 && (
                     <p className="text-center text-muted-foreground text-sm py-2">
-                      Showing 20 of {monthSessions.length} sessions
+                      {t("hoursAnalytics.showingOf", { shown: 20, total: monthSessions.length })}
                     </p>
                   )}
                 </div>
@@ -1156,19 +1163,19 @@ export default function HoursAnalytics() {
             <DialogHeader>
               <DialogTitle className="flex items-center gap-2">
                 <span className="material-icons text-primary">schedule</span>
-                Average Session Duration
+                {t("hoursAnalytics.avgSessionDuration")}
               </DialogTitle>
-              <DialogDescription>Insights into typical work session length</DialogDescription>
+              <DialogDescription>{t("hoursAnalytics.sessionDurationInsights")}</DialogDescription>
             </DialogHeader>
             <div className="space-y-4">
               <div className="text-center py-6">
                 <div className="text-6xl font-bold text-primary">{avgSessionDuration}h</div>
-                <div className="text-muted-foreground mt-2">Average Duration</div>
+                <div className="text-muted-foreground mt-2">{t("hoursAnalytics.averageDuration")}</div>
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div className="text-center p-4 bg-muted rounded-lg">
                   <div className="text-2xl font-bold">{completedSessions.length}</div>
-                  <div className="text-sm text-muted-foreground">Total Sessions</div>
+                  <div className="text-sm text-muted-foreground">{t("hoursAnalytics.totalSessions")}</div>
                 </div>
                 <div className="text-center p-4 bg-muted rounded-lg">
                   <div className="text-2xl font-bold">
@@ -1181,7 +1188,7 @@ export default function HoursAnalytics() {
                         }, 0)).toFixed(1))
                       : '0.0'}h
                   </div>
-                  <div className="text-sm text-muted-foreground">Total Hours</div>
+                  <div className="text-sm text-muted-foreground">{t("hoursAnalytics.totalHours")}</div>
                 </div>
               </div>
             </div>
@@ -1193,23 +1200,23 @@ export default function HoursAnalytics() {
             <DialogHeader>
               <DialogTitle className="flex items-center gap-2">
                 <span className="material-icons text-orange-600">arrow_downward</span>
-                Total Drops This Month
+                {t("hoursAnalytics.totalDropsThisMonth")}
               </DialogTitle>
-              <DialogDescription>Drops completed across all elevations</DialogDescription>
+              <DialogDescription>{t("hoursAnalytics.dropsCompletedAllElevations")}</DialogDescription>
             </DialogHeader>
             <div className="space-y-4">
               <div className="text-center py-6">
                 <div className="text-6xl font-bold text-orange-600">{totalDropsThisMonth}</div>
-                <div className="text-muted-foreground mt-2">Total Drops</div>
+                <div className="text-muted-foreground mt-2">{t("hoursAnalytics.totalDrops")}</div>
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div className="text-center p-4 bg-muted rounded-lg">
                   <div className="text-2xl font-bold">{sessionsWithDrops.length}</div>
-                  <div className="text-sm text-muted-foreground">Sessions with Drops</div>
+                  <div className="text-sm text-muted-foreground">{t("hoursAnalytics.sessionsWithDrops")}</div>
                 </div>
                 <div className="text-center p-4 bg-muted rounded-lg">
                   <div className="text-2xl font-bold">{avgDropsPerSession}</div>
-                  <div className="text-sm text-muted-foreground">Avg per Session</div>
+                  <div className="text-sm text-muted-foreground">{t("hoursAnalytics.avgPerSession")}</div>
                 </div>
               </div>
             </div>
@@ -1221,17 +1228,17 @@ export default function HoursAnalytics() {
             <DialogHeader>
               <DialogTitle className="flex items-center gap-2">
                 <span className="material-icons text-primary">speed</span>
-                Average Drops Per Session
+                {t("hoursAnalytics.avgDropsPerSession")}
               </DialogTitle>
-              <DialogDescription>Productivity metric for rope access work</DialogDescription>
+              <DialogDescription>{t("hoursAnalytics.productivityMetric")}</DialogDescription>
             </DialogHeader>
             <div className="space-y-4">
               <div className="text-center py-6">
                 <div className="text-6xl font-bold text-primary">{avgDropsPerSession}</div>
-                <div className="text-muted-foreground mt-2">Drops per Session</div>
+                <div className="text-muted-foreground mt-2">{t("hoursAnalytics.dropsPerSession")}</div>
               </div>
               <div className="p-4 bg-muted rounded-lg">
-                <div className="text-sm text-muted-foreground">This shows the average number of drops completed in each work session, indicating team productivity and efficiency.</div>
+                <div className="text-sm text-muted-foreground">{t("hoursAnalytics.dropsExplanation")}</div>
               </div>
             </div>
           </DialogContent>

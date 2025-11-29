@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo, useContext } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
+import { useTranslation } from "react-i18next";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { useLocation } from "wouter";
 import FullCalendar from "@fullcalendar/react";
@@ -31,6 +32,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip
 import { BrandingContext } from "@/App";
 
 export default function Schedule() {
+  const { t } = useTranslation();
   const { toast } = useToast();
   const [, setLocation] = useLocation();
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
@@ -83,7 +85,7 @@ export default function Schedule() {
           className="mb-2"
         >
           <ArrowLeft className="w-4 h-4 mr-2" />
-          Back to Dashboard
+          {t('schedule.backToDashboard', 'Back to Dashboard')}
         </Button>
 
         <Card className="border-2 border-destructive/50">
@@ -93,13 +95,13 @@ export default function Schedule() {
                 <Lock className="w-12 h-12 text-destructive" />
               </div>
               <div className="space-y-2">
-                <h2 className="text-2xl font-bold">Access Denied</h2>
+                <h2 className="text-2xl font-bold">{t('schedule.accessDenied', 'Access Denied')}</h2>
                 <p className="text-muted-foreground max-w-md">
-                  You don't have permission to view the Job Schedule. Please contact your administrator to request access.
+                  {t('schedule.accessDeniedMessage', "You don't have permission to view the Job Schedule. Please contact your administrator to request access.")}
                 </p>
               </div>
               <Button onClick={() => setLocation("/dashboard")} data-testid="button-return-dashboard">
-                Return to Dashboard
+                {t('schedule.returnToDashboard', 'Return to Dashboard')}
               </Button>
             </div>
           </CardContent>
@@ -553,14 +555,14 @@ export default function Schedule() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/schedule"] });
       toast({
-        title: "Assignment updated",
-        description: "Employee assignment has been updated",
+        title: t('schedule.assignmentCreated', 'Assignment updated'),
+        description: t('schedule.assignmentCreated', 'Employee assignment has been updated'),
       });
     },
     onError: () => {
       toast({
-        title: "Error",
-        description: "Failed to update assignment",
+        title: t('schedule.error', 'Error'),
+        description: t('schedule.error', 'Failed to update assignment'),
         variant: "destructive",
       });
     },
@@ -594,14 +596,14 @@ export default function Schedule() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/schedule"] });
       toast({
-        title: "Job rescheduled",
-        description: "All days of the job have been moved",
+        title: t('schedule.jobUpdated', 'Job rescheduled'),
+        description: t('schedule.jobUpdated', 'All days of the job have been moved'),
       });
     },
     onError: () => {
       toast({
-        title: "Error",
-        description: "Failed to reschedule job",
+        title: t('schedule.error', 'Error'),
+        description: t('schedule.error', 'Failed to reschedule job'),
         variant: "destructive",
       });
     },
@@ -628,14 +630,14 @@ export default function Schedule() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/schedule"] });
       toast({
-        title: "Employee unassigned",
-        description: "Removed from all scheduled jobs",
+        title: t('schedule.assignmentRemoved', 'Employee unassigned'),
+        description: t('schedule.assignmentRemoved', 'Removed from all scheduled jobs'),
       });
     },
     onError: () => {
       toast({
-        title: "Error",
-        description: "Failed to unassign employee",
+        title: t('schedule.error', 'Error'),
+        description: t('schedule.error', 'Failed to unassign employee'),
         variant: "destructive",
       });
     },
@@ -786,16 +788,16 @@ export default function Schedule() {
         className="mb-2"
       >
         <ArrowLeft className="w-4 h-4 mr-2" />
-        Back to Dashboard
+        {t('schedule.backToDashboard', 'Back to Dashboard')}
       </Button>
 
       {/* Header */}
       <div className="flex items-center gap-3">
         <Calendar className="w-8 h-8 text-primary" />
         <div>
-          <h1 className="text-2xl font-bold">Job Schedule</h1>
+          <h1 className="text-2xl font-bold">{t('schedule.title', 'Job Schedule')}</h1>
           <p className="text-sm text-muted-foreground">
-            Manage your team's job assignments and schedule
+            {t('schedule.subtitle', "Manage your team's job assignments and schedule")}
           </p>
         </div>
       </div>
@@ -808,7 +810,7 @@ export default function Schedule() {
               <CardTitle className="text-sm font-bold flex items-center justify-between text-primary">
                 <div className="flex items-center gap-1.5">
                   <Users className="w-4 h-4" />
-                  EMPLOYEE AVAILABILITY
+                  {t('schedule.employeeAvailability', 'EMPLOYEE AVAILABILITY')}
                   <Badge variant="secondary" className="ml-2 text-xs">
                     {assignedEmployees.length} / {employees.length}
                   </Badge>
@@ -824,10 +826,10 @@ export default function Schedule() {
                 <div className="bg-card rounded p-1.5 border-l-4 border-l-green-600 shadow-sm">
                   <div className="flex items-center gap-1 mb-1">
                     <UserCheck className="w-3.5 h-3.5 text-green-600" />
-                    <h3 className="font-bold text-xs text-green-700">Assigned ({assignedEmployees.length})</h3>
+                    <h3 className="font-bold text-xs text-green-700">{t('schedule.assigned', 'Assigned')} ({assignedEmployees.length})</h3>
                   </div>
                   {assignedEmployees.length === 0 ? (
-                    <p className="text-xs text-muted-foreground">No employees assigned</p>
+                    <p className="text-xs text-muted-foreground">{t('schedule.noAssignments', 'No employees assigned')}</p>
                   ) : (
                     <div className="space-y-0.5 max-h-24 overflow-y-auto pr-1">
                       {assignedEmployees.map(employee => {
@@ -872,10 +874,10 @@ export default function Schedule() {
                   <div className="bg-card rounded p-1.5 border-l-4 border-l-primary shadow-sm">
                     <div className="flex items-center gap-1 mb-1">
                       <UserX className="w-3.5 h-3.5 text-primary" />
-                      <h3 className="font-bold text-xs text-primary">Available ({availableEmployees.length})</h3>
+                      <h3 className="font-bold text-xs text-primary">{t('schedule.available', 'Available')} ({availableEmployees.length})</h3>
                     </div>
                     {availableEmployees.length === 0 ? (
-                      <p className="text-xs text-muted-foreground">All employees assigned</p>
+                      <p className="text-xs text-muted-foreground">{t('schedule.allAssigned', 'All employees assigned')}</p>
                     ) : (
                       <div className="space-y-0.5 max-h-24 overflow-y-auto pr-1">
                         {availableEmployees.map(employee => {
@@ -909,7 +911,7 @@ export default function Schedule() {
         <CardHeader className="pb-1 pt-2">
           <CardTitle className="text-sm font-bold flex items-center gap-1.5 text-primary">
             <Users className="w-4 h-4" />
-            EMPLOYEE AVAILABILITY
+            {t('schedule.employeeAvailability', 'EMPLOYEE AVAILABILITY')}
           </CardTitle>
         </CardHeader>
         <CardContent className="pt-0 pb-2">
@@ -918,10 +920,10 @@ export default function Schedule() {
             <div className="bg-card rounded p-1.5 border-l-4 border-l-green-600 shadow-sm">
               <div className="flex items-center gap-1 mb-1">
                 <UserCheck className="w-3.5 h-3.5 text-green-600" />
-                <h3 className="font-bold text-xs text-green-700">Assigned ({assignedEmployees.length})</h3>
+                <h3 className="font-bold text-xs text-green-700">{t('schedule.assigned', 'Assigned')} ({assignedEmployees.length})</h3>
               </div>
               {assignedEmployees.length === 0 ? (
-                <p className="text-xs text-muted-foreground">No employees assigned</p>
+                <p className="text-xs text-muted-foreground">{t('schedule.noAssignments', 'No employees assigned')}</p>
               ) : (
                 <div className="space-y-0.5 max-h-24 overflow-y-auto pr-1">
                   {assignedEmployees.map(employee => {
@@ -966,10 +968,10 @@ export default function Schedule() {
               <div className="bg-card rounded p-1.5 border-l-4 border-l-primary shadow-sm">
                 <div className="flex items-center gap-1 mb-1">
                   <UserX className="w-3.5 h-3.5 text-primary" />
-                  <h3 className="font-bold text-xs text-primary">Available ({availableEmployees.length})</h3>
+                  <h3 className="font-bold text-xs text-primary">{t('schedule.available', 'Available')} ({availableEmployees.length})</h3>
                 </div>
                 {availableEmployees.length === 0 ? (
-                  <p className="text-xs text-muted-foreground">All employees assigned</p>
+                  <p className="text-xs text-muted-foreground">{t('schedule.allAssigned', 'All employees assigned')}</p>
                 ) : (
                   <div className="space-y-0.5 max-h-24 overflow-y-auto pr-1">
                     {availableEmployees.map(employee => {
@@ -983,7 +985,7 @@ export default function Schedule() {
                           type="available"
                         >
                           <Badge variant="default" className="mt-0.5 text-[9px] h-4 px-1.5 py-0 bg-primary hover:bg-primary/90">
-                            Ready
+                            {t('schedule.available', 'Ready')}
                           </Badge>
                         </DraggableEmployeeCard>
                       );
@@ -1004,14 +1006,14 @@ export default function Schedule() {
             data-testid="tab-job-schedule"
             className="text-base font-bold bg-background border border-border data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:border-primary data-[state=active]:shadow-lg transition-all"
           >
-            Job Schedule
+            {t('schedule.calendar', 'Job Schedule')}
           </TabsTrigger>
           <TabsTrigger 
             value="employee-schedule" 
             data-testid="tab-employee-schedule"
             className="text-base font-bold bg-background border border-border data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:border-primary data-[state=active]:shadow-lg transition-all"
           >
-            Employee Schedule
+            {t('schedule.timeline', 'Employee Schedule')}
           </TabsTrigger>
         </TabsList>
 
@@ -1020,16 +1022,16 @@ export default function Schedule() {
             {activeEmployeeId && (
               <div className="mb-4 p-3 bg-primary/10 border-2 border-primary rounded-lg">
                 <p className="text-sm font-semibold text-primary">
-                  🎯 Assigning: {activeEmployee?.name}
+                  {t('schedule.assignEmployee', 'Assigning')}: {activeEmployee?.name}
                 </p>
                 <p className="text-xs text-muted-foreground mt-1">
-                  Click on any job to assign this employee. Green = assign, Red = remove. Press Escape to cancel.
+                  {t('schedule.dragToAssign', 'Click on any job to assign this employee. Green = assign, Red = remove. Press Escape to cancel.')}
                 </p>
               </div>
             )}
         {isLoading ? (
           <div className="flex items-center justify-center h-96">
-            <div className="text-muted-foreground">Loading calendar...</div>
+            <div className="text-muted-foreground">{t('schedule.loading', 'Loading calendar...')}</div>
           </div>
         ) : (
           <div className="schedule-calendar-wrapper">
@@ -1321,7 +1323,7 @@ export default function Schedule() {
                   {employees.length === 0 ? (
                     <div className="text-center py-12 text-muted-foreground">
                       <Users className="w-12 h-12 mx-auto mb-3 opacity-50" />
-                      <p>No team members found</p>
+                      <p>{t('schedule.noAssignments', 'No team members found')}</p>
                     </div>
                   ) : (
                     employees.map((employee) => (
@@ -1451,15 +1453,15 @@ export default function Schedule() {
               <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground mb-3">
                 <div className="flex items-center gap-2">
                   <div className="w-3 h-3 rounded bg-primary"></div>
-                  <span>Today</span>
+                  <span>{t('schedule.today', 'Today')}</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <Briefcase className="w-4 h-4" />
-                  <span>Click on a job to view details</span>
+                  <span>{t('schedule.jobDetails', 'Click on a job to view details')}</span>
                 </div>
               </div>
               <div className="flex flex-wrap items-center gap-3 text-xs">
-                <span className="font-medium text-muted-foreground">Time Off:</span>
+                <span className="font-medium text-muted-foreground">{t('schedule.onTimeOff', 'Time Off')}:</span>
                 {timeOffTypes.map((type) => (
                   <div key={type.value} className="flex items-center gap-1.5">
                     <div 
@@ -1479,20 +1481,20 @@ export default function Schedule() {
       <Dialog open={timeOffDialogOpen} onOpenChange={setTimeOffDialogOpen}>
         <DialogContent className="max-w-md">
           <DialogHeader>
-            <DialogTitle>Schedule Time Off</DialogTitle>
+            <DialogTitle>{t('schedule.onTimeOff', 'Schedule Time Off')}</DialogTitle>
             <DialogDescription>
-              Schedule time off for a team member. This will block the selected days on their schedule.
+              {t('schedule.onTimeOff', 'Schedule time off for a team member. This will block the selected days on their schedule.')}
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4 py-4">
             <div className="space-y-2">
-              <Label>Employee</Label>
+              <Label>{t('schedule.employees', 'Employee')}</Label>
               <Select
                 value={selectedEmployeeForTimeOff}
                 onValueChange={setSelectedEmployeeForTimeOff}
               >
                 <SelectTrigger data-testid="select-time-off-employee">
-                  <SelectValue placeholder="Select employee..." />
+                  <SelectValue placeholder={t('schedule.selectProject', 'Select employee...')} />
                 </SelectTrigger>
                 <SelectContent>
                   {employees.map((employee) => (
@@ -1506,7 +1508,7 @@ export default function Schedule() {
             
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-2">
-                <Label>Start Date</Label>
+                <Label>{t('schedule.startDate', 'Start Date')}</Label>
                 <Input
                   type="date"
                   value={selectedTimeOffStartDate}
@@ -1520,7 +1522,7 @@ export default function Schedule() {
                 />
               </div>
               <div className="space-y-2">
-                <Label>End Date</Label>
+                <Label>{t('schedule.endDate', 'End Date')}</Label>
                 <Input
                   type="date"
                   value={selectedTimeOffEndDate}
@@ -1567,11 +1569,11 @@ export default function Schedule() {
             </div>
             
             <div className="space-y-2">
-              <Label>Notes (Optional)</Label>
+              <Label>{t('schedule.notes', 'Notes')} ({t('common.optional', 'Optional')})</Label>
               <Textarea
                 value={timeOffNotes}
                 onChange={(e) => setTimeOffNotes(e.target.value)}
-                placeholder="Add any notes about this time off..."
+                placeholder={t('schedule.notes', 'Add any notes about this time off...')}
                 data-testid="input-time-off-notes"
               />
             </div>
@@ -1585,14 +1587,14 @@ export default function Schedule() {
               }}
               data-testid="button-cancel-time-off"
             >
-              Cancel
+              {t('schedule.cancel', 'Cancel')}
             </Button>
             <Button
               onClick={handleCreateTimeOff}
               disabled={createTimeOffMutation.isPending}
               data-testid="button-save-time-off"
             >
-              {createTimeOffMutation.isPending ? "Scheduling..." : "Schedule Time Off"}
+              {createTimeOffMutation.isPending ? t('schedule.onTimeOff', 'Scheduling...') : t('schedule.onTimeOff', 'Schedule Time Off')}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -1632,15 +1634,15 @@ export default function Schedule() {
         <Sheet open={assignmentDialogOpen} onOpenChange={setAssignmentDialogOpen}>
           <SheetContent>
             <SheetHeader>
-              <SheetTitle>Assign Employee to Job</SheetTitle>
+              <SheetTitle>{t('schedule.assignEmployee', 'Assign Employee to Job')}</SheetTitle>
               <SheetDescription>
-                Specify the date range when {selectedEmployeeForAssignment.name} will work on this job
+                {t('schedule.assignEmployee', 'Specify the date range when')} {selectedEmployeeForAssignment.name} {t('schedule.assignEmployee', 'will work on this job')}
               </SheetDescription>
             </SheetHeader>
             
             <div className="space-y-4 mt-6">
               <div>
-                <Label htmlFor="assign-start-date">Start Date</Label>
+                <Label htmlFor="assign-start-date">{t('schedule.startDate', 'Start Date')}</Label>
                 <Input
                   id="assign-start-date"
                   type="date"
@@ -1650,7 +1652,7 @@ export default function Schedule() {
                 />
               </div>
               <div>
-                <Label htmlFor="assign-end-date">End Date</Label>
+                <Label htmlFor="assign-end-date">{t('schedule.endDate', 'End Date')}</Label>
                 <Input
                   id="assign-end-date"
                   type="date"
@@ -1667,7 +1669,7 @@ export default function Schedule() {
                 onClick={() => setAssignmentDialogOpen(false)}
                 data-testid="button-cancel-assignment"
               >
-                Cancel
+                {t('schedule.cancel', 'Cancel')}
               </Button>
               <Button
                 onClick={() => {
@@ -1681,7 +1683,7 @@ export default function Schedule() {
                 disabled={assignEmployeeMutation.isPending}
                 data-testid="button-save-assignment"
               >
-                {assignEmployeeMutation.isPending ? "Assigning..." : "Assign Employee"}
+                {assignEmployeeMutation.isPending ? t('schedule.assignEmployee', 'Assigning...') : t('schedule.assignEmployee', 'Assign Employee')}
               </Button>
             </SheetFooter>
           </SheetContent>
@@ -1747,6 +1749,7 @@ function DraggableEmployeeCard({
 
 // Droppable Available Zone Component
 function DroppableAvailableZone({ isDragging, children }: { isDragging: boolean; children: React.ReactNode }) {
+  const { t } = useTranslation();
   const { setNodeRef, isOver } = useDroppable({
     id: 'available-zone',
   });
@@ -1758,7 +1761,7 @@ function DroppableAvailableZone({ isDragging, children }: { isDragging: boolean;
     >
       {isOver && (
         <div className="absolute inset-0 flex items-center justify-center bg-primary/5 rounded-lg z-10 pointer-events-none">
-          <p className="text-sm font-bold text-primary">Drop to unassign from all jobs</p>
+          <p className="text-sm font-bold text-primary">{t('schedule.dropHere', 'Drop to unassign from all jobs')}</p>
         </div>
       )}
       {children}
@@ -1778,6 +1781,7 @@ function CreateJobDialog({
   selectedDates: { start: Date; end: Date } | null;
   employees: User[];
 }) {
+  const { t } = useTranslation();
   const { toast } = useToast();
   const { brandColors, brandingActive } = useContext(BrandingContext);
   const defaultJobColor = brandingActive && brandColors.length > 0 ? brandColors[0] : "hsl(var(--primary))";
@@ -1835,8 +1839,8 @@ function CreateJobDialog({
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/schedule"] });
       toast({
-        title: "Job created",
-        description: "Job has been added to the schedule",
+        title: t('schedule.jobCreated', 'Job created'),
+        description: t('schedule.jobCreated', 'Job has been added to the schedule'),
       });
       onOpenChange(false);
       resetForm();
@@ -1844,14 +1848,14 @@ function CreateJobDialog({
     onError: (error: any) => {
       if (error.conflicts) {
         toast({
-          title: "Schedule conflict",
-          description: `${error.conflicts[0].employeeName} is already assigned to "${error.conflicts[0].conflictingJob}"`,
+          title: t('schedule.error', 'Schedule conflict'),
+          description: `${error.conflicts[0].employeeName} ${t('schedule.error', 'is already assigned to')} "${error.conflicts[0].conflictingJob}"`,
           variant: "destructive",
         });
       } else {
         toast({
-          title: "Error",
-          description: error.message || "Failed to create job",
+          title: t('schedule.error', 'Error'),
+          description: error.message || t('schedule.error', 'Failed to create job'),
           variant: "destructive",
         });
       }
@@ -1902,20 +1906,20 @@ function CreateJobDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Create New Job</DialogTitle>
+          <DialogTitle>{t('schedule.createJob', 'Create New Job')}</DialogTitle>
           <DialogDescription>
-            Schedule a new job and assign team members
+            {t('schedule.createJob', 'Schedule a new job and assign team members')}
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="project">Select Project (Optional)</Label>
+            <Label htmlFor="project">{t('schedule.project', 'Select Project')} ({t('common.optional', 'Optional')})</Label>
             <Select
               value={formData.projectId}
               onValueChange={(value) => setFormData({ ...formData, projectId: value })}
             >
               <SelectTrigger data-testid="select-project">
-                <SelectValue placeholder="Choose a project or leave blank for custom job" />
+                <SelectValue placeholder={t('schedule.selectProject', 'Choose a project or leave blank for custom job')} />
               </SelectTrigger>
               <SelectContent>
                 {projects.map((project: any) => (
@@ -1928,24 +1932,24 @@ function CreateJobDialog({
           </div>
           
           <div className="space-y-2">
-            <Label htmlFor="title">Job Title {!formData.projectId && '*'}</Label>
+            <Label htmlFor="title">{t('schedule.jobTitle', 'Job Title')} {!formData.projectId && '*'}</Label>
             <Input
               id="title"
               value={formData.title}
               onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-              placeholder="e.g., Window Cleaning - North Tower"
+              placeholder={t('schedule.jobTitle', 'e.g., Window Cleaning - North Tower')}
               required={!formData.projectId}
               disabled={!!formData.projectId}
               data-testid="input-job-title"
             />
             {formData.projectId && (
-              <p className="text-xs text-muted-foreground">Project name will be used automatically</p>
+              <p className="text-xs text-muted-foreground">{t('schedule.project', 'Project name will be used automatically')}</p>
             )}
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="startDate">Start Date *</Label>
+              <Label htmlFor="startDate">{t('schedule.startDate', 'Start Date')} *</Label>
               <Input
                 id="startDate"
                 type="datetime-local"
@@ -1956,7 +1960,7 @@ function CreateJobDialog({
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="endDate">End Date *</Label>
+              <Label htmlFor="endDate">{t('schedule.endDate', 'End Date')} *</Label>
               <Input
                 id="endDate"
                 type="datetime-local"
@@ -1969,7 +1973,7 @@ function CreateJobDialog({
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="jobType">Job Type *</Label>
+            <Label htmlFor="jobType">{t('projects.type', 'Job Type')} *</Label>
             <Select
               value={formData.jobType}
               onValueChange={(value) => setFormData({ ...formData, jobType: value })}
@@ -1978,25 +1982,25 @@ function CreateJobDialog({
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="window_cleaning">Window Cleaning</SelectItem>
-                <SelectItem value="dryer_vent_cleaning">Dryer Vent Cleaning</SelectItem>
-                <SelectItem value="building_wash">Building Wash - Pressure washing</SelectItem>
-                <SelectItem value="in_suite">In-Suite Service</SelectItem>
-                <SelectItem value="parkade">Parkade Cleaning</SelectItem>
-                <SelectItem value="ground_window">Ground Window Cleaning</SelectItem>
-                <SelectItem value="custom">Custom</SelectItem>
+                <SelectItem value="window_cleaning">{t('projects.windowCleaning', 'Window Cleaning')}</SelectItem>
+                <SelectItem value="dryer_vent_cleaning">{t('projects.dryerVentCleaning', 'Dryer Vent Cleaning')}</SelectItem>
+                <SelectItem value="building_wash">{t('projects.buildingWash', 'Building Wash - Pressure washing')}</SelectItem>
+                <SelectItem value="in_suite">{t('projects.inSuite', 'In-Suite Service')}</SelectItem>
+                <SelectItem value="parkade">{t('projects.parkade', 'Parkade Cleaning')}</SelectItem>
+                <SelectItem value="ground_window">{t('projects.groundWindow', 'Ground Window Cleaning')}</SelectItem>
+                <SelectItem value="custom">{t('projects.custom', 'Custom')}</SelectItem>
               </SelectContent>
             </Select>
           </div>
 
           {formData.jobType === "custom" && (
             <div className="space-y-2">
-              <Label htmlFor="customJobType">Custom Job Type *</Label>
+              <Label htmlFor="customJobType">{t('projects.customType', 'Custom Job Type')} *</Label>
               <Input
                 id="customJobType"
                 value={formData.customJobType}
                 onChange={(e) => setFormData({ ...formData, customJobType: e.target.value })}
-                placeholder="e.g., Gutter Cleaning, Sidewalk Repair"
+                placeholder={t('projects.customType', 'e.g., Gutter Cleaning, Sidewalk Repair')}
                 required
                 data-testid="input-custom-job-type"
               />
@@ -2004,18 +2008,18 @@ function CreateJobDialog({
           )}
 
           <div className="space-y-2">
-            <Label htmlFor="location">Location</Label>
+            <Label htmlFor="location">{t('projects.location', 'Location')}</Label>
             <Input
               id="location"
               value={formData.location}
               onChange={(e) => setFormData({ ...formData, location: e.target.value })}
-              placeholder="Job site address"
+              placeholder={t('projects.location', 'Job site address')}
               data-testid="input-location"
             />
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="color">Calendar Color</Label>
+            <Label htmlFor="color">{t('schedule.color', 'Calendar Color')}</Label>
             <div className="flex items-center gap-3">
               <Input
                 id="color"
@@ -2030,7 +2034,7 @@ function CreateJobDialog({
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="estimatedHours">Estimated Hours</Label>
+            <Label htmlFor="estimatedHours">{t('projects.estimatedHours', 'Estimated Hours')}</Label>
             <Input
               id="estimatedHours"
               type="number"
@@ -2042,24 +2046,24 @@ function CreateJobDialog({
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="description">Description</Label>
+            <Label htmlFor="description">{t('common.description', 'Description')}</Label>
             <Textarea
               id="description"
               value={formData.description}
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-              placeholder="Job details..."
+              placeholder={t('common.description', 'Job details...')}
               rows={3}
               data-testid="input-description"
             />
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="notes">Notes</Label>
+            <Label htmlFor="notes">{t('schedule.notes', 'Notes')}</Label>
             <Textarea
               id="notes"
               value={formData.notes}
               onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-              placeholder="Additional notes..."
+              placeholder={t('schedule.notes', 'Additional notes...')}
               rows={2}
               data-testid="input-notes"
             />
@@ -2067,10 +2071,10 @@ function CreateJobDialog({
 
           {/* Employee Assignment */}
           <div className="space-y-2">
-            <Label>Assign Team Members</Label>
+            <Label>{t('schedule.assignedEmployees', 'Assign Team Members')}</Label>
             <div className="border rounded-md p-4 max-h-48 overflow-y-auto space-y-2">
               {employees.length === 0 ? (
-                <p className="text-sm text-muted-foreground">No employees available</p>
+                <p className="text-sm text-muted-foreground">{t('schedule.availableEmployees', 'No employees available')}</p>
               ) : (
                 employees.map((employee) => (
                   <div key={employee.id} className="flex items-center space-x-2">
@@ -2106,7 +2110,7 @@ function CreateJobDialog({
             </div>
             {formData.employeeIds.length > 0 && (
               <p className="text-sm text-muted-foreground">
-                {formData.employeeIds.length} team member(s) selected
+                {formData.employeeIds.length} {t('schedule.assignedEmployees', 'team member(s) selected')}
               </p>
             )}
           </div>
@@ -2118,14 +2122,14 @@ function CreateJobDialog({
               onClick={() => onOpenChange(false)}
               data-testid="button-cancel"
             >
-              Cancel
+              {t('schedule.cancel', 'Cancel')}
             </Button>
             <Button
               type="submit"
               disabled={createJobMutation.isPending}
               data-testid="button-submit-job"
             >
-              {createJobMutation.isPending ? "Creating..." : "Create Job"}
+              {createJobMutation.isPending ? t('schedule.createJob', 'Creating...') : t('schedule.createJob', 'Create Job')}
             </Button>
           </DialogFooter>
         </form>
@@ -2148,6 +2152,7 @@ function JobDetailDialog({
   onEdit: () => void;
   employees: User[];
 }) {
+  const { t } = useTranslation();
   const { toast } = useToast();
   const [showAssignEmployees, setShowAssignEmployees] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
@@ -2165,15 +2170,15 @@ function JobDetailDialog({
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/schedule"] });
       toast({
-        title: "Job deleted",
-        description: "Job has been removed from the schedule",
+        title: t('schedule.jobDeleted', 'Job deleted'),
+        description: t('schedule.jobDeleted', 'Job has been removed from the schedule'),
       });
       onOpenChange(false);
     },
     onError: () => {
       toast({
-        title: "Error",
-        description: "Failed to delete job",
+        title: t('schedule.error', 'Error'),
+        description: t('schedule.error', 'Failed to delete job'),
         variant: "destructive",
       });
     },
@@ -2198,8 +2203,8 @@ function JobDetailDialog({
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ["/api/schedule"] });
       toast({
-        title: "Employee assigned",
-        description: "Team member has been assigned to this job",
+        title: t('schedule.assignmentCreated', 'Employee assigned'),
+        description: t('schedule.assignmentCreated', 'Team member has been assigned to this job'),
       });
       setAssignDialogOpen(false);
       setSelectedEmployee(null);
@@ -2207,8 +2212,8 @@ function JobDetailDialog({
     },
     onError: (error: Error) => {
       toast({
-        title: "Error",
-        description: error.message || "Failed to assign employee",
+        title: t('schedule.error', 'Error'),
+        description: error.message || t('schedule.error', 'Failed to assign employee'),
         variant: "destructive",
       });
     },
@@ -2221,14 +2226,14 @@ function JobDetailDialog({
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ["/api/schedule"] });
       toast({
-        title: "Employee unassigned",
-        description: "Team member has been removed from this job",
+        title: t('schedule.assignmentRemoved', 'Employee unassigned'),
+        description: t('schedule.assignmentRemoved', 'Team member has been removed from this job'),
       });
     },
     onError: (error: Error) => {
       toast({
-        title: "Error",
-        description: error.message || "Failed to unassign employee",
+        title: t('schedule.error', 'Error'),
+        description: error.message || t('schedule.error', 'Failed to unassign employee'),
         variant: "destructive",
       });
     },
@@ -2297,20 +2302,20 @@ function JobDetailDialog({
         <div className="space-y-4">
           {job.description && (
             <div>
-              <h3 className="font-medium text-sm mb-1">Description</h3>
+              <h3 className="font-medium text-sm mb-1">{t('common.description', 'Description')}</h3>
               <p className="text-sm text-muted-foreground">{job.description}</p>
             </div>
           )}
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <h3 className="font-medium text-sm mb-1">Start Date</h3>
+              <h3 className="font-medium text-sm mb-1">{t('schedule.startDate', 'Start Date')}</h3>
               <p className="text-sm text-muted-foreground">
                 {new Date(job.startDate).toLocaleString()}
               </p>
             </div>
             <div>
-              <h3 className="font-medium text-sm mb-1">End Date</h3>
+              <h3 className="font-medium text-sm mb-1">{t('schedule.endDate', 'End Date')}</h3>
               <p className="text-sm text-muted-foreground">
                 {new Date(job.endDate).toLocaleString()}
               </p>
@@ -2319,7 +2324,7 @@ function JobDetailDialog({
 
           <div>
             <div className="flex items-center justify-between mb-3">
-              <h3 className="font-medium text-sm">Assigned Team Members</h3>
+              <h3 className="font-medium text-sm">{t('schedule.assignedEmployees', 'Assigned Team Members')}</h3>
               <Button
                 variant={showAssignEmployees ? "outline" : "default"}
                 size="default"
@@ -2344,7 +2349,7 @@ function JobDetailDialog({
                 className="gap-2"
               >
                 <Users className="w-4 h-4" />
-                {showAssignEmployees ? "Cancel" : "Manage/assign employee to job"}
+                {showAssignEmployees ? t('schedule.cancel', 'Cancel') : t('schedule.assignEmployee', 'Manage/assign employee to job')}
               </Button>
             </div>
             
@@ -2353,7 +2358,7 @@ function JobDetailDialog({
                 <div className="border rounded-md p-4 max-h-64 overflow-y-auto">
                   {(() => {
                     if (employees.length === 0) {
-                      return <p className="text-sm text-muted-foreground">No employees available</p>;
+                      return <p className="text-sm text-muted-foreground">{t('schedule.availableEmployees', 'No employees available')}</p>;
                     }
                     
                     const unassignedEmployees = employees.filter(emp => {
@@ -2363,7 +2368,7 @@ function JobDetailDialog({
                     });
                     
                     if (unassignedEmployees.length === 0) {
-                      return <p className="text-sm text-muted-foreground">All employees are already assigned to this job</p>;
+                      return <p className="text-sm text-muted-foreground">{t('schedule.allAssigned', 'All employees are already assigned to this job')}</p>;
                     }
                     
                     return (
@@ -2402,7 +2407,7 @@ function JobDetailDialog({
                                 {new Date(assignment.startDate).toLocaleDateString()} - {new Date(assignment.endDate).toLocaleDateString()}
                               </>
                             ) : (
-                              <span>Entire job duration</span>
+                              <span>{t('schedule.allDay', 'Entire job duration')}</span>
                             )}
                           </div>
                         </div>
@@ -2442,7 +2447,7 @@ function JobDetailDialog({
                   </div>
                 ) : (
                   <p className="text-sm text-muted-foreground">
-                    No team members assigned yet
+                    {t('schedule.noAssignments', 'No team members assigned yet')}
                   </p>
                 )}
               </>
@@ -2451,21 +2456,21 @@ function JobDetailDialog({
 
           {job.location && (
             <div>
-              <h3 className="font-medium text-sm mb-1">Location</h3>
+              <h3 className="font-medium text-sm mb-1">{t('projects.location', 'Location')}</h3>
               <p className="text-sm text-muted-foreground">{job.location}</p>
             </div>
           )}
 
           {job.estimatedHours && (
             <div>
-              <h3 className="font-medium text-sm mb-1">Estimated Hours</h3>
-              <p className="text-sm text-muted-foreground">{job.estimatedHours} hours</p>
+              <h3 className="font-medium text-sm mb-1">{t('projects.estimatedHours', 'Estimated Hours')}</h3>
+              <p className="text-sm text-muted-foreground">{job.estimatedHours} {t('common.hours', 'hours')}</p>
             </div>
           )}
 
           {job.notes && (
             <div>
-              <h3 className="font-medium text-sm mb-1">Notes</h3>
+              <h3 className="font-medium text-sm mb-1">{t('schedule.notes', 'Notes')}</h3>
               <p className="text-sm text-muted-foreground">{job.notes}</p>
             </div>
           )}
@@ -2478,14 +2483,14 @@ function JobDetailDialog({
             data-testid="button-delete-job"
           >
             <Trash2 className="w-4 h-4 mr-2" />
-            Delete
+            {t('schedule.delete', 'Delete')}
           </Button>
           <Button
             onClick={onEdit}
             data-testid="button-edit-job"
           >
             <Edit2 className="w-4 h-4 mr-2" />
-            Edit
+            {t('schedule.editJob', 'Edit')}
           </Button>
         </DialogFooter>
       </DialogContent>
@@ -2494,13 +2499,13 @@ function JobDetailDialog({
     <AlertDialog open={showDeleteConfirm} onOpenChange={setShowDeleteConfirm}>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>Delete Job?</AlertDialogTitle>
+          <AlertDialogTitle>{t('schedule.deleteJob', 'Delete Job')}?</AlertDialogTitle>
           <AlertDialogDescription>
-            Are you sure you want to delete "{job?.title}"? This action cannot be undone and will remove all assignments for this job.
+            {t('schedule.confirmDelete', 'Are you sure you want to delete')} "{job?.title}"? {t('schedule.confirmDelete', 'This action cannot be undone and will remove all assignments for this job.')}
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel>Cancel</AlertDialogCancel>
+          <AlertDialogCancel>{t('schedule.cancel', 'Cancel')}</AlertDialogCancel>
           <AlertDialogAction
             onClick={() => {
               if (job) {
@@ -2510,7 +2515,7 @@ function JobDetailDialog({
             }}
             className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
           >
-            Delete Job
+            {t('schedule.deleteJob', 'Delete Job')}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
@@ -2520,15 +2525,15 @@ function JobDetailDialog({
       <Sheet open={assignDialogOpen} onOpenChange={setAssignDialogOpen}>
         <SheetContent>
           <SheetHeader>
-            <SheetTitle>Assign Employee to Job</SheetTitle>
+            <SheetTitle>{t('schedule.assignEmployee', 'Assign Employee to Job')}</SheetTitle>
             <SheetDescription>
-              Specify the date range when {selectedEmployee?.name} will work on this job
+              {t('schedule.assignEmployee', 'Specify the date range when')} {selectedEmployee?.name} {t('schedule.assignEmployee', 'will work on this job')}
             </SheetDescription>
           </SheetHeader>
           
           <div className="space-y-4 mt-6">
             <div>
-              <Label htmlFor="assign-start-date">Start Date</Label>
+              <Label htmlFor="assign-start-date">{t('schedule.startDate', 'Start Date')}</Label>
               <Input
                 id="assign-start-date"
                 type="date"
@@ -2540,7 +2545,7 @@ function JobDetailDialog({
               />
             </div>
             <div>
-              <Label htmlFor="assign-end-date">End Date</Label>
+              <Label htmlFor="assign-end-date">{t('schedule.endDate', 'End Date')}</Label>
               <Input
                 id="assign-end-date"
                 type="date"
@@ -2559,14 +2564,14 @@ function JobDetailDialog({
               onClick={() => setAssignDialogOpen(false)}
               data-testid="button-cancel-assignment"
             >
-              Cancel
+              {t('schedule.cancel', 'Cancel')}
             </Button>
             <Button
               onClick={handleSaveAssignment}
               disabled={assignEmployeeMutation.isPending}
               data-testid="button-save-assignment"
             >
-              {assignEmployeeMutation.isPending ? "Assigning..." : "Assign Employee"}
+              {assignEmployeeMutation.isPending ? t('schedule.assignEmployee', 'Assigning...') : t('schedule.assignEmployee', 'Assign Employee')}
             </Button>
           </SheetFooter>
         </SheetContent>
@@ -2588,6 +2593,7 @@ function EditJobDialog({
   job: ScheduledJobWithAssignments | null;
   employees: User[];
 }) {
+  const { t } = useTranslation();
   const { toast } = useToast();
   const { brandColors, brandingActive } = useContext(BrandingContext);
   const defaultJobColor = brandingActive && brandColors.length > 0 ? brandColors[0] : "hsl(var(--primary))";
@@ -2665,15 +2671,15 @@ function EditJobDialog({
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/schedule"] });
       toast({
-        title: "Job updated",
-        description: "Job details have been saved",
+        title: t('schedule.jobUpdated', 'Job updated'),
+        description: t('schedule.jobUpdated', 'Job details have been saved'),
       });
       onOpenChange(false);
     },
     onError: (error: any) => {
       toast({
-        title: "Error",
-        description: error.message || "Failed to update job",
+        title: t('schedule.error', 'Error'),
+        description: error.message || t('schedule.error', 'Failed to update job'),
         variant: "destructive",
       });
     },
@@ -2708,17 +2714,17 @@ function EditJobDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Edit Job</DialogTitle>
+          <DialogTitle>{t('schedule.editJob', 'Edit Job')}</DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="edit-project">Select Project (Optional)</Label>
+            <Label htmlFor="edit-project">{t('schedule.project', 'Select Project')} ({t('common.optional', 'Optional')})</Label>
             <Select
               value={formData.projectId}
               onValueChange={(value) => setFormData({ ...formData, projectId: value })}
             >
               <SelectTrigger data-testid="select-edit-project">
-                <SelectValue placeholder="Choose a project or leave blank for custom job" />
+                <SelectValue placeholder={t('schedule.selectProject', 'Choose a project or leave blank for custom job')} />
               </SelectTrigger>
               <SelectContent>
                 {projects.map((project: any) => (
@@ -2731,7 +2737,7 @@ function EditJobDialog({
           </div>
           
           <div className="space-y-2">
-            <Label htmlFor="edit-title">Job Title {!formData.projectId && '*'}</Label>
+            <Label htmlFor="edit-title">{t('schedule.jobTitle', 'Job Title')} {!formData.projectId && '*'}</Label>
             <Input
               id="edit-title"
               value={formData.title}
@@ -2741,13 +2747,13 @@ function EditJobDialog({
               data-testid="input-edit-title"
             />
             {formData.projectId && (
-              <p className="text-xs text-muted-foreground">Project name will be used automatically</p>
+              <p className="text-xs text-muted-foreground">{t('schedule.project', 'Project name will be used automatically')}</p>
             )}
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="edit-startDate">Start Date *</Label>
+              <Label htmlFor="edit-startDate">{t('schedule.startDate', 'Start Date')} *</Label>
               <Input
                 id="edit-startDate"
                 type="datetime-local"
@@ -2758,7 +2764,7 @@ function EditJobDialog({
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="edit-endDate">End Date *</Label>
+              <Label htmlFor="edit-endDate">{t('schedule.endDate', 'End Date')} *</Label>
               <Input
                 id="edit-endDate"
                 type="datetime-local"
@@ -2771,7 +2777,7 @@ function EditJobDialog({
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="edit-status">Status *</Label>
+            <Label htmlFor="edit-status">{t('common.status', 'Status')} *</Label>
             <Select
               value={formData.status}
               onValueChange={(value) => setFormData({ ...formData, status: value })}
@@ -2780,16 +2786,16 @@ function EditJobDialog({
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="upcoming">Upcoming</SelectItem>
-                <SelectItem value="in_progress">In Progress</SelectItem>
-                <SelectItem value="completed">Completed</SelectItem>
-                <SelectItem value="cancelled">Cancelled</SelectItem>
+                <SelectItem value="upcoming">{t('projects.upcoming', 'Upcoming')}</SelectItem>
+                <SelectItem value="in_progress">{t('projects.inProgress', 'In Progress')}</SelectItem>
+                <SelectItem value="completed">{t('projects.completed', 'Completed')}</SelectItem>
+                <SelectItem value="cancelled">{t('projects.cancelled', 'Cancelled')}</SelectItem>
               </SelectContent>
             </Select>
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="edit-jobType">Job Type *</Label>
+            <Label htmlFor="edit-jobType">{t('projects.type', 'Job Type')} *</Label>
             <Select
               value={formData.jobType}
               onValueChange={(value) => setFormData({ ...formData, jobType: value })}
@@ -2798,25 +2804,25 @@ function EditJobDialog({
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="window_cleaning">Window Cleaning</SelectItem>
-                <SelectItem value="dryer_vent_cleaning">Dryer Vent Cleaning</SelectItem>
-                <SelectItem value="building_wash">Building Wash - Pressure washing</SelectItem>
-                <SelectItem value="in_suite">In-Suite Service</SelectItem>
-                <SelectItem value="parkade">Parkade Cleaning</SelectItem>
-                <SelectItem value="ground_window">Ground Window Cleaning</SelectItem>
-                <SelectItem value="custom">Custom</SelectItem>
+                <SelectItem value="window_cleaning">{t('projects.windowCleaning', 'Window Cleaning')}</SelectItem>
+                <SelectItem value="dryer_vent_cleaning">{t('projects.dryerVentCleaning', 'Dryer Vent Cleaning')}</SelectItem>
+                <SelectItem value="building_wash">{t('projects.buildingWash', 'Building Wash - Pressure washing')}</SelectItem>
+                <SelectItem value="in_suite">{t('projects.inSuite', 'In-Suite Service')}</SelectItem>
+                <SelectItem value="parkade">{t('projects.parkade', 'Parkade Cleaning')}</SelectItem>
+                <SelectItem value="ground_window">{t('projects.groundWindow', 'Ground Window Cleaning')}</SelectItem>
+                <SelectItem value="custom">{t('projects.custom', 'Custom')}</SelectItem>
               </SelectContent>
             </Select>
           </div>
 
           {formData.jobType === "custom" && (
             <div className="space-y-2">
-              <Label htmlFor="edit-customJobType">Custom Job Type *</Label>
+              <Label htmlFor="edit-customJobType">{t('projects.customType', 'Custom Job Type')} *</Label>
               <Input
                 id="edit-customJobType"
                 value={formData.customJobType}
                 onChange={(e) => setFormData({ ...formData, customJobType: e.target.value })}
-                placeholder="e.g., Gutter Cleaning, Sidewalk Repair"
+                placeholder={t('projects.customType', 'e.g., Gutter Cleaning, Sidewalk Repair')}
                 required
                 data-testid="input-edit-custom-job-type"
               />
@@ -2824,7 +2830,7 @@ function EditJobDialog({
           )}
 
           <div className="space-y-2">
-            <Label htmlFor="edit-location">Location</Label>
+            <Label htmlFor="edit-location">{t('projects.location', 'Location')}</Label>
             <Input
               id="edit-location"
               value={formData.location}
@@ -2834,7 +2840,7 @@ function EditJobDialog({
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="edit-color">Calendar Color</Label>
+            <Label htmlFor="edit-color">{t('schedule.color', 'Calendar Color')}</Label>
             <div className="flex items-center gap-3">
               <Input
                 id="edit-color"
@@ -2849,7 +2855,7 @@ function EditJobDialog({
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="edit-estimatedHours">Estimated Hours</Label>
+            <Label htmlFor="edit-estimatedHours">{t('projects.estimatedHours', 'Estimated Hours')}</Label>
             <Input
               id="edit-estimatedHours"
               type="number"
@@ -2860,7 +2866,7 @@ function EditJobDialog({
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="edit-description">Description</Label>
+            <Label htmlFor="edit-description">{t('common.description', 'Description')}</Label>
             <Textarea
               id="edit-description"
               value={formData.description}
@@ -2871,7 +2877,7 @@ function EditJobDialog({
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="edit-notes">Notes</Label>
+            <Label htmlFor="edit-notes">{t('schedule.notes', 'Notes')}</Label>
             <Textarea
               id="edit-notes"
               value={formData.notes}
@@ -2883,10 +2889,10 @@ function EditJobDialog({
 
           {/* Employee Assignment */}
           <div className="space-y-2">
-            <Label>Assigned Team Members</Label>
+            <Label>{t('schedule.assignedEmployees', 'Assigned Team Members')}</Label>
             <div className="border rounded-md p-4 max-h-48 overflow-y-auto space-y-2">
               {employees.length === 0 ? (
-                <p className="text-sm text-muted-foreground">No employees available</p>
+                <p className="text-sm text-muted-foreground">{t('schedule.availableEmployees', 'No employees available')}</p>
               ) : (
                 employees.map((employee) => (
                   <div key={employee.id} className="flex items-center space-x-2">
@@ -2922,7 +2928,7 @@ function EditJobDialog({
             </div>
             {formData.employeeIds.length > 0 && (
               <p className="text-sm text-muted-foreground">
-                {formData.employeeIds.length} team member(s) selected
+                {formData.employeeIds.length} {t('schedule.assignedEmployees', 'team member(s) selected')}
               </p>
             )}
           </div>
@@ -2934,14 +2940,14 @@ function EditJobDialog({
               onClick={() => onOpenChange(false)}
               data-testid="button-edit-cancel"
             >
-              Cancel
+              {t('schedule.cancel', 'Cancel')}
             </Button>
             <Button
               type="submit"
               disabled={updateJobMutation.isPending}
               data-testid="button-update-job"
             >
-              {updateJobMutation.isPending ? "Saving..." : "Save Changes"}
+              {updateJobMutation.isPending ? t('schedule.save', 'Saving...') : t('schedule.save', 'Save Changes')}
             </Button>
           </DialogFooter>
         </form>

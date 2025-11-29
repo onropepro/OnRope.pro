@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useLocation } from "wouter";
+import { useTranslation } from "react-i18next";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { hasFinancialAccess } from "@/lib/permissions";
 import type { PayPeriodConfig, PayPeriod, EmployeeHoursSummary } from "@shared/schema";
@@ -18,6 +19,7 @@ import { DollarSign, Calendar, Users, Settings, ArrowLeft, Clock, Pencil, Trash2
 import { format } from "date-fns";
 
 export default function Payroll() {
+  const { t } = useTranslation();
   const { toast } = useToast();
   const [, setLocation] = useLocation();
   const [selectedPeriodId, setSelectedPeriodId] = useState<string | null>(null);
@@ -172,8 +174,8 @@ export default function Payroll() {
     },
     onSuccess: () => {
       toast({
-        title: "Success",
-        description: "Work session added successfully",
+        title: t('common.success', 'Success'),
+        description: t('payroll.sessionAdded', 'Work session added successfully'),
       });
       
       // Reset form
@@ -195,8 +197,8 @@ export default function Payroll() {
     },
     onError: (error: any) => {
       toast({
-        title: "Error",
-        description: error.message || "Failed to add work session",
+        title: t('payroll.error', 'Error'),
+        description: error.message || t('payroll.error', 'Failed to add work session'),
         variant: "destructive",
       });
     },
@@ -214,8 +216,8 @@ export default function Payroll() {
     },
     onSuccess: () => {
       toast({
-        title: "Success",
-        description: "Work session updated successfully",
+        title: t('common.success', 'Success'),
+        description: t('payroll.sessionUpdated', 'Work session updated successfully'),
       });
       
       setIsEditDialogOpen(false);
@@ -229,8 +231,8 @@ export default function Payroll() {
     },
     onError: (error: any) => {
       toast({
-        title: "Error",
-        description: error.message || "Failed to update work session",
+        title: t('payroll.error', 'Error'),
+        description: error.message || t('payroll.error', 'Failed to update work session'),
         variant: "destructive",
       });
     },
@@ -248,8 +250,8 @@ export default function Payroll() {
     },
     onSuccess: () => {
       toast({
-        title: "Success",
-        description: "Work session deleted successfully",
+        title: t('common.success', 'Success'),
+        description: t('payroll.sessionDeleted', 'Work session deleted successfully'),
       });
       
       setIsDeleteDialogOpen(false);
@@ -263,8 +265,8 @@ export default function Payroll() {
     },
     onError: (error: any) => {
       toast({
-        title: "Error",
-        description: error.message || "Failed to delete work session",
+        title: t('payroll.error', 'Error'),
+        description: error.message || t('payroll.error', 'Failed to delete work session'),
         variant: "destructive",
       });
     },
@@ -300,28 +302,28 @@ export default function Payroll() {
         if (response.ok) {
           await queryClient.invalidateQueries({ queryKey: ['/api/payroll/periods'] });
           toast({
-            title: "Configuration Saved",
-            description: "Pay period configuration has been updated and periods have been generated.",
+            title: t('payroll.configurationSaved', 'Configuration Saved'),
+            description: t('payroll.configurationSaved', 'Pay period configuration has been updated and periods have been generated.'),
           });
         } else {
           toast({
-            title: "Configuration Saved",
-            description: "Configuration saved but failed to generate periods. You may need to configure your settings.",
+            title: t('payroll.configurationSaved', 'Configuration Saved'),
+            description: t('payroll.error', 'Configuration saved but failed to generate periods. You may need to configure your settings.'),
             variant: "destructive",
           });
         }
       } catch (error) {
         toast({
-          title: "Configuration Saved",
-          description: "Configuration saved but failed to generate periods.",
+          title: t('payroll.configurationSaved', 'Configuration Saved'),
+          description: t('payroll.error', 'Configuration saved but failed to generate periods.'),
           variant: "destructive",
         });
       }
     },
     onError: (error: any) => {
       toast({
-        title: "Error",
-        description: error.message || "Failed to save configuration",
+        title: t('payroll.error', 'Error'),
+        description: error.message || t('payroll.error', 'Failed to save configuration'),
         variant: "destructive",
       });
     },
@@ -352,20 +354,20 @@ export default function Payroll() {
   useEffect(() => {
     if (!userLoading && currentUser && !canAccessPayroll) {
       toast({
-        title: "Access Denied",
-        description: "You don't have permission to access payroll data.",
+        title: t('payroll.accessDenied', 'Access Denied'),
+        description: t('payroll.accessDeniedMessage', "You don't have permission to access payroll data."),
         variant: "destructive",
       });
       setLocation("/dashboard");
     }
-  }, [currentUser, userLoading, canAccessPayroll, setLocation, toast]);
+  }, [currentUser, userLoading, canAccessPayroll, setLocation, toast, t]);
 
   // Show loading while checking permissions
   if (userLoading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
-          <div className="text-lg font-medium">Loading...</div>
+          <div className="text-lg font-medium">{t('payroll.loading', 'Loading...')}</div>
         </div>
       </div>
     );
@@ -380,8 +382,8 @@ export default function Payroll() {
     // Validate period type is selected
     if (!periodType) {
       toast({
-        title: "Validation Error",
-        description: "Please select a pay period type",
+        title: t('payroll.error', 'Validation Error'),
+        description: t('payroll.selectPeriod', 'Please select a pay period type'),
         variant: "destructive",
       });
       return;
@@ -396,8 +398,8 @@ export default function Payroll() {
     // Check for NaN values
     if (isNaN(overtimeMult) || isNaN(doubleTimeMult) || isNaN(overtimeThreshold) || isNaN(doubleTimeThreshold)) {
       toast({
-        title: "Validation Error",
-        description: "Please enter valid numbers for all overtime and double time fields",
+        title: t('payroll.error', 'Validation Error'),
+        description: t('payroll.error', 'Please enter valid numbers for all overtime and double time fields'),
         variant: "destructive",
       });
       return;
@@ -427,8 +429,8 @@ export default function Payroll() {
     } else if (periodType === 'custom') {
       if (!customStartDate || !customEndDate) {
         toast({
-          title: "Validation Error",
-          description: "Please provide both start and end dates for custom period",
+          title: t('payroll.error', 'Validation Error'),
+          description: t('payroll.error', 'Please provide both start and end dates for custom period'),
           variant: "destructive",
         });
         return;
@@ -444,8 +446,8 @@ export default function Payroll() {
     // Validate required fields
     if (!selectedEmployeeId || !workDate || !startTime || !endTime) {
       toast({
-        title: "Validation Error",
-        description: "Please fill in all required fields",
+        title: t('payroll.error', 'Validation Error'),
+        description: t('payroll.error', 'Please fill in all required fields'),
         variant: "destructive",
       });
       return;
@@ -454,8 +456,8 @@ export default function Payroll() {
     // Validate session type specific requirements
     if (sessionType === 'billable' && !selectedProjectId) {
       toast({
-        title: "Validation Error",
-        description: "Please select a project for billable hours",
+        title: t('payroll.error', 'Validation Error'),
+        description: t('payroll.error', 'Please select a project for billable hours'),
         variant: "destructive",
       });
       return;
@@ -463,8 +465,8 @@ export default function Payroll() {
 
     if (sessionType === 'non-billable' && !description.trim()) {
       toast({
-        title: "Validation Error",
-        description: "Please provide a description for non-billable hours",
+        title: t('payroll.error', 'Validation Error'),
+        description: t('payroll.error', 'Please provide a description for non-billable hours'),
         variant: "destructive",
       });
       return;
@@ -498,13 +500,13 @@ export default function Payroll() {
   };
 
   const dayOfWeekOptions = [
-    { value: "0", label: "Sunday" },
-    { value: "1", label: "Monday" },
-    { value: "2", label: "Tuesday" },
-    { value: "3", label: "Wednesday" },
-    { value: "4", label: "Thursday" },
-    { value: "5", label: "Friday" },
-    { value: "6", label: "Saturday" },
+    { value: "0", label: t('payroll.sunday', 'Sunday') },
+    { value: "1", label: t('payroll.monday', 'Monday') },
+    { value: "2", label: t('payroll.tuesday', 'Tuesday') },
+    { value: "3", label: t('payroll.wednesday', 'Wednesday') },
+    { value: "4", label: t('payroll.thursday', 'Thursday') },
+    { value: "5", label: t('payroll.friday', 'Friday') },
+    { value: "6", label: t('payroll.saturday', 'Saturday') },
   ];
 
   return (
@@ -519,8 +521,8 @@ export default function Payroll() {
           <ArrowLeft className="h-5 w-5" />
         </Button>
         <div className="flex-1 min-w-0">
-          <h1 className="text-xl md:text-3xl font-bold truncate" data-testid="heading-payroll">Payroll Management</h1>
-          <p className="text-sm text-muted-foreground hidden sm:block">Manage pay periods and employee hours</p>
+          <h1 className="text-xl md:text-3xl font-bold truncate" data-testid="heading-payroll">{t('payroll.title', 'Payroll')}</h1>
+          <p className="text-sm text-muted-foreground hidden sm:block">{t('payroll.subtitle', 'Manage pay periods and employee hours')}</p>
         </div>
       </div>
 
@@ -529,23 +531,23 @@ export default function Payroll() {
           <TabsList className="grid w-full min-w-[400px] md:min-w-0 grid-cols-4 gap-1">
             <TabsTrigger value="hours" data-testid="tab-hours" className="text-xs md:text-sm px-2 md:px-4">
               <Users className="w-4 h-4 md:mr-2 flex-shrink-0" />
-              <span className="hidden md:inline">Employee Hours</span>
-              <span className="md:hidden">Hours</span>
+              <span className="hidden md:inline">{t('payroll.employeeHours', 'Employee Hours')}</span>
+              <span className="md:hidden">{t('payroll.hours', 'Hours')}</span>
             </TabsTrigger>
             <TabsTrigger value="add-hours" data-testid="tab-add-hours" className="text-xs md:text-sm px-2 md:px-4">
               <Clock className="w-4 h-4 md:mr-2 flex-shrink-0" />
-              <span className="hidden md:inline">Add Hours</span>
-              <span className="md:hidden">Add</span>
+              <span className="hidden md:inline">{t('payroll.addHours', 'Add Hours')}</span>
+              <span className="md:hidden">{t('common.add', 'Add')}</span>
             </TabsTrigger>
             <TabsTrigger value="past-periods" data-testid="tab-past-periods" className="text-xs md:text-sm px-2 md:px-4">
               <Calendar className="w-4 h-4 md:mr-2 flex-shrink-0" />
-              <span className="hidden md:inline">Past Periods</span>
-              <span className="md:hidden">Past</span>
+              <span className="hidden md:inline">{t('payroll.pastPeriod', 'Past Periods')}</span>
+              <span className="md:hidden">{t('payroll.pastPeriod', 'Past')}</span>
             </TabsTrigger>
             <TabsTrigger value="settings" data-testid="tab-settings" className="text-xs md:text-sm px-2 md:px-4">
               <Settings className="w-4 h-4 md:mr-2 flex-shrink-0" />
-              <span className="hidden md:inline">Settings</span>
-              <span className="md:hidden">Settings</span>
+              <span className="hidden md:inline">{t('payroll.settings', 'Settings')}</span>
+              <span className="md:hidden">{t('payroll.settings', 'Settings')}</span>
             </TabsTrigger>
           </TabsList>
         </div>
@@ -553,18 +555,18 @@ export default function Payroll() {
         <TabsContent value="hours" className="space-y-4">
           <Card>
             <CardHeader>
-              <CardTitle>Employee Hours Summary</CardTitle>
-              <CardDescription>Select a pay period to view employee hours and labor costs</CardDescription>
+              <CardTitle>{t('payroll.employeeHours', 'Employee Hours Summary')}</CardTitle>
+              <CardDescription>{t('payroll.selectPeriod', 'Select a pay period to view employee hours and labor costs')}</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="period-select">Pay Period</Label>
+                <Label htmlFor="period-select">{t('payroll.payPeriods', 'Pay Period')}</Label>
                 <Select 
                   value={selectedPeriodId || ""} 
                   onValueChange={setSelectedPeriodId}
                 >
                   <SelectTrigger id="period-select" data-testid="select-pay-period">
-                    <SelectValue placeholder="Select a pay period" />
+                    <SelectValue placeholder={t('payroll.selectPeriod', 'Select a pay period')} />
                   </SelectTrigger>
                   <SelectContent>
                     {periodsData?.periods.map((period) => (
@@ -577,7 +579,7 @@ export default function Payroll() {
               </div>
 
               {selectedPeriodId && hoursLoading && (
-                <div className="text-center py-8 text-muted-foreground">Loading employee hours...</div>
+                <div className="text-center py-8 text-muted-foreground">{t('payroll.loading', 'Loading employee hours...')}</div>
               )}
 
               {selectedPeriodId && !hoursLoading && hoursData && hoursData.hoursSummary.length > 0 && (
@@ -585,7 +587,7 @@ export default function Payroll() {
                   <div className="grid gap-4 md:grid-cols-3">
                     <Card>
                       <CardHeader className="pb-2">
-                        <CardTitle className="text-sm font-medium">Total Employees</CardTitle>
+                        <CardTitle className="text-sm font-medium">{t('payroll.employee', 'Total Employees')}</CardTitle>
                       </CardHeader>
                       <CardContent>
                         <div className="text-2xl font-bold">{hoursData.hoursSummary.length}</div>
@@ -593,7 +595,7 @@ export default function Payroll() {
                     </Card>
                     <Card>
                       <CardHeader className="pb-2">
-                        <CardTitle className="text-sm font-medium">Total Hours</CardTitle>
+                        <CardTitle className="text-sm font-medium">{t('payroll.totalHours', 'Total Hours')}</CardTitle>
                       </CardHeader>
                       <CardContent>
                         <div className="text-2xl font-bold">
@@ -603,7 +605,7 @@ export default function Payroll() {
                     </Card>
                     <Card>
                       <CardHeader className="pb-2">
-                        <CardTitle className="text-sm font-medium">Total Labor Cost</CardTitle>
+                        <CardTitle className="text-sm font-medium">{t('payroll.grossPay', 'Total Labor Cost')}</CardTitle>
                       </CardHeader>
                       <CardContent>
                         <div className="text-2xl font-bold">
@@ -628,15 +630,15 @@ export default function Payroll() {
                                 <div>
                                   <div className="text-lg font-semibold text-left">{employee.employeeName}</div>
                                   <div className="text-sm text-muted-foreground mt-1">
-                                    Total: <span className="font-medium">{employee.totalHours.toFixed(2)}h</span>
+                                    {t('payroll.totalHours', 'Total')}: <span className="font-medium">{employee.totalHours.toFixed(2)}h</span>
                                     {" "}(
-                                    <span className="text-foreground">{employee.regularHours.toFixed(2)}h</span> regular
-                                    {employee.overtimeHours > 0 && <>, <span className="text-orange-600 dark:text-orange-400">{employee.overtimeHours.toFixed(2)}h</span> OT</>}
-                                    {employee.doubleTimeHours > 0 && <>, <span className="text-red-600 dark:text-red-400">{employee.doubleTimeHours.toFixed(2)}h</span> 2x</>}
+                                    <span className="text-foreground">{employee.regularHours.toFixed(2)}h</span> {t('payroll.regularHours', 'regular')}
+                                    {employee.overtimeHours > 0 && <>, <span className="text-orange-600 dark:text-orange-400">{employee.overtimeHours.toFixed(2)}h</span> {t('payroll.overtimeHours', 'OT')}</>}
+                                    {employee.doubleTimeHours > 0 && <>, <span className="text-red-600 dark:text-red-400">{employee.doubleTimeHours.toFixed(2)}h</span> {t('payroll.doubleTimeHours', '2x')}</>}
                                     )
                                   </div>
                                   <div className="text-xs text-muted-foreground mt-0.5">
-                                    {employee.sessions.length} work sessions
+                                    {employee.sessions.length} {t('payroll.sessions', 'work sessions')}
                                   </div>
                                 </div>
                               </div>
@@ -648,7 +650,7 @@ export default function Payroll() {
                           </AccordionTrigger>
                           <AccordionContent className="px-6 pb-4">
                             <div className="space-y-2 mt-2">
-                              <div className="text-sm font-semibold mb-3">Work Sessions</div>
+                              <div className="text-sm font-semibold mb-3">{t('payroll.sessions', 'Work Sessions')}</div>
                               {employee.sessions.map((session, index) => {
                                 const startTime = new Date(session.startTime);
                                 const endTime = session.endTime ? new Date(session.endTime) : null;
@@ -675,12 +677,12 @@ export default function Payroll() {
                                             </div>
                                             <div className="flex items-center gap-2 mb-2">
                                               <span className="material-icons text-sm">business</span>
-                                              <span className="text-muted-foreground">{session.projectName || 'Non-Billable'}</span>
+                                              <span className="text-muted-foreground">{session.projectName || t('payroll.nonBillable', 'Non-Billable')}</span>
                                             </div>
                                             {totalDrops > 0 && (
                                               <div className="flex items-center gap-2">
                                                 <span className="material-icons text-sm">check_circle</span>
-                                                <span className="text-muted-foreground">{totalDrops} drops completed</span>
+                                                <span className="text-muted-foreground">{totalDrops} {t('payroll.dropsNorth', 'drops completed')}</span>
                                               </div>
                                             )}
                                           </div>
@@ -688,21 +690,21 @@ export default function Payroll() {
                                             <div className="flex items-center gap-2 mb-2">
                                               <Clock className="h-4 w-4" />
                                               <span className="text-muted-foreground">
-                                                {format(startTime, 'h:mm a')} - {endTime ? format(endTime, 'h:mm a') : 'In Progress'}
+                                                {format(startTime, 'h:mm a')} - {endTime ? format(endTime, 'h:mm a') : t('payroll.loading', 'In Progress')}
                                               </span>
                                             </div>
                                             <div className="flex items-center gap-2 mb-2">
                                               <span className="material-icons text-sm">schedule</span>
                                               <div className="flex flex-col">
-                                                <span className="font-semibold">{hours.toFixed(2)} hours</span>
+                                                <span className="font-semibold">{hours.toFixed(2)} {t('payroll.hours', 'hours')}</span>
                                                 {(session.regularHours || session.overtimeHours || session.doubleTimeHours) && (
                                                   <span className="text-xs text-muted-foreground">
-                                                    {parseFloat(session.regularHours || '0').toFixed(2)}h regular
+                                                    {parseFloat(session.regularHours || '0').toFixed(2)}h {t('payroll.regularHours', 'regular')}
                                                     {session.overtimeHours && parseFloat(session.overtimeHours) > 0 && (
-                                                      <>, <span className="text-orange-600 dark:text-orange-400 font-medium">{parseFloat(session.overtimeHours).toFixed(2)}h OT</span></>
+                                                      <>, <span className="text-orange-600 dark:text-orange-400 font-medium">{parseFloat(session.overtimeHours).toFixed(2)}h {t('payroll.overtimeHours', 'OT')}</span></>
                                                     )}
                                                     {session.doubleTimeHours && parseFloat(session.doubleTimeHours) > 0 && (
-                                                      <>, <span className="text-red-600 dark:text-red-400 font-medium">{parseFloat(session.doubleTimeHours).toFixed(2)}h 2x</span></>
+                                                      <>, <span className="text-red-600 dark:text-red-400 font-medium">{parseFloat(session.doubleTimeHours).toFixed(2)}h {t('payroll.doubleTimeHours', '2x')}</span></>
                                                     )}
                                                   </span>
                                                 )}
@@ -755,17 +757,17 @@ export default function Payroll() {
               {selectedPeriodId && !hoursLoading && (!hoursData || hoursData.hoursSummary.length === 0) && (
                 <div className="text-center py-12 space-y-2">
                   <div className="text-muted-foreground">
-                    No employee hours recorded for this pay period.
+                    {t('payroll.noHoursData', 'No employee hours recorded for this pay period.')}
                   </div>
                   <div className="text-sm text-muted-foreground">
-                    Work sessions logged during this period will appear here automatically.
+                    {t('payroll.noHoursData', 'Work sessions logged during this period will appear here automatically.')}
                   </div>
                 </div>
               )}
 
               {!selectedPeriodId && (
                 <div className="text-center py-12 text-muted-foreground">
-                  Select a pay period above to view employee hours.
+                  {t('payroll.selectPeriod', 'Select a pay period above to view employee hours.')}
                 </div>
               )}
             </CardContent>
@@ -775,16 +777,16 @@ export default function Payroll() {
         <TabsContent value="add-hours" className="space-y-4">
           <Card>
             <CardHeader>
-              <CardTitle>Add Work Hours</CardTitle>
-              <CardDescription>Manually add work hours for employees (e.g., when they forgot to clock in)</CardDescription>
+              <CardTitle>{t('payroll.addHours', 'Add Work Hours')}</CardTitle>
+              <CardDescription>{t('payroll.addHours', 'Manually add work hours for employees (e.g., when they forgot to clock in)')}</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid gap-4 md:grid-cols-2">
                 <div className="space-y-2">
-                  <Label htmlFor="employee-select">Employee *</Label>
+                  <Label htmlFor="employee-select">{t('payroll.employee', 'Employee')} *</Label>
                   <Select value={selectedEmployeeId} onValueChange={setSelectedEmployeeId}>
                     <SelectTrigger id="employee-select" data-testid="select-employee">
-                      <SelectValue placeholder="Select employee" />
+                      <SelectValue placeholder={t('payroll.employee', 'Select employee')} />
                     </SelectTrigger>
                     <SelectContent>
                       {employeesData?.employees.map((emp) => (
@@ -797,14 +799,14 @@ export default function Payroll() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="session-type">Session Type *</Label>
+                  <Label htmlFor="session-type">{t('payroll.sessionType', 'Session Type')} *</Label>
                   <Select value={sessionType} onValueChange={setSessionType}>
                     <SelectTrigger id="session-type" data-testid="select-session-type">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="billable">Billable (Project Work)</SelectItem>
-                      <SelectItem value="non-billable">Non-Billable (Errands, Maintenance)</SelectItem>
+                      <SelectItem value="billable">{t('payroll.billable', 'Billable (Project Work)')}</SelectItem>
+                      <SelectItem value="non-billable">{t('payroll.nonBillable', 'Non-Billable (Errands, Maintenance)')}</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -812,10 +814,10 @@ export default function Payroll() {
 
               {sessionType === 'billable' && (
                 <div className="space-y-2">
-                  <Label htmlFor="project-select">Project *</Label>
+                  <Label htmlFor="project-select">{t('payroll.project', 'Project')} *</Label>
                   <Select value={selectedProjectId} onValueChange={setSelectedProjectId}>
                     <SelectTrigger id="project-select" data-testid="select-project">
-                      <SelectValue placeholder="Select project" />
+                      <SelectValue placeholder={t('payroll.project', 'Select project')} />
                     </SelectTrigger>
                     <SelectContent>
                       {projectsData?.projects.filter((p) => p.status === 'active').map((proj) => (
@@ -830,13 +832,13 @@ export default function Payroll() {
 
               {sessionType === 'non-billable' && (
                 <div className="space-y-2">
-                  <Label htmlFor="description">Description *</Label>
+                  <Label htmlFor="description">{t('payroll.description', 'Description')} *</Label>
                   <Input
                     id="description"
                     type="text"
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
-                    placeholder="e.g., Errands, Equipment Maintenance, Admin Work"
+                    placeholder={t('payroll.description', 'e.g., Errands, Equipment Maintenance, Admin Work')}
                     data-testid="input-description"
                   />
                 </div>
@@ -844,7 +846,7 @@ export default function Payroll() {
 
               <div className="grid gap-4 md:grid-cols-3">
                 <div className="space-y-2">
-                  <Label htmlFor="work-date">Work Date *</Label>
+                  <Label htmlFor="work-date">{t('payroll.workDate', 'Work Date')} *</Label>
                   <Input
                     id="work-date"
                     type="date"
@@ -855,7 +857,7 @@ export default function Payroll() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="start-time">Start Time *</Label>
+                  <Label htmlFor="start-time">{t('payroll.startTime', 'Start Time')} *</Label>
                   <Input
                     id="start-time"
                     type="time"
@@ -866,7 +868,7 @@ export default function Payroll() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="end-time">End Time *</Label>
+                  <Label htmlFor="end-time">{t('payroll.endTime', 'End Time')} *</Label>
                   <Input
                     id="end-time"
                     type="time"
@@ -882,9 +884,9 @@ export default function Payroll() {
                   <div className="border-t pt-4">
                     {selectedJobType === 'parkade_pressure_cleaning' ? (
                       <>
-                        <h4 className="font-medium mb-3">Stalls Completed (Optional)</h4>
+                        <h4 className="font-medium mb-3">{t('payroll.dropsNorth', 'Stalls Completed (Optional)')}</h4>
                         <div className="space-y-2">
-                          <Label htmlFor="stalls-completed">Number of Stalls</Label>
+                          <Label htmlFor="stalls-completed">{t('payroll.dropsNorth', 'Number of Stalls')}</Label>
                           <Input
                             id="stalls-completed"
                             type="number"
@@ -897,9 +899,9 @@ export default function Payroll() {
                       </>
                     ) : selectedJobType === 'in_suite_dryer_vent_cleaning' ? (
                       <>
-                        <h4 className="font-medium mb-3">Floors Completed (Optional)</h4>
+                        <h4 className="font-medium mb-3">{t('payroll.dropsNorth', 'Floors Completed (Optional)')}</h4>
                         <div className="space-y-2">
-                          <Label htmlFor="floors-completed">Number of Floors</Label>
+                          <Label htmlFor="floors-completed">{t('payroll.dropsNorth', 'Number of Floors')}</Label>
                           <Input
                             id="floors-completed"
                             type="number"
@@ -912,9 +914,9 @@ export default function Payroll() {
                       </>
                     ) : selectedJobType === 'ground_window_cleaning' || selectedJobType === 'general_pressure_washing' ? (
                       <>
-                        <h4 className="font-medium mb-3">Work Completed (Optional)</h4>
+                        <h4 className="font-medium mb-3">{t('payroll.dropsNorth', 'Work Completed (Optional)')}</h4>
                         <div className="space-y-2">
-                          <Label htmlFor="work-completed">Amount Completed</Label>
+                          <Label htmlFor="work-completed">{t('payroll.dropsNorth', 'Amount Completed')}</Label>
                           <Input
                             id="work-completed"
                             type="number"
@@ -927,10 +929,10 @@ export default function Payroll() {
                       </>
                     ) : (
                       <>
-                        <h4 className="font-medium mb-3">Drops Completed (Optional)</h4>
+                        <h4 className="font-medium mb-3">{t('payroll.dropsNorth', 'Drops Completed (Optional)')}</h4>
                         <div className="grid gap-4 md:grid-cols-4">
                           <div className="space-y-2">
-                            <Label htmlFor="drops-north">North</Label>
+                            <Label htmlFor="drops-north">{t('payroll.dropsNorth', 'North')}</Label>
                             <Input
                               id="drops-north"
                               type="number"
@@ -941,7 +943,7 @@ export default function Payroll() {
                             />
                           </div>
                           <div className="space-y-2">
-                            <Label htmlFor="drops-east">East</Label>
+                            <Label htmlFor="drops-east">{t('payroll.dropsEast', 'East')}</Label>
                             <Input
                               id="drops-east"
                               type="number"
@@ -952,7 +954,7 @@ export default function Payroll() {
                             />
                           </div>
                           <div className="space-y-2">
-                            <Label htmlFor="drops-south">South</Label>
+                            <Label htmlFor="drops-south">{t('payroll.dropsSouth', 'South')}</Label>
                             <Input
                               id="drops-south"
                               type="number"
@@ -963,7 +965,7 @@ export default function Payroll() {
                             />
                           </div>
                           <div className="space-y-2">
-                            <Label htmlFor="drops-west">West</Label>
+                            <Label htmlFor="drops-west">{t('payroll.dropsWest', 'West')}</Label>
                             <Input
                               id="drops-west"
                               type="number"
@@ -979,7 +981,7 @@ export default function Payroll() {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="shortfall-reason">Shortfall Reason (if work below target)</Label>
+                    <Label htmlFor="shortfall-reason">{t('payroll.shortfallReason', 'Shortfall Reason (if work below target)')}</Label>
                     <Input
                       id="shortfall-reason"
                       type="text"
@@ -999,7 +1001,7 @@ export default function Payroll() {
                 data-testid="button-add-work-session"
               >
                 <Clock className="w-4 h-4 mr-2" />
-                {addWorkSessionMutation.isPending ? "Adding..." : "Add Work Hours"}
+                {addWorkSessionMutation.isPending ? t('payroll.loading', 'Adding...') : t('payroll.addHours', 'Add Work Hours')}
               </Button>
             </CardContent>
           </Card>
@@ -1008,13 +1010,13 @@ export default function Payroll() {
         <TabsContent value="past-periods" className="space-y-4">
           <Card>
             <CardHeader>
-              <CardTitle>Past Pay Periods</CardTitle>
-              <CardDescription>View historical pay periods</CardDescription>
+              <CardTitle>{t('payroll.pastPeriod', 'Past Pay Periods')}</CardTitle>
+              <CardDescription>{t('payroll.pastPeriod', 'View historical pay periods')}</CardDescription>
             </CardHeader>
             <CardContent>
               {!periodsData?.periods || periodsData.periods.filter(p => p.status === 'past').length === 0 ? (
                 <div className="text-center py-8 text-muted-foreground">
-                  No past pay periods yet.
+                  {t('payroll.noPeriods', 'No past pay periods yet.')}
                 </div>
               ) : (
                 <div className="space-y-2">
@@ -1038,7 +1040,7 @@ export default function Payroll() {
                             }}
                             data-testid={`button-view-hours-${period.id}`}
                           >
-                            View Hours
+                            {t('payroll.hours', 'View Hours')}
                           </Button>
                         </CardContent>
                       </Card>
@@ -1052,22 +1054,22 @@ export default function Payroll() {
         <TabsContent value="settings" className="space-y-4">
           <Card>
             <CardHeader>
-              <CardTitle>Pay Period Configuration</CardTitle>
-              <CardDescription>Configure how pay periods are calculated. Periods are automatically generated when you save.</CardDescription>
+              <CardTitle>{t('payroll.configuration', 'Pay Period Configuration')}</CardTitle>
+              <CardDescription>{t('payroll.configuration', 'Configure how pay periods are calculated. Periods are automatically generated when you save.')}</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="period-type">Pay Period Type</Label>
+                <Label htmlFor="period-type">{t('payroll.periodType', 'Pay Period Type')}</Label>
                 <Select value={periodType} onValueChange={setPeriodType}>
                   <SelectTrigger id="period-type" data-testid="select-period-type">
-                    <SelectValue placeholder="Select period type" />
+                    <SelectValue placeholder={t('payroll.periodType', 'Select period type')} />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="semi-monthly">Semi-Monthly</SelectItem>
-                    <SelectItem value="monthly">Monthly</SelectItem>
-                    <SelectItem value="weekly">Weekly</SelectItem>
-                    <SelectItem value="bi-weekly">Bi-Weekly</SelectItem>
-                    <SelectItem value="custom">Custom Range</SelectItem>
+                    <SelectItem value="semi-monthly">{t('payroll.semiMonthly', 'Semi-Monthly')}</SelectItem>
+                    <SelectItem value="monthly">{t('payroll.monthly', 'Monthly')}</SelectItem>
+                    <SelectItem value="weekly">{t('payroll.weekly', 'Weekly')}</SelectItem>
+                    <SelectItem value="bi-weekly">{t('payroll.biWeekly', 'Bi-Weekly')}</SelectItem>
+                    <SelectItem value="custom">{t('payroll.custom', 'Custom Range')}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -1075,7 +1077,7 @@ export default function Payroll() {
               {periodType === 'semi-monthly' && (
                 <div className="grid gap-4 md:grid-cols-2">
                   <div className="space-y-2">
-                    <Label htmlFor="first-pay-day">First Pay Day of Month</Label>
+                    <Label htmlFor="first-pay-day">{t('payroll.firstPayDay', 'First Pay Day of Month')}</Label>
                     <Input
                       id="first-pay-day"
                       type="number"
@@ -1085,10 +1087,10 @@ export default function Payroll() {
                       onChange={(e) => setFirstPayDay(e.target.value)}
                       data-testid="input-first-pay-day"
                     />
-                    <p className="text-sm text-muted-foreground">Day 1-28</p>
+                    <p className="text-sm text-muted-foreground">{t('payroll.firstPayDay', 'Day 1-28')}</p>
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="second-pay-day">Second Pay Day of Month</Label>
+                    <Label htmlFor="second-pay-day">{t('payroll.secondPayDay', 'Second Pay Day of Month')}</Label>
                     <Input
                       id="second-pay-day"
                       type="number"
@@ -1098,7 +1100,7 @@ export default function Payroll() {
                       onChange={(e) => setSecondPayDay(e.target.value)}
                       data-testid="input-second-pay-day"
                     />
-                    <p className="text-sm text-muted-foreground">Day 1-28</p>
+                    <p className="text-sm text-muted-foreground">{t('payroll.secondPayDay', 'Day 1-28')}</p>
                   </div>
                 </div>
               )}
@@ -1106,7 +1108,7 @@ export default function Payroll() {
               {periodType === 'monthly' && (
                 <div className="grid gap-4 md:grid-cols-2">
                   <div className="space-y-2">
-                    <Label htmlFor="monthly-start-day">Period Start Day</Label>
+                    <Label htmlFor="monthly-start-day">{t('payroll.startDate', 'Period Start Day')}</Label>
                     <Input
                       id="monthly-start-day"
                       type="number"
@@ -1116,10 +1118,10 @@ export default function Payroll() {
                       onChange={(e) => setMonthlyStartDay(e.target.value)}
                       data-testid="input-monthly-start-day"
                     />
-                    <p className="text-sm text-muted-foreground">Day of month when period starts (1-28)</p>
+                    <p className="text-sm text-muted-foreground">{t('payroll.startDate', 'Day of month when period starts (1-28)')}</p>
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="monthly-end-day">Period End Day</Label>
+                    <Label htmlFor="monthly-end-day">{t('payroll.endDate', 'Period End Day')}</Label>
                     <Input
                       id="monthly-end-day"
                       type="number"
@@ -1129,17 +1131,17 @@ export default function Payroll() {
                       onChange={(e) => setMonthlyEndDay(e.target.value)}
                       data-testid="input-monthly-end-day"
                     />
-                    <p className="text-sm text-muted-foreground">Day of month when period ends (1-31)</p>
+                    <p className="text-sm text-muted-foreground">{t('payroll.endDate', 'Day of month when period ends (1-31)')}</p>
                   </div>
                 </div>
               )}
 
               {periodType === 'weekly' && (
                 <div className="space-y-2">
-                  <Label htmlFor="start-day-week">Week Starts On</Label>
+                  <Label htmlFor="start-day-week">{t('payroll.startDayOfWeek', 'Week Starts On')}</Label>
                   <Select value={startDayOfWeek} onValueChange={setStartDayOfWeek}>
                     <SelectTrigger id="start-day-week" data-testid="select-start-day">
-                      <SelectValue placeholder="Select day" />
+                      <SelectValue placeholder={t('payroll.startDayOfWeek', 'Select day')} />
                     </SelectTrigger>
                     <SelectContent>
                       {dayOfWeekOptions.map((day) => (
@@ -1155,10 +1157,10 @@ export default function Payroll() {
               {periodType === 'bi-weekly' && (
                 <div className="space-y-4">
                   <div className="space-y-2">
-                    <Label htmlFor="start-day-week-biweekly">Week Starts On</Label>
+                    <Label htmlFor="start-day-week-biweekly">{t('payroll.startDayOfWeek', 'Week Starts On')}</Label>
                     <Select value={startDayOfWeek} onValueChange={setStartDayOfWeek}>
                       <SelectTrigger id="start-day-week-biweekly" data-testid="select-start-day-biweekly">
-                        <SelectValue placeholder="Select day" />
+                        <SelectValue placeholder={t('payroll.startDayOfWeek', 'Select day')} />
                       </SelectTrigger>
                       <SelectContent>
                         {dayOfWeekOptions.map((day) => (
@@ -1170,7 +1172,7 @@ export default function Payroll() {
                     </Select>
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="anchor-date">Starting Date (Anchor)</Label>
+                    <Label htmlFor="anchor-date">{t('payroll.anchorDate', 'Starting Date (Anchor)')}</Label>
                     <Input
                       id="anchor-date"
                       type="date"
@@ -1179,7 +1181,7 @@ export default function Payroll() {
                       data-testid="input-anchor-date"
                     />
                     <p className="text-sm text-muted-foreground">
-                      First day of a pay period to use as reference
+                      {t('payroll.anchorDate', 'First day of a pay period to use as reference')}
                     </p>
                   </div>
                 </div>
@@ -1188,7 +1190,7 @@ export default function Payroll() {
               {periodType === 'custom' && (
                 <div className="grid gap-4 md:grid-cols-2">
                   <div className="space-y-2">
-                    <Label htmlFor="custom-start-date">Period Start Date</Label>
+                    <Label htmlFor="custom-start-date">{t('payroll.startDate', 'Period Start Date')}</Label>
                     <Input
                       id="custom-start-date"
                       type="date"
@@ -1197,11 +1199,11 @@ export default function Payroll() {
                       data-testid="input-custom-start-date"
                     />
                     <p className="text-sm text-muted-foreground">
-                      Starting date of your custom pay period
+                      {t('payroll.startDate', 'Starting date of your custom pay period')}
                     </p>
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="custom-end-date">Period End Date</Label>
+                    <Label htmlFor="custom-end-date">{t('payroll.endDate', 'Period End Date')}</Label>
                     <Input
                       id="custom-end-date"
                       type="date"
@@ -1210,7 +1212,7 @@ export default function Payroll() {
                       data-testid="input-custom-end-date"
                     />
                     <p className="text-sm text-muted-foreground">
-                      Ending date of your custom pay period
+                      {t('payroll.endDate', 'Ending date of your custom pay period')}
                     </p>
                   </div>
                 </div>
@@ -1220,29 +1222,29 @@ export default function Payroll() {
               <div className="border-t pt-4 mt-4">
                 <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
                   <Clock className="w-5 h-5" />
-                  Overtime & Double Time Pay
+                  {t('payroll.overtimeSettings', 'Overtime & Double Time Pay')}
                 </h3>
                 
                 {/* Overtime Settings */}
                 <div className="space-y-4 mb-6">
-                  <h4 className="font-medium text-sm text-muted-foreground">Overtime Configuration</h4>
+                  <h4 className="font-medium text-sm text-muted-foreground">{t('payroll.overtimeSettings', 'Overtime Configuration')}</h4>
                   <div className="grid gap-4 md:grid-cols-3">
                     <div className="space-y-2">
-                      <Label htmlFor="overtime-trigger-type">Overtime Trigger</Label>
+                      <Label htmlFor="overtime-trigger-type">{t('payroll.triggerType', 'Overtime Trigger')}</Label>
                       <Select value={overtimeTriggerType} onValueChange={setOvertimeTriggerType}>
                         <SelectTrigger id="overtime-trigger-type" data-testid="select-overtime-trigger-type">
-                          <SelectValue placeholder="Select trigger type" />
+                          <SelectValue placeholder={t('payroll.triggerType', 'Select trigger type')} />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="none">None (No Overtime)</SelectItem>
-                          <SelectItem value="daily">Per Day</SelectItem>
-                          <SelectItem value="weekly">Per Week</SelectItem>
+                          <SelectItem value="none">{t('payroll.triggerType', 'None (No Overtime)')}</SelectItem>
+                          <SelectItem value="daily">{t('payroll.daily', 'Per Day')}</SelectItem>
+                          <SelectItem value="weekly">{t('payroll.weekly', 'Per Week')}</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="overtime-hours-threshold">
-                        {overtimeTriggerType === 'daily' ? 'Triggers After (Hours/Day)' : overtimeTriggerType === 'weekly' ? 'Triggers After (Hours/Week)' : 'Not Applicable'}
+                        {overtimeTriggerType === 'daily' ? t('payroll.hoursThreshold', 'Triggers After (Hours/Day)') : overtimeTriggerType === 'weekly' ? t('payroll.hoursThreshold', 'Triggers After (Hours/Week)') : t('payroll.hoursThreshold', 'Not Applicable')}
                       </Label>
                       <Input
                         id="overtime-hours-threshold"
@@ -1256,11 +1258,11 @@ export default function Payroll() {
                         data-testid="input-overtime-hours-threshold"
                       />
                       <p className="text-sm text-muted-foreground">
-                        {overtimeTriggerType === 'daily' ? 'e.g., after 8 hours/day' : 'e.g., after 40 hours/week'}
+                        {overtimeTriggerType === 'daily' ? t('payroll.hoursThreshold', 'e.g., after 8 hours/day') : t('payroll.hoursThreshold', 'e.g., after 40 hours/week')}
                       </p>
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="overtime-multiplier">Pay Multiplier</Label>
+                      <Label htmlFor="overtime-multiplier">{t('payroll.overtimeMultiplier', 'Pay Multiplier')}</Label>
                       <Input
                         id="overtime-multiplier"
                         type="number"
@@ -1273,7 +1275,7 @@ export default function Payroll() {
                         data-testid="input-overtime-multiplier"
                       />
                       <p className="text-sm text-muted-foreground">
-                        {overtimeTriggerType === 'none' ? 'Not applicable' : 'e.g., 1.5 for time-and-a-half'}
+                        {overtimeTriggerType === 'none' ? t('payroll.overtimeMultiplier', 'Not applicable') : t('payroll.overtimeMultiplier', 'e.g., 1.5 for time-and-a-half')}
                       </p>
                     </div>
                   </div>
@@ -1281,24 +1283,24 @@ export default function Payroll() {
 
                 {/* Double Time Settings */}
                 <div className="space-y-4">
-                  <h4 className="font-medium text-sm text-muted-foreground">Double Time Configuration</h4>
+                  <h4 className="font-medium text-sm text-muted-foreground">{t('payroll.doubleTimeMultiplier', 'Double Time Configuration')}</h4>
                   <div className="grid gap-4 md:grid-cols-3">
                     <div className="space-y-2">
-                      <Label htmlFor="double-time-trigger-type">Double Time Trigger</Label>
+                      <Label htmlFor="double-time-trigger-type">{t('payroll.triggerType', 'Double Time Trigger')}</Label>
                       <Select value={doubleTimeTriggerType} onValueChange={setDoubleTimeTriggerType}>
                         <SelectTrigger id="double-time-trigger-type" data-testid="select-double-time-trigger-type">
-                          <SelectValue placeholder="Select trigger type" />
+                          <SelectValue placeholder={t('payroll.triggerType', 'Select trigger type')} />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="none">None (No Double Time)</SelectItem>
-                          <SelectItem value="daily">Per Day</SelectItem>
-                          <SelectItem value="weekly">Per Week</SelectItem>
+                          <SelectItem value="none">{t('payroll.triggerType', 'None (No Double Time)')}</SelectItem>
+                          <SelectItem value="daily">{t('payroll.daily', 'Per Day')}</SelectItem>
+                          <SelectItem value="weekly">{t('payroll.weekly', 'Per Week')}</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="double-time-hours-threshold">
-                        {doubleTimeTriggerType === 'daily' ? 'Triggers After (Hours/Day)' : doubleTimeTriggerType === 'weekly' ? 'Triggers After (Hours/Week)' : 'Not Applicable'}
+                        {doubleTimeTriggerType === 'daily' ? t('payroll.hoursThreshold', 'Triggers After (Hours/Day)') : doubleTimeTriggerType === 'weekly' ? t('payroll.hoursThreshold', 'Triggers After (Hours/Week)') : t('payroll.hoursThreshold', 'Not Applicable')}
                       </Label>
                       <Input
                         id="double-time-hours-threshold"
@@ -1312,11 +1314,11 @@ export default function Payroll() {
                         data-testid="input-double-time-hours-threshold"
                       />
                       <p className="text-sm text-muted-foreground">
-                        {doubleTimeTriggerType === 'none' ? 'Not applicable' : doubleTimeTriggerType === 'daily' ? 'e.g., after 12 hours/day' : 'e.g., after 60 hours/week'}
+                        {doubleTimeTriggerType === 'none' ? t('payroll.hoursThreshold', 'Not applicable') : doubleTimeTriggerType === 'daily' ? t('payroll.hoursThreshold', 'e.g., after 12 hours/day') : t('payroll.hoursThreshold', 'e.g., after 60 hours/week')}
                       </p>
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="double-time-multiplier">Pay Multiplier</Label>
+                      <Label htmlFor="double-time-multiplier">{t('payroll.doubleTimeMultiplier', 'Pay Multiplier')}</Label>
                       <Input
                         id="double-time-multiplier"
                         type="number"
@@ -1329,7 +1331,7 @@ export default function Payroll() {
                         data-testid="input-double-time-multiplier"
                       />
                       <p className="text-sm text-muted-foreground">
-                        {doubleTimeTriggerType === 'none' ? 'Not applicable' : 'e.g., 2.0 for double time'}
+                        {doubleTimeTriggerType === 'none' ? t('payroll.doubleTimeMultiplier', 'Not applicable') : t('payroll.doubleTimeMultiplier', 'e.g., 2.0 for double time')}
                       </p>
                     </div>
                   </div>
@@ -1343,7 +1345,7 @@ export default function Payroll() {
                 data-testid="button-save-config"
               >
                 <DollarSign className="w-4 h-4 mr-2" />
-                Save Configuration
+                {t('payroll.saveConfiguration', 'Save Configuration')}
               </Button>
             </CardContent>
           </Card>
@@ -1354,9 +1356,9 @@ export default function Payroll() {
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
         <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>Edit Work Session</DialogTitle>
+            <DialogTitle>{t('payroll.editSession', 'Edit Work Session')}</DialogTitle>
             <DialogDescription>
-              Update the work session details
+              {t('payroll.editSession', 'Update the work session details')}
             </DialogDescription>
           </DialogHeader>
           {editingSession && (
@@ -1385,13 +1387,13 @@ export default function Payroll() {
       <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Delete Work Session?</AlertDialogTitle>
+            <AlertDialogTitle>{t('payroll.confirmDelete', 'Delete Work Session?')}</AlertDialogTitle>
             <AlertDialogDescription>
-              This action cannot be undone. This will permanently delete the work session.
+              {t('payroll.confirmDelete', 'This action cannot be undone. This will permanently delete the work session.')}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogCancel>{t('payroll.cancel', 'Cancel')}</AlertDialogCancel>
             <AlertDialogAction
               onClick={() => {
                 if (deleteSessionId) {
@@ -1407,7 +1409,7 @@ export default function Payroll() {
               }}
               className="bg-destructive hover:bg-destructive/90"
             >
-              Delete
+              {t('payroll.delete', 'Delete')}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
@@ -1424,6 +1426,7 @@ function EditSessionForm({ session, onSave, onCancel, isPending, projects }: {
   isPending: boolean;
   projects: any[];
 }) {
+  const { t } = useTranslation();
   const [workDate, setWorkDate] = useState(session.workDate.split('T')[0]);
   const [startTime, setStartTime] = useState(format(new Date(session.startTime), 'HH:mm'));
   const [endTime, setEndTime] = useState(format(new Date(session.endTime), 'HH:mm'));
@@ -1467,7 +1470,7 @@ function EditSessionForm({ session, onSave, onCancel, isPending, projects }: {
     <div className="space-y-4">
       <div className="grid gap-4 md:grid-cols-3">
         <div className="space-y-2">
-          <Label htmlFor="edit-work-date">Work Date *</Label>
+          <Label htmlFor="edit-work-date">{t('payroll.workDate', 'Work Date')} *</Label>
           <Input
             id="edit-work-date"
             type="date"
@@ -1477,7 +1480,7 @@ function EditSessionForm({ session, onSave, onCancel, isPending, projects }: {
           />
         </div>
         <div className="space-y-2">
-          <Label htmlFor="edit-start-time">Start Time *</Label>
+          <Label htmlFor="edit-start-time">{t('payroll.startTime', 'Start Time')} *</Label>
           <Input
             id="edit-start-time"
             type="time"
@@ -1487,7 +1490,7 @@ function EditSessionForm({ session, onSave, onCancel, isPending, projects }: {
           />
         </div>
         <div className="space-y-2">
-          <Label htmlFor="edit-end-time">End Time *</Label>
+          <Label htmlFor="edit-end-time">{t('payroll.endTime', 'End Time')} *</Label>
           <Input
             id="edit-end-time"
             type="time"
@@ -1500,13 +1503,13 @@ function EditSessionForm({ session, onSave, onCancel, isPending, projects }: {
 
       {isNonBillable ? (
         <div className="space-y-2">
-          <Label htmlFor="edit-description">Description *</Label>
+          <Label htmlFor="edit-description">{t('payroll.description', 'Description')} *</Label>
           <Input
             id="edit-description"
             type="text"
             value={description}
             onChange={(e) => setDescription(e.target.value)}
-                placeholder="e.g., Errands, Admin Work"
+            placeholder={t('payroll.description', 'e.g., Errands, Admin Work')}
             data-testid="input-edit-description"
           />
         </div>
@@ -1515,7 +1518,7 @@ function EditSessionForm({ session, onSave, onCancel, isPending, projects }: {
           <div className="border-t pt-4">
             {jobType === 'parkade_pressure_cleaning' ? (
               <div className="space-y-2">
-                <Label htmlFor="edit-stalls">Stalls Completed</Label>
+                <Label htmlFor="edit-stalls">{t('payroll.dropsNorth', 'Stalls Completed')}</Label>
                 <Input
                   id="edit-stalls"
                   type="number"
@@ -1527,7 +1530,7 @@ function EditSessionForm({ session, onSave, onCancel, isPending, projects }: {
               </div>
             ) : jobType === 'in_suite_dryer_vent_cleaning' ? (
               <div className="space-y-2">
-                <Label htmlFor="edit-floors">Floors Completed</Label>
+                <Label htmlFor="edit-floors">{t('payroll.dropsNorth', 'Floors Completed')}</Label>
                 <Input
                   id="edit-floors"
                   type="number"
@@ -1540,7 +1543,7 @@ function EditSessionForm({ session, onSave, onCancel, isPending, projects }: {
             ) : (
               <div className="grid gap-4 md:grid-cols-4">
                 <div className="space-y-2">
-                  <Label htmlFor="edit-drops-north">North</Label>
+                  <Label htmlFor="edit-drops-north">{t('payroll.dropsNorth', 'North')}</Label>
                   <Input
                     id="edit-drops-north"
                     type="number"
@@ -1551,7 +1554,7 @@ function EditSessionForm({ session, onSave, onCancel, isPending, projects }: {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="edit-drops-east">East</Label>
+                  <Label htmlFor="edit-drops-east">{t('payroll.dropsEast', 'East')}</Label>
                   <Input
                     id="edit-drops-east"
                     type="number"
@@ -1562,7 +1565,7 @@ function EditSessionForm({ session, onSave, onCancel, isPending, projects }: {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="edit-drops-south">South</Label>
+                  <Label htmlFor="edit-drops-south">{t('payroll.dropsSouth', 'South')}</Label>
                   <Input
                     id="edit-drops-south"
                     type="number"
@@ -1573,7 +1576,7 @@ function EditSessionForm({ session, onSave, onCancel, isPending, projects }: {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="edit-drops-west">West</Label>
+                  <Label htmlFor="edit-drops-west">{t('payroll.dropsWest', 'West')}</Label>
                   <Input
                     id="edit-drops-west"
                     type="number"
@@ -1588,13 +1591,13 @@ function EditSessionForm({ session, onSave, onCancel, isPending, projects }: {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="edit-shortfall-reason">Shortfall Reason</Label>
+            <Label htmlFor="edit-shortfall-reason">{t('payroll.shortfallReason', 'Shortfall Reason')}</Label>
             <Input
               id="edit-shortfall-reason"
               type="text"
               value={shortfallReason}
               onChange={(e) => setShortfallReason(e.target.value)}
-              placeholder="e.g., Weather delay, Equipment issue"
+              placeholder={t('payroll.shortfallReason', 'e.g., Weather delay, Equipment issue')}
               data-testid="input-edit-shortfall-reason"
             />
           </div>
@@ -1603,10 +1606,10 @@ function EditSessionForm({ session, onSave, onCancel, isPending, projects }: {
 
       <div className="flex gap-2 justify-end pt-4">
         <Button variant="outline" onClick={onCancel} disabled={isPending}>
-          Cancel
+          {t('payroll.cancel', 'Cancel')}
         </Button>
         <Button onClick={handleSubmit} disabled={isPending}>
-          {isPending ? "Saving..." : "Save Changes"}
+          {isPending ? t('payroll.loading', 'Saving...') : t('payroll.save', 'Save Changes')}
         </Button>
       </div>
     </div>

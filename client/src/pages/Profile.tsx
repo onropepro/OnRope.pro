@@ -182,7 +182,7 @@ function LanguagePreferenceCard() {
     queryKey: ["/api/user"],
   });
 
-  const currentLanguage = userData?.user?.preferredLanguage || i18n.language || 'en';
+  const currentLanguage = i18n.language || userData?.user?.preferredLanguage || 'en';
 
   const handleLanguageChange = async (language: string) => {
     try {
