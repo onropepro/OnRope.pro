@@ -452,8 +452,8 @@ export function DocumentReviews({ companyDocuments = [], methodStatements = [] }
         )}
 
         {signedReviews.length > 0 && (
-          <Collapsible defaultOpen={pendingReviews.length === 0}>
-            <CollapsibleTrigger className="flex items-center gap-2 w-full p-2 rounded-lg hover-elevate mb-2">
+          <Collapsible defaultOpen={false}>
+            <CollapsibleTrigger className="flex items-center gap-2 w-full p-2 rounded-lg hover-elevate mb-2 group">
               <ChevronRight className="h-4 w-4 transition-transform duration-200 group-data-[state=open]:rotate-90" />
               <h3 className="text-sm font-semibold text-muted-foreground flex items-center gap-2">
                 <Check className="h-4 w-4 text-emerald-500" />
