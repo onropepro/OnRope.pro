@@ -689,6 +689,540 @@ const SAFE_WORK_PROCEDURES: SafeWorkProcedure[] = [
   }
 ];
 
+// Safe Work Practice Template Structure
+interface SafeWorkPractice {
+  id: string;
+  title: string;
+  description: string;
+  category: string;
+  keyPrinciples: string[];
+  requirements: string[];
+  doList: string[];
+  dontList: string[];
+  emergencyActions: string[];
+}
+
+// Safe Work Practice Templates
+const SAFE_WORK_PRACTICES: SafeWorkPractice[] = [
+  {
+    id: 'general_ppe',
+    title: 'Personal Protective Equipment (PPE)',
+    description: 'Guidelines for proper selection, use, and maintenance of personal protective equipment in rope access operations.',
+    category: 'General Safety',
+    keyPrinciples: [
+      'PPE is the last line of defense - engineering controls come first',
+      'All PPE must be inspected before each use',
+      'PPE must be appropriate for the specific hazard',
+      'Damaged or expired PPE must never be used',
+      'PPE must fit correctly to provide protection'
+    ],
+    requirements: [
+      'Full body harness inspected within 12 months',
+      'Hard hat with chin strap rated to EN 397',
+      'Safety glasses or goggles as required',
+      'Appropriate gloves for the task',
+      'Safety footwear with non-slip soles',
+      'High visibility clothing when near traffic',
+      'Hearing protection when noise exceeds 85dB'
+    ],
+    doList: [
+      'Inspect all PPE before each use',
+      'Store PPE properly when not in use',
+      'Report any damage immediately',
+      'Replace PPE according to manufacturer guidelines',
+      'Ensure proper fit of all equipment',
+      'Keep PPE clean and maintained'
+    ],
+    dontList: [
+      'Never use damaged or expired PPE',
+      'Never modify PPE from original design',
+      'Never share personal PPE without sanitization',
+      'Never use PPE for purposes other than intended',
+      'Never remove PPE while in hazardous areas'
+    ],
+    emergencyActions: [
+      'If PPE fails during work, immediately move to safe position',
+      'Report all PPE failures to supervisor',
+      'Document equipment failures for investigation',
+      'Do not continue work with compromised PPE'
+    ]
+  },
+  {
+    id: 'fall_protection',
+    title: 'Fall Protection',
+    description: 'Essential practices for preventing falls from height during rope access operations.',
+    category: 'Working at Heights',
+    keyPrinciples: [
+      'Falls from height are the leading cause of fatalities in construction',
+      'Dual rope systems provide redundancy for safety',
+      'Anchor points must be independently tested and certified',
+      '100% tie-off at all times when at height',
+      'Fall arrest systems must limit fall distance'
+    ],
+    requirements: [
+      'Minimum IRATA Level 1 certification',
+      'Dual rope system with independent anchors',
+      'Anchor points rated to minimum 15kN',
+      'Fall arrester device properly engaged at all times',
+      'Work positioning lanyard when hands-free work needed',
+      'Edge protection for rope at sharp edges'
+    ],
+    doList: [
+      'Verify anchor point integrity before use',
+      'Maintain 100% tie-off at all times at height',
+      'Use backup device in addition to descender',
+      'Keep work area clear of trip hazards',
+      'Communicate clearly with team members',
+      'Plan escape routes before starting work'
+    ],
+    dontList: [
+      'Never work at height alone',
+      'Never trust unverified anchor points',
+      'Never remove fall protection while at height',
+      'Never exceed equipment weight limits',
+      'Never work in severe weather conditions'
+    ],
+    emergencyActions: [
+      'In case of fall arrest, immediately call for rescue',
+      'Suspended worker rescue must occur within 15 minutes',
+      'Activate emergency services if rescue not possible',
+      'Document all fall incidents for investigation'
+    ]
+  },
+  {
+    id: 'manual_handling',
+    title: 'Manual Handling',
+    description: 'Safe practices for lifting, carrying, and moving materials during work operations.',
+    category: 'Ergonomics',
+    keyPrinciples: [
+      'Back injuries are often preventable with proper technique',
+      'Use mechanical aids whenever possible',
+      'Team lifts for loads over 25kg',
+      'Plan the lift before starting',
+      'Never twist while lifting'
+    ],
+    requirements: [
+      'Risk assessment before manual handling tasks',
+      'Mechanical aids available where practical',
+      'Clear pathways for carrying materials',
+      'Appropriate footwear for grip and stability',
+      'Training in proper lifting techniques'
+    ],
+    doList: [
+      'Assess the load weight before lifting',
+      'Keep loads close to your body',
+      'Bend at the knees, not the waist',
+      'Use leg muscles to lift, not back',
+      'Ask for help with heavy or awkward loads',
+      'Take rest breaks during repetitive handling'
+    ],
+    dontList: [
+      'Never lift loads beyond your capacity',
+      'Never twist your body while carrying loads',
+      'Never carry loads that block your vision',
+      'Never rush when handling materials',
+      'Never ignore pain or discomfort'
+    ],
+    emergencyActions: [
+      'Stop immediately if you feel pain',
+      'Report all injuries no matter how minor',
+      'Seek medical attention for persistent pain',
+      'Document the incident and contributing factors'
+    ]
+  },
+  {
+    id: 'heat_cold_stress',
+    title: 'Heat and Cold Stress Prevention',
+    description: 'Managing environmental temperature extremes to protect worker health and safety.',
+    category: 'Environmental',
+    keyPrinciples: [
+      'Both heat and cold can cause serious medical emergencies',
+      'Acclimatization takes time - build up exposure gradually',
+      'Hydration is critical in both hot and cold environments',
+      'Know the signs of heat exhaustion and hypothermia',
+      'Work schedules may need adjustment for extreme temperatures'
+    ],
+    requirements: [
+      'Access to shade or shelter from elements',
+      'Adequate hydration supplies available',
+      'Appropriate clothing for conditions',
+      'Work/rest cycles in extreme temperatures',
+      'First aid trained personnel on site'
+    ],
+    doList: [
+      'Monitor weather conditions throughout the day',
+      'Take regular hydration breaks',
+      'Wear appropriate clothing layers',
+      'Watch coworkers for signs of distress',
+      'Schedule heavy work for cooler periods',
+      'Acclimatize gradually to temperature changes'
+    ],
+    dontList: [
+      'Never ignore signs of heat exhaustion or hypothermia',
+      'Never continue working if feeling unwell',
+      'Never restrict water intake',
+      'Never remove safety PPE due to heat discomfort',
+      'Never underestimate wind chill effects'
+    ],
+    emergencyActions: [
+      'Heat exhaustion: Move to cool area, hydrate, cool with water',
+      'Heat stroke: Call emergency services, cool victim rapidly',
+      'Hypothermia: Move to warm shelter, remove wet clothing, warm gradually',
+      'Frostbite: Warm affected area gradually, seek medical attention'
+    ]
+  },
+  {
+    id: 'chemical_safety',
+    title: 'Chemical Safety',
+    description: 'Safe handling, storage, and use of cleaning chemicals and hazardous substances.',
+    category: 'Hazardous Materials',
+    keyPrinciples: [
+      'All chemicals can be hazardous if misused',
+      'Safety Data Sheets (SDS) contain critical safety information',
+      'Never mix chemicals unless specifically authorized',
+      'Proper ventilation is essential when using chemicals',
+      'Storage and disposal must follow regulations'
+    ],
+    requirements: [
+      'SDS available for all chemicals on site',
+      'Appropriate PPE for chemicals being used',
+      'Chemical-resistant gloves and eye protection',
+      'Ventilation or respiratory protection as needed',
+      'Spill containment materials available'
+    ],
+    doList: [
+      'Read and understand SDS before using chemicals',
+      'Wear required PPE at all times',
+      'Use chemicals only for intended purposes',
+      'Store chemicals in original containers',
+      'Dispose of chemicals according to regulations',
+      'Wash hands thoroughly after chemical contact'
+    ],
+    dontList: [
+      'Never mix different chemicals together',
+      'Never eat or drink near chemicals',
+      'Never transfer chemicals to unmarked containers',
+      'Never use chemicals in confined spaces without ventilation',
+      'Never ignore chemical exposure symptoms'
+    ],
+    emergencyActions: [
+      'Eye contact: Flush with water for 15 minutes, seek medical help',
+      'Skin contact: Remove contaminated clothing, wash affected area',
+      'Inhalation: Move to fresh air, seek medical attention if symptomatic',
+      'Spill: Contain using appropriate materials, follow SDS procedures'
+    ]
+  },
+  {
+    id: 'tool_safety',
+    title: 'Tool and Equipment Safety',
+    description: 'Safe practices for using hand tools, power tools, and equipment at height.',
+    category: 'Equipment',
+    keyPrinciples: [
+      'Tools can become deadly projectiles if dropped from height',
+      'All tools must be tethered when working at height',
+      'Power tools require additional safety precautions',
+      'Proper tool selection prevents injuries',
+      'Regular maintenance keeps tools safe to use'
+    ],
+    requirements: [
+      'Tool lanyards for all equipment at height',
+      'Exclusion zones below work areas',
+      'Tools inspected before use',
+      'Power tools with safety guards in place',
+      'Appropriate tool for the task'
+    ],
+    doList: [
+      'Tether all tools when working at height',
+      'Inspect tools before each use',
+      'Use the right tool for the job',
+      'Keep cutting tools sharp',
+      'Store tools properly when not in use',
+      'Report damaged tools immediately'
+    ],
+    dontList: [
+      'Never use damaged tools',
+      'Never remove safety guards from power tools',
+      'Never carry tools in pockets at height',
+      'Never throw tools between workers',
+      'Never leave tools unattended at height'
+    ],
+    emergencyActions: [
+      'Dropped object: Alert workers below immediately',
+      'Tool injury: Apply first aid, seek medical attention',
+      'Power tool malfunction: Stop immediately, isolate power',
+      'Report all near-misses involving tools'
+    ]
+  },
+  {
+    id: 'emergency_response',
+    title: 'Emergency Response',
+    description: 'Procedures for responding to emergencies during rope access operations.',
+    category: 'Emergency',
+    keyPrinciples: [
+      'Every site must have an emergency response plan',
+      'All workers must know the rescue procedure',
+      'Time is critical in suspended worker emergencies',
+      'Communication is essential during emergencies',
+      'Regular drills maintain emergency readiness'
+    ],
+    requirements: [
+      'Site-specific emergency plan in place',
+      'Rescue equipment readily accessible',
+      'First aid kit on site',
+      'Emergency contact numbers posted',
+      'Communication devices operational',
+      'At least one rescue-trained person on site'
+    ],
+    doList: [
+      'Know the emergency plan before starting work',
+      'Identify assembly points and escape routes',
+      'Keep emergency equipment accessible',
+      'Practice rescue procedures regularly',
+      'Report all incidents to supervisor',
+      'Maintain calm and follow procedures'
+    ],
+    dontList: [
+      'Never start work without knowing emergency procedures',
+      'Never block emergency equipment access',
+      'Never ignore alarms or emergency signals',
+      'Never attempt rescue without proper training',
+      'Never leave the scene of an incident without authorization'
+    ],
+    emergencyActions: [
+      'Raise the alarm immediately',
+      'Call emergency services if required',
+      'Begin rescue procedures if trained and safe to do so',
+      'Administer first aid if qualified',
+      'Secure the scene for investigators',
+      'Document the incident as soon as practical'
+    ]
+  },
+  {
+    id: 'communication_protocols',
+    title: 'Communication Protocols',
+    description: 'Effective communication practices for safe rope access operations.',
+    category: 'Operations',
+    keyPrinciples: [
+      'Clear communication prevents accidents',
+      'Standardized signals ensure understanding',
+      'Two-way radios are essential for rope access',
+      'Never assume your message was received',
+      'Language barriers must be addressed'
+    ],
+    requirements: [
+      'Two-way radios for all rope access personnel',
+      'Backup communication method available',
+      'Standardized hand signals known by all',
+      'Communication check before work starts',
+      'Clear line of sight or radio contact maintained'
+    ],
+    doList: [
+      'Test communication equipment before use',
+      'Use clear, concise language',
+      'Confirm receipt of critical messages',
+      'Use standardized terminology',
+      'Keep radio channels clear for safety communication',
+      'Report communication failures immediately'
+    ],
+    dontList: [
+      'Never assume your message was understood',
+      'Never use personal phones for critical communication',
+      'Never ignore calls from team members',
+      'Never use unfamiliar signals or codes',
+      'Never continue work if communication is lost'
+    ],
+    emergencyActions: [
+      'Lost communication: Return to safe position immediately',
+      'Emergency signal: Stop work and respond according to plan',
+      'Equipment failure: Use backup communication method',
+      'If no communication possible: Evacuate to assembly point'
+    ]
+  },
+  {
+    id: 'fatigue_management',
+    title: 'Fatigue and Wellbeing',
+    description: 'Managing fatigue and maintaining physical and mental wellbeing for safe work.',
+    category: 'Health',
+    keyPrinciples: [
+      'Fatigue significantly increases risk of accidents',
+      'Physical and mental health affect work performance',
+      'Rest breaks are essential for safety',
+      'Personal problems can impact work safety',
+      'Speak up if you are not fit for work'
+    ],
+    requirements: [
+      'Adequate rest before work shifts',
+      'Regular breaks during work',
+      'Access to drinking water and rest facilities',
+      'Reasonable work hours and schedules',
+      'Fitness for duty assessment if concerns arise'
+    ],
+    doList: [
+      'Get adequate sleep before work',
+      'Take scheduled rest breaks',
+      'Stay hydrated throughout the day',
+      'Report if feeling unwell or fatigued',
+      'Support colleagues who appear fatigued',
+      'Maintain work-life balance'
+    ],
+    dontList: [
+      'Never work while impaired by drugs or alcohol',
+      'Never hide fatigue or illness',
+      'Never skip breaks when doing demanding work',
+      'Never pressure colleagues to work when unfit',
+      'Never ignore signs of fatigue in yourself or others'
+    ],
+    emergencyActions: [
+      'If severely fatigued: Stop work immediately',
+      'If colleague appears unwell: Notify supervisor',
+      'Medical emergency: Call for first aid assistance',
+      'Mental health crisis: Access employee support services'
+    ]
+  },
+  {
+    id: 'housekeeping',
+    title: 'Worksite Housekeeping',
+    description: 'Maintaining clean and organized work areas for safety and efficiency.',
+    category: 'General Safety',
+    keyPrinciples: [
+      'Good housekeeping prevents slips, trips, and falls',
+      'Organized work areas improve efficiency',
+      'Everyone is responsible for housekeeping',
+      'Clean up as you go, not just at the end',
+      'Proper storage prevents damage and injuries'
+    ],
+    requirements: [
+      'Designated storage areas for equipment',
+      'Waste disposal containers available',
+      'Clear walkways and access routes',
+      'Adequate lighting in work areas',
+      'Spill cleanup materials available'
+    ],
+    doList: [
+      'Keep work areas clean and organized',
+      'Store tools and equipment properly',
+      'Dispose of waste in designated containers',
+      'Clean up spills immediately',
+      'Maintain clear access and egress routes',
+      'Report housekeeping hazards'
+    ],
+    dontList: [
+      'Never leave tools or materials on walkways',
+      'Never leave extension cords across paths',
+      'Never pile materials unsafely',
+      'Never ignore slip or trip hazards',
+      'Never leave rubbish on site'
+    ],
+    emergencyActions: [
+      'Trip hazard causing injury: Provide first aid, report incident',
+      'Spill on work surface: Clean immediately, mark area until dry',
+      'Cluttered emergency route: Clear immediately, report to supervisor'
+    ]
+  }
+];
+
+// Generate PDF for Safe Work Practice
+const generateSafeWorkPracticePDF = (practice: SafeWorkPractice, companyName?: string): void => {
+  const doc = new jsPDF();
+  const pageWidth = doc.internal.pageSize.getWidth();
+  const pageHeight = doc.internal.pageSize.getHeight();
+  const margin = 20;
+  const contentWidth = pageWidth - (margin * 2);
+  let yPos = 20;
+
+  const checkPageBreak = (requiredSpace: number) => {
+    if (yPos + requiredSpace > pageHeight - 30) {
+      doc.addPage();
+      yPos = 20;
+    }
+  };
+
+  const addSection = (title: string, items: string[], bulletStyle: boolean = true) => {
+    checkPageBreak(30);
+    doc.setFontSize(12);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(34, 34, 34);
+    doc.text(title, margin, yPos);
+    yPos += 8;
+
+    doc.setFontSize(10);
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(60, 60, 60);
+
+    items.forEach((item, index) => {
+      const prefix = bulletStyle ? '  - ' : `  ${index + 1}. `;
+      const lines = doc.splitTextToSize(prefix + item, contentWidth - 10);
+      checkPageBreak(lines.length * 5 + 2);
+      lines.forEach((line: string) => {
+        doc.text(line, margin + 5, yPos);
+        yPos += 5;
+      });
+      yPos += 1;
+    });
+    yPos += 5;
+  };
+
+  // Header
+  doc.setFillColor(59, 130, 246); // Blue for practices
+  doc.rect(0, 0, pageWidth, 40, 'F');
+  
+  // Company name if provided
+  if (companyName) {
+    doc.setTextColor(255, 255, 255);
+    doc.setFontSize(9);
+    doc.setFont('helvetica', 'bold');
+    doc.text(companyName.toUpperCase(), pageWidth / 2, 10, { align: 'center' });
+  }
+
+  doc.setTextColor(255, 255, 255);
+  doc.setFontSize(18);
+  doc.setFont('helvetica', 'bold');
+  doc.text('SAFE WORK PRACTICE', pageWidth / 2, 22, { align: 'center' });
+  
+  doc.setFontSize(12);
+  doc.text(practice.title, pageWidth / 2, 32, { align: 'center' });
+
+  yPos = 50;
+
+  // Category badge
+  doc.setFontSize(9);
+  doc.setTextColor(100, 100, 100);
+  doc.text(`Category: ${practice.category}`, margin, yPos);
+  yPos += 10;
+
+  // Description
+  doc.setFontSize(10);
+  doc.setFont('helvetica', 'normal');
+  doc.setTextColor(60, 60, 60);
+  const descLines = doc.splitTextToSize(practice.description, contentWidth);
+  descLines.forEach((line: string) => {
+    doc.text(line, margin, yPos);
+    yPos += 5;
+  });
+  yPos += 10;
+
+  // Sections
+  addSection('Key Principles', practice.keyPrinciples);
+  addSection('Requirements', practice.requirements);
+  addSection('Do', practice.doList);
+  addSection('Do Not', practice.dontList);
+  addSection('Emergency Actions', practice.emergencyActions);
+
+  // Footer on all pages
+  const totalPages = doc.getNumberOfPages();
+  for (let i = 1; i <= totalPages; i++) {
+    doc.setPage(i);
+    doc.setFontSize(8);
+    doc.setTextColor(150, 150, 150);
+    doc.text(`Page ${i} of ${totalPages}`, pageWidth / 2, pageHeight - 10, { align: 'center' });
+    doc.text(`Generated: ${new Date().toLocaleDateString()}`, margin, pageHeight - 10);
+  }
+
+  // Download
+  const fileName = `SWPractice_${practice.id}.pdf`;
+  doc.save(fileName);
+};
+
 // Generate PDF for Safe Work Procedure
 const generateSafeWorkProcedurePDF = (procedure: SafeWorkProcedure, companyName?: string): void => {
   const doc = new jsPDF();
