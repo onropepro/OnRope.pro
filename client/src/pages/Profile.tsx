@@ -721,6 +721,7 @@ function FeatureRequestsSection({ userId, userName }: { userId: string; userName
 }
 
 export default function Profile() {
+  const { t } = useTranslation();
   const [, setLocation] = useLocation();
   const { toast } = useToast();
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
@@ -1003,12 +1004,12 @@ export default function Profile() {
             {hasLogo && (
               <img 
                 src={branding.logoUrl} 
-                alt="Company Logo" 
+                alt={t('profile.companyLogo', 'Company Logo')} 
                 className="h-10 w-auto object-contain"
                 data-testid="img-company-logo"
               />
             )}
-            <h1 className="text-lg font-bold">Profile</h1>
+            <h1 className="text-lg font-bold">{t('profile.title', 'Profile')}</h1>
           </div>
           <div className="flex items-center gap-2">
             <RefreshButton />
@@ -1028,17 +1029,17 @@ export default function Profile() {
         {user?.role === "company" ? (
           <Tabs defaultValue="profile" className="w-full">
             <TabsList className="grid w-full grid-cols-4">
-              <TabsTrigger value="profile" data-testid="tab-profile">Profile</TabsTrigger>
-              <TabsTrigger value="subscription" data-testid="tab-subscription">Subscription</TabsTrigger>
-              <TabsTrigger value="branding" data-testid="tab-branding">Branding</TabsTrigger>
-              <TabsTrigger value="feature-requests" data-testid="tab-feature-requests">Feedback</TabsTrigger>
+              <TabsTrigger value="profile" data-testid="tab-profile">{t('profile.title', 'Profile')}</TabsTrigger>
+              <TabsTrigger value="subscription" data-testid="tab-subscription">{t('profile.subscription', 'Subscription')}</TabsTrigger>
+              <TabsTrigger value="branding" data-testid="tab-branding">{t('profile.branding', 'Branding')}</TabsTrigger>
+              <TabsTrigger value="feature-requests" data-testid="tab-feature-requests">{t('profile.feedback', 'Feedback')}</TabsTrigger>
             </TabsList>
 
             <TabsContent value="profile" className="space-y-4 mt-4">
               {/* Profile Information */}
               <Card>
           <CardHeader>
-            <CardTitle>Profile Information</CardTitle>
+            <CardTitle>{t('profile.profileInformation', 'Profile Information')}</CardTitle>
           </CardHeader>
           <CardContent>
             <Form {...profileForm}>
@@ -1048,10 +1049,10 @@ export default function Profile() {
                   name="name"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Name</FormLabel>
+                      <FormLabel>{t('common.name', 'Name')}</FormLabel>
                       <FormControl>
                         <Input
-                          placeholder="Your name"
+                          placeholder={t('profile.yourName', 'Your name')}
                           {...field}
                           data-testid="input-name"
                           className="h-12"
@@ -1068,7 +1069,7 @@ export default function Profile() {
                     name="email"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Email</FormLabel>
+                        <FormLabel>{t('common.email', 'Email')}</FormLabel>
                         <FormControl>
                           <Input
                             type="email"
@@ -1091,7 +1092,7 @@ export default function Profile() {
                       name="unitNumber"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Unit Number</FormLabel>
+                          <FormLabel>{t('profile.unitNumber', 'Unit Number')}</FormLabel>
                           <FormControl>
                             <Input
                               placeholder="e.g., 101, 1205"
@@ -1109,7 +1110,7 @@ export default function Profile() {
                       name="parkingStallNumber"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Parking Stall Number</FormLabel>
+                          <FormLabel>{t('profile.parkingStallNumber', 'Parking Stall Number')}</FormLabel>
                           <FormControl>
                             <Input
                               placeholder="e.g., 42, A-5, P1-23"
@@ -1177,7 +1178,7 @@ export default function Profile() {
                       name="companyName"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Company Name</FormLabel>
+                          <FormLabel>{t('profile.companyName', 'Company Name')}</FormLabel>
                           <FormControl>
                             <Input
                               placeholder="Company name"
@@ -1195,7 +1196,7 @@ export default function Profile() {
                       name="residentCode"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Resident Code</FormLabel>
+                          <FormLabel>{t('profile.residentCode', 'Resident Code')}</FormLabel>
                           <FormControl>
                             <Input
                               placeholder="10-character code for residents"
@@ -1213,14 +1214,14 @@ export default function Profile() {
                     <Separator className="my-4" />
 
                     <div className="space-y-4">
-                      <h3 className="text-sm font-medium">Company Information</h3>
+                      <h3 className="text-sm font-medium">{t('profile.companyInformation', 'Company Information')}</h3>
                       
                       <FormField
                         control={profileForm.control}
                         name="streetAddress"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Street Address</FormLabel>
+                            <FormLabel>{t('profile.streetAddress', 'Street Address')}</FormLabel>
                             <FormControl>
                               <Input
                                 placeholder="123 Main St, Suite 100"
@@ -1240,7 +1241,7 @@ export default function Profile() {
                           name="province"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>Province/State</FormLabel>
+                              <FormLabel>{t('profile.provinceState', 'Province/State')}</FormLabel>
                               <FormControl>
                                 <Input
                                   placeholder="BC, ON, etc."
@@ -1259,7 +1260,7 @@ export default function Profile() {
                           name="country"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>Country</FormLabel>
+                              <FormLabel>{t('profile.country', 'Country')}</FormLabel>
                               <FormControl>
                                 <Input
                                   placeholder="Canada, USA, etc."
@@ -1279,7 +1280,7 @@ export default function Profile() {
                         name="zipCode"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Postal/Zip Code</FormLabel>
+                            <FormLabel>{t('profile.postalZipCode', 'Postal/Zip Code')}</FormLabel>
                             <FormControl>
                               <Input
                                 placeholder="V6B 1A1, 90210, etc."
@@ -1298,7 +1299,7 @@ export default function Profile() {
                         name="employeePhoneNumber"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Phone Number</FormLabel>
+                            <FormLabel>{t('profile.phoneNumber', 'Phone Number')}</FormLabel>
                             <FormControl>
                               <Input
                                 placeholder="(604) 555-1234"
@@ -1317,7 +1318,7 @@ export default function Profile() {
                         name="hourlyRate"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Hourly Rate (for yourself)</FormLabel>
+                            <FormLabel>{t('profile.hourlyRateSelf', 'Hourly Rate (for yourself)')}</FormLabel>
                             <FormControl>
                               <Input
                                 type="number"
@@ -1343,7 +1344,7 @@ export default function Profile() {
                         <div className="flex items-center justify-between gap-3 mb-2">
                           <div className="flex items-center gap-2">
                             <span className="material-icons text-primary text-lg">groups</span>
-                            <span className="text-sm font-medium">Employee Seats</span>
+                            <span className="text-sm font-medium">{t('profile.employeeSeats', 'Employee Seats')}</span>
                           </div>
                           <Badge 
                             variant={employeesData.seatInfo.atSeatLimit ? "destructive" : "secondary"}
@@ -1371,7 +1372,7 @@ export default function Profile() {
                 )}
 
                 <div className="pt-2">
-                  <div className="text-sm text-muted-foreground mb-2">Role</div>
+                  <div className="text-sm text-muted-foreground mb-2">{t('profile.role', 'Role')}</div>
                   <div className="text-sm font-medium capitalize">
                     {user?.role.replace(/_/g, " ")}
                   </div>
@@ -1379,7 +1380,7 @@ export default function Profile() {
 
                 {user?.techLevel && (
                   <div className="pt-2">
-                    <div className="text-sm text-muted-foreground mb-2">IRATA Level</div>
+                    <div className="text-sm text-muted-foreground mb-2">{t('profile.irataLevel', 'IRATA Level')}</div>
                     <div className="text-sm font-medium">{user.techLevel}</div>
                   </div>
                 )}
@@ -1390,7 +1391,7 @@ export default function Profile() {
                   data-testid="button-update-profile"
                   disabled={updateProfileMutation.isPending}
                 >
-                  {updateProfileMutation.isPending ? "Updating..." : "Update Profile"}
+                  {updateProfileMutation.isPending ? t('common.updating', 'Updating...') : t('profile.updateProfile', 'Update Profile')}
                 </Button>
               </form>
             </Form>
@@ -1402,7 +1403,7 @@ export default function Profile() {
         {/* Change Password */}
         <Card>
           <CardHeader>
-            <CardTitle>Change Password</CardTitle>
+            <CardTitle>{t('profile.changePassword', 'Change Password')}</CardTitle>
           </CardHeader>
           <CardContent>
             <Form {...passwordForm}>
@@ -1412,7 +1413,7 @@ export default function Profile() {
                   name="currentPassword"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Current Password</FormLabel>
+                      <FormLabel>{t('profile.currentPassword', 'Current Password')}</FormLabel>
                       <FormControl>
                         <Input
                           type="password"
@@ -1432,7 +1433,7 @@ export default function Profile() {
                   name="newPassword"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>New Password</FormLabel>
+                      <FormLabel>{t('profile.newPassword', 'New Password')}</FormLabel>
                       <FormControl>
                         <Input
                           type="password"
@@ -1452,7 +1453,7 @@ export default function Profile() {
                   name="confirmPassword"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Confirm New Password</FormLabel>
+                      <FormLabel>{t('profile.confirmNewPassword', 'Confirm New Password')}</FormLabel>
                       <FormControl>
                         <Input
                           type="password"
@@ -1757,7 +1758,7 @@ export default function Profile() {
                       name="unitNumber"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Unit Number</FormLabel>
+                          <FormLabel>{t('profile.unitNumber', 'Unit Number')}</FormLabel>
                           <FormControl>
                             <Input
                               placeholder="e.g., 101, 1205"
@@ -1775,7 +1776,7 @@ export default function Profile() {
                       name="parkingStallNumber"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Parking Stall Number</FormLabel>
+                          <FormLabel>{t('profile.parkingStallNumber', 'Parking Stall Number')}</FormLabel>
                           <FormControl>
                             <Input
                               placeholder="e.g., 42, A-5, P1-23"
@@ -1837,7 +1838,7 @@ export default function Profile() {
                 )}
 
                 <div className="pt-2">
-                  <div className="text-sm text-muted-foreground mb-2">Role</div>
+                  <div className="text-sm text-muted-foreground mb-2">{t('profile.role', 'Role')}</div>
                   <div className="text-sm font-medium capitalize">
                     {user?.role.replace(/_/g, " ")}
                   </div>
@@ -1845,7 +1846,7 @@ export default function Profile() {
 
                 {user?.techLevel && (
                   <div className="pt-2">
-                    <div className="text-sm text-muted-foreground mb-2">IRATA Level</div>
+                    <div className="text-sm text-muted-foreground mb-2">{t('profile.irataLevel', 'IRATA Level')}</div>
                     <div className="text-sm font-medium">{user.techLevel}</div>
                   </div>
                 )}
@@ -1856,7 +1857,7 @@ export default function Profile() {
                   data-testid="button-update-profile"
                   disabled={updateProfileMutation.isPending}
                 >
-                  {updateProfileMutation.isPending ? "Updating..." : "Update Profile"}
+                  {updateProfileMutation.isPending ? t('common.updating', 'Updating...') : t('profile.updateProfile', 'Update Profile')}
                 </Button>
               </form>
             </Form>
@@ -1868,7 +1869,7 @@ export default function Profile() {
         {/* Change Password */}
         <Card>
           <CardHeader>
-            <CardTitle>Change Password</CardTitle>
+            <CardTitle>{t('profile.changePassword', 'Change Password')}</CardTitle>
           </CardHeader>
           <CardContent>
             <Form {...passwordForm}>
@@ -1878,7 +1879,7 @@ export default function Profile() {
                   name="currentPassword"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Current Password</FormLabel>
+                      <FormLabel>{t('profile.currentPassword', 'Current Password')}</FormLabel>
                       <FormControl>
                         <Input
                           type="password"
@@ -1898,7 +1899,7 @@ export default function Profile() {
                   name="newPassword"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>New Password</FormLabel>
+                      <FormLabel>{t('profile.newPassword', 'New Password')}</FormLabel>
                       <FormControl>
                         <Input
                           type="password"
@@ -1918,7 +1919,7 @@ export default function Profile() {
                   name="confirmPassword"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Confirm New Password</FormLabel>
+                      <FormLabel>{t('profile.confirmNewPassword', 'Confirm New Password')}</FormLabel>
                       <FormControl>
                         <Input
                           type="password"
