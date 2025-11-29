@@ -5175,6 +5175,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   // Get all work sessions across all company projects
   app.get("/api/all-work-sessions", requireAuth, async (req: Request, res: Response) => {
+    // Disable caching to ensure fresh data (drops change frequently)
+    res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+    res.setHeader('Pragma', 'no-cache');
+    res.setHeader('Expires', '0');
+    
     try {
       const currentUser = await storage.getUserById(req.session.userId!);
       
