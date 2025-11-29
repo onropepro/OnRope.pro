@@ -7342,7 +7342,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const totalStaffCount = companyOwnerForCSR ? companyEmployees.length + 1 : companyEmployees.length;
       
       // Required document types that employees must sign
-      const requiredDocTypes = ['health_safety_manual', 'company_policy', 'safe_work_procedure'];
+      const requiredDocTypes = ['health_safety_manual', 'company_policy', 'safe_work_procedure', 'safe_work_practice'];
       const requiredDocs = companyDocuments.filter((doc: any) => 
         requiredDocTypes.includes(doc.documentType)
       );
@@ -7571,7 +7571,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const totalStaffCount = companyOwnerForPM ? companyEmployees.length + 1 : companyEmployees.length;
       
       // Required document types that employees must sign
-      const requiredDocTypes = ['health_safety_manual', 'company_policy', 'safe_work_procedure'];
+      const requiredDocTypes = ['health_safety_manual', 'company_policy', 'safe_work_procedure', 'safe_work_practice'];
       const requiredDocs = companyDocuments.filter((doc: any) => 
         requiredDocTypes.includes(doc.documentType)
       );
@@ -8042,7 +8042,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       if (companyId) {
         // Auto-enroll: Check for required documents that the employee hasn't been enrolled for yet
-        const requiredDocTypes = ['health_safety_manual', 'company_policy', 'safe_work_procedure'];
+        const requiredDocTypes = ['health_safety_manual', 'company_policy', 'safe_work_procedure', 'safe_work_practice'];
         const existingReviews = await storage.getDocumentReviewSignaturesByEmployee(currentUser.id);
         const existingDocIds = new Set(existingReviews.map(r => r.documentId).filter(Boolean));
         
@@ -8111,7 +8111,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Documents array is required" });
       }
       
-      const validDocTypes = ['health_safety_manual', 'company_policy', 'method_statement'];
+      const validDocTypes = ['health_safety_manual', 'company_policy', 'method_statement', 'safe_work_practice'];
       for (const doc of documents) {
         if (!doc.type || !validDocTypes.includes(doc.type)) {
           return res.status(400).json({ message: `Invalid document type: ${doc.type}` });
@@ -8145,8 +8145,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       for (const doc of documents) {
         let fileUrl = doc.fileUrl;
         
-        // For health_safety_manual and company_policy, resolve from company documents
-        if ((doc.type === 'health_safety_manual' || doc.type === 'company_policy') && !fileUrl) {
+        // For health_safety_manual, company_policy, and safe_work_practice resolve from company documents
+        if ((doc.type === 'health_safety_manual' || doc.type === 'company_policy' || doc.type === 'safe_work_practice') && !fileUrl) {
           const companyDocs = await storage.getCompanyDocumentsByType(companyId, doc.type);
           if (companyDocs.length > 0) {
             fileUrl = companyDocs[0].fileUrl;
@@ -8319,7 +8319,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Documents array is required" });
       }
       
-      const validDocTypes = ['health_safety_manual', 'company_policy', 'method_statement'];
+      const validDocTypes = ['health_safety_manual', 'company_policy', 'method_statement', 'safe_work_practice'];
       for (const doc of documents) {
         if (!doc.type || !validDocTypes.includes(doc.type)) {
           return res.status(400).json({ message: `Invalid document type: ${doc.type}` });
@@ -8347,8 +8347,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       for (const doc of documents) {
         let fileUrl = doc.fileUrl;
         
-        // For health_safety_manual and company_policy, resolve from company documents
-        if ((doc.type === 'health_safety_manual' || doc.type === 'company_policy') && !fileUrl) {
+        // For health_safety_manual, company_policy, and safe_work_practice resolve from company documents
+        if ((doc.type === 'health_safety_manual' || doc.type === 'company_policy' || doc.type === 'safe_work_practice') && !fileUrl) {
           const companyDocs = await storage.getCompanyDocumentsByType(companyId, doc.type);
           if (companyDocs.length > 0) {
             fileUrl = companyDocs[0].fileUrl;
@@ -8365,8 +8365,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
           }
         }
         
-        // Require fileUrl for health_safety_manual and company_policy
-        if ((doc.type === 'health_safety_manual' || doc.type === 'company_policy') && !fileUrl) {
+        // Require fileUrl for health_safety_manual, company_policy, and safe_work_practice
+        if ((doc.type === 'health_safety_manual' || doc.type === 'company_policy' || doc.type === 'safe_work_practice') && !fileUrl) {
           return res.status(400).json({ message: `No ${doc.type.replace(/_/g, ' ')} document uploaded. Please upload the document first.` });
         }
         
@@ -8434,7 +8434,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const companyDocuments = await storage.getCompanyDocuments(companyId);
       
       // Filter to required document types
-      const requiredDocTypes = ['health_safety_manual', 'company_policy', 'safe_work_procedure'];
+      const requiredDocTypes = ['health_safety_manual', 'company_policy', 'safe_work_procedure', 'safe_work_practice'];
       const requiredDocs = companyDocuments.filter((doc: any) => 
         requiredDocTypes.includes(doc.documentType)
       );
@@ -8527,7 +8527,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       const { documentType, jobType, customJobType } = req.body;
       
-      if (!documentType || !['health_safety_manual', 'company_policy', 'certificate_of_insurance', 'method_statement', 'safe_work_procedure'].includes(documentType)) {
+      if (!documentType || !['health_safety_manual', 'company_policy', 'certificate_of_insurance', 'method_statement', 'safe_work_procedure', 'safe_work_practice'].includes(documentType)) {
         return res.status(400).json({ message: "Invalid document type" });
       }
 
@@ -8557,8 +8557,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         ...(documentType === 'method_statement' && { jobType, customJobType }),
       });
 
-      // Auto-enroll all employees for Health & Safety Manual, Company Policy, and Safe Work Procedure documents
-      if (documentType === 'health_safety_manual' || documentType === 'company_policy' || documentType === 'safe_work_procedure') {
+      // Auto-enroll all employees for Health & Safety Manual, Company Policy, Safe Work Procedure, and Safe Work Practice documents
+      if (documentType === 'health_safety_manual' || documentType === 'company_policy' || documentType === 'safe_work_procedure' || documentType === 'safe_work_practice') {
         try {
           const employees = await storage.getAllEmployees(companyId);
           const docToEnroll = [{
