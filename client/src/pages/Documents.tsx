@@ -3994,10 +3994,17 @@ export default function Documents() {
     },
   });
 
-  // Check which templates are not yet added
+  // Check which SWP templates are not yet added
   const existingTemplateIds = new Set(templateSWPDocs.map((doc: any) => doc.templateId));
   const availableTemplates = SAFE_WORK_PROCEDURES.filter(
     (p) => !existingTemplateIds.has(`swp_${p.jobType}`)
+  );
+
+  // Check which Safe Work Practice templates are already added
+  const existingPracticeDocs = companyDocuments.filter((doc: any) => doc.documentType === 'safe_work_practice');
+  const existingPracticeTemplateIds = new Set(existingPracticeDocs.map((doc: any) => doc.templateId));
+  const availablePracticeTemplates = SAFE_WORK_PRACTICES.filter(
+    (p) => !existingPracticeTemplateIds.has(`swpractice_${p.id}`)
   );
 
   // Add a single template procedure
@@ -4019,6 +4026,52 @@ export default function Documents() {
       jobType: p.jobType,
     }));
     initTemplatesMutation.mutate(templates);
+  };
+
+  // Initialize Safe Work Practice templates mutation
+  const initPracticeTemplatesMutation = useMutation({
+    mutationFn: async (practices: { templateId: string; title: string; description: string; content: string }[]) => {
+      const response = await apiRequest("POST", "/api/company-documents/init-practice-templates", { practices });
+      return await response.json();
+    },
+    onSuccess: (data) => {
+      if (data.documents?.length > 0) {
+        toast({
+          title: "Template Added",
+          description: `Added ${data.documents.length} safe work practice(s). Employees will be enrolled to review and sign.`,
+        });
+        queryClient.invalidateQueries({ queryKey: ["/api/company-documents"] });
+        queryClient.invalidateQueries({ queryKey: ["/api/document-reviews"] });
+      }
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to add practice template",
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Add a single practice template
+  const handleAddPracticeTemplate = (practice: SafeWorkPractice) => {
+    initPracticeTemplatesMutation.mutate([{
+      templateId: `swpractice_${practice.id}`,
+      title: practice.title,
+      description: practice.description,
+      content: getPracticeContent(practice),
+    }]);
+  };
+
+  // Add all available practice templates
+  const handleAddAllPracticeTemplates = () => {
+    const practices = availablePracticeTemplates.map(p => ({
+      templateId: `swpractice_${p.id}`,
+      title: p.title,
+      description: p.description,
+      content: getPracticeContent(p),
+    }));
+    initPracticeTemplatesMutation.mutate(practices);
   };
 
   return (
@@ -5277,7 +5330,7 @@ export default function Documents() {
                             <Button
                               size="sm"
                               variant="destructive"
-                              onClick={() => handleDeleteDocument(doc.id)}
+                              onClick={() => deleteDocumentMutation.mutate(doc.id)}
                               data-testid={`delete-swpractice-${doc.id}`}
                             >
                               <Trash2 className="h-3 w-3" />
@@ -5351,50 +5404,75 @@ export default function Documents() {
                                 </Badge>
                               )}
                             </div>
-                            <div className="flex gap-2">
-                              <Dialog>
-                                <DialogTrigger asChild>
-                                  <Button size="sm" variant="outline" className="flex-1" data-testid={`preview-swpractice-${practice.id}`}>
-                                    <Eye className="h-3 w-3 mr-1" />
-                                    Preview
-                                  </Button>
-                                </DialogTrigger>
-                                <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
-                                  <DialogHeader>
-                                    <DialogTitle className="flex items-center gap-2">
-                                      <practice.icon className="h-5 w-5 text-amber-600" />
-                                      {practice.title}
-                                    </DialogTitle>
-                                    <DialogDescription>{practice.description}</DialogDescription>
-                                  </DialogHeader>
-                                  <div className="space-y-4 mt-4">
-                                    <div>
-                                      <h4 className="font-medium text-sm mb-2">Key Principles</h4>
-                                      <ul className="list-disc pl-5 text-sm text-muted-foreground space-y-1">
-                                        {practice.keyPrinciples.map((principle, idx) => (
-                                          <li key={idx}>{principle}</li>
-                                        ))}
-                                      </ul>
-                                    </div>
-                                    <div>
-                                      <h4 className="font-medium text-sm mb-2">Content</h4>
-                                      <div className="text-sm text-muted-foreground whitespace-pre-wrap bg-muted/30 p-4 rounded-lg">
-                                        {getPracticeContent(practice)}
+                            <div className="flex flex-col gap-2">
+                              <div className="flex gap-2">
+                                <Dialog>
+                                  <DialogTrigger asChild>
+                                    <Button size="sm" variant="outline" className="flex-1" data-testid={`preview-swpractice-${practice.id}`}>
+                                      <Eye className="h-3 w-3 mr-1" />
+                                      Preview
+                                    </Button>
+                                  </DialogTrigger>
+                                  <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+                                    <DialogHeader>
+                                      <DialogTitle className="flex items-center gap-2">
+                                        <practice.icon className="h-5 w-5 text-amber-600" />
+                                        {practice.title}
+                                      </DialogTitle>
+                                      <DialogDescription>{practice.description}</DialogDescription>
+                                    </DialogHeader>
+                                    <div className="space-y-4 mt-4">
+                                      <div>
+                                        <h4 className="font-medium text-sm mb-2">Key Principles</h4>
+                                        <ul className="list-disc pl-5 text-sm text-muted-foreground space-y-1">
+                                          {practice.keyPrinciples.map((principle, idx) => (
+                                            <li key={idx}>{principle}</li>
+                                          ))}
+                                        </ul>
+                                      </div>
+                                      <div>
+                                        <h4 className="font-medium text-sm mb-2">Content</h4>
+                                        <div className="text-sm text-muted-foreground whitespace-pre-wrap bg-muted/30 p-4 rounded-lg">
+                                          {getPracticeContent(practice)}
+                                        </div>
                                       </div>
                                     </div>
-                                  </div>
-                                  <DialogFooter className="mt-4">
-                                    <Button variant="outline" onClick={() => generateSafeWorkPracticePDF(practice)} data-testid={`download-preview-swpractice-${practice.id}`}>
-                                      <Download className="h-4 w-4 mr-2" />
-                                      Download PDF
-                                    </Button>
-                                  </DialogFooter>
-                                </DialogContent>
-                              </Dialog>
-                              <Button size="sm" variant="default" onClick={() => generateSafeWorkPracticePDF(practice)} data-testid={`download-swpractice-${practice.id}`}>
-                                <Download className="h-3 w-3 mr-1" />
-                                PDF
-                              </Button>
+                                    <DialogFooter className="mt-4">
+                                      <Button variant="outline" onClick={() => generateSafeWorkPracticePDF(practice)} data-testid={`download-preview-swpractice-${practice.id}`}>
+                                        <Download className="h-4 w-4 mr-2" />
+                                        Download PDF
+                                      </Button>
+                                    </DialogFooter>
+                                  </DialogContent>
+                                </Dialog>
+                                <Button size="sm" variant="outline" onClick={() => generateSafeWorkPracticePDF(practice)} data-testid={`download-swpractice-${practice.id}`}>
+                                  <Download className="h-3 w-3 mr-1" />
+                                  PDF
+                                </Button>
+                              </div>
+                              {canUploadDocuments && (
+                                existingPracticeTemplateIds.has(`swpractice_${practice.id}`) ? (
+                                  <Badge variant="secondary" className="bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 text-xs justify-center py-1">
+                                    <CheckCircle2 className="h-3 w-3 mr-1" />
+                                    Added to Your Documents
+                                  </Badge>
+                                ) : (
+                                  <Button 
+                                    size="sm" 
+                                    onClick={() => handleAddPracticeTemplate(practice)}
+                                    disabled={initPracticeTemplatesMutation.isPending}
+                                    className="w-full"
+                                    data-testid={`add-swpractice-${practice.id}`}
+                                  >
+                                    {initPracticeTemplatesMutation.isPending ? (
+                                      <Loader2 className="h-3 w-3 mr-1 animate-spin" />
+                                    ) : (
+                                      <Plus className="h-3 w-3 mr-1" />
+                                    )}
+                                    Use This Template
+                                  </Button>
+                                )
+                              )}
                             </div>
                           </CardContent>
                         </Card>

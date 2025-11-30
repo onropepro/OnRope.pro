@@ -9220,6 +9220,84 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Initialize template safe work PRACTICES for a company
+  app.post("/api/company-documents/init-practice-templates", requireAuth, requireRole("operations_manager", "company"), async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      const companyId = currentUser.role === "company" ? currentUser.id : currentUser.companyId;
+      
+      if (!companyId) {
+        return res.status(400).json({ message: "Unable to determine company" });
+      }
+
+      const { practices } = req.body;
+      
+      if (!practices || !Array.isArray(practices)) {
+        return res.status(400).json({ message: "Practices array is required" });
+      }
+
+      const createdDocs: any[] = [];
+      const employees = await storage.getAllEmployees(companyId);
+      // Also include company owner in enrollment
+      const companyOwner = await storage.getUserById(companyId);
+
+      for (const practice of practices) {
+        // Check if template already exists for this company
+        const existing = await storage.getCompanyDocumentByTemplateId(companyId, practice.templateId);
+        
+        if (!existing) {
+          // Create the practice template document
+          const document = await storage.createCompanyDocument({
+            companyId,
+            documentType: 'safe_work_practice',
+            fileName: practice.title,
+            fileUrl: '', // Template practices store content, no file URL
+            uploadedById: currentUser.id,
+            uploadedByName: 'System Template',
+            isTemplate: true,
+            templateId: practice.templateId,
+            description: practice.description,
+            content: practice.content, // Store the practice content
+          });
+
+          createdDocs.push(document);
+
+          // Auto-enroll all employees AND company owner for this template
+          const docToEnroll = [{
+            type: 'safe_work_practice',
+            id: document.id,
+            name: practice.title,
+            fileUrl: '',
+          }];
+          
+          // Enroll company owner
+          if (companyOwner) {
+            await storage.enrollEmployeeInDocumentReviews(companyId, companyOwner.id, docToEnroll);
+          }
+          
+          // Enroll all employees
+          for (const employee of employees) {
+            await storage.enrollEmployeeInDocumentReviews(companyId, employee.id, docToEnroll);
+          }
+        }
+      }
+
+      res.json({ 
+        message: `Added ${createdDocs.length} safe work practice template(s)`,
+        documents: createdDocs,
+        enrolledEmployees: employees.length + (companyOwner ? 1 : 0)
+      });
+    } catch (error) {
+      console.error("Initialize practice templates error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
   // ==================== JOB COMMENTS ROUTES ====================
   
   // Create job comment
