@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -36,12 +36,24 @@ import {
   Image,
   Search,
   Download,
-  Paintbrush
+  Paintbrush,
+  GripVertical,
+  TrendingUp,
+  TrendingDown,
+  DollarSign,
+  BarChart3,
+  Target,
+  Clock,
+  Trophy,
+  XCircle,
+  Kanban
 } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { DndContext, DragOverlay, useDraggable, useDroppable, closestCenter, type DragEndEvent } from '@dnd-kit/core';
+import { PieChart, Pie, Cell, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip as RechartsTooltip, Legend } from 'recharts';
 
 // Service types configuration
 const SERVICE_TYPES = [
@@ -117,6 +129,128 @@ const SERVICE_TYPES = [
   },
 ];
 
+// Pipeline stages configuration for Kanban board
+const PIPELINE_STAGES = [
+  { id: "draft", color: "bg-muted-foreground" },
+  { id: "submitted", color: "bg-blue-500" },
+  { id: "review", color: "bg-yellow-500" },
+  { id: "negotiation", color: "bg-orange-500" },
+  { id: "approved", color: "bg-purple-500" },
+  { id: "won", color: "bg-green-500" },
+  { id: "lost", color: "bg-red-500" },
+];
+
+// Draggable Quote Card component for Kanban
+function DraggableQuoteCard({ quote, onClick }: { quote: QuoteWithServices; onClick: () => void }) {
+  const { t } = useTranslation();
+  const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
+    id: quote.id,
+    data: { quote },
+  });
+
+  const style = transform ? {
+    transform: `translate3d(${transform.x}px, ${transform.y}px, 0)`,
+    opacity: isDragging ? 0.5 : 1,
+  } : undefined;
+
+  const totalAmount = parseFloat(quote.totalAmount?.toString() || '0') || 
+    quote.services.reduce((sum, s) => sum + parseFloat(s.totalCost?.toString() || '0'), 0);
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      className={`bg-card border rounded-lg p-3 cursor-grab active:cursor-grabbing shadow-sm hover:shadow-md transition-shadow ${isDragging ? 'shadow-lg ring-2 ring-primary' : ''}`}
+      {...attributes}
+      {...listeners}
+      data-testid={`draggable-quote-${quote.id}`}
+    >
+      <div className="flex items-start gap-2 mb-2">
+        <GripVertical className="w-4 h-4 text-muted-foreground shrink-0 mt-0.5" />
+        <div className="flex-1 min-w-0">
+          <h4 className="font-medium text-sm truncate">{quote.buildingName}</h4>
+          <p className="text-xs text-muted-foreground truncate">{quote.strataPlanNumber}</p>
+        </div>
+      </div>
+      <div className="space-y-1 text-xs text-muted-foreground">
+        <p className="truncate">{quote.buildingAddress}</p>
+        <div className="flex items-center justify-between">
+          <span>{quote.services.length} {t('quotes.pipeline.services', 'services')}</span>
+          {totalAmount > 0 && (
+            <span className="font-medium text-foreground">${totalAmount.toLocaleString()}</span>
+          )}
+        </div>
+      </div>
+      <button
+        onClick={(e) => { e.stopPropagation(); onClick(); }}
+        className="mt-2 text-xs text-primary hover:underline"
+        data-testid={`button-view-quote-${quote.id}`}
+      >
+        {t('quotes.pipeline.viewDetails', 'View Details')}
+      </button>
+    </div>
+  );
+}
+
+// Droppable Stage Column component for Kanban
+function StageColumn({ 
+  stageId, 
+  quotes, 
+  onQuoteClick,
+  color 
+}: { 
+  stageId: string; 
+  quotes: QuoteWithServices[]; 
+  onQuoteClick: (quote: QuoteWithServices) => void;
+  color: string;
+}) {
+  const { t } = useTranslation();
+  const { isOver, setNodeRef } = useDroppable({
+    id: stageId,
+  });
+
+  const stageName = t(`quotes.pipeline.stages.${stageId}`, stageId.charAt(0).toUpperCase() + stageId.slice(1));
+  const totalValue = quotes.reduce((sum, q) => {
+    const amount = parseFloat(q.totalAmount?.toString() || '0') || 
+      q.services.reduce((s, svc) => s + parseFloat(svc.totalCost?.toString() || '0'), 0);
+    return sum + amount;
+  }, 0);
+
+  return (
+    <div
+      ref={setNodeRef}
+      className={`flex flex-col min-w-[280px] max-w-[320px] bg-muted/30 rounded-lg p-2 ${isOver ? 'ring-2 ring-primary bg-primary/5' : ''}`}
+      data-testid={`stage-column-${stageId}`}
+    >
+      <div className="flex items-center justify-between mb-3 px-1">
+        <div className="flex items-center gap-2">
+          <div className={`w-3 h-3 rounded-full ${color}`} />
+          <h3 className="font-semibold text-sm">{stageName}</h3>
+          <Badge variant="secondary" className="text-xs">{quotes.length}</Badge>
+        </div>
+        {totalValue > 0 && (
+          <span className="text-xs text-muted-foreground">${totalValue.toLocaleString()}</span>
+        )}
+      </div>
+      <div className="flex-1 space-y-2 min-h-[200px] overflow-y-auto max-h-[calc(100vh-300px)]">
+        {quotes.length === 0 ? (
+          <div className="flex items-center justify-center h-24 border-2 border-dashed border-muted-foreground/20 rounded-lg">
+            <p className="text-xs text-muted-foreground">{t('quotes.pipeline.dragHere', 'Drag quotes here')}</p>
+          </div>
+        ) : (
+          quotes.map((quote) => (
+            <DraggableQuoteCard
+              key={quote.id}
+              quote={quote}
+              onClick={() => onQuoteClick(quote)}
+            />
+          ))
+        )}
+      </div>
+    </div>
+  );
+}
+
 // Form schemas
 const buildingInfoSchema = z.object({
   buildingName: z.string().min(1, "Building name is required"),
@@ -167,6 +301,8 @@ export default function Quotes() {
   // View states
   const [view, setView] = useState<"list" | "create" | "detail">("list");
   const [activeTab, setActiveTab] = useState<"create" | "my-quotes">("my-quotes");
+  const [managementTab, setManagementTab] = useState<"list" | "pipeline" | "analytics">("list");
+  const [analyticsRange, setAnalyticsRange] = useState<"week" | "month" | "year" | "all">("month");
   const [searchQuery, setSearchQuery] = useState("");
   const [createStep, setCreateStep] = useState<"building" | "services" | "configure">("services");
   const [selectedQuote, setSelectedQuote] = useState<QuoteWithServices | null>(null);
@@ -469,6 +605,99 @@ export default function Quotes() {
       });
     },
   });
+
+  // Pipeline stage update mutation for Kanban drag-and-drop
+  const updateStageMutation = useMutation({
+    mutationFn: async ({ quoteId, pipelineStage }: { quoteId: string; pipelineStage: string }) => {
+      await apiRequest("PATCH", `/api/quotes/${quoteId}/stage`, { pipelineStage });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/quotes"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/quotes/analytics", { range: analyticsRange }] });
+    },
+    onError: (error: any) => {
+      toast({
+        title: t('quotes.pipeline.updateFailed', 'Update failed'),
+        description: error.message || t('quotes.pipeline.updateFailedDesc', 'Failed to update quote stage'),
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Fetch quote analytics
+  const { data: analyticsData, isLoading: isLoadingAnalytics } = useQuery<{
+    range: string;
+    totalQuotes: number;
+    wonCount: number;
+    lostCount: number;
+    pendingCount: number;
+    wonAmount: number;
+    lostAmount: number;
+    pendingAmount: number;
+    totalAmount: number;
+    winRate: number;
+    stageBreakdown: Record<string, number>;
+  }>({
+    queryKey: ["/api/quotes/analytics", { range: analyticsRange }],
+    queryFn: async () => {
+      const response = await fetch(`/api/quotes/analytics?range=${analyticsRange}`, {
+        credentials: "include",
+      });
+      if (!response.ok) {
+        throw new Error("Failed to fetch analytics");
+      }
+      return response.json();
+    },
+    enabled: managementTab === "analytics" && !["rope_access_tech", "manager", "ground_crew", "ground_crew_supervisor"].includes(currentUser?.role || ""),
+  });
+
+  // Group quotes by pipeline stage for Kanban view
+  const quotesByStage = useMemo(() => {
+    const quotes = quotesData?.quotes || [];
+    const grouped: Record<string, QuoteWithServices[]> = {};
+    
+    PIPELINE_STAGES.forEach(stage => {
+      grouped[stage.id] = [];
+    });
+    
+    quotes.forEach(quote => {
+      const stage = (quote as any).pipelineStage || 'draft';
+      if (grouped[stage]) {
+        grouped[stage].push(quote);
+      } else {
+        grouped['draft'].push(quote);
+      }
+    });
+    
+    return grouped;
+  }, [quotesData?.quotes]);
+
+  // Handle drag end for pipeline stage change
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+    
+    if (!over || active.id === over.id) return;
+    
+    const quoteId = active.id as string;
+    const newStage = over.id as string;
+    
+    // Find the quote being moved
+    const quote = quotesData?.quotes?.find(q => q.id === quoteId);
+    if (!quote) return;
+    
+    const currentStage = (quote as any).pipelineStage || 'draft';
+    if (currentStage === newStage) return;
+    
+    // Update the stage
+    updateStageMutation.mutate({ quoteId, pipelineStage: newStage });
+    
+    toast({
+      title: t('quotes.pipeline.stageMoved', 'Quote moved'),
+      description: t('quotes.pipeline.stageMovedDesc', 'Quote moved to {{stage}}', { 
+        stage: t(`quotes.pipeline.stages.${newStage}`, newStage) 
+      }),
+    });
+  };
 
   const resetForm = () => {
     setBuildingInfo(null);
@@ -1008,13 +1237,13 @@ export default function Quotes() {
       );
     }
 
-    // Management view (no tabs)
+    // Management view with tabs for List, Pipeline, and Analytics
     return (
       <div className="min-h-screen bg-background p-4 md:p-8">
         <div className="max-w-7xl mx-auto">
           <BackButton to="/dashboard" label={t('quotes.backToDashboard', 'Back to Dashboard')} />
 
-          <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-8 gap-4">
+          <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-6 gap-4">
             <div>
               <h1 className="text-4xl font-bold text-foreground mb-2">{t('quotes.pageTitle', 'Service Quotes')}</h1>
               <p className="text-muted-foreground">{t('quotes.pageSubtitle', 'Create and manage service quotes for buildings')}</p>
@@ -1032,116 +1261,332 @@ export default function Quotes() {
             </Button>
           </div>
 
-          {/* Search bar */}
-          <div className="mb-6">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-              <Input
-                placeholder={t('quotes.searchPlaceholder', 'Search by strata plan number or building name...')}
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10"
-                data-testid="input-search-quotes"
-              />
-            </div>
-          </div>
+          {/* Management Tabs */}
+          <Tabs value={managementTab} onValueChange={(value) => setManagementTab(value as "list" | "pipeline" | "analytics")} className="mb-6">
+            <TabsList className="mb-6">
+              <TabsTrigger value="list" data-testid="tab-list">
+                <Building2 className="w-4 h-4 mr-2" />
+                {t('quotes.tabs.list', 'All Quotes')}
+              </TabsTrigger>
+              <TabsTrigger value="pipeline" data-testid="tab-pipeline">
+                <Kanban className="w-4 h-4 mr-2" />
+                {t('quotes.tabs.pipeline', 'Pipeline')}
+              </TabsTrigger>
+              <TabsTrigger value="analytics" data-testid="tab-analytics">
+                <BarChart3 className="w-4 h-4 mr-2" />
+                {t('quotes.tabs.analytics', 'Analytics')}
+              </TabsTrigger>
+            </TabsList>
 
-          {isLoading ? (
-            <div className="text-center py-12">
-              <p className="text-muted-foreground">{t('quotes.loading', 'Loading quotes...')}</p>
-            </div>
-          ) : filteredQuotes.length === 0 ? (
-            <Card className="rounded-2xl shadow-lg border border-border">
-              <CardContent className="p-12 text-center">
-                <Building2 className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-                <h3 className="text-xl font-semibold text-foreground mb-2">
-                  {searchQuery ? t('quotes.noQuotesFound', 'No quotes found') : t('quotes.noQuotesYet', 'No quotes yet')}
-                </h3>
-                <p className="text-muted-foreground mb-6">
-                  {searchQuery ? t('quotes.tryDifferentSearch', 'Try a different search term') : t('quotes.createFirstQuote', 'Create your first service quote to get started')}
-                </p>
-                {!searchQuery && (
-                  <Button
-                    onClick={() => {
-                      resetForm();
-                      setView("create");
-                    }}
-                    className="bg-primary hover:bg-primary/90"
-                    data-testid="button-create-first-quote"
-                  >
-                    <Plus className="w-4 h-4 mr-2" />
-                    {t('quotes.createQuote', 'Create Quote')}
-                  </Button>
-                )}
-              </CardContent>
-            </Card>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {filteredQuotes.map((quote) => (
-                <Card
-                  key={quote.id}
-                  className="rounded-2xl shadow-lg border border-border hover:shadow-xl transition-shadow cursor-pointer"
-                  onClick={() => {
-                    setSelectedQuote(quote);
-                    setView("detail");
-                  }}
-                  data-testid={`card-quote-${quote.id}`}
-                >
-                  <CardHeader className="p-6">
-                    <div className="flex items-start justify-between mb-4">
-                      <div className="flex-1">
-                        <CardTitle className="text-xl font-semibold text-foreground mb-1">
-                          {quote.buildingName}
-                        </CardTitle>
-                        <CardDescription className="text-muted-foreground">
-                          {quote.strataPlanNumber}
-                        </CardDescription>
-                      </div>
-                      <Badge
-                        className={`rounded-full px-3 py-1 ${
-                          quote.status === "open"
-                            ? "bg-chart-2 text-white"
-                            : quote.status === "draft"
-                            ? "bg-muted-foreground text-white"
-                            : "bg-success text-white"
-                        }`}
-                        data-testid={`badge-status-${quote.id}`}
+            {/* List Tab */}
+            <TabsContent value="list">
+              {/* Search bar */}
+              <div className="mb-6">
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                  <Input
+                    placeholder={t('quotes.searchPlaceholder', 'Search by strata plan number or building name...')}
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="pl-10"
+                    data-testid="input-search-quotes"
+                  />
+                </div>
+              </div>
+
+              {isLoading ? (
+                <div className="text-center py-12">
+                  <p className="text-muted-foreground">{t('quotes.loading', 'Loading quotes...')}</p>
+                </div>
+              ) : filteredQuotes.length === 0 ? (
+                <Card className="rounded-2xl shadow-lg border border-border">
+                  <CardContent className="p-12 text-center">
+                    <Building2 className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+                    <h3 className="text-xl font-semibold text-foreground mb-2">
+                      {searchQuery ? t('quotes.noQuotesFound', 'No quotes found') : t('quotes.noQuotesYet', 'No quotes yet')}
+                    </h3>
+                    <p className="text-muted-foreground mb-6">
+                      {searchQuery ? t('quotes.tryDifferentSearch', 'Try a different search term') : t('quotes.createFirstQuote', 'Create your first service quote to get started')}
+                    </p>
+                    {!searchQuery && (
+                      <Button
+                        onClick={() => {
+                          resetForm();
+                          setView("create");
+                        }}
+                        className="bg-primary hover:bg-primary/90"
+                        data-testid="button-create-first-quote"
                       >
-                        {quote.status}
-                      </Badge>
-                    </div>
-                    <div className="space-y-2 text-sm text-muted-foreground">
-                      <p>{quote.buildingAddress}</p>
-                      <p>{quote.floorCount} {t('quotes.floors', 'floors')}</p>
-                      {quote.createdAt && (
-                        <p className="text-xs">
-                          {new Date(quote.createdAt).toLocaleDateString()}
-                        </p>
-                      )}
-                    </div>
-                  </CardHeader>
-                  <CardContent className="p-6 pt-0">
-                    <div className="space-y-3">
-                      <div className="flex items-center justify-between text-sm">
-                        <span className="text-muted-foreground">{t('quotes.services', 'Services')}:</span>
-                        <Badge variant="outline" data-testid={`badge-service-count-${quote.id}`}>
-                          {quote.services.length}
-                        </Badge>
-                      </div>
-                      {canViewFinancialData && (
-                        <div className="flex items-center justify-between">
-                          <span className="text-muted-foreground">Total:</span>
-                          <span className="text-2xl font-bold text-primary">
-                            ${quote.services.reduce((sum, s) => sum + Number(s.totalCost || 0), 0).toFixed(2)}
-                          </span>
-                        </div>
-                      )}
-                    </div>
+                        <Plus className="w-4 h-4 mr-2" />
+                        {t('quotes.createQuote', 'Create Quote')}
+                      </Button>
+                    )}
                   </CardContent>
                 </Card>
-              ))}
-            </div>
-          )}
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                  {filteredQuotes.map((quote) => (
+                    <Card
+                      key={quote.id}
+                      className="rounded-2xl shadow-lg border border-border hover:shadow-xl transition-shadow cursor-pointer"
+                      onClick={() => {
+                        setSelectedQuote(quote);
+                        setView("detail");
+                      }}
+                      data-testid={`card-quote-${quote.id}`}
+                    >
+                      <CardHeader className="p-6">
+                        <div className="flex items-start justify-between mb-4">
+                          <div className="flex-1">
+                            <CardTitle className="text-xl font-semibold text-foreground mb-1">
+                              {quote.buildingName}
+                            </CardTitle>
+                            <CardDescription className="text-muted-foreground">
+                              {quote.strataPlanNumber}
+                            </CardDescription>
+                          </div>
+                          <Badge
+                            className={`rounded-full px-3 py-1 ${
+                              quote.status === "open"
+                                ? "bg-chart-2 text-white"
+                                : quote.status === "draft"
+                                ? "bg-muted-foreground text-white"
+                                : "bg-success text-white"
+                            }`}
+                            data-testid={`badge-status-${quote.id}`}
+                          >
+                            {quote.status}
+                          </Badge>
+                        </div>
+                        <div className="space-y-2 text-sm text-muted-foreground">
+                          <p>{quote.buildingAddress}</p>
+                          <p>{quote.floorCount} {t('quotes.floors', 'floors')}</p>
+                          {quote.createdAt && (
+                            <p className="text-xs">
+                              {new Date(quote.createdAt).toLocaleDateString()}
+                            </p>
+                          )}
+                        </div>
+                      </CardHeader>
+                      <CardContent className="p-6 pt-0">
+                        <div className="space-y-3">
+                          <div className="flex items-center justify-between text-sm">
+                            <span className="text-muted-foreground">{t('quotes.services', 'Services')}:</span>
+                            <Badge variant="outline" data-testid={`badge-service-count-${quote.id}`}>
+                              {quote.services.length}
+                            </Badge>
+                          </div>
+                          {canViewFinancialData && (
+                            <div className="flex items-center justify-between">
+                              <span className="text-muted-foreground">{t('quotes.total', 'Total')}:</span>
+                              <span className="text-2xl font-bold text-primary">
+                                ${quote.services.reduce((sum, s) => sum + Number(s.totalCost || 0), 0).toFixed(2)}
+                              </span>
+                            </div>
+                          )}
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              )}
+            </TabsContent>
+
+            {/* Pipeline Tab - Kanban Board */}
+            <TabsContent value="pipeline">
+              <div className="mb-4">
+                <p className="text-muted-foreground">
+                  {t('quotes.pipeline.description', 'Drag quotes between stages to track their progress through your sales pipeline.')}
+                </p>
+              </div>
+              
+              {isLoading ? (
+                <div className="text-center py-12">
+                  <p className="text-muted-foreground">{t('quotes.loading', 'Loading quotes...')}</p>
+                </div>
+              ) : (
+                <DndContext onDragEnd={handleDragEnd} collisionDetection={closestCenter}>
+                  <div className="flex gap-4 overflow-x-auto pb-4">
+                    {PIPELINE_STAGES.map((stage) => (
+                      <StageColumn
+                        key={stage.id}
+                        stageId={stage.id}
+                        quotes={quotesByStage[stage.id] || []}
+                        onQuoteClick={(quote) => {
+                          setSelectedQuote(quote);
+                          setView("detail");
+                        }}
+                        color={stage.color}
+                      />
+                    ))}
+                  </div>
+                </DndContext>
+              )}
+            </TabsContent>
+
+            {/* Analytics Tab */}
+            <TabsContent value="analytics">
+              {/* Time Range Selector */}
+              <div className="flex flex-wrap items-center gap-4 mb-6">
+                <Label className="text-sm font-medium">{t('quotes.analytics.timeRange', 'Time Range')}:</Label>
+                <div className="flex gap-2">
+                  {(['week', 'month', 'year', 'all'] as const).map((range) => (
+                    <Button
+                      key={range}
+                      variant={analyticsRange === range ? "default" : "outline"}
+                      size="sm"
+                      onClick={() => setAnalyticsRange(range)}
+                      data-testid={`button-range-${range}`}
+                    >
+                      {t(`quotes.analytics.ranges.${range}`, range.charAt(0).toUpperCase() + range.slice(1))}
+                    </Button>
+                  ))}
+                </div>
+              </div>
+
+              {isLoadingAnalytics ? (
+                <div className="text-center py-12">
+                  <p className="text-muted-foreground">{t('quotes.analytics.loading', 'Loading analytics...')}</p>
+                </div>
+              ) : analyticsData ? (
+                <div className="space-y-6">
+                  {/* Summary Stats */}
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <Card>
+                      <CardContent className="pt-6">
+                        <div className="flex items-center gap-3">
+                          <div className="p-2 bg-primary/10 rounded-lg">
+                            <Building2 className="w-5 h-5 text-primary" />
+                          </div>
+                          <div>
+                            <p className="text-sm text-muted-foreground">{t('quotes.analytics.totalQuotes', 'Total Quotes')}</p>
+                            <p className="text-2xl font-bold">{analyticsData.totalQuotes}</p>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                    
+                    <Card>
+                      <CardContent className="pt-6">
+                        <div className="flex items-center gap-3">
+                          <div className="p-2 bg-green-500/10 rounded-lg">
+                            <Trophy className="w-5 h-5 text-green-500" />
+                          </div>
+                          <div>
+                            <p className="text-sm text-muted-foreground">{t('quotes.analytics.won', 'Won')}</p>
+                            <p className="text-2xl font-bold text-green-500">{analyticsData.wonCount}</p>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                    
+                    <Card>
+                      <CardContent className="pt-6">
+                        <div className="flex items-center gap-3">
+                          <div className="p-2 bg-red-500/10 rounded-lg">
+                            <XCircle className="w-5 h-5 text-red-500" />
+                          </div>
+                          <div>
+                            <p className="text-sm text-muted-foreground">{t('quotes.analytics.lost', 'Lost')}</p>
+                            <p className="text-2xl font-bold text-red-500">{analyticsData.lostCount}</p>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                    
+                    <Card>
+                      <CardContent className="pt-6">
+                        <div className="flex items-center gap-3">
+                          <div className="p-2 bg-blue-500/10 rounded-lg">
+                            <Target className="w-5 h-5 text-blue-500" />
+                          </div>
+                          <div>
+                            <p className="text-sm text-muted-foreground">{t('quotes.analytics.winRate', 'Win Rate')}</p>
+                            <p className="text-2xl font-bold text-blue-500">{analyticsData.winRate}%</p>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </div>
+
+                  {/* Financial Summary */}
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <Card>
+                      <CardContent className="pt-6">
+                        <div className="flex items-center gap-3">
+                          <div className="p-2 bg-green-500/10 rounded-lg">
+                            <DollarSign className="w-5 h-5 text-green-500" />
+                          </div>
+                          <div>
+                            <p className="text-sm text-muted-foreground">{t('quotes.analytics.wonValue', 'Won Value')}</p>
+                            <p className="text-2xl font-bold text-green-500">${analyticsData.wonAmount.toLocaleString()}</p>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                    
+                    <Card>
+                      <CardContent className="pt-6">
+                        <div className="flex items-center gap-3">
+                          <div className="p-2 bg-red-500/10 rounded-lg">
+                            <TrendingDown className="w-5 h-5 text-red-500" />
+                          </div>
+                          <div>
+                            <p className="text-sm text-muted-foreground">{t('quotes.analytics.lostValue', 'Lost Value')}</p>
+                            <p className="text-2xl font-bold text-red-500">${analyticsData.lostAmount.toLocaleString()}</p>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                    
+                    <Card>
+                      <CardContent className="pt-6">
+                        <div className="flex items-center gap-3">
+                          <div className="p-2 bg-yellow-500/10 rounded-lg">
+                            <Clock className="w-5 h-5 text-yellow-500" />
+                          </div>
+                          <div>
+                            <p className="text-sm text-muted-foreground">{t('quotes.analytics.pendingValue', 'Pending Value')}</p>
+                            <p className="text-2xl font-bold text-yellow-500">${analyticsData.pendingAmount.toLocaleString()}</p>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </div>
+
+                  {/* Stage Breakdown Chart */}
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>{t('quotes.analytics.stageBreakdown', 'Pipeline Stage Breakdown')}</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="h-64">
+                        <ResponsiveContainer width="100%" height="100%">
+                          <BarChart data={Object.entries(analyticsData.stageBreakdown).map(([stage, count]) => ({
+                            stage: t(`quotes.pipeline.stages.${stage}`, stage),
+                            count,
+                          }))}>
+                            <XAxis dataKey="stage" tick={{ fontSize: 12 }} />
+                            <YAxis allowDecimals={false} />
+                            <RechartsTooltip />
+                            <Bar dataKey="count" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} />
+                          </BarChart>
+                        </ResponsiveContainer>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+              ) : (
+                <Card>
+                  <CardContent className="p-12 text-center">
+                    <BarChart3 className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+                    <h3 className="text-xl font-semibold text-foreground mb-2">{t('quotes.analytics.noData', 'No analytics data')}</h3>
+                    <p className="text-muted-foreground">{t('quotes.analytics.noDataDesc', 'Create some quotes to see analytics here.')}</p>
+                  </CardContent>
+                </Card>
+              )}
+            </TabsContent>
+          </Tabs>
         </div>
       </div>
     );

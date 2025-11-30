@@ -2014,6 +2014,50 @@
       "accepted": "Accepted",
       "rejected": "Rejected",
       "expired": "Expired"
+    },
+    "tabs": {
+      "list": "All Quotes",
+      "pipeline": "Pipeline",
+      "analytics": "Analytics"
+    },
+    "pipeline": {
+      "description": "Drag quotes between stages to track their progress through your sales pipeline.",
+      "services": "services",
+      "viewDetails": "View Details",
+      "dragHere": "Drag quotes here",
+      "stageMoved": "Quote moved",
+      "stageMovedDesc": "Quote moved to {{stage}}",
+      "updateFailed": "Update failed",
+      "updateFailedDesc": "Failed to update quote stage",
+      "stages": {
+        "draft": "Draft",
+        "submitted": "Submitted",
+        "review": "In Review",
+        "negotiation": "Negotiation",
+        "approved": "Approved",
+        "won": "Won",
+        "lost": "Lost"
+      }
+    },
+    "analytics": {
+      "timeRange": "Time Range",
+      "loading": "Loading analytics...",
+      "totalQuotes": "Total Quotes",
+      "won": "Won",
+      "lost": "Lost",
+      "winRate": "Win Rate",
+      "wonValue": "Won Value",
+      "lostValue": "Lost Value",
+      "pendingValue": "Pending Value",
+      "stageBreakdown": "Pipeline Stage Breakdown",
+      "noData": "No analytics data",
+      "noDataDesc": "Create some quotes to see analytics here.",
+      "ranges": {
+        "week": "Week",
+        "month": "Month",
+        "year": "Year",
+        "all": "All Time"
+      }
     }
   },
   "schedule": {

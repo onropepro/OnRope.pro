@@ -1077,12 +1077,20 @@ export const quotes = pgTable("quotes", {
   // Status
   status: varchar("status").notNull().default('draft'), // draft | open | closed
   
+  // Pipeline CRM - stage tracking for quote workflow
+  pipelineStage: varchar("pipeline_stage").notNull().default('draft'), // draft | submitted | review | negotiation | approved | won | lost
+  stageUpdatedAt: timestamp("stage_updated_at").defaultNow(),
+  
+  // Calculated total amount for analytics (sum of all service costs)
+  totalAmount: numeric("total_amount", { precision: 12, scale: 2 }).default('0'),
+  
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 }, (table) => [
   index("IDX_quotes_company").on(table.companyId),
   index("IDX_quotes_strata").on(table.strataPlanNumber),
   index("IDX_quotes_status").on(table.companyId, table.status),
+  index("IDX_quotes_pipeline_stage").on(table.companyId, table.pipelineStage),
 ]);
 
 // Quote services table - each quote can have multiple services

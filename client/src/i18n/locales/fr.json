@@ -2036,6 +2036,50 @@
       "accepted": "Accepté",
       "rejected": "Rejeté",
       "expired": "Expiré"
+    },
+    "tabs": {
+      "list": "Tous les devis",
+      "pipeline": "Pipeline",
+      "analytics": "Analytique"
+    },
+    "pipeline": {
+      "description": "Glissez les devis entre les étapes pour suivre leur progression dans votre pipeline de ventes.",
+      "services": "services",
+      "viewDetails": "Voir les détails",
+      "dragHere": "Glissez les devis ici",
+      "stageMoved": "Devis déplacé",
+      "stageMovedDesc": "Devis déplacé vers {{stage}}",
+      "updateFailed": "Échec de la mise à jour",
+      "updateFailedDesc": "Impossible de mettre à jour l'étape du devis",
+      "stages": {
+        "draft": "Brouillon",
+        "submitted": "Soumis",
+        "review": "En révision",
+        "negotiation": "Négociation",
+        "approved": "Approuvé",
+        "won": "Gagné",
+        "lost": "Perdu"
+      }
+    },
+    "analytics": {
+      "timeRange": "Période",
+      "loading": "Chargement des analytiques...",
+      "totalQuotes": "Total des devis",
+      "won": "Gagnés",
+      "lost": "Perdus",
+      "winRate": "Taux de réussite",
+      "wonValue": "Valeur gagnée",
+      "lostValue": "Valeur perdue",
+      "pendingValue": "Valeur en attente",
+      "stageBreakdown": "Répartition par étape du pipeline",
+      "noData": "Aucune donnée analytique",
+      "noDataDesc": "Créez des devis pour voir les analytiques ici.",
+      "ranges": {
+        "week": "Semaine",
+        "month": "Mois",
+        "year": "Année",
+        "all": "Tout"
+      }
     }
   },
   "schedule": {
