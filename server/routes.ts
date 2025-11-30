@@ -9754,6 +9754,101 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get quote analytics - aggregated stats for CRM dashboard (MUST be before :id route)
+  app.get("/api/quotes/analytics", requireAuth, requireRole("company", "owner_ceo", "human_resources", "accounting", "operations_manager", "general_supervisor", "rope_access_supervisor", "account_manager", "supervisor"), async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      const companyId = currentUser.role === "company" ? currentUser.id : currentUser.companyId;
+      if (!companyId) {
+        return res.status(400).json({ message: "Unable to determine company" });
+      }
+      
+      // Get range from query params (default: month)
+      const range = (req.query.range as string) || "month";
+      
+      // Calculate date filter based on range
+      const now = new Date();
+      let startDate: Date;
+      
+      switch (range) {
+        case "week":
+          startDate = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+          break;
+        case "month":
+          startDate = new Date(now.getFullYear(), now.getMonth(), 1);
+          break;
+        case "year":
+          startDate = new Date(now.getFullYear(), 0, 1);
+          break;
+        case "all":
+          startDate = new Date(0); // Beginning of time
+          break;
+        default:
+          startDate = new Date(now.getFullYear(), now.getMonth(), 1);
+      }
+      
+      // Get all quotes for the company
+      const allQuotes = await storage.getQuotesByCompany(companyId);
+      
+      // Filter quotes by date range
+      const quotesInRange = allQuotes.filter((q: any) => 
+        new Date(q.createdAt) >= startDate
+      );
+      
+      // Calculate aggregations
+      const totalQuotes = quotesInRange.length;
+      const wonQuotes = quotesInRange.filter((q: any) => q.pipelineStage === "won");
+      const lostQuotes = quotesInRange.filter((q: any) => q.pipelineStage === "lost");
+      const pendingQuotes = quotesInRange.filter((q: any) => 
+        !["won", "lost"].includes(q.pipelineStage)
+      );
+      
+      // Calculate total amounts
+      const calculateTotal = (quotes: any[]) => 
+        quotes.reduce((sum: number, q: any) => sum + (parseFloat(q.totalAmount) || 0), 0);
+      
+      const wonAmount = calculateTotal(wonQuotes);
+      const lostAmount = calculateTotal(lostQuotes);
+      const pendingAmount = calculateTotal(pendingQuotes);
+      
+      // Win rate calculation (only consider quotes that have a final outcome)
+      const completedQuotes = wonQuotes.length + lostQuotes.length;
+      const winRate = completedQuotes > 0 ? (wonQuotes.length / completedQuotes) * 100 : 0;
+      
+      // Stage breakdown
+      const stageBreakdown = {
+        draft: quotesInRange.filter((q: any) => q.pipelineStage === "draft").length,
+        submitted: quotesInRange.filter((q: any) => q.pipelineStage === "submitted").length,
+        review: quotesInRange.filter((q: any) => q.pipelineStage === "review").length,
+        negotiation: quotesInRange.filter((q: any) => q.pipelineStage === "negotiation").length,
+        approved: quotesInRange.filter((q: any) => q.pipelineStage === "approved").length,
+        won: wonQuotes.length,
+        lost: lostQuotes.length,
+      };
+      
+      res.json({
+        range,
+        totalQuotes,
+        wonCount: wonQuotes.length,
+        lostCount: lostQuotes.length,
+        pendingCount: pendingQuotes.length,
+        wonAmount,
+        lostAmount,
+        pendingAmount,
+        totalAmount: wonAmount + lostAmount + pendingAmount,
+        winRate: Math.round(winRate * 10) / 10,
+        stageBreakdown,
+      });
+    } catch (error) {
+      console.error("Get quote analytics error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
   // Get quote by ID - All employees can view
   app.get("/api/quotes/:id", requireAuth, requireRole("company", "owner_ceo", "human_resources", "accounting", "operations_manager", "general_supervisor", "rope_access_supervisor", "account_manager", "supervisor", "rope_access_tech", "manager", "ground_crew", "ground_crew_supervisor"), async (req: Request, res: Response) => {
     try {
@@ -10030,101 +10125,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({ quote: updatedQuote, message: `Quote moved to ${pipelineStage}` });
     } catch (error) {
       console.error("Update quote pipeline stage error:", error);
-      res.status(500).json({ message: "Internal server error" });
-    }
-  });
-
-  // Get quote analytics - aggregated stats for CRM dashboard
-  app.get("/api/quotes/analytics", requireAuth, requireRole("company", "owner_ceo", "human_resources", "accounting", "operations_manager", "general_supervisor", "rope_access_supervisor", "account_manager", "supervisor"), async (req: Request, res: Response) => {
-    try {
-      const currentUser = await storage.getUserById(req.session.userId!);
-      if (!currentUser) {
-        return res.status(404).json({ message: "User not found" });
-      }
-      
-      const companyId = currentUser.role === "company" ? currentUser.id : currentUser.companyId;
-      if (!companyId) {
-        return res.status(400).json({ message: "Unable to determine company" });
-      }
-      
-      // Get range from query params (default: month)
-      const range = (req.query.range as string) || "month";
-      
-      // Calculate date filter based on range
-      const now = new Date();
-      let startDate: Date;
-      
-      switch (range) {
-        case "week":
-          startDate = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
-          break;
-        case "month":
-          startDate = new Date(now.getFullYear(), now.getMonth(), 1);
-          break;
-        case "year":
-          startDate = new Date(now.getFullYear(), 0, 1);
-          break;
-        case "all":
-          startDate = new Date(0); // Beginning of time
-          break;
-        default:
-          startDate = new Date(now.getFullYear(), now.getMonth(), 1);
-      }
-      
-      // Get all quotes for the company
-      const allQuotes = await storage.getQuotesByCompany(companyId);
-      
-      // Filter quotes by date range
-      const quotesInRange = allQuotes.filter((q: any) => 
-        new Date(q.createdAt) >= startDate
-      );
-      
-      // Calculate aggregations
-      const totalQuotes = quotesInRange.length;
-      const wonQuotes = quotesInRange.filter((q: any) => q.pipelineStage === "won");
-      const lostQuotes = quotesInRange.filter((q: any) => q.pipelineStage === "lost");
-      const pendingQuotes = quotesInRange.filter((q: any) => 
-        !["won", "lost"].includes(q.pipelineStage)
-      );
-      
-      // Calculate total amounts
-      const calculateTotal = (quotes: any[]) => 
-        quotes.reduce((sum: number, q: any) => sum + (parseFloat(q.totalAmount) || 0), 0);
-      
-      const wonAmount = calculateTotal(wonQuotes);
-      const lostAmount = calculateTotal(lostQuotes);
-      const pendingAmount = calculateTotal(pendingQuotes);
-      
-      // Win rate calculation (only consider quotes that have a final outcome)
-      const completedQuotes = wonQuotes.length + lostQuotes.length;
-      const winRate = completedQuotes > 0 ? (wonQuotes.length / completedQuotes) * 100 : 0;
-      
-      // Stage breakdown
-      const stageBreakdown = {
-        draft: quotesInRange.filter((q: any) => q.pipelineStage === "draft").length,
-        submitted: quotesInRange.filter((q: any) => q.pipelineStage === "submitted").length,
-        review: quotesInRange.filter((q: any) => q.pipelineStage === "review").length,
-        negotiation: quotesInRange.filter((q: any) => q.pipelineStage === "negotiation").length,
-        approved: quotesInRange.filter((q: any) => q.pipelineStage === "approved").length,
-        won: wonQuotes.length,
-        lost: lostQuotes.length,
-      };
-      
-      res.json({
-        range,
-        totalQuotes,
-        wonCount: wonQuotes.length,
-        lostCount: lostQuotes.length,
-        pendingCount: pendingQuotes.length,
-        wonAmount,
-        lostAmount,
-        pendingAmount,
-        totalAmount: wonAmount + lostAmount + pendingAmount,
-        winRate: Math.round(winRate * 10) / 10,
-        stageBreakdown,
-      });
-    } catch (error) {
-      console.error("Get quote analytics error:", error);
       res.status(500).json({ message: "Internal server error" });
     }
   });
