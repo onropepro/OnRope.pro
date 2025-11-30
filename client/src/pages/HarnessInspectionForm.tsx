@@ -15,7 +15,9 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { ArrowLeft, ClipboardCheck, AlertTriangle, CheckCircle2, Package, Shield } from "lucide-react";
+import { ClipboardCheck, AlertTriangle, CheckCircle2, Package, Shield } from "lucide-react";
+import { BackButton } from "@/components/BackButton";
+import { MainMenuButton } from "@/components/MainMenuButton";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
@@ -293,14 +295,8 @@ export default function HarnessInspectionForm() {
     <div className="min-h-screen bg-background">
       <div className="container mx-auto py-6 px-4 max-w-4xl">
         <div className="flex items-center gap-4 mb-6">
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => setLocation("/dashboard")}
-            data-testid="button-back"
-          >
-            <ArrowLeft className="h-5 w-5" />
-          </Button>
+          <BackButton size="icon" />
+          <MainMenuButton size="icon" />
           <div className="flex items-center gap-3">
             <ClipboardCheck className="h-8 w-8 text-primary" />
             <div>

@@ -10,6 +10,8 @@ interface BackButtonProps {
   className?: string;
   useHistoryBack?: boolean;
   fallbackTo?: string;
+  size?: "default" | "sm" | "lg" | "icon";
+  variant?: "default" | "ghost" | "outline" | "secondary" | "destructive";
 }
 
 export function BackButton({ 
@@ -18,7 +20,9 @@ export function BackButton({
   onClick, 
   className = "",
   useHistoryBack = true,
-  fallbackTo = "/dashboard"
+  fallbackTo = "/dashboard",
+  size = "default",
+  variant = "ghost"
 }: BackButtonProps) {
   const { t } = useTranslation();
   const [, setLocation] = useLocation();
@@ -47,12 +51,13 @@ export function BackButton({
     return (
       <Link href={to}>
         <Button
-          variant="ghost"
+          variant={variant}
+          size={size}
           className={`gap-2 ${className}`}
           data-testid="button-back"
         >
           <ArrowLeft className="w-4 h-4" />
-          {displayLabel}
+          {size !== "icon" && displayLabel}
         </Button>
       </Link>
     );
@@ -60,13 +65,14 @@ export function BackButton({
 
   return (
     <Button
-      variant="ghost"
+      variant={variant}
+      size={size}
       onClick={handleClick}
       className={`gap-2 ${className}`}
       data-testid="button-back"
     >
       <ArrowLeft className="w-4 h-4" />
-      {displayLabel}
+      {size !== "icon" && displayLabel}
     </Button>
   );
 }

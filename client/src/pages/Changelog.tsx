@@ -1,10 +1,10 @@
 import { useLocation, Link } from "wouter";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
+import { BackButton } from "@/components/BackButton";
+import { MainMenuButton } from "@/components/MainMenuButton";
 import { 
-  ArrowLeft, 
   Shield, 
   Users, 
   Building2, 
@@ -616,14 +616,8 @@ export default function Changelog() {
       <div className="max-w-4xl mx-auto">
         <div className="mb-8">
           <div className="flex items-center gap-3 mb-4">
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => navigate("/dashboard")}
-              data-testid="button-back"
-            >
-              <ArrowLeft className="h-5 w-5" />
-            </Button>
+            <BackButton size="icon" />
+            <MainMenuButton size="icon" />
             <div className="flex-1">
               <h1 className="text-2xl sm:text-3xl font-bold">Platform Changelog</h1>
               <p className="text-sm text-muted-foreground mt-1">

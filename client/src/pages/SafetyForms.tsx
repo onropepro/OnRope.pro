@@ -1,8 +1,9 @@
 import { useLocation } from "wouter";
 import { useTranslation } from "react-i18next";
-import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
-import { ArrowLeft, FileCheck, ClipboardList, Shield, AlertTriangle, FileWarning, BookOpen, FileText } from "lucide-react";
+import { FileCheck, ClipboardList, Shield, AlertTriangle, FileWarning, BookOpen, FileText } from "lucide-react";
+import { BackButton } from "@/components/BackButton";
+import { MainMenuButton } from "@/components/MainMenuButton";
 
 export default function SafetyForms() {
   const { t } = useTranslation();
@@ -75,14 +76,8 @@ export default function SafetyForms() {
     <div className="min-h-screen bg-background p-4 pb-24">
       <div className="max-w-4xl mx-auto">
         <div className="flex items-center gap-3 mb-4">
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => navigate("/dashboard")}
-            data-testid="button-back"
-          >
-            <ArrowLeft className="h-5 w-5" />
-          </Button>
+          <BackButton size="icon" />
+          <MainMenuButton size="icon" />
           <div className="flex items-center gap-2 min-w-0 flex-1">
             <Shield className="h-5 w-5 sm:h-6 sm:w-6 text-primary flex-shrink-0" />
             <h1 className="text-lg sm:text-2xl font-bold truncate">{t('safetyForms.title', 'Safety Forms')}</h1>

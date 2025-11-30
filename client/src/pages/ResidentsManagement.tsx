@@ -7,6 +7,8 @@ import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { useLocation } from "wouter";
+import { BackButton } from "@/components/BackButton";
+import { MainMenuButton } from "@/components/MainMenuButton";
 
 interface Resident {
   id: string;
@@ -66,15 +68,8 @@ export default function ResidentsManagement() {
       {/* Header with back button */}
       <header className="sticky top-0 z-50 bg-card/80 backdrop-blur-sm border-b shadow-sm">
         <div className="container mx-auto px-4 py-4 flex items-center gap-4">
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => setLocation("/dashboard")}
-            data-testid="button-back"
-            className="hover-elevate"
-          >
-            <span className="material-icons text-2xl">arrow_back</span>
-          </Button>
+          <BackButton size="icon" />
+          <MainMenuButton size="icon" />
           <div className="flex items-center gap-3">
             <span className="material-icons text-3xl text-primary">people</span>
             <div>

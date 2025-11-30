@@ -3,6 +3,8 @@ import { useLocation } from "wouter";
 import { useState, useMemo, useEffect, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
+import { BackButton } from "@/components/BackButton";
+import { MainMenuButton } from "@/components/MainMenuButton";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -198,14 +200,8 @@ export default function ActiveWorkers() {
       <div className="sticky top-0 z-50 bg-background/95 backdrop-blur-sm border-b shadow-sm">
         <div className="max-w-4xl mx-auto p-3 sm:p-4">
           <div className="flex items-center gap-3">
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => setLocation("/dashboard")}
-              data-testid="button-back"
-            >
-              <span className="material-icons">arrow_back</span>
-            </Button>
+            <BackButton size="icon" />
+            <MainMenuButton size="icon" />
             <div className="flex-1 min-w-0">
               <h1 className="text-lg sm:text-2xl font-bold truncate">{t('activeWorkers.title', 'Active Workers')}</h1>
               <p className="text-xs sm:text-sm text-muted-foreground hidden sm:block">

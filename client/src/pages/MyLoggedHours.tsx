@@ -4,6 +4,8 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useLocation } from "wouter";
+import { BackButton } from "@/components/BackButton";
+import { MainMenuButton } from "@/components/MainMenuButton";
 import { format } from "date-fns";
 import { fr, enUS } from "date-fns/locale";
 import { parseLocalDate } from "@/lib/dateUtils";
@@ -170,14 +172,8 @@ export default function MyLoggedHours() {
       <header className="sticky top-0 z-[100] bg-card border-b shadow-md">
         <div className="px-4 py-3 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 max-w-7xl mx-auto">
           <div className="flex items-center gap-3">
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => setLocation("/dashboard")}
-              data-testid="button-back"
-            >
-              <span className="material-icons">arrow_back</span>
-            </Button>
+            <BackButton size="icon" />
+            <MainMenuButton size="icon" />
             <div>
               <h1 className="text-lg sm:text-xl font-bold tracking-tight">{t('loggedHours.title', 'My Logged Hours')}</h1>
               <p className="text-xs text-muted-foreground mt-0.5">

@@ -16,7 +16,9 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { useToast } from "@/hooks/use-toast";
-import { DollarSign, Calendar, Users, Settings, ArrowLeft, Clock, Pencil, Trash2 } from "lucide-react";
+import { DollarSign, Calendar, Users, Settings, Clock, Pencil, Trash2 } from "lucide-react";
+import { BackButton } from "@/components/BackButton";
+import { MainMenuButton } from "@/components/MainMenuButton";
 import { format } from "date-fns";
 import { fr, enUS } from "date-fns/locale";
 
@@ -517,14 +519,8 @@ export default function Payroll() {
   return (
     <div className="container mx-auto p-4 space-y-6">
       <div className="flex items-center gap-3">
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={() => setLocation('/dashboard')}
-          data-testid="button-back"
-        >
-          <ArrowLeft className="h-5 w-5" />
-        </Button>
+        <BackButton size="icon" />
+        <MainMenuButton size="icon" />
         <div className="flex-1 min-w-0">
           <h1 className="text-xl md:text-3xl font-bold truncate" data-testid="heading-payroll">{t('payroll.title', 'Payroll')}</h1>
           <p className="text-sm text-muted-foreground hidden sm:block">{t('payroll.subtitle', 'Manage pay periods and employee hours')}</p>

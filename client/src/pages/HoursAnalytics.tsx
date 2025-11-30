@@ -10,7 +10,9 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from "recharts";
-import { ArrowLeft, Clock, Users, TrendingUp, Award } from "lucide-react";
+import { Clock, Users, TrendingUp, Award } from "lucide-react";
+import { BackButton } from "@/components/BackButton";
+import { MainMenuButton } from "@/components/MainMenuButton";
 import { SessionDetailsDialog } from "@/components/SessionDetailsDialog";
 import { BrandingContext } from "@/App";
 import {
@@ -533,15 +535,8 @@ export default function HoursAnalytics() {
         {/* Header - Premium Style */}
         <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 mb-2">
           <div className="flex items-center gap-3 flex-1 min-w-0">
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => setLocation("/dashboard")}
-              data-testid="button-back"
-              className="flex-shrink-0"
-            >
-              <ArrowLeft className="h-5 w-5" />
-            </Button>
+            <BackButton size="icon" className="flex-shrink-0" />
+            <MainMenuButton size="icon" className="flex-shrink-0" />
             <div className="min-w-0 flex-1">
               <h1 className={`text-xl sm:text-3xl font-bold truncate ${hasCustomBranding ? 'text-primary' : 'gradient-text'}`}>{isManagement ? t("hoursAnalytics.title") : t("hoursAnalytics.myHours")}</h1>
               <p className="text-xs sm:text-sm text-muted-foreground mt-1 hidden sm:block">
