@@ -688,6 +688,437 @@ const SAFE_WORK_PROCEDURES: SafeWorkProcedure[] = [
       'Equipment maintenance basics',
       'Customer service skills'
     ]
+  },
+  {
+    jobType: 'gutter_cleaning',
+    title: 'Gutter Cleaning - Rope Access',
+    description: 'Safe work procedure for cleaning gutters, downspouts, and drainage systems using rope access techniques on multi-story buildings.',
+    scope: 'This procedure applies to all rope access gutter cleaning operations including debris removal, flushing, and minor repairs on building gutter systems.',
+    hazards: [
+      'Falls from height - primary hazard during rope access operations',
+      'Sharp edges on gutters, flashing, and metal components',
+      'Biological hazards - mold, bird droppings, decaying organic matter',
+      'Structural instability - deteriorated gutters or mounting brackets',
+      'Falling debris - accumulated leaves, sediment, and foreign objects',
+      'Weather conditions - slippery surfaces when wet',
+      'Insects and pests - wasps, bees, rodents in gutter systems',
+      'Overhead hazards - electrical lines near rooflines'
+    ],
+    controlMeasures: [
+      'Dual rope system with independently tested anchor points',
+      'Full assessment of gutter structural integrity before loading',
+      'Debris containment using collection bags secured to technician',
+      'Ground-level exclusion zone to protect from falling debris',
+      'Respiratory protection when disturbing accumulated organic matter',
+      'Heavy-duty gloves for protection against cuts and biological hazards',
+      'Pre-work inspection of all electrical hazards in work area',
+      'Communication with ground support for debris management'
+    ],
+    ppe: [
+      'Full body harness (IRATA approved)',
+      'Helmet with chin strap and face shield option',
+      'Heavy-duty cut-resistant gloves',
+      'Respiratory protection (N95 minimum for organic debris)',
+      'Safety glasses or goggles',
+      'Waterproof outer layer',
+      'Safety footwear with ankle support',
+      'Knee pads for working on roof sections'
+    ],
+    equipment: [
+      'Static kernmantle ropes (10.5mm minimum)',
+      'Debris collection bags with secure attachments',
+      'Gutter scoops and hand tools',
+      'Garden hose or portable water supply for flushing',
+      'Small hand-held vacuum for fine debris',
+      'Downspout clearing tools',
+      'Inspection mirror and flashlight',
+      'Minor repair supplies (sealant, brackets, screws)'
+    ],
+    preWorkChecks: [
+      'Assess gutter structural condition from accessible points',
+      'Identify all electrical hazards including service drops',
+      'Check weather conditions - avoid work during rain or high wind',
+      'Confirm anchor point suitability and capacity',
+      'Prepare ground-level exclusion zone',
+      'Verify communication equipment function',
+      'Brief ground support on debris management plan',
+      'Prepare first aid supplies for cut and biological exposure'
+    ],
+    workProcedure: [
+      '1. Establish exclusion zone at ground level with barriers',
+      '2. Rig rope access systems with appropriate anchor points',
+      '3. Perform visual inspection of gutter condition before loading',
+      '4. Remove large debris by hand into secured collection bags',
+      '5. Use gutter scoop for sediment and fine debris removal',
+      '6. Check and clear downspout inlets',
+      '7. Flush gutter runs with water to verify proper drainage',
+      '8. Clear any blockages in downspouts using appropriate tools',
+      '9. Perform final flush to confirm system is clear',
+      '10. Note and report any structural concerns or repairs needed',
+      '11. Lower debris bags to ground support safely',
+      '12. Derigging and equipment cleanup following standard procedures'
+    ],
+    emergencyProcedures: [
+      'Structural failure: immediately transfer to backup rope and evacuate area',
+      'Electrical contact: do not touch victim, call emergency services immediately',
+      'Bee/wasp encounter: withdraw slowly, do not swat, alert ground crew',
+      'Cut or puncture: apply first aid, assess for contamination exposure',
+      'Rescue: initiate rescue plan if technician incapacitated on rope'
+    ],
+    competencyRequirements: [
+      'IRATA Level 1 or equivalent rope access certification',
+      'Current first aid certification',
+      'Biological hazard awareness training',
+      'Tool handling and attachment procedures',
+      'Rescue procedures training'
+    ]
+  },
+  {
+    jobType: 'lighting_maintenance',
+    title: 'Lighting and Signage Maintenance - Rope Access',
+    description: 'Safe work procedure for maintaining, repairing, and replacing exterior lighting fixtures and signage using rope access techniques.',
+    scope: 'This procedure applies to all rope access lighting and signage maintenance including bulb replacement, fixture cleaning, electrical connections, and sign repairs on building exteriors.',
+    hazards: [
+      'Falls from height - primary hazard during rope access operations',
+      'Electrical shock - working with energized or potentially energized fixtures',
+      'Burns - from hot lighting elements or electrical arcing',
+      'Broken glass - from lamps or sign materials',
+      'Heavy loads - lighting fixtures and signage components',
+      'Weather conditions - wind affecting stability, lightning risk',
+      'Chemical exposure - cleaning solutions, electrical contact cleaner',
+      'Falling objects - tools, bulbs, fixture components'
+    ],
+    controlMeasures: [
+      'Lock-out/tag-out (LOTO) procedures for all electrical work',
+      'Voltage testing before touching any electrical components',
+      'Dual rope system with independent anchor points',
+      'Tool lanyards on all equipment to prevent drops',
+      'Allow hot fixtures to cool before handling',
+      'Use insulated tools rated for electrical work',
+      'Ground-level exclusion zone during component lowering',
+      'Cease work during electrical storms or high winds'
+    ],
+    ppe: [
+      'Full body harness (IRATA approved)',
+      'Helmet with chin strap',
+      'Insulated gloves rated for electrical work',
+      'Safety glasses or face shield',
+      'Arc-rated clothing if working on energized systems',
+      'Safety footwear with electrical hazard rating',
+      'Cut-resistant gloves for glass handling',
+      'High visibility vest when working near traffic'
+    ],
+    equipment: [
+      'Static kernmantle ropes (10.5mm minimum)',
+      'Insulated tools and voltage testers',
+      'Lock-out/tag-out equipment',
+      'Replacement bulbs and components in protective cases',
+      'Lifting/lowering bag for heavy components',
+      'Cleaning supplies appropriate for fixture type',
+      'Electrical contact cleaner',
+      'Multi-meter for electrical testing',
+      'Headlamp for working in dark conditions'
+    ],
+    preWorkChecks: [
+      'Confirm LOTO procedures are in place and verified',
+      'Test for absence of voltage on circuits to be worked',
+      'Verify anchor point suitability and load capacity',
+      'Check weather forecast - no work during storms',
+      'Inspect all tools for damage, especially insulation',
+      'Prepare replacement components and verify specifications',
+      'Establish ground-level exclusion zone',
+      'Brief ground support on component handling procedures'
+    ],
+    workProcedure: [
+      '1. Implement lock-out/tag-out on affected circuits',
+      '2. Verify absence of voltage using appropriate tester',
+      '3. Rig rope access systems to access fixture location',
+      '4. Position for stable work access to fixture',
+      '5. Allow hot components to cool before handling',
+      '6. Remove fixture covers carefully, secure with lanyard',
+      '7. Perform required maintenance, repair, or replacement',
+      '8. Clean fixture components as needed',
+      '9. Reassemble fixture, ensure all connections secure',
+      '10. Request circuit re-energization for testing',
+      '11. Verify proper operation of repaired/replaced components',
+      '12. Remove LOTO devices only after work complete',
+      '13. Derigging following standard procedures'
+    ],
+    emergencyProcedures: [
+      'Electrical shock: do not touch victim if in contact, cut power at source, call 911',
+      'Arc flash: evacuate area, call emergency services, administer first aid for burns',
+      'Fall or suspension: initiate rescue plan immediately',
+      'Broken glass injury: apply first aid, ensure all glass fragments contained',
+      'Dropped fixture: clear area below, assess for injuries, secure scene'
+    ],
+    competencyRequirements: [
+      'IRATA Level 1 or equivalent rope access certification',
+      'Electrical safety awareness training',
+      'Lock-out/tag-out procedures certification',
+      'Current first aid certification',
+      'Specific fixture manufacturer training as required'
+    ]
+  },
+  {
+    jobType: 'caulking_sealing',
+    title: 'Caulking and Sealing - Rope Access',
+    description: 'Safe work procedure for applying, repairing, and replacing caulking and sealants on building exteriors using rope access techniques.',
+    scope: 'This procedure applies to all rope access caulking and sealing operations including window perimeters, expansion joints, facade penetrations, and weatherproofing applications.',
+    hazards: [
+      'Falls from height - primary hazard during rope access operations',
+      'Chemical exposure - solvents, primers, adhesives',
+      'Respiratory hazards - volatile organic compounds (VOCs)',
+      'Skin sensitization - uncured sealant materials',
+      'Sharp tools - utility knives, scrapers',
+      'Falling objects - tools, caulking tubes, removed material',
+      'Weather conditions - temperature affecting cure times, wind',
+      'Eye hazards - splashing chemicals, flying debris during prep'
+    ],
+    controlMeasures: [
+      'Dual rope system with independent anchor points',
+      'Adequate ventilation or respiratory protection for VOC exposure',
+      'Chemical-resistant gloves and skin protection',
+      'Tool lanyards on all equipment',
+      'Ground-level exclusion zone for falling materials',
+      'Temperature monitoring for proper cure conditions',
+      'Sharp tool handling procedures and blade disposal',
+      'Eye protection mandatory during all operations'
+    ],
+    ppe: [
+      'Full body harness (IRATA approved)',
+      'Helmet with chin strap',
+      'Chemical-resistant nitrile gloves',
+      'Safety glasses or goggles',
+      'Respiratory protection appropriate for product used',
+      'Protective coveralls or sleeve guards',
+      'Safety footwear',
+      'Barrier cream for exposed skin'
+    ],
+    equipment: [
+      'Static kernmantle ropes (10.5mm minimum)',
+      'Caulking guns (manual and/or pneumatic)',
+      'Sealant and caulking materials as specified',
+      'Joint preparation tools (scrapers, grinders, brushes)',
+      'Backer rod and bond breaker tape',
+      'Primer and cleaner appropriate for substrate',
+      'Masking tape for clean finish lines',
+      'Rags and cleanup solvent',
+      'Sharp blade disposal container'
+    ],
+    preWorkChecks: [
+      'Review product safety data sheets (SDS)',
+      'Verify temperature and humidity within product specifications',
+      'Check weather forecast - no rain during cure time',
+      'Inspect substrate condition and compatibility',
+      'Confirm correct products for application',
+      'Establish ground-level exclusion zone',
+      'Verify anchor points and rope access setup',
+      'Prepare waste collection for removed materials'
+    ],
+    workProcedure: [
+      '1. Establish exclusion zone at ground level',
+      '2. Rig rope access system for work area access',
+      '3. Prepare joint by removing old sealant and debris',
+      '4. Clean joint surfaces per manufacturer specifications',
+      '5. Apply primer if required, allow proper flash time',
+      '6. Install backer rod to correct depth if required',
+      '7. Apply masking tape for clean finish edges',
+      '8. Apply sealant using proper tooling technique',
+      '9. Tool sealant to achieve specified profile',
+      '10. Remove masking tape before sealant skins',
+      '11. Inspect completed work for voids or defects',
+      '12. Document work completed with photos',
+      '13. Protect uncured sealant from disturbance',
+      '14. Clean tools and dispose of waste properly'
+    ],
+    emergencyProcedures: [
+      'Eye contact with chemicals: flush with water for 15 minutes, seek medical attention',
+      'Skin reaction: wash affected area, remove contaminated clothing, seek medical attention',
+      'Respiratory distress: move to fresh air immediately, seek medical attention',
+      'Cut injury: apply first aid, ensure proper wound cleaning',
+      'Fall or suspension trauma: initiate rescue plan immediately'
+    ],
+    competencyRequirements: [
+      'IRATA Level 1 or equivalent rope access certification',
+      'Sealant application training and manufacturer certification',
+      'Chemical handling and safety awareness',
+      'Current first aid certification',
+      'Quality control documentation procedures'
+    ]
+  },
+  {
+    jobType: 'bird_deterrent',
+    title: 'Bird Deterrent Installation - Rope Access',
+    description: 'Safe work procedure for installing, maintaining, and repairing bird deterrent systems using rope access techniques.',
+    scope: 'This procedure applies to all rope access bird deterrent operations including spike installation, netting, wire systems, and visual/auditory deterrent placement on building exteriors.',
+    hazards: [
+      'Falls from height - primary hazard during rope access operations',
+      'Biological hazards - bird droppings, feathers, parasites, diseases',
+      'Sharp materials - bird spikes, wire, fasteners',
+      'Respiratory hazards - dried bird droppings (histoplasmosis risk)',
+      'Drilling and fastening - dust, flying debris, pinch points',
+      'Chemical exposure - cleaning and disinfecting agents',
+      'Netting entanglement - working with large netting materials',
+      'Weather conditions - wind affecting netting and materials'
+    ],
+    controlMeasures: [
+      'Dual rope system with independent anchor points',
+      'Full respiratory protection when disturbing bird waste',
+      'Heavy-duty gloves for handling spikes and wire',
+      'Pre-cleaning and disinfection of work areas before installation',
+      'Tool lanyards on all equipment',
+      'Netting handling procedures to prevent entanglement',
+      'Cease work in high winds when handling large materials',
+      'Ground-level exclusion zone for debris and materials'
+    ],
+    ppe: [
+      'Full body harness (IRATA approved)',
+      'Helmet with chin strap',
+      'N95 or P100 respirator (minimum) for contaminated areas',
+      'Heavy-duty puncture-resistant gloves',
+      'Safety glasses or goggles',
+      'Disposable coveralls for contaminated areas',
+      'Safety footwear',
+      'Disposable boot covers when required'
+    ],
+    equipment: [
+      'Static kernmantle ropes (10.5mm minimum)',
+      'Bird deterrent materials (spikes, netting, wire systems)',
+      'Fastening tools and hardware',
+      'Cleaning and disinfecting supplies',
+      'Waste bags for removed materials and debris',
+      'Measuring and layout tools',
+      'Adhesives or mechanical fasteners as specified',
+      'Tensioning tools for wire and netting systems',
+      'HEPA vacuum for bird waste cleanup'
+    ],
+    preWorkChecks: [
+      'Survey site for extent of bird presence and contamination',
+      'Ensure no protected bird species present (check regulations)',
+      'Verify cleaning/disinfection supplies on hand',
+      'Confirm correct deterrent materials for application',
+      'Check weather - avoid high winds for netting work',
+      'Establish ground-level exclusion zone',
+      'Brief team on biological hazard controls',
+      'Prepare waste disposal per biohazard requirements'
+    ],
+    workProcedure: [
+      '1. Establish exclusion zone at ground level',
+      '2. Rig rope access systems for work area access',
+      '3. Document existing conditions with photos',
+      '4. Remove any nests (outside breeding season only)',
+      '5. Clean and disinfect surfaces to be treated',
+      '6. Allow surfaces to dry completely',
+      '7. Mark layout for deterrent installation',
+      '8. Install deterrent system per manufacturer specifications',
+      '9. Ensure secure attachment at all points',
+      '10. Tension wire or netting systems as required',
+      '11. Inspect installation for gaps or weaknesses',
+      '12. Document completed work with photos',
+      '13. Remove all waste and dispose per regulations',
+      '14. Derigging following decontamination procedures'
+    ],
+    emergencyProcedures: [
+      'Puncture injury: clean wound immediately, apply first aid, consider tetanus status',
+      'Respiratory distress: move to fresh air, seek medical attention',
+      'Entanglement in netting: remain calm, cut free carefully, do not panic',
+      'Bird attack: protect face and eyes, withdraw from area',
+      'Fall or suspension: initiate rescue plan immediately'
+    ],
+    competencyRequirements: [
+      'IRATA Level 1 or equivalent rope access certification',
+      'Bird deterrent installation training',
+      'Biological hazard awareness and handling',
+      'Current first aid certification',
+      'Local wildlife regulation awareness'
+    ]
+  },
+  {
+    jobType: 'anchor_inspection',
+    title: 'Anchor Point Inspection and Certification',
+    description: 'Safe work procedure for inspecting, testing, and certifying permanent anchor points used for rope access and fall protection systems.',
+    scope: 'This procedure applies to all anchor point inspection activities including visual examination, non-destructive testing, load testing, and certification documentation for permanent anchor systems.',
+    hazards: [
+      'Falls from height - working near unverified anchor points',
+      'Anchor failure during testing - sudden release of load',
+      'Working on roofs and parapets - unprotected edges',
+      'Tool drops - testing equipment at height',
+      'Weather conditions - affecting test results and safety',
+      'Structural concerns - deterioration around anchor points',
+      'Electrical hazards - rooftop electrical equipment',
+      'Trip hazards - rooftop obstacles and equipment'
+    ],
+    controlMeasures: [
+      'Use only verified anchor points until testing complete',
+      'Maintain safe distance from anchors during load testing',
+      'Barricade test area during active load testing',
+      'Dual rope system from known-good anchor points',
+      'Progressive loading during pull tests',
+      'Tool lanyards on all equipment',
+      'Weather monitoring - dry conditions required for testing',
+      'Clear communication protocols during testing'
+    ],
+    ppe: [
+      'Full body harness (IRATA approved)',
+      'Helmet with chin strap',
+      'Safety glasses',
+      'Work gloves',
+      'Safety footwear with ankle support',
+      'High visibility vest',
+      'Hearing protection during load testing',
+      'Knee pads for inspection work'
+    ],
+    equipment: [
+      'Static kernmantle ropes from verified anchors',
+      'Anchor pull test equipment (calibrated)',
+      'Non-destructive testing equipment (as specified)',
+      'Torque wrenches (calibrated)',
+      'Inspection mirrors and flashlights',
+      'Measuring tools for corrosion/wear assessment',
+      'Camera for documentation',
+      'Anchor identification tags and markers',
+      'Inspection checklists and documentation forms'
+    ],
+    preWorkChecks: [
+      'Review previous inspection records if available',
+      'Identify all anchor points requiring inspection',
+      'Verify testing equipment calibration current',
+      'Check weather conditions suitable for testing',
+      'Confirm access route using known-good anchors',
+      'Prepare documentation and tagging materials',
+      'Brief team on test procedures and emergency protocols',
+      'Establish barricades for testing zones'
+    ],
+    workProcedure: [
+      '1. Access inspection area using verified anchor system',
+      '2. Locate and identify all anchor points in scope',
+      '3. Perform visual inspection of each anchor point',
+      '4. Document corrosion, wear, damage, or concerns',
+      '5. Check fastener torque where accessible',
+      '6. Perform non-destructive testing if specified',
+      '7. Set up pull test equipment on anchor to be tested',
+      '8. Clear test zone of personnel',
+      '9. Apply progressive load to specified test load',
+      '10. Hold test load for specified duration',
+      '11. Release load and inspect anchor for deformation',
+      '12. Record test results immediately',
+      '13. Tag anchor with certification or failure status',
+      '14. Compile complete inspection report'
+    ],
+    emergencyProcedures: [
+      'Anchor failure during test: ensure all personnel clear of zone, document failure mode',
+      'Anchor showing signs of failure: immediately tag out of service, notify building management',
+      'Fall or suspension: initiate rescue plan using verified anchors only',
+      'Equipment malfunction: cease testing, do not use suspect results',
+      'Weather change: secure equipment, suspend testing until conditions suitable'
+    ],
+    competencyRequirements: [
+      'IRATA Level 2 or equivalent (Level 3 for supervision)',
+      'Anchor inspection and testing certification',
+      'Non-destructive testing qualifications as required',
+      'Current first aid certification',
+      'Documentation and reporting procedures'
+    ]
   }
 ];
 
@@ -1150,6 +1581,228 @@ const SAFE_WORK_PRACTICES: SafeWorkPractice[] = [
       'Trip hazard causing injury: Provide first aid, report incident',
       'Spill on work surface: Clean immediately, mark area until dry',
       'Cluttered emergency route: Clear immediately, report to supervisor'
+    ]
+  },
+  {
+    id: 'confined_space',
+    title: 'Confined Space Entry',
+    description: 'Safety practices for entering and working in confined spaces during rope access operations.',
+    category: 'Specialized Operations',
+    icon: AlertTriangle,
+    keyPrinciples: [
+      'Never enter a confined space without proper authorization',
+      'Atmospheric testing is mandatory before and during entry',
+      'A trained attendant must be present at all times',
+      'Rescue plans must be in place before entry',
+      'Ventilation is critical for safe operations'
+    ],
+    requirements: [
+      'Confined space entry permit completed and approved',
+      'Atmospheric testing equipment calibrated and ready',
+      'Rescue equipment immediately available',
+      'Trained attendant stationed at entry point',
+      'Communication system between entrant and attendant',
+      'Ventilation equipment as required',
+      'Appropriate respiratory protection available'
+    ],
+    doList: [
+      'Obtain proper entry permit before entering',
+      'Test atmosphere for oxygen, flammables, and toxics',
+      'Continuously monitor atmosphere during work',
+      'Maintain communication with attendant at all times',
+      'Use appropriate PPE for identified hazards',
+      'Exit immediately if conditions change',
+      'Know the rescue procedures before entry'
+    ],
+    dontList: [
+      'Never enter without a valid permit',
+      'Never enter if atmospheric testing is incomplete',
+      'Never work alone in a confined space',
+      'Never remove ventilation without authorization',
+      'Never ignore warning signs or alarms',
+      'Never attempt rescue without proper training'
+    ],
+    emergencyActions: [
+      'Atmospheric alarm: evacuate immediately, alert attendant',
+      'Worker collapse: do not enter to rescue, call trained rescue team',
+      'Loss of communication: treat as emergency, initiate rescue',
+      'Fire or smoke: evacuate, activate fire alarm, call emergency services'
+    ]
+  },
+  {
+    id: 'electrical_safety',
+    title: 'Working Near Electrical Hazards',
+    description: 'Safety practices for working near electrical installations and power lines during rope access operations.',
+    category: 'Hazard Awareness',
+    icon: AlertTriangle,
+    keyPrinciples: [
+      'Electricity can kill or cause severe burns instantly',
+      'Maintain safe distances from all power sources',
+      'Assume all electrical equipment is energized until verified',
+      'Never work on electrical systems without proper training',
+      'Arc flash can occur without direct contact'
+    ],
+    requirements: [
+      'Electrical hazard survey before work begins',
+      'Minimum safe approach distances established',
+      'Lock-out/tag-out procedures for controlled work',
+      'Insulated tools when working near electricity',
+      'Non-conductive equipment (ropes, ladders)',
+      'Voltage detection equipment available'
+    ],
+    doList: [
+      'Conduct electrical hazard survey before starting',
+      'Maintain minimum safe distances at all times',
+      'Use insulated tools and equipment',
+      'Test before touch - verify de-energization',
+      'Report any damaged electrical installations',
+      'Use non-conductive ropes near electrical hazards'
+    ],
+    dontList: [
+      'Never approach closer than minimum safe distance',
+      'Never assume power is off without verification',
+      'Never use metal ladders near electrical hazards',
+      'Never touch electrical equipment without training',
+      'Never work near power lines in wet conditions',
+      'Never store equipment near electrical panels'
+    ],
+    emergencyActions: [
+      'Electrical contact: do not touch victim, isolate power, call 911',
+      'Arc flash burn: cool burns with water, call emergency services',
+      'Fallen power line: stay clear, keep others away, call utility company',
+      'Electrical fire: evacuate, use CO2 or dry chemical extinguisher only'
+    ]
+  },
+  {
+    id: 'rescue_procedures',
+    title: 'Rescue Procedures',
+    description: 'Emergency rescue practices for rope access technicians in distress.',
+    category: 'Emergency Response',
+    icon: AlertTriangle,
+    keyPrinciples: [
+      'Prevention is better than rescue - follow safe practices',
+      'Suspension trauma can be fatal within 30 minutes',
+      'Self-rescue is the first option when possible',
+      'Team rescue must be practiced regularly',
+      'Never delay calling emergency services'
+    ],
+    requirements: [
+      'Written rescue plan for each work site',
+      'Rescue-trained personnel on site at all times',
+      'Rescue equipment immediately accessible',
+      'Regular rescue drills (minimum annually)',
+      'Communication devices for all rope access workers',
+      'First aid equipment and trained personnel'
+    ],
+    doList: [
+      'Develop site-specific rescue plan before work',
+      'Ensure rescue equipment is checked and ready',
+      'Practice rescue scenarios regularly',
+      'Monitor team members for signs of distress',
+      'Initiate rescue immediately if worker incapacitated',
+      'Call emergency services early in any rescue'
+    ],
+    dontList: [
+      'Never work without a rescue plan in place',
+      'Never delay rescue - suspension trauma is time-critical',
+      'Never attempt complex rescue without training',
+      'Never ignore signs of distress in team members',
+      'Never assume someone will self-rescue',
+      'Never practice rescue on an actual emergency'
+    ],
+    emergencyActions: [
+      'Unconscious worker on rope: initiate rescue immediately, call 911',
+      'Suspension trauma: lower to ground ASAP, place in recovery position',
+      'Entanglement: assess situation, cut free if safe, lower carefully',
+      'Equipment failure: transfer to backup system, evacuate, inspect all gear'
+    ]
+  },
+  {
+    id: 'environmental_protection',
+    title: 'Environmental Protection',
+    description: 'Practices for protecting the environment during rope access operations.',
+    category: 'General Safety',
+    icon: Shield,
+    keyPrinciples: [
+      'Prevent pollution at the source',
+      'Contain and properly dispose of all waste',
+      'Chemicals must never enter storm drains',
+      'Protect vegetation and wildlife from damage',
+      'Report all spills immediately'
+    ],
+    requirements: [
+      'Spill containment materials on site',
+      'Proper waste disposal containers',
+      'Knowledge of local environmental regulations',
+      'Material Safety Data Sheets for all chemicals',
+      'Designated waste collection areas',
+      'Storm drain protection when working with liquids'
+    ],
+    doList: [
+      'Use drip trays and containment when handling fluids',
+      'Block storm drains when using cleaning chemicals',
+      'Collect and properly dispose of all wash water',
+      'Use biodegradable products when possible',
+      'Segregate waste for proper disposal',
+      'Report any environmental concerns immediately'
+    ],
+    dontList: [
+      'Never pour chemicals down drains or on ground',
+      'Never leave waste materials on site',
+      'Never use more chemical than necessary',
+      'Never ignore spills or leaks',
+      'Never damage trees or vegetation unnecessarily',
+      'Never disturb wildlife or nesting birds'
+    ],
+    emergencyActions: [
+      'Chemical spill: contain immediately, prevent entering drains',
+      'Large spill: evacuate area, call environmental emergency line',
+      'Spill into water: report to authorities immediately',
+      'Unknown substance: do not touch, identify before cleanup'
+    ]
+  },
+  {
+    id: 'public_safety',
+    title: 'Public Interface Safety',
+    description: 'Practices for ensuring public safety during rope access operations.',
+    category: 'General Safety',
+    icon: Users,
+    keyPrinciples: [
+      'Public safety is always the first priority',
+      'Exclusion zones protect the public from falling objects',
+      'Clear communication prevents public confusion',
+      'Professional conduct maintains positive relations',
+      'Anticipate public behavior and protect accordingly'
+    ],
+    requirements: [
+      'Ground-level exclusion zones properly barricaded',
+      'Warning signs in place and visible',
+      'Ground support personnel when public present',
+      'Communication plan for building occupants',
+      'Tool lanyards on all equipment at height',
+      'Contact information displayed for inquiries'
+    ],
+    doList: [
+      'Establish and maintain exclusion zones at all times',
+      'Post clear warning signage in appropriate languages',
+      'Have ground support monitor public access areas',
+      'Respond professionally to public inquiries',
+      'Coordinate with building management on notices',
+      'Secure all tools and equipment to prevent drops'
+    ],
+    dontList: [
+      'Never leave exclusion zones unattended when public present',
+      'Never drop anything from height without ground clear',
+      'Never argue with members of the public',
+      'Never block emergency exits or access routes',
+      'Never work over pedestrians without proper controls',
+      'Never ignore public safety concerns raised'
+    ],
+    emergencyActions: [
+      'Object dropped toward public: alert ground crew immediately',
+      'Injury to member of public: provide first aid, call 911, report',
+      'Public enters exclusion zone: stop work, redirect politely',
+      'Crowd gathering: request additional ground support, maintain control'
     ]
   }
 ];
