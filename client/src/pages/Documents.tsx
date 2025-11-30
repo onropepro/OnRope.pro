@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useLocation } from "wouter";
 import { useTranslation } from 'react-i18next';
@@ -26,6 +26,7 @@ import { downloadMethodStatement } from "@/pages/MethodStatementForm";
 import { formatLocalDate, formatLocalDateLong, formatLocalDateMedium, parseLocalDate } from "@/lib/dateUtils";
 import { format } from "date-fns";
 import { DocumentReviews } from "@/components/DocumentReviews";
+import SignatureCanvas from 'react-signature-canvas';
 
 // Standard job types for method statements - use translation keys
 const STANDARD_JOB_TYPES = [
@@ -2466,6 +2467,92 @@ export default function Documents() {
     queryKey: ["/api/document-reviews"],
     enabled: userData?.user?.role === 'company' || userData?.user?.role === 'operations_manager',
   });
+
+  // User's own document reviews for signing
+  const { data: myDocumentReviewsData } = useQuery<{ reviews: any[] }>({
+    queryKey: ["/api/document-reviews/my"],
+  });
+
+  // Signature canvas ref and state for SWP signing
+  const swpSignatureRef = useRef<SignatureCanvas>(null);
+  const [isSwpSignDialogOpen, setIsSwpSignDialogOpen] = useState(false);
+  const [pendingSwpReview, setPendingSwpReview] = useState<any>(null);
+
+  // Find if the current SWP has a pending review for the user
+  const findMyPendingSwpReview = (swpTitle: string) => {
+    const reviews = myDocumentReviewsData?.reviews || [];
+    return reviews.find(r => 
+      r.documentType === 'safe_work_procedure' && 
+      r.documentName === swpTitle && 
+      !r.signedAt
+    );
+  };
+
+  // Mutation for signing SWP from preview dialog
+  const signSwpMutation = useMutation({
+    mutationFn: async ({ reviewId, signatureDataUrl }: { reviewId: string; signatureDataUrl: string }) => {
+      return apiRequest('POST', `/api/document-reviews/${reviewId}/sign`, { signatureDataUrl });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/document-reviews/my'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/document-reviews'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/csr'] });
+      setIsSwpSignDialogOpen(false);
+      setPendingSwpReview(null);
+      setIsViewSWPDialogOpen(false);
+      toast({
+        title: "Document Signed",
+        description: "Your signature has been recorded successfully.",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: error.message || "Failed to sign document",
+      });
+    },
+  });
+
+  // Mark document as viewed when opening sign dialog
+  const markSwpViewedMutation = useMutation({
+    mutationFn: async (reviewId: string) => {
+      return apiRequest('POST', `/api/document-reviews/${reviewId}/view`);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/document-reviews/my'] });
+    },
+  });
+
+  const handleProceedToSignSwp = () => {
+    if (viewingSWPProcedure) {
+      const review = findMyPendingSwpReview(viewingSWPProcedure.title);
+      if (review) {
+        markSwpViewedMutation.mutate(review.id);
+        setPendingSwpReview(review);
+        setIsSwpSignDialogOpen(true);
+      }
+    }
+  };
+
+  const handleSignSwp = () => {
+    if (!pendingSwpReview || !swpSignatureRef.current) return;
+    
+    if (swpSignatureRef.current.isEmpty()) {
+      toast({
+        variant: "destructive",
+        title: "Signature Required",
+        description: "Please provide your signature before submitting.",
+      });
+      return;
+    }
+
+    const signatureDataUrl = swpSignatureRef.current.toDataURL('image/png');
+    signSwpMutation.mutate({
+      reviewId: pendingSwpReview.id,
+      signatureDataUrl,
+    });
+  };
 
   // Fetch all employees for document compliance calculation
   const { data: employeesData } = useQuery<{ employees: any[] }>({
@@ -7264,20 +7351,102 @@ export default function Documents() {
             </div>
           )}
           
-          <DialogFooter>
-            <Button
-              variant="outline"
-              onClick={() => {
-                if (viewingSWPProcedure) {
-                  generateSafeWorkProcedurePDF(viewingSWPProcedure, currentUser?.companyName);
-                }
-              }}
-            >
-              <Download className="h-4 w-4 mr-2" />
-              Download PDF
+          <DialogFooter className="flex-col sm:flex-row gap-2">
+            {viewingSWPProcedure && findMyPendingSwpReview(viewingSWPProcedure.title) && (
+              <p className="text-xs text-muted-foreground flex-1">
+                Review this document carefully before signing to acknowledge receipt and understanding.
+              </p>
+            )}
+            <div className="flex gap-2">
+              <Button
+                variant="outline"
+                onClick={() => {
+                  if (viewingSWPProcedure) {
+                    generateSafeWorkProcedurePDF(viewingSWPProcedure, currentUser?.companyName);
+                  }
+                }}
+              >
+                <Download className="h-4 w-4 mr-2" />
+                Download PDF
+              </Button>
+              {viewingSWPProcedure && findMyPendingSwpReview(viewingSWPProcedure.title) ? (
+                <Button onClick={handleProceedToSignSwp} data-testid="button-swp-proceed-sign">
+                  <PenLine className="h-4 w-4 mr-2" />
+                  Proceed to Sign
+                </Button>
+              ) : (
+                <Button onClick={() => setIsViewSWPDialogOpen(false)}>
+                  Close
+                </Button>
+              )}
+            </div>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* SWP Signature Dialog */}
+      <Dialog open={isSwpSignDialogOpen} onOpenChange={setIsSwpSignDialogOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <PenLine className="h-5 w-5 text-primary" />
+              Sign Document
+            </DialogTitle>
+            <DialogDescription>
+              By signing below, you acknowledge that you have read, understood, and will comply with this Safe Work Procedure.
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="space-y-4">
+            <div className="text-sm text-muted-foreground">
+              <strong>Document:</strong> {pendingSwpReview?.documentName}
+            </div>
+            
+            <div className="space-y-2">
+              <Label>Your Signature</Label>
+              <div className="border rounded-md bg-white">
+                <SignatureCanvas
+                  ref={swpSignatureRef}
+                  canvasProps={{
+                    className: 'w-full h-32',
+                    style: { width: '100%', height: '128px' },
+                  }}
+                  backgroundColor="white"
+                />
+              </div>
+              <div className="flex justify-end">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => swpSignatureRef.current?.clear()}
+                  data-testid="button-clear-swp-signature"
+                >
+                  Clear
+                </Button>
+              </div>
+            </div>
+          </div>
+
+          <DialogFooter className="gap-2">
+            <Button variant="outline" onClick={() => setIsSwpSignDialogOpen(false)}>
+              Cancel
             </Button>
-            <Button onClick={() => setIsViewSWPDialogOpen(false)}>
-              Close
+            <Button 
+              onClick={handleSignSwp} 
+              disabled={signSwpMutation.isPending}
+              data-testid="button-submit-swp-signature"
+            >
+              {signSwpMutation.isPending ? (
+                <>
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  Signing...
+                </>
+              ) : (
+                <>
+                  <CheckCircle className="h-4 w-4 mr-2" />
+                  Submit Signature
+                </>
+              )}
             </Button>
           </DialogFooter>
         </DialogContent>
