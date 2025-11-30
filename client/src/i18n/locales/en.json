@@ -1669,6 +1669,12 @@
     "weight": "Weight",
     "length": "Length",
     "batchNumber": "Batch Number",
+    "myEquipment": "My Equipment",
+    "equipmentAssignedToYou": "Equipment assigned to you",
+    "wantToAddNew": "Want to add new items to company inventory?",
+    "switchToManageGear": "Switch to the \"Manage Gear\" tab to add new inventory items",
+    "goToManageGear": "Go to Manage Gear",
+    "addGear": "Add Gear",
     "tabs": {
       "myGear": "My Gear",
       "teamGear": "Team Gear",

@@ -1669,6 +1669,12 @@
     "weight": "Poids",
     "length": "Longueur",
     "batchNumber": "Numéro de lot",
+    "myEquipment": "Mon équipement",
+    "equipmentAssignedToYou": "Équipement qui vous est assigné",
+    "wantToAddNew": "Vous voulez ajouter de nouveaux articles à l'inventaire de l'entreprise?",
+    "switchToManageGear": "Passez à l'onglet \"Gérer le matériel\" pour ajouter de nouveaux articles à l'inventaire",
+    "goToManageGear": "Aller à Gérer le matériel",
+    "addGear": "Ajouter du matériel",
     "tabs": {
       "myGear": "Mon matériel",
       "teamGear": "Matériel d'équipe",
