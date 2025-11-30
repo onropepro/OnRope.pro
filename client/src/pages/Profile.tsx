@@ -277,6 +277,7 @@ const featureRequestSchema = z.object({
   category: z.string().min(1, "Category is required"),
   description: z.string().min(10, "Description must be at least 10 characters"),
   priority: z.string().default('normal'),
+  screenshotUrl: z.string().optional(),
 });
 
 type FeatureRequestFormData = z.infer<typeof featureRequestSchema>;
@@ -287,6 +288,9 @@ function FeatureRequestsSection({ userId, userName }: { userId: string; userName
   const [newMessage, setNewMessage] = useState("");
   const [showThankYouDialog, setShowThankYouDialog] = useState(false);
   const [showNewRequestForm, setShowNewRequestForm] = useState(false);
+  const [screenshotFile, setScreenshotFile] = useState<File | null>(null);
+  const [screenshotPreview, setScreenshotPreview] = useState<string | null>(null);
+  const [isUploadingScreenshot, setIsUploadingScreenshot] = useState(false);
 
   // Fetch feature requests
   const { data: requestsData, isLoading, refetch } = useQuery<{ requests: any[] }>({
@@ -294,6 +298,43 @@ function FeatureRequestsSection({ userId, userName }: { userId: string; userName
   });
 
   const requests = requestsData?.requests || [];
+
+  // Handle screenshot file selection
+  const handleScreenshotChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      // Validate file type
+      if (!file.type.startsWith('image/')) {
+        toast({
+          title: "Invalid file type",
+          description: "Please select an image file (PNG, JPG, etc.)",
+          variant: "destructive",
+        });
+        return;
+      }
+      // Validate file size (max 5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        toast({
+          title: "File too large",
+          description: "Screenshot must be less than 5MB",
+          variant: "destructive",
+        });
+        return;
+      }
+      setScreenshotFile(file);
+      // Create preview
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        setScreenshotPreview(e.target?.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const removeScreenshot = () => {
+    setScreenshotFile(null);
+    setScreenshotPreview(null);
+  };
 
   // Form for creating new requests
   const form = useForm<FeatureRequestFormData>({
@@ -303,6 +344,7 @@ function FeatureRequestsSection({ userId, userName }: { userId: string; userName
       category: "",
       description: "",
       priority: "normal",
+      screenshotUrl: "",
     },
   });
 
@@ -314,6 +356,8 @@ function FeatureRequestsSection({ userId, userName }: { userId: string; userName
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/feature-requests"] });
       form.reset();
+      setScreenshotFile(null);
+      setScreenshotPreview(null);
       setShowNewRequestForm(false);
       setShowThankYouDialog(true);
     },
@@ -345,8 +389,43 @@ function FeatureRequestsSection({ userId, userName }: { userId: string; userName
     },
   });
 
-  const onSubmit = (data: FeatureRequestFormData) => {
-    createMutation.mutate(data);
+  const onSubmit = async (data: FeatureRequestFormData) => {
+    let screenshotUrl = "";
+    
+    // Upload screenshot if present
+    if (screenshotFile) {
+      setIsUploadingScreenshot(true);
+      try {
+        const formData = new FormData();
+        formData.append('file', screenshotFile);
+        formData.append('type', 'feature-request-screenshot');
+        
+        const uploadResponse = await fetch('/api/upload', {
+          method: 'POST',
+          body: formData,
+          credentials: 'include',
+        });
+        
+        if (!uploadResponse.ok) {
+          throw new Error('Failed to upload screenshot');
+        }
+        
+        const uploadResult = await uploadResponse.json();
+        screenshotUrl = uploadResult.url;
+      } catch (error) {
+        toast({
+          title: "Upload failed",
+          description: "Failed to upload screenshot. Please try again.",
+          variant: "destructive",
+        });
+        setIsUploadingScreenshot(false);
+        return;
+      }
+      setIsUploadingScreenshot(false);
+    }
+    
+    // Submit the request with screenshot URL
+    createMutation.mutate({ ...data, screenshotUrl });
   };
 
   const handleSendMessage = () => {
@@ -417,6 +496,16 @@ function FeatureRequestsSection({ userId, userName }: { userId: string; userName
           <div className="p-4 bg-muted/50 rounded-lg">
             <p className="text-sm text-muted-foreground mb-1">Original Request:</p>
             <p className="text-sm whitespace-pre-wrap">{currentRequest.description}</p>
+            {currentRequest.screenshotUrl && (
+              <div className="mt-3">
+                <p className="text-xs text-muted-foreground mb-2">Attached Screenshot:</p>
+                <img 
+                  src={currentRequest.screenshotUrl} 
+                  alt="Request screenshot" 
+                  className="max-h-[200px] rounded-md border object-contain"
+                />
+              </div>
+            )}
             <p className="text-xs text-muted-foreground mt-2">
               Submitted {format(new Date(currentRequest.createdAt), 'MMM d, yyyy h:mm a')}
             </p>
@@ -589,6 +678,46 @@ function FeatureRequestsSection({ userId, userName }: { userId: string; userName
                 )}
               />
 
+              {/* Screenshot Upload */}
+              <div className="space-y-2">
+                <Label>Screenshot (Optional)</Label>
+                <p className="text-xs text-muted-foreground mb-2">
+                  Attach a screenshot to help illustrate your request
+                </p>
+                {screenshotPreview ? (
+                  <div className="relative border rounded-lg p-2 bg-muted/30">
+                    <img 
+                      src={screenshotPreview} 
+                      alt="Screenshot preview" 
+                      className="max-h-[200px] rounded-md mx-auto object-contain"
+                    />
+                    <Button
+                      type="button"
+                      variant="destructive"
+                      size="icon"
+                      className="absolute top-2 right-2"
+                      onClick={removeScreenshot}
+                      data-testid="button-remove-screenshot"
+                    >
+                      <span className="material-icons text-lg">close</span>
+                    </Button>
+                  </div>
+                ) : (
+                  <label className="flex flex-col items-center justify-center h-32 border-2 border-dashed rounded-lg cursor-pointer hover:bg-muted/30 transition-colors">
+                    <span className="material-icons text-3xl text-muted-foreground mb-2">add_photo_alternate</span>
+                    <span className="text-sm text-muted-foreground">Click to upload screenshot</span>
+                    <span className="text-xs text-muted-foreground/70 mt-1">PNG, JPG up to 5MB</span>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleScreenshotChange}
+                      className="hidden"
+                      data-testid="input-screenshot"
+                    />
+                  </label>
+                )}
+              </div>
+
               <div className="flex gap-2 pt-4">
                 <Button
                   type="button"
@@ -601,16 +730,21 @@ function FeatureRequestsSection({ userId, userName }: { userId: string; userName
                 </Button>
                 <Button
                   type="submit"
-                  disabled={createMutation.isPending}
+                  disabled={createMutation.isPending || isUploadingScreenshot}
                   className="h-12 flex-1"
                   data-testid="button-submit-request"
                 >
-                  {createMutation.isPending ? (
-                    <span className="material-icons animate-spin mr-2">autorenew</span>
+                  {createMutation.isPending || isUploadingScreenshot ? (
+                    <>
+                      <span className="material-icons animate-spin mr-2">autorenew</span>
+                      {isUploadingScreenshot ? "Uploading..." : "Submitting..."}
+                    </>
                   ) : (
-                    <span className="material-icons mr-2 text-lg">send</span>
+                    <>
+                      <span className="material-icons mr-2 text-lg">send</span>
+                      Submit Request
+                    </>
                   )}
-                  Submit Request
                 </Button>
               </div>
             </form>

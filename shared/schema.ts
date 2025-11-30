@@ -1812,6 +1812,9 @@ export const featureRequests = pgTable("feature_requests", {
   // Status tracking
   status: varchar("status").default('pending').notNull(), // pending | reviewing | in_progress | completed | declined
   
+  // Screenshot attachment (optional)
+  screenshotUrl: varchar("screenshot_url"), // URL to uploaded screenshot in object storage
+  
   // Contact info (auto-filled from company)
   contactName: varchar("contact_name").notNull(),
   contactEmail: varchar("contact_email").notNull(),

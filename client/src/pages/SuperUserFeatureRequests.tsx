@@ -180,6 +180,17 @@ export default function SuperUserFeatureRequests() {
               <div className="p-4 bg-muted/50 rounded-lg">
                 <p className="text-sm text-muted-foreground mb-1">Original Request:</p>
                 <p className="text-sm whitespace-pre-wrap">{currentRequest.description}</p>
+                {currentRequest.screenshotUrl && (
+                  <div className="mt-3">
+                    <p className="text-xs text-muted-foreground mb-2">Attached Screenshot:</p>
+                    <img 
+                      src={currentRequest.screenshotUrl} 
+                      alt="Request screenshot" 
+                      className="max-h-[300px] rounded-md border object-contain cursor-pointer hover:opacity-90"
+                      onClick={() => window.open(currentRequest.screenshotUrl, '_blank')}
+                    />
+                  </div>
+                )}
                 <p className="text-xs text-muted-foreground mt-2">
                   Submitted {format(new Date(currentRequest.createdAt), 'MMM d, yyyy h:mm a')}
                 </p>
