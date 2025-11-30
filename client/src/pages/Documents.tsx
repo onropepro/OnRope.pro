@@ -15,7 +15,7 @@ import { Calendar as CalendarComponent } from "@/components/ui/calendar";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { FileText, Download, Calendar, DollarSign, Upload, Trash2, Shield, BookOpen, ArrowLeft, AlertTriangle, Plus, FileCheck, ChevronDown, ChevronRight, FolderOpen, CalendarRange, Package, Loader2, Users, Eye, PenLine, Clock, CheckCircle2, AlertCircle } from "lucide-react";
+import { FileText, Download, Calendar, DollarSign, Upload, Trash2, Shield, BookOpen, ArrowLeft, AlertTriangle, Plus, FileCheck, ChevronDown, ChevronRight, FolderOpen, CalendarRange, Package, Loader2, Users, Eye, PenLine, Clock, CheckCircle2, AlertCircle, HardHat, ClipboardList, CheckCircle } from "lucide-react";
 import { CardDescription } from "@/components/ui/card";
 import { hasFinancialAccess, canViewSafetyDocuments } from "@/lib/permissions";
 import { useToast } from "@/hooks/use-toast";
@@ -1761,6 +1761,8 @@ export default function Documents() {
   const [showMethodStatementUploadDialog, setShowMethodStatementUploadDialog] = useState(false);
   const [activeTab, setActiveTab] = useState("health-safety");
   const [downloadingComplianceReport, setDownloadingComplianceReport] = useState(false);
+  const [viewingSWPProcedure, setViewingSWPProcedure] = useState<typeof SAFE_WORK_PROCEDURES[0] | null>(null);
+  const [isViewSWPDialogOpen, setIsViewSWPDialogOpen] = useState(false);
 
   const { data: userData } = useQuery<{ user: any }>({
     queryKey: ["/api/user"],
@@ -5115,15 +5117,29 @@ export default function Documents() {
                               </div>
                               <div className="flex flex-col gap-2">
                                 {procedure && (
-                                  <Button
-                                    size="sm"
-                                    variant="outline"
-                                    onClick={() => generateSafeWorkProcedurePDF(procedure, currentUser?.companyName)}
-                                    data-testid={`download-swp-${doc.id}`}
-                                  >
-                                    <Download className="h-4 w-4 mr-1" />
-                                    PDF
-                                  </Button>
+                                  <>
+                                    <Button
+                                      size="sm"
+                                      variant="outline"
+                                      onClick={() => {
+                                        setViewingSWPProcedure(procedure);
+                                        setIsViewSWPDialogOpen(true);
+                                      }}
+                                      data-testid={`view-swp-${doc.id}`}
+                                    >
+                                      <Eye className="h-4 w-4 mr-1" />
+                                      View
+                                    </Button>
+                                    <Button
+                                      size="sm"
+                                      variant="outline"
+                                      onClick={() => generateSafeWorkProcedurePDF(procedure, currentUser?.companyName)}
+                                      data-testid={`download-swp-${doc.id}`}
+                                    >
+                                      <Download className="h-4 w-4 mr-1" />
+                                      PDF
+                                    </Button>
+                                  </>
                                 )}
                                 {canUploadDocuments && (
                                   <Button
@@ -6483,6 +6499,132 @@ export default function Documents() {
               setMethodStatementCustomJobType("");
             }}>
               Cancel
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* View Safe Work Procedure Dialog */}
+      <Dialog open={isViewSWPDialogOpen} onOpenChange={setIsViewSWPDialogOpen}>
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Shield className="h-5 w-5 text-primary" />
+              {viewingSWPProcedure?.title || 'Safe Work Procedure'}
+            </DialogTitle>
+            <DialogDescription>
+              {viewingSWPProcedure?.description}
+            </DialogDescription>
+          </DialogHeader>
+          
+          {viewingSWPProcedure && (
+            <div className="space-y-6 py-4">
+              {/* Scope Section */}
+              <div>
+                <h3 className="font-semibold text-lg mb-2 flex items-center gap-2">
+                  <FileText className="h-4 w-4" />
+                  Scope
+                </h3>
+                <p className="text-muted-foreground">{viewingSWPProcedure.scope}</p>
+              </div>
+
+              {/* Hazards Section */}
+              <div>
+                <h3 className="font-semibold text-lg mb-3 flex items-center gap-2">
+                  <AlertTriangle className="h-4 w-4 text-amber-500" />
+                  Hazards Identified
+                </h3>
+                <div className="grid gap-2">
+                  {viewingSWPProcedure.hazards.map((hazard, index) => (
+                    <div key={index} className="flex items-start gap-2 p-2 bg-amber-50 dark:bg-amber-950/20 rounded-md">
+                      <span className="text-amber-600 font-medium min-w-[24px]">{index + 1}.</span>
+                      <span>{hazard}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Control Measures Section */}
+              <div>
+                <h3 className="font-semibold text-lg mb-3 flex items-center gap-2">
+                  <Shield className="h-4 w-4 text-green-500" />
+                  Control Measures
+                </h3>
+                <div className="grid gap-2">
+                  {viewingSWPProcedure.controlMeasures.map((control, index) => (
+                    <div key={index} className="flex items-start gap-2 p-2 bg-green-50 dark:bg-green-950/20 rounded-md">
+                      <CheckCircle className="h-4 w-4 text-green-500 mt-0.5 flex-shrink-0" />
+                      <span>{control}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* PPE Section */}
+              <div>
+                <h3 className="font-semibold text-lg mb-3 flex items-center gap-2">
+                  <HardHat className="h-4 w-4 text-blue-500" />
+                  Personal Protective Equipment (PPE)
+                </h3>
+                <div className="flex flex-wrap gap-2">
+                  {viewingSWPProcedure.ppe.map((item, index) => (
+                    <Badge key={index} variant="secondary" className="text-sm">
+                      {item}
+                    </Badge>
+                  ))}
+                </div>
+              </div>
+
+              {/* Procedures Section */}
+              <div>
+                <h3 className="font-semibold text-lg mb-3 flex items-center gap-2">
+                  <ClipboardList className="h-4 w-4 text-primary" />
+                  Work Procedures
+                </h3>
+                <div className="space-y-2">
+                  {viewingSWPProcedure.workProcedure.map((step: string, index: number) => (
+                    <div key={index} className="flex items-start gap-3 p-3 bg-muted/50 rounded-md">
+                      <span className="bg-primary text-primary-foreground rounded-full h-6 w-6 flex items-center justify-center text-sm font-medium flex-shrink-0">
+                        {index + 1}
+                      </span>
+                      <span>{step}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Emergency Procedures Section */}
+              <div>
+                <h3 className="font-semibold text-lg mb-3 flex items-center gap-2">
+                  <AlertTriangle className="h-4 w-4 text-red-500" />
+                  Emergency Procedures
+                </h3>
+                <div className="grid gap-2">
+                  {viewingSWPProcedure.emergencyProcedures.map((emergency, index) => (
+                    <div key={index} className="flex items-start gap-2 p-2 bg-red-50 dark:bg-red-950/20 rounded-md border border-red-200 dark:border-red-800">
+                      <span className="text-red-600 font-medium">{index + 1}.</span>
+                      <span>{emergency}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
+          
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => {
+                if (viewingSWPProcedure) {
+                  generateSafeWorkProcedurePDF(viewingSWPProcedure, currentUser?.companyName);
+                }
+              }}
+            >
+              <Download className="h-4 w-4 mr-2" />
+              Download PDF
+            </Button>
+            <Button onClick={() => setIsViewSWPDialogOpen(false)}>
+              Close
             </Button>
           </DialogFooter>
         </DialogContent>
