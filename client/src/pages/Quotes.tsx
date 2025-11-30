@@ -1948,11 +1948,11 @@ export default function Quotes() {
               <Button
                 onClick={() => closeQuoteMutation.mutate(selectedQuote.id)}
                 disabled={closeQuoteMutation.isPending}
-                className="bg-success hover:bg-success/90"
+                className="bg-success hover:bg-success/90 text-white"
                 data-testid="button-close-quote"
               >
                 <CheckCircle2 className="w-4 h-4 mr-2" />
-                Close Quote
+                {t('quotes.closeQuote', 'Close Quote')}
               </Button>
             )}
             <Button
