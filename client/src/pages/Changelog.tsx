@@ -37,8 +37,13 @@ import {
   Timer,
   CalendarDays,
   ChevronRight,
-  ExternalLink
+  ExternalLink,
+  History,
+  Languages,
+  TrendingUp,
+  Activity
 } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 type ChangelogSection = {
   title: string;
@@ -69,6 +74,88 @@ type ServiceItem = {
   icon: string;
   trackingType: string;
 };
+
+type RecentChange = {
+  date: string;
+  title: string;
+  description: string;
+  type: "feature" | "improvement" | "fix";
+};
+
+const recentChangesData: RecentChange[] = [
+  {
+    date: "November 30, 2025",
+    title: "Platform Metrics Dashboard",
+    description: "Added comprehensive metrics tracking for super users including MRR, customer churn, LTV, and resubscription monitoring",
+    type: "feature"
+  },
+  {
+    date: "November 29, 2025",
+    title: "Quote Email System",
+    description: "Send quotes directly to customers as professional PDF attachments via email",
+    type: "feature"
+  },
+  {
+    date: "November 28, 2025",
+    title: "Sales Pipeline & CRM Analytics",
+    description: "Added Kanban-style pipeline view for quote management with drag-and-drop stage transitions and analytics dashboard showing win rates, revenue tracking, and stage breakdowns",
+    type: "feature"
+  },
+  {
+    date: "November 27, 2025",
+    title: "Navigation Improvements",
+    description: "Standardized back button and main menu button components across all pages for consistent navigation experience",
+    type: "improvement"
+  },
+  {
+    date: "November 25, 2025",
+    title: "Multi-Language Support",
+    description: "Full French translation added with language toggle, user preference settings, and localized date/time formatting",
+    type: "feature"
+  },
+  {
+    date: "November 22, 2025",
+    title: "Personal Kit Selection",
+    description: "Link harness inspections to technician's assigned personal equipment kit for better tracking",
+    type: "feature"
+  },
+  {
+    date: "November 20, 2025",
+    title: "Feature Request System",
+    description: "Company owners can submit feature requests and ideas, with super user management dashboard",
+    type: "feature"
+  },
+  {
+    date: "November 18, 2025",
+    title: "Safe Work Practices",
+    description: "New document type with 10 daily safety topics, employee acknowledgment and sign-off tracking",
+    type: "feature"
+  },
+  {
+    date: "November 15, 2025",
+    title: "Document Compliance Reports",
+    description: "Download employee signature compliance reports and improved tracking for all document types",
+    type: "improvement"
+  },
+  {
+    date: "November 12, 2025",
+    title: "Equipment Damage Reporting",
+    description: "Report damage linked to specific inventory items by serial number with PDF generation",
+    type: "feature"
+  },
+  {
+    date: "November 10, 2025",
+    title: "Hours Logging Prompt",
+    description: "Automatic prompt asking technicians if they want to log IRATA hours after ending work sessions",
+    type: "improvement"
+  },
+  {
+    date: "November 8, 2025",
+    title: "Subscription Add-ons",
+    description: "Purchase additional seats and project add-ons directly from subscription management page",
+    type: "feature"
+  }
+];
 
 const servicesData: ServiceItem[] = [
   { 
@@ -315,16 +402,19 @@ const changelogData: ChangelogSection[] = [
     title: "Safety & Compliance Documentation",
     icon: Shield,
     iconColor: "text-red-600 dark:text-red-400",
-    description: "Digital safety forms with signatures and PDF export",
+    description: "Digital safety forms with signatures, personal kit integration, and PDF export",
     features: [
-      "Harness Inspection Forms with detailed equipment checks",
+      "Harness Inspection Forms with personal kit selection",
+      "Link inspections to technician's assigned equipment by serial number",
       "Toolbox Meeting documentation with attendee signatures",
       "FLHA (Field Level Hazard Assessment) forms",
       "Incident Report forms with comprehensive tracking",
       "Method Statement documentation",
+      "Quick access safety form buttons on project pages",
       "Digital signature capture for all safety documents",
       "Professional PDF generation with embedded signatures",
       "7-day coverage window for toolbox meeting compliance",
+      "Cross-project harness inspection tracking",
       "Date of manufacture tracking for gear"
     ],
     status: "complete"
@@ -352,16 +442,18 @@ const changelogData: ChangelogSection[] = [
     title: "Document Management",
     icon: FileText,
     iconColor: "text-teal-600 dark:text-teal-400",
-    description: "Centralized document storage with role-based access",
+    description: "Centralized document storage with compliance tracking and role-based access",
     features: [
-      "Health & Safety Manual uploads",
-      "Company Policy document management",
+      "Health & Safety Manual uploads with employee acknowledgment",
+      "Company Policy document management with signature tracking",
       "Certificate of Insurance (restricted to owners/managers)",
       "Safe Work Procedures templates library (10 templates with PDF generation)",
-      "Safe Work Practices library (10 daily safety topics with acknowledgment)",
-      "Equipment Inspections tracking",
-      "Damage Reports with equipment linking",
+      "Safe Work Practices library (10 daily safety topics with acknowledgment and sign-off)",
+      "Equipment Inspections tracking with compliance status",
+      "Damage Reports with specific equipment serial number linking",
+      "Employee signature compliance reports with download capability",
       "Clean dropdown navigation between document types",
+      "Collapsible document review sections for better organization",
       "Role-based visibility for sensitive documents",
       "Document upload with file type validation",
       "Bulk export of date-ranged documents as ZIP files",
@@ -407,17 +499,19 @@ const changelogData: ChangelogSection[] = [
     title: "Gear & Equipment Inventory",
     icon: Wrench,
     iconColor: "text-slate-600 dark:text-slate-400",
-    description: "Equipment tracking with serial numbers, damage reporting, and maintenance",
+    description: "Equipment tracking with serial numbers, damage reporting, and personal kit management",
     features: [
-      "Comprehensive gear inventory management",
+      "Comprehensive gear inventory management with category organization",
       "Serial number tracking for individual equipment units",
+      "Personal equipment kit assignment to technicians",
       "Equipment damage reporting linked to specific serial numbers",
-      "Damage report PDF generation with equipment details",
-      "Equipment assignment to employees",
-      "Date of manufacture tracking",
+      "Damage report PDF generation with equipment details and photos",
+      "Equipment retirement workflow for damaged or expired gear",
+      "Date of manufacture and expiration tracking",
       "Service history and maintenance schedules",
       "My Gear view for individual technicians",
-      "Equipment status tracking"
+      "Integration with harness inspection forms",
+      "Equipment status tracking and compliance indicators"
     ],
     status: "complete"
   },
@@ -438,17 +532,20 @@ const changelogData: ChangelogSection[] = [
     status: "complete"
   },
   {
-    title: "Quoting System",
-    icon: FileText,
+    title: "Quoting & Sales Pipeline",
+    icon: TrendingUp,
     iconColor: "text-pink-600 dark:text-pink-400",
-    description: "Quote generation with labor cost calculations",
+    description: "Complete CRM with quote generation, pipeline tracking, and analytics",
     features: [
-      "Quote creation with itemized services",
-      "Labor cost calculations",
-      "Tax computation (GST/HST)",
-      "Quote status tracking (draft, sent, approved, rejected)",
-      "Permission-based access to financial data",
-      "Quote to project conversion"
+      "Quote creation with itemized services and labor cost calculations",
+      "Kanban-style pipeline view with drag-and-drop stage transitions",
+      "Pipeline stages: Draft, Sent, Negotiating, Won, Lost",
+      "Email quotes directly to customers as professional PDF attachments",
+      "CRM analytics dashboard with win rates and revenue tracking",
+      "Stage breakdown charts and time-range filtering (week/month/year/all)",
+      "Tax computation (GST/HST) with automatic calculations",
+      "Quote to project conversion workflow",
+      "Permission-based access to financial data"
     ],
     status: "complete"
   },
@@ -536,16 +633,21 @@ const changelogData: ChangelogSection[] = [
     status: "complete"
   },
   {
-    title: "SuperUser Administration",
-    icon: Settings,
+    title: "Platform Administration & Metrics",
+    icon: Activity,
     iconColor: "text-gray-600 dark:text-gray-400",
-    description: "Platform-wide administrative oversight",
+    description: "Comprehensive platform oversight with revenue tracking and customer health monitoring",
     features: [
       "Centralized company oversight dashboard",
+      "Platform metrics dashboard with MRR, ARR, and revenue tracking",
+      "Customer churn monitoring and resubscription tracking",
+      "Lifetime value (LTV) and customer acquisition cost (CAC) analytics",
       "License status monitoring across all companies",
-      "Detailed company analytics and metrics",
-      "User and subscription management",
-      "System-wide reporting capabilities"
+      "Feature request management system with status tracking",
+      "User and subscription management tools",
+      "Detailed company analytics and activity metrics",
+      "System-wide reporting capabilities",
+      "Revenue trend visualization and forecasting"
     ],
     status: "complete"
   },
@@ -561,6 +663,24 @@ const changelogData: ChangelogSection[] = [
       "Real-time active worker monitoring",
       "Hours analytics with date range filtering",
       "Project progress visualization"
+    ],
+    status: "complete"
+  },
+  {
+    title: "Multi-Language Support",
+    icon: Languages,
+    iconColor: "text-blue-600 dark:text-blue-400",
+    description: "Internationalization with full French translation and user language preferences",
+    features: [
+      "Complete French translation of all interface elements",
+      "Language toggle accessible from login and settings pages",
+      "User language preference saved to profile settings",
+      "Localized date and time formatting based on language",
+      "FullCalendar localization for schedule views",
+      "Form validation messages in selected language",
+      "Safety form translations including equipment categories",
+      "Email notifications in user's preferred language",
+      "Browser language auto-detection for new users"
     ],
     status: "complete"
   },
@@ -669,6 +789,69 @@ export default function Changelog() {
             </CardContent>
           </Card>
         </div>
+
+        <Card className="mb-8">
+          <CardHeader>
+            <div className="flex items-center gap-3">
+              <div className="p-2.5 rounded-xl bg-amber-500/10 ring-1 ring-amber-500/20">
+                <History className="h-5 w-5 text-amber-600 dark:text-amber-400" />
+              </div>
+              <div>
+                <CardTitle className="text-xl">Recent Changes</CardTitle>
+                <CardDescription>
+                  Latest platform updates and improvements (November 2025)
+                </CardDescription>
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent className="pt-0">
+            <div className="space-y-4">
+              {recentChangesData.map((change, index) => (
+                <div 
+                  key={index}
+                  className="flex items-start gap-4 p-4 rounded-lg bg-muted/30"
+                >
+                  <div className="flex-shrink-0">
+                    <div className={`p-2 rounded-lg ${
+                      change.type === 'feature' 
+                        ? 'bg-emerald-500/10 ring-1 ring-emerald-500/20' 
+                        : change.type === 'improvement'
+                        ? 'bg-blue-500/10 ring-1 ring-blue-500/20'
+                        : 'bg-orange-500/10 ring-1 ring-orange-500/20'
+                    }`}>
+                      {change.type === 'feature' ? (
+                        <Zap className={`h-4 w-4 text-emerald-600 dark:text-emerald-400`} />
+                      ) : change.type === 'improvement' ? (
+                        <TrendingUp className={`h-4 w-4 text-blue-600 dark:text-blue-400`} />
+                      ) : (
+                        <Wrench className={`h-4 w-4 text-orange-600 dark:text-orange-400`} />
+                      )}
+                    </div>
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 flex-wrap mb-1">
+                      <span className="font-semibold text-sm">{change.title}</span>
+                      <Badge 
+                        variant="secondary" 
+                        className={`text-xs ${
+                          change.type === 'feature' 
+                            ? 'bg-emerald-500/10 text-emerald-700 dark:text-emerald-300' 
+                            : change.type === 'improvement'
+                            ? 'bg-blue-500/10 text-blue-700 dark:text-blue-300'
+                            : 'bg-orange-500/10 text-orange-700 dark:text-orange-300'
+                        }`}
+                      >
+                        {change.type === 'feature' ? 'New Feature' : change.type === 'improvement' ? 'Improvement' : 'Fix'}
+                      </Badge>
+                    </div>
+                    <p className="text-sm text-muted-foreground mb-1">{change.description}</p>
+                    <p className="text-xs text-muted-foreground/70">{change.date}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
 
         <Card className="mb-8">
           <CardHeader>
