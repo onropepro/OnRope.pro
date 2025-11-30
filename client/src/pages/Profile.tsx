@@ -305,10 +305,11 @@ function FeatureRequestsSection({ userId, userName }: { userId: string; userName
   
   const selectedRequest = selectedRequestData?.request || null;
 
-  // Invalidate unread count when viewing a request
+  // Invalidate both unread count and main list when viewing a request
   useEffect(() => {
     if (selectedRequestId && selectedRequestData?.request) {
       queryClient.invalidateQueries({ queryKey: ["/api/feature-requests/unread-count"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/feature-requests"] });
     }
   }, [selectedRequestId, selectedRequestData]);
 
