@@ -137,7 +137,6 @@ const PIPELINE_STAGES = [
   { id: "submitted", color: "bg-blue-500", borderColor: "border-blue-200 dark:border-blue-800", bgColor: "bg-blue-50/50 dark:bg-blue-950/30" },
   { id: "review", color: "bg-amber-500", borderColor: "border-amber-200 dark:border-amber-800", bgColor: "bg-amber-50/50 dark:bg-amber-950/30" },
   { id: "negotiation", color: "bg-orange-500", borderColor: "border-orange-200 dark:border-orange-800", bgColor: "bg-orange-50/50 dark:bg-orange-950/30" },
-  { id: "approved", color: "bg-primary", borderColor: "border-primary/30", bgColor: "bg-primary/5" },
   { id: "won", color: "bg-emerald-500", borderColor: "border-emerald-200 dark:border-emerald-800", bgColor: "bg-emerald-50/50 dark:bg-emerald-950/30" },
   { id: "lost", color: "bg-rose-500", borderColor: "border-rose-200 dark:border-rose-800", bgColor: "bg-rose-50/50 dark:bg-rose-950/30" },
 ];
@@ -1454,7 +1453,7 @@ export default function Quotes() {
                 </div>
               ) : (
                 <DndContext onDragEnd={handleDragEnd} collisionDetection={closestCenter}>
-                  <div className="grid grid-cols-4 gap-3 pb-4">
+                  <div className="grid grid-cols-3 gap-3 pb-4">
                     {PIPELINE_STAGES.map((stage) => (
                       <StageColumn
                         key={stage.id}
