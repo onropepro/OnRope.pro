@@ -1872,6 +1872,131 @@ export type FeatureRequestWithMessages = FeatureRequest & {
   unreadCount?: number;
 };
 
+// ==========================================
+// SUPERUSER METRICS DASHBOARD TABLES
+// ==========================================
+
+// MRR Snapshots - daily snapshots of revenue metrics for historical tracking
+export const mrrSnapshots = pgTable("mrr_snapshots", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  snapshotDate: date("snapshot_date").notNull(),
+  
+  // Total MRR
+  totalMrr: numeric("total_mrr", { precision: 12, scale: 2 }).notNull(),
+  
+  // MRR by subscription tier
+  basicMrr: numeric("basic_mrr", { precision: 12, scale: 2 }).default("0"),
+  starterMrr: numeric("starter_mrr", { precision: 12, scale: 2 }).default("0"),
+  premiumMrr: numeric("premium_mrr", { precision: 12, scale: 2 }).default("0"),
+  enterpriseMrr: numeric("enterprise_mrr", { precision: 12, scale: 2 }).default("0"),
+  
+  // MRR by add-on type
+  extraSeatsMrr: numeric("extra_seats_mrr", { precision: 12, scale: 2 }).default("0"),
+  extraProjectsMrr: numeric("extra_projects_mrr", { precision: 12, scale: 2 }).default("0"),
+  whiteLabelMrr: numeric("white_label_mrr", { precision: 12, scale: 2 }).default("0"),
+  
+  // MRR movement (from previous snapshot)
+  newMrr: numeric("new_mrr", { precision: 12, scale: 2 }).default("0"),         // From new customers
+  expansionMrr: numeric("expansion_mrr", { precision: 12, scale: 2 }).default("0"),   // Upgrades + add-ons
+  contractionMrr: numeric("contraction_mrr", { precision: 12, scale: 2 }).default("0"), // Downgrades (negative)
+  churnedMrr: numeric("churned_mrr", { precision: 12, scale: 2 }).default("0"),     // Cancellations (negative)
+  
+  // Customer counts
+  totalCustomers: integer("total_customers").default(0),
+  basicCustomers: integer("basic_customers").default(0),
+  starterCustomers: integer("starter_customers").default(0),
+  premiumCustomers: integer("premium_customers").default(0),
+  enterpriseCustomers: integer("enterprise_customers").default(0),
+  
+  // New signups this period
+  newCustomers: integer("new_customers").default(0),
+  churnedCustomers: integer("churned_customers").default(0),
+  
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+}, (table) => [
+  index("IDX_mrr_snapshot_date").on(table.snapshotDate),
+]);
+
+export const insertMrrSnapshotSchema = createInsertSchema(mrrSnapshots).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type MrrSnapshot = typeof mrrSnapshots.$inferSelect;
+export type InsertMrrSnapshot = z.infer<typeof insertMrrSnapshotSchema>;
+
+// Customer Health Scores - calculated scores for churn risk assessment
+export const customerHealthScores = pgTable("customer_health_scores", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  companyId: varchar("company_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  calculatedAt: timestamp("calculated_at").defaultNow().notNull(),
+  
+  // Overall score (0-100)
+  overallScore: integer("overall_score").notNull(),
+  
+  // Component scores (0-100 each)
+  loginScore: integer("login_score").default(0),        // Based on last login date
+  usageScore: integer("usage_score").default(0),        // Based on features used
+  paymentScore: integer("payment_score").default(0),    // Based on payment status
+  engagementScore: integer("engagement_score").default(0), // Based on activity
+  
+  // Health status
+  status: varchar("status").notNull(), // healthy | at_risk | critical
+  
+  // Last login date for reference
+  lastLoginDate: timestamp("last_login_date"),
+  
+  // Usage metrics for reference
+  projectsCount: integer("projects_count").default(0),
+  employeesCount: integer("employees_count").default(0),
+  workSessionsCount: integer("work_sessions_count").default(0),
+  
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+}, (table) => [
+  index("IDX_health_company").on(table.companyId),
+  index("IDX_health_calculated").on(table.calculatedAt),
+  index("IDX_health_status").on(table.status),
+]);
+
+export const insertCustomerHealthScoreSchema = createInsertSchema(customerHealthScores).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type CustomerHealthScore = typeof customerHealthScores.$inferSelect;
+export type InsertCustomerHealthScore = z.infer<typeof insertCustomerHealthScoreSchema>;
+
+// Churn Events - records when and why customers churned
+export const churnEvents = pgTable("churn_events", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  companyId: varchar("company_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  churnDate: date("churn_date").notNull(),
+  
+  // Financial impact
+  finalMrr: numeric("final_mrr", { precision: 12, scale: 2 }),
+  tier: varchar("tier"), // basic | starter | premium | enterprise
+  
+  // Churn reason
+  reason: varchar("reason"), // business_closed | too_expensive | missing_features | competitor | no_engagement | payment_failure | unknown
+  notes: text("notes"),
+  
+  // Win-back tracking
+  winBackDate: date("win_back_date"),
+  
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+}, (table) => [
+  index("IDX_churn_company").on(table.companyId),
+  index("IDX_churn_date").on(table.churnDate),
+]);
+
+export const insertChurnEventSchema = createInsertSchema(churnEvents).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type ChurnEvent = typeof churnEvents.$inferSelect;
+export type InsertChurnEvent = z.infer<typeof insertChurnEventSchema>;
+
 // Extended types for frontend use with relations
 export type QuoteWithServices = Quote & {
   services: QuoteService[];
