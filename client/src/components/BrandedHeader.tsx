@@ -4,6 +4,13 @@ import { RefreshButton } from "@/components/RefreshButton";
 import { useLocation } from "wouter";
 import { Badge } from "@/components/ui/badge";
 
+interface CurrentUser {
+  id: string;
+  role: string;
+  companyId?: string;
+  [key: string]: any;
+}
+
 interface BrandedHeaderProps {
   title: string;
   subtitle?: string;
@@ -15,21 +22,23 @@ interface BrandedHeaderProps {
 export function BrandedHeader({ title, subtitle, showBackButton, backPath = "/dashboard", children }: BrandedHeaderProps) {
   const [, setLocation] = useLocation();
 
-  const { data: userData } = useQuery({
+  const { data: userData } = useQuery<{ user: CurrentUser | null }>({
     queryKey: ["/api/user"],
   });
+
+  const user = userData?.user;
 
   // Fetch unread feature request message count for company owners
   const { data: unreadData } = useQuery<{ count: number }>({
     queryKey: ["/api/feature-requests/unread-count"],
-    enabled: userData?.user?.role === 'company',
+    enabled: user?.role === 'company',
     refetchInterval: 30000, // Refresh every 30 seconds
   });
 
   // Determine company ID to fetch branding for
-  const companyIdForBranding = userData?.user?.role === 'company' 
-    ? userData.user.id 
-    : userData?.user?.companyId;
+  const companyIdForBranding = user?.role === 'company' 
+    ? user.id 
+    : user?.companyId;
 
   const { data: brandingData } = useQuery({
     queryKey: ["/api/company", companyIdForBranding, "branding"],
@@ -40,7 +49,7 @@ export function BrandedHeader({ title, subtitle, showBackButton, backPath = "/da
       if (!response.ok) throw new Error(`Failed to fetch branding: ${response.status}`);
       return response.json();
     },
-    enabled: !!companyIdForBranding && userData?.user?.role !== 'resident' && userData?.user?.role !== 'superuser',
+    enabled: !!companyIdForBranding && user?.role !== 'resident' && user?.role !== 'superuser',
     retry: 1,
   });
 
