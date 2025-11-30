@@ -2058,6 +2058,24 @@
         "year": "Year",
         "all": "All Time"
       }
+    },
+    "email": {
+      "button": "Email",
+      "title": "Email Quote to Customer",
+      "recipientLabel": "Recipient Email",
+      "recipientPlaceholder": "customer@example.com",
+      "subjectLabel": "Subject",
+      "subjectPlaceholder": "Service Quote for...",
+      "messageLabel": "Personal Message (Optional)",
+      "messagePlaceholder": "Add a personal message to include with the quote...",
+      "note": "The quote will be sent as a professional email with a PDF attachment for the customer's records.",
+      "send": "Send Quote",
+      "sending": "Sending...",
+      "success": "Quote sent",
+      "successDesc": "The quote has been emailed with PDF attachment successfully.",
+      "failed": "Send failed",
+      "failedDesc": "Failed to send quote email",
+      "defaultSubject": "Service Quote for"
     }
   },
   "schedule": {

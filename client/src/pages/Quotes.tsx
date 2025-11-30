@@ -46,7 +46,9 @@ import {
   Clock,
   Trophy,
   XCircle,
-  Kanban
+  Kanban,
+  Mail,
+  Send
 } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
@@ -311,6 +313,10 @@ export default function Quotes() {
   const [isSubmitDialogOpen, setIsSubmitDialogOpen] = useState(false);
   const [quoteToSubmit, setQuoteToSubmit] = useState<QuoteWithServices | null>(null);
   const [editingServices, setEditingServices] = useState<Map<string, ServiceFormData>>(new Map());
+  const [isEmailDialogOpen, setIsEmailDialogOpen] = useState(false);
+  const [emailRecipient, setEmailRecipient] = useState("");
+  const [emailMessage, setEmailMessage] = useState("");
+  const [emailSubject, setEmailSubject] = useState("");
   
   // Form data
   const [buildingInfo, setBuildingInfo] = useState<BuildingInfoFormData | null>(null);
@@ -619,6 +625,40 @@ export default function Quotes() {
       toast({
         title: t('quotes.pipeline.updateFailed', 'Update failed'),
         description: error.message || t('quotes.pipeline.updateFailedDesc', 'Failed to update quote stage'),
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Email quote mutation
+  const emailQuoteMutation = useMutation({
+    mutationFn: async ({ quoteId, recipientEmail, message, subject }: { 
+      quoteId: string; 
+      recipientEmail: string; 
+      message?: string;
+      subject?: string;
+    }) => {
+      const response = await apiRequest("POST", `/api/quotes/${quoteId}/email`, { 
+        recipientEmail, 
+        message,
+        subject 
+      });
+      return response;
+    },
+    onSuccess: () => {
+      setIsEmailDialogOpen(false);
+      setEmailRecipient("");
+      setEmailMessage("");
+      setEmailSubject("");
+      toast({
+        title: t('quotes.email.success', 'Quote sent'),
+        description: t('quotes.email.successDesc', 'The quote has been emailed successfully.'),
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: t('quotes.email.failed', 'Send failed'),
+        description: error.message || t('quotes.email.failedDesc', 'Failed to send quote email'),
         variant: "destructive",
       });
     },
@@ -1632,7 +1672,7 @@ export default function Quotes() {
                   >
                     {selectedQuote.status}
                   </Badge>
-                  <div className="flex gap-2">
+                  <div className="flex gap-2 flex-wrap">
                     <Button
                       onClick={() => downloadQuote(selectedQuote)}
                       variant="outline"
@@ -1640,6 +1680,17 @@ export default function Quotes() {
                     >
                       <Download className="w-4 h-4 mr-2" />
                       {t('quotes.download', 'Download')}
+                    </Button>
+                    <Button
+                      onClick={() => {
+                        setEmailSubject(`${t('quotes.email.defaultSubject', 'Service Quote for')} ${selectedQuote.buildingName} - ${selectedQuote.strataPlanNumber}`);
+                        setIsEmailDialogOpen(true);
+                      }}
+                      variant="outline"
+                      data-testid="button-email-quote"
+                    >
+                      <Mail className="w-4 h-4 mr-2" />
+                      {t('quotes.email.button', 'Email')}
                     </Button>
                     {selectedQuote.status === "draft" && 
                      (canEditQuotes || selectedQuote.createdBy === currentUser?.id) && (
@@ -2559,6 +2610,90 @@ export default function Quotes() {
             </AlertDialogFooter>
           </AlertDialogContent>
         </AlertDialog>
+
+        <Dialog open={isEmailDialogOpen} onOpenChange={setIsEmailDialogOpen}>
+          <DialogContent className="sm:max-w-md">
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2">
+                <Mail className="w-5 h-5" />
+                {t('quotes.email.title', 'Email Quote to Customer')}
+              </DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4 py-4">
+              <div className="space-y-2">
+                <Label htmlFor="email-recipient">{t('quotes.email.recipientLabel', 'Recipient Email')} *</Label>
+                <Input
+                  id="email-recipient"
+                  type="email"
+                  placeholder={t('quotes.email.recipientPlaceholder', 'customer@example.com')}
+                  value={emailRecipient}
+                  onChange={(e) => setEmailRecipient(e.target.value)}
+                  data-testid="input-email-recipient"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="email-subject">{t('quotes.email.subjectLabel', 'Subject')}</Label>
+                <Input
+                  id="email-subject"
+                  type="text"
+                  placeholder={t('quotes.email.subjectPlaceholder', 'Service Quote for...')}
+                  value={emailSubject}
+                  onChange={(e) => setEmailSubject(e.target.value)}
+                  data-testid="input-email-subject"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="email-message">{t('quotes.email.messageLabel', 'Personal Message (Optional)')}</Label>
+                <textarea
+                  id="email-message"
+                  className="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                  placeholder={t('quotes.email.messagePlaceholder', 'Add a personal message to include with the quote...')}
+                  value={emailMessage}
+                  onChange={(e) => setEmailMessage(e.target.value)}
+                  data-testid="input-email-message"
+                />
+              </div>
+              <p className="text-sm text-muted-foreground">
+                {t('quotes.email.note', 'The quote will be sent as a professionally formatted email that can be printed to PDF.')}
+              </p>
+            </div>
+            <div className="flex justify-end gap-2">
+              <Button
+                variant="outline"
+                onClick={() => setIsEmailDialogOpen(false)}
+                data-testid="button-cancel-email"
+              >
+                {t('common.cancel', 'Cancel')}
+              </Button>
+              <Button
+                onClick={() => {
+                  if (selectedQuote && emailRecipient) {
+                    emailQuoteMutation.mutate({
+                      quoteId: selectedQuote.id,
+                      recipientEmail: emailRecipient,
+                      message: emailMessage || undefined,
+                      subject: emailSubject || undefined,
+                    });
+                  }
+                }}
+                disabled={!emailRecipient || emailQuoteMutation.isPending}
+                data-testid="button-send-email"
+              >
+                {emailQuoteMutation.isPending ? (
+                  <>
+                    <span className="animate-spin mr-2">...</span>
+                    {t('quotes.email.sending', 'Sending...')}
+                  </>
+                ) : (
+                  <>
+                    <Send className="w-4 h-4 mr-2" />
+                    {t('quotes.email.send', 'Send Quote')}
+                  </>
+                )}
+              </Button>
+            </div>
+          </DialogContent>
+        </Dialog>
 
       </>
     );

@@ -2080,6 +2080,24 @@
         "year": "Année",
         "all": "Tout"
       }
+    },
+    "email": {
+      "button": "Envoyer",
+      "title": "Envoyer le devis par courriel",
+      "recipientLabel": "Courriel du destinataire",
+      "recipientPlaceholder": "client@exemple.com",
+      "subjectLabel": "Objet",
+      "subjectPlaceholder": "Devis de service pour...",
+      "messageLabel": "Message personnel (Optionnel)",
+      "messagePlaceholder": "Ajoutez un message personnel à inclure avec le devis...",
+      "note": "Le devis sera envoyé sous forme de courriel professionnel avec une pièce jointe PDF.",
+      "send": "Envoyer le devis",
+      "sending": "Envoi en cours...",
+      "success": "Devis envoyé",
+      "successDesc": "Le devis a été envoyé avec succès avec la pièce jointe PDF.",
+      "failed": "Échec de l'envoi",
+      "failedDesc": "Impossible d'envoyer le devis par courriel",
+      "defaultSubject": "Devis de service pour"
     }
   },
   "schedule": {

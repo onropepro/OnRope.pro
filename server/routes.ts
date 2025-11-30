@@ -14,6 +14,7 @@ import Stripe from "stripe";
 import { type TierName, type Currency, TIER_CONFIG, ADDON_CONFIG } from "../shared/stripe-config";
 import { checkSubscriptionLimits } from "./subscription-middleware";
 import { getTodayString, toLocalDateString, parseLocalDate, getStartOfWeek, getEndOfWeek } from "./dateUtils";
+import { Resend } from "resend";
 
 // Initialize Stripe for direct API calls
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
@@ -10086,6 +10087,298 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({ message: "Service deleted successfully" });
     } catch (error) {
       console.error("Delete quote service error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Email quote to customer with PDF attachment
+  app.post("/api/quotes/:id/email", requireAuth, requireRole("company", "owner_ceo", "human_resources", "accounting", "operations_manager", "general_supervisor", "rope_access_supervisor", "account_manager", "supervisor"), async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      const companyId = currentUser.role === "company" ? currentUser.id : currentUser.companyId;
+      if (!companyId) {
+        return res.status(400).json({ message: "Unable to determine company" });
+      }
+      
+      // Get the quote with services
+      const quote = await storage.getQuoteWithServicesById(req.params.id);
+      
+      if (!quote) {
+        return res.status(404).json({ message: "Quote not found" });
+      }
+      
+      if (quote.companyId !== companyId) {
+        return res.status(403).json({ message: "Forbidden" });
+      }
+      
+      // Validate email address
+      const { recipientEmail, recipientName, subject, message } = req.body;
+      
+      if (!recipientEmail || typeof recipientEmail !== 'string') {
+        return res.status(400).json({ message: "Recipient email is required" });
+      }
+      
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(recipientEmail)) {
+        return res.status(400).json({ message: "Invalid email address format" });
+      }
+      
+      // Check if RESEND_API_KEY is configured
+      if (!process.env.RESEND_API_KEY) {
+        return res.status(500).json({ message: "Email service not configured. Please add RESEND_API_KEY to your environment." });
+      }
+      
+      // Get company info for the email
+      const company = await storage.getUserById(companyId);
+      const companyName = company?.companyName || "Rope Access Company";
+      
+      // HTML escape function to prevent XSS/injection
+      const escapeHtml = (text: string): string => {
+        const map: Record<string, string> = {
+          '&': '&amp;',
+          '<': '&lt;',
+          '>': '&gt;',
+          '"': '&quot;',
+          "'": '&#039;'
+        };
+        return text.replace(/[&<>"']/g, (m) => map[m]);
+      };
+      
+      // Sanitize user-provided message
+      const sanitizedMessage = message ? escapeHtml(String(message)) : '';
+      
+      // Service name mapping
+      const serviceNames: Record<string, string> = {
+        window_cleaning: "Window Cleaning",
+        dryer_vent_cleaning: "Exterior Dryer Vent Cleaning",
+        building_wash: "Building Wash - Pressure washing",
+        general_pressure_washing: "General Pressure Washing",
+        gutter_cleaning: "Gutter Cleaning",
+        parkade: "Parkade Cleaning",
+        ground_windows: "Ground Windows",
+        in_suite: "In-Suite Dryer Vent",
+        painting: "Painting",
+        custom: "Custom Service"
+      };
+      
+      // Calculate grand total
+      const grandTotal = quote.services.reduce((sum, s) => sum + Number(s.totalCost || 0), 0);
+      
+      // Generate professional HTML for PDF
+      const pdfHtmlContent = `<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Service Quote - ${escapeHtml(quote.strataPlanNumber)}</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', sans-serif; line-height: 1.6; color: #333; max-width: 900px; margin: 40px auto; padding: 20px; background: #f5f5f5; }
+        .container { background: white; padding: 60px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .header { border-bottom: 3px solid #3B82F6; padding-bottom: 30px; margin-bottom: 40px; }
+        .header h1 { color: #3B82F6; font-size: 32px; margin-bottom: 8px; }
+        .header .subtitle { color: #71717A; font-size: 18px; }
+        .info-grid { display: flex; gap: 30px; margin-bottom: 40px; }
+        .info-section { flex: 1; }
+        .info-section h3 { color: #3B82F6; font-size: 14px; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 10px; }
+        .info-section p { color: #333; margin-bottom: 5px; }
+        .info-section strong { font-weight: 600; }
+        .services-section { margin: 40px 0; }
+        .services-section h2 { color: #0A0A0A; font-size: 24px; margin-bottom: 25px; border-bottom: 2px solid #E4E4E7; padding-bottom: 10px; }
+        .service-item { background: #FAFAFA; border: 1px solid #E4E4E7; border-radius: 8px; padding: 25px; margin-bottom: 20px; }
+        .service-item h3 { color: #0A0A0A; font-size: 18px; margin-bottom: 15px; }
+        .service-details { color: #71717A; font-size: 14px; }
+        .service-details p { margin: 8px 0; padding-left: 10px; }
+        .pricing-row { display: flex; justify-content: space-between; align-items: center; margin-top: 15px; padding-top: 15px; border-top: 1px solid #E4E4E7; }
+        .pricing-row strong { color: #0A0A0A; }
+        .total-section { background: #3B82F6; color: white; padding: 30px; border-radius: 8px; text-align: right; margin-top: 30px; }
+        .total-section h3 { font-size: 16px; margin-bottom: 10px; font-weight: 500; opacity: 0.9; }
+        .total-section .amount { font-size: 36px; font-weight: bold; }
+        .footer { margin-top: 50px; padding-top: 30px; border-top: 2px solid #E4E4E7; text-align: center; color: #71717A; font-size: 14px; }
+        @media print { body { background: white; margin: 0; padding: 0; } .container { box-shadow: none; padding: 40px; } }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>SERVICE QUOTE</h1>
+            <p class="subtitle">${escapeHtml(companyName)}</p>
+        </div>
+
+        <div class="info-grid">
+            <div class="info-section">
+                <h3>Quote Information</h3>
+                <p><strong>Quote Date:</strong> ${quote.createdAt ? new Date(quote.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) : 'N/A'}</p>
+                <p><strong>Quote Number:</strong> ${escapeHtml(quote.strataPlanNumber)}</p>
+                <p><strong>Status:</strong> ${quote.status.toUpperCase()}</p>
+            </div>
+            <div class="info-section">
+                <h3>Property Information</h3>
+                <p><strong>Building:</strong> ${escapeHtml(quote.buildingName)}</p>
+                <p><strong>Address:</strong> ${escapeHtml(quote.buildingAddress)}</p>
+                <p><strong>Floors:</strong> ${quote.floorCount}</p>
+            </div>
+        </div>
+
+        ${quote.strataManagerName || quote.strataManagerAddress ? `
+        <div class="info-grid">
+            <div class="info-section">
+                <h3>Strata Property Manager</h3>
+                ${quote.strataManagerName ? `<p><strong>Name:</strong> ${escapeHtml(quote.strataManagerName)}</p>` : ''}
+                ${quote.strataManagerAddress ? `<p><strong>Address:</strong> ${escapeHtml(quote.strataManagerAddress)}</p>` : ''}
+            </div>
+        </div>
+        ` : ''}
+
+        <div class="services-section">
+            <h2>Services Proposed</h2>
+            ${quote.services.map((service, index) => {
+              const serviceName = escapeHtml(service.customServiceName || serviceNames[service.serviceType] || service.serviceType);
+              let details: string[] = [];
+
+              if (service.dropsNorth || service.dropsEast || service.dropsSouth || service.dropsWest) {
+                details.push(`<p><strong>Elevation Drops:</strong> North: ${service.dropsNorth || 0}, East: ${service.dropsEast || 0}, South: ${service.dropsSouth || 0}, West: ${service.dropsWest || 0}</p>`);
+                if (service.dropsPerDay) details.push(`<p><strong>Drops per Day:</strong> ${service.dropsPerDay}</p>`);
+              }
+
+              if (service.parkadeStalls) {
+                details.push(`<p><strong>Parking Stalls:</strong> ${service.parkadeStalls}</p>`);
+              }
+
+              if (service.groundWindowHours) {
+                details.push(`<p><strong>Estimated Hours:</strong> ${service.groundWindowHours}</p>`);
+              }
+
+              return `
+                <div class="service-item">
+                    <h3>${index + 1}. ${serviceName}</h3>
+                    <div class="service-details">
+                        ${details.join('')}
+                        ${service.totalHours ? `<p><strong>Total Hours:</strong> ${service.totalHours}</p>` : ''}
+                    </div>
+                    ${service.totalCost ? `
+                    <div class="pricing-row">
+                        <strong>Service Total</strong>
+                        <strong>$${Number(service.totalCost).toFixed(2)}</strong>
+                    </div>
+                    ` : ''}
+                </div>
+              `;
+            }).join('')}
+        </div>
+
+        <div class="total-section">
+            <h3>TOTAL INVESTMENT</h3>
+            <div class="amount">$${grandTotal.toFixed(2)}</div>
+        </div>
+
+        <div class="footer">
+            <p><strong>${escapeHtml(companyName)}</strong></p>
+            <p>Professional Rope Access & High-Rise Maintenance Services</p>
+            <p style="margin-top: 15px; font-size: 12px;">This quote is valid for 30 days from the date of issue. All work will be completed in accordance with IRATA standards and local safety regulations.</p>
+        </div>
+    </div>
+</body>
+</html>`;
+
+      // Generate PDF using html-pdf-node
+      const htmlPdf = await import('html-pdf-node');
+      const pdfOptions = { 
+        format: 'A4' as const,
+        printBackground: true,
+        margin: { top: '20px', right: '20px', bottom: '20px', left: '20px' }
+      };
+      
+      let pdfBuffer: Buffer;
+      try {
+        // html-pdf-node returns { content: <Buffer> } when content is passed
+        const pdfResult = await htmlPdf.default.generatePdf(
+          { content: pdfHtmlContent }, 
+          pdfOptions
+        );
+        // Extract the actual buffer - may be direct Buffer or { content: Buffer }
+        pdfBuffer = Buffer.isBuffer(pdfResult) ? pdfResult : (pdfResult as any).content || pdfResult;
+        
+        if (!Buffer.isBuffer(pdfBuffer)) {
+          throw new Error("PDF generation did not return a valid buffer");
+        }
+      } catch (pdfError) {
+        console.error("PDF generation error:", pdfError);
+        return res.status(500).json({ message: "Failed to generate PDF. Please try again." });
+      }
+      
+      // Generate email body HTML (simpler version for email clients)
+      const emailHtmlContent = `<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
+    <div style="background: white; padding: 30px; border-radius: 8px; border: 1px solid #E4E4E7;">
+        <div style="border-bottom: 2px solid #3B82F6; padding-bottom: 15px; margin-bottom: 20px;">
+            <h1 style="color: #3B82F6; font-size: 24px; margin: 0 0 5px 0;">Service Quote</h1>
+            <p style="color: #71717A; font-size: 14px; margin: 0;">${escapeHtml(companyName)}</p>
+        </div>
+
+        ${sanitizedMessage ? `<div style="background: #F3F4F6; padding: 15px; border-radius: 6px; margin-bottom: 20px;">
+            <p style="margin: 0; color: #374151;">${sanitizedMessage}</p>
+        </div>` : ''}
+
+        <p style="margin-bottom: 15px;">Please find attached the service quote for <strong>${escapeHtml(quote.buildingName)}</strong>.</p>
+        
+        <div style="background: #F9FAFB; padding: 15px; border-radius: 6px; margin-bottom: 20px;">
+            <p style="margin: 5px 0;"><strong>Quote Number:</strong> ${escapeHtml(quote.strataPlanNumber)}</p>
+            <p style="margin: 5px 0;"><strong>Building:</strong> ${escapeHtml(quote.buildingName)}</p>
+            <p style="margin: 5px 0;"><strong>Total:</strong> $${grandTotal.toFixed(2)}</p>
+        </div>
+
+        <p style="color: #71717A; font-size: 13px;">The detailed quote is attached as a PDF for your records.</p>
+        
+        <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #E4E4E7; text-align: center; color: #71717A; font-size: 12px;">
+            <p style="margin: 0;"><strong>${escapeHtml(companyName)}</strong></p>
+            <p style="margin: 3px 0;">Professional Rope Access & High-Rise Maintenance Services</p>
+        </div>
+    </div>
+</body>
+</html>`;
+
+      // Initialize Resend and send email with PDF attachment
+      const resend = new Resend(process.env.RESEND_API_KEY);
+      
+      const emailSubject = subject ? escapeHtml(String(subject)) : `Service Quote for ${escapeHtml(quote.buildingName)} - ${escapeHtml(quote.strataPlanNumber)}`;
+      const pdfFilename = `Quote_${quote.strataPlanNumber.replace(/[^a-zA-Z0-9]/g, '_')}_${new Date().toISOString().split('T')[0]}.pdf`;
+      
+      const { data, error } = await resend.emails.send({
+        from: 'OnRopePro <quotes@onropepro.com>',
+        to: recipientEmail,
+        subject: emailSubject,
+        html: emailHtmlContent,
+        attachments: [
+          {
+            filename: pdfFilename,
+            content: pdfBuffer.toString('base64'),
+          }
+        ],
+      });
+      
+      if (error) {
+        console.error("Resend email error:", error);
+        return res.status(500).json({ message: `Failed to send email: ${error.message}` });
+      }
+      
+      console.log(`Quote ${quote.strataPlanNumber} emailed to ${recipientEmail} with PDF attachment, message ID: ${data?.id}`);
+      
+      res.json({ 
+        message: "Quote sent successfully with PDF attachment",
+        emailId: data?.id 
+      });
+    } catch (error) {
+      console.error("Email quote error:", error);
       res.status(500).json({ message: "Internal server error" });
     }
   });
