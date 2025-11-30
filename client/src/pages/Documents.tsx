@@ -4222,8 +4222,8 @@ export default function Documents() {
               ? [companyOwner, ...allEmployees.filter((e: any) => e.id !== companyOwner.id)]
               : allEmployees;
             
-            // Required documents that employees must sign (includes all safe work procedures)
-            const requiredDocTypes = ['health_safety_manual', 'company_policy', 'safe_work_procedure'];
+            // Required documents that employees must sign (includes all safe work procedures AND practices)
+            const requiredDocTypes = ['health_safety_manual', 'company_policy', 'safe_work_procedure', 'safe_work_practice'];
             const requiredDocs = companyDocuments.filter((doc: any) => 
               requiredDocTypes.includes(doc.documentType)
             );
