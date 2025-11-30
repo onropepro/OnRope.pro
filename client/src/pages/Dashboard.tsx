@@ -5906,16 +5906,16 @@ export default function Dashboard() {
 
       {/* Employee Detail Dialog */}
       <Dialog open={showEmployeeDetailDialog} onOpenChange={setShowEmployeeDetailDialog}>
-        <DialogContent className="max-w-2xl max-h-[90vh] p-0">
-          <div className="overflow-y-auto">
-            {employeeToView && (
-              <>
-                <DialogHeader className="p-6 border-b sticky top-0 bg-background z-10">
-                  <DialogTitle>{t('dashboard.employeeDetails.title', 'Employee Details')}</DialogTitle>
-                  <DialogDescription>
-                    {t('dashboard.employeeDetails.subtitle', 'View complete employee information, documents, and certifications')}
-                  </DialogDescription>
-                </DialogHeader>
+        <DialogContent className="max-w-2xl max-h-[90vh] flex flex-col p-0">
+          {employeeToView && (
+            <>
+              <DialogHeader className="p-6 border-b flex-shrink-0">
+                <DialogTitle>{t('dashboard.employeeDetails.title', 'Employee Details')}</DialogTitle>
+                <DialogDescription>
+                  {t('dashboard.employeeDetails.subtitle', 'View complete employee information, documents, and certifications')}
+                </DialogDescription>
+              </DialogHeader>
+              <div className="overflow-y-auto flex-1 min-h-0">
 
                 <div className="p-6 space-y-6">
                   {/* Profile Photo & Basic Info */}
@@ -6207,9 +6207,9 @@ export default function Dashboard() {
                     </CardContent>
                   </Card>
                 </div>
-              </>
-            )}
-          </div>
+              </div>
+            </>
+          )}
         </DialogContent>
       </Dialog>
 
