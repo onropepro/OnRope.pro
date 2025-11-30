@@ -2310,6 +2310,109 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get company analytics for SuperUser
+  app.get("/api/superuser/companies/:id/analytics", requireAuth, async (req: Request, res: Response) => {
+    try {
+      if (req.session.userId !== 'superuser') {
+        return res.status(403).json({ message: "Access denied. SuperUser only." });
+      }
+
+      const companyId = req.params.id;
+      const company = await storage.getUserById(companyId);
+      
+      if (!company || company.role !== 'company') {
+        return res.status(404).json({ message: "Company not found" });
+      }
+
+      // Fetch all data for analytics
+      const [projects, employees, clients, quotes, workSessions, harnessInspections, toolboxMeetings] = await Promise.all([
+        storage.getProjectsByCompany(companyId),
+        storage.getAllEmployees(companyId),
+        storage.getClientsByCompany(companyId),
+        storage.getQuotesByCompany(companyId),
+        storage.getWorkSessionsByCompany(companyId),
+        storage.getHarnessInspectionsByCompany(companyId),
+        storage.getToolboxMeetingsByCompany(companyId),
+      ]);
+
+      // Calculate project stats
+      const activeProjects = projects.filter(p => p.status === 'active').length;
+      const completedProjects = projects.filter(p => p.status === 'completed').length;
+      const pendingProjects = projects.filter(p => p.status === 'pending').length;
+
+      // Calculate employee stats
+      const activeEmployees = employees.filter(e => !e.terminatedDate).length;
+      const terminatedEmployees = employees.filter(e => e.terminatedDate).length;
+
+      // Calculate quote stats
+      const totalQuoteValue = quotes.reduce((sum, q) => sum + parseFloat(q.totalAmount || '0'), 0);
+      const acceptedQuotes = quotes.filter(q => q.status === 'accepted');
+      const acceptedQuoteValue = acceptedQuotes.reduce((sum, q) => sum + parseFloat(q.totalAmount || '0'), 0);
+      const pendingQuotes = quotes.filter(q => q.status === 'pending' || q.status === 'sent');
+
+      // Calculate work session stats
+      const completedSessions = workSessions.filter(s => s.status === 'completed');
+      const totalBillableHours = completedSessions.reduce((sum, s) => {
+        if (s.totalHours && s.sessionType === 'billable') {
+          return sum + parseFloat(s.totalHours);
+        }
+        return sum;
+      }, 0);
+      const totalNonBillableHours = completedSessions.reduce((sum, s) => {
+        if (s.totalHours && s.sessionType !== 'billable') {
+          return sum + parseFloat(s.totalHours);
+        }
+        return sum;
+      }, 0);
+
+      // Calculate safety stats
+      const last30Days = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+      const recentInspections = harnessInspections.filter(h => new Date(h.inspectionDate) >= last30Days).length;
+      const recentMeetings = toolboxMeetings.filter(m => new Date(m.meetingDate) >= last30Days).length;
+
+      res.json({
+        analytics: {
+          projects: {
+            total: projects.length,
+            active: activeProjects,
+            completed: completedProjects,
+            pending: pendingProjects,
+          },
+          employees: {
+            total: employees.length,
+            active: activeEmployees,
+            terminated: terminatedEmployees,
+          },
+          clients: {
+            total: clients.length,
+          },
+          quotes: {
+            total: quotes.length,
+            totalValue: totalQuoteValue,
+            accepted: acceptedQuotes.length,
+            acceptedValue: acceptedQuoteValue,
+            pending: pendingQuotes.length,
+          },
+          workSessions: {
+            total: workSessions.length,
+            completed: completedSessions.length,
+            billableHours: totalBillableHours,
+            nonBillableHours: totalNonBillableHours,
+          },
+          safety: {
+            harnessInspections: harnessInspections.length,
+            toolboxMeetings: toolboxMeetings.length,
+            recentInspections,
+            recentMeetings,
+          },
+        },
+      });
+    } catch (error) {
+      console.error("Get company analytics error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
   // Get employee data for a specific company (SuperUser only)
   app.get("/api/superuser/companies/:id/employees", requireAuth, async (req: Request, res: Response) => {
     try {

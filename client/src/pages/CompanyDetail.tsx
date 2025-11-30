@@ -46,6 +46,12 @@ export default function CompanyDetail() {
     enabled: !!companyId,
   });
 
+  // Fetch company analytics
+  const { data: analyticsData, isLoading: analyticsLoading } = useQuery<{ analytics: any }>({
+    queryKey: ["/api/superuser/companies", companyId, "analytics"],
+    enabled: !!companyId,
+  });
+
   const giftAddonsMutation = useMutation({
     mutationFn: async (data: GiftAddonsForm) => {
       const response = await apiRequest('POST', `/api/superuser/companies/${companyId}/gift-addons`, data);
@@ -284,15 +290,181 @@ export default function CompanyDetail() {
           </TabsContent>
 
           <TabsContent value="analytics">
-            <Card>
-              <CardContent className="p-12 text-center">
-                <span className="material-icons text-6xl text-muted-foreground mb-4">analytics</span>
-                <h3 className="text-xl font-semibold mb-2">Analytics</h3>
-                <p className="text-muted-foreground">
-                  Company analytics and metrics will be displayed here
-                </p>
-              </CardContent>
-            </Card>
+            {analyticsLoading ? (
+              <Card>
+                <CardContent className="p-12 text-center">
+                  <span className="material-icons animate-spin text-4xl text-muted-foreground">autorenew</span>
+                  <p className="text-muted-foreground mt-4">Loading analytics...</p>
+                </CardContent>
+              </Card>
+            ) : analyticsData?.analytics ? (
+              <div className="space-y-6">
+                {/* Projects Analytics */}
+                <Card>
+                  <CardContent className="p-6">
+                    <div className="flex items-center gap-2 mb-4">
+                      <span className="material-icons text-primary">folder</span>
+                      <h3 className="font-semibold">Projects</h3>
+                    </div>
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                      <div className="text-center p-4 bg-muted/50 rounded-lg">
+                        <p className="text-2xl font-bold">{analyticsData.analytics.projects.total}</p>
+                        <p className="text-xs text-muted-foreground">Total Projects</p>
+                      </div>
+                      <div className="text-center p-4 bg-green-100 dark:bg-green-900/20 rounded-lg">
+                        <p className="text-2xl font-bold text-green-600 dark:text-green-400">{analyticsData.analytics.projects.active}</p>
+                        <p className="text-xs text-muted-foreground">Active</p>
+                      </div>
+                      <div className="text-center p-4 bg-blue-100 dark:bg-blue-900/20 rounded-lg">
+                        <p className="text-2xl font-bold text-blue-600 dark:text-blue-400">{analyticsData.analytics.projects.completed}</p>
+                        <p className="text-xs text-muted-foreground">Completed</p>
+                      </div>
+                      <div className="text-center p-4 bg-yellow-100 dark:bg-yellow-900/20 rounded-lg">
+                        <p className="text-2xl font-bold text-yellow-600 dark:text-yellow-400">{analyticsData.analytics.projects.pending}</p>
+                        <p className="text-xs text-muted-foreground">Pending</p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Employees & Clients */}
+                <div className="grid md:grid-cols-2 gap-6">
+                  <Card>
+                    <CardContent className="p-6">
+                      <div className="flex items-center gap-2 mb-4">
+                        <span className="material-icons text-primary">group</span>
+                        <h3 className="font-semibold">Employees</h3>
+                      </div>
+                      <div className="grid grid-cols-3 gap-4">
+                        <div className="text-center p-4 bg-muted/50 rounded-lg">
+                          <p className="text-2xl font-bold">{analyticsData.analytics.employees.total}</p>
+                          <p className="text-xs text-muted-foreground">Total</p>
+                        </div>
+                        <div className="text-center p-4 bg-green-100 dark:bg-green-900/20 rounded-lg">
+                          <p className="text-2xl font-bold text-green-600 dark:text-green-400">{analyticsData.analytics.employees.active}</p>
+                          <p className="text-xs text-muted-foreground">Active</p>
+                        </div>
+                        <div className="text-center p-4 bg-red-100 dark:bg-red-900/20 rounded-lg">
+                          <p className="text-2xl font-bold text-red-600 dark:text-red-400">{analyticsData.analytics.employees.terminated}</p>
+                          <p className="text-xs text-muted-foreground">Terminated</p>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  <Card>
+                    <CardContent className="p-6">
+                      <div className="flex items-center gap-2 mb-4">
+                        <span className="material-icons text-primary">business</span>
+                        <h3 className="font-semibold">Clients</h3>
+                      </div>
+                      <div className="text-center p-6 bg-muted/50 rounded-lg">
+                        <p className="text-4xl font-bold">{analyticsData.analytics.clients.total}</p>
+                        <p className="text-sm text-muted-foreground">Total Clients</p>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+
+                {/* Quotes Analytics */}
+                <Card>
+                  <CardContent className="p-6">
+                    <div className="flex items-center gap-2 mb-4">
+                      <span className="material-icons text-primary">request_quote</span>
+                      <h3 className="font-semibold">Quotes</h3>
+                    </div>
+                    <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+                      <div className="text-center p-4 bg-muted/50 rounded-lg">
+                        <p className="text-2xl font-bold">{analyticsData.analytics.quotes.total}</p>
+                        <p className="text-xs text-muted-foreground">Total Quotes</p>
+                      </div>
+                      <div className="text-center p-4 bg-muted/50 rounded-lg">
+                        <p className="text-2xl font-bold">${analyticsData.analytics.quotes.totalValue.toLocaleString()}</p>
+                        <p className="text-xs text-muted-foreground">Total Value</p>
+                      </div>
+                      <div className="text-center p-4 bg-green-100 dark:bg-green-900/20 rounded-lg">
+                        <p className="text-2xl font-bold text-green-600 dark:text-green-400">{analyticsData.analytics.quotes.accepted}</p>
+                        <p className="text-xs text-muted-foreground">Accepted</p>
+                      </div>
+                      <div className="text-center p-4 bg-green-100 dark:bg-green-900/20 rounded-lg">
+                        <p className="text-2xl font-bold text-green-600 dark:text-green-400">${analyticsData.analytics.quotes.acceptedValue.toLocaleString()}</p>
+                        <p className="text-xs text-muted-foreground">Accepted Value</p>
+                      </div>
+                      <div className="text-center p-4 bg-yellow-100 dark:bg-yellow-900/20 rounded-lg">
+                        <p className="text-2xl font-bold text-yellow-600 dark:text-yellow-400">{analyticsData.analytics.quotes.pending}</p>
+                        <p className="text-xs text-muted-foreground">Pending</p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Work Sessions */}
+                <Card>
+                  <CardContent className="p-6">
+                    <div className="flex items-center gap-2 mb-4">
+                      <span className="material-icons text-primary">schedule</span>
+                      <h3 className="font-semibold">Work Sessions</h3>
+                    </div>
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                      <div className="text-center p-4 bg-muted/50 rounded-lg">
+                        <p className="text-2xl font-bold">{analyticsData.analytics.workSessions.total}</p>
+                        <p className="text-xs text-muted-foreground">Total Sessions</p>
+                      </div>
+                      <div className="text-center p-4 bg-blue-100 dark:bg-blue-900/20 rounded-lg">
+                        <p className="text-2xl font-bold text-blue-600 dark:text-blue-400">{analyticsData.analytics.workSessions.completed}</p>
+                        <p className="text-xs text-muted-foreground">Completed</p>
+                      </div>
+                      <div className="text-center p-4 bg-green-100 dark:bg-green-900/20 rounded-lg">
+                        <p className="text-2xl font-bold text-green-600 dark:text-green-400">{analyticsData.analytics.workSessions.billableHours.toFixed(1)}h</p>
+                        <p className="text-xs text-muted-foreground">Billable Hours</p>
+                      </div>
+                      <div className="text-center p-4 bg-muted/50 rounded-lg">
+                        <p className="text-2xl font-bold">{analyticsData.analytics.workSessions.nonBillableHours.toFixed(1)}h</p>
+                        <p className="text-xs text-muted-foreground">Non-Billable Hours</p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Safety Stats */}
+                <Card>
+                  <CardContent className="p-6">
+                    <div className="flex items-center gap-2 mb-4">
+                      <span className="material-icons text-primary">health_and_safety</span>
+                      <h3 className="font-semibold">Safety Compliance</h3>
+                    </div>
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                      <div className="text-center p-4 bg-muted/50 rounded-lg">
+                        <p className="text-2xl font-bold">{analyticsData.analytics.safety.harnessInspections}</p>
+                        <p className="text-xs text-muted-foreground">Harness Inspections</p>
+                      </div>
+                      <div className="text-center p-4 bg-muted/50 rounded-lg">
+                        <p className="text-2xl font-bold">{analyticsData.analytics.safety.toolboxMeetings}</p>
+                        <p className="text-xs text-muted-foreground">Toolbox Meetings</p>
+                      </div>
+                      <div className="text-center p-4 bg-blue-100 dark:bg-blue-900/20 rounded-lg">
+                        <p className="text-2xl font-bold text-blue-600 dark:text-blue-400">{analyticsData.analytics.safety.recentInspections}</p>
+                        <p className="text-xs text-muted-foreground">Inspections (30 days)</p>
+                      </div>
+                      <div className="text-center p-4 bg-blue-100 dark:bg-blue-900/20 rounded-lg">
+                        <p className="text-2xl font-bold text-blue-600 dark:text-blue-400">{analyticsData.analytics.safety.recentMeetings}</p>
+                        <p className="text-xs text-muted-foreground">Meetings (30 days)</p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+            ) : (
+              <Card>
+                <CardContent className="p-12 text-center">
+                  <span className="material-icons text-6xl text-muted-foreground mb-4">analytics</span>
+                  <h3 className="text-xl font-semibold mb-2">No Analytics Data</h3>
+                  <p className="text-muted-foreground">
+                    Unable to load analytics for this company
+                  </p>
+                </CardContent>
+              </Card>
+            )}
           </TabsContent>
 
           <TabsContent value="overall">
