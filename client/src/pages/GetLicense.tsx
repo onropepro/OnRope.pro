@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -9,20 +9,50 @@ import { TIER_CONFIG } from "@shared/stripe-config";
 export default function GetLicense() {
   const { t } = useTranslation();
   const [processingTier, setProcessingTier] = useState<string | null>(null);
+  const [currency, setCurrency] = useState<'usd' | 'cad'>('usd');
   const { toast } = useToast();
+
+  // Auto-detect Canadian users based on timezone or browser locale
+  useEffect(() => {
+    try {
+      const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+      const locale = navigator.language || (navigator as any).userLanguage || '';
+      
+      // Check for Canadian timezone or locale
+      const isCanadian = timezone.startsWith('America/Toronto') ||
+                         timezone.startsWith('America/Vancouver') ||
+                         timezone.startsWith('America/Edmonton') ||
+                         timezone.startsWith('America/Winnipeg') ||
+                         timezone.startsWith('America/Halifax') ||
+                         timezone.startsWith('America/St_Johns') ||
+                         timezone.startsWith('America/Regina') ||
+                         timezone.startsWith('America/Montreal') ||
+                         timezone.startsWith('Canada/') ||
+                         locale.toLowerCase().includes('ca') ||
+                         locale === 'en-CA' ||
+                         locale === 'fr-CA';
+      
+      if (isCanadian) {
+        setCurrency('cad');
+      }
+    } catch (e) {
+      // Default to USD if detection fails
+      console.log('Currency detection failed, defaulting to USD');
+    }
+  }, []);
 
   const handleSelectTier = async (tierName: keyof typeof TIER_CONFIG) => {
     try {
       setProcessingTier(tierName);
       
-      // Create checkout session for new customer (always USD)
+      // Create checkout session with selected currency
       const response = await fetch('/api/stripe/create-license-checkout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
         body: JSON.stringify({
           tier: tierName,
-          currency: 'usd',
+          currency: currency,
         }),
       });
 
@@ -46,6 +76,8 @@ export default function GetLicense() {
     }
   };
 
+  const currencySymbol = currency === 'cad' ? 'CAD' : 'USD';
+
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
@@ -61,14 +93,37 @@ export default function GetLicense() {
                 <p className="text-sm text-muted-foreground">{t('getLicense.header.subtitle', 'Professional High-Rise Maintenance')}</p>
               </div>
             </div>
-            <Button 
-              variant="ghost" 
-              onClick={() => window.location.href = "/"}
-              data-testid="button-back-to-login"
-            >
-              <span className="material-icons mr-2">arrow_back</span>
-              {t('getLicense.header.backToLogin', 'Back to Login')}
-            </Button>
+            <div className="flex items-center gap-4">
+              {/* Currency Toggle */}
+              <div className="flex items-center gap-2 bg-muted rounded-lg p-1">
+                <Button
+                  variant={currency === 'usd' ? 'default' : 'ghost'}
+                  size="sm"
+                  onClick={() => setCurrency('usd')}
+                  className="text-sm"
+                  data-testid="button-currency-usd"
+                >
+                  USD $
+                </Button>
+                <Button
+                  variant={currency === 'cad' ? 'default' : 'ghost'}
+                  size="sm"
+                  onClick={() => setCurrency('cad')}
+                  className="text-sm"
+                  data-testid="button-currency-cad"
+                >
+                  CAD $
+                </Button>
+              </div>
+              <Button 
+                variant="ghost" 
+                onClick={() => window.location.href = "/"}
+                data-testid="button-back-to-login"
+              >
+                <span className="material-icons mr-2">arrow_back</span>
+                {t('getLicense.header.backToLogin', 'Back to Login')}
+              </Button>
+            </div>
           </div>
         </div>
       </div>
@@ -80,13 +135,18 @@ export default function GetLicense() {
           <p className="text-xl text-muted-foreground">
             {t('getLicense.main.subtitle', 'Start your 30-day free trial today')}
           </p>
+          {currency === 'cad' && (
+            <p className="text-sm text-muted-foreground mt-2">
+              Prices shown in Canadian Dollars (CAD)
+            </p>
+          )}
         </div>
 
         {/* Pricing Grid */}
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
           {(Object.keys(TIER_CONFIG) as Array<keyof typeof TIER_CONFIG>).map((tierKey) => {
             const tier = TIER_CONFIG[tierKey];
-            const price = tier.priceUSD;
+            const price = currency === 'cad' ? tier.priceCAD : tier.priceUSD;
             const isProcessing = processingTier === tierKey;
             const isEnterprise = tierKey === 'enterprise';
             const isPremium = tierKey === 'premium';
@@ -113,7 +173,7 @@ export default function GetLicense() {
                         ${price}
                       </span>
                       <span className="text-muted-foreground ml-2">
-                        {t('getLicense.tier.perMonth', 'USD/month')}
+                        {currencySymbol}/month
                       </span>
                     </div>
                     <div className="mt-2 text-sm">
