@@ -1224,7 +1224,8 @@ export default function Inventory() {
       });
     });
 
-    if (totalWorkDays === 0) return 0;
+    // If no work days required inspections, compliance is 100% (nothing to miss)
+    if (totalWorkDays === 0) return 100;
     return Math.round((compliantWorkDays / totalWorkDays) * 100);
   };
 
@@ -1337,7 +1338,9 @@ export default function Inventory() {
     console.log('Final counts - totalWorkDays:', totalWorkDays, 'compliantWorkDays:', compliantWorkDays);
     console.log('=== END DEBUG ===');
 
-    if (totalWorkDays === 0) return 0;
+    // If no work days required inspections, compliance is 100% (nothing to miss)
+    // This ensures new accounts/employees start at 100% and only lose points for missed inspections
+    if (totalWorkDays === 0) return 100;
     return Math.round((compliantWorkDays / totalWorkDays) * 100);
   }, [inspectionFilter, inspectionDays, allSessions, harnessInspections]);
 
