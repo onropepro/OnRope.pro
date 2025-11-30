@@ -6,6 +6,7 @@ import { z } from "zod";
 import { Link } from "wouter";
 import { useTranslation } from "react-i18next";
 import { queryClient, apiRequest } from "@/lib/queryClient";
+import { BackButton } from "@/components/BackButton";
 import { hasFinancialAccess, isManagement, hasPermission } from "@/lib/permissions";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -866,16 +867,7 @@ export default function Quotes() {
       return (
         <div className="min-h-screen bg-background p-4 md:p-8">
           <div className="max-w-7xl mx-auto">
-            <Link href="/dashboard">
-              <Button
-                variant="ghost"
-                className="mb-6"
-                data-testid="button-back-to-dashboard"
-              >
-                <ArrowLeft className="w-4 h-4 mr-2" />
-                {t('quotes.backToDashboard', 'Back to Dashboard')}
-              </Button>
-            </Link>
+            <BackButton to="/dashboard" label={t('quotes.backToDashboard', 'Back to Dashboard')} />
 
             <div className="mb-6 sm:mb-8">
               <h1 className="text-2xl sm:text-4xl font-bold text-foreground mb-2">{t('quotes.pageTitle', 'Service Quotes')}</h1>
@@ -1020,16 +1012,7 @@ export default function Quotes() {
     return (
       <div className="min-h-screen bg-background p-4 md:p-8">
         <div className="max-w-7xl mx-auto">
-          <Link href="/dashboard">
-            <Button
-              variant="ghost"
-              className="mb-6"
-              data-testid="button-back-to-dashboard"
-            >
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              {t('quotes.backToDashboard', 'Back to Dashboard')}
-            </Button>
-          </Link>
+          <BackButton to="/dashboard" label={t('quotes.backToDashboard', 'Back to Dashboard')} />
 
           <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-8 gap-4">
             <div>
@@ -1170,18 +1153,13 @@ export default function Quotes() {
       <>
         <div className="min-h-screen bg-background p-4 md:p-8">
         <div className="max-w-4xl mx-auto">
-          <Button
-            variant="ghost"
+          <BackButton 
             onClick={() => {
               setSelectedQuote(null);
               setView("list");
             }}
-            className="mb-6"
-            data-testid="button-back-to-list"
-          >
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            {t('quotes.backToQuotes', 'Back to Quotes')}
-          </Button>
+            label={t('quotes.backToQuotes', 'Back to Quotes')}
+          />
 
           <Card className="rounded-2xl shadow-lg border border-border mb-8">
             <CardHeader className="p-4 md:p-8">

@@ -4,6 +4,7 @@ import { useLocation } from "wouter";
 import { useTranslation } from 'react-i18next';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { BackButton } from "@/components/BackButton";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -4024,19 +4025,10 @@ export default function Documents() {
     <div className="min-h-screen bg-background p-4 pb-24">
       <div className="max-w-6xl mx-auto">
         <div className="mb-6">
-          <div className="flex items-center gap-3 mb-2">
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => navigate("/dashboard")}
-              data-testid="button-back"
-            >
-              <ArrowLeft className="h-5 w-5" />
-            </Button>
-            <div className="flex-1 min-w-0">
-              <h1 className="text-xl sm:text-3xl font-bold truncate">{t('documents.pageTitle', 'Documents & Records')}</h1>
-              <p className="text-sm text-muted-foreground hidden sm:block mt-1">{t('documents.pageSubtitle', 'All company documents and safety records')}</p>
-            </div>
+          <BackButton to="/dashboard" label={t('dashboard.backToDashboard', 'Back to Dashboard')} />
+          <div className="mb-4">
+            <h1 className="text-xl sm:text-3xl font-bold truncate">{t('documents.pageTitle', 'Documents & Records')}</h1>
+            <p className="text-sm text-muted-foreground hidden sm:block mt-1">{t('documents.pageSubtitle', 'All company documents and safety records')}</p>
           </div>
         </div>
 

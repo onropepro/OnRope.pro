@@ -3,6 +3,7 @@ import { useQuery, useMutation } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { useLocation } from "wouter";
+import { BackButton } from "@/components/BackButton";
 import FullCalendar from "@fullcalendar/react";
 import { toLocalDateString, parseLocalDate, nextDateOnly, addDaysToDateString, extractLocalDateFromISO } from "@/lib/dateUtils";
 import dayGridPlugin from "@fullcalendar/daygrid";
@@ -83,15 +84,7 @@ export default function Schedule() {
   if (currentUser && !hasSchedulePermission) {
     return (
       <div className="p-4 md:p-6 space-y-6">
-        <Button
-          variant="ghost"
-          onClick={() => setLocation("/dashboard")}
-          data-testid="button-back"
-          className="mb-2"
-        >
-          <ArrowLeft className="w-4 h-4 mr-2" />
-          {t('schedule.backToDashboard', 'Back to Dashboard')}
-        </Button>
+        <BackButton to="/dashboard" label={t('schedule.backToDashboard', 'Back to Dashboard')} />
 
         <Card className="border-2 border-destructive/50">
           <CardContent className="pt-6">
@@ -786,15 +779,7 @@ export default function Schedule() {
     >
     <div className="p-4 md:p-6 space-y-6">
       {/* Back Button */}
-      <Button
-        variant="ghost"
-        onClick={() => setLocation("/dashboard")}
-        data-testid="button-back"
-        className="mb-2"
-      >
-        <ArrowLeft className="w-4 h-4 mr-2" />
-        {t('schedule.backToDashboard', 'Back to Dashboard')}
-      </Button>
+      <BackButton to="/dashboard" label={t('schedule.backToDashboard', 'Back to Dashboard')} />
 
       {/* Header */}
       <div className="flex items-center gap-3">

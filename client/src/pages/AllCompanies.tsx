@@ -1,10 +1,13 @@
 import { useQuery } from "@tanstack/react-query";
 import { useLocation, Link } from "wouter";
+import { useTranslation } from "react-i18next";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { BackButton } from "@/components/BackButton";
 
 export default function AllCompanies() {
+  const { t } = useTranslation();
   const [, setLocation] = useLocation();
 
   const { data: userData } = useQuery<{ user: any }>({
@@ -34,12 +37,7 @@ export default function AllCompanies() {
               View and manage all companies registered on the platform
             </p>
           </div>
-          <Link href="/superuser">
-            <Button variant="outline" data-testid="button-back-to-dashboard">
-              <span className="material-icons mr-2">arrow_back</span>
-              Back to Dashboard
-            </Button>
-          </Link>
+          <BackButton to="/superuser" label={t('common.back', 'Back')} />
         </div>
 
         {/* Companies List */}
