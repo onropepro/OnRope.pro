@@ -732,6 +732,12 @@ export class Storage {
       .orderBy(desc(workSessions.workDate));
   }
 
+  async getWorkSessionsByCompany(companyId: string): Promise<WorkSession[]> {
+    return db.select().from(workSessions)
+      .where(eq(workSessions.companyId, companyId))
+      .orderBy(desc(workSessions.workDate), desc(workSessions.startTime));
+  }
+
   // Non-billable work session operations
   async createNonBillableWorkSession(session: any): Promise<any> {
     const result = await db.insert(nonBillableWorkSessions).values(session).returning();
