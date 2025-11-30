@@ -2765,6 +2765,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         requestId,
         senderId: 'superuser',
         senderRole: 'superuser',
+        senderName: 'OnRopePro Team',
         message: message.trim(),
       });
 
