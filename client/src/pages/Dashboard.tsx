@@ -4553,7 +4553,7 @@ export default function Dashboard() {
                     {t('dashboard.clientDatabase.addNewClient', 'Add New Client')}
                   </Button>
                 </DialogTrigger>
-                <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto">
+                <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto" data-testid="dialog-add-client">
                   <DialogHeader className="pb-4">
                     <DialogTitle>{t('dashboard.clientDatabase.addNewClient', 'Add New Client')}</DialogTitle>
                     <DialogDescription>{t('dashboard.clientDatabase.clientDescription', 'Enter property manager or building owner details')}</DialogDescription>
@@ -4838,12 +4838,23 @@ export default function Dashboard() {
                           type="button"
                           variant="outline"
                           size="sm"
-                          onClick={() => setLmsNumbers([...lmsNumbers, { number: "", address: "" }])}
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            const newEntry = { number: "", buildingName: "", address: "", stories: undefined, units: undefined, parkingStalls: undefined, dailyDropTarget: undefined, totalDropsNorth: undefined, totalDropsEast: undefined, totalDropsSouth: undefined, totalDropsWest: undefined };
+                            setLmsNumbers(prev => [...prev, newEntry]);
+                            setTimeout(() => {
+                              const dialog = document.querySelector('[data-testid="dialog-add-client"]');
+                              if (dialog) {
+                                dialog.scrollTop = dialog.scrollHeight;
+                              }
+                            }, 100);
+                          }}
                           className="w-full"
                           data-testid="button-add-lms"
                         >
                           <span className="material-icons text-sm mr-1">add</span>
-                          {t('dashboard.clientForm.addAnotherStrata', 'Add Another Strata Number')}
+                          {t('dashboard.clientForm.addAnotherStrata', 'Add Another Strata Number')} ({lmsNumbers.length})
                         </Button>
                       </div>
 
@@ -5011,7 +5022,7 @@ export default function Dashboard() {
 
       {/* Edit Client Dialog */}
       <Dialog open={showEditClientDialog} onOpenChange={setShowEditClientDialog}>
-        <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto">
+        <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto" data-testid="dialog-edit-client">
           <DialogHeader className="pb-4">
             <DialogTitle>{t('dashboard.clientForm.editClient', 'Edit Client')}</DialogTitle>
             <DialogDescription>{t('dashboard.clientForm.editClientDescription', 'Update property manager or building owner details')}</DialogDescription>
@@ -5296,12 +5307,23 @@ export default function Dashboard() {
                   type="button"
                   variant="outline"
                   size="sm"
-                  onClick={() => setEditLmsNumbers([...editLmsNumbers, { number: "", address: "" }])}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    const newEntry = { number: "", buildingName: "", address: "", stories: undefined, units: undefined, parkingStalls: undefined, dailyDropTarget: undefined, totalDropsNorth: undefined, totalDropsEast: undefined, totalDropsSouth: undefined, totalDropsWest: undefined };
+                    setEditLmsNumbers(prev => [...prev, newEntry]);
+                    setTimeout(() => {
+                      const dialog = document.querySelector('[data-testid="dialog-edit-client"]');
+                      if (dialog) {
+                        dialog.scrollTop = dialog.scrollHeight;
+                      }
+                    }, 100);
+                  }}
                   className="w-full"
                   data-testid="button-edit-add-lms"
                 >
                   <span className="material-icons text-sm mr-1">add</span>
-                  {t('dashboard.clientForm.addAnotherStrata', 'Add Another Strata Number')}
+                  {t('dashboard.clientForm.addAnotherStrata', 'Add Another Strata Number')} ({editLmsNumbers.length})
                 </Button>
               </div>
 
