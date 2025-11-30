@@ -133,13 +133,13 @@ const SERVICE_TYPES = [
 
 // Pipeline stages configuration for Kanban board
 const PIPELINE_STAGES = [
-  { id: "draft", color: "bg-muted-foreground" },
-  { id: "submitted", color: "bg-blue-500" },
-  { id: "review", color: "bg-yellow-500" },
-  { id: "negotiation", color: "bg-orange-500" },
-  { id: "approved", color: "bg-purple-500" },
-  { id: "won", color: "bg-green-500" },
-  { id: "lost", color: "bg-red-500" },
+  { id: "draft", color: "bg-slate-400 dark:bg-slate-500", borderColor: "border-slate-300 dark:border-slate-600", bgColor: "bg-slate-50/50 dark:bg-slate-900/30" },
+  { id: "submitted", color: "bg-blue-500", borderColor: "border-blue-200 dark:border-blue-800", bgColor: "bg-blue-50/50 dark:bg-blue-950/30" },
+  { id: "review", color: "bg-amber-500", borderColor: "border-amber-200 dark:border-amber-800", bgColor: "bg-amber-50/50 dark:bg-amber-950/30" },
+  { id: "negotiation", color: "bg-orange-500", borderColor: "border-orange-200 dark:border-orange-800", bgColor: "bg-orange-50/50 dark:bg-orange-950/30" },
+  { id: "approved", color: "bg-primary", borderColor: "border-primary/30", bgColor: "bg-primary/5" },
+  { id: "won", color: "bg-emerald-500", borderColor: "border-emerald-200 dark:border-emerald-800", bgColor: "bg-emerald-50/50 dark:bg-emerald-950/30" },
+  { id: "lost", color: "bg-rose-500", borderColor: "border-rose-200 dark:border-rose-800", bgColor: "bg-rose-50/50 dark:bg-rose-950/30" },
 ];
 
 // Draggable Quote Card component for Kanban
@@ -162,34 +162,38 @@ function DraggableQuoteCard({ quote, onClick }: { quote: QuoteWithServices; onCl
     <div
       ref={setNodeRef}
       style={style}
-      className={`bg-card border rounded-lg p-3 cursor-grab active:cursor-grabbing shadow-sm hover:shadow-md transition-shadow ${isDragging ? 'shadow-lg ring-2 ring-primary' : ''}`}
+      className={`bg-card border border-border/60 rounded-md p-3 cursor-grab active:cursor-grabbing shadow-sm hover:shadow-md hover:border-primary/40 transition-all duration-200 ${isDragging ? 'shadow-lg ring-2 ring-primary border-primary' : ''}`}
       {...attributes}
       {...listeners}
       data-testid={`draggable-quote-${quote.id}`}
     >
       <div className="flex items-start gap-2 mb-2">
-        <GripVertical className="w-4 h-4 text-muted-foreground shrink-0 mt-0.5" />
+        <GripVertical className="w-4 h-4 text-muted-foreground/50 shrink-0 mt-0.5" />
         <div className="flex-1 min-w-0">
-          <h4 className="font-medium text-sm truncate">{quote.buildingName}</h4>
+          <h4 className="font-semibold text-sm truncate text-foreground">{quote.buildingName}</h4>
           <p className="text-xs text-muted-foreground truncate">{quote.strataPlanNumber}</p>
         </div>
       </div>
-      <div className="space-y-1 text-xs text-muted-foreground">
+      <div className="space-y-1.5 text-xs text-muted-foreground pl-6">
         <p className="truncate">{quote.buildingAddress}</p>
-        <div className="flex items-center justify-between">
-          <span>{quote.services.length} {t('quotes.pipeline.services', 'services')}</span>
+        <div className="flex items-center justify-between gap-2">
+          <Badge variant="secondary" className="text-[10px] px-1.5 py-0">
+            {quote.services.length} {t('quotes.pipeline.services', 'services')}
+          </Badge>
           {totalAmount > 0 && (
-            <span className="font-medium text-foreground">${totalAmount.toLocaleString()}</span>
+            <span className="font-semibold text-sm text-primary">${totalAmount.toLocaleString()}</span>
           )}
         </div>
       </div>
-      <button
-        onClick={(e) => { e.stopPropagation(); onClick(); }}
-        className="mt-2 text-xs text-primary hover:underline"
-        data-testid={`button-view-quote-${quote.id}`}
-      >
-        {t('quotes.pipeline.viewDetails', 'View Details')}
-      </button>
+      <div className="mt-3 pt-2 border-t border-border/40 pl-6">
+        <button
+          onClick={(e) => { e.stopPropagation(); onClick(); }}
+          className="text-xs font-medium text-primary hover:text-primary/80 transition-colors"
+          data-testid={`button-view-quote-${quote.id}`}
+        >
+          {t('quotes.pipeline.viewDetails', 'View Details')}
+        </button>
+      </div>
     </div>
   );
 }
@@ -199,12 +203,16 @@ function StageColumn({
   stageId, 
   quotes, 
   onQuoteClick,
-  color 
+  color,
+  borderColor,
+  bgColor
 }: { 
   stageId: string; 
   quotes: QuoteWithServices[]; 
   onQuoteClick: (quote: QuoteWithServices) => void;
   color: string;
+  borderColor: string;
+  bgColor: string;
 }) {
   const { t } = useTranslation();
   const { isOver, setNodeRef } = useDroppable({
@@ -221,23 +229,23 @@ function StageColumn({
   return (
     <div
       ref={setNodeRef}
-      className={`flex flex-col min-w-[280px] max-w-[320px] bg-muted/30 rounded-lg p-2 ${isOver ? 'ring-2 ring-primary bg-primary/5' : ''}`}
+      className={`flex flex-col min-w-[280px] max-w-[320px] rounded-lg border-2 ${borderColor} ${bgColor} transition-all duration-200 ${isOver ? 'ring-2 ring-primary border-primary shadow-lg scale-[1.01]' : ''}`}
       data-testid={`stage-column-${stageId}`}
     >
-      <div className="flex items-center justify-between mb-3 px-1">
+      <div className={`flex items-center justify-between px-3 py-2.5 border-b ${borderColor}`}>
         <div className="flex items-center gap-2">
-          <div className={`w-3 h-3 rounded-full ${color}`} />
-          <h3 className="font-semibold text-sm">{stageName}</h3>
-          <Badge variant="secondary" className="text-xs">{quotes.length}</Badge>
+          <div className={`w-2.5 h-2.5 rounded-full ${color} shadow-sm`} />
+          <h3 className="font-semibold text-sm text-foreground">{stageName}</h3>
+          <Badge variant="outline" className="text-xs font-medium border-border/60">{quotes.length}</Badge>
         </div>
         {totalValue > 0 && (
-          <span className="text-xs text-muted-foreground">${totalValue.toLocaleString()}</span>
+          <span className="text-xs font-medium text-muted-foreground">${totalValue.toLocaleString()}</span>
         )}
       </div>
-      <div className="flex-1 space-y-2 min-h-[200px] overflow-y-auto max-h-[calc(100vh-300px)]">
+      <div className="flex-1 space-y-2 min-h-[200px] overflow-y-auto max-h-[calc(100vh-300px)] p-2">
         {quotes.length === 0 ? (
-          <div className="flex items-center justify-center h-24 border-2 border-dashed border-muted-foreground/20 rounded-lg">
-            <p className="text-xs text-muted-foreground">{t('quotes.pipeline.dragHere', 'Drag quotes here')}</p>
+          <div className={`flex items-center justify-center h-28 border-2 border-dashed ${borderColor} rounded-md bg-background/50`}>
+            <p className="text-xs text-muted-foreground/70">{t('quotes.pipeline.dragHere', 'Drag quotes here')}</p>
           </div>
         ) : (
           quotes.map((quote) => (
@@ -1457,6 +1465,8 @@ export default function Quotes() {
                           setView("detail");
                         }}
                         color={stage.color}
+                        borderColor={stage.borderColor}
+                        bgColor={stage.bgColor}
                       />
                     ))}
                   </div>
