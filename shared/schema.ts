@@ -1058,6 +1058,9 @@ export const quotes = pgTable("quotes", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   companyId: varchar("company_id").notNull().references(() => users.id, { onDelete: "cascade" }),
   
+  // Unique quote number for display (e.g., "Q-0001")
+  quoteNumber: varchar("quote_number"),
+  
   // Building information
   buildingName: varchar("building_name").notNull(),
   strataPlanNumber: varchar("strata_plan_number").notNull(),

@@ -1105,9 +1105,16 @@ export default function Quotes() {
                         <CardHeader className="p-6">
                           <div className="flex items-start justify-between mb-4">
                             <div className="flex-1">
-                              <CardTitle className="text-xl font-semibold text-foreground mb-1">
-                                {quote.buildingName}
-                              </CardTitle>
+                              <div className="flex items-center gap-2 mb-1">
+                                <CardTitle className="text-xl font-semibold text-foreground">
+                                  {quote.buildingName}
+                                </CardTitle>
+                                {quote.quoteNumber && (
+                                  <Badge variant="outline" className="text-xs font-medium">
+                                    {quote.quoteNumber}
+                                  </Badge>
+                                )}
+                              </div>
                               <CardDescription className="text-muted-foreground">
                                 {quote.strataPlanNumber}
                               </CardDescription>
@@ -1278,9 +1285,16 @@ export default function Quotes() {
                       <CardHeader className="p-6">
                         <div className="flex items-start justify-between mb-4">
                           <div className="flex-1">
-                            <CardTitle className="text-xl font-semibold text-foreground mb-1">
-                              {quote.buildingName}
-                            </CardTitle>
+                            <div className="flex items-center gap-2 mb-1">
+                              <CardTitle className="text-xl font-semibold text-foreground">
+                                {quote.buildingName}
+                              </CardTitle>
+                              {quote.quoteNumber && (
+                                <Badge variant="outline" className="text-xs font-medium">
+                                  {quote.quoteNumber}
+                                </Badge>
+                              )}
+                            </div>
                             <CardDescription className="text-muted-foreground">
                               {quote.strataPlanNumber}
                             </CardDescription>
@@ -1552,9 +1566,16 @@ export default function Quotes() {
             <CardHeader className="p-4 md:p-8">
               <div className="flex items-start justify-between mb-4">
                 <div>
-                  <CardTitle className="text-3xl font-bold text-foreground mb-2">
-                    {selectedQuote.buildingName}
-                  </CardTitle>
+                  <div className="flex items-center gap-3 mb-2">
+                    <CardTitle className="text-3xl font-bold text-foreground">
+                      {selectedQuote.buildingName}
+                    </CardTitle>
+                    {selectedQuote.quoteNumber && (
+                      <Badge variant="outline" className="text-base font-semibold">
+                        {selectedQuote.quoteNumber}
+                      </Badge>
+                    )}
+                  </div>
                   <CardDescription className="text-lg text-muted-foreground">
                     {selectedQuote.strataPlanNumber}
                   </CardDescription>
@@ -1590,7 +1611,7 @@ export default function Quotes() {
                     </Button>
                     <Button
                       onClick={() => {
-                        setEmailSubject(`${t('quotes.email.defaultSubject', 'Service Quote for')} ${selectedQuote.buildingName} - ${selectedQuote.strataPlanNumber}`);
+                        setEmailSubject(`${t('quotes.email.defaultSubject', 'Service Quote for')} ${selectedQuote.buildingName} - ${selectedQuote.quoteNumber || selectedQuote.strataPlanNumber}`);
                         setIsEmailDialogOpen(true);
                       }}
                       variant="outline"

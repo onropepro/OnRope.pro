@@ -9761,11 +9761,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const isWorker = ["rope_access_tech", "manager", "ground_crew", "ground_crew_supervisor"].includes(currentUser.role);
       const initialStatus = isWorker ? "draft" : "open";
       
+      // Generate unique quote number for the company
+      const existingQuotes = await storage.getQuotesByCompany(companyId);
+      const nextNumber = existingQuotes.length + 1;
+      const quoteNumber = `Q-${String(nextNumber).padStart(4, '0')}`;
+      
       const quoteData = insertQuoteSchema.parse({
         ...quoteFields,
         companyId,
         createdBy: currentUser.id,
         status: initialStatus,
+        quoteNumber,
       });
       
       // Create the quote
@@ -10335,7 +10341,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
             </div>
             <div class="quote-title">
                 <h1>QUOTE</h1>
-                <div class="quote-number">#${escapeHtml(quote.strataPlanNumber)}</div>
+                <div class="quote-number">${escapeHtml(quote.quoteNumber || quote.strataPlanNumber)}</div>
                 <div class="quote-date">Date: ${new Date(quote.createdAt || Date.now()).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</div>
             </div>
         </div>
@@ -11108,7 +11114,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         <p style="margin-bottom: 15px;">Please find attached the service quote for <strong>${escapeHtml(quote.buildingName)}</strong>.</p>
         
         <div style="background: #F9FAFB; padding: 15px; border-radius: 6px; margin-bottom: 20px;">
-            <p style="margin: 5px 0;"><strong>Quote Number:</strong> ${escapeHtml(quote.strataPlanNumber)}</p>
+            <p style="margin: 5px 0;"><strong>Quote Number:</strong> ${escapeHtml(quote.quoteNumber || quote.strataPlanNumber)}</p>
             <p style="margin: 5px 0;"><strong>Building:</strong> ${escapeHtml(quote.buildingName)}</p>
             <p style="margin: 5px 0;"><strong>Total:</strong> $${grandTotal.toFixed(2)}</p>
         </div>
@@ -11126,8 +11132,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Initialize Resend and send email with PDF attachment
       const resend = new Resend(process.env.RESEND_API_KEY);
       
-      const emailSubject = subject ? escapeHtml(String(subject)) : `Service Quote for ${escapeHtml(quote.buildingName)} - ${escapeHtml(quote.strataPlanNumber)}`;
-      const pdfFilename = `Quote_${quote.strataPlanNumber.replace(/[^a-zA-Z0-9]/g, '_')}_${new Date().toISOString().split('T')[0]}.pdf`;
+      const emailSubject = subject ? escapeHtml(String(subject)) : `Service Quote for ${escapeHtml(quote.buildingName)} - ${escapeHtml(quote.quoteNumber || quote.strataPlanNumber)}`;
+      const quoteIdentifier = quote.quoteNumber || quote.strataPlanNumber;
+      const pdfFilename = `Quote_${quoteIdentifier.replace(/[^a-zA-Z0-9]/g, '_')}_${new Date().toISOString().split('T')[0]}.pdf`;
       
       const { data, error } = await resend.emails.send({
         from: 'OnRopePro <quotes@onropepro.com>',
