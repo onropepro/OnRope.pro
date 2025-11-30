@@ -182,8 +182,15 @@ const PERMISSION_CATEGORIES = [
 
 // Helper function to get translated job type label
 const getJobTypeLabel = (t: (key: string) => string, jobType: string): string => {
-  const jobTypeKey = `dashboard.jobTypes.${jobType}`;
-  return t(jobTypeKey);
+  // Normalize job type: convert spaces to underscores and lowercase for translation key lookup
+  const normalizedJobType = jobType.toLowerCase().replace(/\s+/g, '_');
+  const jobTypeKey = `dashboard.jobTypes.${normalizedJobType}`;
+  const translated = t(jobTypeKey);
+  // If translation returns the key itself (not found), fall back to formatted job type
+  if (translated === jobTypeKey) {
+    return jobType.replace(/_/g, ' ');
+  }
+  return translated;
 };
 
 // Flat list of all permissions for compatibility
@@ -3041,7 +3048,7 @@ export default function Dashboard() {
                                 <div className="text-sm font-medium text-muted-foreground mb-1">{project.strataPlanNumber}</div>
                                 <div className="text-sm text-muted-foreground capitalize flex items-center gap-2">
                                   <span className="material-icons text-base text-primary">business</span>
-                                  {project.jobType.replace(/_/g, ' ')}
+                                  {getJobTypeLabel(t, project.jobType)}
                                 </div>
                                 {project.createdAt && (
                                   <div className="text-xs text-muted-foreground mt-1 flex items-center gap-1">
@@ -3160,7 +3167,7 @@ export default function Dashboard() {
                             <div className="text-sm font-medium text-muted-foreground mb-1">{project.strataPlanNumber}</div>
                             <div className="text-sm text-muted-foreground capitalize flex items-center gap-2">
                               <span className="material-icons text-base text-success">check_circle</span>
-                              {project.jobType.replace(/_/g, ' ')}
+                              {getJobTypeLabel(t, project.jobType)}
                             </div>
                             {project.createdAt && (
                               <div className="text-xs text-muted-foreground mt-1 flex items-center gap-1">
