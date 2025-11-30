@@ -2575,6 +2575,107 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // ==================== SuperUser Platform Metrics Endpoints ====================
+
+  // SuperUser: Get MRR metrics summary
+  app.get("/api/superuser/metrics/mrr", requireAuth, async (req: Request, res: Response) => {
+    try {
+      if (req.session.userId !== 'superuser') {
+        return res.status(403).json({ message: "Access denied. SuperUser only." });
+      }
+
+      const mrrMetrics = await storage.calculateLiveMrrMetrics();
+      
+      // Calculate ARR
+      const arr = mrrMetrics.totalMrr * 12;
+      
+      res.json({
+        mrr: mrrMetrics.totalMrr,
+        arr,
+        byTier: mrrMetrics.byTier,
+        byAddon: mrrMetrics.byAddon,
+        customerCounts: mrrMetrics.customerCounts,
+      });
+    } catch (error) {
+      console.error('[SuperUser] Get MRR metrics error:', error);
+      res.status(500).json({ message: "Failed to fetch MRR metrics" });
+    }
+  });
+
+  // SuperUser: Get customer summary metrics
+  app.get("/api/superuser/metrics/customers", requireAuth, async (req: Request, res: Response) => {
+    try {
+      if (req.session.userId !== 'superuser') {
+        return res.status(403).json({ message: "Access denied. SuperUser only." });
+      }
+
+      const customerMetrics = await storage.getCustomerSummaryMetrics();
+      res.json(customerMetrics);
+    } catch (error) {
+      console.error('[SuperUser] Get customer metrics error:', error);
+      res.status(500).json({ message: "Failed to fetch customer metrics" });
+    }
+  });
+
+  // SuperUser: Get product usage metrics
+  app.get("/api/superuser/metrics/usage", requireAuth, async (req: Request, res: Response) => {
+    try {
+      if (req.session.userId !== 'superuser') {
+        return res.status(403).json({ message: "Access denied. SuperUser only." });
+      }
+
+      const usageMetrics = await storage.getProductUsageMetrics();
+      res.json(usageMetrics);
+    } catch (error) {
+      console.error('[SuperUser] Get usage metrics error:', error);
+      res.status(500).json({ message: "Failed to fetch usage metrics" });
+    }
+  });
+
+  // SuperUser: Get subscription breakdown by company
+  app.get("/api/superuser/metrics/subscriptions", requireAuth, async (req: Request, res: Response) => {
+    try {
+      if (req.session.userId !== 'superuser') {
+        return res.status(403).json({ message: "Access denied. SuperUser only." });
+      }
+
+      const subscriptionBreakdown = await storage.getSubscriptionBreakdown();
+      res.json({ subscriptions: subscriptionBreakdown });
+    } catch (error) {
+      console.error('[SuperUser] Get subscription breakdown error:', error);
+      res.status(500).json({ message: "Failed to fetch subscription breakdown" });
+    }
+  });
+
+  // SuperUser: Get combined dashboard metrics summary
+  app.get("/api/superuser/metrics/summary", requireAuth, async (req: Request, res: Response) => {
+    try {
+      if (req.session.userId !== 'superuser') {
+        return res.status(403).json({ message: "Access denied. SuperUser only." });
+      }
+
+      // Fetch all metrics in parallel
+      const [mrrMetrics, customerMetrics, usageMetrics] = await Promise.all([
+        storage.calculateLiveMrrMetrics(),
+        storage.getCustomerSummaryMetrics(),
+        storage.getProductUsageMetrics(),
+      ]);
+
+      res.json({
+        mrr: mrrMetrics.totalMrr,
+        arr: mrrMetrics.totalMrr * 12,
+        byTier: mrrMetrics.byTier,
+        byAddon: mrrMetrics.byAddon,
+        customerCounts: mrrMetrics.customerCounts,
+        customers: customerMetrics,
+        usage: usageMetrics,
+      });
+    } catch (error) {
+      console.error('[SuperUser] Get metrics summary error:', error);
+      res.status(500).json({ message: "Failed to fetch metrics summary" });
+    }
+  });
+
   // SuperUser: Get all feature requests with messages
   app.get("/api/superuser/feature-requests", requireAuth, async (req: Request, res: Response) => {
     try {

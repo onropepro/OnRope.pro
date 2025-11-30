@@ -2731,6 +2731,305 @@ export class Storage {
       return messages.length;
     }
   }
+
+  // ==================== SuperUser Platform Metrics ====================
+
+  /**
+   * Calculate live MRR metrics from current subscription data
+   * Uses existing user subscription fields without new tables for real-time calculation
+   * License key format: COMPANY-XXXXX-XXXXX-XXXXX-N or GIFT-XXXXX-XXXXX-XXXXX-N
+   * Where N is tier: 1=Basic, 2=Starter, 3=Premium, 4=Enterprise
+   */
+  async calculateLiveMrrMetrics(): Promise<{
+    totalMrr: number;
+    byTier: { basic: number; starter: number; premium: number; enterprise: number };
+    byAddon: { extraSeats: number; extraProjects: number; whiteLabel: number };
+    customerCounts: { total: number; basic: number; starter: number; premium: number; enterprise: number };
+  }> {
+    // Get all company users with active subscriptions (have license key)
+    const companies = await db.select().from(users).where(
+      and(
+        eq(users.role, "company"),
+        isNotNull(users.licenseKey)
+      )
+    );
+
+    // Tier pricing (monthly) - map tier number to tier name and price
+    const tierMap: Record<string, { name: string; price: number }> = {
+      '1': { name: 'basic', price: 79 },
+      '2': { name: 'starter', price: 299 },
+      '3': { name: 'premium', price: 499 },
+      '4': { name: 'enterprise', price: 899 },
+    };
+
+    // Add-on pricing (monthly)
+    const addonPricing = {
+      extraSeats: 19,  // Per 2 seats package (additionalSeatsCount is number of packs)
+      extraProjects: 49,  // Per project (additionalProjectsCount is number of projects)
+      whiteLabel: 49,  // Flat rate
+    };
+
+    const byTier = { basic: 0, starter: 0, premium: 0, enterprise: 0 };
+    const byAddon = { extraSeats: 0, extraProjects: 0, whiteLabel: 0 };
+    const customerCounts = { total: 0, basic: 0, starter: 0, premium: 0, enterprise: 0 };
+
+    for (const company of companies) {
+      // Extract tier from license key - format: COMPANY-XXXXX-XXXXX-XXXXX-N or GIFT-XXXXX-XXXXX-XXXXX-N
+      // Split on '-' and get the last segment which is the tier number (1-4)
+      if (company.licenseKey) {
+        const segments = company.licenseKey.split('-');
+        const lastSegment = segments[segments.length - 1];
+        // Normalize: take only the first character in case there are extra digits
+        const tierNumber = lastSegment?.charAt(0) || '1';
+        const tierInfo = tierMap[tierNumber];
+        
+        if (tierInfo) {
+          const tier = tierInfo.name as keyof typeof byTier;
+          byTier[tier] += tierInfo.price;
+          customerCounts[tier]++;
+          customerCounts.total++;
+        } else {
+          // Default to basic if tier not recognized
+          byTier.basic += tierMap['1'].price;
+          customerCounts.basic++;
+          customerCounts.total++;
+        }
+      }
+
+      // Calculate add-on MRR using actual stored add-on counts
+      // additionalSeatsCount = number of seat packs purchased (each pack = 2 seats, $19/mo)
+      if (company.additionalSeatsCount && company.additionalSeatsCount > 0) {
+        byAddon.extraSeats += company.additionalSeatsCount * addonPricing.extraSeats;
+      }
+
+      // additionalProjectsCount = number of extra projects purchased ($49/mo each)
+      if (company.additionalProjectsCount && company.additionalProjectsCount > 0) {
+        byAddon.extraProjects += company.additionalProjectsCount * addonPricing.extraProjects;
+      }
+
+      // whitelabelBrandingActive = white label branding subscription ($49/mo)
+      if (company.whitelabelBrandingActive) {
+        byAddon.whiteLabel += addonPricing.whiteLabel;
+      }
+    }
+
+    const totalMrr = Object.values(byTier).reduce((a, b) => a + b, 0) +
+                     Object.values(byAddon).reduce((a, b) => a + b, 0);
+
+    return { totalMrr, byTier, byAddon, customerCounts };
+  }
+
+  /**
+   * Get customer summary metrics including geographic distribution
+   */
+  async getCustomerSummaryMetrics(): Promise<{
+    totalCustomers: number;
+    activeCustomers: number;
+    trialCustomers: number;
+    churned: number;
+    byRegion: Record<string, number>;
+    recentSignups: { count: number; period: string };
+  }> {
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+
+    // Get all companies
+    const companies = await db.select().from(users).where(eq(users.role, "company"));
+
+    // Count by status
+    const activeCustomers = companies.filter(c => c.stripeCustomerId && c.licenseKey).length;
+    const trialCustomers = companies.filter(c => !c.stripeCustomerId || !c.licenseKey).length;
+
+    // Geographic distribution - using country field if available, or parsing address
+    const byRegion: Record<string, number> = {};
+    for (const company of companies) {
+      // Try to extract region from company data
+      let region = 'Unknown';
+      
+      // If we have country data, use it
+      if (company.country) {
+        region = company.country;
+      } else if (company.companyAddress) {
+        // Try to parse country from address (common patterns)
+        const addr = company.companyAddress.toLowerCase();
+        if (addr.includes('canada') || addr.includes(', ca')) region = 'Canada';
+        else if (addr.includes('usa') || addr.includes('united states') || addr.match(/, [a-z]{2} \d{5}/)) region = 'United States';
+        else region = 'Other';
+      }
+      
+      byRegion[region] = (byRegion[region] || 0) + 1;
+    }
+
+    // Recent signups
+    const recentSignups = companies.filter(c => c.createdAt && new Date(c.createdAt) > thirtyDaysAgo).length;
+
+    return {
+      totalCustomers: companies.length,
+      activeCustomers,
+      trialCustomers,
+      churned: 0,  // Would need churn events table data
+      byRegion,
+      recentSignups: { count: recentSignups, period: 'last 30 days' },
+    };
+  }
+
+  /**
+   * Get product usage metrics across the platform
+   */
+  async getProductUsageMetrics(): Promise<{
+    totalProjects: number;
+    activeProjects: number;
+    totalWorkSessions: number;
+    totalEmployees: number;
+    safetyFormsCount: { harness: number; toolbox: number; flha: number; incident: number };
+    quotesCount: { total: number; sent: number; accepted: number };
+    avgProjectsPerCompany: number;
+    avgEmployeesPerCompany: number;
+  }> {
+    // Count projects
+    const allProjects = await db.select({ count: sql<number>`count(*)::int` }).from(projects);
+    const totalProjects = allProjects[0]?.count || 0;
+
+    // Active projects (status = in_progress or open)
+    const activeProjectsResult = await db.select({ count: sql<number>`count(*)::int` })
+      .from(projects)
+      .where(or(
+        eq(projects.status, 'in_progress'),
+        eq(projects.status, 'open')
+      ));
+    const activeProjects = activeProjectsResult[0]?.count || 0;
+
+    // Work sessions count
+    const workSessionsResult = await db.select({ count: sql<number>`count(*)::int` }).from(workSessions);
+    const totalWorkSessions = workSessionsResult[0]?.count || 0;
+
+    // Employees count (non-company, non-resident users)
+    const employeesResult = await db.select({ count: sql<number>`count(*)::int` })
+      .from(users)
+      .where(and(
+        not(eq(users.role, 'company')),
+        not(eq(users.role, 'resident')),
+        not(eq(users.role, 'property_manager')),
+        not(eq(users.role, 'superuser'))
+      ));
+    const totalEmployees = employeesResult[0]?.count || 0;
+
+    // Safety forms counts
+    const harnessResult = await db.select({ count: sql<number>`count(*)::int` }).from(harnessInspections);
+    const toolboxResult = await db.select({ count: sql<number>`count(*)::int` }).from(toolboxMeetings);
+    const flhaResult = await db.select({ count: sql<number>`count(*)::int` }).from(flhaForms);
+    const incidentResult = await db.select({ count: sql<number>`count(*)::int` }).from(incidentReports);
+
+    // Quotes counts
+    const totalQuotesResult = await db.select({ count: sql<number>`count(*)::int` }).from(quotes);
+    const sentQuotesResult = await db.select({ count: sql<number>`count(*)::int` })
+      .from(quotes)
+      .where(eq(quotes.pipelineStage, 'sent'));
+    const acceptedQuotesResult = await db.select({ count: sql<number>`count(*)::int` })
+      .from(quotes)
+      .where(eq(quotes.pipelineStage, 'accepted'));
+
+    // Company counts for averages
+    const companiesResult = await db.select({ count: sql<number>`count(*)::int` })
+      .from(users)
+      .where(eq(users.role, 'company'));
+    const totalCompanies = companiesResult[0]?.count || 1;
+
+    return {
+      totalProjects,
+      activeProjects,
+      totalWorkSessions,
+      totalEmployees,
+      safetyFormsCount: {
+        harness: harnessResult[0]?.count || 0,
+        toolbox: toolboxResult[0]?.count || 0,
+        flha: flhaResult[0]?.count || 0,
+        incident: incidentResult[0]?.count || 0,
+      },
+      quotesCount: {
+        total: totalQuotesResult[0]?.count || 0,
+        sent: sentQuotesResult[0]?.count || 0,
+        accepted: acceptedQuotesResult[0]?.count || 0,
+      },
+      avgProjectsPerCompany: Math.round(totalProjects / totalCompanies * 10) / 10,
+      avgEmployeesPerCompany: Math.round(totalEmployees / totalCompanies * 10) / 10,
+    };
+  }
+
+  /**
+   * Get detailed subscription tier breakdown for all companies
+   * License key format: COMPANY-XXXXX-XXXXX-XXXXX-N or GIFT-XXXXX-XXXXX-XXXXX-N
+   * Where N is tier: 1=Basic, 2=Starter, 3=Premium, 4=Enterprise
+   */
+  async getSubscriptionBreakdown(): Promise<Array<{
+    companyId: string;
+    companyName: string;
+    tier: string;
+    mrr: number;
+    addons: { extraSeats: boolean; extraProjects: boolean; whiteLabel: boolean };
+    createdAt: Date | null;
+    lastLoginAt: Date | null;
+  }>> {
+    const companies = await db.select().from(users).where(
+      and(
+        eq(users.role, "company"),
+        isNotNull(users.licenseKey)
+      )
+    );
+
+    // Map tier number to tier name and price
+    const tierMap: Record<string, { name: string; price: number }> = {
+      '1': { name: 'Basic', price: 79 },
+      '2': { name: 'Starter', price: 299 },
+      '3': { name: 'Premium', price: 499 },
+      '4': { name: 'Enterprise', price: 899 },
+    };
+
+    return companies.map(company => {
+      // Extract tier from license key - format: COMPANY-XXXXX-XXXXX-XXXXX-N or GIFT-XXXXX-XXXXX-XXXXX-N
+      // Split on '-' and get the last segment which is the tier number (1-4)
+      const segments = company.licenseKey?.split('-') || [];
+      const lastSegment = segments[segments.length - 1];
+      // Normalize: take only the first character in case there are extra digits
+      const tierNumber = lastSegment?.charAt(0) || '1';
+      const tierInfo = tierMap[tierNumber] || tierMap['1'];
+
+      // Calculate MRR from tier + add-ons
+      let mrr = tierInfo.price;
+      
+      // Add-ons: additionalSeatsCount = number of seat packs ($19/mo each)
+      const hasExtraSeats = (company.additionalSeatsCount || 0) > 0;
+      if (hasExtraSeats) {
+        mrr += (company.additionalSeatsCount || 0) * 19;
+      }
+
+      // Add-ons: additionalProjectsCount = number of extra projects ($49/mo each)
+      const hasExtraProjects = (company.additionalProjectsCount || 0) > 0;
+      if (hasExtraProjects) {
+        mrr += (company.additionalProjectsCount || 0) * 49;
+      }
+
+      // Add-ons: whitelabelBrandingActive = white label branding ($49/mo)
+      const hasWhiteLabel = !!company.whitelabelBrandingActive;
+      if (hasWhiteLabel) {
+        mrr += 49;
+      }
+
+      return {
+        companyId: company.id,
+        companyName: company.companyName || 'Unknown',
+        tier: tierInfo.name,
+        mrr,
+        addons: {
+          extraSeats: hasExtraSeats,
+          extraProjects: hasExtraProjects,
+          whiteLabel: hasWhiteLabel,
+        },
+        createdAt: company.createdAt,
+        lastLoginAt: company.lastLoginAt,
+      };
+    });
+  }
 }
 
 export const storage = new Storage();

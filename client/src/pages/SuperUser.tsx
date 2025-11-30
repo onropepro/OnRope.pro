@@ -187,6 +187,29 @@ export default function SuperUser() {
               </p>
             </CardContent>
           </Card>
+
+          <Card 
+            className="hover-elevate active-elevate-2 cursor-pointer transition-all"
+            onClick={() => setLocation('/superuser/metrics')}
+            data-testid="card-platform-metrics"
+          >
+            <CardHeader>
+              <div className="flex items-center gap-3">
+                <div className="h-12 w-12 rounded-full bg-blue-500/10 flex items-center justify-center">
+                  <span className="material-icons text-blue-500 text-2xl">analytics</span>
+                </div>
+                <div>
+                  <CardTitle className="text-xl">Platform Metrics</CardTitle>
+                  <CardDescription>Business intelligence and analytics</CardDescription>
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <p className="text-sm text-muted-foreground">
+                View MRR/ARR, customer distribution, product usage, and revenue analytics
+              </p>
+            </CardContent>
+          </Card>
         </div>
       </div>
 
