@@ -2,6 +2,7 @@ import { useState, useMemo } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useLocation } from "wouter";
 import { useTranslation } from "react-i18next";
+import i18n from "@/i18n";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -21,7 +22,11 @@ import { Label } from "@/components/ui/label";
 import { hasFinancialAccess, canViewCSR, canAccessInventory, canManageInventory, canAssignGear, canViewGearAssignments } from "@/lib/permissions";
 import HarnessInspectionForm from "./HarnessInspectionForm";
 import { format } from "date-fns";
+import { fr, enUS } from "date-fns/locale";
 import { jsPDF } from "jspdf";
+
+// Helper to get date locale based on current language
+const getDateLocale = () => i18n.language?.startsWith('fr') ? fr : enUS;
 
 const gearTypes = [
   { name: "Harness", icon: Shield },
@@ -2074,8 +2079,8 @@ export default function Inventory() {
                         <th className="text-left p-3 font-medium text-sm">{t('common.employee', 'Employee')}</th>
                         {inspectionDays.map((date, index) => (
                           <th key={index} className="text-center p-3 font-medium text-sm">
-                            <div>{format(date, 'EEE')}</div>
-                            <div className="text-xs text-muted-foreground">{format(date, 'MMM d')}</div>
+                            <div>{format(date, 'EEE', { locale: getDateLocale() })}</div>
+                            <div className="text-xs text-muted-foreground">{format(date, 'MMM d', { locale: getDateLocale() })}</div>
                           </th>
                         ))}
                       </tr>
@@ -2214,7 +2219,7 @@ export default function Inventory() {
                                 {report.damageSeverity}
                               </Badge>
                               <div className="text-xs text-muted-foreground">
-                                {format(new Date(report.discoveredDate), "MMM d, yyyy")}
+                                {format(new Date(report.discoveredDate), "MMM d, yyyy", { locale: getDateLocale() })}
                               </div>
                               <div className="text-xs text-muted-foreground">
                                 by {report.reporterName}

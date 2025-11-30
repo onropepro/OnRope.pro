@@ -1,6 +1,7 @@
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useParams, useLocation } from "wouter";
 import { useTranslation } from "react-i18next";
+import i18n from "@/i18n";
 import { queryClient } from "@/lib/queryClient";
 import { hasFinancialAccess, isManagement as checkIsManagement, hasPermission, canViewSafetyDocuments } from "@/lib/permissions";
 import { Button } from "@/components/ui/button";
@@ -27,6 +28,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useState, useEffect } from "react";
 import { format } from "date-fns";
+import { fr, enUS } from "date-fns/locale";
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from "recharts";
 import { parseLocalDate } from "@/lib/dateUtils";
 import type { Project } from "@shared/schema";
@@ -35,6 +37,9 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { apiRequest } from "@/lib/queryClient";
+
+// Helper to get date locale based on current language
+const getDateLocale = () => i18n.language?.startsWith('fr') ? fr : enUS;
 
 const endDaySchema = z.object({
   dropsCompletedNorth: z.string().optional(),
@@ -1513,8 +1518,8 @@ export default function ProjectDetail() {
                       workSessions.forEach((session: any) => {
                         const sessionDate = new Date(session.workDate);
                         const year = format(sessionDate, "yyyy");
-                        const month = format(sessionDate, "MMMM yyyy");
-                        const day = format(sessionDate, "EEEE, MMM d, yyyy");
+                        const month = format(sessionDate, "MMMM yyyy", { locale: getDateLocale() });
+                        const day = format(sessionDate, "EEEE, MMM d, yyyy", { locale: getDateLocale() });
                         
                         if (!sessionsByDate[year]) sessionsByDate[year] = {};
                         if (!sessionsByDate[year][month]) sessionsByDate[year][month] = {};
@@ -1957,7 +1962,7 @@ export default function ProjectDetail() {
                               </div>
                             )}
                             <div className="text-xs text-muted-foreground mt-1">
-                              {format(new Date(photo.createdAt), "MMM d, yyyy 'at' h:mm a")}
+                              {format(new Date(photo.createdAt), "MMM d, yyyy 'at' h:mm a", { locale: getDateLocale() })}
                             </div>
                           </div>
                         </div>
@@ -2022,7 +2027,7 @@ export default function ProjectDetail() {
                               </div>
                             )}
                             <div className="text-xs text-muted-foreground mt-1">
-                              {format(new Date(photo.createdAt), "MMM d, yyyy 'at' h:mm a")}
+                              {format(new Date(photo.createdAt), "MMM d, yyyy 'at' h:mm a", { locale: getDateLocale() })}
                             </div>
                           </div>
                         </div>
@@ -2061,7 +2066,7 @@ export default function ProjectDetail() {
                         <div className="flex items-start justify-between gap-2 mb-1">
                           <div className="flex-1 min-w-0">
                             <div className="text-sm font-medium">
-                              {format(parseLocalDate(meeting.meetingDate), 'MMMM d, yyyy')}
+                              {format(parseLocalDate(meeting.meetingDate), 'MMMM d, yyyy', { locale: getDateLocale() })}
                             </div>
                             <div className="text-xs text-muted-foreground">
                               {t('projectDetail.toolbox.conductedBy', 'Conducted by')}: {meeting.conductedByName}
@@ -2970,7 +2975,7 @@ export default function ProjectDetail() {
                 <div>
                   <div className="text-sm font-medium text-muted-foreground">{t('projectDetail.toolboxMeetings.date', 'Date')}</div>
                   <div className="text-base">
-                    {format(parseLocalDate(selectedMeeting.meetingDate), 'EEEE, MMMM d, yyyy')}
+                    {format(parseLocalDate(selectedMeeting.meetingDate), 'EEEE, MMMM d, yyyy', { locale: getDateLocale() })}
                   </div>
                 </div>
                 <div>
@@ -3339,7 +3344,7 @@ export default function ProjectDetail() {
               <div className="flex items-center justify-between">
                 <span className="text-sm text-muted-foreground">{t('projectDetail.dialogs.logHoursPrompt.date', 'Date')}</span>
                 <span className="font-medium">
-                  {endedSessionData?.workDate ? format(parseLocalDate(endedSessionData.workDate), "MMM d, yyyy") : "-"}
+                  {endedSessionData?.workDate ? format(parseLocalDate(endedSessionData.workDate), "MMM d, yyyy", { locale: getDateLocale() }) : "-"}
                 </span>
               </div>
               <div className="flex items-center justify-between">
@@ -3399,7 +3404,7 @@ export default function ProjectDetail() {
               <div>
                 <div className="text-xs text-muted-foreground">{t('projectDetail.dialogs.logHoursPrompt.date', 'Date')}</div>
                 <div className="text-lg font-semibold">
-                  {endedSessionData?.workDate ? format(parseLocalDate(endedSessionData.workDate), "MMM d, yyyy") : "-"}
+                  {endedSessionData?.workDate ? format(parseLocalDate(endedSessionData.workDate), "MMM d, yyyy", { locale: getDateLocale() }) : "-"}
                 </div>
               </div>
               <div className="flex-1">

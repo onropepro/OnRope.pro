@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useLocation } from "wouter";
 import { format } from "date-fns";
+import { fr, enUS } from "date-fns/locale";
 import { parseLocalDate } from "@/lib/dateUtils";
 import { IRATA_TASK_TYPES, type IrataTaskLog } from "@shared/schema";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
@@ -14,6 +15,10 @@ import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
+import i18n from "@/i18n";
+
+// Helper to get date locale based on current language
+const getDateLocale = () => i18n.language?.startsWith('fr') ? fr : enUS;
 
 const getTaskLabel = (taskId: string, t: (key: string, fallback: string) => string): string => {
   const task = IRATA_TASK_TYPES.find(t => t.id === taskId);
@@ -374,7 +379,7 @@ export default function MyLoggedHours() {
                                   <div className="flex items-center gap-2">
                                     <span className="material-icons text-sm text-muted-foreground">event</span>
                                     <span className="font-medium">
-                                      {format(parseLocalDate(log.workDate), "EEEE, MMMM d, yyyy")}
+                                      {format(parseLocalDate(log.workDate), "EEEE, MMMM d, yyyy", { locale: getDateLocale() })}
                                     </span>
                                   </div>
                                   <Badge>{parseFloat(log.hoursWorked || "0").toFixed(1)} {t('loggedHours.hrs', 'hrs')}</Badge>
@@ -436,7 +441,7 @@ export default function MyLoggedHours() {
                   <div>
                     <div className="text-xs text-muted-foreground">{t('loggedHours.issuedDate', 'Issued Date')}</div>
                     <div className="font-semibold">
-                      {format(parseLocalDate(currentUser.irataIssuedDate), "MMM d, yyyy")}
+                      {format(parseLocalDate(currentUser.irataIssuedDate), "MMM d, yyyy", { locale: getDateLocale() })}
                     </div>
                   </div>
                 )}
@@ -444,7 +449,7 @@ export default function MyLoggedHours() {
                   <div>
                     <div className="text-xs text-muted-foreground">{t('loggedHours.expires', 'Expires')}</div>
                     <div className="font-semibold">
-                      {format(parseLocalDate(currentUser.irataExpirationDate), "MMM d, yyyy")}
+                      {format(parseLocalDate(currentUser.irataExpirationDate), "MMM d, yyyy", { locale: getDateLocale() })}
                     </div>
                   </div>
                 )}

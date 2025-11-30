@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useLocation } from "wouter";
 import { useTranslation } from "react-i18next";
+import i18n from "@/i18n";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { hasFinancialAccess } from "@/lib/permissions";
 import type { PayPeriodConfig, PayPeriod, EmployeeHoursSummary } from "@shared/schema";
@@ -17,6 +18,10 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { useToast } from "@/hooks/use-toast";
 import { DollarSign, Calendar, Users, Settings, ArrowLeft, Clock, Pencil, Trash2 } from "lucide-react";
 import { format } from "date-fns";
+import { fr, enUS } from "date-fns/locale";
+
+// Helper to get date locale based on current language
+const getDateLocale = () => i18n.language?.startsWith('fr') ? fr : enUS;
 
 export default function Payroll() {
   const { t } = useTranslation();
@@ -571,7 +576,7 @@ export default function Payroll() {
                   <SelectContent>
                     {periodsData?.periods.map((period) => (
                       <SelectItem key={period.id} value={period.id}>
-                        {format(new Date(period.startDate), 'MMM dd, yyyy')} - {format(new Date(period.endDate), 'MMM dd, yyyy')} ({period.status})
+                        {format(new Date(period.startDate), 'MMM dd, yyyy', { locale: getDateLocale() })} - {format(new Date(period.endDate), 'MMM dd, yyyy', { locale: getDateLocale() })} ({period.status})
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -672,7 +677,7 @@ export default function Payroll() {
                                             <div className="flex items-center gap-2 mb-2">
                                               <span className="material-icons text-sm">event</span>
                                               <span className="font-medium">
-                                                {format(new Date(session.workDate), 'EEE, MMM dd, yyyy')}
+                                                {format(new Date(session.workDate), 'EEE, MMM dd, yyyy', { locale: getDateLocale() })}
                                               </span>
                                             </div>
                                             <div className="flex items-center gap-2 mb-2">
@@ -1027,7 +1032,7 @@ export default function Payroll() {
                         <CardContent className="flex items-center justify-between p-4">
                           <div>
                             <div className="font-medium">
-                              {format(new Date(period.startDate), 'MMM dd, yyyy')} - {format(new Date(period.endDate), 'MMM dd, yyyy')}
+                              {format(new Date(period.startDate), 'MMM dd, yyyy', { locale: getDateLocale() })} - {format(new Date(period.endDate), 'MMM dd, yyyy', { locale: getDateLocale() })}
                             </div>
                             <div className="text-sm text-muted-foreground capitalize">{period.status}</div>
                           </div>

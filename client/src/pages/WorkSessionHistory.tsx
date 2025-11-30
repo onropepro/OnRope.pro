@@ -1,6 +1,7 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useLocation, useRoute } from "wouter";
 import { useTranslation } from "react-i18next";
+import i18n from "@/i18n";
 import { hasFinancialAccess } from "@/lib/permissions";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -9,6 +10,7 @@ import { Progress } from "@/components/ui/progress";
 import { HighRiseBuilding } from "@/components/HighRiseBuilding";
 import { ArrowLeft, ChevronDown, ChevronRight, Sparkles, MapPin } from "lucide-react";
 import { format, getYear, getMonth } from "date-fns";
+import { fr, enUS } from "date-fns/locale";
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from "recharts";
 import { useMemo, useState } from "react";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
@@ -58,14 +60,18 @@ export default function WorkSessionHistory() {
                        user?.role === "operations_manager" || 
                        user?.role === "supervisor";
 
+  // Get the current locale for date formatting
+  const getDateLocale = () => i18n.language?.startsWith('fr') ? fr : enUS;
+
   // Group sessions by year, month, and day
   const groupedSessions = useMemo(() => {
     const groups: Record<string, Record<string, Record<string, any[]>>> = {};
+    const locale = getDateLocale();
     
     allWorkSessions.forEach((session: any) => {
       const sessionDate = new Date(session.workDate);
       const year = getYear(sessionDate).toString();
-      const month = format(sessionDate, "MMMM");
+      const month = format(sessionDate, "MMMM", { locale });
       const day = format(sessionDate, "yyyy-MM-dd");
       
       if (!groups[year]) groups[year] = {};
@@ -76,7 +82,7 @@ export default function WorkSessionHistory() {
     });
     
     return groups;
-  }, [allWorkSessions]);
+  }, [allWorkSessions, i18n.language]);
 
   // Get sorted years (newest first)
   const sortedYears = Object.keys(groupedSessions).sort((a, b) => parseInt(b) - parseInt(a));
@@ -362,8 +368,12 @@ export default function WorkSessionHistory() {
               <div className="space-y-4">
                 {sortedYears.map((year) => {
                   const monthsInYear = Object.keys(groupedSessions[year]);
+                  const locale = getDateLocale();
+                  // Get localized month order for sorting (works with both English and French)
+                  const monthOrder = Array.from({ length: 12 }, (_, i) => 
+                    format(new Date(2024, i, 1), "MMMM", { locale })
+                  );
                   const sortedMonths = monthsInYear.sort((a, b) => {
-                    const monthOrder = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
                     return monthOrder.indexOf(b) - monthOrder.indexOf(a);
                   });
                   
@@ -428,7 +438,7 @@ export default function WorkSessionHistory() {
                                           className="w-full justify-between text-sm"
                                           data-testid={`button-day-${day}`}
                                         >
-                                          <span>{format(new Date(day), "EEEE, MMM d")}</span>
+                                          <span>{format(new Date(day), "EEEE, MMM d", { locale: getDateLocale() })}</span>
                                           <div className="flex items-center gap-2">
                                             <Badge variant="secondary">{sessionsOnDay.length}</Badge>
                                             {openDays[day] ? (
