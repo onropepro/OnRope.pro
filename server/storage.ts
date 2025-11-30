@@ -1,6 +1,6 @@
 import { db } from "./db";
-import { users, clients, projects, customJobTypes, dropLogs, workSessions, nonBillableWorkSessions, complaints, complaintNotes, projectPhotos, jobComments, harnessInspections, toolboxMeetings, flhaForms, incidentReports, methodStatements, companyDocuments, payPeriodConfig, payPeriods, quotes, quoteServices, gearItems, gearAssignments, gearSerialNumbers, scheduledJobs, jobAssignments, userPreferences, propertyManagerCompanyLinks, irataTaskLogs, employeeTimeOff, documentReviewSignatures, equipmentDamageReports, featureRequests, featureRequestMessages } from "@shared/schema";
-import type { User, InsertUser, Client, InsertClient, Project, InsertProject, CustomJobType, InsertCustomJobType, DropLog, InsertDropLog, WorkSession, InsertWorkSession, Complaint, InsertComplaint, ComplaintNote, InsertComplaintNote, ProjectPhoto, InsertProjectPhoto, JobComment, InsertJobComment, HarnessInspection, InsertHarnessInspection, ToolboxMeeting, InsertToolboxMeeting, FlhaForm, InsertFlhaForm, IncidentReport, InsertIncidentReport, MethodStatement, InsertMethodStatement, PayPeriodConfig, InsertPayPeriodConfig, PayPeriod, InsertPayPeriod, EmployeeHoursSummary, Quote, InsertQuote, QuoteService, InsertQuoteService, QuoteWithServices, GearItem, InsertGearItem, GearAssignment, InsertGearAssignment, GearSerialNumber, InsertGearSerialNumber, ScheduledJob, InsertScheduledJob, JobAssignment, InsertJobAssignment, ScheduledJobWithAssignments, UserPreferences, InsertUserPreferences, PropertyManagerCompanyLink, InsertPropertyManagerCompanyLink, IrataTaskLog, InsertIrataTaskLog, EmployeeTimeOff, InsertEmployeeTimeOff, DocumentReviewSignature, InsertDocumentReviewSignature, EquipmentDamageReport, InsertEquipmentDamageReport, FeatureRequest, InsertFeatureRequest, FeatureRequestMessage, InsertFeatureRequestMessage, FeatureRequestWithMessages } from "@shared/schema";
+import { users, clients, projects, customJobTypes, dropLogs, workSessions, nonBillableWorkSessions, complaints, complaintNotes, projectPhotos, jobComments, harnessInspections, toolboxMeetings, flhaForms, incidentReports, methodStatements, companyDocuments, payPeriodConfig, payPeriods, quotes, quoteServices, gearItems, gearAssignments, gearSerialNumbers, scheduledJobs, jobAssignments, userPreferences, propertyManagerCompanyLinks, irataTaskLogs, employeeTimeOff, documentReviewSignatures, equipmentDamageReports, featureRequests, featureRequestMessages, churnEvents } from "@shared/schema";
+import type { User, InsertUser, Client, InsertClient, Project, InsertProject, CustomJobType, InsertCustomJobType, DropLog, InsertDropLog, WorkSession, InsertWorkSession, Complaint, InsertComplaint, ComplaintNote, InsertComplaintNote, ProjectPhoto, InsertProjectPhoto, JobComment, InsertJobComment, HarnessInspection, InsertHarnessInspection, ToolboxMeeting, InsertToolboxMeeting, FlhaForm, InsertFlhaForm, IncidentReport, InsertIncidentReport, MethodStatement, InsertMethodStatement, PayPeriodConfig, InsertPayPeriodConfig, PayPeriod, InsertPayPeriod, EmployeeHoursSummary, Quote, InsertQuote, QuoteService, InsertQuoteService, QuoteWithServices, GearItem, InsertGearItem, GearAssignment, InsertGearAssignment, GearSerialNumber, InsertGearSerialNumber, ScheduledJob, InsertScheduledJob, JobAssignment, InsertJobAssignment, ScheduledJobWithAssignments, UserPreferences, InsertUserPreferences, PropertyManagerCompanyLink, InsertPropertyManagerCompanyLink, IrataTaskLog, InsertIrataTaskLog, EmployeeTimeOff, InsertEmployeeTimeOff, DocumentReviewSignature, InsertDocumentReviewSignature, EquipmentDamageReport, InsertEquipmentDamageReport, FeatureRequest, InsertFeatureRequest, FeatureRequestMessage, InsertFeatureRequestMessage, FeatureRequestWithMessages, ChurnEvent, InsertChurnEvent } from "@shared/schema";
 import { eq, and, or, desc, sql, isNull, isNotNull, not, gte, lte, between, inArray } from "drizzle-orm";
 import bcrypt from "bcrypt";
 
@@ -2863,11 +2863,14 @@ export class Storage {
     // Recent signups
     const recentSignups = companies.filter(c => c.createdAt && new Date(c.createdAt) > thirtyDaysAgo).length;
 
+    // Get actual churned customer count from churn_events table
+    const churnedCount = await this.getChurnedCustomerCount();
+
     return {
       totalCustomers: companies.length,
       activeCustomers,
       trialCustomers,
-      churned: 0,  // Would need churn events table data
+      churned: churnedCount,
       byRegion,
       recentSignups: { count: recentSignups, period: 'last 30 days' },
     };
@@ -3029,6 +3032,92 @@ export class Storage {
         lastLoginAt: company.lastLoginAt,
       };
     });
+  }
+
+  /**
+   * Record a churn event when a customer cancels their subscription
+   */
+  async recordChurnEvent(data: {
+    companyId: string;
+    finalMrr?: number;
+    tier?: string;
+    reason?: string;
+    notes?: string;
+  }): Promise<ChurnEvent> {
+    const today = new Date().toISOString().split('T')[0];
+    
+    const result = await db.insert(churnEvents).values({
+      companyId: data.companyId,
+      churnDate: today,
+      finalMrr: data.finalMrr?.toString() || null,
+      tier: data.tier || null,
+      reason: data.reason || 'unknown',
+      notes: data.notes || null,
+    }).returning();
+
+    console.log(`[Churn] Recorded churn event for company ${data.companyId}`);
+    return result[0];
+  }
+
+  /**
+   * Get count of churned customers (customers who have churn events without win-back)
+   */
+  async getChurnedCustomerCount(): Promise<number> {
+    const result = await db.select({ count: sql<number>`count(*)::int` })
+      .from(churnEvents)
+      .where(isNull(churnEvents.winBackDate));
+    
+    return result[0]?.count || 0;
+  }
+
+  /**
+   * Get all churn events for analytics
+   */
+  async getChurnEvents(options?: { limit?: number; offset?: number }): Promise<ChurnEvent[]> {
+    let query = db.select().from(churnEvents).orderBy(desc(churnEvents.churnDate));
+    
+    if (options?.limit) {
+      query = query.limit(options.limit) as typeof query;
+    }
+    if (options?.offset) {
+      query = query.offset(options.offset) as typeof query;
+    }
+    
+    return query;
+  }
+
+  /**
+   * Record a win-back event (customer resubscribed after churning)
+   */
+  async recordWinBack(companyId: string): Promise<void> {
+    const today = new Date().toISOString().split('T')[0];
+    
+    await db.update(churnEvents)
+      .set({ winBackDate: today })
+      .where(
+        and(
+          eq(churnEvents.companyId, companyId),
+          isNull(churnEvents.winBackDate)
+        )
+      );
+    
+    console.log(`[Churn] Recorded win-back for company ${companyId}`);
+  }
+
+  /**
+   * Check if a company has an active churn event (not won back)
+   */
+  async hasActiveChurnEvent(companyId: string): Promise<boolean> {
+    const result = await db.select({ count: sql<number>`count(*)::int` })
+      .from(churnEvents)
+      .where(
+        and(
+          eq(churnEvents.companyId, companyId),
+          isNull(churnEvents.winBackDate)
+        )
+      );
+    
+    return (result[0]?.count || 0) > 0;
   }
 }
 

@@ -16,6 +16,7 @@
 import Stripe from 'stripe';
 import type { User } from '../shared/schema';
 import { STRIPE_PRICE_IDS, TIER_CONFIG, ADDON_CONFIG, type TierName, type AddonName, type Currency } from '../shared/stripe-config';
+import { storage } from './storage';
 
 // Initialize Stripe with latest API version
 // Using type assertion because Stripe types default to latest version
@@ -338,6 +339,20 @@ export async function handleWebhookEvent(
           }
         }
 
+        // Check if this is a win-back (customer who previously churned and is resubscribing)
+        if (event.type === 'customer.subscription.created') {
+          try {
+            const hasChurned = await storage.hasActiveChurnEvent(userId);
+            if (hasChurned) {
+              await storage.recordWinBack(userId);
+              console.log(`[Webhook] Win-back recorded for user ${userId}`);
+            }
+          } catch (winBackError) {
+            console.error(`[Webhook] Failed to check/record win-back:`, winBackError);
+            // Don't fail the webhook if win-back recording fails
+          }
+        }
+
         // Update user subscription in database
         await updateUserSubscription({
           userId: userId,
@@ -364,6 +379,49 @@ export async function handleWebhookEvent(
 
         const userId = customer.metadata?.userId;
         if (!userId) return;
+
+        // Get the user's current subscription info before cancellation for churn tracking
+        const user = await storage.getUserById(userId);
+        let finalMrr = 0;
+        let tier: string | undefined;
+        
+        if (user?.licenseKey) {
+          // Parse tier from license key: format is COMPANY-XXXXX-XXXXX-XXXXX-N
+          const segments = user.licenseKey.split('-');
+          const lastSegment = segments[segments.length - 1];
+          const tierNumber = lastSegment.charAt(0);
+          
+          const tierMap: Record<string, { name: string; price: number }> = {
+            '1': { name: 'basic', price: 79 },
+            '2': { name: 'starter', price: 299 },
+            '3': { name: 'premium', price: 499 },
+            '4': { name: 'enterprise', price: 899 },
+          };
+          
+          const tierInfo = tierMap[tierNumber] || tierMap['1'];
+          tier = tierInfo.name;
+          finalMrr = tierInfo.price;
+          
+          // Add add-on revenue
+          if (user.additionalSeatsCount) finalMrr += user.additionalSeatsCount * 19;
+          if (user.additionalProjectsCount) finalMrr += user.additionalProjectsCount * 49;
+          if (user.whitelabelBrandingActive) finalMrr += 49;
+        }
+
+        // Record churn event for metrics tracking
+        try {
+          await storage.recordChurnEvent({
+            companyId: userId,
+            finalMrr,
+            tier,
+            reason: 'unknown', // Could be enhanced to capture cancellation reason
+            notes: `Subscription ${subscription.id} deleted via Stripe webhook`,
+          });
+          console.log(`[Webhook] Churn event recorded for user ${userId}`);
+        } catch (churnError) {
+          console.error(`[Webhook] Failed to record churn event:`, churnError);
+          // Don't fail the webhook if churn recording fails
+        }
 
         // Mark subscription as canceled
         await updateUserSubscription({
