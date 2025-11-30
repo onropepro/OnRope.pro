@@ -233,6 +233,13 @@
     "haveAccount": "Already have an account?",
     "signIn": "Sign in"
   },
+  "navigation": {
+    "back": "Back",
+    "mainMenu": "Main Menu",
+    "goBack": "Go Back",
+    "returnToDashboard": "Return to Dashboard",
+    "home": "Home"
+  },
   "common": {
     "loading": "Loading...",
     "generating": "Generating...",

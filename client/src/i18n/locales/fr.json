@@ -233,6 +233,13 @@
     "haveAccount": "Vous avez déjà un compte?",
     "signIn": "Connexion"
   },
+  "navigation": {
+    "back": "Retour",
+    "mainMenu": "Menu principal",
+    "goBack": "Revenir",
+    "returnToDashboard": "Retour au tableau de bord",
+    "home": "Accueil"
+  },
   "common": {
     "loading": "Chargement...",
     "generating": "Génération en cours...",

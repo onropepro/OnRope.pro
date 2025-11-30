@@ -8,28 +8,47 @@ interface BackButtonProps {
   label?: string;
   onClick?: () => void;
   className?: string;
+  useHistoryBack?: boolean;
+  fallbackTo?: string;
 }
 
-export function BackButton({ to = "/dashboard", label, onClick, className = "" }: BackButtonProps) {
+export function BackButton({ 
+  to, 
+  label, 
+  onClick, 
+  className = "",
+  useHistoryBack = true,
+  fallbackTo = "/dashboard"
+}: BackButtonProps) {
   const { t } = useTranslation();
   const [, setLocation] = useLocation();
   
-  const displayLabel = label || t('common.back', 'Back');
+  const displayLabel = label || t('navigation.back', 'Back');
   
   const handleClick = () => {
     if (onClick) {
       onClick();
-    } else if (to) {
+      return;
+    }
+    
+    if (to) {
       setLocation(to);
+      return;
+    }
+    
+    if (useHistoryBack && window.history.length > 1) {
+      window.history.back();
+    } else {
+      setLocation(fallbackTo);
     }
   };
 
-  if (to && !onClick) {
+  if (to && !onClick && !useHistoryBack) {
     return (
       <Link href={to}>
         <Button
           variant="ghost"
-          className={`mb-4 gap-2 ${className}`}
+          className={`gap-2 ${className}`}
           data-testid="button-back"
         >
           <ArrowLeft className="w-4 h-4" />
@@ -43,7 +62,7 @@ export function BackButton({ to = "/dashboard", label, onClick, className = "" }
     <Button
       variant="ghost"
       onClick={handleClick}
-      className={`mb-4 gap-2 ${className}`}
+      className={`gap-2 ${className}`}
       data-testid="button-back"
     >
       <ArrowLeft className="w-4 h-4" />
