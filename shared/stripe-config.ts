@@ -17,10 +17,10 @@ export const STRIPE_PRICE_IDS = {
       enterprise: 'price_1SW7VYBzDsOltscrIAUE5EyJ',  // $899/mo - Unlimited
     },
     cad: {
-      basic: 'price_1SW7VXBzDsOltscrExhtYscJ',       // $79 CAD/mo - 2 projects, 4 seats
-      starter: 'price_1SW7VXBzDsOltscr1kSadPRG',     // $299 CAD/mo - 5 projects, 10 seats
-      premium: 'price_1SW7VYBzDsOltscrnMVcmbVN',     // $499 CAD/mo - 9 projects, 18 seats
-      enterprise: 'price_1SW7VYBzDsOltscrzfWODg4L',  // $899 CAD/mo - Unlimited
+      basic: 'price_1SZG6qBzDsOltscrieJwV0Uf',       // $79 CAD/mo - 2 projects, 4 seats (FIXED - same as USD)
+      starter: 'price_1SZG6qBzDsOltscrXwhfXjys',     // $299 CAD/mo - 5 projects, 10 seats (FIXED - same as USD)
+      premium: 'price_1SZG6qBzDsOltscrSkZXaalG',     // $499 CAD/mo - 9 projects, 18 seats (FIXED - same as USD)
+      enterprise: 'price_1SZG6qBzDsOltscrD9aT6Fqz',  // $899 CAD/mo - Unlimited (FIXED - same as USD)
     },
   },
   
@@ -33,9 +33,9 @@ export const STRIPE_PRICE_IDS = {
       white_label: 'price_1SWCTnBzDsOltscrD2qcZ47m',     // $49/mo recurring ✓
     },
     cad: {
-      extra_seats: 'price_1SWDH5BzDsOltscrT9ip4d8u',     // $19 CAD/mo recurring - 2 seats ✓
-      extra_project: 'price_1SWDH5BzDsOltscrEyPZV89W',   // $49 CAD/mo recurring - 1 project ✓
-      white_label: 'price_1SWCToBzDsOltscrRljmQTLz',     // $49 CAD/mo recurring ✓
+      extra_seats: 'price_1SZG7KBzDsOltscrAcGW9Vuw',     // $19 CAD/mo recurring - 2 seats (FIXED - same as USD)
+      extra_project: 'price_1SZG7KBzDsOltscru51yMkzP',   // $49 CAD/mo recurring - 1 project (FIXED - same as USD)
+      white_label: 'price_1SZG7KBzDsOltscrs9vnr0v2',     // $49 CAD/mo recurring (FIXED - same as USD)
     },
   },
 } as const;
