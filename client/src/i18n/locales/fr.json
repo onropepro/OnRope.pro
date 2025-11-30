@@ -1211,6 +1211,17 @@
   },
   "documents": {
     "title": "Documents",
+    "pageTitle": "Documents et archives",
+    "pageSubtitle": "Tous les documents et dossiers de sécurité de l'entreprise",
+    "healthSafety": "Santé et sécurité",
+    "companyPolicy": "Politique d'entreprise",
+    "safetyRating": {
+      "title": "Cote de sécurité documentaire",
+      "excellent": "Excellent! Tous les documents requis sont téléchargés",
+      "partial": "Conformité partielle - téléchargez les documents manquants",
+      "none": "Aucun document téléchargé",
+      "documents": "documents"
+    },
     "allDocuments": "Tous les documents",
     "companyDocuments": "Documents d'entreprise",
     "projectDocuments": "Documents de projet",

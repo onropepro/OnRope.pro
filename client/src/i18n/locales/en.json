@@ -1211,6 +1211,17 @@
   },
   "documents": {
     "title": "Documents",
+    "pageTitle": "Documents & Records",
+    "pageSubtitle": "All company documents and safety records",
+    "healthSafety": "Health & Safety",
+    "companyPolicy": "Company Policy",
+    "safetyRating": {
+      "title": "Documentation Safety Rating",
+      "excellent": "Excellent! All required documents are uploaded",
+      "partial": "Partial compliance - upload missing documents",
+      "none": "No documents uploaded yet",
+      "documents": "documents"
+    },
     "allDocuments": "All Documents",
     "companyDocuments": "Company Documents",
     "projectDocuments": "Project Documents",

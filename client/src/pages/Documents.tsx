@@ -4034,8 +4034,8 @@ export default function Documents() {
               <ArrowLeft className="h-5 w-5" />
             </Button>
             <div className="flex-1 min-w-0">
-              <h1 className="text-xl sm:text-3xl font-bold truncate">Documents & Records</h1>
-              <p className="text-sm text-muted-foreground hidden sm:block mt-1">All company documents and safety records</p>
+              <h1 className="text-xl sm:text-3xl font-bold truncate">{t('documents.pageTitle', 'Documents & Records')}</h1>
+              <p className="text-sm text-muted-foreground hidden sm:block mt-1">{t('documents.pageSubtitle', 'All company documents and safety records')}</p>
             </div>
           </div>
         </div>
@@ -4074,13 +4074,13 @@ export default function Documents() {
                     }`} />
                   </div>
                   <div className="flex-1">
-                    <CardTitle className="text-xl mb-1">Documentation Safety Rating</CardTitle>
+                    <CardTitle className="text-xl mb-1">{t('documents.safetyRating.title', 'Documentation Safety Rating')}</CardTitle>
                     <p className="text-sm text-muted-foreground">
                       {ratingPercent === 100 
-                        ? 'Excellent! All required documents are uploaded' 
+                        ? t('documents.safetyRating.excellent', 'Excellent! All required documents are uploaded')
                         : ratingPercent >= 50 
-                          ? 'Partial compliance - upload missing documents'
-                          : 'No documents uploaded yet'}
+                          ? t('documents.safetyRating.partial', 'Partial compliance - upload missing documents')
+                          : t('documents.safetyRating.none', 'No documents uploaded yet')}
                     </p>
                   </div>
                   <div className="text-right">
@@ -4093,7 +4093,7 @@ export default function Documents() {
                     }`}>
                       {ratingPercent}%
                     </div>
-                    <div className="text-sm text-muted-foreground">{docsCount}/{totalDocsRequired} documents</div>
+                    <div className="text-sm text-muted-foreground">{docsCount}/{totalDocsRequired} {t('documents.safetyRating.documents', 'documents')}</div>
                   </div>
                 </div>
               </CardHeader>
@@ -4113,7 +4113,7 @@ export default function Documents() {
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                       </svg>
                     )}
-                    Health & Safety
+                    {t('documents.healthSafety', 'Health & Safety')}
                   </div>
                   <div className={`flex items-center gap-2 px-3 py-1.5 rounded-md text-sm ${
                     hasPolicy 
@@ -4129,7 +4129,7 @@ export default function Documents() {
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                       </svg>
                     )}
-                    Company Policy
+                    {t('documents.companyPolicy', 'Company Policy')}
                   </div>
                   {canUploadDocuments && (
                     <div className={`flex items-center gap-2 px-3 py-1.5 rounded-md text-sm ${
@@ -4146,7 +4146,7 @@ export default function Documents() {
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                         </svg>
                       )}
-                      Certificate of Insurance
+                      {t('documents.certificateOfInsurance', 'Certificate of Insurance')}
                     </div>
                   )}
                 </div>
