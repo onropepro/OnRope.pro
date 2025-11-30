@@ -4236,9 +4236,11 @@ export default function Documents() {
             const pendingEmployees = totalEmployees - completeEmployees;
             
             // Compliance = signed reviews / total required signatures
+            // If no documents uploaded, show 0% (not 100%) - documents need to be added first
+            const hasNoDocuments = requiredDocs.length === 0;
             const compliancePercent = totalRequiredSignatures > 0 
               ? Math.round((signedReviews / totalRequiredSignatures) * 100) 
-              : (requiredDocs.length === 0 ? 100 : 0);
+              : 0;
             
             const formatDocType = (type: string, docName?: string) => {
               switch (type) {
@@ -4285,15 +4287,30 @@ export default function Documents() {
                       </Button>
                       <div className="flex flex-col items-end gap-1">
                         <Badge 
-                          variant={compliancePercent === 100 ? "default" : "secondary"} 
-                          className={`text-base font-semibold px-3 ${compliancePercent === 100 ? 'bg-emerald-500' : ''}`}
+                          variant={compliancePercent === 100 && !hasNoDocuments ? "default" : "secondary"} 
+                          className={`text-base font-semibold px-3 ${
+                            hasNoDocuments 
+                              ? 'bg-amber-500/20 text-amber-700 dark:text-amber-300' 
+                              : compliancePercent === 100 
+                                ? 'bg-emerald-500' 
+                                : ''
+                          }`}
                         >
-                          {compliancePercent}% {t('documents.signed', 'Signed')}
+                          {hasNoDocuments 
+                            ? t('documents.noDocuments', 'No Documents') 
+                            : `${compliancePercent}% ${t('documents.signed', 'Signed')}`
+                          }
                         </Badge>
-                        {compliancePercent < 100 && (
+                        {!hasNoDocuments && compliancePercent < 100 && (
                           <span className="text-xs text-amber-600 dark:text-amber-400 flex items-center gap-1">
                             <Shield className="h-3 w-3" />
                             {Math.round((100 - compliancePercent) * 0.05)}% {t('documents.csrPenalty', 'CSR penalty')}
+                          </span>
+                        )}
+                        {hasNoDocuments && (
+                          <span className="text-xs text-amber-600 dark:text-amber-400 flex items-center gap-1">
+                            <AlertCircle className="h-3 w-3" />
+                            {t('documents.uploadDocsFirst', 'Upload documents first')}
                           </span>
                         )}
                       </div>
@@ -4346,7 +4363,12 @@ export default function Documents() {
                               <span className="font-medium truncate">{employee.employeeName}</span>
                             </div>
                             <div className="flex items-center gap-2">
-                              {employee.isComplete ? (
+                              {hasNoDocuments ? (
+                                <Badge variant="secondary" className="bg-muted text-muted-foreground text-xs">
+                                  <FileText className="h-3 w-3 mr-1" />
+                                  {t('documents.awaitingDocs', 'Awaiting Documents')}
+                                </Badge>
+                              ) : employee.isComplete ? (
                                 <Badge variant="default" className="bg-emerald-500 text-xs">
                                   <CheckCircle2 className="h-3 w-3 mr-1" />
                                   {t('documents.complete', 'Complete')}
