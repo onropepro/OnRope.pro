@@ -992,15 +992,8 @@ export default function Inventory() {
   };
 
   const openAssignDialog = (item: GearItem) => {
-    // Guard: Only users with assign_gear permission can open the assign dialog
-    if (!canAssignGear(currentUser)) {
-      toast({
-        title: t('common.accessDenied', 'Access Denied'),
-        description: t('inventory.permissions.noAssignGear', "You don't have permission to assign gear"),
-        variant: "destructive",
-      });
-      return;
-    }
+    // All employees can self-assign gear (for "My Kit" functionality)
+    // The assign dialog will restrict to self-only if user doesn't have assign_gear permission
     
     setManagingItem(item);
     // Auto-fill with current user's ID - employees can only assign to themselves by default
@@ -1015,6 +1008,7 @@ export default function Inventory() {
   };
   
   // Check if user can assign gear to other employees (requires assign_gear permission)
+  // Users without this permission can still self-assign gear
   const canAssignToOthers = canAssignGear(currentUser);
 
   const handleAssignGear = () => {

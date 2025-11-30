@@ -169,13 +169,15 @@ export function canViewCSR(user: User | null | undefined): boolean {
 
 /**
  * Check if user can access inventory/gear management (view)
- * - Company owners always have access
- * - All other roles need explicit 'view_inventory' permission
+ * - All authenticated employees can access the inventory page
+ * - This allows everyone to view gear and manage their own "My Kit"
+ * - Note: Adding/editing gear items still requires manage_inventory permission
+ * - Note: Assigning gear to others still requires assign_gear permission
  */
 export function canAccessInventory(user: User | null | undefined): boolean {
   if (!user) return false;
-  if (isCompanyOwner(user)) return true;
-  return checkPermission(user, 'view_inventory');
+  // All authenticated users can access inventory to view and manage their own kit
+  return true;
 }
 
 /**
