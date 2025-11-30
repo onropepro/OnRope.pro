@@ -2664,6 +2664,12 @@
     "hoursLoggedThisMonth": "Heures enregistrées ce mois",
     "noEmployeesToDisplay": "Aucun employé à afficher",
     "taskStatusBreakdown": "Répartition des statuts de tâches",
+    "taskStatus": {
+      "inProgress": "En cours",
+      "completed": "Terminé",
+      "onHold": "En attente",
+      "pending": "En attente"
+    },
     "currentYear": "Année en cours",
     "noHoursThisYear": "Aucune heure enregistrée cette année",
     "currentMonth": "Mois en cours",

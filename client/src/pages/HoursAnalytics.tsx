@@ -779,10 +779,10 @@ export default function HoursAnalytics() {
                   <PieChart>
                     <Pie
                       data={[
-                        { name: 'In Progress', value: 35, color: primaryColor },
-                        { name: 'Completed', value: 45, color: `${primaryColor}99` },
-                        { name: 'Task 98', value: 10, color: `${primaryColor}66` },
-                        { name: 'On Hold', value: 10, color: `${primaryColor}33` },
+                        { name: t("hoursAnalytics.taskStatus.inProgress"), value: 35, color: primaryColor },
+                        { name: t("hoursAnalytics.taskStatus.completed"), value: 45, color: `${primaryColor}99` },
+                        { name: t("hoursAnalytics.taskStatus.pending"), value: 10, color: `${primaryColor}66` },
+                        { name: t("hoursAnalytics.taskStatus.onHold"), value: 10, color: `${primaryColor}33` },
                       ]}
                       cx="50%"
                       cy="50%"
@@ -793,10 +793,10 @@ export default function HoursAnalytics() {
                       label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
                     >
                       {[
-                        { name: 'In Progress', value: 35, color: primaryColor },
-                        { name: 'Completed', value: 45, color: `${primaryColor}99` },
-                        { name: 'Task 98', value: 10, color: `${primaryColor}66` },
-                        { name: 'On Hold', value: 10, color: `${primaryColor}33` },
+                        { name: t("hoursAnalytics.taskStatus.inProgress"), value: 35, color: primaryColor },
+                        { name: t("hoursAnalytics.taskStatus.completed"), value: 45, color: `${primaryColor}99` },
+                        { name: t("hoursAnalytics.taskStatus.pending"), value: 10, color: `${primaryColor}66` },
+                        { name: t("hoursAnalytics.taskStatus.onHold"), value: 10, color: `${primaryColor}33` },
                       ].map((entry, index) => (
                         <Cell key={`cell-${index}`} fill={entry.color} />
                       ))}

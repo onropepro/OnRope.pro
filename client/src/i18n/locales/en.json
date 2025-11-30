@@ -2664,6 +2664,12 @@
     "hoursLoggedThisMonth": "Hours Logged This Month",
     "noEmployeesToDisplay": "No employees to display",
     "taskStatusBreakdown": "Task Status Breakdown",
+    "taskStatus": {
+      "inProgress": "In Progress",
+      "completed": "Completed",
+      "onHold": "On Hold",
+      "pending": "Pending"
+    },
     "currentYear": "Current Year",
     "noHoursThisYear": "No hours recorded this year",
     "currentMonth": "Current Month",
