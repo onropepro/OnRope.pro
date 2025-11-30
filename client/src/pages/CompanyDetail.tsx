@@ -266,11 +266,19 @@ export default function CompanyDetail() {
           <TabsContent value="dashboard">
             <Card>
               <CardContent className="p-12 text-center">
-                <span className="material-icons text-6xl text-muted-foreground mb-4">dashboard</span>
-                <h3 className="text-xl font-semibold mb-2">Company Dashboard</h3>
-                <p className="text-muted-foreground">
-                  View the company's dashboard as they see it
+                <span className="material-icons text-6xl text-primary/60 mb-4">visibility</span>
+                <h3 className="text-xl font-semibold mb-2">View as Company</h3>
+                <p className="text-muted-foreground mb-6">
+                  See exactly what {company.companyName || 'this company'} sees on their dashboard in read-only mode
                 </p>
+                <Button 
+                  onClick={() => setLocation(`/superuser/view-as/${company.id}`)}
+                  size="lg"
+                  data-testid="button-view-as-company"
+                >
+                  <span className="material-icons mr-2">visibility</span>
+                  Enter View Mode
+                </Button>
               </CardContent>
             </Card>
           </TabsContent>

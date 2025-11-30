@@ -2776,6 +2776,110 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // SuperUser: View company dashboard data (impersonation mode - read-only)
+  app.get("/api/superuser/impersonate/:companyId/dashboard", requireAuth, async (req: Request, res: Response) => {
+    try {
+      if (req.session.userId !== 'superuser') {
+        return res.status(403).json({ message: "Access denied. SuperUser only." });
+      }
+
+      const companyId = req.params.companyId;
+      
+      // Get the company user
+      const company = await storage.getUserById(companyId);
+      if (!company || company.role !== 'company') {
+        return res.status(404).json({ message: "Company not found" });
+      }
+
+      // Fetch all dashboard-related data for this company
+      const [projects, employees, clients, workSessions, quotes] = await Promise.all([
+        storage.getProjectsByCompany(companyId),
+        storage.getAllEmployees(companyId),
+        storage.getClientsByCompany(companyId),
+        storage.getWorkSessionsByCompany(companyId),
+        storage.getQuotesByCompany(companyId),
+      ]);
+
+      // Get active work sessions
+      const activeWorkSessions = workSessions.filter(session => session.status === 'active');
+
+      // Calculate stats
+      const stats = {
+        totalProjects: projects.length,
+        activeProjects: projects.filter(p => p.status === 'active').length,
+        completedProjects: projects.filter(p => p.status === 'completed').length,
+        totalEmployees: employees.length,
+        activeWorkers: activeWorkSessions.length,
+        totalClients: clients.length,
+        totalQuotes: quotes.length,
+        pendingQuotes: quotes.filter(q => q.status === 'pending' || q.status === 'submitted').length,
+      };
+
+      // Build company info (without password)
+      const { passwordHash, ...companyInfo } = company;
+
+      res.json({
+        company: companyInfo,
+        projects,
+        employees: employees.map(emp => {
+          const { passwordHash: _, ...empWithoutPassword } = emp;
+          return empWithoutPassword;
+        }),
+        clients,
+        stats,
+        activeWorkSessions: activeWorkSessions.map(session => ({
+          ...session,
+          employeeName: employees.find(e => e.id === session.userId)?.name || 'Unknown',
+        })),
+        quotes: quotes.slice(0, 20), // Limit to recent 20 quotes
+      });
+    } catch (error) {
+      console.error('[SuperUser] Impersonate dashboard error:', error);
+      res.status(500).json({ message: "Failed to fetch company dashboard data" });
+    }
+  });
+
+  // SuperUser: Get company safety data (impersonation mode - read-only)
+  app.get("/api/superuser/impersonate/:companyId/safety", requireAuth, async (req: Request, res: Response) => {
+    try {
+      if (req.session.userId !== 'superuser') {
+        return res.status(403).json({ message: "Access denied. SuperUser only." });
+      }
+
+      const companyId = req.params.companyId;
+      
+      // Verify company exists
+      const company = await storage.getUserById(companyId);
+      if (!company || company.role !== 'company') {
+        return res.status(404).json({ message: "Company not found" });
+      }
+
+      // Fetch safety-related data
+      const [harnessInspections, toolboxMeetings, flhaForms, incidentReports] = await Promise.all([
+        storage.getHarnessInspectionsByCompany(companyId),
+        storage.getToolboxMeetingsByCompany(companyId),
+        storage.getFlhaFormsByCompany(companyId),
+        storage.getIncidentReportsByCompany(companyId),
+      ]);
+
+      res.json({
+        harnessInspections: harnessInspections.slice(0, 50),
+        toolboxMeetings: toolboxMeetings.slice(0, 50),
+        flhaForms: flhaForms.slice(0, 50),
+        incidentReports: incidentReports.slice(0, 50),
+        counts: {
+          harnessInspections: harnessInspections.length,
+          toolboxMeetings: toolboxMeetings.length,
+          flhaForms: flhaForms.length,
+          incidentReports: incidentReports.length,
+        }
+      });
+    } catch (error) {
+      console.error('[SuperUser] Impersonate safety error:', error);
+      res.status(500).json({ message: "Failed to fetch company safety data" });
+    }
+  });
+
   // Update user profile
   app.patch("/api/user/profile", requireAuth, async (req: Request, res: Response) => {
     try {

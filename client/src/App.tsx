@@ -34,6 +34,7 @@ import Schedule from "@/pages/Schedule";
 import SuperUser from "@/pages/SuperUser";
 import AllCompanies from "@/pages/AllCompanies";
 import CompanyDetail from "@/pages/CompanyDetail";
+import ViewAsCompany from "@/pages/ViewAsCompany";
 import SuperUserFeatureRequests from "@/pages/SuperUserFeatureRequests";
 import SuperUserMetrics from "@/pages/SuperUserMetrics";
 import ResidentsManagement from "@/pages/ResidentsManagement";
@@ -73,6 +74,11 @@ function Router() {
       <Route path="/superuser/companies/:id">
         <ProtectedRoute allowedRoles={["superuser"]}>
           <CompanyDetail />
+        </ProtectedRoute>
+      </Route>
+      <Route path="/superuser/view-as/:companyId">
+        <ProtectedRoute allowedRoles={["superuser"]}>
+          <ViewAsCompany />
         </ProtectedRoute>
       </Route>
       <Route path="/superuser/feature-requests">
