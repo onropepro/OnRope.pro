@@ -590,6 +590,13 @@ export default function Dashboard() {
     queryKey: ["/api/user"],
   });
 
+  // Fetch unread feature request message count for company owners
+  const { data: unreadMessageData } = useQuery<{ count: number }>({
+    queryKey: ["/api/feature-requests/unread-count"],
+    enabled: userData?.user?.role === 'company',
+    refetchInterval: 30000, // Refresh every 30 seconds
+  });
+
   // Fetch user preferences
   const { data: preferencesData } = useQuery({
     queryKey: ["/api/user-preferences"],
@@ -2107,9 +2114,20 @@ export default function Dashboard() {
           <div className="flex items-center gap-1 sm:gap-3 flex-shrink-0">
             <CSRBadge user={currentUser} />
             <RefreshButton />
-            <Button variant="ghost" size="icon" data-testid="button-profile" onClick={() => setLocation("/profile")}>
-              <span className="material-icons text-xl sm:text-2xl">person</span>
-            </Button>
+            <div className="relative">
+              <Button variant="ghost" size="icon" data-testid="button-profile" onClick={() => setLocation("/profile")}>
+                <span className="material-icons text-xl sm:text-2xl">person</span>
+              </Button>
+              {unreadMessageData && unreadMessageData.count > 0 && (
+                <Badge 
+                  variant="destructive" 
+                  className="absolute -top-1 -right-1 min-w-[18px] h-[18px] flex items-center justify-center text-[10px] px-1 pointer-events-none"
+                  data-testid="badge-unread-messages"
+                >
+                  {unreadMessageData.count > 99 ? '99+' : unreadMessageData.count}
+                </Badge>
+              )}
+            </div>
             <Button variant="ghost" size="icon" data-testid="button-logout" onClick={() => setShowLogoutDialog(true)}>
               <span className="material-icons text-xl sm:text-2xl">logout</span>
             </Button>
