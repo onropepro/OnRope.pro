@@ -10005,6 +10005,473 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Export quote as PDF - Management only (requires financial access)
+  app.get("/api/quotes/:id/pdf", requireAuth, requireRole("company", "owner_ceo", "human_resources", "accounting", "operations_manager", "general_supervisor", "rope_access_supervisor", "account_manager", "supervisor"), async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      const companyId = currentUser.role === "company" ? currentUser.id : currentUser.companyId;
+      if (!companyId) {
+        return res.status(400).json({ message: "Unable to determine company" });
+      }
+      
+      // Check if user has financial permissions
+      const canViewFinancialData = currentUser.role === "company" || 
+                                    currentUser.permissions?.includes("view_financial_data");
+      
+      if (!canViewFinancialData) {
+        return res.status(403).json({ message: "Financial data access required to export quotes" });
+      }
+      
+      const quote = await storage.getQuoteById(req.params.id);
+      
+      if (!quote) {
+        return res.status(404).json({ message: "Quote not found" });
+      }
+      
+      if (quote.companyId !== companyId) {
+        return res.status(403).json({ message: "Forbidden" });
+      }
+      
+      // Get company info for branding
+      const company = await storage.getUserById(companyId);
+      if (!company) {
+        return res.status(404).json({ message: "Company not found" });
+      }
+      
+      // Check if white label branding is active
+      const hasBranding = company.whitelabelBrandingActive;
+      const brandColor = hasBranding && company.brandingColor ? company.brandingColor : '#3B82F6';
+      const companyName = company.name || company.companyName || 'Company';
+      const companyLogo = hasBranding && company.brandingLogoUrl ? company.brandingLogoUrl : null;
+      
+      // Service type labels
+      const serviceTypeLabels: Record<string, string> = {
+        window_cleaning: 'Window Cleaning',
+        dryer_vent_cleaning: 'Exterior Dryer Vent Cleaning',
+        building_wash: 'Building Wash - Pressure Washing',
+        general_pressure_washing: 'General Pressure Washing',
+        gutter_cleaning: 'Gutter Cleaning',
+        parkade: 'Parkade Cleaning',
+        ground_windows: 'Ground Windows',
+        in_suite: 'In-Suite Dryer Vent',
+        painting: 'Painting',
+        custom: 'Custom Service',
+      };
+      
+      // Calculate totals
+      let grandTotal = 0;
+      const serviceRows = quote.services.map(service => {
+        const serviceName = service.serviceType === 'custom' 
+          ? (service.customServiceName || 'Custom Service')
+          : (serviceTypeLabels[service.serviceType] || service.serviceType);
+        
+        const cost = parseFloat(service.totalCost || '0');
+        grandTotal += cost;
+        
+        // Build description based on service type
+        let description = '';
+        if (['window_cleaning', 'dryer_vent_cleaning', 'building_wash', 'painting'].includes(service.serviceType)) {
+          const drops = [
+            service.dropsNorth ? `N: ${service.dropsNorth}` : null,
+            service.dropsEast ? `E: ${service.dropsEast}` : null,
+            service.dropsSouth ? `S: ${service.dropsSouth}` : null,
+            service.dropsWest ? `W: ${service.dropsWest}` : null,
+          ].filter(Boolean).join(', ');
+          if (drops) description = `Drops: ${drops}`;
+        } else if (service.serviceType === 'parkade') {
+          description = `${service.parkadeStalls || 0} stalls @ $${parseFloat(service.pricePerStall || '0').toFixed(2)}/stall`;
+        } else if (service.serviceType === 'ground_windows') {
+          description = `${service.groundWindowHours || 0} hours`;
+        } else if (service.serviceType === 'in_suite') {
+          description = `${service.suitesPerDay || 0} suites/day, ${service.floorsPerDay || 0} floors/day`;
+        }
+        
+        return {
+          name: serviceName,
+          description,
+          cost: cost.toFixed(2),
+        };
+      });
+
+      // Calculate tax (13% HST as example)
+      const taxRate = 0.13;
+      const taxAmount = grandTotal * taxRate;
+      const totalWithTax = grandTotal + taxAmount;
+      
+      // Generate PDF HTML with professional styling
+      const escapeHtml = (text: string) => {
+        return text
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;')
+          .replace(/'/g, '&#039;');
+      };
+
+      const pdfHtmlContent = `<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quote - ${escapeHtml(quote.buildingName)}</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+            font-size: 12px;
+            line-height: 1.5;
+            color: #1a1a1a;
+            background: white;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 40px;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 40px;
+            padding-bottom: 20px;
+            border-bottom: 3px solid ${brandColor};
+        }
+        .company-info {
+            flex: 1;
+        }
+        .company-logo {
+            max-width: 180px;
+            max-height: 80px;
+            object-fit: contain;
+            margin-bottom: 10px;
+        }
+        .company-name {
+            font-size: 24px;
+            font-weight: 700;
+            color: ${brandColor};
+            margin-bottom: 5px;
+        }
+        .company-tagline {
+            font-size: 11px;
+            color: #666;
+        }
+        .quote-title {
+            text-align: right;
+        }
+        .quote-title h1 {
+            font-size: 32px;
+            font-weight: 700;
+            color: ${brandColor};
+            margin-bottom: 5px;
+        }
+        .quote-number {
+            font-size: 14px;
+            color: #666;
+        }
+        .quote-date {
+            font-size: 12px;
+            color: #888;
+            margin-top: 5px;
+        }
+        .section {
+            margin-bottom: 30px;
+        }
+        .section-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: ${brandColor};
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 12px;
+            padding-bottom: 5px;
+            border-bottom: 1px solid #e5e5e5;
+        }
+        .info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        .info-box {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 6px;
+        }
+        .info-label {
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #666;
+            margin-bottom: 5px;
+        }
+        .info-value {
+            font-size: 13px;
+            font-weight: 500;
+            color: #1a1a1a;
+        }
+        .services-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+        .services-table th {
+            background: ${brandColor};
+            color: white;
+            padding: 12px 15px;
+            text-align: left;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .services-table th:last-child {
+            text-align: right;
+        }
+        .services-table td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #e5e5e5;
+        }
+        .services-table td:last-child {
+            text-align: right;
+            font-weight: 500;
+        }
+        .services-table tr:last-child td {
+            border-bottom: none;
+        }
+        .services-table .service-name {
+            font-weight: 500;
+        }
+        .services-table .service-desc {
+            font-size: 11px;
+            color: #666;
+            margin-top: 3px;
+        }
+        .totals {
+            margin-top: 20px;
+            border-top: 2px solid #e5e5e5;
+            padding-top: 15px;
+        }
+        .totals-row {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            padding: 8px 0;
+        }
+        .totals-label {
+            width: 150px;
+            text-align: right;
+            padding-right: 20px;
+            color: #666;
+        }
+        .totals-value {
+            width: 100px;
+            text-align: right;
+            font-weight: 500;
+        }
+        .totals-row.grand-total {
+            border-top: 2px solid ${brandColor};
+            margin-top: 10px;
+            padding-top: 15px;
+        }
+        .totals-row.grand-total .totals-label {
+            font-size: 14px;
+            font-weight: 600;
+            color: #1a1a1a;
+        }
+        .totals-row.grand-total .totals-value {
+            font-size: 18px;
+            font-weight: 700;
+            color: ${brandColor};
+        }
+        .footer {
+            margin-top: 50px;
+            padding-top: 20px;
+            border-top: 1px solid #e5e5e5;
+            text-align: center;
+        }
+        .footer-text {
+            font-size: 11px;
+            color: #888;
+            margin-bottom: 5px;
+        }
+        .footer-company {
+            font-size: 12px;
+            font-weight: 600;
+            color: ${brandColor};
+        }
+        .terms {
+            margin-top: 30px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 6px;
+        }
+        .terms-title {
+            font-size: 11px;
+            font-weight: 600;
+            color: #666;
+            margin-bottom: 8px;
+        }
+        .terms-text {
+            font-size: 10px;
+            color: #888;
+            line-height: 1.6;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="company-info">
+                ${companyLogo ? `<img src="${escapeHtml(companyLogo)}" alt="Company Logo" class="company-logo" />` : ''}
+                <div class="company-name">${escapeHtml(companyName)}</div>
+                <div class="company-tagline">Professional Rope Access & Building Maintenance</div>
+            </div>
+            <div class="quote-title">
+                <h1>QUOTE</h1>
+                <div class="quote-number">#${escapeHtml(quote.strataPlanNumber)}</div>
+                <div class="quote-date">Date: ${new Date(quote.createdAt || Date.now()).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</div>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-title">Property Information</div>
+            <div class="info-grid">
+                <div class="info-box">
+                    <div class="info-label">Building Name</div>
+                    <div class="info-value">${escapeHtml(quote.buildingName)}</div>
+                </div>
+                <div class="info-box">
+                    <div class="info-label">Strata Plan Number</div>
+                    <div class="info-value">${escapeHtml(quote.strataPlanNumber)}</div>
+                </div>
+                <div class="info-box">
+                    <div class="info-label">Address</div>
+                    <div class="info-value">${escapeHtml(quote.buildingAddress)}</div>
+                </div>
+                <div class="info-box">
+                    <div class="info-label">Number of Floors</div>
+                    <div class="info-value">${quote.floorCount} floors</div>
+                </div>
+            </div>
+        </div>
+
+        ${quote.strataManagerName ? `
+        <div class="section">
+            <div class="section-title">Property Manager</div>
+            <div class="info-grid">
+                <div class="info-box">
+                    <div class="info-label">Manager Name</div>
+                    <div class="info-value">${escapeHtml(quote.strataManagerName)}</div>
+                </div>
+                ${quote.strataManagerAddress ? `
+                <div class="info-box">
+                    <div class="info-label">Manager Address</div>
+                    <div class="info-value">${escapeHtml(quote.strataManagerAddress)}</div>
+                </div>
+                ` : ''}
+            </div>
+        </div>
+        ` : ''}
+
+        <div class="section">
+            <div class="section-title">Services</div>
+            <table class="services-table">
+                <thead>
+                    <tr>
+                        <th>Service</th>
+                        <th>Amount</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${serviceRows.map(row => `
+                    <tr>
+                        <td>
+                            <div class="service-name">${escapeHtml(row.name)}</div>
+                            ${row.description ? `<div class="service-desc">${escapeHtml(row.description)}</div>` : ''}
+                        </td>
+                        <td>$${row.cost}</td>
+                    </tr>
+                    `).join('')}
+                </tbody>
+            </table>
+            
+            <div class="totals">
+                <div class="totals-row">
+                    <span class="totals-label">Subtotal</span>
+                    <span class="totals-value">$${grandTotal.toFixed(2)}</span>
+                </div>
+                <div class="totals-row">
+                    <span class="totals-label">HST (13%)</span>
+                    <span class="totals-value">$${taxAmount.toFixed(2)}</span>
+                </div>
+                <div class="totals-row grand-total">
+                    <span class="totals-label">Total</span>
+                    <span class="totals-value">$${totalWithTax.toFixed(2)}</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="terms">
+            <div class="terms-title">Terms & Conditions</div>
+            <div class="terms-text">
+                This quote is valid for 30 days from the date of issue. Payment terms: Net 30 days from invoice date. 
+                All prices are in Canadian dollars unless otherwise specified. Work will be scheduled upon acceptance 
+                of this quote. Additional charges may apply for work outside the scope of this quote.
+            </div>
+        </div>
+
+        <div class="footer">
+            <div class="footer-text">Thank you for considering our services</div>
+            <div class="footer-company">${escapeHtml(companyName)}</div>
+        </div>
+    </div>
+</body>
+</html>`;
+
+      // Generate PDF using html-pdf-node
+      const htmlPdf = await import('html-pdf-node');
+      const pdfOptions = { 
+        format: 'A4' as const,
+        printBackground: true,
+        margin: { top: '20px', right: '20px', bottom: '20px', left: '20px' }
+      };
+      
+      let pdfBuffer: Buffer;
+      try {
+        const pdfResult = await htmlPdf.default.generatePdf(
+          { content: pdfHtmlContent }, 
+          pdfOptions
+        );
+        pdfBuffer = Buffer.isBuffer(pdfResult) ? pdfResult : (pdfResult as any).content || pdfResult;
+        
+        if (!Buffer.isBuffer(pdfBuffer)) {
+          throw new Error("PDF generation did not return a valid buffer");
+        }
+      } catch (pdfError) {
+        console.error("Quote PDF generation error:", pdfError);
+        return res.status(500).json({ message: "Failed to generate PDF. Please try again." });
+      }
+      
+      // Set headers for PDF download
+      const fileName = `Quote-${quote.strataPlanNumber}-${quote.buildingName.replace(/[^a-zA-Z0-9]/g, '_')}.pdf`;
+      res.setHeader('Content-Type', 'application/pdf');
+      res.setHeader('Content-Disposition', `attachment; filename="${fileName}"`);
+      res.setHeader('Content-Length', pdfBuffer.length);
+      
+      res.send(pdfBuffer);
+    } catch (error) {
+      console.error("Export quote PDF error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
   // Update quote - Management and workers with edit_quotes permission
   app.patch("/api/quotes/:id", requireAuth, requireRole("company", "owner_ceo", "human_resources", "accounting", "operations_manager", "general_supervisor", "rope_access_supervisor", "account_manager", "supervisor", "rope_access_tech", "manager", "ground_crew", "ground_crew_supervisor"), async (req: Request, res: Response) => {
     try {
