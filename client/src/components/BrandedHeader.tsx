@@ -2,6 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { RefreshButton } from "@/components/RefreshButton";
 import { useLocation } from "wouter";
+import { Badge } from "@/components/ui/badge";
 
 interface BrandedHeaderProps {
   title: string;
@@ -16,6 +17,13 @@ export function BrandedHeader({ title, subtitle, showBackButton, backPath = "/da
 
   const { data: userData } = useQuery({
     queryKey: ["/api/user"],
+  });
+
+  // Fetch unread feature request message count for company owners
+  const { data: unreadData } = useQuery<{ count: number }>({
+    queryKey: ["/api/feature-requests/unread-count"],
+    enabled: userData?.user?.role === 'company',
+    refetchInterval: 30000, // Refresh every 30 seconds
   });
 
   // Determine company ID to fetch branding for
@@ -74,15 +82,26 @@ export function BrandedHeader({ title, subtitle, showBackButton, backPath = "/da
         <div className="flex items-center gap-3">
           {children}
           <RefreshButton />
-          <Button 
-            variant="ghost" 
-            size="icon" 
-            data-testid="button-profile" 
-            onClick={() => setLocation("/profile")} 
-            className="hover-elevate w-12 h-12"
-          >
-            <span className="material-icons text-2xl">person</span>
-          </Button>
+          <div className="relative">
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              data-testid="button-profile" 
+              onClick={() => setLocation("/profile")} 
+              className="hover-elevate w-12 h-12"
+            >
+              <span className="material-icons text-2xl">person</span>
+            </Button>
+            {unreadData && unreadData.count > 0 && (
+              <Badge 
+                variant="destructive" 
+                className="absolute -top-1 -right-1 min-w-[20px] h-5 flex items-center justify-center text-xs px-1.5 pointer-events-none"
+                data-testid="badge-unread-messages"
+              >
+                {unreadData.count > 99 ? '99+' : unreadData.count}
+              </Badge>
+            )}
+          </div>
         </div>
       </div>
     </header>
