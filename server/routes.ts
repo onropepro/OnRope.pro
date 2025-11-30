@@ -8637,7 +8637,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Documents array is required" });
       }
       
-      const validDocTypes = ['health_safety_manual', 'company_policy', 'method_statement', 'safe_work_practice'];
+      const validDocTypes = ['health_safety_manual', 'company_policy', 'method_statement', 'safe_work_practice', 'safe_work_procedure'];
       for (const doc of documents) {
         if (!doc.type || !validDocTypes.includes(doc.type)) {
           return res.status(400).json({ message: `Invalid document type: ${doc.type}` });
@@ -8845,7 +8845,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Documents array is required" });
       }
       
-      const validDocTypes = ['health_safety_manual', 'company_policy', 'method_statement', 'safe_work_practice'];
+      const validDocTypes = ['health_safety_manual', 'company_policy', 'method_statement', 'safe_work_practice', 'safe_work_procedure'];
       for (const doc of documents) {
         if (!doc.type || !validDocTypes.includes(doc.type)) {
           return res.status(400).json({ message: `Invalid document type: ${doc.type}` });
