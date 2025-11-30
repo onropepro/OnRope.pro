@@ -9,7 +9,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, Di
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
-import { FileText, Eye, PenLine, Check, AlertCircle, Clock, ChevronRight, ChevronDown, FileCheck, FileWarning, Loader2, ExternalLink, Shield, HardHat, Wrench, AlertTriangle, ClipboardList, Phone, GraduationCap } from "lucide-react";
+import { FileText, Eye, PenLine, Check, AlertCircle, Clock, ChevronRight, ChevronDown, FileCheck, FileWarning, Loader2, ExternalLink, Shield, HardHat, Wrench, AlertTriangle, ClipboardList, Phone, GraduationCap, Package, Thermometer, HeartPulse, MessageCircle, Lightbulb, Zap } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 
@@ -147,6 +147,72 @@ const SAFE_WORK_PROCEDURES: SafeWorkProcedure[] = [
   }
 ];
 
+// Safe Work Practice Template Interface
+interface SafeWorkPractice {
+  id: string;
+  title: string;
+  description: string;
+  category: string;
+  icon: any;
+  keyPrinciples: string[];
+  requirements: string[];
+  doList: string[];
+  dontList: string[];
+  emergencyActions: string[];
+}
+
+// Safe Work Practice Templates
+const SAFE_WORK_PRACTICES: SafeWorkPractice[] = [
+  {
+    id: 'general_ppe',
+    title: 'Personal Protective Equipment (PPE)',
+    description: 'Guidelines for proper selection, use, and maintenance of personal protective equipment.',
+    category: 'General Safety',
+    icon: Shield,
+    keyPrinciples: ['PPE is the last line of defense', 'All PPE must be inspected before each use', 'PPE must be appropriate for the specific hazard', 'Damaged or expired PPE must never be used'],
+    requirements: ['Full body harness inspected within 12 months', 'Hard hat with chin strap rated to EN 397', 'Safety glasses or goggles as required', 'Appropriate gloves for the task'],
+    doList: ['Inspect all PPE before each use', 'Store PPE properly when not in use', 'Report any damage immediately', 'Replace PPE according to manufacturer guidelines'],
+    dontList: ['Never use damaged or expired PPE', 'Never modify PPE from original design', 'Never share personal PPE without sanitization'],
+    emergencyActions: ['If PPE fails during work, immediately move to safe position', 'Report all PPE failures to supervisor']
+  },
+  {
+    id: 'fall_protection',
+    title: 'Fall Protection',
+    description: 'Essential practices for preventing falls from height during rope access operations.',
+    category: 'Working at Heights',
+    icon: AlertTriangle,
+    keyPrinciples: ['Falls from height are the leading cause of fatalities', 'Dual rope systems provide redundancy', 'Anchor points must be independently tested', '100% tie-off at all times when at height'],
+    requirements: ['Minimum IRATA Level 1 certification', 'Dual rope system with independent anchors', 'Anchor points rated to minimum 15kN', 'Fall arrester device properly engaged'],
+    doList: ['Verify anchor point integrity before use', 'Maintain 100% tie-off at all times', 'Use backup device in addition to descender', 'Communicate clearly with team members'],
+    dontList: ['Never work at height alone', 'Never trust unverified anchor points', 'Never remove fall protection while at height', 'Never work in severe weather conditions'],
+    emergencyActions: ['In case of fall arrest, immediately call for rescue', 'Suspended worker rescue must occur within 15 minutes', 'Activate emergency services if rescue not possible']
+  },
+  {
+    id: 'chemical_safety',
+    title: 'Chemical Safety',
+    description: 'Safe handling, storage, and disposal of chemicals used in cleaning operations.',
+    category: 'Hazardous Materials',
+    icon: Zap,
+    keyPrinciples: ['Know the hazards before using any chemical', 'Always read and follow SDS information', 'Use appropriate PPE for each chemical', 'Never mix chemicals unless approved'],
+    requirements: ['SDS available for all chemicals on site', 'Chemical-specific PPE available', 'Proper storage containers and areas', 'Spill containment materials on hand'],
+    doList: ['Read SDS before first use of any chemical', 'Use in well-ventilated areas', 'Store chemicals in designated areas', 'Label all containers clearly'],
+    dontList: ['Never mix different chemicals', 'Never transfer to unlabeled containers', 'Never use chemicals near ignition sources', 'Never dispose of chemicals in drains'],
+    emergencyActions: ['For chemical exposure: rinse immediately with water', 'For inhalation: move to fresh air', 'For spills: contain and refer to SDS', 'Seek medical attention if symptoms persist']
+  },
+  {
+    id: 'communication_protocols',
+    title: 'Communication Protocols',
+    description: 'Effective communication practices for rope access team operations.',
+    category: 'Team Operations',
+    icon: MessageCircle,
+    keyPrinciples: ['Clear communication prevents accidents', 'All team members must have working radios', 'Use standard signals and terminology', 'Confirm all critical messages'],
+    requirements: ['Two-way radios for all rope access personnel', 'Pre-work communication check', 'Emergency contact numbers available', 'Hand signals for backup communication'],
+    doList: ['Check radio functionality before work', 'Use clear, concise language', 'Confirm receipt of critical messages', 'Report all safety concerns immediately'],
+    dontList: ['Never work without means of communication', 'Never ignore calls or messages', 'Never use phones while on rope', 'Never assume message was received'],
+    emergencyActions: ['Use emergency channel for urgent situations', 'Three short whistle blasts = emergency', 'Maintain line of sight when possible', 'Have backup communication methods ready']
+  }
+];
+
 interface DocumentReviewSignature {
   id: string;
   companyId: string;
@@ -178,6 +244,8 @@ export function DocumentReviews({ companyDocuments = [], methodStatements = [] }
   const [isSignatureEmpty, setIsSignatureEmpty] = useState(true);
   const [isSWPDialogOpen, setIsSWPDialogOpen] = useState(false);
   const [selectedSWP, setSelectedSWP] = useState<SafeWorkProcedure | null>(null);
+  const [isPracticeDialogOpen, setIsPracticeDialogOpen] = useState(false);
+  const [selectedPractice, setSelectedPractice] = useState<SafeWorkPractice | null>(null);
 
   const { data: reviewsData, isLoading } = useQuery<{ reviews: DocumentReviewSignature[] }>({
     queryKey: ['/api/document-reviews/my'],
@@ -257,6 +325,8 @@ export function DocumentReviews({ companyDocuments = [], methodStatements = [] }
         return 'Method Statement';
       case 'safe_work_procedure':
         return 'Safe Work Procedure';
+      case 'safe_work_practice':
+        return 'Safe Work Practice';
       default:
         return type;
     }
@@ -264,6 +334,10 @@ export function DocumentReviews({ companyDocuments = [], methodStatements = [] }
 
   const findSWPTemplate = (documentName: string): SafeWorkProcedure | null => {
     return SAFE_WORK_PROCEDURES.find(swp => swp.title === documentName) || null;
+  };
+
+  const findPracticeTemplate = (documentName: string): SafeWorkPractice | null => {
+    return SAFE_WORK_PRACTICES.find(practice => practice.title === documentName) || null;
   };
 
   const handleViewDocument = (review: DocumentReviewSignature) => {
@@ -285,6 +359,20 @@ export function DocumentReviews({ companyDocuments = [], methodStatements = [] }
           variant: "destructive",
           title: "Document Not Available",
           description: "The safe work procedure template could not be found.",
+        });
+      }
+    } else if (review.documentType === 'safe_work_practice') {
+      const practiceTemplate = findPracticeTemplate(review.documentName);
+      if (practiceTemplate) {
+        setSelectedPractice(practiceTemplate);
+        setSelectedReview(review);
+        setIsPracticeDialogOpen(true);
+        markViewedMutation.mutate(review.id);
+      } else {
+        toast({
+          variant: "destructive",
+          title: "Document Not Available",
+          description: "The safe work practice template could not be found.",
         });
       }
     } else {
@@ -695,6 +783,111 @@ export function DocumentReviews({ companyDocuments = [], methodStatements = [] }
                 }
               }}
               data-testid="button-swp-proceed-sign"
+            >
+              <PenLine className="h-4 w-4 mr-2" />
+              {t('documents.proceedToSign', 'Proceed to Sign')}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Safe Work Practice Dialog */}
+      <Dialog open={isPracticeDialogOpen} onOpenChange={setIsPracticeDialogOpen}>
+        <DialogContent className="sm:max-w-3xl max-h-[85vh]">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Shield className="h-5 w-5 text-amber-500" />
+              {selectedPractice?.title || t('documents.safeWorkPractice', 'Safe Work Practice')}
+            </DialogTitle>
+            <DialogDescription>
+              {selectedPractice?.description}
+            </DialogDescription>
+          </DialogHeader>
+          
+          <ScrollArea className="max-h-[60vh] pr-4">
+            {selectedPractice && (
+              <div className="space-y-6">
+                <div>
+                  <h4 className="font-semibold text-sm mb-2 flex items-center gap-2">
+                    <Lightbulb className="h-4 w-4 text-amber-500" />
+                    Key Principles
+                  </h4>
+                  <ul className="text-sm text-muted-foreground space-y-1 list-disc list-inside">
+                    {selectedPractice.keyPrinciples.map((principle, idx) => (
+                      <li key={idx}>{principle}</li>
+                    ))}
+                  </ul>
+                </div>
+
+                <Separator />
+
+                <div>
+                  <h4 className="font-semibold text-sm mb-2 flex items-center gap-2">
+                    <ClipboardList className="h-4 w-4 text-blue-500" />
+                    Requirements
+                  </h4>
+                  <ul className="text-sm text-muted-foreground space-y-1 list-disc list-inside">
+                    {selectedPractice.requirements.map((req, idx) => (
+                      <li key={idx}>{req}</li>
+                    ))}
+                  </ul>
+                </div>
+
+                <div className="grid md:grid-cols-2 gap-6">
+                  <div>
+                    <h4 className="font-semibold text-sm mb-2 flex items-center gap-2">
+                      <Check className="h-4 w-4 text-emerald-500" />
+                      Do
+                    </h4>
+                    <ul className="text-sm text-muted-foreground space-y-1 list-disc list-inside">
+                      {selectedPractice.doList.map((item, idx) => (
+                        <li key={idx}>{item}</li>
+                      ))}
+                    </ul>
+                  </div>
+
+                  <div>
+                    <h4 className="font-semibold text-sm mb-2 flex items-center gap-2">
+                      <AlertCircle className="h-4 w-4 text-red-500" />
+                      Don't
+                    </h4>
+                    <ul className="text-sm text-muted-foreground space-y-1 list-disc list-inside">
+                      {selectedPractice.dontList.map((item, idx) => (
+                        <li key={idx}>{item}</li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+
+                <Separator />
+
+                <div>
+                  <h4 className="font-semibold text-sm mb-2 flex items-center gap-2">
+                    <Phone className="h-4 w-4 text-red-500" />
+                    Emergency Actions
+                  </h4>
+                  <ul className="text-sm text-muted-foreground space-y-1 list-disc list-inside">
+                    {selectedPractice.emergencyActions.map((action, idx) => (
+                      <li key={idx}>{action}</li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+            )}
+          </ScrollArea>
+
+          <DialogFooter className="flex-col sm:flex-row gap-2">
+            <p className="text-xs text-muted-foreground flex-1">
+              {t('documents.reviewBeforeSigning', 'Review this document carefully before signing to acknowledge receipt and understanding.')}
+            </p>
+            <Button
+              onClick={() => {
+                setIsPracticeDialogOpen(false);
+                if (selectedReview) {
+                  handleOpenSignDialog(selectedReview, true);
+                }
+              }}
+              data-testid="button-practice-proceed-sign"
             >
               <PenLine className="h-4 w-4 mr-2" />
               {t('documents.proceedToSign', 'Proceed to Sign')}
