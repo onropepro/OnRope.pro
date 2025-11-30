@@ -4,6 +4,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Link } from "wouter";
+import { useTranslation } from "react-i18next";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { hasFinancialAccess, isManagement, hasPermission } from "@/lib/permissions";
 import { Button } from "@/components/ui/button";
@@ -159,6 +160,7 @@ type BuildingInfoFormData = z.infer<typeof buildingInfoSchema>;
 type ServiceFormData = z.infer<typeof serviceFormSchema>;
 
 export default function Quotes() {
+  const { t } = useTranslation();
   const { toast } = useToast();
   
   // View states
@@ -871,19 +873,19 @@ export default function Quotes() {
                 data-testid="button-back-to-dashboard"
               >
                 <ArrowLeft className="w-4 h-4 mr-2" />
-                Back to Dashboard
+                {t('quotes.backToDashboard', 'Back to Dashboard')}
               </Button>
             </Link>
 
             <div className="mb-6 sm:mb-8">
-              <h1 className="text-2xl sm:text-4xl font-bold text-foreground mb-2">Service Quotes</h1>
-              <p className="text-sm sm:text-base text-muted-foreground">Create and manage service quotes for buildings</p>
+              <h1 className="text-2xl sm:text-4xl font-bold text-foreground mb-2">{t('quotes.pageTitle', 'Service Quotes')}</h1>
+              <p className="text-sm sm:text-base text-muted-foreground">{t('quotes.pageSubtitle', 'Create and manage service quotes for buildings')}</p>
             </div>
 
             <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as "create" | "my-quotes")}>
               <TabsList className="mb-6">
-                <TabsTrigger value="my-quotes" data-testid="tab-my-quotes">My Quotes</TabsTrigger>
-                <TabsTrigger value="create" data-testid="tab-create">Create Quote</TabsTrigger>
+                <TabsTrigger value="my-quotes" data-testid="tab-my-quotes">{t('quotes.myQuotes', 'My Quotes')}</TabsTrigger>
+                <TabsTrigger value="create" data-testid="tab-create">{t('quotes.createQuote', 'Create Quote')}</TabsTrigger>
               </TabsList>
 
               <TabsContent value="my-quotes">
@@ -892,7 +894,7 @@ export default function Quotes() {
                   <div className="relative">
                     <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                     <Input
-                      placeholder="Search by strata plan number or building name..."
+                      placeholder={t('quotes.searchPlaceholder', 'Search by strata plan number or building name...')}
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
                       className="pl-10"
@@ -903,17 +905,17 @@ export default function Quotes() {
 
                 {isLoading ? (
                   <div className="text-center py-12">
-                    <p className="text-muted-foreground">Loading quotes...</p>
+                    <p className="text-muted-foreground">{t('quotes.loading', 'Loading quotes...')}</p>
                   </div>
                 ) : filteredQuotes.length === 0 ? (
                   <Card className="rounded-2xl shadow-lg border border-border">
                     <CardContent className="p-12 text-center">
                       <Building2 className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
                       <h3 className="text-xl font-semibold text-foreground mb-2">
-                        {searchQuery ? "No quotes found" : "No quotes yet"}
+                        {searchQuery ? t('quotes.noQuotesFound', 'No quotes found') : t('quotes.noQuotesYet', 'No quotes yet')}
                       </h3>
                       <p className="text-muted-foreground mb-6">
-                        {searchQuery ? "Try a different search term" : "Create your first service quote to get started"}
+                        {searchQuery ? t('quotes.tryDifferentSearch', 'Try a different search term') : t('quotes.createFirstQuote', 'Create your first service quote to get started')}
                       </p>
                       {!searchQuery && (
                         <Button
@@ -922,7 +924,7 @@ export default function Quotes() {
                           data-testid="button-create-first-quote"
                         >
                           <Plus className="w-4 h-4 mr-2" />
-                          Create Quote
+                          {t('quotes.createQuote', 'Create Quote')}
                         </Button>
                       )}
                     </CardContent>
@@ -964,7 +966,7 @@ export default function Quotes() {
                           </div>
                           <div className="space-y-2 text-sm text-muted-foreground">
                             <p>{quote.buildingAddress}</p>
-                            <p>{quote.floorCount} floors</p>
+                            <p>{quote.floorCount} {t('quotes.floors', 'floors')}</p>
                             {quote.createdAt && (
                               <p className="text-xs">
                                 {new Date(quote.createdAt).toLocaleDateString()}
@@ -975,7 +977,7 @@ export default function Quotes() {
                         <CardContent className="p-6 pt-0">
                           <div className="space-y-3">
                             <div className="flex items-center justify-between text-sm">
-                              <span className="text-muted-foreground">Services:</span>
+                              <span className="text-muted-foreground">{t('quotes.services', 'Services')}:</span>
                               <Badge variant="outline" data-testid={`badge-service-count-${quote.id}`}>
                                 {quote.services.length}
                               </Badge>
@@ -1003,7 +1005,7 @@ export default function Quotes() {
                       data-testid="button-create-quote"
                     >
                       <Plus className="w-4 h-4 mr-2" />
-                      New Quote
+                      {t('quotes.newQuote', 'New Quote')}
                     </Button>
                   </CardContent>
                 </Card>
@@ -1025,14 +1027,14 @@ export default function Quotes() {
               data-testid="button-back-to-dashboard"
             >
               <ArrowLeft className="w-4 h-4 mr-2" />
-              Back to Dashboard
+              {t('quotes.backToDashboard', 'Back to Dashboard')}
             </Button>
           </Link>
 
           <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-8 gap-4">
             <div>
-              <h1 className="text-4xl font-bold text-foreground mb-2">Service Quotes</h1>
-              <p className="text-muted-foreground">Create and manage service quotes for buildings</p>
+              <h1 className="text-4xl font-bold text-foreground mb-2">{t('quotes.pageTitle', 'Service Quotes')}</h1>
+              <p className="text-muted-foreground">{t('quotes.pageSubtitle', 'Create and manage service quotes for buildings')}</p>
             </div>
             <Button
               onClick={() => {
@@ -1043,7 +1045,7 @@ export default function Quotes() {
               data-testid="button-create-quote"
             >
               <Plus className="w-4 h-4 mr-2" />
-              New Quote
+              {t('quotes.newQuote', 'New Quote')}
             </Button>
           </div>
 
@@ -1052,7 +1054,7 @@ export default function Quotes() {
             <div className="relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
               <Input
-                placeholder="Search by strata plan number or building name..."
+                placeholder={t('quotes.searchPlaceholder', 'Search by strata plan number or building name...')}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="pl-10"
@@ -1063,17 +1065,17 @@ export default function Quotes() {
 
           {isLoading ? (
             <div className="text-center py-12">
-              <p className="text-muted-foreground">Loading quotes...</p>
+              <p className="text-muted-foreground">{t('quotes.loading', 'Loading quotes...')}</p>
             </div>
           ) : filteredQuotes.length === 0 ? (
             <Card className="rounded-2xl shadow-lg border border-border">
               <CardContent className="p-12 text-center">
                 <Building2 className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
                 <h3 className="text-xl font-semibold text-foreground mb-2">
-                  {searchQuery ? "No quotes found" : "No quotes yet"}
+                  {searchQuery ? t('quotes.noQuotesFound', 'No quotes found') : t('quotes.noQuotesYet', 'No quotes yet')}
                 </h3>
                 <p className="text-muted-foreground mb-6">
-                  {searchQuery ? "Try a different search term" : "Create your first service quote to get started"}
+                  {searchQuery ? t('quotes.tryDifferentSearch', 'Try a different search term') : t('quotes.createFirstQuote', 'Create your first service quote to get started')}
                 </p>
                 {!searchQuery && (
                   <Button
@@ -1085,7 +1087,7 @@ export default function Quotes() {
                     data-testid="button-create-first-quote"
                   >
                     <Plus className="w-4 h-4 mr-2" />
-                    Create Quote
+                    {t('quotes.createQuote', 'Create Quote')}
                   </Button>
                 )}
               </CardContent>
@@ -1127,7 +1129,7 @@ export default function Quotes() {
                     </div>
                     <div className="space-y-2 text-sm text-muted-foreground">
                       <p>{quote.buildingAddress}</p>
-                      <p>{quote.floorCount} floors</p>
+                      <p>{quote.floorCount} {t('quotes.floors', 'floors')}</p>
                       {quote.createdAt && (
                         <p className="text-xs">
                           {new Date(quote.createdAt).toLocaleDateString()}
@@ -1138,7 +1140,7 @@ export default function Quotes() {
                   <CardContent className="p-6 pt-0">
                     <div className="space-y-3">
                       <div className="flex items-center justify-between text-sm">
-                        <span className="text-muted-foreground">Services:</span>
+                        <span className="text-muted-foreground">{t('quotes.services', 'Services')}:</span>
                         <Badge variant="outline" data-testid={`badge-service-count-${quote.id}`}>
                           {quote.services.length}
                         </Badge>
@@ -1178,7 +1180,7 @@ export default function Quotes() {
             data-testid="button-back-to-list"
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
-            Back to Quotes
+            {t('quotes.backToQuotes', 'Back to Quotes')}
           </Button>
 
           <Card className="rounded-2xl shadow-lg border border-border mb-8">
@@ -1214,7 +1216,7 @@ export default function Quotes() {
                       data-testid="button-download-quote"
                     >
                       <Download className="w-4 h-4 mr-2" />
-                      Download
+                      {t('quotes.download', 'Download')}
                     </Button>
                     {selectedQuote.status === "draft" && 
                      (canEditQuotes || selectedQuote.createdBy === currentUser?.id) && (
@@ -1478,11 +1480,11 @@ export default function Quotes() {
                             <p className="font-medium text-foreground">${Number(service.pricePerHour).toFixed(2)}</p>
                           </div>
                           <div>
-                            <p className="text-muted-foreground mb-1">Total Hours</p>
+                            <p className="text-muted-foreground mb-1">{t('quotes.totalHours', 'Total Hours')}</p>
                             <p className="font-medium text-foreground">{Number(service.totalHours).toFixed(1)}</p>
                           </div>
                           <div>
-                            <p className="text-muted-foreground mb-1">Total Cost</p>
+                            <p className="text-muted-foreground mb-1">{t('quotes.totalCost', 'Total Cost')}</p>
                             <p className="text-xl font-bold text-primary">
                               ${Number(service.totalCost).toFixed(2)}
                             </p>
@@ -1501,7 +1503,7 @@ export default function Quotes() {
               <CardContent className="p-8">
                 <div className="flex items-center justify-between">
                   <div>
-                    <h3 className="text-xl font-semibold text-foreground mb-1">Quote Total</h3>
+                    <h3 className="text-xl font-semibold text-foreground mb-1">{t('quotes.quoteTotal', 'Quote Total')}</h3>
                     <p className="text-muted-foreground">
                       {selectedQuote.services.length} service{selectedQuote.services.length !== 1 ? 's' : ''}
                     </p>
@@ -1558,7 +1560,7 @@ export default function Quotes() {
                 data-testid="button-edit-quote"
               >
                 <Edit className="w-4 h-4 mr-2" />
-                Edit Quote
+                {t('quotes.editQuote', 'Edit Quote')}
               </Button>
             )}
             {selectedQuote.status === "open" && (
@@ -1582,7 +1584,7 @@ export default function Quotes() {
               disabled={deleteQuoteMutation.isPending}
               data-testid="button-delete-quote"
             >
-              Delete Quote
+              {t('quotes.deleteQuote', 'Delete Quote')}
             </Button>
           </div>
         </div>
@@ -1592,13 +1594,13 @@ export default function Quotes() {
         <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
           <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
-              <DialogTitle className="text-2xl font-bold">Edit Quote</DialogTitle>
+              <DialogTitle className="text-2xl font-bold">{t('quotes.editQuote', 'Edit Quote')}</DialogTitle>
             </DialogHeader>
             <Form {...editForm}>
               <form onSubmit={editForm.handleSubmit((data) => editQuoteMutation.mutate(data))} className="space-y-6">
                 {/* Building Information */}
                 <div className="space-y-4">
-                  <h3 className="text-lg font-semibold">Building Information</h3>
+                  <h3 className="text-lg font-semibold">{t('quotes.buildingInfo', 'Building Information')}</h3>
                   <div className="grid grid-cols-2 gap-4">
                     <FormField
                       control={editForm.control}
@@ -2381,7 +2383,7 @@ export default function Quotes() {
             data-testid="button-back-to-list"
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
-            Back to Quotes
+            {t('quotes.backToQuotes', 'Back to Quotes')}
           </Button>
 
           <div className="mb-8">

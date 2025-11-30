@@ -5764,8 +5764,8 @@ export default function Documents() {
                   <FileText className="h-6 w-6 text-primary" />
                 </div>
                 <div className="flex-1">
-                  <CardTitle className="text-xl mb-1">Rope Access Plans</CardTitle>
-                  <p className="text-sm text-muted-foreground">Project-specific access plans and documentation</p>
+                  <CardTitle className="text-xl mb-1">{t('documents.ropeAccessPlans', 'Rope Access Plans')}</CardTitle>
+                  <p className="text-sm text-muted-foreground">{t('documents.ropeAccessPlansDesc', 'Project-specific access plans and documentation')}</p>
                 </div>
                 <Badge variant="secondary" className="text-base font-semibold px-3">
                   {allDocuments.length}
@@ -5833,8 +5833,8 @@ export default function Documents() {
                   <div className="inline-flex p-4 bg-primary/5 rounded-full mb-4">
                     <FileText className="h-8 w-8 text-primary/50" />
                   </div>
-                  <p className="text-muted-foreground font-medium">No rope access plans uploaded yet</p>
-                  <p className="text-sm text-muted-foreground mt-1">Plans will appear here when added to projects</p>
+                  <p className="text-muted-foreground font-medium">{t('documents.noRopeAccessPlans', 'No rope access plans uploaded yet')}</p>
+                  <p className="text-sm text-muted-foreground mt-1">{t('documents.noRopeAccessPlansDesc', 'Plans will appear here when added to projects')}</p>
                 </div>
               )}
             </CardContent>
@@ -5849,8 +5849,8 @@ export default function Documents() {
                 <Calendar className="h-6 w-6 text-primary" />
               </div>
               <div className="flex-1">
-                <CardTitle className="text-xl mb-1">Toolbox Meeting Records</CardTitle>
-                <p className="text-sm text-muted-foreground">Daily safety briefings and discussions</p>
+                <CardTitle className="text-xl mb-1">{t('documents.toolboxMeetingRecords', 'Toolbox Meeting Records')}</CardTitle>
+                <p className="text-sm text-muted-foreground">{t('documents.toolboxMeetingRecordsDesc', 'Daily safety briefings and discussions')}</p>
               </div>
               <Badge variant="secondary" className="text-base font-semibold px-3">
                 {meetings.length}
@@ -5915,8 +5915,8 @@ export default function Documents() {
                 <div className="inline-flex p-4 bg-primary/5 rounded-full mb-4">
                   <Calendar className="h-8 w-8 text-primary/50" />
                 </div>
-                <p className="text-muted-foreground font-medium">No toolbox meetings recorded yet</p>
-                <p className="text-sm text-muted-foreground mt-1">Safety meetings will appear here when conducted</p>
+                <p className="text-muted-foreground font-medium">{t('documents.noToolboxMeetings', 'No toolbox meetings recorded yet')}</p>
+                <p className="text-sm text-muted-foreground mt-1">{t('documents.noToolboxMeetingsDesc', 'Safety meetings will appear here when conducted')}</p>
               </div>
             )}
           </CardContent>
@@ -5931,8 +5931,8 @@ export default function Documents() {
                   <Calendar className="h-6 w-6 text-orange-600 dark:text-orange-400" />
                 </div>
                 <div className="flex-1">
-                  <CardTitle className="text-xl mb-1">FLHA Records</CardTitle>
-                  <p className="text-sm text-muted-foreground">Field-level hazard assessments</p>
+                  <CardTitle className="text-xl mb-1">{t('documents.flhaRecords', 'FLHA Records')}</CardTitle>
+                  <p className="text-sm text-muted-foreground">{t('documents.flhaRecordsDesc', 'Field-level hazard assessments')}</p>
                 </div>
                 <Badge variant="secondary" className="text-base font-semibold px-3">
                   {flhaForms.length}
@@ -6008,8 +6008,8 @@ export default function Documents() {
                   <div className="inline-flex p-4 bg-orange-500/5 rounded-full mb-4">
                     <Calendar className="h-8 w-8 text-orange-500/50" />
                   </div>
-                  <p className="text-muted-foreground font-medium">No FLHA forms recorded yet</p>
-                  <p className="text-sm text-muted-foreground mt-1">Hazard assessments will appear here when completed</p>
+                  <p className="text-muted-foreground font-medium">{t('documents.noFlhaForms', 'No FLHA forms recorded yet')}</p>
+                  <p className="text-sm text-muted-foreground mt-1">{t('documents.noFlhaFormsDesc', 'Hazard assessments will appear here when completed')}</p>
                 </div>
               )}
             </CardContent>
@@ -6025,8 +6025,8 @@ export default function Documents() {
                   <AlertTriangle className="h-6 w-6 text-primary" />
                 </div>
                 <div className="flex-1">
-                  <CardTitle className="text-xl mb-1">Incident Reports</CardTitle>
-                  <p className="text-sm text-muted-foreground">Safety incidents and accident reports</p>
+                  <CardTitle className="text-xl mb-1">{t('documents.incidentReports', 'Incident Reports')}</CardTitle>
+                  <p className="text-sm text-muted-foreground">{t('documents.incidentReportsDesc', 'Safety incidents and accident reports')}</p>
                 </div>
                 <Badge variant="secondary" className="text-base font-semibold px-3">
                   {incidentReports.length}
@@ -6120,8 +6120,8 @@ export default function Documents() {
                   <div className="inline-flex p-4 bg-red-500/5 rounded-full mb-4">
                     <AlertTriangle className="h-8 w-8 text-red-500/50" />
                   </div>
-                  <p className="text-muted-foreground font-medium">No incident reports recorded yet</p>
-                  <p className="text-sm text-muted-foreground mt-1">Safety incidents will be documented here</p>
+                  <p className="text-muted-foreground font-medium">{t('documents.noIncidentReports', 'No incident reports recorded yet')}</p>
+                  <p className="text-sm text-muted-foreground mt-1">{t('documents.noIncidentReportsDesc', 'Safety incidents will be documented here')}</p>
                 </div>
               )}
             </CardContent>
@@ -6136,8 +6136,8 @@ export default function Documents() {
                 <FileText className="h-6 w-6 text-primary" />
               </div>
               <div className="flex-1">
-                <CardTitle className="text-xl mb-1">Method Statements</CardTitle>
-                <p className="text-sm text-muted-foreground">Work procedures and safety methods</p>
+                <CardTitle className="text-xl mb-1">{t('documents.methodStatements', 'Method Statements')}</CardTitle>
+                <p className="text-sm text-muted-foreground">{t('documents.methodStatementsDesc', 'Work procedures and safety methods')}</p>
               </div>
               <Badge variant="secondary" className="text-base font-semibold px-3">
                 {methodStatements.length + methodStatementDocs.length}
@@ -6152,10 +6152,10 @@ export default function Documents() {
                   <div className="flex-1">
                     <label className="block mb-2 text-sm font-semibold flex items-center gap-2">
                       <Upload className="h-4 w-4" />
-                      Upload Your Own Method Statement
+                      {t('documents.uploadMethodStatement', 'Upload Your Own Method Statement')}
                     </label>
                     <p className="text-xs text-muted-foreground">
-                      Upload your company's method statement document for a specific job type to satisfy compliance requirements.
+                      {t('documents.uploadMethodStatementDesc', "Upload your company's method statement document for a specific job type to satisfy compliance requirements.")}
                     </p>
                   </div>
                   <Button
@@ -6164,7 +6164,7 @@ export default function Documents() {
                     data-testid="button-upload-method-statement"
                   >
                     <Plus className="h-4 w-4 mr-2" />
-                    Upload Document
+                    {t('documents.uploadDocument', 'Upload Document')}
                   </Button>
                 </div>
               </div>
@@ -6286,8 +6286,8 @@ export default function Documents() {
                 <div className="inline-flex p-4 bg-primary/5 rounded-full mb-4">
                   <FileText className="h-8 w-8 text-primary/50" />
                 </div>
-                <p className="text-muted-foreground font-medium">No method statements recorded yet</p>
-                <p className="text-sm text-muted-foreground mt-1">Work procedures will be documented here</p>
+                <p className="text-muted-foreground font-medium">{t('documents.noMethodStatements', 'No method statements recorded yet')}</p>
+                <p className="text-sm text-muted-foreground mt-1">{t('documents.noMethodStatementsDesc', 'Work procedures will be documented here')}</p>
               </div>
             )}
           </CardContent>
