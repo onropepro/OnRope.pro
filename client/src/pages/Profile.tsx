@@ -284,7 +284,7 @@ type FeatureRequestFormData = z.infer<typeof featureRequestSchema>;
 
 function FeatureRequestsSection({ userId, userName }: { userId: string; userName: string }) {
   const { toast } = useToast();
-  const [selectedRequest, setSelectedRequest] = useState<any>(null);
+  const [selectedRequestId, setSelectedRequestId] = useState<string | null>(null);
   const [newMessage, setNewMessage] = useState("");
   const [showThankYouDialog, setShowThankYouDialog] = useState(false);
   const [showNewRequestForm, setShowNewRequestForm] = useState(false);
@@ -296,6 +296,21 @@ function FeatureRequestsSection({ userId, userName }: { userId: string; userName
   const { data: requestsData, isLoading, refetch } = useQuery<{ requests: any[] }>({
     queryKey: ["/api/feature-requests"],
   });
+
+  // Fetch single request when selected (triggers mark-as-read on backend)
+  const { data: selectedRequestData } = useQuery<{ request: any }>({
+    queryKey: ["/api/feature-requests", selectedRequestId],
+    enabled: !!selectedRequestId,
+  });
+  
+  const selectedRequest = selectedRequestData?.request || null;
+
+  // Invalidate unread count when viewing a request
+  useEffect(() => {
+    if (selectedRequestId && selectedRequestData?.request) {
+      queryClient.invalidateQueries({ queryKey: ["/api/feature-requests/unread-count"] });
+    }
+  }, [selectedRequestId, selectedRequestData]);
 
   const requests = requestsData?.requests || [];
 
@@ -429,9 +444,9 @@ function FeatureRequestsSection({ userId, userName }: { userId: string; userName
   };
 
   const handleSendMessage = () => {
-    if (!selectedRequest || !newMessage.trim()) return;
+    if (!selectedRequestId || !newMessage.trim()) return;
     sendMessageMutation.mutate({
-      requestId: selectedRequest.id,
+      requestId: selectedRequestId,
       message: newMessage.trim(),
     });
   };
@@ -465,7 +480,7 @@ function FeatureRequestsSection({ userId, userName }: { userId: string; userName
 
   // View single request with messages
   if (selectedRequest) {
-    const currentRequest = requests.find(r => r.id === selectedRequest.id) || selectedRequest;
+    const currentRequest = selectedRequest;
     return (
       <Card>
         <CardHeader>
@@ -473,7 +488,7 @@ function FeatureRequestsSection({ userId, userName }: { userId: string; userName
             <Button
               variant="ghost"
               size="icon"
-              onClick={() => setSelectedRequest(null)}
+              onClick={() => setSelectedRequestId(null)}
               data-testid="button-back-to-requests"
             >
               <span className="material-icons">arrow_back</span>
@@ -794,7 +809,7 @@ function FeatureRequestsSection({ userId, userName }: { userId: string; userName
               {requests.map((request) => (
                 <div
                   key={request.id}
-                  onClick={() => setSelectedRequest(request)}
+                  onClick={() => setSelectedRequestId(request.id)}
                   className="p-4 border rounded-lg hover-elevate cursor-pointer"
                   data-testid={`request-item-${request.id}`}
                 >
