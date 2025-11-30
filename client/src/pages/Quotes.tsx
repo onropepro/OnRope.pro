@@ -161,36 +161,34 @@ function DraggableQuoteCard({ quote, onClick }: { quote: QuoteWithServices; onCl
     <div
       ref={setNodeRef}
       style={style}
-      className={`bg-card border border-border/60 rounded-md p-3 cursor-grab active:cursor-grabbing shadow-sm hover:shadow-md hover:border-primary/40 transition-all duration-200 ${isDragging ? 'shadow-lg ring-2 ring-primary border-primary' : ''}`}
+      className={`bg-card border border-border/60 rounded-md p-2 cursor-grab active:cursor-grabbing shadow-sm hover:shadow-md hover:border-primary/40 transition-all duration-200 ${isDragging ? 'shadow-lg ring-2 ring-primary border-primary' : ''}`}
       {...attributes}
       {...listeners}
       data-testid={`draggable-quote-${quote.id}`}
     >
-      <div className="flex items-start gap-2 mb-2">
-        <GripVertical className="w-4 h-4 text-muted-foreground/50 shrink-0 mt-0.5" />
+      <div className="flex items-start gap-1.5 mb-1">
+        <GripVertical className="w-3 h-3 text-muted-foreground/50 shrink-0 mt-0.5" />
         <div className="flex-1 min-w-0">
-          <h4 className="font-semibold text-sm truncate text-foreground">{quote.buildingName}</h4>
-          <p className="text-xs text-muted-foreground truncate">{quote.strataPlanNumber}</p>
+          <h4 className="font-semibold text-[11px] truncate text-foreground leading-tight">{quote.buildingName}</h4>
+          <p className="text-[10px] text-muted-foreground truncate">{quote.strataPlanNumber}</p>
         </div>
       </div>
-      <div className="space-y-1.5 text-xs text-muted-foreground pl-6">
+      <div className="space-y-0.5 text-[10px] text-muted-foreground pl-4">
         <p className="truncate">{quote.buildingAddress}</p>
-        <div className="flex items-center justify-between gap-2 flex-wrap">
-          <Badge variant="secondary" className="text-[10px] px-1.5 py-0">
-            {quote.services.length} {t('quotes.pipeline.services', 'services')}
-          </Badge>
+        <div className="flex items-center justify-between gap-1">
+          <span className="text-muted-foreground/70">{quote.services.length} svc</span>
           {totalAmount > 0 && (
-            <span className="font-semibold text-sm text-primary">${totalAmount.toLocaleString()}</span>
+            <span className="font-semibold text-[11px] text-primary">${totalAmount.toLocaleString()}</span>
           )}
         </div>
       </div>
-      <div className="mt-3 pt-2 border-t border-border/40 pl-6">
+      <div className="mt-1.5 pt-1 border-t border-border/40 pl-4">
         <button
           onClick={(e) => { e.stopPropagation(); onClick(); }}
-          className="text-xs font-medium text-primary hover:text-primary/80 transition-colors"
+          className="text-[10px] font-medium text-primary hover:text-primary/80 transition-colors"
           data-testid={`button-view-quote-${quote.id}`}
         >
-          {t('quotes.pipeline.viewDetails', 'View Details')}
+          {t('quotes.pipeline.viewDetails', 'View')}
         </button>
       </div>
     </div>
@@ -231,20 +229,20 @@ function StageColumn({
       className={`flex flex-col flex-1 min-w-0 rounded-lg border-2 ${borderColor} ${bgColor} transition-all duration-200 ${isOver ? 'ring-2 ring-primary border-primary shadow-lg scale-[1.01]' : ''}`}
       data-testid={`stage-column-${stageId}`}
     >
-      <div className={`flex items-center justify-between gap-2 px-3 py-2.5 border-b ${borderColor}`}>
-        <div className="flex items-center gap-2 min-w-0">
-          <div className={`w-2.5 h-2.5 rounded-full ${color} shadow-sm shrink-0`} />
-          <h3 className="font-semibold text-sm text-foreground truncate">{stageName}</h3>
-          <Badge variant="outline" className="text-xs px-1.5 py-0 font-medium border-border/60 shrink-0">{quotes.length}</Badge>
+      <div className={`flex items-center justify-between gap-1 px-2 py-2 border-b ${borderColor}`}>
+        <div className="flex items-center gap-1.5 min-w-0">
+          <div className={`w-2 h-2 rounded-full ${color} shadow-sm shrink-0`} />
+          <h3 className="font-semibold text-xs text-foreground truncate">{stageName}</h3>
+          <Badge variant="outline" className="text-[10px] px-1 py-0 font-medium border-border/60 shrink-0">{quotes.length}</Badge>
         </div>
         {totalValue > 0 && (
-          <span className="text-xs font-medium text-muted-foreground shrink-0">${totalValue.toLocaleString()}</span>
+          <span className="text-[10px] font-medium text-muted-foreground shrink-0">${totalValue.toLocaleString()}</span>
         )}
       </div>
-      <div className="flex-1 space-y-2 min-h-[180px] overflow-y-auto max-h-[calc(100vh-400px)] p-2">
+      <div className="flex-1 space-y-1.5 overflow-y-auto p-1.5">
         {quotes.length === 0 ? (
-          <div className={`flex items-center justify-center h-24 border-2 border-dashed ${borderColor} rounded-md bg-background/50`}>
-            <p className="text-xs text-muted-foreground/70 text-center px-2">{t('quotes.pipeline.dragHere', 'Drag quotes here')}</p>
+          <div className={`flex items-center justify-center h-full min-h-[100px] border-2 border-dashed ${borderColor} rounded-md bg-background/50`}>
+            <p className="text-[10px] text-muted-foreground/70 text-center px-1">{t('quotes.pipeline.dragHere', 'Drag quotes here')}</p>
           </div>
         ) : (
           quotes.map((quote) => (
@@ -1286,14 +1284,14 @@ export default function Quotes() {
 
     // Management view with tabs for List, Pipeline, and Analytics
     return (
-      <div className="min-h-screen bg-background p-4 md:p-8">
-        <div className="max-w-7xl mx-auto">
+      <div className="h-screen bg-background p-4 md:p-6 flex flex-col overflow-hidden">
+        <div className="flex-1 flex flex-col min-h-0 max-w-full">
           <BackButton to="/dashboard" label={t('quotes.backToDashboard', 'Back to Dashboard')} />
 
-          <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-6 gap-4">
+          <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-3 gap-2">
             <div>
-              <h1 className="text-4xl font-bold text-foreground mb-2">{t('quotes.pageTitle', 'Service Quotes')}</h1>
-              <p className="text-muted-foreground">{t('quotes.pageSubtitle', 'Create and manage service quotes for buildings')}</p>
+              <h1 className="text-xl sm:text-2xl font-bold text-foreground">{t('quotes.pageTitle', 'Service Quotes')}</h1>
+              <p className="text-xs text-muted-foreground">{t('quotes.pageSubtitle', 'Create and manage service quotes for buildings')}</p>
             </div>
             <Button
               onClick={() => {
@@ -1309,8 +1307,8 @@ export default function Quotes() {
           </div>
 
           {/* Management Tabs */}
-          <Tabs value={managementTab} onValueChange={(value) => setManagementTab(value as "list" | "pipeline" | "analytics")} className="mb-6">
-            <TabsList className="mb-6">
+          <Tabs value={managementTab} onValueChange={(value) => setManagementTab(value as "list" | "pipeline" | "analytics")} className="flex-1 flex flex-col min-h-0">
+            <TabsList className="mb-3">
               <TabsTrigger value="list" data-testid="tab-list">
                 <Building2 className="w-4 h-4 mr-2" />
                 {t('quotes.tabs.list', 'All Quotes')}
@@ -1439,10 +1437,10 @@ export default function Quotes() {
               )}
             </TabsContent>
 
-            {/* Pipeline Tab - Kanban Board */}
-            <TabsContent value="pipeline">
-              <div className="mb-4">
-                <p className="text-muted-foreground">
+            {/* Pipeline Tab - Kanban Board - Full Page View */}
+            <TabsContent value="pipeline" className="flex-1 flex flex-col min-h-0">
+              <div className="mb-3">
+                <p className="text-sm text-muted-foreground">
                   {t('quotes.pipeline.description', 'Drag quotes between stages to track their progress through your sales pipeline.')}
                 </p>
               </div>
@@ -1453,7 +1451,7 @@ export default function Quotes() {
                 </div>
               ) : (
                 <DndContext onDragEnd={handleDragEnd} collisionDetection={closestCenter}>
-                  <div className="grid grid-cols-3 gap-3 pb-4">
+                  <div className="flex-1 grid grid-cols-6 gap-3 min-h-0">
                     {PIPELINE_STAGES.map((stage) => (
                       <StageColumn
                         key={stage.id}
