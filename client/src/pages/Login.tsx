@@ -11,7 +11,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { queryClient } from "@/lib/queryClient";
-import { Rocket, Play, Building2, Clock, DollarSign, Users, Shield, FileText, Calculator, FileSpreadsheet, Radio, ClipboardCheck, MessageSquare, Home, Award, Calendar, FolderOpen, Globe } from "lucide-react";
+import { Rocket, Play, Building2, Clock, DollarSign, Users, Shield, FileText, Calculator, FileSpreadsheet, Radio, ClipboardCheck, MessageSquare, Home, Award, Calendar, FolderOpen, Globe, TrendingUp } from "lucide-react";
 import ropeAccessProLogo from "@assets/generated_images/Blue_rope_access_worker_logo_ac1aa8fd.png";
 
 const loginSchema = z.object({
@@ -283,6 +283,31 @@ export default function Login() {
           <p className="text-xl md:text-2xl font-bold mt-12">
             {t('login.painPoints.conclusion', "Let them keep thinking they're organized.")}
           </p>
+        </div>
+      </section>
+
+      {/* ROI Calculator Section */}
+      <section className="py-16 md:py-24 px-6 bg-primary/5">
+        <div className="max-w-3xl mx-auto text-center">
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-medium mb-6">
+            <Calculator className="w-4 h-4" />
+            {t('login.roiCalculator.badge', '60-Second Assessment')}
+          </div>
+          <h2 className="text-2xl md:text-4xl font-bold mb-4">
+            {t('login.roiCalculator.title', 'Calculate Your Hidden Costs')}
+          </h2>
+          <p className="text-muted-foreground mb-8 max-w-xl mx-auto">
+            {t('login.roiCalculator.subtitle', 'Most rope access companies waste $15,000-25,000 per year on scattered tools, manual processes, and hidden admin time. Find out how much you could save.')}
+          </p>
+          <Button 
+            size="lg"
+            onClick={() => setLocation("/roi-calculator")}
+            className="gap-2 px-8"
+            data-testid="button-roi-calculator"
+          >
+            <TrendingUp className="w-5 h-5" />
+            {t('login.roiCalculator.cta', 'Calculate My Savings')}
+          </Button>
         </div>
       </section>
 

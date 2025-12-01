@@ -39,6 +39,12 @@
       "losingContracts": "Ils perdent des contrats parce qu'ils ont l'air d'amateurs à côté de vous.",
       "conclusion": "Laissez-les continuer à penser qu'ils sont organisés."
     },
+    "roiCalculator": {
+      "badge": "Évaluation en 60 secondes",
+      "title": "Calculez vos coûts cachés",
+      "subtitle": "La plupart des entreprises d'accès sur corde gaspillent 15 000 à 25 000 $ par an en outils dispersés, processus manuels et temps d'administration caché. Découvrez combien vous pourriez économiser.",
+      "cta": "Calculer mes économies"
+    },
     "cta": {
       "title": "Prêt à optimiser vos opérations d'accès sur corde?",
       "subtitle": "Rejoignez les entreprises d'accès sur corde qui ont déjà abandonné le chaos des tableurs",
@@ -4579,6 +4585,140 @@
       "unableToLoadDetails": "Impossible de charger les détails du projet",
       "failedToLoadProjects": "Échec du chargement des projets",
       "unableToLoadProjects": "Impossible de charger les projets. Veuillez réessayer."
+    }
+  },
+  "roi": {
+    "title": "Calculez vos coûts cachés",
+    "subtitle": "La plupart des entreprises d'accès sur corde gaspillent 15 000 à 25 000 $ par an en outils dispersés et processus manuels.",
+    "header": {
+      "backToHome": "Retour à l'accueil"
+    },
+    "progress": {
+      "step": "Question {{current}} sur {{total}}"
+    },
+    "questions": {
+      "employees": {
+        "title": "Combien d'employés travaillent sur le terrain ou au bureau ?",
+        "min": "5 employés",
+        "max": "50 employés",
+        "description": "Incluez tous les techniciens de terrain, le personnel de bureau et la direction"
+      },
+      "timeTracking": {
+        "title": "Comment suivez-vous actuellement les heures des employés pour la paie ?"
+      },
+      "projectManagement": {
+        "title": "Comment suivez-vous les bâtiments/projets sur lesquels vos équipes travaillent ?"
+      },
+      "crm": {
+        "title": "Comment gérez-vous les relations clients et l'historique des communications ?"
+      },
+      "safetyCompliance": {
+        "title": "Comment documentez-vous les inspections quotidiennes de harnais et les réunions de sécurité (conformité IRATA/SPRAT) ?"
+      },
+      "scheduling": {
+        "title": "Comment planifiez-vous quels techniciens travaillent sur quels projets chaque jour ?"
+      },
+      "documentStorage": {
+        "title": "Où stockez-vous les photos de projet, les plans d'accès sur corde et les contrats clients ?"
+      }
+    },
+    "options": {
+      "timeTracking": {
+        "paper": "Feuilles de temps papier",
+        "excel": "Tableurs Excel",
+        "software": "Logiciel de suivi du temps (ClockShark, TSheets, etc.)",
+        "none": "Nous ne suivons pas précisément"
+      },
+      "projectManagement": {
+        "whiteboard": "Tableau blanc ou papier",
+        "excel": "Excel/Google Sheets",
+        "software": "Logiciel de gestion de projet (Asana, Monday.com, etc.)",
+        "texts": "Textos de groupe et appels téléphoniques"
+      },
+      "crm": {
+        "email": "Boîte de réception email uniquement",
+        "spreadsheet": "Tableur de contacts",
+        "software": "Logiciel CRM (Pipedrive, HubSpot, etc.)",
+        "memory": "Mémoire et notes papier"
+      },
+      "safetyCompliance": {
+        "paper": "Formulaires papier classés au bureau",
+        "none": "Rien de formel (risque !)",
+        "software": "Application de sécurité numérique (SafetyCulture, etc.)",
+        "photos": "Photos sur téléphones"
+      },
+      "scheduling": {
+        "calls": "Appels téléphoniques chaque matin",
+        "excel": "Planning Excel mis à jour quotidiennement",
+        "software": "Logiciel de planification (Deputy, When I Work, etc.)",
+        "verbal": "Affectations verbales au jour le jour"
+      },
+      "documentStorage": {
+        "filing": "Classeurs et tiroirs de bureau",
+        "computer": "Dossiers sur ordinateur personnel",
+        "cloud": "Stockage cloud (Dropbox, Google Drive, etc.)",
+        "mix": "Mélange de physique et numérique"
+      }
+    },
+    "categories": {
+      "timeTracking": "Suivi du temps",
+      "projectManagement": "Gestion de projet",
+      "crm": "Communication client",
+      "safetyCompliance": "Conformité sécurité",
+      "scheduling": "Planification",
+      "documentStorage": "Stockage de documents"
+    },
+    "navigation": {
+      "previous": "Précédent",
+      "next": "Suivant",
+      "seeResults": "Voir mes résultats",
+      "backToQuestions": "Retour aux questions"
+    },
+    "preview": {
+      "currentWaste": "Gaspillage mensuel actuel :",
+      "potentialSavings": "Économies potentielles :"
+    },
+    "results": {
+      "wastingTitle": "Vous gaspillez actuellement",
+      "perMonth": "/mois",
+      "currentCosts": "Coûts actuels",
+      "directToolCosts": "Coûts directs des outils :",
+      "hiddenAdminWaste": "Gaspillage admin caché :",
+      "total": "Total :",
+      "yourSavings": "Vos économies",
+      "monthly": "Mensuel :",
+      "annually": "Annuel :",
+      "timeRecovered": "Temps récupéré :",
+      "tier1": "Plan Starter (équipes de moins de 8)",
+      "tier2": "Plan Professionnel",
+      "includes": {
+        "timeTracking": "Suivi du temps",
+        "projectManagement": "Gestion de projet",
+        "crm": "CRM & Portail client",
+        "safetyCompliance": "Conformité sécurité",
+        "scheduling": "Planification",
+        "documentStorage": "Stockage de documents"
+      },
+      "showBreakdown": "Afficher la ventilation détaillée",
+      "startFreeTrial": "Commencer l'essai gratuit - 90 jours",
+      "emailAnalysis": "M'envoyer cette analyse par email",
+      "alreadyOptimized": "Vous êtes déjà bien optimisé !",
+      "consolidateMessage": "Vous investissez déjà dans des outils numériques ({{cost}} $/mois). OnRopePro consolide ces 6-8 systèmes séparés en UNE seule plateforme pour {{onropeCost}} $/mois, éliminant les frictions entre outils et les silos de données.",
+      "currentSetupGood": "Selon votre configuration actuelle, vous avez une bonne pile technologique. Cependant, OnRopePro pourrait encore aider en consolidant vos outils en une seule plateforme conçue spécifiquement pour les opérations d'accès sur corde.",
+      "consolidateBenefits": "Considérez les avantages de consolider vers une seule plateforme :",
+      "benefits": {
+        "singleLogin": "Une seule connexion pour toutes les opérations",
+        "integratedData": "Données intégrées dans tous les modules",
+        "ropeAccessSpecific": "Conçu spécifiquement pour les entreprises d'accès sur corde"
+      }
+    },
+    "email": {
+      "title": "Vous pourriez économiser {{savings}} $ par an !",
+      "description": "Nous vous enverrons votre rapport ROI personnalisé et vous montrerons comment des entreprises comme la vôtre éliminent plus de 32 heures de travail administratif par mois.",
+      "label": "Adresse email",
+      "placeholder": "votre@email.com",
+      "submit": "Envoyer mon analyse",
+      "disclaimer": "Nous respectons votre vie privée. Pas de spam, juste votre rapport d'économies personnalisé."
     }
   }
 }

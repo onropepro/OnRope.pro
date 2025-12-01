@@ -39,6 +39,12 @@
       "losingContracts": "They're losing contracts because they look like amateurs next to you.",
       "conclusion": "Let them keep thinking they're organized."
     },
+    "roiCalculator": {
+      "badge": "60-Second Assessment",
+      "title": "Calculate Your Hidden Costs",
+      "subtitle": "Most rope access companies waste $15,000-25,000 per year on scattered tools, manual processes, and hidden admin time. Find out how much you could save.",
+      "cta": "Calculate My Savings"
+    },
     "cta": {
       "title": "Ready to Streamline Your Rope Access Operations?",
       "subtitle": "Join rope access companies who've already ditched the spreadsheet chaos",
@@ -4562,6 +4568,140 @@
       "unableToLoadDetails": "Unable to Load Project Details",
       "failedToLoadProjects": "Failed to Load Projects",
       "unableToLoadProjects": "Unable to load projects. Please try again."
+    }
+  },
+  "roi": {
+    "title": "Calculate Your Hidden Costs",
+    "subtitle": "Most rope access companies waste $15,000-25,000 per year on scattered tools and manual processes.",
+    "header": {
+      "backToHome": "Back to Home"
+    },
+    "progress": {
+      "step": "Question {{current}} of {{total}}"
+    },
+    "questions": {
+      "employees": {
+        "title": "How many employees work in the field or office?",
+        "min": "5 employees",
+        "max": "50 employees",
+        "description": "Include all field technicians, office staff, and management"
+      },
+      "timeTracking": {
+        "title": "How do you currently track employee hours for payroll?"
+      },
+      "projectManagement": {
+        "title": "How do you track which buildings/projects your teams are working on?"
+      },
+      "crm": {
+        "title": "How do you manage client relationships and track communication history?"
+      },
+      "safetyCompliance": {
+        "title": "How do you document daily harness inspections and safety meetings (IRATA/SPRAT compliance)?"
+      },
+      "scheduling": {
+        "title": "How do you schedule which technicians work on which projects each day?"
+      },
+      "documentStorage": {
+        "title": "Where do you store project photos, rope access plans, and client contracts?"
+      }
+    },
+    "options": {
+      "timeTracking": {
+        "paper": "Paper timesheets",
+        "excel": "Excel spreadsheets",
+        "software": "Time tracking software (ClockShark, TSheets, etc.)",
+        "none": "We don't track precisely"
+      },
+      "projectManagement": {
+        "whiteboard": "Whiteboard or paper",
+        "excel": "Excel/Google Sheets",
+        "software": "Project management software (Asana, Monday.com, etc.)",
+        "texts": "Group texts and phone calls"
+      },
+      "crm": {
+        "email": "Email inbox only",
+        "spreadsheet": "Spreadsheet of contacts",
+        "software": "CRM software (Pipedrive, HubSpot, etc.)",
+        "memory": "Memory and paper notes"
+      },
+      "safetyCompliance": {
+        "paper": "Paper forms filed in office",
+        "none": "Nothing formal (risk!)",
+        "software": "Digital safety app (SafetyCulture, etc.)",
+        "photos": "Photos on phones"
+      },
+      "scheduling": {
+        "calls": "Phone calls each morning",
+        "excel": "Excel schedule updated daily",
+        "software": "Scheduling software (Deputy, When I Work, etc.)",
+        "verbal": "Verbal assignments day-by-day"
+      },
+      "documentStorage": {
+        "filing": "Filing cabinets and desk drawers",
+        "computer": "Personal computer folders",
+        "cloud": "Cloud storage (Dropbox, Google Drive, etc.)",
+        "mix": "Mix of physical and digital"
+      }
+    },
+    "categories": {
+      "timeTracking": "Time Tracking",
+      "projectManagement": "Project Management",
+      "crm": "Client Communication",
+      "safetyCompliance": "Safety Compliance",
+      "scheduling": "Scheduling",
+      "documentStorage": "Document Storage"
+    },
+    "navigation": {
+      "previous": "Previous",
+      "next": "Next",
+      "seeResults": "See My Results",
+      "backToQuestions": "Back to Questions"
+    },
+    "preview": {
+      "currentWaste": "Current Monthly Waste:",
+      "potentialSavings": "Potential Savings:"
+    },
+    "results": {
+      "wastingTitle": "You're Currently Wasting",
+      "perMonth": "/month",
+      "currentCosts": "Current Costs",
+      "directToolCosts": "Direct Tool Costs:",
+      "hiddenAdminWaste": "Hidden Admin Waste:",
+      "total": "Total:",
+      "yourSavings": "Your Savings",
+      "monthly": "Monthly:",
+      "annually": "Annually:",
+      "timeRecovered": "Time Recovered:",
+      "tier1": "Starter Plan (for teams under 8)",
+      "tier2": "Professional Plan",
+      "includes": {
+        "timeTracking": "Time Tracking",
+        "projectManagement": "Project Management",
+        "crm": "CRM & Client Portal",
+        "safetyCompliance": "Safety Compliance",
+        "scheduling": "Scheduling",
+        "documentStorage": "Document Storage"
+      },
+      "showBreakdown": "Show detailed breakdown",
+      "startFreeTrial": "Start Free Trial - 90 Days",
+      "emailAnalysis": "Email Me This Analysis",
+      "alreadyOptimized": "You're Already Well Optimized!",
+      "consolidateMessage": "You're already investing in digital tools (${{cost}}/month). OnRopePro consolidates these 6-8 separate systems into ONE platform for ${{onropeCost}}/month, eliminating tool-switching friction and data silos.",
+      "currentSetupGood": "Based on your current setup, you have a solid tech stack. However, OnRopePro could still help by consolidating your tools into one platform built specifically for rope access operations.",
+      "consolidateBenefits": "Consider the benefits of consolidating to a single platform:",
+      "benefits": {
+        "singleLogin": "Single login for all operations",
+        "integratedData": "Integrated data across all modules",
+        "ropeAccessSpecific": "Purpose-built for rope access companies"
+      }
+    },
+    "email": {
+      "title": "You could save ${{savings}} per year!",
+      "description": "We'll send your personalized ROI report and show you how companies like yours eliminate 32+ hours of admin work monthly.",
+      "label": "Email Address",
+      "placeholder": "your@email.com",
+      "submit": "Send My Analysis",
+      "disclaimer": "We respect your privacy. No spam, just your personalized savings report."
     }
   }
 }
