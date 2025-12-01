@@ -211,7 +211,7 @@ export default function Login() {
           {t('login.hero.builtBy', 'Built by a Level 3 IRATA Tech')}
         </p>
         
-        <p className="text-2xl md:text-4xl font-medium mb-2" style={{ color: '#0B64A3' }}>
+        <p className="text-2xl md:text-4xl font-medium mb-2 text-[#3B3B3B]" style={{ color: '#0B64A3' }}>
           {t('login.hero.tagline', "Your competitors think they're organized.")}
         </p>
         
