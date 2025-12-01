@@ -44,6 +44,23 @@ export function requireRole(...roles: string[]) {
   };
 }
 
+// Helper to normalize permissions to array format (handles string, array, or null)
+function normalizePermissions(permissions: any): string[] {
+  if (!permissions) return [];
+  if (Array.isArray(permissions)) return permissions;
+  // Handle stringified JSON array (e.g., "[\"view_inventory\"]")
+  if (typeof permissions === 'string') {
+    if (permissions.startsWith('[')) {
+      try { return JSON.parse(permissions); } catch { return []; }
+    }
+    // Handle PostgreSQL array format as string (e.g., "{view_inventory,log_drops}")
+    if (permissions.startsWith('{') && permissions.endsWith('}')) {
+      return permissions.slice(1, -1).split(',').map(s => s.trim()).filter(Boolean);
+    }
+  }
+  return [];
+}
+
 // Helper function to check if user can view safety documents
 function canViewSafetyDocuments(user: any): boolean {
   if (!user) return false;
@@ -52,7 +69,8 @@ function canViewSafetyDocuments(user: any): boolean {
   if (user.role === 'company') return true;
   
   // All other roles need explicit permission
-  return user.permissions?.includes('view_safety_documents') || false;
+  const permissions = normalizePermissions(user.permissions);
+  return permissions.includes('view_safety_documents');
 }
 
 // Helper function to check if user can view Company Safety Rating (CSR)
@@ -63,7 +81,8 @@ function canViewCSR(user: any): boolean {
   if (user.role === 'company') return true;
   
   // All other roles need explicit permission
-  return user.permissions?.includes('view_csr') || false;
+  const permissions = normalizePermissions(user.permissions);
+  return permissions.includes('view_csr');
 }
 
 // ============================================================================
@@ -74,28 +93,33 @@ function canViewCSR(user: any): boolean {
 function canViewInventory(user: any): boolean {
   if (!user) return false;
   if (user.role === 'company') return true;
-  return user.permissions?.includes('view_inventory') || false;
+  
+  const permissions = normalizePermissions(user.permissions);
+  return permissions.includes('view_inventory');
 }
 
 // Helper function to check if user can manage inventory (add/edit/delete)
 function canManageInventory(user: any): boolean {
   if (!user) return false;
   if (user.role === 'company') return true;
-  return user.permissions?.includes('manage_inventory') || false;
+  const permissions = normalizePermissions(user.permissions);
+  return permissions.includes('manage_inventory');
 }
 
 // Helper function to check if user can assign gear to employees
 function canAssignGear(user: any): boolean {
   if (!user) return false;
   if (user.role === 'company') return true;
-  return user.permissions?.includes('assign_gear') || false;
+  const permissions = normalizePermissions(user.permissions);
+  return permissions.includes('assign_gear');
 }
 
 // Helper function to check if user can view all gear assignments
 function canViewGearAssignments(user: any): boolean {
   if (!user) return false;
   if (user.role === 'company') return true;
-  return user.permissions?.includes('view_gear_assignments') || false;
+  const permissions = normalizePermissions(user.permissions);
+  return permissions.includes('view_gear_assignments');
 }
 
 // Overtime calculation utility
