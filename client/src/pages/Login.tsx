@@ -204,7 +204,7 @@ export default function Login() {
       </header>
       {/* Hero Section */}
       <section className="flex flex-col items-center justify-center text-center px-6 py-16 md:py-24" style={{ backgroundColor: '#F3F3F3' }}>
-        <h1 className="text-xs md:text-sm font-semibold tracking-widest text-muted-foreground uppercase mb-2">
+        <h1 className="text-xs md:text-sm font-semibold tracking-widest text-muted-foreground uppercase mb-1.5">
           {t('login.hero.subtitle', 'Building Maintenance Management Software')}
         </h1>
         <p className="text-xs md:text-sm font-semibold tracking-widest text-muted-foreground uppercase mb-6">
