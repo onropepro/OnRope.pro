@@ -135,8 +135,22 @@ const REVEAL_MESSAGES = {
 export default function ROICalculator() {
   const { t, i18n } = useTranslation();
   const [, setLocation] = useLocation();
-  const [currentStep, setCurrentStep] = useState(1);
-  const [employeeCount, setEmployeeCount] = useState(12);
+  
+  const getInitialValuesFromURL = () => {
+    const params = new URLSearchParams(window.location.search);
+    const employeesParam = params.get('employees');
+    const stepParam = params.get('step');
+    
+    const employees = employeesParam ? Math.min(50, Math.max(5, parseInt(employeesParam, 10) || 12)) : 12;
+    const step = stepParam ? Math.min(7, Math.max(1, parseInt(stepParam, 10) || 1)) : 1;
+    
+    return { employees, step };
+  };
+  
+  const initialValues = getInitialValuesFromURL();
+  
+  const [currentStep, setCurrentStep] = useState(initialValues.step);
+  const [employeeCount, setEmployeeCount] = useState(initialValues.employees);
   const [answers, setAnswers] = useState<CalculatorAnswers>({
     timeTracking: null,
     projectManagement: null,
@@ -157,6 +171,7 @@ export default function ROICalculator() {
     hoursRecovered: 0
   });
   const [landingLanguage, setLandingLanguage] = useState<'en' | 'fr'>('en');
+  const [cameFromLanding, setCameFromLanding] = useState(initialValues.step > 1);
 
   useEffect(() => {
     const savedLandingLang = localStorage.getItem('landingPageLang') as 'en' | 'fr' | null;
@@ -384,6 +399,8 @@ export default function ROICalculator() {
   const handleBack = () => {
     if (showResults) {
       setShowResults(false);
+    } else if (currentStep === 2 && cameFromLanding) {
+      setLocation("/");
     } else if (currentStep > 1) {
       setCurrentStep(prev => prev - 1);
     }
@@ -795,7 +812,7 @@ export default function ROICalculator() {
                   <Button 
                     variant="ghost" 
                     onClick={handleBack}
-                    disabled={currentStep === 1}
+                    disabled={currentStep === 1 && !cameFromLanding}
                     data-testid="button-previous"
                   >
                     <ArrowLeft className="w-4 h-4 mr-2" />
