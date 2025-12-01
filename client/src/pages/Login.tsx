@@ -219,12 +219,14 @@ export default function Login() {
           {t('login.hero.taglineBold', "THEY'RE NOT")}
         </div>
         
-        <p className="text-base md:text-lg max-w-xl mb-8 text-[#3B3B3B]">
-          {t('login.hero.description', 'You track every')} <span 
+        <p className="text-base md:text-lg text-muted-foreground max-w-xl mb-8">
+          {t('login.hero.description', 'You track every')}{" "}
+          <span 
             className="inline-block font-semibold transition-all duration-300 opacity-100 translate-y-0 text-[#A3320B]"
           >
-            drop
-          </span>{t('login.hero.descriptionEnd', ', from a single platform that actually speaks rope access.')}
+            {rotatingWords[currentWordIndex]}
+          </span>
+          {t('login.hero.descriptionEnd', ', from a single platform that actually speaks rope access.')}
         </p>
         
         <div className="flex flex-col sm:flex-row items-center gap-4">
