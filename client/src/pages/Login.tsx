@@ -222,7 +222,7 @@ export default function Login() {
         <p className="text-base md:text-lg text-muted-foreground max-w-xl mb-8">
           {t('login.hero.description', 'You track every')}{" "}
           <span 
-            className="inline-block font-semibold transition-all duration-300 opacity-100 translate-y-0 text-[#193A63]"
+            className="inline-block font-semibold transition-all duration-300 opacity-100 translate-y-0 text-[#A3320B]"
           >
             {rotatingWords[currentWordIndex]}
           </span>
@@ -253,12 +253,8 @@ export default function Login() {
       {/* ROI Calculator Section - Embedded Question 1 */}
       <section className="py-16 md:py-24 px-6 bg-primary/5">
         <div className="max-w-3xl mx-auto text-center">
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-medium mb-6">
-            <Calculator className="w-4 h-4" />
-            {t('login.roiCalculator.badge', '60-Second Assessment')}
-          </div>
           <h2 className="text-2xl md:text-4xl font-bold mb-4">
-            {t('login.roiCalculator.title', 'Calculate Your Hidden Costs')}
+            {t('login.roiCalculator.title', 'Calculate Your Hidden Costs In Less Than 60 Seconds')}
           </h2>
           <p className="text-muted-foreground mb-6 max-w-xl mx-auto">
             {t('login.roiCalculator.subtitle', 'Most rope access companies waste $15,000-25,000 per year on scattered tools, manual processes, and hidden admin, and wasted time. Find out how much you could save.')}
