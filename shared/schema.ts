@@ -143,6 +143,9 @@ export const users = pgTable("users", {
   // Language preference (all roles)
   preferredLanguage: varchar("preferred_language").default('en'), // en | fr - user's preferred language
   
+  // Activity tracking
+  lastActivityAt: timestamp("last_activity_at"), // Last time user made any API request (for activity monitoring)
+  
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });

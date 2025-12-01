@@ -21,11 +21,22 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: '2024-11-20.acacia' as any,
 });
 
-// Authentication middleware
+// Authentication middleware with activity tracking
 export function requireAuth(req: Request, res: Response, next: NextFunction) {
   if (!req.session.userId) {
     return res.status(401).json({ message: "Unauthorized - Please log in" });
   }
+  
+  // Update last activity timestamp asynchronously (fire and forget)
+  // Skip for superuser to avoid noise
+  if (req.session.userId !== 'superuser') {
+    db.update(users)
+      .set({ lastActivityAt: sql`NOW()` })
+      .where(eq(users.id, req.session.userId))
+      .execute()
+      .catch(err => console.error('Failed to update lastActivityAt:', err));
+  }
+  
   next();
 }
 
