@@ -203,64 +203,6 @@ export default function Login() {
         </div>
       </header>
 
-      {/* ROI Calculator Section - Embedded Question 1 */}
-      <section className="py-16 md:py-24 px-6 bg-primary/5">
-        <div className="max-w-3xl mx-auto text-center">
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-medium mb-6">
-            <Calculator className="w-4 h-4" />
-            {t('login.roiCalculator.badge', '60-Second Assessment')}
-          </div>
-          <h2 className="text-2xl md:text-4xl font-bold mb-4">
-            {t('login.roiCalculator.title', 'Calculate Your Hidden Costs')}
-          </h2>
-          <p className="text-muted-foreground mb-6 max-w-xl mx-auto">
-            {t('login.roiCalculator.subtitle', 'Most rope access companies waste $15,000-25,000 per year on scattered tools, manual processes, and hidden admin time. Find out how much you could save.')}
-          </p>
-          
-          {/* Embedded Employee Slider - Question 1 */}
-          <Card className="max-w-lg mx-auto">
-            <CardContent className="pt-6 space-y-6">
-              <div className="flex items-center gap-3 justify-center">
-                <Users className="w-6 h-6 text-primary" />
-                <h3 className="text-lg font-semibold">
-                  {t('roi.questions.employees.title', 'How many employees work in the field or office?')}
-                </h3>
-              </div>
-              
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-muted-foreground">{t('roi.questions.employees.min', '5 employees')}</span>
-                  <span className="text-3xl font-bold text-primary">{roiEmployeeCount}</span>
-                  <span className="text-sm text-muted-foreground">{t('roi.questions.employees.max', '50 employees')}</span>
-                </div>
-                <Slider
-                  value={[roiEmployeeCount]}
-                  onValueChange={(value) => setRoiEmployeeCount(value[0])}
-                  min={5}
-                  max={50}
-                  step={1}
-                  className="w-full"
-                  data-testid="slider-landing-employee-count"
-                />
-                <p className="text-sm text-muted-foreground text-center">
-                  {t('roi.questions.employees.description', 'Include all field technicians, office staff, and management')}
-                </p>
-              </div>
-              
-              <Button 
-                size="lg"
-                onClick={() => setLocation(`/roi-calculator?employees=${roiEmployeeCount}&step=2`)}
-                className="w-full gap-2"
-                data-testid="button-roi-calculator-next"
-              >
-                {t('roi.navigation.next', 'Next')}
-                <ArrowRight className="w-5 h-5" />
-              </Button>
-            </CardContent>
-          </Card>
-        </div>
-      </section>
-
       {/* Hero Section */}
       <section className="flex flex-col items-center justify-center text-center px-6 py-16 md:py-24 bg-gradient-to-b from-primary/5 to-transparent">
         <p className="text-xs md:text-sm font-semibold tracking-widest text-muted-foreground uppercase mb-6">
@@ -307,6 +249,64 @@ export default function Login() {
             <Play className="w-4 h-4" />
             {t('login.hero.watchDemo', 'Watch Demo')}
           </Button>
+        </div>
+      </section>
+
+      {/* ROI Calculator Section - Embedded Question 1 */}
+      <section className="py-16 md:py-24 px-6 bg-primary/5">
+        <div className="max-w-3xl mx-auto text-center">
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-medium mb-6">
+            <Calculator className="w-4 h-4" />
+            {t('login.roiCalculator.badge', '60-Second Assessment')}
+          </div>
+          <h2 className="text-2xl md:text-4xl font-bold mb-4">
+            {t('login.roiCalculator.title', 'Calculate Your Hidden Costs')}
+          </h2>
+          <p className="text-muted-foreground mb-6 max-w-xl mx-auto">
+            {t('login.roiCalculator.subtitle', 'Most rope access companies waste $15,000-25,000 per year on scattered tools, manual processes, and hidden admin, and wasted time. Find out how much you could save.')}
+          </p>
+          
+          {/* Embedded Employee Slider - Question 1 */}
+          <Card className="max-w-lg mx-auto">
+            <CardContent className="pt-6 space-y-6">
+              <div className="flex items-center gap-3 justify-center">
+                <Users className="w-6 h-6 text-primary" />
+                <h3 className="text-lg font-semibold">
+                  {t('roi.questions.employees.title', 'How many employees work in the field or office?')}
+                </h3>
+              </div>
+              
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-muted-foreground">{t('roi.questions.employees.min', '5 employees')}</span>
+                  <span className="text-3xl font-bold text-primary">{roiEmployeeCount}</span>
+                  <span className="text-sm text-muted-foreground">{t('roi.questions.employees.max', '50 employees')}</span>
+                </div>
+                <Slider
+                  value={[roiEmployeeCount]}
+                  onValueChange={(value) => setRoiEmployeeCount(value[0])}
+                  min={5}
+                  max={50}
+                  step={1}
+                  className="w-full"
+                  data-testid="slider-landing-employee-count"
+                />
+                <p className="text-sm text-muted-foreground text-center">
+                  {t('roi.questions.employees.description', 'Include all field technicians, office staff, and management')}
+                </p>
+              </div>
+              
+              <Button 
+                size="lg"
+                onClick={() => setLocation(`/roi-calculator?employees=${roiEmployeeCount}&step=2`)}
+                className="w-full gap-2"
+                data-testid="button-roi-calculator-next"
+              >
+                {t('roi.navigation.next', 'Next')}
+                <ArrowRight className="w-5 h-5" />
+              </Button>
+            </CardContent>
+          </Card>
         </div>
       </section>
 
