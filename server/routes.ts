@@ -90,12 +90,18 @@ function canViewCSR(user: any): boolean {
 // ============================================================================
 
 // Helper function to check if user can view inventory
+// All employees can view inventory to manage their own kit
+// Residents and property managers are NOT allowed access
+const EMPLOYEE_ROLES = [
+  'company', 'owner_ceo', 'human_resources', 'accounting', 'operations_manager',
+  'general_supervisor', 'rope_access_supervisor', 'account_manager',
+  'rope_access_tech', 'manager', 'ground_crew', 'ground_crew_supervisor', 'labourer', 'supervisor'
+];
+
 function canViewInventory(user: any): boolean {
   if (!user) return false;
-  if (user.role === 'company') return true;
-  
-  const permissions = normalizePermissions(user.permissions);
-  return permissions.includes('view_inventory');
+  // Only employees (including all worker and management roles) can view inventory
+  return EMPLOYEE_ROLES.includes(user.role);
 }
 
 // Helper function to check if user can manage inventory (add/edit/delete)

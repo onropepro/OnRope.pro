@@ -169,15 +169,19 @@ export function canViewCSR(user: User | null | undefined): boolean {
 
 /**
  * Check if user can access inventory/gear management (view)
- * - All authenticated employees can access the inventory page
- * - This allows everyone to view gear and manage their own "My Kit"
+ * - All employees can access the inventory page
+ * - This allows employees to view gear and manage their own "My Kit"
+ * - Residents and property managers are NOT allowed access
  * - Note: Adding/editing gear items still requires manage_inventory permission
  * - Note: Assigning gear to others still requires assign_gear permission
  */
 export function canAccessInventory(user: User | null | undefined): boolean {
   if (!user) return false;
-  // All authenticated users can access inventory to view and manage their own kit
-  return true;
+  // Only employees (including all worker and management roles) can view inventory
+  // Explicitly exclude resident and property_manager roles
+  if (user.role === 'resident' || user.role === 'property_manager') return false;
+  // All other authenticated users (employees) can access inventory
+  return EMPLOYEE_ROLES.includes(user.role);
 }
 
 /**
