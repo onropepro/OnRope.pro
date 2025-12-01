@@ -204,10 +204,12 @@ export default function Login() {
       </header>
       {/* Hero Section */}
       <section className="flex flex-col items-center justify-center text-center px-6 py-16 md:py-24 bg-gradient-to-b from-primary/5 to-transparent">
-        <h1 className="text-xs md:text-sm font-semibold tracking-widest text-muted-foreground uppercase mb-6">
-          {t('login.hero.subtitle', 'Building Maintenance Management Software')}<br />
-          {t('login.hero.builtBy', 'Built by a Level 3 IRATA Tech')}
+        <h1 className="text-xs md:text-sm font-semibold tracking-widest text-muted-foreground uppercase mb-2">
+          {t('login.hero.subtitle', 'Building Maintenance Management Software')}
         </h1>
+        <p className="text-xs md:text-sm font-semibold tracking-widest text-muted-foreground uppercase mb-6">
+          {t('login.hero.builtBy', 'Built by a Level 3 IRATA Tech')}
+        </p>
         
         <p className="text-2xl md:text-4xl font-medium mb-2" style={{ color: '#0B64A3' }}>
           {t('login.hero.tagline', "Your competitors think they're organized.")}
