@@ -11,6 +11,21 @@ The Rope Access Management Platform is an enterprise-grade, mobile-first web app
 - Interaction: Collaborative interaction requiring approval for major architectural changes
 - Code Management: No code deletion without explicit permission
 
+## Recent Changes (Landing Page Styling - December 1, 2025)
+
+**Landing Page Updates:**
+- Hero section background changed to solid light gray (#F3F3F3) for cleaner aesthetic
+- Brand color scheme applied: Rust/brown (#A3320B) for all primary CTAs and rotating accent words
+- "Get Started" button in header: #A3320B (rust/brown)
+- "Get Started Free" button in hero: #A3320B (rust/brown)
+- Rotating words display "safety meeting" in brand color
+- ROI Calculator section redesigned:
+  - Removed "60-Second Assessment" badge and icon
+  - Updated heading to "Calculate Your Hidden Costs In Less Than 60 Seconds"
+  - Cleaner, more direct messaging focused on value proposition
+- All Tailwind arbitrary color syntax (text-[#color], etc.) replaced with inline styles due to project config limitations
+- Color application method: `style={{ backgroundColor: '#F3F3F3' }}` for custom brand colors
+
 ## System Architecture
 
 The platform is built with a React 18 frontend using TypeScript and Wouter for routing, a Node.js Express.js backend, and a PostgreSQL database with Drizzle ORM. Styling is managed with Tailwind CSS and Shadcn UI, featuring a premium SaaS aesthetic with glass-morphism effects, refined shadows, and a mobile-first responsive strategy. Authentication is custom session-based, using secure cookie storage. Replit Object Storage is used for file storage.
