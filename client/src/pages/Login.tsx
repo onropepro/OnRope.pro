@@ -254,7 +254,8 @@ export default function Login() {
       <section className="py-16 md:py-24 px-6 bg-primary/5">
         <div className="max-w-3xl mx-auto text-center">
           <h2 className="text-2xl md:text-4xl font-bold mb-4">
-            {t('login.roiCalculator.title', 'Calculate Your Hidden Costs In Less Than 60 Seconds')}
+            Calculate Your Hidden Costs<br />
+            In Less Than 60 Seconds
           </h2>
           <p className="text-muted-foreground mb-6 max-w-xl mx-auto">
             {t('login.roiCalculator.subtitle', 'Most rope access companies waste $15,000-25,000 per year on scattered tools, manual processes, and hidden admin, and wasted time. Find out how much you could save.')}
