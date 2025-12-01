@@ -213,6 +213,7 @@ export const projects = pgTable("projects", {
   stallsPerDay: integer("stalls_per_day"), // For parkade_pressure_cleaning
   buildingFloors: integer("building_floors"), // For in_suite_dryer_vent_cleaning - total floors in building (separate from unit count)
   assignedEmployees: text("assigned_employees").array().default(sql`ARRAY[]::text[]`), // Array of employee IDs assigned to this project
+  peaceWork: boolean("peace_work").notNull().default(false), // Peace work toggle for project billing/tracking
   
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),

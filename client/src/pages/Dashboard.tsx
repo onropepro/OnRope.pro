@@ -31,6 +31,7 @@ import { AlertCircle } from "lucide-react";
 import { useLocation } from "wouter";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Switch } from "@/components/ui/switch";
 import type { Project, Client, InsertClient } from "@shared/schema";
 import { normalizeStrataPlan } from "@shared/schema";
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from "recharts";
@@ -80,6 +81,7 @@ const projectSchema = z.object({
   totalStalls: z.string().optional(),
   stallsPerDay: z.string().optional(),
   assignedEmployees: z.array(z.string()).optional(),
+  peaceWork: z.boolean().default(false),
 }).refine((data) => {
   if (data.jobType === "other") {
     return data.customJobType && data.customJobType.trim().length > 0;
@@ -722,6 +724,7 @@ export default function Dashboard() {
       estimatedHours: "",
       calendarColor: defaultCalendarColor,
       assignedEmployees: [],
+      peaceWork: false,
     },
   });
 
@@ -2846,6 +2849,30 @@ export default function Dashboard() {
                                 {t('dashboard.projectForm.calendarColorDesc', 'Choose the color this project appears on the calendar')}
                               </FormDescription>
                               <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+
+                        <FormField
+                          control={projectForm.control}
+                          name="peaceWork"
+                          render={({ field }) => (
+                            <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+                              <div className="space-y-0.5">
+                                <FormLabel className="text-base">
+                                  {t('dashboard.projectForm.peaceWork', 'Peace Work')}
+                                </FormLabel>
+                                <FormDescription className="text-xs">
+                                  {t('dashboard.projectForm.peaceWorkDesc', 'Enable peace work mode for this project')}
+                                </FormDescription>
+                              </div>
+                              <FormControl>
+                                <Switch
+                                  checked={field.value}
+                                  onCheckedChange={field.onChange}
+                                  data-testid="switch-peace-work"
+                                />
+                              </FormControl>
                             </FormItem>
                           )}
                         />
