@@ -14,19 +14,15 @@ The Rope Access Management Platform is an enterprise-grade, mobile-first web app
 ## Recent Changes (Landing Page Styling - December 1, 2025)
 
 **Landing Page Updates:**
-- **Hero Section Complete Redesign:**
-  - Background now features app screenshot (progress tracking UI) with professional dark overlay gradient
-  - Dark overlay (black/60 → black/50 → black/60) ensures perfect text readability
-  - Text colors optimized for dark background overlay
-- **Hero Headline Typography:**
-  - "Your competitors think they're organized." - Bright Blue (#64B5FF)
-  - "THEY'RE NOT" - Very Light Blue (#E8F0FF)
-  - Reduced vertical spacing between the two lines for tighter visual impact
+- Hero section background changed to solid light gray (#F3F3F3) for cleaner aesthetic
 - Brand color scheme applied: Rust/brown (#A3320B) for all primary CTAs and rotating accent words
 - "Get Started" button in header: #A3320B (rust/brown)
 - "Get Started Free" button in hero: #A3320B (rust/brown)
-- "Watch Demo" button: Transparent white background (bg-white/10) with white text for hero overlay
-- Rotating words display "safety meeting" in orange (#FF8C42) for contrast on dark overlay
+- Rotating words display "safety meeting" in brand color
+- **Hero Headline Typography:**
+  - "Your competitors think they're organized." - Blue (#0B64A3)
+  - "THEY'RE NOT" - Deep Navy Blue (#193A63)
+  - Reduced vertical spacing between the two lines for tighter visual impact
 - ROI Calculator section redesigned:
   - Removed "60-Second Assessment" badge and icon
   - Updated heading to "Calculate Your Hidden Costs In Less Than 60 Seconds"

@@ -14,7 +14,6 @@ import { queryClient } from "@/lib/queryClient";
 import { Rocket, Play, Building2, Clock, DollarSign, Users, Shield, FileText, Calculator, FileSpreadsheet, Radio, ClipboardCheck, MessageSquare, Home, Award, Calendar, FolderOpen, Globe, TrendingUp, ArrowRight } from "lucide-react";
 import { Slider } from "@/components/ui/slider";
 import onRopeProLogo from "@assets/OnRopePro-logo_1764625558626.png";
-import appScreenshot from "@assets/drop-progress_1764631978695.png";
 
 const loginSchema = z.object({
   identifier: z.string().min(1, "Email is required"),
@@ -204,65 +203,51 @@ export default function Login() {
         </div>
       </header>
       {/* Hero Section */}
-      <section 
-        className="flex flex-col items-center justify-center text-center px-6 py-16 md:py-24 relative overflow-hidden"
-        style={{
-          backgroundImage: `url(${appScreenshot})`,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-        }}
-      >
-        {/* Dark overlay gradient for text readability */}
-        <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/50 to-black/60 pointer-events-none"></div>
+      <section className="flex flex-col items-center justify-center text-center px-6 py-16 md:py-24" style={{ backgroundColor: '#F3F3F3' }}>
+        <h1 className="text-xs md:text-sm font-semibold tracking-widest text-muted-foreground uppercase mb-2">
+          {t('login.hero.subtitle', 'Building Maintenance Management Software')}
+        </h1>
+        <p className="text-xs md:text-sm font-semibold tracking-widest text-muted-foreground uppercase mb-6">
+          {t('login.hero.builtBy', 'Built by a Level 3 IRATA Tech')}
+        </p>
         
-        {/* Content container with relative positioning */}
-        <div className="relative z-10">
-          <h1 className="text-xs md:text-sm font-semibold tracking-widest text-white/90 uppercase mb-2">
-            {t('login.hero.subtitle', 'Building Maintenance Management Software')}
-          </h1>
-          <p className="text-xs md:text-sm font-semibold tracking-widest text-white/80 uppercase mb-6">
-            {t('login.hero.builtBy', 'Built by a Level 3 IRATA Tech')}
-          </p>
-          
-          <p className="text-2xl md:text-4xl font-medium mb-0" style={{ color: '#64B5FF' }}>
-            {t('login.hero.tagline', "Your competitors think they're organized.")}
-          </p>
-          
-          <div className="text-5xl md:text-7xl lg:text-8xl font-black tracking-tight mb-6" style={{ color: '#E8F0FF' }}>
-            {t('login.hero.taglineBold', "THEY'RE NOT")}
-          </div>
-          
-          <p className="text-base md:text-lg text-white/85 max-w-xl mb-8">
-            {t('login.hero.description', 'You track every')}{" "}
-            <span 
-              className="inline-block font-semibold transition-all duration-300 opacity-100 translate-y-0"
-              style={{ color: '#FF8C42' }}
-            >
-              {rotatingWords[currentWordIndex]}
-            </span>
-            {t('login.hero.descriptionEnd', ', from a single platform that actually speaks rope access.')}
-          </p>
-          
-          <div className="flex flex-col sm:flex-row items-center gap-4">
-            <Button 
-              size="lg"
-              onClick={() => setLocation("/pricing")}
-              className="gap-2 px-6 bg-[#A3320B] hover:bg-[#8A2908]"
-              data-testid="button-get-started-free"
-            >
-              <Rocket className="w-4 h-4" />
-              {t('login.hero.getStartedFree', 'Get Started Free')}
-            </Button>
-            <Button 
-              variant="outline"
-              size="lg"
-              className="gap-2 px-6 bg-white/10 border-white/30 text-white hover:bg-white/20"
-              data-testid="button-watch-demo"
-            >
-              <Play className="w-4 h-4" />
-              {t('login.hero.watchDemo', 'Watch Demo')}
-            </Button>
-          </div>
+        <p className="text-2xl md:text-4xl font-medium mb-0 text-[#3B3B3B]" style={{ color: '#0B64A3' }}>
+          {t('login.hero.tagline', "Your competitors think they're organized.")}
+        </p>
+        
+        <div className="text-5xl md:text-7xl lg:text-8xl font-black tracking-tight mb-6" style={{ color: '#193A63' }}>
+          {t('login.hero.taglineBold', "THEY'RE NOT")}
+        </div>
+        
+        <p className="text-base md:text-lg text-muted-foreground max-w-xl mb-8">
+          {t('login.hero.description', 'You track every')}{" "}
+          <span 
+            className="inline-block font-semibold transition-all duration-300 opacity-100 translate-y-0 text-[#A3320B]"
+          >
+            {rotatingWords[currentWordIndex]}
+          </span>
+          {t('login.hero.descriptionEnd', ', from a single platform that actually speaks rope access.')}
+        </p>
+        
+        <div className="flex flex-col sm:flex-row items-center gap-4">
+          <Button 
+            size="lg"
+            onClick={() => setLocation("/pricing")}
+            className="gap-2 px-6 bg-[#A3320B]"
+            data-testid="button-get-started-free"
+          >
+            <Rocket className="w-4 h-4" />
+            {t('login.hero.getStartedFree', 'Get Started Free')}
+          </Button>
+          <Button 
+            variant="outline"
+            size="lg"
+            className="gap-2 px-6"
+            data-testid="button-watch-demo"
+          >
+            <Play className="w-4 h-4" />
+            {t('login.hero.watchDemo', 'Watch Demo')}
+          </Button>
         </div>
       </section>
       {/* ROI Calculator Section - Embedded Question 1 */}
