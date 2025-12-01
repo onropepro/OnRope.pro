@@ -916,7 +916,12 @@
       "fallProtectionPlan": "Fall Protection Plan (PDF)",
       "fallProtectionPlanDesc": "Optional: Upload the rope access/fall protection plan PDF",
       "anchorInspectionCert": "Anchor Inspection Certificate (PDF)",
-      "anchorInspectionCertDesc": "Optional: Upload the anchor inspection certificate PDF"
+      "anchorInspectionCertDesc": "Optional: Upload the anchor inspection certificate PDF",
+      "peaceWork": "Peace Work",
+      "peaceWorkDesc": "Enable piece rate compensation for this project (pay based on drops completed instead of hours worked)",
+      "pricePerDrop": "Price Per Drop",
+      "pricePerDropPlaceholder": "Enter price per drop",
+      "pricePerDropHelp": "Amount paid per drop completed"
     },
     "projects": {
       "activeProjects": "Active Projects",

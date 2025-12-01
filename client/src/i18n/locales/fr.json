@@ -916,7 +916,12 @@
       "fallProtectionPlan": "Plan de protection contre les chutes (PDF)",
       "fallProtectionPlanDesc": "Optionnel : Téléverser le plan d'accès sur corde/protection contre les chutes PDF",
       "anchorInspectionCert": "Certificat d'inspection d'ancrage (PDF)",
-      "anchorInspectionCertDesc": "Optionnel : Téléverser le certificat d'inspection d'ancrage PDF"
+      "anchorInspectionCertDesc": "Optionnel : Téléverser le certificat d'inspection d'ancrage PDF",
+      "peaceWork": "Travail à la pièce",
+      "peaceWorkDesc": "Activer la rémunération à la pièce pour ce projet (paiement basé sur les descentes complétées au lieu des heures travaillées)",
+      "pricePerDrop": "Prix par descente",
+      "pricePerDropPlaceholder": "Entrer le prix par descente",
+      "pricePerDropHelp": "Montant payé par descente complétée"
     },
     "projects": {
       "activeProjects": "Projets actifs",
