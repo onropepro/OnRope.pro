@@ -82,6 +82,7 @@ const projectSchema = z.object({
   stallsPerDay: z.string().optional(),
   assignedEmployees: z.array(z.string()).optional(),
   peaceWork: z.boolean().default(false),
+  pricePerDrop: z.string().optional(),
 }).refine((data) => {
   if (data.jobType === "other") {
     return data.customJobType && data.customJobType.trim().length > 0;
@@ -725,6 +726,7 @@ export default function Dashboard() {
       calendarColor: defaultCalendarColor,
       assignedEmployees: [],
       peaceWork: false,
+      pricePerDrop: "",
     },
   });
 
@@ -958,6 +960,8 @@ export default function Dashboard() {
           totalStalls: data.totalStalls ? parseInt(data.totalStalls) : undefined,
           stallsPerDay: data.stallsPerDay ? parseInt(data.stallsPerDay) : undefined,
           assignedEmployees: data.assignedEmployees || [],
+          peaceWork: data.peaceWork || false,
+          pricePerDrop: data.pricePerDrop ? parseInt(data.pricePerDrop) : undefined,
         }),
         credentials: "include",
       });
@@ -2876,6 +2880,29 @@ export default function Dashboard() {
                             </FormItem>
                           )}
                         />
+
+                        {projectForm.watch("peaceWork") && (
+                          <FormField
+                            control={projectForm.control}
+                            name="pricePerDrop"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>{t('dashboard.projectForm.pricePerDrop', 'Price Per Drop')}</FormLabel>
+                                <FormControl>
+                                  <Input 
+                                    type="number" 
+                                    min="0" 
+                                    placeholder={t('dashboard.projectForm.pricePerDropPlaceholder', 'Enter price per drop')} 
+                                    {...field} 
+                                    data-testid="input-price-per-drop" 
+                                    className="h-12" 
+                                  />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                        )}
 
                         <FormField
                           control={projectForm.control}
