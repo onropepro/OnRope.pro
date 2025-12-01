@@ -3264,7 +3264,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       const { 
-        name, email, password, role, techLevel, hourlyRate, permissions,
+        name, email, password, role, techLevel, hourlyRate, isSalary, salary, permissions,
         startDate, birthday, driversLicenseNumber, driversLicenseProvince, driversLicenseDocuments,
         homeAddress, employeePhoneNumber, emergencyContactName, emergencyContactPhone,
         specialMedicalConditions, irataLevel, irataLicenseNumber, irataIssuedDate, irataExpirationDate
@@ -3282,6 +3282,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         role,
         techLevel: role === "rope_access_tech" ? techLevel : null,
         hourlyRate: hourlyRate ? hourlyRate : null,
+        isSalary: isSalary ?? false,
+        salary: salary ? salary : null,
         permissions: permissions || [],
         companyId, // Link employee to this company
         passwordHash: password, // Storage will hash this
@@ -3342,7 +3344,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       const { 
-        name, email, role, techLevel, hourlyRate, permissions,
+        name, email, role, techLevel, hourlyRate, isSalary, salary, permissions,
         startDate, birthday, driversLicenseNumber, driversLicenseProvince, driversLicenseDocuments,
         homeAddress, employeePhoneNumber, emergencyContactName, emergencyContactPhone,
         specialMedicalConditions, irataLevel, irataLicenseNumber, irataIssuedDate, 
@@ -3361,6 +3363,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         role,
         techLevel: role === "rope_access_tech" ? techLevel : null,
         hourlyRate: hourlyRate ? hourlyRate : null,
+        isSalary: isSalary !== undefined ? isSalary : undefined,
+        salary: salary !== undefined ? (salary ? salary : null) : undefined,
         permissions: permissions || [],
         startDate: startDate !== undefined ? (startDate || null) : undefined,
         birthday: birthday !== undefined ? (birthday || null) : undefined,

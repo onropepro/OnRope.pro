@@ -205,6 +205,8 @@ const employeeSchema = z.object({
   password: z.string().min(6, "Password must be at least 6 characters"),
   role: z.enum(["owner_ceo", "operations_manager", "human_resources", "accounting", "account_manager", "general_supervisor", "rope_access_supervisor", "manager", "rope_access_tech", "ground_crew_supervisor", "ground_crew", "labourer"]),
   hourlyRate: z.string().optional(),
+  isSalary: z.boolean().default(false),
+  salary: z.string().optional(),
   permissions: z.array(z.string()).default([]),
   // New employee details
   startDate: z.string().optional(),
@@ -230,6 +232,8 @@ const editEmployeeSchema = z.object({
   email: z.string().email("Invalid email address"),
   role: z.enum(["owner_ceo", "operations_manager", "human_resources", "accounting", "account_manager", "general_supervisor", "rope_access_supervisor", "manager", "rope_access_tech", "ground_crew_supervisor", "ground_crew", "labourer"]),
   hourlyRate: z.string().optional(),
+  isSalary: z.boolean().default(false),
+  salary: z.string().optional(),
   permissions: z.array(z.string()).default([]),
   // New employee details
   startDate: z.string().optional(),
@@ -758,6 +762,8 @@ export default function Dashboard() {
       password: "",
       role: "rope_access_tech",
       hourlyRate: "",
+      isSalary: false,
+      salary: "",
       permissions: [],
       startDate: "",
       birthday: "",
@@ -784,6 +790,8 @@ export default function Dashboard() {
       email: "",
       role: "rope_access_tech",
       hourlyRate: "",
+      isSalary: false,
+      salary: "",
       permissions: [],
       startDate: "",
       birthday: "",
@@ -1285,6 +1293,8 @@ export default function Dashboard() {
       email: employee.email ?? "",
       role: employee.role,
       hourlyRate: employee.hourlyRate != null ? String(employee.hourlyRate) : "",
+      isSalary: employee.isSalary ?? false,
+      salary: employee.salary != null ? String(employee.salary) : "",
       permissions: employee.permissions || [],
       startDate: employee.startDate ?? "",
       birthday: employee.birthday ?? "",
@@ -3750,28 +3760,77 @@ export default function Dashboard() {
 
                       <FormField
                         control={employeeForm.control}
-                        name="hourlyRate"
+                        name="isSalary"
                         render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>{t('dashboard.employeeForm.hourlyRate', 'Hourly Rate ($/hr)')}</FormLabel>
+                          <FormItem className="flex items-center justify-between rounded-lg border p-4">
+                            <div className="space-y-0.5">
+                              <FormLabel className="text-base">{t('dashboard.employeeForm.isSalary', 'Salary Employee')}</FormLabel>
+                              <FormDescription className="text-xs">
+                                {t('dashboard.employeeForm.isSalaryDescription', 'Toggle on for salaried employees instead of hourly')}
+                              </FormDescription>
+                            </div>
                             <FormControl>
-                              <Input 
-                                type="number" 
-                                step="0.01" 
-                                min="0" 
-                                placeholder="25.00" 
-                                {...field} 
-                                data-testid="input-employee-hourly-rate" 
-                                className="h-12" 
+                              <Switch
+                                checked={field.value}
+                                onCheckedChange={field.onChange}
+                                data-testid="switch-employee-is-salary"
                               />
                             </FormControl>
-                            <FormDescription className="text-xs">
-                              {t('dashboard.employeeForm.hourlyRateDescription', 'Optional - for labor cost calculations')}
-                            </FormDescription>
-                            <FormMessage />
                           </FormItem>
                         )}
                       />
+
+                      {employeeForm.watch("isSalary") ? (
+                        <FormField
+                          control={employeeForm.control}
+                          name="salary"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>{t('dashboard.employeeForm.salary', 'Annual Salary ($)')}</FormLabel>
+                              <FormControl>
+                                <Input 
+                                  type="number" 
+                                  step="1" 
+                                  min="0" 
+                                  placeholder="50000" 
+                                  {...field} 
+                                  data-testid="input-employee-salary" 
+                                  className="h-12" 
+                                />
+                              </FormControl>
+                              <FormDescription className="text-xs">
+                                {t('dashboard.employeeForm.salaryDescription', 'Annual salary amount')}
+                              </FormDescription>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      ) : (
+                        <FormField
+                          control={employeeForm.control}
+                          name="hourlyRate"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>{t('dashboard.employeeForm.hourlyRate', 'Hourly Rate ($/hr)')}</FormLabel>
+                              <FormControl>
+                                <Input 
+                                  type="number" 
+                                  step="0.01" 
+                                  min="0" 
+                                  placeholder="25.00" 
+                                  {...field} 
+                                  data-testid="input-employee-hourly-rate" 
+                                  className="h-12" 
+                                />
+                              </FormControl>
+                              <FormDescription className="text-xs">
+                                {t('dashboard.employeeForm.hourlyRateDescription', 'Optional - for labor cost calculations')}
+                              </FormDescription>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      )}
 
                       <div className="border-t pt-4 mt-6">
                         <h3 className="text-sm font-medium mb-4">{t('dashboard.employeeForm.personalDetails', 'Personal Details (Optional)')}</h3>
@@ -4249,11 +4308,19 @@ export default function Dashboard() {
                                   {t('dashboard.employees.started', 'Started:')} {new Date(employee.startDate).toLocaleDateString()}
                                 </Badge>
                               )}
-                              {employee.hourlyRate && hasFinancialAccess(user) && (
-                                <Badge variant="outline" className="text-xs">
-                                  ${employee.hourlyRate}/hr
-                                </Badge>
-                              )}
+                              {hasFinancialAccess(user) && (employee.isSalary ? (
+                                employee.salary && (
+                                  <Badge variant="outline" className="text-xs">
+                                    ${Number(employee.salary).toLocaleString()}/{t('dashboard.employees.year', 'yr')}
+                                  </Badge>
+                                )
+                              ) : (
+                                employee.hourlyRate && (
+                                  <Badge variant="outline" className="text-xs">
+                                    ${employee.hourlyRate}/{t('dashboard.employees.hour', 'hr')}
+                                  </Badge>
+                                )
+                              ))}
                               {employee.techLevel && (
                                 <Badge variant="outline" className="text-xs">
                                   IRATA {employee.techLevel}
@@ -4437,11 +4504,19 @@ export default function Dashboard() {
                                       {t('dashboard.employees.started', 'Started:')} {new Date(employee.startDate).toLocaleDateString()}
                                     </Badge>
                                   )}
-                                  {employee.hourlyRate && hasFinancialAccess(user) && (
-                                    <Badge variant="outline" className="text-xs">
-                                      ${employee.hourlyRate}/hr
-                                    </Badge>
-                                  )}
+                                  {hasFinancialAccess(user) && (employee.isSalary ? (
+                                    employee.salary && (
+                                      <Badge variant="outline" className="text-xs">
+                                        ${Number(employee.salary).toLocaleString()}/{t('dashboard.employees.year', 'yr')}
+                                      </Badge>
+                                    )
+                                  ) : (
+                                    employee.hourlyRate && (
+                                      <Badge variant="outline" className="text-xs">
+                                        ${employee.hourlyRate}/{t('dashboard.employees.hour', 'hr')}
+                                      </Badge>
+                                    )
+                                  ))}
                                   {employee.techLevel && (
                                     <Badge variant="outline" className="text-xs">
                                       IRATA {employee.techLevel}
@@ -5570,28 +5645,77 @@ export default function Dashboard() {
 
                 <FormField
                   control={editEmployeeForm.control}
-                  name="hourlyRate"
+                  name="isSalary"
                   render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>{t('dashboard.employeeForm.hourlyRate', 'Hourly Rate ($/hr)')}</FormLabel>
+                    <FormItem className="flex items-center justify-between rounded-lg border p-4">
+                      <div className="space-y-0.5">
+                        <FormLabel className="text-base">{t('dashboard.employeeForm.isSalary', 'Salary Employee')}</FormLabel>
+                        <FormDescription className="text-xs">
+                          {t('dashboard.employeeForm.isSalaryDescription', 'Toggle on for salaried employees instead of hourly')}
+                        </FormDescription>
+                      </div>
                       <FormControl>
-                        <Input 
-                          type="number" 
-                          step="0.01" 
-                          min="0" 
-                          placeholder="25.00" 
-                          {...field} 
-                          data-testid="input-edit-employee-hourly-rate" 
-                          className="h-12" 
+                        <Switch
+                          checked={field.value}
+                          onCheckedChange={field.onChange}
+                          data-testid="switch-edit-employee-is-salary"
                         />
                       </FormControl>
-                      <FormDescription className="text-xs">
-                        {t('dashboard.employeeForm.hourlyRateDescription', 'Optional - for labor cost calculations')}
-                      </FormDescription>
-                      <FormMessage />
                     </FormItem>
                   )}
                 />
+
+                {editEmployeeForm.watch("isSalary") ? (
+                  <FormField
+                    control={editEmployeeForm.control}
+                    name="salary"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>{t('dashboard.employeeForm.salary', 'Annual Salary ($)')}</FormLabel>
+                        <FormControl>
+                          <Input 
+                            type="number" 
+                            step="1" 
+                            min="0" 
+                            placeholder="50000" 
+                            {...field} 
+                            data-testid="input-edit-employee-salary" 
+                            className="h-12" 
+                          />
+                        </FormControl>
+                        <FormDescription className="text-xs">
+                          {t('dashboard.employeeForm.salaryDescription', 'Annual salary amount')}
+                        </FormDescription>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                ) : (
+                  <FormField
+                    control={editEmployeeForm.control}
+                    name="hourlyRate"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>{t('dashboard.employeeForm.hourlyRate', 'Hourly Rate ($/hr)')}</FormLabel>
+                        <FormControl>
+                          <Input 
+                            type="number" 
+                            step="0.01" 
+                            min="0" 
+                            placeholder="25.00" 
+                            {...field} 
+                            data-testid="input-edit-employee-hourly-rate" 
+                            className="h-12" 
+                          />
+                        </FormControl>
+                        <FormDescription className="text-xs">
+                          {t('dashboard.employeeForm.hourlyRateDescription', 'Optional - for labor cost calculations')}
+                        </FormDescription>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                )}
 
                 <div className="border-t pt-4 mt-6">
                   <h3 className="text-sm font-medium mb-4">{t('dashboard.employeeForm.personalDetails', 'Personal Details (Optional)')}</h3>
@@ -6035,12 +6159,21 @@ export default function Dashboard() {
                           <div className="text-sm font-medium">{new Date(employeeToView.startDate).toLocaleDateString()}</div>
                         </div>
                       )}
-                      {employeeToView.hourlyRate && hasFinancialAccess(user) && (
-                        <div>
-                          <div className="text-xs text-muted-foreground">{t('dashboard.employeeDetails.hourlyRate', 'Hourly Rate')}</div>
-                          <div className="text-sm font-medium">${employeeToView.hourlyRate}/hr</div>
-                        </div>
-                      )}
+                      {hasFinancialAccess(user) && (employeeToView.isSalary ? (
+                        employeeToView.salary && (
+                          <div>
+                            <div className="text-xs text-muted-foreground">{t('dashboard.employeeDetails.salary', 'Annual Salary')}</div>
+                            <div className="text-sm font-medium">${Number(employeeToView.salary).toLocaleString()}/{t('dashboard.employees.year', 'yr')}</div>
+                          </div>
+                        )
+                      ) : (
+                        employeeToView.hourlyRate && (
+                          <div>
+                            <div className="text-xs text-muted-foreground">{t('dashboard.employeeDetails.hourlyRate', 'Hourly Rate')}</div>
+                            <div className="text-sm font-medium">${employeeToView.hourlyRate}/{t('dashboard.employees.hour', 'hr')}</div>
+                          </div>
+                        )
+                      ))}
                       {employeeToView.techLevel && (
                         <div>
                           <div className="text-xs text-muted-foreground">{t('dashboard.employeeDetails.techLevel', 'Tech Level')}</div>

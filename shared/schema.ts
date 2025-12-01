@@ -85,6 +85,8 @@ export const users = pgTable("users", {
   // Employee-specific fields
   techLevel: varchar("tech_level"), // for rope_access_tech role (e.g., "Level 1", "Level 2", "Level 3")
   hourlyRate: numeric("hourly_rate", { precision: 10, scale: 2 }), // Hourly rate for employees (e.g., 25.50)
+  isSalary: boolean("is_salary").default(false), // Whether employee is paid salary instead of hourly
+  salary: numeric("salary", { precision: 12, scale: 2 }), // Annual salary for salaried employees
   permissions: text("permissions").array().default(sql`ARRAY[]::text[]`), // Array of permission strings for employees
   isTempPassword: boolean("is_temp_password").default(false),
   

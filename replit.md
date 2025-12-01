@@ -19,7 +19,7 @@ The platform is built with a React 18 frontend using TypeScript and Wouter for r
 
 *   **Multi-Tenant Role-Based Access Control (RBAC):** Supports various roles with granular permissions for data access and actions.
 *   **Project Management System:** Manages diverse job types with visual selection, detailed project attributes, and multiple progress tracking systems. Custom job types can be saved and reused.
-*   **Workforce & Time Tracking:** Includes employee management (onboarding, certifications, rates, permissions), real-time clock-in/out with GPS, billable/non-billable hours, and payroll-ready reporting. Includes IRATA certification expiration tracking.
+*   **Workforce & Time Tracking:** Includes employee management (onboarding, certifications, rates, permissions), real-time clock-in/out with GPS, billable/non-billable hours, and payroll-ready reporting. Includes IRATA certification expiration tracking. Supports both hourly and salaried employee compensation types via toggle switch in employee forms.
 *   **IRATA Task Logging System:** Comprehensive work hours logging system for IRATA technicians to track specific rope access tasks performed during work sessions, supporting certification progression. Features include:
     - Task selection dialog after ending work sessions (IRATA technicians only)
     - 20+ canonical rope access task types (rope transfer, ascending, descending, rigging, deviation, rescue techniques, etc.)
