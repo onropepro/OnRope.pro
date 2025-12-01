@@ -2315,13 +2315,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Fetch all users with company role
       const companies = await storage.getAllCompanies();
       
-      // Return companies without sensitive password hashes
-      const companiesWithoutPasswords = companies.map(company => {
-        const { passwordHash,  ...companyData } = company;
-        return companyData;
-      });
+      // For each company, get the most recent activity from any user (owner + employees)
+      const companiesWithActivity = await Promise.all(companies.map(async (company) => {
+        const { passwordHash, ...companyData } = company;
+        
+        // Query for the most recent activity across company owner and all employees
+        const activityResult = await db.select({
+          lastActivity: sql<Date>`MAX(last_activity_at)`
+        })
+        .from(users)
+        .where(
+          sql`${users.id} = ${company.id} OR ${users.companyId} = ${company.id}`
+        );
+        
+        const lastCompanyActivity = activityResult[0]?.lastActivity || company.lastActivityAt;
+        
+        return {
+          ...companyData,
+          lastCompanyActivity, // Most recent activity from any user in the company
+        };
+      }));
 
-      res.json({ companies: companiesWithoutPasswords });
+      res.json({ companies: companiesWithActivity });
     } catch (error) {
       console.error("Get all companies error:", error);
       res.status(500).json({ message: "Internal server error" });

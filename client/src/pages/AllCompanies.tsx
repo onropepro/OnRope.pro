@@ -98,7 +98,7 @@ export default function AllCompanies() {
                   </div>
                 </CardHeader>
                 <CardContent>
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                  <div className="grid grid-cols-2 md:grid-cols-5 gap-4 text-sm">
                     <div>
                       <p className="text-muted-foreground">Company ID</p>
                       <p className="font-mono text-xs">{company.id}</p>
@@ -106,6 +106,21 @@ export default function AllCompanies() {
                     <div>
                       <p className="text-muted-foreground">Registration Date</p>
                       <p>{company.createdAt ? new Date(company.createdAt).toLocaleDateString() : 'N/A'}</p>
+                    </div>
+                    <div>
+                      <p className="text-muted-foreground">Last Activity</p>
+                      <p className={company.lastCompanyActivity ? '' : 'text-muted-foreground'}>
+                        {company.lastCompanyActivity ? (
+                          <>
+                            {new Date(company.lastCompanyActivity).toLocaleDateString()}{' '}
+                            <span className="text-muted-foreground">
+                              {new Date(company.lastCompanyActivity).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                            </span>
+                          </>
+                        ) : (
+                          'Never'
+                        )}
+                      </p>
                     </div>
                     <div>
                       <p className="text-muted-foreground">License Key</p>
