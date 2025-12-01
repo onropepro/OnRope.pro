@@ -31,7 +31,7 @@ import {
   Shield,
   Globe
 } from "lucide-react";
-import onRopeProLogo from "@assets/OnRopePro-Logo_1764624625662.png";
+import onRopeProLogo from "@assets/OnRopePro-logo_1764625084590.png";
 
 type TimeTrackingOption = 'paper' | 'excel' | 'software' | 'none';
 type ProjectManagementOption = 'whiteboard' | 'excel' | 'software' | 'texts';

@@ -13,7 +13,7 @@ import { useToast } from "@/hooks/use-toast";
 import { queryClient } from "@/lib/queryClient";
 import { Rocket, Play, Building2, Clock, DollarSign, Users, Shield, FileText, Calculator, FileSpreadsheet, Radio, ClipboardCheck, MessageSquare, Home, Award, Calendar, FolderOpen, Globe, TrendingUp, ArrowRight } from "lucide-react";
 import { Slider } from "@/components/ui/slider";
-import onRopeProLogo from "@assets/OnRopePro-Logo_1764624625662.png";
+import onRopeProLogo from "@assets/OnRopePro-logo_1764625084590.png";
 
 const loginSchema = z.object({
   identifier: z.string().min(1, "Email is required"),
