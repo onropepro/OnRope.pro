@@ -202,7 +202,6 @@ export default function Login() {
           </Button>
         </div>
       </header>
-
       {/* Hero Section */}
       <section className="flex flex-col items-center justify-center text-center px-6 py-16 md:py-24 bg-gradient-to-b from-primary/5 to-transparent">
         <p className="text-xs md:text-sm font-semibold tracking-widest text-muted-foreground uppercase mb-6">
@@ -210,7 +209,7 @@ export default function Login() {
           {t('login.hero.builtBy', 'Built by a Level 3 IRATA Tech')}
         </p>
         
-        <h1 className="text-2xl md:text-4xl font-medium text-primary mb-2">
+        <h1 className="text-2xl md:text-4xl font-medium mb-2 text-[0B64A3]">
           {t('login.hero.tagline', "Your competitors think they're organized.")}
         </h1>
         
@@ -251,7 +250,6 @@ export default function Login() {
           </Button>
         </div>
       </section>
-
       {/* ROI Calculator Section - Embedded Question 1 */}
       <section className="py-16 md:py-24 px-6 bg-primary/5">
         <div className="max-w-3xl mx-auto text-center">
@@ -309,7 +307,6 @@ export default function Login() {
           </Card>
         </div>
       </section>
-
       {/* Pain Points Section - Below the Fold */}
       <section className="py-16 md:py-24 px-6">
         <div className="max-w-3xl mx-auto text-center">
@@ -344,7 +341,6 @@ export default function Login() {
           </p>
         </div>
       </section>
-
       {/* CTA Section */}
       <section className="py-16 md:py-24 px-6 bg-muted/30">
         <div className="max-w-3xl mx-auto text-center">
@@ -376,7 +372,6 @@ export default function Login() {
           </div>
         </div>
       </section>
-
       {/* Features Section */}
       <section className="py-16 md:py-24 px-6">
         <div className="max-w-6xl mx-auto">
@@ -585,7 +580,6 @@ export default function Login() {
           </div>
         </div>
       </section>
-
       {/* Login Modal - Overlay when shown */}
       {showLoginForm && (
         <div 
