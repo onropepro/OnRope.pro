@@ -50,8 +50,8 @@ export default function Login() {
   };
 
   const rotatingWords = [
-    t('login.rotatingWords.project', 'project'),
     t('login.rotatingWords.safetyMeeting', 'safety meeting'),
+    t('login.rotatingWords.project', 'project'),
     t('login.rotatingWords.hourWorked', 'hour worked'),
     t('login.rotatingWords.drop', 'drop'),
     t('login.rotatingWords.residentComplaint', 'resident complaint'),
@@ -222,7 +222,7 @@ export default function Login() {
         <p className="text-base md:text-lg text-muted-foreground max-w-xl mb-8">
           {t('login.hero.description', 'You track every')}{" "}
           <span 
-            className="inline-block font-semibold transition-all duration-300 opacity-100 translate-y-0 text-[#A3320B]"
+            className="inline-block font-semibold transition-all duration-300 opacity-100 translate-y-0 text-[#193A63]"
           >
             {rotatingWords[currentWordIndex]}
           </span>
