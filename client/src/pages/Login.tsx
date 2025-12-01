@@ -209,11 +209,11 @@ export default function Login() {
           {t('login.hero.builtBy', 'Built by a Level 3 IRATA Tech')}
         </p>
         
-        <h1 className="text-2xl md:text-4xl font-medium mb-2 text-[0B64A3]">
+        <h1 className="text-2xl md:text-4xl font-medium mb-2 text-[#0B64A3]">
           {t('login.hero.tagline', "Your competitors think they're organized.")}
         </h1>
         
-        <div className="text-5xl md:text-7xl lg:text-8xl font-black tracking-tight mb-6">
+        <div className="text-5xl md:text-7xl lg:text-8xl font-black tracking-tight mb-6 text-[#3B3B3B]">
           {t('login.hero.taglineBold', "THEY'RE NOT")}
         </div>
         
