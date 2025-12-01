@@ -195,6 +195,7 @@ export default function Login() {
           </Button>
           <Button 
             onClick={() => setLocation("/pricing")}
+            className="bg-[#A3320B]"
             data-testid="button-get-started-header"
           >
             {t('login.header.getStarted', 'Get Started')}
