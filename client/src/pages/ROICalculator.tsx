@@ -31,7 +31,7 @@ import {
   Shield,
   Globe
 } from "lucide-react";
-import ropeAccessProLogo from "@assets/generated_images/Blue_rope_access_worker_logo_ac1aa8fd.png";
+import onRopeProLogo from "@assets/OnRopePro-Logo_1764624625662.png";
 
 type TimeTrackingOption = 'paper' | 'excel' | 'software' | 'none';
 type ProjectManagementOption = 'whiteboard' | 'excel' | 'software' | 'texts';
@@ -760,9 +760,8 @@ export default function ROICalculator() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-primary/5 via-background to-background flex flex-col">
       <header className="flex items-center justify-between px-6 md:px-8 py-4 border-b bg-background/80 backdrop-blur-sm sticky top-0 z-50">
-        <div className="flex items-center gap-2 cursor-pointer" onClick={() => setLocation("/")}>
-          <img src={ropeAccessProLogo} alt="OnRopePro" className="w-7 h-7 object-contain" />
-          <span className="font-bold text-lg">OnRopePro</span>
+        <div className="flex items-center cursor-pointer" onClick={() => setLocation("/")}>
+          <img src={onRopeProLogo} alt="OnRopePro" className="h-8 object-contain" />
         </div>
         <div className="flex items-center gap-3">
           <Button 

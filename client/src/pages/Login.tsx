@@ -13,7 +13,7 @@ import { useToast } from "@/hooks/use-toast";
 import { queryClient } from "@/lib/queryClient";
 import { Rocket, Play, Building2, Clock, DollarSign, Users, Shield, FileText, Calculator, FileSpreadsheet, Radio, ClipboardCheck, MessageSquare, Home, Award, Calendar, FolderOpen, Globe, TrendingUp, ArrowRight } from "lucide-react";
 import { Slider } from "@/components/ui/slider";
-import ropeAccessProLogo from "@assets/generated_images/Blue_rope_access_worker_logo_ac1aa8fd.png";
+import onRopeProLogo from "@assets/OnRopePro-Logo_1764624625662.png";
 
 const loginSchema = z.object({
   identifier: z.string().min(1, "Email is required"),
@@ -173,9 +173,8 @@ export default function Login() {
     <div className="min-h-screen bg-gradient-to-b from-primary/5 via-background to-background flex flex-col">
       {/* Header */}
       <header className="flex items-center justify-between px-6 md:px-8 py-4 border-b bg-background/80 backdrop-blur-sm sticky top-0 z-50">
-        <div className="flex items-center gap-2">
-          <img src={ropeAccessProLogo} alt="OnRopePro" className="w-7 h-7 object-contain" />
-          <span className="font-bold text-lg">OnRopePro</span>
+        <div className="flex items-center">
+          <img src={onRopeProLogo} alt="OnRopePro" className="h-8 object-contain" />
         </div>
         <div className="flex items-center gap-3">
           <Button 
