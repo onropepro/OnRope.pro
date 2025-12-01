@@ -279,6 +279,9 @@ export const workSessions = pgTable("work_sessions", {
   // Manual completion percentage for hours-based job types (General Pressure Washing, Ground Window)
   manualCompletionPercentage: integer("manual_completion_percentage"), // 0-100, null if not applicable
   
+  // Peace work payment - when project has peaceWork enabled, pay = drops × pricePerDrop
+  peaceWorkPay: numeric("peace_work_pay", { precision: 10, scale: 2 }), // Total pay for this session based on drops (null if not peace work)
+  
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 }, (table) => [

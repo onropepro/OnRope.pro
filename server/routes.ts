@@ -5336,6 +5336,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Use the validatedPercentage from earlier validation
       const completionPercentage = validatedPercentage !== undefined ? Math.round(validatedPercentage) : undefined;
       
+      // Calculate peace work pay if project has peace work enabled
+      let peaceWorkPay: number | null = null;
+      if (project.peaceWork && project.pricePerDrop) {
+        peaceWorkPay = totalDropsCompleted * project.pricePerDrop;
+        console.log(`[PEACE WORK] Project ${project.id}: ${totalDropsCompleted} drops × $${project.pricePerDrop} = $${peaceWorkPay}`);
+      }
+      
       // End the session with elevation-specific drops and overtime hours
       const session = await storage.endWorkSession(
         sessionId,
@@ -5349,7 +5356,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         overtimeBreakdown.regularHours,
         overtimeBreakdown.overtimeHours,
         overtimeBreakdown.doubleTimeHours,
-        completionPercentage
+        completionPercentage,
+        peaceWorkPay
       );
       
       res.json({ session });

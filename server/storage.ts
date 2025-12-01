@@ -661,7 +661,8 @@ export class Storage {
     regularHours?: number,
     overtimeHours?: number,
     doubleTimeHours?: number,
-    manualCompletionPercentage?: number
+    manualCompletionPercentage?: number,
+    peaceWorkPay?: number | null
   ): Promise<WorkSession> {
     const result = await db.update(workSessions)
       .set({
@@ -677,6 +678,7 @@ export class Storage {
         overtimeHours: overtimeHours !== undefined ? overtimeHours.toString() : '0',
         doubleTimeHours: doubleTimeHours !== undefined ? doubleTimeHours.toString() : '0',
         manualCompletionPercentage: manualCompletionPercentage !== undefined ? manualCompletionPercentage : null,
+        peaceWorkPay: peaceWorkPay !== null && peaceWorkPay !== undefined ? peaceWorkPay.toString() : null,
         updatedAt: sql`NOW()`,
       })
       .where(eq(workSessions.id, sessionId))
@@ -1554,6 +1556,8 @@ export class Storage {
         employeeName: users.name,
         hourlyRate: users.hourlyRate,
         projectName: projects.buildingName,
+        peaceWorkPay: workSessions.peaceWorkPay,
+        projectPeaceWork: projects.peaceWork,
       })
       .from(workSessions)
       .leftJoin(users, eq(workSessions.employeeId, users.id))
@@ -1604,6 +1608,10 @@ export class Storage {
 
       const hours = (new Date(session.endTime).getTime() - new Date(session.startTime).getTime()) / (1000 * 60 * 60);
       const rate = parseFloat(session.hourlyRate || '0');
+      
+      // For peace work sessions, use peaceWorkPay instead of hours * rate
+      const isPeaceWork = session.projectPeaceWork && session.peaceWorkPay;
+      const sessionPay = isPeaceWork ? parseFloat(session.peaceWorkPay || '0') : hours * rate;
 
       if (!employeeMap.has(session.employeeId)) {
         employeeMap.set(session.employeeId, {
@@ -1628,7 +1636,7 @@ export class Storage {
       summary.regularHours += regularHrs;
       summary.overtimeHours += overtimeHrs;
       summary.doubleTimeHours += doubleTimeHrs;
-      summary.totalPay += hours * rate;
+      summary.totalPay += sessionPay;
       summary.sessions.push({
         id: session.sessionId,
         projectId: session.projectId,
