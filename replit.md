@@ -25,6 +25,11 @@ The Rope Access Management Platform is an enterprise-grade, mobile-first web app
   - Cleaner, more direct messaging focused on value proposition
 - All Tailwind arbitrary color syntax (text-[#color], etc.) replaced with inline styles due to project config limitations
 - Color application method: `style={{ backgroundColor: '#F3F3F3' }}` for custom brand colors
+- **Font System Updated:**
+  - Added TypeKit link for Apparat font family
+  - Updated CSS variables to use Apparat for headings and body text
+  - Apparat applied globally across all headings and paragraph text
+  - Fallback to Inter and system fonts if Apparat unavailable
 
 ## System Architecture
 
