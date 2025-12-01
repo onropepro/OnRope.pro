@@ -2265,15 +2265,15 @@ export default function Inventory() {
 
       {/* Add Item Dialog */}
       <Dialog open={showAddDialog} onOpenChange={setShowAddDialog}>
-        <DialogContent data-testid="dialog-add-item" className="max-w-2xl">
-          <DialogHeader>
+        <DialogContent data-testid="dialog-add-item" className="max-w-2xl flex flex-col max-h-[90vh]">
+          <DialogHeader className="flex-shrink-0">
             <DialogTitle>{addItemStep === 1 ? t('inventory.dialog.selectItemType', 'Select Item Type') : t('inventory.dialog.addItemDetails', 'Add Item Details')}</DialogTitle>
             <DialogDescription>
               {addItemStep === 1 ? t('inventory.dialog.chooseGearType', "Choose the type of gear you're adding") : t('inventory.dialog.fillItemInfo', 'Fill in the item information')}
             </DialogDescription>
           </DialogHeader>
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(handleAddItem)} className="space-y-4">
+            <form onSubmit={form.handleSubmit(handleAddItem)} className="flex flex-col flex-1 min-h-0 space-y-4">
               
               {addItemStep === 1 && (
                 <>
@@ -2364,7 +2364,7 @@ export default function Inventory() {
 
               {addItemStep === 2 && (
                 <>
-                  <div className="max-h-[60vh] overflow-y-auto px-1 space-y-4">
+                  <div className="flex-1 min-h-0 overflow-y-auto px-1 space-y-4">
 
               <FormField
                 control={form.control}
@@ -2706,7 +2706,7 @@ export default function Inventory() {
               )}
                   </div>
 
-                  <div className="flex gap-2 pt-4">
+                  <div className="flex gap-2 pt-4 flex-shrink-0">
                     <Button
                       type="button"
                       variant="outline"
