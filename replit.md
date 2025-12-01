@@ -19,6 +19,10 @@ The Rope Access Management Platform is an enterprise-grade, mobile-first web app
 - "Get Started" button in header: #A3320B (rust/brown)
 - "Get Started Free" button in hero: #A3320B (rust/brown)
 - Rotating words display "safety meeting" in brand color
+- **Hero Headline Typography:**
+  - "Your competitors think they're organized." - Blue (#0B64A3)
+  - "THEY'RE NOT" - Deep Navy Blue (#193A63)
+  - Reduced vertical spacing between the two lines for tighter visual impact
 - ROI Calculator section redesigned:
   - Removed "60-Second Assessment" badge and icon
   - Updated heading to "Calculate Your Hidden Costs In Less Than 60 Seconds"

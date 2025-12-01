@@ -215,7 +215,7 @@ export default function Login() {
           {t('login.hero.tagline', "Your competitors think they're organized.")}
         </p>
         
-        <div className="text-5xl md:text-7xl lg:text-8xl font-black tracking-tight mb-6 text-[#3B3B3B]">
+        <div className="text-5xl md:text-7xl lg:text-8xl font-black tracking-tight mb-6" style={{ color: '#193A63' }}>
           {t('login.hero.taglineBold', "THEY'RE NOT")}
         </div>
         
