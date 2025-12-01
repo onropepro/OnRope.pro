@@ -43,7 +43,8 @@ export const WORKER_ROLES = [
   'manager',
   'ground_crew',
   'ground_crew_supervisor',
-  'labourer'
+  'labourer',
+  'supervisor'  // Generic supervisor role
 ];
 
 /** All employee roles that should access the dashboard */
