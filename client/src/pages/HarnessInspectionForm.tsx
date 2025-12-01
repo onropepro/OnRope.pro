@@ -88,14 +88,14 @@ export default function HarnessInspectionForm() {
   const allGearItems = gearData?.items || [];
   const myKit = myKitData?.kit || [];
   
-  // Show ALL company inventory items (not just assigned ones) - users can inspect any equipment
-  const availableHarnesses = allGearItems.filter((item: any) => 
-    item.equipmentType?.toLowerCase().includes('harness') && item.inService !== false
+  // Show ALL items in user's kit (all equipment types, not just harnesses)
+  const myKitItems = myKit.filter((item: any) => 
+    item.inService !== false
   );
 
-  // Filter my kit to show harnesses for inspection
-  const myKitHarnesses = myKit.filter((item: any) => 
-    item.equipmentType?.toLowerCase().includes('harness') && item.inService !== false
+  // Show ALL company inventory items for selection from inventory
+  const availableInventoryItems = allGearItems.filter((item: any) => 
+    item.inService !== false
   );
 
   // Fetch projects for optional selection
@@ -393,18 +393,18 @@ export default function HarnessInspectionForm() {
                     </DialogHeader>
                     <div className="space-y-4 py-4">
                       {/* My Kit Section */}
-                      {myKitHarnesses.length > 0 && (
+                      {myKitItems.length > 0 && (
                         <div className="space-y-3">
                           <div className="flex items-center gap-2 text-primary">
                             <Shield className="h-5 w-5" />
                             <h3 className="font-semibold">{t('harnessInspection.myKit.title', 'My Kit')}</h3>
-                            <Badge variant="secondary" className="ml-auto">{myKitHarnesses.length}</Badge>
+                            <Badge variant="secondary" className="ml-auto">{myKitItems.length}</Badge>
                           </div>
                           <p className="text-sm text-muted-foreground">
                             {t('harnessInspection.myKit.description', 'Your personal assigned equipment')}
                           </p>
                           <div className="grid gap-2">
-                            {myKitHarnesses.map((item: any) => (
+                            {myKitItems.map((item: any) => (
                               <Card 
                                 key={`kit-${item.assignmentId}`}
                                 className="hover-elevate active-elevate-2 cursor-pointer border-primary/30 bg-primary/5"
@@ -444,7 +444,7 @@ export default function HarnessInspectionForm() {
                       )}
 
                       {/* Divider if both sections have items */}
-                      {myKitHarnesses.length > 0 && availableHarnesses.length > 0 && (
+                      {myKitItems.length > 0 && availableInventoryItems.length > 0 && (
                         <div className="relative py-2">
                           <div className="absolute inset-0 flex items-center">
                             <span className="w-full border-t" />
@@ -458,15 +458,15 @@ export default function HarnessInspectionForm() {
                       )}
 
                       {/* Full Inventory Section */}
-                      {availableHarnesses.length > 0 ? (
+                      {availableInventoryItems.length > 0 ? (
                         <div className="space-y-3">
                           <div className="flex items-center gap-2">
                             <Package className="h-5 w-5 text-muted-foreground" />
                             <h3 className="font-semibold text-muted-foreground">{t('harnessInspection.inventory.title', 'Company Inventory')}</h3>
-                            <Badge variant="outline" className="ml-auto">{availableHarnesses.length}</Badge>
+                            <Badge variant="outline" className="ml-auto">{availableInventoryItems.length}</Badge>
                           </div>
                           <div className="grid gap-2">
-                            {availableHarnesses.map((harness: any) => (
+                            {availableInventoryItems.map((harness: any) => (
                               <Card 
                                 key={harness.id}
                                 className="hover-elevate active-elevate-2 cursor-pointer"
@@ -496,7 +496,7 @@ export default function HarnessInspectionForm() {
                             ))}
                           </div>
                         </div>
-                      ) : myKitHarnesses.length === 0 ? (
+                      ) : myKitItems.length === 0 ? (
                         <div className="text-center py-8">
                           <Package className="mx-auto h-12 w-12 text-muted-foreground mb-3" />
                           <p className="text-sm text-muted-foreground">
@@ -512,7 +512,7 @@ export default function HarnessInspectionForm() {
                 </Dialog>
 
                 {/* Gear Selection Dropdown for Autofill */}
-                {availableHarnesses.length > 0 && (
+                {availableInventoryItems.length > 0 && (
                   <div className="bg-primary/5 border border-primary/20 rounded-md p-4 space-y-3">
                     <div className="flex items-start gap-3">
                       <span className="material-icons text-primary mt-0.5">auto_awesome</span>
@@ -527,7 +527,7 @@ export default function HarnessInspectionForm() {
                           </SelectTrigger>
                           <SelectContent>
                             <SelectItem value="none">{t('harnessInspection.quickFill.none', 'None (enter manually)')}</SelectItem>
-                            {availableHarnesses.map((item: any) => (
+                            {availableInventoryItems.map((item: any) => (
                               <SelectItem key={item.id} value={item.id}>
                                 {item.equipmentType} {item.brand ? `- ${item.brand}` : ""} {item.model ? item.model : ""} 
                                 {item.serialNumbers && item.serialNumbers.length > 0 ? ` (${item.serialNumbers[0]})` : ""}
