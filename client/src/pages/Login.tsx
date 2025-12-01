@@ -232,7 +232,7 @@ export default function Login() {
           <Button 
             size="lg"
             onClick={() => setLocation("/pricing")}
-            className="gap-2 px-6"
+            className="gap-2 px-6 bg-[#A3320B]"
             data-testid="button-get-started-free"
           >
             <Rocket className="w-4 h-4" />
