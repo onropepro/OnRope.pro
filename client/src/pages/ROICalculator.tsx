@@ -761,7 +761,7 @@ export default function ROICalculator() {
     <div className="min-h-screen bg-gradient-to-b from-primary/5 via-background to-background flex flex-col">
       <header className="flex items-center justify-between px-6 md:px-8 py-4 border-b bg-background/80 backdrop-blur-sm sticky top-0 z-50">
         <div className="flex items-center cursor-pointer" onClick={() => setLocation("/")}>
-          <img src={onRopeProLogo} alt="OnRopePro" className="h-8 object-contain" />
+          <img src={onRopeProLogo} alt="OnRopePro" className="h-16 object-contain" />
         </div>
         <div className="flex items-center gap-3">
           <Button 
