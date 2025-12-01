@@ -58,10 +58,9 @@ export default function Login() {
     t('login.rotatingWords.pieceOfGear', 'piece of gear'),
     t('login.rotatingWords.nonBillableHour', 'non-billable hour'),
     t('login.rotatingWords.jobQuote', 'job quote'),
-    t('login.rotatingWords.safetyDocument', 'safety document'),
+    t('login.rotatingWords.jobProgress', "job's progress"),
     t('login.rotatingWords.hourScheduled', 'hour scheduled'),
-    t('login.rotatingWords.employeePerformance', "employee's performance level"),
-    t('login.rotatingWords.jobProgress', "job's progress")
+    t('login.rotatingWords.employeePerformance', "employee's performance level")
   ];
 
   useEffect(() => {
@@ -222,9 +221,7 @@ export default function Login() {
         <p className="text-base md:text-lg text-muted-foreground max-w-xl mb-8">
           {t('login.hero.description', 'You track every')}{" "}
           <span 
-            className={`inline-block font-semibold text-primary transition-all duration-300 ${
-              isAnimating ? 'opacity-0 translate-y-2' : 'opacity-100 translate-y-0'
-            }`}
+            className="inline-block font-semibold transition-all duration-300 opacity-100 translate-y-0 text-[#A3320B]"
           >
             {rotatingWords[currentWordIndex]}
           </span>
