@@ -977,6 +977,7 @@ export default function Changelog() {
         <div className="space-y-4">
           {changelogData.map((section, index) => {
             const Icon = section.icon;
+            const isInventorySection = section.title === "Gear & Equipment Inventory";
             return (
               <Card key={index} className="overflow-hidden">
                 <CardHeader className="pb-3">
@@ -988,6 +989,14 @@ export default function Changelog() {
                       <div className="flex items-center gap-3 flex-wrap">
                         <CardTitle className="text-lg">{section.title}</CardTitle>
                         {getStatusBadge(section.status)}
+                        {isInventorySection && (
+                          <Link href="/changelog/inventory">
+                            <Button variant="outline" size="sm" className="text-xs" data-testid="link-inventory-guide">
+                              View Guide
+                              <ExternalLink className="h-3 w-3 ml-1" />
+                            </Button>
+                          </Link>
+                        )}
                       </div>
                       <CardDescription className="mt-1">
                         {section.description}
