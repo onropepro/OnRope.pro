@@ -237,6 +237,7 @@ const pagesData: PageCategory[] = [
       { name: "Get License", path: "/get-license", description: "Subscription pricing", roles: ["Public"] },
       { name: "Resident/PM Linking", path: "/link", description: "Link account with company code", roles: ["Public"] },
       { name: "Changelog", path: "/changelog", description: "Platform feature overview", roles: ["Public"] },
+      { name: "Pricing", path: "/changelog/pricing", description: "Subscription tiers and add-ons", roles: ["Public"] },
     ]
   },
   {

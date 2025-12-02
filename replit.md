@@ -11,7 +11,19 @@ The Rope Access Management Platform is an enterprise-grade, mobile-first web app
 - Interaction: Collaborative interaction requiring approval for major architectural changes
 - Code Management: No code deletion without explicit permission
 
-## Recent Changes (Landing Page Styling - December 1, 2025)
+## Recent Changes (Pricing Page - December 2, 2025)
+
+**Pricing Page Added:**
+- New pricing page at `/changelog/pricing` detailing all subscription tiers and add-ons
+- Displays four subscription plans: Basic ($79), Starter ($299), Premium ($499 - highlighted as "Most Popular"), Enterprise ($899)
+- Shows key features for each tier with visual checkmarks
+- Add-ons section: Additional Seats ($19), Extra Projects ($49), White Label Branding ($49/month)
+- Comprehensive FAQ section covering pricing, billing, and subscription management
+- Pricing link added to Changelog page navigation under "Public Pages"
+- Fully responsive design with mobile and desktop views
+- All prices in USD/CAD (same pricing for both currencies)
+
+## Previous Changes (Landing Page Styling - December 1, 2025)
 
 **Landing Page Updates:**
 - Hero section background changed to solid light gray (#F3F3F3) for cleaner aesthetic
