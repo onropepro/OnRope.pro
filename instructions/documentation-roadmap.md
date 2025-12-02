@@ -17,6 +17,7 @@
 
 ### System/Feature Documents (Complete)
 6. **gear-inventory-instructions-v1.0.md** - Slot-based gear tracking, assignments, serial management ✅
+7. **safety-documentation-instructions-v1.0.md** - Safety forms, CSR calculation, digital signatures ✅
 
 ---
 
@@ -33,14 +34,15 @@
   - Multi-project support
   - Shortfall reporting requirements
 
-#### Safety Documentation System
-- **safety-documentation-instructions-v1.0.md**
-  - Harness inspection workflow
-  - FLHA form processing
-  - Toolbox meeting records
-  - Digital signature capture
-  - PDF generation and storage
-  - Compliance tracking
+#### Safety Documentation System ✅ COMPLETE
+- **safety-documentation-instructions-v1.0.md** (December 2, 2024)
+  - Five document types: Harness Inspections, Toolbox Meetings, FLHA, Incident Reports, Method Statements
+  - Harness inspection required before work session (hard gate)
+  - 7-day toolbox meeting coverage window for CSR calculation
+  - Digital signatures with base64 data URL capture
+  - PDF generation with jsPDF and embedded signatures
+  - Company Safety Rating (CSR) penalty calculation: 80% max penalty
+  - Permission model: canViewSafetyDocuments, canViewCSR
 
 #### Multi-Tenant Architecture
 - **multi-tenant-isolation-instructions-v1.0.md**
@@ -420,7 +422,7 @@ Every document MUST include:
 ## Notes
 
 - **Total Documents Needed**: 45 instruction documents
-- **Completed**: 6 documents (5 foundation + 1 system/feature) (13%)
+- **Completed**: 7 documents (5 foundation + 2 system/feature) (16%)
 - **Estimated Completion**: 10 weeks with phased approach
 - **Review Cycle**: Each document requires multi-stage review
 - **Living Documents**: Continuous updates with system changes
