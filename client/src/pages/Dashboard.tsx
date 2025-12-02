@@ -1964,23 +1964,13 @@ export default function Dashboard() {
     },
     {
       id: "payroll",
-      label: t('dashboard.cards.payroll.label', 'Payroll'),
-      description: t('dashboard.cards.payroll.description', 'Employee hours'),
+      label: t('dashboard.cards.payroll.label', 'Financials'),
+      description: t('dashboard.cards.payroll.description', 'Payroll & quotes'),
       icon: "payments",
       onClick: () => setLocation("/payroll"),
       testId: "button-payroll",
       isVisible: (user: any) => hasFinancialAccess(user), // Financial permission required
       borderColor: "#22c55e",
-    },
-    {
-      id: "quotes",
-      label: t('dashboard.cards.quotes.label', 'Quotes'),
-      description: t('dashboard.cards.quotes.description', 'Service quotes'),
-      icon: "request_quote",
-      onClick: () => setLocation("/quotes"),
-      testId: "button-quotes",
-      isVisible: (user: any) => hasFinancialAccess(user), // Financial permission required
-      borderColor: "#16a34a",
     },
     {
       id: "schedule",

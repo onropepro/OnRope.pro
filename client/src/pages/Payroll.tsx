@@ -522,10 +522,26 @@ export default function Payroll() {
         <BackButton size="icon" />
         <MainMenuButton size="icon" />
         <div className="flex-1 min-w-0">
-          <h1 className="text-xl md:text-3xl font-bold truncate" data-testid="heading-payroll">{t('payroll.title', 'Payroll')}</h1>
-          <p className="text-sm text-muted-foreground hidden sm:block">{t('payroll.subtitle', 'Manage pay periods and employee hours')}</p>
+          <h1 className="text-xl md:text-3xl font-bold truncate" data-testid="heading-payroll">{t('payroll.title', 'Financials')}</h1>
+          <p className="text-sm text-muted-foreground hidden sm:block">{t('payroll.subtitle', 'Manage payroll and quotes')}</p>
         </div>
       </div>
+
+      {/* Quotes Quick Access */}
+      <Card className="hover-elevate active-elevate-2 cursor-pointer border-green-500/20 bg-gradient-to-br from-green-500/5 via-transparent to-transparent" onClick={() => setLocation("/quotes")} data-testid="card-quotes">
+        <CardHeader>
+          <div className="flex items-center gap-4">
+            <div className="p-3 bg-green-500/10 rounded-xl">
+              <span className="material-icons text-green-500">request_quote</span>
+            </div>
+            <div className="flex-1">
+              <CardTitle className="text-lg">{t('dashboard.cards.quotes.label', 'Quotes')}</CardTitle>
+              <CardDescription>{t('dashboard.cards.quotes.description', 'Service quotes')}</CardDescription>
+            </div>
+            <span className="material-icons text-muted-foreground">chevron_right</span>
+          </div>
+        </CardHeader>
+      </Card>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
         <div className="overflow-x-auto -mx-4 px-4 md:mx-0 md:px-0">
