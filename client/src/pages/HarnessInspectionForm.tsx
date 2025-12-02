@@ -722,37 +722,40 @@ export default function HarnessInspectionForm() {
                   />
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <FormField
-                    control={form.control}
-                    name="manufacturer"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>{t('harnessInspection.fields.manufacturer', 'Primary Manufacturer')}</FormLabel>
-                        <FormControl>
-                          <Input {...field} placeholder={t('harnessInspection.placeholders.manufacturer', 'e.g., Petzl, Kong, CMC')} data-testid="input-manufacturer" />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  
-                  <FormField
-                    control={form.control}
-                    name="equipmentId"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>{t('harnessInspection.fields.equipmentId', 'Equipment ID / Serial Number')}</FormLabel>
-                        <FormControl>
-                          <Input {...field} placeholder={t('harnessInspection.placeholders.serialNumber', 'Serial or ID number')} data-testid="input-equipment-id" />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
+                {/* Manufacturer and Equipment ID - Hidden in Kit Inspection Mode */}
+                {!isKitInspectionMode && (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <FormField
+                      control={form.control}
+                      name="manufacturer"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>{t('harnessInspection.fields.manufacturer', 'Primary Manufacturer')}</FormLabel>
+                          <FormControl>
+                            <Input {...field} placeholder={t('harnessInspection.placeholders.manufacturer', 'e.g., Petzl, Kong, CMC')} data-testid="input-manufacturer" />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    
+                    <FormField
+                      control={form.control}
+                      name="equipmentId"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>{t('harnessInspection.fields.equipmentId', 'Equipment ID / Serial Number')}</FormLabel>
+                          <FormControl>
+                            <Input {...field} placeholder={t('harnessInspection.placeholders.serialNumber', 'Serial or ID number')} data-testid="input-equipment-id" />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                )}
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className={`grid gap-4 ${isKitInspectionMode ? 'grid-cols-1' : 'grid-cols-1 md:grid-cols-2'}`}>
                   <FormField
                     control={form.control}
                     name="projectId"
@@ -779,19 +782,22 @@ export default function HarnessInspectionForm() {
                     )}
                   />
 
-                  <FormField
-                    control={form.control}
-                    name="dateInService"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>{t('harnessInspection.fields.dateInService', 'Date Placed in Service')}</FormLabel>
-                        <FormControl>
-                          <Input type="date" {...field} data-testid="input-date-in-service" />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+                  {/* Date in Service - Hidden in Kit Inspection Mode */}
+                  {!isKitInspectionMode && (
+                    <FormField
+                      control={form.control}
+                      name="dateInService"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>{t('harnessInspection.fields.dateInService', 'Date Placed in Service')}</FormLabel>
+                          <FormControl>
+                            <Input type="date" {...field} data-testid="input-date-in-service" />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  )}
                 </div>
               </CardContent>
             </Card>
