@@ -1143,11 +1143,21 @@ export class Storage {
     companyId: string; 
     employeeId: string; 
     quantity: number; 
-    serialNumber?: string;
-    dateOfManufacture?: string;
-    dateInService?: string;
+    serialNumber?: string | null;
+    dateOfManufacture?: string | null;
+    dateInService?: string | null;
   }): Promise<any> {
-    const result = await db.insert(gearAssignments).values(assignment).returning();
+    // Clean up the assignment object - convert undefined to null for database compatibility
+    const cleanedAssignment = {
+      gearItemId: assignment.gearItemId,
+      companyId: assignment.companyId,
+      employeeId: assignment.employeeId,
+      quantity: assignment.quantity,
+      serialNumber: assignment.serialNumber || null,
+      dateOfManufacture: assignment.dateOfManufacture || null,
+      dateInService: assignment.dateInService || null,
+    };
+    const result = await db.insert(gearAssignments).values(cleanedAssignment).returning();
     return result[0];
   }
   

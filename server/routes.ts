@@ -7180,6 +7180,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
       
+      // Normalize date values - ensure they are valid date strings or null (not undefined or empty string)
+      const dateOfManufacture = req.body.dateOfManufacture && req.body.dateOfManufacture.trim() !== '' 
+        ? req.body.dateOfManufacture.trim() 
+        : null;
+      const dateInService = req.body.dateInService && req.body.dateInService.trim() !== '' 
+        ? req.body.dateInService.trim() 
+        : null;
+      
       // If serial number provided, check if it needs to be registered
       if (serialNumber) {
         // Check if serial already exists for this gear item (case-insensitive due to uppercase normalization)
@@ -7212,8 +7220,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
             gearItemId,
             companyId,
             serialNumber,
-            dateOfManufacture: req.body.dateOfManufacture || undefined,
-            dateInService: req.body.dateInService || undefined,
+            dateOfManufacture,
+            dateInService,
           });
         }
       }
@@ -7225,8 +7233,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         employeeId: currentUser.id,
         quantity: requestedQuantity,
         serialNumber,
-        dateOfManufacture: req.body.dateOfManufacture || undefined,
-        dateInService: req.body.dateInService || undefined,
+        dateOfManufacture,
+        dateInService,
       });
       
       res.json({ assignment });
