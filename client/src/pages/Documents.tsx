@@ -6938,6 +6938,17 @@ export default function Documents() {
             </div>
           </CardHeader>
           <CardContent className="pt-6">
+            {meetings.length > 0 && (
+              <div className="mb-4">
+                <DateRangeExport
+                  documents={meetings}
+                  getDateFn={(m: any) => m.meetingDate}
+                  generatePdf={generateMeetingPdfBlob}
+                  documentType="Meetings"
+                  colorClass="text-cyan-600 dark:text-cyan-400"
+                />
+              </div>
+            )}
             {meetings.length > 0 ? (
               <div className="space-y-2">
                 {groupDocumentsByDate(meetings, (m: any) => m.meetingDate).map((yearGroup) => (
