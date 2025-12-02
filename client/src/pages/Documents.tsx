@@ -3304,11 +3304,16 @@ export default function Documents() {
     doc.save(`FLHA_${new Date(flha.assessmentDate).toISOString().split('T')[0]}.pdf`);
   };
 
-  const downloadHarnessInspection = async (inspection: any) => {
+  const downloadHarnessInspection = async (inspection: any, allInspections?: any[]) => {
     const doc = new jsPDF();
     const pageWidth = doc.internal.pageSize.getWidth();
     const pageHeight = doc.internal.pageSize.getHeight();
     let yPosition = 20;
+    
+    // Find all kit items if this is part of a kit inspection
+    const kitItems = inspection.kitInspectionId && allInspections
+      ? allInspections.filter((i: any) => i.kitInspectionId === inspection.kitInspectionId)
+      : [];
 
     // Helper function to add multi-line text with pagination
     const addMultilineText = (lines: string[], currentY: number, lineHeight: number = 6): number => {
@@ -3380,6 +3385,68 @@ export default function Documents() {
 
     doc.text(`Date in Service: ${inspection.dateInService || 'N/A'}`, 20, yPosition);
     yPosition += 12;
+
+    // Kit Inspection Summary - Show all equipment if this is a kit inspection
+    if (kitItems.length > 1) {
+      yPosition = checkPageBreak(30);
+      
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(11);
+      doc.setTextColor(14, 165, 233); // Ocean blue
+      doc.text('KIT INSPECTION', 20, yPosition);
+      yPosition += 6;
+      
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(9);
+      doc.setTextColor(100, 100, 100);
+      doc.text(`${kitItems.length} items inspected together`, 20, yPosition);
+      yPosition += 8;
+      
+      // List all equipment in the kit
+      doc.setTextColor(0, 0, 0);
+      doc.setFontSize(10);
+      
+      for (let i = 0; i < kitItems.length; i++) {
+        const item = kitItems[i];
+        yPosition = checkPageBreak(12);
+        
+        const isCurrentItem = item.id === inspection.id;
+        const itemNum = i + 1;
+        const equipmentDesc = `${itemNum}. ${item.manufacturer || 'Unknown'} - ${item.equipmentId || 'N/A'}`;
+        
+        if (isCurrentItem) {
+          doc.setFont('helvetica', 'bold');
+          doc.text(`${equipmentDesc} (this document)`, 25, yPosition);
+          doc.setFont('helvetica', 'normal');
+        } else {
+          doc.text(equipmentDesc, 25, yPosition);
+        }
+        
+        // Show pass/fail badge for each item
+        const itemStatus = item.overallStatus?.toUpperCase() || 'N/A';
+        const badgeX = 150;
+        if (itemStatus === 'PASS') {
+          doc.setFillColor(220, 252, 231);
+          doc.setTextColor(34, 197, 94);
+        } else if (itemStatus === 'FAIL') {
+          doc.setFillColor(254, 226, 226);
+          doc.setTextColor(239, 68, 68);
+        } else {
+          doc.setFillColor(254, 249, 195);
+          doc.setTextColor(161, 98, 7);
+        }
+        doc.roundedRect(badgeX, yPosition - 3, 18, 5, 1, 1, 'F');
+        doc.setFontSize(7);
+        doc.setFont('helvetica', 'bold');
+        doc.text(itemStatus, badgeX + 9, yPosition, { align: 'center' });
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(10);
+        doc.setTextColor(0, 0, 0);
+        
+        yPosition += 6;
+      }
+      yPosition += 6;
+    }
 
     // Inspection Result
     doc.setFont('helvetica', 'bold');
@@ -6521,7 +6588,7 @@ export default function Documents() {
                                           <Badge variant={inspection.overallStatus === 'pass' ? 'default' : 'destructive'} className="text-xs">
                                             {inspection.overallStatus || 'N/A'}
                                           </Badge>
-                                          <Button size="sm" variant="outline" onClick={() => downloadHarnessInspection(inspection)} data-testid={`download-inspection-tab-${inspection.id}`}>
+                                          <Button size="sm" variant="outline" onClick={() => downloadHarnessInspection(inspection, inspections)} data-testid={`download-inspection-tab-${inspection.id}`}>
                                             <Download className="h-3 w-3 mr-1" />
                                             PDF
                                           </Button>

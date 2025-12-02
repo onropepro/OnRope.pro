@@ -659,11 +659,18 @@ export const harnessInspections = pgTable("harness_inspections", {
   // PDF storage
   pdfUrl: text("pdf_url"),
   
+  // Kit inspection batch ID - links multiple inspections done together as a kit
+  kitInspectionId: varchar("kit_inspection_id"),
+  
+  // Reference to the specific gear item from inventory
+  gearItemId: varchar("gear_item_id").references(() => gearItems.id, { onDelete: "set null" }),
+  
   createdAt: timestamp("created_at").defaultNow(),
 }, (table) => [
   index("IDX_harness_inspections_company_date").on(table.companyId, table.inspectionDate),
   index("IDX_harness_inspections_worker").on(table.workerId, table.inspectionDate),
   index("IDX_harness_inspections_project").on(table.projectId),
+  index("IDX_harness_inspections_kit").on(table.kitInspectionId),
 ]);
 
 // Toolbox meetings table

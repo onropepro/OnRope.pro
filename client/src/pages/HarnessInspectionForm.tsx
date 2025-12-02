@@ -292,6 +292,9 @@ export default function HarnessInspectionForm() {
       // If in kit inspection mode, create inspections for all kit items
       if (isKitInspectionMode && selectedKitItems.length > 0) {
         const results = [];
+        // Generate a unique kit inspection ID to link all items together
+        const kitInspectionId = `kit-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
+        
         for (const kitItem of selectedKitItems) {
           // Get serial number from item
           const serialNumber = kitItem.serialNumber || 
@@ -314,6 +317,8 @@ export default function HarnessInspectionForm() {
             equipmentFindings: findings,
             overallStatus,
             gearItemId: kitItem.gearItemId || kitItem.id,
+            // Kit inspection batch ID
+            kitInspectionId,
           };
           const result = await apiRequest("POST", "/api/harness-inspections", payload);
           results.push(result);
