@@ -27,6 +27,7 @@ import { formatLocalDate, formatLocalDateLong, formatLocalDateMedium, parseLocal
 import { format } from "date-fns";
 import { DocumentReviews } from "@/components/DocumentReviews";
 import SignatureCanvas from 'react-signature-canvas';
+import { ROPE_ACCESS_EQUIPMENT_CATEGORIES, ROPE_ACCESS_INSPECTION_ITEMS, type RopeAccessEquipmentCategory } from "@shared/schema";
 
 // Standard job types for method statements - use translation keys
 const STANDARD_JOB_TYPES = [
@@ -3323,6 +3324,15 @@ export default function Documents() {
       return y;
     };
 
+    // Helper to check and add new page if needed
+    const checkPageBreak = (requiredSpace: number = 30): number => {
+      if (yPosition > pageHeight - requiredSpace) {
+        doc.addPage();
+        return 20;
+      }
+      return yPosition;
+    };
+
     // Header - Title
     doc.setFillColor(14, 165, 233); // Ocean blue
     
@@ -3383,19 +3393,137 @@ export default function Documents() {
       doc.setTextColor(234, 179, 8); // Yellow
     }
     doc.text(`INSPECTION RESULT: ${status}`, 20, yPosition);
-    yPosition += 12;
+    yPosition += 15;
 
-    // Comments
-    if (inspection.comments) {
-      if (yPosition > pageHeight - 30) {
-        doc.addPage();
-        yPosition = 20;
+    // Detailed Inspection Findings Section
+    const equipmentFindings = inspection.equipmentFindings;
+    if (equipmentFindings && typeof equipmentFindings === 'object' && Object.keys(equipmentFindings).length > 0) {
+      yPosition = checkPageBreak(40);
+      
+      doc.setTextColor(0, 0, 0);
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(12);
+      doc.text('DETAILED INSPECTION CHECKLIST', 20, yPosition);
+      yPosition += 3;
+      
+      // Draw underline
+      doc.setDrawColor(14, 165, 233);
+      doc.setLineWidth(0.5);
+      doc.line(20, yPosition, pageWidth - 20, yPosition);
+      yPosition += 10;
+
+      // Iterate through each category in the findings
+      for (const categoryKey of Object.keys(equipmentFindings)) {
+        const categoryData = equipmentFindings[categoryKey];
+        if (!categoryData || !categoryData.items) continue;
+
+        // Get category label from constants
+        const categoryLabel = ROPE_ACCESS_EQUIPMENT_CATEGORIES[categoryKey as RopeAccessEquipmentCategory] || categoryKey;
+        const categoryItems = ROPE_ACCESS_INSPECTION_ITEMS[categoryKey as RopeAccessEquipmentCategory] || [];
+
+        yPosition = checkPageBreak(25);
+
+        // Category header with status badge
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(11);
+        doc.setTextColor(0, 0, 0);
+        doc.text(categoryLabel.toUpperCase(), 20, yPosition);
+
+        // Category status badge
+        const catStatus = categoryData.status?.toUpperCase() || 'N/A';
+        const badgeX = 120;
+        if (catStatus === 'PASS') {
+          doc.setFillColor(34, 197, 94);
+          doc.setTextColor(255, 255, 255);
+        } else if (catStatus === 'FAIL') {
+          doc.setFillColor(239, 68, 68);
+          doc.setTextColor(255, 255, 255);
+        } else {
+          doc.setFillColor(234, 179, 8);
+          doc.setTextColor(0, 0, 0);
+        }
+        doc.roundedRect(badgeX, yPosition - 4, 25, 6, 1, 1, 'F');
+        doc.setFontSize(8);
+        doc.text(catStatus, badgeX + 12.5, yPosition, { align: 'center' });
+        
+        yPosition += 8;
+
+        // Individual inspection items in this category
+        doc.setFontSize(9);
+        for (const itemDef of categoryItems) {
+          const itemResult = categoryData.items[itemDef.key];
+          // Skip only if item is undefined (not recorded), but include items with any result value
+          if (itemResult === undefined) continue;
+
+          yPosition = checkPageBreak(12);
+
+          // Item label
+          doc.setFont('helvetica', 'normal');
+          doc.setTextColor(60, 60, 60);
+          const itemLabel = doc.splitTextToSize(`${itemDef.label}`, 90);
+          doc.text(itemLabel[0], 25, yPosition);
+
+          // Normalize the result value - handle object, string, and boolean formats
+          let itemStatus = 'N/A';
+          let itemNotes: string | null = null;
+          
+          if (typeof itemResult === 'object' && itemResult !== null) {
+            // Standard format: { result: "pass"|"fail", notes?: string }
+            itemStatus = String(itemResult.result || 'N/A').toUpperCase();
+            itemNotes = itemResult.notes || null;
+          } else if (typeof itemResult === 'boolean') {
+            // Legacy boolean format: true = pass, false = fail
+            itemStatus = itemResult ? 'PASS' : 'FAIL';
+          } else if (typeof itemResult === 'string') {
+            // String format: "pass"|"fail"
+            itemStatus = itemResult.toUpperCase();
+          }
+          
+          const itemBadgeX = 125;
+          if (itemStatus === 'PASS') {
+            doc.setFillColor(220, 252, 231); // Light green bg
+            doc.setTextColor(34, 197, 94);
+          } else if (itemStatus === 'FAIL') {
+            doc.setFillColor(254, 226, 226); // Light red bg
+            doc.setTextColor(239, 68, 68);
+          } else {
+            doc.setFillColor(254, 249, 195); // Light yellow bg
+            doc.setTextColor(161, 98, 7);
+          }
+          doc.roundedRect(itemBadgeX, yPosition - 3, 18, 5, 1, 1, 'F');
+          doc.setFontSize(7);
+          doc.setFont('helvetica', 'bold');
+          doc.text(itemStatus, itemBadgeX + 9, yPosition, { align: 'center' });
+
+          yPosition += 6;
+
+          // Show notes if item failed and has notes
+          if (itemNotes && itemStatus === 'FAIL') {
+            doc.setFont('helvetica', 'italic');
+            doc.setFontSize(8);
+            doc.setTextColor(100, 100, 100);
+            const notesLines = doc.splitTextToSize(`Note: ${itemNotes}`, pageWidth - 55);
+            for (const noteLine of notesLines) {
+              yPosition = checkPageBreak(8);
+              doc.text(noteLine, 30, yPosition);
+              yPosition += 4;
+            }
+            yPosition += 2;
+          }
+        }
+
+        yPosition += 6;
       }
+    }
+
+    // Comments Section
+    if (inspection.comments) {
+      yPosition = checkPageBreak(30);
       
       doc.setTextColor(0, 0, 0);
       doc.setFont('helvetica', 'bold');
       doc.setFontSize(11);
-      doc.text('Comments:', 20, yPosition);
+      doc.text('Additional Comments:', 20, yPosition);
       yPosition += 6;
 
       doc.setFont('helvetica', 'normal');
@@ -3405,12 +3533,17 @@ export default function Documents() {
       yPosition += 8;
     }
 
-    // Footer
-    const footerY = pageHeight - 15;
-    doc.setFontSize(8);
-    doc.setTextColor(100, 100, 100);
-    doc.setFont('helvetica', 'italic');
-    doc.text('This is an official equipment inspection record. Keep for compliance purposes.', pageWidth / 2, footerY, { align: 'center' });
+    // Footer on each page
+    const totalPages = doc.getNumberOfPages();
+    for (let i = 1; i <= totalPages; i++) {
+      doc.setPage(i);
+      const footerY = pageHeight - 15;
+      doc.setFontSize(8);
+      doc.setTextColor(100, 100, 100);
+      doc.setFont('helvetica', 'italic');
+      doc.text('This is an official equipment inspection record. Keep for compliance purposes.', pageWidth / 2, footerY, { align: 'center' });
+      doc.text(`Page ${i} of ${totalPages}`, pageWidth - 20, footerY, { align: 'right' });
+    }
 
     // Save PDF
     doc.save(`Equipment_Inspection_${new Date(inspection.inspectionDate).toISOString().split('T')[0]}.pdf`);
