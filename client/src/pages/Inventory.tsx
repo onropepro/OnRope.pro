@@ -444,15 +444,22 @@ export default function Inventory() {
     if (!selfAssignItem) return [];
     // Use serialNumbers directly from the item (backend provides array of unassigned serial strings)
     const serials = selfAssignItem.serialNumbers || [];
-    // Convert strings to objects for compatibility with existing UI
+    // Get serialEntries for date information (cast to any since backend adds this dynamically)
+    const entries = (selfAssignItem as any).serialEntries || [];
+    
+    // Convert strings to objects, looking up dates from serialEntries
     if (Array.isArray(serials) && serials.length > 0) {
-      return serials.map((serialNumber: string) => ({
-        id: serialNumber,
-        serialNumber,
-        dateOfManufacture: "",
-        dateInService: "",
-        isAssigned: false
-      }));
+      return serials.map((serialNumber: string) => {
+        // Find the matching entry to get dates
+        const entry = entries.find((e: any) => e.serialNumber === serialNumber);
+        return {
+          id: serialNumber,
+          serialNumber,
+          dateOfManufacture: entry?.dateOfManufacture || null,
+          dateInService: entry?.dateInService || null,
+          isAssigned: false
+        };
+      });
     }
     return [];
   };
@@ -462,15 +469,22 @@ export default function Inventory() {
     if (!managingItem) return [];
     // Use serialNumbers directly from the item (backend provides array of unassigned serial strings)
     const serials = managingItem.serialNumbers || [];
-    // Convert strings to objects for compatibility with existing UI
+    // Get serialEntries for date information (cast to any since backend adds this dynamically)
+    const entries = (managingItem as any).serialEntries || [];
+    
+    // Convert strings to objects, looking up dates from serialEntries
     if (Array.isArray(serials) && serials.length > 0) {
-      return serials.map((serialNumber: string) => ({
-        id: serialNumber,
-        serialNumber,
-        dateOfManufacture: "",
-        dateInService: "",
-        isAssigned: false
-      }));
+      return serials.map((serialNumber: string) => {
+        // Find the matching entry to get dates
+        const entry = entries.find((e: any) => e.serialNumber === serialNumber);
+        return {
+          id: serialNumber,
+          serialNumber,
+          dateOfManufacture: entry?.dateOfManufacture || null,
+          dateInService: entry?.dateInService || null,
+          isAssigned: false
+        };
+      });
     }
     return [];
   };
