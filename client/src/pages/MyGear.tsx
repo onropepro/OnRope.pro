@@ -38,6 +38,7 @@ export default function MyGear() {
   const [showAddGearDialog, setShowAddGearDialog] = useState(false);
   const [selectedGearItem, setSelectedGearItem] = useState<any>(null);
   const [assignQuantity, setAssignQuantity] = useState(1);
+  const [selectedSerialNumber, setSelectedSerialNumber] = useState<string>("");
   const [searchQuery, setSearchQuery] = useState("");
 
   const { data: userData } = useQuery<{ user: any }>({
@@ -138,9 +139,12 @@ export default function MyGear() {
 
   const handleAssignGear = () => {
     if (!selectedGearItem) return;
+    // If item has serials and one is selected, use that; otherwise use quantity
+    const hasSerials = selectedGearItem.serialNumbers && selectedGearItem.serialNumbers.length > 0;
     assignGearMutation.mutate({
       gearItemId: selectedGearItem.id,
-      quantity: assignQuantity,
+      quantity: hasSerials && selectedSerialNumber ? 1 : assignQuantity,
+      serialNumber: selectedSerialNumber || undefined,
     });
   };
 
@@ -430,25 +434,53 @@ export default function MyGear() {
           {/* Quantity and Confirm */}
           {selectedGearItem && (
             <div className="pt-4 border-t space-y-4">
-              <div className="flex items-center gap-4">
-                <div className="flex-1">
-                  <Label htmlFor="quantity">{t('myGear.quantityToAssign', 'Quantity to assign')}</Label>
-                  <Input
-                    id="quantity"
-                    type="number"
-                    min={1}
-                    max={(selectedGearItem.quantity || 0) - (selectedGearItem.assignedQuantity || 0)}
-                    value={assignQuantity}
-                    onChange={(e) => setAssignQuantity(Math.max(1, parseInt(e.target.value) || 1))}
-                    className="mt-1"
-                    data-testid="input-assign-quantity"
-                  />
+              {selectedGearItem.serialNumbers && selectedGearItem.serialNumbers.length > 0 ? (
+                <div className="space-y-3">
+                  <div>
+                    <Label>{t('myGear.selectSerialNumber', 'Select Serial Number')}</Label>
+                    <div className="mt-2 space-y-2 max-h-40 overflow-y-auto">
+                      {selectedGearItem.serialNumbers.map((serial: string) => (
+                        <div
+                          key={serial}
+                          className={`p-2 border rounded cursor-pointer transition-colors ${
+                            selectedSerialNumber === serial
+                              ? "border-primary bg-primary/10"
+                              : "border-border hover:bg-muted"
+                          }`}
+                          onClick={() => setSelectedSerialNumber(serial)}
+                          data-testid={`serial-option-${serial}`}
+                        >
+                          {serial}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                  <div className="text-sm text-muted-foreground">
+                    <div className="font-medium">{selectedGearItem.equipmentType}</div>
+                    <div>{selectedGearItem.availableQuantity} {t('myGear.availableInInventory', 'available in inventory')}</div>
+                  </div>
                 </div>
-                <div className="flex-1 text-sm text-muted-foreground">
-                  <div className="font-medium">{selectedGearItem.equipmentType}</div>
-                  <div>{(selectedGearItem.quantity || 0) - (selectedGearItem.assignedQuantity || 0)} {t('myGear.availableInInventory', 'available in inventory')}</div>
+              ) : (
+                <div className="flex items-center gap-4">
+                  <div className="flex-1">
+                    <Label htmlFor="quantity">{t('myGear.quantityToAssign', 'Quantity to assign')}</Label>
+                    <Input
+                      id="quantity"
+                      type="number"
+                      min={1}
+                      max={(selectedGearItem.quantity || 0) - (selectedGearItem.assignedQuantity || 0)}
+                      value={assignQuantity}
+                      onChange={(e) => setAssignQuantity(Math.max(1, parseInt(e.target.value) || 1))}
+                      className="mt-1"
+                      data-testid="input-assign-quantity"
+                    />
+                  </div>
+                  <div className="flex-1 text-sm text-muted-foreground">
+                    <div className="font-medium">{selectedGearItem.equipmentType}</div>
+                    <div>{(selectedGearItem.quantity || 0) - (selectedGearItem.assignedQuantity || 0)} {t('myGear.availableInInventory', 'available in inventory')}</div>
+                  </div>
                 </div>
-              </div>
+              )}
               <div className="flex gap-2">
                 <Button
                   variant="outline"
@@ -456,6 +488,8 @@ export default function MyGear() {
                   onClick={() => {
                     setSelectedGearItem(null);
                     setShowAddGearDialog(false);
+                    setSelectedSerialNumber("");
+                    setAssignQuantity(1);
                   }}
                   data-testid="button-cancel-add-gear"
                 >
