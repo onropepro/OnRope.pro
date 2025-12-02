@@ -6692,11 +6692,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
           .map(s => s.serialNumber);
         const registeredSerialCount = itemSerials.length;
         
+        // Get full serial entries for this item (with dates, for edit dialog)
+        const fullSerialEntries = (item as any).serialEntries || [];
+        
         if (!hasFinancialPermission) {
           const { itemPrice, ...rest } = item;
-          return { ...rest, assignedQuantity, availableQuantity: availableSlots, serialNumbers: unassignedSerials, registeredSerialCount };
+          return { ...rest, assignedQuantity, availableQuantity: availableSlots, serialNumbers: unassignedSerials, registeredSerialCount, serialEntries: fullSerialEntries };
         }
-        return { ...item, assignedQuantity, availableQuantity: availableSlots, serialNumbers: unassignedSerials, registeredSerialCount };
+        return { ...item, assignedQuantity, availableQuantity: availableSlots, serialNumbers: unassignedSerials, registeredSerialCount, serialEntries: fullSerialEntries };
       });
       
       res.json({ items: filteredItems });
