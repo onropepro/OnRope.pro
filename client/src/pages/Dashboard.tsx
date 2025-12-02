@@ -2354,7 +2354,7 @@ export default function Dashboard() {
                       <span className="hidden sm:inline">{projectsData?.projectInfo?.atProjectLimit ? t('dashboard.projects.limitReached', 'Project Limit Reached') : t('dashboard.projects.newProject', 'New Project')}</span>
                     </Button>
                   </DialogTrigger>
-                  <DialogContent className="max-w-md p-0 max-h-[95vh] flex flex-col gap-0">
+                  <DialogContent className="max-w-2xl p-0 max-h-[95vh] flex flex-col gap-0">
                     <div className="p-6 border-b bg-card">
                       <DialogHeader>
                         <DialogTitle className="text-xl">{t('dashboard.projects.createTitle', 'Create New Project')}</DialogTitle>
@@ -2524,7 +2524,7 @@ export default function Dashboard() {
                             <FormItem>
                               <FormLabel>{t('dashboard.createProject.jobType', 'Job Type')}</FormLabel>
                               <FormControl>
-                                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                                <div className="grid grid-cols-3 sm:grid-cols-4 gap-3">
                                   {[
                                     { value: "window_cleaning", labelKey: "dashboard.jobTypes.window_cleaning", label: "Window Cleaning", icon: "window" },
                                     { value: "dryer_vent_cleaning", labelKey: "dashboard.jobTypes.dryer_vent_cleaning_exterior", label: "Exterior Dryer Vent", icon: "air" },
