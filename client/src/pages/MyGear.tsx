@@ -414,7 +414,12 @@ export default function MyGear() {
                       )}
                     </div>
                     <div className="text-right text-sm">
-                      <div className="font-medium">{(item.quantity || 0) - (item.assignedQuantity || 0)} {t('myGear.available', 'available')}</div>
+                      <div className="font-medium">
+                        {item.availableQuantity !== undefined 
+                          ? item.availableQuantity 
+                          : ((item.quantity || 0) - (item.assignedQuantity || 0))
+                        } {t('myGear.available', 'available')}
+                      </div>
                     </div>
                   </div>
                 </div>
