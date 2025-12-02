@@ -24,7 +24,7 @@
       "nonBillableHour": "non-billable hour",
       "jobQuote": "job quote",
       "safetyDocument": "safety document",
-      "hourScheduled": "hour scheduled",
+      "hourScheduled": "drop",
       "employeePerformance": "employee's performance level",
       "jobProgress": "job's progress"
     },
