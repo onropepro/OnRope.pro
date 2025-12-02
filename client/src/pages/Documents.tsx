@@ -4404,6 +4404,27 @@ export default function Documents() {
     return { blob, filename };
   };
 
+  // Helper to fetch PDF blob from URL (for Rope Access Plans)
+  const fetchPdfBlobFromUrl = async (doc: any): Promise<{ blob: Blob; filename: string }> => {
+    try {
+      const response = await fetch(doc.url);
+      if (!response.ok) throw new Error('Failed to fetch PDF');
+      const blob = await response.blob();
+      
+      // Extract filename from URL or create one
+      const urlParts = doc.url.split('/');
+      const originalFilename = urlParts[urlParts.length - 1] || 'document.pdf';
+      const projectName = doc.projectName?.replace(/[^a-zA-Z0-9]/g, '_') || 'Project';
+      const dateStr = doc.date ? new Date(doc.date).toISOString().split('T')[0] : 'unknown';
+      const filename = `RopeAccessPlan_${projectName}_${dateStr}_${originalFilename}`;
+      
+      return { blob, filename };
+    } catch (error) {
+      console.error('Error fetching PDF:', error);
+      throw error;
+    }
+  };
+
   // ============ END BULK EXPORT PDF GENERATORS ============
 
   // Same professional HTML download function as Quotes.tsx
@@ -6821,6 +6842,17 @@ export default function Documents() {
               </div>
             </CardHeader>
             <CardContent className="pt-6">
+              {allDocuments.length > 0 && (
+                <div className="mb-4">
+                  <DateRangeExport
+                    documents={allDocuments}
+                    getDateFn={(d: any) => d.date}
+                    generatePdf={fetchPdfBlobFromUrl}
+                    documentType="RopeAccessPlans"
+                    colorClass="text-primary"
+                  />
+                </div>
+              )}
               {allDocuments.length > 0 ? (
                 <div className="space-y-2">
                   {groupDocumentsByDate(allDocuments, (d: any) => d.date).map((yearGroup) => (
