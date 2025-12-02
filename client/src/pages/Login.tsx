@@ -258,7 +258,7 @@ export default function Login() {
             In Less Than 60 Seconds
           </h2>
           <p className="text-muted-foreground mb-6 max-w-xl mx-auto">
-            {t('login.roiCalculator.subtitle', 'Most rope access companies waste $15,000-25,000 per year on scattered tools, manual processes, and hidden admin, and wasted time. Find out how much you could save.')}
+            {t('login.roiCalculator.subtitle', 'Most rope access companies waste $15,000-25,000 per year on scattered online SAAS tools, manual processes, hidden admin costs, and wasted time. Find out how much you could save.')}
           </p>
           
           {/* Embedded Employee Slider - Question 1 */}
