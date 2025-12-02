@@ -383,6 +383,7 @@ export const gearSerialNumbers = pgTable("gear_serial_numbers", {
   index("IDX_gear_serial_numbers_item").on(table.gearItemId),
   index("IDX_gear_serial_numbers_company").on(table.companyId),
   index("IDX_gear_serial_numbers_serial").on(table.serialNumber),
+  sql`UNIQUE ("gear_item_id", "serial_number")`,
 ]);
 
 // Equipment damage reports table - tracks reported damage to equipment

@@ -6650,25 +6650,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
         assignedByItem.set(assignment.gearItemId, current + (assignment.quantity || 0));
       }
       
-      // Get all serial numbers for this company with their assignment status
+      // Get all serial numbers for this company
       const allSerialNumbers = await db.select()
         .from(gearSerialNumbers)
         .where(eq(gearSerialNumbers.companyId, companyId));
       
-      // Get all assigned serial numbers (has assignedTo or assignment record)
+      // Build set of assigned serial numbers
       const assignedSerials = new Set<string>();
       for (const assignment of allAssignments) {
         if (assignment.serialNumber) {
           assignedSerials.add(assignment.serialNumber);
-        }
-      }
-      
-      // Calculate unassigned serial count per item
-      const unassignedSerialsByItem = new Map<string, number>();
-      for (const serial of allSerialNumbers) {
-        if (!assignedSerials.has(serial.serialNumber)) {
-          const current = unassignedSerialsByItem.get(serial.gearItemId) || 0;
-          unassignedSerialsByItem.set(serial.gearItemId, current + 1);
         }
       }
       
@@ -6677,21 +6668,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
         (currentUser.permissions && currentUser.permissions.includes("view_financial_data"));
       
       const filteredItems = items.map(item => {
+        const totalQuantity = Number(item.quantity) || 0;
         const assignedQuantity = assignedByItem.get(item.id) || 0;
-        // For items with serial numbers, use unassigned serial count as available
-        const unassignedSerialCount = unassignedSerialsByItem.get(item.id) || 0;
-        // Get unassigned serial numbers for this item from allSerialNumbers (not item.serialEntries)
+        // Available slots = total quantity minus assigned (regardless of serial registration)
+        const availableSlots = Math.max(0, totalQuantity - assignedQuantity);
+        
+        // Get unassigned serial numbers for this item (for the picker UI)
         const itemSerials = allSerialNumbers.filter(s => s.gearItemId === item.id);
         const unassignedSerials = itemSerials
           .filter(s => !assignedSerials.has(s.serialNumber))
           .map(s => s.serialNumber);
-        
+        const registeredSerialCount = itemSerials.length;
         
         if (!hasFinancialPermission) {
           const { itemPrice, ...rest } = item;
-          return { ...rest, assignedQuantity, availableQuantity: unassignedSerialCount, serialNumbers: unassignedSerials };
+          return { ...rest, assignedQuantity, availableQuantity: availableSlots, serialNumbers: unassignedSerials, registeredSerialCount };
         }
-        return { ...item, assignedQuantity, availableQuantity: unassignedSerialCount, serialNumbers: unassignedSerials };
+        return { ...item, assignedQuantity, availableQuantity: availableSlots, serialNumbers: unassignedSerials, registeredSerialCount };
       });
       
       res.json({ items: filteredItems });
@@ -6877,7 +6870,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
-  // Create a gear assignment
+  // Create a gear assignment (manager assigns to employee)
+  // Handles both picking existing serials and entering new ones (atomic registration + assignment)
   app.post("/api/gear-assignments", requireAuth, async (req: Request, res: Response) => {
     try {
       const currentUser = await storage.getUserById(req.session.userId!);
@@ -6897,22 +6891,90 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Unable to determine company" });
       }
       
-      console.log("Creating gear assignment:", req.body);
+      const gearItemId = req.body.gearItemId;
+      const rawQuantity = parseInt(req.body.quantity);
+      const requestedQuantity = isNaN(rawQuantity) || rawQuantity < 1 ? 1 : rawQuantity;
+      // Normalize serial number: trim whitespace and convert to uppercase for consistency
+      const serialNumber = req.body.serialNumber?.trim().toUpperCase() || undefined;
       
+      // Verify the gear item exists and belongs to company
+      const gearItem = await db.select().from(gearItems).where(eq(gearItems.id, gearItemId)).limit(1);
+      
+      if (!gearItem.length || gearItem[0].companyId !== companyId) {
+        return res.status(404).json({ message: "Gear item not found" });
+      }
+      
+      // Check available slots (quantity - assigned)
+      const existingAssignments = await db.select()
+        .from(gearAssignments)
+        .where(eq(gearAssignments.gearItemId, gearItemId));
+      
+      const totalAssigned = existingAssignments.reduce((sum, a) => sum + (a.quantity || 0), 0);
+      const totalQuantity = Number(gearItem[0].quantity) || 0;
+      const availableSlots = Math.max(0, totalQuantity - totalAssigned);
+      
+      if (requestedQuantity > availableSlots) {
+        return res.status(400).json({ 
+          message: `Not enough available. Only ${availableSlots} of ${totalQuantity} available.`,
+          availableSlots
+        });
+      }
+      
+      // If serial number provided, check if it needs to be registered
+      if (serialNumber) {
+        // Check if serial already exists for this gear item (case-insensitive due to uppercase normalization)
+        const existingSerial = await db.select()
+          .from(gearSerialNumbers)
+          .where(and(
+            eq(gearSerialNumbers.gearItemId, gearItemId),
+            eq(gearSerialNumbers.serialNumber, serialNumber)
+          ))
+          .limit(1);
+        
+        // Check if serial is already assigned to someone
+        const serialAssignment = await db.select()
+          .from(gearAssignments)
+          .where(and(
+            eq(gearAssignments.gearItemId, gearItemId),
+            eq(gearAssignments.serialNumber, serialNumber)
+          ))
+          .limit(1);
+        
+        if (serialAssignment.length > 0) {
+          return res.status(400).json({ 
+            message: "This serial number is already assigned to someone else" 
+          });
+        }
+        
+        // If serial doesn't exist, register it first (atomic with assignment)
+        if (!existingSerial.length) {
+          await db.insert(gearSerialNumbers).values({
+            gearItemId,
+            companyId,
+            serialNumber,
+            dateOfManufacture: req.body.dateOfManufacture || undefined,
+            dateInService: req.body.dateInService || undefined,
+          });
+        }
+      }
+      
+      // Create assignment
       const assignment = await storage.createGearAssignment({
-        gearItemId: req.body.gearItemId,
+        gearItemId,
         companyId,
         employeeId: req.body.employeeId,
-        quantity: parseInt(req.body.quantity),
-        serialNumber: req.body.serialNumber || undefined,
+        quantity: requestedQuantity,
+        serialNumber,
         dateOfManufacture: req.body.dateOfManufacture || undefined,
         dateInService: req.body.dateInService || undefined,
       });
       
-      console.log("Assignment created successfully:", assignment);
-      
       res.json({ assignment });
-    } catch (error) {
+    } catch (error: any) {
+      // Handle unique constraint violation (duplicate serial)
+      if (error?.code === '23505' && error?.constraint?.includes('serial')) {
+        return res.status(400).json({ message: "This serial number already exists for this item" });
+      }
       if (error instanceof z.ZodError) {
         return res.status(400).json({ message: "Validation error", errors: error.errors });
       }
@@ -7057,6 +7119,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Self-assign gear - allows any employee to assign gear to themselves
+  // Handles both picking existing serials and entering new ones (atomic registration + assignment)
   app.post("/api/gear-assignments/self", requireAuth, async (req: Request, res: Response) => {
     try {
       const currentUser = await storage.getUserById(req.session.userId!);
@@ -7071,26 +7134,90 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Unable to determine company" });
       }
       
+      const gearItemId = req.body.gearItemId;
+      const rawQuantity = parseInt(req.body.quantity);
+      const requestedQuantity = isNaN(rawQuantity) || rawQuantity < 1 ? 1 : rawQuantity;
+      // Normalize serial number: trim whitespace and convert to uppercase for consistency
+      const serialNumber = req.body.serialNumber?.trim().toUpperCase() || undefined;
+      
       // Verify the gear item belongs to the same company
-      const gearItem = await db.select().from(gearItems).where(eq(gearItems.id, req.body.gearItemId)).limit(1);
+      const gearItem = await db.select().from(gearItems).where(eq(gearItems.id, gearItemId)).limit(1);
       
       if (!gearItem.length || gearItem[0].companyId !== companyId) {
         return res.status(404).json({ message: "Gear item not found" });
       }
       
+      // Check available slots (quantity - assigned)
+      const existingAssignments = await db.select()
+        .from(gearAssignments)
+        .where(eq(gearAssignments.gearItemId, gearItemId));
+      
+      const totalAssigned = existingAssignments.reduce((sum, a) => sum + (a.quantity || 0), 0);
+      const totalQuantity = Number(gearItem[0].quantity) || 0;
+      const availableSlots = Math.max(0, totalQuantity - totalAssigned);
+      
+      if (requestedQuantity > availableSlots) {
+        return res.status(400).json({ 
+          message: `Not enough available. Only ${availableSlots} of ${totalQuantity} available.`,
+          availableSlots
+        });
+      }
+      
+      // If serial number provided, check if it needs to be registered
+      if (serialNumber) {
+        // Check if serial already exists for this gear item (case-insensitive due to uppercase normalization)
+        const existingSerial = await db.select()
+          .from(gearSerialNumbers)
+          .where(and(
+            eq(gearSerialNumbers.gearItemId, gearItemId),
+            eq(gearSerialNumbers.serialNumber, serialNumber)
+          ))
+          .limit(1);
+        
+        // Check if serial is already assigned to someone
+        const serialAssignment = await db.select()
+          .from(gearAssignments)
+          .where(and(
+            eq(gearAssignments.gearItemId, gearItemId),
+            eq(gearAssignments.serialNumber, serialNumber)
+          ))
+          .limit(1);
+        
+        if (serialAssignment.length > 0) {
+          return res.status(400).json({ 
+            message: "This serial number is already assigned to someone else" 
+          });
+        }
+        
+        // If serial doesn't exist, register it first (atomic with assignment)
+        if (!existingSerial.length) {
+          await db.insert(gearSerialNumbers).values({
+            gearItemId,
+            companyId,
+            serialNumber,
+            dateOfManufacture: req.body.dateOfManufacture || undefined,
+            dateInService: req.body.dateInService || undefined,
+          });
+        }
+      }
+      
       // Create assignment to self
       const assignment = await storage.createGearAssignment({
-        gearItemId: req.body.gearItemId,
+        gearItemId,
         companyId,
-        employeeId: currentUser.id, // Always assign to self
-        quantity: parseInt(req.body.quantity) || 1,
-        serialNumber: req.body.serialNumber || undefined,
+        employeeId: currentUser.id,
+        quantity: requestedQuantity,
+        serialNumber,
         dateOfManufacture: req.body.dateOfManufacture || undefined,
         dateInService: req.body.dateInService || undefined,
       });
       
       res.json({ assignment });
-    } catch (error) {
+    } catch (error: any) {
+      // Handle unique constraint violation (duplicate serial)
+      if (error?.code === '23505' && error?.constraint?.includes('serial')) {
+        return res.status(400).json({ message: "This serial number already exists for this item" });
+      }
       if (error instanceof z.ZodError) {
         return res.status(400).json({ message: "Validation error", errors: error.errors });
       }

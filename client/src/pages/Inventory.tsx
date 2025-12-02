@@ -475,15 +475,14 @@ export default function Inventory() {
     return [];
   };
   
-  // Helper function to calculate available quantity for an item
-  // For serial-tracked items: uses backend's availableQuantity (unassigned serial count)
-  // For bulk items: uses quantity - assignedQuantity
+  // Helper function to get available slots for an item
+  // Available slots = total quantity - assigned quantity (regardless of serial registration)
   const getAvailableQuantity = (item: any) => {
-    // If backend provides availableQuantity, use it (this is the unassigned serial count)
+    // Backend now provides availableQuantity as slots-based (quantity - assigned)
     if (typeof item.availableQuantity === 'number') {
       return item.availableQuantity;
     }
-    // Fallback for bulk items or when availableQuantity not provided
+    // Fallback calculation
     const totalQuantity = Number(item.quantity) || 0;
     const assignedQuantity = Number(item.assignedQuantity) || 0;
     return Math.max(0, totalQuantity - assignedQuantity);
