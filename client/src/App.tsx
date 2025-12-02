@@ -44,6 +44,7 @@ import PropertyManagerSettings from "@/pages/PropertyManagerSettings";
 import PropertyManager from "@/pages/PropertyManager";
 import MyLoggedHours from "@/pages/MyLoggedHours";
 import Changelog from "@/pages/Changelog";
+import InventoryGuide from "@/pages/InventoryGuide";
 import ROICalculator from "@/pages/ROICalculator";
 import NotFound from "@/pages/not-found";
 import ProtectedRoute from "@/components/ProtectedRoute";
@@ -223,6 +224,7 @@ function Router() {
         </ProtectedRoute>
       </Route>
       <Route path="/changelog" component={Changelog} />
+      <Route path="/inventory-guide" component={InventoryGuide} />
       <Route path="/roi-calculator" component={ROICalculator} />
       <Route component={NotFound} />
     </Switch>
