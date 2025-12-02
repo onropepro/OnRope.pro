@@ -476,8 +476,14 @@ export default function Inventory() {
   };
   
   // Helper function to calculate available quantity for an item
-  // Uses assignedQuantity from the API which includes ALL assignments (not just user's own)
+  // For serial-tracked items: uses backend's availableQuantity (unassigned serial count)
+  // For bulk items: uses quantity - assignedQuantity
   const getAvailableQuantity = (item: any) => {
+    // If backend provides availableQuantity, use it (this is the unassigned serial count)
+    if (typeof item.availableQuantity === 'number') {
+      return item.availableQuantity;
+    }
+    // Fallback for bulk items or when availableQuantity not provided
     const totalQuantity = Number(item.quantity) || 0;
     const assignedQuantity = Number(item.assignedQuantity) || 0;
     return Math.max(0, totalQuantity - assignedQuantity);
