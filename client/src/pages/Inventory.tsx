@@ -92,7 +92,7 @@ export default function Inventory() {
 
   // Self-assign gear state
   const [showSelfAssignDialog, setShowSelfAssignDialog] = useState(false);
-  const [selfAssignItem, setSelfAssignItem] = useState<GearItem | null>(null);
+  const [selfAssignItem, setSelfAssignItem] = useState<(GearItem & { serialNumbers: string[], assignedQuantity: number, availableQuantity: number }) | null>(null);
   const [selfAssignQuantity, setSelfAssignQuantity] = useState<string>("1");
   const [selfAssignSearch, setSelfAssignSearch] = useState("");
   const [selfAssignSerialNumber, setSelfAssignSerialNumber] = useState<string>("");
@@ -178,7 +178,7 @@ export default function Inventory() {
   const harnessInspections = harnessInspectionsData?.inspections || [];
 
   // Fetch all gear items
-  const { data: gearData, isLoading } = useQuery<{ items: GearItem[] }>({
+  const { data: gearData, isLoading } = useQuery<{ items: (GearItem & { serialNumbers: string[], assignedQuantity: number, availableQuantity: number })[] }>({
     queryKey: ["/api/gear-items"],
   });
 
@@ -471,7 +471,7 @@ export default function Inventory() {
   const getAvailableSerialNumbers = () => {
     if (!selfAssignItem) return [];
     // Use serialNumbers directly from the item (backend provides array of unassigned serial strings)
-    const serials = (selfAssignItem as any).serialNumbers || [];
+    const serials = selfAssignItem.serialNumbers || [];
     // Convert strings to objects for compatibility with existing UI
     if (Array.isArray(serials) && serials.length > 0) {
       return serials.map((serialNumber: string) => ({
