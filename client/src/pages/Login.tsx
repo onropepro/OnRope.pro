@@ -219,7 +219,7 @@ export default function Login() {
           {t('login.hero.taglineBold', "THEY'RE NOT")}
         </div>
         
-        <p className="text-base md:text-lg text-muted-foreground max-w-xl mb-8">
+        <p className="text-base md:text-lg max-w-xl mb-8" style={{ color: '#3B3B3B' }}>
           {t('login.hero.description', 'You track every')}{" "}
           <span 
             className="inline-block font-semibold transition-all duration-300 opacity-100 translate-y-0 text-[#A3320B]"
