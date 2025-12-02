@@ -46,6 +46,10 @@ export default function HarnessInspectionForm() {
   const [selectedGearId, setSelectedGearId] = useState<string>("");
   const [showHarnessPicker, setShowHarnessPicker] = useState(false);
   
+  // Bulk kit inspection mode - when true, all kit items will be inspected together
+  const [isKitInspectionMode, setIsKitInspectionMode] = useState(false);
+  const [selectedKitItems, setSelectedKitItems] = useState<any[]>([]);
+  
   // Get project ID from URL params (when coming from project start day flow)
   const urlParams = new URLSearchParams(searchString);
   const projectIdFromUrl = urlParams.get('projectId');
@@ -170,11 +174,35 @@ export default function HarnessInspectionForm() {
   // Handle harness selection from picker dialog
   const handleHarnessSelection = (harness: any) => {
     console.log('[Harness Picker] Selected harness:', harness);
+    // Reset kit mode when selecting individual item
+    setIsKitInspectionMode(false);
+    setSelectedKitItems([]);
     handleGearSelection(harness.id);
     setShowHarnessPicker(false);
     toast({
       title: t('harnessInspection.toast.harnessSelected', 'Harness selected'),
       description: t('harnessInspection.toast.detailsLoaded', '{{type}} details loaded', { type: harness.equipmentType }),
+    });
+  };
+  
+  // Handle selecting entire kit for bulk inspection
+  const handleSelectEntireKit = () => {
+    if (myKitItems.length === 0) return;
+    
+    setIsKitInspectionMode(true);
+    setSelectedKitItems(myKitItems);
+    setSelectedGearId(""); // Clear single selection
+    
+    // Use first item's details as representative for form display
+    const firstItem = myKitItems[0];
+    form.setValue("equipmentId", `Kit: ${myKitItems.length} items`);
+    form.setValue("manufacturer", "");
+    form.setValue("dateInService", "");
+    
+    setShowHarnessPicker(false);
+    toast({
+      title: t('harnessInspection.toast.kitSelected', 'Entire Kit Selected'),
+      description: t('harnessInspection.toast.kitSelectedDescription', 'Inspecting {{count}} items from your kit', { count: myKitItems.length }),
     });
   };
 
@@ -261,12 +289,46 @@ export default function HarnessInspectionForm() {
 
   const submitInspection = useMutation({
     mutationFn: async (data: InspectionFormData) => {
-      const payload = {
-        ...data,
-        equipmentFindings: findings,
-        overallStatus,
-      };
-      return apiRequest("POST", "/api/harness-inspections", payload);
+      // If in kit inspection mode, create inspections for all kit items
+      if (isKitInspectionMode && selectedKitItems.length > 0) {
+        const results = [];
+        for (const kitItem of selectedKitItems) {
+          // Get serial number from item
+          const serialNumber = kitItem.serialNumber || 
+            (kitItem.serialNumbers && kitItem.serialNumbers.length > 0 ? kitItem.serialNumbers[0] : '');
+          
+          // Build manufacturer string
+          const manufacturer = `${kitItem.brand || ''}${kitItem.model ? ` ${kitItem.model}` : ''}`.trim();
+          
+          // Create a fresh payload for each item with item-specific fields OVERRIDING shared data
+          const payload = {
+            inspectionDate: data.inspectionDate,
+            inspectorName: data.inspectorName,
+            projectId: data.projectId,
+            comments: data.comments,
+            // Item-specific fields
+            equipmentId: serialNumber || kitItem.equipmentType,
+            manufacturer: manufacturer || '',
+            dateInService: kitItem.dateInService || '',
+            // Shared inspection findings
+            equipmentFindings: findings,
+            overallStatus,
+            gearItemId: kitItem.gearItemId || kitItem.id,
+          };
+          const result = await apiRequest("POST", "/api/harness-inspections", payload);
+          results.push(result);
+        }
+        return results;
+      } else {
+        // Single item inspection
+        const payload = {
+          ...data,
+          equipmentFindings: findings,
+          overallStatus,
+          gearItemId: selectedGearId || undefined,
+        };
+        return apiRequest("POST", "/api/harness-inspections", payload);
+      }
     },
     onSuccess: () => {
       // Track harness inspection completion
@@ -275,9 +337,12 @@ export default function HarnessInspectionForm() {
         result: overallStatus === 'pass' ? 'pass' : 'fail',
       });
       
+      const itemCount = isKitInspectionMode ? selectedKitItems.length : 1;
       toast({ 
         title: t('harnessInspection.toast.submitted', 'Inspection submitted'), 
-        description: t('harnessInspection.toast.submittedDescription', 'Your rope access equipment inspection has been recorded successfully.') 
+        description: isKitInspectionMode 
+          ? t('harnessInspection.toast.kitSubmittedDescription', '{{count}} equipment inspections have been recorded successfully.', { count: itemCount })
+          : t('harnessInspection.toast.submittedDescription', 'Your rope access equipment inspection has been recorded successfully.') 
       });
       queryClient.invalidateQueries({ queryKey: ["/api/my-harness-inspections"] });
       queryClient.invalidateQueries({ queryKey: ["/api/harness-inspections"] });
@@ -410,6 +475,43 @@ export default function HarnessInspectionForm() {
                           <p className="text-sm text-muted-foreground">
                             {t('harnessInspection.myKit.description', 'Your personal assigned equipment')}
                           </p>
+                          
+                          {/* Select Entire Kit Button */}
+                          <Card 
+                            className="hover-elevate active-elevate-2 cursor-pointer border-2 border-primary bg-primary/10"
+                            onClick={handleSelectEntireKit}
+                            data-testid="button-select-entire-kit"
+                          >
+                            <CardContent className="p-4">
+                              <div className="flex items-center gap-3">
+                                <div className="flex items-center justify-center w-10 h-10 rounded-full bg-primary/20">
+                                  <span className="material-icons text-primary text-xl">select_all</span>
+                                </div>
+                                <div className="flex-1">
+                                  <div className="font-semibold text-primary">
+                                    {t('harnessInspection.selectEntireKit', 'Select Entire Kit')}
+                                  </div>
+                                  <div className="text-sm text-muted-foreground">
+                                    {t('harnessInspection.inspectAllItems', 'Inspect all {{count}} items at once', { count: myKitItems.length })}
+                                  </div>
+                                </div>
+                                <CheckCircle2 className="h-5 w-5 text-primary" />
+                              </div>
+                            </CardContent>
+                          </Card>
+                          
+                          {/* Individual Kit Items */}
+                          <div className="relative py-1">
+                            <div className="absolute inset-0 flex items-center">
+                              <span className="w-full border-t" />
+                            </div>
+                            <div className="relative flex justify-center text-xs">
+                              <span className="bg-background px-2 text-muted-foreground">
+                                {t('harnessInspection.orSelectIndividual', 'or select individual items')}
+                              </span>
+                            </div>
+                          </div>
+                          
                           <div className="grid gap-2">
                             {myKitItems.map((item: any) => (
                               <Card 
@@ -517,9 +619,52 @@ export default function HarnessInspectionForm() {
                     </div>
                   </DialogContent>
                 </Dialog>
+                
+                {/* Kit Inspection Mode Indicator */}
+                {isKitInspectionMode && selectedKitItems.length > 0 && (
+                  <Card className="border-2 border-primary bg-primary/5">
+                    <CardContent className="p-4">
+                      <div className="flex items-center gap-3 mb-3">
+                        <div className="flex items-center justify-center w-10 h-10 rounded-full bg-primary/20">
+                          <span className="material-icons text-primary text-xl">select_all</span>
+                        </div>
+                        <div>
+                          <div className="font-semibold text-primary">
+                            {t('harnessInspection.kitMode.title', 'Kit Inspection Mode')}
+                          </div>
+                          <div className="text-sm text-muted-foreground">
+                            {t('harnessInspection.kitMode.description', 'All {{count}} items will be inspected together', { count: selectedKitItems.length })}
+                          </div>
+                        </div>
+                        <Button 
+                          type="button"
+                          variant="ghost" 
+                          size="sm"
+                          className="ml-auto"
+                          onClick={() => {
+                            setIsKitInspectionMode(false);
+                            setSelectedKitItems([]);
+                            form.setValue("equipmentId", "");
+                          }}
+                          data-testid="button-clear-kit-selection"
+                        >
+                          {t('common.clear', 'Clear')}
+                        </Button>
+                      </div>
+                      <div className="flex flex-wrap gap-2">
+                        {selectedKitItems.map((item: any, index: number) => (
+                          <Badge key={`selected-${item.assignmentId || index}`} variant="secondary" className="text-xs">
+                            {item.equipmentType}
+                            {item.serialNumber && ` (${item.serialNumber})`}
+                          </Badge>
+                        ))}
+                      </div>
+                    </CardContent>
+                  </Card>
+                )}
 
                 {/* Gear Selection Dropdown for Autofill */}
-                {availableInventoryItems.length > 0 && (
+                {availableInventoryItems.length > 0 && !isKitInspectionMode && (
                   <div className="bg-primary/5 border border-primary/20 rounded-md p-4 space-y-3">
                     <div className="flex items-start gap-3">
                       <span className="material-icons text-primary mt-0.5">auto_awesome</span>
