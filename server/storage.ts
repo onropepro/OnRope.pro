@@ -1036,12 +1036,101 @@ export class Storage {
     return results[0];
   }
 
-  async updateGearItem(id: string, updates: Partial<InsertGearItem>): Promise<GearItem> {
+  async updateGearItem(id: string, updates: Partial<InsertGearItem>, serialEntries?: Array<{serialNumber: string, dateOfManufacture?: string, dateInService?: string}>): Promise<GearItem & { serialEntries: GearSerialNumber[] }> {
+    // Get the gear item first to get its companyId
+    const existingItem = await db.select().from(gearItems).where(eq(gearItems.id, id));
+    if (!existingItem[0]) {
+      throw new Error("Gear item not found");
+    }
+    const companyId = existingItem[0].companyId;
+    
+    // Update the gear item
     const result = await db.update(gearItems)
       .set({ ...updates, updatedAt: new Date() })
       .where(eq(gearItems.id, id))
       .returning();
-    return result[0];
+    const gearItem = result[0];
+    
+    // Handle serial entries if provided
+    let savedSerialEntries: GearSerialNumber[] = [];
+    if (serialEntries !== undefined) {
+      // Get existing serial entries and their assignment status
+      const existingSerials = await db.select()
+        .from(gearSerialNumbers)
+        .where(eq(gearSerialNumbers.gearItemId, id));
+      
+      // Get assignments to check which serials are in use
+      const assignments = await db.select()
+        .from(gearAssignments)
+        .where(eq(gearAssignments.gearItemId, id));
+      
+      const assignedSerialSet = new Set(
+        assignments
+          .filter(a => a.serialNumber)
+          .map(a => a.serialNumber)
+      );
+      
+      // Create a map of existing serials for quick lookup
+      const existingSerialMap = new Map(
+        existingSerials.map(s => [s.serialNumber, s])
+      );
+      
+      // Determine new serial numbers from the input
+      const newSerialSet = new Set(serialEntries.map(e => e.serialNumber));
+      
+      // Delete serial entries that are no longer in the list AND are not assigned
+      for (const existing of existingSerials) {
+        if (!newSerialSet.has(existing.serialNumber) && !assignedSerialSet.has(existing.serialNumber)) {
+          await db.delete(gearSerialNumbers)
+            .where(eq(gearSerialNumbers.id, existing.id));
+        }
+      }
+      
+      // Insert or update serial entries
+      for (const entry of serialEntries) {
+        if (entry.serialNumber) {
+          const existingSerial = existingSerialMap.get(entry.serialNumber);
+          if (existingSerial) {
+            // Update existing serial entry
+            const [updated] = await db.update(gearSerialNumbers)
+              .set({
+                dateOfManufacture: entry.dateOfManufacture || existingSerial.dateOfManufacture,
+                dateInService: entry.dateInService || existingSerial.dateInService,
+              })
+              .where(eq(gearSerialNumbers.id, existingSerial.id))
+              .returning();
+            savedSerialEntries.push(updated);
+          } else {
+            // Insert new serial entry
+            const serialData = {
+              gearItemId: id,
+              companyId: companyId,
+              serialNumber: entry.serialNumber,
+              dateOfManufacture: entry.dateOfManufacture || undefined,
+              dateInService: entry.dateInService || undefined,
+            };
+            const [savedEntry] = await db.insert(gearSerialNumbers)
+              .values(serialData)
+              .returning();
+            savedSerialEntries.push(savedEntry);
+          }
+        }
+      }
+      
+      // Also include any assigned serials that weren't in the new list (they should be preserved)
+      for (const existing of existingSerials) {
+        if (assignedSerialSet.has(existing.serialNumber) && !newSerialSet.has(existing.serialNumber)) {
+          savedSerialEntries.push(existing);
+        }
+      }
+    } else {
+      // No serialEntries provided, fetch existing ones
+      savedSerialEntries = await db.select()
+        .from(gearSerialNumbers)
+        .where(eq(gearSerialNumbers.gearItemId, id));
+    }
+    
+    return { ...gearItem, serialEntries: savedSerialEntries };
   }
 
   async deleteGearItem(id: string): Promise<void> {

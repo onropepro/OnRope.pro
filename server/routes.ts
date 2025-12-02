@@ -6814,7 +6814,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (req.body.dateOutOfService !== undefined) cleanedBody.dateOutOfService = req.body.dateOutOfService || null;
       if (req.body.inService !== undefined) cleanedBody.inService = req.body.inService;
       
-      const item = await storage.updateGearItem(req.params.id, cleanedBody);
+      // Pass serialEntries to the storage method for proper persistence
+      const serialEntries = req.body.serialEntries || undefined;
+      const item = await storage.updateGearItem(req.params.id, cleanedBody, serialEntries);
       res.json({ item });
     } catch (error) {
       console.error("Update gear item error:", error);
