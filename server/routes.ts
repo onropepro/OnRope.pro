@@ -6650,17 +6650,41 @@ export async function registerRoutes(app: Express): Promise<Server> {
         assignedByItem.set(assignment.gearItemId, current + (assignment.quantity || 0));
       }
       
+      // Get all serial numbers for this company with their assignment status
+      const allSerialNumbers = await db.select()
+        .from(gearSerialNumbers)
+        .where(eq(gearSerialNumbers.companyId, companyId));
+      
+      // Get all assigned serial numbers (has assignedTo or assignment record)
+      const assignedSerials = new Set<string>();
+      for (const assignment of allAssignments) {
+        if (assignment.serialNumber) {
+          assignedSerials.add(assignment.serialNumber);
+        }
+      }
+      
+      // Calculate unassigned serial count per item
+      const unassignedSerialsByItem = new Map<string, number>();
+      for (const serial of allSerialNumbers) {
+        if (!assignedSerials.has(serial.serialNumber)) {
+          const current = unassignedSerialsByItem.get(serial.gearItemId) || 0;
+          unassignedSerialsByItem.set(serial.gearItemId, current + 1);
+        }
+      }
+      
       // Filter out financial data if user doesn't have permission
       const hasFinancialPermission = currentUser.role === "company" || 
         (currentUser.permissions && currentUser.permissions.includes("view_financial_data"));
       
       const filteredItems = items.map(item => {
         const assignedQuantity = assignedByItem.get(item.id) || 0;
+        // For items with serial numbers, use unassigned serial count as available
+        const unassignedSerialCount = unassignedSerialsByItem.get(item.id) || 0;
         if (!hasFinancialPermission) {
           const { itemPrice, ...rest } = item;
-          return { ...rest, assignedQuantity };
+          return { ...rest, assignedQuantity, availableQuantity: unassignedSerialCount };
         }
-        return { ...item, assignedQuantity };
+        return { ...item, assignedQuantity, availableQuantity: unassignedSerialCount };
       });
       
       res.json({ items: filteredItems });

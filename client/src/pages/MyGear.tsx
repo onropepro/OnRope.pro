@@ -56,12 +56,19 @@ export default function MyGear() {
   const myGear = allGearItems.filter((item: any) => item.assignedTo === currentUser?.name);
 
   // Available gear items (inventory items that can be assigned)
-  // Calculate actual available quantity: total quantity minus assigned quantity
+  // For items with serial numbers, availableQuantity is set by backend (count of unassigned serials)
+  // For bulk items, calculate available: total quantity minus assigned quantity
   const availableGear = allGearItems.filter((item: any) => {
+    if (item.inService === false) return false;
+    // If backend provided availableQuantity (for serial-tracked items), use that
+    if (item.availableQuantity !== undefined) {
+      return item.availableQuantity > 0;
+    }
+    // Otherwise calculate for bulk items
     const totalQty = item.quantity || 0;
     const assignedQty = item.assignedQuantity || 0;
     const availableQty = totalQty - assignedQty;
-    return item.inService !== false && availableQty > 0;
+    return availableQty > 0;
   });
 
   // Filter available gear based on search
