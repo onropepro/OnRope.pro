@@ -238,6 +238,8 @@ const pagesData: PageCategory[] = [
       { name: "Resident/PM Linking", path: "/link", description: "Link account with company code", roles: ["Public"] },
       { name: "Changelog", path: "/changelog", description: "Platform feature overview", roles: ["Public"] },
       { name: "Pricing", path: "/changelog/pricing", description: "Subscription tiers and add-ons", roles: ["Public"] },
+      { name: "Safety Guide", path: "/changelog/safety", description: "Safety & compliance documentation guide", roles: ["Public"] },
+      { name: "Inventory Guide", path: "/changelog/inventory", description: "Equipment tracking guide", roles: ["Public"] },
     ]
   },
   {
@@ -979,6 +981,7 @@ export default function Changelog() {
           {changelogData.map((section, index) => {
             const Icon = section.icon;
             const isInventorySection = section.title === "Gear & Equipment Inventory";
+            const isSafetySection = section.title === "Safety & Compliance Documentation" || section.title === "Company Safety Rating (CSR)";
             return (
               <Card key={index} className="overflow-hidden">
                 <CardHeader className="pb-3">
@@ -993,6 +996,14 @@ export default function Changelog() {
                         {isInventorySection && (
                           <Link href="/changelog/inventory">
                             <Button variant="outline" size="sm" className="text-xs" data-testid="link-inventory-guide">
+                              View Guide
+                              <ExternalLink className="h-3 w-3 ml-1" />
+                            </Button>
+                          </Link>
+                        )}
+                        {isSafetySection && (
+                          <Link href="/changelog/safety">
+                            <Button variant="outline" size="sm" className="text-xs" data-testid="link-safety-guide">
                               View Guide
                               <ExternalLink className="h-3 w-3 ml-1" />
                             </Button>

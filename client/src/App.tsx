@@ -45,6 +45,7 @@ import PropertyManager from "@/pages/PropertyManager";
 import MyLoggedHours from "@/pages/MyLoggedHours";
 import Changelog from "@/pages/Changelog";
 import InventoryGuide from "@/pages/InventoryGuide";
+import SafetyGuide from "@/pages/SafetyGuide";
 import Pricing from "@/pages/Pricing";
 import ROICalculator from "@/pages/ROICalculator";
 import NotFound from "@/pages/not-found";
@@ -226,6 +227,7 @@ function Router() {
       </Route>
       <Route path="/changelog" component={Changelog} />
       <Route path="/changelog/inventory" component={InventoryGuide} />
+      <Route path="/changelog/safety" component={SafetyGuide} />
       <Route path="/changelog/pricing" component={Pricing} />
       <Route path="/roi-calculator" component={ROICalculator} />
       <Route component={NotFound} />
