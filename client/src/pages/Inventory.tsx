@@ -470,9 +470,16 @@ export default function Inventory() {
   // Get available serial numbers (not currently assigned to anyone) for self-assign
   const getAvailableSerialNumbers = () => {
     if (!selfAssignItem) return [];
-    const allSerials = serialNumbersData?.serialNumbers || [];
-    // Filter to only show serial numbers that are NOT assigned to anyone
-    return allSerials.filter(s => !s.isAssigned);
+    // Use serialNumbers directly from the item (backend provides array of unassigned serial strings)
+    const serials = selfAssignItem.serialNumbers || [];
+    // Convert strings to objects for compatibility with existing UI
+    return serials.map((serialNumber: string) => ({
+      id: serialNumber,
+      serialNumber,
+      dateOfManufacture: "",
+      dateInService: "",
+      isAssigned: false
+    }));
   };
   
   // Get available serial numbers for manager assign dialog
