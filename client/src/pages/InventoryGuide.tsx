@@ -43,7 +43,7 @@ export default function InventoryGuide() {
       <header className="sticky top-0 z-50 bg-card border-b shadow-sm">
         <div className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            <BackButton />
+            <BackButton to="/changelog" />
             <div>
               <h1 className="text-xl font-bold">Inventory System Guide</h1>
               <p className="text-xs text-muted-foreground">Complete documentation for equipment tracking</p>

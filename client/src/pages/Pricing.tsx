@@ -113,7 +113,7 @@ export default function Pricing() {
       <header className="sticky top-0 z-50 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
         <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <BackButton />
+            <BackButton to="/changelog" />
             <h1 className="text-lg font-semibold">Pricing & Subscriptions</h1>
           </div>
           <MainMenuButton />
