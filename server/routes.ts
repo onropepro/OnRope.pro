@@ -7239,6 +7239,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Validation error", errors: error.errors });
       }
       console.error("Self-assign gear error:", error);
+      console.error("Self-assign gear error details:", {
+        message: error?.message,
+        code: error?.code,
+        detail: error?.detail,
+        constraint: error?.constraint,
+        stack: error?.stack?.split('\n').slice(0, 5).join('\n'),
+      });
       res.status(500).json({ message: "Internal server error" });
     }
   });
