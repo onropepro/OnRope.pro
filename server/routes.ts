@@ -6680,10 +6680,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         const assignedQuantity = assignedByItem.get(item.id) || 0;
         // For items with serial numbers, use unassigned serial count as available
         const unassignedSerialCount = unassignedSerialsByItem.get(item.id) || 0;
-        // Get unassigned serial numbers for this item
-        const unassignedSerials = (item as any).serialEntries
-          ?.filter((s: any) => !assignedSerials.has(s.serialNumber))
-          .map((s: any) => s.serialNumber) || [];
+        // Get unassigned serial numbers for this item from allSerialNumbers (not item.serialEntries)
+        const itemSerials = allSerialNumbers.filter(s => s.gearItemId === item.id);
+        const unassignedSerials = itemSerials
+          .filter(s => !assignedSerials.has(s.serialNumber))
+          .map(s => s.serialNumber);
+        
         
         if (!hasFinancialPermission) {
           const { itemPrice, ...rest } = item;

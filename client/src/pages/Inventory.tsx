@@ -3320,9 +3320,12 @@ export default function Inventory() {
                     );
                   }
                   
-                  // No registered serials - show standard input fields
+                  // No unassigned serials available - show standard input fields with explanation
                   return (
                     <div className="space-y-3">
+                      <div className="text-sm text-muted-foreground bg-muted/50 p-2 rounded-md mb-2">
+                        {t('inventory.noUnassignedSerials', 'No unassigned serial numbers available. Enter a new serial number below.')}
+                      </div>
                       <div className="space-y-2">
                         <Label htmlFor="assign-serial-number">{t('inventory.serialNumberOptional', 'Serial Number (Optional)')}</Label>
                         <Input
@@ -3754,7 +3757,7 @@ export default function Inventory() {
                   return (
                     <div className="space-y-3">
                       <div className="text-sm text-muted-foreground bg-muted/50 p-2 rounded-md">
-                        No serial numbers registered yet. Enter the details for this new equipment.
+                        No unassigned serial numbers available. Enter a new serial number below, or unassign existing gear first.
                       </div>
                       <div className="grid grid-cols-2 gap-3">
                         <div className="space-y-2">
