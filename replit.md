@@ -37,6 +37,11 @@ The platform is built with a React 18 frontend using TypeScript and Wouter for r
 *   **Security Architecture:** Implements session-based authentication with secure HTTP-only cookies, multi-tenant data isolation, permission-based API response filtering, and robust API security.
 *   **UI/UX Standards:** Emphasizes obvious, prominent buttons with icons, clear visual feedback, mobile-first design, and accessibility. The design includes specific typography choices (Apparat font family).
 
+## UI Design Standards
+
+*   **Dialog/Modal Width:** All major form dialogs and modals should use `max-w-4xl` for consistent sizing across the application. This provides ample space for forms, reduces scrolling, and maintains a professional appearance.
+*   **Grid Layouts in Dialogs:** When displaying selectable options (like job types), use `grid-cols-4 sm:grid-cols-6` to maximize use of the wider dialog space.
+
 ## External Dependencies
 
 *   **Database:** PostgreSQL
