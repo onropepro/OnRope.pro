@@ -11,7 +11,22 @@ The Rope Access Management Platform is an enterprise-grade, mobile-first web app
 - Interaction: Collaborative interaction requiring approval for major architectural changes
 - Code Management: No code deletion without explicit permission
 
-## Recent Changes (Pricing Page - December 2, 2025)
+## Recent Changes (Inventory System Guide - December 2, 2025)
+
+**Inventory Guide Comprehensive Update (`/changelog/inventory`):**
+- Complete rewrite of the Inventory System Guide for use as knowledge base foundation
+- **The Golden Rule**: Prominent display of `Available = Quantity - Assigned` formula with visual example
+- **Three Tables Architecture**: Clear explanation of gearItems, gearAssignments, and gearSerialNumbers tables
+- **Four Permission Levels**: Detailed breakdown of canAccessInventory, canManageInventory, canAssignGear, canViewGearAssignments
+- **Dual-Path Serial Assignment**: New section explaining two methods for serial number assignment:
+  - Path A: Pick from dropdown of existing registered serials
+  - Path B: Enter new serial with atomic auto-registration during assignment
+- **Step-by-Step Workflows**: Four documented workflows (Add Gear, Manager Assign, Self-Assign, Return/Remove)
+- **Complete Example Scenario**: Day-by-day walkthrough of harness equipment management
+- **Important Technical Notes**: Serial independence from availability, unique constraints, deletion rules
+- Version 3.0 with updated documentation footer
+
+## Previous Changes (Pricing Page - December 2, 2025)
 
 **Pricing Page Added:**
 - New pricing page at `/changelog/pricing` detailing all subscription tiers and add-ons
