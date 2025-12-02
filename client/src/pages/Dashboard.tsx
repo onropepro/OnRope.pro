@@ -1924,23 +1924,13 @@ export default function Dashboard() {
     },
     {
       id: "performance",
-      label: t('dashboard.cards.performance.label', 'Performance'),
-      description: t('dashboard.cards.performance.description', 'View analytics'),
+      label: t('dashboard.cards.performance.label', 'Performance & Live Activity'),
+      description: t('dashboard.cards.performance.description', 'Analytics & active workers'),
       icon: "analytics",
       onClick: () => handleTabChange("performance"),
       testId: "button-nav-performance",
       isVisible: (user: any) => canViewPerformance(user), // Management only
       borderColor: "#f97316",
-    },
-    {
-      id: "active-workers",
-      label: t('dashboard.cards.activeWorkers.label', 'Active Workers'),
-      description: t('dashboard.cards.activeWorkers.description', "Who's working"),
-      icon: "work_history",
-      onClick: () => setLocation("/active-workers"),
-      testId: "button-active-workers",
-      isVisible: (user: any) => hasPermission(user, "view_active_workers"), // Permission-based
-      borderColor: "#6366f1",
     },
     {
       id: "complaints",
@@ -2092,7 +2082,7 @@ export default function Dashboard() {
       case "": return t('dashboard.pageTitle.dashboard', 'Dashboard');
       case "projects": return t('dashboard.pageTitle.projects', 'Projects');
       case "past-projects": return t('dashboard.pageTitle.pastProjects', 'Past Projects');
-      case "performance": return t('dashboard.pageTitle.performance', 'Performance');
+      case "performance": return t('dashboard.pageTitle.performance', 'Performance & Live Activity');
       case "complaints": return t('dashboard.pageTitle.complaints', 'Complaints');
       case "employees": return t('dashboard.pageTitle.employees', 'Employees');
       case "documents": return t('dashboard.pageTitle.documents', 'Documents');
@@ -3312,6 +3302,22 @@ export default function Dashboard() {
         {activeTab === "performance" && (
           <div>
             <div className="space-y-4">
+              {/* Active Workers Quick Access */}
+              <Card className="hover-elevate active-elevate-2 cursor-pointer border-indigo-500/20 bg-gradient-to-br from-indigo-500/5 via-transparent to-transparent" onClick={() => setLocation("/active-workers")} data-testid="card-active-workers">
+                <CardHeader>
+                  <div className="flex items-center gap-4">
+                    <div className="p-3 bg-indigo-500/10 rounded-xl">
+                      <span className="material-icons text-indigo-500">work_history</span>
+                    </div>
+                    <div className="flex-1">
+                      <CardTitle className="text-lg">{t('dashboard.cards.activeWorkers.label', 'Active Workers')}</CardTitle>
+                      <CardDescription>{t('dashboard.cards.activeWorkers.description', "Who's working")}</CardDescription>
+                    </div>
+                    <span className="material-icons text-muted-foreground">chevron_right</span>
+                  </div>
+                </CardHeader>
+              </Card>
+
               {completedSessions.length > 0 ? (
                 <>
                   {/* Overall Performance */}
