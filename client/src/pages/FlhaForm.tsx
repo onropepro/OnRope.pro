@@ -5,6 +5,7 @@ import { z } from "zod";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useLocation } from "wouter";
 import { useTranslation } from "react-i18next";
+import { trackFLHASubmission } from "@/lib/analytics";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
@@ -238,6 +239,12 @@ export default function FlhaForm() {
       return await response.json();
     },
     onSuccess: () => {
+      // Track FLHA submission
+      trackFLHASubmission({
+        projectId: form.getValues('projectId'),
+        hazardCount: hazardKeys.filter(h => form.getValues(h.id as keyof FlhaFormValues)).length,
+      });
+      
       toast({
         title: t('safetyForms.flha.toasts.success', 'Success'),
         description: t('safetyForms.flha.toasts.flhaSubmitted', 'FLHA form submitted successfully'),

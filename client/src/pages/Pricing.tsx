@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { BackButton } from "@/components/BackButton";
 import { MainMenuButton } from "@/components/MainMenuButton";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -5,8 +6,13 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
 import { Check, ArrowRight } from "lucide-react";
+import { trackPricingPageView } from "@/lib/analytics";
 
 export default function Pricing() {
+  // Track pricing page view on mount
+  useEffect(() => {
+    trackPricingPageView({ source: 'pricing_page' });
+  }, []);
   const subscriptionTiers = [
     {
       name: "Basic",

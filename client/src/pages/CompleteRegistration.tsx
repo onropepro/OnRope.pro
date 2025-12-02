@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { Skeleton } from "@/components/ui/skeleton";
+import { trackSignUp, trackSubscriptionPurchase } from "@/lib/analytics";
 
 interface SessionData {
   licenseKey: string;
@@ -158,6 +159,16 @@ export default function CompleteRegistration() {
       toast({
         title: t('completeRegistration.successTitle', 'Success!'),
         description: t('completeRegistration.accountCreated', 'Your account has been created. Redirecting to your profile...'),
+      });
+
+      // Track sign up and subscription purchase
+      trackSignUp('email');
+      trackSubscriptionPurchase({
+        planTier: sessionData.tier,
+        planPrice: 0,
+        currency: sessionData.currency || 'USD',
+        billingPeriod: 'monthly',
+        transactionId: sessionData.stripeSubscriptionId,
       });
 
       // Redirect to profile page to complete account details

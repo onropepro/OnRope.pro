@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/hooks/use-toast";
+import { trackCheckoutStart, trackAddOnPurchase } from "@/lib/analytics";
 import { 
   CreditCard, 
   Check, 
@@ -132,9 +133,23 @@ export function SubscriptionManagement() {
   const createCheckoutMutation = useMutation({
     mutationFn: async (tier: TierName) => {
       const response = await apiRequest('POST', '/api/stripe/create-checkout-session', { tier });
-      return response.json();
+      const data = await response.json();
+      // Return both the response data and the tier for tracking
+      return { ...data, requestedTier: tier };
     },
     onSuccess: (data) => {
+      // Track checkout after successful session creation using the confirmed tier
+      if (data.requestedTier && data.url) {
+        const tier = data.requestedTier as TierName;
+        const tierInfo = TIER_INFO[tier];
+        trackCheckoutStart({
+          planTier: tier,
+          planPrice: tierInfo.price,
+          currency: subDetails?.currency || 'USD',
+          billingPeriod: 'monthly',
+        });
+      }
+      
       if (data.url) {
         window.location.href = data.url;
       }

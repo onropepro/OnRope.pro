@@ -5,6 +5,7 @@ import { z } from "zod";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useLocation } from "wouter";
 import { useTranslation } from "react-i18next";
+import { trackToolboxMeeting } from "@/lib/analytics";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
@@ -259,6 +260,13 @@ export default function ToolboxMeetingForm() {
     },
     onSuccess: (data) => {
       console.log('[Toolbox Meeting] Navigating to dashboard');
+      
+      // Track toolbox meeting creation
+      trackToolboxMeeting({
+        projectId: data?.meeting?.projectId,
+        attendeeCount: selectedEmployees.length,
+      });
+      
       toast({
         title: t('safetyForms.toolbox.toasts.success', 'Success'),
         description: t('safetyForms.toolbox.toasts.meetingRecorded', 'Toolbox meeting recorded successfully'),

@@ -11,6 +11,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { queryClient } from "@/lib/queryClient";
+import { trackLogin } from "@/lib/analytics";
 import { Rocket, Play, Building2, Clock, DollarSign, Users, Shield, FileText, Calculator, FileSpreadsheet, Radio, ClipboardCheck, MessageSquare, Home, Award, Calendar, FolderOpen, Globe, TrendingUp, ArrowRight } from "lucide-react";
 import { Slider } from "@/components/ui/slider";
 import onRopeProLogo from "@assets/OnRopePro-logo_1764625558626.png";
@@ -149,6 +150,9 @@ export default function Login() {
         role: user.role,
         companyId: user.companyId
       });
+      
+      // Track login event
+      trackLogin('email');
       
       // Use client-side navigation to preserve React state and cache
       if (user.role === "resident") {

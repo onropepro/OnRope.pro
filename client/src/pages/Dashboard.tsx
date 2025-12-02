@@ -41,6 +41,7 @@ import { RefreshButton } from "@/components/RefreshButton";
 import { CSRBadge } from "@/components/CSRBadge";
 import { formatLocalDate, formatLocalDateLong } from "@/lib/dateUtils";
 import { QRCodeSVG } from 'qrcode.react';
+import { trackLogout, trackWorkSessionStart, trackWorkSessionEnd, trackProjectCreated, trackClientAdded, trackBuildingAdded, trackEmployeeAdded } from "@/lib/analytics";
 import {
   DndContext,
   closestCenter,
@@ -987,6 +988,12 @@ export default function Dashboard() {
       // Store project data BEFORE resetting
       const formData = projectForm.getValues();
       
+      // Track project creation
+      trackProjectCreated({
+        projectType: formData.jobType,
+        clientId: selectedClientForProject || undefined,
+      });
+      
       // Check if this project was created from client database or manually
       // If selectedClientForProject is empty, it means manual entry
       const wasManualEntry = !selectedClientForProject;
@@ -1033,6 +1040,12 @@ export default function Dashboard() {
       return response.json();
     },
     onSuccess: () => {
+      // Track employee creation
+      const formData = employeeForm.getValues();
+      trackEmployeeAdded({
+        role: formData.role,
+      });
+      
       queryClient.invalidateQueries({ queryKey: ["/api/employees/all"] });
       setShowEmployeeDialog(false);
       setEmployeeFormStep(1); // Reset to step 1
@@ -1408,6 +1421,9 @@ export default function Dashboard() {
       });
     },
     onSuccess: () => {
+      // Track client creation
+      trackClientAdded();
+      
       queryClient.invalidateQueries({ queryKey: ["/api/clients"] });
       setShowClientDialog(false);
       clientForm.reset();
@@ -1644,6 +1660,13 @@ export default function Dashboard() {
       queryClient.invalidateQueries({ queryKey: ["/api/projects"] });
       queryClient.invalidateQueries({ queryKey: ["/api/my-drops-today"] });
       const hasLocation = data.session?.startLatitude && data.session?.startLongitude;
+      
+      // Track work session start
+      trackWorkSessionStart({
+        projectId: data.session?.projectId,
+        employeeId: data.session?.employeeId,
+      });
+      
       toast({ 
         title: t('dashboard.toast.workSessionStarted', 'Work session started'), 
         description: hasLocation 
@@ -1677,6 +1700,13 @@ export default function Dashboard() {
       queryClient.invalidateQueries({ queryKey: ["/api/my-drops-today"] });
       endDayForm.reset();
       const hasLocation = data?.session?.endLatitude && data?.session?.endLongitude;
+      
+      // Track work session end
+      trackWorkSessionEnd({
+        projectId: data?.session?.projectId,
+        employeeId: data?.session?.employeeId,
+      });
+      
       toast({ 
         title: t('dashboard.toast.workSessionEnded', 'Work session ended'), 
         description: hasLocation 
@@ -1691,6 +1721,8 @@ export default function Dashboard() {
 
   const confirmLogout = async () => {
     try {
+      // Track logout event before clearing session
+      trackLogout();
       await fetch("/api/logout", {
         method: "POST",
         credentials: "include",

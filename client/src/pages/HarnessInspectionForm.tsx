@@ -4,6 +4,7 @@ import { queryClient, apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { useLocation, useSearch } from "wouter";
 import { useTranslation } from "react-i18next";
+import { trackHarnessInspection } from "@/lib/analytics";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -268,6 +269,12 @@ export default function HarnessInspectionForm() {
       return apiRequest("POST", "/api/harness-inspections", payload);
     },
     onSuccess: () => {
+      // Track harness inspection completion
+      trackHarnessInspection({
+        employeeId: currentUser?.id || '',
+        result: overallStatus === 'pass' ? 'pass' : 'fail',
+      });
+      
       toast({ 
         title: t('harnessInspection.toast.submitted', 'Inspection submitted'), 
         description: t('harnessInspection.toast.submittedDescription', 'Your rope access equipment inspection has been recorded successfully.') 
