@@ -6643,12 +6643,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
         .from(gearAssignments)
         .where(eq(gearAssignments.companyId, companyId));
       
-      // Calculate assigned quantity for each item
+      // Calculate assigned quantity for each item (ensure numeric addition)
       const assignedByItem = new Map<string, number>();
       for (const assignment of allAssignments) {
         const current = assignedByItem.get(assignment.gearItemId) || 0;
-        assignedByItem.set(assignment.gearItemId, current + (assignment.quantity || 0));
+        const qty = Number(assignment.quantity) || 0;
+        assignedByItem.set(assignment.gearItemId, current + qty);
       }
+      
+      // Debug logging for gear items
+      console.log('[GEAR-ITEMS] Company:', companyId);
+      console.log('[GEAR-ITEMS] Total assignments fetched:', allAssignments.length);
+      console.log('[GEAR-ITEMS] Raw assignments:', allAssignments.map(a => ({ 
+        id: a.id.substring(0, 8), 
+        itemId: a.gearItemId.substring(0, 8), 
+        qty: a.quantity, 
+        typeofQty: typeof a.quantity 
+      })));
+      console.log('[GEAR-ITEMS] Summed by item:', Object.fromEntries(assignedByItem));
       
       // Get all serial numbers for this company
       const allSerialNumbers = await db.select()

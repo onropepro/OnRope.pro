@@ -45,16 +45,41 @@ export default function MyGear() {
     queryKey: ["/api/user"],
   });
 
-  const { data: gearData, isLoading } = useQuery<{ items: any[] }>({
+  const { data: gearData, isLoading: gearLoading } = useQuery<{ items: any[] }>({
     queryKey: ["/api/gear-items"],
   });
+
+  const { data: assignmentsData, isLoading: assignmentsLoading } = useQuery<{ assignments: any[] }>({
+    queryKey: ["/api/gear-assignments"],
+  });
+
+  const isLoading = gearLoading || assignmentsLoading;
 
   const currentUser = userData?.user;
   const canSeeFinancials = hasFinancialAccess(currentUser);
   const allGearItems = gearData?.items || [];
+  const allAssignments = assignmentsData?.assignments || [];
 
-  // Filter gear items assigned to current user
-  const myGear = allGearItems.filter((item: any) => item.assignedTo === currentUser?.name);
+  // Build a map of gear items by ID for quick lookup
+  const gearItemsById = new Map(allGearItems.map(item => [item.id, item]));
+
+  // Filter assignments to current user and enrich with gear item details
+  // Use assignmentId as the unique key (not gearItemId) since a user can have multiple assignments for the same item
+  const myGear = allAssignments
+    .filter((assignment: any) => assignment.employeeId === currentUser?.id)
+    .map((assignment: any) => {
+      const gearItem = gearItemsById.get(assignment.gearItemId);
+      if (!gearItem) return null;
+      return {
+        ...gearItem,
+        assignmentId: assignment.id,
+        assignedQuantity: Number(assignment.quantity) || 1, // Ensure numeric for calculations
+        assignedSerialNumber: assignment.serialNumber,
+        assignedDateOfManufacture: assignment.dateOfManufacture,
+        assignedDateInService: assignment.dateInService,
+      };
+    })
+    .filter(Boolean);
 
   // Available gear items (inventory items that can be assigned)
   // For items with serial numbers, availableQuantity is set by backend (count of unassigned serials)
@@ -82,11 +107,11 @@ export default function MyGear() {
     );
   });
 
-  // Calculate totals
-  const totalItems = myGear.reduce((sum: number, item: any) => sum + (item.quantity || 0), 0);
+  // Calculate totals - use assignedQuantity from the assignment, not inventory quantity
+  const totalItems = myGear.reduce((sum: number, item: any) => sum + (item.assignedQuantity || 0), 0);
   const totalValue = myGear.reduce((sum: number, item: any) => {
     const price = parseFloat(item.itemPrice || "0");
-    const qty = item.quantity || 0;
+    const qty = item.assignedQuantity || 0;
     return sum + (price * qty);
   }, 0);
 
@@ -250,7 +275,7 @@ export default function MyGear() {
         ) : (
           <div className="space-y-4">
             {myGear.map((item: any) => (
-              <Card key={item.id} className="overflow-hidden">
+              <Card key={item.assignmentId} className="overflow-hidden">
                 <CardContent className="p-4">
                   <div className="flex items-start gap-4">
                     {/* Icon */}
@@ -281,8 +306,13 @@ export default function MyGear() {
                         <div className="text-right flex items-start gap-2">
                           <div>
                             <div className="font-semibold text-lg">
-                              {item.quantity} {item.quantity === 1 ? t('myGear.item', 'item') : t('myGear.items', 'items')}
+                              {item.assignedQuantity} {item.assignedQuantity === 1 ? t('myGear.item', 'item') : t('myGear.items', 'items')}
                             </div>
+                            {item.assignedSerialNumber && (
+                              <div className="text-xs text-muted-foreground font-mono">
+                                S/N: {item.assignedSerialNumber}
+                              </div>
+                            )}
                             {canSeeFinancials && item.itemPrice && (
                               <div className="text-sm text-muted-foreground">
                                 ${parseFloat(item.itemPrice).toFixed(2)} {t('myGear.each', 'each')}
@@ -296,7 +326,7 @@ export default function MyGear() {
                               className="text-destructive hover:text-destructive"
                               onClick={() => removeGearMutation.mutate(item.assignmentId)}
                               disabled={removeGearMutation.isPending}
-                              data-testid={`button-remove-gear-${item.id}`}
+                              data-testid={`button-remove-gear-${item.assignmentId}`}
                             >
                               <span className="material-icons text-sm">close</span>
                             </Button>
@@ -304,21 +334,21 @@ export default function MyGear() {
                         </div>
                       </div>
 
-                      {/* Details Grid */}
+                      {/* Details Grid - prefer assignment-specific dates over general item dates */}
                       <div className="grid grid-cols-2 gap-3 text-sm">
-                        {item.dateOfManufacture && (
+                        {(item.assignedDateOfManufacture || item.dateOfManufacture) && (
                           <div>
                             <span className="text-muted-foreground">{t('myGear.manufactured', 'Manufactured:')}</span>
                             <div className="font-medium mt-0.5">
-                              {new Date(item.dateOfManufacture).toLocaleDateString()}
+                              {new Date(item.assignedDateOfManufacture || item.dateOfManufacture).toLocaleDateString()}
                             </div>
                           </div>
                         )}
-                        {item.dateInService && (
+                        {(item.assignedDateInService || item.dateInService) && (
                           <div>
                             <span className="text-muted-foreground">{t('myGear.inService', 'In Service:')}</span>
                             <div className="font-medium mt-0.5">
-                              {new Date(item.dateInService).toLocaleDateString()}
+                              {new Date(item.assignedDateInService || item.dateInService).toLocaleDateString()}
                             </div>
                           </div>
                         )}
