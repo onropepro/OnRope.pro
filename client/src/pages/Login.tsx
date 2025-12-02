@@ -59,7 +59,7 @@ export default function Login() {
     t('login.rotatingWords.nonBillableHour', 'non-billable hour'),
     t('login.rotatingWords.jobQuote', 'job quote'),
     t('login.rotatingWords.jobProgress', "job's progress"),
-    t('login.rotatingWords.hourScheduled', 'hour scheduled'),
+    t('login.rotatingWords.hourScheduled', 'drop'),
     t('login.rotatingWords.employeePerformance', "employee's performance level")
   ];
 
@@ -222,7 +222,7 @@ export default function Login() {
         <p className="text-base md:text-lg max-w-xl mb-8" style={{ color: '#3B3B3B' }}>
           {t('login.hero.description', 'You track every')}{" "}
           <span 
-            className="inline-block font-semibold transition-all duration-300 opacity-100 translate-y-0 text-[#A3320B]"
+            className="inline-block transition-all duration-300 opacity-100 translate-y-0 text-[#3B3B3B] font-bold"
           >
             {rotatingWords[currentWordIndex]}
           </span>
