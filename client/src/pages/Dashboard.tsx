@@ -1883,16 +1883,6 @@ export default function Dashboard() {
       borderColor: "#06b6d4",
     },
     {
-      id: "my-logged-hours",
-      label: t('dashboard.cards.myLoggedHours.label', 'My Logged Hours'),
-      description: t('dashboard.cards.myLoggedHours.description', 'IRATA logbook'),
-      icon: "assignment",
-      onClick: () => setLocation("/my-logged-hours"),
-      testId: "button-my-logged-hours",
-      isVisible: () => true, // Everyone - all technicians can view their own hours
-      borderColor: "#8b5cf6",
-    },
-    {
       id: "past-projects",
       label: t('dashboard.cards.pastProjects.label', 'Past Projects'),
       description: t('dashboard.cards.pastProjects.description', 'Completed work'),
