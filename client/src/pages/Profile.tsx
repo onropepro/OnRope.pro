@@ -1632,6 +1632,24 @@ export default function Profile() {
         </Card>
 
               <Separator />
+
+              {/* My Logged Hours - IRATA Logbook */}
+              <Card className="hover-elevate active-elevate-2 cursor-pointer" onClick={() => setLocation("/my-logged-hours")} data-testid="card-my-logged-hours">
+                <CardHeader>
+                  <div className="flex items-center gap-4">
+                    <div className="p-3 bg-violet-500/10 rounded-xl">
+                      <span className="material-icons text-violet-500">assignment</span>
+                    </div>
+                    <div className="flex-1">
+                      <CardTitle className="text-lg">{t('dashboard.cards.myLoggedHours.label', 'My Logged Hours')}</CardTitle>
+                      <CardDescription>{t('dashboard.cards.myLoggedHours.description', 'IRATA logbook')}</CardDescription>
+                    </div>
+                    <span className="material-icons text-muted-foreground">chevron_right</span>
+                  </div>
+                </CardHeader>
+              </Card>
+              
+              <Separator />
               
               {/* Language Preference */}
               <LanguagePreferenceCard />
