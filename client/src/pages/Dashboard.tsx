@@ -1973,6 +1973,16 @@ export default function Dashboard() {
       borderColor: "#22c55e",
     },
     {
+      id: "quotes",
+      label: t('dashboard.cards.quotes.label', 'Quotes'),
+      description: t('dashboard.cards.quotes.description', 'Service quotes'),
+      icon: "request_quote",
+      onClick: () => setLocation("/quotes"),
+      testId: "button-quotes",
+      isVisible: (user: any) => hasFinancialAccess(user), // Financial permission required
+      borderColor: "#16a34a",
+    },
+    {
       id: "schedule",
       label: t('dashboard.cards.schedule.label', 'Job Schedule'),
       description: t('dashboard.cards.schedule.description', 'Team assignments'),
