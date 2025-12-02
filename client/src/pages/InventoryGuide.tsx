@@ -17,7 +17,10 @@ import {
   Shield,
   Zap,
   ChevronRight,
-  Plus
+  Plus,
+  ArrowRight,
+  UserCheck,
+  LogIn
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -270,6 +273,96 @@ export default function InventoryGuide() {
                 <p className="text-xs font-semibold">Best for: Employee choice and flexibility</p>
               </CardContent>
             </Card>
+          </div>
+        </section>
+
+        <Separator />
+
+        {/* Customer Journey Visualization */}
+        <section className="space-y-4">
+          <h2 className="text-xl font-bold flex items-center gap-2">
+            <LogIn className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
+            Customer Journey
+          </h2>
+
+          <div className="space-y-6">
+            {/* Manager Journey */}
+            <div className="space-y-3">
+              <h3 className="font-semibold text-sm text-green-700 dark:text-green-300">Manager Journey</h3>
+              <div className="bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-950 dark:to-emerald-950 rounded-lg p-6 border border-green-200 dark:border-green-800">
+                <div className="flex flex-col md:flex-row items-start md:items-center gap-3 md:gap-0">
+                  {/* Step 1 */}
+                  <div className="flex flex-col items-center gap-2 flex-1">
+                    <div className="bg-green-600 text-white rounded-full w-12 h-12 flex items-center justify-center font-bold">1</div>
+                    <div className="text-center text-sm">
+                      <p className="font-semibold">Add Gear</p>
+                      <p className="text-xs text-muted-foreground">Create inventory items</p>
+                    </div>
+                  </div>
+
+                  <ArrowRight className="h-5 w-5 text-green-600 dark:text-green-400 md:mx-2 rotate-90 md:rotate-0" />
+
+                  {/* Step 2 */}
+                  <div className="flex flex-col items-center gap-2 flex-1">
+                    <div className="bg-green-600 text-white rounded-full w-12 h-12 flex items-center justify-center font-bold">2</div>
+                    <div className="text-center text-sm">
+                      <p className="font-semibold">Assign to Employees</p>
+                      <p className="text-xs text-muted-foreground">Distribute with control</p>
+                    </div>
+                  </div>
+
+                  <ArrowRight className="h-5 w-5 text-green-600 dark:text-green-400 md:mx-2 rotate-90 md:rotate-0" />
+
+                  {/* Step 3 */}
+                  <div className="flex flex-col items-center gap-2 flex-1">
+                    <div className="bg-green-600 text-white rounded-full w-12 h-12 flex items-center justify-center font-bold">3</div>
+                    <div className="text-center text-sm">
+                      <p className="font-semibold">Monitor & Track</p>
+                      <p className="text-xs text-muted-foreground">View real-time status</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Employee Journey */}
+            <div className="space-y-3">
+              <h3 className="font-semibold text-sm text-blue-700 dark:text-blue-300">Employee Journey</h3>
+              <div className="bg-gradient-to-r from-blue-50 to-cyan-50 dark:from-blue-950 dark:to-cyan-950 rounded-lg p-6 border border-blue-200 dark:border-blue-800">
+                <div className="flex flex-col md:flex-row items-start md:items-center gap-3 md:gap-0">
+                  {/* Step 1 */}
+                  <div className="flex flex-col items-center gap-2 flex-1">
+                    <div className="bg-blue-600 text-white rounded-full w-12 h-12 flex items-center justify-center font-bold">1</div>
+                    <div className="text-center text-sm">
+                      <p className="font-semibold">View Available</p>
+                      <p className="text-xs text-muted-foreground">Browse inventory</p>
+                    </div>
+                  </div>
+
+                  <ArrowRight className="h-5 w-5 text-blue-600 dark:text-blue-400 md:mx-2 rotate-90 md:rotate-0" />
+
+                  {/* Step 2 */}
+                  <div className="flex flex-col items-center gap-2 flex-1">
+                    <div className="bg-blue-600 text-white rounded-full w-12 h-12 flex items-center justify-center font-bold">2</div>
+                    <div className="text-center text-sm">
+                      <p className="font-semibold">Self-Assign Gear</p>
+                      <p className="text-xs text-muted-foreground">Pick your equipment</p>
+                    </div>
+                  </div>
+
+                  <ArrowRight className="h-5 w-5 text-blue-600 dark:text-blue-400 md:mx-2 rotate-90 md:rotate-0" />
+
+                  {/* Step 3 */}
+                  <div className="flex flex-col items-center gap-2 flex-1">
+                    <div className="bg-blue-600 text-white rounded-full w-12 h-12 flex items-center justify-center font-bold">3</div>
+                    <div className="text-center text-sm">
+                      <p className="font-semibold">View My Gear</p>
+                      <p className="text-xs text-muted-foreground">Manage assignments</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </section>
 
