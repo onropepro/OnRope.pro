@@ -224,7 +224,7 @@ function Router() {
         </ProtectedRoute>
       </Route>
       <Route path="/changelog" component={Changelog} />
-      <Route path="/inventory-guide" component={InventoryGuide} />
+      <Route path="/changelog/inventory" component={InventoryGuide} />
       <Route path="/roi-calculator" component={ROICalculator} />
       <Route component={NotFound} />
     </Switch>
