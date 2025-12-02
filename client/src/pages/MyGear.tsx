@@ -117,7 +117,7 @@ export default function MyGear() {
 
   // Self-assign gear mutation
   const assignGearMutation = useMutation({
-    mutationFn: async (data: { gearItemId: string; quantity: number }) => {
+    mutationFn: async (data: { gearItemId: string; quantity: number; serialNumber?: string }) => {
       return apiRequest("POST", "/api/gear-assignments/self", data);
     },
     onSuccess: () => {
