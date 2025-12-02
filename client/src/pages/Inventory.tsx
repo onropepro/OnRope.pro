@@ -72,7 +72,7 @@ export default function Inventory() {
   
   // Assignment dialog state
   const [showAssignDialog, setShowAssignDialog] = useState(false);
-  const [managingItem, setManagingItem] = useState<GearItem | null>(null);
+  const [managingItem, setManagingItem] = useState<(GearItem & { serialNumbers: string[], assignedQuantity: number, availableQuantity: number }) | null>(null);
   const [assignEmployeeId, setAssignEmployeeId] = useState<string>("");
   const [assignQuantity, setAssignQuantity] = useState<string>("1");
   const [assignSerialNumber, setAssignSerialNumber] = useState<string>("");
@@ -190,34 +190,6 @@ export default function Inventory() {
   // Fetch active employees for dropdown
   const { data: employeesData } = useQuery<{ employees: any[] }>({
     queryKey: ["/api/employees"],
-  });
-  
-  // Fetch serial numbers for selected self-assign item
-  const { data: serialNumbersData } = useQuery<{ serialNumbers: any[] }>({
-    queryKey: ["/api/gear-items", selfAssignItem?.id, "serial-numbers"],
-    queryFn: async () => {
-      if (!selfAssignItem?.id) return { serialNumbers: [] };
-      const response = await fetch(`/api/gear-items/${selfAssignItem.id}/serial-numbers`, {
-        credentials: 'include',
-      });
-      if (!response.ok) return { serialNumbers: [] };
-      return response.json();
-    },
-    enabled: !!selfAssignItem?.id,
-  });
-  
-  // Fetch serial numbers for manager assign dialog item
-  const { data: assignSerialNumbersData } = useQuery<{ serialNumbers: any[] }>({
-    queryKey: ["/api/gear-items", managingItem?.id, "serial-numbers"],
-    queryFn: async () => {
-      if (!managingItem?.id) return { serialNumbers: [] };
-      const response = await fetch(`/api/gear-items/${managingItem.id}/serial-numbers`, {
-        credentials: 'include',
-      });
-      if (!response.ok) return { serialNumbers: [] };
-      return response.json();
-    },
-    enabled: !!managingItem?.id,
   });
 
   // Fetch equipment damage reports
@@ -488,9 +460,19 @@ export default function Inventory() {
   // Get available serial numbers for manager assign dialog
   const getAvailableSerialNumbersForAssign = () => {
     if (!managingItem) return [];
-    const allSerials = assignSerialNumbersData?.serialNumbers || [];
-    // Filter to only show serial numbers that are NOT assigned to anyone
-    return allSerials.filter(s => !s.isAssigned);
+    // Use serialNumbers directly from the item (backend provides array of unassigned serial strings)
+    const serials = managingItem.serialNumbers || [];
+    // Convert strings to objects for compatibility with existing UI
+    if (Array.isArray(serials) && serials.length > 0) {
+      return serials.map((serialNumber: string) => ({
+        id: serialNumber,
+        serialNumber,
+        dateOfManufacture: "",
+        dateInService: "",
+        isAssigned: false
+      }));
+    }
+    return [];
   };
   
   // Helper function to calculate available quantity for an item
@@ -1001,7 +983,7 @@ export default function Inventory() {
     setShowEditDialog(true);
   };
 
-  const openAssignDialog = (item: GearItem) => {
+  const openAssignDialog = (item: any) => {
     // All employees can self-assign gear (for "My Kit" functionality)
     // The assign dialog will restrict to self-only if user doesn't have assign_gear permission
     
