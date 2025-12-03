@@ -42,6 +42,43 @@ The platform is built with a React 18 frontend using TypeScript and Wouter for r
 *   **Dialog/Modal Width:** All major form dialogs and modals should use `max-w-4xl` for consistent sizing across the application. This provides ample space for forms, reduces scrolling, and maintains a professional appearance.
 *   **Grid Layouts in Dialogs:** When displaying selectable options (like job types), use `grid-cols-4 sm:grid-cols-6` to maximize use of the wider dialog space.
 
+## Mandatory Date/Time Handling (CRITICAL)
+
+**All date/time operations MUST use timezone-safe utilities from `client/src/lib/dateUtils.ts`.**
+
+This is essential for accurate payroll, scheduling, performance tracking, and financial calculations.
+
+### NEVER USE:
+```typescript
+// WRONG - causes off-by-one-day bugs in timezones west of UTC
+new Date("2025-01-15").toLocaleDateString()  // Bug: Shows Jan 14!
+```
+
+### ALWAYS USE:
+```typescript
+import { formatLocalDate, formatLocalDateLong, formatDateTime, formatTimestampDate, parseLocalDate, toLocalDateString } from "@/lib/dateUtils";
+
+// Display dates in UI:
+formatLocalDate("2025-01-15")       // "1/15/2025" - short format
+formatLocalDateLong("2025-01-15")   // "Wednesday, January 15, 2025" - full format
+formatDateTime(timestampValue)       // "Jan 15, 2025, 2:30 PM" - timestamps with time
+
+// Parse dates correctly:
+parseLocalDate("2025-01-15")        // Returns Date at LOCAL midnight
+toLocalDateString(date)             // Returns "2025-01-15" in local timezone
+
+// For PDF filename dates:
+formatLocalDate(date).replace(/\//g, '-')  // "1-15-2025"
+```
+
+### Why This Matters:
+- `new Date("2025-01-15")` parses as midnight UTC
+- In Pacific timezone (UTC-8), this shows as Jan 14 at 4pm
+- Results in wrong dates on payroll, schedules, quotes, and safety documents
+
+### File Location: `client/src/lib/dateUtils.ts`
+Contains all timezone-safe parsing and formatting utilities.
+
 ## External Dependencies
 
 *   **Database:** PostgreSQL
