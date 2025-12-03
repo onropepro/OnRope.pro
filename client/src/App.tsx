@@ -53,6 +53,10 @@ import IRATALoggingGuide from "@/pages/IRATALoggingGuide";
 import DocumentManagementGuide from "@/pages/DocumentManagementGuide";
 import EmployeeManagementGuide from "@/pages/EmployeeManagementGuide";
 import SchedulingGuide from "@/pages/SchedulingGuide";
+import QuotingGuide from "@/pages/QuotingGuide";
+import CRMGuide from "@/pages/CRMGuide";
+import ResidentPortalGuide from "@/pages/ResidentPortalGuide";
+import BrandingGuide from "@/pages/BrandingGuide";
 import Pricing from "@/pages/Pricing";
 import ROICalculator from "@/pages/ROICalculator";
 import NotFound from "@/pages/not-found";
@@ -242,6 +246,10 @@ function Router() {
       <Route path="/changelog/documents" component={DocumentManagementGuide} />
       <Route path="/changelog/employees" component={EmployeeManagementGuide} />
       <Route path="/changelog/scheduling" component={SchedulingGuide} />
+      <Route path="/changelog/quoting" component={QuotingGuide} />
+      <Route path="/changelog/crm" component={CRMGuide} />
+      <Route path="/changelog/resident-portal" component={ResidentPortalGuide} />
+      <Route path="/changelog/branding" component={BrandingGuide} />
       <Route path="/changelog/pricing" component={Pricing} />
       <Route path="/roi-calculator" component={ROICalculator} />
       <Route component={NotFound} />

@@ -247,6 +247,10 @@ const pagesData: PageCategory[] = [
       { name: "Document Management Guide", path: "/changelog/documents", description: "Document storage and compliance tracking", roles: ["Public"] },
       { name: "Employee Management Guide", path: "/changelog/employees", description: "Workforce administration and certifications", roles: ["Public"] },
       { name: "Scheduling Guide", path: "/changelog/scheduling", description: "Calendar and time-off management", roles: ["Public"] },
+      { name: "Quoting Guide", path: "/changelog/quoting", description: "Sales pipeline and quote creation", roles: ["Public"] },
+      { name: "CRM Guide", path: "/changelog/crm", description: "Client relationship management", roles: ["Public"] },
+      { name: "Resident Portal Guide", path: "/changelog/resident-portal", description: "Resident communication and complaints", roles: ["Public"] },
+      { name: "Branding Guide", path: "/changelog/branding", description: "White-label customization", roles: ["Public"] },
     ]
   },
   {
@@ -996,6 +1000,10 @@ export default function Changelog() {
             const isDocumentSection = section.title === "Document Management";
             const isEmployeeSection = section.title === "Employee Management";
             const isSchedulingSection = section.title === "Scheduling & Time-Off Management";
+            const isQuotingSection = section.title === "Quoting & Sales Pipeline";
+            const isCRMSection = section.title === "Client Relationship Management";
+            const isResidentPortalSection = section.title === "Resident Portal";
+            const isBrandingSection = section.title === "White-Label Branding";
             return (
               <Card key={index} className="overflow-hidden">
                 <CardHeader className="pb-3">
@@ -1074,6 +1082,38 @@ export default function Changelog() {
                         {isSchedulingSection && (
                           <Link href="/changelog/scheduling">
                             <Button variant="outline" size="sm" className="text-xs" data-testid="link-scheduling-guide">
+                              View Guide
+                              <ExternalLink className="h-3 w-3 ml-1" />
+                            </Button>
+                          </Link>
+                        )}
+                        {isQuotingSection && (
+                          <Link href="/changelog/quoting">
+                            <Button variant="outline" size="sm" className="text-xs" data-testid="link-quoting-guide">
+                              View Guide
+                              <ExternalLink className="h-3 w-3 ml-1" />
+                            </Button>
+                          </Link>
+                        )}
+                        {isCRMSection && (
+                          <Link href="/changelog/crm">
+                            <Button variant="outline" size="sm" className="text-xs" data-testid="link-crm-guide">
+                              View Guide
+                              <ExternalLink className="h-3 w-3 ml-1" />
+                            </Button>
+                          </Link>
+                        )}
+                        {isResidentPortalSection && (
+                          <Link href="/changelog/resident-portal">
+                            <Button variant="outline" size="sm" className="text-xs" data-testid="link-resident-portal-guide">
+                              View Guide
+                              <ExternalLink className="h-3 w-3 ml-1" />
+                            </Button>
+                          </Link>
+                        )}
+                        {isBrandingSection && (
+                          <Link href="/changelog/branding">
+                            <Button variant="outline" size="sm" className="text-xs" data-testid="link-branding-guide">
                               View Guide
                               <ExternalLink className="h-3 w-3 ml-1" />
                             </Button>
