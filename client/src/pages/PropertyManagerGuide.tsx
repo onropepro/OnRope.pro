@@ -117,6 +117,44 @@ export default function PropertyManagerGuide() {
 
         <Separator />
 
+        {/* Problems Solved */}
+        <section className="space-y-4">
+          <Card className="border border-green-200 dark:border-green-900 bg-green-50/50 dark:bg-green-950/50">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-lg flex items-center gap-2 text-green-900 dark:text-green-100">
+                <CheckCircle2 className="w-5 h-5" />
+                Problems Solved
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="text-green-900 dark:text-green-100">
+              <ul className="space-y-2 text-sm">
+                <li className="flex items-start gap-2">
+                  <CheckCircle2 className="w-4 h-4 mt-0.5 shrink-0" />
+                  <span><strong>Vendor safety verification:</strong> Company Safety Rating (CSR) provides transparent compliance metrics</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <CheckCircle2 className="w-4 h-4 mt-0.5 shrink-0" />
+                  <span><strong>Scattered vendor information:</strong> Centralized "My Vendors" dashboard aggregates all contractor details</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <CheckCircle2 className="w-4 h-4 mt-0.5 shrink-0" />
+                  <span><strong>Audit evidence collection:</strong> Read-only access provides documentation without edit risk</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <CheckCircle2 className="w-4 h-4 mt-0.5 shrink-0" />
+                  <span><strong>Liability concerns:</strong> CSR breakdown shows specific compliance categories and penalties</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <CheckCircle2 className="w-4 h-4 mt-0.5 shrink-0" />
+                  <span><strong>Access control:</strong> Strict role-based linking ensures managers only see authorized vendors</span>
+                </li>
+              </ul>
+            </CardContent>
+          </Card>
+        </section>
+
+        <Separator />
+
         <section className="space-y-4">
           <h2 className="text-xl font-bold flex items-center gap-2">
             <Layers className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />

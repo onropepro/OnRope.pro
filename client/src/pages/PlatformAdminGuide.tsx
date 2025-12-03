@@ -117,6 +117,44 @@ export default function PlatformAdminGuide() {
 
         <Separator />
 
+        {/* Problems Solved */}
+        <section className="space-y-4">
+          <Card className="border border-green-200 dark:border-green-900 bg-green-50/50 dark:bg-green-950/50">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-lg flex items-center gap-2 text-green-900 dark:text-green-100">
+                <CheckCircle2 className="w-5 h-5" />
+                Problems Solved
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="text-green-900 dark:text-green-100">
+              <ul className="space-y-2 text-sm">
+                <li className="flex items-start gap-2">
+                  <CheckCircle2 className="w-4 h-4 mt-0.5 shrink-0" />
+                  <span><strong>Platform oversight gaps:</strong> SuperUser dashboard provides centralized visibility into all registered companies</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <CheckCircle2 className="w-4 h-4 mt-0.5 shrink-0" />
+                  <span><strong>License enforcement:</strong> Tier-based limits on projects and seats enforced automatically</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <CheckCircle2 className="w-4 h-4 mt-0.5 shrink-0" />
+                  <span><strong>Support debugging:</strong> "View as Company" impersonation mode enables safe troubleshooting</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <CheckCircle2 className="w-4 h-4 mt-0.5 shrink-0" />
+                  <span><strong>Subscription tracking:</strong> Real-time status monitoring for billing and renewals</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <CheckCircle2 className="w-4 h-4 mt-0.5 shrink-0" />
+                  <span><strong>Multi-tenant isolation:</strong> Clear separation between platform admin and company data</span>
+                </li>
+              </ul>
+            </CardContent>
+          </Card>
+        </section>
+
+        <Separator />
+
         <section className="space-y-4">
           <h2 className="text-xl font-bold flex items-center gap-2">
             <Layers className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
