@@ -251,6 +251,11 @@ const pagesData: PageCategory[] = [
       { name: "CRM Guide", path: "/changelog/crm", description: "Client relationship management", roles: ["Public"] },
       { name: "Resident Portal Guide", path: "/changelog/resident-portal", description: "Resident communication and complaints", roles: ["Public"] },
       { name: "Branding Guide", path: "/changelog/branding", description: "White-label customization", roles: ["Public"] },
+      { name: "Platform Administration Guide", path: "/changelog/platform-admin", description: "SuperUser management and metrics", roles: ["Public"] },
+      { name: "Analytics & Reporting Guide", path: "/changelog/analytics", description: "Business intelligence and reports", roles: ["Public"] },
+      { name: "Multi-Language Guide", path: "/changelog/language", description: "Internationalization and localization", roles: ["Public"] },
+      { name: "GPS & Location Guide", path: "/changelog/gps", description: "Location tracking and verification", roles: ["Public"] },
+      { name: "Property Manager Guide", path: "/changelog/property-manager", description: "Vendor management interface", roles: ["Public"] },
     ]
   },
   {
@@ -1004,6 +1009,11 @@ export default function Changelog() {
             const isCRMSection = section.title === "Client Relationship Management";
             const isResidentPortalSection = section.title === "Resident Portal";
             const isBrandingSection = section.title === "White-Label Branding";
+            const isPlatformAdminSection = section.title === "Platform Administration & Metrics";
+            const isAnalyticsSection = section.title === "Analytics & Reporting";
+            const isLanguageSection = section.title === "Multi-Language Support";
+            const isGPSSection = section.title === "GPS & Location Services";
+            const isPropertyManagerSection = section.title === "Property Manager Interface";
             return (
               <Card key={index} className="overflow-hidden">
                 <CardHeader className="pb-3">
@@ -1114,6 +1124,46 @@ export default function Changelog() {
                         {isBrandingSection && (
                           <Link href="/changelog/branding">
                             <Button variant="outline" size="sm" className="text-xs" data-testid="link-branding-guide">
+                              View Guide
+                              <ExternalLink className="h-3 w-3 ml-1" />
+                            </Button>
+                          </Link>
+                        )}
+                        {isPlatformAdminSection && (
+                          <Link href="/changelog/platform-admin">
+                            <Button variant="outline" size="sm" className="text-xs" data-testid="link-platform-admin-guide">
+                              View Guide
+                              <ExternalLink className="h-3 w-3 ml-1" />
+                            </Button>
+                          </Link>
+                        )}
+                        {isAnalyticsSection && (
+                          <Link href="/changelog/analytics">
+                            <Button variant="outline" size="sm" className="text-xs" data-testid="link-analytics-guide">
+                              View Guide
+                              <ExternalLink className="h-3 w-3 ml-1" />
+                            </Button>
+                          </Link>
+                        )}
+                        {isLanguageSection && (
+                          <Link href="/changelog/language">
+                            <Button variant="outline" size="sm" className="text-xs" data-testid="link-language-guide">
+                              View Guide
+                              <ExternalLink className="h-3 w-3 ml-1" />
+                            </Button>
+                          </Link>
+                        )}
+                        {isGPSSection && (
+                          <Link href="/changelog/gps">
+                            <Button variant="outline" size="sm" className="text-xs" data-testid="link-gps-guide">
+                              View Guide
+                              <ExternalLink className="h-3 w-3 ml-1" />
+                            </Button>
+                          </Link>
+                        )}
+                        {isPropertyManagerSection && (
+                          <Link href="/changelog/property-manager">
+                            <Button variant="outline" size="sm" className="text-xs" data-testid="link-property-manager-guide">
                               View Guide
                               <ExternalLink className="h-3 w-3 ml-1" />
                             </Button>

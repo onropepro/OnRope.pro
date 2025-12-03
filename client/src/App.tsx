@@ -57,6 +57,11 @@ import QuotingGuide from "@/pages/QuotingGuide";
 import CRMGuide from "@/pages/CRMGuide";
 import ResidentPortalGuide from "@/pages/ResidentPortalGuide";
 import BrandingGuide from "@/pages/BrandingGuide";
+import PlatformAdminGuide from "@/pages/PlatformAdminGuide";
+import AnalyticsGuide from "@/pages/AnalyticsGuide";
+import LanguageGuide from "@/pages/LanguageGuide";
+import GPSGuide from "@/pages/GPSGuide";
+import PropertyManagerGuide from "@/pages/PropertyManagerGuide";
 import Pricing from "@/pages/Pricing";
 import ROICalculator from "@/pages/ROICalculator";
 import NotFound from "@/pages/not-found";
@@ -250,6 +255,11 @@ function Router() {
       <Route path="/changelog/crm" component={CRMGuide} />
       <Route path="/changelog/resident-portal" component={ResidentPortalGuide} />
       <Route path="/changelog/branding" component={BrandingGuide} />
+      <Route path="/changelog/platform-admin" component={PlatformAdminGuide} />
+      <Route path="/changelog/analytics" component={AnalyticsGuide} />
+      <Route path="/changelog/language" component={LanguageGuide} />
+      <Route path="/changelog/gps" component={GPSGuide} />
+      <Route path="/changelog/property-manager" component={PropertyManagerGuide} />
       <Route path="/changelog/pricing" component={Pricing} />
       <Route path="/roi-calculator" component={ROICalculator} />
       <Route component={NotFound} />
