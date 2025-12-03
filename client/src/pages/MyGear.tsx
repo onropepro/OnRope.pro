@@ -11,6 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { queryClient, apiRequest } from "@/lib/queryClient";
+import { formatLocalDate } from "@/lib/dateUtils";
 
 const EQUIPMENT_ICONS: Record<string, string> = {
   Harness: "security",
@@ -340,7 +341,7 @@ export default function MyGear() {
                           <div>
                             <span className="text-muted-foreground">{t('myGear.manufactured', 'Manufactured:')}</span>
                             <div className="font-medium mt-0.5">
-                              {new Date(item.assignedDateOfManufacture || item.dateOfManufacture).toLocaleDateString()}
+                              {formatLocalDate(item.assignedDateOfManufacture || item.dateOfManufacture)}
                             </div>
                           </div>
                         )}
@@ -348,7 +349,7 @@ export default function MyGear() {
                           <div>
                             <span className="text-muted-foreground">{t('myGear.inService', 'In Service:')}</span>
                             <div className="font-medium mt-0.5">
-                              {new Date(item.assignedDateInService || item.dateInService).toLocaleDateString()}
+                              {formatLocalDate(item.assignedDateInService || item.dateInService)}
                             </div>
                           </div>
                         )}
@@ -356,7 +357,7 @@ export default function MyGear() {
                           <div>
                             <span className="text-muted-foreground">{t('myGear.outOfServiceDate', 'Out of Service:')}</span>
                             <div className="font-medium mt-0.5">
-                              {new Date(item.dateOutOfService).toLocaleDateString()}
+                              {formatLocalDate(item.dateOutOfService)}
                             </div>
                           </div>
                         )}

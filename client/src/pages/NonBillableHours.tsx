@@ -10,6 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { useTranslation } from "react-i18next";
+import { formatDateTime } from "@/lib/dateUtils";
 
 export default function NonBillableHours() {
   const { t } = useTranslation();
@@ -161,7 +162,7 @@ export default function NonBillableHours() {
               <div className="space-y-3">
                 <div className="flex items-center gap-2 text-sm text-muted-foreground">
                   <span className="material-icons text-base">today</span>
-                  <span>{t('nonBillable.started', 'Started')}: {new Date(activeSession.startTime).toLocaleString()}</span>
+                  <span>{t('nonBillable.started', 'Started')}: {formatDateTime(activeSession.startTime)}</span>
                 </div>
                 
                 <Button

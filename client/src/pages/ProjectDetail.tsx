@@ -30,7 +30,7 @@ import { useState, useEffect } from "react";
 import { format } from "date-fns";
 import { fr, enUS } from "date-fns/locale";
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from "recharts";
-import { parseLocalDate } from "@/lib/dateUtils";
+import { parseLocalDate, formatTimestampDate } from "@/lib/dateUtils";
 import type { Project } from "@shared/schema";
 import { IRATA_TASK_TYPES } from "@shared/schema";
 import { useForm } from "react-hook-form";
@@ -2158,7 +2158,7 @@ export default function ProjectDetail() {
                             </div>
                           )}
                           <div className="text-xs text-muted-foreground">
-                            {new Date(complaint.createdAt).toLocaleDateString()}
+                            {formatTimestampDate(complaint.createdAt)}
                           </div>
                         </CardContent>
                       </Card>

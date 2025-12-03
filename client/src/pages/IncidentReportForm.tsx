@@ -19,6 +19,7 @@ import { apiRequest, queryClient } from "@/lib/queryClient";
 import { ArrowLeft, AlertTriangle, PenTool, Plus, X, Trash2 } from "lucide-react";
 import type { Project } from "@shared/schema";
 import SignatureCanvas from "react-signature-canvas";
+import { formatLocalDate } from "@/lib/dateUtils";
 
 const personInvolvedSchema = z.object({
   name: z.string().min(1, "Name is required"),
@@ -649,7 +650,7 @@ export default function IncidentReportForm() {
                         <div className="flex-1">
                           <div className="font-medium">{action.action}</div>
                           <div className="text-sm text-muted-foreground">
-                            {t('incidentReport.correctiveActions.assignedTo', 'Assigned to')}: {action.assignedTo} • {t('incidentReport.correctiveActions.due', 'Due')}: {new Date(action.dueDate).toLocaleDateString()}
+                            {t('incidentReport.correctiveActions.assignedTo', 'Assigned to')}: {action.assignedTo} • {t('incidentReport.correctiveActions.due', 'Due')}: {formatLocalDate(action.dueDate)}
                           </div>
                           <Badge variant="secondary" className="mt-1">
                             {action.status}

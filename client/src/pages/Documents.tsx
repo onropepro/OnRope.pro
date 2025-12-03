@@ -23,7 +23,7 @@ import { apiRequest, queryClient } from "@/lib/queryClient";
 import { jsPDF } from "jspdf";
 import JSZip from "jszip";
 import { downloadMethodStatement } from "@/pages/MethodStatementForm";
-import { formatLocalDate, formatLocalDateLong, formatLocalDateMedium, parseLocalDate } from "@/lib/dateUtils";
+import { formatLocalDate, formatLocalDateLong, formatLocalDateMedium, parseLocalDate, formatTimestampDate, formatLocalDateShort } from "@/lib/dateUtils";
 import { format } from "date-fns";
 import { DocumentReviews } from "@/components/DocumentReviews";
 import SignatureCanvas from 'react-signature-canvas';
@@ -2186,11 +2186,7 @@ function groupDocumentsByDate<T>(
         days.push({
           day,
           date: localDateStr,
-          formattedDate: new Date(year, month, day).toLocaleDateString('en-US', { 
-            weekday: 'short', 
-            month: 'short', 
-            day: 'numeric' 
-          }),
+          formattedDate: formatLocalDateShort(localDateStr),
           items: dayItems
         });
       }
@@ -3090,12 +3086,7 @@ export default function Documents() {
 
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(10);
-    doc.text(`Date: ${new Date(flha.assessmentDate).toLocaleDateString('en-US', {
-      weekday: 'long',
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    })}`, 20, yPosition);
+    doc.text(`Date: ${formatLocalDateLong(flha.assessmentDate)}`, 20, yPosition);
     yPosition += 6;
 
     doc.text(`Assessor: ${flha.assessorName}`, 20, yPosition);
@@ -3366,12 +3357,7 @@ export default function Documents() {
 
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(10);
-    doc.text(`Inspection Date: ${new Date(inspection.inspectionDate).toLocaleDateString('en-US', {
-      weekday: 'long',
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    })}`, 20, yPosition);
+    doc.text(`Inspection Date: ${formatLocalDateLong(inspection.inspectionDate)}`, 20, yPosition);
     yPosition += 6;
 
     doc.text(`Inspector: ${inspection.inspectorName}`, 20, yPosition);
@@ -3661,12 +3647,7 @@ export default function Documents() {
 
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(10);
-    doc.text(`Date: ${new Date(report.incidentDate).toLocaleDateString('en-US', {
-      weekday: 'long',
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    })}`, 20, yPosition);
+    doc.text(`Date: ${formatLocalDateLong(report.incidentDate)}`, 20, yPosition);
     yPosition += 6;
 
     doc.text(`Time: ${report.incidentTime || 'N/A'}`, 20, yPosition);
@@ -3683,7 +3664,7 @@ export default function Documents() {
     doc.text(`Reported By: ${report.reportedByName}`, 20, yPosition);
     yPosition += 6;
 
-    doc.text(`Report Date: ${new Date(report.reportDate).toLocaleDateString()}`, 20, yPosition);
+    doc.text(`Report Date: ${formatLocalDate(report.reportDate)}`, 20, yPosition);
     yPosition += 10;
 
     // Description
@@ -3837,7 +3818,7 @@ export default function Documents() {
 
         doc.text(`Assigned To: ${action.assignedTo}`, 30, yPosition);
         yPosition += 5;
-        doc.text(`Due Date: ${new Date(action.dueDate).toLocaleDateString()}`, 30, yPosition);
+        doc.text(`Due Date: ${formatLocalDate(action.dueDate)}`, 30, yPosition);
         yPosition += 5;
         doc.text(`Status: ${action.status}`, 30, yPosition);
         yPosition += 8;
@@ -3860,7 +3841,7 @@ export default function Documents() {
       yPosition += 6;
 
       if (report.regulatorNotificationDate) {
-        doc.text(`Notification Date: ${new Date(report.regulatorNotificationDate).toLocaleDateString()}`, 20, yPosition);
+        doc.text(`Notification Date: ${formatLocalDate(report.regulatorNotificationDate)}`, 20, yPosition);
         yPosition += 6;
       }
 
@@ -3886,7 +3867,7 @@ export default function Documents() {
       doc.setFont('helvetica', 'normal');
       doc.text(`Reviewed By: ${report.supervisorReviewedBy || 'N/A'}`, 20, yPosition);
       yPosition += 6;
-      doc.text(`Review Date: ${new Date(report.supervisorReviewDate).toLocaleDateString()}`, 20, yPosition);
+      doc.text(`Review Date: ${formatLocalDate(report.supervisorReviewDate)}`, 20, yPosition);
       yPosition += 6;
 
       if (report.supervisorComments) {
@@ -3915,7 +3896,7 @@ export default function Documents() {
       doc.setFont('helvetica', 'normal');
       doc.text(`Reviewed By: ${report.managementReviewedBy || 'N/A'}`, 20, yPosition);
       yPosition += 6;
-      doc.text(`Review Date: ${new Date(report.managementReviewDate).toLocaleDateString()}`, 20, yPosition);
+      doc.text(`Review Date: ${formatLocalDate(report.managementReviewDate)}`, 20, yPosition);
       yPosition += 6;
 
       if (report.managementComments) {
@@ -4025,7 +4006,7 @@ export default function Documents() {
 
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(10);
-    doc.text(`Inspection Date: ${new Date(inspection.inspectionDate).toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}`, 20, yPosition);
+    doc.text(`Inspection Date: ${formatLocalDateLong(inspection.inspectionDate)}`, 20, yPosition);
     yPosition += 6;
     doc.text(`Inspector: ${inspection.inspectorName}`, 20, yPosition);
     yPosition += 6;
@@ -4192,7 +4173,7 @@ export default function Documents() {
 
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(10);
-    doc.text(`Date: ${new Date(flha.assessmentDate).toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}`, 20, yPosition);
+    doc.text(`Date: ${formatLocalDateLong(flha.assessmentDate)}`, 20, yPosition);
     yPosition += 6;
     doc.text(`Assessor: ${flha.assessorName}`, 20, yPosition);
     yPosition += 6;
@@ -4275,7 +4256,7 @@ export default function Documents() {
 
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(10);
-    doc.text(`Date: ${new Date(report.incidentDate).toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}`, 20, yPosition);
+    doc.text(`Date: ${formatLocalDateLong(report.incidentDate)}`, 20, yPosition);
     yPosition += 6;
     doc.text(`Time: ${report.incidentTime || 'N/A'}`, 20, yPosition);
     yPosition += 6;
@@ -4287,7 +4268,7 @@ export default function Documents() {
     }
     doc.text(`Reported By: ${report.reportedByName}`, 20, yPosition);
     yPosition += 6;
-    doc.text(`Report Date: ${new Date(report.reportDate).toLocaleDateString()}`, 20, yPosition);
+    doc.text(`Report Date: ${formatLocalDate(report.reportDate)}`, 20, yPosition);
     yPosition += 10;
 
     // Description
@@ -4359,7 +4340,7 @@ export default function Documents() {
     doc.setFontSize(10);
     doc.text(`Title: ${statement.title}`, 20, yPosition);
     yPosition += 6;
-    doc.text(`Date Created: ${new Date(statement.dateCreated).toLocaleDateString()}`, 20, yPosition);
+    doc.text(`Date Created: ${formatLocalDate(statement.dateCreated)}`, 20, yPosition);
     yPosition += 6;
     if (statement.projectName) {
       doc.text(`Project: ${statement.projectName}`, 20, yPosition);
@@ -4484,7 +4465,7 @@ export default function Documents() {
         <div class="info-grid">
             <div class="info-section">
                 <h3>Quote Information</h3>
-                <p><strong>Quote Date:</strong> ${quote.createdAt ? new Date(quote.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) : 'N/A'}</p>
+                <p><strong>Quote Date:</strong> ${quote.createdAt ? formatLocalDateMedium(quote.createdAt) : 'N/A'}</p>
                 <p><strong>Quote Number:</strong> ${quote.strataPlanNumber}</p>
                 <p><strong>Status:</strong> ${quote.status.toUpperCase()}</p>
             </div>
@@ -4617,9 +4598,7 @@ export default function Documents() {
       yPos += 5;
       
       doc.setFontSize(9);
-      doc.text(`Generated: ${new Date(data.generatedAt).toLocaleDateString('en-US', { 
-        year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' 
-      })}`, pageWidth / 2, yPos, { align: 'center' });
+      doc.text(`Generated: ${formatLocalDateLong(data.generatedAt)}`, pageWidth / 2, yPos, { align: 'center' });
       doc.setTextColor(0, 0, 0);
       yPos += 12;
       
@@ -4734,7 +4713,7 @@ export default function Documents() {
           
           // Status text
           const statusText = docItem.status === 'signed' 
-            ? `Signed ${new Date(docItem.signedAt).toLocaleDateString()}` 
+            ? `Signed ${formatTimestampDate(docItem.signedAt)}` 
             : docItem.status === 'viewed' ? 'Viewed' : 'Pending';
           doc.setFontSize(6);
           doc.setTextColor(100, 100, 100);
@@ -5990,7 +5969,7 @@ export default function Documents() {
                             <div className="min-w-0">
                               <p className="font-medium text-sm truncate">{doc.fileName}</p>
                               <p className="text-xs text-muted-foreground">
-                                Uploaded {new Date(doc.uploadedAt).toLocaleDateString()}
+                                Uploaded {formatTimestampDate(doc.uploadedAt)}
                               </p>
                             </div>
                           </div>

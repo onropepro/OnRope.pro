@@ -26,6 +26,7 @@ import {
   HardHat,
   ClipboardList,
 } from "lucide-react";
+import { formatTimestampDate, formatTime, formatLocalDate } from "@/lib/dateUtils";
 
 interface DashboardData {
   company: any;
@@ -291,7 +292,7 @@ export default function ViewAsCompany() {
                           <div>
                             <p className="font-medium">{session.employeeName}</p>
                             <p className="text-xs text-muted-foreground">
-                              Started: {new Date(session.clockInTime).toLocaleTimeString()}
+                              Started: {formatTime(session.clockInTime)}
                             </p>
                           </div>
                           <Badge variant="secondary" className="bg-emerald-500/10 text-emerald-600">
@@ -334,7 +335,7 @@ export default function ViewAsCompany() {
                               {quote.buildingName || quote.clientName || 'Unnamed Quote'}
                             </p>
                             <p className="text-xs text-muted-foreground">
-                              {quote.createdAt ? new Date(quote.createdAt).toLocaleDateString() : 'N/A'}
+                              {quote.createdAt ? formatTimestampDate(quote.createdAt) : 'N/A'}
                             </p>
                           </div>
                           <Badge variant="outline" className="capitalize">
@@ -415,7 +416,7 @@ export default function ViewAsCompany() {
                           </div>
                           <p className="text-xs text-muted-foreground mt-1">
                             {project.jobType?.replace(/_/g, ' ') || 'No job type'} | 
-                            {project.startDate ? ` Started: ${new Date(project.startDate).toLocaleDateString()}` : ' No start date'}
+                            {project.startDate ? ` Started: ${formatLocalDate(project.startDate)}` : ' No start date'}
                           </p>
                         </div>
                         <div className="flex items-center gap-2">
@@ -526,7 +527,7 @@ export default function ViewAsCompany() {
                           <div key={inspection.id} className="flex items-center justify-between p-2 bg-muted/50 rounded">
                             <span className="text-sm truncate">{inspection.inspectorName || 'Unknown'}</span>
                             <span className="text-xs text-muted-foreground">
-                              {inspection.inspectionDate ? new Date(inspection.inspectionDate).toLocaleDateString() : 'N/A'}
+                              {inspection.inspectionDate ? formatLocalDate(inspection.inspectionDate) : 'N/A'}
                             </span>
                           </div>
                         ))}
@@ -554,7 +555,7 @@ export default function ViewAsCompany() {
                           <div key={meeting.id} className="flex items-center justify-between p-2 bg-muted/50 rounded">
                             <span className="text-sm truncate">{meeting.topic || meeting.projectName || 'Meeting'}</span>
                             <span className="text-xs text-muted-foreground">
-                              {meeting.meetingDate ? new Date(meeting.meetingDate).toLocaleDateString() : 'N/A'}
+                              {meeting.meetingDate ? formatLocalDate(meeting.meetingDate) : 'N/A'}
                             </span>
                           </div>
                         ))}
@@ -582,7 +583,7 @@ export default function ViewAsCompany() {
                           <div key={form.id} className="flex items-center justify-between p-2 bg-muted/50 rounded">
                             <span className="text-sm truncate">{form.createdByName || 'Unknown'}</span>
                             <span className="text-xs text-muted-foreground">
-                              {form.assessmentDate ? new Date(form.assessmentDate).toLocaleDateString() : 'N/A'}
+                              {form.assessmentDate ? formatLocalDate(form.assessmentDate) : 'N/A'}
                             </span>
                           </div>
                         ))}

@@ -56,6 +56,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { DndContext, DragOverlay, useDraggable, useDroppable, closestCenter, type DragEndEvent } from '@dnd-kit/core';
 import { PieChart, Pie, Cell, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip as RechartsTooltip, Legend } from 'recharts';
+import { formatTimestampDate } from "@/lib/dateUtils";
 
 // Service types configuration
 const SERVICE_TYPES = [
@@ -1137,7 +1138,7 @@ export default function Quotes() {
                             <p>{quote.floorCount} {t('quotes.floors', 'floors')}</p>
                             {quote.createdAt && (
                               <p className="text-xs">
-                                {new Date(quote.createdAt).toLocaleDateString()}
+                                {formatTimestampDate(quote.createdAt)}
                               </p>
                             )}
                           </div>
@@ -1317,7 +1318,7 @@ export default function Quotes() {
                           <p>{quote.floorCount} {t('quotes.floors', 'floors')}</p>
                           {quote.createdAt && (
                             <p className="text-xs">
-                              {new Date(quote.createdAt).toLocaleDateString()}
+                              {formatTimestampDate(quote.createdAt)}
                             </p>
                           )}
                         </div>

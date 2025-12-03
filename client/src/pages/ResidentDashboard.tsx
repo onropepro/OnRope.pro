@@ -20,6 +20,7 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { AlertCircle } from "lucide-react";
 import { isReadOnly } from "@/lib/permissions";
+import { formatTimestampDate } from "@/lib/dateUtils";
 
 const complaintSchema = z.object({
   residentName: z.string().min(1, "Name is required"),
@@ -1073,11 +1074,7 @@ export default function ResidentDashboard() {
                             </div>
                           )}
                           <div className="text-xs text-muted-foreground border-t pt-2">
-                            {new Date(photo.createdAt).toLocaleDateString('en-US', { 
-                              month: 'short', 
-                              day: 'numeric', 
-                              year: 'numeric' 
-                            })}
+                            {formatTimestampDate(photo.createdAt)}
                           </div>
                         </div>
                       </div>
@@ -1269,7 +1266,7 @@ export default function ResidentDashboard() {
                             </div>
                             <div className="flex items-center justify-between text-xs text-muted-foreground">
                               <span>Unit {complaint.unitNumber}</span>
-                              <span>{new Date(complaint.createdAt).toLocaleDateString()}</span>
+                              <span>{formatTimestampDate(complaint.createdAt)}</span>
                             </div>
                           </div>
                         </Link>

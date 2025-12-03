@@ -24,6 +24,7 @@ import HarnessInspectionForm from "./HarnessInspectionForm";
 import { format } from "date-fns";
 import { fr, enUS } from "date-fns/locale";
 import { jsPDF } from "jspdf";
+import { formatLocalDate } from "@/lib/dateUtils";
 
 // Helper to get date locale based on current language
 const getDateLocale = () => i18n.language?.startsWith('fr') ? fr : enUS;
@@ -1558,7 +1559,7 @@ export default function Inventory() {
                               <div>
                                 <span className="text-muted-foreground">{t('inventory.dateOfManufacture', 'Date of Manufacture')}:</span>
                                 <div className="font-medium mt-0.5">
-                                  {new Date(myAssignment.dateOfManufacture).toLocaleDateString()}
+                                  {formatLocalDate(myAssignment.dateOfManufacture)}
                                 </div>
                               </div>
                             )}
@@ -1566,7 +1567,7 @@ export default function Inventory() {
                               <div>
                                 <span className="text-muted-foreground">{t('inventory.dateInService', 'Date In Service')}:</span>
                                 <div className="font-medium mt-0.5">
-                                  {new Date(myAssignment.dateInService).toLocaleDateString()}
+                                  {formatLocalDate(myAssignment.dateInService)}
                                 </div>
                               </div>
                             )}
@@ -1582,7 +1583,7 @@ export default function Inventory() {
                               <div>
                                 <span className="text-muted-foreground">{t('inventory.outOfServiceDate', 'Out of Service')}:</span>
                                 <div className="font-medium mt-0.5">
-                                  {new Date(item.dateOutOfService).toLocaleDateString()}
+                                  {formatLocalDate(item.dateOutOfService)}
                                 </div>
                               </div>
                             )}
@@ -1715,12 +1716,12 @@ export default function Inventory() {
                                             <div className="flex flex-wrap gap-2 mt-1">
                                               {assignment.dateOfManufacture && (
                                                 <span className="text-xs text-muted-foreground">
-                                                  {t('inventory.mfg', 'Mfg')}: {new Date(assignment.dateOfManufacture).toLocaleDateString()}
+                                                  {t('inventory.mfg', 'Mfg')}: {formatLocalDate(assignment.dateOfManufacture)}
                                                 </span>
                                               )}
                                               {assignment.dateInService && (
                                                 <span className="text-xs text-muted-foreground">
-                                                  {t('inventory.inService', 'In Service')}: {new Date(assignment.dateInService).toLocaleDateString()}
+                                                  {t('inventory.inService', 'In Service')}: {formatLocalDate(assignment.dateInService)}
                                                 </span>
                                               )}
                                             </div>
@@ -2651,10 +2652,10 @@ export default function Inventory() {
                               <div className="font-medium">{entry.serialNumber}</div>
                               <div className="text-xs text-muted-foreground flex flex-wrap gap-2 mt-1">
                                 {entry.dateOfManufacture && (
-                                  <span>{t('inventory.mfgAbbrev', 'Mfg')}: {new Date(entry.dateOfManufacture).toLocaleDateString()}</span>
+                                  <span>{t('inventory.mfgAbbrev', 'Mfg')}: {formatLocalDate(entry.dateOfManufacture)}</span>
                                 )}
                                 {entry.dateInService && (
-                                  <span>{t('inventory.inService', 'In Service')}: {new Date(entry.dateInService).toLocaleDateString()}</span>
+                                  <span>{t('inventory.inService', 'In Service')}: {formatLocalDate(entry.dateInService)}</span>
                                 )}
                                 {!entry.dateOfManufacture && !entry.dateInService && (
                                   <span className="italic">{t('inventory.noDatesSet', 'No dates set')}</span>
@@ -2933,10 +2934,10 @@ export default function Inventory() {
                           <div className="font-medium">{entry.serialNumber}</div>
                           <div className="text-xs text-muted-foreground flex flex-wrap gap-2 mt-1">
                             {entry.dateOfManufacture && (
-                              <span>{t('inventory.mfgAbbrev', 'Mfg')}: {new Date(entry.dateOfManufacture).toLocaleDateString()}</span>
+                              <span>{t('inventory.mfgAbbrev', 'Mfg')}: {formatLocalDate(entry.dateOfManufacture)}</span>
                             )}
                             {entry.dateInService && (
-                              <span>{t('inventory.inService', 'In Service')}: {new Date(entry.dateInService).toLocaleDateString()}</span>
+                              <span>{t('inventory.inService', 'In Service')}: {formatLocalDate(entry.dateInService)}</span>
                             )}
                             {!entry.dateOfManufacture && !entry.dateInService && (
                               <span className="italic">{t('inventory.noDatesSet', 'No dates set')}</span>
@@ -3284,10 +3285,10 @@ export default function Inventory() {
                                   {(serial.dateOfManufacture || serial.dateInService) && (
                                     <div className="text-xs text-muted-foreground mt-1 flex gap-3">
                                       {serial.dateOfManufacture && (
-                                        <span>Mfg: {new Date(serial.dateOfManufacture).toLocaleDateString()}</span>
+                                        <span>Mfg: {formatLocalDate(serial.dateOfManufacture)}</span>
                                       )}
                                       {serial.dateInService && (
-                                        <span>In Service: {new Date(serial.dateInService).toLocaleDateString()}</span>
+                                        <span>In Service: {formatLocalDate(serial.dateInService)}</span>
                                       )}
                                     </div>
                                   )}
@@ -3707,10 +3708,10 @@ export default function Inventory() {
                                   {(serial.dateOfManufacture || serial.dateInService) && (
                                     <div className="text-xs text-muted-foreground mt-1 flex gap-3">
                                       {serial.dateOfManufacture && (
-                                        <span>Mfg: {new Date(serial.dateOfManufacture).toLocaleDateString()}</span>
+                                        <span>Mfg: {formatLocalDate(serial.dateOfManufacture)}</span>
                                       )}
                                       {serial.dateInService && (
-                                        <span>In Service: {new Date(serial.dateInService).toLocaleDateString()}</span>
+                                        <span>In Service: {formatLocalDate(serial.dateInService)}</span>
                                       )}
                                     </div>
                                   )}

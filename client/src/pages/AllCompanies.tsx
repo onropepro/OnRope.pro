@@ -5,6 +5,7 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { BackButton } from "@/components/BackButton";
+import { formatTimestampDate, formatTime } from "@/lib/dateUtils";
 
 export default function AllCompanies() {
   const { t } = useTranslation();
@@ -105,16 +106,16 @@ export default function AllCompanies() {
                     </div>
                     <div>
                       <p className="text-muted-foreground">Registration Date</p>
-                      <p>{company.createdAt ? new Date(company.createdAt).toLocaleDateString() : 'N/A'}</p>
+                      <p>{company.createdAt ? formatTimestampDate(company.createdAt) : 'N/A'}</p>
                     </div>
                     <div>
                       <p className="text-muted-foreground">Last Activity</p>
                       <p className={company.lastCompanyActivity ? '' : 'text-muted-foreground'}>
                         {company.lastCompanyActivity ? (
                           <>
-                            {new Date(company.lastCompanyActivity).toLocaleDateString()}{' '}
+                            {formatTimestampDate(company.lastCompanyActivity)}{' '}
                             <span className="text-muted-foreground">
-                              {new Date(company.lastCompanyActivity).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                              {formatTime(company.lastCompanyActivity)}
                             </span>
                           </>
                         ) : (

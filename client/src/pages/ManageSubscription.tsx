@@ -24,6 +24,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { formatTimestampDate } from "@/lib/dateUtils";
 
 type TierName = 'basic' | 'starter' | 'premium' | 'enterprise';
 
@@ -272,11 +273,7 @@ export default function ManageSubscription() {
   const tierName = TIER_NAMES[subscriptionData.tier];
   const tierPrice = TIER_PRICES[subscriptionData.tier][subscriptionData.currency];
   const currencySymbol = subscriptionData.currency === 'usd' ? '$' : 'CA$';
-  const renewalDate = new Date(subscriptionData.currentPeriodEnd).toLocaleDateString('en-US', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-  });
+  const renewalDate = formatTimestampDate(subscriptionData.currentPeriodEnd);
 
   return (
     <div className="min-h-screen bg-background p-6">

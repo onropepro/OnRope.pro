@@ -15,6 +15,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage, FormDescription } from "@/components/ui/form";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { formatTimestampDate, formatTime } from "@/lib/dateUtils";
 
 const noteSchema = z.object({
   note: z.string().min(1, "Note cannot be empty"),
@@ -227,13 +228,13 @@ export default function ComplaintDetail() {
               <div>
                 <CardTitle className="text-base">{t('complaintDetail.feedbackDetails', 'Feedback Details')}</CardTitle>
                 <div className="text-sm text-muted-foreground mt-1">
-                  {t('complaintDetail.submitted', 'Submitted:')} {new Date(complaint.createdAt).toLocaleDateString()} {t('complaintDetail.at', 'at')}{" "}
-                  {new Date(complaint.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                  {t('complaintDetail.submitted', 'Submitted:')} {formatTimestampDate(complaint.createdAt)} {t('complaintDetail.at', 'at')}{" "}
+                  {formatTime(complaint.createdAt)}
                 </div>
                 {complaint.viewedAt && (
                   <div className="text-sm text-status-closed mt-1">
-                    {t('complaintDetail.viewedByStaff', 'Viewed by staff:')} {new Date(complaint.viewedAt).toLocaleDateString()} {t('complaintDetail.at', 'at')}{" "}
-                    {new Date(complaint.viewedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                    {t('complaintDetail.viewedByStaff', 'Viewed by staff:')} {formatTimestampDate(complaint.viewedAt)} {t('complaintDetail.at', 'at')}{" "}
+                    {formatTime(complaint.viewedAt)}
                   </div>
                 )}
                 {!complaint.viewedAt && userData?.user?.role === "resident" && (
@@ -315,8 +316,8 @@ export default function ComplaintDetail() {
                           )}
                         </div>
                         <div className="text-xs text-muted-foreground">
-                          {new Date(note.createdAt).toLocaleDateString()} {t('complaintDetail.at', 'at')}{" "}
-                          {new Date(note.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                          {formatTimestampDate(note.createdAt)} {t('complaintDetail.at', 'at')}{" "}
+                          {formatTime(note.createdAt)}
                         </div>
                       </div>
                       <p className="text-sm">{note.note}</p>
@@ -386,7 +387,7 @@ export default function ComplaintDetail() {
                         <div className="flex items-start justify-between mb-2">
                           <div className="font-medium text-sm">{note.userName}</div>
                           <div className="text-xs text-muted-foreground">
-                            {new Date(note.createdAt).toLocaleDateString()}
+                            {formatTimestampDate(note.createdAt)}
                           </div>
                         </div>
                         <p className="text-sm">{note.note}</p>

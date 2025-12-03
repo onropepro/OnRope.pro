@@ -9,7 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { HighRiseBuilding } from "@/components/HighRiseBuilding";
 import { ArrowLeft, ChevronDown, ChevronRight, Sparkles, MapPin } from "lucide-react";
-import { format, getYear, getMonth } from "date-fns";
+import { format, getYear } from "date-fns";
 import { fr, enUS } from "date-fns/locale";
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from "recharts";
 import { useMemo, useState } from "react";
@@ -17,6 +17,7 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/component
 import { queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { SessionDetailsDialog } from "@/components/SessionDetailsDialog";
+import { parseLocalDate } from "@/lib/dateUtils";
 
 export default function WorkSessionHistory() {
   const { t } = useTranslation();
@@ -69,10 +70,10 @@ export default function WorkSessionHistory() {
     const locale = getDateLocale();
     
     allWorkSessions.forEach((session: any) => {
-      const sessionDate = new Date(session.workDate);
+      const sessionDate = parseLocalDate(session.workDate);
       const year = getYear(sessionDate).toString();
       const month = format(sessionDate, "MMMM", { locale });
-      const day = format(sessionDate, "yyyy-MM-dd");
+      const day = session.workDate.split('T')[0]; // Keep as YYYY-MM-DD string
       
       if (!groups[year]) groups[year] = {};
       if (!groups[year][month]) groups[year][month] = {};

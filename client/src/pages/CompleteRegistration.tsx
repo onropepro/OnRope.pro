@@ -9,6 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { Skeleton } from "@/components/ui/skeleton";
 import { trackSignUp, trackSubscriptionPurchase } from "@/lib/analytics";
+import { formatTimestampDate } from "@/lib/dateUtils";
 
 interface SessionData {
   licenseKey: string;
@@ -221,7 +222,7 @@ export default function CompleteRegistration() {
   }
 
   const trialEndDate = sessionData.trialEnd 
-    ? new Date(sessionData.trialEnd * 1000).toLocaleDateString() 
+    ? formatTimestampDate(new Date(sessionData.trialEnd * 1000)) 
     : null;
 
   return (

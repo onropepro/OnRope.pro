@@ -5,7 +5,7 @@ import { queryClient, apiRequest } from "@/lib/queryClient";
 import { useLocation } from "wouter";
 import { BackButton } from "@/components/BackButton";
 import FullCalendar from "@fullcalendar/react";
-import { toLocalDateString, parseLocalDate, nextDateOnly, addDaysToDateString, extractLocalDateFromISO } from "@/lib/dateUtils";
+import { toLocalDateString, parseLocalDate, nextDateOnly, addDaysToDateString, extractLocalDateFromISO, formatDateTime, formatLocalDate } from "@/lib/dateUtils";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import timeGridPlugin from "@fullcalendar/timegrid";
 import interactionPlugin from "@fullcalendar/interaction";
@@ -2302,13 +2302,13 @@ function JobDetailDialog({
             <div>
               <h3 className="font-medium text-sm mb-1">{t('schedule.startDate', 'Start Date')}</h3>
               <p className="text-sm text-muted-foreground">
-                {new Date(job.startDate).toLocaleString()}
+                {formatDateTime(job.startDate)}
               </p>
             </div>
             <div>
               <h3 className="font-medium text-sm mb-1">{t('schedule.endDate', 'End Date')}</h3>
               <p className="text-sm text-muted-foreground">
-                {new Date(job.endDate).toLocaleString()}
+                {formatDateTime(job.endDate)}
               </p>
             </div>
           </div>
@@ -2395,7 +2395,7 @@ function JobDetailDialog({
                           <div className="text-xs text-muted-foreground">
                             {assignment.startDate && assignment.endDate ? (
                               <>
-                                {new Date(assignment.startDate).toLocaleDateString()} - {new Date(assignment.endDate).toLocaleDateString()}
+                                {formatLocalDate(assignment.startDate)} - {formatLocalDate(assignment.endDate)}
                               </>
                             ) : (
                               <span>{t('schedule.allDay', 'Entire job duration')}</span>

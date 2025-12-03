@@ -31,6 +31,7 @@ import {
   rectSortingStrategy,
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
+import { formatLocalDate } from "@/lib/dateUtils";
 
 // Sortable Stats Card Component
 function SortableStatsCard({ card, isRearranging, t }: { card: any; isRearranging: boolean; t: (key: string) => string }) {
@@ -985,7 +986,7 @@ export default function HoursAnalytics() {
                       <div className="text-sm text-muted-foreground mt-1">{project.jobType.replace(/_/g, ' ')}</div>
                       {project.targetCompletionDate && (
                         <div className="text-xs text-muted-foreground mt-2">
-                          Target: {new Date(project.targetCompletionDate).toLocaleDateString()}
+                          Target: {formatLocalDate(project.targetCompletionDate)}
                         </div>
                       )}
                     </Card>

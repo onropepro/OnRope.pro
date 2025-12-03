@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 import { Building2, Plus, Mail, Phone, LogOut, Settings, FileText, Download, AlertCircle, CheckCircle2, Clock, Upload, FileCheck, Trash2, User, Shield } from "lucide-react";
+import { formatLocalDate, formatTimestampDate, formatTime } from "@/lib/dateUtils";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Label } from "@/components/ui/label";
 import { useForm } from "react-hook-form";
@@ -1216,13 +1217,13 @@ export default function PropertyManager() {
                           {projectDetailsData.project.startDate && (
                             <div>
                               <Label className="text-xs text-muted-foreground">{t('propertyManager.projectDetails.startDate', 'Start Date')}</Label>
-                              <p className="font-medium">{new Date(projectDetailsData.project.startDate).toLocaleDateString()}</p>
+                              <p className="font-medium">{formatLocalDate(projectDetailsData.project.startDate)}</p>
                             </div>
                           )}
                           {projectDetailsData.project.endDate && (
                             <div>
                               <Label className="text-xs text-muted-foreground">{t('propertyManager.projectDetails.endDate', 'End Date')}</Label>
-                              <p className="font-medium">{new Date(projectDetailsData.project.endDate).toLocaleDateString()}</p>
+                              <p className="font-medium">{formatLocalDate(projectDetailsData.project.endDate)}</p>
                             </div>
                           )}
                           {projectDetailsData.project.buildingAddress && (
@@ -1507,8 +1508,8 @@ export default function PropertyManager() {
                                       <div className="flex-1">
                                         <p className="text-sm font-medium">{complaint.subject || t('propertyManager.projectDetails.complaints.noSubject', 'No Subject')}</p>
                                         <p className="text-xs text-muted-foreground mt-1">
-                                          {new Date(complaint.createdAt).toLocaleDateString()} {t('propertyManager.projectDetails.complaints.at', 'at')}{' '}
-                                          {new Date(complaint.createdAt).toLocaleTimeString()}
+                                          {formatTimestampDate(complaint.createdAt)} {t('propertyManager.projectDetails.complaints.at', 'at')}{' '}
+                                          {formatTime(complaint.createdAt)}
                                         </p>
                                       </div>
                                       <Badge variant={complaint.status === 'resolved' ? 'default' : 'secondary'} className="text-xs">
@@ -1591,8 +1592,8 @@ export default function PropertyManager() {
                 {selectedComplaint?.subject || t('propertyManager.complaintDetails.noSubject', 'No Subject')}
               </DialogTitle>
               <DialogDescription data-testid="text-complaint-timestamp">
-                {t('propertyManager.complaintDetails.submittedOn', 'Submitted on')} {selectedComplaint ? new Date(selectedComplaint.createdAt).toLocaleDateString() : ''} {t('propertyManager.complaintDetails.at', 'at')}{' '}
-                {selectedComplaint ? new Date(selectedComplaint.createdAt).toLocaleTimeString() : ''}
+                {t('propertyManager.complaintDetails.submittedOn', 'Submitted on')} {selectedComplaint ? formatTimestampDate(selectedComplaint.createdAt) : ''} {t('propertyManager.complaintDetails.at', 'at')}{' '}
+                {selectedComplaint ? formatTime(selectedComplaint.createdAt) : ''}
               </DialogDescription>
             </DialogHeader>
 
@@ -1657,7 +1658,7 @@ export default function PropertyManager() {
                             <div className="flex items-start justify-between gap-2 mb-2">
                               <span className="text-xs font-medium">{note.authorName}</span>
                               <span className="text-xs text-muted-foreground">
-                                {new Date(note.createdAt).toLocaleDateString()} {new Date(note.createdAt).toLocaleTimeString()}
+                                {formatTimestampDate(note.createdAt)} {formatTime(note.createdAt)}
                               </span>
                             </div>
                             <p className="text-sm whitespace-pre-wrap">{note.content}</p>

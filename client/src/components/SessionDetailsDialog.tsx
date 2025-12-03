@@ -13,6 +13,7 @@ import { useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import { parseLocalDate, formatLocalDateMedium } from "@/lib/dateUtils";
 
 // Fix leaflet icon paths
 import markerIcon2x from 'leaflet/dist/images/marker-icon-2x.png';
@@ -245,7 +246,7 @@ export function SessionDetailsDialog({
                 <span>Date</span>
               </div>
               <div className="font-semibold">
-                {format(new Date(session.workDate), 'MMMM d, yyyy')}
+                {formatLocalDateMedium(session.workDate)}
               </div>
             </div>
 

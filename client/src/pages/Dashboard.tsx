@@ -39,7 +39,7 @@ import { isManagement, hasFinancialAccess, canManageEmployees, canViewPerformanc
 import { DocumentUploader } from "@/components/DocumentUploader";
 import { RefreshButton } from "@/components/RefreshButton";
 import { CSRBadge } from "@/components/CSRBadge";
-import { formatLocalDate, formatLocalDateLong } from "@/lib/dateUtils";
+import { formatLocalDate, formatLocalDateLong, formatTimestampDate, formatTimestampDateShort, formatTimestampDateMedium, parseLocalDate, formatLocalDateMedium } from "@/lib/dateUtils";
 import { QRCodeSVG } from 'qrcode.react';
 import { trackLogout, trackWorkSessionStart, trackWorkSessionEnd, trackProjectCreated, trackClientAdded, trackBuildingAdded, trackEmployeeAdded } from "@/lib/analytics";
 import {
@@ -458,7 +458,7 @@ function DeletedProjectsTab() {
                     {project.updatedAt && (
                       <div className="text-xs text-muted-foreground mt-1 flex items-center gap-1">
                         <span className="material-icons text-xs">event</span>
-                        {t('dashboard.deletedProjects.deleted', 'Deleted')} {new Date(project.updatedAt).toLocaleDateString()}
+                        {t('dashboard.deletedProjects.deleted', 'Deleted')} {formatTimestampDate(project.updatedAt)}
                       </div>
                     )}
                   </div>
@@ -3147,7 +3147,7 @@ export default function Dashboard() {
                                 {project.createdAt && (
                                   <div className="text-xs text-muted-foreground mt-1 flex items-center gap-1">
                                     <span className="material-icons text-xs text-primary/70">event</span>
-                                    {t('dashboard.projects.created', 'Created')} {new Date(project.createdAt).toLocaleDateString()}
+                                    {t('dashboard.projects.created', 'Created')} {formatTimestampDate(project.createdAt)}
                                   </div>
                                 )}
                               </div>
@@ -3266,7 +3266,7 @@ export default function Dashboard() {
                             {project.createdAt && (
                               <div className="text-xs text-muted-foreground mt-1 flex items-center gap-1">
                                 <span className="material-icons text-xs">event</span>
-                                {t('dashboard.projects.created', 'Created')} {new Date(project.createdAt).toLocaleDateString()}
+                                {t('dashboard.projects.created', 'Created')} {formatTimestampDate(project.createdAt)}
                               </div>
                             )}
                           </div>
@@ -3578,7 +3578,7 @@ export default function Dashboard() {
                                             </div>
                                             <p className="text-sm line-clamp-2">{complaint.message}</p>
                                             <div className="text-xs text-muted-foreground mt-2">
-                                              {new Date(complaint.createdAt).toLocaleDateString()}
+                                              {formatTimestampDate(complaint.createdAt)}
                                             </div>
                                           </div>
                                         </div>
@@ -4333,7 +4333,7 @@ export default function Dashboard() {
                             <div className="flex flex-wrap gap-2">
                               {employee.startDate && (
                                 <Badge variant="outline" className="text-xs">
-                                  {t('dashboard.employees.started', 'Started:')} {new Date(employee.startDate).toLocaleDateString()}
+                                  {t('dashboard.employees.started', 'Started:')} {formatLocalDate(employee.startDate)}
                                 </Badge>
                               )}
                               {hasFinancialAccess(user) && (employee.isSalary ? (
@@ -4368,7 +4368,7 @@ export default function Dashboard() {
                                 )}
                                 {employee.irataExpirationDate && (
                                   <div className="ml-6">
-                                    {t('dashboard.employees.expires', 'Expires:')} {new Date(employee.irataExpirationDate).toLocaleDateString()}
+                                    {t('dashboard.employees.expires', 'Expires:')} {formatLocalDate(employee.irataExpirationDate)}
                                   </div>
                                 )}
                               </div>
@@ -4462,7 +4462,7 @@ export default function Dashboard() {
                                     </Badge>
                                     {employee.terminatedDate && (
                                       <div className="text-xs text-destructive mt-2">
-                                        {t('dashboard.employees.terminated', 'Terminated:')} {new Date(employee.terminatedDate).toLocaleDateString()}
+                                        {t('dashboard.employees.terminated', 'Terminated:')} {formatLocalDate(employee.terminatedDate)}
                                       </div>
                                     )}
                                   </div>
@@ -4529,7 +4529,7 @@ export default function Dashboard() {
                                 <div className="flex flex-wrap gap-2">
                                   {employee.startDate && (
                                     <Badge variant="outline" className="text-xs">
-                                      {t('dashboard.employees.started', 'Started:')} {new Date(employee.startDate).toLocaleDateString()}
+                                      {t('dashboard.employees.started', 'Started:')} {formatLocalDate(employee.startDate)}
                                     </Badge>
                                   )}
                                   {hasFinancialAccess(user) && (employee.isSalary ? (
@@ -4601,12 +4601,7 @@ export default function Dashboard() {
                             <div className="flex-1 min-w-0">
                               <div className="font-medium">{inspection.inspectorName}</div>
                               <div className="text-sm text-muted-foreground">
-                                {new Date(inspection.inspectionDate).toLocaleDateString('en-US', { 
-                                  weekday: 'short', 
-                                  year: 'numeric', 
-                                  month: 'short', 
-                                  day: 'numeric' 
-                                })}
+                                {formatLocalDate(inspection.inspectionDate, { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' })}
                               </div>
                               {inspection.manufacturer && (
                                 <div className="text-xs text-muted-foreground mt-1">
@@ -6144,7 +6139,7 @@ export default function Dashboard() {
                       </Badge>
                       {employeeToView.terminatedDate && (
                         <Badge variant="destructive" className="mt-1 ml-2">
-                          {t('dashboard.employeeDetails.terminated', 'Terminated')}: {new Date(employeeToView.terminatedDate).toLocaleDateString()}
+                          {t('dashboard.employeeDetails.terminated', 'Terminated')}: {formatLocalDate(employeeToView.terminatedDate)}
                         </Badge>
                       )}
                     </div>
@@ -6184,7 +6179,7 @@ export default function Dashboard() {
                       {employeeToView.startDate && (
                         <div>
                           <div className="text-xs text-muted-foreground">{t('dashboard.employeeDetails.startDate', 'Start Date')}</div>
-                          <div className="text-sm font-medium">{new Date(employeeToView.startDate).toLocaleDateString()}</div>
+                          <div className="text-sm font-medium">{formatLocalDate(employeeToView.startDate)}</div>
                         </div>
                       )}
                       {hasFinancialAccess(user) && (employeeToView.isSalary ? (
@@ -6235,10 +6230,11 @@ export default function Dashboard() {
                           <div>
                             <div className="text-xs text-muted-foreground">{t('dashboard.employeeDetails.expirationDate', 'Expiration Date')}</div>
                             <div className="text-sm font-medium">
-                              {new Date(employeeToView.irataExpirationDate).toLocaleDateString()}
+                              {formatLocalDate(employeeToView.irataExpirationDate)}
                               {(() => {
-                                const expirationDate = new Date(employeeToView.irataExpirationDate);
+                                const expirationDate = parseLocalDate(employeeToView.irataExpirationDate);
                                 const today = new Date();
+                                today.setHours(0, 0, 0, 0);
                                 if (expirationDate < today) {
                                   return <Badge variant="destructive" className="ml-2">{t('dashboard.employeeDetails.expired', 'Expired')}</Badge>;
                                 }
@@ -7164,20 +7160,12 @@ export default function Dashboard() {
       <div>
         <div class="metadata-field">
           <div class="metadata-label">Inspection Date</div>
-          <div class="metadata-value">${new Date(selectedInspection.inspectionDate).toLocaleDateString('en-US', { 
-            year: 'numeric', 
-            month: 'long', 
-            day: 'numeric' 
-          })}</div>
+          <div class="metadata-value">${formatLocalDateMedium(selectedInspection.inspectionDate)}</div>
         </div>
         ${selectedInspection.dateInService ? `
         <div class="metadata-field">
           <div class="metadata-label">Date In Service</div>
-          <div class="metadata-value">${new Date(selectedInspection.dateInService).toLocaleDateString('en-US', { 
-            year: 'numeric', 
-            month: 'long', 
-            day: 'numeric' 
-          })}</div>
+          <div class="metadata-value">${formatLocalDateMedium(selectedInspection.dateInService)}</div>
         </div>
         ` : ''}
         <div class="metadata-field">
@@ -7273,12 +7261,7 @@ export default function Dashboard() {
                 <div>
                   <div className="text-sm font-medium text-muted-foreground">Inspection Date</div>
                   <div className="text-base font-semibold">
-                    {new Date(selectedInspection.inspectionDate).toLocaleDateString('en-US', { 
-                      weekday: 'long', 
-                      year: 'numeric', 
-                      month: 'long', 
-                      day: 'numeric' 
-                    })}
+                    {formatLocalDateLong(selectedInspection.inspectionDate)}
                   </div>
                 </div>
                 <div>
@@ -7309,11 +7292,7 @@ export default function Dashboard() {
                   <div>
                     <div className="text-sm font-medium text-muted-foreground">Date In Service</div>
                     <div className="text-base">
-                      {new Date(selectedInspection.dateInService).toLocaleDateString('en-US', { 
-                        year: 'numeric', 
-                        month: 'long', 
-                        day: 'numeric' 
-                      })}
+                      {formatLocalDateMedium(selectedInspection.dateInService)}
                     </div>
                   </div>
                 )}

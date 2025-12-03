@@ -242,3 +242,51 @@ export function daysBetween(startStr: string, endStr: string): number {
   const diffTime = end.getTime() - start.getTime();
   return Math.round(diffTime / (1000 * 60 * 60 * 24));
 }
+
+/**
+ * Format a timestamp (ISO string or Date) to display just the date portion in local timezone.
+ * Safe for timestamps that include time (createdAt, updatedAt, etc).
+ */
+export function formatTimestampDate(timestamp: string | Date | null | undefined, options?: Intl.DateTimeFormatOptions): string {
+  if (!timestamp) return '';
+  const date = typeof timestamp === 'string' ? new Date(timestamp) : timestamp;
+  return date.toLocaleDateString('en-US', options || { 
+    month: 'numeric', 
+    day: 'numeric', 
+    year: 'numeric' 
+  });
+}
+
+/**
+ * Format a timestamp to display date in long format (e.g., "Monday, January 1, 2025")
+ */
+export function formatTimestampDateLong(timestamp: string | Date | null | undefined): string {
+  return formatTimestampDate(timestamp, { 
+    weekday: 'long', 
+    month: 'long', 
+    day: 'numeric', 
+    year: 'numeric' 
+  });
+}
+
+/**
+ * Format a timestamp to display date in medium format (e.g., "January 1, 2025")
+ */
+export function formatTimestampDateMedium(timestamp: string | Date | null | undefined): string {
+  return formatTimestampDate(timestamp, { 
+    month: 'long', 
+    day: 'numeric', 
+    year: 'numeric' 
+  });
+}
+
+/**
+ * Format a timestamp to display date in short format (e.g., "Jan 1, 2025")
+ */
+export function formatTimestampDateShort(timestamp: string | Date | null | undefined): string {
+  return formatTimestampDate(timestamp, { 
+    month: 'short', 
+    day: 'numeric', 
+    year: 'numeric' 
+  });
+}

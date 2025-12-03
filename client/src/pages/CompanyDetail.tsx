@@ -11,6 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import { formatTimestampDate } from "@/lib/dateUtils";
 
 interface GiftAddonsForm {
   extraSeats: number;
@@ -171,7 +172,7 @@ export default function CompanyDetail() {
               </div>
               <div>
                 <p className="text-sm text-muted-foreground mb-1">Registration Date</p>
-                <p className="text-sm">{company.createdAt ? new Date(company.createdAt).toLocaleDateString() : 'N/A'}</p>
+                <p className="text-sm">{company.createdAt ? formatTimestampDate(company.createdAt) : 'N/A'}</p>
               </div>
               <div>
                 <p className="text-sm text-muted-foreground mb-1">License Key</p>
@@ -197,7 +198,7 @@ export default function CompanyDetail() {
                 </div>
                 <div>
                   <p className="text-sm text-muted-foreground mb-1">Next Payment / Trial End</p>
-                  <p className="text-sm">{company.subscriptionEndDate ? new Date(company.subscriptionEndDate).toLocaleDateString() : 'N/A'}</p>
+                  <p className="text-sm">{company.subscriptionEndDate ? formatTimestampDate(company.subscriptionEndDate) : 'N/A'}</p>
                 </div>
                 <div>
                   <p className="text-sm text-muted-foreground mb-1">Add-ons</p>

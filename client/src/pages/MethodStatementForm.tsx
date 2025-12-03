@@ -20,6 +20,7 @@ import { ArrowLeft, FileCheck, PenTool, X, Shield, Plus, Trash2 } from "lucide-r
 import type { Project, User } from "@shared/schema";
 import SignatureCanvas from "react-signature-canvas";
 import { jsPDF } from "jspdf";
+import { formatLocalDateLong, formatLocalDate, formatTimestampDate } from "@/lib/dateUtils";
 
 // Standard job types for rope access work - use translation keys
 const STANDARD_JOB_TYPES = [
@@ -245,12 +246,7 @@ export const downloadMethodStatement = (statement: any, currentUser: any, transl
   doc.setFontSize(10);
   doc.text(`${t.location}: ${statement.location || t.na}`, 20, yPosition);
   yPosition += 6;
-  doc.text(`${t.dateCreated}: ${new Date(statement.dateCreated).toLocaleDateString('en-US', {
-    weekday: 'long',
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric'
-  })}`, 20, yPosition);
+  doc.text(`${t.dateCreated}: ${formatLocalDateLong(statement.dateCreated)}`, 20, yPosition);
   yPosition += 6;
   doc.text(`${t.preparedBy}: ${statement.preparedByName}`, 20, yPosition);
   yPosition += 6;
@@ -550,7 +546,7 @@ export const downloadMethodStatement = (statement: any, currentUser: any, transl
       yPosition += 6;
 
       if (sig.signedAt) {
-        doc.text(`${t.signedAt}: ${new Date(sig.signedAt).toLocaleDateString()}`, 20, yPosition);
+        doc.text(`${t.signedAt}: ${formatTimestampDate(sig.signedAt)}`, 20, yPosition);
         yPosition += 6;
       }
 
@@ -582,7 +578,7 @@ export const downloadMethodStatement = (statement: any, currentUser: any, transl
   }
 
   // Save PDF
-  const fileName = `Method_Statement_${statement.location}_${new Date(statement.dateCreated).toLocaleDateString().replace(/\//g, '-')}.pdf`;
+  const fileName = `Method_Statement_${statement.location}_${formatLocalDate(statement.dateCreated).replace(/\//g, '-')}.pdf`;
   doc.save(fileName);
 };
 
