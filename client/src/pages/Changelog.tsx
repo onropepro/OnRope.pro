@@ -84,6 +84,12 @@ type RecentChange = {
 
 const recentChangesData: RecentChange[] = [
   {
+    date: "December 3, 2025",
+    title: "Knowledge Base Expansion",
+    description: "Added 5 comprehensive V3.0 documentation guides: Platform Administration, Analytics & Reporting, Multi-Language Support, GPS & Location Services, and Property Manager Interface",
+    type: "feature"
+  },
+  {
     date: "November 30, 2025",
     title: "Platform Metrics Dashboard",
     description: "Added comprehensive metrics tracking for super users including MRR, customer churn, LTV, and resubscription monitoring",
