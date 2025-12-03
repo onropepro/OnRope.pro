@@ -985,6 +985,9 @@ export default function Changelog() {
             const Icon = section.icon;
             const isInventorySection = section.title === "Gear & Equipment Inventory";
             const isSafetySection = section.title === "Safety & Compliance Documentation" || section.title === "Company Safety Rating (CSR)";
+            const isUserAccessSection = section.title === "Authentication & User Management";
+            const isProjectsSection = section.title === "Project Management System";
+            const isTimeTrackingSection = section.title === "Work Session & Time Tracking";
             return (
               <Card key={index} className="overflow-hidden">
                 <CardHeader className="pb-3">
@@ -1007,6 +1010,30 @@ export default function Changelog() {
                         {isSafetySection && (
                           <Link href="/changelog/safety">
                             <Button variant="outline" size="sm" className="text-xs" data-testid="link-safety-guide">
+                              View Guide
+                              <ExternalLink className="h-3 w-3 ml-1" />
+                            </Button>
+                          </Link>
+                        )}
+                        {isUserAccessSection && (
+                          <Link href="/changelog/user-access">
+                            <Button variant="outline" size="sm" className="text-xs" data-testid="link-user-access-guide">
+                              View Guide
+                              <ExternalLink className="h-3 w-3 ml-1" />
+                            </Button>
+                          </Link>
+                        )}
+                        {isProjectsSection && (
+                          <Link href="/changelog/projects">
+                            <Button variant="outline" size="sm" className="text-xs" data-testid="link-projects-guide">
+                              View Guide
+                              <ExternalLink className="h-3 w-3 ml-1" />
+                            </Button>
+                          </Link>
+                        )}
+                        {isTimeTrackingSection && (
+                          <Link href="/changelog/time-tracking">
+                            <Button variant="outline" size="sm" className="text-xs" data-testid="link-time-tracking-guide">
                               View Guide
                               <ExternalLink className="h-3 w-3 ml-1" />
                             </Button>
