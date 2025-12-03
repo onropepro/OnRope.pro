@@ -570,7 +570,16 @@ export default function Payroll() {
                     <SelectValue placeholder={t('payroll.selectPeriod', 'Select a pay period')} />
                   </SelectTrigger>
                   <SelectContent>
-                    {periodsData?.periods.map((period) => (
+                    {periodsData?.periods
+                      .slice()
+                      .sort((a, b) => {
+                        const statusOrder = { current: 0, upcoming: 1, past: 2 };
+                        const aOrder = statusOrder[a.status as keyof typeof statusOrder] ?? 3;
+                        const bOrder = statusOrder[b.status as keyof typeof statusOrder] ?? 3;
+                        if (aOrder !== bOrder) return aOrder - bOrder;
+                        return new Date(b.startDate).getTime() - new Date(a.startDate).getTime();
+                      })
+                      .map((period) => (
                       <SelectItem key={period.id} value={period.id}>
                         {format(new Date(period.startDate), 'MMM dd, yyyy', { locale: getDateLocale() })} - {format(new Date(period.endDate), 'MMM dd, yyyy', { locale: getDateLocale() })} ({period.status})
                       </SelectItem>
