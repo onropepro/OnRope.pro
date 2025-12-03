@@ -115,8 +115,6 @@ export default function PropertyManagerGuide() {
           </Card>
         </section>
 
-        <Separator />
-
         {/* Problems Solved */}
         <section className="space-y-4">
           <Card className="border border-green-200 dark:border-green-900 bg-green-50/50 dark:bg-green-950/50">
