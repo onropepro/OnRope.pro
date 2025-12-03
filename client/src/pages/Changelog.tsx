@@ -243,6 +243,10 @@ const pagesData: PageCategory[] = [
       { name: "User Access Guide", path: "/changelog/user-access", description: "Roles, permissions, and authentication", roles: ["Public"] },
       { name: "Projects Guide", path: "/changelog/projects", description: "Project management and job types", roles: ["Public"] },
       { name: "Time Tracking Guide", path: "/changelog/time-tracking", description: "Work sessions and clock in/out", roles: ["Public"] },
+      { name: "IRATA Logging Guide", path: "/changelog/irata-logging", description: "Task logging for certification progression", roles: ["Public"] },
+      { name: "Document Management Guide", path: "/changelog/documents", description: "Document storage and compliance tracking", roles: ["Public"] },
+      { name: "Employee Management Guide", path: "/changelog/employees", description: "Workforce administration and certifications", roles: ["Public"] },
+      { name: "Scheduling Guide", path: "/changelog/scheduling", description: "Calendar and time-off management", roles: ["Public"] },
     ]
   },
   {
@@ -988,6 +992,10 @@ export default function Changelog() {
             const isUserAccessSection = section.title === "Authentication & User Management";
             const isProjectsSection = section.title === "Project Management System";
             const isTimeTrackingSection = section.title === "Work Session & Time Tracking";
+            const isIRATASection = section.title === "IRATA Task Logging System";
+            const isDocumentSection = section.title === "Document Management";
+            const isEmployeeSection = section.title === "Employee Management";
+            const isSchedulingSection = section.title === "Scheduling & Time-Off Management";
             return (
               <Card key={index} className="overflow-hidden">
                 <CardHeader className="pb-3">
@@ -1034,6 +1042,38 @@ export default function Changelog() {
                         {isTimeTrackingSection && (
                           <Link href="/changelog/time-tracking">
                             <Button variant="outline" size="sm" className="text-xs" data-testid="link-time-tracking-guide">
+                              View Guide
+                              <ExternalLink className="h-3 w-3 ml-1" />
+                            </Button>
+                          </Link>
+                        )}
+                        {isIRATASection && (
+                          <Link href="/changelog/irata-logging">
+                            <Button variant="outline" size="sm" className="text-xs" data-testid="link-irata-logging-guide">
+                              View Guide
+                              <ExternalLink className="h-3 w-3 ml-1" />
+                            </Button>
+                          </Link>
+                        )}
+                        {isDocumentSection && (
+                          <Link href="/changelog/documents">
+                            <Button variant="outline" size="sm" className="text-xs" data-testid="link-documents-guide">
+                              View Guide
+                              <ExternalLink className="h-3 w-3 ml-1" />
+                            </Button>
+                          </Link>
+                        )}
+                        {isEmployeeSection && (
+                          <Link href="/changelog/employees">
+                            <Button variant="outline" size="sm" className="text-xs" data-testid="link-employees-guide">
+                              View Guide
+                              <ExternalLink className="h-3 w-3 ml-1" />
+                            </Button>
+                          </Link>
+                        )}
+                        {isSchedulingSection && (
+                          <Link href="/changelog/scheduling">
+                            <Button variant="outline" size="sm" className="text-xs" data-testid="link-scheduling-guide">
                               View Guide
                               <ExternalLink className="h-3 w-3 ml-1" />
                             </Button>
