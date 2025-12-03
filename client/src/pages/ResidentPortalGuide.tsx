@@ -181,12 +181,226 @@ export default function ResidentPortalGuide() {
 
         <Separator />
 
-        {/* Complaint Workflow */}
-        <section className="space-y-4">
-          <h2 className="text-xl font-bold flex items-center gap-2">
-            <MessageSquare className="w-5 h-5 text-orange-600 dark:text-orange-400" />
-            Complaint Submission Workflow
-          </h2>
+        {/* COMPLAINT MANAGEMENT SYSTEM - Comprehensive Section */}
+        <section className="space-y-6">
+          <div>
+            <h2 className="text-2xl font-bold flex items-center gap-2 mb-2">
+              <MessageSquare className="w-6 h-6 text-orange-600 dark:text-orange-400" />
+              Complaint Management System
+            </h2>
+            <p className="text-muted-foreground">
+              The complaint management system is the core communication bridge between building residents and your maintenance operations. It provides accountability, creates a paper trail, and ensures no resident concern goes unaddressed.
+            </p>
+          </div>
+
+          {/* Problems Solved */}
+          <Card className="border-2 border-orange-300 dark:border-orange-700 bg-orange-50/50 dark:bg-orange-950/30">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-lg flex items-center gap-2">
+                <AlertTriangle className="w-5 h-5 text-orange-600 dark:text-orange-400" />
+                Problems This System Solves
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid md:grid-cols-2 gap-4">
+                <div className="space-y-3">
+                  <div className="flex gap-3">
+                    <XCircle className="w-5 h-5 text-red-500 shrink-0 mt-0.5" />
+                    <div>
+                      <p className="font-semibold text-sm">Without This System</p>
+                      <ul className="text-sm text-muted-foreground space-y-1 mt-1">
+                        <li>Complaints get lost in emails or phone calls</li>
+                        <li>No record of what was reported or when</li>
+                        <li>Residents don't know if anyone is addressing their issue</li>
+                        <li>Management can't track response times</li>
+                        <li>Property managers have no visibility into tenant concerns</li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+                <div className="space-y-3">
+                  <div className="flex gap-3">
+                    <CheckCircle2 className="w-5 h-5 text-emerald-500 shrink-0 mt-0.5" />
+                    <div>
+                      <p className="font-semibold text-sm">With This System</p>
+                      <ul className="text-sm text-muted-foreground space-y-1 mt-1">
+                        <li>Every complaint is logged with timestamp</li>
+                        <li>Photo evidence attached to each report</li>
+                        <li>Residents see real-time status updates</li>
+                        <li>Complete audit trail for accountability</li>
+                        <li>Management can track response times and quality</li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-white dark:bg-orange-900/30 rounded-lg p-4 mt-4">
+                <p className="text-sm font-medium text-orange-900 dark:text-orange-100">
+                  Bottom Line: This system transforms "he said, she said" disputes into documented, trackable conversations with clear accountability on both sides.
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Access & Oversight Hierarchy */}
+          <div className="space-y-4">
+            <h3 className="text-xl font-bold flex items-center gap-2">
+              <Users className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+              Who Can See What: Access Hierarchy
+            </h3>
+            <p className="text-sm text-muted-foreground">
+              The complaint system has carefully designed access levels to ensure privacy while maintaining oversight.
+            </p>
+
+            <div className="space-y-3">
+              {/* Residents */}
+              <Card>
+                <CardContent className="pt-6">
+                  <div className="flex items-start gap-4">
+                    <div className="w-12 h-12 rounded-full bg-cyan-100 dark:bg-cyan-900 flex items-center justify-center shrink-0">
+                      <Home className="w-6 h-6 text-cyan-600 dark:text-cyan-400" />
+                    </div>
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <h4 className="font-semibold">Residents</h4>
+                        <Badge variant="secondary" className="text-xs">Limited View</Badge>
+                      </div>
+                      <div className="mt-2 text-sm text-muted-foreground space-y-1">
+                        <p className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-emerald-500" /> Submit new complaints with photos</p>
+                        <p className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-emerald-500" /> View only their own complaints</p>
+                        <p className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-emerald-500" /> See replies marked "visible to resident"</p>
+                        <p className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-emerald-500" /> Reopen closed complaints by replying</p>
+                        <p className="flex items-center gap-2"><XCircle className="w-4 h-4 text-red-500" /> Cannot see internal staff notes</p>
+                        <p className="flex items-center gap-2"><XCircle className="w-4 h-4 text-red-500" /> Cannot close complaints</p>
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Company Staff */}
+              <Card>
+                <CardContent className="pt-6">
+                  <div className="flex items-start gap-4">
+                    <div className="w-12 h-12 rounded-full bg-blue-100 dark:bg-blue-900 flex items-center justify-center shrink-0">
+                      <Users className="w-6 h-6 text-blue-600 dark:text-blue-400" />
+                    </div>
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <h4 className="font-semibold">Company Staff</h4>
+                        <Badge variant="secondary" className="text-xs bg-blue-500/10 text-blue-700 dark:text-blue-400">Full Access</Badge>
+                      </div>
+                      <p className="text-xs text-muted-foreground mt-1">Technicians, Supervisors, Operations Managers, Company Owner</p>
+                      <div className="mt-2 text-sm text-muted-foreground space-y-1">
+                        <p className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-emerald-500" /> View all complaints for their company's projects</p>
+                        <p className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-emerald-500" /> Add internal notes (staff-only, not visible to resident)</p>
+                        <p className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-emerald-500" /> Add visible replies (resident can see these)</p>
+                        <p className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-emerald-500" /> Change status: Open or Closed</p>
+                        <p className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-emerald-500" /> See when complaint was first viewed</p>
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Property Managers */}
+              <Card>
+                <CardContent className="pt-6">
+                  <div className="flex items-start gap-4">
+                    <div className="w-12 h-12 rounded-full bg-purple-100 dark:bg-purple-900 flex items-center justify-center shrink-0">
+                      <Building2 className="w-6 h-6 text-purple-600 dark:text-purple-400" />
+                    </div>
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <h4 className="font-semibold">Property Managers</h4>
+                        <Badge variant="secondary" className="text-xs bg-purple-500/10 text-purple-700 dark:text-purple-400">No Direct Access</Badge>
+                      </div>
+                      <p className="text-xs text-muted-foreground mt-1">Via "My Vendors" dashboard</p>
+                      <div className="mt-2 text-sm text-muted-foreground space-y-1">
+                        <p className="flex items-center gap-2"><XCircle className="w-4 h-4 text-red-500" /> Cannot view resident complaints</p>
+                        <p className="flex items-center gap-2"><XCircle className="w-4 h-4 text-red-500" /> Cannot respond to complaints</p>
+                        <p className="flex items-center gap-2"><XCircle className="w-4 h-4 text-red-500" /> Cannot see complaint history or notes</p>
+                      </div>
+                      <p className="text-xs text-muted-foreground mt-3 italic">
+                        Complaint management is handled directly between residents and the rope access company. Property managers can view general vendor information through their dashboard but do not have access to complaint data.
+                      </p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+
+          {/* Two-Track Communication System */}
+          <div className="space-y-4">
+            <h3 className="text-xl font-bold flex items-center gap-2">
+              <FileText className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
+              Two-Track Communication System
+            </h3>
+            <p className="text-sm text-muted-foreground">
+              Staff can add two types of notes to complaints. This allows internal coordination without exposing sensitive discussions to residents.
+            </p>
+
+            <div className="grid md:grid-cols-2 gap-4">
+              <Card className="border-2 border-slate-300 dark:border-slate-600">
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-base flex items-center gap-2">
+                    <Lock className="w-4 h-4 text-slate-600 dark:text-slate-400" />
+                    Internal Notes
+                    <Badge variant="secondary" className="text-xs">Staff Only</Badge>
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="text-sm space-y-2">
+                  <p className="text-muted-foreground">Private notes visible only to company staff. Use for:</p>
+                  <ul className="text-muted-foreground space-y-1">
+                    <li className="flex items-center gap-2"><ArrowRight className="w-3 h-3" /> Coordination between team members</li>
+                    <li className="flex items-center gap-2"><ArrowRight className="w-3 h-3" /> Investigation notes</li>
+                    <li className="flex items-center gap-2"><ArrowRight className="w-3 h-3" /> Scheduling discussions</li>
+                    <li className="flex items-center gap-2"><ArrowRight className="w-3 h-3" /> Sensitive information</li>
+                  </ul>
+                  <div className="bg-slate-100 dark:bg-slate-800 rounded p-2 mt-3">
+                    <p className="text-xs font-medium">Example: "Checked with John - issue is from previous contractor, not our work. Need to document for liability."</p>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="border-2 border-emerald-300 dark:border-emerald-600">
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-base flex items-center gap-2">
+                    <Eye className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                    Visible Replies
+                    <Badge variant="secondary" className="text-xs bg-emerald-500/10 text-emerald-700 dark:text-emerald-400">Resident Sees</Badge>
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="text-sm space-y-2">
+                  <p className="text-muted-foreground">Responses the resident can read. Use for:</p>
+                  <ul className="text-muted-foreground space-y-1">
+                    <li className="flex items-center gap-2"><ArrowRight className="w-3 h-3" /> Acknowledging the complaint</li>
+                    <li className="flex items-center gap-2"><ArrowRight className="w-3 h-3" /> Providing status updates</li>
+                    <li className="flex items-center gap-2"><ArrowRight className="w-3 h-3" /> Asking follow-up questions</li>
+                    <li className="flex items-center gap-2"><ArrowRight className="w-3 h-3" /> Confirming resolution</li>
+                  </ul>
+                  <div className="bg-emerald-50 dark:bg-emerald-900/30 rounded p-2 mt-3">
+                    <p className="text-xs font-medium">Example: "Thank you for reporting this. Our team will address the water stain during tomorrow's scheduled visit."</p>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+
+          <Separator />
+
+          {/* Complaint Workflow - Enhanced */}
+          <div className="space-y-4">
+            <h3 className="text-xl font-bold flex items-center gap-2">
+              <Clock className="w-5 h-5 text-orange-600 dark:text-orange-400" />
+              Complaint Lifecycle
+            </h3>
+            <p className="text-sm text-muted-foreground">
+              Every complaint goes through a defined lifecycle with clear status indicators at each stage.
+            </p>
+          </div>
 
           <div className="space-y-3">
             <Card className="bg-muted/30">
@@ -198,8 +412,15 @@ export default function ResidentPortalGuide() {
                   <div>
                     <h3 className="font-semibold">Resident Submits Complaint</h3>
                     <p className="text-sm text-muted-foreground mt-1">
-                      Resident fills out complaint form with their name, unit number, contact info, and issue description. Can attach photos.
+                      Resident fills out form with name, unit number, phone number, and detailed description. <strong>Can attach photo evidence</strong> (water damage, scratches, etc.).
                     </p>
+                    <div className="flex flex-wrap gap-2 mt-2">
+                      <Badge variant="outline" className="text-xs">Name</Badge>
+                      <Badge variant="outline" className="text-xs">Unit #</Badge>
+                      <Badge variant="outline" className="text-xs">Phone</Badge>
+                      <Badge variant="outline" className="text-xs">Description</Badge>
+                      <Badge variant="outline" className="text-xs">Photo (optional)</Badge>
+                    </div>
                   </div>
                 </div>
               </CardContent>
@@ -270,7 +491,7 @@ export default function ResidentPortalGuide() {
                     <div>
                       <h3 className="font-semibold text-emerald-900 dark:text-emerald-100">Closed</h3>
                       <p className="text-sm text-emerald-800 dark:text-emerald-200 mt-1">
-                        Issue resolved. Resident can view final status and any management notes.
+                        Issue resolved. Resident can view final status and visible management replies.
                       </p>
                     </div>
                   </div>
@@ -291,6 +512,29 @@ export default function ResidentPortalGuide() {
                 </CardContent>
               </Card>
             </div>
+
+            {/* Reopen Flow */}
+            <Card className="bg-amber-50 dark:bg-amber-950 border-amber-200 dark:border-amber-800 mt-4">
+              <CardContent className="pt-6">
+                <div className="flex items-start gap-4">
+                  <div className="w-10 h-10 rounded-full bg-amber-100 dark:bg-amber-900 flex items-center justify-center shrink-0">
+                    <ArrowRight className="w-5 h-5 text-amber-600 dark:text-amber-400 rotate-180" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-amber-900 dark:text-amber-100 flex items-center gap-2">
+                      Resident Can Reopen
+                      <Badge variant="secondary" className="bg-amber-500/20 text-amber-700 dark:text-amber-300 text-xs">Important</Badge>
+                    </h3>
+                    <p className="text-sm text-amber-800 dark:text-amber-200 mt-1">
+                      If a resident is not satisfied with the resolution, they can <strong>reply to a closed complaint</strong>. This automatically reopens the complaint and changes status back to "Open".
+                    </p>
+                    <p className="text-xs text-amber-700 dark:text-amber-300 mt-2">
+                      This ensures residents always have a way to follow up if issues persist after closure.
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
           </div>
         </section>
 
@@ -560,23 +804,55 @@ export default function ResidentPortalGuide() {
               <MessageSquare className="w-5 h-5 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5" />
               <div>
                 <p className="font-semibold">Two-Way Communication</p>
-                <p className="text-sm text-muted-foreground">Residents and management can message.</p>
+                <p className="text-sm text-muted-foreground">Residents and staff exchange messages with full history.</p>
               </div>
             </div>
 
             <div className="flex gap-3">
               <Image className="w-5 h-5 text-purple-600 dark:text-purple-400 flex-shrink-0 mt-0.5" />
               <div>
-                <p className="font-semibold">Photo Gallery Access</p>
-                <p className="text-sm text-muted-foreground">View progress and before/after images.</p>
+                <p className="font-semibold">Photo Evidence</p>
+                <p className="text-sm text-muted-foreground">Attach photos to complaints for documentation.</p>
               </div>
             </div>
 
             <div className="flex gap-3">
               <Bell className="w-5 h-5 text-red-600 dark:text-red-400 flex-shrink-0 mt-0.5" />
               <div>
-                <p className="font-semibold">Notification Badges</p>
-                <p className="text-sm text-muted-foreground">Visual alerts for new complaints.</p>
+                <p className="font-semibold">Status Tracking</p>
+                <p className="text-sm text-muted-foreground">New, Viewed, Closed status badges.</p>
+              </div>
+            </div>
+
+            <div className="flex gap-3">
+              <Lock className="w-5 h-5 text-slate-600 dark:text-slate-400 flex-shrink-0 mt-0.5" />
+              <div>
+                <p className="font-semibold">Internal Notes</p>
+                <p className="text-sm text-muted-foreground">Staff-only notes hidden from residents.</p>
+              </div>
+            </div>
+
+            <div className="flex gap-3">
+              <ArrowRight className="w-5 h-5 text-amber-600 dark:text-amber-400 flex-shrink-0 mt-0.5 rotate-180" />
+              <div>
+                <p className="font-semibold">Reopen Complaints</p>
+                <p className="text-sm text-muted-foreground">Residents can reopen closed issues by replying.</p>
+              </div>
+            </div>
+
+            <div className="flex gap-3">
+              <Clock className="w-5 h-5 text-cyan-600 dark:text-cyan-400 flex-shrink-0 mt-0.5" />
+              <div>
+                <p className="font-semibold">Audit Trail</p>
+                <p className="text-sm text-muted-foreground">Timestamps for submissions, views, and responses.</p>
+              </div>
+            </div>
+
+            <div className="flex gap-3">
+              <Building2 className="w-5 h-5 text-indigo-600 dark:text-indigo-400 flex-shrink-0 mt-0.5" />
+              <div>
+                <p className="font-semibold">Multi-Level Visibility</p>
+                <p className="text-sm text-muted-foreground">Staff see all, residents see their own.</p>
               </div>
             </div>
           </div>
