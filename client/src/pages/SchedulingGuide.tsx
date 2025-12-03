@@ -395,11 +395,11 @@ export default function SchedulingGuide() {
 
             <div className="flex justify-center gap-8">
               <div className="flex flex-col items-center">
-                <ArrowRight className="w-5 h-5 text-emerald-500 rotate-45" />
+                <ArrowRight className="w-5 h-5 text-emerald-500 rotate-[135deg]" />
                 <span className="text-xs text-emerald-600 mt-1">Approve</span>
               </div>
               <div className="flex flex-col items-center">
-                <ArrowRight className="w-5 h-5 text-red-500 -rotate-45" />
+                <ArrowRight className="w-5 h-5 text-red-500 rotate-45" />
                 <span className="text-xs text-red-600 mt-1">Deny</span>
               </div>
             </div>
