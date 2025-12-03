@@ -26,6 +26,14 @@ import { fr, enUS } from "date-fns/locale";
 // Helper to get date locale based on current language
 const getDateLocale = () => i18n.language?.startsWith('fr') ? fr : enUS;
 
+// Helper to parse YYYY-MM-DD date strings as local dates (not UTC)
+// This prevents timezone issues where UTC midnight shows as previous day for users in negative UTC offsets
+const parseLocalDate = (dateStr: string): Date => {
+  if (!dateStr) return new Date();
+  const parts = dateStr.split('T')[0].split('-');
+  return new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
+};
+
 export default function Payroll() {
   const { t } = useTranslation();
   const { toast } = useToast();
@@ -578,11 +586,11 @@ export default function Payroll() {
                         const aOrder = statusOrder[a.status as keyof typeof statusOrder] ?? 3;
                         const bOrder = statusOrder[b.status as keyof typeof statusOrder] ?? 3;
                         if (aOrder !== bOrder) return aOrder - bOrder;
-                        return new Date(b.startDate).getTime() - new Date(a.startDate).getTime();
+                        return parseLocalDate(b.startDate).getTime() - parseLocalDate(a.startDate).getTime();
                       })
                       .map((period) => (
                       <SelectItem key={period.id} value={period.id}>
-                        {format(new Date(period.startDate), 'MMM dd, yyyy', { locale: getDateLocale() })} - {format(new Date(period.endDate), 'MMM dd, yyyy', { locale: getDateLocale() })} ({period.status})
+                        {format(parseLocalDate(period.startDate), 'MMM dd, yyyy', { locale: getDateLocale() })} - {format(parseLocalDate(period.endDate), 'MMM dd, yyyy', { locale: getDateLocale() })} ({period.status})
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -687,7 +695,7 @@ export default function Payroll() {
                                             <div className="flex items-center gap-2 mb-2">
                                               <span className="material-icons text-sm">event</span>
                                               <span className="font-medium">
-                                                {format(new Date(session.workDate), 'EEE, MMM dd, yyyy', { locale: getDateLocale() })}
+                                                {format(parseLocalDate(session.workDate), 'EEE, MMM dd, yyyy', { locale: getDateLocale() })}
                                               </span>
                                             </div>
                                             <div className="flex items-center gap-2 mb-2">
@@ -1050,7 +1058,7 @@ export default function Payroll() {
                         <CardContent className="flex items-center justify-between p-4">
                           <div>
                             <div className="font-medium">
-                              {format(new Date(period.startDate), 'MMM dd, yyyy', { locale: getDateLocale() })} - {format(new Date(period.endDate), 'MMM dd, yyyy', { locale: getDateLocale() })}
+                              {format(parseLocalDate(period.startDate), 'MMM dd, yyyy', { locale: getDateLocale() })} - {format(parseLocalDate(period.endDate), 'MMM dd, yyyy', { locale: getDateLocale() })}
                             </div>
                             <div className="text-sm text-muted-foreground capitalize">{period.status}</div>
                           </div>
