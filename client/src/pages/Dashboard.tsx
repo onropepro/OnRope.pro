@@ -7230,7 +7230,7 @@ export default function Dashboard() {
     
     <div class="footer">
       This inspection report was generated in accordance with IRATA International Code of Practice.<br>
-      Document generated on ${new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
+      Document generated on ${formatLocalDateLong(new Date().toISOString())}
     </div>
   </div>
 </body>

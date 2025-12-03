@@ -12,6 +12,7 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/component
 import { FileText, Eye, PenLine, Check, AlertCircle, Clock, ChevronRight, ChevronDown, FileCheck, FileWarning, Loader2, ExternalLink, Shield, HardHat, Wrench, AlertTriangle, ClipboardList, Phone, GraduationCap, Package, Thermometer, HeartPulse, MessageCircle, Lightbulb, Zap } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
+import { formatDateTime } from "@/lib/dateUtils";
 
 interface SafeWorkProcedure {
   jobType: string;
@@ -625,13 +626,7 @@ export function DocumentReviews({ companyDocuments = [], methodStatements = [] }
 
   const formatDate = (dateString?: string) => {
     if (!dateString) return '-';
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-    });
+    return formatDateTime(dateString);
   };
 
   if (isLoading) {

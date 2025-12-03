@@ -1930,7 +1930,7 @@ const generateSafeWorkPracticePDF = (
     doc.setFontSize(8);
     doc.setTextColor(150, 150, 150);
     doc.text(t.pageOf(i, totalPages), pageWidth / 2, pageHeight - 10, { align: 'center' });
-    doc.text(`${t.generated}: ${new Date().toLocaleDateString()}`, margin, pageHeight - 10);
+    doc.text(`${t.generated}: ${formatLocalDate(new Date().toISOString())}`, margin, pageHeight - 10);
   }
 
   // Download
@@ -2079,7 +2079,7 @@ const generateSafeWorkProcedurePDF = (
     doc.setFontSize(8);
     doc.setTextColor(128, 128, 128);
     doc.text(t.pageOf(i, totalPages), pageWidth / 2, pageHeight - 10, { align: 'center' });
-    doc.text(`${t.generated}: ${new Date().toLocaleDateString()}`, margin, pageHeight - 10);
+    doc.text(`${t.generated}: ${formatLocalDate(new Date().toISOString())}`, margin, pageHeight - 10);
   }
 
   // Download

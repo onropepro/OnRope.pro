@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { apiRequest, queryClient } from "@/lib/queryClient";
+import { formatTimestampDate } from "@/lib/dateUtils";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -400,9 +401,9 @@ export function SubscriptionManagement() {
               <div className="flex items-center gap-2 text-sm text-muted-foreground">
                 <Calendar className="w-4 h-4" />
                 {subStatus.cancelAtPeriodEnd ? (
-                  <span>Ends on {new Date(subStatus.currentPeriodEnd).toLocaleDateString()}</span>
+                  <span>Ends on {formatTimestampDate(subStatus.currentPeriodEnd)}</span>
                 ) : (
-                  <span>Renews on {new Date(subStatus.currentPeriodEnd).toLocaleDateString()}</span>
+                  <span>Renews on {formatTimestampDate(subStatus.currentPeriodEnd)}</span>
                 )}
               </div>
             )}
