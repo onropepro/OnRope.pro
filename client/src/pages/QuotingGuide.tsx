@@ -123,6 +123,44 @@ export default function QuotingGuide() {
 
         <Separator />
 
+        {/* Problems Solved */}
+        <section className="space-y-4">
+          <Card className="border border-green-200 dark:border-green-900 bg-green-50/50 dark:bg-green-950/50">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-lg flex items-center gap-2 text-green-900 dark:text-green-100">
+                <CheckCircle2 className="w-5 h-5" />
+                Problems Solved
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="text-green-900 dark:text-green-100">
+              <ul className="space-y-2 text-sm">
+                <li className="flex items-start gap-2">
+                  <CheckCircle2 className="w-4 h-4 mt-0.5 shrink-0" />
+                  <span><strong>Inconsistent pricing:</strong> Service-specific formulas ensure accurate labor cost calculations</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <CheckCircle2 className="w-4 h-4 mt-0.5 shrink-0" />
+                  <span><strong>Lost sales opportunities:</strong> Kanban pipeline tracks quotes from draft to won with stage visibility</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <CheckCircle2 className="w-4 h-4 mt-0.5 shrink-0" />
+                  <span><strong>Tax calculation errors:</strong> Automatic HST/GST calculation based on company settings</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <CheckCircle2 className="w-4 h-4 mt-0.5 shrink-0" />
+                  <span><strong>Financial data exposure:</strong> Permission-based pricing visibility protects sensitive information</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <CheckCircle2 className="w-4 h-4 mt-0.5 shrink-0" />
+                  <span><strong>Quote-to-project friction:</strong> One-click conversion creates projects with all pricing data intact</span>
+                </li>
+              </ul>
+            </CardContent>
+          </Card>
+        </section>
+
+        <Separator />
+
         {/* Service Types */}
         <section className="space-y-4">
           <h2 className="text-xl font-bold flex items-center gap-2">

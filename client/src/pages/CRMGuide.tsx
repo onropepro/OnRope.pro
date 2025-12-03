@@ -121,6 +121,44 @@ export default function CRMGuide() {
 
         <Separator />
 
+        {/* Problems Solved */}
+        <section className="space-y-4">
+          <Card className="border border-green-200 dark:border-green-900 bg-green-50/50 dark:bg-green-950/50">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-lg flex items-center gap-2 text-green-900 dark:text-green-100">
+                <CheckCircle2 className="w-5 h-5" />
+                Problems Solved
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="text-green-900 dark:text-green-100">
+              <ul className="space-y-2 text-sm">
+                <li className="flex items-start gap-2">
+                  <CheckCircle2 className="w-4 h-4 mt-0.5 shrink-0" />
+                  <span><strong>Repeated data entry:</strong> Building specs auto-fill into new projects from client LMS records</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <CheckCircle2 className="w-4 h-4 mt-0.5 shrink-0" />
+                  <span><strong>Scattered client information:</strong> Centralized database of clients with multiple building portfolios</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <CheckCircle2 className="w-4 h-4 mt-0.5 shrink-0" />
+                  <span><strong>Lost building specifications:</strong> Floor counts, strata plans, and drop targets stored permanently</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <CheckCircle2 className="w-4 h-4 mt-0.5 shrink-0" />
+                  <span><strong>Billing address confusion:</strong> Separate billing vs. service addresses per client</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <CheckCircle2 className="w-4 h-4 mt-0.5 shrink-0" />
+                  <span><strong>Inconsistent project setup:</strong> Client selection populates correct building data automatically</span>
+                </li>
+              </ul>
+            </CardContent>
+          </Card>
+        </section>
+
+        <Separator />
+
         {/* Client Data Structure */}
         <section className="space-y-4">
           <h2 className="text-xl font-bold flex items-center gap-2">

@@ -120,6 +120,44 @@ export default function ResidentPortalGuide() {
 
         <Separator />
 
+        {/* Problems Solved */}
+        <section className="space-y-4">
+          <Card className="border border-green-200 dark:border-green-900 bg-green-50/50 dark:bg-green-950/50">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-lg flex items-center gap-2 text-green-900 dark:text-green-100">
+                <CheckCircle2 className="w-5 h-5" />
+                Problems Solved
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="text-green-900 dark:text-green-100">
+              <ul className="space-y-2 text-sm">
+                <li className="flex items-start gap-2">
+                  <CheckCircle2 className="w-4 h-4 mt-0.5 shrink-0" />
+                  <span><strong>Resident communication gaps:</strong> Direct portal access for project updates without phone calls</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <CheckCircle2 className="w-4 h-4 mt-0.5 shrink-0" />
+                  <span><strong>Lost complaint records:</strong> Two-way messaging system with unit tracking and response history</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <CheckCircle2 className="w-4 h-4 mt-0.5 shrink-0" />
+                  <span><strong>Work transparency issues:</strong> Photo galleries show before/after progress to residents</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <CheckCircle2 className="w-4 h-4 mt-0.5 shrink-0" />
+                  <span><strong>Access control complexity:</strong> Simple building codes link residents to their specific project</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <CheckCircle2 className="w-4 h-4 mt-0.5 shrink-0" />
+                  <span><strong>Unread message tracking:</strong> Notification badges show pending responses to company staff</span>
+                </li>
+              </ul>
+            </CardContent>
+          </Card>
+        </section>
+
+        <Separator />
+
         {/* Resident Features */}
         <section className="space-y-4">
           <h2 className="text-xl font-bold flex items-center gap-2">
