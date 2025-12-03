@@ -210,6 +210,29 @@ export default function SuperUser() {
               </p>
             </CardContent>
           </Card>
+
+          <Card 
+            className="hover-elevate active-elevate-2 cursor-pointer transition-all"
+            onClick={() => setLocation('/changelog')}
+            data-testid="card-changelog"
+          >
+            <CardHeader>
+              <div className="flex items-center gap-3">
+                <div className="h-12 w-12 rounded-full bg-orange-500/10 flex items-center justify-center">
+                  <span className="material-icons text-orange-500 text-2xl">menu_book</span>
+                </div>
+                <div>
+                  <CardTitle className="text-xl">Changelog & Knowledge Base</CardTitle>
+                  <CardDescription>Documentation and feature guides</CardDescription>
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <p className="text-sm text-muted-foreground">
+                Browse comprehensive guides for all platform features and systems
+              </p>
+            </CardContent>
+          </Card>
         </div>
       </div>
 
