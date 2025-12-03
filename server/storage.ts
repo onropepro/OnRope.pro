@@ -1752,6 +1752,8 @@ export class Storage {
         regularHours: session.regularHours,
         overtimeHours: session.overtimeHours,
         doubleTimeHours: session.doubleTimeHours,
+        peaceWorkPay: session.peaceWorkPay,
+        isPeaceWork: session.projectPeaceWork,
         createdAt: new Date(),
         updatedAt: new Date(),
         projectName: session.projectName || 'Unknown Project',

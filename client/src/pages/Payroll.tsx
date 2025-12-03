@@ -658,7 +658,11 @@ export default function Payroll() {
                                 const hours = endTime 
                                   ? ((endTime.getTime() - startTime.getTime()) / (1000 * 60 * 60))
                                   : 0;
-                                const sessionCost = hours * parseFloat(employee.hourlyRate);
+                                const isPeaceWork = Boolean(session.isPeaceWork);
+                                const peaceWorkPayAmount = session.peaceWorkPay ? parseFloat(session.peaceWorkPay) : 0;
+                                const sessionCost = isPeaceWork 
+                                  ? peaceWorkPayAmount
+                                  : hours * parseFloat(employee.hourlyRate);
                                 const totalDrops = (session.dropsCompletedNorth || 0) + 
                                                   (session.dropsCompletedEast || 0) + 
                                                   (session.dropsCompletedSouth || 0) + 
@@ -679,11 +683,19 @@ export default function Payroll() {
                                             <div className="flex items-center gap-2 mb-2">
                                               <span className="material-icons text-sm">business</span>
                                               <span className="text-muted-foreground">{session.projectName || t('payroll.nonBillable', 'Non-Billable')}</span>
+                                              {isPeaceWork && (
+                                                <Badge variant="secondary" className="text-xs bg-emerald-500/10 text-emerald-700 dark:text-emerald-400">
+                                                  {t('payroll.pieceWork', 'Piece Work')}
+                                                </Badge>
+                                              )}
                                             </div>
                                             {totalDrops > 0 && (
                                               <div className="flex items-center gap-2">
                                                 <span className="material-icons text-sm">check_circle</span>
-                                                <span className="text-muted-foreground">{totalDrops} {t('payroll.dropsNorth', 'drops completed')}</span>
+                                                <span className="text-muted-foreground">
+                                                  {totalDrops} {t('payroll.dropsNorth', 'drops completed')}
+                                                  {isPeaceWork && totalDrops > 0 && ` @ $${(peaceWorkPayAmount / totalDrops).toFixed(0)}/drop`}
+                                                </span>
                                               </div>
                                             )}
                                           </div>
