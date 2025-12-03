@@ -2044,7 +2044,7 @@ export type EmployeeHoursSummary = {
   overtimeHours: number;
   doubleTimeHours: number;
   totalPay: number;
-  sessions: (WorkSession & { projectName: string })[];
+  sessions: (WorkSession & { projectName: string; isPeaceWork?: boolean })[];
 };
 
 export type EmployeeAssignment = {

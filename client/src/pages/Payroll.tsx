@@ -8,6 +8,7 @@ import { hasFinancialAccess } from "@/lib/permissions";
 import type { PayPeriodConfig, PayPeriod, EmployeeHoursSummary } from "@shared/schema";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
@@ -76,7 +77,7 @@ export default function Payroll() {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
   // Fetch current user to check permissions
-  const { data: userData, isLoading: userLoading } = useQuery({
+  const { data: userData, isLoading: userLoading } = useQuery<{ user: any }>({
     queryKey: ["/api/user"],
   });
 
