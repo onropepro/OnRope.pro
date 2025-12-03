@@ -9978,7 +9978,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       const periods = await storage.getPayPeriodsByCompany(companyId);
-      res.json({ periods });
+      
+      // Dynamically recalculate status based on current date
+      const today = new Date().toISOString().split('T')[0];
+      const periodsWithCurrentStatus = periods.map(period => {
+        let status: string;
+        if (period.startDate > today) {
+          status = 'upcoming';
+        } else if (period.endDate < today) {
+          status = 'past';
+        } else {
+          status = 'current';
+        }
+        return { ...period, status };
+      });
+      
+      res.json({ periods: periodsWithCurrentStatus });
     } catch (error) {
       console.error("Get pay periods error:", error);
       res.status(500).json({ message: "Internal server error" });
