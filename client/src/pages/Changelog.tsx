@@ -240,6 +240,9 @@ const pagesData: PageCategory[] = [
       { name: "Pricing", path: "/changelog/pricing", description: "Subscription tiers and add-ons", roles: ["Public"] },
       { name: "Safety Guide", path: "/changelog/safety", description: "Safety & compliance documentation guide", roles: ["Public"] },
       { name: "Inventory Guide", path: "/changelog/inventory", description: "Equipment tracking guide", roles: ["Public"] },
+      { name: "User Access Guide", path: "/changelog/user-access", description: "Roles, permissions, and authentication", roles: ["Public"] },
+      { name: "Projects Guide", path: "/changelog/projects", description: "Project management and job types", roles: ["Public"] },
+      { name: "Time Tracking Guide", path: "/changelog/time-tracking", description: "Work sessions and clock in/out", roles: ["Public"] },
     ]
   },
   {
