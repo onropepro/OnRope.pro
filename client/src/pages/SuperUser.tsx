@@ -233,6 +233,29 @@ export default function SuperUser() {
               </p>
             </CardContent>
           </Card>
+
+          <Card 
+            className="hover-elevate active-elevate-2 cursor-pointer transition-all"
+            onClick={() => setLocation('/superuser/founder-resources')}
+            data-testid="card-founder-resources"
+          >
+            <CardHeader>
+              <div className="flex items-center gap-3">
+                <div className="h-12 w-12 rounded-full bg-rose-500/10 flex items-center justify-center">
+                  <span className="material-icons text-rose-500 text-2xl">rocket_launch</span>
+                </div>
+                <div>
+                  <CardTitle className="text-xl">Founder Resources</CardTitle>
+                  <CardDescription>Private resources for Tommy & Glenn</CardDescription>
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <p className="text-sm text-muted-foreground">
+                Development tools, launch strategy, sales planning, and important links
+              </p>
+            </CardContent>
+          </Card>
         </div>
       </div>
 

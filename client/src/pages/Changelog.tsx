@@ -85,6 +85,12 @@ type RecentChange = {
 const recentChangesData: RecentChange[] = [
   {
     date: "December 4, 2025",
+    title: "Founder Resources Section",
+    description: "Added private Founder Resources page for Tommy & Glenn in SuperUser dashboard with development tools links, launch strategy roadmap, sales strategy planning, and important notes",
+    type: "feature"
+  },
+  {
+    date: "December 4, 2025",
     title: "Security Hardening Audit",
     description: "Major security improvements: mandatory SESSION_SECRET environment variable, rate limiting on all auth endpoints (login 10/15min, registration 5/hour, password changes 5/15min), password complexity requirements (8+ chars with uppercase, lowercase, number), account enumeration prevention with generic error messages, and comprehensive employee role access control",
     type: "improvement"

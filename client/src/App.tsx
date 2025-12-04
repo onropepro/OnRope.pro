@@ -37,6 +37,7 @@ import CompanyDetail from "@/pages/CompanyDetail";
 import ViewAsCompany from "@/pages/ViewAsCompany";
 import SuperUserFeatureRequests from "@/pages/SuperUserFeatureRequests";
 import SuperUserMetrics from "@/pages/SuperUserMetrics";
+import FounderResources from "@/pages/FounderResources";
 import ResidentsManagement from "@/pages/ResidentsManagement";
 import Documents from "@/pages/Documents";
 import ResidentLink from "@/pages/ResidentLink";
@@ -114,6 +115,11 @@ function Router() {
       <Route path="/superuser/companies">
         <ProtectedRoute allowedRoles={["superuser"]}>
           <AllCompanies />
+        </ProtectedRoute>
+      </Route>
+      <Route path="/superuser/founder-resources">
+        <ProtectedRoute allowedRoles={["superuser"]}>
+          <FounderResources />
         </ProtectedRoute>
       </Route>
       <Route path="/resident">
