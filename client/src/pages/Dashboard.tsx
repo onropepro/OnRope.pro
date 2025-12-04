@@ -291,6 +291,80 @@ type DropLogFormData = z.infer<typeof dropLogSchema>;
 type EndDayFormData = z.infer<typeof endDaySchema>;
 type ClientFormData = z.infer<typeof clientSchema>;
 
+// Helper function to create tint from hex color - shared between card components
+function createTintFromHex(hex: string, lightness: number = 90): string {
+  hex = hex.replace(/^#/, '');
+  const r = parseInt(hex.substring(0, 2), 16) / 255;
+  const g = parseInt(hex.substring(2, 4), 16) / 255;
+  const b = parseInt(hex.substring(4, 6), 16) / 255;
+  
+  const max = Math.max(r, g, b);
+  const min = Math.min(r, g, b);
+  let h = 0, s = 0;
+  
+  if (max !== min) {
+    const d = max - min;
+    const l = (max + min) / 2;
+    s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+    switch (max) {
+      case r: h = ((g - b) / d + (g < b ? 6 : 0)) / 6; break;
+      case g: h = ((b - r) / d + 2) / 6; break;
+      case b: h = ((r - g) / d + 4) / 6; break;
+    }
+  }
+  
+  return `hsl(${Math.round(h * 360)}, ${Math.round(s * 100)}%, ${lightness}%)`;
+}
+
+// Static Card Component - for filtered views without drag-and-drop
+function StaticCard({ card, colorIndex, brandColors }: { card: any; colorIndex: number; brandColors: string[] }) {
+  const brandingActive = brandColors.length > 0;
+
+  let activeColor = card.borderColor;
+  let cardBackground: string | undefined = undefined;
+  let iconColor = card.borderColor;
+
+  if (brandingActive && brandColors.length > 0) {
+    const brandColor = brandColors[colorIndex % brandColors.length];
+    activeColor = brandColor;
+    cardBackground = createTintFromHex(brandColor, 90);
+    iconColor = brandColor;
+  }
+
+  const style: React.CSSProperties = {
+    borderLeft: `6px solid ${activeColor}`,
+    ...(cardBackground && { background: cardBackground }),
+  };
+
+  return (
+    <div
+      style={style}
+      className="bg-card rounded-xl border border-border/50 shadow-md hover:shadow-lg transition-all duration-300 cursor-pointer overflow-hidden group hover-scale"
+      onClick={card.onClick}
+      data-testid={card.testId}
+    >
+      <div className="p-4 flex flex-col items-center gap-3">
+        <div 
+          className="w-14 h-14 rounded-xl flex items-center justify-center transition-transform duration-300 group-hover:scale-110 border-2"
+          style={{ 
+            backgroundColor: `${iconColor}15`, 
+            color: iconColor, 
+            borderColor: `${iconColor}40` 
+          }}
+        >
+          <span className="material-icons text-4xl">{card.icon}</span>
+        </div>
+        <div className="text-center">
+          <div className="text-base font-bold mb-0.5 text-foreground">
+            {card.label}
+          </div>
+          <div className="text-xs text-muted-foreground">{card.description}</div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // Sortable Card Component - uses brand colors when active, otherwise original multicolor
 function SortableCard({ card, isRearranging, colorIndex, brandColors }: { card: any; isRearranging: boolean; colorIndex: number; brandColors: string[] }) {
   const {
@@ -302,42 +376,13 @@ function SortableCard({ card, isRearranging, colorIndex, brandColors }: { card: 
     isDragging,
   } = useSortable({ id: card.id, disabled: !isRearranging });
 
-  // Brand colors passed directly as props - most reliable approach
   const brandingActive = brandColors.length > 0;
 
-  // Create a light tint from hex color
-  const createTintFromHex = (hex: string, lightness: number = 90): string => {
-    hex = hex.replace(/^#/, '');
-    const r = parseInt(hex.substring(0, 2), 16) / 255;
-    const g = parseInt(hex.substring(2, 4), 16) / 255;
-    const b = parseInt(hex.substring(4, 6), 16) / 255;
-    
-    const max = Math.max(r, g, b);
-    const min = Math.min(r, g, b);
-    let h = 0, s = 0;
-    
-    if (max !== min) {
-      const d = max - min;
-      const l = (max + min) / 2;
-      s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
-      switch (max) {
-        case r: h = ((g - b) / d + (g < b ? 6 : 0)) / 6; break;
-        case g: h = ((b - r) / d + 2) / 6; break;
-        case b: h = ((r - g) / d + 4) / 6; break;
-      }
-    }
-    
-    return `hsl(${Math.round(h * 360)}, ${Math.round(s * 100)}%, ${lightness}%)`;
-  };
-
-  // When branding is active: use ONLY brand colors for EVERYTHING
-  // When branding is NOT active: use original card borderColor with default bg-card
   let activeColor = card.borderColor;
   let cardBackground: string | undefined = undefined;
   let iconColor = card.borderColor;
 
   if (brandingActive && brandColors.length > 0) {
-    // Cycle through brand colors
     const brandColor = brandColors[colorIndex % brandColors.length];
     activeColor = brandColor;
     cardBackground = createTintFromHex(brandColor, 90);
@@ -552,6 +597,7 @@ export default function Dashboard() {
   const [terminationData, setTerminationData] = useState<{ reason: string; notes: string }>({ reason: "", notes: "" });
   const [cardOrder, setCardOrder] = useState<string[]>([]);
   const [isRearranging, setIsRearranging] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [showSaveAsClientDialog, setShowSaveAsClientDialog] = useState(false);
   const [projectDataForClient, setProjectDataForClient] = useState<any>(null);
   const [showOtherElevationFields, setShowOtherElevationFields] = useState(false);
@@ -1862,6 +1908,16 @@ export default function Dashboard() {
   const currentUser = userData?.user;
   const userIsReadOnly = isReadOnly(currentUser);
 
+  // Category definitions for dashboard card filtering
+  const cardCategories = [
+    { id: "all", label: t('dashboard.categories.all', 'All'), icon: "apps" },
+    { id: "operations", label: t('dashboard.categories.operations', 'Operations'), icon: "engineering" },
+    { id: "safety", label: t('dashboard.categories.safety', 'Safety'), icon: "health_and_safety" },
+    { id: "financial", label: t('dashboard.categories.financial', 'Financial'), icon: "payments" },
+    { id: "team", label: t('dashboard.categories.team', 'Team'), icon: "groups" },
+    { id: "communication", label: t('dashboard.categories.communication', 'Communication'), icon: "forum" },
+  ];
+
   // Dashboard card configuration with permission filtering
   const dashboardCards = useMemo(() => [
     {
@@ -1873,6 +1929,7 @@ export default function Dashboard() {
       testId: "button-nav-projects",
       isVisible: () => true, // Everyone
       borderColor: "#3b82f6",
+      category: "operations",
     },
     {
       id: "non-billable-hours",
@@ -1883,6 +1940,7 @@ export default function Dashboard() {
       testId: "button-non-billable-hours",
       isVisible: () => true, // Everyone
       borderColor: "#06b6d4",
+      category: "operations",
     },
     {
       id: "past-projects",
@@ -1893,6 +1951,7 @@ export default function Dashboard() {
       testId: "button-nav-past-projects",
       isVisible: () => true, // Everyone
       borderColor: "#60a5fa",
+      category: "operations",
     },
     {
       id: "employees",
@@ -1903,6 +1962,7 @@ export default function Dashboard() {
       testId: "button-nav-employees",
       isVisible: (user: any) => canManageEmployees(user), // Management only
       borderColor: "#a855f7",
+      category: "team",
     },
     {
       id: "clients",
@@ -1913,16 +1973,18 @@ export default function Dashboard() {
       testId: "button-nav-clients",
       isVisible: (user: any) => hasPermission(user, "view_clients"), // Permission-based
       borderColor: "#10b981",
+      category: "communication",
     },
     {
       id: "performance",
-      label: t('dashboard.cards.performance.label', 'Performance & Live Activity'),
-      description: t('dashboard.cards.performance.description', 'Analytics & active workers'),
+      label: t('dashboard.cards.performance.label', 'Performance'),
+      description: t('dashboard.cards.performance.description', 'View analytics'),
       icon: "analytics",
       onClick: () => handleTabChange("performance"),
       testId: "button-nav-performance",
       isVisible: (user: any) => canViewPerformance(user), // Management only
       borderColor: "#f97316",
+      category: "team",
     },
     {
       id: "complaints",
@@ -1933,6 +1995,7 @@ export default function Dashboard() {
       testId: "button-nav-complaints",
       isVisible: () => true, // Everyone
       borderColor: "#ec4899",
+      category: "communication",
     },
     {
       id: "inventory",
@@ -1943,6 +2006,7 @@ export default function Dashboard() {
       testId: "button-inventory",
       isVisible: () => true, // Everyone can access (tabs handle different views)
       borderColor: "#d97706",
+      category: "safety",
     },
     {
       id: "safety-forms",
@@ -1953,16 +2017,18 @@ export default function Dashboard() {
       testId: "button-safety-forms",
       isVisible: () => true, // Everyone
       borderColor: "#f87171",
+      category: "safety",
     },
     {
       id: "payroll",
-      label: t('dashboard.cards.payroll.label', 'Financials'),
-      description: t('dashboard.cards.payroll.description', 'Payroll & quotes'),
+      label: t('dashboard.cards.payroll.label', 'Payroll'),
+      description: t('dashboard.cards.payroll.description', 'Employee hours'),
       icon: "payments",
       onClick: () => setLocation("/payroll"),
       testId: "button-payroll",
       isVisible: (user: any) => hasFinancialAccess(user), // Financial permission required
       borderColor: "#22c55e",
+      category: "financial",
     },
     {
       id: "quotes",
@@ -1973,6 +2039,7 @@ export default function Dashboard() {
       testId: "button-quotes",
       isVisible: (user: any) => hasFinancialAccess(user), // Financial permission required
       borderColor: "#16a34a",
+      category: "financial",
     },
     {
       id: "schedule",
@@ -1981,8 +2048,9 @@ export default function Dashboard() {
       icon: "event",
       onClick: () => setLocation("/schedule"),
       testId: "button-schedule",
-      isVisible: (user: any) => isManagement(user), // Management only
+      isVisible: (user: any) => canViewSchedule(user), // Schedule permission
       borderColor: "#0ea5e9",
+      category: "operations",
     },
     {
       id: "documents",
@@ -1993,6 +2061,7 @@ export default function Dashboard() {
       testId: "button-documents",
       isVisible: () => true, // Everyone
       borderColor: "#14b8a6",
+      category: "communication",
     },
     {
       id: "residents",
@@ -2003,6 +2072,7 @@ export default function Dashboard() {
       testId: "button-residents",
       isVisible: (user: any) => isManagement(user), // Management only
       borderColor: "#8b5cf6",
+      category: "communication",
     },
   ].filter(card => {
     try {
@@ -2013,7 +2083,6 @@ export default function Dashboard() {
     }
   }), [currentUser, t]); // useMemo dependency - recreate when currentUser or language changes
 
-  // Load saved card order from localStorage
   // Load saved card order from backend preferences
   useEffect(() => {
     if (preferencesData?.preferences?.dashboardCardOrder) {
@@ -2023,14 +2092,23 @@ export default function Dashboard() {
     }
   }, [preferencesData, dashboardCards]); // Re-run when preferences or available cards change
 
-  // Sort cards based on saved order
-  const sortedDashboardCards = [...dashboardCards].sort((a, b) => {
-    const aIndex = cardOrder.indexOf(a.id);
-    const bIndex = cardOrder.indexOf(b.id);
-    if (aIndex === -1) return 1;
-    if (bIndex === -1) return -1;
-    return aIndex - bIndex;
-  });
+  // Disable rearranging when switching away from "all" category
+  useEffect(() => {
+    if (selectedCategory !== "all") {
+      setIsRearranging(false);
+    }
+  }, [selectedCategory]);
+
+  // Sort cards based on saved order and filter by selected category
+  const sortedDashboardCards = [...dashboardCards]
+    .filter(card => selectedCategory === "all" || card.category === selectedCategory)
+    .sort((a, b) => {
+      const aIndex = cardOrder.indexOf(a.id);
+      const bIndex = cardOrder.indexOf(b.id);
+      if (aIndex === -1) return 1;
+      if (bIndex === -1) return -1;
+      return aIndex - bIndex;
+    });
 
   // Handle drag end
   // Mutation to save preferences
@@ -2045,13 +2123,51 @@ export default function Dashboard() {
   });
 
   const handleDragEnd = (event: DragEndEvent) => {
+    // Only allow rearranging when viewing all cards to prevent corrupting full order
+    if (selectedCategory !== "all") {
+      setIsRearranging(false); // Force disable rearranging on stale drag events
+      return;
+    }
+    
+    // Don't process if not in rearranging mode
+    if (!isRearranging) return;
+    
     const { active, over } = event;
     
     if (over && active.id !== over.id) {
-      const oldIndex = sortedDashboardCards.findIndex(c => c.id === active.id);
-      const newIndex = sortedDashboardCards.findIndex(c => c.id === over.id);
+      const activeId = active.id as string;
+      const overId = over.id as string;
       
-      const newOrder = arrayMove(sortedDashboardCards, oldIndex, newIndex).map(c => c.id);
+      // Get canonical list of all dashboard card IDs
+      const dashboardCardIds = new Set(dashboardCards.map(c => c.id));
+      
+      // Validate both IDs exist in current dashboardCards
+      if (!dashboardCardIds.has(activeId) || !dashboardCardIds.has(overId)) {
+        console.warn('Dashboard drag event ignored: stale card IDs not in dashboardCards');
+        return;
+      }
+      
+      // Validate both IDs exist in current cardOrder
+      const oldIndex = cardOrder.indexOf(activeId);
+      const newIndex = cardOrder.indexOf(overId);
+      if (oldIndex === -1 || newIndex === -1) {
+        console.warn('Dashboard drag event ignored: card IDs not in cardOrder');
+        return;
+      }
+      
+      // Perform the move on a copy of the full cardOrder
+      const newOrder = arrayMove([...cardOrder], oldIndex, newIndex);
+      
+      // Final integrity check: newOrder must contain exactly the same IDs as dashboardCards
+      const newOrderSet = new Set(newOrder);
+      const hasAllCards = dashboardCardIds.size === newOrderSet.size && 
+                          [...dashboardCardIds].every(id => newOrderSet.has(id));
+      
+      if (!hasAllCards || newOrder.length !== dashboardCards.length) {
+        console.warn('Dashboard order corruption prevented: order integrity check failed');
+        return;
+      }
+      
       setCardOrder(newOrder);
       updatePreferencesMutation.mutate({ dashboardCardOrder: newOrder });
     }
@@ -2193,51 +2309,100 @@ export default function Dashboard() {
         {activeTab === "" && (
           <>
             <div className="mb-8">
-              <div className="flex items-center justify-between mb-6">
+              {/* Category Filter Tabs */}
+              <div className="mb-6">
+                <ScrollArea className="w-full">
+                  <div className="flex gap-2 pb-2">
+                    {cardCategories.map((category) => {
+                      const cardsInCategory = dashboardCards.filter(c => category.id === "all" || c.category === category.id);
+                      if (cardsInCategory.length === 0 && category.id !== "all") return null;
+                      
+                      return (
+                        <Button
+                          key={category.id}
+                          variant={selectedCategory === category.id ? "default" : "outline"}
+                          size="sm"
+                          onClick={() => {
+                            setSelectedCategory(category.id);
+                            if (category.id !== "all") setIsRearranging(false);
+                          }}
+                          className="gap-2 whitespace-nowrap"
+                          data-testid={`button-category-${category.id}`}
+                        >
+                          <span className="material-icons text-base">{category.icon}</span>
+                          {category.label}
+                          {category.id !== "all" && (
+                            <Badge variant="secondary" className="ml-1 min-w-[20px] h-5 text-xs">
+                              {cardsInCategory.length}
+                            </Badge>
+                          )}
+                        </Button>
+                      );
+                    })}
+                  </div>
+                  <ScrollBar orientation="horizontal" />
+                </ScrollArea>
+              </div>
+
+              <div className="flex items-center justify-between mb-6 gap-4">
                 <h2 className={`text-3xl font-bold ${hasCustomBranding ? 'custom-brand-text' : 'gradient-text'}`}>{t('dashboard.quickActions', 'Quick Actions')}</h2>
-                <div className="flex gap-2">
-                  <Button
-                    variant={isRearranging ? "default" : "outline"}
-                    size="sm"
-                    onClick={() => setIsRearranging(!isRearranging)}
-                    className="gap-2"
-                    data-testid="button-rearrange-cards"
-                  >
-                    <span className="material-icons text-base">
-                      {isRearranging ? "check" : "swap_vert"}
-                    </span>
-                    {isRearranging ? t('dashboard.done', 'Done') : t('dashboard.rearrangeCards', 'Rearrange Cards')}
-                  </Button>
-                  {isRearranging && (
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={resetCardOrder}
-                      className="gap-2"
-                      data-testid="button-reset-layout"
-                    >
-                      <span className="material-icons text-base">restart_alt</span>
-                      {t('dashboard.reset', 'Reset')}
-                    </Button>
+                <div className="flex gap-2 flex-shrink-0">
+                  {selectedCategory === "all" && (
+                    <>
+                      <Button
+                        variant={isRearranging ? "default" : "outline"}
+                        size="sm"
+                        onClick={() => setIsRearranging(!isRearranging)}
+                        className="gap-2"
+                        data-testid="button-rearrange-cards"
+                      >
+                        <span className="material-icons text-base">
+                          {isRearranging ? "check" : "swap_vert"}
+                        </span>
+                        <span className="hidden sm:inline">{isRearranging ? t('dashboard.done', 'Done') : t('dashboard.rearrangeCards', 'Rearrange Cards')}</span>
+                      </Button>
+                      {isRearranging && (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={resetCardOrder}
+                          className="gap-2"
+                          data-testid="button-reset-layout"
+                        >
+                          <span className="material-icons text-base">restart_alt</span>
+                          <span className="hidden sm:inline">{t('dashboard.reset', 'Reset')}</span>
+                        </Button>
+                      )}
+                    </>
                   )}
                 </div>
               </div>
-              <DndContext
-                sensors={sensors}
-                collisionDetection={closestCenter}
-                onDragEnd={handleDragEnd}
-              >
-                <SortableContext
-                  items={sortedDashboardCards.map(c => c.id)}
-                  strategy={rectSortingStrategy}
+              {/* Only enable drag-and-drop when viewing all cards to prevent order corruption */}
+              {selectedCategory === "all" ? (
+                <DndContext
+                  sensors={sensors}
+                  collisionDetection={closestCenter}
+                  onDragEnd={handleDragEnd}
                 >
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {sortedDashboardCards.map((card, index) => (
-                      <SortableCard key={card.id} card={card} isRearranging={isRearranging} colorIndex={index} brandColors={brandColors} />
-                    ))}
-                  </div>
-                </SortableContext>
-              </DndContext>
+                  <SortableContext
+                    items={sortedDashboardCards.map(c => c.id)}
+                    strategy={rectSortingStrategy}
+                  >
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                      {sortedDashboardCards.map((card, index) => (
+                        <SortableCard key={card.id} card={card} isRearranging={isRearranging} colorIndex={index} brandColors={brandColors} />
+                      ))}
+                    </div>
+                  </SortableContext>
+                </DndContext>
+              ) : (
+                /* Filtered view: use StaticCard without any drag-and-drop hooks */
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {sortedDashboardCards.map((card, index) => (
+                    <StaticCard key={card.id} card={card} colorIndex={index} brandColors={brandColors} />
+                  ))}
+                </div>
+              )}
             </div>
 
             {/* Resident Code Display - Show for all company staff on main dashboard */}
