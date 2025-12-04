@@ -19,7 +19,7 @@
       "safetyMeeting": "safety meeting",
       "hourWorked": "hour worked",
       "drop": "drop",
-      "residentComplaint": "resident complaint",
+      "residentFeedback": "resident feedback",
       "pieceOfGear": "piece of gear",
       "nonBillableHour": "non-billable hour",
       "jobQuote": "job quote",
@@ -114,8 +114,8 @@
           "title": "Safety Compliance",
           "description": "Digital safety forms, PDF rope access plans, and comprehensive safety documentation management."
         },
-        "complaints": {
-          "category": "Complaint Management",
+        "feedback": {
+          "category": "Feedback Management",
           "title": "Centralized. Organized. Done.",
           "tagline": "70% Fewer Calls. 24-Hour Resolution",
           "description": "Mrs. Henderson adds a photo: \"Missed my window.\" She is replied to in 4 minutes: \"On it tomorrow, 9am.\" She stops calling the building manager. They stop calling you. Everyone stops calling. Residents self-serve. You respond same-day. Your competitor? Still using paper."
@@ -123,8 +123,8 @@
         "residents": {
           "category": "Resident Portal",
           "title": "Building Resident Management",
-          "tagline": "The Contract Renewal Machine. 240 Residents Watch Progress. Submit Complaints. Stop Calling.",
-          "description": "240 residents watch progress on their phones. Submit complaints that get fixed same-day. Tell their council \"these guys are professional.\" Your competitor? Still using paper. Contract renewal rate: 95%. Theirs: 60%. Math is simple."
+          "tagline": "The Contract Renewal Machine. 240 Residents Watch Progress. Submit Feedback. Stop Calling.",
+          "description": "240 residents watch progress on their phones. Submit feedback that gets addressed same-day. Tell their council \"these guys are professional.\" Your competitor? Still using paper. Contract renewal rate: 95%. Theirs: 60%. Math is simple."
         },
         "audit": {
           "category": "IRATA & Insurance Audit Protection",
@@ -3494,7 +3494,7 @@
       "loadError": "Failed to load equipment"
     }
   },
-  "complaintDetail": {
+  "feedbackDetail": {
     "loading": "Loading...",
     "feedbackNotFound": "Feedback Not Found",
     "feedbackDetails": "Feedback Details",
@@ -4205,13 +4205,13 @@
     },
     "residentFeedback": {
       "title": "Resident Feedback",
-      "complaintCount": "{{count}} complaint",
       "feedbackCount": "{{count}} feedback items",
+      "feedbackCountSingular": "{{count}} feedback item",
       "noFeedback": "No feedback received yet",
       "closed": "Closed",
       "viewed": "Viewed",
       "new": "New",
-      "complaintPhoto": "Complaint photo"
+      "feedbackPhoto": "Feedback photo"
     },
     "jobComments": {
       "title": "Job Comments",
@@ -4459,7 +4459,7 @@
     },
     "projectDetails": {
       "title": "Project Details",
-      "description": "View project information, progress, and complaint history",
+      "description": "View project information, progress, and feedback history",
       "loading": "Loading project details...",
       "errorLoading": "Failed to load project details",
       "projectInfo": "Project Information",

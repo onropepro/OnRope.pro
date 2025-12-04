@@ -1482,7 +1482,7 @@ export default function PropertyManager() {
                       <CardHeader>
                         <CardTitle className="text-lg flex items-center gap-2">
                           <AlertCircle className="w-5 h-5" />
-                          {t('propertyManager.projectDetails.complaints.title', 'Complaints History')}
+                          {t('propertyManager.projectDetails.feedback.title', 'Complaints History')}
                           {projectDetailsData.complaints.length > 0 && (
                             <Badge variant="secondary">{projectDetailsData.complaints.length}</Badge>
                           )}
@@ -1491,7 +1491,7 @@ export default function PropertyManager() {
                       <CardContent>
                         {projectDetailsData.complaints.length === 0 ? (
                           <div className="text-sm text-muted-foreground text-center py-4" data-testid="text-no-complaints">
-                            {t('propertyManager.projectDetails.complaints.none', 'No complaints recorded for this project')}
+                            {t('propertyManager.projectDetails.feedback.none', 'No complaints recorded for this project')}
                           </div>
                         ) : (
                           <div className="space-y-3 max-h-60 overflow-y-auto">
@@ -1506,14 +1506,14 @@ export default function PropertyManager() {
                                   <div className="space-y-2">
                                     <div className="flex items-start justify-between gap-2">
                                       <div className="flex-1">
-                                        <p className="text-sm font-medium">{complaint.subject || t('propertyManager.projectDetails.complaints.noSubject', 'No Subject')}</p>
+                                        <p className="text-sm font-medium">{complaint.subject || t('propertyManager.projectDetails.feedback.noSubject', 'No Subject')}</p>
                                         <p className="text-xs text-muted-foreground mt-1">
-                                          {formatTimestampDate(complaint.createdAt)} {t('propertyManager.projectDetails.complaints.at', 'at')}{' '}
+                                          {formatTimestampDate(complaint.createdAt)} {t('propertyManager.projectDetails.feedback.at', 'at')}{' '}
                                           {formatTime(complaint.createdAt)}
                                         </p>
                                       </div>
                                       <Badge variant={complaint.status === 'resolved' ? 'default' : 'secondary'} className="text-xs">
-                                        {complaint.status === 'resolved' ? t('propertyManager.projectDetails.complaints.resolved', 'resolved') : t('propertyManager.projectDetails.complaints.pending', 'pending')}
+                                        {complaint.status === 'resolved' ? t('propertyManager.projectDetails.feedback.resolved', 'resolved') : t('propertyManager.projectDetails.feedback.pending', 'pending')}
                                       </Badge>
                                     </div>
                                     {complaint.description && (
@@ -1589,10 +1589,10 @@ export default function PropertyManager() {
           <DialogContent className="h-[90vh] flex flex-col p-0 max-w-2xl" data-testid="dialog-complaint-details">
             <DialogHeader className="shrink-0 px-6 pt-6 pb-4 border-b">
               <DialogTitle data-testid="text-complaint-title">
-                {selectedComplaint?.subject || t('propertyManager.complaintDetails.noSubject', 'No Subject')}
+                {selectedComplaint?.subject || t('propertyManager.feedbackDetails.noSubject', 'No Subject')}
               </DialogTitle>
               <DialogDescription data-testid="text-complaint-timestamp">
-                {t('propertyManager.complaintDetails.submittedOn', 'Submitted on')} {selectedComplaint ? formatTimestampDate(selectedComplaint.createdAt) : ''} {t('propertyManager.complaintDetails.at', 'at')}{' '}
+                {t('propertyManager.feedbackDetails.submittedOn', 'Submitted on')} {selectedComplaint ? formatTimestampDate(selectedComplaint.createdAt) : ''} {t('propertyManager.feedbackDetails.at', 'at')}{' '}
                 {selectedComplaint ? formatTime(selectedComplaint.createdAt) : ''}
               </DialogDescription>
             </DialogHeader>
@@ -1601,22 +1601,22 @@ export default function PropertyManager() {
               <div className="space-y-6">
                 {/* Status Badge */}
                 <div className="flex items-center gap-2">
-                  <span className="text-sm font-medium">{t('propertyManager.complaintDetails.status', 'Status:')}</span>
+                  <span className="text-sm font-medium">{t('propertyManager.feedbackDetails.status', 'Status:')}</span>
                   <Badge variant={selectedComplaint?.status === 'resolved' ? 'default' : 'secondary'}>
-                    {selectedComplaint?.status === 'resolved' ? t('propertyManager.complaintDetails.resolved', 'resolved') : t('propertyManager.complaintDetails.pending', 'pending')}
+                    {selectedComplaint?.status === 'resolved' ? t('propertyManager.feedbackDetails.resolved', 'resolved') : t('propertyManager.feedbackDetails.pending', 'pending')}
                   </Badge>
                 </div>
 
                 {/* Resident Information */}
                 <div className="space-y-2">
-                  <h4 className="text-sm font-semibold">{t('propertyManager.complaintDetails.residentInfo', 'Resident Information')}</h4>
+                  <h4 className="text-sm font-semibold">{t('propertyManager.feedbackDetails.residentInfo', 'Resident Information')}</h4>
                   <div className="bg-muted/50 rounded-lg p-3 space-y-1 text-sm">
-                    <div><span className="font-medium">{t('propertyManager.complaintDetails.name', 'Name:')}</span> {selectedComplaint?.residentName || t('propertyManager.complaintDetails.notAvailable', 'N/A')}</div>
+                    <div><span className="font-medium">{t('propertyManager.feedbackDetails.name', 'Name:')}</span> {selectedComplaint?.residentName || t('propertyManager.feedbackDetails.notAvailable', 'N/A')}</div>
                     {selectedComplaint?.unitNumber && (
-                      <div><span className="font-medium">{t('propertyManager.complaintDetails.unit', 'Unit:')}</span> {selectedComplaint.unitNumber}</div>
+                      <div><span className="font-medium">{t('propertyManager.feedbackDetails.unit', 'Unit:')}</span> {selectedComplaint.unitNumber}</div>
                     )}
                     {selectedComplaint?.phoneNumber && (
-                      <div><span className="font-medium">{t('propertyManager.complaintDetails.phone', 'Phone:')}</span> {selectedComplaint.phoneNumber}</div>
+                      <div><span className="font-medium">{t('propertyManager.feedbackDetails.phone', 'Phone:')}</span> {selectedComplaint.phoneNumber}</div>
                     )}
                   </div>
                 </div>
@@ -1624,7 +1624,7 @@ export default function PropertyManager() {
                 {/* Description */}
                 {selectedComplaint?.description && (
                   <div className="space-y-2">
-                    <h4 className="text-sm font-semibold">{t('propertyManager.complaintDetails.description', 'Description')}</h4>
+                    <h4 className="text-sm font-semibold">{t('propertyManager.feedbackDetails.description', 'Description')}</h4>
                     <div className="bg-muted/50 rounded-lg p-3 text-sm whitespace-pre-wrap">
                       {selectedComplaint.description}
                     </div>
@@ -1634,11 +1634,11 @@ export default function PropertyManager() {
                 {/* Photo */}
                 {selectedComplaint?.photoUrl && (
                   <div className="space-y-2">
-                    <h4 className="text-sm font-semibold">{t('propertyManager.complaintDetails.attachedPhoto', 'Attached Photo')}</h4>
+                    <h4 className="text-sm font-semibold">{t('propertyManager.feedbackDetails.attachedPhoto', 'Attached Photo')}</h4>
                     <div className="bg-muted/50 rounded-lg p-3">
                       <img 
                         src={selectedComplaint.photoUrl} 
-                        alt={t('propertyManager.complaintDetails.photoAlt', 'Complaint photo')} 
+                        alt={t('propertyManager.feedbackDetails.photoAlt', 'Complaint photo')} 
                         className="w-full h-auto rounded-md"
                         data-testid="img-complaint-photo"
                       />
@@ -1649,7 +1649,7 @@ export default function PropertyManager() {
                 {/* Notes (visible to resident) */}
                 {selectedComplaint?.notes && selectedComplaint.notes.length > 0 && (
                   <div className="space-y-2">
-                    <h4 className="text-sm font-semibold">{t('propertyManager.complaintDetails.communicationHistory', 'Communication History')}</h4>
+                    <h4 className="text-sm font-semibold">{t('propertyManager.feedbackDetails.communicationHistory', 'Communication History')}</h4>
                     <div className="space-y-2">
                       {selectedComplaint.notes
                         .filter((note: any) => note.visibleToResident)

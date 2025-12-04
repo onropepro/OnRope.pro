@@ -55,7 +55,7 @@ export default function Login() {
     t('login.rotatingWords.project', 'project'),
     t('login.rotatingWords.hourWorked', 'hour worked'),
     t('login.rotatingWords.drop', 'drop'),
-    t('login.rotatingWords.residentComplaint', 'resident complaint'),
+    t('login.rotatingWords.residentFeedback', 'resident feedback'),
     t('login.rotatingWords.pieceOfGear', 'piece of gear'),
     t('login.rotatingWords.nonBillableHour', 'non-billable hour'),
     t('login.rotatingWords.jobQuote', 'job quote'),
@@ -520,11 +520,11 @@ export default function Login() {
               <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
                 <MessageSquare className="w-5 h-5 text-primary" />
               </div>
-              <p className="text-xs text-muted-foreground uppercase tracking-wide">{t('login.features.cards.complaints.category')}</p>
-              <h3 className="font-bold">{t('login.features.cards.complaints.title')}</h3>
-              <p className="text-sm text-primary font-medium">{t('login.features.cards.complaints.tagline')}</p>
+              <p className="text-xs text-muted-foreground uppercase tracking-wide">{t('login.features.cards.feedback.category')}</p>
+              <h3 className="font-bold">{t('login.features.cards.feedback.title')}</h3>
+              <p className="text-sm text-primary font-medium">{t('login.features.cards.feedback.tagline')}</p>
               <p className="text-sm text-muted-foreground">
-                {t('login.features.cards.complaints.description')}
+                {t('login.features.cards.feedback.description')}
               </p>
             </div>
 

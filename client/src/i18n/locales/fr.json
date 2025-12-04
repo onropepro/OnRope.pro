@@ -19,7 +19,7 @@
       "safetyMeeting": "réunion de sécurité",
       "hourWorked": "heure travaillée",
       "drop": "descente",
-      "residentComplaint": "plainte de résident",
+      "residentFeedback": "commentaire de résident",
       "pieceOfGear": "équipement",
       "nonBillableHour": "heure non facturable",
       "jobQuote": "soumission",
@@ -114,8 +114,8 @@
           "title": "Conformité sécurité",
           "description": "Formulaires de sécurité numériques, plans d'accès sur corde PDF et gestion complète de la documentation de sécurité."
         },
-        "complaints": {
-          "category": "Gestion des plaintes",
+        "feedback": {
+          "category": "Gestion des commentaires",
           "title": "Centralisé. Organisé. Terminé.",
           "tagline": "70% moins d'appels. Résolution en 24 heures",
           "description": "Mme Henderson ajoute une photo: « Fenêtre manquée. » On lui répond en 4 minutes: « On s'en occupe demain, 9h. » Elle arrête d'appeler le gestionnaire d'immeuble. Ils arrêtent de vous appeler. Tout le monde arrête d'appeler. Les résidents se servent eux-mêmes. Vous répondez le jour même. Votre concurrent? Encore sur papier."
@@ -123,8 +123,8 @@
         "residents": {
           "category": "Portail résident",
           "title": "Gestion des résidents d'immeuble",
-          "tagline": "La machine à renouvellement de contrats. 240 résidents suivent la progression. Soumettent des plaintes. Arrêtent d'appeler.",
-          "description": "240 résidents suivent la progression sur leur téléphone. Soumettent des plaintes réglées le jour même. Disent au conseil « ces gars sont professionnels. » Votre concurrent? Encore sur papier. Taux de renouvellement: 95%. Le leur: 60%. Le calcul est simple."
+          "tagline": "La machine à renouvellement de contrats. 240 résidents suivent la progression. Soumettent des commentaires. Arrêtent d'appeler.",
+          "description": "240 résidents suivent la progression sur leur téléphone. Soumettent des commentaires traités le jour même. Disent au conseil « ces gars sont professionnels. » Votre concurrent? Encore sur papier. Taux de renouvellement: 95%. Le leur: 60%. Le calcul est simple."
         },
         "audit": {
           "category": "Protection audits IRATA et assurance",
@@ -3682,7 +3682,7 @@
       "loadError": "Échec du chargement de l'équipement"
     }
   },
-  "complaintDetail": {
+  "feedbackDetail": {
     "loading": "Chargement...",
     "feedbackNotFound": "Commentaire non trouvé",
     "feedbackDetails": "Détails du commentaire",
