@@ -62,7 +62,7 @@ const projectSchema = z.object({
   strataPlanNumber: z.string().optional(),
   buildingName: z.string().optional(),
   buildingAddress: z.string().optional(),
-  jobType: z.enum(["window_cleaning", "dryer_vent_cleaning", "building_wash", "general_pressure_washing", "gutter_cleaning", "in_suite_dryer_vent_cleaning", "parkade_pressure_cleaning", "ground_window_cleaning", "other"]),
+  jobType: z.enum(["window_cleaning", "dryer_vent_cleaning", "building_wash", "general_pressure_washing", "gutter_cleaning", "in_suite_dryer_vent_cleaning", "parkade_pressure_cleaning", "ground_window_cleaning", "painting", "inspection", "other"]),
   customJobType: z.string().optional(),
   totalDropsNorth: z.string().optional(),
   totalDropsEast: z.string().optional(),
@@ -2710,6 +2710,8 @@ export default function Dashboard() {
                         {(projectForm.watch("jobType") === "window_cleaning" || 
                           projectForm.watch("jobType") === "building_wash" || 
                           projectForm.watch("jobType") === "dryer_vent_cleaning" ||
+                          projectForm.watch("jobType") === "painting" ||
+                          projectForm.watch("jobType") === "inspection" ||
                           (projectForm.watch("jobType") === "other" && showOtherElevationFields)) && (
                           <>
                             <div className="space-y-2">
