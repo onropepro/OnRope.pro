@@ -53,8 +53,10 @@ import {
   ChevronDown,
   ChevronRight,
   FileText,
-  ArrowRightLeft
+  ArrowRightLeft,
+  Users
 } from "lucide-react";
+import { Separator } from "@/components/ui/separator";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
@@ -331,6 +333,10 @@ export default function Quotes() {
   const [emailSubject, setEmailSubject] = useState("");
   const [isHistoryOpen, setIsHistoryOpen] = useState(false);
   const [quoteHistory, setQuoteHistory] = useState<QuoteHistory[]>([]);
+  
+  // Client & Property selection for autofill
+  const [selectedClientId, setSelectedClientId] = useState<string | null>(null);
+  const [selectedPropertyIndex, setSelectedPropertyIndex] = useState<number | null>(null);
   
   // Form data
   const [buildingInfo, setBuildingInfo] = useState<BuildingInfoFormData | null>(null);
@@ -773,6 +779,8 @@ export default function Quotes() {
     setConfiguredServices(new Map());
     setServiceBeingConfigured(null);
     setSelectedPhotoFile(null);
+    setSelectedClientId(null);
+    setSelectedPropertyIndex(null);
     setCreateStep("services");
     buildingForm.reset();
     serviceForm.reset();
@@ -2763,6 +2771,107 @@ export default function Quotes() {
             <CardContent className="p-8 pt-0">
               <Form {...buildingForm}>
                 <form onSubmit={buildingForm.handleSubmit(handleBuildingInfoSubmit)} className="space-y-6">
+                  
+                  {/* Client Selection with Property Autofill */}
+                  <div className="space-y-4 p-4 bg-muted/30 rounded-lg border border-border">
+                    <div className="flex items-center gap-2 mb-2">
+                      <Users className="w-5 h-5 text-primary" />
+                      <Label className="text-base font-semibold">Quick Fill from Client</Label>
+                    </div>
+                    <p className="text-sm text-muted-foreground mb-4">
+                      Select a client to autofill property manager details. If the client has saved properties, you can also autofill building information.
+                    </p>
+                    
+                    <div className="space-y-2">
+                      <Label>Select Client</Label>
+                      <Select
+                        value={selectedClientId || ""}
+                        onValueChange={(value) => {
+                          const client = clients.find((c: any) => c.id === value);
+                          setSelectedClientId(value);
+                          setSelectedPropertyIndex(null);
+                          if (client) {
+                            buildingForm.setValue('strataManagerName', `${client.firstName} ${client.lastName}`);
+                            buildingForm.setValue('strataManagerAddress', client.address || '');
+                          }
+                        }}
+                      >
+                        <SelectTrigger className="h-12" data-testid="select-client">
+                          <SelectValue placeholder="Select a client..." />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {clients.length === 0 ? (
+                            <div className="p-2 text-sm text-muted-foreground">No clients found. Add clients first.</div>
+                          ) : (
+                            clients.map((client: any) => (
+                              <SelectItem key={client.id} value={client.id}>
+                                {client.firstName} {client.lastName} {client.company ? `- ${client.company}` : ''}
+                              </SelectItem>
+                            ))
+                          )}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    
+                    {/* Property Selector - only show if client has properties */}
+                    {selectedClientId && (() => {
+                      const selectedClient = clients.find((c: any) => c.id === selectedClientId);
+                      const properties = selectedClient?.lmsNumbers || [];
+                      
+                      if (properties.length > 0) {
+                        return (
+                          <div className="space-y-2">
+                            <Label>Select Property to Autofill</Label>
+                            <Select
+                              value={selectedPropertyIndex !== null ? String(selectedPropertyIndex) : ""}
+                              onValueChange={(value) => {
+                                const index = parseInt(value);
+                                setSelectedPropertyIndex(index);
+                                const property = properties[index];
+                                if (property) {
+                                  buildingForm.setValue('buildingName', property.buildingName || '');
+                                  buildingForm.setValue('strataPlanNumber', property.number || '');
+                                  buildingForm.setValue('buildingAddress', property.address || '');
+                                  if (property.stories) {
+                                    buildingForm.setValue('floorCount', property.stories);
+                                  }
+                                  toast({
+                                    title: "Property details filled",
+                                    description: `Building information autofilled from ${property.buildingName || property.number}`,
+                                  });
+                                }
+                              }}
+                            >
+                              <SelectTrigger className="h-12" data-testid="select-property">
+                                <SelectValue placeholder="Select a property to autofill building details..." />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {properties.map((prop: any, idx: number) => (
+                                  <SelectItem key={idx} value={String(idx)}>
+                                    <div className="flex flex-col">
+                                      <span className="font-medium">{prop.buildingName || prop.number}</span>
+                                      <span className="text-xs text-muted-foreground">{prop.address}</span>
+                                    </div>
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                            <p className="text-xs text-muted-foreground">
+                              This client has {properties.length} saved {properties.length === 1 ? 'property' : 'properties'}
+                            </p>
+                          </div>
+                        );
+                      }
+                      return (
+                        <p className="text-sm text-muted-foreground italic">
+                          This client has no saved properties. Building details must be entered manually.
+                        </p>
+                      );
+                    })()}
+                  </div>
+
+                  <Separator />
+
                   <FormField
                     control={buildingForm.control}
                     name="buildingName"
@@ -2840,30 +2949,6 @@ export default function Quotes() {
                       </FormItem>
                     )}
                   />
-
-                  <div className="space-y-4">
-                    <Label>Strata Property Manager (Optional)</Label>
-                    <Select
-                      onValueChange={(value) => {
-                        const client = clients.find((c: any) => c.id === value);
-                        if (client) {
-                          buildingForm.setValue('strataManagerName', `${client.firstName} ${client.lastName}`);
-                          buildingForm.setValue('strataManagerAddress', client.address || '');
-                        }
-                      }}
-                    >
-                      <SelectTrigger className="h-12" data-testid="select-client">
-                        <SelectValue placeholder="Select from client list..." />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {clients.map((client: any) => (
-                          <SelectItem key={client.id} value={client.id}>
-                            {client.firstName} {client.lastName} {client.company ? `- ${client.company}` : ''}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
 
                   <FormField
                     control={buildingForm.control}
