@@ -15,6 +15,57 @@ import { type TierName, type Currency, TIER_CONFIG, ADDON_CONFIG } from "../shar
 import { checkSubscriptionLimits } from "./subscription-middleware";
 import { getTodayString, toLocalDateString, parseLocalDate, getStartOfWeek, getEndOfWeek } from "./dateUtils";
 import { Resend } from "resend";
+import rateLimit from "express-rate-limit";
+
+// SECURITY: Rate limiting for login endpoint to prevent brute force attacks
+const loginRateLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 10, // 10 login attempts per window
+  message: { message: "Too many login attempts. Please try again after 15 minutes." },
+  standardHeaders: true,
+  legacyHeaders: false,
+  skipSuccessfulRequests: false, // Count all attempts
+});
+
+const registrationRateLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000, // 1 hour
+  max: 5, // 5 registration attempts per hour per IP
+  message: { message: "Too many registration attempts. Please try again later." },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+const passwordChangeRateLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 5, // 5 password change attempts per 15 minutes
+  message: { message: "Too many password change attempts. Please try again later." },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+// SECURITY: Password strength validation
+function validatePasswordStrength(password: string): { valid: boolean; message: string } {
+  if (!password || password.length < 8) {
+    return { valid: false, message: "Password must be at least 8 characters long" };
+  }
+  
+  // Check for at least one uppercase letter
+  if (!/[A-Z]/.test(password)) {
+    return { valid: false, message: "Password must contain at least one uppercase letter" };
+  }
+  
+  // Check for at least one lowercase letter
+  if (!/[a-z]/.test(password)) {
+    return { valid: false, message: "Password must contain at least one lowercase letter" };
+  }
+  
+  // Check for at least one number
+  if (!/[0-9]/.test(password)) {
+    return { valid: false, message: "Password must contain at least one number" };
+  }
+  
+  return { valid: true, message: "" };
+}
 
 // Initialize Stripe for direct API calls
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
@@ -348,8 +399,8 @@ async function generatePropertyManagerCode(): Promise<string> {
 export async function registerRoutes(app: Express): Promise<Server> {
   // ==================== AUTH ROUTES ====================
   
-  // Registration endpoint
-  app.post("/api/register", async (req: Request, res: Response) => {
+  // Registration endpoint - SECURITY: Rate limited to prevent abuse
+  app.post("/api/register", registrationRateLimiter, async (req: Request, res: Response) => {
     try {
       const { confirmPassword, ...userData } = req.body;
       
@@ -363,18 +414,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Validate input
       const validatedData = insertUserSchema.parse(userData);
       
-      // Check if user already exists
+      // SECURITY: Check if user already exists - use generic message to prevent account enumeration
       if (validatedData.email && typeof validatedData.email === 'string') {
         const existingUser = await storage.getUserByEmail(validatedData.email);
         if (existingUser) {
-          return res.status(400).json({ message: "Email already registered" });
+          return res.status(400).json({ message: "Unable to create account with these details. If you already have an account, please try logging in." });
         }
       }
       
       if (validatedData.companyName && typeof validatedData.companyName === 'string') {
         const existingCompany = await storage.getUserByCompanyName(validatedData.companyName);
         if (existingCompany) {
-          return res.status(400).json({ message: "Company name already taken" });
+          return res.status(400).json({ message: "Unable to create account with these details. If you already have an account, please try logging in." });
         }
       }
       
@@ -466,8 +517,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
-  // Registration with license (for new customers after Stripe checkout)
-  app.post("/api/register-with-license", async (req: Request, res: Response) => {
+  // Registration with license (for new customers after Stripe checkout) - SECURITY: Rate limited
+  app.post("/api/register-with-license", registrationRateLimiter, async (req: Request, res: Response) => {
     try {
       const { 
         companyName, 
@@ -519,13 +570,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
           throw new Error("Stripe information does not match license");
         }
 
-        // Check if user already exists (using transaction client)
+        // SECURITY: Check if user already exists - use generic message to prevent account enumeration
         const existingUserByEmail = await tx.query.users.findFirst({
           where: eq(users.email, email),
         });
 
         if (existingUserByEmail) {
-          throw new Error("Email already registered");
+          throw new Error("Unable to create account with these details. If you already have an account, please try logging in.");
         }
 
         const existingUserByCompanyName = await tx.query.users.findFirst({
@@ -533,7 +584,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
 
         if (existingUserByCompanyName) {
-          throw new Error("Company name already taken");
+          throw new Error("Unable to create account with these details. If you already have an account, please try logging in.");
         }
 
         // Hash password
@@ -614,8 +665,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Login endpoint
-  app.post("/api/login", async (req: Request, res: Response) => {
+  // Login endpoint - SECURITY: Rate limited to prevent brute force attacks
+  app.post("/api/login", loginRateLimiter, async (req: Request, res: Response) => {
     try {
       const { identifier, password } = req.body;
       
@@ -3127,8 +3178,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Change password
-  app.patch("/api/user/password", requireAuth, async (req: Request, res: Response) => {
+  // Change password - SECURITY: Rate limited to prevent brute force attacks
+  app.patch("/api/user/password", requireAuth, passwordChangeRateLimiter, async (req: Request, res: Response) => {
     try {
       const { currentPassword, newPassword } = req.body;
       
@@ -3136,8 +3187,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Current and new passwords are required" });
       }
       
-      if (newPassword.length < 6) {
-        return res.status(400).json({ message: "New password must be at least 6 characters" });
+      // SECURITY: Validate password strength
+      const passwordValidation = validatePasswordStrength(newPassword);
+      if (!passwordValidation.valid) {
+        return res.status(400).json({ message: passwordValidation.message });
       }
       
       const user = await storage.getUserById(req.session.userId!);
@@ -3270,8 +3323,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         specialMedicalConditions, irataLevel, irataLicenseNumber, irataIssuedDate, irataExpirationDate
       } = req.body;
       
-      if (!password || password.length < 6) {
-        return res.status(400).json({ message: "Password must be at least 6 characters" });
+      // SECURITY: Validate password strength
+      const passwordValidation = validatePasswordStrength(password);
+      if (!passwordValidation.valid) {
+        return res.status(400).json({ message: passwordValidation.message });
       }
       
       // Create employee account linked to company
@@ -3445,8 +3500,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
-  // Change employee password (company owner only)
-  app.patch("/api/employees/:id/change-password", requireAuth, requireRole("company"), async (req: Request, res: Response) => {
+  // Change employee password (company owner only) - SECURITY: Rate limited
+  app.patch("/api/employees/:id/change-password", requireAuth, requireRole("company"), passwordChangeRateLimiter, async (req: Request, res: Response) => {
     try {
       const currentUser = await storage.getUserById(req.session.userId!);
       
@@ -3474,9 +3529,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       const { newPassword } = req.body;
       
-      // Validate password
-      if (!newPassword || typeof newPassword !== "string" || newPassword.length < 6) {
-        return res.status(400).json({ message: "Password must be at least 6 characters long" });
+      // SECURITY: Validate password strength
+      if (!newPassword || typeof newPassword !== "string") {
+        return res.status(400).json({ message: "Password is required" });
+      }
+      const passwordValidation = validatePasswordStrength(newPassword);
+      if (!passwordValidation.valid) {
+        return res.status(400).json({ message: passwordValidation.message });
       }
       
       // Hash new password

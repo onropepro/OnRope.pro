@@ -85,6 +85,12 @@ type RecentChange = {
 const recentChangesData: RecentChange[] = [
   {
     date: "December 4, 2025",
+    title: "Security Hardening Audit",
+    description: "Major security improvements: mandatory SESSION_SECRET environment variable, rate limiting on all auth endpoints (login 10/15min, registration 5/hour, password changes 5/15min), password complexity requirements (8+ chars with uppercase, lowercase, number), account enumeration prevention with generic error messages, and comprehensive employee role access control",
+    type: "improvement"
+  },
+  {
+    date: "December 4, 2025",
     title: "Second Code Audit & Bug Fixes",
     description: "Fixed 5 additional bugs: work session clock-in/out timezone handling for accurate payroll, delete account dialog flow keeping password visible on failure, password change form security clearing fields on error, property manager code generation error message typo, and toolbox meeting attendees schema simplification",
     type: "fix"

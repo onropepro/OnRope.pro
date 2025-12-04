@@ -563,7 +563,16 @@ export class Storage {
       return project.companyId === userId;
     }
     
-    if (userRole === "operations_manager" || userRole === "supervisor" || userRole === "rope_access_tech") {
+    // SECURITY: All employee roles can access their company's projects
+    // Must match EMPLOYEE_ROLES constant in routes.ts for consistency
+    const employeeRoles = [
+      "owner_ceo", "human_resources", "accounting", "operations_manager",
+      "general_supervisor", "rope_access_supervisor", "account_manager",
+      "rope_access_tech", "manager", "ground_crew", "ground_crew_supervisor", 
+      "labourer", "supervisor"
+    ];
+    
+    if (employeeRoles.includes(userRole)) {
       return project.companyId === userCompanyId;
     }
     
