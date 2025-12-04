@@ -15,7 +15,9 @@ import {
   CheckCircle2,
   Clock,
   AlertCircle,
-  ExternalLink
+  ExternalLink,
+  Mail,
+  BookOpen
 } from "lucide-react";
 
 interface ResourceLink {
@@ -48,7 +50,7 @@ const developmentTools: ResourceLink[] = [
   {
     name: "Stripe Dashboard",
     url: "https://dashboard.stripe.com",
-    description: "Payment processing and subscriptions",
+    description: "Payment processing and subscriptions | info@onrope.pro",
     icon: TrendingUp,
   },
   {
@@ -56,6 +58,18 @@ const developmentTools: ResourceLink[] = [
     url: "https://console.neon.tech",
     description: "PostgreSQL database management",
     icon: FileText,
+  },
+  {
+    name: "NotebookLM",
+    url: "https://notebooklm.google.com",
+    description: "AI research assistant | info@onrope.pro",
+    icon: BookOpen,
+  },
+  {
+    name: "Gmail",
+    url: "https://mail.google.com",
+    description: "Email | info@onrope.pro",
+    icon: Mail,
   },
 ];
 
