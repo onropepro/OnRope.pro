@@ -169,10 +169,10 @@ const PERMISSION_CATEGORIES = [
     ],
   },
   {
-    nameKey: "dashboard.permissions.categories.complaints",
+    nameKey: "dashboard.permissions.categories.feedback",
     permissions: [
-      { id: "view_complaints", labelKey: "dashboard.permissions.viewComplaints" },
-      { id: "manage_complaints", labelKey: "dashboard.permissions.manageComplaints" },
+      { id: "view_complaints", labelKey: "dashboard.permissions.viewFeedback" },
+      { id: "manage_complaints", labelKey: "dashboard.permissions.manageFeedback" },
     ],
   },
   {
@@ -1988,8 +1988,8 @@ export default function Dashboard() {
     },
     {
       id: "complaints",
-      label: t('dashboard.cards.complaints.label', 'Complaints'),
-      description: t('dashboard.cards.complaints.description', 'Resident feedback'),
+      label: t('dashboard.cards.feedback.label', 'Feedback'),
+      description: t('dashboard.cards.feedback.description', 'Resident feedback'),
       icon: "feedback",
       onClick: () => handleTabChange("complaints"),
       testId: "button-nav-complaints",
@@ -2191,7 +2191,7 @@ export default function Dashboard() {
       case "projects": return t('dashboard.pageTitle.projects', 'Projects');
       case "past-projects": return t('dashboard.pageTitle.pastProjects', 'Past Projects');
       case "performance": return t('dashboard.pageTitle.performance', 'Performance & Live Activity');
-      case "complaints": return t('dashboard.pageTitle.complaints', 'Complaints');
+      case "complaints": return t('dashboard.pageTitle.feedback', 'Feedback');
       case "employees": return t('dashboard.pageTitle.employees', 'Employees');
       case "documents": return t('dashboard.pageTitle.documents', 'Documents');
       case "clients": return t('dashboard.pageTitle.clients', 'Clients');
@@ -3668,16 +3668,16 @@ export default function Dashboard() {
             <div className="space-y-4">
               <Card>
                 <CardHeader>
-                  <CardTitle>{t('dashboard.complaints.allComplaints', 'All Complaints')}</CardTitle>
+                  <CardTitle>{t('dashboard.feedback.allFeedback', 'All Feedback')}</CardTitle>
                   <CardDescription>
-                    {t('dashboard.complaints.viewManageFeedback', 'View and manage resident feedback across all projects')}
+                    {t('dashboard.feedback.viewManageFeedback', 'View and manage resident feedback across all projects')}
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
                   {complaintsLoading ? (
-                    <div className="text-center py-8 text-muted-foreground">{t('dashboard.complaints.loadingComplaints', 'Loading complaints...')}</div>
+                    <div className="text-center py-8 text-muted-foreground">{t('dashboard.feedback.loadingFeedback', 'Loading feedback...')}</div>
                   ) : complaints.length === 0 ? (
-                    <div className="text-center py-8 text-muted-foreground">{t('dashboard.complaints.noComplaints', 'No complaints yet')}</div>
+                    <div className="text-center py-8 text-muted-foreground">{t('dashboard.feedback.noFeedback', 'No feedback yet')}</div>
                   ) : (() => {
                     // Group complaints by strata plan number
                     const groupedComplaints = complaints.reduce((acc: any, complaint: any) => {
@@ -3715,11 +3715,11 @@ export default function Dashboard() {
                                   <div className="flex items-center gap-3">
                                     {openCount > 0 && (
                                       <Badge variant="default" className="text-xs">
-                                        {openCount} {t('dashboard.complaints.open', 'open')}
+                                        {openCount} {t('dashboard.feedback.open', 'open')}
                                       </Badge>
                                     )}
                                     <Badge variant="secondary" className="text-xs">
-                                      {building.complaints.length} {t('dashboard.complaints.total', 'total')}
+                                      {building.complaints.length} {t('dashboard.feedback.total', 'total')}
                                     </Badge>
                                   </div>
                                 </div>

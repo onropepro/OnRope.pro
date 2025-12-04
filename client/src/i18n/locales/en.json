@@ -506,8 +506,8 @@
         "label": "Active Workers",
         "description": "Who's working"
       },
-      "complaints": {
-        "label": "Complaints",
+      "feedback": {
+        "label": "Feedback",
         "description": "Resident feedback"
       },
       "inventory": {
@@ -626,7 +626,7 @@
         "safetyCompliance": "Safety & Compliance",
         "inventoryGear": "Inventory & Gear",
         "workSessions": "Work Sessions",
-        "complaints": "Complaints",
+        "feedback": "Feedback",
         "analyticsFinancial": "Analytics & Financial"
       },
       "viewProjects": "View Projects",
@@ -649,8 +649,8 @@
       "manageWorkSessions": "Manage Work Sessions",
       "viewWorkHistory": "View Work History",
       "viewActiveWorkers": "View Active Workers",
-      "viewComplaints": "View Complaints",
-      "manageComplaints": "Manage Complaints",
+      "viewFeedback": "View Feedback",
+      "manageFeedback": "Manage Feedback",
       "viewAnalytics": "View Analytics",
       "viewFinancialData": "View Financial Data (Labor Costs, Wages)"
     },
@@ -719,7 +719,7 @@
       "projects": "Projects",
       "pastProjects": "Past Projects",
       "performance": "Performance",
-      "complaints": "Complaints",
+      "feedback": "Feedback",
       "employees": "Employees",
       "documents": "Documents",
       "clients": "Clients"
@@ -824,11 +824,11 @@
       "noCompletedSessions": "No completed work sessions yet",
       "performanceDataAppear": "Performance data will appear after completing work sessions"
     },
-    "complaints": {
-      "allComplaints": "All Complaints",
+    "feedback": {
+      "allFeedback": "All Feedback",
       "viewManageFeedback": "View and manage resident feedback across all projects",
-      "loadingComplaints": "Loading complaints...",
-      "noComplaints": "No complaints yet",
+      "loadingFeedback": "Loading feedback...",
+      "noFeedback": "No feedback yet",
       "open": "open",
       "total": "total"
     },
@@ -2127,14 +2127,14 @@
   "resident": {
     "title": "Resident Portal",
     "welcome": "Welcome to the Resident Portal",
-    "myComplaints": "My Complaints",
-    "submitComplaint": "Submit Complaint",
-    "complaintDetails": "Complaint Details",
-    "complaintSubject": "Subject",
-    "complaintDescription": "Description",
-    "complaintStatus": "Status",
-    "complaintDate": "Date Submitted",
-    "noComplaints": "No complaints found",
+    "myFeedback": "My Feedback",
+    "submitFeedback": "Submit Feedback",
+    "feedbackDetails": "Feedback Details",
+    "feedbackSubject": "Subject",
+    "feedbackDescription": "Description",
+    "feedbackStatus": "Status",
+    "feedbackDate": "Date Submitted",
+    "noFeedback": "No feedback found",
     "gallery": "Photo Gallery",
     "noPhotos": "No photos available",
     "linkAccount": "Link Account",
@@ -2675,7 +2675,7 @@
     "parkingStall": "Parking Stall",
     "building": "Building",
     "sendEmail": "Send Email",
-    "viewComplaints": "View Complaints",
+    "viewFeedback": "View Feedback",
     "propertyInformation": "Property Information",
     "buildingName": "Building Name",
     "strataPlanNumber": "Strata Plan Number",
@@ -4206,7 +4206,7 @@
     "residentFeedback": {
       "title": "Resident Feedback",
       "complaintCount": "{{count}} complaint",
-      "complaintsCount": "{{count}} complaints",
+      "feedbackCount": "{{count}} feedback items",
       "noFeedback": "No feedback received yet",
       "closed": "Closed",
       "viewed": "Viewed",
@@ -4246,7 +4246,7 @@
     "dialogs": {
       "deleteProject": {
         "title": "Delete Project",
-        "description": "Are you sure you want to delete this project? This will permanently remove all associated work sessions, drop logs, and complaints. This action cannot be undone.",
+        "description": "Are you sure you want to delete this project? This will permanently remove all associated work sessions, drop logs, and feedback. This action cannot be undone.",
         "cancel": "Cancel",
         "confirm": "Delete Project"
       },
@@ -4416,7 +4416,7 @@
       "companyEmail": "Company Email",
       "phoneNumber": "Phone Number",
       "residentAccessCode": "Resident Access Code",
-      "residentCodeHelp": "Share this code with building residents so they can access the resident portal to view project updates and submit complaints.",
+      "residentCodeHelp": "Share this code with building residents so they can access the resident portal to view project updates and submit feedback.",
       "propertyManagerCode": "Property Manager Code",
       "strataNumber": {
         "label": "Strata/Building Number (Required)",
@@ -4489,27 +4489,27 @@
         "uploadNew": "Upload New Document",
         "upload": "Upload Document"
       },
-      "complaints": {
-        "title": "Complaints History",
-        "none": "No complaints recorded for this project",
-        "noComplaints": "No complaints recorded for this project",
+      "feedback": {
+        "title": "Feedback History",
+        "none": "No feedback recorded for this project",
+        "noFeedback": "No feedback recorded for this project",
         "noSubject": "No Subject",
         "at": "at",
         "resolved": "resolved",
         "pending": "pending",
-        "complaintDetails": "Complaint Details",
+        "feedbackDetails": "Feedback Details",
         "status": "Status",
         "unit": "Unit",
         "submittedBy": "Submitted By",
         "submittedAt": "Submitted At",
-        "complaintDescription": "Complaint",
+        "feedbackDescription": "Feedback",
         "responses": "Responses",
         "noResponses": "No responses yet",
         "anonymous": "Anonymous"
       },
       "close": "Close"
     },
-    "complaintDetails": {
+    "feedbackDetails": {
       "noSubject": "No Subject",
       "submittedOn": "Submitted on",
       "at": "at",
@@ -4523,7 +4523,7 @@
       "phone": "Phone:",
       "description": "Description",
       "attachedPhoto": "Attached Photo",
-      "photoAlt": "Complaint photo",
+      "photoAlt": "Feedback photo",
       "communicationHistory": "Communication History"
     },
     "removeVendor": {

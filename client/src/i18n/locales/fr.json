@@ -506,8 +506,8 @@
         "label": "Travailleurs actifs",
         "description": "Qui travaille"
       },
-      "complaints": {
-        "label": "Plaintes",
+      "feedback": {
+        "label": "Commentaires",
         "description": "Commentaires des résidents"
       },
       "inventory": {
@@ -626,7 +626,7 @@
         "safetyCompliance": "Sécurité et conformité",
         "inventoryGear": "Inventaire et équipement",
         "workSessions": "Sessions de travail",
-        "complaints": "Plaintes",
+        "feedback": "Commentaires",
         "analyticsFinancial": "Analytique et finances"
       },
       "viewProjects": "Voir les projets",
@@ -649,8 +649,8 @@
       "manageWorkSessions": "Gérer les sessions de travail",
       "viewWorkHistory": "Voir l'historique de travail",
       "viewActiveWorkers": "Voir les travailleurs actifs",
-      "viewComplaints": "Voir les plaintes",
-      "manageComplaints": "Gérer les plaintes",
+      "viewFeedback": "Voir les commentaires",
+      "manageFeedback": "Gérer les commentaires",
       "viewAnalytics": "Voir les analyses",
       "viewFinancialData": "Voir les données financières (Coûts de main-d'œuvre, Salaires)"
     },
@@ -719,7 +719,7 @@
       "projects": "Projets",
       "pastProjects": "Projets passés",
       "performance": "Performance",
-      "complaints": "Plaintes",
+      "feedback": "Commentaires",
       "employees": "Employés",
       "documents": "Documents",
       "clients": "Clients"
@@ -824,11 +824,11 @@
       "noCompletedSessions": "Aucune session de travail terminée pour le moment",
       "performanceDataAppear": "Les données de performance apparaîtront après avoir terminé des sessions de travail"
     },
-    "complaints": {
-      "allComplaints": "Toutes les plaintes",
+    "feedback": {
+      "allFeedback": "Tous les commentaires",
       "viewManageFeedback": "Voir et gérer les commentaires des résidents sur tous les projets",
-      "loadingComplaints": "Chargement des plaintes...",
-      "noComplaints": "Aucune plainte pour le moment",
+      "loadingFeedback": "Chargement des commentaires...",
+      "noFeedback": "Aucun commentaire pour le moment",
       "open": "ouvert(es)",
       "total": "total"
     },
@@ -2149,14 +2149,14 @@
   "resident": {
     "title": "Portail résident",
     "welcome": "Bienvenue sur le portail résident",
-    "myComplaints": "Mes plaintes",
-    "submitComplaint": "Soumettre une plainte",
-    "complaintDetails": "Détails de la plainte",
-    "complaintSubject": "Sujet",
-    "complaintDescription": "Description",
-    "complaintStatus": "Statut",
-    "complaintDate": "Date de soumission",
-    "noComplaints": "Aucune plainte trouvée",
+    "myFeedback": "Mes commentaires",
+    "submitFeedback": "Soumettre un commentaire",
+    "feedbackDetails": "Détails du commentaire",
+    "feedbackSubject": "Sujet",
+    "feedbackDescription": "Description",
+    "feedbackStatus": "Statut",
+    "feedbackDate": "Date de soumission",
+    "noFeedback": "Aucun commentaire trouvé",
     "gallery": "Galerie de photos",
     "noPhotos": "Aucune photo disponible",
     "linkAccount": "Lier le compte",
@@ -2697,7 +2697,7 @@
     "parkingStall": "Place de stationnement",
     "building": "Bâtiment",
     "sendEmail": "Envoyer un email",
-    "viewComplaints": "Voir les plaintes",
+    "viewFeedback": "Voir les commentaires",
     "propertyInformation": "Informations sur la propriété",
     "buildingName": "Nom du bâtiment",
     "strataPlanNumber": "Numéro du plan de copropriété",
@@ -4222,13 +4222,13 @@
     },
     "residentFeedback": {
       "title": "Commentaires des résidents",
-      "complaintCount": "{{count}} plainte",
-      "complaintsCount": "{{count}} plaintes",
+      "feedbackCount": "{{count}} commentaire",
+      "feedbackCountPlural": "{{count}} commentaires",
       "noFeedback": "Aucun commentaire reçu",
       "closed": "Fermé",
       "viewed": "Vu",
       "new": "Nouveau",
-      "complaintPhoto": "Photo de la plainte"
+      "feedbackPhoto": "Photo du commentaire"
     },
     "jobComments": {
       "title": "Commentaires du projet",
@@ -4263,7 +4263,7 @@
     "dialogs": {
       "deleteProject": {
         "title": "Supprimer le projet",
-        "description": "Êtes-vous sûr de vouloir supprimer ce projet ? Cela supprimera définitivement toutes les sessions de travail, journaux de descentes et plaintes associés. Cette action est irréversible.",
+        "description": "Êtes-vous sûr de vouloir supprimer ce projet ? Cela supprimera définitivement toutes les sessions de travail, journaux de descentes et commentaires associés. Cette action est irréversible.",
         "cancel": "Annuler",
         "confirm": "Supprimer le projet"
       },
@@ -4433,7 +4433,7 @@
       "companyEmail": "Courriel de l'entreprise",
       "phoneNumber": "Numéro de téléphone",
       "residentAccessCode": "Code d'accès résident",
-      "residentCodeHelp": "Partagez ce code avec les résidents de l'immeuble pour qu'ils puissent accéder au portail résident pour voir les mises à jour du projet et soumettre des plaintes.",
+      "residentCodeHelp": "Partagez ce code avec les résidents de l'immeuble pour qu'ils puissent accéder au portail résident pour voir les mises à jour du projet et soumettre des commentaires.",
       "propertyManagerCode": "Code gestionnaire immobilier",
       "strataNumber": {
         "label": "Numéro de copropriété/bâtiment (Requis)",
@@ -4476,7 +4476,7 @@
     },
     "projectDetails": {
       "title": "Détails du projet",
-      "description": "Voir les informations du projet, la progression et l'historique des plaintes",
+      "description": "Voir les informations du projet, la progression et l'historique des commentaires",
       "loading": "Chargement des détails du projet...",
       "errorLoading": "Échec du chargement des détails du projet",
       "projectInfo": "Informations du projet",
@@ -4506,27 +4506,27 @@
         "uploadNew": "Téléverser un nouveau document",
         "upload": "Téléverser le document"
       },
-      "complaints": {
-        "title": "Historique des plaintes",
-        "none": "Aucune plainte enregistrée pour ce projet",
-        "noComplaints": "Aucune plainte enregistrée pour ce projet",
+      "feedback": {
+        "title": "Historique des commentaires",
+        "none": "Aucun commentaire enregistré pour ce projet",
+        "noFeedback": "Aucun commentaire enregistré pour ce projet",
         "noSubject": "Sans objet",
         "at": "à",
         "resolved": "résolu",
         "pending": "en attente",
-        "complaintDetails": "Détails de la plainte",
+        "feedbackDetails": "Détails du commentaire",
         "status": "Statut",
         "unit": "Unité",
         "submittedBy": "Soumis par",
         "submittedAt": "Soumis le",
-        "complaintDescription": "Plainte",
+        "feedbackDescription": "Commentaire",
         "responses": "Réponses",
         "noResponses": "Aucune réponse pour le moment",
         "anonymous": "Anonyme"
       },
       "close": "Fermer"
     },
-    "complaintDetails": {
+    "feedbackDetails": {
       "noSubject": "Sans objet",
       "submittedOn": "Soumis le",
       "at": "à",
@@ -4540,7 +4540,7 @@
       "phone": "Téléphone :",
       "description": "Description",
       "attachedPhoto": "Photo jointe",
-      "photoAlt": "Photo de la plainte",
+      "photoAlt": "Photo du commentaire",
       "communicationHistory": "Historique des communications"
     },
     "removeVendor": {

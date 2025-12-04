@@ -830,7 +830,7 @@ export default function ResidentDashboard() {
                 '--custom-primary': primaryColor
               } as React.CSSProperties : {}}
             >
-              Complaints
+              Feedback
               {newResponsesCount > 0 && (
                 <Badge 
                   variant="destructive" 
