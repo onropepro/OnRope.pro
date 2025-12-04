@@ -3,7 +3,7 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { db } from "./db";
 import { wsHub } from "./websocket-hub";
-import { insertUserSchema, insertClientSchema, insertProjectSchema, insertDropLogSchema, insertComplaintSchema, insertComplaintNoteSchema, insertJobCommentSchema, insertHarnessInspectionSchema, insertToolboxMeetingSchema, insertFlhaFormSchema, insertIncidentReportSchema, insertMethodStatementSchema, insertPayPeriodConfigSchema, insertQuoteSchema, insertQuoteServiceSchema, insertGearItemSchema, insertGearAssignmentSchema, insertGearSerialNumberSchema, insertEquipmentDamageReportSchema, insertScheduledJobSchema, insertJobAssignmentSchema, updatePropertyManagerAccountSchema, insertFeatureRequestSchema, insertFeatureRequestMessageSchema, normalizeStrataPlan, type InsertGearItem, type InsertGearAssignment, type InsertGearSerialNumber, type Project, gearAssignments, gearSerialNumbers, gearItems, jobAssignments, workSessions, nonBillableWorkSessions, licenseKeys, users, propertyManagerCompanyLinks, IRATA_TASK_TYPES } from "@shared/schema";
+import { insertUserSchema, insertClientSchema, insertProjectSchema, insertDropLogSchema, insertComplaintSchema, insertComplaintNoteSchema, insertJobCommentSchema, insertHarnessInspectionSchema, insertToolboxMeetingSchema, insertFlhaFormSchema, insertIncidentReportSchema, insertMethodStatementSchema, insertPayPeriodConfigSchema, insertQuoteSchema, insertQuoteServiceSchema, insertGearItemSchema, insertGearAssignmentSchema, insertGearSerialNumberSchema, insertEquipmentDamageReportSchema, insertScheduledJobSchema, insertJobAssignmentSchema, updatePropertyManagerAccountSchema, insertFeatureRequestSchema, insertFeatureRequestMessageSchema, normalizeStrataPlan, type InsertGearItem, type InsertGearAssignment, type InsertGearSerialNumber, type Project, gearAssignments, gearSerialNumbers, gearItems, jobAssignments, workSessions, nonBillableWorkSessions, licenseKeys, users, propertyManagerCompanyLinks, IRATA_TASK_TYPES, quotes, quoteServices, quoteHistory } from "@shared/schema";
 import { eq, sql, and } from "drizzle-orm";
 import { z } from "zod";
 import bcrypt from "bcrypt";
@@ -10125,12 +10125,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
         quoteNumber,
       });
       
-      // Create the quote
-      const quote = await storage.createQuote(quoteData);
-      createdQuoteId = quote.id;
-      
-      // Create all services - if any fail, rollback the quote
-      try {
+      // Create quote, services, and history in a single transaction
+      const quoteWithServices = await db.transaction(async (tx) => {
+        // Create the quote
+        const [quote] = await tx.insert(quotes).values(quoteData).returning();
+        createdQuoteId = quote.id;
+        
+        // Create all services
         for (const serviceData of services) {
           // Strip pricing fields if user doesn't have financial permissions
           const processedServiceData = canViewFinancialData 
@@ -10148,17 +10149,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
             ...processedServiceData,
             quoteId: quote.id,
           });
-          await storage.createQuoteService(service);
+          await tx.insert(quoteServices).values(service);
         }
-      } catch (serviceError) {
-        // Rollback: delete the quote if service creation failed
-        await storage.deleteQuote(quote.id);
-        throw new Error(`Failed to create services: ${serviceError instanceof Error ? serviceError.message : 'Unknown error'}`);
-      }
+        
+        // Log quote creation history (inside transaction for guaranteed audit trail)
+        await tx.insert(quoteHistory).values({
+          quoteId: quote.id,
+          companyId,
+          eventType: "created",
+          actorUserId: currentUser.id,
+          actorName: currentUser.name || currentUser.username,
+          notes: `Quote ${quoteNumber} created`,
+        });
+        
+        return quote;
+      });
       
-      // Get the complete quote with services
-      const quoteWithServices = await storage.getQuoteById(quote.id);
-      res.json({ quote: quoteWithServices });
+      // Get the complete quote with services (after transaction)
+      const fullQuote = await storage.getQuoteById(quoteWithServices.id);
+      
+      res.json({ quote: fullQuote });
     } catch (error) {
       if (error instanceof z.ZodError) {
         return res.status(400).json({ message: "Validation error", errors: error.errors });
@@ -11044,14 +11054,72 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(403).json({ message: "Forbidden" });
       }
       
-      const updatedQuote = await storage.updateQuote(req.params.id, { 
-        pipelineStage,
-        stageUpdatedAt: new Date()
+      const previousStage = quote.pipelineStage;
+      
+      // Update quote stage and log history in a single transaction with optimistic locking
+      const updatedQuote = await db.transaction(async (tx) => {
+        // Update the quote stage with optimistic locking (verify previousStage hasn't changed)
+        const [updated] = await tx.update(quotes)
+          .set({ 
+            pipelineStage,
+            stageUpdatedAt: new Date()
+          })
+          .where(and(eq(quotes.id, req.params.id), eq(quotes.pipelineStage, previousStage!)))
+          .returning();
+        
+        if (!updated) {
+          throw new Error("Quote stage was modified by another user. Please refresh and try again.");
+        }
+        
+        // Log pipeline stage change history (inside transaction for guaranteed audit trail)
+        await tx.insert(quoteHistory).values({
+          quoteId: quote.id,
+          companyId,
+          eventType: "pipeline_stage_changed",
+          previousStage,
+          newStage: pipelineStage,
+          actorUserId: currentUser.id,
+          actorName: currentUser.name || currentUser.username,
+          notes: `Stage changed from ${previousStage} to ${pipelineStage}`,
+        });
+        
+        return updated;
       });
       
       res.json({ quote: updatedQuote, message: `Quote moved to ${pipelineStage}` });
     } catch (error) {
       console.error("Update quote pipeline stage error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Get quote history timeline
+  app.get("/api/quotes/:id/history", requireAuth, requireRole("company", "owner_ceo", "human_resources", "accounting", "operations_manager", "general_supervisor", "rope_access_supervisor", "account_manager", "supervisor", "rope_access_tech", "manager"), async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      const companyId = currentUser.role === "company" ? currentUser.id : currentUser.companyId;
+      if (!companyId) {
+        return res.status(400).json({ message: "Unable to determine company" });
+      }
+      
+      const quote = await storage.getQuoteById(req.params.id);
+      
+      if (!quote) {
+        return res.status(404).json({ message: "Quote not found" });
+      }
+      
+      if (quote.companyId !== companyId) {
+        return res.status(403).json({ message: "Forbidden" });
+      }
+      
+      const history = await storage.getQuoteHistory(req.params.id);
+      res.json({ history });
+    } catch (error) {
+      console.error("Get quote history error:", error);
       res.status(500).json({ message: "Internal server error" });
     }
   });

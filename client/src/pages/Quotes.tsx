@@ -17,7 +17,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
-import { insertQuoteSchema, type QuoteWithServices } from "@shared/schema";
+import { insertQuoteSchema, type QuoteWithServices, type QuoteHistory } from "@shared/schema";
 import { 
   Building2, 
   Droplet, 
@@ -48,11 +48,17 @@ import {
   XCircle,
   Kanban,
   Mail,
-  Send
+  Send,
+  History,
+  ChevronDown,
+  ChevronRight,
+  FileText,
+  ArrowRightLeft
 } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { DndContext, DragOverlay, useDraggable, useDroppable, closestCenter, type DragEndEvent } from '@dnd-kit/core';
 import { PieChart, Pie, Cell, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip as RechartsTooltip, Legend } from 'recharts';
@@ -323,6 +329,8 @@ export default function Quotes() {
   const [emailRecipient, setEmailRecipient] = useState("");
   const [emailMessage, setEmailMessage] = useState("");
   const [emailSubject, setEmailSubject] = useState("");
+  const [isHistoryOpen, setIsHistoryOpen] = useState(false);
+  const [quoteHistory, setQuoteHistory] = useState<QuoteHistory[]>([]);
   
   // Form data
   const [buildingInfo, setBuildingInfo] = useState<BuildingInfoFormData | null>(null);
@@ -504,6 +512,20 @@ export default function Quotes() {
       });
     },
   });
+
+  const loadQuoteHistory = async (quoteId: string) => {
+    try {
+      const response = await fetch(`/api/quotes/${quoteId}/history`, {
+        credentials: 'include',
+      });
+      if (response.ok) {
+        const data = await response.json();
+        setQuoteHistory(data.history || []);
+      }
+    } catch (error) {
+      console.error("Failed to load quote history:", error);
+    }
+  };
 
   const submitQuoteMutation = useMutation({
     mutationFn: async (id: string) => {
@@ -1991,6 +2013,92 @@ export default function Quotes() {
             </Button>
           </div>
         </div>
+
+          {/* Quote History Timeline */}
+          <Card className="rounded-2xl shadow-lg border border-border mb-8">
+            <Collapsible open={isHistoryOpen} onOpenChange={(open) => {
+              setIsHistoryOpen(open);
+              if (open && selectedQuote) {
+                loadQuoteHistory(selectedQuote.id);
+              }
+            }}>
+              <CollapsibleTrigger className="w-full">
+                <CardHeader className="p-4 md:p-6 flex flex-row items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-lg bg-muted flex items-center justify-center">
+                      <History className="w-5 h-5 text-muted-foreground" />
+                    </div>
+                    <CardTitle className="text-lg font-semibold text-foreground">
+                      {t('quotes.history.title', 'Quote History')}
+                    </CardTitle>
+                  </div>
+                  {isHistoryOpen ? (
+                    <ChevronDown className="w-5 h-5 text-muted-foreground" />
+                  ) : (
+                    <ChevronRight className="w-5 h-5 text-muted-foreground" />
+                  )}
+                </CardHeader>
+              </CollapsibleTrigger>
+              <CollapsibleContent>
+                <CardContent className="px-4 pb-4 md:px-6 md:pb-6">
+                  {quoteHistory.length === 0 ? (
+                    <div className="text-center py-8 text-muted-foreground">
+                      <History className="w-12 h-12 mx-auto mb-3 opacity-50" />
+                      <p>{t('quotes.history.noHistory', 'No history entries yet')}</p>
+                    </div>
+                  ) : (
+                    <div className="relative">
+                      <div className="absolute left-4 top-2 bottom-2 w-0.5 bg-border" />
+                      <div className="space-y-4">
+                        {quoteHistory.map((entry, index) => (
+                          <div key={entry.id} className="relative flex gap-4 pl-10">
+                            <div className="absolute left-2 top-1 w-5 h-5 rounded-full bg-background border-2 border-primary flex items-center justify-center">
+                              {entry.eventType === 'created' ? (
+                                <FileText className="w-2.5 h-2.5 text-primary" />
+                              ) : (
+                                <ArrowRightLeft className="w-2.5 h-2.5 text-primary" />
+                              )}
+                            </div>
+                            <div className="flex-1 pb-4">
+                              <div className="flex items-start justify-between gap-2 flex-wrap">
+                                <div>
+                                  <p className="font-medium text-foreground">
+                                    {entry.eventType === 'created' 
+                                      ? t('quotes.history.created', 'Quote Created')
+                                      : t('quotes.history.stageChanged', 'Stage Changed')
+                                    }
+                                  </p>
+                                  {entry.eventType === 'pipeline_stage_changed' && entry.previousStage && entry.newStage && (
+                                    <div className="flex items-center gap-2 mt-1">
+                                      <Badge variant="outline" className="text-xs">
+                                        {entry.previousStage}
+                                      </Badge>
+                                      <ArrowRightLeft className="w-3 h-3 text-muted-foreground" />
+                                      <Badge variant="secondary" className="text-xs">
+                                        {entry.newStage}
+                                      </Badge>
+                                    </div>
+                                  )}
+                                </div>
+                                <span className="text-xs text-muted-foreground whitespace-nowrap">
+                                  {entry.createdAt && formatTimestampDate(entry.createdAt)}
+                                </span>
+                              </div>
+                              {entry.actorName && (
+                                <p className="text-sm text-muted-foreground mt-1">
+                                  {t('quotes.history.by', 'by')} {entry.actorName}
+                                </p>
+                              )}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </CardContent>
+              </CollapsibleContent>
+            </Collapsible>
+          </Card>
         </div>
 
         {/* Edit Quote Dialog */}

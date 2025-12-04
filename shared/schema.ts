@@ -1155,6 +1155,33 @@ export const quoteServices = pgTable("quote_services", {
   index("IDX_quote_services_type").on(table.quoteId, table.serviceType),
 ]);
 
+// Quote history table - audit trail for quote creation and pipeline stage changes
+export const quoteHistory = pgTable("quote_history", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  quoteId: varchar("quote_id").notNull().references(() => quotes.id, { onDelete: "cascade" }),
+  companyId: varchar("company_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  
+  // Event type
+  eventType: varchar("event_type").notNull(), // created | pipeline_stage_changed
+  
+  // Stage change details (null for 'created' events)
+  previousStage: varchar("previous_stage"), // draft | submitted | review | negotiation | approved | won | lost
+  newStage: varchar("new_stage"), // draft | submitted | review | negotiation | approved | won | lost
+  
+  // Actor who made the change
+  actorUserId: varchar("actor_user_id").references(() => users.id, { onDelete: "set null" }),
+  actorName: varchar("actor_name"), // Denormalized for audit trail persistence
+  
+  // Optional notes
+  notes: text("notes"),
+  
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+}, (table) => [
+  index("IDX_quote_history_quote").on(table.quoteId),
+  index("IDX_quote_history_company").on(table.companyId),
+  index("IDX_quote_history_created").on(table.quoteId, table.createdAt),
+]);
+
 // Relations
 export const usersRelations = relations(users, ({ many }) => ({
   projects: many(projects), // For company role
@@ -1521,6 +1548,11 @@ export const insertQuoteServiceSchema = createInsertSchema(quoteServices).omit({
   createdAt: true,
 });
 
+export const insertQuoteHistorySchema = createInsertSchema(quoteHistory).omit({
+  id: true,
+  createdAt: true,
+});
+
 // Scheduled Jobs table - Calendar-based job scheduling
 export const scheduledJobs = pgTable("scheduled_jobs", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
@@ -1690,6 +1722,9 @@ export type InsertQuote = z.infer<typeof insertQuoteSchema>;
 
 export type QuoteService = typeof quoteServices.$inferSelect;
 export type InsertQuoteService = z.infer<typeof insertQuoteServiceSchema>;
+
+export type QuoteHistory = typeof quoteHistory.$inferSelect;
+export type InsertQuoteHistory = z.infer<typeof insertQuoteHistorySchema>;
 
 export type ScheduledJob = typeof scheduledJobs.$inferSelect;
 export type InsertScheduledJob = z.infer<typeof insertScheduledJobSchema>;
