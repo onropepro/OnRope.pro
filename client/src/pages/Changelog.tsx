@@ -84,6 +84,18 @@ type RecentChange = {
 
 const recentChangesData: RecentChange[] = [
   {
+    date: "December 4, 2025",
+    title: "Quote Client & Property Autofill",
+    description: "Quick fill building information from saved client properties when creating quotes - select a client to autofill manager details, then pick from their saved properties to populate building name, strata plan, address, and floor count",
+    type: "feature"
+  },
+  {
+    date: "December 4, 2025",
+    title: "Quote History Audit Trail",
+    description: "Full transactional history tracking for quotes with collapsible timeline showing creation events and pipeline stage changes with timestamps",
+    type: "feature"
+  },
+  {
     date: "December 3, 2025",
     title: "Knowledge Base Expansion",
     description: "Added 5 comprehensive V3.0 documentation guides: Platform Administration, Analytics & Reporting, Multi-Language Support, GPS & Location Services, and Property Manager Interface",
