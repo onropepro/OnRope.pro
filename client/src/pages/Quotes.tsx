@@ -579,6 +579,7 @@ export default function Quotes() {
           totalHours: serviceData.totalHours?.toString(),
           totalCost: totalCost?.toString(),
           groundWindowHours: serviceData.groundWindowHours?.toString(),
+          simpleServiceHours: serviceData.simpleServiceHours?.toString(),
         };
       });
       
@@ -739,6 +740,8 @@ export default function Quotes() {
       if (grouped[stage]) {
         grouped[stage].push(quote);
       } else {
+        // Log unexpected pipeline stage for debugging data integrity issues
+        console.warn(`Quote ${quote.id} has unexpected pipeline stage: "${stage}". Defaulting to draft.`);
         grouped['draft'].push(quote);
       }
     });

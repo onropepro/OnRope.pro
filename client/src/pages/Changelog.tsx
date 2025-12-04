@@ -85,6 +85,12 @@ type RecentChange = {
 const recentChangesData: RecentChange[] = [
   {
     date: "December 4, 2025",
+    title: "Comprehensive Code Audit & Bug Fixes",
+    description: "Fixed 7 bugs including: IRATA license expiration timezone parsing, inventory compliance rating date handling, PDF filename timezone issues, quote service hours data loss on edit, debug console logs removal, bulk export graceful error handling with partial success support, and quote pipeline data integrity logging",
+    type: "fix"
+  },
+  {
+    date: "December 4, 2025",
     title: "Quote Client & Property Autofill",
     description: "Quick fill building information from saved client properties when creating quotes - select a client to autofill manager details, then pick from their saved properties to populate building name, strata plan, address, and floor count",
     type: "feature"

@@ -871,6 +871,7 @@ export default function Dashboard() {
 
   // Auto-select all permissions for Owner/CEO role when creating employee
   // Auto-select financial permissions for Accounting role when creating employee
+  // Note: Permissions are intentionally preserved when switching roles to allow manual customization
   useEffect(() => {
     const subscription = employeeForm.watch((value, { name }) => {
       if (name === "role") {
@@ -890,6 +891,7 @@ export default function Dashboard() {
 
   // Auto-select all permissions for Owner/CEO role when editing employee
   // Auto-select financial permissions for Accounting role when editing employee
+  // Note: Permissions are intentionally preserved when switching roles to allow manual customization
   useEffect(() => {
     const subscription = editEmployeeForm.watch((value, { name }) => {
       if (name === "role") {
@@ -4222,12 +4224,16 @@ export default function Dashboard() {
                     }
                     
                     return activeEmployees.map((employee: any) => {
-                      // Check IRATA license expiration status
+                      // Check IRATA license expiration status using timezone-safe date parsing
                       const irataStatus = employee.irataExpirationDate ? (() => {
-                        const expirationDate = new Date(employee.irataExpirationDate);
+                        const expirationDate = parseLocalDate(employee.irataExpirationDate);
+                        if (!expirationDate) return null;
+                        
                         const today = new Date();
+                        today.setHours(0, 0, 0, 0);
                         const thirtyDaysFromNow = new Date();
-                        thirtyDaysFromNow.setDate(today.getDate() + 30);
+                        thirtyDaysFromNow.setHours(0, 0, 0, 0);
+                        thirtyDaysFromNow.setDate(thirtyDaysFromNow.getDate() + 30);
                         
                         if (expirationDate < today) {
                           return 'expired';

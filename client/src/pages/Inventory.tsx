@@ -24,7 +24,7 @@ import HarnessInspectionForm from "./HarnessInspectionForm";
 import { format } from "date-fns";
 import { fr, enUS } from "date-fns/locale";
 import { jsPDF } from "jspdf";
-import { formatLocalDate } from "@/lib/dateUtils";
+import { formatLocalDate, formatLocalDateLong, parseLocalDate, toLocalDateString } from "@/lib/dateUtils";
 
 // Helper to get date locale based on current language
 const getDateLocale = () => i18n.language?.startsWith('fr') ? fr : enUS;
@@ -1168,18 +1168,18 @@ export default function Inventory() {
     return days;
   }, [inspectionFilter, allSessions]);
 
-  // Helper to normalize date to YYYY-MM-DD string
+  // Helper to normalize date to YYYY-MM-DD string using timezone-safe parsing
   const normalizeDateStr = (date: any): string => {
     if (!date) return '';
     if (typeof date === 'string') {
       // If already YYYY-MM-DD format, return as-is
       if (/^\d{4}-\d{2}-\d{2}$/.test(date)) return date;
-      // Otherwise parse and format
-      const d = new Date(date);
-      if (isNaN(d.getTime())) return '';
-      return format(d, 'yyyy-MM-dd');
+      // Use timezone-safe parsing for ISO strings
+      const parsed = parseLocalDate(date);
+      if (!parsed || isNaN(parsed.getTime())) return '';
+      return toLocalDateString(parsed);
     }
-    return format(date, 'yyyy-MM-dd');
+    return toLocalDateString(date);
   };
 
   // Helper function to calculate rating for a specific number of days
@@ -1243,37 +1243,6 @@ export default function Inventory() {
 
   // Calculate company safety rating based on filter
   const companySafetyRating = useMemo(() => {
-    // DEBUG: Log data to understand what we're working with
-    console.log('=== COMPLIANCE CALCULATION DEBUG ===');
-    console.log('allSessions count:', allSessions.length);
-    console.log('harnessInspections count:', harnessInspections.length);
-    console.log('inspectionDays count:', inspectionDays.length);
-    
-    if (allSessions.length > 0) {
-      console.log('Sample session:', JSON.stringify(allSessions[0], null, 2));
-    }
-    if (harnessInspections.length > 0) {
-      console.log('Sample inspection:', JSON.stringify(harnessInspections[0], null, 2));
-    }
-    if (inspectionDays.length > 0) {
-      console.log('Sample inspectionDay (Date object):', inspectionDays[0]);
-      console.log('Sample inspectionDay formatted:', format(inspectionDays[0], 'yyyy-MM-dd'));
-    }
-    
-    // Collect all unique work dates from sessions
-    const uniqueWorkDates = new Set<string>();
-    allSessions.forEach((s: any) => {
-      if (s.workDate) uniqueWorkDates.add(s.workDate);
-    });
-    console.log('Unique work dates in sessions:', Array.from(uniqueWorkDates));
-    
-    // Collect all unique inspection dates
-    const uniqueInspDates = new Set<string>();
-    harnessInspections.forEach((i: any) => {
-      if (i.inspectionDate) uniqueInspDates.add(i.inspectionDate);
-    });
-    console.log('Unique inspection dates:', Array.from(uniqueInspDates));
-    
     if (inspectionFilter === "combined") {
       // Calculate average of week, month, and all-time ratings
       const weekRating = calculateRatingForDays(7);
