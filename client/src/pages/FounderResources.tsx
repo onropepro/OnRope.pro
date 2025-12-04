@@ -71,6 +71,18 @@ const developmentTools: ResourceLink[] = [
     description: "Email | info@onrope.pro",
     icon: Mail,
   },
+  {
+    name: "Shadcn Blocks",
+    url: "https://www.shadcnblocks.com/components",
+    description: "UI component blocks and templates",
+    icon: Code,
+  },
+  {
+    name: "21st.dev Components",
+    url: "https://21st.dev/community/components",
+    description: "Community UI components",
+    icon: Code,
+  },
 ];
 
 const launchStrategy: StrategyItem[] = [
