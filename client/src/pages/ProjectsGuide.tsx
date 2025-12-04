@@ -504,19 +504,35 @@ export default function ProjectsGuide() {
                 <div className="grid grid-cols-2 gap-2">
                   <div className="p-2 bg-muted rounded text-xs">
                     <p className="font-semibold">Rope Access Plan</p>
-                    <p className="text-muted-foreground">Required safety document</p>
+                    <p className="text-muted-foreground">Site-specific safety and rigging plan</p>
                   </div>
                   <div className="p-2 bg-muted rounded text-xs">
                     <p className="font-semibold">Anchor Inspection</p>
-                    <p className="text-muted-foreground">Certification document</p>
-                  </div>
-                  <div className="p-2 bg-muted rounded text-xs">
-                    <p className="font-semibold">General Documents</p>
-                    <p className="text-muted-foreground">Any supporting PDFs</p>
+                    <p className="text-muted-foreground">Engineer-certified anchor point reports</p>
                   </div>
                   <div className="p-2 bg-muted rounded text-xs">
                     <p className="font-semibold">Site Photos</p>
-                    <p className="text-muted-foreground">Image gallery</p>
+                    <p className="text-muted-foreground">Before/after images, progress shots</p>
+                  </div>
+                  <div className="p-2 bg-muted rounded text-xs">
+                    <p className="font-semibold">Contracts & Work Orders</p>
+                    <p className="text-muted-foreground">Signed agreements with clients</p>
+                  </div>
+                  <div className="p-2 bg-muted rounded text-xs">
+                    <p className="font-semibold">Risk Assessments</p>
+                    <p className="text-muted-foreground">Site-specific hazard analysis</p>
+                  </div>
+                  <div className="p-2 bg-muted rounded text-xs">
+                    <p className="font-semibold">Building Access Info</p>
+                    <p className="text-muted-foreground">Security codes, key procedures, contacts</p>
+                  </div>
+                  <div className="p-2 bg-muted rounded text-xs">
+                    <p className="font-semibold">Permits & Approvals</p>
+                    <p className="text-muted-foreground">City permits, strata approvals</p>
+                  </div>
+                  <div className="p-2 bg-muted rounded text-xs">
+                    <p className="font-semibold">Insurance Certificates</p>
+                    <p className="text-muted-foreground">Liability and WCB documentation</p>
                   </div>
                 </div>
               </CardContent>
