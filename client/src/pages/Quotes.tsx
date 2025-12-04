@@ -2793,6 +2793,10 @@ export default function Quotes() {
                           if (client) {
                             buildingForm.setValue('strataManagerName', `${client.firstName} ${client.lastName}`);
                             buildingForm.setValue('strataManagerAddress', client.address || '');
+                            buildingForm.setValue('buildingName', '');
+                            buildingForm.setValue('strataPlanNumber', '');
+                            buildingForm.setValue('buildingAddress', '');
+                            buildingForm.setValue('floorCount', undefined);
                           }
                         }}
                       >
