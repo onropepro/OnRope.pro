@@ -82,20 +82,30 @@ export default function TimeTrackingGuide() {
               </div>
               
               <div className="space-y-2 text-sm">
-                <p><strong>This is a hard gate.</strong> When an employee clicks "Start Day":</p>
-                <ul className="list-disc list-inside space-y-1 ml-2">
-                  <li>System checks: Has this employee completed a harness inspection <strong>today</strong>?</li>
-                  <li>If <strong>NO</strong>: Redirected to complete harness inspection first</li>
-                  <li>If <strong>YES</strong>: Work session starts normally</li>
-                </ul>
+                <p><strong>When an employee clicks "Start Day", they see three options:</strong></p>
+                <div className="space-y-2 ml-2 mt-2">
+                  <div className="flex items-start gap-2">
+                    <Badge variant="default" className="shrink-0 mt-0.5">Yes</Badge>
+                    <span>Confirms inspection is complete. Proceeds to start work session.</span>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <Badge variant="destructive" className="shrink-0 mt-0.5">No</Badge>
+                    <span>Redirected to complete harness inspection form first.</span>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <Badge variant="outline" className="shrink-0 mt-0.5 border-orange-600 text-orange-900 dark:text-orange-100">Not Applicable</Badge>
+                    <span>For non-rope-access work (ground tasks, office work, equipment transport). Records N/A status and proceeds.</span>
+                  </div>
+                </div>
               </div>
 
-              <div className="bg-orange-100 dark:bg-orange-800 rounded-lg p-3 text-sm">
+              <div className="bg-orange-100 dark:bg-orange-800 rounded-lg p-3 text-sm space-y-2">
                 <p className="font-semibold flex items-center gap-2">
                   <AlertTriangle className="w-4 h-4" />
-                  No Bypass
+                  Honor System with Auditing
                 </p>
-                <p className="mt-1">This safety check cannot be skipped. It ensures every technician inspects their personal protective equipment before performing rope access work.</p>
+                <p>Employees can select "Yes" even without completing an inspection, but the system knows. The inspection database is checked independently, and any discrepancy (claiming "Yes" without a matching inspection record) is reflected in the Company Safety Rating (CSR).</p>
+                <p className="text-xs mt-2"><strong>Result:</strong> Honest employees build trust. Dishonest answers create an audit trail that affects company compliance scores visible to property managers.</p>
               </div>
             </CardContent>
           </Card>
