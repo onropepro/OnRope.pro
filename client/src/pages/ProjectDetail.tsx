@@ -30,7 +30,7 @@ import { useState, useEffect } from "react";
 import { format } from "date-fns";
 import { fr, enUS } from "date-fns/locale";
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from "recharts";
-import { parseLocalDate, formatTimestampDate } from "@/lib/dateUtils";
+import { parseLocalDate, formatTimestampDate, getTodayString } from "@/lib/dateUtils";
 import type { Project } from "@shared/schema";
 import { IRATA_TASK_TYPES } from "@shared/schema";
 import { useForm } from "react-hook-form";
@@ -314,9 +314,8 @@ export default function ProjectDetail() {
         // Continue without location if unavailable
       }
 
-      // Get local date in YYYY-MM-DD format (user's timezone)
-      const localDate = new Date();
-      const localDateString = `${localDate.getFullYear()}-${String(localDate.getMonth() + 1).padStart(2, '0')}-${String(localDate.getDate()).padStart(2, '0')}`;
+      // Get local date in YYYY-MM-DD format (user's timezone) using timezone-safe utility
+      const localDateString = getTodayString();
 
       const response = await fetch(`/api/projects/${projectId}/work-sessions/start`, {
         method: "POST",
@@ -516,8 +515,8 @@ export default function ProjectDetail() {
     mutationFn: async () => {
       if (!currentUser) throw new Error("User not found");
       
-      const localDate = new Date();
-      const localDateString = `${localDate.getFullYear()}-${String(localDate.getMonth() + 1).padStart(2, '0')}-${String(localDate.getDate()).padStart(2, '0')}`;
+      // Get local date in YYYY-MM-DD format using timezone-safe utility
+      const localDateString = getTodayString();
       
       // Backend auto-fills workerId from session.userId and companyId from user data
       const response = await fetch('/api/harness-inspections', {

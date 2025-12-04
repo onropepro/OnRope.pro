@@ -1012,6 +1012,10 @@ export default function Profile() {
       toast({ title: "Password changed successfully" });
     },
     onError: (error: Error) => {
+      // Clear password fields on error for security - don't leave sensitive data visible
+      passwordForm.setValue("currentPassword", "");
+      passwordForm.setValue("newPassword", "");
+      passwordForm.setValue("confirmPassword", "");
       toast({ title: "Error", description: error.message, variant: "destructive" });
     },
   });
@@ -1021,22 +1025,30 @@ export default function Profile() {
       return apiRequest("DELETE", "/api/user/account", { password });
     },
     onSuccess: () => {
+      // Close dialog and clear password on success
+      setShowDeleteDialog(false);
+      setDeletePassword("");
       toast({ title: "Account deleted successfully" });
       setLocation("/");
     },
     onError: (error: Error) => {
+      // Keep dialog open so user can retry - don't clear password or close dialog
       toast({ title: "Error", description: error.message, variant: "destructive" });
     },
   });
 
-  const handleDeleteAccount = () => {
+  const handleDeleteAccount = async () => {
     if (!deletePassword) {
       toast({ title: "Error", description: "Please enter your password", variant: "destructive" });
       return;
     }
-    deleteAccountMutation.mutate(deletePassword);
-    setShowDeleteDialog(false);
-    setDeletePassword("");
+    try {
+      await deleteAccountMutation.mutateAsync(deletePassword);
+      // Only close dialog and clear password on success (handled in onSuccess callback)
+    } catch (error) {
+      // Keep dialog open and password visible so user can retry
+      // Error toast is shown by onError callback
+    }
   };
 
   const confirmLogout = async () => {

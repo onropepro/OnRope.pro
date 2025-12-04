@@ -26,7 +26,7 @@ const toolboxMeetingFormSchema = z.object({
   projectId: z.string().min(1, "Project is required"),
   meetingDate: z.string().min(1, "Date is required"),
   conductedByName: z.string().min(1, "Your name is required"),
-  attendees: z.union([z.string(), z.array(z.string())]).optional(),
+  attendees: z.array(z.string()).default([]),
   
   topicFallProtection: z.boolean().default(false),
   topicAnchorPoints: z.boolean().default(false),

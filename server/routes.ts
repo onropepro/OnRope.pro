@@ -342,7 +342,7 @@ async function generatePropertyManagerCode(): Promise<string> {
   }
   
   // If we couldn't generate a unique code after max attempts, throw error
-  throw new Error('Unable to generate unique resident code. Please try again.');
+  throw new Error('Unable to generate unique property manager code. Please try again.');
 }
 
 export async function registerRoutes(app: Express): Promise<Server> {

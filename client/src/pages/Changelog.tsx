@@ -85,6 +85,12 @@ type RecentChange = {
 const recentChangesData: RecentChange[] = [
   {
     date: "December 4, 2025",
+    title: "Second Code Audit & Bug Fixes",
+    description: "Fixed 5 additional bugs: work session clock-in/out timezone handling for accurate payroll, delete account dialog flow keeping password visible on failure, password change form security clearing fields on error, property manager code generation error message typo, and toolbox meeting attendees schema simplification",
+    type: "fix"
+  },
+  {
+    date: "December 4, 2025",
     title: "Comprehensive Code Audit & Bug Fixes",
     description: "Fixed 7 bugs including: IRATA license expiration timezone parsing, inventory compliance rating date handling, PDF filename timezone issues, quote service hours data loss on edit, debug console logs removal, bulk export graceful error handling with partial success support, and quote pipeline data integrity logging",
     type: "fix"
