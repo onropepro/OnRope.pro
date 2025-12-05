@@ -3257,10 +3257,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       const [task] = await db.insert(superuserTasks).values({
         title,
-        description,
+        description: description || null,
         section,
         assignee,
-        dueDate,
+        dueDate: dueDate || null, // Convert empty string to null for date field
         priority: priority || 'medium',
         createdBy,
       }).returning();
@@ -3315,10 +3315,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       }
       if (title !== undefined) updates.title = title;
-      if (description !== undefined) updates.description = description;
+      if (description !== undefined) updates.description = description || null;
       if (section !== undefined) updates.section = section;
       if (assignee !== undefined) updates.assignee = assignee;
-      if (dueDate !== undefined) updates.dueDate = dueDate;
+      if (dueDate !== undefined) updates.dueDate = dueDate || null; // Convert empty string to null
       if (priority !== undefined) updates.priority = priority;
 
       const [updated] = await db.update(superuserTasks)
