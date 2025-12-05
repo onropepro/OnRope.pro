@@ -2124,7 +2124,7 @@ export default function ProjectDetail() {
                   </Badge>
                 )}
                 <Badge variant="secondary" className="text-xs">
-                  {complaints.length} {complaints.length === 1 ? t('projectDetail.feedback.complaint', 'complaint') : t('projectDetail.feedback.complaintsPlural', 'complaints')}
+                  {complaints.length} {complaints.length === 1 ? t('projectDetail.feedback.item', 'item') : t('projectDetail.feedback.itemsPlural', 'items')}
                 </Badge>
               </div>
             </div>
@@ -2155,7 +2155,7 @@ export default function ProjectDetail() {
                         key={complaint.id}
                         className="hover-elevate cursor-pointer"
                         onClick={() => setLocation(`/complaints/${complaint.id}`)}
-                        data-testid={`complaint-card-${complaint.id}`}
+                        data-testid={`feedback-card-${complaint.id}`}
                       >
                         <CardContent className="p-3">
                           <div className="flex items-start justify-between gap-2 mb-2">
@@ -2170,7 +2170,7 @@ export default function ProjectDetail() {
                             <div className="mb-2">
                               <img 
                                 src={complaint.photoUrl} 
-                                alt="Complaint photo" 
+                                alt="Feedback photo" 
                                 className="w-full max-w-xs rounded-lg border"
                               />
                             </div>
@@ -2374,7 +2374,7 @@ export default function ProjectDetail() {
           <AlertDialogHeader>
             <AlertDialogTitle>{t('projectDetail.dialogs.deleteProject.title', 'Delete Project')}</AlertDialogTitle>
             <AlertDialogDescription>
-              {t('projectDetail.dialogs.deleteProject.description', 'Are you sure you want to delete this project? This will permanently remove all associated work sessions, drop logs, and complaints. This action cannot be undone.')}
+              {t('projectDetail.dialogs.deleteProject.description', 'Are you sure you want to delete this project? This will permanently remove all associated work sessions, drop logs, and feedback. This action cannot be undone.')}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
