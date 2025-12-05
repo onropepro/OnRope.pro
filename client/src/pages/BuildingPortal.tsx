@@ -229,6 +229,9 @@ export default function BuildingPortal() {
                     data-testid="input-strata-number"
                   />
                 </div>
+                <p className="text-xs text-muted-foreground">
+                  You can enter with or without spaces (e.g., LMS1000 or LMS 1000)
+                </p>
               </div>
               <div className="space-y-2">
                 <Label htmlFor="password">Password</Label>
