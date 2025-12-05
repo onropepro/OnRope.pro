@@ -3280,7 +3280,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       const { id } = req.params;
-      const { status, title, description, section, assignee, dueDate, priority, completedBy } = req.body;
+      const { status, title, description, section, assignee, dueDate, priority, completedBy, currentUser } = req.body;
+
+      // SECURITY: Only the assignee can complete or uncomplete a task
+      if (status !== undefined) {
+        const existingTask = await db.query.superuserTasks.findFirst({
+          where: eq(superuserTasks.id, id),
+        });
+        
+        if (!existingTask) {
+          return res.status(404).json({ message: "Task not found" });
+        }
+        
+        // If changing status to/from completed, verify the current user is the assignee
+        if (status === 'completed' || existingTask.status === 'completed') {
+          if (currentUser !== existingTask.assignee) {
+            return res.status(403).json({ message: "Only the assignee can complete or uncomplete this task" });
+          }
+        }
+      }
 
       const updates: any = { updatedAt: new Date() };
       

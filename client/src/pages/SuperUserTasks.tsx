@@ -92,6 +92,7 @@ export default function SuperUserTasks() {
   const [addTaskOpen, setAddTaskOpen] = useState(false);
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const [newComment, setNewComment] = useState("");
+  const [currentUser, setCurrentUser] = useState<string>("Tommy"); // Default current user
   
   const [taskForm, setTaskForm] = useState({
     title: "",
@@ -125,6 +126,10 @@ export default function SuperUserTasks() {
   const updateTaskMutation = useMutation({
     mutationFn: async ({ id, ...data }: { id: string; [key: string]: any }) => {
       const response = await apiRequest("PATCH", `/api/superuser/tasks/${id}`, data);
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || "Failed to update task");
+      }
       return response.json();
     },
     onSuccess: (data) => {
@@ -133,8 +138,8 @@ export default function SuperUserTasks() {
         setSelectedTask(data.task);
       }
     },
-    onError: () => {
-      toast({ title: "Error", description: "Failed to update task", variant: "destructive" });
+    onError: (error: Error) => {
+      toast({ title: "Error", description: error.message, variant: "destructive" });
     },
   });
 
@@ -189,12 +194,18 @@ export default function SuperUserTasks() {
     completed: tasks.filter((t) => t.status === "completed").length,
   };
 
-  const handleToggleComplete = (task: Task, currentUser: string) => {
+  const handleToggleComplete = (task: Task) => {
+    // Only the assignee can complete or uncomplete a task
+    if (task.assignee !== currentUser) {
+      toast({ title: "Not allowed", description: "Only the assignee can complete this task", variant: "destructive" });
+      return;
+    }
     const newStatus = task.status === "completed" ? "todo" : "completed";
     updateTaskMutation.mutate({
       id: task.id,
       status: newStatus,
       completedBy: newStatus === "completed" ? currentUser : null,
+      currentUser, // Pass current user for backend verification
     });
   };
 
@@ -236,10 +247,30 @@ export default function SuperUserTasks() {
               <p className="text-xs text-muted-foreground">Internal project management</p>
             </div>
           </div>
-          <Button onClick={() => setAddTaskOpen(true)} data-testid="button-add-task">
-            <Plus className="h-4 w-4 mr-2" />
-            Add New Task
-          </Button>
+          <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2">
+              <span className="text-sm text-muted-foreground">Working as:</span>
+              <Select value={currentUser} onValueChange={setCurrentUser}>
+                <SelectTrigger className="w-[120px]" data-testid="select-current-user">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {ASSIGNEES.map((name) => (
+                    <SelectItem key={name} value={name}>
+                      <div className="flex items-center gap-2">
+                        <div className={`h-2 w-2 rounded-full ${ASSIGNEE_COLORS[name]}`} />
+                        {name}
+                      </div>
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <Button onClick={() => setAddTaskOpen(true)} data-testid="button-add-task">
+              <Plus className="h-4 w-4 mr-2" />
+              Add New Task
+            </Button>
+          </div>
         </div>
       </header>
 
@@ -341,13 +372,15 @@ export default function SuperUserTasks() {
                         <div
                           onClick={(e) => {
                             e.stopPropagation();
-                            handleToggleComplete(task, task.assignee);
+                            handleToggleComplete(task);
                           }}
-                          className="flex-shrink-0"
+                          className={`flex-shrink-0 ${task.assignee !== currentUser ? "opacity-50 cursor-not-allowed" : ""}`}
+                          title={task.assignee !== currentUser ? `Only ${task.assignee} can complete this task` : undefined}
                         >
                           <Checkbox
                             checked={task.status === "completed"}
                             className="h-5 w-5"
+                            disabled={task.assignee !== currentUser}
                             data-testid={`checkbox-task-${task.id}`}
                           />
                         </div>
@@ -571,13 +604,19 @@ export default function SuperUserTasks() {
                     <h4 className="text-sm font-medium mb-2">Status</h4>
                     <Select
                       value={selectedTask.status}
-                      onValueChange={(status) =>
+                      onValueChange={(status) => {
+                        // Check if changing to/from completed and not assignee
+                        if ((status === "completed" || selectedTask.status === "completed") && selectedTask.assignee !== currentUser) {
+                          toast({ title: "Not allowed", description: "Only the assignee can complete or uncomplete this task", variant: "destructive" });
+                          return;
+                        }
                         updateTaskMutation.mutate({
                           id: selectedTask.id,
                           status,
-                          completedBy: status === "completed" ? selectedTask.assignee : null,
-                        })
-                      }
+                          completedBy: status === "completed" ? currentUser : null,
+                          currentUser, // Pass current user for backend verification
+                        });
+                      }}
                     >
                       <SelectTrigger className="h-8" data-testid="select-status">
                         <SelectValue />
@@ -585,7 +624,9 @@ export default function SuperUserTasks() {
                       <SelectContent>
                         <SelectItem value="todo">To Do</SelectItem>
                         <SelectItem value="in_progress">In Progress</SelectItem>
-                        <SelectItem value="completed">Completed</SelectItem>
+                        <SelectItem value="completed" disabled={selectedTask.assignee !== currentUser && selectedTask.status !== "completed"}>
+                          Completed {selectedTask.assignee !== currentUser ? `(${selectedTask.assignee} only)` : ""}
+                        </SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
@@ -645,16 +686,14 @@ export default function SuperUserTasks() {
                   </div>
 
                   <div className="flex gap-2">
-                    <Select defaultValue="Tommy">
-                      <SelectTrigger className="w-[100px]" data-testid="select-comment-author">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {ASSIGNEES.map((name) => (
-                          <SelectItem key={name} value={name}>{name}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                      <Avatar className="h-6 w-6">
+                        <AvatarFallback className={`text-xs text-white ${ASSIGNEE_COLORS[currentUser] || "bg-gray-500"}`}>
+                          {currentUser.charAt(0)}
+                        </AvatarFallback>
+                      </Avatar>
+                      <span>{currentUser}</span>
+                    </div>
                     <div className="flex-1 flex gap-2">
                       <Input
                         placeholder="Add a comment..."
@@ -663,20 +702,14 @@ export default function SuperUserTasks() {
                         onKeyDown={(e) => {
                           if (e.key === "Enter" && !e.shiftKey) {
                             e.preventDefault();
-                            const authorSelect = document.querySelector('[data-testid="select-comment-author"]');
-                            const authorName = authorSelect?.textContent || "Tommy";
-                            handleAddComment(selectedTask.id, authorName);
+                            handleAddComment(selectedTask.id, currentUser);
                           }
                         }}
                         data-testid="input-comment"
                       />
                       <Button
                         size="icon"
-                        onClick={() => {
-                          const authorSelect = document.querySelector('[data-testid="select-comment-author"]');
-                          const authorName = authorSelect?.textContent || "Tommy";
-                          handleAddComment(selectedTask.id, authorName);
-                        }}
+                        onClick={() => handleAddComment(selectedTask.id, currentUser)}
                         disabled={!newComment.trim() || addCommentMutation.isPending}
                         data-testid="button-send-comment"
                       >
