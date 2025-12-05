@@ -1732,8 +1732,8 @@ export default function Quotes() {
                         Submit Quote
                       </Button>
                     )}
-                    {/* Convert to Project button - only show for won quotes */}
-                    {(selectedQuote as any).pipelineStage === "won" && canEditQuotes && (
+                    {/* Convert to Project button - available for all quotes */}
+                    {canEditQuotes && (
                       <Button
                         onClick={() => handleConvertToProject(selectedQuote)}
                         className="bg-emerald-600 hover:bg-emerald-700 text-white"
