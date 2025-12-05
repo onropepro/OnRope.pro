@@ -31,14 +31,20 @@ async function getBrowser(): Promise<Browser> {
   
   if (!browser || !browser.isConnected()) {
     console.log('[IRATA] Launching new browser instance');
+    
+    // Use system chromium which has all required dependencies
+    const systemChromiumPath = '/nix/store/qa9cnw4v5xkxyip6mb9kxqfq1z4x2dx1-chromium-138.0.7204.100/bin/chromium';
+    
     browser = await chromium.launch({
       headless: true,
+      executablePath: systemChromiumPath,
       args: [
         '--no-sandbox',
         '--disable-setuid-sandbox',
         '--disable-dev-shm-usage',
         '--disable-gpu',
-        '--single-process'
+        '--single-process',
+        '--disable-extensions'
       ]
     });
     browserLaunchTime = now;
