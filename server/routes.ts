@@ -3,7 +3,7 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { db } from "./db";
 import { wsHub } from "./websocket-hub";
-import { insertUserSchema, insertClientSchema, insertProjectSchema, insertDropLogSchema, insertComplaintSchema, insertComplaintNoteSchema, insertJobCommentSchema, insertHarnessInspectionSchema, insertToolboxMeetingSchema, insertFlhaFormSchema, insertIncidentReportSchema, insertMethodStatementSchema, insertPayPeriodConfigSchema, insertQuoteSchema, insertQuoteServiceSchema, insertGearItemSchema, insertGearAssignmentSchema, insertGearSerialNumberSchema, insertEquipmentDamageReportSchema, insertScheduledJobSchema, insertJobAssignmentSchema, updatePropertyManagerAccountSchema, insertFeatureRequestSchema, insertFeatureRequestMessageSchema, normalizeStrataPlan, type InsertGearItem, type InsertGearAssignment, type InsertGearSerialNumber, type Project, gearAssignments, gearSerialNumbers, gearItems, jobAssignments, workSessions, nonBillableWorkSessions, licenseKeys, users, propertyManagerCompanyLinks, IRATA_TASK_TYPES, quotes, quoteServices, quoteHistory } from "@shared/schema";
+import { insertUserSchema, insertClientSchema, insertProjectSchema, insertDropLogSchema, insertComplaintSchema, insertComplaintNoteSchema, insertJobCommentSchema, insertHarnessInspectionSchema, insertToolboxMeetingSchema, insertFlhaFormSchema, insertIncidentReportSchema, insertMethodStatementSchema, insertPayPeriodConfigSchema, insertQuoteSchema, insertQuoteServiceSchema, insertGearItemSchema, insertGearAssignmentSchema, insertGearSerialNumberSchema, insertEquipmentDamageReportSchema, insertScheduledJobSchema, insertJobAssignmentSchema, updatePropertyManagerAccountSchema, insertFeatureRequestSchema, insertFeatureRequestMessageSchema, normalizeStrataPlan, type InsertGearItem, type InsertGearAssignment, type InsertGearSerialNumber, type Project, gearAssignments, gearSerialNumbers, gearItems, jobAssignments, workSessions, nonBillableWorkSessions, licenseKeys, users, propertyManagerCompanyLinks, IRATA_TASK_TYPES, quotes, quoteServices, quoteHistory, superuserTasks, superuserTaskComments } from "@shared/schema";
 import { eq, sql, and } from "drizzle-orm";
 import { z } from "zod";
 import bcrypt from "bcrypt";
@@ -3199,6 +3199,192 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error('[SuperUser] Reset building password error:', error);
       res.status(500).json({ message: "Failed to reset password" });
+    }
+  });
+
+  // ==================== SUPERUSER TASK MANAGEMENT ====================
+
+  // Get all SuperUser tasks with comments
+  app.get("/api/superuser/tasks", requireAuth, async (req: Request, res: Response) => {
+    try {
+      if (req.session.userId !== 'superuser') {
+        return res.status(403).json({ message: "Access denied. SuperUser only." });
+      }
+
+      const tasks = await db.query.superuserTasks.findMany({
+        orderBy: (tasks, { asc, desc }) => [asc(tasks.section), desc(tasks.createdAt)],
+      });
+
+      // Get comments for all tasks
+      const comments = await db.query.superuserTaskComments.findMany({
+        orderBy: (comments, { asc }) => [asc(comments.createdAt)],
+      });
+
+      // Group comments by taskId
+      const commentsByTask: Record<string, typeof comments> = {};
+      for (const comment of comments) {
+        if (!commentsByTask[comment.taskId]) {
+          commentsByTask[comment.taskId] = [];
+        }
+        commentsByTask[comment.taskId].push(comment);
+      }
+
+      // Attach comments to tasks
+      const tasksWithComments = tasks.map(task => ({
+        ...task,
+        comments: commentsByTask[task.id] || [],
+      }));
+
+      res.json({ tasks: tasksWithComments });
+    } catch (error) {
+      console.error('[SuperUser] Get tasks error:', error);
+      res.status(500).json({ message: "Failed to fetch tasks" });
+    }
+  });
+
+  // Create a new SuperUser task
+  app.post("/api/superuser/tasks", requireAuth, async (req: Request, res: Response) => {
+    try {
+      if (req.session.userId !== 'superuser') {
+        return res.status(403).json({ message: "Access denied. SuperUser only." });
+      }
+
+      const { title, description, section, assignee, dueDate, priority, createdBy } = req.body;
+
+      if (!title || !section || !assignee || !createdBy) {
+        return res.status(400).json({ message: "Title, section, assignee, and createdBy are required" });
+      }
+
+      const [task] = await db.insert(superuserTasks).values({
+        title,
+        description,
+        section,
+        assignee,
+        dueDate,
+        priority: priority || 'medium',
+        createdBy,
+      }).returning();
+
+      res.json({ task: { ...task, comments: [] } });
+    } catch (error) {
+      console.error('[SuperUser] Create task error:', error);
+      res.status(500).json({ message: "Failed to create task" });
+    }
+  });
+
+  // Update a SuperUser task (status, details)
+  app.patch("/api/superuser/tasks/:id", requireAuth, async (req: Request, res: Response) => {
+    try {
+      if (req.session.userId !== 'superuser') {
+        return res.status(403).json({ message: "Access denied. SuperUser only." });
+      }
+
+      const { id } = req.params;
+      const { status, title, description, section, assignee, dueDate, priority, completedBy } = req.body;
+
+      const updates: any = { updatedAt: new Date() };
+      
+      if (status !== undefined) {
+        updates.status = status;
+        // If completing the task, record completion details
+        if (status === 'completed') {
+          updates.completedAt = new Date();
+          updates.completedBy = completedBy || 'Unknown';
+        } else {
+          // If uncompleting, clear completion details
+          updates.completedAt = null;
+          updates.completedBy = null;
+        }
+      }
+      if (title !== undefined) updates.title = title;
+      if (description !== undefined) updates.description = description;
+      if (section !== undefined) updates.section = section;
+      if (assignee !== undefined) updates.assignee = assignee;
+      if (dueDate !== undefined) updates.dueDate = dueDate;
+      if (priority !== undefined) updates.priority = priority;
+
+      const [updated] = await db.update(superuserTasks)
+        .set(updates)
+        .where(eq(superuserTasks.id, id))
+        .returning();
+
+      if (!updated) {
+        return res.status(404).json({ message: "Task not found" });
+      }
+
+      // Get comments for this task
+      const comments = await db.query.superuserTaskComments.findMany({
+        where: eq(superuserTaskComments.taskId, id),
+        orderBy: (comments, { asc }) => [asc(comments.createdAt)],
+      });
+
+      res.json({ task: { ...updated, comments } });
+    } catch (error) {
+      console.error('[SuperUser] Update task error:', error);
+      res.status(500).json({ message: "Failed to update task" });
+    }
+  });
+
+  // Delete a SuperUser task
+  app.delete("/api/superuser/tasks/:id", requireAuth, async (req: Request, res: Response) => {
+    try {
+      if (req.session.userId !== 'superuser') {
+        return res.status(403).json({ message: "Access denied. SuperUser only." });
+      }
+
+      const { id } = req.params;
+
+      await db.delete(superuserTasks).where(eq(superuserTasks.id, id));
+
+      res.json({ message: "Task deleted" });
+    } catch (error) {
+      console.error('[SuperUser] Delete task error:', error);
+      res.status(500).json({ message: "Failed to delete task" });
+    }
+  });
+
+  // Add a comment to a SuperUser task
+  app.post("/api/superuser/tasks/:id/comments", requireAuth, async (req: Request, res: Response) => {
+    try {
+      if (req.session.userId !== 'superuser') {
+        return res.status(403).json({ message: "Access denied. SuperUser only." });
+      }
+
+      const { id } = req.params;
+      const { authorName, content } = req.body;
+
+      if (!authorName || !content) {
+        return res.status(400).json({ message: "Author name and content are required" });
+      }
+
+      const [comment] = await db.insert(superuserTaskComments).values({
+        taskId: id,
+        authorName,
+        content,
+      }).returning();
+
+      res.json({ comment });
+    } catch (error) {
+      console.error('[SuperUser] Add comment error:', error);
+      res.status(500).json({ message: "Failed to add comment" });
+    }
+  });
+
+  // Delete a comment
+  app.delete("/api/superuser/tasks/:taskId/comments/:commentId", requireAuth, async (req: Request, res: Response) => {
+    try {
+      if (req.session.userId !== 'superuser') {
+        return res.status(403).json({ message: "Access denied. SuperUser only." });
+      }
+
+      const { commentId } = req.params;
+
+      await db.delete(superuserTaskComments).where(eq(superuserTaskComments.id, commentId));
+
+      res.json({ message: "Comment deleted" });
+    } catch (error) {
+      console.error('[SuperUser] Delete comment error:', error);
+      res.status(500).json({ message: "Failed to delete comment" });
     }
   });
 

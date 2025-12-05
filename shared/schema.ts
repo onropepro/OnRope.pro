@@ -2107,6 +2107,57 @@ export const insertChurnEventSchema = createInsertSchema(churnEvents).omit({
 export type ChurnEvent = typeof churnEvents.$inferSelect;
 export type InsertChurnEvent = z.infer<typeof insertChurnEventSchema>;
 
+// SuperUser Task Management - Internal project management system for launch coordination
+export const superuserTasks = pgTable("superuser_tasks", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  title: text("title").notNull(),
+  description: text("description"),
+  section: varchar("section").notNull(), // Module/category grouping (e.g., "User Access", "Safety Forms", "Documentation")
+  status: varchar("status").notNull().default("todo"), // todo | in_progress | completed
+  assignee: varchar("assignee").notNull(), // Tommy | Glenn | Kara
+  dueDate: date("due_date"),
+  priority: varchar("priority").default("medium"), // low | medium | high
+  createdBy: varchar("created_by").notNull(), // SuperUser who created the task
+  completedAt: timestamp("completed_at"),
+  completedBy: varchar("completed_by"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+}, (table) => [
+  index("IDX_superuser_tasks_section").on(table.section),
+  index("IDX_superuser_tasks_status").on(table.status),
+  index("IDX_superuser_tasks_assignee").on(table.assignee),
+]);
+
+export const insertSuperuserTaskSchema = createInsertSchema(superuserTasks).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+  completedAt: true,
+  completedBy: true,
+});
+
+export type SuperuserTask = typeof superuserTasks.$inferSelect;
+export type InsertSuperuserTask = z.infer<typeof insertSuperuserTaskSchema>;
+
+// SuperUser Task Comments - Slack-style threaded comments on tasks
+export const superuserTaskComments = pgTable("superuser_task_comments", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  taskId: varchar("task_id").notNull().references(() => superuserTasks.id, { onDelete: "cascade" }),
+  authorName: varchar("author_name").notNull(), // Tommy | Glenn | Kara
+  content: text("content").notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+}, (table) => [
+  index("IDX_superuser_task_comments_task").on(table.taskId),
+]);
+
+export const insertSuperuserTaskCommentSchema = createInsertSchema(superuserTaskComments).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type SuperuserTaskComment = typeof superuserTaskComments.$inferSelect;
+export type InsertSuperuserTaskComment = z.infer<typeof insertSuperuserTaskCommentSchema>;
+
 // Extended types for frontend use with relations
 export type QuoteWithServices = Quote & {
   services: QuoteService[];
