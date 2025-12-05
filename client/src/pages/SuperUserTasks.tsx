@@ -29,7 +29,13 @@ import {
   Send,
   Trash2,
   GripVertical,
-  Filter
+  Filter,
+  Paperclip,
+  Upload,
+  FileText,
+  File,
+  Download,
+  X
 } from "lucide-react";
 
 interface TaskComment {
@@ -37,6 +43,18 @@ interface TaskComment {
   taskId: string;
   authorName: string;
   content: string;
+  createdAt: string;
+}
+
+interface TaskAttachment {
+  id: string;
+  taskId: string;
+  fileName: string;
+  originalName: string;
+  fileSize: number;
+  contentType: string;
+  storagePath: string;
+  uploadedBy: string;
   createdAt: string;
 }
 
@@ -103,9 +121,16 @@ export default function SuperUserTasks() {
     dueDate: "",
     priority: "medium",
   });
+  const [isUploading, setIsUploading] = useState(false);
+  const [isDragging, setIsDragging] = useState(false);
 
   const { data: tasksData, isLoading } = useQuery<{ tasks: Task[] }>({
     queryKey: ["/api/superuser/tasks"],
+  });
+
+  const { data: attachmentsData, refetch: refetchAttachments } = useQuery<{ attachments: TaskAttachment[] }>({
+    queryKey: ["/api/superuser/tasks", selectedTask?.id, "attachments"],
+    enabled: !!selectedTask,
   });
 
   const createTaskMutation = useMutation({
@@ -172,7 +197,87 @@ export default function SuperUserTasks() {
     },
   });
 
+  const deleteAttachmentMutation = useMutation({
+    mutationFn: async ({ taskId, attachmentId }: { taskId: string; attachmentId: string }) => {
+      const response = await apiRequest("DELETE", `/api/superuser/tasks/${taskId}/attachments/${attachmentId}`);
+      if (!response.ok) throw new Error("Failed to delete attachment");
+      return response.json();
+    },
+    onSuccess: () => {
+      refetchAttachments();
+      toast({ title: "Attachment deleted" });
+    },
+    onError: () => {
+      toast({ title: "Error", description: "Failed to delete attachment", variant: "destructive" });
+    },
+  });
+
+  const handleFileUpload = async (files: FileList | null) => {
+    if (!files || files.length === 0 || !selectedTask) return;
+    
+    setIsUploading(true);
+    try {
+      for (const file of Array.from(files)) {
+        const formData = new FormData();
+        formData.append("file", file);
+        formData.append("uploaderName", currentUser);
+        
+        const response = await fetch(`/api/superuser/tasks/${selectedTask.id}/attachments`, {
+          method: "POST",
+          body: formData,
+          credentials: "include",
+        });
+        
+        if (!response.ok) {
+          const error = await response.json();
+          throw new Error(error.message || "Failed to upload file");
+        }
+      }
+      
+      refetchAttachments();
+      toast({ title: "File uploaded", description: `${files.length} file(s) uploaded successfully` });
+    } catch (error) {
+      toast({ 
+        title: "Upload failed", 
+        description: error instanceof Error ? error.message : "Failed to upload file", 
+        variant: "destructive" 
+      });
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(false);
+    handleFileUpload(e.dataTransfer.files);
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(false);
+  };
+
+  const formatFileSize = (bytes: number) => {
+    if (bytes < 1024) return `${bytes} B`;
+    if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+    return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+  };
+
+  const getFileIcon = (contentType: string, fileName: string) => {
+    if (contentType.startsWith("image/")) return File;
+    if (fileName.endsWith(".md") || contentType === "text/markdown") return FileText;
+    if (contentType === "application/pdf") return FileText;
+    return File;
+  };
+
   const tasks = tasksData?.tasks || [];
+  const attachments = attachmentsData?.attachments || [];
 
   const filteredTasks = tasks.filter((task) => {
     if (statusFilter !== "all" && task.status !== statusFilter) return false;
@@ -638,6 +743,119 @@ export default function SuperUserTasks() {
                     </p>
                   </div>
                 )}
+
+                <Separator />
+
+                {/* Attachments Section */}
+                <div>
+                  <h4 className="text-sm font-medium mb-4 flex items-center gap-2">
+                    <Paperclip className="h-4 w-4" />
+                    Attachments
+                    {attachments.length > 0 && (
+                      <Badge variant="secondary" className="text-xs">{attachments.length}</Badge>
+                    )}
+                  </h4>
+
+                  {/* File Upload Area */}
+                  <div
+                    className={`border-2 border-dashed rounded-md p-4 mb-4 text-center transition-colors ${
+                      isDragging 
+                        ? "border-primary bg-primary/5" 
+                        : "border-muted-foreground/25 hover:border-muted-foreground/50"
+                    }`}
+                    onDrop={handleDrop}
+                    onDragOver={handleDragOver}
+                    onDragLeave={handleDragLeave}
+                  >
+                    {isUploading ? (
+                      <div className="flex flex-col items-center gap-2 py-2">
+                        <div className="h-8 w-8 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+                        <p className="text-sm text-muted-foreground">Uploading...</p>
+                      </div>
+                    ) : (
+                      <>
+                        <Upload className="h-8 w-8 mx-auto text-muted-foreground/50 mb-2" />
+                        <p className="text-sm text-muted-foreground mb-2">
+                          Drag and drop files here, or click to select
+                        </p>
+                        <input
+                          type="file"
+                          id="file-upload"
+                          className="hidden"
+                          multiple
+                          accept=".md,.txt,.pdf,.doc,.docx,.xls,.xlsx,.json,.csv,.png,.jpg,.jpeg,.gif,.webp"
+                          onChange={(e) => handleFileUpload(e.target.files)}
+                          data-testid="input-file-upload"
+                        />
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => document.getElementById("file-upload")?.click()}
+                          data-testid="button-select-files"
+                        >
+                          Select Files
+                        </Button>
+                        <p className="text-xs text-muted-foreground mt-2">
+                          Supported: .md, .txt, .pdf, .doc, .docx, .xls, .xlsx, .json, .csv, images
+                        </p>
+                      </>
+                    )}
+                  </div>
+
+                  {/* Attachments List */}
+                  {attachments.length === 0 ? (
+                    <p className="text-sm text-muted-foreground text-center py-2">No attachments yet</p>
+                  ) : (
+                    <div className="space-y-2">
+                      {attachments.map((attachment) => {
+                        const FileIcon = getFileIcon(attachment.contentType, attachment.originalName);
+                        return (
+                          <div
+                            key={attachment.id}
+                            className="flex items-center gap-3 p-2 rounded-md bg-muted/50 group"
+                          >
+                            <FileIcon className="h-5 w-5 text-muted-foreground flex-shrink-0" />
+                            <div className="flex-1 min-w-0">
+                              <p className="text-sm font-medium truncate">{attachment.originalName}</p>
+                              <p className="text-xs text-muted-foreground">
+                                {formatFileSize(attachment.fileSize)} - Uploaded by {attachment.uploadedBy}
+                              </p>
+                            </div>
+                            <div className="flex items-center gap-1">
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-8 w-8"
+                                onClick={() => {
+                                  window.open(`/api/superuser/tasks/${selectedTask.id}/attachments/${attachment.id}/download`, "_blank");
+                                }}
+                                data-testid={`button-download-${attachment.id}`}
+                              >
+                                <Download className="h-4 w-4" />
+                              </Button>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-8 w-8 text-destructive"
+                                onClick={() => {
+                                  if (confirm("Delete this attachment?")) {
+                                    deleteAttachmentMutation.mutate({
+                                      taskId: selectedTask.id,
+                                      attachmentId: attachment.id,
+                                    });
+                                  }
+                                }}
+                                data-testid={`button-delete-attachment-${attachment.id}`}
+                              >
+                                <X className="h-4 w-4" />
+                              </Button>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
 
                 <Separator />
 
