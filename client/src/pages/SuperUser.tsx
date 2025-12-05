@@ -279,6 +279,29 @@ export default function SuperUser() {
               </p>
             </CardContent>
           </Card>
+
+          <Card 
+            className="hover-elevate active-elevate-2 cursor-pointer transition-all"
+            onClick={() => setLocation('/superuser/tasks')}
+            data-testid="card-task-list"
+          >
+            <CardHeader>
+              <div className="flex items-center gap-3">
+                <div className="h-12 w-12 rounded-full bg-indigo-500/10 flex items-center justify-center">
+                  <span className="material-icons text-indigo-500 text-2xl">checklist</span>
+                </div>
+                <div>
+                  <CardTitle className="text-xl">Task List</CardTitle>
+                  <CardDescription>Internal project management</CardDescription>
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <p className="text-sm text-muted-foreground">
+                Manage development tasks, assign to team members, and track progress
+              </p>
+            </CardContent>
+          </Card>
         </div>
       </div>
 

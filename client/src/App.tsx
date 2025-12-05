@@ -40,6 +40,7 @@ import SuperUserMetrics from "@/pages/SuperUserMetrics";
 import FounderResources from "@/pages/FounderResources";
 import BuildingPortal from "@/pages/BuildingPortal";
 import SuperUserBuildings from "@/pages/SuperUserBuildings";
+import SuperUserTasks from "@/pages/SuperUserTasks";
 import ResidentsManagement from "@/pages/ResidentsManagement";
 import Documents from "@/pages/Documents";
 import ResidentLink from "@/pages/ResidentLink";
@@ -127,6 +128,11 @@ function Router() {
       <Route path="/superuser/buildings">
         <ProtectedRoute allowedRoles={["superuser"]}>
           <SuperUserBuildings />
+        </ProtectedRoute>
+      </Route>
+      <Route path="/superuser/tasks">
+        <ProtectedRoute allowedRoles={["superuser"]}>
+          <SuperUserTasks />
         </ProtectedRoute>
       </Route>
       <Route path="/building-portal" component={BuildingPortal} />
