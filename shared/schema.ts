@@ -2161,6 +2161,29 @@ export const insertSuperuserTaskCommentSchema = createInsertSchema(superuserTask
 export type SuperuserTaskComment = typeof superuserTaskComments.$inferSelect;
 export type InsertSuperuserTaskComment = z.infer<typeof insertSuperuserTaskCommentSchema>;
 
+// SuperUser Task Attachments - File attachments for tasks
+export const superuserTaskAttachments = pgTable("superuser_task_attachments", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  taskId: varchar("task_id").notNull().references(() => superuserTasks.id, { onDelete: "cascade" }),
+  fileName: varchar("file_name").notNull(), // Stored filename in object storage
+  originalName: varchar("original_name").notNull(), // Original filename uploaded by user
+  fileSize: integer("file_size").notNull(), // Size in bytes
+  contentType: varchar("content_type").notNull(), // MIME type
+  storagePath: varchar("storage_path").notNull(), // Full path in object storage
+  uploadedBy: varchar("uploaded_by").notNull(), // Tommy | Glenn | Kara
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+}, (table) => [
+  index("IDX_superuser_task_attachments_task").on(table.taskId),
+]);
+
+export const insertSuperuserTaskAttachmentSchema = createInsertSchema(superuserTaskAttachments).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type SuperuserTaskAttachment = typeof superuserTaskAttachments.$inferSelect;
+export type InsertSuperuserTaskAttachment = z.infer<typeof insertSuperuserTaskAttachmentSchema>;
+
 // Extended types for frontend use with relations
 export type QuoteWithServices = Quote & {
   services: QuoteService[];
