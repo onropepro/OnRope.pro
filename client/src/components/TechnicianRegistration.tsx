@@ -38,7 +38,11 @@ interface TechnicianData {
   certification: CertificationType;
   irataLicenseNumber: string;
   spratLicenseNumber: string;
-  address: string;
+  streetAddress: string;
+  city: string;
+  provinceState: string;
+  country: string;
+  postalCode: string;
   irataVerified?: IrataVerificationResult;
   manualVerificationAcknowledged?: boolean;
 }
@@ -58,14 +62,18 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
     certification: null,
     irataLicenseNumber: "",
     spratLicenseNumber: "",
-    address: "",
+    streetAddress: "",
+    city: "",
+    provinceState: "",
+    country: "",
+    postalCode: "",
   });
   const [error, setError] = useState("");
 
   const irataVerifyMutation = useMutation({
-    mutationFn: async ({ lastName, irataNumber }: { lastName: string; irataNumber: string }) => {
+    mutationFn: async ({ lastName, irataNumber }: { lastName: string; irataNumber: string }): Promise<IrataVerificationResult> => {
       const response = await apiRequest("POST", "/api/verify-irata", { lastName, irataNumber });
-      return response as IrataVerificationResult;
+      return response.json() as Promise<IrataVerificationResult>;
     },
     onMutate: () => {
       // Reset acknowledgement and previous results before new verification attempt
@@ -123,7 +131,11 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
       certification: null,
       irataLicenseNumber: "",
       spratLicenseNumber: "",
-      address: "",
+      streetAddress: "",
+      city: "",
+      provinceState: "",
+      country: "",
+      postalCode: "",
     });
     setError("");
   };
@@ -223,8 +235,24 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
         setStep("address");
         break;
       case "address":
-        if (!data.address.trim()) {
-          setError("Please enter your address");
+        if (!data.streetAddress.trim()) {
+          setError("Please enter your street address");
+          return;
+        }
+        if (!data.city.trim()) {
+          setError("Please enter your city");
+          return;
+        }
+        if (!data.provinceState.trim()) {
+          setError("Please enter your province/state");
+          return;
+        }
+        if (!data.country.trim()) {
+          setError("Please enter your country");
+          return;
+        }
+        if (!data.postalCode.trim()) {
+          setError("Please enter your postal code");
           return;
         }
         setStep("complete");
@@ -310,27 +338,22 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
       } else if (data.irataVerified.requiresManualVerification || !data.irataVerified.success) {
         // Soft failure: CAPTCHA detected, service unavailable, or parsing failed
         // User can proceed after manual acknowledgement
-        const isServiceUnavailable = !data.irataVerified.success;
         return (
           <div className="p-3 rounded-lg bg-amber-500/10 border border-amber-500/20 space-y-3">
             <div className="flex items-center gap-2 text-amber-600 dark:text-amber-400">
               <AlertTriangle className="w-5 h-5" />
-              <span className="font-medium">
-                {isServiceUnavailable ? 'Verification Service Unavailable' : 'Manual Verification Required'}
-              </span>
+              <span className="font-medium">Manual Verification Required</span>
             </div>
             <p className="text-sm text-muted-foreground">
-              {data.irataVerified.error || 'Automatic verification unavailable. Please verify your license manually at '}
-              {!data.irataVerified.error && (
-                <a 
-                  href="https://techconnect.irata.org/verify/tech" 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="text-primary underline"
-                >
-                  techconnect.irata.org
-                </a>
-              )}
+              The IRATA website requires human verification. Please verify your license manually at{' '}
+              <a 
+                href="https://techconnect.irata.org/verify/tech" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="text-primary underline"
+              >
+                techconnect.irata.org
+              </a>
             </p>
             <div className="flex items-center space-x-2 pt-2 border-t border-amber-500/20">
               <Checkbox 
@@ -666,18 +689,63 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
                 Enter your home address
               </DialogDescription>
             </DialogHeader>
-            <div className="py-6">
-              <Label htmlFor="address" className="sr-only">Address</Label>
-              <Input
-                id="address"
-                data-testid="input-technician-address"
-                placeholder="Enter your full address"
-                value={data.address}
-                onChange={(e) => setData({ ...data, address: e.target.value })}
-                onKeyDown={(e) => e.key === "Enter" && handleContinue()}
-                autoFocus
-                className="text-center text-lg h-12"
-              />
+            <div className="py-4 space-y-3">
+              <div>
+                <Label htmlFor="streetAddress" className="text-sm font-medium">Street Address</Label>
+                <Input
+                  id="streetAddress"
+                  data-testid="input-technician-street-address"
+                  placeholder="123 Main Street, Apt 4"
+                  value={data.streetAddress}
+                  onChange={(e) => setData({ ...data, streetAddress: e.target.value })}
+                  autoFocus
+                />
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <Label htmlFor="city" className="text-sm font-medium">City</Label>
+                  <Input
+                    id="city"
+                    data-testid="input-technician-city"
+                    placeholder="Vancouver"
+                    value={data.city}
+                    onChange={(e) => setData({ ...data, city: e.target.value })}
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="provinceState" className="text-sm font-medium">Province/State</Label>
+                  <Input
+                    id="provinceState"
+                    data-testid="input-technician-province-state"
+                    placeholder="BC"
+                    value={data.provinceState}
+                    onChange={(e) => setData({ ...data, provinceState: e.target.value })}
+                  />
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <Label htmlFor="country" className="text-sm font-medium">Country</Label>
+                  <Input
+                    id="country"
+                    data-testid="input-technician-country"
+                    placeholder="Canada"
+                    value={data.country}
+                    onChange={(e) => setData({ ...data, country: e.target.value })}
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="postalCode" className="text-sm font-medium">Postal Code</Label>
+                  <Input
+                    id="postalCode"
+                    data-testid="input-technician-postal-code"
+                    placeholder="V6B 1A1"
+                    value={data.postalCode}
+                    onChange={(e) => setData({ ...data, postalCode: e.target.value })}
+                    onKeyDown={(e) => e.key === "Enter" && handleContinue()}
+                  />
+                </div>
+              </div>
               {error && <p className="text-destructive text-sm text-center mt-2">{error}</p>}
             </div>
             <DialogFooter className="flex-col gap-2 sm:flex-col">
@@ -754,9 +822,13 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
                     <span className="font-medium">{data.spratLicenseNumber}</span>
                   </div>
                 )}
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">Address:</span>
-                  <span className="font-medium text-right max-w-[200px]">{data.address}</span>
+                <div className="pt-2 border-t border-border">
+                  <span className="text-muted-foreground text-sm">Address:</span>
+                  <div className="font-medium text-sm mt-1">
+                    <div>{data.streetAddress}</div>
+                    <div>{data.city}, {data.provinceState} {data.postalCode}</div>
+                    <div>{data.country}</div>
+                  </div>
                 </div>
               </div>
               <p className="text-sm text-muted-foreground text-center">
