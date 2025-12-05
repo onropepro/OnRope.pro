@@ -534,7 +534,7 @@ export default function SuperUserTasks() {
                 <div className="flex items-start justify-between gap-2">
                   <div className="flex items-start gap-3">
                     <div
-                      onClick={() => handleToggleComplete(selectedTask, selectedTask.assignee)}
+                      onClick={() => handleToggleComplete(selectedTask)}
                       className="mt-1 cursor-pointer"
                     >
                       {selectedTask.status === "completed" ? (
