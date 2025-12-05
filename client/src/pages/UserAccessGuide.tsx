@@ -33,8 +33,7 @@ import {
   FileText,
   BarChart3,
   UserCog,
-  Clock,
-  ArrowRight
+  Clock
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -407,28 +406,35 @@ export default function UserAccessGuide() {
 
           <Card>
             <CardContent className="pt-4">
-              <div className="space-y-3 text-sm">
-                <div className="flex items-center gap-3">
-                  <div className="bg-blue-100 dark:bg-blue-900 rounded-full w-8 h-8 flex items-center justify-center shrink-0">
-                    <span className="font-bold text-blue-600 dark:text-blue-400">1</span>
+              <div className="relative text-sm">
+                <div className="absolute left-4 top-4 bottom-4 w-0.5 bg-blue-200 dark:bg-blue-800" />
+                
+                <div className="relative flex gap-4 pb-6">
+                  <div className="relative z-10 bg-blue-600 dark:bg-blue-500 rounded-full w-8 h-8 flex items-center justify-center shrink-0">
+                    <span className="font-bold text-white text-sm">1</span>
                   </div>
-                  <p>Company Owner creates new employee account</p>
+                  <div className="pt-1">
+                    <p className="font-medium">Company Owner creates new employee account</p>
+                  </div>
                 </div>
-                <ArrowRight className="w-4 h-4 mx-auto text-muted-foreground" />
-                <div className="flex items-center gap-3">
-                  <div className="bg-blue-100 dark:bg-blue-900 rounded-full w-8 h-8 flex items-center justify-center shrink-0">
-                    <span className="font-bold text-blue-600 dark:text-blue-400">2</span>
+
+                <div className="relative flex gap-4 pb-6">
+                  <div className="relative z-10 bg-blue-600 dark:bg-blue-500 rounded-full w-8 h-8 flex items-center justify-center shrink-0">
+                    <span className="font-bold text-white text-sm">2</span>
                   </div>
-                  <p>Selects base role (e.g., "Operations Manager" or "Inventory Manager")</p>
+                  <div className="pt-1">
+                    <p className="font-medium">Selects base role</p>
+                    <p className="text-xs text-muted-foreground mt-0.5">e.g., "Operations Manager" or "Inventory Manager"</p>
+                  </div>
                 </div>
-                <ArrowRight className="w-4 h-4 mx-auto text-muted-foreground" />
-                <div className="flex items-center gap-3">
-                  <div className="bg-blue-100 dark:bg-blue-900 rounded-full w-8 h-8 flex items-center justify-center shrink-0">
-                    <span className="font-bold text-blue-600 dark:text-blue-400">3</span>
+
+                <div className="relative flex gap-4 pb-6">
+                  <div className="relative z-10 bg-blue-600 dark:bg-blue-500 rounded-full w-8 h-8 flex items-center justify-center shrink-0">
+                    <span className="font-bold text-white text-sm">3</span>
                   </div>
-                  <div>
-                    <p>Assigns granular permissions across all categories:</p>
-                    <div className="flex flex-wrap gap-1 mt-1">
+                  <div className="pt-1">
+                    <p className="font-medium">Assigns granular permissions across all categories</p>
+                    <div className="flex flex-wrap gap-1 mt-2">
                       <Badge variant="secondary" className="text-xs">Financial</Badge>
                       <Badge variant="secondary" className="text-xs">Project Mgmt</Badge>
                       <Badge variant="secondary" className="text-xs">Employee Mgmt</Badge>
@@ -440,19 +446,25 @@ export default function UserAccessGuide() {
                     </div>
                   </div>
                 </div>
-                <ArrowRight className="w-4 h-4 mx-auto text-muted-foreground" />
-                <div className="flex items-center gap-3">
-                  <div className="bg-blue-100 dark:bg-blue-900 rounded-full w-8 h-8 flex items-center justify-center shrink-0">
-                    <span className="font-bold text-blue-600 dark:text-blue-400">4</span>
+
+                <div className="relative flex gap-4 pb-6">
+                  <div className="relative z-10 bg-blue-600 dark:bg-blue-500 rounded-full w-8 h-8 flex items-center justify-center shrink-0">
+                    <span className="font-bold text-white text-sm">4</span>
                   </div>
-                  <p>Employee receives unique access profile (role + custom permissions)</p>
+                  <div className="pt-1">
+                    <p className="font-medium">Employee receives unique access profile</p>
+                    <p className="text-xs text-muted-foreground mt-0.5">Role + custom permissions combined</p>
+                  </div>
                 </div>
-                <ArrowRight className="w-4 h-4 mx-auto text-muted-foreground" />
-                <div className="flex items-center gap-3">
-                  <div className="bg-green-100 dark:bg-green-900 rounded-full w-8 h-8 flex items-center justify-center shrink-0">
-                    <CheckCircle2 className="w-4 h-4 text-green-600 dark:text-green-400" />
+
+                <div className="relative flex gap-4">
+                  <div className="relative z-10 bg-green-600 dark:bg-green-500 rounded-full w-8 h-8 flex items-center justify-center shrink-0">
+                    <CheckCircle2 className="w-4 h-4 text-white" />
                   </div>
-                  <p>Permissions can be modified at any time by company owner</p>
+                  <div className="pt-1">
+                    <p className="font-medium">Permissions can be modified at any time</p>
+                    <p className="text-xs text-muted-foreground mt-0.5">Company owner can adjust as responsibilities change</p>
+                  </div>
                 </div>
               </div>
             </CardContent>
