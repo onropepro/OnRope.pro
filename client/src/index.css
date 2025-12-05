@@ -524,15 +524,16 @@
 
 /* SuperUser Section - Outfit font with 14px minimum */
 .superuser-root {
-  font-family: 'Outfit', sans-serif;
-  font-size: 14px;
+  font-family: 'Outfit', sans-serif !important;
+  font-size: 14px !important;
   line-height: 1.6;
 }
 
 .superuser-root *:not(.material-icons):not(.material-icons-outlined):not(.material-symbols-outlined) {
-  font-family: 'Outfit', sans-serif;
+  font-family: 'Outfit', sans-serif !important;
 }
 
+/* Enforce minimum 14px for all small text classes */
 .superuser-root .text-xs:not(.material-icons),
 .superuser-root .text-\[10px\]:not(.material-icons),
 .superuser-root .text-\[11px\]:not(.material-icons),
@@ -542,11 +543,22 @@
 }
 
 .superuser-root small {
-  font-size: 14px;
+  font-size: 14px !important;
 }
 
 .superuser-root .text-sm:not(.material-icons) {
-  font-size: 14px;
+  font-size: 14px !important;
+}
+
+/* Also enforce 14px for muted/secondary text which often uses smaller sizes */
+.superuser-root .text-muted-foreground {
+  font-size: 14px !important;
+}
+
+.superuser-root p,
+.superuser-root span:not(.material-icons):not(.material-icons-outlined):not(.material-symbols-outlined),
+.superuser-root div {
+  font-size: max(14px, inherit);
 }
 
 /* Preserve Material Icons font */
