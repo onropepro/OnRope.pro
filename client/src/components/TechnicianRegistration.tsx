@@ -5,8 +5,10 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, Di
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Badge } from "@/components/ui/badge";
+import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
-import { User, ArrowRight, Award, MapPin } from "lucide-react";
+import { User, ArrowRight, Award, MapPin, Loader2, CheckCircle2, XCircle, AlertTriangle } from "lucide-react";
 import { apiRequest } from "@/lib/queryClient";
 
 type CertificationType = "irata" | "sprat" | "both" | "none" | null;
@@ -19,6 +21,17 @@ type RegistrationStep =
   | "address"
   | "complete";
 
+interface IrataVerificationResult {
+  success: boolean;
+  verified: boolean;
+  technicianName?: string;
+  level?: string;
+  expiryDate?: string;
+  status?: string;
+  error?: string;
+  requiresManualVerification?: boolean;
+}
+
 interface TechnicianData {
   firstName: string;
   lastName: string;
@@ -26,6 +39,8 @@ interface TechnicianData {
   irataLicenseNumber: string;
   spratLicenseNumber: string;
   address: string;
+  irataVerified?: IrataVerificationResult;
+  manualVerificationAcknowledged?: boolean;
 }
 
 interface TechnicianRegistrationProps {
@@ -47,6 +62,59 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
   });
   const [error, setError] = useState("");
 
+  const irataVerifyMutation = useMutation({
+    mutationFn: async ({ lastName, irataNumber }: { lastName: string; irataNumber: string }) => {
+      const response = await apiRequest("POST", "/api/verify-irata", { lastName, irataNumber });
+      return response as IrataVerificationResult;
+    },
+    onMutate: () => {
+      // Reset acknowledgement and previous results before new verification attempt
+      setData(prev => ({ ...prev, irataVerified: undefined, manualVerificationAcknowledged: false }));
+      setError("");
+    },
+    onSuccess: (result) => {
+      // Store result and ensure acknowledgement is reset
+      setData(prev => ({ ...prev, irataVerified: result, manualVerificationAcknowledged: false }));
+      if (result.verified) {
+        toast({
+          title: "IRATA License Verified",
+          description: `${result.level || 'Technician'} - Valid until ${result.expiryDate || 'N/A'}`,
+        });
+        setError("");
+      } else if (result.requiresManualVerification || !result.success) {
+        // Soft failure - show info toast
+        toast({
+          title: "Manual Verification Required",
+          description: "Please verify your license manually and acknowledge below.",
+        });
+      } else {
+        // Hard failure - show error
+        toast({
+          title: "License Not Found",
+          description: result.error || "Please check your license details",
+          variant: "destructive",
+        });
+      }
+    },
+    onError: (error: any) => {
+      // Network/service error - treat as soft failure
+      setData(prev => ({ 
+        ...prev, 
+        irataVerified: { 
+          success: false, 
+          verified: false, 
+          error: error.message || "Could not verify IRATA license" 
+        },
+        manualVerificationAcknowledged: false 
+      }));
+      toast({
+        title: "Verification Service Error",
+        description: error.message || "Could not connect to verification service",
+        variant: "destructive",
+      });
+    }
+  });
+
   const resetForm = () => {
     setStep("firstName");
     setData({
@@ -63,6 +131,18 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
   const handleClose = () => {
     resetForm();
     onOpenChange(false);
+  };
+
+  const handleVerifyIrata = () => {
+    if (!data.irataLicenseNumber.trim()) {
+      setError("Please enter your IRATA license number first");
+      return;
+    }
+    setError("");
+    irataVerifyMutation.mutate({
+      lastName: data.lastName,
+      irataNumber: data.irataLicenseNumber.trim()
+    });
   };
 
   const handleContinue = () => {
@@ -95,9 +175,42 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
         }
         break;
       case "licenseNumbers":
+        // Block if verification is in progress
+        if (irataVerifyMutation.isPending) {
+          setError("Please wait while we verify your IRATA license...");
+          return;
+        }
+        
         if (data.certification === "irata" || data.certification === "both") {
           if (!data.irataLicenseNumber.trim()) {
             setError("Please enter your IRATA license number");
+            return;
+          }
+          // Require verification before proceeding
+          if (!data.irataVerified) {
+            // Auto-trigger verification
+            irataVerifyMutation.mutate({
+              lastName: data.lastName,
+              irataNumber: data.irataLicenseNumber.trim()
+            });
+            return;
+          }
+          
+          // Verification passed - allow to continue
+          if (data.irataVerified.verified) {
+            // Good to proceed
+          }
+          // Soft failure (CAPTCHA, network, timeout, service unavailable) - allow manual acknowledgement
+          else if (data.irataVerified.requiresManualVerification || !data.irataVerified.success) {
+            if (!data.manualVerificationAcknowledged) {
+              setError("Please acknowledge manual verification by clicking the checkbox below");
+              return;
+            }
+            // Has manual acknowledgement, can proceed
+          }
+          // Hard failure (technician not found with success=true) - cannot proceed
+          else {
+            setError("IRATA verification failed. Please check that your last name and license number are correct, then try again.");
             return;
           }
         }
@@ -142,8 +255,119 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
   };
 
   const handleCertificationSelect = (cert: CertificationType) => {
-    setData({ ...data, certification: cert });
+    setData({ ...data, certification: cert, irataVerified: undefined });
     setError("");
+  };
+
+  const renderVerificationStatus = () => {
+    if (irataVerifyMutation.isPending) {
+      return (
+        <div className="flex items-center gap-2 p-3 rounded-lg bg-blue-500/10 text-blue-600 dark:text-blue-400">
+          <Loader2 className="w-4 h-4 animate-spin" />
+          <span className="text-sm">Verifying with IRATA...</span>
+        </div>
+      );
+    }
+
+    if (data.irataVerified) {
+      if (data.irataVerified.verified) {
+        return (
+          <div className="p-3 rounded-lg bg-green-500/10 border border-green-500/20">
+            <div className="flex items-center gap-2 text-green-600 dark:text-green-400 mb-2">
+              <CheckCircle2 className="w-5 h-5" />
+              <span className="font-medium">License Verified</span>
+            </div>
+            <div className="space-y-1 text-sm">
+              {data.irataVerified.technicianName && (
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Name:</span>
+                  <span>{data.irataVerified.technicianName}</span>
+                </div>
+              )}
+              {data.irataVerified.level && (
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Level:</span>
+                  <Badge variant="secondary">{data.irataVerified.level}</Badge>
+                </div>
+              )}
+              {data.irataVerified.expiryDate && (
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Expires:</span>
+                  <span>{data.irataVerified.expiryDate}</span>
+                </div>
+              )}
+              {data.irataVerified.status && (
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Status:</span>
+                  <Badge variant={data.irataVerified.status === 'Current' || data.irataVerified.status === 'Active' ? 'default' : 'destructive'}>
+                    {data.irataVerified.status}
+                  </Badge>
+                </div>
+              )}
+            </div>
+          </div>
+        );
+      } else if (data.irataVerified.requiresManualVerification || !data.irataVerified.success) {
+        // Soft failure: CAPTCHA detected, service unavailable, or parsing failed
+        // User can proceed after manual acknowledgement
+        const isServiceUnavailable = !data.irataVerified.success;
+        return (
+          <div className="p-3 rounded-lg bg-amber-500/10 border border-amber-500/20 space-y-3">
+            <div className="flex items-center gap-2 text-amber-600 dark:text-amber-400">
+              <AlertTriangle className="w-5 h-5" />
+              <span className="font-medium">
+                {isServiceUnavailable ? 'Verification Service Unavailable' : 'Manual Verification Required'}
+              </span>
+            </div>
+            <p className="text-sm text-muted-foreground">
+              {data.irataVerified.error || 'Automatic verification unavailable. Please verify your license manually at '}
+              {!data.irataVerified.error && (
+                <a 
+                  href="https://techconnect.irata.org/verify/tech" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="text-primary underline"
+                >
+                  techconnect.irata.org
+                </a>
+              )}
+            </p>
+            <div className="flex items-center space-x-2 pt-2 border-t border-amber-500/20">
+              <Checkbox 
+                id="manualVerify" 
+                checked={data.manualVerificationAcknowledged || false}
+                onCheckedChange={(checked) => {
+                  setData({ ...data, manualVerificationAcknowledged: checked === true });
+                  setError("");
+                }}
+                data-testid="checkbox-manual-verification"
+              />
+              <Label htmlFor="manualVerify" className="text-sm cursor-pointer">
+                I confirm that I have verified my IRATA license manually
+              </Label>
+            </div>
+          </div>
+        );
+      } else {
+        // Hard failure - technician not found - no bypass allowed
+        return (
+          <div className="p-3 rounded-lg bg-red-500/10 border border-red-500/20">
+            <div className="flex items-center gap-2 text-red-600 dark:text-red-400 mb-2">
+              <XCircle className="w-5 h-5" />
+              <span className="font-medium">License Not Found</span>
+            </div>
+            <p className="text-sm text-muted-foreground">
+              {data.irataVerified.error || 'No technician found with the provided details.'}
+            </p>
+            <p className="text-sm text-muted-foreground mt-2">
+              Please double-check your last name and IRATA license number, then try again.
+            </p>
+          </div>
+        );
+      }
+    }
+
+    return null;
   };
 
   const renderStepContent = () => {
@@ -346,17 +570,34 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
             </DialogHeader>
             <div className="py-6 space-y-4">
               {(data.certification === "irata" || data.certification === "both") && (
-                <div className="space-y-2">
-                  <Label htmlFor="irataLicense">IRATA License Number</Label>
-                  <Input
-                    id="irataLicense"
-                    data-testid="input-irata-license"
-                    placeholder="Enter IRATA license number"
-                    value={data.irataLicenseNumber}
-                    onChange={(e) => setData({ ...data, irataLicenseNumber: e.target.value })}
-                    autoFocus={data.certification === "irata" || data.certification === "both"}
-                    className="h-12"
-                  />
+                <div className="space-y-3">
+                  <div className="space-y-2">
+                    <Label htmlFor="irataLicense">IRATA License Number</Label>
+                    <div className="flex gap-2">
+                      <Input
+                        id="irataLicense"
+                        data-testid="input-irata-license"
+                        placeholder="Enter IRATA license number"
+                        value={data.irataLicenseNumber}
+                        onChange={(e) => setData({ ...data, irataLicenseNumber: e.target.value, irataVerified: undefined })}
+                        className="h-12 flex-1"
+                      />
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={handleVerifyIrata}
+                        disabled={irataVerifyMutation.isPending || !data.irataLicenseNumber.trim()}
+                        data-testid="button-verify-irata"
+                      >
+                        {irataVerifyMutation.isPending ? (
+                          <Loader2 className="w-4 h-4 animate-spin" />
+                        ) : (
+                          "Verify"
+                        )}
+                      </Button>
+                    </div>
+                  </div>
+                  {renderVerificationStatus()}
                 </div>
               )}
               {(data.certification === "sprat" || data.certification === "both") && (
@@ -368,9 +609,11 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
                     placeholder="Enter SPRAT license number"
                     value={data.spratLicenseNumber}
                     onChange={(e) => setData({ ...data, spratLicenseNumber: e.target.value })}
-                    autoFocus={data.certification === "sprat"}
                     className="h-12"
                   />
+                  <p className="text-xs text-muted-foreground">
+                    SPRAT verification coming soon
+                  </p>
                 </div>
               )}
               {error && <p className="text-destructive text-sm text-center mt-2">{error}</p>}
@@ -379,15 +622,26 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
               <Button 
                 onClick={handleContinue} 
                 className="w-full"
+                disabled={irataVerifyMutation.isPending}
                 data-testid="button-continue-license"
               >
-                Continue
-                <ArrowRight className="w-4 h-4 ml-2" />
+                {irataVerifyMutation.isPending ? (
+                  <>
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    Verifying...
+                  </>
+                ) : (
+                  <>
+                    Continue
+                    <ArrowRight className="w-4 h-4 ml-2" />
+                  </>
+                )}
               </Button>
               <Button 
                 variant="ghost" 
                 onClick={handleBack}
                 className="w-full"
+                disabled={irataVerifyMutation.isPending}
                 data-testid="button-back-to-certification"
               >
                 Back
@@ -453,7 +707,7 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
             <DialogHeader>
               <div className="flex items-center justify-center mb-4">
                 <div className="p-3 rounded-full bg-green-500/10">
-                  <User className="w-8 h-8 text-green-500" />
+                  <CheckCircle2 className="w-8 h-8 text-green-500" />
                 </div>
               </div>
               <DialogTitle className="text-center text-xl">
@@ -478,9 +732,20 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
                   </span>
                 </div>
                 {data.irataLicenseNumber && (
-                  <div className="flex justify-between">
+                  <div className="flex justify-between items-center">
                     <span className="text-muted-foreground">IRATA License:</span>
-                    <span className="font-medium">{data.irataLicenseNumber}</span>
+                    <div className="flex items-center gap-2">
+                      <span className="font-medium">{data.irataLicenseNumber}</span>
+                      {data.irataVerified?.verified && (
+                        <CheckCircle2 className="w-4 h-4 text-green-500" />
+                      )}
+                    </div>
+                  </div>
+                )}
+                {data.irataVerified?.verified && data.irataVerified.level && (
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">IRATA Level:</span>
+                    <Badge variant="secondary">{data.irataVerified.level}</Badge>
                   </div>
                 )}
                 {data.spratLicenseNumber && (

@@ -43,6 +43,15 @@ const passwordChangeRateLimiter = rateLimit({
   legacyHeaders: false,
 });
 
+// SECURITY: Strict rate limiting for IRATA verification (resource-intensive Playwright operation)
+const irataVerificationRateLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000, // 1 hour
+  max: 10, // 10 verification attempts per hour per IP
+  message: { message: "Too many verification attempts. Please try again later." },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
 // SECURITY: Password strength validation
 function validatePasswordStrength(password: string): { valid: boolean; message: string } {
   if (!password || password.length < 8) {
@@ -900,6 +909,43 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       res.json({ message: "Logged out successfully" });
     });
+  });
+
+  // IRATA License Verification endpoint (public - for technician registration)
+  // SECURITY: Rate limited due to resource-intensive Playwright browser automation
+  app.post("/api/verify-irata", irataVerificationRateLimiter, async (req: Request, res: Response) => {
+    try {
+      const { lastName, irataNumber } = req.body;
+      
+      if (!lastName || !irataNumber) {
+        return res.status(400).json({ 
+          success: false,
+          message: "Last name and IRATA number are required" 
+        });
+      }
+      
+      // Validate IRATA number format (typically numeric)
+      const cleanedNumber = irataNumber.toString().trim();
+      if (!/^\d+$/.test(cleanedNumber)) {
+        return res.status(400).json({ 
+          success: false,
+          message: "IRATA number should contain only digits" 
+        });
+      }
+      
+      // Import and call the verification service
+      const { verifyIrataLicense } = await import('./services/irataVerification');
+      const result = await verifyIrataLicense(lastName.trim(), cleanedNumber);
+      
+      res.json(result);
+    } catch (error) {
+      console.error("IRATA verification error:", error);
+      res.status(500).json({ 
+        success: false,
+        verified: false,
+        error: "Verification service temporarily unavailable" 
+      });
+    }
   });
   
   // Link resident account to company using resident code
