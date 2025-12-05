@@ -32,6 +32,7 @@ The platform is built with a React 18 frontend using TypeScript and Wouter for r
 *   **Financial Controls & Quoting:** Enables quote generation with labor cost calculations and tax computation, protected by strict permission-based access.
 *   **Subscription Management:** Fully integrated Stripe subscription system with four pricing tiers and add-ons, supporting USD and CAD currencies, with prorated upgrades/downgrades.
 *   **SuperUser Administration:** Centralized dashboard for company oversight, license status monitoring, and a "View as Company" impersonation mode for superusers.
+*   **Global Building Database:** SuperUser-managed centralized database of all buildings across all companies. Buildings are auto-created when projects are created with strata plan numbers. Each building has login credentials (strata number = username, password defaults to strata number) for a building portal that shows cross-company maintenance history.
 *   **Changelog Page:** A visual development progress guide showing implemented features by category.
 *   **Analytics & Reporting:** Provides insights into billable vs. non-billable hours, employee productivity, project labor costs, and real-time active worker tracking.
 *   **Security Architecture:** Implements session-based authentication with secure HTTP-only cookies, multi-tenant data isolation, permission-based API response filtering, and robust API security.

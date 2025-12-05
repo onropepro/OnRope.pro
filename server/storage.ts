@@ -1,6 +1,6 @@
 import { db } from "./db";
-import { users, clients, projects, customJobTypes, dropLogs, workSessions, nonBillableWorkSessions, complaints, complaintNotes, projectPhotos, jobComments, harnessInspections, toolboxMeetings, flhaForms, incidentReports, methodStatements, companyDocuments, payPeriodConfig, payPeriods, quotes, quoteServices, quoteHistory, gearItems, gearAssignments, gearSerialNumbers, scheduledJobs, jobAssignments, userPreferences, propertyManagerCompanyLinks, irataTaskLogs, employeeTimeOff, documentReviewSignatures, equipmentDamageReports, featureRequests, featureRequestMessages, churnEvents } from "@shared/schema";
-import type { User, InsertUser, Client, InsertClient, Project, InsertProject, CustomJobType, InsertCustomJobType, DropLog, InsertDropLog, WorkSession, InsertWorkSession, Complaint, InsertComplaint, ComplaintNote, InsertComplaintNote, ProjectPhoto, InsertProjectPhoto, JobComment, InsertJobComment, HarnessInspection, InsertHarnessInspection, ToolboxMeeting, InsertToolboxMeeting, FlhaForm, InsertFlhaForm, IncidentReport, InsertIncidentReport, MethodStatement, InsertMethodStatement, PayPeriodConfig, InsertPayPeriodConfig, PayPeriod, InsertPayPeriod, EmployeeHoursSummary, Quote, InsertQuote, QuoteService, InsertQuoteService, QuoteWithServices, QuoteHistory, InsertQuoteHistory, GearItem, InsertGearItem, GearAssignment, InsertGearAssignment, GearSerialNumber, InsertGearSerialNumber, ScheduledJob, InsertScheduledJob, JobAssignment, InsertJobAssignment, ScheduledJobWithAssignments, UserPreferences, InsertUserPreferences, PropertyManagerCompanyLink, InsertPropertyManagerCompanyLink, IrataTaskLog, InsertIrataTaskLog, EmployeeTimeOff, InsertEmployeeTimeOff, DocumentReviewSignature, InsertDocumentReviewSignature, EquipmentDamageReport, InsertEquipmentDamageReport, FeatureRequest, InsertFeatureRequest, FeatureRequestMessage, InsertFeatureRequestMessage, FeatureRequestWithMessages, ChurnEvent, InsertChurnEvent } from "@shared/schema";
+import { users, clients, projects, customJobTypes, dropLogs, workSessions, nonBillableWorkSessions, complaints, complaintNotes, projectPhotos, jobComments, harnessInspections, toolboxMeetings, flhaForms, incidentReports, methodStatements, companyDocuments, payPeriodConfig, payPeriods, quotes, quoteServices, quoteHistory, gearItems, gearAssignments, gearSerialNumbers, scheduledJobs, jobAssignments, userPreferences, propertyManagerCompanyLinks, irataTaskLogs, employeeTimeOff, documentReviewSignatures, equipmentDamageReports, featureRequests, featureRequestMessages, churnEvents, buildings, normalizeStrataPlan } from "@shared/schema";
+import type { User, InsertUser, Client, InsertClient, Project, InsertProject, CustomJobType, InsertCustomJobType, DropLog, InsertDropLog, WorkSession, InsertWorkSession, Complaint, InsertComplaint, ComplaintNote, InsertComplaintNote, ProjectPhoto, InsertProjectPhoto, JobComment, InsertJobComment, HarnessInspection, InsertHarnessInspection, ToolboxMeeting, InsertToolboxMeeting, FlhaForm, InsertFlhaForm, IncidentReport, InsertIncidentReport, MethodStatement, InsertMethodStatement, PayPeriodConfig, InsertPayPeriodConfig, PayPeriod, InsertPayPeriod, EmployeeHoursSummary, Quote, InsertQuote, QuoteService, InsertQuoteService, QuoteWithServices, QuoteHistory, InsertQuoteHistory, GearItem, InsertGearItem, GearAssignment, InsertGearAssignment, GearSerialNumber, InsertGearSerialNumber, ScheduledJob, InsertScheduledJob, JobAssignment, InsertJobAssignment, ScheduledJobWithAssignments, UserPreferences, InsertUserPreferences, PropertyManagerCompanyLink, InsertPropertyManagerCompanyLink, IrataTaskLog, InsertIrataTaskLog, EmployeeTimeOff, InsertEmployeeTimeOff, DocumentReviewSignature, InsertDocumentReviewSignature, EquipmentDamageReport, InsertEquipmentDamageReport, FeatureRequest, InsertFeatureRequest, FeatureRequestMessage, InsertFeatureRequestMessage, FeatureRequestWithMessages, ChurnEvent, InsertChurnEvent, Building, InsertBuilding } from "@shared/schema";
 import { eq, and, or, desc, sql, isNull, isNotNull, not, gte, lte, between, inArray } from "drizzle-orm";
 import bcrypt from "bcrypt";
 
@@ -3254,6 +3254,158 @@ export class Storage {
       );
     
     return (result[0]?.count || 0) > 0;
+  }
+
+  // ==================== BUILDING OPERATIONS (Global SuperUser Database) ====================
+
+  /**
+   * Get a building by its strata plan number
+   */
+  async getBuildingByStrata(strataPlanNumber: string): Promise<Building | undefined> {
+    const normalized = normalizeStrataPlan(strataPlanNumber);
+    const result = await db.select().from(buildings).where(eq(buildings.strataPlanNumber, normalized)).limit(1);
+    return result[0];
+  }
+
+  /**
+   * Get a building by ID
+   */
+  async getBuildingById(id: string): Promise<Building | undefined> {
+    const result = await db.select().from(buildings).where(eq(buildings.id, id)).limit(1);
+    return result[0];
+  }
+
+  /**
+   * Get all buildings (for SuperUser)
+   */
+  async getAllBuildings(): Promise<Building[]> {
+    return db.select().from(buildings).orderBy(desc(buildings.createdAt));
+  }
+
+  /**
+   * Create a new building - password defaults to strata number
+   */
+  async createBuilding(building: InsertBuilding): Promise<Building> {
+    const normalized = normalizeStrataPlan(building.strataPlanNumber);
+    const hashedPassword = await bcrypt.hash(building.passwordHash || normalized, SALT_ROUNDS);
+    
+    const result = await db.insert(buildings).values({
+      ...building,
+      strataPlanNumber: normalized,
+      passwordHash: hashedPassword,
+    }).returning();
+    
+    return result[0];
+  }
+
+  /**
+   * Update a building
+   */
+  async updateBuilding(id: string, updates: Partial<InsertBuilding>): Promise<Building | undefined> {
+    const result = await db.update(buildings)
+      .set({ ...updates, updatedAt: new Date() })
+      .where(eq(buildings.id, id))
+      .returning();
+    return result[0];
+  }
+
+  /**
+   * Auto-create building from project data if it doesn't exist
+   * Returns the building (existing or newly created)
+   */
+  async ensureBuildingExists(projectData: {
+    strataPlanNumber: string;
+    buildingName?: string | null;
+    buildingAddress?: string | null;
+    floorCount?: number | null;
+    totalStalls?: number | null;
+    totalDropsNorth?: number | null;
+    totalDropsEast?: number | null;
+    totalDropsSouth?: number | null;
+    totalDropsWest?: number | null;
+  }): Promise<Building> {
+    if (!projectData.strataPlanNumber) {
+      throw new Error("Strata plan number is required to track building");
+    }
+
+    const normalized = normalizeStrataPlan(projectData.strataPlanNumber);
+    
+    // Check if building already exists
+    const existing = await this.getBuildingByStrata(normalized);
+    if (existing) {
+      return existing;
+    }
+
+    // Create new building with project data
+    const newBuilding = await this.createBuilding({
+      strataPlanNumber: normalized,
+      passwordHash: normalized, // Default password is strata number
+      buildingName: projectData.buildingName || undefined,
+      buildingAddress: projectData.buildingAddress || undefined,
+      floorCount: projectData.floorCount || undefined,
+      parkingStalls: projectData.totalStalls || undefined,
+      dropsNorth: projectData.totalDropsNorth || 0,
+      dropsEast: projectData.totalDropsEast || 0,
+      dropsSouth: projectData.totalDropsSouth || 0,
+      dropsWest: projectData.totalDropsWest || 0,
+    });
+
+    console.log(`[Buildings] Created new building: ${normalized} - ${projectData.buildingName || 'Unnamed'}`);
+    return newBuilding;
+  }
+
+  /**
+   * Verify building password for login
+   */
+  async verifyBuildingPassword(strataPlanNumber: string, password: string): Promise<Building | null> {
+    const normalized = normalizeStrataPlan(strataPlanNumber);
+    const building = await this.getBuildingByStrata(normalized);
+    
+    if (!building) {
+      return null;
+    }
+
+    const isValid = await bcrypt.compare(password, building.passwordHash);
+    return isValid ? building : null;
+  }
+
+  /**
+   * Update building password
+   */
+  async updateBuildingPassword(id: string, newPassword: string): Promise<void> {
+    const hashedPassword = await bcrypt.hash(newPassword, SALT_ROUNDS);
+    await db.update(buildings)
+      .set({ passwordHash: hashedPassword, updatedAt: new Date() })
+      .where(eq(buildings.id, id));
+  }
+
+  /**
+   * Get all projects for a building across all companies
+   */
+  async getProjectsForBuilding(strataPlanNumber: string): Promise<Project[]> {
+    const normalized = normalizeStrataPlan(strataPlanNumber);
+    return db.select().from(projects)
+      .where(
+        and(
+          sql`UPPER(TRIM(REPLACE(${projects.strataPlanNumber}, ' ', ''))) = ${normalized}`,
+          eq(projects.deleted, false)
+        )
+      )
+      .orderBy(desc(projects.createdAt));
+  }
+
+  /**
+   * Increment building's completed projects count
+   */
+  async incrementBuildingProjectsCompleted(strataPlanNumber: string): Promise<void> {
+    const normalized = normalizeStrataPlan(strataPlanNumber);
+    await db.update(buildings)
+      .set({ 
+        totalProjectsCompleted: sql`${buildings.totalProjectsCompleted} + 1`,
+        lastServiceDate: new Date().toISOString().split('T')[0],
+        updatedAt: new Date()
+      })
+      .where(eq(buildings.strataPlanNumber, normalized));
   }
 }
 

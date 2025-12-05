@@ -3090,6 +3090,204 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // ==================== GLOBAL BUILDINGS DATABASE (SuperUser) ====================
+
+  // SuperUser: Get all buildings
+  app.get("/api/superuser/buildings", requireAuth, async (req: Request, res: Response) => {
+    try {
+      if (req.session.userId !== 'superuser') {
+        return res.status(403).json({ message: "Access denied. SuperUser only." });
+      }
+
+      const allBuildings = await storage.getAllBuildings();
+      
+      // Return buildings without password hash
+      const buildings = allBuildings.map(({ passwordHash, ...building }) => building);
+      
+      res.json({ buildings });
+    } catch (error) {
+      console.error('[SuperUser] Get all buildings error:', error);
+      res.status(500).json({ message: "Failed to fetch buildings" });
+    }
+  });
+
+  // SuperUser: Get single building with project history
+  app.get("/api/superuser/buildings/:id", requireAuth, async (req: Request, res: Response) => {
+    try {
+      if (req.session.userId !== 'superuser') {
+        return res.status(403).json({ message: "Access denied. SuperUser only." });
+      }
+
+      const building = await storage.getBuildingById(req.params.id);
+      
+      if (!building) {
+        return res.status(404).json({ message: "Building not found" });
+      }
+
+      // Get all projects for this building
+      const buildingProjects = await storage.getProjectsForBuilding(building.strataPlanNumber);
+      
+      // Get unique companies that have worked on this building
+      const companyIds = [...new Set(buildingProjects.map(p => p.companyId))];
+      const companies = await Promise.all(
+        companyIds.map(async (id) => {
+          const company = await storage.getUserById(id);
+          return company ? { id: company.id, name: company.companyName } : null;
+        })
+      );
+
+      const { passwordHash, ...buildingData } = building;
+      
+      res.json({ 
+        building: buildingData,
+        projects: buildingProjects,
+        companies: companies.filter(Boolean),
+      });
+    } catch (error) {
+      console.error('[SuperUser] Get building error:', error);
+      res.status(500).json({ message: "Failed to fetch building" });
+    }
+  });
+
+  // SuperUser: Update building details
+  app.patch("/api/superuser/buildings/:id", requireAuth, async (req: Request, res: Response) => {
+    try {
+      if (req.session.userId !== 'superuser') {
+        return res.status(403).json({ message: "Access denied. SuperUser only." });
+      }
+
+      const building = await storage.getBuildingById(req.params.id);
+      
+      if (!building) {
+        return res.status(404).json({ message: "Building not found" });
+      }
+
+      // Don't allow changing strata plan number (it's the unique identifier)
+      const { strataPlanNumber, passwordHash, ...allowedUpdates } = req.body;
+      
+      const updated = await storage.updateBuilding(req.params.id, allowedUpdates);
+      
+      if (updated) {
+        const { passwordHash: _, ...buildingData } = updated;
+        res.json({ building: buildingData });
+      } else {
+        res.status(500).json({ message: "Failed to update building" });
+      }
+    } catch (error) {
+      console.error('[SuperUser] Update building error:', error);
+      res.status(500).json({ message: "Failed to update building" });
+    }
+  });
+
+  // SuperUser: Reset building password
+  app.post("/api/superuser/buildings/:id/reset-password", requireAuth, async (req: Request, res: Response) => {
+    try {
+      if (req.session.userId !== 'superuser') {
+        return res.status(403).json({ message: "Access denied. SuperUser only." });
+      }
+
+      const building = await storage.getBuildingById(req.params.id);
+      
+      if (!building) {
+        return res.status(404).json({ message: "Building not found" });
+      }
+
+      const newPassword = req.body.password || building.strataPlanNumber;
+      await storage.updateBuildingPassword(req.params.id, newPassword);
+      
+      res.json({ message: "Password reset successfully" });
+    } catch (error) {
+      console.error('[SuperUser] Reset building password error:', error);
+      res.status(500).json({ message: "Failed to reset password" });
+    }
+  });
+
+  // ==================== BUILDING PORTAL LOGIN ====================
+
+  // Building login endpoint
+  app.post("/api/building/login", loginRateLimiter, async (req: Request, res: Response) => {
+    try {
+      const { strataPlanNumber, password } = req.body;
+
+      if (!strataPlanNumber || !password) {
+        return res.status(400).json({ message: "Strata plan number and password are required" });
+      }
+
+      const building = await storage.verifyBuildingPassword(strataPlanNumber, password);
+      
+      if (!building) {
+        return res.status(401).json({ message: "Invalid strata number or password" });
+      }
+
+      // Create building session
+      req.session.userId = building.id;
+      req.session.role = 'building';
+      req.session.buildingId = building.id;
+      req.session.strataPlanNumber = building.strataPlanNumber;
+
+      const { passwordHash, ...buildingData } = building;
+      
+      res.json({ 
+        message: "Login successful",
+        building: buildingData,
+      });
+    } catch (error) {
+      console.error('[Building] Login error:', error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Building portal: Get building data and project history
+  app.get("/api/building/portal", requireAuth, async (req: Request, res: Response) => {
+    try {
+      // Check if this is a building session
+      if (req.session.role !== 'building' || !req.session.buildingId) {
+        return res.status(403).json({ message: "Access denied. Building login required." });
+      }
+
+      const building = await storage.getBuildingById(req.session.buildingId);
+      
+      if (!building) {
+        return res.status(404).json({ message: "Building not found" });
+      }
+
+      // Get all projects for this building across all companies
+      const allProjects = await storage.getProjectsForBuilding(building.strataPlanNumber);
+      
+      // Get work sessions for these projects
+      const projectHistory = await Promise.all(
+        allProjects.map(async (project) => {
+          const company = await storage.getUserById(project.companyId);
+          return {
+            id: project.id,
+            jobType: project.jobType,
+            customJobType: project.customJobType,
+            status: project.status,
+            startDate: project.startDate,
+            endDate: project.endDate,
+            companyName: company?.companyName || 'Unknown Company',
+            createdAt: project.createdAt,
+          };
+        })
+      );
+
+      const { passwordHash, ...buildingData } = building;
+      
+      res.json({ 
+        building: buildingData,
+        projectHistory,
+        stats: {
+          totalProjects: allProjects.length,
+          completedProjects: allProjects.filter(p => p.status === 'completed').length,
+          activeProjects: allProjects.filter(p => p.status === 'active').length,
+        },
+      });
+    } catch (error) {
+      console.error('[Building] Portal error:', error);
+      res.status(500).json({ message: "Failed to fetch building data" });
+    }
+  });
+
   // Update user profile
   app.patch("/api/user/profile", requireAuth, async (req: Request, res: Response) => {
     try {
@@ -4600,6 +4798,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
       
       const project = await storage.createProject(projectData);
+      
+      // Auto-create building in global SuperUser database if strata number exists
+      if (project.strataPlanNumber) {
+        try {
+          await storage.ensureBuildingExists({
+            strataPlanNumber: project.strataPlanNumber,
+            buildingName: project.buildingName,
+            buildingAddress: project.buildingAddress,
+            floorCount: project.floorCount,
+            totalStalls: project.totalStalls,
+            totalDropsNorth: project.totalDropsNorth,
+            totalDropsEast: project.totalDropsEast,
+            totalDropsSouth: project.totalDropsSouth,
+            totalDropsWest: project.totalDropsWest,
+          });
+        } catch (buildingError) {
+          // Log but don't fail project creation if building creation fails
+          console.error("[Buildings] Failed to auto-create building:", buildingError);
+        }
+      }
       
       // If this is a custom job type, save it to the company's custom job types list (if not already exists)
       if (project.jobType === "other" && project.customJobType) {
