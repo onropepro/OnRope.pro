@@ -529,15 +529,15 @@
   line-height: 1.6;
 }
 
-.superuser-root * {
+.superuser-root *:not(.material-icons):not(.material-icons-outlined):not(.material-symbols-outlined) {
   font-family: 'Outfit', sans-serif;
 }
 
-.superuser-root .text-xs,
-.superuser-root .text-\[10px\],
-.superuser-root .text-\[11px\],
-.superuser-root .text-\[12px\],
-.superuser-root .text-\[13px\] {
+.superuser-root .text-xs:not(.material-icons),
+.superuser-root .text-\[10px\]:not(.material-icons),
+.superuser-root .text-\[11px\]:not(.material-icons),
+.superuser-root .text-\[12px\]:not(.material-icons),
+.superuser-root .text-\[13px\]:not(.material-icons) {
   font-size: 14px !important;
 }
 
@@ -545,6 +545,13 @@
   font-size: 14px;
 }
 
-.superuser-root .text-sm {
+.superuser-root .text-sm:not(.material-icons) {
   font-size: 14px;
+}
+
+/* Preserve Material Icons font */
+.superuser-root .material-icons,
+.superuser-root .material-icons-outlined,
+.superuser-root .material-symbols-outlined {
+  font-family: 'Material Icons' !important;
 }
