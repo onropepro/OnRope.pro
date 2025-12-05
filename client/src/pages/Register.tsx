@@ -578,14 +578,14 @@ export default function Register() {
       {/* Unit Conflict Confirmation Dialog */}
       <Dialog open={showUnitConflictDialog} onOpenChange={setShowUnitConflictDialog}>
         <DialogContent 
-          className="sm:max-w-md" 
+          className="sm:max-w-lg w-[calc(100%-2rem)] mx-4" 
           data-testid="dialog-unit-conflict"
           aria-labelledby="unit-conflict-title"
           aria-describedby="unit-conflict-description"
         >
           <DialogHeader>
             <DialogTitle id="unit-conflict-title" className="flex items-center gap-2">
-              <AlertTriangle className="h-5 w-5 text-amber-500" aria-hidden="true" />
+              <AlertTriangle className="h-5 w-5 text-amber-500 flex-shrink-0" aria-hidden="true" />
               {t('register.unitConflict.title', 'Unit Already Linked')}
             </DialogTitle>
             <DialogDescription id="unit-conflict-description" className="pt-2 space-y-3">
@@ -600,7 +600,7 @@ export default function Register() {
               </p>
             </DialogDescription>
           </DialogHeader>
-          <DialogFooter className="flex flex-col gap-2 sm:flex-row sm:justify-end">
+          <DialogFooter className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end pt-2">
             <Button
               variant="outline"
               onClick={handleCancelUnitTakeover}
@@ -608,7 +608,7 @@ export default function Register() {
               data-testid="button-unit-conflict-cancel"
               aria-label={t('register.unitConflict.reenterAria', 'Cancel and re-enter unit number')}
             >
-              {t('register.unitConflict.reenter', 'No, let me re-enter my unit number')}
+              {t('register.unitConflict.cancel', 'Cancel')}
             </Button>
             <Button
               onClick={handleConfirmUnitTakeover}
@@ -618,7 +618,7 @@ export default function Register() {
             >
               {isSubmitting 
                 ? t('register.unitConflict.linking', 'Linking...') 
-                : t('register.unitConflict.confirm', 'Yes, this is my unit - link it')
+                : t('register.unitConflict.confirm', 'Yes, link this unit to me')
               }
             </Button>
           </DialogFooter>
