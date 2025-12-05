@@ -39,7 +39,7 @@ import { isManagement, hasFinancialAccess, canManageEmployees, canViewPerformanc
 import { DocumentUploader } from "@/components/DocumentUploader";
 import { RefreshButton } from "@/components/RefreshButton";
 import { CSRBadge } from "@/components/CSRBadge";
-import { formatLocalDate, formatLocalDateLong, formatTimestampDate, formatTimestampDateShort, formatTimestampDateMedium, parseLocalDate, formatLocalDateMedium } from "@/lib/dateUtils";
+import { formatLocalDate, formatLocalDateLong, formatTimestampDate, formatTimestampDateShort, formatTimestampDateMedium, parseLocalDate, formatLocalDateMedium, formatDurationMs } from "@/lib/dateUtils";
 import { QRCodeSVG } from 'qrcode.react';
 import { trackLogout, trackWorkSessionStart, trackWorkSessionEnd, trackProjectCreated, trackClientAdded, trackBuildingAdded, trackEmployeeAdded } from "@/lib/analytics";
 import {
@@ -710,6 +710,17 @@ export default function Dashboard() {
   // Fetch all complaints for the company
   const { data: complaintsData, isLoading: complaintsLoading } = useQuery({
     queryKey: ["/api/complaints"],
+  });
+
+  // Fetch complaint metrics for average resolution time
+  const { data: complaintMetricsData, isLoading: metricsLoading } = useQuery<{
+    metrics: {
+      totalClosed: number;
+      averageResolutionMs: number | null;
+    };
+  }>({
+    queryKey: ["/api/complaints/metrics", companyIdForData],
+    enabled: !!companyIdForData,
   });
 
   // Fetch harness inspections
@@ -3668,10 +3679,24 @@ export default function Dashboard() {
             <div className="space-y-4">
               <Card>
                 <CardHeader>
-                  <CardTitle>{t('dashboard.feedback.allFeedback', 'All Feedback')}</CardTitle>
-                  <CardDescription>
-                    {t('dashboard.feedback.viewManageFeedback', 'View and manage resident feedback across all projects')}
-                  </CardDescription>
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                    <div>
+                      <CardTitle>{t('dashboard.feedback.allFeedback', 'All Feedback')}</CardTitle>
+                      <CardDescription>
+                        {t('dashboard.feedback.viewManageFeedback', 'View and manage resident feedback across all projects')}
+                      </CardDescription>
+                    </div>
+                    {complaintMetricsData?.metrics?.averageResolutionMs && (
+                      <div className="flex items-center gap-2">
+                        <Badge variant="outline" className="gap-1.5 px-3 py-1.5" data-testid="badge-avg-resolution-time">
+                          <span className="material-icons text-sm">schedule</span>
+                          <span className="text-sm font-semibold">
+                            {t('dashboard.feedback.avgResolution', 'Avg Resolution')}: {formatDurationMs(complaintMetricsData.metrics.averageResolutionMs)}
+                          </span>
+                        </Badge>
+                      </div>
+                    )}
+                  </div>
                 </CardHeader>
                 <CardContent>
                   {complaintsLoading ? (
