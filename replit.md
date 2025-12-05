@@ -91,3 +91,9 @@ Contains all timezone-safe parsing and formatting utilities.
 *   **File Storage:** Replit Object Storage
 *   **Mapping:** Leaflet
 *   **Payment Processing:** Stripe
+
+## Founder Resources
+
+*   **2Captcha** - CAPTCHA solving API for automated IRATA license verification
+    *   URL: https://2captcha.com/
+    *   Login: Use Google account for API access
