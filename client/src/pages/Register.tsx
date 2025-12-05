@@ -10,7 +10,15 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage, FormDescription } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ArrowLeft, Globe } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { ArrowLeft, Globe, AlertTriangle } from "lucide-react";
 import { Link } from "wouter";
 
 const residentSchema = z.object({
@@ -68,6 +76,11 @@ export default function Register() {
   const [activeTab, setActiveTab] = useState<"resident" | "company" | "property_manager">("resident");
   const [, setLocation] = useLocation();
   const [landingLanguage, setLandingLanguage] = useState<'en' | 'fr'>('en');
+  
+  // Unit conflict dialog state
+  const [showUnitConflictDialog, setShowUnitConflictDialog] = useState(false);
+  const [pendingRegistrationData, setPendingRegistrationData] = useState<ResidentFormData | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Initialize landing page language from its own storage key (separate from user preference)
   useEffect(() => {
@@ -157,8 +170,10 @@ export default function Register() {
     },
   });
 
-  const onResidentSubmit = async (data: ResidentFormData) => {
+  // Internal registration function that handles unit conflict
+  const registerResident = async (data: ResidentFormData, confirmUnitTakeover: boolean = false) => {
     try {
+      setIsSubmitting(true);
       const { confirmPassword, ...registrationData } = data;
       
       const response = await fetch("/api/register", {
@@ -168,6 +183,7 @@ export default function Register() {
           ...registrationData,
           role: "resident",
           passwordHash: data.password,
+          confirmUnitTakeover,
         }),
         credentials: "include",
       });
@@ -175,7 +191,19 @@ export default function Register() {
       const result = await response.json();
 
       if (!response.ok) {
-        residentForm.setError("email", { message: result.message || "Registration failed" });
+        // Check if this is a unit conflict that requires confirmation
+        if (response.status === 409 && result.unitConflict && result.requiresConfirmation) {
+          // Store the data and show confirmation dialog
+          setPendingRegistrationData(data);
+          setShowUnitConflictDialog(true);
+          setIsSubmitting(false);
+          return;
+        }
+        
+        // Set error on the appropriate field based on backend response
+        const errorField = result.field === "unitNumber" ? "unitNumber" : "email";
+        residentForm.setError(errorField, { message: result.message || "Registration failed" });
+        setIsSubmitting(false);
         return;
       }
 
@@ -183,7 +211,31 @@ export default function Register() {
       window.location.href = "/resident";
     } catch (error) {
       residentForm.setError("email", { message: "An error occurred. Please try again." });
+      setIsSubmitting(false);
     }
+  };
+
+  // Form submit handler - wrapper for react-hook-form
+  const onResidentSubmit = async (data: ResidentFormData) => {
+    await registerResident(data, false);
+  };
+
+  // Handle unit conflict confirmation - user confirms this is their unit
+  const handleConfirmUnitTakeover = async () => {
+    if (!pendingRegistrationData) return;
+    
+    setShowUnitConflictDialog(false);
+    await registerResident(pendingRegistrationData, true);
+    setPendingRegistrationData(null);
+  };
+
+  // Handle unit conflict cancellation - user wants to re-enter unit number
+  const handleCancelUnitTakeover = () => {
+    setShowUnitConflictDialog(false);
+    setPendingRegistrationData(null);
+    setIsSubmitting(false);
+    // Focus on the unit number field for re-entry
+    residentForm.setFocus("unitNumber");
   };
 
   const onCompanySubmit = async (data: CompanyFormData) => {
@@ -522,6 +574,56 @@ export default function Register() {
           </div>
         </CardContent>
       </Card>
+
+      {/* Unit Conflict Confirmation Dialog */}
+      <Dialog open={showUnitConflictDialog} onOpenChange={setShowUnitConflictDialog}>
+        <DialogContent 
+          className="sm:max-w-md" 
+          data-testid="dialog-unit-conflict"
+          aria-labelledby="unit-conflict-title"
+          aria-describedby="unit-conflict-description"
+        >
+          <DialogHeader>
+            <DialogTitle id="unit-conflict-title" className="flex items-center gap-2">
+              <AlertTriangle className="h-5 w-5 text-amber-500" aria-hidden="true" />
+              {t('register.unitConflict.title', 'Unit Already Linked')}
+            </DialogTitle>
+            <DialogDescription id="unit-conflict-description" className="pt-2 space-y-3">
+              <p>
+                {t('register.unitConflict.message', 'Unit {{unitNumber}} at building {{strataPlan}} is already linked to another resident account.', {
+                  unitNumber: pendingRegistrationData?.unitNumber,
+                  strataPlan: pendingRegistrationData?.strataPlanNumber
+                })}
+              </p>
+              <p className="text-muted-foreground">
+                {t('register.unitConflict.explanation', 'This can happen when a previous resident moves out and a new resident moves in. If you are the new resident of this unit, you can claim it and the previous link will be removed.')}
+              </p>
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="flex flex-col gap-2 sm:flex-row sm:justify-end">
+            <Button
+              variant="outline"
+              onClick={handleCancelUnitTakeover}
+              disabled={isSubmitting}
+              data-testid="button-unit-conflict-cancel"
+              aria-label={t('register.unitConflict.reenterAria', 'Cancel and re-enter unit number')}
+            >
+              {t('register.unitConflict.reenter', 'No, let me re-enter my unit number')}
+            </Button>
+            <Button
+              onClick={handleConfirmUnitTakeover}
+              disabled={isSubmitting}
+              data-testid="button-unit-conflict-confirm"
+              aria-label={t('register.unitConflict.confirmAria', 'Confirm this is my unit and link it to my account')}
+            >
+              {isSubmitting 
+                ? t('register.unitConflict.linking', 'Linking...') 
+                : t('register.unitConflict.confirm', 'Yes, this is my unit - link it')
+              }
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

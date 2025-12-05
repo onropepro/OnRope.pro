@@ -399,6 +399,47 @@ async function generatePropertyManagerCode(): Promise<string> {
 export async function registerRoutes(app: Express): Promise<Server> {
   // ==================== AUTH ROUTES ====================
   
+  // Check if a unit is already linked to a resident account
+  // Used during registration to detect potential unit conflicts (previous resident moved out)
+  app.get("/api/check-unit-availability", async (req: Request, res: Response) => {
+    try {
+      const { strataPlanNumber, unitNumber } = req.query;
+      
+      if (!strataPlanNumber || !unitNumber) {
+        return res.status(400).json({ message: "Strata plan number and unit number are required" });
+      }
+      
+      // Find any existing resident with this strata plan + unit combination
+      const existingResident = await db.select({
+        id: users.id,
+        name: users.name,
+      }).from(users)
+        .where(
+          and(
+            eq(users.role, 'resident'),
+            eq(users.strataPlanNumber, strataPlanNumber as string),
+            eq(users.unitNumber, unitNumber as string)
+          )
+        )
+        .limit(1);
+      
+      if (existingResident.length > 0) {
+        // Unit is already linked - return conflict info (no sensitive data)
+        return res.json({
+          available: false,
+          unitConflict: true,
+          message: "This unit is already linked to another resident account"
+        });
+      }
+      
+      // Unit is available
+      return res.json({ available: true });
+    } catch (error) {
+      console.error("Error checking unit availability:", error);
+      return res.status(500).json({ message: "Error checking unit availability" });
+    }
+  });
+  
   // Registration endpoint - SECURITY: Rate limited to prevent abuse
   app.post("/api/register", registrationRateLimiter, async (req: Request, res: Response) => {
     try {
@@ -468,8 +509,70 @@ export async function registerRoutes(app: Express): Promise<Server> {
           }
           return res.status(500).json({ message: "Failed to create account. Please try again." });
         }
+      } else if (validatedData.role === 'resident' && validatedData.strataPlanNumber && validatedData.unitNumber) {
+        // For residents: always use unified path with conflict detection
+        // Check for existing resident with same strata + unit
+        const existingResident = await db.select({
+          id: users.id,
+        }).from(users)
+          .where(
+            and(
+              eq(users.role, 'resident'),
+              eq(users.strataPlanNumber, validatedData.strataPlanNumber),
+              eq(users.unitNumber, validatedData.unitNumber)
+            )
+          )
+          .limit(1);
+        
+        const hasConflict = existingResident.length > 0;
+        
+        // Validate confirmUnitTakeover flag (must be boolean true if provided)
+        const confirmTakeover = req.body.confirmUnitTakeover === true;
+        
+        if (hasConflict && !confirmTakeover) {
+          // Unit is linked to another resident - ask for confirmation
+          return res.status(409).json({
+            message: "This unit is already linked to another resident account",
+            unitConflict: true,
+            requiresConfirmation: true,
+            field: "unitNumber"
+          });
+        }
+        
+        // Hash password once for all resident registrations
+        const hashedPassword = await bcrypt.hash(validatedData.passwordHash, 10);
+        
+        try {
+          // Use transaction for all resident registrations to ensure atomic operations
+          user = await db.transaction(async (tx) => {
+            // If there's a conflict and user confirmed, unlink the old resident
+            if (hasConflict && confirmTakeover) {
+              await tx.update(users)
+                .set({ unitNumber: null })
+                .where(eq(users.id, existingResident[0].id));
+            }
+            
+            // Create the new resident
+            const [newUser] = await tx.insert(users).values({
+              ...validatedData,
+              passwordHash: hashedPassword,
+            }).returning();
+            
+            return newUser;
+          });
+        } catch (error) {
+          console.error('Error during resident registration:', error);
+          // Check for unique constraint violation (e.g., duplicate email)
+          if (error && typeof error === 'object' && 'code' in error && error.code === '23505') {
+            return res.status(400).json({ 
+              message: "Unable to create account with these details. If you already have an account, please try logging in.",
+              field: "email"
+            });
+          }
+          return res.status(500).json({ message: "Failed to create account. Please try again." });
+        }
       } else {
-        // For non-property-managers, create user normally
+        // For all other roles, create user normally
         user = await storage.createUser(validatedData);
       }
       
