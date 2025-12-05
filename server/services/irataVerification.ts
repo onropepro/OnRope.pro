@@ -13,6 +13,21 @@ interface TwoCaptchaResponse {
   request: string;
 }
 
+export interface IrataVerificationResult {
+  success: boolean;
+  verified: boolean;
+  technicianName?: string;
+  level?: string;
+  expiryDate?: string;
+  status?: string;
+  error?: string;
+  requiresManualVerification?: boolean;
+}
+
+let browser: Browser | null = null;
+let browserLaunchTime: number = 0;
+const BROWSER_MAX_AGE_MS = 30 * 60 * 1000;
+
 async function solve2Captcha(siteKey: string, pageUrl: string): Promise<string | null> {
   if (!TWOCAPTCHA_API_KEY) {
     console.log('[2Captcha] No API key configured');
@@ -35,7 +50,7 @@ async function solve2Captcha(siteKey: string, pageUrl: string): Promise<string |
     const requestId = submitResult.request;
     console.log('[2Captcha] Request ID:', requestId);
     
-    const maxAttempts = 30;
+    const maxAttempts = 40;
     const pollInterval = 5000;
     
     for (let attempt = 0; attempt < maxAttempts; attempt++) {
@@ -67,81 +82,9 @@ async function solve2Captcha(siteKey: string, pageUrl: string): Promise<string |
   }
 }
 
-async function injectRecaptchaToken(page: Page, token: string): Promise<boolean> {
-  try {
-    console.log('[IRATA] Injecting reCAPTCHA token...');
-    
-    await page.evaluate((token) => {
-      let responseField = document.querySelector('#g-recaptcha-response') as HTMLTextAreaElement;
-      if (!responseField) {
-        responseField = document.createElement('textarea');
-        responseField.id = 'g-recaptcha-response';
-        responseField.name = 'g-recaptcha-response';
-        responseField.style.display = 'none';
-        document.body.appendChild(responseField);
-      }
-      responseField.value = token;
-      
-      const hiddenInputs = document.querySelectorAll('input[name="g-recaptcha-response"]');
-      hiddenInputs.forEach((input: Element) => {
-        (input as HTMLInputElement).value = token;
-      });
-      
-      if (typeof (window as any).grecaptcha !== 'undefined' && (window as any).grecaptcha.enterprise) {
-        try {
-          (window as any).grecaptcha.enterprise.execute = () => Promise.resolve(token);
-        } catch (e) {}
-      }
-      
-      if (typeof (window as any).grecaptcha !== 'undefined') {
-        try {
-          (window as any).grecaptcha.getResponse = () => token;
-          (window as any).grecaptcha.execute = () => Promise.resolve(token);
-        } catch (e) {}
-      }
-    }, token);
-    
-    console.log('[IRATA] reCAPTCHA token injected');
-    return true;
-  } catch (error) {
-    console.error('[IRATA] Error injecting token:', error);
-    return false;
-  }
-}
-
-export interface IrataVerificationResult {
-  success: boolean;
-  verified: boolean;
-  technicianName?: string;
-  level?: string;
-  expiryDate?: string;
-  status?: string;
-  error?: string;
-  requiresManualVerification?: boolean;
-}
-
-let browser: Browser | null = null;
-let browserLaunchTime: number = 0;
-const BROWSER_MAX_AGE_MS = 30 * 60 * 1000; // 30 minutes max browser lifetime
-
 async function randomDelay(min: number, max: number): Promise<void> {
   const delay = Math.floor(Math.random() * (max - min + 1)) + min;
   await new Promise(resolve => setTimeout(resolve, delay));
-}
-
-async function humanLikeType(page: Page, selector: string, text: string): Promise<void> {
-  const element = await page.$(selector);
-  if (!element) return;
-  
-  await element.click();
-  await randomDelay(100, 300);
-  
-  for (const char of text) {
-    await element.type(char, { delay: Math.floor(Math.random() * 100) + 50 });
-    if (Math.random() > 0.9) {
-      await randomDelay(200, 500);
-    }
-  }
 }
 
 async function humanLikeMouseMove(page: Page): Promise<void> {
@@ -259,10 +202,23 @@ export async function verifyIrataLicense(
 ): Promise<IrataVerificationResult> {
   let context: BrowserContext | null = null;
   let page: Page | null = null;
-  const TIMEOUT = 30000;
+  const TIMEOUT = 60000;
   
   try {
-    console.log(`[IRATA] Starting stealth verification for: ${lastName}, ${irataNumber}`);
+    console.log(`[IRATA] Starting verification for: ${lastName}, ${irataNumber}`);
+    
+    if (!TWOCAPTCHA_API_KEY) {
+      console.log('[IRATA] No 2Captcha API key - cannot proceed with automated verification');
+      return {
+        success: false,
+        verified: false,
+        requiresManualVerification: true,
+        error: 'Automated verification requires 2Captcha API key. Please verify manually.'
+      };
+    }
+    
+    console.log('[IRATA] Starting 2Captcha solve proactively...');
+    const captchaTokenPromise = solve2Captcha(RECAPTCHA_SITE_KEY, IRATA_VERIFY_URL);
     
     const browserInstance = await getBrowser();
     context = await createStealthContext(browserInstance);
@@ -274,29 +230,123 @@ export async function verifyIrataLicense(
     await randomDelay(500, 1500);
     
     console.log('[IRATA] Navigating to verification page...');
-    await page.goto('https://techconnect.irata.org/verify/tech', {
-      waitUntil: 'networkidle',
+    await page.goto(IRATA_VERIFY_URL, {
+      waitUntil: 'domcontentloaded',
       timeout: TIMEOUT
     });
     
-    await randomDelay(1000, 2000);
+    await randomDelay(2000, 3000);
+    
+    console.log('[IRATA] Waiting for page to fully render...');
+    await page.waitForLoadState('networkidle', { timeout: 30000 }).catch(() => {
+      console.log('[IRATA] Networkidle timeout, continuing...');
+    });
+    
+    await randomDelay(2000, 3000);
     await humanLikeMouseMove(page);
     
-    await page.waitForLoadState('networkidle', { timeout: TIMEOUT });
-    await randomDelay(500, 1000);
+    let pageContent = await page.content();
+    let pageText = await page.innerText('body').catch(() => '');
     
-    console.log('[IRATA] Looking for form fields...');
+    console.log('[IRATA] Page content length:', pageContent.length);
+    console.log('[IRATA] Page text preview:', pageText.substring(0, 300));
     
-    const inputs = await page.$$('input[type="text"], input:not([type])');
-    console.log(`[IRATA] Found ${inputs.length} text input fields`);
+    const captchaToken = await captchaTokenPromise;
     
-    if (inputs.length < 2) {
-      await page.waitForSelector('input', { timeout: 10000 });
-      await randomDelay(500, 1000);
+    if (!captchaToken) {
+      console.log('[IRATA] Failed to solve CAPTCHA');
+      return {
+        success: false,
+        verified: false,
+        requiresManualVerification: true,
+        error: 'Could not solve security challenge. Please verify manually at techconnect.irata.org'
+      };
     }
     
+    console.log('[IRATA] Got CAPTCHA token, injecting...');
+    
+    await page.evaluate((token) => {
+      let responseField = document.querySelector('#g-recaptcha-response') as HTMLTextAreaElement;
+      if (!responseField) {
+        responseField = document.createElement('textarea');
+        responseField.id = 'g-recaptcha-response';
+        responseField.name = 'g-recaptcha-response';
+        responseField.style.display = 'none';
+        document.body.appendChild(responseField);
+      }
+      responseField.value = token;
+      
+      const hiddenInputs = document.querySelectorAll('input[name="g-recaptcha-response"]');
+      hiddenInputs.forEach((input: Element) => {
+        (input as HTMLInputElement).value = token;
+      });
+      
+      const forms = document.querySelectorAll('form');
+      forms.forEach(form => {
+        let input = form.querySelector('input[name="g-recaptcha-response"]') as HTMLInputElement;
+        if (!input) {
+          input = document.createElement('input');
+          input.type = 'hidden';
+          input.name = 'g-recaptcha-response';
+          input.value = token;
+          form.appendChild(input);
+        } else {
+          input.value = token;
+        }
+      });
+      
+      if (typeof (window as any).grecaptcha !== 'undefined') {
+        try {
+          (window as any).grecaptcha.getResponse = () => token;
+          (window as any).grecaptcha.execute = () => Promise.resolve(token);
+        } catch (e) {}
+      }
+      
+      if (typeof (window as any).grecaptcha !== 'undefined' && (window as any).grecaptcha.enterprise) {
+        try {
+          (window as any).grecaptcha.enterprise.execute = () => Promise.resolve(token);
+        } catch (e) {}
+      }
+    }, captchaToken);
+    
+    await randomDelay(1000, 2000);
+    
+    console.log('[IRATA] Reloading page with CAPTCHA token...');
+    await page.reload({ waitUntil: 'domcontentloaded' });
+    
+    await randomDelay(2000, 3000);
+    await page.waitForLoadState('networkidle', { timeout: 30000 }).catch(() => {});
+    
     await humanLikeMouseMove(page);
-    await randomDelay(300, 700);
+    await randomDelay(1000, 2000);
+    
+    pageContent = await page.content();
+    pageText = await page.innerText('body').catch(() => '');
+    
+    console.log('[IRATA] Looking for form fields after CAPTCHA...');
+    
+    const allInputs = await page.$$('input');
+    console.log(`[IRATA] Found ${allInputs.length} total input fields`);
+    
+    for (const input of allInputs) {
+      const type = await input.getAttribute('type');
+      const name = await input.getAttribute('name');
+      const id = await input.getAttribute('id');
+      const placeholder = await input.getAttribute('placeholder');
+      console.log(`[IRATA] Input: type=${type}, name=${name}, id=${id}, placeholder=${placeholder}`);
+    }
+    
+    if (allInputs.length === 0) {
+      console.log('[IRATA] Still no form fields found. Page may require different approach.');
+      console.log('[IRATA] Full page HTML preview:', pageContent.substring(0, 2000));
+      
+      return {
+        success: false,
+        verified: false,
+        requiresManualVerification: true,
+        error: 'Could not access IRATA verification form. Please verify manually at techconnect.irata.org'
+      };
+    }
     
     let lastNameFilled = false;
     const lastNameSelectors = [
@@ -306,13 +356,14 @@ export async function verifyIrataLicense(
       'input[placeholder*="surname" i]',
       'input[placeholder*="last" i]',
       'input[id*="surname" i]',
-      'input[id*="lastName" i]'
+      'input[id*="lastName" i]',
+      'input[type="text"]:first-of-type'
     ];
     
     for (const selector of lastNameSelectors) {
       try {
         const input = await page.$(selector);
-        if (input) {
+        if (input && await input.isVisible()) {
           await humanLikeMouseMove(page);
           await randomDelay(200, 500);
           await input.click();
@@ -331,37 +382,19 @@ export async function verifyIrataLicense(
     }
     
     if (!lastNameFilled) {
-      try {
-        const label = await page.$('text=/surname|last name/i');
-        if (label) {
-          const labelFor = await label.getAttribute('for');
-          if (labelFor) {
-            const input = await page.$(`#${labelFor}`);
-            if (input) {
-              await input.click();
-              await randomDelay(100, 300);
-              for (const char of lastName) {
-                await input.type(char, { delay: Math.floor(Math.random() * 80) + 40 });
-              }
-              lastNameFilled = true;
-              console.log('[IRATA] Last name filled using label');
-            }
+      const textInputs = await page.$$('input[type="text"], input:not([type])');
+      if (textInputs.length > 0) {
+        const firstInput = textInputs[0];
+        if (await firstInput.isVisible()) {
+          await firstInput.click();
+          await randomDelay(100, 300);
+          for (const char of lastName) {
+            await firstInput.type(char, { delay: Math.floor(Math.random() * 80) + 40 });
           }
+          lastNameFilled = true;
+          console.log('[IRATA] Last name filled using first visible text input');
         }
-      } catch (e) {
-        console.log('[IRATA] Could not fill by label');
       }
-    }
-    
-    if (!lastNameFilled && inputs.length >= 1) {
-      const firstInput = inputs[0];
-      await firstInput.click();
-      await randomDelay(100, 300);
-      for (const char of lastName) {
-        await firstInput.type(char, { delay: Math.floor(Math.random() * 80) + 40 });
-      }
-      lastNameFilled = true;
-      console.log('[IRATA] Last name filled using first input');
     }
     
     await randomDelay(500, 1000);
@@ -376,13 +409,14 @@ export async function verifyIrataLicense(
       'input[placeholder*="cert" i]',
       'input[placeholder*="number" i]',
       'input[id*="irata" i]',
-      'input[id*="cert" i]'
+      'input[id*="cert" i]',
+      'input[type="text"]:nth-of-type(2)'
     ];
     
     for (const selector of irataSelectors) {
       try {
         const input = await page.$(selector);
-        if (input) {
+        if (input && await input.isVisible()) {
           await humanLikeMouseMove(page);
           await randomDelay(200, 500);
           await input.click();
@@ -400,23 +434,29 @@ export async function verifyIrataLicense(
       }
     }
     
-    if (!irataFilled && inputs.length >= 2) {
-      const secondInput = inputs[1];
-      await secondInput.click();
-      await randomDelay(100, 300);
-      for (const char of irataNumber) {
-        await secondInput.type(char, { delay: Math.floor(Math.random() * 80) + 40 });
+    if (!irataFilled) {
+      const textInputs = await page.$$('input[type="text"], input:not([type])');
+      if (textInputs.length > 1) {
+        const secondInput = textInputs[1];
+        if (await secondInput.isVisible()) {
+          await secondInput.click();
+          await randomDelay(100, 300);
+          for (const char of irataNumber) {
+            await secondInput.type(char, { delay: Math.floor(Math.random() * 80) + 40 });
+          }
+          irataFilled = true;
+          console.log('[IRATA] IRATA number filled using second visible text input');
+        }
       }
-      irataFilled = true;
-      console.log('[IRATA] IRATA number filled using second input');
     }
     
     if (!lastNameFilled || !irataFilled) {
-      console.log('[IRATA] Could not locate form fields');
+      console.log('[IRATA] Could not locate all form fields');
       return {
         success: false,
         verified: false,
-        error: 'Could not locate form fields on IRATA verification page. The page structure may have changed.'
+        requiresManualVerification: true,
+        error: 'Could not fill verification form. Please verify manually at techconnect.irata.org'
       };
     }
     
@@ -439,7 +479,7 @@ export async function verifyIrataLicense(
     for (const selector of submitSelectors) {
       try {
         const btn = await page.$(selector);
-        if (btn) {
+        if (btn && await btn.isVisible()) {
           await humanLikeMouseMove(page);
           await randomDelay(300, 700);
           await btn.click();
@@ -461,20 +501,21 @@ export async function verifyIrataLicense(
     }
     
     console.log('[IRATA] Waiting for response...');
-    await randomDelay(2000, 4000);
+    await randomDelay(3000, 5000);
     
     try {
-      await page.waitForLoadState('networkidle', { timeout: 15000 });
+      await page.waitForLoadState('networkidle', { timeout: 20000 });
     } catch (e) {
-      console.log('[IRATA] Networkidle timeout, continuing anyway');
+      console.log('[IRATA] Networkidle timeout after submit, continuing...');
     }
     
     await randomDelay(1000, 2000);
     
-    const pageText = await page.innerText('body');
-    const pageContent = await page.content();
+    pageText = await page.innerText('body').catch(() => '');
+    pageContent = await page.content();
     
-    console.log('[IRATA] Page text length:', pageText.length);
+    console.log('[IRATA] Result page text length:', pageText.length);
+    console.log('[IRATA] Result preview:', pageText.substring(0, 500));
     
     const noResultsPatterns = [
       /no\s+(?:results?|records?|match(?:es)?)\s+found/i,
@@ -526,102 +567,14 @@ export async function verifyIrataLicense(
       };
     }
     
-    const recaptchaBlocked = pageText.includes('captcha') || 
-                              pageText.includes('robot') ||
-                              pageText.includes('automated') ||
-                              pageContent.includes('g-recaptcha-response') ||
-                              pageContent.includes('grecaptcha');
-    
-    if (recaptchaBlocked && TWOCAPTCHA_API_KEY) {
-      console.log('[IRATA] CAPTCHA block detected - attempting 2Captcha solve...');
-      
-      const captchaToken = await solve2Captcha(RECAPTCHA_SITE_KEY, IRATA_VERIFY_URL);
-      
-      if (captchaToken) {
-        console.log('[IRATA] Got CAPTCHA token, retrying verification...');
-        
-        await injectRecaptchaToken(page, captchaToken);
-        await randomDelay(500, 1000);
-        
-        for (const selector of submitSelectors) {
-          try {
-            const btn = await page.$(selector);
-            if (btn) {
-              await humanLikeMouseMove(page);
-              await randomDelay(300, 700);
-              await btn.click();
-              console.log('[IRATA] Form resubmitted with CAPTCHA token');
-              break;
-            }
-          } catch (e) {
-            continue;
-          }
-        }
-        
-        await randomDelay(2000, 4000);
-        
-        try {
-          await page.waitForLoadState('networkidle', { timeout: 15000 });
-        } catch (e) {
-          console.log('[IRATA] Networkidle timeout after CAPTCHA, continuing...');
-        }
-        
-        const retryPageText = await page.innerText('body');
-        const retryPageContent = await page.content();
-        
-        for (const pattern of noResultsPatterns) {
-          if (pattern.test(retryPageText)) {
-            console.log('[IRATA] No technician found after CAPTCHA solve');
-            return {
-              success: true,
-              verified: false,
-              error: 'No technician found with the provided details. Please check your last name and IRATA number.'
-            };
-          }
-        }
-        
-        const retryLevelMatch = retryPageText.match(/(?:Level|Lvl)\s*[:\s]*(\d)/i) ||
-                                retryPageContent.match(/(?:Level|Lvl)\s*[:\s]*(\d)/i);
-        const retryExpiryMatch = retryPageText.match(/(?:Expir[ey]|Valid\s+until)\s*[:\s]*([0-9]{1,2}[\/\-][0-9]{1,2}[\/\-][0-9]{2,4})/i) ||
-                                 retryPageText.match(/(\d{1,2}\s+(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\s+\d{4})/i);
-        const retryStatusMatch = retryPageText.match(/(?:Status)\s*[:\s]*(Current|Expired|On\s+Hold|Active|Valid|Suspended|Registered)/i);
-        const retryNameMatch = retryPageText.match(/(?:Name|Technician)\s*[:\s]*([A-Za-z\s\-']+?)(?:\s*Level|\s*Status|\s*Expir|\s*$)/i);
-        const retryHasTableWithData = await page.$('table tr td, .result, .technician-info, .verification-result');
-        
-        if (retryLevelMatch || retryExpiryMatch || retryStatusMatch || retryHasTableWithData) {
-          console.log('[IRATA] Verification successful after 2Captcha!');
-          return {
-            success: true,
-            verified: true,
-            technicianName: retryNameMatch ? retryNameMatch[1].trim() : undefined,
-            level: retryLevelMatch ? `Level ${retryLevelMatch[1]}` : undefined,
-            expiryDate: retryExpiryMatch ? retryExpiryMatch[1] : undefined,
-            status: retryStatusMatch ? retryStatusMatch[1].replace(/\s+/g, ' ') : 'Verified'
-          };
-        }
-      }
-      
-      console.log('[IRATA] 2Captcha solve did not help');
-    }
-    
-    if (recaptchaBlocked) {
-      console.log('[IRATA] CAPTCHA block remains unresolved');
-      return {
-        success: true,
-        verified: false,
-        requiresManualVerification: true,
-        error: 'Verification blocked by security check. Please try again or verify manually.'
-      };
-    }
-    
     console.log('[IRATA] Could not parse verification results');
-    console.log('[IRATA] Page preview:', pageText.substring(0, 500));
+    console.log('[IRATA] Full page content:', pageContent.substring(0, 3000));
     
     return {
       success: true,
       verified: false,
       requiresManualVerification: true,
-      error: 'Could not parse verification results. Please verify manually at https://techconnect.irata.org/verify/tech'
+      error: 'Could not parse verification results. Please verify manually at techconnect.irata.org'
     };
     
   } catch (error) {
