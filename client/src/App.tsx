@@ -38,6 +38,8 @@ import ViewAsCompany from "@/pages/ViewAsCompany";
 import SuperUserFeatureRequests from "@/pages/SuperUserFeatureRequests";
 import SuperUserMetrics from "@/pages/SuperUserMetrics";
 import FounderResources from "@/pages/FounderResources";
+import BuildingPortal from "@/pages/BuildingPortal";
+import SuperUserBuildings from "@/pages/SuperUserBuildings";
 import ResidentsManagement from "@/pages/ResidentsManagement";
 import Documents from "@/pages/Documents";
 import ResidentLink from "@/pages/ResidentLink";
@@ -122,6 +124,12 @@ function Router() {
           <FounderResources />
         </ProtectedRoute>
       </Route>
+      <Route path="/superuser/buildings">
+        <ProtectedRoute allowedRoles={["superuser"]}>
+          <SuperUserBuildings />
+        </ProtectedRoute>
+      </Route>
+      <Route path="/building-portal" component={BuildingPortal} />
       <Route path="/resident">
         <ProtectedRoute allowedRoles={["resident"]}>
           <ResidentDashboard />

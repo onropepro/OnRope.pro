@@ -256,6 +256,29 @@ export default function SuperUser() {
               </p>
             </CardContent>
           </Card>
+
+          <Card 
+            className="hover-elevate active-elevate-2 cursor-pointer transition-all"
+            onClick={() => setLocation('/superuser/buildings')}
+            data-testid="card-global-buildings"
+          >
+            <CardHeader>
+              <div className="flex items-center gap-3">
+                <div className="h-12 w-12 rounded-full bg-cyan-500/10 flex items-center justify-center">
+                  <span className="material-icons text-cyan-500 text-2xl">apartment</span>
+                </div>
+                <div>
+                  <CardTitle className="text-xl">Global Buildings Database</CardTitle>
+                  <CardDescription>Centralized building maintenance records</CardDescription>
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <p className="text-sm text-muted-foreground">
+                View all buildings with strata numbers, their maintenance history across all companies
+              </p>
+            </CardContent>
+          </Card>
         </div>
       </div>
 
