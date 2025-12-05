@@ -43,6 +43,8 @@ type MenuItem = {
 };
 
 const changelogSubItems: SubMenuItem[] = [
+  { title: "Authentication Guide", path: "/changelog/authentication" },
+  { title: "Project Management Guide", path: "/changelog/project-management" },
   { title: "Pricing", path: "/changelog/pricing" },
   { title: "Safety Guide", path: "/changelog/safety" },
   { title: "Inventory Guide", path: "/changelog/inventory" },
@@ -362,7 +364,7 @@ export default function SuperUserLayout({ children, title }: SuperUserLayoutProp
 
   return (
     <SidebarProvider style={sidebarStyle as React.CSSProperties}>
-      <div className="flex h-screen w-full">
+      <div className="flex h-screen w-full" style={{ fontFamily: "'Outfit', sans-serif", fontSize: '14px' }}>
         <Sidebar collapsible="icon">
           <SidebarContents />
         </Sidebar>
