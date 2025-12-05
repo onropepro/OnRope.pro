@@ -83,6 +83,12 @@ const developmentTools: ResourceLink[] = [
     description: "Community UI components",
     icon: Code,
   },
+  {
+    name: "2Captcha",
+    url: "https://2captcha.com/",
+    description: "CAPTCHA solving API | Use Google account to login",
+    icon: Code,
+  },
 ];
 
 const launchStrategy: StrategyItem[] = [
