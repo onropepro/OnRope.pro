@@ -43,8 +43,6 @@ type MenuItem = {
 };
 
 const changelogSubItems: SubMenuItem[] = [
-  { title: "Authentication Guide", path: "/changelog/authentication" },
-  { title: "Project Management Guide", path: "/changelog/project-management" },
   { title: "Pricing", path: "/changelog/pricing" },
   { title: "Safety Guide", path: "/changelog/safety" },
   { title: "Inventory Guide", path: "/changelog/inventory" },
