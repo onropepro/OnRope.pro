@@ -2,8 +2,8 @@ import { useLocation } from "wouter";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { BackButton } from "@/components/BackButton";
 import { 
-  ArrowLeft,
   Code,
   Rocket,
   TrendingUp,
@@ -185,24 +185,13 @@ function StatusBadge({ status }: { status: "completed" | "in-progress" | "planne
 }
 
 export default function FounderResources() {
-  const [, setLocation] = useLocation();
-
   return (
     <div className="min-h-screen page-gradient p-6">
       <div className="max-w-5xl mx-auto space-y-8">
-        <div className="flex items-center gap-4">
-          <Button 
-            variant="ghost" 
-            size="icon"
-            onClick={() => setLocation('/superuser')}
-            data-testid="button-back"
-          >
-            <ArrowLeft className="h-5 w-5" />
-          </Button>
-          <div>
-            <h1 className="text-4xl font-bold gradient-text">Founder Resources</h1>
-            <p className="text-muted-foreground mt-1">Private resources for Tommy & Glenn</p>
-          </div>
+        <BackButton to="/superuser" label="Back to Dashboard" />
+        <div>
+          <h1 className="text-4xl font-bold gradient-text">Founder Resources</h1>
+          <p className="text-muted-foreground mt-1">Private resources for Tommy & Glenn</p>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">

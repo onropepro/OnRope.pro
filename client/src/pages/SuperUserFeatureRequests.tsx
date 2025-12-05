@@ -8,6 +8,7 @@ import { queryClient, apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { format } from "date-fns";
 import SuperUserLayout from "@/components/SuperUserLayout";
+import { BackButton } from "@/components/BackButton";
 
 const FEATURE_CATEGORIES = [
   { value: 'feature', label: 'New Feature' },
@@ -260,6 +261,9 @@ export default function SuperUserFeatureRequests() {
     <SuperUserLayout title="Feature Requests">
       <div className="p-4 md:p-6">
         <div className="max-w-5xl mx-auto space-y-6">
+          {/* Back Button */}
+          <BackButton to="/superuser" label="Back to Dashboard" />
+
           <p className="text-muted-foreground">Review and respond to company feedback</p>
 
         <Card>

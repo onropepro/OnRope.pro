@@ -12,6 +12,7 @@ import { queryClient, apiRequest } from "@/lib/queryClient";
 import { formatLocalDate } from "@/lib/dateUtils";
 import { Loader2, Building2, ArrowLeft, Search, History, CheckCircle, RefreshCw, Key, Layers, MapPin, Compass } from "lucide-react";
 import SuperUserLayout from "@/components/SuperUserLayout";
+import { BackButton } from "@/components/BackButton";
 
 interface BuildingData {
   id: string;
@@ -452,6 +453,9 @@ export default function SuperUserBuildings() {
     <SuperUserLayout title="Global Buildings Database">
       <div className="p-4 md:p-6">
         <div className="max-w-4xl mx-auto space-y-6">
+          {/* Back Button */}
+          <BackButton to="/superuser" label="Back to Dashboard" />
+
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <p className="text-muted-foreground">
               {buildings.length} building(s) in database

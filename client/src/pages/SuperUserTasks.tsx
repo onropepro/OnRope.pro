@@ -17,6 +17,7 @@ import { useToast } from "@/hooks/use-toast";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { formatLocalDate } from "@/lib/dateUtils";
 import SuperUserLayout from "@/components/SuperUserLayout";
+import { BackButton } from "@/components/BackButton";
 import { 
   Plus, 
   Calendar, 
@@ -28,8 +29,7 @@ import {
   Send,
   Trash2,
   GripVertical,
-  Filter,
-  ArrowLeft
+  Filter
 } from "lucide-react";
 
 interface TaskComment {
@@ -235,15 +235,7 @@ export default function SuperUserTasks() {
       <div className="p-4 md:p-6">
         <div className="max-w-7xl mx-auto space-y-6">
           {/* Back Button */}
-          <Button 
-            variant="ghost" 
-            onClick={() => setLocation("/superuser")}
-            className="gap-2"
-            data-testid="button-back"
-          >
-            <ArrowLeft className="h-4 w-4" />
-            Back to Dashboard
-          </Button>
+          <BackButton to="/superuser" label="Back to Dashboard" />
 
           {/* Action Bar */}
           <div className="flex flex-wrap items-center justify-between gap-4">

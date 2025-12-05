@@ -7,6 +7,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Progress } from "@/components/ui/progress";
 import { useTranslation } from "react-i18next";
 import SuperUserLayout from "@/components/SuperUserLayout";
+import { BackButton } from "@/components/BackButton";
 import {
   TrendingUp,
   TrendingDown,
@@ -176,7 +177,8 @@ export default function SuperUserMetrics() {
     return (
       <SuperUserLayout title={t('superuser.metrics.title', 'Platform Metrics')}>
         <div className="p-6">
-          <div className="max-w-7xl mx-auto">
+          <div className="max-w-7xl mx-auto space-y-6">
+            <BackButton to="/superuser" label={t('common.backToDashboard', 'Back to Dashboard')} />
             <Card className="p-8 text-center">
               <p className="text-destructive">{t('superuser.metrics.error', 'Failed to load metrics. Please try again.')}</p>
               <Button 
@@ -211,6 +213,9 @@ export default function SuperUserMetrics() {
     <SuperUserLayout title={t('superuser.metrics.title', 'Platform Metrics')}>
       <div className="p-4 md:p-6">
         <div className="max-w-7xl mx-auto space-y-8">
+          {/* Back Button */}
+          <BackButton to="/superuser" label={t('common.backToDashboard', 'Back to Dashboard')} />
+
           {/* Header Description */}
           <p className="text-muted-foreground">
             {t('superuser.metrics.subtitle', 'Real-time business intelligence for OnRopePro')}
