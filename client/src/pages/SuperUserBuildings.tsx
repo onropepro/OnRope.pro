@@ -524,8 +524,8 @@ export default function SuperUserBuildings() {
                           {building.buildingName || `Building ${building.strataPlanNumber}`}
                         </h3>
                         <p className="text-sm text-muted-foreground">
-                          {building.address ? (
-                            `${building.address}, ${building.city || ""}`
+                          {building.buildingAddress ? (
+                            `${building.buildingAddress}, ${building.city || ""}`
                           ) : (
                             `Strata: ${building.strataPlanNumber}`
                           )}
@@ -534,11 +534,15 @@ export default function SuperUserBuildings() {
                     </div>
                     <div className="flex items-center gap-4 text-sm">
                       <div className="text-center">
-                        <p className="font-medium">{building.totalProjects}</p>
-                        <p className="text-muted-foreground">Projects</p>
+                        <p className="font-medium">{getTotalDrops(building)}</p>
+                        <p className="text-muted-foreground">Total Drops</p>
                       </div>
                       <div className="text-center">
-                        <p className="font-medium">{building.projectsCompleted}</p>
+                        <p className="font-medium">{building.floorCount || "—"}</p>
+                        <p className="text-muted-foreground">Floors</p>
+                      </div>
+                      <div className="text-center">
+                        <p className="font-medium">{building.totalProjectsCompleted || 0}</p>
                         <p className="text-muted-foreground">Completed</p>
                       </div>
                     </div>
