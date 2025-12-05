@@ -86,6 +86,24 @@ type RecentChange = {
 
 const recentChangesData: RecentChange[] = [
   {
+    date: "December 5, 2025",
+    title: "Resident Unit Conflict Detection",
+    description: "New resident registration now detects when a unit is already linked to another account. Shows confirmation dialog explaining the takeover scenario, with atomic database transactions ensuring safe unit transfers between residents",
+    type: "feature"
+  },
+  {
+    date: "December 5, 2025",
+    title: "Quote-to-Project Conversion",
+    description: "Convert accepted quotes directly into projects with prefilled details. Navigate from Quotes page to Dashboard with project creation form auto-populated with quote data",
+    type: "feature"
+  },
+  {
+    date: "December 5, 2025",
+    title: "Feedback Resolution Time Metrics",
+    description: "Company owners now see average resolution time badge in Dashboard feedback section, showing how quickly the team resolves resident feedback",
+    type: "improvement"
+  },
+  {
     date: "December 4, 2025",
     title: "Founder Resources Section",
     description: "Added private Founder Resources page for Tommy & Glenn in SuperUser dashboard with development tools links, launch strategy roadmap, sales strategy planning, and important notes",
