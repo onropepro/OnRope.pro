@@ -4,6 +4,111 @@ import StealthPlugin from 'puppeteer-extra-plugin-stealth';
 
 chromium.use(StealthPlugin());
 
+const TWOCAPTCHA_API_KEY = process.env.TWOCAPTCHA_API_KEY || '';
+const RECAPTCHA_SITE_KEY = '6LclgYooAAAAAMSMpBh5Ct2ku8wg_R3S4P5y2kaH';
+const IRATA_VERIFY_URL = 'https://techconnect.irata.org/verify/tech';
+
+interface TwoCaptchaResponse {
+  status: number;
+  request: string;
+}
+
+async function solve2Captcha(siteKey: string, pageUrl: string): Promise<string | null> {
+  if (!TWOCAPTCHA_API_KEY) {
+    console.log('[2Captcha] No API key configured');
+    return null;
+  }
+
+  try {
+    console.log('[2Captcha] Submitting reCAPTCHA v3 solve request...');
+    
+    const submitUrl = `http://2captcha.com/in.php?key=${TWOCAPTCHA_API_KEY}&method=userrecaptcha&googlekey=${siteKey}&pageurl=${encodeURIComponent(pageUrl)}&version=v3&action=verify&min_score=0.7&json=1`;
+    
+    const submitResponse = await fetch(submitUrl);
+    const submitResult: TwoCaptchaResponse = await submitResponse.json();
+    
+    if (submitResult.status !== 1) {
+      console.log('[2Captcha] Submit failed:', submitResult.request);
+      return null;
+    }
+    
+    const requestId = submitResult.request;
+    console.log('[2Captcha] Request ID:', requestId);
+    
+    const maxAttempts = 30;
+    const pollInterval = 5000;
+    
+    for (let attempt = 0; attempt < maxAttempts; attempt++) {
+      await new Promise(resolve => setTimeout(resolve, pollInterval));
+      
+      console.log(`[2Captcha] Polling for result (attempt ${attempt + 1}/${maxAttempts})...`);
+      
+      const resultUrl = `http://2captcha.com/res.php?key=${TWOCAPTCHA_API_KEY}&action=get&id=${requestId}&json=1`;
+      const resultResponse = await fetch(resultUrl);
+      const resultData: TwoCaptchaResponse = await resultResponse.json();
+      
+      if (resultData.status === 1) {
+        console.log('[2Captcha] CAPTCHA solved successfully!');
+        return resultData.request;
+      }
+      
+      if (resultData.request !== 'CAPCHA_NOT_READY') {
+        console.log('[2Captcha] Error:', resultData.request);
+        return null;
+      }
+    }
+    
+    console.log('[2Captcha] Timeout waiting for solution');
+    return null;
+    
+  } catch (error) {
+    console.error('[2Captcha] Error:', error);
+    return null;
+  }
+}
+
+async function injectRecaptchaToken(page: Page, token: string): Promise<boolean> {
+  try {
+    console.log('[IRATA] Injecting reCAPTCHA token...');
+    
+    await page.evaluate((token) => {
+      let responseField = document.querySelector('#g-recaptcha-response') as HTMLTextAreaElement;
+      if (!responseField) {
+        responseField = document.createElement('textarea');
+        responseField.id = 'g-recaptcha-response';
+        responseField.name = 'g-recaptcha-response';
+        responseField.style.display = 'none';
+        document.body.appendChild(responseField);
+      }
+      responseField.value = token;
+      
+      const hiddenInputs = document.querySelectorAll('input[name="g-recaptcha-response"]');
+      hiddenInputs.forEach((input: Element) => {
+        (input as HTMLInputElement).value = token;
+      });
+      
+      if (typeof (window as any).grecaptcha !== 'undefined' && (window as any).grecaptcha.enterprise) {
+        try {
+          (window as any).grecaptcha.enterprise.execute = () => Promise.resolve(token);
+        } catch (e) {}
+      }
+      
+      if (typeof (window as any).grecaptcha !== 'undefined') {
+        try {
+          (window as any).grecaptcha.getResponse = () => token;
+          (window as any).grecaptcha.execute = () => Promise.resolve(token);
+        } catch (e) {}
+      }
+    }, token);
+    
+    console.log('[IRATA] reCAPTCHA token injected');
+    return true;
+  } catch (error) {
+    console.error('[IRATA] Error injecting token:', error);
+    return false;
+  }
+}
+
 export interface IrataVerificationResult {
   success: boolean;
   verified: boolean;
@@ -424,10 +529,83 @@ export async function verifyIrataLicense(
     const recaptchaBlocked = pageText.includes('captcha') || 
                               pageText.includes('robot') ||
                               pageText.includes('automated') ||
-                              pageContent.includes('g-recaptcha-response');
+                              pageContent.includes('g-recaptcha-response') ||
+                              pageContent.includes('grecaptcha');
+    
+    if (recaptchaBlocked && TWOCAPTCHA_API_KEY) {
+      console.log('[IRATA] CAPTCHA block detected - attempting 2Captcha solve...');
+      
+      const captchaToken = await solve2Captcha(RECAPTCHA_SITE_KEY, IRATA_VERIFY_URL);
+      
+      if (captchaToken) {
+        console.log('[IRATA] Got CAPTCHA token, retrying verification...');
+        
+        await injectRecaptchaToken(page, captchaToken);
+        await randomDelay(500, 1000);
+        
+        for (const selector of submitSelectors) {
+          try {
+            const btn = await page.$(selector);
+            if (btn) {
+              await humanLikeMouseMove(page);
+              await randomDelay(300, 700);
+              await btn.click();
+              console.log('[IRATA] Form resubmitted with CAPTCHA token');
+              break;
+            }
+          } catch (e) {
+            continue;
+          }
+        }
+        
+        await randomDelay(2000, 4000);
+        
+        try {
+          await page.waitForLoadState('networkidle', { timeout: 15000 });
+        } catch (e) {
+          console.log('[IRATA] Networkidle timeout after CAPTCHA, continuing...');
+        }
+        
+        const retryPageText = await page.innerText('body');
+        const retryPageContent = await page.content();
+        
+        for (const pattern of noResultsPatterns) {
+          if (pattern.test(retryPageText)) {
+            console.log('[IRATA] No technician found after CAPTCHA solve');
+            return {
+              success: true,
+              verified: false,
+              error: 'No technician found with the provided details. Please check your last name and IRATA number.'
+            };
+          }
+        }
+        
+        const retryLevelMatch = retryPageText.match(/(?:Level|Lvl)\s*[:\s]*(\d)/i) ||
+                                retryPageContent.match(/(?:Level|Lvl)\s*[:\s]*(\d)/i);
+        const retryExpiryMatch = retryPageText.match(/(?:Expir[ey]|Valid\s+until)\s*[:\s]*([0-9]{1,2}[\/\-][0-9]{1,2}[\/\-][0-9]{2,4})/i) ||
+                                 retryPageText.match(/(\d{1,2}\s+(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\s+\d{4})/i);
+        const retryStatusMatch = retryPageText.match(/(?:Status)\s*[:\s]*(Current|Expired|On\s+Hold|Active|Valid|Suspended|Registered)/i);
+        const retryNameMatch = retryPageText.match(/(?:Name|Technician)\s*[:\s]*([A-Za-z\s\-']+?)(?:\s*Level|\s*Status|\s*Expir|\s*$)/i);
+        const retryHasTableWithData = await page.$('table tr td, .result, .technician-info, .verification-result');
+        
+        if (retryLevelMatch || retryExpiryMatch || retryStatusMatch || retryHasTableWithData) {
+          console.log('[IRATA] Verification successful after 2Captcha!');
+          return {
+            success: true,
+            verified: true,
+            technicianName: retryNameMatch ? retryNameMatch[1].trim() : undefined,
+            level: retryLevelMatch ? `Level ${retryLevelMatch[1]}` : undefined,
+            expiryDate: retryExpiryMatch ? retryExpiryMatch[1] : undefined,
+            status: retryStatusMatch ? retryStatusMatch[1].replace(/\s+/g, ' ') : 'Verified'
+          };
+        }
+      }
+      
+      console.log('[IRATA] 2Captcha solve did not help');
+    }
     
     if (recaptchaBlocked) {
-      console.log('[IRATA] Possible CAPTCHA block detected');
+      console.log('[IRATA] CAPTCHA block remains unresolved');
       return {
         success: true,
         verified: false,
