@@ -905,7 +905,7 @@ export default function Changelog() {
                         {change.type === 'feature' ? 'New Feature' : change.type === 'improvement' ? 'Improvement' : 'Fix'}
                       </Badge>
                     </div>
-                    <p className="text-base text-muted-foreground mt-2.5 mb-2.5">{change.description}</p>
+                    <p className="text-base text-gray-500 dark:text-gray-400 mt-2.5 mb-2.5" style={{ fontFamily: 'Outfit, sans-serif' }}>{change.description}</p>
                     <p className="text-xs text-muted-foreground/70">{change.date}</p>
                   </div>
                 </div>
