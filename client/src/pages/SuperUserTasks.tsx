@@ -28,7 +28,8 @@ import {
   Send,
   Trash2,
   GripVertical,
-  Filter
+  Filter,
+  ArrowLeft
 } from "lucide-react";
 
 interface TaskComment {
@@ -233,6 +234,17 @@ export default function SuperUserTasks() {
     <SuperUserLayout title="Task List">
       <div className="p-4 md:p-6">
         <div className="max-w-7xl mx-auto space-y-6">
+          {/* Back Button */}
+          <Button 
+            variant="ghost" 
+            onClick={() => setLocation("/superuser")}
+            className="gap-2"
+            data-testid="button-back"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            Back to Dashboard
+          </Button>
+
           {/* Action Bar */}
           <div className="flex flex-wrap items-center justify-between gap-4">
             <div className="flex items-center gap-2">
