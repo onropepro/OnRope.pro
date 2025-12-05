@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useLocation, Link } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import { queryClient } from "@/lib/queryClient";
@@ -14,6 +14,9 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  SidebarMenuSub,
+  SidebarMenuSubItem,
+  SidebarMenuSubButton,
   SidebarProvider,
   SidebarTrigger,
   useSidebar,
@@ -26,12 +29,52 @@ import {
 import { Separator } from "@/components/ui/separator";
 import { ChevronDown, ChevronRight } from "lucide-react";
 
+type SubMenuItem = {
+  title: string;
+  path: string;
+};
+
+type MenuItem = {
+  title: string;
+  icon: string;
+  path: string;
+  exact?: boolean;
+  subItems?: SubMenuItem[];
+};
+
+const changelogSubItems: SubMenuItem[] = [
+  { title: "Pricing", path: "/changelog/pricing" },
+  { title: "Safety Guide", path: "/changelog/safety" },
+  { title: "Inventory Guide", path: "/changelog/inventory" },
+  { title: "User Access Guide", path: "/changelog/user-access" },
+  { title: "Projects Guide", path: "/changelog/projects" },
+  { title: "Time Tracking Guide", path: "/changelog/time-tracking" },
+  { title: "IRATA Logging Guide", path: "/changelog/irata-logging" },
+  { title: "Documents Guide", path: "/changelog/documents" },
+  { title: "Employees Guide", path: "/changelog/employees" },
+  { title: "Scheduling Guide", path: "/changelog/scheduling" },
+  { title: "Quoting Guide", path: "/changelog/quoting" },
+  { title: "CRM Guide", path: "/changelog/crm" },
+  { title: "Resident Portal Guide", path: "/changelog/resident-portal" },
+  { title: "Branding Guide", path: "/changelog/branding" },
+  { title: "Platform Admin Guide", path: "/changelog/platform-admin" },
+  { title: "Analytics Guide", path: "/changelog/analytics" },
+  { title: "Multi-Language Guide", path: "/changelog/language" },
+  { title: "GPS & Location Guide", path: "/changelog/gps" },
+  { title: "Property Manager Guide", path: "/changelog/property-manager" },
+];
+
 interface SuperUserLayoutProps {
   children: React.ReactNode;
   title?: string;
 }
 
-const menuGroups = [
+type MenuGroup = {
+  label: string;
+  items: MenuItem[];
+};
+
+const menuGroups: MenuGroup[] = [
   {
     label: "MAIN",
     items: [
@@ -85,6 +128,7 @@ const menuGroups = [
         title: "Changelog",
         icon: "menu_book",
         path: "/changelog",
+        subItems: changelogSubItems,
       },
       {
         title: "Founder Resources",
@@ -103,13 +147,32 @@ function SidebarContents() {
     ANALYTICS: true,
     RESOURCES: true,
   });
+  
+  const isOnChangelogPage = location.startsWith("/changelog");
+  
+  const [expandedSubMenus, setExpandedSubMenus] = useState<Record<string, boolean>>({
+    Changelog: isOnChangelogPage,
+  });
   const { state } = useSidebar();
   const isCollapsed = state === "collapsed";
+  
+  useEffect(() => {
+    if (isOnChangelogPage && !expandedSubMenus.Changelog) {
+      setExpandedSubMenus(prev => ({ ...prev, Changelog: true }));
+    }
+  }, [isOnChangelogPage]);
 
   const toggleGroup = (label: string) => {
     setExpandedGroups((prev) => ({
       ...prev,
       [label]: !prev[label],
+    }));
+  };
+
+  const toggleSubMenu = (title: string) => {
+    setExpandedSubMenus((prev) => ({
+      ...prev,
+      [title]: !prev[title],
     }));
   };
 
@@ -171,18 +234,71 @@ function SidebarContents() {
                     <SidebarMenu>
                       {group.items.map((item) => (
                         <SidebarMenuItem key={item.path}>
-                          <SidebarMenuButton
-                            asChild
-                            isActive={isActive(item.path, item.exact)}
-                            tooltip={item.title}
-                          >
-                            <Link href={item.path}>
-                              <span className="material-icons text-lg">
-                                {item.icon}
-                              </span>
-                              <span>{item.title}</span>
-                            </Link>
-                          </SidebarMenuButton>
+                          {item.subItems ? (
+                            <Collapsible
+                              open={expandedSubMenus[item.title]}
+                              onOpenChange={() => toggleSubMenu(item.title)}
+                            >
+                              <CollapsibleTrigger asChild>
+                                <SidebarMenuButton
+                                  isActive={isActive(item.path)}
+                                  tooltip={item.title}
+                                  className="justify-between"
+                                >
+                                  <div className="flex items-center gap-2">
+                                    <span className="material-icons text-lg">
+                                      {item.icon}
+                                    </span>
+                                    <span>{item.title}</span>
+                                  </div>
+                                  {expandedSubMenus[item.title] ? (
+                                    <ChevronDown className="h-4 w-4" />
+                                  ) : (
+                                    <ChevronRight className="h-4 w-4" />
+                                  )}
+                                </SidebarMenuButton>
+                              </CollapsibleTrigger>
+                              <CollapsibleContent>
+                                <SidebarMenuSub>
+                                  <SidebarMenuSubItem>
+                                    <SidebarMenuSubButton
+                                      asChild
+                                      isActive={location === item.path}
+                                    >
+                                      <Link href={item.path}>
+                                        <span className="text-xs">Overview</span>
+                                      </Link>
+                                    </SidebarMenuSubButton>
+                                  </SidebarMenuSubItem>
+                                  {item.subItems.map((subItem) => (
+                                    <SidebarMenuSubItem key={subItem.path}>
+                                      <SidebarMenuSubButton
+                                        asChild
+                                        isActive={location === subItem.path}
+                                      >
+                                        <Link href={subItem.path}>
+                                          <span className="text-xs">{subItem.title}</span>
+                                        </Link>
+                                      </SidebarMenuSubButton>
+                                    </SidebarMenuSubItem>
+                                  ))}
+                                </SidebarMenuSub>
+                              </CollapsibleContent>
+                            </Collapsible>
+                          ) : (
+                            <SidebarMenuButton
+                              asChild
+                              isActive={isActive(item.path, item.exact)}
+                              tooltip={item.title}
+                            >
+                              <Link href={item.path}>
+                                <span className="material-icons text-lg">
+                                  {item.icon}
+                                </span>
+                                <span>{item.title}</span>
+                              </Link>
+                            </SidebarMenuButton>
+                          )}
                         </SidebarMenuItem>
                       ))}
                     </SidebarMenu>

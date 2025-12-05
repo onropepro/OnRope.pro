@@ -42,7 +42,8 @@ import {
   History,
   Languages,
   TrendingUp,
-  Activity
+  Activity,
+  Code
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -846,6 +847,15 @@ export default function Changelog() {
                   <div>
                     <div className="text-2xl font-bold">{servicesData.length}</div>
                     <div className="text-sm text-muted-foreground">Service Types</div>
+                  </div>
+                </div>
+                <div className="flex items-center gap-3">
+                  <div className="p-2 bg-pink-500/10 rounded-lg">
+                    <Code className="h-5 w-5 text-pink-600 dark:text-pink-400" />
+                  </div>
+                  <div>
+                    <div className="text-2xl font-bold">78,450</div>
+                    <div className="text-sm text-muted-foreground">Lines of Code</div>
                   </div>
                 </div>
               </div>
