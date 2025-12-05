@@ -3,7 +3,7 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { db } from "./db";
 import { wsHub } from "./websocket-hub";
-import { insertUserSchema, insertClientSchema, insertProjectSchema, insertDropLogSchema, insertComplaintSchema, insertComplaintNoteSchema, insertJobCommentSchema, insertHarnessInspectionSchema, insertToolboxMeetingSchema, insertFlhaFormSchema, insertIncidentReportSchema, insertMethodStatementSchema, insertPayPeriodConfigSchema, insertQuoteSchema, insertQuoteServiceSchema, insertGearItemSchema, insertGearAssignmentSchema, insertGearSerialNumberSchema, insertEquipmentDamageReportSchema, insertScheduledJobSchema, insertJobAssignmentSchema, updatePropertyManagerAccountSchema, insertFeatureRequestSchema, insertFeatureRequestMessageSchema, normalizeStrataPlan, type InsertGearItem, type InsertGearAssignment, type InsertGearSerialNumber, type Project, gearAssignments, gearSerialNumbers, gearItems, jobAssignments, workSessions, nonBillableWorkSessions, licenseKeys, users, propertyManagerCompanyLinks, IRATA_TASK_TYPES, quotes, quoteServices, quoteHistory, superuserTasks, superuserTaskComments } from "@shared/schema";
+import { insertUserSchema, insertClientSchema, insertProjectSchema, insertDropLogSchema, insertComplaintSchema, insertComplaintNoteSchema, insertJobCommentSchema, insertHarnessInspectionSchema, insertToolboxMeetingSchema, insertFlhaFormSchema, insertIncidentReportSchema, insertMethodStatementSchema, insertPayPeriodConfigSchema, insertQuoteSchema, insertQuoteServiceSchema, insertGearItemSchema, insertGearAssignmentSchema, insertGearSerialNumberSchema, insertEquipmentDamageReportSchema, insertScheduledJobSchema, insertJobAssignmentSchema, updatePropertyManagerAccountSchema, insertFeatureRequestSchema, insertFeatureRequestMessageSchema, normalizeStrataPlan, type InsertGearItem, type InsertGearAssignment, type InsertGearSerialNumber, type Project, gearAssignments, gearSerialNumbers, gearItems, jobAssignments, workSessions, nonBillableWorkSessions, licenseKeys, users, propertyManagerCompanyLinks, IRATA_TASK_TYPES, quotes, quoteServices, quoteHistory, superuserTasks, superuserTaskComments, superuserTaskAttachments } from "@shared/schema";
 import { eq, sql, and } from "drizzle-orm";
 import { z } from "zod";
 import bcrypt from "bcrypt";
@@ -3506,6 +3506,186 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error('[SuperUser] Delete comment error:', error);
       res.status(500).json({ message: "Failed to delete comment" });
+    }
+  });
+
+  // ==================== TASK ATTACHMENTS ====================
+  
+  // Multer config for task attachments (supports various file types)
+  const taskAttachmentUpload = multer({
+    storage: multer.memoryStorage(),
+    limits: { fileSize: 25 * 1024 * 1024 }, // 25MB max
+    fileFilter: (req, file, cb) => {
+      // Allow common document and file types
+      const allowedTypes = [
+        'text/markdown',
+        'text/plain',
+        'text/csv',
+        'application/pdf',
+        'application/json',
+        'application/xml',
+        'application/msword',
+        'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+        'application/vnd.ms-excel',
+        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        'image/png',
+        'image/jpeg',
+        'image/gif',
+        'image/webp',
+      ];
+      // Also allow .md files which may come as application/octet-stream
+      if (allowedTypes.includes(file.mimetype) || 
+          file.originalname.endsWith('.md') ||
+          file.originalname.endsWith('.txt')) {
+        cb(null, true);
+      } else {
+        cb(new Error('File type not allowed. Supported: .md, .txt, .pdf, .doc, .docx, .xls, .xlsx, .json, .csv, images'));
+      }
+    }
+  });
+
+  // Get attachments for a task
+  app.get("/api/superuser/tasks/:id/attachments", requireAuth, async (req: Request, res: Response) => {
+    try {
+      if (req.session.userId !== 'superuser') {
+        return res.status(403).json({ message: "Access denied. SuperUser only." });
+      }
+
+      const { id } = req.params;
+      const attachments = await db.query.superuserTaskAttachments.findMany({
+        where: eq(superuserTaskAttachments.taskId, id),
+        orderBy: (attachments, { desc }) => [desc(attachments.createdAt)],
+      });
+
+      res.json({ attachments });
+    } catch (error) {
+      console.error('[SuperUser] Get attachments error:', error);
+      res.status(500).json({ message: "Failed to get attachments" });
+    }
+  });
+
+  // Upload attachment to a task
+  app.post("/api/superuser/tasks/:id/attachments", requireAuth, taskAttachmentUpload.single('file'), async (req: Request, res: Response) => {
+    try {
+      if (req.session.userId !== 'superuser') {
+        return res.status(403).json({ message: "Access denied. SuperUser only." });
+      }
+
+      const { id } = req.params;
+      const { uploaderName } = req.body;
+
+      if (!req.file) {
+        return res.status(400).json({ message: "No file uploaded" });
+      }
+
+      if (!uploaderName) {
+        return res.status(400).json({ message: "Uploader name is required" });
+      }
+
+      // Verify task exists
+      const task = await db.query.superuserTasks.findFirst({
+        where: eq(superuserTasks.id, id),
+      });
+
+      if (!task) {
+        return res.status(404).json({ message: "Task not found" });
+      }
+
+      // Generate unique filename
+      const timestamp = Date.now();
+      const safeOriginalName = req.file.originalname.replace(/[^a-zA-Z0-9._-]/g, '_');
+      const fileName = `task-${id}-${timestamp}-${safeOriginalName}`;
+
+      // Upload to object storage
+      const objectStorageService = new ObjectStorageService();
+      const storagePath = await objectStorageService.uploadPrivateFile(
+        fileName,
+        req.file.buffer,
+        req.file.mimetype
+      );
+
+      // Save attachment record to database
+      const [attachment] = await db.insert(superuserTaskAttachments).values({
+        taskId: id,
+        fileName,
+        originalName: req.file.originalname,
+        fileSize: req.file.size,
+        contentType: req.file.mimetype,
+        storagePath,
+        uploadedBy: uploaderName,
+      }).returning();
+
+      res.json({ attachment });
+    } catch (error) {
+      console.error('[SuperUser] Upload attachment error:', error);
+      res.status(500).json({ message: "Failed to upload attachment" });
+    }
+  });
+
+  // Download attachment
+  app.get("/api/superuser/tasks/:taskId/attachments/:attachmentId/download", requireAuth, async (req: Request, res: Response) => {
+    try {
+      if (req.session.userId !== 'superuser') {
+        return res.status(403).json({ message: "Access denied. SuperUser only." });
+      }
+
+      const { attachmentId } = req.params;
+
+      // Get attachment record
+      const attachment = await db.query.superuserTaskAttachments.findFirst({
+        where: eq(superuserTaskAttachments.id, attachmentId),
+      });
+
+      if (!attachment) {
+        return res.status(404).json({ message: "Attachment not found" });
+      }
+
+      // Get file from object storage
+      const objectStorageService = new ObjectStorageService();
+      const file = await objectStorageService.getPrivateFile(attachment.fileName);
+
+      if (!file) {
+        return res.status(404).json({ message: "File not found in storage" });
+      }
+
+      // Set headers for download
+      res.set({
+        'Content-Disposition': `attachment; filename="${attachment.originalName}"`,
+        'Content-Type': attachment.contentType,
+      });
+
+      await objectStorageService.downloadObject(file, res);
+    } catch (error) {
+      console.error('[SuperUser] Download attachment error:', error);
+      res.status(500).json({ message: "Failed to download attachment" });
+    }
+  });
+
+  // Delete attachment
+  app.delete("/api/superuser/tasks/:taskId/attachments/:attachmentId", requireAuth, async (req: Request, res: Response) => {
+    try {
+      if (req.session.userId !== 'superuser') {
+        return res.status(403).json({ message: "Access denied. SuperUser only." });
+      }
+
+      const { attachmentId } = req.params;
+
+      // Get attachment to find file name
+      const attachment = await db.query.superuserTaskAttachments.findFirst({
+        where: eq(superuserTaskAttachments.id, attachmentId),
+      });
+
+      if (!attachment) {
+        return res.status(404).json({ message: "Attachment not found" });
+      }
+
+      // Delete from database (file can stay in storage - orphaned files can be cleaned up later)
+      await db.delete(superuserTaskAttachments).where(eq(superuserTaskAttachments.id, attachmentId));
+
+      res.json({ message: "Attachment deleted" });
+    } catch (error) {
+      console.error('[SuperUser] Delete attachment error:', error);
+      res.status(500).json({ message: "Failed to delete attachment" });
     }
   });
 
