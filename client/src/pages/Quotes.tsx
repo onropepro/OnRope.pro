@@ -3,7 +3,7 @@ import { useQuery, useMutation } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { Link } from "wouter";
+import { Link, useLocation } from "wouter";
 import { useTranslation } from "react-i18next";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { BackButton } from "@/components/BackButton";
@@ -54,7 +54,8 @@ import {
   ChevronRight,
   FileText,
   ArrowRightLeft,
-  Users
+  Users,
+  FolderPlus
 } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -313,6 +314,7 @@ type ServiceFormData = z.infer<typeof serviceFormSchema>;
 export default function Quotes() {
   const { t } = useTranslation();
   const { toast } = useToast();
+  const [, setLocation] = useLocation();
   
   // View states
   const [view, setView] = useState<"list" | "create" | "detail">("list");
@@ -787,6 +789,69 @@ export default function Quotes() {
     setCreateStep("services");
     buildingForm.reset();
     serviceForm.reset();
+  };
+
+  // Handle converting a won quote to a project
+  const handleConvertToProject = (quote: QuoteWithServices) => {
+    // Find the primary service type from the quote's services
+    const primaryService = quote.services[0];
+    let jobType = "window_cleaning";
+    let customJobType = "";
+    
+    // Map quote service types to project job types
+    if (primaryService) {
+      const serviceTypeMap: Record<string, string> = {
+        "window_cleaning": "window_cleaning",
+        "dryer_vent_cleaning": "dryer_vent_cleaning", 
+        "building_wash": "building_wash",
+        "general_pressure_washing": "general_pressure_washing",
+        "gutter_cleaning": "gutter_cleaning",
+        "in_suite": "in_suite_dryer_vent_cleaning",
+        "parkade": "parkade_pressure_cleaning",
+        "ground_windows": "ground_window_cleaning",
+        "painting": "painting",
+        "custom": "other"
+      };
+      
+      jobType = serviceTypeMap[primaryService.serviceType] || "other";
+      if (jobType === "other" && primaryService.customServiceName) {
+        customJobType = primaryService.customServiceName;
+      }
+    }
+    
+    // Get elevation drops from the primary service if available
+    const dropsNorth = primaryService?.dropsNorth?.toString() || "";
+    const dropsEast = primaryService?.dropsEast?.toString() || "";
+    const dropsSouth = primaryService?.dropsSouth?.toString() || "";
+    const dropsWest = primaryService?.dropsWest?.toString() || "";
+    const dropsPerDay = primaryService?.dropsPerDay?.toString() || "";
+    
+    // Store quote data in sessionStorage for the project form to use
+    const projectData = {
+      strataPlanNumber: quote.strataPlanNumber || "",
+      buildingName: quote.buildingName || "",
+      buildingAddress: quote.buildingAddress || "",
+      floorCount: quote.floorCount?.toString() || "",
+      jobType,
+      customJobType,
+      totalDropsNorth: dropsNorth,
+      totalDropsEast: dropsEast,
+      totalDropsSouth: dropsSouth,
+      totalDropsWest: dropsWest,
+      dailyDropTarget: dropsPerDay,
+      quoteId: quote.id,
+      quoteNumber: quote.quoteNumber || "",
+    };
+    
+    sessionStorage.setItem('quoteToProject', JSON.stringify(projectData));
+    
+    toast({
+      title: t('quotes.convertToProject.navigating', 'Opening Project Form'),
+      description: t('quotes.convertToProject.prefilled', 'Building details will be prefilled from the quote'),
+    });
+    
+    // Navigate to dashboard with projects tab and trigger create
+    setLocation("/?tab=projects&action=create&fromQuote=true");
   };
 
   const handleBuildingInfoSubmit = (data: BuildingInfoFormData) => {
@@ -1665,6 +1730,17 @@ export default function Quotes() {
                         data-testid="button-submit-quote"
                       >
                         Submit Quote
+                      </Button>
+                    )}
+                    {/* Convert to Project button - only show for won quotes */}
+                    {(selectedQuote as any).pipelineStage === "won" && canEditQuotes && (
+                      <Button
+                        onClick={() => handleConvertToProject(selectedQuote)}
+                        className="bg-emerald-600 hover:bg-emerald-700 text-white"
+                        data-testid="button-convert-to-project"
+                      >
+                        <FolderPlus className="w-4 h-4 mr-2" />
+                        {t('quotes.convertToProject.button', 'Convert to Project')}
                       </Button>
                     )}
                   </div>
