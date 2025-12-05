@@ -1217,13 +1217,13 @@ export default function ResidentDashboard() {
           <TabsContent value="history" className="mt-6">
             <div className="bg-card/60 backdrop-blur-sm rounded-2xl border border-border/50 shadow-xl p-6 sm:p-8">
               <div className="mb-6">
-                <h2 className="text-2xl font-bold mb-2">My Complaint History</h2>
+                <h2 className="text-2xl font-bold mb-2">My Feedback History</h2>
                 <p className="text-muted-foreground">View the status of your submitted feedback</p>
               </div>
                 {!complaintsData?.complaints || complaintsData.complaints.length === 0 ? (
                   <div className="text-center py-8">
                     <span className="material-icons text-6xl text-muted-foreground mb-3">feedback</span>
-                    <p className="text-muted-foreground">No complaints submitted yet</p>
+                    <p className="text-muted-foreground">No feedback submitted yet</p>
                   </div>
                 ) : (
                   <div className="space-y-4">
