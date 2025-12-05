@@ -364,7 +364,7 @@ export default function SuperUserLayout({ children, title }: SuperUserLayoutProp
 
   return (
     <SidebarProvider style={sidebarStyle as React.CSSProperties}>
-      <div className="flex h-screen w-full" style={{ fontFamily: "'Outfit', sans-serif", fontSize: '14px' }}>
+      <div className="flex h-screen w-full superuser-root">
         <Sidebar collapsible="icon">
           <SidebarContents />
         </Sidebar>

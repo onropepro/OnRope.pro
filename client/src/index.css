@@ -521,3 +521,30 @@
     background-clip: text;
   }
 }
+
+/* SuperUser Section - Outfit font with 14px minimum */
+.superuser-root {
+  font-family: 'Outfit', sans-serif;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.superuser-root * {
+  font-family: 'Outfit', sans-serif;
+}
+
+.superuser-root .text-xs,
+.superuser-root .text-\[10px\],
+.superuser-root .text-\[11px\],
+.superuser-root .text-\[12px\],
+.superuser-root .text-\[13px\] {
+  font-size: 14px !important;
+}
+
+.superuser-root small {
+  font-size: 14px;
+}
+
+.superuser-root .text-sm {
+  font-size: 14px;
+}
