@@ -4,8 +4,8 @@ import { useTranslation } from "react-i18next";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { BackButton } from "@/components/BackButton";
 import { formatTimestampDate, formatTime } from "@/lib/dateUtils";
+import SuperUserLayout from "@/components/SuperUserLayout";
 
 export default function AllCompanies() {
   const { t } = useTranslation();
@@ -28,18 +28,16 @@ export default function AllCompanies() {
   const companies = companiesData?.companies || [];
 
   return (
-    <div className="min-h-screen page-gradient p-6">
-      <div className="max-w-7xl mx-auto space-y-6">
-        {/* Header */}
-        <div className="flex items-center justify-between">
+    <SuperUserLayout title="All Companies">
+      <div className="p-6">
+        <div className="max-w-7xl mx-auto space-y-6">
+          {/* Header */}
           <div>
-            <h1 className="text-4xl font-bold gradient-text">All Registered Companies</h1>
+            <h1 className="text-3xl font-bold">All Registered Companies</h1>
             <p className="text-muted-foreground mt-2">
               View and manage all companies registered on the platform
             </p>
           </div>
-          <BackButton to="/superuser" label={t('common.back', 'Back')} />
-        </div>
 
         {/* Companies List */}
         <div className="space-y-4">
@@ -145,7 +143,8 @@ export default function AllCompanies() {
             ))
           )}
         </div>
+        </div>
       </div>
-    </div>
+    </SuperUserLayout>
   );
 }

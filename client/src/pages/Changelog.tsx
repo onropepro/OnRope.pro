@@ -4,6 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { BackButton } from "@/components/BackButton";
 import { MainMenuButton } from "@/components/MainMenuButton";
+import ChangelogLayout from "@/components/ChangelogLayout";
 import { 
   Shield, 
   Users, 
@@ -793,12 +794,13 @@ export default function Changelog() {
   const totalFeatures = changelogData.reduce((acc, section) => acc + section.features.length, 0);
 
   return (
-    <div className="min-h-screen bg-background p-4 pb-24">
-      <div className="max-w-4xl mx-auto">
-        <div className="mb-8">
-          <div className="flex items-center gap-3 mb-4">
-            <BackButton size="icon" />
-            <MainMenuButton size="icon" />
+    <ChangelogLayout title="Changelog">
+      <div className="min-h-screen bg-background p-4 pb-24">
+        <div className="max-w-4xl mx-auto">
+          <div className="mb-8">
+            <div className="flex items-center gap-3 mb-4">
+              <BackButton size="icon" />
+              <MainMenuButton size="icon" />
             <div className="flex-1">
               <h1 className="text-2xl sm:text-3xl font-bold">Platform Changelog</h1>
               <p className="text-sm text-muted-foreground mt-1">
@@ -1234,7 +1236,8 @@ export default function Changelog() {
             </div>
           </CardContent>
         </Card>
+        </div>
       </div>
-    </div>
+    </ChangelogLayout>
   );
 }

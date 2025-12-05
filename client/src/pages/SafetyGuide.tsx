@@ -4,6 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { BackButton } from "@/components/BackButton";
 import { MainMenuButton } from "@/components/MainMenuButton";
+import ChangelogLayout from "@/components/ChangelogLayout";
 import {
   Shield,
   CheckCircle2,
@@ -39,9 +40,10 @@ export default function SafetyGuide() {
   const [, navigate] = useLocation();
 
   return (
-    <div className="min-h-screen bg-background pb-20">
-      {/* Header */}
-      <header className="sticky top-0 z-50 bg-card border-b shadow-sm">
+    <ChangelogLayout title="Safety Guide">
+      <div className="min-h-screen bg-background pb-20">
+        {/* Header */}
+        <header className="sticky top-0 z-50 bg-card border-b shadow-sm">
         <div className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <BackButton to="/changelog" />
@@ -1139,6 +1141,7 @@ export default function SafetyGuide() {
           </CardContent>
         </Card>
       </main>
-    </div>
+      </div>
+    </ChangelogLayout>
   );
 }

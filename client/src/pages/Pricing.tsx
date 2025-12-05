@@ -7,6 +7,7 @@ import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
 import { Check, ArrowRight } from "lucide-react";
 import { trackPricingPageView } from "@/lib/analytics";
+import ChangelogLayout from "@/components/ChangelogLayout";
 
 export default function Pricing() {
   // Track pricing page view on mount
@@ -115,8 +116,9 @@ export default function Pricing() {
   ];
 
   return (
-    <div className="min-h-screen bg-background">
-      <header className="sticky top-0 z-50 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+    <ChangelogLayout title="Pricing">
+      <div className="min-h-screen bg-background">
+        <header className="sticky top-0 z-50 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
         <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
           <div className="flex items-center gap-4">
             <BackButton to="/changelog" />
@@ -311,6 +313,7 @@ export default function Pricing() {
           </CardContent>
         </Card>
       </main>
-    </div>
+      </div>
+    </ChangelogLayout>
   );
 }

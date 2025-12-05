@@ -4,6 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { BackButton } from "@/components/BackButton";
 import { MainMenuButton } from "@/components/MainMenuButton";
+import ChangelogLayout from "@/components/ChangelogLayout";
 import {
   Building2,
   FolderOpen,
@@ -40,8 +41,9 @@ export default function ProjectsGuide() {
   const [, navigate] = useLocation();
 
   return (
-    <div className="min-h-screen bg-background pb-20">
-      <header className="sticky top-0 z-50 bg-card border-b shadow-sm">
+    <ChangelogLayout title="Projects Guide">
+      <div className="min-h-screen bg-background pb-20">
+        <header className="sticky top-0 z-50 bg-card border-b shadow-sm">
         <div className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <BackButton to="/changelog" />
@@ -701,6 +703,7 @@ export default function ProjectsGuide() {
           </Button>
         </div>
       </main>
-    </div>
+      </div>
+    </ChangelogLayout>
   );
 }
