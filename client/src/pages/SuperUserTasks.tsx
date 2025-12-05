@@ -16,6 +16,7 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { useToast } from "@/hooks/use-toast";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { formatLocalDate } from "@/lib/dateUtils";
+import SuperUserLayout from "@/components/SuperUserLayout";
 import { 
   ArrowLeft, 
   Plus, 
@@ -230,24 +231,11 @@ export default function SuperUserTasks() {
   };
 
   return (
-    <div className="min-h-screen bg-background">
-      <header className="sticky top-0 z-50 bg-card border-b">
-        <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between gap-4">
-          <div className="flex items-center gap-3">
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => setLocation("/superuser")}
-              data-testid="button-back"
-            >
-              <ArrowLeft className="h-5 w-5" />
-            </Button>
-            <div>
-              <h1 className="text-xl font-bold" style={{ fontFamily: "Outfit, sans-serif" }}>Task List</h1>
-              <p className="text-xs text-muted-foreground">Internal project management</p>
-            </div>
-          </div>
-          <div className="flex items-center gap-3">
+    <SuperUserLayout title="Task List">
+      <div className="p-4 md:p-6">
+        <div className="max-w-7xl mx-auto space-y-6">
+          {/* Action Bar */}
+          <div className="flex flex-wrap items-center justify-between gap-4">
             <div className="flex items-center gap-2">
               <span className="text-sm text-muted-foreground">Working as:</span>
               <Select value={currentUser} onValueChange={setCurrentUser}>
@@ -271,10 +259,8 @@ export default function SuperUserTasks() {
               Add New Task
             </Button>
           </div>
-        </div>
-      </header>
-
-      <main className="max-w-7xl mx-auto px-4 py-6">
+          
+          {/* Filters */}
         <Card className="mb-6">
           <CardContent className="p-4">
             <div className="flex flex-wrap items-center justify-between gap-4">
@@ -425,7 +411,6 @@ export default function SuperUserTasks() {
             ))}
           </div>
         )}
-      </main>
 
       <Dialog open={addTaskOpen} onOpenChange={setAddTaskOpen}>
         <DialogContent className="sm:max-w-lg">
@@ -723,6 +708,8 @@ export default function SuperUserTasks() {
           )}
         </SheetContent>
       </Sheet>
-    </div>
+        </div>
+      </div>
+    </SuperUserLayout>
   );
 }

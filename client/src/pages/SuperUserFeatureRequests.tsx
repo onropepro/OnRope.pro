@@ -7,6 +7,7 @@ import { useQuery, useMutation } from "@tanstack/react-query";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { format } from "date-fns";
+import SuperUserLayout from "@/components/SuperUserLayout";
 
 const FEATURE_CATEGORIES = [
   { value: 'feature', label: 'New Feature' },
@@ -122,32 +123,34 @@ export default function SuperUserFeatureRequests() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen page-gradient p-6">
-        <div className="max-w-5xl mx-auto">
-          <div className="flex items-center justify-center h-64">
-            <span className="material-icons animate-spin text-4xl text-muted-foreground">autorenew</span>
+      <SuperUserLayout title="Feature Requests">
+        <div className="p-6">
+          <div className="max-w-5xl mx-auto">
+            <div className="flex items-center justify-center h-64">
+              <span className="material-icons animate-spin text-4xl text-muted-foreground">autorenew</span>
+            </div>
           </div>
         </div>
-      </div>
+      </SuperUserLayout>
     );
   }
 
   if (selectedRequest) {
     const currentRequest = requests.find(r => r.id === selectedRequest.id) || selectedRequest;
     return (
-      <div className="min-h-screen page-gradient p-6">
-        <div className="max-w-3xl mx-auto space-y-6">
-          <div className="flex items-center gap-4">
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => setSelectedRequest(null)}
-              data-testid="button-back-to-list"
-            >
-              <span className="material-icons">arrow_back</span>
-            </Button>
-            <h1 className="text-2xl font-bold">{currentRequest.title}</h1>
-          </div>
+      <SuperUserLayout title={currentRequest.title}>
+        <div className="p-4 md:p-6">
+          <div className="max-w-3xl mx-auto space-y-6">
+            <div className="flex items-center gap-4">
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setSelectedRequest(null)}
+                data-testid="button-back-to-list"
+              >
+                <span className="material-icons">arrow_back</span>
+              </Button>
+            </div>
 
           <Card>
             <CardHeader>
@@ -247,28 +250,17 @@ export default function SuperUserFeatureRequests() {
               </div>
             </CardContent>
           </Card>
+          </div>
         </div>
-      </div>
+      </SuperUserLayout>
     );
   }
 
   return (
-    <div className="min-h-screen page-gradient p-6">
-      <div className="max-w-5xl mx-auto space-y-6">
-        <div className="flex items-center gap-4">
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => setLocation('/superuser')}
-            data-testid="button-back-to-dashboard"
-          >
-            <span className="material-icons">arrow_back</span>
-          </Button>
-          <div>
-            <h1 className="text-3xl font-bold">Feature Requests</h1>
-            <p className="text-muted-foreground">Review and respond to company feedback</p>
-          </div>
-        </div>
+    <SuperUserLayout title="Feature Requests">
+      <div className="p-4 md:p-6">
+        <div className="max-w-5xl mx-auto space-y-6">
+          <p className="text-muted-foreground">Review and respond to company feedback</p>
 
         <Card>
           <CardHeader>
@@ -346,7 +338,8 @@ export default function SuperUserFeatureRequests() {
             )}
           </CardContent>
         </Card>
+        </div>
       </div>
-    </div>
+    </SuperUserLayout>
   );
 }

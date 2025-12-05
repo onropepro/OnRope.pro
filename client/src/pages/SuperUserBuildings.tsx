@@ -11,6 +11,7 @@ import { useToast } from "@/hooks/use-toast";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { formatLocalDate } from "@/lib/dateUtils";
 import { Loader2, Building2, ArrowLeft, Search, History, CheckCircle, RefreshCw, Key, Layers, MapPin, Compass } from "lucide-react";
+import SuperUserLayout from "@/components/SuperUserLayout";
 
 interface BuildingData {
   id: string;
@@ -151,32 +152,30 @@ export default function SuperUserBuildings() {
 
   if (selectedBuilding) {
     return (
-      <div className="min-h-screen page-gradient p-4 md:p-6">
-        <div className="max-w-4xl mx-auto space-y-6">
-          <div className="flex items-center gap-4">
-            <Button 
-              variant="outline" 
-              size="icon"
-              onClick={() => setSelectedBuilding(null)}
-              data-testid="button-back"
-            >
-              <ArrowLeft className="h-4 w-4" />
-            </Button>
-            <div className="flex-1">
-              <h1 className="text-2xl font-bold">
-                {selectedBuilding.buildingName || `Building ${selectedBuilding.strataPlanNumber}`}
-              </h1>
-              <p className="text-muted-foreground">Strata: {selectedBuilding.strataPlanNumber}</p>
+      <SuperUserLayout title={selectedBuilding.buildingName || `Building ${selectedBuilding.strataPlanNumber}`}>
+        <div className="p-4 md:p-6">
+          <div className="max-w-4xl mx-auto space-y-6">
+            <div className="flex items-center gap-4">
+              <Button 
+                variant="outline" 
+                size="icon"
+                onClick={() => setSelectedBuilding(null)}
+                data-testid="button-back"
+              >
+                <ArrowLeft className="h-4 w-4" />
+              </Button>
+              <div className="flex-1">
+                <p className="text-muted-foreground">Strata: {selectedBuilding.strataPlanNumber}</p>
+              </div>
+              <Button
+                variant="outline"
+                onClick={() => setResetPasswordOpen(true)}
+                data-testid="button-reset-password"
+              >
+                <Key className="mr-2 h-4 w-4" />
+                Reset Password
+              </Button>
             </div>
-            <Button
-              variant="outline"
-              onClick={() => setResetPasswordOpen(true)}
-              data-testid="button-reset-password"
-            >
-              <Key className="mr-2 h-4 w-4" />
-              Reset Password
-            </Button>
-          </div>
 
           {isLoadingDetails ? (
             <div className="flex items-center justify-center py-12">
@@ -443,32 +442,21 @@ export default function SuperUserBuildings() {
               </DialogFooter>
             </DialogContent>
           </Dialog>
+          </div>
         </div>
-      </div>
+      </SuperUserLayout>
     );
   }
 
   return (
-    <div className="min-h-screen page-gradient p-4 md:p-6">
-      <div className="max-w-4xl mx-auto space-y-6">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div className="flex items-center gap-4">
-            <Button 
-              variant="outline" 
-              size="icon"
-              onClick={() => setLocation('/superuser')}
-              data-testid="button-back-to-dashboard"
-            >
-              <ArrowLeft className="h-4 w-4" />
-            </Button>
-            <div>
-              <h1 className="text-2xl font-bold">Global Buildings Database</h1>
-              <p className="text-muted-foreground">
-                {buildings.length} building(s) in database
-              </p>
-            </div>
+    <SuperUserLayout title="Global Buildings Database">
+      <div className="p-4 md:p-6">
+        <div className="max-w-4xl mx-auto space-y-6">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <p className="text-muted-foreground">
+              {buildings.length} building(s) in database
+            </p>
           </div>
-        </div>
 
         <div className="relative">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -552,7 +540,8 @@ export default function SuperUserBuildings() {
             ))}
           </div>
         )}
+        </div>
       </div>
-    </div>
+    </SuperUserLayout>
   );
 }

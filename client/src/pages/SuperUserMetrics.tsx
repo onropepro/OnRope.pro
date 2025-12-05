@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Progress } from "@/components/ui/progress";
 import { useTranslation } from "react-i18next";
-import { BackButton } from "@/components/BackButton";
+import SuperUserLayout from "@/components/SuperUserLayout";
 import {
   TrendingUp,
   TrendingDown,
@@ -174,24 +174,22 @@ export default function SuperUserMetrics() {
 
   if (error) {
     return (
-      <div className="min-h-screen page-gradient p-6">
-        <div className="max-w-7xl mx-auto">
-          <div className="flex items-center gap-4 mb-8">
-            <BackButton />
-            <h1 className="text-3xl font-bold">{t('superuser.metrics.title', 'Platform Metrics')}</h1>
+      <SuperUserLayout title={t('superuser.metrics.title', 'Platform Metrics')}>
+        <div className="p-6">
+          <div className="max-w-7xl mx-auto">
+            <Card className="p-8 text-center">
+              <p className="text-destructive">{t('superuser.metrics.error', 'Failed to load metrics. Please try again.')}</p>
+              <Button 
+                onClick={() => window.location.reload()} 
+                className="mt-4"
+                data-testid="button-retry"
+              >
+                {t('common.retry', 'Retry')}
+              </Button>
+            </Card>
           </div>
-          <Card className="p-8 text-center">
-            <p className="text-destructive">{t('superuser.metrics.error', 'Failed to load metrics. Please try again.')}</p>
-            <Button 
-              onClick={() => window.location.reload()} 
-              className="mt-4"
-              data-testid="button-retry"
-            >
-              {t('common.retry', 'Retry')}
-            </Button>
-          </Card>
         </div>
-      </div>
+      </SuperUserLayout>
     );
   }
 
@@ -210,30 +208,13 @@ export default function SuperUserMetrics() {
   };
 
   return (
-    <div className="min-h-screen page-gradient p-6">
-      <div className="max-w-7xl mx-auto space-y-8">
-        {/* Header */}
-        <div className="flex items-center justify-between flex-wrap gap-4">
-          <div className="flex items-center gap-4">
-            <BackButton />
-            <div>
-              <h1 className="text-3xl font-bold" data-testid="text-page-title">
-                {t('superuser.metrics.title', 'Platform Metrics')}
-              </h1>
-              <p className="text-muted-foreground">
-                {t('superuser.metrics.subtitle', 'Real-time business intelligence for OnRopePro')}
-              </p>
-            </div>
-          </div>
-          <Button
-            variant="outline"
-            onClick={() => setLocation('/superuser')}
-            data-testid="button-back-dashboard"
-          >
-            <span className="material-icons mr-2">arrow_back</span>
-            {t('superuser.metrics.backToDashboard', 'Back to Dashboard')}
-          </Button>
-        </div>
+    <SuperUserLayout title={t('superuser.metrics.title', 'Platform Metrics')}>
+      <div className="p-4 md:p-6">
+        <div className="max-w-7xl mx-auto space-y-8">
+          {/* Header Description */}
+          <p className="text-muted-foreground">
+            {t('superuser.metrics.subtitle', 'Real-time business intelligence for OnRopePro')}
+          </p>
 
         {/* Primary KPI Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -638,7 +619,8 @@ export default function SuperUserMetrics() {
             </CardContent>
           </Card>
         </div>
+        </div>
       </div>
-    </div>
+    </SuperUserLayout>
   );
 }
