@@ -554,12 +554,7 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
         <BrandingProvider>
-          <div className="fixed top-0 left-0 right-0 z-[9999] bg-red-600 text-white text-center py-0.5 text-[10px] font-medium leading-tight">
-            Free Beta Access - Subscription Service Coming Soon - Do Not Distribute
-          </div>
-          <div className="pt-4">
-            <Router />
-          </div>
+          <Router />
           <Toaster />
         </BrandingProvider>
       </TooltipProvider>
