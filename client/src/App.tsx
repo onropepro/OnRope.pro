@@ -53,7 +53,6 @@ import SafetyGuide from "@/pages/SafetyGuide";
 import UserAccessGuide from "@/pages/UserAccessGuide";
 import ProjectsGuide from "@/pages/ProjectsGuide";
 import AuthenticationGuide from "@/pages/AuthenticationGuide";
-import ProjectManagementGuide from "@/pages/ProjectManagementGuide";
 import TimeTrackingGuide from "@/pages/TimeTrackingGuide";
 import IRATALoggingGuide from "@/pages/IRATALoggingGuide";
 import DocumentManagementGuide from "@/pages/DocumentManagementGuide";
@@ -265,7 +264,7 @@ function Router() {
       </Route>
       <Route path="/changelog" component={Changelog} />
       <Route path="/changelog/authentication" component={AuthenticationGuide} />
-      <Route path="/changelog/project-management" component={ProjectManagementGuide} />
+      <Route path="/changelog/project-management" component={ProjectsGuide} />
       <Route path="/changelog/inventory" component={InventoryGuide} />
       <Route path="/changelog/safety" component={SafetyGuide} />
       <Route path="/changelog/user-access" component={UserAccessGuide} />

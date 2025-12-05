@@ -47,7 +47,11 @@ import {
   Eye,
   CalendarCheck,
   History,
-  MessageSquare
+  MessageSquare,
+  Sparkles,
+  ParkingCircle,
+  Wrench,
+  AppWindow
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -129,6 +133,151 @@ export default function ProjectsGuide() {
               </div>
             </div>
           </div>
+        </section>
+
+        <Separator />
+
+        {/* Job Types Visual Grid */}
+        <section className="space-y-4">
+          <h2 className="text-xl font-bold flex items-center gap-2" style={{ fontFamily: "Outfit, sans-serif" }}>
+            <Grid3X3 className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
+            Supported Job Types
+          </h2>
+          
+          <div className="grid md:grid-cols-3 gap-3">
+            <Card>
+              <CardContent className="pt-4">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-lg bg-blue-100 dark:bg-blue-900 flex items-center justify-center">
+                    <AppWindow className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+                  </div>
+                  <div>
+                    <p className="font-medium" style={{ fontFamily: "Outfit, sans-serif" }}>Window Cleaning</p>
+                    <p className="text-xs text-muted-foreground">Drop-based tracking</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardContent className="pt-4">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-lg bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
+                    <Wind className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+                  </div>
+                  <div>
+                    <p className="font-medium" style={{ fontFamily: "Outfit, sans-serif" }}>Dryer Vent Cleaning</p>
+                    <p className="text-xs text-muted-foreground">Drop-based tracking</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardContent className="pt-4">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-lg bg-amber-100 dark:bg-amber-900 flex items-center justify-center">
+                    <Building2 className="w-5 h-5 text-amber-600 dark:text-amber-400" />
+                  </div>
+                  <div>
+                    <p className="font-medium" style={{ fontFamily: "Outfit, sans-serif" }}>Building Wash</p>
+                    <p className="text-xs text-muted-foreground">Drop-based tracking</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardContent className="pt-4">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-lg bg-purple-100 dark:bg-purple-900 flex items-center justify-center">
+                    <ParkingCircle className="w-5 h-5 text-purple-600 dark:text-purple-400" />
+                  </div>
+                  <div>
+                    <p className="font-medium" style={{ fontFamily: "Outfit, sans-serif" }}>Parkade Cleaning</p>
+                    <p className="text-xs text-muted-foreground">Stall-based tracking</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardContent className="pt-4">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-lg bg-green-100 dark:bg-green-900 flex items-center justify-center">
+                    <Search className="w-5 h-5 text-green-600 dark:text-green-400" />
+                  </div>
+                  <div>
+                    <p className="font-medium" style={{ fontFamily: "Outfit, sans-serif" }}>Inspection</p>
+                    <p className="text-xs text-muted-foreground">Hours-based tracking</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardContent className="pt-4">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-lg bg-red-100 dark:bg-red-900 flex items-center justify-center">
+                    <Wrench className="w-5 h-5 text-red-600 dark:text-red-400" />
+                  </div>
+                  <div>
+                    <p className="font-medium" style={{ fontFamily: "Outfit, sans-serif" }}>Repairs</p>
+                    <p className="text-xs text-muted-foreground">Hours-based tracking</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          <Card className="border-dashed">
+            <CardContent className="pt-4">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-lg border-2 border-dashed flex items-center justify-center">
+                  <Sparkles className="w-5 h-5 text-muted-foreground" />
+                </div>
+                <div>
+                  <p className="font-medium" style={{ fontFamily: "Outfit, sans-serif" }}>Custom Job Types</p>
+                  <p className="text-xs text-muted-foreground">Create and save custom job types with icons for reuse across projects</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </section>
+
+        <Separator />
+
+        {/* Directional Drop Tracking Visual */}
+        <section className="space-y-4">
+          <h2 className="text-xl font-bold flex items-center gap-2" style={{ fontFamily: "Outfit, sans-serif" }}>
+            <Compass className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
+            Directional Drop Tracking
+          </h2>
+          
+          <Card className="border-2 border-emerald-500 bg-emerald-50 dark:bg-emerald-950">
+            <CardContent className="pt-6 text-emerald-900 dark:text-emerald-100">
+              <p className="mb-4" style={{ fontFamily: "Outfit, sans-serif" }}>Track progress on each side of a building independently:</p>
+              <div className="grid grid-cols-4 gap-3 text-center">
+                <div className="bg-white dark:bg-emerald-900 rounded-lg p-3">
+                  <Compass className="w-6 h-6 mx-auto mb-1 text-emerald-600" />
+                  <p className="font-bold text-sm">North</p>
+                </div>
+                <div className="bg-white dark:bg-emerald-900 rounded-lg p-3">
+                  <Compass className="w-6 h-6 mx-auto mb-1 text-emerald-600 rotate-90" />
+                  <p className="font-bold text-sm">East</p>
+                </div>
+                <div className="bg-white dark:bg-emerald-900 rounded-lg p-3">
+                  <Compass className="w-6 h-6 mx-auto mb-1 text-emerald-600 rotate-180" />
+                  <p className="font-bold text-sm">South</p>
+                </div>
+                <div className="bg-white dark:bg-emerald-900 rounded-lg p-3">
+                  <Compass className="w-6 h-6 mx-auto mb-1 text-emerald-600 -rotate-90" />
+                  <p className="font-bold text-sm">West</p>
+                </div>
+              </div>
+              <p className="text-sm mt-4" style={{ fontFamily: "Outfit, sans-serif" }}>Each direction tracks its own drop count, completion status, and assigned crew members. This allows precise scheduling when different elevations have different access requirements or completion timelines.</p>
+            </CardContent>
+          </Card>
         </section>
 
         <Separator />
