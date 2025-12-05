@@ -3128,7 +3128,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const buildingProjects = await storage.getProjectsForBuilding(building.strataPlanNumber);
       
       // Get unique companies that have worked on this building
-      const companyIds = [...new Set(buildingProjects.map(p => p.companyId))];
+      const companyIds = Array.from(new Set(buildingProjects.map(p => p.companyId)));
       const companies = await Promise.all(
         companyIds.map(async (id) => {
           const company = await storage.getUserById(id);
@@ -3224,6 +3224,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
       req.session.role = 'building';
       req.session.buildingId = building.id;
       req.session.strataPlanNumber = building.strataPlanNumber;
+
+      // Save session before responding (critical for production)
+      await new Promise<void>((resolve, reject) => {
+        req.session.save((err) => {
+          if (err) reject(err);
+          else resolve();
+        });
+      });
 
       const { passwordHash, ...buildingData } = building;
       
