@@ -327,7 +327,7 @@ export default function Login() {
               {t('login.painPoints.underbidding', "They're underbidding 25% of jobs because they're guessing.")}
             </p>
             <p>
-              {t('login.painPoints.complaints', "They're juggling resident complaints between memory, emails, texts, phone calls, notes in a glovebox.")}
+              {t('login.painPoints.feedback', "They're juggling resident feedback between memory, emails, texts, phone calls, notes in a glovebox.")}
             </p>
             <p>
               {t('login.painPoints.lawsuit', "They're one accident away from a lawsuit they can't defend because their safety documentation is (maybe) under the driver's front seat.")}

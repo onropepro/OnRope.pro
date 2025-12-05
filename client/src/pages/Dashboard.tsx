@@ -1992,7 +1992,7 @@ export default function Dashboard() {
       description: t('dashboard.cards.feedback.description', 'Resident feedback'),
       icon: "feedback",
       onClick: () => handleTabChange("complaints"),
-      testId: "button-nav-complaints",
+      testId: "button-nav-feedback",
       isVisible: () => true, // Everyone
       borderColor: "#ec4899",
       category: "communication",
@@ -3731,7 +3731,7 @@ export default function Dashboard() {
                                       key={complaint.id} 
                                       className="hover-elevate cursor-pointer"
                                       onClick={() => setLocation(`/complaints/${complaint.id}`)}
-                                      data-testid={`complaint-card-${complaint.id}`}
+                                      data-testid={`feedback-card-${complaint.id}`}
                                     >
                                       <CardContent className="p-4">
                                         <div className="flex items-start justify-between gap-3">

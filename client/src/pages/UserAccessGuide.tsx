@@ -310,7 +310,7 @@ export default function UserAccessGuide() {
 
               <AccordionItem value="bm-3" className="border rounded-lg px-4">
                 <AccordionTrigger className="hover:no-underline py-4">
-                  <span className="text-left font-medium" style={{ fontFamily: "Outfit, sans-serif", fontSize: "18px" }}>Complaints escalating to building managers instead of vendors</span>
+                  <span className="text-left font-medium" style={{ fontFamily: "Outfit, sans-serif", fontSize: "18px" }}>Feedback escalating to building managers instead of vendors</span>
                 </AccordionTrigger>
                 <AccordionContent className="pb-4">
                   <div className="space-y-4 text-muted-foreground leading-relaxed" style={{ fontFamily: "Outfit, sans-serif", fontSize: "16px" }}>
@@ -362,7 +362,7 @@ export default function UserAccessGuide() {
 
               <AccordionItem value="res-2" className="border rounded-lg px-4">
                 <AccordionTrigger className="hover:no-underline py-4">
-                  <span className="text-left font-medium" style={{ fontFamily: "Outfit, sans-serif", fontSize: "18px" }}>No record of complaint resolution</span>
+                  <span className="text-left font-medium" style={{ fontFamily: "Outfit, sans-serif", fontSize: "18px" }}>No record of feedback resolution</span>
                 </AccordionTrigger>
                 <AccordionContent className="pb-4">
                   <div className="space-y-4 text-muted-foreground leading-relaxed" style={{ fontFamily: "Outfit, sans-serif", fontSize: "16px" }}>
@@ -404,7 +404,7 @@ export default function UserAccessGuide() {
                 </AccordionTrigger>
                 <AccordionContent className="pb-4">
                   <div className="space-y-4 text-muted-foreground leading-relaxed" style={{ fontFamily: "Outfit, sans-serif", fontSize: "16px" }}>
-                    <p>You're a small rope access company. You can't afford enterprise-grade IT security. But you handle sensitive information: employee SINs, hourly rates, client billing data, building access codes, resident complaints.</p>
+                    <p>You're a small rope access company. You can't afford enterprise-grade IT security. But you handle sensitive information: employee SINs, hourly rates, client billing data, building access codes, resident feedback.</p>
                     <p><span className="font-medium text-foreground">Example:</span> You're evaluating a construction software platform. Their security documentation is vague. You ask: "Can other companies see my data?" The answer is concerning: "Our system uses role-based permissions." That doesn't answer the question.</p>
                     <p><span className="font-medium text-foreground">Solution:</span> Complete multi-tenant isolation architecture. Your company's data exists in a completely separate partition from every other company. A security flaw in another company's account cannot expose your data.</p>
                     <p><span className="font-medium text-foreground">Benefit:</span> Bank-level data protection without hiring security experts. Regulatory compliance for privacy laws.</p>

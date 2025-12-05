@@ -291,7 +291,7 @@ const pagesData: PageCategory[] = [
       { name: "Scheduling Guide", path: "/changelog/scheduling", description: "Calendar and time-off management", roles: ["Public"] },
       { name: "Quoting Guide", path: "/changelog/quoting", description: "Sales pipeline and quote creation", roles: ["Public"] },
       { name: "CRM Guide", path: "/changelog/crm", description: "Client relationship management", roles: ["Public"] },
-      { name: "Resident Portal Guide", path: "/changelog/resident-portal", description: "Resident communication and complaints", roles: ["Public"] },
+      { name: "Resident Portal Guide", path: "/changelog/resident-portal", description: "Resident communication and feedback", roles: ["Public"] },
       { name: "Branding Guide", path: "/changelog/branding", description: "White-label customization", roles: ["Public"] },
       { name: "Platform Administration Guide", path: "/changelog/platform-admin", description: "SuperUser management and metrics", roles: ["Public"] },
       { name: "Analytics & Reporting Guide", path: "/changelog/analytics", description: "Business intelligence and reports", roles: ["Public"] },
@@ -359,7 +359,7 @@ const pagesData: PageCategory[] = [
     icon: Home,
     iconColor: "text-cyan-600 dark:text-cyan-400",
     pages: [
-      { name: "Resident Dashboard", path: "/resident", description: "Resident complaint and photo access", roles: ["Resident"] },
+      { name: "Resident Dashboard", path: "/resident", description: "Resident feedback and photo access", roles: ["Resident"] },
     ]
   },
   {
@@ -376,8 +376,8 @@ const pagesData: PageCategory[] = [
     icon: MessageSquare,
     iconColor: "text-pink-600 dark:text-pink-400",
     pages: [
-      { name: "Residents Management", path: "/residents", description: "Resident complaint management", roles: ["Company", "Ops Manager", "Supervisor"] },
-      { name: "Complaint Detail", path: "/complaints/:id", description: "Individual complaint view", roles: ["Company", "Ops Manager", "Supervisor", "Resident"] },
+      { name: "Residents Management", path: "/residents", description: "Resident feedback management", roles: ["Company", "Ops Manager", "Supervisor"] },
+      { name: "Feedback Detail", path: "/complaints/:id", description: "Individual feedback view", roles: ["Company", "Ops Manager", "Supervisor", "Resident"] },
     ]
   },
   {
@@ -629,11 +629,11 @@ const changelogData: ChangelogSection[] = [
     title: "Resident Portal",
     icon: Home,
     iconColor: "text-rose-600 dark:text-rose-400",
-    description: "Building resident communication and complaint management",
+    description: "Building resident communication and feedback management",
     features: [
       "Secure resident registration with company code linking",
-      "Complaint submission with photo attachments",
-      "Two-way communication on complaints",
+      "Feedback submission with photo attachments",
+      "Two-way communication on feedback",
       "Work history visibility for resident units",
       "Photo gallery with unit-specific tagging",
       "Notification badges for new updates",

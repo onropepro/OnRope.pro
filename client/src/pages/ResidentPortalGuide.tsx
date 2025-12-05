@@ -39,7 +39,7 @@ export default function ResidentPortalGuide() {
             <BackButton to="/changelog" />
             <div>
               <h1 className="text-xl font-bold">Resident Portal Guide</h1>
-              <p className="text-xs text-muted-foreground">Resident access, complaints, and communication</p>
+              <p className="text-xs text-muted-foreground">Resident access, feedback, and communication</p>
             </div>
           </div>
           <MainMenuButton />
@@ -135,7 +135,7 @@ export default function ResidentPortalGuide() {
                 </li>
                 <li className="flex items-start gap-2">
                   <CheckCircle2 className="w-4 h-4 mt-0.5 shrink-0" />
-                  <span><strong>Lost complaint records:</strong> Two-way messaging system with unit tracking and response history</span>
+                  <span><strong>Lost feedback records:</strong> Two-way messaging system with unit tracking and response history</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <CheckCircle2 className="w-4 h-4 mt-0.5 shrink-0" />
@@ -181,7 +181,7 @@ export default function ResidentPortalGuide() {
               <CardHeader className="pb-2">
                 <CardTitle className="text-base flex items-center gap-2">
                   <MessageSquare className="w-4 h-4 text-green-600" />
-                  Submit Complaints
+                  Submit Feedback
                 </CardTitle>
               </CardHeader>
               <CardContent className="text-sm text-muted-foreground">
@@ -217,15 +217,15 @@ export default function ResidentPortalGuide() {
 
         <Separator />
 
-        {/* COMPLAINT MANAGEMENT SYSTEM - Comprehensive Section */}
+        {/* FEEDBACK MANAGEMENT SYSTEM - Comprehensive Section */}
         <section className="space-y-6">
           <div>
             <h2 className="text-2xl font-bold flex items-center gap-2 mb-2">
               <MessageSquare className="w-6 h-6 text-orange-600 dark:text-orange-400" />
-              Complaint Management System
+              Feedback Management System
             </h2>
             <p className="text-muted-foreground">
-              The complaint management system is the core communication bridge between building residents and your maintenance operations. It provides accountability, creates a paper trail, and ensures no resident concern goes unaddressed.
+              The feedback management system is the core communication bridge between building residents and your maintenance operations. It provides accountability, creates a paper trail, and ensures no resident concern goes unaddressed.
             </p>
           </div>
 
@@ -245,7 +245,7 @@ export default function ResidentPortalGuide() {
                     <div>
                       <p className="font-semibold text-sm">Without This System</p>
                       <ul className="text-sm text-muted-foreground space-y-1 mt-1">
-                        <li>Complaints get lost in emails or phone calls</li>
+                        <li>Feedback gets lost in emails or phone calls</li>
                         <li>No record of what was reported or when</li>
                         <li>Residents don't know if anyone is addressing their issue</li>
                         <li>Management can't track response times</li>
@@ -260,7 +260,7 @@ export default function ResidentPortalGuide() {
                     <div>
                       <p className="font-semibold text-sm">With This System</p>
                       <ul className="text-sm text-muted-foreground space-y-1 mt-1">
-                        <li>Every complaint is logged with timestamp</li>
+                        <li>Every feedback item is logged with timestamp</li>
                         <li>Photo evidence attached to each report</li>
                         <li>Residents see real-time status updates</li>
                         <li>Complete audit trail for accountability</li>
@@ -286,7 +286,7 @@ export default function ResidentPortalGuide() {
               Who Can See What: Access Hierarchy
             </h3>
             <p className="text-sm text-muted-foreground">
-              The complaint system has carefully designed access levels to ensure privacy while maintaining oversight.
+              The feedback system has carefully designed access levels to ensure privacy while maintaining oversight.
             </p>
 
             <div className="space-y-3">
@@ -303,12 +303,12 @@ export default function ResidentPortalGuide() {
                         <Badge variant="secondary" className="text-xs">Limited View</Badge>
                       </div>
                       <div className="mt-2 text-sm text-muted-foreground space-y-1">
-                        <p className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-emerald-500" /> Submit new complaints with photos</p>
-                        <p className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-emerald-500" /> View only their own complaints</p>
+                        <p className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-emerald-500" /> Submit new feedback with photos</p>
+                        <p className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-emerald-500" /> View only their own feedback</p>
                         <p className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-emerald-500" /> See replies marked "visible to resident"</p>
-                        <p className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-emerald-500" /> Reopen closed complaints by replying</p>
+                        <p className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-emerald-500" /> Reopen closed feedback by replying</p>
                         <p className="flex items-center gap-2"><XCircle className="w-4 h-4 text-red-500" /> Cannot see internal staff notes</p>
-                        <p className="flex items-center gap-2"><XCircle className="w-4 h-4 text-red-500" /> Cannot close complaints</p>
+                        <p className="flex items-center gap-2"><XCircle className="w-4 h-4 text-red-500" /> Cannot close feedback</p>
                       </div>
                     </div>
                   </div>
@@ -329,11 +329,11 @@ export default function ResidentPortalGuide() {
                       </div>
                       <p className="text-xs text-muted-foreground mt-1">Technicians, Supervisors, Operations Managers, Company Owner</p>
                       <div className="mt-2 text-sm text-muted-foreground space-y-1">
-                        <p className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-emerald-500" /> View all complaints for their company's projects</p>
+                        <p className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-emerald-500" /> View all feedback for their company's projects</p>
                         <p className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-emerald-500" /> Add internal notes (staff-only, not visible to resident)</p>
                         <p className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-emerald-500" /> Add visible replies (resident can see these)</p>
                         <p className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-emerald-500" /> Change status: Open or Closed</p>
-                        <p className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-emerald-500" /> See when complaint was first viewed</p>
+                        <p className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-emerald-500" /> See when feedback was first viewed</p>
                       </div>
                     </div>
                   </div>
@@ -354,12 +354,12 @@ export default function ResidentPortalGuide() {
                       </div>
                       <p className="text-xs text-muted-foreground mt-1">Via "My Vendors" dashboard</p>
                       <div className="mt-2 text-sm text-muted-foreground space-y-1">
-                        <p className="flex items-center gap-2"><XCircle className="w-4 h-4 text-red-500" /> Cannot view resident complaints</p>
-                        <p className="flex items-center gap-2"><XCircle className="w-4 h-4 text-red-500" /> Cannot respond to complaints</p>
-                        <p className="flex items-center gap-2"><XCircle className="w-4 h-4 text-red-500" /> Cannot see complaint history or notes</p>
+                        <p className="flex items-center gap-2"><XCircle className="w-4 h-4 text-red-500" /> Cannot view resident feedback</p>
+                        <p className="flex items-center gap-2"><XCircle className="w-4 h-4 text-red-500" /> Cannot respond to feedback</p>
+                        <p className="flex items-center gap-2"><XCircle className="w-4 h-4 text-red-500" /> Cannot see feedback history or notes</p>
                       </div>
                       <p className="text-xs text-muted-foreground mt-3 italic">
-                        Complaint management is handled directly between residents and the rope access company. Property managers can view general vendor information through their dashboard but do not have access to complaint data.
+                        Feedback management is handled directly between residents and the rope access company. Property managers can view general vendor information through their dashboard but do not have access to feedback data.
                       </p>
                     </div>
                   </div>
@@ -375,7 +375,7 @@ export default function ResidentPortalGuide() {
               Two-Track Communication System
             </h3>
             <p className="text-sm text-muted-foreground">
-              Staff can add two types of notes to complaints. This allows internal coordination without exposing sensitive discussions to residents.
+              Staff can add two types of notes to feedback. This allows internal coordination without exposing sensitive discussions to residents.
             </p>
 
             <div className="grid md:grid-cols-2 gap-4">
@@ -412,7 +412,7 @@ export default function ResidentPortalGuide() {
                 <CardContent className="text-sm space-y-2">
                   <p className="text-muted-foreground">Responses the resident can read. Use for:</p>
                   <ul className="text-muted-foreground space-y-1">
-                    <li className="flex items-center gap-2"><ArrowRight className="w-3 h-3" /> Acknowledging the complaint</li>
+                    <li className="flex items-center gap-2"><ArrowRight className="w-3 h-3" /> Acknowledging the feedback</li>
                     <li className="flex items-center gap-2"><ArrowRight className="w-3 h-3" /> Providing status updates</li>
                     <li className="flex items-center gap-2"><ArrowRight className="w-3 h-3" /> Asking follow-up questions</li>
                     <li className="flex items-center gap-2"><ArrowRight className="w-3 h-3" /> Confirming resolution</li>
@@ -427,14 +427,14 @@ export default function ResidentPortalGuide() {
 
           <Separator />
 
-          {/* Complaint Workflow - Enhanced */}
+          {/* Feedback Workflow - Enhanced */}
           <div className="space-y-4">
             <h3 className="text-xl font-bold flex items-center gap-2">
               <Clock className="w-5 h-5 text-orange-600 dark:text-orange-400" />
-              Complaint Lifecycle
+              Feedback Lifecycle
             </h3>
             <p className="text-sm text-muted-foreground">
-              Every complaint goes through a defined lifecycle with clear status indicators at each stage.
+              Every feedback item goes through a defined lifecycle with clear status indicators at each stage.
             </p>
           </div>
 
@@ -446,7 +446,7 @@ export default function ResidentPortalGuide() {
                     1
                   </div>
                   <div>
-                    <h3 className="font-semibold">Resident Submits Complaint</h3>
+                    <h3 className="font-semibold">Resident Submits Feedback</h3>
                     <p className="text-sm text-muted-foreground mt-1">
                       Resident fills out form with name, unit number, phone number, and detailed description. <strong>Can attach photo evidence</strong> (water damage, scratches, etc.).
                     </p>
@@ -474,11 +474,11 @@ export default function ResidentPortalGuide() {
                   </div>
                   <div>
                     <h3 className="font-semibold flex items-center gap-2">
-                      Complaint Appears in Feedback
+                      Feedback Appears in Dashboard
                       <Badge variant="secondary" className="bg-orange-500/10 text-orange-700 dark:text-orange-400 text-xs">New</Badge>
                     </h3>
                     <p className="text-sm text-muted-foreground mt-1">
-                      Management sees new complaint in the project's "Resident Feedback" section with "New" badge. Notification badge appears.
+                      Management sees new feedback in the project's "Resident Feedback" section with "New" badge. Notification badge appears.
                     </p>
                   </div>
                 </div>
@@ -501,7 +501,7 @@ export default function ResidentPortalGuide() {
                       <Badge variant="secondary" className="bg-primary/10 text-primary text-xs">Viewed</Badge>
                     </h3>
                     <p className="text-sm text-muted-foreground mt-1">
-                      When management opens the complaint, it's marked as "Viewed" with timestamp. They can add replies and update status.
+                      When management opens the feedback, it's marked as "Viewed" with timestamp. They can add replies and update status.
                     </p>
                   </div>
                 </div>
@@ -562,7 +562,7 @@ export default function ResidentPortalGuide() {
                       <Badge variant="secondary" className="bg-amber-500/20 text-amber-700 dark:text-amber-300 text-xs">Important</Badge>
                     </h3>
                     <p className="text-sm text-amber-800 dark:text-amber-200 mt-1">
-                      If a resident is not satisfied with the resolution, they can <strong>reply to a closed complaint</strong>. This automatically reopens the complaint and changes status back to "Open".
+                      If a resident is not satisfied with the resolution, they can <strong>reply to closed feedback</strong>. This automatically reopens the feedback and changes status back to "Open".
                     </p>
                     <p className="text-xs text-amber-700 dark:text-amber-300 mt-2">
                       This ensures residents always have a way to follow up if issues persist after closure.
@@ -637,9 +637,9 @@ export default function ResidentPortalGuide() {
                     <Badge variant="destructive" className="absolute -top-1 -right-1 h-4 w-4 p-0 flex items-center justify-center text-[10px]">3</Badge>
                   </div>
                   <div>
-                    <p className="font-semibold">New Complaint Badges</p>
+                    <p className="font-semibold">New Feedback Badges</p>
                     <p className="text-sm text-muted-foreground mt-1">
-                      When new complaints are submitted, a notification badge appears in the project's feedback section. The number indicates unread complaints.
+                      When new feedback is submitted, a notification badge appears in the project's feedback section. The number indicates unread feedback.
                     </p>
                   </div>
                 </div>
@@ -656,7 +656,7 @@ export default function ResidentPortalGuide() {
                   </div>
                 </div>
                 <p className="text-sm text-muted-foreground mt-3">
-                  Each complaint shows its current status. "New" for unread, "Viewed" when management has opened it, "Closed" when resolved.
+                  Each feedback item shows its current status. "New" for unread, "Viewed" when management has opened it, "Closed" when resolved.
                 </p>
               </CardContent>
             </Card>
@@ -690,7 +690,7 @@ export default function ResidentPortalGuide() {
                       <td className="py-2">View and update</td>
                     </tr>
                     <tr className="border-b">
-                      <td className="py-2">Submit Complaints</td>
+                      <td className="py-2">Submit Feedback</td>
                       <td className="py-2">Create and view own</td>
                       <td className="py-2">View all, respond, close</td>
                     </tr>
@@ -779,7 +779,7 @@ export default function ResidentPortalGuide() {
                     <div className="bg-green-600 text-white rounded-full w-12 h-12 flex items-center justify-center font-bold">1</div>
                     <div className="text-center text-sm">
                       <p className="font-semibold">Receive Alert</p>
-                      <p className="text-xs text-muted-foreground">New complaint badge</p>
+                      <p className="text-xs text-muted-foreground">New feedback badge</p>
                     </div>
                   </div>
 
@@ -848,7 +848,7 @@ export default function ResidentPortalGuide() {
               <Image className="w-5 h-5 text-purple-600 dark:text-purple-400 flex-shrink-0 mt-0.5" />
               <div>
                 <p className="font-semibold">Photo Evidence</p>
-                <p className="text-sm text-muted-foreground">Attach photos to complaints for documentation.</p>
+                <p className="text-sm text-muted-foreground">Attach photos to feedback for documentation.</p>
               </div>
             </div>
 
@@ -871,7 +871,7 @@ export default function ResidentPortalGuide() {
             <div className="flex gap-3">
               <ArrowRight className="w-5 h-5 text-amber-600 dark:text-amber-400 flex-shrink-0 mt-0.5 rotate-180" />
               <div>
-                <p className="font-semibold">Reopen Complaints</p>
+                <p className="font-semibold">Reopen Feedback</p>
                 <p className="text-sm text-muted-foreground">Residents can reopen closed issues by replying.</p>
               </div>
             </div>
@@ -909,7 +909,7 @@ export default function ResidentPortalGuide() {
             >
               <div className="text-left">
                 <div className="font-semibold">Resident Management</div>
-                <div className="text-xs text-muted-foreground">View and manage complaints</div>
+                <div className="text-xs text-muted-foreground">View and manage feedback</div>
               </div>
               <ArrowRight className="w-4 h-4" />
             </Button>

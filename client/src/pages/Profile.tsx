@@ -1679,7 +1679,7 @@ export default function Profile() {
                       Permanently delete your company account and all associated data. This action cannot be undone.
                     </p>
                     <p className="text-sm text-destructive font-medium">
-                      Warning: This will delete all employees, projects, work sessions, drop logs, and complaints.
+                      Warning: This will delete all employees, projects, work sessions, drop logs, and feedback.
                     </p>
                     <Button
                       variant="destructive"
@@ -2161,7 +2161,7 @@ export default function Profile() {
           <AlertDialogHeader>
             <AlertDialogTitle>Delete Company Account</AlertDialogTitle>
             <AlertDialogDescription>
-              This will permanently delete your company account, all employees, projects, work sessions, drop logs, and complaints. This action cannot be undone.
+              This will permanently delete your company account, all employees, projects, work sessions, drop logs, and feedback. This action cannot be undone.
               
               Please enter your password to confirm.
             </AlertDialogDescription>
