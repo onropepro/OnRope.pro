@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 import { Building2, Plus, Mail, Phone, LogOut, Settings, FileText, Download, AlertCircle, CheckCircle2, Clock, Upload, FileCheck, Trash2, User, Shield } from "lucide-react";
-import { formatLocalDate, formatTimestampDate, formatTime } from "@/lib/dateUtils";
+import { formatLocalDate, formatTimestampDate, formatTime, formatDurationMs } from "@/lib/dateUtils";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Label } from "@/components/ui/label";
 import { useForm } from "react-hook-form";
@@ -251,6 +251,18 @@ export default function PropertyManager() {
       return data;
     },
     enabled: !!selectedVendor?.linkId,
+    retry: false,
+  });
+
+  // Fetch complaint metrics for selected vendor (average resolution time)
+  const { data: vendorMetricsData, isLoading: isLoadingMetrics } = useQuery<{
+    metrics: {
+      totalClosed: number;
+      averageResolutionMs: number | null;
+    };
+  }>({
+    queryKey: ["/api/complaints/metrics", selectedVendor?.id],
+    enabled: !!selectedVendor?.id,
     retry: false,
   });
 
@@ -824,6 +836,44 @@ export default function PropertyManager() {
                         {t('propertyManager.vendorDetails.csr.helpText', 'CSR measures vendor compliance with safety documentation, daily toolbox meetings, and equipment inspections. A score of 90%+ indicates excellent safety practices.')}
                       </p>
                     </div>
+                  )}
+                </div>
+
+                {/* Complaint Resolution Metrics */}
+                <div className="border rounded-lg p-4 bg-muted/30 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <Clock className="w-5 h-5 text-muted-foreground" />
+                      <div>
+                        <Label className="text-sm font-medium">{t('propertyManager.vendorDetails.resolutionTime.title', 'Average Resolution Time')}</Label>
+                        <p className="text-xs text-muted-foreground mt-0.5">{t('propertyManager.vendorDetails.resolutionTime.description', 'Average time to resolve resident complaints')}</p>
+                      </div>
+                    </div>
+                    {isLoadingMetrics ? (
+                      <Badge variant="outline" className="gap-1.5 px-3 py-1.5 animate-pulse" data-testid="badge-resolution-time-loading">
+                        <Clock className="w-4 h-4" />
+                        <span className="text-sm font-medium">--</span>
+                      </Badge>
+                    ) : vendorMetricsData?.metrics?.averageResolutionMs ? (
+                      <Badge 
+                        variant="outline"
+                        className="gap-1.5 px-3 py-1.5 no-default-hover-elevate no-default-active-elevate bg-blue-500/10 text-blue-700 dark:text-blue-400 border-blue-500/20"
+                        data-testid="badge-resolution-time"
+                      >
+                        <Clock className="w-4 h-4" />
+                        <span className="text-sm font-semibold">{formatDurationMs(vendorMetricsData.metrics.averageResolutionMs)}</span>
+                      </Badge>
+                    ) : (
+                      <Badge variant="outline" className="gap-1.5 px-3 py-1.5" data-testid="badge-resolution-time-unavailable">
+                        <Clock className="w-4 h-4" />
+                        <span className="text-sm font-medium">{t('propertyManager.vendorDetails.resolutionTime.noData', 'No data')}</span>
+                      </Badge>
+                    )}
+                  </div>
+                  {vendorMetricsData?.metrics && vendorMetricsData.metrics.totalClosed > 0 && (
+                    <p className="text-xs text-muted-foreground pt-2 border-t">
+                      {t('propertyManager.vendorDetails.resolutionTime.basedOn', 'Based on {{count}} resolved complaints', { count: vendorMetricsData.metrics.totalClosed })}
+                    </p>
                   )}
                 </div>
 

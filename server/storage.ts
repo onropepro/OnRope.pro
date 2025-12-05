@@ -483,8 +483,21 @@ export class Storage {
   }
 
   async updateComplaintStatus(id: string, status: string): Promise<Complaint> {
+    // Set closedAt timestamp when closing, clear it when reopening
+    const updateData: any = { 
+      status, 
+      updatedAt: new Date() 
+    };
+    
+    if (status === 'closed') {
+      updateData.closedAt = new Date();
+    } else if (status === 'open') {
+      // If reopening a complaint, clear the closedAt timestamp
+      updateData.closedAt = null;
+    }
+    
     const result = await db.update(complaints)
-      .set({ status, updatedAt: new Date() })
+      .set(updateData)
       .where(eq(complaints.id, id))
       .returning();
     return result[0];
@@ -589,6 +602,58 @@ export class Storage {
     return db.select().from(complaintNotes)
       .where(eq(complaintNotes.complaintId, complaintId))
       .orderBy(complaintNotes.createdAt);
+  }
+
+  // Complaint metrics for resolution time tracking
+  async getComplaintMetrics(companyId: string): Promise<{
+    totalClosed: number;
+    averageResolutionMs: number | null;
+  }> {
+    // Get all closed complaints for this company's projects
+    const companyProjects = await db.select({ id: projects.id })
+      .from(projects)
+      .where(eq(projects.companyId, companyId));
+    
+    const projectIds = companyProjects.map(p => p.id);
+    
+    if (projectIds.length === 0) {
+      return { totalClosed: 0, averageResolutionMs: null };
+    }
+    
+    // Get closed complaints with both createdAt and closedAt
+    const closedComplaints = await db.select({
+      createdAt: complaints.createdAt,
+      closedAt: complaints.closedAt,
+    })
+    .from(complaints)
+    .where(and(
+      sql`${complaints.projectId} IN (${sql.join(projectIds.map(id => sql`${id}`), sql`, `)})`,
+      eq(complaints.status, 'closed'),
+      sql`${complaints.closedAt} IS NOT NULL`
+    ));
+    
+    if (closedComplaints.length === 0) {
+      return { totalClosed: 0, averageResolutionMs: null };
+    }
+    
+    // Calculate average resolution time in milliseconds
+    let totalResolutionMs = 0;
+    let validCount = 0;
+    
+    for (const complaint of closedComplaints) {
+      if (complaint.createdAt && complaint.closedAt) {
+        const resolutionMs = complaint.closedAt.getTime() - complaint.createdAt.getTime();
+        if (resolutionMs > 0) {
+          totalResolutionMs += resolutionMs;
+          validCount++;
+        }
+      }
+    }
+    
+    return {
+      totalClosed: validCount,
+      averageResolutionMs: validCount > 0 ? Math.round(totalResolutionMs / validCount) : null,
+    };
   }
 
   // Work session operations

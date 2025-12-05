@@ -30,7 +30,7 @@ import { useState, useEffect } from "react";
 import { format } from "date-fns";
 import { fr, enUS } from "date-fns/locale";
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from "recharts";
-import { parseLocalDate, formatTimestampDate, getTodayString } from "@/lib/dateUtils";
+import { parseLocalDate, formatTimestampDate, getTodayString, formatDurationMs } from "@/lib/dateUtils";
 import type { Project } from "@shared/schema";
 import { IRATA_TASK_TYPES } from "@shared/schema";
 import { useForm } from "react-hook-form";
@@ -177,6 +177,17 @@ export default function ProjectDetail() {
   const { data: complaintsData } = useQuery({
     queryKey: ["/api/projects", id, "complaints"],
     enabled: !!id,
+  });
+
+  // Fetch complaint metrics for company-wide average resolution time
+  const { data: complaintMetricsData, isLoading: metricsLoading } = useQuery<{
+    metrics: {
+      totalClosed: number;
+      averageResolutionMs: number | null;
+    };
+  }>({
+    queryKey: ["/api/complaints/metrics", (projectData?.project as any)?.companyId],
+    enabled: !!(projectData?.project as any)?.companyId,
   });
 
   // Fetch photos for this project
@@ -2103,11 +2114,19 @@ export default function ProjectDetail() {
         {/* Resident Feedback Card */}
         <Card className="glass-card border-0 shadow-premium">
           <CardHeader>
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between flex-wrap gap-2">
               <CardTitle className="text-base">{t('projectDetail.feedback.title', 'Resident Feedback')}</CardTitle>
-              <Badge variant="secondary" className="text-xs">
-                {complaints.length} {complaints.length === 1 ? t('projectDetail.feedback.complaint', 'complaint') : t('projectDetail.feedback.complaintsPlural', 'complaints')}
-              </Badge>
+              <div className="flex items-center gap-2 flex-wrap">
+                {complaintMetricsData?.metrics?.averageResolutionMs && (
+                  <Badge variant="outline" className="text-xs gap-1" data-testid="badge-avg-resolution-time">
+                    <span className="material-icons text-sm">schedule</span>
+                    {t('projectDetail.feedback.avgResolution', 'Avg')}: {formatDurationMs(complaintMetricsData.metrics.averageResolutionMs)}
+                  </Badge>
+                )}
+                <Badge variant="secondary" className="text-xs">
+                  {complaints.length} {complaints.length === 1 ? t('projectDetail.feedback.complaint', 'complaint') : t('projectDetail.feedback.complaintsPlural', 'complaints')}
+                </Badge>
+              </div>
             </div>
           </CardHeader>
           <CardContent>

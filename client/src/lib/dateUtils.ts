@@ -290,3 +290,43 @@ export function formatTimestampDateShort(timestamp: string | Date | null | undef
     year: 'numeric' 
   });
 }
+
+/**
+ * Format a duration in milliseconds to a human-readable string.
+ * Examples: "2 hours", "1 day 3 hours", "45 minutes"
+ * Shows the two most significant units for readability.
+ */
+export function formatDurationMs(ms: number | null | undefined): string {
+  if (ms === null || ms === undefined || ms <= 0) {
+    return 'N/A';
+  }
+  
+  const seconds = Math.floor(ms / 1000);
+  const minutes = Math.floor(seconds / 60);
+  const hours = Math.floor(minutes / 60);
+  const days = Math.floor(hours / 24);
+  
+  const remainingHours = hours % 24;
+  const remainingMinutes = minutes % 60;
+  
+  const parts: string[] = [];
+  
+  if (days > 0) {
+    parts.push(`${days} ${days === 1 ? 'day' : 'days'}`);
+  }
+  if (remainingHours > 0) {
+    parts.push(`${remainingHours} ${remainingHours === 1 ? 'hour' : 'hours'}`);
+  }
+  if (remainingMinutes > 0 && days === 0) {
+    // Only show minutes if less than a day
+    parts.push(`${remainingMinutes} ${remainingMinutes === 1 ? 'minute' : 'minutes'}`);
+  }
+  
+  // If we have no parts (less than a minute), show "< 1 minute"
+  if (parts.length === 0) {
+    return '< 1 minute';
+  }
+  
+  // Return up to 2 parts for readability
+  return parts.slice(0, 2).join(' ');
+}

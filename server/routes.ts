@@ -7019,6 +7019,42 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
+  // Get complaint metrics for a company (average resolution time)
+  app.get("/api/complaints/metrics/:companyId", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      const { companyId } = req.params;
+      
+      // Company owners can view their own metrics
+      // Property managers can view metrics for linked companies
+      // SuperUsers can view any company's metrics
+      if (currentUser.role === "company") {
+        if (currentUser.id !== companyId) {
+          return res.status(403).json({ message: "Access denied" });
+        }
+      } else if (currentUser.role === "property_manager") {
+        const links = await storage.getPropertyManagerCompanyLinks(currentUser.id);
+        const linkedCompanyIds = links.map(link => link.companyId);
+        if (!linkedCompanyIds.includes(companyId)) {
+          return res.status(403).json({ message: "Access denied" });
+        }
+      } else if (currentUser.role !== "superuser") {
+        return res.status(403).json({ message: "Access denied" });
+      }
+      
+      const metrics = await storage.getComplaintMetrics(companyId);
+      res.json({ metrics });
+    } catch (error) {
+      console.error("Get complaint metrics error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+  
   // Add complaint note (staff only)
   app.post("/api/complaints/:complaintId/notes", requireAuth, requireRole("rope_access_tech", "general_supervisor", "rope_access_supervisor", "supervisor", "operations_manager", "company"), async (req: Request, res: Response) => {
     try {

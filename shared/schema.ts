@@ -481,6 +481,7 @@ export const complaints = pgTable("complaints", {
   photoUrl: text("photo_url"), // Optional photo uploaded by resident
   status: varchar("status").notNull().default('open'), // open | closed
   viewedAt: timestamp("viewed_at"), // When staff first viewed this complaint
+  closedAt: timestamp("closed_at"), // When complaint was closed - used for resolution time calculation
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
@@ -1527,6 +1528,8 @@ export const insertComplaintSchema = createInsertSchema(complaints).omit({
   createdAt: true,
   updatedAt: true,
   status: true,
+  viewedAt: true, // Set server-side when staff views
+  closedAt: true, // Set server-side when complaint is closed
 });
 
 export const insertComplaintNoteSchema = createInsertSchema(complaintNotes).omit({
