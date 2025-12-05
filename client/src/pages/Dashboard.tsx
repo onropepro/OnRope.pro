@@ -1000,6 +1000,70 @@ export default function Dashboard() {
     checkActiveSession();
   }, [projects, activeSession]);
 
+  // Handle quote-to-project conversion via URL parameters and sessionStorage
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const fromQuote = urlParams.get('fromQuote');
+    const action = urlParams.get('action');
+    const tab = urlParams.get('tab');
+    
+    if (fromQuote === 'true' && action === 'create' && tab === 'projects') {
+      // Read quote data from sessionStorage
+      const quoteDataStr = sessionStorage.getItem('quoteToProject');
+      if (quoteDataStr) {
+        try {
+          const quoteData = JSON.parse(quoteDataStr);
+          
+          // Switch to projects tab
+          handleTabChange('projects');
+          
+          // Prefill the project form with quote data
+          projectForm.reset({
+            strataPlanNumber: quoteData.strataPlanNumber || "",
+            buildingName: quoteData.buildingName || "",
+            buildingAddress: quoteData.buildingAddress || "",
+            floorCount: quoteData.floorCount || "",
+            jobType: quoteData.jobType || "window_cleaning",
+            customJobType: quoteData.customJobType || "",
+            totalDropsNorth: quoteData.totalDropsNorth || "",
+            totalDropsEast: quoteData.totalDropsEast || "",
+            totalDropsSouth: quoteData.totalDropsSouth || "",
+            totalDropsWest: quoteData.totalDropsWest || "",
+            dailyDropTarget: quoteData.dailyDropTarget || "",
+            startDate: "",
+            endDate: "",
+            targetCompletionDate: "",
+            estimatedHours: "",
+            calendarColor: defaultCalendarColor,
+            assignedEmployees: [],
+            peaceWork: false,
+            pricePerDrop: "",
+          });
+          
+          // Show elevation fields if the job type is "other"
+          if (quoteData.jobType === "other") {
+            setShowOtherElevationFields(true);
+          }
+          
+          // Open the project creation dialog
+          setShowProjectDialog(true);
+          
+          // Clear sessionStorage and URL params after reading
+          sessionStorage.removeItem('quoteToProject');
+          window.history.replaceState({}, '', '/');
+          
+          // Show toast notification
+          toast({
+            title: t('dashboard.quoteImport.success', 'Quote Data Imported'),
+            description: t('dashboard.quoteImport.prefilled', 'Building details from quote #{{quoteNumber}} have been prefilled', { quoteNumber: quoteData.quoteNumber || '' }),
+          });
+        } catch (error) {
+          console.error('Error parsing quote data:', error);
+        }
+      }
+    }
+  }, [projectForm, defaultCalendarColor, toast, t]);
+
   const createProjectMutation = useMutation({
     mutationFn: async (data: ProjectFormData & { ropeAccessPlanUrl?: string | null; anchorInspectionCertificateUrl?: string | null }) => {
       const response = await fetch("/api/projects", {
