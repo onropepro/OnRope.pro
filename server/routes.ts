@@ -4820,6 +4820,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
             totalDropsEast: project.totalDropsEast,
             totalDropsSouth: project.totalDropsSouth,
             totalDropsWest: project.totalDropsWest,
+            totalFloors: project.totalFloors,
+            buildingFloors: project.buildingFloors,
+            dailyDropTarget: project.dailyDropTarget,
           });
         } catch (buildingError) {
           // Log but don't fail project creation if building creation fails

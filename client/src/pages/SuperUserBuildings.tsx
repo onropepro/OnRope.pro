@@ -10,20 +10,30 @@ import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/hooks/use-toast";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { formatLocalDate } from "@/lib/dateUtils";
-import { Loader2, Building2, ArrowLeft, Search, History, CheckCircle, RefreshCw, Key } from "lucide-react";
+import { Loader2, Building2, ArrowLeft, Search, History, CheckCircle, RefreshCw, Key, Layers, MapPin, Compass } from "lucide-react";
 
 interface BuildingData {
   id: string;
   strataPlanNumber: string;
   buildingName: string | null;
-  address: string | null;
+  buildingAddress: string | null;
   city: string | null;
   province: string | null;
   postalCode: string | null;
+  floorCount: number | null;
+  parkingStalls: number | null;
   totalUnits: number | null;
-  totalProjects: number;
-  projectsCompleted: number;
+  dropsNorth: number | null;
+  dropsEast: number | null;
+  dropsSouth: number | null;
+  dropsWest: number | null;
+  yearBuilt: number | null;
+  buildingType: string | null;
+  notes: string | null;
+  lastServiceDate: string | null;
+  totalProjectsCompleted: number;
   createdAt: string;
+  updatedAt: string;
 }
 
 interface ProjectData {
@@ -102,10 +112,25 @@ export default function SuperUserBuildings() {
     return (
       building.strataPlanNumber.toLowerCase().includes(search) ||
       building.buildingName?.toLowerCase().includes(search) ||
-      building.address?.toLowerCase().includes(search) ||
+      building.buildingAddress?.toLowerCase().includes(search) ||
       building.city?.toLowerCase().includes(search)
     );
   });
+
+  const getTotalDrops = (building: BuildingData) => {
+    return (building.dropsNorth || 0) + (building.dropsEast || 0) + 
+           (building.dropsSouth || 0) + (building.dropsWest || 0);
+  };
+
+  const formatBuildingType = (type: string | null) => {
+    if (!type) return null;
+    const types: Record<string, string> = {
+      residential: "Residential",
+      commercial: "Commercial",
+      mixed: "Mixed Use",
+    };
+    return types[type] || type;
+  };
 
   const getJobTypeName = (jobType: string, customJobType: string | null) => {
     if (customJobType) return customJobType;
@@ -161,43 +186,143 @@ export default function SuperUserBuildings() {
             <>
               <Card>
                 <CardHeader>
-                  <CardTitle>Building Information</CardTitle>
+                  <CardTitle className="flex items-center gap-2">
+                    <Building2 className="h-5 w-5" />
+                    Building Information
+                  </CardTitle>
                 </CardHeader>
-                <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <p className="text-sm text-muted-foreground">Strata Plan Number</p>
-                    <p className="font-medium">{selectedBuilding.strataPlanNumber}</p>
+                <CardContent className="space-y-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <p className="text-sm text-muted-foreground">Strata Plan Number</p>
+                      <p className="font-medium">{selectedBuilding.strataPlanNumber}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm text-muted-foreground">Building Name</p>
+                      <p className="font-medium">{selectedBuilding.buildingName || "Not specified"}</p>
+                    </div>
+                    <div className="md:col-span-2">
+                      <p className="text-sm text-muted-foreground">Address</p>
+                      <p className="font-medium">
+                        {selectedBuilding.buildingAddress ? (
+                          <>
+                            {selectedBuilding.buildingAddress}
+                            {(selectedBuilding.city || selectedBuilding.province || selectedBuilding.postalCode) && (
+                              <>, {[selectedBuilding.city, selectedBuilding.province, selectedBuilding.postalCode].filter(Boolean).join(" ")}</>
+                            )}
+                          </>
+                        ) : (
+                          "Not specified"
+                        )}
+                      </p>
+                    </div>
+                    {formatBuildingType(selectedBuilding.buildingType) && (
+                      <div>
+                        <p className="text-sm text-muted-foreground">Building Type</p>
+                        <p className="font-medium">{formatBuildingType(selectedBuilding.buildingType)}</p>
+                      </div>
+                    )}
+                    {selectedBuilding.yearBuilt && (
+                      <div>
+                        <p className="text-sm text-muted-foreground">Year Built</p>
+                        <p className="font-medium">{selectedBuilding.yearBuilt}</p>
+                      </div>
+                    )}
                   </div>
+
+                  <Separator />
+
                   <div>
-                    <p className="text-sm text-muted-foreground">Building Name</p>
-                    <p className="font-medium">{selectedBuilding.buildingName || "Not specified"}</p>
+                    <h4 className="font-medium mb-3 flex items-center gap-2">
+                      <Layers className="h-4 w-4" />
+                      Building Specifications
+                    </h4>
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                      <div>
+                        <p className="text-sm text-muted-foreground">Floors</p>
+                        <p className="font-medium text-lg">{selectedBuilding.floorCount || "—"}</p>
+                      </div>
+                      <div>
+                        <p className="text-sm text-muted-foreground">Total Units</p>
+                        <p className="font-medium text-lg">{selectedBuilding.totalUnits || "—"}</p>
+                      </div>
+                      <div>
+                        <p className="text-sm text-muted-foreground">Parking Stalls</p>
+                        <p className="font-medium text-lg">{selectedBuilding.parkingStalls || "—"}</p>
+                      </div>
+                      <div>
+                        <p className="text-sm text-muted-foreground">Total Drops</p>
+                        <p className="font-medium text-lg">{getTotalDrops(selectedBuilding) || "—"}</p>
+                      </div>
+                    </div>
                   </div>
+
+                  {getTotalDrops(selectedBuilding) > 0 && (
+                    <>
+                      <Separator />
+                      <div>
+                        <h4 className="font-medium mb-3 flex items-center gap-2">
+                          <Compass className="h-4 w-4" />
+                          Drops by Elevation
+                        </h4>
+                        <div className="grid grid-cols-4 gap-4 text-center">
+                          <div className="p-3 rounded-md bg-muted/50">
+                            <p className="text-xs text-muted-foreground uppercase">North</p>
+                            <p className="font-bold text-xl">{selectedBuilding.dropsNorth || 0}</p>
+                          </div>
+                          <div className="p-3 rounded-md bg-muted/50">
+                            <p className="text-xs text-muted-foreground uppercase">East</p>
+                            <p className="font-bold text-xl">{selectedBuilding.dropsEast || 0}</p>
+                          </div>
+                          <div className="p-3 rounded-md bg-muted/50">
+                            <p className="text-xs text-muted-foreground uppercase">South</p>
+                            <p className="font-bold text-xl">{selectedBuilding.dropsSouth || 0}</p>
+                          </div>
+                          <div className="p-3 rounded-md bg-muted/50">
+                            <p className="text-xs text-muted-foreground uppercase">West</p>
+                            <p className="font-bold text-xl">{selectedBuilding.dropsWest || 0}</p>
+                          </div>
+                        </div>
+                      </div>
+                    </>
+                  )}
+
+                  <Separator />
+
                   <div>
-                    <p className="text-sm text-muted-foreground">Address</p>
-                    <p className="font-medium">
-                      {selectedBuilding.address ? (
-                        `${selectedBuilding.address}, ${selectedBuilding.city || ""} ${selectedBuilding.province || ""} ${selectedBuilding.postalCode || ""}`.trim()
-                      ) : (
-                        "Not specified"
-                      )}
-                    </p>
+                    <h4 className="font-medium mb-3 flex items-center gap-2">
+                      <History className="h-4 w-4" />
+                      Service Statistics
+                    </h4>
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                      <div>
+                        <p className="text-sm text-muted-foreground">Projects Completed</p>
+                        <p className="font-medium text-lg">{selectedBuilding.totalProjectsCompleted || 0}</p>
+                      </div>
+                      <div>
+                        <p className="text-sm text-muted-foreground">Last Service</p>
+                        <p className="font-medium">{selectedBuilding.lastServiceDate ? formatLocalDate(selectedBuilding.lastServiceDate) : "Never"}</p>
+                      </div>
+                      <div>
+                        <p className="text-sm text-muted-foreground">Database Created</p>
+                        <p className="font-medium">{formatLocalDate(selectedBuilding.createdAt)}</p>
+                      </div>
+                      <div>
+                        <p className="text-sm text-muted-foreground">Last Updated</p>
+                        <p className="font-medium">{formatLocalDate(selectedBuilding.updatedAt)}</p>
+                      </div>
+                    </div>
                   </div>
-                  <div>
-                    <p className="text-sm text-muted-foreground">Total Units</p>
-                    <p className="font-medium">{selectedBuilding.totalUnits || "Not specified"}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-muted-foreground">Total Projects</p>
-                    <p className="font-medium">{selectedBuilding.totalProjects}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-muted-foreground">Completed Projects</p>
-                    <p className="font-medium">{selectedBuilding.projectsCompleted}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-muted-foreground">Created</p>
-                    <p className="font-medium">{formatLocalDate(selectedBuilding.createdAt)}</p>
-                  </div>
+
+                  {selectedBuilding.notes && (
+                    <>
+                      <Separator />
+                      <div>
+                        <h4 className="font-medium mb-2">Notes</h4>
+                        <p className="text-sm text-muted-foreground whitespace-pre-wrap">{selectedBuilding.notes}</p>
+                      </div>
+                    </>
+                  )}
                 </CardContent>
               </Card>
 
@@ -399,8 +524,8 @@ export default function SuperUserBuildings() {
                           {building.buildingName || `Building ${building.strataPlanNumber}`}
                         </h3>
                         <p className="text-sm text-muted-foreground">
-                          {building.address ? (
-                            `${building.address}, ${building.city || ""}`
+                          {building.buildingAddress ? (
+                            `${building.buildingAddress}, ${building.city || ""}`
                           ) : (
                             `Strata: ${building.strataPlanNumber}`
                           )}
@@ -409,11 +534,15 @@ export default function SuperUserBuildings() {
                     </div>
                     <div className="flex items-center gap-4 text-sm">
                       <div className="text-center">
-                        <p className="font-medium">{building.totalProjects}</p>
-                        <p className="text-muted-foreground">Projects</p>
+                        <p className="font-medium">{getTotalDrops(building)}</p>
+                        <p className="text-muted-foreground">Total Drops</p>
                       </div>
                       <div className="text-center">
-                        <p className="font-medium">{building.projectsCompleted}</p>
+                        <p className="font-medium">{building.floorCount || "—"}</p>
+                        <p className="text-muted-foreground">Floors</p>
+                      </div>
+                      <div className="text-center">
+                        <p className="font-medium">{building.totalProjectsCompleted || 0}</p>
                         <p className="text-muted-foreground">Completed</p>
                       </div>
                     </div>
