@@ -3365,7 +3365,13 @@ export class Storage {
       return null;
     }
 
-    const isValid = await bcrypt.compare(password, building.passwordHash);
+    // Try password as-is first, then try normalized version
+    // (since default password is the normalized strata number)
+    let isValid = await bcrypt.compare(password, building.passwordHash);
+    if (!isValid) {
+      const normalizedPassword = normalizeStrataPlan(password);
+      isValid = await bcrypt.compare(normalizedPassword, building.passwordHash);
+    }
     return isValid ? building : null;
   }
 
