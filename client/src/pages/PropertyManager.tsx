@@ -839,14 +839,14 @@ export default function PropertyManager() {
                   )}
                 </div>
 
-                {/* Complaint Resolution Metrics */}
+                {/* Feedback Resolution Metrics */}
                 <div className="border rounded-lg p-4 bg-muted/30 space-y-3">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
                       <Clock className="w-5 h-5 text-muted-foreground" />
                       <div>
                         <Label className="text-sm font-medium">{t('propertyManager.vendorDetails.resolutionTime.title', 'Average Resolution Time')}</Label>
-                        <p className="text-xs text-muted-foreground mt-0.5">{t('propertyManager.vendorDetails.resolutionTime.description', 'Average time to resolve resident complaints')}</p>
+                        <p className="text-xs text-muted-foreground mt-0.5">{t('propertyManager.vendorDetails.resolutionTime.description', 'Average time to resolve resident feedback')}</p>
                       </div>
                     </div>
                     {isLoadingMetrics ? (
@@ -872,7 +872,7 @@ export default function PropertyManager() {
                   </div>
                   {vendorMetricsData?.metrics && vendorMetricsData.metrics.totalClosed > 0 && (
                     <p className="text-xs text-muted-foreground pt-2 border-t">
-                      {t('propertyManager.vendorDetails.resolutionTime.basedOn', 'Based on {{count}} resolved complaints', { count: vendorMetricsData.metrics.totalClosed })}
+                      {t('propertyManager.vendorDetails.resolutionTime.basedOn', 'Based on {{count}} resolved feedback items', { count: vendorMetricsData.metrics.totalClosed })}
                     </p>
                   )}
                 </div>
@@ -954,7 +954,7 @@ export default function PropertyManager() {
                         {selectedVendor.residentCode}
                       </div>
                       <p className="text-[10px] text-muted-foreground mt-1">
-                        {t('propertyManager.vendorDetails.residentCodeHelp', 'Share this code with building residents so they can access the resident portal to view project updates and submit complaints.')}
+                        {t('propertyManager.vendorDetails.residentCodeHelp', 'Share this code with building residents so they can access the resident portal to view project updates and submit feedback.')}
                       </p>
                     </div>
                   )}
@@ -1236,7 +1236,7 @@ export default function PropertyManager() {
                     {selectedProject.buildingName || selectedProject.projectName || t('propertyManager.projectDetails.title', 'Project Details')}
                   </DialogTitle>
                   <DialogDescription data-testid="text-project-details-description">
-                    {t('propertyManager.projectDetails.description', 'View project information, progress, and complaint history')}
+                    {t('propertyManager.projectDetails.description', 'View project information, progress, and feedback history')}
                   </DialogDescription>
                 </DialogHeader>
                 
@@ -1527,12 +1527,12 @@ export default function PropertyManager() {
                       </CardContent>
                     </Card>
 
-                    {/* Complaints History */}
-                    <Card data-testid="card-complaints-history">
+                    {/* Feedback History */}
+                    <Card data-testid="card-feedback-history">
                       <CardHeader>
                         <CardTitle className="text-lg flex items-center gap-2">
                           <AlertCircle className="w-5 h-5" />
-                          {t('propertyManager.projectDetails.feedback.title', 'Complaints History')}
+                          {t('propertyManager.projectDetails.feedback.title', 'Feedback History')}
                           {projectDetailsData.complaints.length > 0 && (
                             <Badge variant="secondary">{projectDetailsData.complaints.length}</Badge>
                           )}
@@ -1540,8 +1540,8 @@ export default function PropertyManager() {
                       </CardHeader>
                       <CardContent>
                         {projectDetailsData.complaints.length === 0 ? (
-                          <div className="text-sm text-muted-foreground text-center py-4" data-testid="text-no-complaints">
-                            {t('propertyManager.projectDetails.feedback.none', 'No complaints recorded for this project')}
+                          <div className="text-sm text-muted-foreground text-center py-4" data-testid="text-no-feedback">
+                            {t('propertyManager.projectDetails.feedback.none', 'No feedback recorded for this project')}
                           </div>
                         ) : (
                           <div className="space-y-3 max-h-60 overflow-y-auto">
@@ -1549,7 +1549,7 @@ export default function PropertyManager() {
                               <Card 
                                 key={complaint.id} 
                                 className="bg-muted/50 cursor-pointer hover-elevate" 
-                                data-testid={`card-complaint-${complaint.id}`}
+                                data-testid={`card-feedback-${complaint.id}`}
                                 onClick={() => setSelectedComplaint(complaint)}
                               >
                                 <CardContent className="p-3">
@@ -1688,9 +1688,9 @@ export default function PropertyManager() {
                     <div className="bg-muted/50 rounded-lg p-3">
                       <img 
                         src={selectedComplaint.photoUrl} 
-                        alt={t('propertyManager.feedbackDetails.photoAlt', 'Complaint photo')} 
+                        alt={t('propertyManager.feedbackDetails.photoAlt', 'Feedback photo')} 
                         className="w-full h-auto rounded-md"
-                        data-testid="img-complaint-photo"
+                        data-testid="img-feedback-photo"
                       />
                     </div>
                   </div>
@@ -1724,7 +1724,7 @@ export default function PropertyManager() {
               <Button
                 variant="outline"
                 onClick={() => setSelectedComplaint(null)}
-                data-testid="button-close-complaint-details"
+                data-testid="button-close-feedback-details"
               >
                 {t('propertyManager.close', 'Close')}
               </Button>
