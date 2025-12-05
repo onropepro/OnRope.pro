@@ -111,6 +111,13 @@ export const users = pgTable("users", {
   irataDocuments: text("irata_documents").array().default(sql`ARRAY[]::text[]`), // Array of IRATA certification document URLs
   irataBaselineHours: numeric("irata_baseline_hours", { precision: 10, scale: 2 }).default("0"), // Baseline logbook hours before using this system
   
+  // SPRAT certification fields (optional)
+  spratLevel: varchar("sprat_level"), // SPRAT level (e.g., "Level 1", "Level 2", "Level 3")
+  spratLicenseNumber: varchar("sprat_license_number"), // SPRAT license number
+  spratIssuedDate: date("sprat_issued_date"), // SPRAT certification issue date
+  spratExpirationDate: date("sprat_expiration_date"), // SPRAT certification expiration date
+  spratDocuments: text("sprat_documents").array().default(sql`ARRAY[]::text[]`), // Array of SPRAT certification document URLs
+  
   // Employee photo
   photoUrl: text("photo_url"), // Employee profile photo URL
   

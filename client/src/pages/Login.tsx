@@ -12,7 +12,8 @@ import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { queryClient } from "@/lib/queryClient";
 import { trackLogin } from "@/lib/analytics";
-import { Rocket, Play, Building2, Clock, DollarSign, Users, Shield, FileText, Calculator, FileSpreadsheet, Radio, ClipboardCheck, MessageSquare, Home, Award, Calendar, FolderOpen, Globe, TrendingUp, ArrowRight } from "lucide-react";
+import { Rocket, Play, Building2, Clock, DollarSign, Users, Shield, FileText, Calculator, FileSpreadsheet, Radio, ClipboardCheck, MessageSquare, Home, Award, Calendar, FolderOpen, Globe, TrendingUp, ArrowRight, HardHat } from "lucide-react";
+import { TechnicianRegistration } from "@/components/TechnicianRegistration";
 import { Slider } from "@/components/ui/slider";
 import onRopeProLogo from "@assets/OnRopePro-logo_1764625558626.png";
 
@@ -28,6 +29,7 @@ export default function Login() {
   const { toast } = useToast();
   const [, setLocation] = useLocation();
   const [showLoginForm, setShowLoginForm] = useState(false);
+  const [showTechnicianRegistration, setShowTechnicianRegistration] = useState(false);
   const [currentWordIndex, setCurrentWordIndex] = useState(0);
   const [isAnimating, setIsAnimating] = useState(false);
   const [landingLanguage, setLandingLanguage] = useState<'en' | 'fr'>('en');
@@ -947,6 +949,19 @@ export default function Login() {
                 <span className="material-icons mr-2">person_add</span>
                 Create Resident/Property Manager Account
               </Button>
+
+              <Button 
+                variant="outline" 
+                className="w-full h-12 text-base font-medium border-amber-500/50 text-amber-600 dark:text-amber-400" 
+                onClick={() => {
+                  setShowLoginForm(false);
+                  setShowTechnicianRegistration(true);
+                }}
+                data-testid="button-create-technician-account"
+              >
+                <HardHat className="mr-2 h-5 w-5" />
+                Create Technician Account
+              </Button>
             </div>
 
             <div className="relative">
@@ -999,6 +1014,11 @@ export default function Login() {
         </Card>
         </div>
       )}
+
+      <TechnicianRegistration 
+        open={showTechnicianRegistration} 
+        onOpenChange={setShowTechnicianRegistration} 
+      />
     </div>
   );
 }
