@@ -1,4 +1,4 @@
-import { Link, useLocation } from "wouter";
+import { useLocation } from "wouter";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
@@ -11,17 +11,11 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "@/components/ui/collapsible";
-import {
   Users,
   Shield,
   Lock,
   Eye,
   Settings,
-  UserCheck,
   Building2,
   Home,
   Briefcase,
@@ -30,7 +24,6 @@ import {
   Key,
   LogIn,
   ChevronRight,
-  ChevronDown,
   AlertTriangle,
   Info,
   CheckCircle2,
@@ -86,538 +79,354 @@ export default function UserAccessGuide() {
 
         <Separator />
 
-        <section className="space-y-4">
-          <Card className="border-2 border-amber-500 bg-amber-50 dark:bg-amber-950">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-lg flex items-center gap-2 text-amber-900 dark:text-amber-100">
-                <Key className="w-5 h-5 text-amber-600 dark:text-amber-400" />
-                The Golden Rule: Role + Permissions = Access
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="text-amber-900 dark:text-amber-100 space-y-4">
-              <div className="bg-white dark:bg-amber-900 rounded-lg p-4 text-center">
-                <p className="text-lg font-mono font-bold">
-                  Access = Base Role (Organizational Structure) + Granular Permissions (Actual Capabilities)
-                </p>
-              </div>
-              
-              <div className="space-y-2 text-sm">
-                <p className="font-semibold">Key Principles:</p>
-                <ul className="list-disc list-inside space-y-1 ml-2">
-                  <li><strong>Each user has exactly one base role</strong> (Company Owner, Operations Manager, Supervisor, Technician, etc.)</li>
-                  <li><strong>Base roles provide organizational structure</strong> — they suggest typical access patterns but do NOT determine permissions</li>
-                  <li><strong>Permissions are CUSTOMIZED per employee</strong> by the company owner, regardless of role title</li>
-                  <li><strong>Permissions define what users can actually DO</strong> with the data they can access</li>
+        <section className="space-y-6">
+          <div className="rounded-lg border-l-4 border-amber-500 bg-card p-6">
+            <h3 className="text-lg font-semibold flex items-center gap-2 mb-4">
+              <Key className="w-5 h-5 text-amber-500" />
+              The Golden Rule: Role + Permissions = Access
+            </h3>
+            
+            <div className="bg-muted/50 rounded-lg p-4 mb-6">
+              <p className="text-base font-mono text-center leading-relaxed">
+                Access = Base Role (Organizational Structure) + Granular Permissions (Actual Capabilities)
+              </p>
+            </div>
+            
+            <div className="space-y-4">
+              <div>
+                <h4 className="font-medium mb-3">Key Principles</h4>
+                <ul className="space-y-2 text-muted-foreground leading-relaxed">
+                  <li className="flex gap-2">
+                    <span className="text-amber-500 mt-1">1.</span>
+                    <span>Each user has exactly one base role (Company Owner, Operations Manager, Supervisor, Technician, etc.)</span>
+                  </li>
+                  <li className="flex gap-2">
+                    <span className="text-amber-500 mt-1">2.</span>
+                    <span>Base roles provide organizational structure — they suggest typical access patterns but do NOT determine permissions</span>
+                  </li>
+                  <li className="flex gap-2">
+                    <span className="text-amber-500 mt-1">3.</span>
+                    <span>Permissions are customized per employee by the company owner, regardless of role title</span>
+                  </li>
+                  <li className="flex gap-2">
+                    <span className="text-amber-500 mt-1">4.</span>
+                    <span>Permissions define what users can actually do with the data they can access</span>
+                  </li>
                 </ul>
               </div>
 
-              <div className="bg-amber-100 dark:bg-amber-800 rounded-lg p-3 text-sm">
-                <p className="font-semibold flex items-center gap-2 mb-2">
-                  <Info className="w-4 h-4" />
+              <div className="border rounded-lg p-4 mt-4">
+                <p className="font-medium flex items-center gap-2 mb-4">
+                  <Info className="w-4 h-4 text-muted-foreground" />
                   Same Role, Different Capabilities
                 </p>
-                <div className="grid md:grid-cols-2 gap-3 text-xs">
-                  <div className="bg-white/50 dark:bg-amber-900/50 rounded p-2">
-                    <p className="font-semibold mb-1">Company A - Operations Manager:</p>
-                    <div className="space-y-0.5">
-                      <p className="flex items-center gap-1"><CheckCircle2 className="w-3 h-3 text-green-600" /> Financial permissions</p>
-                      <p className="flex items-center gap-1"><CheckCircle2 className="w-3 h-3 text-green-600" /> Create projects</p>
-                      <p className="flex items-center gap-1"><XCircle className="w-3 h-3 text-red-500" /> Inventory management</p>
+                <div className="grid md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <p className="text-sm font-medium">Company A - Operations Manager</p>
+                    <div className="space-y-1 text-sm">
+                      <p className="flex items-center gap-2 text-muted-foreground"><CheckCircle2 className="w-4 h-4 text-green-500" /> Financial permissions</p>
+                      <p className="flex items-center gap-2 text-muted-foreground"><CheckCircle2 className="w-4 h-4 text-green-500" /> Create projects</p>
+                      <p className="flex items-center gap-2 text-muted-foreground"><XCircle className="w-4 h-4 text-red-400" /> Inventory management</p>
                     </div>
                   </div>
-                  <div className="bg-white/50 dark:bg-amber-900/50 rounded p-2">
-                    <p className="font-semibold mb-1">Company B - Operations Manager:</p>
-                    <div className="space-y-0.5">
-                      <p className="flex items-center gap-1"><XCircle className="w-3 h-3 text-red-500" /> Financial permissions</p>
-                      <p className="flex items-center gap-1"><XCircle className="w-3 h-3 text-red-500" /> Create projects</p>
-                      <p className="flex items-center gap-1"><CheckCircle2 className="w-3 h-3 text-green-600" /> Inventory management</p>
+                  <div className="space-y-2">
+                    <p className="text-sm font-medium">Company B - Operations Manager</p>
+                    <div className="space-y-1 text-sm">
+                      <p className="flex items-center gap-2 text-muted-foreground"><XCircle className="w-4 h-4 text-red-400" /> Financial permissions</p>
+                      <p className="flex items-center gap-2 text-muted-foreground"><XCircle className="w-4 h-4 text-red-400" /> Create projects</p>
+                      <p className="flex items-center gap-2 text-muted-foreground"><CheckCircle2 className="w-4 h-4 text-green-500" /> Inventory management</p>
                     </div>
                   </div>
                 </div>
-                <p className="mt-2 text-center font-medium">Same role title, completely different capabilities</p>
+                <p className="text-sm text-center text-muted-foreground mt-4 pt-3 border-t">Same role title, completely different capabilities</p>
               </div>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
         </section>
 
         <Separator />
 
-        <section className="space-y-6">
+        <section className="space-y-8">
           <div>
-            <h2 className="text-2xl font-bold flex items-center gap-2 mb-2">
-              <CheckCircle2 className="w-6 h-6 text-green-600 dark:text-green-400" />
-              Problems Solved
-            </h2>
-            <p className="text-muted-foreground">
-              Comprehensive problem-solution documentation showing how OnRopePro's User Access & Authentication module addresses real challenges across the rope access industry.
+            <h2 className="text-2xl font-semibold mb-2">Problems Solved</h2>
+            <p className="text-muted-foreground leading-relaxed">
+              Real challenges addressed by OnRopePro's User Access & Authentication module.
             </p>
           </div>
 
-          <Accordion
-            className="-space-y-1 w-full"
-            collapsible
-            defaultValue="company-owners"
-            type="single"
-          >
-            {/* For Rope Access Company Owners */}
-            <AccordionItem
-              className="overflow-hidden border bg-background first:rounded-t-lg last:rounded-b-lg last:border-b"
-              value="company-owners"
-            >
-              <AccordionTrigger className="px-4 py-3 hover:no-underline">
-                <div className="flex items-center gap-2">
-                  <Crown className="size-5 text-amber-600 dark:text-amber-400" />
-                  <span className="font-bold text-amber-700 dark:text-amber-400">For Rope Access Company Owners</span>
-                  <Badge variant="secondary" className="ml-2">6 problems</Badge>
-                </div>
-              </AccordionTrigger>
-              <AccordionContent className="p-0">
-                <Collapsible className="space-y-1 border-border border-t bg-accent px-4 py-3">
-                  <CollapsibleTrigger className="flex gap-2 font-medium text-left [&[data-state=open]>svg]:rotate-180">
-                    <ChevronDown aria-hidden="true" className="mt-1 shrink-0 opacity-60 transition-transform duration-200" size={16} strokeWidth={2} />
-                    <span className="text-red-700 dark:text-red-400">"Supervisors accidentally seeing everyone's pay rates"</span>
-                  </CollapsibleTrigger>
-                  <CollapsibleContent className="overflow-hidden ps-6 text-sm transition-all data-[state=closed]:animate-collapsible-up data-[state=open]:animate-collapsible-down">
-                    <div className="space-y-3 pt-2">
-                      <p className="text-muted-foreground">You need your supervisor to create projects and assign technicians, but the moment you give them access, they can see what every technician earns. Generic construction software forces you to choose: operational efficiency or payroll privacy.</p>
-                      <div className="bg-muted/50 rounded-lg p-3 border-l-4 border-amber-500">
-                        <p className="font-semibold text-sm text-amber-700 dark:text-amber-400 mb-1">Example:</p>
-                        <p className="text-sm text-muted-foreground">Your operations manager needs to review project budgets to ensure profitability, but you don't want them seeing individual hourly rates. Traditional systems make this impossible—budget access automatically includes rate visibility.</p>
-                      </div>
-                      <div className="bg-green-50 dark:bg-green-950 rounded-lg p-3">
-                        <p className="font-semibold text-sm text-green-700 dark:text-green-400 mb-1">Solution:</p>
-                        <p className="text-sm text-green-900 dark:text-green-100">OnRopePro's flexible permission system separates operational capabilities from financial visibility. Grant your supervisor project creation rights, employee assignment capabilities, and schedule management—while keeping hourly rates, labor costs, and payroll data owner-only.</p>
-                      </div>
-                      <div className="flex items-start gap-2 bg-blue-50 dark:bg-blue-950 rounded-lg p-3">
-                        <CheckCircle2 className="w-4 h-4 text-blue-600 shrink-0 mt-0.5" />
-                        <p className="text-sm text-blue-900 dark:text-blue-100"><strong>Benefit:</strong> Delegate confidently without compromising financial privacy. Supervisors manage day-to-day operations without seeing what anyone earns.</p>
-                      </div>
-                    </div>
-                  </CollapsibleContent>
-                </Collapsible>
+          {/* Company Owners Section */}
+          <div className="space-y-4">
+            <div className="flex items-center gap-3 pb-2 border-b">
+              <Crown className="w-5 h-5 text-amber-500" />
+              <h3 className="text-lg font-medium">For Rope Access Company Owners</h3>
+            </div>
+            
+            <Accordion type="single" collapsible className="space-y-3">
+              <AccordionItem value="owner-1" className="border rounded-lg px-4">
+                <AccordionTrigger className="hover:no-underline py-4">
+                  <span className="text-left font-medium">Supervisors accidentally seeing everyone's pay rates</span>
+                </AccordionTrigger>
+                <AccordionContent className="pb-4">
+                  <div className="space-y-4 text-muted-foreground leading-relaxed">
+                    <p>You need your supervisor to create projects and assign technicians, but the moment you give them access, they can see what every technician earns. Generic construction software forces you to choose: operational efficiency or payroll privacy.</p>
+                    <p><span className="font-medium text-foreground">Example:</span> Your operations manager needs to review project budgets to ensure profitability, but you don't want them seeing individual hourly rates. Traditional systems make this impossible—budget access automatically includes rate visibility.</p>
+                    <p><span className="font-medium text-foreground">Solution:</span> OnRopePro's flexible permission system separates operational capabilities from financial visibility. Grant your supervisor project creation rights, employee assignment capabilities, and schedule management—while keeping hourly rates, labor costs, and payroll data owner-only.</p>
+                    <p><span className="font-medium text-foreground">Benefit:</span> Delegate confidently without compromising financial privacy. Supervisors manage day-to-day operations without seeing what anyone earns.</p>
+                  </div>
+                </AccordionContent>
+              </AccordionItem>
 
-                <Collapsible className="space-y-1 border-border border-t bg-accent px-4 py-3">
-                  <CollapsibleTrigger className="flex gap-2 font-medium text-left [&[data-state=open]>svg]:rotate-180">
-                    <ChevronDown aria-hidden="true" className="mt-1 shrink-0 opacity-60 transition-transform duration-200" size={16} strokeWidth={2} />
-                    <span className="text-red-700 dark:text-red-400">"Financial data visible to people who shouldn't see it"</span>
-                  </CollapsibleTrigger>
-                  <CollapsibleContent className="overflow-hidden ps-6 text-sm transition-all data-[state=closed]:animate-collapsible-up data-[state=open]:animate-collapsible-down">
-                    <div className="space-y-3 pt-2">
-                      <p className="text-muted-foreground">Your bookkeeper needs access to generate reports. Your field supervisor needs to check if projects are on budget. But once they're in the system, they can see everything—company-wide profitability, individual employee rates, sensitive client billing margins.</p>
-                      <div className="bg-muted/50 rounded-lg p-3 border-l-4 border-amber-500">
-                        <p className="font-semibold text-sm text-amber-700 dark:text-amber-400 mb-1">Example:</p>
-                        <p className="text-sm text-muted-foreground">You hire a new administrative assistant to help with invoicing. Within a week, they know exactly how much profit you make on each client, what your best technicians earn, and which jobs are money-losers. This isn't malicious—the software just shows everything to anyone with access.</p>
-                      </div>
-                      <div className="bg-green-50 dark:bg-green-950 rounded-lg p-3">
-                        <p className="font-semibold text-sm text-green-700 dark:text-green-400 mb-1">Solution:</p>
-                        <p className="text-sm text-green-900 dark:text-green-100">Granular permission controls let you grant exactly what each employee needs. Your bookkeeper sees aggregate labor costs but not individual rates. Your supervisor sees project budgets but not company-wide profitability. Your admin sees client invoices but not internal cost breakdowns.</p>
-                      </div>
-                      <div className="flex items-start gap-2 bg-blue-50 dark:bg-blue-950 rounded-lg p-3">
-                        <CheckCircle2 className="w-4 h-4 text-blue-600 shrink-0 mt-0.5" />
-                        <p className="text-sm text-blue-900 dark:text-blue-100"><strong>Benefit:</strong> Protect sensitive financial information while still delegating operational responsibilities. No more "all or nothing" access decisions.</p>
-                      </div>
-                    </div>
-                  </CollapsibleContent>
-                </Collapsible>
+              <AccordionItem value="owner-2" className="border rounded-lg px-4">
+                <AccordionTrigger className="hover:no-underline py-4">
+                  <span className="text-left font-medium">Financial data visible to people who shouldn't see it</span>
+                </AccordionTrigger>
+                <AccordionContent className="pb-4">
+                  <div className="space-y-4 text-muted-foreground leading-relaxed">
+                    <p>Your bookkeeper needs access to generate reports. Your field supervisor needs to check if projects are on budget. But once they're in the system, they can see everything—company-wide profitability, individual employee rates, sensitive client billing margins.</p>
+                    <p><span className="font-medium text-foreground">Example:</span> You hire a new administrative assistant to help with invoicing. Within a week, they know exactly how much profit you make on each client, what your best technicians earn, and which jobs are money-losers.</p>
+                    <p><span className="font-medium text-foreground">Solution:</span> Granular permission controls let you grant exactly what each employee needs. Your bookkeeper sees aggregate labor costs but not individual rates. Your supervisor sees project budgets but not company-wide profitability.</p>
+                    <p><span className="font-medium text-foreground">Benefit:</span> Protect sensitive financial information while still delegating operational responsibilities. No more "all or nothing" access decisions.</p>
+                  </div>
+                </AccordionContent>
+              </AccordionItem>
 
-                <Collapsible className="space-y-1 border-border border-t bg-accent px-4 py-3">
-                  <CollapsibleTrigger className="flex gap-2 font-medium text-left [&[data-state=open]>svg]:rotate-180">
-                    <ChevronDown aria-hidden="true" className="mt-1 shrink-0 opacity-60 transition-transform duration-200" size={16} strokeWidth={2} />
-                    <span className="text-red-700 dark:text-red-400">"Can't track IRATA certifications"</span>
-                  </CollapsibleTrigger>
-                  <CollapsibleContent className="overflow-hidden ps-6 text-sm transition-all data-[state=closed]:animate-collapsible-up data-[state=open]:animate-collapsible-down">
-                    <div className="space-y-3 pt-2">
-                      <p className="text-muted-foreground">You've got 15 technicians with different IRATA levels. Client contracts require Level 2 or higher for certain buildings. Insurance audits demand proof of certification levels. But you're tracking this in a spreadsheet that's always outdated.</p>
-                      <div className="bg-muted/50 rounded-lg p-3 border-l-4 border-amber-500">
-                        <p className="font-semibold text-sm text-amber-700 dark:text-amber-400 mb-1">Example:</p>
-                        <p className="text-sm text-muted-foreground">A client asks: "Which of your technicians are Level 2 or 3 and available next week?" You're digging through certification files, checking expiry dates, cross-referencing the schedule. This takes 30 minutes and you're still not confident the data is current.</p>
-                      </div>
-                      <div className="bg-green-50 dark:bg-green-950 rounded-lg p-3">
-                        <p className="font-semibold text-sm text-green-700 dark:text-green-400 mb-1">Solution:</p>
-                        <p className="text-sm text-green-900 dark:text-green-100">Each employee profile includes IRATA level (Level 1, 2, or 3) tracked in the system. When you need to assign work or respond to client requirements, you see certification levels instantly alongside availability and hourly rates.</p>
-                      </div>
-                      <div className="flex items-start gap-2 bg-blue-50 dark:bg-blue-950 rounded-lg p-3">
-                        <CheckCircle2 className="w-4 h-4 text-blue-600 shrink-0 mt-0.5" />
-                        <p className="text-sm text-blue-900 dark:text-blue-100"><strong>Benefit:</strong> Instant visibility into team qualifications. Assign work confidently knowing technician certifications match client requirements. Respond to client questions in seconds, not minutes.</p>
-                      </div>
-                    </div>
-                  </CollapsibleContent>
-                </Collapsible>
+              <AccordionItem value="owner-3" className="border rounded-lg px-4">
+                <AccordionTrigger className="hover:no-underline py-4">
+                  <span className="text-left font-medium">Can't track IRATA certifications</span>
+                </AccordionTrigger>
+                <AccordionContent className="pb-4">
+                  <div className="space-y-4 text-muted-foreground leading-relaxed">
+                    <p>You've got 15 technicians with different IRATA levels. Client contracts require Level 2 or higher for certain buildings. Insurance audits demand proof of certification levels. But you're tracking this in a spreadsheet that's always outdated.</p>
+                    <p><span className="font-medium text-foreground">Example:</span> A client asks: "Which of your technicians are Level 2 or 3 and available next week?" You're digging through certification files, checking expiry dates, cross-referencing the schedule. This takes 30 minutes.</p>
+                    <p><span className="font-medium text-foreground">Solution:</span> Each employee profile includes IRATA level (Level 1, 2, or 3) tracked in the system. When you need to assign work or respond to client requirements, you see certification levels instantly.</p>
+                    <p><span className="font-medium text-foreground">Benefit:</span> Instant visibility into team qualifications. Respond to client questions in seconds, not minutes.</p>
+                  </div>
+                </AccordionContent>
+              </AccordionItem>
 
-                <Collapsible className="space-y-1 border-border border-t bg-accent px-4 py-3">
-                  <CollapsibleTrigger className="flex gap-2 font-medium text-left [&[data-state=open]>svg]:rotate-180">
-                    <ChevronDown aria-hidden="true" className="mt-1 shrink-0 opacity-60 transition-transform duration-200" size={16} strokeWidth={2} />
-                    <span className="text-red-700 dark:text-red-400">"No control over who can edit/delete projects"</span>
-                  </CollapsibleTrigger>
-                  <CollapsibleContent className="overflow-hidden ps-6 text-sm transition-all data-[state=closed]:animate-collapsible-up data-[state=open]:animate-collapsible-down">
-                    <div className="space-y-3 pt-2">
-                      <p className="text-muted-foreground">Everyone with system access can modify or delete projects—including your newest technician who accidentally deleted last month's completed job when trying to log today's drops.</p>
-                      <div className="bg-muted/50 rounded-lg p-3 border-l-4 border-amber-500">
-                        <p className="font-semibold text-sm text-amber-700 dark:text-amber-400 mb-1">Example:</p>
-                        <p className="text-sm text-muted-foreground">Your supervisor creates a project for a 40-story tower with detailed drop counts per elevation. A technician accidentally opens this project and changes the North elevation from 120 drops to 12 drops. The error isn't discovered until the client questions why you only invoiced for 12 drops.</p>
-                      </div>
-                      <div className="bg-green-50 dark:bg-green-950 rounded-lg p-3">
-                        <p className="font-semibold text-sm text-green-700 dark:text-green-400 mb-1">Solution:</p>
-                        <p className="text-sm text-green-900 dark:text-green-100">Project management permissions control who can create, edit, and delete projects. Restrict these capabilities to supervisors and managers while technicians can only log work and upload photos for projects they're assigned to.</p>
-                      </div>
-                      <div className="flex items-start gap-2 bg-blue-50 dark:bg-blue-950 rounded-lg p-3">
-                        <CheckCircle2 className="w-4 h-4 text-blue-600 shrink-0 mt-0.5" />
-                        <p className="text-sm text-blue-900 dark:text-blue-100"><strong>Benefit:</strong> Protect project data integrity. Prevent accidental deletions and modifications. Maintain accurate records for client billing and historical reference.</p>
-                      </div>
-                    </div>
-                  </CollapsibleContent>
-                </Collapsible>
+              <AccordionItem value="owner-4" className="border rounded-lg px-4">
+                <AccordionTrigger className="hover:no-underline py-4">
+                  <span className="text-left font-medium">No control over who can edit/delete projects</span>
+                </AccordionTrigger>
+                <AccordionContent className="pb-4">
+                  <div className="space-y-4 text-muted-foreground leading-relaxed">
+                    <p>Everyone with system access can modify or delete projects—including your newest technician who accidentally deleted last month's completed job when trying to log today's drops.</p>
+                    <p><span className="font-medium text-foreground">Example:</span> A technician accidentally changes the North elevation from 120 drops to 12 drops. The error isn't discovered until the client questions why you only invoiced for 12 drops.</p>
+                    <p><span className="font-medium text-foreground">Solution:</span> Project management permissions control who can create, edit, and delete projects. Restrict these capabilities to supervisors and managers while technicians can only log work for assigned projects.</p>
+                    <p><span className="font-medium text-foreground">Benefit:</span> Protect project data integrity. Maintain accurate records for client billing and historical reference.</p>
+                  </div>
+                </AccordionContent>
+              </AccordionItem>
 
-                <Collapsible className="space-y-1 border-border border-t bg-accent px-4 py-3">
-                  <CollapsibleTrigger className="flex gap-2 font-medium text-left [&[data-state=open]>svg]:rotate-180">
-                    <ChevronDown aria-hidden="true" className="mt-1 shrink-0 opacity-60 transition-transform duration-200" size={16} strokeWidth={2} />
-                    <span className="text-red-700 dark:text-red-400">"Crew members changing data they shouldn't access"</span>
-                  </CollapsibleTrigger>
-                  <CollapsibleContent className="overflow-hidden ps-6 text-sm transition-all data-[state=closed]:animate-collapsible-up data-[state=open]:animate-collapsible-down">
-                    <div className="space-y-3 pt-2">
-                      <p className="text-muted-foreground">A technician logs into the system and starts browsing. They edit their own hourly rate from $32 to $42 per hour. They change last week's drop counts to show higher productivity. You discover this during payroll processing.</p>
-                      <div className="bg-muted/50 rounded-lg p-3 border-l-4 border-amber-500">
-                        <p className="font-semibold text-sm text-amber-700 dark:text-amber-400 mb-1">Example:</p>
-                        <p className="text-sm text-muted-foreground">Your most experienced Level 3 tech goes into past projects and adds extra drops to his record to make his productivity numbers look better for his upcoming performance review. The client complains months later when reviewing photos that don't match the drop counts you invoiced.</p>
-                      </div>
-                      <div className="bg-green-50 dark:bg-green-950 rounded-lg p-3">
-                        <p className="font-semibold text-sm text-green-700 dark:text-green-400 mb-1">Solution:</p>
-                        <p className="text-sm text-green-900 dark:text-green-100">Permission-based access controls what data each employee can view and modify. Technicians see only their own work records and assigned projects. Only owners and designated managers can modify rates, historical records, and sensitive information.</p>
-                      </div>
-                      <div className="flex items-start gap-2 bg-blue-50 dark:bg-blue-950 rounded-lg p-3">
-                        <CheckCircle2 className="w-4 h-4 text-blue-600 shrink-0 mt-0.5" />
-                        <p className="text-sm text-blue-900 dark:text-blue-100"><strong>Benefit:</strong> Prevent unauthorized data changes. Maintain data integrity for payroll, client billing, and performance reviews. Create clear audit trails.</p>
-                      </div>
-                    </div>
-                  </CollapsibleContent>
-                </Collapsible>
+              <AccordionItem value="owner-5" className="border rounded-lg px-4">
+                <AccordionTrigger className="hover:no-underline py-4">
+                  <span className="text-left font-medium">Crew members changing data they shouldn't access</span>
+                </AccordionTrigger>
+                <AccordionContent className="pb-4">
+                  <div className="space-y-4 text-muted-foreground leading-relaxed">
+                    <p>A technician logs into the system and edits their own hourly rate from $32 to $42 per hour. They change last week's drop counts. You discover this during payroll processing.</p>
+                    <p><span className="font-medium text-foreground">Example:</span> Your most experienced tech goes into past projects and adds extra drops to his record for his upcoming performance review. The client complains when photos don't match invoiced drop counts.</p>
+                    <p><span className="font-medium text-foreground">Solution:</span> Permission-based access controls what each employee can view and modify. Technicians see only their own work records. Only owners can modify rates and historical records.</p>
+                    <p><span className="font-medium text-foreground">Benefit:</span> Prevent unauthorized data changes. Create clear audit trails.</p>
+                  </div>
+                </AccordionContent>
+              </AccordionItem>
 
-                <Collapsible className="space-y-1 border-border border-t bg-accent px-4 py-3">
-                  <CollapsibleTrigger className="flex gap-2 font-medium text-left [&[data-state=open]>svg]:rotate-180">
-                    <ChevronDown aria-hidden="true" className="mt-1 shrink-0 opacity-60 transition-transform duration-200" size={16} strokeWidth={2} />
-                    <span className="text-red-700 dark:text-red-400">"Subscription limit monitoring - using 5 of 8 seats"</span>
-                  </CollapsibleTrigger>
-                  <CollapsibleContent className="overflow-hidden ps-6 text-sm transition-all data-[state=closed]:animate-collapsible-up data-[state=open]:animate-collapsible-down">
-                    <div className="space-y-3 pt-2">
-                      <p className="text-muted-foreground">You're on the Tier 1 plan with 8 included seats. You hire two people thinking you had space, but discover you're now at 9 seats and being charged $19/month per extra seat.</p>
-                      <div className="bg-muted/50 rounded-lg p-3 border-l-4 border-amber-500">
-                        <p className="font-semibold text-sm text-amber-700 dark:text-amber-400 mb-1">Example:</p>
-                        <p className="text-sm text-muted-foreground">Peak season hits. You need to hire 3 temporary technicians immediately to meet demand. But you can't remember if your plan includes 8 seats or 12 seats, and you don't know how many you're currently using. You delay hiring while trying to figure out your subscription status.</p>
-                      </div>
-                      <div className="bg-green-50 dark:bg-green-950 rounded-lg p-3">
-                        <p className="font-semibold text-sm text-green-700 dark:text-green-400 mb-1">Solution:</p>
-                        <p className="text-sm text-green-900 dark:text-green-100">Employee management dashboard displays your subscription tier limits clearly: "Using 7 of 8 seats" with visual indicators showing capacity. Know instantly if you can add employees or need to upgrade your tier before hiring.</p>
-                      </div>
-                      <div className="flex items-start gap-2 bg-blue-50 dark:bg-blue-950 rounded-lg p-3">
-                        <CheckCircle2 className="w-4 h-4 text-blue-600 shrink-0 mt-0.5" />
-                        <p className="text-sm text-blue-900 dark:text-blue-100"><strong>Benefit:</strong> Make hiring decisions confidently. Avoid surprise overage charges. Plan tier upgrades proactively as your team grows.</p>
-                      </div>
-                    </div>
-                  </CollapsibleContent>
-                </Collapsible>
-              </AccordionContent>
-            </AccordionItem>
+              <AccordionItem value="owner-6" className="border rounded-lg px-4">
+                <AccordionTrigger className="hover:no-underline py-4">
+                  <span className="text-left font-medium">Subscription limit monitoring</span>
+                </AccordionTrigger>
+                <AccordionContent className="pb-4">
+                  <div className="space-y-4 text-muted-foreground leading-relaxed">
+                    <p>You're on the Tier 1 plan with 8 included seats. You hire two people thinking you had space, but discover you're now at 9 seats and being charged extra per seat.</p>
+                    <p><span className="font-medium text-foreground">Example:</span> Peak season hits. You need to hire 3 temporary technicians but can't remember your plan's seat limit. You delay hiring while trying to figure out your subscription status.</p>
+                    <p><span className="font-medium text-foreground">Solution:</span> Employee management dashboard displays subscription tier limits clearly: "Using 7 of 8 seats" with visual indicators showing capacity.</p>
+                    <p><span className="font-medium text-foreground">Benefit:</span> Make hiring decisions confidently. Avoid surprise overage charges.</p>
+                  </div>
+                </AccordionContent>
+              </AccordionItem>
+            </Accordion>
+          </div>
 
-            {/* For Operations Managers & Supervisors */}
-            <AccordionItem
-              className="overflow-hidden border bg-background first:rounded-t-lg last:rounded-b-lg last:border-b"
-              value="operations-managers"
-            >
-              <AccordionTrigger className="px-4 py-3 hover:no-underline">
-                <div className="flex items-center gap-2">
-                  <Briefcase className="size-5 text-blue-600 dark:text-blue-400" />
-                  <span className="font-bold text-blue-700 dark:text-blue-400">For Operations Managers & Supervisors</span>
-                  <Badge variant="secondary" className="ml-2">1 problem</Badge>
-                </div>
-              </AccordionTrigger>
-              <AccordionContent className="p-0">
-                <Collapsible className="space-y-1 border-border border-t bg-accent px-4 py-3">
-                  <CollapsibleTrigger className="flex gap-2 font-medium text-left [&[data-state=open]>svg]:rotate-180">
-                    <ChevronDown aria-hidden="true" className="mt-1 shrink-0 opacity-60 transition-transform duration-200" size={16} strokeWidth={2} />
-                    <span className="text-red-700 dark:text-red-400">"Need to delegate responsibility but can't give full access"</span>
-                  </CollapsibleTrigger>
-                  <CollapsibleContent className="overflow-hidden ps-6 text-sm transition-all data-[state=closed]:animate-collapsible-up data-[state=open]:animate-collapsible-down">
-                    <div className="space-y-3 pt-2">
-                      <p className="text-muted-foreground">You're the operations manager coordinating 3-4 concurrent projects. You want your field supervisors to create new projects when clients call, assign technicians based on availability, and adjust schedules when weather delays work. But you can't give them system access without also giving them visibility into everyone's pay rates and company profitability.</p>
-                      <div className="bg-muted/50 rounded-lg p-3 border-l-4 border-amber-500">
-                        <p className="font-semibold text-sm text-amber-700 dark:text-amber-400 mb-1">Example:</p>
-                        <p className="text-sm text-muted-foreground">Your most trusted supervisor handles the entire North Shore territory. When clients call for quotes or want to start work, he has to call you to create the project in the system. This creates a bottleneck—you're stuck in meetings and the client has to wait hours for a simple project setup.</p>
-                      </div>
-                      <div className="bg-green-50 dark:bg-green-950 rounded-lg p-3">
-                        <p className="font-semibold text-sm text-green-700 dark:text-green-400 mb-1">Solution:</p>
-                        <p className="text-sm text-green-900 dark:text-green-100">Grant supervisors project creation and management permissions without financial data access. They can create projects, assign employees, manage schedules, and respond to resident feedback—all while hourly rates, labor costs, and profit margins remain visible only to owners and operations managers.</p>
-                      </div>
-                      <div className="flex items-start gap-2 bg-blue-50 dark:bg-blue-950 rounded-lg p-3">
-                        <CheckCircle2 className="w-4 h-4 text-blue-600 shrink-0 mt-0.5" />
-                        <p className="text-sm text-blue-900 dark:text-blue-100"><strong>Benefit:</strong> Eliminate bottlenecks. Supervisors handle day-to-day operations independently. You focus on strategic work instead of being interrupted for routine tasks. Response time to clients improves from hours to minutes.</p>
-                      </div>
-                    </div>
-                  </CollapsibleContent>
-                </Collapsible>
-              </AccordionContent>
-            </AccordionItem>
+          {/* Operations Managers Section */}
+          <div className="space-y-4">
+            <div className="flex items-center gap-3 pb-2 border-b">
+              <Briefcase className="w-5 h-5 text-blue-500" />
+              <h3 className="text-lg font-medium">For Operations Managers & Supervisors</h3>
+            </div>
+            
+            <Accordion type="single" collapsible className="space-y-3">
+              <AccordionItem value="ops-1" className="border rounded-lg px-4">
+                <AccordionTrigger className="hover:no-underline py-4">
+                  <span className="text-left font-medium">Need to delegate responsibility but can't give full access</span>
+                </AccordionTrigger>
+                <AccordionContent className="pb-4">
+                  <div className="space-y-4 text-muted-foreground leading-relaxed">
+                    <p>You're coordinating 3-4 concurrent projects. You want your field supervisors to create projects and adjust schedules. But you can't give them access without exposing pay rates and company profitability.</p>
+                    <p><span className="font-medium text-foreground">Example:</span> Your most trusted supervisor handles the North Shore territory. When clients call, he has to call you to create projects. This creates bottlenecks—clients wait hours for simple project setup.</p>
+                    <p><span className="font-medium text-foreground">Solution:</span> Grant supervisors project creation and management permissions without financial data access. They create projects and manage schedules while rates and margins remain visible only to owners.</p>
+                    <p><span className="font-medium text-foreground">Benefit:</span> Eliminate bottlenecks. Response time to clients improves from hours to minutes.</p>
+                  </div>
+                </AccordionContent>
+              </AccordionItem>
+            </Accordion>
+          </div>
 
-            {/* For Building Managers & Property Managers */}
-            <AccordionItem
-              className="overflow-hidden border bg-background first:rounded-t-lg last:rounded-b-lg last:border-b"
-              value="building-managers"
-            >
-              <AccordionTrigger className="px-4 py-3 hover:no-underline">
-                <div className="flex items-center gap-2">
-                  <Building2 className="size-5 text-violet-600 dark:text-violet-400" />
-                  <span className="font-bold text-violet-700 dark:text-violet-400">For Building Managers & Property Managers</span>
-                  <Badge variant="secondary" className="ml-2">4 problems</Badge>
-                </div>
-              </AccordionTrigger>
-              <AccordionContent className="p-0">
-                <Collapsible className="space-y-1 border-border border-t bg-accent px-4 py-3">
-                  <CollapsibleTrigger className="flex gap-2 font-medium text-left [&[data-state=open]>svg]:rotate-180">
-                    <ChevronDown aria-hidden="true" className="mt-1 shrink-0 opacity-60 transition-transform duration-200" size={16} strokeWidth={2} />
-                    <span className="text-red-700 dark:text-red-400">"Administrative burden from tenant turnover"</span>
-                  </CollapsibleTrigger>
-                  <CollapsibleContent className="overflow-hidden ps-6 text-sm transition-all data-[state=closed]:animate-collapsible-up data-[state=open]:animate-collapsible-down">
-                    <div className="space-y-3 pt-2">
-                      <p className="text-muted-foreground">Your property management company manages 40 buildings. Building managers turnover every 6-12 months. Every time someone leaves, you need to contact every vendor to deactivate the old manager's account and create a new one. This coordination takes 2-3 days per manager change.</p>
-                      <div className="bg-muted/50 rounded-lg p-3 border-l-4 border-amber-500">
-                        <p className="font-semibold text-sm text-amber-700 dark:text-amber-400 mb-1">Example:</p>
-                        <p className="text-sm text-muted-foreground">Sarah managed Tower One for 8 months then transferred. Mike takes over. You send emails to 12 different vendors requesting account changes. Only 4 respond within a week. Three weeks later, Sarah still has access and Mike is calling you asking why he can't log in.</p>
-                      </div>
-                      <div className="bg-green-50 dark:bg-green-950 rounded-lg p-3">
-                        <p className="font-semibold text-sm text-green-700 dark:text-green-400 mb-1">Solution:</p>
-                        <p className="text-sm text-green-900 dark:text-green-100">Building-level accounts eliminate individual manager account management. Each building has one permanent account (e.g., "Tower One Manager"). When managers change, your property management company updates the password—access instantly transfers to the new manager. No vendor coordination required.</p>
-                      </div>
-                      <div className="flex items-start gap-2 bg-blue-50 dark:bg-blue-950 rounded-lg p-3">
-                        <CheckCircle2 className="w-4 h-4 text-blue-600 shrink-0 mt-0.5" />
-                        <p className="text-sm text-blue-900 dark:text-blue-100"><strong>Benefit:</strong> Manager transitions take 30 seconds instead of 3 days. Zero vendor coordination required. No risk of former managers retaining access.</p>
-                      </div>
-                    </div>
-                  </CollapsibleContent>
-                </Collapsible>
+          {/* Building Managers Section */}
+          <div className="space-y-4">
+            <div className="flex items-center gap-3 pb-2 border-b">
+              <Building2 className="w-5 h-5 text-violet-500" />
+              <h3 className="text-lg font-medium">For Building Managers & Property Managers</h3>
+            </div>
+            
+            <Accordion type="single" collapsible className="space-y-3">
+              <AccordionItem value="bm-1" className="border rounded-lg px-4">
+                <AccordionTrigger className="hover:no-underline py-4">
+                  <span className="text-left font-medium">Administrative burden from tenant turnover</span>
+                </AccordionTrigger>
+                <AccordionContent className="pb-4">
+                  <div className="space-y-4 text-muted-foreground leading-relaxed">
+                    <p>Your property management company manages 40 buildings. Building managers turnover every 6-12 months. Every time someone leaves, you contact every vendor to deactivate the old account and create a new one. This takes 2-3 days per manager change.</p>
+                    <p><span className="font-medium text-foreground">Example:</span> Sarah managed Tower One for 8 months then transferred. Mike takes over. You send emails to 12 vendors. Only 4 respond within a week. Three weeks later, Sarah still has access and Mike can't log in.</p>
+                    <p><span className="font-medium text-foreground">Solution:</span> Building-level accounts eliminate individual manager account management. Each building has one permanent account. When managers change, update the password—access instantly transfers. No vendor coordination.</p>
+                    <p><span className="font-medium text-foreground">Benefit:</span> Manager transitions take 30 seconds instead of 3 days.</p>
+                  </div>
+                </AccordionContent>
+              </AccordionItem>
 
-                <Collapsible className="space-y-1 border-border border-t bg-accent px-4 py-3">
-                  <CollapsibleTrigger className="flex gap-2 font-medium text-left [&[data-state=open]>svg]:rotate-180">
-                    <ChevronDown aria-hidden="true" className="mt-1 shrink-0 opacity-60 transition-transform duration-200" size={16} strokeWidth={2} />
-                    <span className="text-red-700 dark:text-red-400">"Residents calling constantly during maintenance work"</span>
-                  </CollapsibleTrigger>
-                  <CollapsibleContent className="overflow-hidden ps-6 text-sm transition-all data-[state=closed]:animate-collapsible-up data-[state=open]:animate-collapsible-down">
-                    <div className="space-y-3 pt-2">
-                      <p className="text-muted-foreground">During window cleaning season (May-September), your office phone never stops ringing. "When are they coming to my side?" "Did they do my floor yet?" Your administrative staff spends 15-20 hours per week just answering progress questions.</p>
-                      <div className="bg-muted/50 rounded-lg p-3 border-l-4 border-amber-500">
-                        <p className="font-semibold text-sm text-amber-700 dark:text-amber-400 mb-1">Example:</p>
-                        <p className="text-sm text-muted-foreground">It's Wednesday during a 2-week window cleaning project. You've received 47 calls since Monday asking about progress. Your admin is on call #48: "When will they do the west side?" She doesn't know—she has to call the maintenance company, wait for a callback, then call the resident back. This one question consumed 25 minutes and three phone calls.</p>
-                      </div>
-                      <div className="bg-green-50 dark:bg-green-950 rounded-lg p-3">
-                        <p className="font-semibold text-sm text-green-700 dark:text-green-400 mb-1">Solution:</p>
-                        <p className="text-sm text-green-900 dark:text-green-100">Resident portal gives building occupants real-time visibility into maintenance progress. They see the 4-elevation building visualization showing exactly which sides are complete (North 100%, East 75%, South 20%, West 0%), view progress photos, and check the project schedule.</p>
-                      </div>
-                      <div className="flex items-start gap-2 bg-blue-50 dark:bg-blue-950 rounded-lg p-3">
-                        <CheckCircle2 className="w-4 h-4 text-blue-600 shrink-0 mt-0.5" />
-                        <p className="text-sm text-blue-900 dark:text-blue-100"><strong>Benefit:</strong> Reduce resident calls by 60-70% during maintenance periods. Administrative staff freed from answering repetitive status questions. Residents get instant answers 24/7.</p>
-                      </div>
-                    </div>
-                  </CollapsibleContent>
-                </Collapsible>
+              <AccordionItem value="bm-2" className="border rounded-lg px-4">
+                <AccordionTrigger className="hover:no-underline py-4">
+                  <span className="text-left font-medium">Residents calling constantly during maintenance work</span>
+                </AccordionTrigger>
+                <AccordionContent className="pb-4">
+                  <div className="space-y-4 text-muted-foreground leading-relaxed">
+                    <p>During window cleaning season, your office phone never stops. "When are they coming to my side?" Your staff spends 15-20 hours per week answering progress questions.</p>
+                    <p><span className="font-medium text-foreground">Example:</span> It's Wednesday during a 2-week cleaning project. You've received 47 calls since Monday. Your admin is on call #48. She has to call the maintenance company, wait for callback, then call the resident back. One question consumed 25 minutes.</p>
+                    <p><span className="font-medium text-foreground">Solution:</span> Resident portal gives building occupants real-time visibility. They see which sides are complete, view progress photos, and check the project schedule.</p>
+                    <p><span className="font-medium text-foreground">Benefit:</span> Reduce resident calls by 60-70% during maintenance periods.</p>
+                  </div>
+                </AccordionContent>
+              </AccordionItem>
 
-                <Collapsible className="space-y-1 border-border border-t bg-accent px-4 py-3">
-                  <CollapsibleTrigger className="flex gap-2 font-medium text-left [&[data-state=open]>svg]:rotate-180">
-                    <ChevronDown aria-hidden="true" className="mt-1 shrink-0 opacity-60 transition-transform duration-200" size={16} strokeWidth={2} />
-                    <span className="text-red-700 dark:text-red-400">"Complaints escalating to building managers instead of going to the vendor"</span>
-                  </CollapsibleTrigger>
-                  <CollapsibleContent className="overflow-hidden ps-6 text-sm transition-all data-[state=closed]:animate-collapsible-up data-[state=open]:animate-collapsible-down">
-                    <div className="space-y-3 pt-2">
-                      <p className="text-muted-foreground">Residents encounter issues during maintenance work: missed windows, water damage from cleaning, scheduling conflicts. But there's no direct way to report these to the maintenance company. So residents call you, the building manager. You become the middleman.</p>
-                      <div className="bg-muted/50 rounded-lg p-3 border-l-4 border-amber-500">
-                        <p className="font-semibold text-sm text-amber-700 dark:text-amber-400 mb-1">Example:</p>
-                        <p className="text-sm text-muted-foreground">Mrs. Chen in Unit 2304 emails you photos of streaky windows. You forward the email to the rope access company. Three days pass with no response. Meanwhile, Mrs. Chen is filing strata council complaints about management responsiveness—but it's not your fault, it's the vendor's lack of direct communication.</p>
-                      </div>
-                      <div className="bg-green-50 dark:bg-green-950 rounded-lg p-3">
-                        <p className="font-semibold text-sm text-green-700 dark:text-green-400 mb-1">Solution:</p>
-                        <p className="text-sm text-green-900 dark:text-green-100">Centralized feedback system with building-level visibility. Residents submit feedback directly to the maintenance company through the portal with photos. Building managers see all feedback for their buildings in real-time, can track response times, and verify resolution—without being the middleman.</p>
-                      </div>
-                      <div className="flex items-start gap-2 bg-blue-50 dark:bg-blue-950 rounded-lg p-3">
-                        <CheckCircle2 className="w-4 h-4 text-blue-600 shrink-0 mt-0.5" />
-                        <p className="text-sm text-blue-900 dark:text-blue-100"><strong>Benefit:</strong> Zero complaints lost in email chains. You see all resident feedback and vendor responses in one place without handling every back-and-forth. Average resolution time drops from 3-5 days to 24 hours.</p>
-                      </div>
-                    </div>
-                  </CollapsibleContent>
-                </Collapsible>
+              <AccordionItem value="bm-3" className="border rounded-lg px-4">
+                <AccordionTrigger className="hover:no-underline py-4">
+                  <span className="text-left font-medium">Complaints escalating to building managers instead of vendors</span>
+                </AccordionTrigger>
+                <AccordionContent className="pb-4">
+                  <div className="space-y-4 text-muted-foreground leading-relaxed">
+                    <p>Residents encounter issues during maintenance—missed windows, water damage, scheduling conflicts. But there's no direct way to report to the maintenance company. So residents call you, and you become the middleman.</p>
+                    <p><span className="font-medium text-foreground">Example:</span> Mrs. Chen emails you photos of streaky windows. You forward to the rope access company. Three days pass with no response. Meanwhile, Mrs. Chen files strata council complaints about management responsiveness.</p>
+                    <p><span className="font-medium text-foreground">Solution:</span> Centralized feedback system with building-level visibility. Residents submit feedback directly to the maintenance company. You see all feedback in real-time without being the middleman.</p>
+                    <p><span className="font-medium text-foreground">Benefit:</span> Average resolution time drops from 3-5 days to 24 hours.</p>
+                  </div>
+                </AccordionContent>
+              </AccordionItem>
 
-                <Collapsible className="space-y-1 border-border border-t bg-accent px-4 py-3">
-                  <CollapsibleTrigger className="flex gap-2 font-medium text-left [&[data-state=open]>svg]:rotate-180">
-                    <ChevronDown aria-hidden="true" className="mt-1 shrink-0 opacity-60 transition-transform duration-200" size={16} strokeWidth={2} />
-                    <span className="text-red-700 dark:text-red-400">"Building managers don't see your value - scattered communication"</span>
-                  </CollapsibleTrigger>
-                  <CollapsibleContent className="overflow-hidden ps-6 text-sm transition-all data-[state=closed]:animate-collapsible-up data-[state=open]:animate-collapsible-down">
-                    <div className="space-y-3 pt-2">
-                      <p className="text-muted-foreground">Your maintenance vendors communicate through whatever channel is convenient: text messages, personal emails, phone calls, sticky notes. When you need to compile a report for the strata council or justify a contract renewal, you're digging through months of texts and emails.</p>
-                      <div className="bg-muted/50 rounded-lg p-3 border-l-4 border-amber-500">
-                        <p className="font-semibold text-sm text-amber-700 dark:text-amber-400 mb-1">Example:</p>
-                        <p className="text-sm text-muted-foreground">The strata council questions why they should renew the rope access contract. "How do we know they're responsive to resident concerns?" You're scrolling through text messages from March, checking your email for attachments. You can't provide concrete data, just vague assurances that "they're usually pretty good."</p>
-                      </div>
-                      <div className="bg-green-50 dark:bg-green-950 rounded-lg p-3">
-                        <p className="font-semibold text-sm text-green-700 dark:text-green-400 mb-1">Solution:</p>
-                        <p className="text-sm text-green-900 dark:text-green-100">Professional vendor portal provides building managers with complete visibility: real-time project progress, comprehensive photo galleries documenting work completion, all resident feedback with response times tracked, complete work history, and downloadable reports for council presentations.</p>
-                      </div>
-                      <div className="flex items-start gap-2 bg-blue-50 dark:bg-blue-950 rounded-lg p-3">
-                        <CheckCircle2 className="w-4 h-4 text-blue-600 shrink-0 mt-0.5" />
-                        <p className="text-sm text-blue-900 dark:text-blue-100"><strong>Benefit:</strong> Answer council questions with data, not vague memories. Generate professional reports in 2 minutes instead of 2 hours of digging through communications. Demonstrate vendor performance objectively.</p>
-                      </div>
-                    </div>
-                  </CollapsibleContent>
-                </Collapsible>
-              </AccordionContent>
-            </AccordionItem>
+              <AccordionItem value="bm-4" className="border rounded-lg px-4">
+                <AccordionTrigger className="hover:no-underline py-4">
+                  <span className="text-left font-medium">Building managers don't see your value - scattered communication</span>
+                </AccordionTrigger>
+                <AccordionContent className="pb-4">
+                  <div className="space-y-4 text-muted-foreground leading-relaxed">
+                    <p>Your maintenance vendors communicate through text messages, personal emails, phone calls, sticky notes. When you need to compile a report for the strata council, you're digging through months of texts and emails.</p>
+                    <p><span className="font-medium text-foreground">Example:</span> The strata council questions why they should renew the rope access contract. "How do we know they're responsive?" You're scrolling through texts from March. You can't provide concrete data.</p>
+                    <p><span className="font-medium text-foreground">Solution:</span> Professional vendor portal provides complete visibility: real-time progress, photo galleries, all feedback with response times tracked, and downloadable reports for council presentations.</p>
+                    <p><span className="font-medium text-foreground">Benefit:</span> Generate professional reports in 2 minutes instead of 2 hours of digging.</p>
+                  </div>
+                </AccordionContent>
+              </AccordionItem>
+            </Accordion>
+          </div>
 
-            {/* For Building Residents */}
-            <AccordionItem
-              className="overflow-hidden border bg-background first:rounded-t-lg last:rounded-b-lg last:border-b"
-              value="residents"
-            >
-              <AccordionTrigger className="px-4 py-3 hover:no-underline">
-                <div className="flex items-center gap-2">
-                  <Home className="size-5 text-rose-600 dark:text-rose-400" />
-                  <span className="font-bold text-rose-700 dark:text-rose-400">For Building Residents</span>
-                  <Badge variant="secondary" className="ml-2">3 problems</Badge>
-                </div>
-              </AccordionTrigger>
-              <AccordionContent className="p-0">
-                <Collapsible className="space-y-1 border-border border-t bg-accent px-4 py-3">
-                  <CollapsibleTrigger className="flex gap-2 font-medium text-left [&[data-state=open]>svg]:rotate-180">
-                    <ChevronDown aria-hidden="true" className="mt-1 shrink-0 opacity-60 transition-transform duration-200" size={16} strokeWidth={2} />
-                    <span className="text-red-700 dark:text-red-400">"70% more service calls than necessary - no transparency into work progress"</span>
-                  </CollapsibleTrigger>
-                  <CollapsibleContent className="overflow-hidden ps-6 text-sm transition-all data-[state=closed]:animate-collapsible-up data-[state=open]:animate-collapsible-down">
-                    <div className="space-y-3 pt-2">
-                      <p className="text-muted-foreground">You see maintenance equipment on the roof. Scaffolding goes up on the building's west side. You have no idea what's being done, when it will be done, or if it will affect your unit. So you call the building manager to ask. So does everyone else in your building.</p>
-                      <div className="bg-muted/50 rounded-lg p-3 border-l-4 border-amber-500">
-                        <p className="font-semibold text-sm text-amber-700 dark:text-amber-400 mb-1">Example:</p>
-                        <p className="text-sm text-muted-foreground">You're in Unit 1847 on the east side of the building. Monday morning you see rope access technicians on the west side. Are they coming to your side? You need to know because you have plants on your exterior balcony that need to be moved before cleaning. You call the building manager. They don't know—they have to contact the vendor.</p>
-                      </div>
-                      <div className="bg-green-50 dark:bg-green-950 rounded-lg p-3">
-                        <p className="font-semibold text-sm text-green-700 dark:text-green-400 mb-1">Solution:</p>
-                        <p className="text-sm text-green-900 dark:text-green-100">Resident portal shows your building's project in real-time. You see the 4-elevation visualization: West 100% complete, North 60% complete, East 0% (not started), South 0% (not started). Schedule shows east elevation starting Wednesday. You move your plants Tuesday night. No phone calls necessary.</p>
-                      </div>
-                      <div className="flex items-start gap-2 bg-blue-50 dark:bg-blue-950 rounded-lg p-3">
-                        <CheckCircle2 className="w-4 h-4 text-blue-600 shrink-0 mt-0.5" />
-                        <p className="text-sm text-blue-900 dark:text-blue-100"><strong>Benefit:</strong> Plan your schedule around maintenance work. Know exactly when work will affect your unit. No calling and waiting for information. No surprises. Reduced stress and frustration.</p>
-                      </div>
-                    </div>
-                  </CollapsibleContent>
-                </Collapsible>
+          {/* Residents Section */}
+          <div className="space-y-4">
+            <div className="flex items-center gap-3 pb-2 border-b">
+              <Home className="w-5 h-5 text-rose-500" />
+              <h3 className="text-lg font-medium">For Building Residents</h3>
+            </div>
+            
+            <Accordion type="single" collapsible className="space-y-3">
+              <AccordionItem value="res-1" className="border rounded-lg px-4">
+                <AccordionTrigger className="hover:no-underline py-4">
+                  <span className="text-left font-medium">No transparency into work progress</span>
+                </AccordionTrigger>
+                <AccordionContent className="pb-4">
+                  <div className="space-y-4 text-muted-foreground leading-relaxed">
+                    <p>You see maintenance equipment on the roof. Scaffolding goes up on the west side. You have no idea what's being done, when it will be done, or if it will affect your unit. So you call the building manager. So does everyone else.</p>
+                    <p><span className="font-medium text-foreground">Example:</span> You're in Unit 1847 on the east side. Monday morning you see technicians on the west side. Are they coming to your side? You need to move plants on your balcony before cleaning. You call the building manager. They don't know—they have to contact the vendor.</p>
+                    <p><span className="font-medium text-foreground">Solution:</span> Resident portal shows your building's project in real-time. You see which elevations are complete, view the schedule showing east elevation starts Wednesday. You move your plants Tuesday night. No calls necessary.</p>
+                    <p><span className="font-medium text-foreground">Benefit:</span> Plan your schedule around maintenance work. No surprises. Reduced stress.</p>
+                  </div>
+                </AccordionContent>
+              </AccordionItem>
 
-                <Collapsible className="space-y-1 border-border border-t bg-accent px-4 py-3">
-                  <CollapsibleTrigger className="flex gap-2 font-medium text-left [&[data-state=open]>svg]:rotate-180">
-                    <ChevronDown aria-hidden="true" className="mt-1 shrink-0 opacity-60 transition-transform duration-200" size={16} strokeWidth={2} />
-                    <span className="text-red-700 dark:text-red-400">"No record of complaint resolution - submit complaint and hear nothing back"</span>
-                  </CollapsibleTrigger>
-                  <CollapsibleContent className="overflow-hidden ps-6 text-sm transition-all data-[state=closed]:animate-collapsible-up data-[state=open]:animate-collapsible-down">
-                    <div className="space-y-3 pt-2">
-                      <p className="text-muted-foreground">You notice streaks on your windows after the cleaning crew left. You email the building manager with photos. Days pass with no acknowledgment. A week later, you email again. No response. You don't know if anyone saw your complaint.</p>
-                      <div className="bg-muted/50 rounded-lg p-3 border-l-4 border-amber-500">
-                        <p className="font-semibold text-sm text-amber-700 dark:text-amber-400 mb-1">Example:</p>
-                        <p className="text-sm text-muted-foreground">Your exterior windows have water damage stains after pressure washing. You email photos to the building manager on Monday. By Friday you've heard nothing. Wednesday you finally get a call: "Oh sorry, I forwarded that to the contractor last week, I think they're planning to come back." No timeline, no confirmation, no accountability.</p>
-                      </div>
-                      <div className="bg-green-50 dark:bg-green-950 rounded-lg p-3">
-                        <p className="font-semibold text-sm text-green-700 dark:text-green-400 mb-1">Solution:</p>
-                        <p className="text-sm text-green-900 dark:text-green-100">Submit feedback directly through the portal with photos. System timestamps your submission immediately. You see status change from "Open" to "In Progress" when management acknowledges the issue. You see status change to "Closed" when fixed, with photos of corrected work.</p>
-                      </div>
-                      <div className="flex items-start gap-2 bg-blue-50 dark:bg-blue-950 rounded-lg p-3">
-                        <CheckCircle2 className="w-4 h-4 text-blue-600 shrink-0 mt-0.5" />
-                        <p className="text-sm text-blue-900 dark:text-blue-100"><strong>Benefit:</strong> Know your concern was received immediately. See progress on resolution in real-time. Hold management accountable with transparent tracking. Average resolution time 24 hours vs. 3-5 days with traditional communication.</p>
-                      </div>
-                    </div>
-                  </CollapsibleContent>
-                </Collapsible>
+              <AccordionItem value="res-2" className="border rounded-lg px-4">
+                <AccordionTrigger className="hover:no-underline py-4">
+                  <span className="text-left font-medium">No record of complaint resolution</span>
+                </AccordionTrigger>
+                <AccordionContent className="pb-4">
+                  <div className="space-y-4 text-muted-foreground leading-relaxed">
+                    <p>You notice streaks on your windows after the cleaning crew left. You email the building manager with photos. Days pass with no acknowledgment. A week later, you email again. No response. You don't know if anyone saw your complaint.</p>
+                    <p><span className="font-medium text-foreground">Example:</span> Your windows have water damage stains after pressure washing. You email Monday. By Friday you've heard nothing. Wednesday you finally get a call: "I forwarded that last week, I think they're planning to come back." No timeline, no accountability.</p>
+                    <p><span className="font-medium text-foreground">Solution:</span> Submit feedback directly through the portal with photos. System timestamps your submission. You see status change from "Open" to "In Progress" when acknowledged, then "Closed" when fixed with photos of corrected work.</p>
+                    <p><span className="font-medium text-foreground">Benefit:</span> Know your concern was received immediately. Average resolution 24 hours vs. 3-5 days.</p>
+                  </div>
+                </AccordionContent>
+              </AccordionItem>
 
-                <Collapsible className="space-y-1 border-border border-t bg-accent px-4 py-3">
-                  <CollapsibleTrigger className="flex gap-2 font-medium text-left [&[data-state=open]>svg]:rotate-180">
-                    <ChevronDown aria-hidden="true" className="mt-1 shrink-0 opacity-60 transition-transform duration-200" size={16} strokeWidth={2} />
-                    <span className="text-red-700 dark:text-red-400">"3-day resolution times from phone tag"</span>
-                  </CollapsibleTrigger>
-                  <CollapsibleContent className="overflow-hidden ps-6 text-sm transition-all data-[state=closed]:animate-collapsible-up data-[state=open]:animate-collapsible-down">
-                    <div className="space-y-3 pt-2">
-                      <p className="text-muted-foreground">The maintenance company needs to know about issues immediately to fix them quickly. But the communication chain is broken: resident to building manager to maintenance company back to building manager back to resident. Each handoff adds 12-24 hours of delay.</p>
-                      <div className="bg-muted/50 rounded-lg p-3 border-l-4 border-amber-500">
-                        <p className="font-semibold text-sm text-amber-700 dark:text-amber-400 mb-1">Example:</p>
-                        <p className="text-sm text-muted-foreground">Unit 3205 has a broken window screen after rope access work. Resident emails building manager Tuesday. Manager forwards to maintenance company Tuesday afternoon. Company schedules repair for Thursday. Resident isn't home Thursday because nobody told them. Repair finally happens Friday—3 days after initial report for a 15-minute fix.</p>
-                      </div>
-                      <div className="bg-green-50 dark:bg-green-950 rounded-lg p-3">
-                        <p className="font-semibold text-sm text-green-700 dark:text-green-400 mb-1">Solution:</p>
-                        <p className="text-sm text-green-900 dark:text-green-100">Direct resident-to-vendor feedback system cuts out the middleman while keeping building managers informed. Resident submits issue Tuesday 9am. Maintenance company sees it Tuesday 9:05am, responds Tuesday 10am: "Scheduling for tomorrow 2pm." Issue resolved Wednesday 2pm.</p>
-                      </div>
-                      <div className="flex items-start gap-2 bg-blue-50 dark:bg-blue-950 rounded-lg p-3">
-                        <CheckCircle2 className="w-4 h-4 text-blue-600 shrink-0 mt-0.5" />
-                        <p className="text-sm text-blue-900 dark:text-blue-100"><strong>Benefit:</strong> 3-day resolution becomes 24-hour resolution. Building managers stay informed without handling every message. Residents get direct communication with the people who can actually fix problems.</p>
-                      </div>
-                    </div>
-                  </CollapsibleContent>
-                </Collapsible>
-              </AccordionContent>
-            </AccordionItem>
+              <AccordionItem value="res-3" className="border rounded-lg px-4">
+                <AccordionTrigger className="hover:no-underline py-4">
+                  <span className="text-left font-medium">3-day resolution times from phone tag</span>
+                </AccordionTrigger>
+                <AccordionContent className="pb-4">
+                  <div className="space-y-4 text-muted-foreground leading-relaxed">
+                    <p>The communication chain is broken: resident to building manager to maintenance company back to building manager back to resident. Each handoff adds 12-24 hours of delay.</p>
+                    <p><span className="font-medium text-foreground">Example:</span> Unit 3205 has a broken window screen. Resident emails building manager Tuesday. Manager forwards Tuesday afternoon. Company schedules repair for Thursday. Resident isn't home Thursday because nobody told them. Repair happens Friday—3 days for a 15-minute fix.</p>
+                    <p><span className="font-medium text-foreground">Solution:</span> Direct resident-to-vendor feedback system cuts out the middleman while keeping building managers informed. Resident submits issue Tuesday 9am. Company sees it Tuesday 9:05am, responds at 10am. Issue resolved Wednesday 2pm.</p>
+                    <p><span className="font-medium text-foreground">Benefit:</span> 3-day resolution becomes 24-hour resolution.</p>
+                  </div>
+                </AccordionContent>
+              </AccordionItem>
+            </Accordion>
+          </div>
 
-            {/* Security & Data Protection */}
-            <AccordionItem
-              className="overflow-hidden border bg-background first:rounded-t-lg last:rounded-b-lg last:border-b"
-              value="security"
-            >
-              <AccordionTrigger className="px-4 py-3 hover:no-underline">
-                <div className="flex items-center gap-2">
-                  <Shield className="size-5 text-emerald-600 dark:text-emerald-400" />
-                  <span className="font-bold text-emerald-700 dark:text-emerald-400">Security & Data Protection</span>
-                  <Badge variant="secondary" className="ml-2">2 problems</Badge>
-                </div>
-              </AccordionTrigger>
-              <AccordionContent className="p-0">
-                <Collapsible className="space-y-1 border-border border-t bg-accent px-4 py-3">
-                  <CollapsibleTrigger className="flex gap-2 font-medium text-left [&[data-state=open]>svg]:rotate-180">
-                    <ChevronDown aria-hidden="true" className="mt-1 shrink-0 opacity-60 transition-transform duration-200" size={16} strokeWidth={2} />
-                    <span className="text-red-700 dark:text-red-400">"Multi-tenant data isolation - can't afford data breaches"</span>
-                  </CollapsibleTrigger>
-                  <CollapsibleContent className="overflow-hidden ps-6 text-sm transition-all data-[state=closed]:animate-collapsible-up data-[state=open]:animate-collapsible-down">
-                    <div className="space-y-3 pt-2">
-                      <p className="text-muted-foreground">You're a small rope access company. You can't afford enterprise-grade IT security or data protection infrastructure. But you handle sensitive information: employee social insurance numbers, hourly rates, client billing data, building access codes, resident complaints.</p>
-                      <div className="bg-muted/50 rounded-lg p-3 border-l-4 border-amber-500">
-                        <p className="font-semibold text-sm text-amber-700 dark:text-amber-400 mb-1">Example:</p>
-                        <p className="text-sm text-muted-foreground">You're evaluating a construction software platform. Their security documentation is vague. You ask: "If I use your platform, can other companies see my data?" The answer is concerning: "Our system uses role-based permissions so only authorized users can access data." That doesn't answer the question—are other companies even in the same database?</p>
-                      </div>
-                      <div className="bg-green-50 dark:bg-green-950 rounded-lg p-3">
-                        <p className="font-semibold text-sm text-green-700 dark:text-green-400 mb-1">Solution:</p>
-                        <p className="text-sm text-green-900 dark:text-green-100">Complete multi-tenant isolation architecture. Your company's projects, employees, work sessions, photos, complaints, and financial data exist in a completely separate partition from every other company. A security flaw in another company's account cannot expose your data.</p>
-                      </div>
-                      <div className="flex items-start gap-2 bg-blue-50 dark:bg-blue-950 rounded-lg p-3">
-                        <CheckCircle2 className="w-4 h-4 text-blue-600 shrink-0 mt-0.5" />
-                        <p className="text-sm text-blue-900 dark:text-blue-100"><strong>Benefit:</strong> Bank-level data protection without hiring security experts. Guarantee to clients that their building information and resident data is isolated. Regulatory compliance for privacy laws.</p>
-                      </div>
-                    </div>
-                  </CollapsibleContent>
-                </Collapsible>
+          {/* Security Section */}
+          <div className="space-y-4">
+            <div className="flex items-center gap-3 pb-2 border-b">
+              <Shield className="w-5 h-5 text-emerald-500" />
+              <h3 className="text-lg font-medium">Security & Data Protection</h3>
+            </div>
+            
+            <Accordion type="single" collapsible className="space-y-3">
+              <AccordionItem value="sec-1" className="border rounded-lg px-4">
+                <AccordionTrigger className="hover:no-underline py-4">
+                  <span className="text-left font-medium">Multi-tenant data isolation</span>
+                </AccordionTrigger>
+                <AccordionContent className="pb-4">
+                  <div className="space-y-4 text-muted-foreground leading-relaxed">
+                    <p>You're a small rope access company. You can't afford enterprise-grade IT security. But you handle sensitive information: employee SINs, hourly rates, client billing data, building access codes, resident complaints.</p>
+                    <p><span className="font-medium text-foreground">Example:</span> You're evaluating a construction software platform. Their security documentation is vague. You ask: "Can other companies see my data?" The answer is concerning: "Our system uses role-based permissions." That doesn't answer the question.</p>
+                    <p><span className="font-medium text-foreground">Solution:</span> Complete multi-tenant isolation architecture. Your company's data exists in a completely separate partition from every other company. A security flaw in another company's account cannot expose your data.</p>
+                    <p><span className="font-medium text-foreground">Benefit:</span> Bank-level data protection without hiring security experts. Regulatory compliance for privacy laws.</p>
+                  </div>
+                </AccordionContent>
+              </AccordionItem>
 
-                <Collapsible className="space-y-1 border-border border-t bg-accent px-4 py-3">
-                  <CollapsibleTrigger className="flex gap-2 font-medium text-left [&[data-state=open]>svg]:rotate-180">
-                    <ChevronDown aria-hidden="true" className="mt-1 shrink-0 opacity-60 transition-transform duration-200" size={16} strokeWidth={2} />
-                    <span className="text-red-700 dark:text-red-400">"Password security - can't control how employees manage passwords"</span>
-                  </CollapsibleTrigger>
-                  <CollapsibleContent className="overflow-hidden ps-6 text-sm transition-all data-[state=closed]:animate-collapsible-up data-[state=open]:animate-collapsible-down">
-                    <div className="space-y-3 pt-2">
-                      <p className="text-muted-foreground">You require employees to create strong passwords, but you have no way to enforce it. Technicians use "password123" or their birthdate. When someone leaves the company, if their password was stored in plain text, it could be used on other systems.</p>
-                      <div className="bg-muted/50 rounded-lg p-3 border-l-4 border-amber-500">
-                        <p className="font-semibold text-sm text-amber-700 dark:text-amber-400 mb-1">Example:</p>
-                        <p className="text-sm text-muted-foreground">You hire a new technician. He creates his account with password "Rope2024". Six months later he leaves to work for a competitor. You disable his account, but his password was stored in plain text in the database. If someone breaches your system, they could retrieve actual passwords and try them on your email system and other platforms.</p>
-                      </div>
-                      <div className="bg-green-50 dark:bg-green-950 rounded-lg p-3">
-                        <p className="font-semibold text-sm text-green-700 dark:text-green-400 mb-1">Solution:</p>
-                        <p className="text-sm text-green-900 dark:text-green-100">Industry-standard bcrypt password hashing with salt rounds. Passwords are never stored in plain text—not even you can see them. When an employee logs in, their entered password is hashed and compared to the stored hash. Even if someone gained database access, they would see only irreversible hashes.</p>
-                      </div>
-                      <div className="flex items-start gap-2 bg-blue-50 dark:bg-blue-950 rounded-lg p-3">
-                        <CheckCircle2 className="w-4 h-4 text-blue-600 shrink-0 mt-0.5" />
-                        <p className="text-sm text-blue-900 dark:text-blue-100"><strong>Benefit:</strong> Protect employee accounts even if database is compromised. Meet security requirements for client contracts and insurance audits. Demonstrate professional security practices. Eliminate "I forgot my password and need you to tell me what it is" requests—you literally cannot retrieve passwords, only reset them.</p>
-                      </div>
-                    </div>
-                  </CollapsibleContent>
-                </Collapsible>
-              </AccordionContent>
-            </AccordionItem>
-          </Accordion>
+              <AccordionItem value="sec-2" className="border rounded-lg px-4">
+                <AccordionTrigger className="hover:no-underline py-4">
+                  <span className="text-left font-medium">Password security</span>
+                </AccordionTrigger>
+                <AccordionContent className="pb-4">
+                  <div className="space-y-4 text-muted-foreground leading-relaxed">
+                    <p>You require employees to create strong passwords, but you have no way to enforce it. Technicians use "password123" or their birthdate. When someone leaves, if their password was stored in plain text, it could be used on other systems.</p>
+                    <p><span className="font-medium text-foreground">Example:</span> A technician creates his account with password "Rope2024". Six months later he leaves to work for a competitor. His password was stored in plain text. If someone breaches your system, they could try those passwords on your email and other platforms.</p>
+                    <p><span className="font-medium text-foreground">Solution:</span> Industry-standard bcrypt password hashing with salt rounds. Passwords are never stored in plain text—not even you can see them. Even if someone gained database access, they would see only irreversible hashes.</p>
+                    <p><span className="font-medium text-foreground">Benefit:</span> Protect employee accounts even if database is compromised. Eliminate "I forgot my password and need you to tell me what it is" requests—you literally cannot retrieve passwords, only reset them.</p>
+                  </div>
+                </AccordionContent>
+              </AccordionItem>
+            </Accordion>
+          </div>
         </section>
 
         <Separator />
