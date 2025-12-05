@@ -10,7 +10,7 @@ import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/hooks/use-toast";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { formatLocalDate, formatLocalDateLong } from "@/lib/dateUtils";
-import { Loader2, Building2, History, CheckCircle, Clock, AlertCircle, LogOut, Lock, Hash } from "lucide-react";
+import { Loader2, Building2, History, CheckCircle, Clock, AlertCircle, LogOut, Lock, Hash, ArrowLeft } from "lucide-react";
 
 interface BuildingData {
   id: string;
@@ -188,7 +188,18 @@ export default function BuildingPortal() {
 
   if (needsLogin) {
     return (
-      <div className="min-h-screen page-gradient flex items-center justify-center p-4">
+      <div className="min-h-screen page-gradient flex flex-col items-center justify-center p-4">
+        <div className="w-full max-w-md mb-4">
+          <Button 
+            variant="ghost" 
+            onClick={() => setLocation("/")}
+            className="gap-2"
+            data-testid="button-back"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            Back to Home
+          </Button>
+        </div>
         <Card className="w-full max-w-md">
           <CardHeader className="text-center space-y-4">
             <div className="mx-auto h-16 w-16 rounded-full bg-primary/10 flex items-center justify-center">
@@ -218,6 +229,9 @@ export default function BuildingPortal() {
                     data-testid="input-strata-number"
                   />
                 </div>
+                <p className="text-xs text-muted-foreground">
+                  You can enter with or without spaces (e.g., LMS1000 or LMS 1000)
+                </p>
               </div>
               <div className="space-y-2">
                 <Label htmlFor="password">Password</Label>
