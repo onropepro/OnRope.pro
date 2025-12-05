@@ -522,10 +522,10 @@
   }
 }
 
-/* SuperUser Section - Outfit font with 14px minimum */
+/* SuperUser Section - Outfit font with 16px minimum */
 .superuser-root {
   font-family: 'Outfit', sans-serif !important;
-  font-size: 14px !important;
+  font-size: 16px !important;
   line-height: 1.6;
 }
 
@@ -533,32 +533,34 @@
   font-family: 'Outfit', sans-serif !important;
 }
 
-/* Enforce minimum 14px for all small text classes */
+/* Enforce minimum 16px for all small text classes */
 .superuser-root .text-xs:not(.material-icons),
 .superuser-root .text-\[10px\]:not(.material-icons),
 .superuser-root .text-\[11px\]:not(.material-icons),
 .superuser-root .text-\[12px\]:not(.material-icons),
-.superuser-root .text-\[13px\]:not(.material-icons) {
-  font-size: 14px !important;
+.superuser-root .text-\[13px\]:not(.material-icons),
+.superuser-root .text-\[14px\]:not(.material-icons),
+.superuser-root .text-\[15px\]:not(.material-icons) {
+  font-size: 16px !important;
 }
 
 .superuser-root small {
-  font-size: 14px !important;
+  font-size: 16px !important;
 }
 
 .superuser-root .text-sm:not(.material-icons) {
-  font-size: 14px !important;
+  font-size: 16px !important;
 }
 
-/* Also enforce 14px for muted/secondary text which often uses smaller sizes */
+/* Also enforce 16px for muted/secondary text which often uses smaller sizes */
 .superuser-root .text-muted-foreground {
-  font-size: 14px !important;
+  font-size: 16px !important;
 }
 
 .superuser-root p,
 .superuser-root span:not(.material-icons):not(.material-icons-outlined):not(.material-symbols-outlined),
 .superuser-root div {
-  font-size: max(14px, inherit);
+  font-size: max(16px, inherit);
 }
 
 /* Preserve Material Icons font */
