@@ -870,44 +870,25 @@ export default function Changelog() {
               {recentChangesData.map((change, index) => (
                 <div 
                   key={index}
-                  className="flex items-start gap-4 p-4 rounded-lg bg-muted/30"
+                  className="p-4 rounded-lg bg-muted/30"
                 >
-                  <div className="flex-shrink-0">
-                    <div className={`p-2 rounded-lg ${
-                      change.type === 'feature' 
-                        ? 'bg-emerald-500/10 ring-1 ring-emerald-500/20' 
-                        : change.type === 'improvement'
-                        ? 'bg-blue-500/10 ring-1 ring-blue-500/20'
-                        : 'bg-orange-500/10 ring-1 ring-orange-500/20'
-                    }`}>
-                      {change.type === 'feature' ? (
-                        <Zap className={`h-4 w-4 text-emerald-600 dark:text-emerald-400`} />
-                      ) : change.type === 'improvement' ? (
-                        <TrendingUp className={`h-4 w-4 text-blue-600 dark:text-blue-400`} />
-                      ) : (
-                        <Wrench className={`h-4 w-4 text-orange-600 dark:text-orange-400`} />
-                      )}
-                    </div>
+                  <div className="flex items-center gap-2 flex-wrap mb-1">
+                    <span className="font-semibold text-[16px] text-black dark:text-white" style={{ fontFamily: 'Outfit, sans-serif' }}>{change.title}</span>
+                    <Badge 
+                      variant="secondary" 
+                      className={`text-xs ${
+                        change.type === 'feature' 
+                          ? 'bg-emerald-500/10 text-emerald-700 dark:text-emerald-300' 
+                          : change.type === 'improvement'
+                          ? 'bg-blue-500/10 text-blue-700 dark:text-blue-300'
+                          : 'bg-orange-500/10 text-orange-700 dark:text-orange-300'
+                      }`}
+                    >
+                      {change.type === 'feature' ? 'New Feature' : change.type === 'improvement' ? 'Improvement' : 'Fix'}
+                    </Badge>
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 flex-wrap mb-1">
-                      <span className="font-semibold text-base text-black dark:text-white" style={{ fontFamily: 'Outfit, sans-serif' }}>{change.title}</span>
-                      <Badge 
-                        variant="secondary" 
-                        className={`text-xs ${
-                          change.type === 'feature' 
-                            ? 'bg-emerald-500/10 text-emerald-700 dark:text-emerald-300' 
-                            : change.type === 'improvement'
-                            ? 'bg-blue-500/10 text-blue-700 dark:text-blue-300'
-                            : 'bg-orange-500/10 text-orange-700 dark:text-orange-300'
-                        }`}
-                      >
-                        {change.type === 'feature' ? 'New Feature' : change.type === 'improvement' ? 'Improvement' : 'Fix'}
-                      </Badge>
-                    </div>
-                    <p className="text-base text-gray-500 dark:text-gray-400 mt-2.5 mb-2.5" style={{ fontFamily: 'Outfit, sans-serif' }}>{change.description}</p>
-                    <p className="text-xs text-muted-foreground/70">{change.date}</p>
-                  </div>
+                  <p className="text-[16px] text-gray-500 dark:text-gray-400 mt-2.5 mb-2.5" style={{ fontFamily: 'Outfit, sans-serif' }}>{change.description}</p>
+                  <p className="text-xs text-muted-foreground/70">{change.date}</p>
                 </div>
               ))}
             </div>
