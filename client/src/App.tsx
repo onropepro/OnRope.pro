@@ -52,7 +52,6 @@ import InventoryGuide from "@/pages/InventoryGuide";
 import SafetyGuide from "@/pages/SafetyGuide";
 import UserAccessGuide from "@/pages/UserAccessGuide";
 import ProjectsGuide from "@/pages/ProjectsGuide";
-import AuthenticationGuide from "@/pages/AuthenticationGuide";
 import TimeTrackingGuide from "@/pages/TimeTrackingGuide";
 import IRATALoggingGuide from "@/pages/IRATALoggingGuide";
 import DocumentManagementGuide from "@/pages/DocumentManagementGuide";
@@ -263,7 +262,7 @@ function Router() {
         </ProtectedRoute>
       </Route>
       <Route path="/changelog" component={Changelog} />
-      <Route path="/changelog/authentication" component={AuthenticationGuide} />
+      <Route path="/changelog/authentication" component={UserAccessGuide} />
       <Route path="/changelog/project-management" component={ProjectsGuide} />
       <Route path="/changelog/inventory" component={InventoryGuide} />
       <Route path="/changelog/safety" component={SafetyGuide} />

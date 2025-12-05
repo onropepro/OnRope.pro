@@ -39,7 +39,11 @@ import {
   FileText,
   BarChart3,
   UserCog,
-  Clock
+  Clock,
+  Fingerprint,
+  KeyRound,
+  User,
+  ShieldCheck
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -55,7 +59,7 @@ export default function UserAccessGuide() {
             <BackButton to="/changelog" />
             <div>
               <h1 className="text-xl font-bold" style={{ fontFamily: "Outfit, sans-serif" }}>User Access & Authentication Guide</h1>
-              <p className="text-sm text-muted-foreground" style={{ fontFamily: "Outfit, sans-serif" }}>Version 2.0 - Updated December 4, 2025</p>
+              <p className="text-sm text-muted-foreground" style={{ fontFamily: "Outfit, sans-serif" }}>Version 2.1 - Updated December 5, 2025</p>
             </div>
           </div>
           <MainMenuButton />
@@ -1127,6 +1131,33 @@ export default function UserAccessGuide() {
                 </div>
               </CardContent>
             </Card>
+
+            <Card>
+              <CardHeader className="pb-2">
+                <div className="flex items-start justify-between gap-2">
+                  <div className="flex items-center gap-2">
+                    <Badge className="bg-violet-600">Flow 4</Badge>
+                    <CardTitle>Property Manager Registration</CardTitle>
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent className="text-sm space-y-3">
+                <ol className="list-decimal list-inside space-y-2">
+                  <li>Property manager registers with email and password</li>
+                  <li>Receives property manager code from rope access company</li>
+                  <li>Enters code to link account to vendor company</li>
+                  <li>Gains read-only access to vendor's company summary and CSR</li>
+                </ol>
+                <div className="bg-violet-50 dark:bg-violet-950 p-2 rounded text-xs space-y-1">
+                  <p><strong>Access Granted:</strong></p>
+                  <ul className="list-disc list-inside">
+                    <li>Read-only access to vendor company summaries</li>
+                    <li>Company Safety Rating (CSR) visibility with breakdowns</li>
+                    <li>My Vendors dashboard for multi-vendor management</li>
+                  </ul>
+                </div>
+              </CardContent>
+            </Card>
           </div>
         </section>
 
@@ -1137,6 +1168,39 @@ export default function UserAccessGuide() {
             <Lock className="w-5 h-5 text-red-600 dark:text-red-400" />
             Security Architecture
           </h2>
+
+          <Card className="border-2 border-emerald-500 bg-emerald-50 dark:bg-emerald-950">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-lg flex items-center gap-2 text-emerald-900 dark:text-emerald-100">
+                <ShieldCheck className="w-5 h-5" />
+                Security Foundations
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="text-emerald-900 dark:text-emerald-100 space-y-4">
+              <div className="grid md:grid-cols-2 gap-4">
+                <div className="bg-white dark:bg-emerald-900 rounded-lg p-4">
+                  <Lock className="w-6 h-6 mb-2 text-emerald-600" />
+                  <p className="font-bold">HTTP-Only Cookies</p>
+                  <p className="text-sm">Session tokens stored in secure HTTP-only cookies prevent XSS attacks from accessing credentials</p>
+                </div>
+                <div className="bg-white dark:bg-emerald-900 rounded-lg p-4">
+                  <Fingerprint className="w-6 h-6 mb-2 text-emerald-600" />
+                  <p className="font-bold">Password Hashing</p>
+                  <p className="text-sm">All passwords are hashed using bcrypt with salt rounds, never stored in plain text</p>
+                </div>
+                <div className="bg-white dark:bg-emerald-900 rounded-lg p-4">
+                  <Building2 className="w-6 h-6 mb-2 text-emerald-600" />
+                  <p className="font-bold">Multi-Tenant Isolation</p>
+                  <p className="text-sm">Complete data isolation ensures companies can never access each other's data</p>
+                </div>
+                <div className="bg-white dark:bg-emerald-900 rounded-lg p-4">
+                  <Key className="w-6 h-6 mb-2 text-emerald-600" />
+                  <p className="font-bold">Role-Based Access</p>
+                  <p className="text-sm">Granular permissions control what each user role can view and modify</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
 
           <div className="grid md:grid-cols-2 gap-4">
             <Card>
@@ -1222,6 +1286,53 @@ export default function UserAccessGuide() {
               <p className="text-xs text-muted-foreground mt-2"><strong>Retention:</strong> All audit logs retained indefinitely for compliance and security investigations. Access limited to company owners and system administrators.</p>
             </CardContent>
           </Card>
+        </section>
+
+        <Separator />
+
+        <section className="space-y-4">
+          <h2 className="text-xl font-bold flex items-center gap-2" style={{ fontFamily: "Outfit, sans-serif" }}>
+            <Settings className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+            Account Management
+          </h2>
+          
+          <div className="grid gap-4">
+            <Card>
+              <CardContent className="pt-6">
+                <div className="flex items-start gap-3">
+                  <KeyRound className="w-5 h-5 text-blue-600 mt-0.5" />
+                  <div>
+                    <p className="font-medium" style={{ fontFamily: "Outfit, sans-serif" }}>Password Changes</p>
+                    <p className="text-sm text-muted-foreground" style={{ fontFamily: "Outfit, sans-serif" }}>Users can change their passwords with current password verification. Company owners can reset employee passwords when needed.</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardContent className="pt-6">
+                <div className="flex items-start gap-3">
+                  <User className="w-5 h-5 text-amber-600 mt-0.5" />
+                  <div>
+                    <p className="font-medium" style={{ fontFamily: "Outfit, sans-serif" }}>Account Deletion</p>
+                    <p className="text-sm text-muted-foreground" style={{ fontFamily: "Outfit, sans-serif" }}>Account deletion available with appropriate permissions. Data retention policies ensure compliance while removing sensitive information. Historical work records are preserved for audit purposes.</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardContent className="pt-6">
+                <div className="flex items-start gap-3">
+                  <LogIn className="w-5 h-5 text-green-600 mt-0.5" />
+                  <div>
+                    <p className="font-medium" style={{ fontFamily: "Outfit, sans-serif" }}>Session Management</p>
+                    <p className="text-sm text-muted-foreground" style={{ fontFamily: "Outfit, sans-serif" }}>Automatic session expiration after 30 days of inactivity. Secure logout functionality clears all session data. Users remain logged in across browser sessions until explicit logout or expiration.</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
         </section>
 
         <Separator />
