@@ -18,7 +18,6 @@ import { queryClient, apiRequest } from "@/lib/queryClient";
 import { formatLocalDate } from "@/lib/dateUtils";
 import SuperUserLayout from "@/components/SuperUserLayout";
 import { 
-  ArrowLeft, 
   Plus, 
   Calendar, 
   MessageCircle, 

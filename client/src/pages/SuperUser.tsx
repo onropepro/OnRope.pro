@@ -64,19 +64,19 @@ export default function SuperUser() {
     queryKey: ["/api/superuser/metrics"],
   });
 
-  const { data: companiesData } = useQuery<any[]>({
+  const { data: companiesData } = useQuery<{ companies: any[] }>({
     queryKey: ["/api/superuser/companies"],
   });
 
-  const { data: buildingsData } = useQuery<any[]>({
+  const { data: buildingsData } = useQuery<{ buildings: any[] }>({
     queryKey: ["/api/superuser/buildings"],
   });
 
-  const { data: tasksData } = useQuery<any[]>({
+  const { data: tasksData } = useQuery<{ tasks: any[] }>({
     queryKey: ["/api/superuser/tasks"],
   });
 
-  const { data: featureRequestsData } = useQuery<any[]>({
+  const { data: featureRequestsData } = useQuery<{ requests: any[] }>({
     queryKey: ["/api/superuser/feature-requests"],
   });
   
@@ -114,8 +114,13 @@ export default function SuperUser() {
     },
   });
 
-  const pendingTasks = tasksData?.filter(t => t.status === 'pending' || t.status === 'in_progress').length || 0;
-  const pendingRequests = featureRequestsData?.filter(r => r.status === 'pending' || r.status === 'under_review').length || 0;
+  const tasks = tasksData?.tasks || [];
+  const requests = featureRequestsData?.requests || [];
+  const companies = companiesData?.companies || [];
+  const buildings = buildingsData?.buildings || [];
+  
+  const pendingTasks = tasks.filter(t => t.status === 'pending' || t.status === 'in_progress').length;
+  const pendingRequests = requests.filter(r => r.status === 'pending' || r.status === 'under_review').length;
 
   return (
     <SuperUserLayout title="Dashboard">
@@ -137,7 +142,7 @@ export default function SuperUser() {
                   <span className="material-icons text-primary text-2xl">business</span>
                 </div>
                 <div>
-                  <p className="text-2xl font-bold">{companiesData?.length || 0}</p>
+                  <p className="text-2xl font-bold">{companies.length}</p>
                   <p className="text-sm text-muted-foreground">Total Companies</p>
                 </div>
               </div>
@@ -151,7 +156,7 @@ export default function SuperUser() {
                   <span className="material-icons text-cyan-500 text-2xl">apartment</span>
                 </div>
                 <div>
-                  <p className="text-2xl font-bold">{buildingsData?.length || 0}</p>
+                  <p className="text-2xl font-bold">{buildings.length}</p>
                   <p className="text-sm text-muted-foreground">Global Buildings</p>
                 </div>
               </div>
