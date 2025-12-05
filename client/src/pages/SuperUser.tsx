@@ -5,10 +5,10 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, Di
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { useLocation } from "wouter";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import SuperUserLayout from "@/components/SuperUserLayout";
 
 interface GiftCompanyForm {
   companyName: string;
@@ -18,7 +18,6 @@ interface GiftCompanyForm {
   licenseKey: string;
 }
 
-// Generate a license key on the frontend for preview
 function generateLicenseKey(tier: string): string {
   const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
   const generateSegment = () => Array(5).fill(0).map(() => chars[Math.floor(Math.random() * chars.length)]).join('');
@@ -36,8 +35,20 @@ interface GiftCompanyResponse {
   maxSeats: number;
 }
 
+interface CompanyStats {
+  total: number;
+  active: number;
+  byTier: Record<string, number>;
+}
+
+interface MetricsData {
+  mrr: number;
+  arr: number;
+  totalRevenue: number;
+  companies: CompanyStats;
+}
+
 export default function SuperUser() {
-  const [, setLocation] = useLocation();
   const { toast } = useToast();
   const [giftDialogOpen, setGiftDialogOpen] = useState(false);
   const [showSuccessInfo, setShowSuccessInfo] = useState<GiftCompanyResponse | null>(null);
@@ -48,24 +59,37 @@ export default function SuperUser() {
     tier: 'basic',
     licenseKey: generateLicenseKey('basic'),
   });
+
+  const { data: metricsData } = useQuery<MetricsData>({
+    queryKey: ["/api/superuser/metrics"],
+  });
+
+  const { data: companiesData } = useQuery<any[]>({
+    queryKey: ["/api/superuser/companies"],
+  });
+
+  const { data: buildingsData } = useQuery<any[]>({
+    queryKey: ["/api/superuser/buildings"],
+  });
+
+  const { data: tasksData } = useQuery<any[]>({
+    queryKey: ["/api/superuser/tasks"],
+  });
+
+  const { data: featureRequestsData } = useQuery<any[]>({
+    queryKey: ["/api/superuser/feature-requests"],
+  });
   
-  // Open dialog and generate a fresh license key
   const openGiftDialog = () => {
     const newLicenseKey = generateLicenseKey(formData.tier);
     setFormData(prev => ({ ...prev, licenseKey: newLicenseKey }));
     setGiftDialogOpen(true);
   };
   
-  // Regenerate license key when tier changes
   const handleTierChange = (newTier: string) => {
     const newLicenseKey = generateLicenseKey(newTier);
     setFormData(prev => ({ ...prev, tier: newTier, licenseKey: newLicenseKey }));
   };
-  
-  // User data is already verified by ProtectedRoute - no need to recheck
-  const { data: userData } = useQuery<{ user: any }>({
-    queryKey: ["/api/user"],
-  });
 
   const giftCompanyMutation = useMutation({
     mutationFn: async (data: GiftCompanyForm) => {
@@ -78,9 +102,7 @@ export default function SuperUser() {
         title: "Account Created",
         description: data.message,
       });
-      // Reset form with new license key
       setFormData({ companyName: '', email: '', password: '', tier: 'basic', licenseKey: generateLicenseKey('basic') });
-      // Refresh companies list if needed
       queryClient.invalidateQueries({ queryKey: ['/api/superuser/companies'] });
     },
     onError: (error: any) => {
@@ -91,218 +113,147 @@ export default function SuperUser() {
       });
     },
   });
-  
-  // ProtectedRoute already handles auth verification, so we can proceed directly
-  
-  const handleLogout = async () => {
-    await fetch('/api/logout', { method: 'POST', credentials: 'include' });
-    // Clear ALL query cache to prevent stale data from causing redirect issues
-    queryClient.clear();
-    setLocation('/login');
-  };
-  
+
+  const pendingTasks = tasksData?.filter(t => t.status === 'pending' || t.status === 'in_progress').length || 0;
+  const pendingRequests = featureRequestsData?.filter(r => r.status === 'pending' || r.status === 'under_review').length || 0;
+
   return (
-    <div className="min-h-screen page-gradient p-6">
-      <div className="max-w-5xl mx-auto space-y-8">
-        {/* Header */}
-        <div className="text-center space-y-4">
-          <h1 className="text-6xl font-bold gradient-text">Super User Dashboard</h1>
-          <Button 
-            onClick={handleLogout}
-            variant="outline"
-            data-testid="button-logout"
-          >
-            <span className="material-icons mr-2">logout</span>
-            Logout
-          </Button>
+    <SuperUserLayout title="Dashboard">
+      <div className="p-6 space-y-6">
+        {/* Welcome Section */}
+        <div className="space-y-1">
+          <h2 className="text-2xl font-bold">Welcome back</h2>
+          <p className="text-muted-foreground">
+            Here's an overview of your platform activity
+          </p>
         </div>
 
-        {/* Admin Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <Card 
-            className="hover-elevate active-elevate-2 cursor-pointer transition-all"
-            onClick={() => setLocation('/superuser/companies')}
-            data-testid="card-view-companies"
-          >
-            <CardHeader>
-              <div className="flex items-center gap-3">
+        {/* Quick Stats */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <Card>
+            <CardContent className="pt-6">
+              <div className="flex items-center gap-4">
                 <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
                   <span className="material-icons text-primary text-2xl">business</span>
                 </div>
                 <div>
-                  <CardTitle className="text-xl">View All Companies</CardTitle>
-                  <CardDescription>View all registered companies on the platform</CardDescription>
+                  <p className="text-2xl font-bold">{companiesData?.length || 0}</p>
+                  <p className="text-sm text-muted-foreground">Total Companies</p>
                 </div>
               </div>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-muted-foreground">
-                Access complete list of companies, their details, and license status
-              </p>
             </CardContent>
           </Card>
 
-          <Card 
-            className="hover-elevate active-elevate-2 cursor-pointer transition-all"
-            onClick={openGiftDialog}
-            data-testid="card-gift-company"
-          >
-            <CardHeader>
-              <div className="flex items-center gap-3">
-                <div className="h-12 w-12 rounded-full bg-green-500/10 flex items-center justify-center">
-                  <span className="material-icons text-green-500 text-2xl">card_giftcard</span>
-                </div>
-                <div>
-                  <CardTitle className="text-xl">Gift Company Account</CardTitle>
-                  <CardDescription>Create a free company account as a gift</CardDescription>
-                </div>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-muted-foreground">
-                Provision a company with full access without requiring payment
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card 
-            className="hover-elevate active-elevate-2 cursor-pointer transition-all"
-            onClick={() => setLocation('/superuser/feature-requests')}
-            data-testid="card-feature-requests"
-          >
-            <CardHeader>
-              <div className="flex items-center gap-3">
-                <div className="h-12 w-12 rounded-full bg-purple-500/10 flex items-center justify-center">
-                  <span className="material-icons text-purple-500 text-2xl">lightbulb</span>
-                </div>
-                <div>
-                  <CardTitle className="text-xl">Feature Requests</CardTitle>
-                  <CardDescription>Review and respond to company feedback</CardDescription>
-                </div>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-muted-foreground">
-                View feature requests, bug reports, and communicate with company owners
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card 
-            className="hover-elevate active-elevate-2 cursor-pointer transition-all"
-            onClick={() => setLocation('/superuser/metrics')}
-            data-testid="card-platform-metrics"
-          >
-            <CardHeader>
-              <div className="flex items-center gap-3">
-                <div className="h-12 w-12 rounded-full bg-blue-500/10 flex items-center justify-center">
-                  <span className="material-icons text-blue-500 text-2xl">analytics</span>
-                </div>
-                <div>
-                  <CardTitle className="text-xl">Platform Metrics</CardTitle>
-                  <CardDescription>Business intelligence and analytics</CardDescription>
-                </div>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-muted-foreground">
-                View MRR/ARR, customer distribution, product usage, and revenue analytics
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card 
-            className="hover-elevate active-elevate-2 cursor-pointer transition-all"
-            onClick={() => setLocation('/changelog')}
-            data-testid="card-changelog"
-          >
-            <CardHeader>
-              <div className="flex items-center gap-3">
-                <div className="h-12 w-12 rounded-full bg-orange-500/10 flex items-center justify-center">
-                  <span className="material-icons text-orange-500 text-2xl">menu_book</span>
-                </div>
-                <div>
-                  <CardTitle className="text-xl">Changelog & Knowledge Base</CardTitle>
-                  <CardDescription>Documentation and feature guides</CardDescription>
-                </div>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-muted-foreground">
-                Browse comprehensive guides for all platform features and systems
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card 
-            className="hover-elevate active-elevate-2 cursor-pointer transition-all"
-            onClick={() => setLocation('/superuser/founder-resources')}
-            data-testid="card-founder-resources"
-          >
-            <CardHeader>
-              <div className="flex items-center gap-3">
-                <div className="h-12 w-12 rounded-full bg-rose-500/10 flex items-center justify-center">
-                  <span className="material-icons text-rose-500 text-2xl">rocket_launch</span>
-                </div>
-                <div>
-                  <CardTitle className="text-xl">Founder Resources</CardTitle>
-                  <CardDescription>Private resources for Tommy & Glenn</CardDescription>
-                </div>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-muted-foreground">
-                Development tools, launch strategy, sales planning, and important links
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card 
-            className="hover-elevate active-elevate-2 cursor-pointer transition-all"
-            onClick={() => setLocation('/superuser/buildings')}
-            data-testid="card-global-buildings"
-          >
-            <CardHeader>
-              <div className="flex items-center gap-3">
+          <Card>
+            <CardContent className="pt-6">
+              <div className="flex items-center gap-4">
                 <div className="h-12 w-12 rounded-full bg-cyan-500/10 flex items-center justify-center">
                   <span className="material-icons text-cyan-500 text-2xl">apartment</span>
                 </div>
                 <div>
-                  <CardTitle className="text-xl">Global Buildings Database</CardTitle>
-                  <CardDescription>Centralized building maintenance records</CardDescription>
+                  <p className="text-2xl font-bold">{buildingsData?.length || 0}</p>
+                  <p className="text-sm text-muted-foreground">Global Buildings</p>
                 </div>
               </div>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-muted-foreground">
-                View all buildings with strata numbers, their maintenance history across all companies
-              </p>
             </CardContent>
           </Card>
 
-          <Card 
-            className="hover-elevate active-elevate-2 cursor-pointer transition-all"
-            onClick={() => setLocation('/superuser/tasks')}
-            data-testid="card-task-list"
-          >
-            <CardHeader>
-              <div className="flex items-center gap-3">
+          <Card>
+            <CardContent className="pt-6">
+              <div className="flex items-center gap-4">
                 <div className="h-12 w-12 rounded-full bg-indigo-500/10 flex items-center justify-center">
                   <span className="material-icons text-indigo-500 text-2xl">checklist</span>
                 </div>
                 <div>
-                  <CardTitle className="text-xl">Task List</CardTitle>
-                  <CardDescription>Internal project management</CardDescription>
+                  <p className="text-2xl font-bold">{pendingTasks}</p>
+                  <p className="text-sm text-muted-foreground">Pending Tasks</p>
                 </div>
               </div>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-muted-foreground">
-                Manage development tasks, assign to team members, and track progress
-              </p>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardContent className="pt-6">
+              <div className="flex items-center gap-4">
+                <div className="h-12 w-12 rounded-full bg-purple-500/10 flex items-center justify-center">
+                  <span className="material-icons text-purple-500 text-2xl">lightbulb</span>
+                </div>
+                <div>
+                  <p className="text-2xl font-bold">{pendingRequests}</p>
+                  <p className="text-sm text-muted-foreground">Pending Requests</p>
+                </div>
+              </div>
             </CardContent>
           </Card>
         </div>
+
+        {/* Revenue Stats */}
+        {metricsData && (
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <Card className="bg-gradient-to-br from-green-500/10 to-green-600/5 border-green-500/20">
+              <CardContent className="pt-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm text-muted-foreground">Monthly Revenue</p>
+                    <p className="text-2xl font-bold text-green-600 dark:text-green-400">
+                      ${metricsData.mrr?.toLocaleString() || '0'}
+                    </p>
+                  </div>
+                  <span className="material-icons text-green-500 text-3xl">trending_up</span>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-gradient-to-br from-blue-500/10 to-blue-600/5 border-blue-500/20">
+              <CardContent className="pt-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm text-muted-foreground">Annual Revenue</p>
+                    <p className="text-2xl font-bold text-blue-600 dark:text-blue-400">
+                      ${metricsData.arr?.toLocaleString() || '0'}
+                    </p>
+                  </div>
+                  <span className="material-icons text-blue-500 text-3xl">assessment</span>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-gradient-to-br from-amber-500/10 to-amber-600/5 border-amber-500/20">
+              <CardContent className="pt-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm text-muted-foreground">Total Revenue</p>
+                    <p className="text-2xl font-bold text-amber-600 dark:text-amber-400">
+                      ${metricsData.totalRevenue?.toLocaleString() || '0'}
+                    </p>
+                  </div>
+                  <span className="material-icons text-amber-500 text-3xl">account_balance</span>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        )}
+
+        {/* Quick Actions */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-lg flex items-center gap-2">
+              <span className="material-icons text-primary">bolt</span>
+              Quick Actions
+            </CardTitle>
+            <CardDescription>Common administrative tasks</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="flex flex-wrap gap-3">
+              <Button onClick={openGiftDialog} data-testid="button-gift-company">
+                <span className="material-icons mr-2">card_giftcard</span>
+                Gift Company Account
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Recent Activity would go here in the future */}
       </div>
 
       {/* Gift Company Dialog */}
@@ -503,6 +454,6 @@ export default function SuperUser() {
           )}
         </DialogContent>
       </Dialog>
-    </div>
+    </SuperUserLayout>
   );
 }
