@@ -851,7 +851,7 @@ export default function Quotes() {
     });
     
     // Navigate to dashboard with projects tab and trigger create
-    setLocation("/?tab=projects&action=create&fromQuote=true");
+    setLocation("/dashboard?tab=projects&action=create&fromQuote=true");
   };
 
   const handleBuildingInfoSubmit = (data: BuildingInfoFormData) => {

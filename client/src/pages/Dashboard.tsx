@@ -1050,7 +1050,7 @@ export default function Dashboard() {
           
           // Clear sessionStorage and URL params after reading
           sessionStorage.removeItem('quoteToProject');
-          window.history.replaceState({}, '', '/');
+          window.history.replaceState({}, '', '/dashboard');
           
           // Show toast notification
           toast({
