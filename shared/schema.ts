@@ -152,6 +152,57 @@ export const users = pgTable("users", {
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
+// Global Buildings table - SuperUser level database of all buildings across all companies
+// Buildings are auto-created when projects are created with new strata numbers
+export const buildings = pgTable("buildings", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  
+  // Login credentials - strata number is the username
+  strataPlanNumber: varchar("strata_plan_number").notNull().unique(), // Unique identifier and login username
+  passwordHash: text("password_hash").notNull(), // Hashed password (defaults to strata number initially)
+  
+  // Building details
+  buildingName: varchar("building_name"),
+  buildingAddress: text("building_address"),
+  city: varchar("city"),
+  province: varchar("province"),
+  postalCode: varchar("postal_code"),
+  
+  // Building specifications
+  floorCount: integer("floor_count"),
+  parkingStalls: integer("parking_stalls"),
+  totalUnits: integer("total_units"), // Total residential/commercial units
+  
+  // Drops per elevation (for rope access)
+  dropsNorth: integer("drops_north").default(0),
+  dropsEast: integer("drops_east").default(0),
+  dropsSouth: integer("drops_south").default(0),
+  dropsWest: integer("drops_west").default(0),
+  
+  // Additional building info
+  yearBuilt: integer("year_built"),
+  buildingType: varchar("building_type"), // residential | commercial | mixed
+  notes: text("notes"),
+  
+  // Tracking
+  lastServiceDate: date("last_service_date"), // Last time any company serviced this building
+  totalProjectsCompleted: integer("total_projects_completed").default(0),
+  
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+}, (table) => [
+  index("IDX_buildings_strata").on(table.strataPlanNumber),
+]);
+
+export const insertBuildingSchema = createInsertSchema(buildings).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type Building = typeof buildings.$inferSelect;
+export type InsertBuilding = z.infer<typeof insertBuildingSchema>;
+
 // Property Manager Company Links - junction table for property managers to access multiple companies via property manager codes
 export const propertyManagerCompanyLinks = pgTable("property_manager_company_links", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
