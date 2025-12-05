@@ -52,8 +52,8 @@ export default function UserAccessGuide() {
           <div className="flex items-center gap-3">
             <BackButton to="/changelog" />
             <div>
-              <h1 className="text-xl font-bold">User Access & Authentication Guide</h1>
-              <p className="text-sm text-muted-foreground">Version 2.0 - Updated December 4, 2025</p>
+              <h1 className="text-xl font-bold" style={{ fontFamily: "Outfit, sans-serif" }}>User Access & Authentication Guide</h1>
+              <p className="text-sm text-muted-foreground" style={{ fontFamily: "Outfit, sans-serif" }}>Version 2.0 - Updated December 4, 2025</p>
             </div>
           </div>
           <MainMenuButton />
@@ -64,14 +64,14 @@ export default function UserAccessGuide() {
         
         <section className="space-y-4">
           <div>
-            <h2 className="text-2xl font-bold flex items-center gap-2 mb-2">
+            <h2 className="text-2xl font-bold flex items-center gap-2 mb-2" style={{ fontFamily: "Outfit, sans-serif" }}>
               <Users className="w-6 h-6 text-blue-600 dark:text-blue-400" />
               User Access Overview
             </h2>
-            <p className="text-muted-foreground">
+            <p className="text-muted-foreground leading-relaxed" style={{ fontFamily: "Outfit, sans-serif", fontSize: "16px" }}>
               OnRopePro implements a sophisticated role-based access control system with <strong>company-scoped multi-tenant architecture</strong>. Each company's data remains completely isolated, and users can only access information relevant to their assigned company and role permissions.
             </p>
-            <p className="text-muted-foreground mt-2">
+            <p className="text-muted-foreground mt-2 leading-relaxed" style={{ fontFamily: "Outfit, sans-serif", fontSize: "16px" }}>
               The platform supports three distinct user categories with <strong>granular, customizable permissions</strong> to accommodate diverse organizational structures across the rope access industry.
             </p>
           </div>
@@ -81,21 +81,21 @@ export default function UserAccessGuide() {
 
         <section className="space-y-6">
           <div className="rounded-lg border-l-4 border-amber-500 bg-card p-6">
-            <h3 className="text-lg font-semibold flex items-center gap-2 mb-4">
+            <h3 className="text-lg font-semibold flex items-center gap-2 mb-4" style={{ fontFamily: "Outfit, sans-serif", fontSize: "18px" }}>
               <Key className="w-5 h-5 text-amber-500" />
               The Golden Rule: Role + Permissions = Access
             </h3>
             
             <div className="bg-muted/50 rounded-lg p-4 mb-6">
-              <p className="text-base font-mono text-center leading-relaxed">
+              <p className="text-base font-mono text-center leading-relaxed" style={{ fontFamily: "Outfit, sans-serif", fontSize: "16px" }}>
                 Access = Base Role (Organizational Structure) + Granular Permissions (Actual Capabilities)
               </p>
             </div>
             
             <div className="space-y-4">
               <div>
-                <h4 className="font-medium mb-3">Key Principles</h4>
-                <ul className="space-y-2 text-muted-foreground leading-relaxed">
+                <h4 className="font-medium mb-3" style={{ fontFamily: "Outfit, sans-serif", fontSize: "16px" }}>Key Principles</h4>
+                <ul className="space-y-2 text-muted-foreground leading-relaxed" style={{ fontFamily: "Outfit, sans-serif", fontSize: "16px" }}>
                   <li className="flex gap-2">
                     <span className="text-amber-500 mt-1">1.</span>
                     <span>Each user has exactly one base role (Company Owner, Operations Manager, Supervisor, Technician, etc.)</span>
@@ -116,29 +116,29 @@ export default function UserAccessGuide() {
               </div>
 
               <div className="border rounded-lg p-4 mt-4">
-                <p className="font-medium flex items-center gap-2 mb-4">
+                <p className="font-medium flex items-center gap-2 mb-4" style={{ fontFamily: "Outfit, sans-serif", fontSize: "16px" }}>
                   <Info className="w-4 h-4 text-muted-foreground" />
                   Same Role, Different Capabilities
                 </p>
                 <div className="grid md:grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <p className="text-sm font-medium">Company A - Operations Manager</p>
-                    <div className="space-y-1 text-sm">
+                    <p className="text-sm font-medium" style={{ fontFamily: "Outfit, sans-serif" }}>Company A - Operations Manager</p>
+                    <div className="space-y-1 text-sm" style={{ fontFamily: "Outfit, sans-serif" }}>
                       <p className="flex items-center gap-2 text-muted-foreground"><CheckCircle2 className="w-4 h-4 text-green-500" /> Financial permissions</p>
                       <p className="flex items-center gap-2 text-muted-foreground"><CheckCircle2 className="w-4 h-4 text-green-500" /> Create projects</p>
                       <p className="flex items-center gap-2 text-muted-foreground"><XCircle className="w-4 h-4 text-red-400" /> Inventory management</p>
                     </div>
                   </div>
                   <div className="space-y-2">
-                    <p className="text-sm font-medium">Company B - Operations Manager</p>
-                    <div className="space-y-1 text-sm">
+                    <p className="text-sm font-medium" style={{ fontFamily: "Outfit, sans-serif" }}>Company B - Operations Manager</p>
+                    <div className="space-y-1 text-sm" style={{ fontFamily: "Outfit, sans-serif" }}>
                       <p className="flex items-center gap-2 text-muted-foreground"><XCircle className="w-4 h-4 text-red-400" /> Financial permissions</p>
                       <p className="flex items-center gap-2 text-muted-foreground"><XCircle className="w-4 h-4 text-red-400" /> Create projects</p>
                       <p className="flex items-center gap-2 text-muted-foreground"><CheckCircle2 className="w-4 h-4 text-green-500" /> Inventory management</p>
                     </div>
                   </div>
                 </div>
-                <p className="text-sm text-center text-muted-foreground mt-4 pt-3 border-t">Same role title, completely different capabilities</p>
+                <p className="text-sm text-center text-muted-foreground mt-4 pt-3 border-t" style={{ fontFamily: "Outfit, sans-serif" }}>Same role title, completely different capabilities</p>
               </div>
             </div>
           </div>
@@ -148,8 +148,8 @@ export default function UserAccessGuide() {
 
         <section className="space-y-8">
           <div>
-            <h2 className="text-2xl font-semibold mb-2">Problems Solved</h2>
-            <p className="text-muted-foreground leading-relaxed">
+            <h2 className="text-2xl font-semibold mb-2" style={{ fontFamily: "Outfit, sans-serif" }}>Problems Solved</h2>
+            <p className="text-muted-foreground leading-relaxed" style={{ fontFamily: "Outfit, sans-serif", fontSize: "16px" }}>
               Real challenges addressed by OnRopePro's User Access & Authentication module.
             </p>
           </div>
@@ -158,7 +158,7 @@ export default function UserAccessGuide() {
           <div className="space-y-4">
             <div className="flex items-center gap-3 pb-2 border-b">
               <Crown className="w-5 h-5 text-amber-500" />
-              <h3 className="text-lg font-medium">For Rope Access Company Owners</h3>
+              <h3 className="text-lg font-medium" style={{ fontFamily: "Outfit, sans-serif", fontSize: "18px" }}>For Rope Access Company Owners</h3>
             </div>
             
             <Accordion type="single" collapsible className="space-y-3">
@@ -252,7 +252,7 @@ export default function UserAccessGuide() {
           <div className="space-y-4">
             <div className="flex items-center gap-3 pb-2 border-b">
               <Briefcase className="w-5 h-5 text-blue-500" />
-              <h3 className="text-lg font-medium">For Operations Managers & Supervisors</h3>
+              <h3 className="text-lg font-medium" style={{ fontFamily: "Outfit, sans-serif", fontSize: "18px" }}>For Operations Managers & Supervisors</h3>
             </div>
             
             <Accordion type="single" collapsible className="space-y-3">
@@ -276,7 +276,7 @@ export default function UserAccessGuide() {
           <div className="space-y-4">
             <div className="flex items-center gap-3 pb-2 border-b">
               <Building2 className="w-5 h-5 text-violet-500" />
-              <h3 className="text-lg font-medium">For Building Managers & Property Managers</h3>
+              <h3 className="text-lg font-medium" style={{ fontFamily: "Outfit, sans-serif", fontSize: "18px" }}>For Building Managers & Property Managers</h3>
             </div>
             
             <Accordion type="single" collapsible className="space-y-3">
@@ -342,7 +342,7 @@ export default function UserAccessGuide() {
           <div className="space-y-4">
             <div className="flex items-center gap-3 pb-2 border-b">
               <Home className="w-5 h-5 text-rose-500" />
-              <h3 className="text-lg font-medium">For Building Residents</h3>
+              <h3 className="text-lg font-medium" style={{ fontFamily: "Outfit, sans-serif", fontSize: "18px" }}>For Building Residents</h3>
             </div>
             
             <Accordion type="single" collapsible className="space-y-3">
@@ -394,7 +394,7 @@ export default function UserAccessGuide() {
           <div className="space-y-4">
             <div className="flex items-center gap-3 pb-2 border-b">
               <Shield className="w-5 h-5 text-emerald-500" />
-              <h3 className="text-lg font-medium">Security & Data Protection</h3>
+              <h3 className="text-lg font-medium" style={{ fontFamily: "Outfit, sans-serif", fontSize: "18px" }}>Security & Data Protection</h3>
             </div>
             
             <Accordion type="single" collapsible className="space-y-3">
@@ -432,11 +432,11 @@ export default function UserAccessGuide() {
         <Separator />
 
         <section className="space-y-4">
-          <h2 className="text-xl font-bold flex items-center gap-2">
+          <h2 className="text-xl font-bold flex items-center gap-2" style={{ fontFamily: "Outfit, sans-serif" }}>
             <Layers className="w-5 h-5 text-purple-600 dark:text-purple-400" />
             Three User Categories
           </h2>
-          <p className="text-sm text-muted-foreground">Users fall into one of three distinct categories with different authentication and data access patterns:</p>
+          <p className="text-muted-foreground leading-relaxed" style={{ fontFamily: "Outfit, sans-serif", fontSize: "16px" }}>Users fall into one of three distinct categories with different authentication and data access patterns:</p>
 
           <div className="grid md:grid-cols-3 gap-4">
             <Card className="border-2 border-amber-200 dark:border-amber-900">
@@ -528,11 +528,11 @@ export default function UserAccessGuide() {
         <Separator />
 
         <section className="space-y-4">
-          <h2 className="text-xl font-bold flex items-center gap-2">
+          <h2 className="text-xl font-bold flex items-center gap-2" style={{ fontFamily: "Outfit, sans-serif" }}>
             <Briefcase className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
             Employee Roles & Flexible Permissions
           </h2>
-          <p className="text-sm text-muted-foreground">
+          <p className="text-muted-foreground leading-relaxed" style={{ fontFamily: "Outfit, sans-serif", fontSize: "16px" }}>
             Company owners select from predefined base roles OR create custom roles. <strong>Base roles organize your team structure but do NOT dictate permissions.</strong>
           </p>
 
@@ -663,7 +663,7 @@ export default function UserAccessGuide() {
         <Separator />
 
         <section className="space-y-4">
-          <h2 className="text-xl font-bold flex items-center gap-2">
+          <h2 className="text-xl font-bold flex items-center gap-2" style={{ fontFamily: "Outfit, sans-serif" }}>
             <Settings className="w-5 h-5 text-blue-600 dark:text-blue-400" />
             How Permission Assignment Works
           </h2>
@@ -768,7 +768,7 @@ export default function UserAccessGuide() {
         <Separator />
 
         <section className="space-y-4">
-          <h2 className="text-xl font-bold flex items-center gap-2">
+          <h2 className="text-xl font-bold flex items-center gap-2" style={{ fontFamily: "Outfit, sans-serif" }}>
             <Shield className="w-5 h-5 text-red-600 dark:text-red-400" />
             Granular Permissions
           </h2>
@@ -953,7 +953,7 @@ export default function UserAccessGuide() {
         <Separator />
 
         <section className="space-y-4">
-          <h2 className="text-xl font-bold flex items-center gap-2">
+          <h2 className="text-xl font-bold flex items-center gap-2" style={{ fontFamily: "Outfit, sans-serif" }}>
             <Home className="w-5 h-5 text-teal-600 dark:text-teal-400" />
             External User Roles
           </h2>
@@ -1047,7 +1047,7 @@ export default function UserAccessGuide() {
         <Separator />
 
         <section className="space-y-4">
-          <h2 className="text-xl font-bold flex items-center gap-2">
+          <h2 className="text-xl font-bold flex items-center gap-2" style={{ fontFamily: "Outfit, sans-serif" }}>
             <LogIn className="w-5 h-5 text-green-600 dark:text-green-400" />
             Authentication Flow
           </h2>
@@ -1131,7 +1131,7 @@ export default function UserAccessGuide() {
         <Separator />
 
         <section className="space-y-4">
-          <h2 className="text-xl font-bold flex items-center gap-2">
+          <h2 className="text-xl font-bold flex items-center gap-2" style={{ fontFamily: "Outfit, sans-serif" }}>
             <Lock className="w-5 h-5 text-red-600 dark:text-red-400" />
             Security Architecture
           </h2>
@@ -1225,7 +1225,7 @@ export default function UserAccessGuide() {
         <Separator />
 
         <section className="space-y-4">
-          <h2 className="text-xl font-bold flex items-center gap-2">
+          <h2 className="text-xl font-bold flex items-center gap-2" style={{ fontFamily: "Outfit, sans-serif" }}>
             <CheckCircle2 className="w-5 h-5 text-green-600 dark:text-green-400" />
             Quick Reference: Who Can Do What
           </h2>
@@ -1382,7 +1382,7 @@ export default function UserAccessGuide() {
         <Separator />
 
         <section className="space-y-4">
-          <h2 className="text-xl font-bold flex items-center gap-2">
+          <h2 className="text-xl font-bold flex items-center gap-2" style={{ fontFamily: "Outfit, sans-serif" }}>
             <Clock className="w-5 h-5 text-blue-600 dark:text-blue-400" />
             Upcoming Features
           </h2>
@@ -1442,7 +1442,7 @@ export default function UserAccessGuide() {
         <Separator />
 
         <section className="space-y-4">
-          <h2 className="text-xl font-bold flex items-center gap-2">
+          <h2 className="text-xl font-bold flex items-center gap-2" style={{ fontFamily: "Outfit, sans-serif" }}>
             <Info className="w-5 h-5 text-blue-600 dark:text-blue-400" />
             Terminology & Naming
           </h2>
