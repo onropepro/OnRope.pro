@@ -891,7 +891,7 @@ export default function Changelog() {
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 flex-wrap mb-1">
-                      <span className="font-semibold text-sm">{change.title}</span>
+                      <span className="font-semibold text-base text-black dark:text-white" style={{ fontFamily: 'Outfit, sans-serif' }}>{change.title}</span>
                       <Badge 
                         variant="secondary" 
                         className={`text-xs ${
