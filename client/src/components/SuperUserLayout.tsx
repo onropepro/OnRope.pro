@@ -215,14 +215,14 @@ function SidebarContents() {
         ))}
       </SidebarContent>
 
-      <SidebarFooter className="p-3">
-        <Separator className="mb-3" />
+      <SidebarFooter className="p-3 mt-auto border-t">
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton
               onClick={handleLogout}
               tooltip="Logout"
               className="text-destructive hover:text-destructive"
+              data-testid="button-logout"
             >
               <span className="material-icons text-lg">logout</span>
               <span>Logout</span>
