@@ -3311,6 +3311,7 @@ export class Storage {
 
   /**
    * Auto-create building from project data if it doesn't exist
+   * Updates existing building with new data if fields are missing
    * Returns the building (existing or newly created)
    */
   async ensureBuildingExists(projectData: {
@@ -3323,6 +3324,9 @@ export class Storage {
     totalDropsEast?: number | null;
     totalDropsSouth?: number | null;
     totalDropsWest?: number | null;
+    dailyDropTarget?: number | null;
+    totalFloors?: number | null;
+    buildingFloors?: number | null;
   }): Promise<Building> {
     if (!projectData.strataPlanNumber) {
       throw new Error("Strata plan number is required to track building");
@@ -3333,16 +3337,58 @@ export class Storage {
     // Check if building already exists
     const existing = await this.getBuildingByStrata(normalized);
     if (existing) {
+      // Update existing building with any new/missing data from this project
+      const updates: Partial<InsertBuilding> = {};
+      
+      // Only update fields that are currently null/0 and we have new data for
+      if (!existing.buildingName && projectData.buildingName) {
+        updates.buildingName = projectData.buildingName;
+      }
+      if (!existing.buildingAddress && projectData.buildingAddress) {
+        updates.buildingAddress = projectData.buildingAddress;
+      }
+      // Use buildingFloors or totalFloors or floorCount for floor count
+      const newFloorCount = projectData.buildingFloors || projectData.totalFloors || projectData.floorCount;
+      if (!existing.floorCount && newFloorCount) {
+        updates.floorCount = newFloorCount;
+      }
+      if (!existing.parkingStalls && projectData.totalStalls) {
+        updates.parkingStalls = projectData.totalStalls;
+      }
+      // Update drops if existing are 0 and new data provided
+      if (existing.dropsNorth === 0 && projectData.totalDropsNorth && projectData.totalDropsNorth > 0) {
+        updates.dropsNorth = projectData.totalDropsNorth;
+      }
+      if (existing.dropsEast === 0 && projectData.totalDropsEast && projectData.totalDropsEast > 0) {
+        updates.dropsEast = projectData.totalDropsEast;
+      }
+      if (existing.dropsSouth === 0 && projectData.totalDropsSouth && projectData.totalDropsSouth > 0) {
+        updates.dropsSouth = projectData.totalDropsSouth;
+      }
+      if (existing.dropsWest === 0 && projectData.totalDropsWest && projectData.totalDropsWest > 0) {
+        updates.dropsWest = projectData.totalDropsWest;
+      }
+      
+      // If we have updates, apply them
+      if (Object.keys(updates).length > 0) {
+        const updated = await this.updateBuilding(existing.id, updates);
+        console.log(`[Buildings] Updated building ${normalized} with new project data:`, Object.keys(updates));
+        return updated || existing;
+      }
+      
       return existing;
     }
 
+    // Use buildingFloors or totalFloors or floorCount for floor count
+    const floorCountValue = projectData.buildingFloors || projectData.totalFloors || projectData.floorCount;
+    
     // Create new building with project data
     const newBuilding = await this.createBuilding({
       strataPlanNumber: normalized,
       passwordHash: normalized, // Default password is strata number
       buildingName: projectData.buildingName || undefined,
       buildingAddress: projectData.buildingAddress || undefined,
-      floorCount: projectData.floorCount || undefined,
+      floorCount: floorCountValue || undefined,
       parkingStalls: projectData.totalStalls || undefined,
       dropsNorth: projectData.totalDropsNorth || 0,
       dropsEast: projectData.totalDropsEast || 0,
