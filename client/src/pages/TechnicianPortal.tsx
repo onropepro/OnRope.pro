@@ -235,11 +235,6 @@ export default function TechnicianPortal() {
                       SPRAT {user.spratLevel}
                     </Badge>
                   )}
-                  {!user.companyId && (
-                    <Badge variant="outline" className="text-amber-600 border-amber-300">
-                      Pending Approval
-                    </Badge>
-                  )}
                 </CardDescription>
               </div>
             </div>
@@ -279,19 +274,6 @@ export default function TechnicianPortal() {
           </CardHeader>
 
           <CardContent>
-            {!user.companyId && (
-              <div className="mb-6 p-4 rounded-lg bg-amber-500/10 border border-amber-500/20 flex items-start gap-3">
-                <AlertCircle className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
-                <div>
-                  <p className="font-medium text-amber-700 dark:text-amber-400">Account Pending Approval</p>
-                  <p className="text-sm text-muted-foreground mt-1">
-                    Your registration is complete. Once a company approves your account, 
-                    you'll have access to clock-in features and work logging.
-                  </p>
-                </div>
-              </div>
-            )}
-
             {isEditing ? (
               <Form {...form}>
                 <form className="space-y-6">
