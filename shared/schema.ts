@@ -134,6 +134,8 @@ export const users = pgTable("users", {
   spratIssuedDate: date("sprat_issued_date"), // SPRAT certification issue date
   spratExpirationDate: date("sprat_expiration_date"), // SPRAT certification expiration date
   spratDocuments: text("sprat_documents").array().default(sql`ARRAY[]::text[]`), // Array of SPRAT certification document URLs
+  spratVerifiedAt: timestamp("sprat_verified_at"), // Timestamp of last successful SPRAT verification via screenshot
+  spratVerificationStatus: varchar("sprat_verification_status"), // Status from SPRAT verification (e.g., "Valid", "Active")
   
   // First Aid certification fields (optional)
   hasFirstAid: boolean("has_first_aid").default(false), // Whether employee has first aid certification
