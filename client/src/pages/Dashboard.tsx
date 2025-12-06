@@ -1229,14 +1229,14 @@ export default function Dashboard() {
     }
   };
 
-  // Link OnRopePro technician to company
-  const linkOnRopeProTechnician = async () => {
+  // Send invitation to OnRopePro technician to join company
+  const inviteOnRopeProTechnician = async () => {
     if (!foundTechnician) return;
     
     setTechnicianLinking(true);
     
     try {
-      const response = await fetch(`/api/technicians/${foundTechnician.id}/link`, {
+      const response = await fetch(`/api/technicians/${foundTechnician.id}/invite`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
@@ -1246,19 +1246,18 @@ export default function Dashboard() {
       const data = await response.json();
       
       if (!response.ok) {
-        throw new Error(data.message || "Link failed");
+        throw new Error(data.message || "Invitation failed");
       }
       
-      queryClient.invalidateQueries({ queryKey: ["/api/employees/all"] });
       setShowEmployeeDialog(false);
       resetOnRopeProSearch();
       toast({ 
-        title: "Technician added!", 
-        description: data.message || `${foundTechnician.name} has been added to your team.`,
+        title: t('dashboard.toast.invitationSent', 'Invitation Sent!'), 
+        description: data.message || t('dashboard.toast.invitationSentDesc', `An invitation has been sent to ${foundTechnician.name}. They can accept or decline in their portal.`),
       });
     } catch (error: any) {
       toast({ 
-        title: "Failed to add technician", 
+        title: t('dashboard.toast.invitationFailed', 'Failed to send invitation'), 
         description: error.message, 
         variant: "destructive" 
       });
@@ -4209,22 +4208,25 @@ export default function Dashboard() {
                             <Button 
                               type="button"
                               className="w-full h-12"
-                              onClick={linkOnRopeProTechnician}
+                              onClick={inviteOnRopeProTechnician}
                               disabled={technicianLinking}
-                              data-testid="button-link-technician"
+                              data-testid="button-invite-technician"
                             >
                               {technicianLinking ? (
                                 <>
                                   <span className="material-icons animate-spin mr-2">sync</span>
-                                  Adding...
+                                  {t('dashboard.employeeForm.sendingInvitation', 'Sending Invitation...')}
                                 </>
                               ) : (
                                 <>
-                                  <span className="material-icons mr-2">person_add</span>
-                                  Add {foundTechnician.name} to Team
+                                  <span className="material-icons mr-2">mail</span>
+                                  {t('dashboard.employeeForm.sendInvitation', 'Send Team Invitation to')} {foundTechnician.name}
                                 </>
                               )}
                             </Button>
+                            <p className="text-xs text-muted-foreground text-center mt-2">
+                              {t('dashboard.employeeForm.invitationNote', 'They will receive a notification in their portal to accept or decline.')}
+                            </p>
                           </div>
                         )}
                         
