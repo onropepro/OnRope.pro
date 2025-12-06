@@ -3014,10 +3014,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // Fetch all metrics in parallel
-      const [mrrMetrics, customerMetrics, usageMetrics] = await Promise.all([
+      const [mrrMetrics, customerMetrics, usageMetrics, allBuildings] = await Promise.all([
         storage.calculateLiveMrrMetrics(),
         storage.getCustomerSummaryMetrics(),
         storage.getProductUsageMetrics(),
+        storage.getAllBuildings(),
       ]);
 
       res.json({
@@ -3027,7 +3028,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         byAddon: mrrMetrics.byAddon,
         customerCounts: mrrMetrics.customerCounts,
         customers: customerMetrics,
-        usage: usageMetrics,
+        usage: {
+          ...usageMetrics,
+          totalBuildings: allBuildings.length,
+        },
       });
     } catch (error) {
       console.error('[SuperUser] Get metrics summary error:', error);
