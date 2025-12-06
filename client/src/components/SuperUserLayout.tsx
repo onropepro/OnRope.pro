@@ -119,6 +119,11 @@ const menuGroups: MenuGroup[] = [
         icon: "analytics",
         path: "/superuser/metrics",
       },
+      {
+        title: "Goals & KPIs",
+        icon: "target",
+        path: "/superuser/goals",
+      },
     ],
   },
   {
