@@ -4673,7 +4673,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
-  // Delete employee
+  // Remove employee from team (unlink, don't delete - technician accounts persist)
   app.delete("/api/employees/:id", requireAuth, requireRole("company", "operations_manager"), async (req: Request, res: Response) => {
     try {
       const currentUser = await storage.getUserById(req.session.userId!);
@@ -4695,10 +4695,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(403).json({ message: "Access denied" });
       }
       
-      await storage.deleteUser(req.params.id);
-      res.json({ message: "Employee deleted successfully" });
+      // IMPORTANT: Don't delete the user - just unlink them from the company
+      // Self-registered technicians keep their accounts and can be invited by other companies
+      await storage.updateUser(req.params.id, { 
+        companyId: null,
+        terminatedDate: null,
+        terminationReason: null,
+        terminationNotes: null
+      });
+      
+      console.log(`[Team] Employee ${employee.name} (${req.params.id}) unlinked from company ${companyId} - account preserved`);
+      
+      res.json({ message: "Employee removed from team" });
     } catch (error) {
-      console.error("Delete employee error:", error);
+      console.error("Remove employee error:", error);
       res.status(500).json({ message: "Internal server error" });
     }
   });
