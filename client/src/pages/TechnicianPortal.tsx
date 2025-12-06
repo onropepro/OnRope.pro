@@ -1106,9 +1106,8 @@ export default function TechnicianPortal() {
                     </div>
                   )}
                   
-                  {/* IRATA License Verification Section */}
-                  {user.irataLevel && (
-                    <div className="mt-6 p-4 bg-primary/5 border border-primary/20 rounded-lg space-y-4">
+                  {/* IRATA License Verification Section - Available to all technicians */}
+                  <div className="mt-6 p-4 bg-primary/5 border border-primary/20 rounded-lg space-y-4">
                       {/* Show verified status if already verified */}
                       {user.irataVerifiedAt && (
                         <div className="flex items-center gap-3 p-3 bg-green-500/10 border border-green-500/30 rounded-lg">
@@ -1228,12 +1227,10 @@ export default function TechnicianPortal() {
                           </div>
                         </div>
                       )}
-                    </div>
-                  )}
+                  </div>
 
-                  {/* SPRAT License Verification Section */}
-                  {user.spratLevel && (
-                    <div className="mt-6 p-4 bg-primary/5 border border-primary/20 rounded-lg space-y-4">
+                  {/* SPRAT License Verification Section - Available to all technicians */}
+                  <div className="mt-6 p-4 bg-primary/5 border border-primary/20 rounded-lg space-y-4">
                       {/* Show verified status if already verified */}
                       {user.spratVerifiedAt && (
                         <div className="flex items-center gap-3 p-3 bg-green-500/10 border border-green-500/30 rounded-lg">
@@ -1274,7 +1271,7 @@ export default function TechnicianPortal() {
                         <Button
                           variant="outline"
                           className="w-full"
-                          onClick={() => window.open('https://sprat.org/verify/', '_blank')}
+                          onClick={() => window.open('https://sprat.org/technician-verification-system/', '_blank')}
                           data-testid="button-open-sprat-portal"
                         >
                           <ExternalLink className="w-4 h-4 mr-2" />
@@ -1353,8 +1350,7 @@ export default function TechnicianPortal() {
                           </div>
                         </div>
                       )}
-                    </div>
-                  )}
+                  </div>
                 </div>
 
                 {user.hasFirstAid && (
