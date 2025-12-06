@@ -3,6 +3,7 @@ import { users, clients, projects, customJobTypes, dropLogs, workSessions, nonBi
 import type { User, InsertUser, Client, InsertClient, Project, InsertProject, CustomJobType, InsertCustomJobType, DropLog, InsertDropLog, WorkSession, InsertWorkSession, Complaint, InsertComplaint, ComplaintNote, InsertComplaintNote, ProjectPhoto, InsertProjectPhoto, JobComment, InsertJobComment, HarnessInspection, InsertHarnessInspection, ToolboxMeeting, InsertToolboxMeeting, FlhaForm, InsertFlhaForm, IncidentReport, InsertIncidentReport, MethodStatement, InsertMethodStatement, PayPeriodConfig, InsertPayPeriodConfig, PayPeriod, InsertPayPeriod, EmployeeHoursSummary, Quote, InsertQuote, QuoteService, InsertQuoteService, QuoteWithServices, QuoteHistory, InsertQuoteHistory, GearItem, InsertGearItem, GearAssignment, InsertGearAssignment, GearSerialNumber, InsertGearSerialNumber, ScheduledJob, InsertScheduledJob, JobAssignment, InsertJobAssignment, ScheduledJobWithAssignments, UserPreferences, InsertUserPreferences, PropertyManagerCompanyLink, InsertPropertyManagerCompanyLink, IrataTaskLog, InsertIrataTaskLog, EmployeeTimeOff, InsertEmployeeTimeOff, DocumentReviewSignature, InsertDocumentReviewSignature, EquipmentDamageReport, InsertEquipmentDamageReport, FeatureRequest, InsertFeatureRequest, FeatureRequestMessage, InsertFeatureRequestMessage, FeatureRequestWithMessages, ChurnEvent, InsertChurnEvent, Building, InsertBuilding } from "@shared/schema";
 import { eq, and, or, desc, sql, isNull, isNotNull, not, gte, lte, between, inArray } from "drizzle-orm";
 import bcrypt from "bcrypt";
+import { encryptSensitiveFields, decryptSensitiveFields } from "./encryption";
 
 const SALT_ROUNDS = 10;
 
@@ -10,44 +11,61 @@ export class Storage {
   // User operations
   async getUserById(id: string): Promise<User | undefined> {
     const result = await db.select().from(users).where(eq(users.id, id)).limit(1);
-    return result[0];
+    return result[0] ? decryptSensitiveFields(result[0]) : undefined;
   }
 
   async getUserByEmail(email: string): Promise<User | undefined> {
     const result = await db.select().from(users).where(eq(users.email, email)).limit(1);
-    return result[0];
+    return result[0] ? decryptSensitiveFields(result[0]) : undefined;
   }
 
   async getUserByResidentCode(residentCode: string): Promise<User | undefined> {
     const result = await db.select().from(users).where(eq(users.residentCode, residentCode)).limit(1);
-    return result[0];
+    return result[0] ? decryptSensitiveFields(result[0]) : undefined;
   }
 
   async getUserByPropertyManagerCode(propertyManagerCode: string): Promise<User | undefined> {
     const result = await db.select().from(users).where(eq(users.propertyManagerCode, propertyManagerCode)).limit(1);
-    return result[0];
+    return result[0] ? decryptSensitiveFields(result[0]) : undefined;
   }
 
   async getUserByLicenseKey(licenseKey: string): Promise<User | undefined> {
     const result = await db.select().from(users).where(eq(users.licenseKey, licenseKey)).limit(1);
-    return result[0];
+    return result[0] ? decryptSensitiveFields(result[0]) : undefined;
   }
 
   async getUserByCompanyName(companyName: string): Promise<User | undefined> {
     const result = await db.select().from(users).where(eq(users.companyName, companyName)).limit(1);
-    return result[0];
+    return result[0] ? decryptSensitiveFields(result[0]) : undefined;
+  }
+
+  async getUserByRopeAccessLicense(licenseNumber: string): Promise<User | undefined> {
+    // Search for users by IRATA or SPRAT license number
+    // For IRATA, the stored format is "level/number" (e.g., "1/123456"), so we search with LIKE %/number
+    // For SPRAT, the stored format is just the number
+    const result = await db.select().from(users).where(
+      or(
+        sql`${users.irataLicenseNumber} LIKE '%/' || ${licenseNumber}`,
+        eq(users.spratLicenseNumber, licenseNumber)
+      )
+    ).limit(1);
+    return result[0] ? decryptSensitiveFields(result[0]) : undefined;
   }
 
   async createUser(user: InsertUser): Promise<User> {
     // Hash password before storing
     const hashedPassword = await bcrypt.hash(user.passwordHash, SALT_ROUNDS);
     
-    const result = await db.insert(users).values({
+    // Encrypt sensitive fields before storing
+    const encryptedUser = encryptSensitiveFields({
       ...user,
       passwordHash: hashedPassword,
-    }).returning();
+    });
     
-    return result[0];
+    const result = await db.insert(users).values(encryptedUser).returning();
+    
+    // Decrypt sensitive fields when returning
+    return decryptSensitiveFields(result[0]);
   }
 
   async verifyPassword(plainPassword: string, hashedPassword: string): Promise<boolean> {
@@ -56,7 +74,7 @@ export class Storage {
 
   async getAllEmployees(companyId: string): Promise<User[]> {
     // Get all employees created by this company (exclude residents and company owner)
-    return db.select().from(users)
+    const results = await db.select().from(users)
       .where(
         and(
           eq(users.companyId, companyId),
@@ -65,13 +83,15 @@ export class Storage {
         )
       )
       .orderBy(desc(users.createdAt));
+    return results.map(user => decryptSensitiveFields(user));
   }
 
   async getAllCompanies(): Promise<User[]> {
     // Get all users with company role
-    return db.select().from(users)
+    const results = await db.select().from(users)
       .where(eq(users.role, "company"))
       .orderBy(desc(users.createdAt));
+    return results.map(user => decryptSensitiveFields(user));
   }
 
   async deleteUser(userId: string): Promise<void> {
@@ -79,11 +99,14 @@ export class Storage {
   }
 
   async updateUser(userId: string, updates: Partial<User>): Promise<User> {
+    // Encrypt sensitive fields before updating
+    const encryptedUpdates = encryptSensitiveFields(updates);
+    
     const result = await db.update(users)
-      .set(updates)
+      .set(encryptedUpdates)
       .where(eq(users.id, userId))
       .returning();
-    return result[0];
+    return decryptSensitiveFields(result[0]);
   }
 
   async updateUserPassword(userId: string, hashedPassword: string): Promise<void> {
@@ -104,8 +127,40 @@ export class Storage {
       .where(eq(users.id, userId));
   }
 
+  async getUnlinkedTechnicianByIrataLicense(licenseNumber: string): Promise<User | undefined> {
+    // Search for unlinked technicians by IRATA license number
+    // The stored format is "level/number" (e.g., "1/123456"), so we search with multiple patterns
+    const results = await db.select().from(users).where(
+      and(
+        eq(users.role, "rope_access_tech"),
+        isNull(users.companyId),
+        or(
+          eq(users.irataLicenseNumber, licenseNumber),
+          sql`${users.irataLicenseNumber} LIKE '%/' || ${licenseNumber}`,
+          sql`split_part(${users.irataLicenseNumber}, '/', 2) = ${licenseNumber}`
+        )
+      )
+    ).limit(1);
+    return results[0] ? decryptSensitiveFields(results[0]) : undefined;
+  }
+
+  async getUnlinkedTechnicianBySpratLicense(licenseNumber: string): Promise<User | undefined> {
+    // Search for unlinked technicians by SPRAT license number
+    const results = await db.select().from(users).where(
+      and(
+        eq(users.role, "rope_access_tech"),
+        isNull(users.companyId),
+        or(
+          eq(users.spratLicenseNumber, licenseNumber),
+          sql`split_part(${users.spratLicenseNumber}, '/', 2) = ${licenseNumber}`
+        )
+      )
+    ).limit(1);
+    return results[0] ? decryptSensitiveFields(results[0]) : undefined;
+  }
+
   async getResidentsByStrataPlan(strataPlanNumber: string): Promise<User[]> {
-    return db.select().from(users)
+    const results = await db.select().from(users)
       .where(
         and(
           eq(users.role, "resident"),
@@ -113,11 +168,12 @@ export class Storage {
         )
       )
       .orderBy(users.email);
+    return results.map(user => decryptSensitiveFields(user));
   }
 
   async getResidentsByCompany(companyId: string): Promise<User[]> {
     // Get only residents who have explicitly linked their account to this company
-    return db.select().from(users)
+    const results = await db.select().from(users)
       .where(
         and(
           eq(users.role, "resident"),
@@ -125,6 +181,7 @@ export class Storage {
         )
       )
       .orderBy(users.name);
+    return results.map(user => decryptSensitiveFields(user));
   }
 
   // Client operations

@@ -777,6 +777,249 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Technician Self-Registration - SECURITY: Rate limited, public endpoint
+  const technicianUpload = multer({
+    storage: multer.memoryStorage(),
+    limits: { fileSize: 10 * 1024 * 1024 }, // 10MB max per file
+    fileFilter: (req, file, cb) => {
+      if (file.mimetype.startsWith('image/') || file.mimetype === 'application/pdf') {
+        cb(null, true);
+      } else {
+        cb(new Error('Only image or PDF files are allowed'));
+      }
+    }
+  }).fields([
+    { name: 'certificationCard', maxCount: 1 },
+    { name: 'voidCheque', maxCount: 1 },
+    { name: 'driversLicense', maxCount: 1 },
+    { name: 'driversAbstract', maxCount: 1 },
+    { name: 'firstAidCertificate', maxCount: 1 },
+  ]);
+
+  app.post("/api/technician-register", registrationRateLimiter, technicianUpload, async (req: Request, res: Response) => {
+    try {
+      const {
+        firstName,
+        lastName,
+        certification,
+        irataLevel,
+        irataLicenseNumber,
+        spratLevel,
+        spratLicenseNumber,
+        logbookTotalHours,
+        streetAddress,
+        city,
+        provinceState,
+        country,
+        postalCode,
+        email,
+        phone,
+        password,
+        emergencyContactName,
+        emergencyContactPhone,
+        emergencyContactRelationship,
+        socialInsuranceNumber,
+        bankTransitNumber,
+        bankInstitutionNumber,
+        bankAccountNumber,
+        driversLicenseNumber,
+        driversLicenseExpiry,
+        birthday,
+        specialMedicalConditions,
+        hasFirstAid,
+        firstAidType,
+        firstAidExpiry,
+        companyCode, // Optional - code to link to a specific company
+      } = req.body;
+
+      console.log('[Technician-Register] Received registration:', { firstName, lastName, email, certification });
+
+      // Validate required fields
+      if (!firstName || !lastName) {
+        return res.status(400).json({ message: "First and last name are required" });
+      }
+      if (!email) {
+        return res.status(400).json({ message: "Email is required" });
+      }
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        return res.status(400).json({ message: "Invalid email format" });
+      }
+      if (!phone) {
+        return res.status(400).json({ message: "Phone number is required" });
+      }
+      if (!password) {
+        return res.status(400).json({ message: "Password is required" });
+      }
+      if (!emergencyContactName || !emergencyContactPhone) {
+        return res.status(400).json({ message: "Emergency contact is required" });
+      }
+      if (!streetAddress || !city || !provinceState || !country || !postalCode) {
+        return res.status(400).json({ message: "Full address is required" });
+      }
+
+      // Validate password strength
+      const passwordValidation = validatePasswordStrength(password);
+      if (!passwordValidation.valid) {
+        return res.status(400).json({ message: passwordValidation.message });
+      }
+
+      // Validate certification and license numbers
+      if (certification === 'irata' || certification === 'both') {
+        if (!irataLevel || !irataLicenseNumber) {
+          return res.status(400).json({ message: "IRATA level and license number are required" });
+        }
+      }
+      if (certification === 'sprat' || certification === 'both') {
+        if (!spratLevel || !spratLicenseNumber) {
+          return res.status(400).json({ message: "SPRAT level and license number are required" });
+        }
+      }
+
+      // Check if user already exists
+      const existingUser = await storage.getUserByEmail(email);
+      if (existingUser) {
+        return res.status(400).json({ message: "An account with this email already exists. Please log in instead." });
+      }
+
+      // Handle file uploads
+      const files = req.files as { [fieldname: string]: Express.Multer.File[] };
+      const uploadedUrls: { [key: string]: string } = {};
+      const objectStorageService = new ObjectStorageService();
+
+      if (files) {
+        for (const [fieldName, fileArray] of Object.entries(files)) {
+          if (fileArray && fileArray.length > 0) {
+            const file = fileArray[0];
+            const timestamp = Date.now();
+            const extension = file.mimetype === 'application/pdf' ? 'pdf' : file.mimetype.split('/')[1];
+            const filename = `technician-${fieldName}-${timestamp}.${extension}`;
+            
+            try {
+              const url = await objectStorageService.uploadPublicFile(filename, file.buffer, file.mimetype);
+              uploadedUrls[fieldName] = url;
+              console.log(`[Technician-Register] Uploaded ${fieldName}:`, url);
+            } catch (uploadError) {
+              console.error(`[Technician-Register] Failed to upload ${fieldName}:`, uploadError);
+            }
+          }
+        }
+      }
+
+      // Build IRATA documents array
+      const irataDocuments: string[] = [];
+      if (uploadedUrls.certificationCard) {
+        irataDocuments.push(uploadedUrls.certificationCard);
+      }
+
+      // Build driver's license documents array
+      const driversLicenseDocuments: string[] = [];
+      if (uploadedUrls.driversLicense) {
+        driversLicenseDocuments.push(uploadedUrls.driversLicense);
+      }
+      if (uploadedUrls.driversAbstract) {
+        driversLicenseDocuments.push(uploadedUrls.driversAbstract);
+      }
+
+      // Build bank documents array
+      const bankDocuments: string[] = [];
+      if (uploadedUrls.voidCheque) {
+        bankDocuments.push(uploadedUrls.voidCheque);
+      }
+
+      // Build first aid documents array
+      const firstAidDocuments: string[] = [];
+      if (uploadedUrls.firstAidCertificate) {
+        firstAidDocuments.push(uploadedUrls.firstAidCertificate);
+      }
+
+      // Determine tech level from IRATA or SPRAT
+      let techLevel = null;
+      if (certification === 'irata' || certification === 'both') {
+        techLevel = `Level ${irataLevel}`;
+      } else if (certification === 'sprat') {
+        techLevel = `Level ${spratLevel}`;
+      }
+
+      // Format IRATA license number with prefix (e.g., "1/123456")
+      const formattedIrataLicense = irataLevel && irataLicenseNumber 
+        ? `${irataLevel}/${irataLicenseNumber}` 
+        : null;
+
+      // Create the technician user (pending company approval)
+      const user = await storage.createUser({
+        name: `${firstName} ${lastName}`,
+        email,
+        role: 'rope_access_tech',
+        passwordHash: password, // storage.createUser will hash this
+        techLevel,
+        companyId: null, // Will be linked to company after approval
+        
+        // Address fields
+        employeeStreetAddress: streetAddress,
+        employeeCity: city,
+        employeeProvinceState: provinceState,
+        employeeCountry: country,
+        employeePostalCode: postalCode,
+        
+        // Contact info
+        employeePhoneNumber: phone,
+        emergencyContactName,
+        emergencyContactPhone,
+        emergencyContactRelationship: emergencyContactRelationship || null,
+        
+        // Sensitive data
+        socialInsuranceNumber: socialInsuranceNumber || null,
+        
+        // Bank info
+        bankTransitNumber: bankTransitNumber || null,
+        bankInstitutionNumber: bankInstitutionNumber || null,
+        bankAccountNumber: bankAccountNumber || null,
+        bankDocuments: bankDocuments.length > 0 ? bankDocuments : [],
+        
+        // Driver's license
+        driversLicenseNumber: driversLicenseNumber || null,
+        driversLicenseExpiry: driversLicenseExpiry || null,
+        driversLicenseDocuments: driversLicenseDocuments.length > 0 ? driversLicenseDocuments : [],
+        
+        // Personal info
+        birthday: birthday || null,
+        specialMedicalConditions: specialMedicalConditions || null,
+        
+        // IRATA certification
+        irataLevel: irataLevel ? `Level ${irataLevel}` : null,
+        irataLicenseNumber: formattedIrataLicense,
+        irataDocuments: irataDocuments.length > 0 ? irataDocuments : [],
+        
+        // SPRAT certification
+        spratLevel: spratLevel ? `Level ${spratLevel}` : null,
+        spratLicenseNumber: spratLicenseNumber || null,
+        
+        // First aid certification
+        hasFirstAid: hasFirstAid === 'true',
+        firstAidType: firstAidType || null,
+        firstAidExpiry: firstAidExpiry || null,
+        firstAidDocuments: firstAidDocuments.length > 0 ? firstAidDocuments : [],
+        
+        // Baseline logbook hours (optional - for future hour tracking accuracy)
+        irataBaselineHours: logbookTotalHours ? logbookTotalHours : "0",
+        
+        // Start date - use timezone-safe utility
+        startDate: getTodayString(),
+      });
+
+      console.log('[Technician-Register] User created:', user.id);
+
+      // Return success (don't log them in - they need to be approved first)
+      res.json({ 
+        success: true,
+        message: "Registration submitted successfully. You will receive an email once your account is approved."
+      });
+    } catch (error: any) {
+      console.error('[Technician-Register] Error:', error);
+      res.status(500).json({ message: error.message || "Registration failed" });
+    }
+  });
+
   // Login endpoint - SECURITY: Rate limited to prevent brute force attacks
   app.post("/api/login", loginRateLimiter, async (req: Request, res: Response) => {
     try {
@@ -818,11 +1061,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       }
       
-      // Try to find user by email or company name
+      // Try to find user by email, company name, or rope access license number
       let user = await storage.getUserByEmail(identifier);
       
       if (!user) {
         user = await storage.getUserByCompanyName(identifier);
+      }
+      
+      // Also check for IRATA/SPRAT license number (for technician login)
+      if (!user) {
+        user = await storage.getUserByRopeAccessLicense(identifier);
       }
       
       if (!user) {
@@ -2182,6 +2430,135 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Get user error:", error);
       res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Technician: Update own profile
+  app.patch("/api/technician/profile", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const userId = req.session.userId;
+      if (!userId) {
+        return res.status(401).json({ message: "Not authenticated" });
+      }
+
+      const user = await storage.getUserById(userId);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      // Allow technicians and employees to update their own profile
+      const allowedRoles = ['rope_access_tech', 'operations_manager', 'office_admin', 'safety_officer', 'ground_crew'];
+      if (!allowedRoles.includes(user.role)) {
+        return res.status(403).json({ message: "Only technicians can update their profile via this endpoint" });
+      }
+
+      const {
+        name,
+        email,
+        employeePhoneNumber,
+        employeeStreetAddress,
+        employeeCity,
+        employeeProvinceState,
+        employeeCountry,
+        employeePostalCode,
+        emergencyContactName,
+        emergencyContactPhone,
+        emergencyContactRelationship,
+        socialInsuranceNumber,
+        bankTransitNumber,
+        bankInstitutionNumber,
+        bankAccountNumber,
+        driversLicenseNumber,
+        driversLicenseExpiry,
+        birthday,
+        specialMedicalConditions,
+        irataBaselineHours,
+      } = req.body;
+
+      // Validate required fields
+      if (!name || !email || !employeePhoneNumber) {
+        return res.status(400).json({ message: "Name, email, and phone are required" });
+      }
+
+      if (!emergencyContactName || !emergencyContactPhone) {
+        return res.status(400).json({ message: "Emergency contact is required" });
+      }
+
+      // Check if email is being changed to one that already exists
+      if (email !== user.email) {
+        const existingUser = await storage.getUserByEmail(email);
+        if (existingUser && existingUser.id !== userId) {
+          return res.status(400).json({ message: "Email is already in use by another account" });
+        }
+      }
+
+      // Build update object - storage.updateUser handles encryption automatically
+      // via encryptSensitiveFields for SIN, bank info, and medical conditions
+      const updateData: any = {
+        name,
+        email,
+        employeePhoneNumber,
+        emergencyContactName,
+        emergencyContactPhone,
+      };
+
+      // Add optional address fields only if provided
+      if (employeeStreetAddress !== undefined) updateData.employeeStreetAddress = employeeStreetAddress || null;
+      if (employeeCity !== undefined) updateData.employeeCity = employeeCity || null;
+      if (employeeProvinceState !== undefined) updateData.employeeProvinceState = employeeProvinceState || null;
+      if (employeeCountry !== undefined) updateData.employeeCountry = employeeCountry || null;
+      if (employeePostalCode !== undefined) updateData.employeePostalCode = employeePostalCode || null;
+      if (emergencyContactRelationship !== undefined) updateData.emergencyContactRelationship = emergencyContactRelationship || null;
+      if (birthday !== undefined) updateData.birthday = birthday || null;
+      if (driversLicenseExpiry !== undefined) updateData.driversLicenseExpiry = driversLicenseExpiry || null;
+      if (irataBaselineHours !== undefined) updateData.irataBaselineHours = irataBaselineHours || "0";
+
+      // Sensitive fields - these are encrypted by storage.updateUser via encryptSensitiveFields
+      if (socialInsuranceNumber !== undefined) updateData.socialInsuranceNumber = socialInsuranceNumber || null;
+      if (bankTransitNumber !== undefined) updateData.bankTransitNumber = bankTransitNumber || null;
+      if (bankInstitutionNumber !== undefined) updateData.bankInstitutionNumber = bankInstitutionNumber || null;
+      if (bankAccountNumber !== undefined) updateData.bankAccountNumber = bankAccountNumber || null;
+      if (driversLicenseNumber !== undefined) updateData.driversLicenseNumber = driversLicenseNumber || null;
+      if (specialMedicalConditions !== undefined) updateData.specialMedicalConditions = specialMedicalConditions || null;
+
+      // Update the user profile - storage.updateUser applies encryption to sensitive fields
+      const updatedUser = await storage.updateUser(userId, updateData);
+
+      console.log(`[Technician-Profile] Profile updated for user ${userId}`);
+
+      // Strip/mask sensitive fields before returning to minimize transport exposure
+      const { 
+        passwordHash, 
+        socialInsuranceNumber: sinValue,
+        bankTransitNumber: transitValue,
+        bankInstitutionNumber: instValue,
+        bankAccountNumber: acctValue,
+        driversLicenseNumber: dlValue,
+        specialMedicalConditions: medValue,
+        ...safeUser 
+      } = updatedUser;
+
+      // Mask sensitive values - show only last 4 chars if they exist
+      const maskValue = (val: string | null) => {
+        if (!val) return null;
+        if (val.length <= 4) return '****';
+        return '*'.repeat(val.length - 4) + val.slice(-4);
+      };
+
+      const maskedUser = {
+        ...safeUser,
+        socialInsuranceNumber: maskValue(sinValue),
+        bankTransitNumber: maskValue(transitValue),
+        bankInstitutionNumber: maskValue(instValue),
+        bankAccountNumber: maskValue(acctValue),
+        driversLicenseNumber: maskValue(dlValue),
+        specialMedicalConditions: medValue ? '[Recorded]' : null,
+      };
+
+      res.json({ user: maskedUser });
+    } catch (error: any) {
+      console.error("[Technician-Profile] Error updating profile:", error);
+      res.status(500).json({ message: error.message || "Failed to update profile" });
     }
   });
 
@@ -4432,6 +4809,132 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
     } catch (error) {
       console.error("Get employees error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+  
+  // ==================== ONROPEPRO TECHNICIAN LINKING ====================
+  
+  // Search for unlinked technicians (self-registered but not linked to any company)
+  app.get("/api/technicians/search", requireAuth, requireRole("company", "operations_manager"), async (req: Request, res: Response) => {
+    try {
+      const { searchType, searchValue } = req.query;
+      
+      if (!searchType || !searchValue) {
+        return res.status(400).json({ message: "Search type and value are required" });
+      }
+      
+      if (!['irata', 'sprat', 'email'].includes(searchType as string)) {
+        return res.status(400).json({ message: "Invalid search type. Must be 'irata', 'sprat', or 'email'" });
+      }
+      
+      const searchVal = (searchValue as string).trim();
+      if (!searchVal) {
+        return res.status(400).json({ message: "Search value cannot be empty" });
+      }
+      
+      // Search for unlinked technicians (companyId is null)
+      let technician = null;
+      
+      if (searchType === 'email') {
+        const user = await storage.getUserByEmail(searchVal);
+        if (user && user.role === 'rope_access_tech' && !user.companyId) {
+          technician = user;
+        }
+      } else if (searchType === 'irata') {
+        // Search by IRATA license number using dedicated storage function
+        technician = await storage.getUnlinkedTechnicianByIrataLicense(searchVal);
+      } else if (searchType === 'sprat') {
+        // Search by SPRAT license number using dedicated storage function
+        technician = await storage.getUnlinkedTechnicianBySpratLicense(searchVal);
+      }
+      
+      if (!technician) {
+        return res.json({ found: false, message: "No unlinked technician found with that information" });
+      }
+      
+      // Return limited info for privacy (don't expose sensitive fields)
+      const { passwordHash, socialInsuranceNumber, bankTransitNumber, bankInstitutionNumber, 
+              bankAccountNumber, driversLicenseNumber, specialMedicalConditions, ...safeInfo } = technician;
+      
+      res.json({ 
+        found: true, 
+        technician: {
+          id: safeInfo.id,
+          name: safeInfo.name,
+          email: safeInfo.email,
+          irataLevel: safeInfo.irataLevel,
+          irataLicenseNumber: safeInfo.irataLicenseNumber,
+          spratLevel: safeInfo.spratLevel,
+          spratLicenseNumber: safeInfo.spratLicenseNumber,
+          employeeCity: safeInfo.employeeCity,
+          employeeProvinceState: safeInfo.employeeProvinceState,
+          hasFirstAid: safeInfo.hasFirstAid,
+          firstAidType: safeInfo.firstAidType,
+        }
+      });
+    } catch (error) {
+      console.error("Search technicians error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+  
+  // Link an existing OnRopePro technician to a company
+  app.post("/api/technicians/:technicianId/link", requireAuth, requireRole("company", "operations_manager"), async (req: Request, res: Response) => {
+    try {
+      const { technicianId } = req.params;
+      const { hourlyRate, isSalary, salary } = req.body;
+      
+      const currentUser = await storage.getUserById(req.session.userId!);
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      const companyId = currentUser.role === "company" ? currentUser.id : currentUser.companyId;
+      if (!companyId) {
+        return res.status(400).json({ message: "Unable to determine company" });
+      }
+      
+      // Check seat limits before linking
+      const limitsCheck = await checkSubscriptionLimits(companyId);
+      const employees = await storage.getAllEmployees(companyId);
+      const activeEmployeeCount = employees.filter(emp => !emp.terminatedDate).length;
+      
+      if (limitsCheck.limits.maxSeats > 0 && activeEmployeeCount >= limitsCheck.limits.maxSeats) {
+        return res.status(400).json({ message: "Seat limit reached. Please upgrade your subscription or add more seats." });
+      }
+      
+      // Find the technician and verify they're unlinked
+      const technician = await storage.getUserById(technicianId);
+      if (!technician) {
+        return res.status(404).json({ message: "Technician not found" });
+      }
+      
+      if (technician.role !== 'rope_access_tech') {
+        return res.status(400).json({ message: "This user is not a technician" });
+      }
+      
+      if (technician.companyId) {
+        return res.status(400).json({ message: "This technician is already linked to a company" });
+      }
+      
+      // Link the technician to this company
+      await storage.updateUser(technicianId, {
+        companyId,
+        hourlyRate: hourlyRate || null,
+        isSalary: isSalary || false,
+        salary: salary || null,
+        startDate: getTodayString(),
+      });
+      
+      console.log(`[Technician-Link] Linked technician ${technicianId} (${technician.name}) to company ${companyId}`);
+      
+      res.json({ 
+        success: true, 
+        message: `${technician.name} has been added to your team!` 
+      });
+    } catch (error) {
+      console.error("Link technician error:", error);
       res.status(500).json({ message: "Internal server error" });
     }
   });

@@ -69,6 +69,8 @@ import GPSGuide from "@/pages/GPSGuide";
 import PropertyManagerGuide from "@/pages/PropertyManagerGuide";
 import Pricing from "@/pages/Pricing";
 import ROICalculator from "@/pages/ROICalculator";
+import TechnicianLogin from "@/pages/TechnicianLogin";
+import TechnicianPortal from "@/pages/TechnicianPortal";
 import NotFound from "@/pages/not-found";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import { EMPLOYEE_ROLES } from "@/lib/permissions";
@@ -142,6 +144,12 @@ function Router() {
         </ProtectedRoute>
       </Route>
       <Route path="/building-portal" component={BuildingPortal} />
+      <Route path="/technician-login" component={TechnicianLogin} />
+      <Route path="/technician-portal">
+        <ProtectedRoute allowedRoles={["rope_access_tech"]}>
+          <TechnicianPortal />
+        </ProtectedRoute>
+      </Route>
       <Route path="/resident">
         <ProtectedRoute allowedRoles={["resident"]}>
           <ResidentDashboard />

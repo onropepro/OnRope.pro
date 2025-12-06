@@ -96,11 +96,26 @@ export const users = pgTable("users", {
   socialInsuranceNumber: varchar("social_insurance_number"), // Social Insurance Number (optional)
   driversLicenseNumber: varchar("drivers_license_number"), // Driver's license number (optional)
   driversLicenseProvince: varchar("drivers_license_province"), // Province where driver's license was issued (optional)
+  driversLicenseExpiry: date("drivers_license_expiry"), // Driver's license expiry date (optional)
   driversLicenseDocuments: text("drivers_license_documents").array().default(sql`ARRAY[]::text[]`), // Array of document URLs (driver's license photos, abstracts, etc.)
-  homeAddress: text("home_address"), // Home address (optional)
+  
+  // Employee address fields (separate fields for self-registration)
+  employeeStreetAddress: text("employee_street_address"), // Employee street address
+  employeeCity: varchar("employee_city"), // Employee city
+  employeeProvinceState: varchar("employee_province_state"), // Employee province/state
+  employeeCountry: varchar("employee_country"), // Employee country
+  employeePostalCode: varchar("employee_postal_code"), // Employee postal code
+  homeAddress: text("home_address"), // Home address (optional - legacy field)
+  
+  // Bank information for payroll
+  bankTransitNumber: varchar("bank_transit_number"), // Bank transit number (optional)
+  bankInstitutionNumber: varchar("bank_institution_number"), // Bank institution number (optional)
+  bankAccountNumber: varchar("bank_account_number"), // Bank account number (optional)
+  bankDocuments: text("bank_documents").array().default(sql`ARRAY[]::text[]`), // Array of void cheque document URLs
   employeePhoneNumber: varchar("employee_phone_number"), // Employee phone number (optional, separate from resident phoneNumber)
   emergencyContactName: varchar("emergency_contact_name"), // Emergency contact name (optional)
   emergencyContactPhone: varchar("emergency_contact_phone"), // Emergency contact phone (optional)
+  emergencyContactRelationship: varchar("emergency_contact_relationship"), // Emergency contact relationship (e.g., spouse, parent, sibling)
   specialMedicalConditions: text("special_medical_conditions"), // Special medical conditions (optional)
   
   // IRATA certification fields (optional)
@@ -117,6 +132,12 @@ export const users = pgTable("users", {
   spratIssuedDate: date("sprat_issued_date"), // SPRAT certification issue date
   spratExpirationDate: date("sprat_expiration_date"), // SPRAT certification expiration date
   spratDocuments: text("sprat_documents").array().default(sql`ARRAY[]::text[]`), // Array of SPRAT certification document URLs
+  
+  // First Aid certification fields (optional)
+  hasFirstAid: boolean("has_first_aid").default(false), // Whether employee has first aid certification
+  firstAidType: varchar("first_aid_type"), // Type of first aid certification (e.g., "Standard First Aid", "Emergency First Aid", "CPR/AED", etc.)
+  firstAidExpiry: date("first_aid_expiry"), // First aid certification expiry date
+  firstAidDocuments: text("first_aid_documents").array().default(sql`ARRAY[]::text[]`), // Array of first aid certification document URLs
   
   // Employee photo
   photoUrl: text("photo_url"), // Employee profile photo URL

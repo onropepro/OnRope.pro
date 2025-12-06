@@ -590,7 +590,13 @@ export default function Dashboard() {
   const [isUploadingAnchorCert, setIsUploadingAnchorCert] = useState(false);
   const [selectedInspection, setSelectedInspection] = useState<any>(null);
   const [selectedMeeting, setSelectedMeeting] = useState<any>(null);
-  const [employeeFormStep, setEmployeeFormStep] = useState<1 | 2>(1); // Track form step (1 = info, 2 = permissions)
+  const [employeeFormStep, setEmployeeFormStep] = useState<0 | 1 | 2>(0); // Track form step (0 = choose mode, 1 = info, 2 = permissions)
+  const [addEmployeeMode, setAddEmployeeMode] = useState<'create' | 'onropepro' | null>(null); // Which mode user chose
+  const [onRopeProSearchType, setOnRopeProSearchType] = useState<'irata' | 'sprat' | 'email'>('irata'); // Search type for OnRopePro
+  const [onRopeProSearchValue, setOnRopeProSearchValue] = useState(''); // Search value for OnRopePro
+  const [foundTechnician, setFoundTechnician] = useState<any>(null); // Found technician from search
+  const [technicianSearching, setTechnicianSearching] = useState(false); // Loading state for search
+  const [technicianLinking, setTechnicianLinking] = useState(false); // Loading state for linking
   const [editEmployeeFormStep, setEditEmployeeFormStep] = useState<1 | 2>(1); // Track edit form step
   const [showTerminationConfirm, setShowTerminationConfirm] = useState(false); // Confirmation for termination
   const [showTerminationDialog, setShowTerminationDialog] = useState(false); // Dialog for termination details
@@ -1181,6 +1187,95 @@ export default function Dashboard() {
       toast({ title: t('dashboard.toast.error', 'Error'), description: error.message, variant: "destructive" });
     },
   });
+
+  // Search for OnRopePro technicians
+  const searchOnRopeProTechnician = async () => {
+    if (!onRopeProSearchValue.trim()) {
+      toast({ title: "Search value required", description: "Please enter a value to search", variant: "destructive" });
+      return;
+    }
+    
+    setTechnicianSearching(true);
+    setFoundTechnician(null);
+    
+    try {
+      const response = await fetch(`/api/technicians/search?searchType=${onRopeProSearchType}&searchValue=${encodeURIComponent(onRopeProSearchValue)}`, {
+        credentials: "include",
+      });
+      
+      const data = await response.json();
+      
+      if (!response.ok) {
+        throw new Error(data.message || "Search failed");
+      }
+      
+      if (data.found) {
+        setFoundTechnician(data.technician);
+      } else {
+        toast({ 
+          title: "No technician found", 
+          description: data.message || "No unlinked technician found with that information",
+          variant: "default" 
+        });
+      }
+    } catch (error: any) {
+      toast({ 
+        title: "Search failed", 
+        description: error.message, 
+        variant: "destructive" 
+      });
+    } finally {
+      setTechnicianSearching(false);
+    }
+  };
+
+  // Link OnRopePro technician to company
+  const linkOnRopeProTechnician = async () => {
+    if (!foundTechnician) return;
+    
+    setTechnicianLinking(true);
+    
+    try {
+      const response = await fetch(`/api/technicians/${foundTechnician.id}/link`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({}),
+      });
+      
+      const data = await response.json();
+      
+      if (!response.ok) {
+        throw new Error(data.message || "Link failed");
+      }
+      
+      queryClient.invalidateQueries({ queryKey: ["/api/employees/all"] });
+      setShowEmployeeDialog(false);
+      resetOnRopeProSearch();
+      toast({ 
+        title: "Technician added!", 
+        description: data.message || `${foundTechnician.name} has been added to your team.`,
+      });
+    } catch (error: any) {
+      toast({ 
+        title: "Failed to add technician", 
+        description: error.message, 
+        variant: "destructive" 
+      });
+    } finally {
+      setTechnicianLinking(false);
+    }
+  };
+
+  // Reset OnRopePro search state
+  const resetOnRopeProSearch = () => {
+    setAddEmployeeMode(null);
+    setEmployeeFormStep(0);
+    setOnRopeProSearchType('irata');
+    setOnRopeProSearchValue('');
+    setFoundTechnician(null);
+    employeeForm.reset();
+  };
 
   const editEmployeeMutation = useMutation({
     mutationFn: async (data: EditEmployeeFormData & { id: string }) => {
@@ -3925,7 +4020,7 @@ export default function Dashboard() {
               )}
               
               {/* Create Employee Button */}
-              <Dialog open={showEmployeeDialog} onOpenChange={(open) => { setShowEmployeeDialog(open); if (!open) setEmployeeFormStep(1); }}>
+              <Dialog open={showEmployeeDialog} onOpenChange={(open) => { setShowEmployeeDialog(open); if (!open) resetOnRopeProSearch(); }}>
                 <DialogTrigger asChild>
                   <Button 
                     className="w-full h-12 gap-2" 
@@ -3940,14 +4035,216 @@ export default function Dashboard() {
                   <div className="p-6 border-b">
                     <DialogHeader>
                       <DialogTitle>
-                        {employeeFormStep === 1 ? t('dashboard.employeeForm.title', 'Employee Information') : t('dashboard.employeeForm.permissionsTitle', 'Permissions')}
+                        {employeeFormStep === 0 ? 'Add Employee' : 
+                         employeeFormStep === 1 ? t('dashboard.employeeForm.title', 'Employee Information') : 
+                         addEmployeeMode === 'onropepro' ? 'Add from OnRopePro' :
+                         t('dashboard.employeeForm.permissionsTitle', 'Permissions')}
                       </DialogTitle>
                       <DialogDescription>
-                        {employeeFormStep === 1 ? t('dashboard.employeeForm.step1', 'Step 1 of 2: Enter employee details') : t('dashboard.employeeForm.step2', 'Step 2 of 2: Configure access permissions')}
+                        {employeeFormStep === 0 ? 'Choose how you want to add an employee' :
+                         employeeFormStep === 1 ? t('dashboard.employeeForm.step1', 'Step 1 of 2: Enter employee details') : 
+                         addEmployeeMode === 'onropepro' ? 'Search for a technician who registered on OnRopePro' :
+                         t('dashboard.employeeForm.step2', 'Step 2 of 2: Configure access permissions')}
                       </DialogDescription>
                     </DialogHeader>
                   </div>
                   <div className="overflow-y-auto flex-1 p-6">
+                    {/* Step 0: Choose mode */}
+                    {employeeFormStep === 0 && (
+                      <div className="space-y-4">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          {/* Create New Employee Option */}
+                          <div 
+                            className="border-2 rounded-lg p-6 cursor-pointer hover-elevate active-elevate-2 transition-all text-center"
+                            onClick={() => { setAddEmployeeMode('create'); setEmployeeFormStep(1); }}
+                            data-testid="button-add-employee-create-new"
+                          >
+                            <span className="material-icons text-4xl text-primary mb-3">person_add</span>
+                            <h3 className="font-semibold text-lg mb-2">Create New Employee</h3>
+                            <p className="text-sm text-muted-foreground">
+                              Manually enter all employee details and create a new account
+                            </p>
+                          </div>
+                          
+                          {/* Add from OnRopePro Option */}
+                          <div 
+                            className="border-2 rounded-lg p-6 cursor-pointer hover-elevate active-elevate-2 transition-all text-center border-primary/30 bg-primary/5"
+                            onClick={() => { setAddEmployeeMode('onropepro'); setEmployeeFormStep(2); }}
+                            data-testid="button-add-employee-from-onropepro"
+                          >
+                            <span className="material-icons text-4xl text-primary mb-3">search</span>
+                            <h3 className="font-semibold text-lg mb-2">Add from OnRopePro</h3>
+                            <p className="text-sm text-muted-foreground">
+                              Find a technician who already registered on OnRopePro
+                            </p>
+                          </div>
+                        </div>
+                        
+                        <div className="pt-4 border-t">
+                          <div className="flex items-start gap-3 p-3 bg-muted/50 rounded-lg">
+                            <span className="material-icons text-primary text-lg mt-0.5">info</span>
+                            <div className="text-sm text-muted-foreground">
+                              <p className="font-medium text-foreground mb-1">What is OnRopePro?</p>
+                              <p>Technicians can self-register at the technician login page. Once they register, you can add them to your company by searching for their license number or email.</p>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Step 2 (when mode is onropepro): Search for technician */}
+                    {employeeFormStep === 2 && addEmployeeMode === 'onropepro' && (
+                      <div className="space-y-6">
+                        {/* Search Type Selection */}
+                        <div className="space-y-3">
+                          <label className="text-sm font-medium">Search by</label>
+                          <div className="grid grid-cols-3 gap-3">
+                            {[
+                              { value: 'irata', label: 'IRATA License', icon: 'badge' },
+                              { value: 'sprat', label: 'SPRAT License', icon: 'verified' },
+                              { value: 'email', label: 'Email', icon: 'email' },
+                            ].map((option) => (
+                              <div
+                                key={option.value}
+                                className={`border-2 rounded-lg p-3 cursor-pointer text-center transition-all ${
+                                  onRopeProSearchType === option.value
+                                    ? 'border-primary bg-primary/5'
+                                    : 'border-muted hover-elevate'
+                                }`}
+                                onClick={() => { setOnRopeProSearchType(option.value as any); setFoundTechnician(null); setOnRopeProSearchValue(''); }}
+                                data-testid={`button-search-type-${option.value}`}
+                              >
+                                <span className="material-icons text-xl text-primary mb-1">{option.icon}</span>
+                                <div className="text-xs font-medium">{option.label}</div>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                        
+                        {/* Search Input */}
+                        <div className="space-y-2">
+                          <label className="text-sm font-medium">
+                            {onRopeProSearchType === 'irata' ? 'IRATA License Number' :
+                             onRopeProSearchType === 'sprat' ? 'SPRAT License Number' :
+                             'Email Address'}
+                          </label>
+                          <div className="flex gap-2">
+                            <Input
+                              placeholder={
+                                onRopeProSearchType === 'irata' ? 'e.g., 123456' :
+                                onRopeProSearchType === 'sprat' ? 'e.g., SP-12345' :
+                                'e.g., technician@email.com'
+                              }
+                              value={onRopeProSearchValue}
+                              onChange={(e) => { setOnRopeProSearchValue(e.target.value); setFoundTechnician(null); }}
+                              className="h-12 flex-1"
+                              data-testid="input-onropepro-search"
+                              onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); searchOnRopeProTechnician(); }}}
+                            />
+                            <Button 
+                              type="button"
+                              onClick={searchOnRopeProTechnician}
+                              disabled={technicianSearching || !onRopeProSearchValue.trim()}
+                              className="h-12 px-6"
+                              data-testid="button-search-onropepro"
+                            >
+                              {technicianSearching ? (
+                                <span className="material-icons animate-spin">sync</span>
+                              ) : (
+                                <span className="material-icons">search</span>
+                              )}
+                            </Button>
+                          </div>
+                        </div>
+                        
+                        {/* Found Technician Result */}
+                        {foundTechnician && (
+                          <div className="border-2 border-green-500/30 bg-green-500/5 rounded-lg p-4 space-y-4">
+                            <div className="flex items-center gap-3">
+                              <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
+                                <span className="material-icons text-primary text-2xl">person</span>
+                              </div>
+                              <div className="flex-1">
+                                <h3 className="font-semibold text-lg">{foundTechnician.name}</h3>
+                                <p className="text-sm text-muted-foreground">{foundTechnician.email}</p>
+                              </div>
+                              <span className="material-icons text-green-500 text-2xl">check_circle</span>
+                            </div>
+                            
+                            <div className="grid grid-cols-2 gap-3 pt-2 border-t">
+                              {foundTechnician.irataLevel && (
+                                <div className="text-sm">
+                                  <span className="text-muted-foreground">IRATA:</span>
+                                  <span className="ml-2 font-medium">{foundTechnician.irataLevel}</span>
+                                  {foundTechnician.irataLicenseNumber && (
+                                    <span className="text-muted-foreground ml-1">({foundTechnician.irataLicenseNumber})</span>
+                                  )}
+                                </div>
+                              )}
+                              {foundTechnician.spratLevel && (
+                                <div className="text-sm">
+                                  <span className="text-muted-foreground">SPRAT:</span>
+                                  <span className="ml-2 font-medium">{foundTechnician.spratLevel}</span>
+                                  {foundTechnician.spratLicenseNumber && (
+                                    <span className="text-muted-foreground ml-1">({foundTechnician.spratLicenseNumber})</span>
+                                  )}
+                                </div>
+                              )}
+                              {(foundTechnician.employeeCity || foundTechnician.employeeProvinceState) && (
+                                <div className="text-sm">
+                                  <span className="text-muted-foreground">Location:</span>
+                                  <span className="ml-2 font-medium">
+                                    {[foundTechnician.employeeCity, foundTechnician.employeeProvinceState].filter(Boolean).join(', ')}
+                                  </span>
+                                </div>
+                              )}
+                              {foundTechnician.hasFirstAid && (
+                                <div className="text-sm">
+                                  <span className="text-muted-foreground">First Aid:</span>
+                                  <span className="ml-2 font-medium text-green-600">{foundTechnician.firstAidType || 'Yes'}</span>
+                                </div>
+                              )}
+                            </div>
+                            
+                            <Button 
+                              type="button"
+                              className="w-full h-12"
+                              onClick={linkOnRopeProTechnician}
+                              disabled={technicianLinking}
+                              data-testid="button-link-technician"
+                            >
+                              {technicianLinking ? (
+                                <>
+                                  <span className="material-icons animate-spin mr-2">sync</span>
+                                  Adding...
+                                </>
+                              ) : (
+                                <>
+                                  <span className="material-icons mr-2">person_add</span>
+                                  Add {foundTechnician.name} to Team
+                                </>
+                              )}
+                            </Button>
+                          </div>
+                        )}
+                        
+                        {/* Back button */}
+                        <div className="pt-4 border-t flex justify-between">
+                          <Button
+                            type="button"
+                            variant="outline"
+                            onClick={() => { setEmployeeFormStep(0); setAddEmployeeMode(null); setFoundTechnician(null); setOnRopeProSearchValue(''); }}
+                            data-testid="button-back-to-mode-select"
+                          >
+                            <span className="material-icons mr-2">arrow_back</span>
+                            Back
+                          </Button>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Original form for creating new employee */}
+                    {addEmployeeMode === 'create' && (
                     <Form {...employeeForm}>
                       <form onSubmit={employeeForm.handleSubmit(onEmployeeSubmit)} className="space-y-4">
                       {employeeFormStep === 1 && (
@@ -4454,6 +4751,7 @@ export default function Dashboard() {
                       )}
                     </form>
                   </Form>
+                    )}
                   </div>
                 </DialogContent>
               </Dialog>

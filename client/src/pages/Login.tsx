@@ -30,6 +30,7 @@ export default function Login() {
   const [, setLocation] = useLocation();
   const [showLoginForm, setShowLoginForm] = useState(false);
   const [showTechnicianRegistration, setShowTechnicianRegistration] = useState(false);
+  const [showDevTools, setShowDevTools] = useState(false);
   const [currentWordIndex, setCurrentWordIndex] = useState(0);
   const [isAnimating, setIsAnimating] = useState(false);
   const [landingLanguage, setLandingLanguage] = useState<'en' | 'fr'>('en');
@@ -682,245 +683,32 @@ export default function Login() {
               </form>
             </Form>
 
-            <div className="grid grid-cols-2 gap-2">
-              <Button 
-                className="h-10 text-xs bg-yellow-500 hover:bg-yellow-600 text-black" 
-                onClick={async () => {
-                  try {
-                    const response = await fetch("/api/login", {
-                      method: "POST",
-                      headers: { "Content-Type": "application/json" },
-                      body: JSON.stringify({ identifier: "testcom", password: "test123" }),
-                      credentials: "include",
-                    });
-                    const result = await response.json();
-                    if (response.ok) {
-                      const user = result.user;
-                      if (user.role === "resident") {
-                        window.location.href = "/resident";
-                      } else if (user.role === "property_manager") {
-                        window.location.href = "/property-manager";
-                      } else {
-                        window.location.href = "/dashboard";
-                      }
-                    } else {
-                      toast({
-                        title: "Quick Login Failed",
-                        description: result.message || "Test account not found in production database",
-                        variant: "destructive",
-                      });
-                    }
-                  } catch (error) {
-                    toast({
-                      title: "Login Error",
-                      description: "Network error. Please try manual login.",
-                      variant: "destructive",
-                    });
-                  }
-                }}
-                data-testid="button-quick-login-testcom"
-              >
-                <span className="material-icons mr-1 text-base">flash_on</span>
-                OWNER DEVELOPMENT ONLY
-              </Button>
-
-              <Button 
-                className="h-10 text-xs bg-green-600 hover:bg-green-700 text-white" 
-                onClick={async () => {
-                  try {
-                    const response = await fetch("/api/login", {
-                      method: "POST",
-                      headers: { "Content-Type": "application/json" },
-                      body: JSON.stringify({ identifier: "tester@tester.com", password: "tester123" }),
-                      credentials: "include",
-                    });
-                    const result = await response.json();
-                    if (response.ok) {
-                      const user = result.user;
-                      if (user.role === "resident") {
-                        window.location.href = "/resident";
-                      } else if (user.role === "property_manager") {
-                        window.location.href = "/property-manager";
-                      } else {
-                        window.location.href = "/dashboard";
-                      }
-                    } else {
-                      toast({
-                        title: "Quick Login Failed",
-                        description: result.message || "Test account not found in production database",
-                        variant: "destructive",
-                      });
-                    }
-                  } catch (error) {
-                    toast({
-                      title: "Login Error",
-                      description: "Network error. Please try manual login.",
-                      variant: "destructive",
-                    });
-                  }
-                }}
-                data-testid="button-quick-login-tester"
-              >
-                <span className="material-icons mr-1 text-base">flash_on</span>
-                TESTER OWNER
-              </Button>
-
-              <Button 
-                className="h-10 text-xs bg-primary hover:bg-primary/90 text-white" 
-                onClick={async () => {
-                  try {
-                    const response = await fetch("/api/login", {
-                      method: "POST",
-                      headers: { "Content-Type": "application/json" },
-                      body: JSON.stringify({ identifier: "employee@employee.com", password: "employee123" }),
-                      credentials: "include",
-                    });
-                    const result = await response.json();
-                    if (response.ok) {
-                      const user = result.user;
-                      if (user.role === "resident") {
-                        window.location.href = "/resident";
-                      } else if (user.role === "property_manager") {
-                        window.location.href = "/property-manager";
-                      } else {
-                        window.location.href = "/dashboard";
-                      }
-                    } else {
-                      toast({
-                        title: "Quick Login Failed",
-                        description: result.message || "Test account not found in production database",
-                        variant: "destructive",
-                      });
-                    }
-                  } catch (error) {
-                    toast({
-                      title: "Login Error",
-                      description: "Network error. Please try manual login.",
-                      variant: "destructive",
-                    });
-                  }
-                }}
-                data-testid="button-quick-login-employee"
-              >
-                <span className="material-icons mr-1 text-base">flash_on</span>
-                EMPLOYEE TESTER
-              </Button>
-
-              <Button 
-                variant="secondary" 
-                className="h-10 text-xs" 
-                onClick={async () => {
-                  try {
-                    const response = await fetch("/api/login", {
-                      method: "POST",
-                      headers: { "Content-Type": "application/json" },
-                      body: JSON.stringify({ identifier: "resident@resident.com", password: "resident123" }),
-                      credentials: "include",
-                    });
-                    const result = await response.json();
-                    if (response.ok) {
-                      const user = result.user;
-                      if (user.role === "resident") {
-                        window.location.href = "/resident";
-                      } else if (user.role === "property_manager") {
-                        window.location.href = "/property-manager";
-                      } else {
-                        window.location.href = "/dashboard";
-                      }
-                    } else {
-                      toast({
-                        title: "Quick Login Failed",
-                        description: result.message || "Test account not found in production database",
-                        variant: "destructive",
-                      });
-                    }
-                  } catch (error) {
-                    toast({
-                      title: "Login Error",
-                      description: "Network error. Please try manual login.",
-                      variant: "destructive",
-                    });
-                  }
-                }}
-                data-testid="button-quick-login-resident"
-              >
-                <span className="material-icons mr-1 text-base">flash_on</span>
-                RESIDENT TESTER
-              </Button>
-
-              <Button 
-                variant="secondary" 
-                className="h-10 text-xs" 
-                onClick={async () => {
-                  try {
-                    const response = await fetch("/api/login", {
-                      method: "POST",
-                      headers: { "Content-Type": "application/json" },
-                      body: JSON.stringify({ identifier: "property@property.com", password: "property123" }),
-                      credentials: "include",
-                    });
-                    const result = await response.json();
-                    if (response.ok) {
-                      window.location.href = "/property-manager";
-                    } else {
-                      toast({
-                        title: "Quick Login Failed",
-                        description: result.message || "Property manager account not found",
-                        variant: "destructive",
-                      });
-                    }
-                  } catch (error) {
-                    toast({
-                      title: "Login Error",
-                      description: "Network error. Please try manual login.",
-                      variant: "destructive",
-                    });
-                  }
-                }}
-                data-testid="button-quick-login-property-manager"
-              >
-                <span className="material-icons mr-1 text-base">flash_on</span>
-                PROPERTY MANAGER
-              </Button>
-
-              <Button
-                variant="outline"
-                size="sm"
-                className="text-xs bg-purple-600 hover:bg-purple-700 text-white border-purple-600"
-                onClick={async () => {
-                  try {
-                    const response = await fetch("/api/login", {
-                      method: "POST",
-                      headers: { "Content-Type": "application/json" },
-                      body: JSON.stringify({ identifier: "info@onrope.pro", password: "onropepro" }),
-                      credentials: "include",
-                    });
-                    const result = await response.json();
-                    if (response.ok) {
-                      window.location.href = "/superuser";
-                    } else {
-                      toast({
-                        title: "Quick Login Failed",
-                        description: result.message || "SuperUser account not found",
-                        variant: "destructive",
-                      });
-                    }
-                  } catch (error) {
-                    toast({
-                      title: "Login Error",
-                      description: "Network error. Please try manual login.",
-                      variant: "destructive",
-                    });
-                  }
-                }}
-                data-testid="button-quick-login-superuser"
-              >
-                <span className="material-icons mr-1 text-base">flash_on</span>
-                SUPERUSER
-              </Button>
+            {/* Portal Access Section */}
+            <div className="space-y-3 pt-2">
+              <div className="grid grid-cols-2 gap-3">
+                <Button 
+                  variant="outline" 
+                  className="h-11 text-sm font-medium border-amber-500/50 text-amber-600 dark:text-amber-400" 
+                  onClick={() => setLocation("/technician-login")}
+                  data-testid="button-technician-login"
+                >
+                  <HardHat className="mr-2 h-4 w-4" />
+                  Technician Login
+                </Button>
+                <Button 
+                  variant="outline" 
+                  className="h-11 text-sm font-medium" 
+                  onClick={() => setLocation("/building-portal")}
+                  data-testid="button-building-portal"
+                >
+                  <Building2 className="mr-2 h-4 w-4" />
+                  Building Portal
+                </Button>
+              </div>
             </div>
 
-            <div className="relative">
+            {/* Divider */}
+            <div className="relative pt-2">
               <div className="absolute inset-0 flex items-center">
                 <span className="w-full border-t" />
               </div>
@@ -929,86 +717,219 @@ export default function Login() {
               </div>
             </div>
 
-            <div className="space-y-3">
+            {/* New User Options */}
+            <div className="space-y-2">
               <Button 
                 variant="default" 
-                className="w-full h-12 text-base font-medium" 
-                onClick={() => window.location.href = "/get-license"}
+                className="w-full h-11 text-sm font-medium" 
+                onClick={() => setLocation("/get-license")}
                 data-testid="button-get-license"
               >
-                <span className="material-icons mr-2">shopping_cart</span>
-                Get License
+                <span className="material-icons mr-2 text-lg">shopping_cart</span>
+                Get Company License
               </Button>
+              
+              <div className="grid grid-cols-2 gap-2">
+                <Button 
+                  variant="ghost" 
+                  size="sm"
+                  className="h-9 text-xs font-medium text-muted-foreground" 
+                  onClick={() => setLocation("/register")}
+                  data-testid="link-register"
+                >
+                  <span className="material-icons mr-1 text-sm">person_add</span>
+                  Resident / Manager
+                </Button>
+                <Button 
+                  variant="ghost" 
+                  size="sm"
+                  className="h-9 text-xs font-medium text-amber-600 dark:text-amber-400" 
+                  onClick={() => {
+                    setShowLoginForm(false);
+                    setShowTechnicianRegistration(true);
+                  }}
+                  data-testid="button-create-technician-account"
+                >
+                  <HardHat className="mr-1 h-3 w-3" />
+                  Technician
+                </Button>
+              </div>
+            </div>
 
+            {/* Footer */}
+            <div className="pt-3 text-center text-xs text-muted-foreground">
+              <p>Secure, Professional, Transparent</p>
+            </div>
+
+            {/* Collapsible Dev Tools Section */}
+            <div className="pt-2 border-t border-dashed border-muted-foreground/20">
               <Button 
-                variant="outline" 
-                className="w-full h-12 text-base font-medium" 
-                onClick={() => window.location.href = "/register"}
-                data-testid="link-register"
+                variant="ghost" 
+                size="sm"
+                className="w-full h-7 text-[10px] text-muted-foreground/50"
+                onClick={() => setShowDevTools(!showDevTools)}
+                data-testid="button-toggle-dev-tools"
               >
-                <span className="material-icons mr-2">person_add</span>
-                Create Resident/Property Manager Account
+                <span className="material-icons text-xs mr-1">{showDevTools ? 'expand_less' : 'expand_more'}</span>
+                {showDevTools ? 'Hide' : 'Show'} Development Tools
               </Button>
-
-              <Button 
-                variant="outline" 
-                className="w-full h-12 text-base font-medium border-amber-500/50 text-amber-600 dark:text-amber-400" 
-                onClick={() => {
-                  setShowLoginForm(false);
-                  setShowTechnicianRegistration(true);
-                }}
-                data-testid="button-create-technician-account"
-              >
-                <HardHat className="mr-2 h-5 w-5" />
-                Create Technician Account
-              </Button>
-            </div>
-
-            <div className="relative">
-              <div className="absolute inset-0 flex items-center">
-                <span className="w-full border-t" />
-              </div>
-              <div className="relative flex justify-center text-xs uppercase">
-                <span className="bg-card px-2 text-muted-foreground">Building Access</span>
-              </div>
-            </div>
-
-            <Button 
-              variant="outline" 
-              className="w-full h-12 text-base font-medium border-primary/30" 
-              onClick={() => window.location.href = "/building-portal"}
-              data-testid="button-building-portal"
-            >
-              <Building2 className="mr-2 h-5 w-5" />
-              Building Portal Login
-            </Button>
-
-            {/* Mobile-only feature highlights */}
-            <div className="md:hidden pt-4 space-y-4 border-t">
-              <h3 className="text-sm font-semibold text-center">Built for All Stakeholders</h3>
-              <div className="grid grid-cols-2 gap-3 text-center">
-                <div className="space-y-1">
-                  <span className="material-icons text-primary text-2xl">business</span>
-                  <div className="text-xs font-medium">Companies</div>
+              
+              {showDevTools && (
+                <div className="grid grid-cols-3 gap-1 pt-2">
+                  <Button 
+                    size="sm"
+                    className="h-7 text-[9px] bg-yellow-500 hover:bg-yellow-600 text-black" 
+                    onClick={async () => {
+                      try {
+                        const response = await fetch("/api/login", {
+                          method: "POST",
+                          headers: { "Content-Type": "application/json" },
+                          body: JSON.stringify({ identifier: "testcom", password: "test123" }),
+                          credentials: "include",
+                        });
+                        const result = await response.json();
+                        if (response.ok) {
+                          window.location.href = "/dashboard";
+                        } else {
+                          toast({ title: "Failed", description: result.message, variant: "destructive" });
+                        }
+                      } catch (error) {
+                        toast({ title: "Error", description: "Network error", variant: "destructive" });
+                      }
+                    }}
+                    data-testid="button-quick-login-testcom"
+                  >
+                    Owner
+                  </Button>
+                  <Button 
+                    size="sm"
+                    className="h-7 text-[9px] bg-green-600 hover:bg-green-700 text-white" 
+                    onClick={async () => {
+                      try {
+                        const response = await fetch("/api/login", {
+                          method: "POST",
+                          headers: { "Content-Type": "application/json" },
+                          body: JSON.stringify({ identifier: "tester@tester.com", password: "tester123" }),
+                          credentials: "include",
+                        });
+                        const result = await response.json();
+                        if (response.ok) {
+                          window.location.href = "/dashboard";
+                        } else {
+                          toast({ title: "Failed", description: result.message, variant: "destructive" });
+                        }
+                      } catch (error) {
+                        toast({ title: "Error", description: "Network error", variant: "destructive" });
+                      }
+                    }}
+                    data-testid="button-quick-login-tester"
+                  >
+                    Tester
+                  </Button>
+                  <Button 
+                    size="sm"
+                    className="h-7 text-[9px] bg-primary hover:bg-primary/90 text-white" 
+                    onClick={async () => {
+                      try {
+                        const response = await fetch("/api/login", {
+                          method: "POST",
+                          headers: { "Content-Type": "application/json" },
+                          body: JSON.stringify({ identifier: "employee@employee.com", password: "employee123" }),
+                          credentials: "include",
+                        });
+                        const result = await response.json();
+                        if (response.ok) {
+                          window.location.href = "/dashboard";
+                        } else {
+                          toast({ title: "Failed", description: result.message, variant: "destructive" });
+                        }
+                      } catch (error) {
+                        toast({ title: "Error", description: "Network error", variant: "destructive" });
+                      }
+                    }}
+                    data-testid="button-quick-login-employee"
+                  >
+                    Employee
+                  </Button>
+                  <Button 
+                    size="sm"
+                    className="h-7 text-[9px]" 
+                    variant="secondary"
+                    onClick={async () => {
+                      try {
+                        const response = await fetch("/api/login", {
+                          method: "POST",
+                          headers: { "Content-Type": "application/json" },
+                          body: JSON.stringify({ identifier: "resident@resident.com", password: "resident123" }),
+                          credentials: "include",
+                        });
+                        const result = await response.json();
+                        if (response.ok) {
+                          window.location.href = "/resident";
+                        } else {
+                          toast({ title: "Failed", description: result.message, variant: "destructive" });
+                        }
+                      } catch (error) {
+                        toast({ title: "Error", description: "Network error", variant: "destructive" });
+                      }
+                    }}
+                    data-testid="button-quick-login-resident"
+                  >
+                    Resident
+                  </Button>
+                  <Button 
+                    size="sm"
+                    className="h-7 text-[9px]" 
+                    variant="secondary"
+                    onClick={async () => {
+                      try {
+                        const response = await fetch("/api/login", {
+                          method: "POST",
+                          headers: { "Content-Type": "application/json" },
+                          body: JSON.stringify({ identifier: "property@property.com", password: "property123" }),
+                          credentials: "include",
+                        });
+                        const result = await response.json();
+                        if (response.ok) {
+                          window.location.href = "/property-manager";
+                        } else {
+                          toast({ title: "Failed", description: result.message, variant: "destructive" });
+                        }
+                      } catch (error) {
+                        toast({ title: "Error", description: "Network error", variant: "destructive" });
+                      }
+                    }}
+                    data-testid="button-quick-login-property-manager"
+                  >
+                    Prop Mgr
+                  </Button>
+                  <Button 
+                    size="sm"
+                    className="h-7 text-[9px] bg-purple-600 hover:bg-purple-700 text-white" 
+                    onClick={async () => {
+                      try {
+                        const response = await fetch("/api/login", {
+                          method: "POST",
+                          headers: { "Content-Type": "application/json" },
+                          body: JSON.stringify({ identifier: "info@onrope.pro", password: "onropepro" }),
+                          credentials: "include",
+                        });
+                        const result = await response.json();
+                        if (response.ok) {
+                          window.location.href = "/superuser";
+                        } else {
+                          toast({ title: "Failed", description: result.message, variant: "destructive" });
+                        }
+                      } catch (error) {
+                        toast({ title: "Error", description: "Network error", variant: "destructive" });
+                      }
+                    }}
+                    data-testid="button-quick-login-superuser"
+                  >
+                    SuperUser
+                  </Button>
                 </div>
-                <div className="space-y-1">
-                  <span className="material-icons text-primary text-2xl">manage_accounts</span>
-                  <div className="text-xs font-medium">Managers</div>
-                </div>
-                <div className="space-y-1">
-                  <span className="material-icons text-primary text-2xl">engineering</span>
-                  <div className="text-xs font-medium">Technicians</div>
-                </div>
-                <div className="space-y-1">
-                  <span className="material-icons text-primary text-2xl">home</span>
-                  <div className="text-xs font-medium">Residents</div>
-                </div>
-              </div>
-            </div>
-
-            <div className="pt-2 text-center text-xs text-muted-foreground space-y-1">
-              <p className="font-medium">Secure, Professional, Transparent</p>
-              <p>Purpose-built for rope access and building maintenance operations</p>
+              )}
             </div>
           </CardContent>
         </Card>

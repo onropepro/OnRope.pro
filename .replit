@@ -110,6 +110,7 @@ PRIVATE_OBJECT_DIR = "/replit-objstore-6e6b229a-26f3-44e3-8851-0347a883531e/priv
 PUBLIC_OBJECT_SEARCH_PATHS = "/replit-objstore-6e6b229a-26f3-44e3-8851-0347a883531e/public"
 SUPERUSER_USERNAME = "info@onrope.pro"
 SUPERUSER_PASSWORD_HASH = "$2b$10$znLuQpyvTqoiYjPt39vMROJILL/Cq0b2L5TQSfTliowZU9TLP9tlm"
+ENCRYPTION_KEY = "04118da23aaf7972a3ac7bf12a0b338b732ddc7dc69379adfa4f7122003efc05"
 
 [objectStorage]
 defaultBucketID = "replit-objstore-6e6b229a-26f3-44e3-8851-0347a883531e"
