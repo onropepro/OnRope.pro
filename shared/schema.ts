@@ -2254,3 +2254,28 @@ export type ScheduledJobWithAssignments = ScheduledJob & {
   employeeAssignments?: EmployeeAssignment[]; // New: includes date ranges
   project?: Project | null;
 };
+
+// Team Invitations - Pending invitations for technicians to join companies
+export const teamInvitations = pgTable("team_invitations", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  technicianId: varchar("technician_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  companyId: varchar("company_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  invitedBy: varchar("invited_by").notNull().references(() => users.id, { onDelete: "cascade" }), // The user who sent the invitation
+  status: varchar("status").notNull().default("pending"), // pending | accepted | declined | expired
+  message: text("message"), // Optional message from the company
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  respondedAt: timestamp("responded_at"), // When the technician responded
+  expiresAt: timestamp("expires_at"), // Optional expiration date
+}, (table) => [
+  index("IDX_team_invitations_technician").on(table.technicianId),
+  index("IDX_team_invitations_company").on(table.companyId),
+  index("IDX_team_invitations_status").on(table.status),
+]);
+
+export const insertTeamInvitationSchema = createInsertSchema(teamInvitations).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type TeamInvitation = typeof teamInvitations.$inferSelect;
+export type InsertTeamInvitation = z.infer<typeof insertTeamInvitationSchema>;
