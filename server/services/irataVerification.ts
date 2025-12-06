@@ -200,12 +200,38 @@ export async function verifyIrataLicense(
   lastName: string,
   irataNumber: string
 ): Promise<IrataVerificationResult> {
+  console.log(`[IRATA] Verification requested for: ${lastName}, ${irataNumber}`);
+  
+  // IRATA's verification portal uses a complex single-spa/SystemJS framework with 
+  // invisible reCAPTCHA v3 that blocks during SPA bootstrap. After extensive testing,
+  // automated verification is not feasible due to:
+  // 1. The SPA framework requires full grecaptcha runtime internals to mount
+  // 2. Any grecaptcha shim prevents the framework from receiving required score events
+  // 3. Network interception cannot bypass server-side reCAPTCHA v3 validation
+  //
+  // Until IRATA provides a public API, manual verification is required.
+  
+  console.log('[IRATA] Returning manual verification requirement - automated access not available');
+  
+  return {
+    success: true,
+    verified: false,
+    requiresManualVerification: true,
+    error: 'IRATA verification requires manual confirmation. Please visit techconnect.irata.org/check-certificate to verify this license, then update the technician record.'
+  };
+}
+
+// Keep the automated verification code for future use when IRATA provides API access
+export async function verifyIrataLicenseAutomated(
+  lastName: string,
+  irataNumber: string
+): Promise<IrataVerificationResult> {
   let context: BrowserContext | null = null;
   let page: Page | null = null;
   const TIMEOUT = 90000;
   
   try {
-    console.log(`[IRATA] Starting verification for: ${lastName}, ${irataNumber}`);
+    console.log(`[IRATA] Starting automated verification for: ${lastName}, ${irataNumber}`);
     
     if (!TWOCAPTCHA_API_KEY) {
       console.log('[IRATA] No 2Captcha API key - cannot proceed with automated verification');

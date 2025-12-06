@@ -92,8 +92,20 @@ Contains all timezone-safe parsing and formatting utilities.
 *   **Mapping:** Leaflet
 *   **Payment Processing:** Stripe
 
+## Known Limitations
+
+### IRATA License Verification (Manual Only)
+IRATA's verification portal (techconnect.irata.org) uses a complex single-spa/SystemJS framework with invisible reCAPTCHA v3 that blocks during SPA bootstrap. After extensive testing with multiple approaches (grecaptcha shims, Object.defineProperty interception, 2Captcha token injection), automated verification is not feasible because:
+1. The SPA framework requires full grecaptcha runtime internals to mount
+2. Any grecaptcha shim prevents the framework from receiving required score events
+3. Network interception cannot bypass server-side reCAPTCHA v3 validation
+
+**Current Solution:** The system returns `requiresManualVerification: true` immediately, directing users to verify licenses manually at techconnect.irata.org/check-certificate.
+
+**Technical Debt:** If IRATA provides a public API in the future, the automated verification code is preserved in `verifyIrataLicenseAutomated()` for reactivation.
+
 ## Founder Resources
 
-*   **2Captcha** - CAPTCHA solving API for automated IRATA license verification
+*   **2Captcha** - CAPTCHA solving API (configured but not currently used for IRATA due to SPA limitations)
     *   URL: https://2captcha.com/
     *   Login: Use Google account for API access
