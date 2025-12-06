@@ -689,7 +689,7 @@ export default function Login() {
                 <Button 
                   variant="outline" 
                   className="h-11 text-sm font-medium border-amber-500/50 text-amber-600 dark:text-amber-400" 
-                  onClick={() => window.location.href = "/technician-login"}
+                  onClick={() => setLocation("/technician-login")}
                   data-testid="button-technician-login"
                 >
                   <HardHat className="mr-2 h-4 w-4" />
@@ -698,7 +698,7 @@ export default function Login() {
                 <Button 
                   variant="outline" 
                   className="h-11 text-sm font-medium" 
-                  onClick={() => window.location.href = "/building-portal"}
+                  onClick={() => setLocation("/building-portal")}
                   data-testid="button-building-portal"
                 >
                   <Building2 className="mr-2 h-4 w-4" />
@@ -722,7 +722,7 @@ export default function Login() {
               <Button 
                 variant="default" 
                 className="w-full h-11 text-sm font-medium" 
-                onClick={() => window.location.href = "/get-license"}
+                onClick={() => setLocation("/get-license")}
                 data-testid="button-get-license"
               >
                 <span className="material-icons mr-2 text-lg">shopping_cart</span>
@@ -734,7 +734,7 @@ export default function Login() {
                   variant="ghost" 
                   size="sm"
                   className="h-9 text-xs font-medium text-muted-foreground" 
-                  onClick={() => window.location.href = "/register"}
+                  onClick={() => setLocation("/register")}
                   data-testid="link-register"
                 >
                   <span className="material-icons mr-1 text-sm">person_add</span>
