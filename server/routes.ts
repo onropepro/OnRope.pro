@@ -5210,6 +5210,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "This invitation has not been accepted" });
       }
       
+      // Check if already acknowledged
+      if (invitation.ownerAcknowledgedAt) {
+        return res.status(400).json({ message: "This invitation has already been acknowledged" });
+      }
+      
       await storage.acknowledgeTeamInvitation(invitationId, companyId);
       
       console.log(`[Team-Invite] Owner ${user.id} acknowledged invitation ${invitationId}`);
