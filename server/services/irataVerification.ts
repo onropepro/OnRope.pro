@@ -202,7 +202,7 @@ export async function verifyIrataLicense(
 ): Promise<IrataVerificationResult> {
   let context: BrowserContext | null = null;
   let page: Page | null = null;
-  const TIMEOUT = 60000;
+  const TIMEOUT = 90000;
   
   try {
     console.log(`[IRATA] Starting verification for: ${lastName}, ${irataNumber}`);
@@ -217,41 +217,8 @@ export async function verifyIrataLicense(
       };
     }
     
-    console.log('[IRATA] Starting 2Captcha solve proactively...');
-    const captchaTokenPromise = solve2Captcha(RECAPTCHA_SITE_KEY, IRATA_VERIFY_URL);
-    
-    const browserInstance = await getBrowser();
-    context = await createStealthContext(browserInstance);
-    page = await context.newPage();
-    
-    page.setDefaultTimeout(TIMEOUT);
-    page.setDefaultNavigationTimeout(TIMEOUT);
-    
-    await randomDelay(500, 1500);
-    
-    console.log('[IRATA] Navigating to verification page...');
-    await page.goto(IRATA_VERIFY_URL, {
-      waitUntil: 'domcontentloaded',
-      timeout: TIMEOUT
-    });
-    
-    await randomDelay(2000, 3000);
-    
-    console.log('[IRATA] Waiting for page to fully render...');
-    await page.waitForLoadState('networkidle', { timeout: 30000 }).catch(() => {
-      console.log('[IRATA] Networkidle timeout, continuing...');
-    });
-    
-    await randomDelay(2000, 3000);
-    await humanLikeMouseMove(page);
-    
-    let pageContent = await page.content();
-    let pageText = await page.innerText('body').catch(() => '');
-    
-    console.log('[IRATA] Page content length:', pageContent.length);
-    console.log('[IRATA] Page text preview:', pageText.substring(0, 300));
-    
-    const captchaToken = await captchaTokenPromise;
+    console.log('[IRATA] Solving CAPTCHA first (this takes 20-40 seconds)...');
+    const captchaToken = await solve2Captcha(RECAPTCHA_SITE_KEY, IRATA_VERIFY_URL);
     
     if (!captchaToken) {
       console.log('[IRATA] Failed to solve CAPTCHA');
@@ -263,67 +230,168 @@ export async function verifyIrataLicense(
       };
     }
     
-    console.log('[IRATA] Got CAPTCHA token, injecting...');
+    console.log('[IRATA] CAPTCHA solved! Setting up browser with token...');
     
-    await page.evaluate((token) => {
-      let responseField = document.querySelector('#g-recaptcha-response') as HTMLTextAreaElement;
-      if (!responseField) {
-        responseField = document.createElement('textarea');
-        responseField.id = 'g-recaptcha-response';
-        responseField.name = 'g-recaptcha-response';
-        responseField.style.display = 'none';
-        document.body.appendChild(responseField);
-      }
-      responseField.value = token;
+    const browserInstance = await getBrowser();
+    context = await createStealthContext(browserInstance);
+    page = await context.newPage();
+    
+    await page.exposeFunction('__getCaptchaToken', () => captchaToken);
+    
+    await context.addInitScript((token: string) => {
+      (window as any).__captchaToken = token;
+      (window as any).__executePatched = false;
+      const readyCallbacks: Array<() => void> = [];
       
-      const hiddenInputs = document.querySelectorAll('input[name="g-recaptcha-response"]');
-      hiddenInputs.forEach((input: Element) => {
-        (input as HTMLInputElement).value = token;
-      });
-      
-      const forms = document.querySelectorAll('form');
-      forms.forEach(form => {
-        let input = form.querySelector('input[name="g-recaptcha-response"]') as HTMLInputElement;
-        if (!input) {
-          input = document.createElement('input');
-          input.type = 'hidden';
-          input.name = 'g-recaptcha-response';
-          input.value = token;
-          form.appendChild(input);
-        } else {
-          input.value = token;
+      const patchGrecaptcha = () => {
+        const gc = (window as any).grecaptcha;
+        if (gc && gc.execute && !(window as any).__executePatched) {
+          console.log('[Shim] Patching grecaptcha.execute with pre-solved token');
+          const originalExecute = gc.execute.bind(gc);
+          
+          gc.execute = function(siteKey: string, options?: any) {
+            console.log('[Shim] grecaptcha.execute called - returning pre-solved token');
+            try {
+              originalExecute(siteKey, options).catch(() => {});
+            } catch (e) {}
+            return Promise.resolve((window as any).__captchaToken);
+          };
+          
+          (window as any).__executePatched = true;
+          
+          while (readyCallbacks.length > 0) {
+            const cb = readyCallbacks.shift();
+            try { cb?.(); } catch (e) {}
+          }
         }
+      };
+      
+      const checkInterval = setInterval(() => {
+        patchGrecaptcha();
+        if ((window as any).__executePatched) {
+          clearInterval(checkInterval);
+        }
+      }, 50);
+      
+      const origGrecaptchaReady = (window as any).grecaptcha?.ready;
+      Object.defineProperty(window, 'grecaptcha', {
+        get: function() {
+          return (window as any).__grecaptchaInternal;
+        },
+        set: function(val) {
+          console.log('[Shim] grecaptcha object being set');
+          (window as any).__grecaptchaInternal = val;
+          
+          if (val && val.ready && val.execute) {
+            console.log('[Shim] Immediately patching execute on assignment');
+            const originalExecute = val.execute.bind(val);
+            val.execute = function(siteKey: string, options?: any) {
+              console.log('[Shim] execute intercepted via setter');
+              try {
+                originalExecute(siteKey, options).catch(() => {});
+              } catch (e) {}
+              return Promise.resolve((window as any).__captchaToken);
+            };
+            (window as any).__executePatched = true;
+          }
+        },
+        configurable: true,
+        enumerable: true
       });
       
-      if (typeof (window as any).grecaptcha !== 'undefined') {
-        try {
-          (window as any).grecaptcha.getResponse = () => token;
-          (window as any).grecaptcha.execute = () => Promise.resolve(token);
-        } catch (e) {}
-      }
+      (window as any).__forceRecaptchaReady = () => {
+        console.log('[Shim] Force triggering recaptcha ready');
+        patchGrecaptcha();
+      };
       
-      if (typeof (window as any).grecaptcha !== 'undefined' && (window as any).grecaptcha.enterprise) {
-        try {
-          (window as any).grecaptcha.enterprise.execute = () => Promise.resolve(token);
-        } catch (e) {}
-      }
+      console.log('[Shim] grecaptcha intercept installed, waiting for Google script');
     }, captchaToken);
     
-    await randomDelay(1000, 2000);
+    page.setDefaultTimeout(TIMEOUT);
+    page.setDefaultNavigationTimeout(TIMEOUT);
     
-    console.log('[IRATA] Reloading page with CAPTCHA token...');
-    await page.reload({ waitUntil: 'domcontentloaded' });
+    page.on('console', msg => {
+      const text = msg.text();
+      if (text.includes('[Shim]') || text.includes('grecaptcha') || text.includes('recaptcha')) {
+        console.log(`[Browser Console] ${text}`);
+      }
+    });
+    
+    console.log('[IRATA] Navigating to verification page with captcha shim...');
+    await page.goto(IRATA_VERIFY_URL, {
+      waitUntil: 'networkidle',
+      timeout: TIMEOUT
+    });
     
     await randomDelay(2000, 3000);
-    await page.waitForLoadState('networkidle', { timeout: 30000 }).catch(() => {});
+    
+    console.log('[IRATA] Triggering force recaptcha ready...');
+    await page.evaluate(() => {
+      if ((window as any).__forceRecaptchaReady) {
+        (window as any).__forceRecaptchaReady();
+      }
+      console.log('[Shim] grecaptcha state:', {
+        exists: !!(window as any).grecaptcha,
+        hasExecute: !!(window as any).grecaptcha?.execute,
+        patched: (window as any).__executePatched
+      });
+    });
+    
+    await randomDelay(3000, 5000);
+    
+    console.log('[IRATA] Waiting for SPA to mount...');
+    
+    try {
+      await page.waitForFunction(() => {
+        return typeof (window as any).System !== 'undefined' && 
+               (window as any).System.has && 
+               typeof (window as any).System.has === 'function';
+      }, { timeout: 15000 });
+      console.log('[IRATA] SystemJS is available');
+    } catch (e) {
+      console.log('[IRATA] SystemJS not detected');
+    }
+    
+    await randomDelay(3000, 5000);
+    
+    try {
+      await page.waitForFunction(() => {
+        return document.querySelectorAll('input').length > 1 ||
+               document.querySelector('form') !== null ||
+               document.body.innerText.includes('Surname') ||
+               document.body.innerText.includes('IRATA');
+      }, { timeout: 20000 });
+      console.log('[IRATA] Page content loaded!');
+    } catch (e) {
+      console.log('[IRATA] Timeout waiting for page content');
+    }
     
     await humanLikeMouseMove(page);
-    await randomDelay(1000, 2000);
+    await randomDelay(2000, 3000);
     
-    pageContent = await page.content();
-    pageText = await page.innerText('body').catch(() => '');
+    for (let attempt = 0; attempt < 8; attempt++) {
+      const inputCount = await page.$$eval('input', inputs => inputs.length);
+      const bodyText = await page.innerText('body').catch(() => '');
+      console.log(`[IRATA] Attempt ${attempt + 1}: Found ${inputCount} inputs, body length: ${bodyText.length}`);
+      
+      if (inputCount > 1 || bodyText.includes('Surname') || bodyText.includes('Certificate')) {
+        console.log('[IRATA] Form content detected!');
+        break;
+      }
+      
+      await page.evaluate(() => {
+        window.scrollTo(0, Math.random() * 500);
+        document.body.click();
+        const event = new Event('load');
+        window.dispatchEvent(event);
+      });
+      await randomDelay(2000, 4000);
+    }
     
-    console.log('[IRATA] Looking for form fields after CAPTCHA...');
+    let pageContent = await page.content();
+    let pageText = await page.innerText('body').catch(() => '');
+    
+    console.log('[IRATA] Looking for form fields after SPA render...');
     
     const allInputs = await page.$$('input');
     console.log(`[IRATA] Found ${allInputs.length} total input fields`);
