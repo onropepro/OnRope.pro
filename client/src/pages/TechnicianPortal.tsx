@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useLocation } from "wouter";
 import { useForm } from "react-hook-form";
@@ -13,7 +13,7 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/hooks/use-toast";
 import { queryClient, apiRequest } from "@/lib/queryClient";
-import { formatLocalDate } from "@/lib/dateUtils";
+import { formatLocalDate, formatDateTime } from "@/lib/dateUtils";
 import { 
   User, 
   LogOut, 
@@ -35,7 +35,9 @@ import {
   Image as ImageIcon,
   Shield,
   ExternalLink,
-  CheckCircle2
+  CheckCircle2,
+  Upload,
+  Loader2
 } from "lucide-react";
 import onRopeProLogo from "@assets/OnRopePro-logo_1764625558626.png";
 
@@ -68,6 +70,22 @@ export default function TechnicianPortal() {
   const { toast } = useToast();
   const [, setLocation] = useLocation();
   const [isEditing, setIsEditing] = useState(false);
+  const [isVerifying, setIsVerifying] = useState(false);
+  const [verificationResult, setVerificationResult] = useState<{
+    success: boolean;
+    verification?: {
+      isValid: boolean;
+      technicianName: string | null;
+      irataNumber: string | null;
+      irataLevel: number | null;
+      expiryDate: string | null;
+      status: string | null;
+      confidence: string;
+      error: string | null;
+    };
+    message: string;
+  } | null>(null);
+  const screenshotInputRef = useRef<HTMLInputElement>(null);
 
   const { data: userData, isLoading } = useQuery<{ user: any }>({
     queryKey: ["/api/user"],
@@ -132,6 +150,67 @@ export default function TechnicianPortal() {
       setLocation("/technician-login");
     } catch (error) {
       console.error("Logout error:", error);
+    }
+  };
+
+  const handleScreenshotUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
+      toast({
+        title: "Invalid file",
+        description: "Please upload an image file (screenshot)",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsVerifying(true);
+    setVerificationResult(null);
+
+    try {
+      const formData = new FormData();
+      formData.append('screenshot', file);
+
+      const response = await fetch('/api/verify-irata-screenshot', {
+        method: 'POST',
+        credentials: 'include',
+        body: formData,
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.message || 'Verification failed');
+      }
+
+      setVerificationResult(result);
+      
+      if (result.success) {
+        toast({
+          title: "Verification Successful",
+          description: "Your IRATA license has been verified!",
+        });
+        queryClient.invalidateQueries({ queryKey: ["/api/user"] });
+      } else {
+        toast({
+          title: "Verification Issue",
+          description: result.message || "Could not verify license from screenshot",
+          variant: "destructive",
+        });
+      }
+    } catch (error: any) {
+      toast({
+        title: "Verification Failed",
+        description: error.message || "Failed to analyze screenshot",
+        variant: "destructive",
+      });
+    } finally {
+      setIsVerifying(false);
+      if (screenshotInputRef.current) {
+        screenshotInputRef.current.value = '';
+      }
     }
   };
 
@@ -733,11 +812,27 @@ export default function TechnicianPortal() {
                   
                   {/* License Verification Section */}
                   {(user.irataLevel || user.spratLevel) && (
-                    <div className="mt-6 p-4 bg-primary/5 border border-primary/20 rounded-lg space-y-3">
+                    <div className="mt-6 p-4 bg-primary/5 border border-primary/20 rounded-lg space-y-4">
+                      {/* Show verified status if already verified */}
+                      {user.irataVerifiedAt && (
+                        <div className="flex items-center gap-3 p-3 bg-green-500/10 border border-green-500/30 rounded-lg">
+                          <CheckCircle2 className="w-5 h-5 text-green-600 flex-shrink-0" />
+                          <div>
+                            <p className="text-sm font-medium text-green-700 dark:text-green-400">License Verified</p>
+                            <p className="text-xs text-muted-foreground">
+                              Last verified: {formatDateTime(user.irataVerifiedAt)}
+                              {user.irataVerificationStatus && ` (${user.irataVerificationStatus})`}
+                            </p>
+                          </div>
+                        </div>
+                      )}
+                      
                       <div className="flex items-start gap-3">
                         <CheckCircle2 className="w-5 h-5 text-primary mt-0.5 flex-shrink-0" />
                         <div className="space-y-2">
-                          <h4 className="font-medium text-sm">Verify Your License Validity</h4>
+                          <h4 className="font-medium text-sm">
+                            {user.irataVerifiedAt ? "Re-verify Your License" : "Verify Your License Validity"}
+                          </h4>
                           <p className="text-xs text-muted-foreground leading-relaxed">
                             Employers require verified certification status to ensure compliance with safety regulations and insurance requirements. 
                             Verifying your license helps your employer confirm you're qualified for rope access work.
@@ -745,23 +840,99 @@ export default function TechnicianPortal() {
                           <div className="text-xs text-muted-foreground space-y-1 pt-1">
                             <p className="font-medium">How it works:</p>
                             <ol className="list-decimal list-inside space-y-0.5 pl-1">
-                              <li>Click the button below to open the verification page</li>
+                              <li>Click "Open IRATA Portal" to open the verification page</li>
                               <li>Enter your last name and license number</li>
                               <li>Take a screenshot of the verification result</li>
-                              <li>Upload the screenshot when prompted</li>
+                              <li>Come back here and click "Upload Screenshot"</li>
                             </ol>
                           </div>
                         </div>
                       </div>
-                      <Button
-                        variant="default"
-                        className="w-full mt-2"
-                        onClick={() => window.open('https://techconnect.irata.org/verify/tech', '_blank')}
-                        data-testid="button-verify-license"
-                      >
-                        <ExternalLink className="w-4 h-4 mr-2" />
-                        Verify My Rope Access License
-                      </Button>
+                      
+                      {/* Action buttons */}
+                      <div className="flex flex-col gap-2">
+                        <Button
+                          variant="outline"
+                          className="w-full"
+                          onClick={() => window.open('https://techconnect.irata.org/verify/tech', '_blank')}
+                          data-testid="button-open-irata-portal"
+                        >
+                          <ExternalLink className="w-4 h-4 mr-2" />
+                          Open IRATA Portal
+                        </Button>
+                        
+                        <input
+                          type="file"
+                          ref={screenshotInputRef}
+                          accept="image/*"
+                          onChange={handleScreenshotUpload}
+                          className="hidden"
+                          data-testid="input-screenshot-upload"
+                        />
+                        
+                        <Button
+                          variant="default"
+                          className="w-full"
+                          onClick={() => screenshotInputRef.current?.click()}
+                          disabled={isVerifying}
+                          data-testid="button-upload-screenshot"
+                        >
+                          {isVerifying ? (
+                            <>
+                              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                              Analyzing Screenshot...
+                            </>
+                          ) : (
+                            <>
+                              <Upload className="w-4 h-4 mr-2" />
+                              Upload Verification Screenshot
+                            </>
+                          )}
+                        </Button>
+                      </div>
+                      
+                      {/* Verification Result Display */}
+                      {verificationResult && (
+                        <div className={`p-3 rounded-lg border ${
+                          verificationResult.success 
+                            ? 'bg-green-500/10 border-green-500/30' 
+                            : 'bg-destructive/10 border-destructive/30'
+                        }`}>
+                          <div className="flex items-start gap-2">
+                            {verificationResult.success ? (
+                              <CheckCircle2 className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                            ) : (
+                              <AlertCircle className="w-5 h-5 text-destructive flex-shrink-0 mt-0.5" />
+                            )}
+                            <div className="space-y-1 text-sm">
+                              <p className={`font-medium ${
+                                verificationResult.success ? 'text-green-700 dark:text-green-400' : 'text-destructive'
+                              }`}>
+                                {verificationResult.message}
+                              </p>
+                              {verificationResult.verification && verificationResult.success && (
+                                <div className="text-xs text-muted-foreground space-y-0.5">
+                                  {verificationResult.verification.technicianName && (
+                                    <p>Name: {verificationResult.verification.technicianName}</p>
+                                  )}
+                                  {verificationResult.verification.irataNumber && (
+                                    <p>License: {verificationResult.verification.irataNumber}</p>
+                                  )}
+                                  {verificationResult.verification.irataLevel && (
+                                    <p>Level: {verificationResult.verification.irataLevel}</p>
+                                  )}
+                                  {verificationResult.verification.expiryDate && (
+                                    <p>Valid Until: {verificationResult.verification.expiryDate}</p>
+                                  )}
+                                  <p className="text-xs opacity-70">
+                                    Confidence: {verificationResult.verification.confidence}
+                                  </p>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      )}
                     </div>
                   )}
                 </div>

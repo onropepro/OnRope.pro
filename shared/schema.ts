@@ -125,6 +125,8 @@ export const users = pgTable("users", {
   irataExpirationDate: date("irata_expiration_date"), // IRATA certification expiration date
   irataDocuments: text("irata_documents").array().default(sql`ARRAY[]::text[]`), // Array of IRATA certification document URLs
   irataBaselineHours: numeric("irata_baseline_hours", { precision: 10, scale: 2 }).default("0"), // Baseline logbook hours before using this system
+  irataVerifiedAt: timestamp("irata_verified_at"), // Timestamp of last successful IRATA verification via screenshot
+  irataVerificationStatus: varchar("irata_verification_status"), // Status from IRATA verification (e.g., "Valid", "Active")
   
   // SPRAT certification fields (optional)
   spratLevel: varchar("sprat_level"), // SPRAT level (e.g., "Level 1", "Level 2", "Level 3")
