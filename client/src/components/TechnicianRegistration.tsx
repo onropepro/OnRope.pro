@@ -9,8 +9,299 @@ import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
-import { User, ArrowRight, ArrowLeft, Award, MapPin, Loader2, Phone, Mail, Lock, Heart, Building, CreditCard, Car, Calendar, Upload, Shield, Info, CheckCircle, Check, X, FileText } from "lucide-react";
+import { User, ArrowRight, ArrowLeft, Award, MapPin, Loader2, Phone, Mail, Lock, Heart, Building, CreditCard, Car, Calendar, Upload, Shield, Info, CheckCircle, Check, X, FileText, Languages } from "lucide-react";
 import { apiRequest } from "@/lib/queryClient";
+
+type Language = 'en' | 'fr';
+
+const translations = {
+  en: {
+    continue: "Continue",
+    back: "Back",
+    cancel: "Cancel",
+    submit: "Submit Registration",
+    submitting: "Submitting...",
+    firstName: "What's your first name?",
+    firstNameSubtitle: "Let's start with your first name",
+    enterFirstName: "Enter your first name",
+    lastName: "What's your last name?",
+    lastNameGreeting: "Hi {name}! What's your last name?",
+    lastNameSubtitle: "Now let's get your last name",
+    enterLastName: "Enter your last name",
+    areCertified: "Are you certified?",
+    selectCertification: "Select your rope access certification(s)",
+    irataCertified: "IRATA Certified",
+    spratCertified: "SPRAT Certified",
+    bothCertified: "Both IRATA & SPRAT",
+    noCertification: "No Certification (Trainee)",
+    licenseNumbers: "License Numbers",
+    enterLicenseDetails: "Enter your certification details",
+    irataLevel: "IRATA Level",
+    irataLicenseNumber: "IRATA License Number",
+    spratLevel: "SPRAT Level",
+    spratLicenseNumber: "SPRAT License Number",
+    selectLevel: "Select level",
+    level1: "Level 1",
+    level2: "Level 2",
+    level3: "Level 3",
+    enterLicenseNumber: "Enter license number",
+    uploadCertCard: "Upload Certification Card (optional)",
+    logbookHours: "Logbook Hours",
+    totalHoursQuestion: "How many total rope access hours are in your logbook?",
+    totalHoursSubtitle: "This helps employers understand your experience level",
+    enterHours: "Enter total hours",
+    optional: "(optional)",
+    firstAid: "First Aid Certification",
+    haveFirstAid: "Do you have a valid First Aid certification?",
+    firstAidSubtitle: "Many job sites require valid First Aid training",
+    yesFirstAid: "Yes, I have First Aid",
+    noFirstAid: "No First Aid certification",
+    firstAidType: "First Aid Type",
+    selectFirstAidType: "Select type",
+    standardFirstAid: "Standard First Aid",
+    emergencyFirstAid: "Emergency First Aid",
+    advancedFirstAid: "Advanced First Aid",
+    wildernesFirstAid: "Wilderness First Aid",
+    marineFirstAid: "Marine First Aid",
+    otherFirstAid: "Other",
+    firstAidExpiry: "Expiry Date",
+    uploadFirstAidCert: "Upload First Aid Certificate (optional)",
+    address: "Home Address",
+    whereDoYouLive: "Where do you live?",
+    addressSubtitle: "Enter your current address",
+    streetAddress: "Street Address",
+    city: "City",
+    provinceState: "Province/State",
+    country: "Country",
+    postalCode: "Postal Code",
+    email: "Email Address",
+    enterEmail: "What's your email address?",
+    emailSubtitle: "We'll use this for login and important updates",
+    enterEmailPlaceholder: "Enter your email",
+    phone: "Phone Number",
+    enterPhone: "What's your phone number?",
+    phoneSubtitle: "For work-related communication",
+    enterPhonePlaceholder: "Enter your phone number",
+    password: "Create Password",
+    createPassword: "Create a secure password",
+    passwordSubtitle: "At least 8 characters",
+    enterPassword: "Enter password",
+    confirmPassword: "Confirm password",
+    passwordsNoMatch: "Passwords do not match",
+    emergencyContact: "Emergency Contact",
+    emergencyContactQuestion: "Who should we contact in an emergency?",
+    emergencyContactSubtitle: "This person will be contacted in case of a workplace emergency",
+    contactName: "Contact Name",
+    contactPhone: "Contact Phone",
+    relationship: "Relationship",
+    socialInsurance: "Social Insurance Number",
+    enterSIN: "What's your SIN?",
+    sinSubtitle: "Required for payroll processing",
+    sinPlaceholder: "123-456-789",
+    sinSkip: "Skip for now",
+    bankInfo: "Bank Information",
+    enterBankInfo: "Enter your banking details for payroll",
+    bankSubtitle: "Direct deposit information",
+    transitNumber: "Transit Number",
+    institutionNumber: "Institution Number",
+    accountNumber: "Account Number",
+    uploadVoidCheque: "Upload Void Cheque (optional)",
+    driversLicense: "Driver's License",
+    enterDriversLicense: "Do you have a driver's license?",
+    driversLicenseSubtitle: "Some jobs require driving company vehicles",
+    licenseNumber: "License Number",
+    expiryDate: "Expiry Date",
+    uploadLicensePhoto: "Upload License Photo (optional)",
+    uploadDriverAbstract: "Upload Driver Abstract (optional)",
+    skipDriversLicense: "Skip - No driver's license",
+    birthday: "Date of Birth",
+    enterBirthday: "When were you born?",
+    birthdaySubtitle: "Required for HR records",
+    medicalConditions: "Medical Conditions",
+    anyMedicalConditions: "Any medical conditions we should know about?",
+    medicalSubtitle: "This information helps us ensure your safety on job sites",
+    medicalPlaceholder: "Any allergies, conditions, or medications...",
+    skipMedical: "Skip - No conditions to report",
+    registrationComplete: "Registration Complete!",
+    thankYou: "Thank you for registering, {name}!",
+    completeSubtitle: "Your account has been created successfully",
+    goToLogin: "Go to Login",
+    infoSecure: "Your Information is Secure",
+    infoSecureDesc: "We store your information securely, limit access to authorized employer staff only, and never sell or share it outside your company without your consent or legal requirement.",
+    infoUsage: "Information collected may be used by your employer for HR purposes including payroll processing, certification compliance, driving eligibility verification, and emergency contact procedures.",
+    registrationSubmitted: "Registration Submitted",
+    registrationSubmittedDesc: "Your registration has been submitted successfully.",
+    registrationFailed: "Registration Failed",
+    employerReview: "Your employer will review your registration and grant you access to the system.",
+    emailNotification: "You'll receive an email at",
+    accountActivated: "once your account is activated.",
+    close: "Close",
+    errorFirstName: "Please enter your first name",
+    errorLastName: "Please enter your last name",
+    errorCertification: "Please select a certification type",
+    errorIrataLevel: "Please select your IRATA level",
+    errorIrataLicense: "Please enter your IRATA license number",
+    errorSpratLevel: "Please select your SPRAT level",
+    errorSpratLicense: "Please enter your SPRAT license number",
+    errorStreetAddress: "Please enter your street address",
+    errorCity: "Please enter your city",
+    errorProvinceState: "Please enter your province/state",
+    errorCountry: "Please enter your country",
+    errorPostalCode: "Please enter your postal code",
+    errorEmail: "Please enter a valid email address",
+    errorPhone: "Please enter your phone number",
+    errorPassword: "Please enter a password",
+    errorPasswordLength: "Password must be at least 8 characters",
+    errorConfirmPassword: "Please confirm your password",
+    errorEmergencyName: "Please enter emergency contact name",
+    errorEmergencyPhone: "Please enter emergency contact phone",
+    errorEmergencyRelationship: "Please enter your relationship to the contact",
+    errorBirthday: "Please enter your birthday",
+  },
+  fr: {
+    continue: "Continuer",
+    back: "Retour",
+    cancel: "Annuler",
+    submit: "Soumettre l'inscription",
+    submitting: "Envoi en cours...",
+    firstName: "Quel est votre prénom?",
+    firstNameSubtitle: "Commençons par votre prénom",
+    enterFirstName: "Entrez votre prénom",
+    lastName: "Quel est votre nom de famille?",
+    lastNameGreeting: "Bonjour {name}! Quel est votre nom de famille?",
+    lastNameSubtitle: "Maintenant, entrons votre nom de famille",
+    enterLastName: "Entrez votre nom de famille",
+    areCertified: "Êtes-vous certifié?",
+    selectCertification: "Sélectionnez vos certifications d'accès sur corde",
+    irataCertified: "Certifié IRATA",
+    spratCertified: "Certifié SPRAT",
+    bothCertified: "IRATA et SPRAT",
+    noCertification: "Aucune certification (Stagiaire)",
+    licenseNumbers: "Numéros de licence",
+    enterLicenseDetails: "Entrez les détails de votre certification",
+    irataLevel: "Niveau IRATA",
+    irataLicenseNumber: "Numéro de licence IRATA",
+    spratLevel: "Niveau SPRAT",
+    spratLicenseNumber: "Numéro de licence SPRAT",
+    selectLevel: "Sélectionner le niveau",
+    level1: "Niveau 1",
+    level2: "Niveau 2",
+    level3: "Niveau 3",
+    enterLicenseNumber: "Entrez le numéro de licence",
+    uploadCertCard: "Téléverser la carte de certification (facultatif)",
+    logbookHours: "Heures du carnet",
+    totalHoursQuestion: "Combien d'heures totales avez-vous dans votre carnet?",
+    totalHoursSubtitle: "Cela aide les employeurs à comprendre votre niveau d'expérience",
+    enterHours: "Entrez le total des heures",
+    optional: "(facultatif)",
+    firstAid: "Certification de premiers soins",
+    haveFirstAid: "Avez-vous une certification de premiers soins valide?",
+    firstAidSubtitle: "De nombreux chantiers exigent une formation en premiers soins",
+    yesFirstAid: "Oui, j'ai les premiers soins",
+    noFirstAid: "Pas de certification premiers soins",
+    firstAidType: "Type de premiers soins",
+    selectFirstAidType: "Sélectionner le type",
+    standardFirstAid: "Premiers soins généraux",
+    emergencyFirstAid: "Premiers soins d'urgence",
+    advancedFirstAid: "Premiers soins avancés",
+    wildernesFirstAid: "Premiers soins en milieu sauvage",
+    marineFirstAid: "Premiers soins maritimes",
+    otherFirstAid: "Autre",
+    firstAidExpiry: "Date d'expiration",
+    uploadFirstAidCert: "Téléverser le certificat (facultatif)",
+    address: "Adresse domicile",
+    whereDoYouLive: "Où habitez-vous?",
+    addressSubtitle: "Entrez votre adresse actuelle",
+    streetAddress: "Adresse civique",
+    city: "Ville",
+    provinceState: "Province/État",
+    country: "Pays",
+    postalCode: "Code postal",
+    email: "Adresse courriel",
+    enterEmail: "Quelle est votre adresse courriel?",
+    emailSubtitle: "Nous l'utiliserons pour la connexion et les mises à jour importantes",
+    enterEmailPlaceholder: "Entrez votre courriel",
+    phone: "Numéro de téléphone",
+    enterPhone: "Quel est votre numéro de téléphone?",
+    phoneSubtitle: "Pour les communications liées au travail",
+    enterPhonePlaceholder: "Entrez votre numéro de téléphone",
+    password: "Créer un mot de passe",
+    createPassword: "Créez un mot de passe sécurisé",
+    passwordSubtitle: "Au moins 8 caractères",
+    enterPassword: "Entrez le mot de passe",
+    confirmPassword: "Confirmez le mot de passe",
+    passwordsNoMatch: "Les mots de passe ne correspondent pas",
+    emergencyContact: "Contact d'urgence",
+    emergencyContactQuestion: "Qui devons-nous contacter en cas d'urgence?",
+    emergencyContactSubtitle: "Cette personne sera contactée en cas d'urgence sur le lieu de travail",
+    contactName: "Nom du contact",
+    contactPhone: "Téléphone du contact",
+    relationship: "Relation",
+    socialInsurance: "Numéro d'assurance sociale",
+    enterSIN: "Quel est votre NAS?",
+    sinSubtitle: "Requis pour le traitement de la paie",
+    sinPlaceholder: "123-456-789",
+    sinSkip: "Passer pour l'instant",
+    bankInfo: "Informations bancaires",
+    enterBankInfo: "Entrez vos informations bancaires pour la paie",
+    bankSubtitle: "Informations de dépôt direct",
+    transitNumber: "Numéro de transit",
+    institutionNumber: "Numéro d'institution",
+    accountNumber: "Numéro de compte",
+    uploadVoidCheque: "Téléverser un chèque annulé (facultatif)",
+    driversLicense: "Permis de conduire",
+    enterDriversLicense: "Avez-vous un permis de conduire?",
+    driversLicenseSubtitle: "Certains emplois nécessitent la conduite de véhicules de l'entreprise",
+    licenseNumber: "Numéro de permis",
+    expiryDate: "Date d'expiration",
+    uploadLicensePhoto: "Téléverser la photo du permis (facultatif)",
+    uploadDriverAbstract: "Téléverser le relevé de conduite (facultatif)",
+    skipDriversLicense: "Passer - Pas de permis de conduire",
+    birthday: "Date de naissance",
+    enterBirthday: "Quelle est votre date de naissance?",
+    birthdaySubtitle: "Requis pour les dossiers RH",
+    medicalConditions: "Conditions médicales",
+    anyMedicalConditions: "Y a-t-il des conditions médicales que nous devrions connaître?",
+    medicalSubtitle: "Ces informations nous aident à assurer votre sécurité sur les chantiers",
+    medicalPlaceholder: "Allergies, conditions ou médicaments...",
+    skipMedical: "Passer - Aucune condition à signaler",
+    registrationComplete: "Inscription terminée!",
+    thankYou: "Merci de vous être inscrit, {name}!",
+    completeSubtitle: "Votre compte a été créé avec succès",
+    goToLogin: "Aller à la connexion",
+    infoSecure: "Vos informations sont sécurisées",
+    infoSecureDesc: "Nous stockons vos informations de manière sécurisée, limitons l'accès au personnel autorisé de l'employeur uniquement, et ne vendons ni partageons jamais vos données à l'externe sans votre consentement ou obligation légale.",
+    infoUsage: "Les informations collectées peuvent être utilisées par votre employeur à des fins RH, notamment le traitement de la paie, la conformité des certifications, la vérification de l'admissibilité à la conduite et les procédures de contact d'urgence.",
+    registrationSubmitted: "Inscription soumise",
+    registrationSubmittedDesc: "Votre inscription a été soumise avec succès.",
+    registrationFailed: "Échec de l'inscription",
+    employerReview: "Votre employeur examinera votre inscription et vous donnera accès au système.",
+    emailNotification: "Vous recevrez un courriel à",
+    accountActivated: "une fois votre compte activé.",
+    close: "Fermer",
+    errorFirstName: "Veuillez entrer votre prénom",
+    errorLastName: "Veuillez entrer votre nom de famille",
+    errorCertification: "Veuillez sélectionner un type de certification",
+    errorIrataLevel: "Veuillez sélectionner votre niveau IRATA",
+    errorIrataLicense: "Veuillez entrer votre numéro de licence IRATA",
+    errorSpratLevel: "Veuillez sélectionner votre niveau SPRAT",
+    errorSpratLicense: "Veuillez entrer votre numéro de licence SPRAT",
+    errorStreetAddress: "Veuillez entrer votre adresse civique",
+    errorCity: "Veuillez entrer votre ville",
+    errorProvinceState: "Veuillez entrer votre province/état",
+    errorCountry: "Veuillez entrer votre pays",
+    errorPostalCode: "Veuillez entrer votre code postal",
+    errorEmail: "Veuillez entrer une adresse courriel valide",
+    errorPhone: "Veuillez entrer votre numéro de téléphone",
+    errorPassword: "Veuillez entrer un mot de passe",
+    errorPasswordLength: "Le mot de passe doit comporter au moins 8 caractères",
+    errorConfirmPassword: "Veuillez confirmer votre mot de passe",
+    errorEmergencyName: "Veuillez entrer le nom du contact d'urgence",
+    errorEmergencyPhone: "Veuillez entrer le téléphone du contact d'urgence",
+    errorEmergencyRelationship: "Veuillez entrer votre relation avec le contact",
+    errorBirthday: "Veuillez entrer votre date de naissance",
+  }
+};
 
 function FileUploadButton({ 
   label, 
@@ -247,6 +538,20 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
     specialMedicalConditions: "",
   });
   const [error, setError] = useState("");
+  const [language, setLanguage] = useState<Language>(() => {
+    if (typeof window !== 'undefined') {
+      return (localStorage.getItem('technicianLanguage') as Language) || 'en';
+    }
+    return 'en';
+  });
+  
+  const t = translations[language];
+  
+  const toggleLanguage = () => {
+    const newLang = language === 'en' ? 'fr' : 'en';
+    setLanguage(newLang);
+    localStorage.setItem('technicianLanguage', newLang);
+  };
 
   const resetForm = () => {
     setStep("firstName");
@@ -338,121 +643,121 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
     switch (step) {
       case "firstName":
         if (!data.firstName.trim()) {
-          setError("Please enter your first name");
+          setError(t.errorFirstName);
           return;
         }
         break;
       case "lastName":
         if (!data.lastName.trim()) {
-          setError("Please enter your last name");
+          setError(t.errorLastName);
           return;
         }
         break;
       case "certification":
         if (!data.certification) {
-          setError("Please select a certification option");
+          setError(t.errorCertification);
           return;
         }
         break;
       case "licenseNumbers":
         if (data.certification === "irata" || data.certification === "both") {
           if (!data.irataLevel) {
-            setError("Please select your IRATA level");
+            setError(t.errorIrataLevel);
             return;
           }
           if (!data.irataLicenseNumber.trim()) {
-            setError("Please enter your IRATA license number");
+            setError(t.errorIrataLicense);
             return;
           }
         }
         if (data.certification === "sprat" || data.certification === "both") {
           if (!data.spratLevel) {
-            setError("Please select your SPRAT level");
+            setError(t.errorSpratLevel);
             return;
           }
           if (!data.spratLicenseNumber.trim()) {
-            setError("Please enter your SPRAT license number");
+            setError(t.errorSpratLicense);
             return;
           }
         }
         break;
       case "address":
         if (!data.streetAddress.trim()) {
-          setError("Please enter your street address");
+          setError(t.errorStreetAddress);
           return;
         }
         if (!data.city.trim()) {
-          setError("Please enter your city");
+          setError(t.errorCity);
           return;
         }
         if (!data.provinceState.trim()) {
-          setError("Please enter your province/state");
+          setError(t.errorProvinceState);
           return;
         }
         if (!data.country.trim()) {
-          setError("Please enter your country");
+          setError(t.errorCountry);
           return;
         }
         if (!data.postalCode.trim()) {
-          setError("Please enter your postal code");
+          setError(t.errorPostalCode);
           return;
         }
         break;
       case "email":
         if (!data.email.trim()) {
-          setError("Please enter your email address");
+          setError(t.errorEmail);
           return;
         }
         if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email)) {
-          setError("Please enter a valid email address");
+          setError(t.errorEmail);
           return;
         }
         break;
       case "phone":
         if (!data.phone.trim()) {
-          setError("Please enter your phone number");
+          setError(t.errorPhone);
           return;
         }
         break;
       case "password":
         if (!data.password) {
-          setError("Please enter a password");
+          setError(t.errorPassword);
           return;
         }
         if (data.password.length < 8) {
-          setError("Password must be at least 8 characters");
+          setError(t.errorPasswordLength);
           return;
         }
         if (!/[A-Z]/.test(data.password)) {
-          setError("Password must contain at least one uppercase letter");
+          setError(t.errorPasswordLength);
           return;
         }
         if (!/[a-z]/.test(data.password)) {
-          setError("Password must contain at least one lowercase letter");
+          setError(t.errorPasswordLength);
           return;
         }
         if (!/[0-9]/.test(data.password)) {
-          setError("Password must contain at least one number");
+          setError(t.errorPasswordLength);
           return;
         }
         if (data.password !== data.confirmPassword) {
-          setError("Passwords do not match");
+          setError(t.passwordsNoMatch);
           return;
         }
         break;
       case "emergencyContact":
         if (!data.emergencyContactName.trim()) {
-          setError("Please enter emergency contact name");
+          setError(t.errorEmergencyName);
           return;
         }
         if (!data.emergencyContactPhone.trim()) {
-          setError("Please enter emergency contact phone number");
+          setError(t.errorEmergencyPhone);
           return;
         }
         break;
       case "firstAid":
         if (data.hasFirstAid && !data.firstAidType.trim()) {
-          setError("Please enter the type of first aid certification you have");
+          setError(t.selectFirstAidType);
           return;
         }
         break;
@@ -550,15 +855,15 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
     },
     onSuccess: () => {
       toast({
-        title: "Registration Submitted",
-        description: "Your registration has been submitted successfully.",
+        title: t.registrationSubmitted,
+        description: t.registrationSubmittedDesc,
       });
       setStep("complete");
     },
     onError: (error: Error) => {
       setError(error.message);
       toast({
-        title: "Registration Failed",
+        title: t.registrationFailed,
         description: error.message,
         variant: "destructive",
       });
@@ -574,18 +879,16 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
       <div className="flex items-start gap-2">
         <Shield className="w-4 h-4 mt-0.5 text-primary flex-shrink-0" />
         <div>
-          <p className="font-medium">Your Information is Secure</p>
+          <p className="font-medium">{t.infoSecure}</p>
           <p className="text-muted-foreground text-xs mt-1">
-            We store your information securely, limit access to authorized employer staff only, 
-            and never sell or share it outside your company without your consent or legal requirement.
+            {t.infoSecureDesc}
           </p>
         </div>
       </div>
       <div className="flex items-start gap-2">
         <Info className="w-4 h-4 mt-0.5 text-muted-foreground flex-shrink-0" />
         <p className="text-muted-foreground text-xs">
-          Information collected may be used by your employer for HR purposes including payroll processing, 
-          certification compliance, driving eligibility verification, and emergency contact procedures.
+          {t.infoUsage}
         </p>
       </div>
     </div>
@@ -597,24 +900,34 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
         return (
           <>
             <DialogHeader>
-              <div className="flex items-center justify-center mb-4">
+              <div className="flex items-center justify-between mb-4">
+                <div className="w-9" />
                 <div className="p-3 rounded-full bg-primary/10">
                   <User className="w-8 h-8 text-primary" />
                 </div>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={toggleLanguage}
+                  data-testid="button-toggle-language-registration"
+                  title={language === 'en' ? 'Passer au français' : 'Switch to English'}
+                >
+                  <Languages className="w-5 h-5" />
+                </Button>
               </div>
-              <DialogTitle className="text-center text-xl">What's your first name?</DialogTitle>
+              <DialogTitle className="text-center text-xl">{t.firstName}</DialogTitle>
               <DialogDescription className="text-center">
-                Let's start with your first name
+                {t.firstNameSubtitle}
               </DialogDescription>
             </DialogHeader>
             <div className="py-6 space-y-4">
               <PrivacyNotice />
               <div>
-                <Label htmlFor="firstName" className="sr-only">First Name</Label>
+                <Label htmlFor="firstName" className="sr-only">{t.firstName}</Label>
                 <Input
                   id="firstName"
                   data-testid="input-technician-first-name"
-                  placeholder="Enter your first name"
+                  placeholder={t.enterFirstName}
                   value={data.firstName}
                   onChange={(e) => setData({ ...data, firstName: e.target.value })}
                   onKeyDown={(e) => e.key === "Enter" && handleContinue()}
@@ -630,7 +943,7 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
                 className="w-full"
                 data-testid="button-continue-first-name"
               >
-                Continue
+                {t.continue}
                 <ArrowRight className="w-4 h-4 ml-2" />
               </Button>
               <Button 
@@ -639,7 +952,7 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
                 className="w-full"
                 data-testid="button-cancel-registration"
               >
-                Cancel
+                {t.cancel}
               </Button>
             </DialogFooter>
           </>
@@ -655,18 +968,18 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
                 </div>
               </div>
               <DialogTitle className="text-center text-xl">
-                Hi {data.firstName}! What's your last name?
+                {t.lastNameGreeting.replace('{name}', data.firstName)}
               </DialogTitle>
               <DialogDescription className="text-center">
-                Now let's get your last name
+                {t.lastNameSubtitle}
               </DialogDescription>
             </DialogHeader>
             <div className="py-6">
-              <Label htmlFor="lastName" className="sr-only">Last Name</Label>
+              <Label htmlFor="lastName" className="sr-only">{t.lastName}</Label>
               <Input
                 id="lastName"
                 data-testid="input-technician-last-name"
-                placeholder="Enter your last name"
+                placeholder={t.enterLastName}
                 value={data.lastName}
                 onChange={(e) => setData({ ...data, lastName: e.target.value })}
                 onKeyDown={(e) => e.key === "Enter" && handleContinue()}
@@ -681,7 +994,7 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
                 className="w-full"
                 data-testid="button-continue-last-name"
               >
-                Continue
+                {t.continue}
                 <ArrowRight className="w-4 h-4 ml-2" />
               </Button>
               <Button 
@@ -691,7 +1004,7 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
                 data-testid="button-back-to-first-name"
               >
                 <ArrowLeft className="w-4 h-4 mr-2" />
-                Back
+                {t.back}
               </Button>
             </DialogFooter>
           </>
@@ -707,10 +1020,10 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
                 </div>
               </div>
               <DialogTitle className="text-center text-xl">
-                Are you certified?
+                {t.areCertified}
               </DialogTitle>
               <DialogDescription className="text-center">
-                Select your rope access certification(s)
+                {t.selectCertification}
               </DialogDescription>
             </DialogHeader>
             <div className="py-6 space-y-3">
@@ -721,7 +1034,7 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
                 data-testid="button-cert-irata"
               >
                 <Award className="w-5 h-5 mr-3" />
-                IRATA Certified
+                {t.irataCertified}
               </Button>
               <Button
                 variant={data.certification === "sprat" ? "default" : "outline"}
@@ -730,7 +1043,7 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
                 data-testid="button-cert-sprat"
               >
                 <Award className="w-5 h-5 mr-3" />
-                SPRAT Certified
+                {t.spratCertified}
               </Button>
               <Button
                 variant={data.certification === "both" ? "default" : "outline"}
@@ -739,7 +1052,7 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
                 data-testid="button-cert-both"
               >
                 <Award className="w-5 h-5 mr-3" />
-                Both IRATA & SPRAT
+                {t.bothCertified}
               </Button>
               <Button
                 variant={data.certification === "none" ? "default" : "outline"}
@@ -748,7 +1061,7 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
                 data-testid="button-cert-none"
               >
                 <User className="w-5 h-5 mr-3" />
-                Not Certified
+                {t.noCertification}
               </Button>
               {error && <p className="text-destructive text-sm text-center mt-2">{error}</p>}
             </div>
@@ -759,7 +1072,7 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
                 disabled={!data.certification}
                 data-testid="button-continue-certification"
               >
-                Continue
+                {t.continue}
                 <ArrowRight className="w-4 h-4 ml-2" />
               </Button>
               <Button 
@@ -769,7 +1082,7 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
                 data-testid="button-back-to-last-name"
               >
                 <ArrowLeft className="w-4 h-4 mr-2" />
-                Back
+                {t.back}
               </Button>
             </DialogFooter>
           </>
@@ -785,7 +1098,7 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
                 </div>
               </div>
               <DialogTitle className="text-center text-xl">
-                Enter your license details
+                {t.enterLicenseDetails}
               </DialogTitle>
               <DialogDescription className="text-center">
                 {data.certification === "both" 
@@ -902,7 +1215,7 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
                 className="w-full"
                 data-testid="button-continue-license"
               >
-                Continue
+                {t.continue}
                 <ArrowRight className="w-4 h-4 ml-2" />
               </Button>
               <Button 
@@ -911,7 +1224,7 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
                 className="w-full"
               >
                 <ArrowLeft className="w-4 h-4 mr-2" />
-                Back
+                {t.back}
               </Button>
             </DialogFooter>
           </>
@@ -996,7 +1309,7 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
                 className="w-full"
               >
                 <ArrowLeft className="w-4 h-4 mr-2" />
-                Back
+                {t.back}
               </Button>
             </DialogFooter>
           </>
@@ -1122,7 +1435,7 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
                 className="w-full"
                 data-testid="button-continue-first-aid"
               >
-                Continue
+                {t.continue}
                 <ArrowRight className="w-4 h-4 ml-2" />
               </Button>
               <Button 
@@ -1131,7 +1444,7 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
                 className="w-full"
               >
                 <ArrowLeft className="w-4 h-4 mr-2" />
-                Back
+                {t.back}
               </Button>
             </DialogFooter>
           </>
@@ -1147,10 +1460,10 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
                 </div>
               </div>
               <DialogTitle className="text-center text-xl">
-                What's your address?
+                {t.whereDoYouLive}
               </DialogTitle>
               <DialogDescription className="text-center">
-                Enter your home address
+                {t.addressSubtitle}
               </DialogDescription>
             </DialogHeader>
             <div className="py-6 space-y-4 max-h-[60vh] overflow-y-auto">
@@ -1216,7 +1529,7 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
                 className="w-full"
                 data-testid="button-continue-address"
               >
-                Continue
+                {t.continue}
                 <ArrowRight className="w-4 h-4 ml-2" />
               </Button>
               <Button 
@@ -1225,7 +1538,7 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
                 className="w-full"
               >
                 <ArrowLeft className="w-4 h-4 mr-2" />
-                Back
+                {t.back}
               </Button>
             </DialogFooter>
           </>
@@ -1268,7 +1581,7 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
                 className="w-full"
                 data-testid="button-continue-email"
               >
-                Continue
+                {t.continue}
                 <ArrowRight className="w-4 h-4 ml-2" />
               </Button>
               <Button 
@@ -1277,7 +1590,7 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
                 className="w-full"
               >
                 <ArrowLeft className="w-4 h-4 mr-2" />
-                Back
+                {t.back}
               </Button>
             </DialogFooter>
           </>
@@ -1320,7 +1633,7 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
                 className="w-full"
                 data-testid="button-continue-phone"
               >
-                Continue
+                {t.continue}
                 <ArrowRight className="w-4 h-4 ml-2" />
               </Button>
               <Button 
@@ -1329,7 +1642,7 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
                 className="w-full"
               >
                 <ArrowLeft className="w-4 h-4 mr-2" />
-                Back
+                {t.back}
               </Button>
             </DialogFooter>
           </>
@@ -1394,7 +1707,7 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
                 className="w-full"
                 data-testid="button-continue-password"
               >
-                Continue
+                {t.continue}
                 <ArrowRight className="w-4 h-4 ml-2" />
               </Button>
               <Button 
@@ -1403,7 +1716,7 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
                 className="w-full"
               >
                 <ArrowLeft className="w-4 h-4 mr-2" />
-                Back
+                {t.back}
               </Button>
             </DialogFooter>
           </>
@@ -1466,7 +1779,7 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
                 className="w-full"
                 data-testid="button-continue-emergency"
               >
-                Continue
+                {t.continue}
                 <ArrowRight className="w-4 h-4 ml-2" />
               </Button>
               <Button 
@@ -1475,7 +1788,7 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
                 className="w-full"
               >
                 <ArrowLeft className="w-4 h-4 mr-2" />
-                Back
+                {t.back}
               </Button>
             </DialogFooter>
           </>
@@ -1528,7 +1841,7 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
                 className="w-full"
                 data-testid="button-continue-sin"
               >
-                Continue
+                {t.continue}
                 <ArrowRight className="w-4 h-4 ml-2" />
               </Button>
               <Button 
@@ -1537,7 +1850,7 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
                 className="w-full"
               >
                 <ArrowLeft className="w-4 h-4 mr-2" />
-                Back
+                {t.back}
               </Button>
             </DialogFooter>
           </>
@@ -1618,7 +1931,7 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
                 className="w-full"
                 data-testid="button-continue-bank"
               >
-                Continue
+                {t.continue}
                 <ArrowRight className="w-4 h-4 ml-2" />
               </Button>
               <Button 
@@ -1627,7 +1940,7 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
                 className="w-full"
               >
                 <ArrowLeft className="w-4 h-4 mr-2" />
-                Back
+                {t.back}
               </Button>
             </DialogFooter>
           </>
@@ -1706,7 +2019,7 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
                 className="w-full"
                 data-testid="button-continue-dl"
               >
-                Continue
+                {t.continue}
                 <ArrowRight className="w-4 h-4 ml-2" />
               </Button>
               <Button 
@@ -1715,7 +2028,7 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
                 className="w-full"
               >
                 <ArrowLeft className="w-4 h-4 mr-2" />
-                Back
+                {t.back}
               </Button>
             </DialogFooter>
           </>
@@ -1755,7 +2068,7 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
                 className="w-full"
                 data-testid="button-continue-birthday"
               >
-                Continue
+                {t.continue}
                 <ArrowRight className="w-4 h-4 ml-2" />
               </Button>
               <Button 
@@ -1764,7 +2077,7 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
                 className="w-full"
               >
                 <ArrowLeft className="w-4 h-4 mr-2" />
-                Back
+                {t.back}
               </Button>
             </DialogFooter>
           </>
@@ -1832,7 +2145,7 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
                 disabled={registrationMutation.isPending}
               >
                 <ArrowLeft className="w-4 h-4 mr-2" />
-                Back
+                {t.back}
               </Button>
             </DialogFooter>
           </>
@@ -1848,19 +2161,19 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
                 </div>
               </div>
               <DialogTitle className="text-center text-xl">
-                Registration Complete!
+                {t.registrationComplete}
               </DialogTitle>
               <DialogDescription className="text-center">
-                Thank you, {data.firstName}! Your registration has been submitted.
+                {t.thankYou.replace('{name}', data.firstName)}
               </DialogDescription>
             </DialogHeader>
             <div className="py-6">
               <div className="p-4 rounded-lg bg-green-500/10 border border-green-500/20 space-y-2">
                 <p className="text-sm text-center">
-                  Your employer will review your registration and grant you access to the system.
+                  {t.employerReview}
                 </p>
                 <p className="text-sm text-center text-muted-foreground">
-                  You'll receive an email at <strong>{data.email}</strong> once your account is activated.
+                  {t.emailNotification} <strong>{data.email}</strong> {t.accountActivated}
                 </p>
               </div>
             </div>

@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useMemo } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useLocation } from "wouter";
 import { useForm } from "react-hook-form";
@@ -37,21 +37,207 @@ import {
   ExternalLink,
   CheckCircle2,
   Upload,
-  Loader2
+  Loader2,
+  Languages
 } from "lucide-react";
 import onRopeProLogo from "@assets/OnRopePro-logo_1764625558626.png";
 
-const profileSchema = z.object({
-  name: z.string().min(1, "Name is required"),
-  email: z.string().email("Invalid email"),
-  employeePhoneNumber: z.string().min(1, "Phone is required"),
+type Language = 'en' | 'fr';
+
+const translations = {
+  en: {
+    technicianPortal: "Technician Portal",
+    signOut: "Sign Out",
+    editProfile: "Edit Profile",
+    cancel: "Cancel",
+    saveChanges: "Save Changes",
+    saving: "Saving...",
+    personalInfo: "Personal Information",
+    fullName: "Full Name",
+    email: "Email",
+    phoneNumber: "Phone Number",
+    birthday: "Birthday",
+    address: "Address",
+    streetAddress: "Street Address",
+    city: "City",
+    provinceState: "Province/State",
+    country: "Country",
+    postalCode: "Postal Code",
+    emergencyContact: "Emergency Contact",
+    contactName: "Contact Name",
+    contactPhone: "Contact Phone",
+    relationship: "Relationship",
+    payrollInfo: "Payroll Information",
+    sin: "Social Insurance Number",
+    bankAccount: "Bank Account",
+    transit: "Transit",
+    institution: "Institution",
+    account: "Account",
+    driversLicense: "Driver's License",
+    licenseNumber: "License #",
+    expiry: "Expiry",
+    medicalConditions: "Medical Conditions",
+    specialMedicalConditions: "Special Medical Conditions",
+    medicalPlaceholder: "Optional - Any conditions your employer should be aware of",
+    certifications: "Certifications",
+    baselineHours: "Baseline Hours",
+    hours: "hours",
+    certificationCard: "Certification Card",
+    tapToViewPdf: "Tap to view PDF",
+    tapToViewDocument: "Tap to view document",
+    licenseVerified: "License Verified",
+    lastVerified: "Last verified",
+    reverifyLicense: "Re-verify Your License",
+    verifyLicenseValidity: "Verify Your License Validity",
+    verificationExplanation: "Employers require verified certification status to ensure compliance with safety regulations and insurance requirements. Verifying your license helps your employer confirm you're qualified for rope access work.",
+    howItWorks: "How it works:",
+    step1: "Click \"Open IRATA Portal\" to open the verification page",
+    step2: "Enter your last name and license number",
+    step3: "Take a screenshot of the verification result",
+    step4: "Come back here and click \"Upload Screenshot\"",
+    openIrataPortal: "Open IRATA Portal",
+    uploadVerificationScreenshot: "Upload Verification Screenshot",
+    analyzingScreenshot: "Analyzing Screenshot...",
+    name: "Name",
+    license: "License",
+    level: "Level",
+    validUntil: "Valid Until",
+    confidence: "Confidence",
+    firstAid: "First Aid",
+    firstAidType: "Type",
+    expiresOn: "Expires on",
+    expired: "Expired",
+    firstAidCertificate: "First Aid Certificate",
+    uploadedDocuments: "Uploaded Documents",
+    licensePhoto: "License Photo",
+    driverAbstract: "Driver Abstract",
+    voidCheque: "Void Cheque / Bank Info",
+    notProvided: "Not provided",
+    loadingProfile: "Loading your profile...",
+    pleaseLogin: "Please log in to view your profile.",
+    goToLogin: "Go to Login",
+    profileUpdated: "Profile Updated",
+    changesSaved: "Your changes have been saved successfully.",
+    updateFailed: "Update Failed",
+    invalidFile: "Invalid file",
+    uploadImageFile: "Please upload an image file (screenshot)",
+    verificationSuccessful: "Verification Successful",
+    irataVerified: "Your IRATA license has been verified!",
+    verificationIssue: "Verification Issue",
+    couldNotVerify: "Could not verify license from screenshot",
+    verificationFailed: "Verification Failed",
+    failedToAnalyze: "Failed to analyze screenshot",
+    privacyNotice: "Privacy Notice",
+    privacyText: "Your personal information is securely stored and used only by your employer for HR and payroll purposes. We never share your data externally.",
+    errorNameRequired: "Name is required",
+    errorInvalidEmail: "Invalid email",
+    errorPhoneRequired: "Phone is required",
+    errorEmergencyNameRequired: "Emergency contact name is required",
+    errorEmergencyPhoneRequired: "Emergency contact phone is required",
+  },
+  fr: {
+    technicianPortal: "Portail du technicien",
+    signOut: "Déconnexion",
+    editProfile: "Modifier le profil",
+    cancel: "Annuler",
+    saveChanges: "Enregistrer",
+    saving: "Enregistrement...",
+    personalInfo: "Informations personnelles",
+    fullName: "Nom complet",
+    email: "Courriel",
+    phoneNumber: "Numéro de téléphone",
+    birthday: "Date de naissance",
+    address: "Adresse",
+    streetAddress: "Adresse civique",
+    city: "Ville",
+    provinceState: "Province/État",
+    country: "Pays",
+    postalCode: "Code postal",
+    emergencyContact: "Contact d'urgence",
+    contactName: "Nom du contact",
+    contactPhone: "Téléphone du contact",
+    relationship: "Relation",
+    payrollInfo: "Informations de paie",
+    sin: "Numéro d'assurance sociale",
+    bankAccount: "Compte bancaire",
+    transit: "Transit",
+    institution: "Institution",
+    account: "Compte",
+    driversLicense: "Permis de conduire",
+    licenseNumber: "Numéro de permis",
+    expiry: "Expiration",
+    medicalConditions: "Conditions médicales",
+    specialMedicalConditions: "Conditions médicales spéciales",
+    medicalPlaceholder: "Facultatif - Toute condition dont votre employeur devrait être informé",
+    certifications: "Certifications",
+    baselineHours: "Heures de base",
+    hours: "heures",
+    certificationCard: "Carte de certification",
+    tapToViewPdf: "Appuyez pour voir le PDF",
+    tapToViewDocument: "Appuyez pour voir le document",
+    licenseVerified: "Licence vérifiée",
+    lastVerified: "Dernière vérification",
+    reverifyLicense: "Re-vérifier votre licence",
+    verifyLicenseValidity: "Vérifier la validité de votre licence",
+    verificationExplanation: "Les employeurs exigent un statut de certification vérifié pour assurer la conformité aux règlements de sécurité et aux exigences d'assurance. La vérification de votre licence aide votre employeur à confirmer que vous êtes qualifié pour le travail d'accès sur corde.",
+    howItWorks: "Comment ça fonctionne:",
+    step1: "Cliquez sur « Ouvrir le portail IRATA » pour ouvrir la page de vérification",
+    step2: "Entrez votre nom de famille et votre numéro de licence",
+    step3: "Prenez une capture d'écran du résultat de la vérification",
+    step4: "Revenez ici et cliquez sur « Téléverser la capture d'écran »",
+    openIrataPortal: "Ouvrir le portail IRATA",
+    uploadVerificationScreenshot: "Téléverser la capture d'écran",
+    analyzingScreenshot: "Analyse en cours...",
+    name: "Nom",
+    license: "Licence",
+    level: "Niveau",
+    validUntil: "Valide jusqu'au",
+    confidence: "Confiance",
+    firstAid: "Premiers soins",
+    firstAidType: "Type",
+    expiresOn: "Expire le",
+    expired: "Expiré",
+    firstAidCertificate: "Certificat de premiers soins",
+    uploadedDocuments: "Documents téléversés",
+    licensePhoto: "Photo du permis",
+    driverAbstract: "Relevé de conduite",
+    voidCheque: "Chèque annulé / Info bancaire",
+    notProvided: "Non fourni",
+    loadingProfile: "Chargement de votre profil...",
+    pleaseLogin: "Veuillez vous connecter pour voir votre profil.",
+    goToLogin: "Aller à la connexion",
+    profileUpdated: "Profil mis à jour",
+    changesSaved: "Vos modifications ont été enregistrées avec succès.",
+    updateFailed: "Échec de la mise à jour",
+    invalidFile: "Fichier invalide",
+    uploadImageFile: "Veuillez téléverser un fichier image (capture d'écran)",
+    verificationSuccessful: "Vérification réussie",
+    irataVerified: "Votre licence IRATA a été vérifiée!",
+    verificationIssue: "Problème de vérification",
+    couldNotVerify: "Impossible de vérifier la licence à partir de la capture d'écran",
+    verificationFailed: "Échec de la vérification",
+    failedToAnalyze: "Échec de l'analyse de la capture d'écran",
+    privacyNotice: "Avis de confidentialité",
+    privacyText: "Vos informations personnelles sont stockées en toute sécurité et utilisées uniquement par votre employeur à des fins de RH et de paie. Nous ne partageons jamais vos données à l'externe.",
+    errorNameRequired: "Le nom est requis",
+    errorInvalidEmail: "Courriel invalide",
+    errorPhoneRequired: "Le téléphone est requis",
+    errorEmergencyNameRequired: "Le nom du contact d'urgence est requis",
+    errorEmergencyPhoneRequired: "Le téléphone du contact d'urgence est requis",
+  }
+};
+
+const createProfileSchema = (t: typeof translations['en']) => z.object({
+  name: z.string().min(1, t.errorNameRequired),
+  email: z.string().email(t.errorInvalidEmail),
+  employeePhoneNumber: z.string().min(1, t.errorPhoneRequired),
   employeeStreetAddress: z.string().optional(),
   employeeCity: z.string().optional(),
   employeeProvinceState: z.string().optional(),
   employeeCountry: z.string().optional(),
   employeePostalCode: z.string().optional(),
-  emergencyContactName: z.string().min(1, "Emergency contact name is required"),
-  emergencyContactPhone: z.string().min(1, "Emergency contact phone is required"),
+  emergencyContactName: z.string().min(1, t.errorEmergencyNameRequired),
+  emergencyContactPhone: z.string().min(1, t.errorEmergencyPhoneRequired),
   emergencyContactRelationship: z.string().optional(),
   socialInsuranceNumber: z.string().optional(),
   bankTransitNumber: z.string().optional(),
@@ -64,13 +250,20 @@ const profileSchema = z.object({
   irataBaselineHours: z.string().optional(),
 });
 
-type ProfileFormData = z.infer<typeof profileSchema>;
+type ProfileFormData = z.infer<ReturnType<typeof createProfileSchema>>;
 
 export default function TechnicianPortal() {
   const { toast } = useToast();
   const [, setLocation] = useLocation();
   const [isEditing, setIsEditing] = useState(false);
   const [isVerifying, setIsVerifying] = useState(false);
+  const [language, setLanguage] = useState<Language>(() => {
+    const saved = localStorage.getItem('techPortalLanguage');
+    return (saved === 'fr' ? 'fr' : 'en') as Language;
+  });
+  
+  const t = translations[language];
+  const profileSchema = useMemo(() => createProfileSchema(t), [t]);
   const [verificationResult, setVerificationResult] = useState<{
     success: boolean;
     verification?: {
@@ -119,6 +312,12 @@ export default function TechnicianPortal() {
     },
   });
 
+  const toggleLanguage = () => {
+    const newLang = language === 'en' ? 'fr' : 'en';
+    setLanguage(newLang);
+    localStorage.setItem('techPortalLanguage', newLang);
+  };
+
   const updateMutation = useMutation({
     mutationFn: async (data: ProfileFormData) => {
       return apiRequest("PATCH", "/api/technician/profile", data);
@@ -127,14 +326,14 @@ export default function TechnicianPortal() {
       queryClient.invalidateQueries({ queryKey: ["/api/user"] });
       setIsEditing(false);
       toast({
-        title: "Profile Updated",
-        description: "Your changes have been saved successfully.",
+        title: t.profileUpdated,
+        description: t.changesSaved,
       });
     },
     onError: (error: any) => {
       toast({
-        title: "Update Failed",
-        description: error.message || "Failed to update profile",
+        title: t.updateFailed,
+        description: error.message || t.updateFailed,
         variant: "destructive",
       });
     },
@@ -159,8 +358,8 @@ export default function TechnicianPortal() {
 
     if (!file.type.startsWith('image/')) {
       toast({
-        title: "Invalid file",
-        description: "Please upload an image file (screenshot)",
+        title: t.invalidFile,
+        description: t.uploadImageFile,
         variant: "destructive",
       });
       return;
@@ -182,28 +381,28 @@ export default function TechnicianPortal() {
       const result = await response.json();
 
       if (!response.ok) {
-        throw new Error(result.message || 'Verification failed');
+        throw new Error(result.message || t.verificationFailed);
       }
 
       setVerificationResult(result);
       
       if (result.success) {
         toast({
-          title: "Verification Successful",
-          description: "Your IRATA license has been verified!",
+          title: t.verificationSuccessful,
+          description: t.irataVerified,
         });
         queryClient.invalidateQueries({ queryKey: ["/api/user"] });
       } else {
         toast({
-          title: "Verification Issue",
-          description: result.message || "Could not verify license from screenshot",
+          title: t.verificationIssue,
+          description: result.message || t.couldNotVerify,
           variant: "destructive",
         });
       }
     } catch (error: any) {
       toast({
-        title: "Verification Failed",
-        description: error.message || "Failed to analyze screenshot",
+        title: t.verificationFailed,
+        description: error.message || t.failedToAnalyze,
         variant: "destructive",
       });
     } finally {
@@ -249,7 +448,7 @@ export default function TechnicianPortal() {
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
-        <div className="animate-pulse">Loading your profile...</div>
+        <div className="animate-pulse">{t.loadingProfile}</div>
       </div>
     );
   }
@@ -259,9 +458,9 @@ export default function TechnicianPortal() {
       <div className="min-h-screen flex items-center justify-center bg-background">
         <Card className="max-w-md">
           <CardContent className="pt-6 text-center">
-            <p className="text-muted-foreground mb-4">Please log in to view your profile.</p>
+            <p className="text-muted-foreground mb-4">{t.pleaseLogin}</p>
             <Button onClick={() => setLocation("/technician-login")}>
-              Go to Login
+              {t.goToLogin}
             </Button>
           </CardContent>
         </Card>
@@ -280,20 +479,32 @@ export default function TechnicianPortal() {
               className="h-8 object-contain"
             />
             <div className="hidden sm:block">
-              <h1 className="font-semibold text-sm">Technician Portal</h1>
+              <h1 className="font-semibold text-sm">{t.technicianPortal}</h1>
               <p className="text-xs text-muted-foreground">{user.name}</p>
             </div>
           </div>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={handleLogout}
-            className="gap-2"
-            data-testid="button-logout"
-          >
-            <LogOut className="w-4 h-4" />
-            Sign Out
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={toggleLanguage}
+              className="gap-1.5"
+              data-testid="button-toggle-language"
+            >
+              <Languages className="w-4 h-4" />
+              {language === 'en' ? 'FR' : 'EN'}
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleLogout}
+              className="gap-2"
+              data-testid="button-logout"
+            >
+              <LogOut className="w-4 h-4" />
+              {t.signOut}
+            </Button>
+          </div>
         </div>
       </header>
 
@@ -332,7 +543,7 @@ export default function TechnicianPortal() {
                 data-testid="button-edit-profile"
               >
                 <Edit2 className="w-4 h-4" />
-                Edit Profile
+                {t.editProfile}
               </Button>
             ) : (
               <div className="flex gap-2 w-full sm:w-auto">
@@ -343,7 +554,7 @@ export default function TechnicianPortal() {
                   data-testid="button-cancel-edit"
                 >
                   <X className="w-4 h-4 mr-2" />
-                  Cancel
+                  {t.cancel}
                 </Button>
                 <Button
                   onClick={form.handleSubmit(onSubmit)}
@@ -352,7 +563,7 @@ export default function TechnicianPortal() {
                   data-testid="button-save-profile"
                 >
                   <Save className="w-4 h-4" />
-                  {updateMutation.isPending ? "Saving..." : "Save Changes"}
+                  {updateMutation.isPending ? t.saving : t.saveChanges}
                 </Button>
               </div>
             )}
@@ -365,7 +576,7 @@ export default function TechnicianPortal() {
                   <div className="space-y-4">
                     <h3 className="font-medium flex items-center gap-2">
                       <User className="w-4 h-4" />
-                      Personal Information
+                      {t.personalInfo}
                     </h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <FormField
@@ -373,7 +584,7 @@ export default function TechnicianPortal() {
                         name="name"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Full Name</FormLabel>
+                            <FormLabel>{t.fullName}</FormLabel>
                             <FormControl>
                               <Input {...field} data-testid="input-name" />
                             </FormControl>
@@ -386,7 +597,7 @@ export default function TechnicianPortal() {
                         name="email"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Email</FormLabel>
+                            <FormLabel>{t.email}</FormLabel>
                             <FormControl>
                               <Input {...field} type="email" data-testid="input-email" />
                             </FormControl>
@@ -399,7 +610,7 @@ export default function TechnicianPortal() {
                         name="employeePhoneNumber"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Phone Number</FormLabel>
+                            <FormLabel>{t.phoneNumber}</FormLabel>
                             <FormControl>
                               <Input {...field} type="tel" data-testid="input-phone" />
                             </FormControl>
@@ -412,7 +623,7 @@ export default function TechnicianPortal() {
                         name="birthday"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Birthday</FormLabel>
+                            <FormLabel>{t.birthday}</FormLabel>
                             <FormControl>
                               <Input {...field} type="date" data-testid="input-birthday" />
                             </FormControl>
@@ -428,7 +639,7 @@ export default function TechnicianPortal() {
                   <div className="space-y-4">
                     <h3 className="font-medium flex items-center gap-2">
                       <MapPin className="w-4 h-4" />
-                      Address
+                      {t.address}
                     </h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <FormField
@@ -436,7 +647,7 @@ export default function TechnicianPortal() {
                         name="employeeStreetAddress"
                         render={({ field }) => (
                           <FormItem className="md:col-span-2">
-                            <FormLabel>Street Address</FormLabel>
+                            <FormLabel>{t.streetAddress}</FormLabel>
                             <FormControl>
                               <Input {...field} data-testid="input-street" />
                             </FormControl>
@@ -449,7 +660,7 @@ export default function TechnicianPortal() {
                         name="employeeCity"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>City</FormLabel>
+                            <FormLabel>{t.city}</FormLabel>
                             <FormControl>
                               <Input {...field} data-testid="input-city" />
                             </FormControl>
@@ -462,7 +673,7 @@ export default function TechnicianPortal() {
                         name="employeeProvinceState"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Province/State</FormLabel>
+                            <FormLabel>{t.provinceState}</FormLabel>
                             <FormControl>
                               <Input {...field} data-testid="input-province" />
                             </FormControl>
@@ -475,7 +686,7 @@ export default function TechnicianPortal() {
                         name="employeeCountry"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Country</FormLabel>
+                            <FormLabel>{t.country}</FormLabel>
                             <FormControl>
                               <Input {...field} data-testid="input-country" />
                             </FormControl>
@@ -488,7 +699,7 @@ export default function TechnicianPortal() {
                         name="employeePostalCode"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Postal Code</FormLabel>
+                            <FormLabel>{t.postalCode}</FormLabel>
                             <FormControl>
                               <Input {...field} data-testid="input-postal" />
                             </FormControl>
@@ -504,7 +715,7 @@ export default function TechnicianPortal() {
                   <div className="space-y-4">
                     <h3 className="font-medium flex items-center gap-2">
                       <Heart className="w-4 h-4" />
-                      Emergency Contact
+                      {t.emergencyContact}
                     </h3>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                       <FormField
@@ -554,7 +765,7 @@ export default function TechnicianPortal() {
                   <div className="space-y-4">
                     <h3 className="font-medium flex items-center gap-2">
                       <Building className="w-4 h-4" />
-                      Payroll Information
+                      {t.payrollInfo}
                     </h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <FormField
@@ -619,7 +830,7 @@ export default function TechnicianPortal() {
                   <div className="space-y-4">
                     <h3 className="font-medium flex items-center gap-2">
                       <CreditCard className="w-4 h-4" />
-                      Driver's License
+                      {t.driversLicense}
                     </h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <FormField
@@ -681,18 +892,18 @@ export default function TechnicianPortal() {
                   <div className="space-y-4">
                     <h3 className="font-medium flex items-center gap-2">
                       <AlertCircle className="w-4 h-4" />
-                      Medical Conditions
+                      {t.medicalConditions}
                     </h3>
                     <FormField
                       control={form.control}
                       name="specialMedicalConditions"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Special Medical Conditions</FormLabel>
+                          <FormLabel>{t.specialMedicalConditions}</FormLabel>
                           <FormControl>
                             <Textarea 
                               {...field} 
-                              placeholder="Optional - Any conditions your employer should be aware of"
+                              placeholder={t.medicalPlaceholder}
                               className="min-h-[80px]"
                               data-testid="input-medical"
                             />
@@ -709,12 +920,12 @@ export default function TechnicianPortal() {
                 <div className="space-y-3">
                   <h3 className="font-medium flex items-center gap-2 text-muted-foreground">
                     <User className="w-4 h-4" />
-                    Personal Information
+                    {t.personalInfo}
                   </h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <InfoItem label="Email" value={user.email} icon={<Mail className="w-4 h-4" />} />
-                    <InfoItem label="Phone" value={user.employeePhoneNumber} icon={<Phone className="w-4 h-4" />} />
-                    <InfoItem label="Birthday" value={user.birthday ? formatLocalDate(user.birthday) : null} icon={<Calendar className="w-4 h-4" />} />
+                    <InfoItem label={t.email} value={user.email} icon={<Mail className="w-4 h-4" />} />
+                    <InfoItem label={t.phoneNumber} value={user.employeePhoneNumber} icon={<Phone className="w-4 h-4" />} />
+                    <InfoItem label={t.birthday} value={user.birthday ? formatLocalDate(user.birthday) : null} icon={<Calendar className="w-4 h-4" />} />
                   </div>
                 </div>
 
@@ -723,7 +934,7 @@ export default function TechnicianPortal() {
                 <div className="space-y-3">
                   <h3 className="font-medium flex items-center gap-2 text-muted-foreground">
                     <MapPin className="w-4 h-4" />
-                    Address
+                    {t.address}
                   </h3>
                   <p className="text-sm">
                     {user.employeeStreetAddress && (
@@ -741,7 +952,7 @@ export default function TechnicianPortal() {
                 <div className="space-y-3">
                   <h3 className="font-medium flex items-center gap-2 text-muted-foreground">
                     <Award className="w-4 h-4" />
-                    Certifications
+                    {t.certifications}
                   </h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {user.irataLevel && (
@@ -751,12 +962,12 @@ export default function TechnicianPortal() {
                       <InfoItem label="SPRAT" value={`${user.spratLevel} - ${user.spratLicenseNumber || 'N/A'}`} />
                     )}
                     {user.irataBaselineHours && parseFloat(user.irataBaselineHours) > 0 && (
-                      <InfoItem label="Baseline Hours" value={`${user.irataBaselineHours} hours`} icon={<Clock className="w-4 h-4" />} />
+                      <InfoItem label={t.baselineHours} value={`${user.irataBaselineHours} ${t.hours}`} icon={<Clock className="w-4 h-4" />} />
                     )}
                   </div>
                   {user.irataDocuments && user.irataDocuments.filter((u: string) => u && u.trim()).length > 0 && (
                     <div className="pt-3">
-                      <p className="text-sm text-muted-foreground mb-3">Certification Card</p>
+                      <p className="text-sm text-muted-foreground mb-3">{t.certificationCard}</p>
                       <div className="space-y-3">
                         {user.irataDocuments.filter((u: string) => u && u.trim()).map((url: string, index: number) => {
                           const lowerUrl = url.toLowerCase();
@@ -776,7 +987,7 @@ export default function TechnicianPortal() {
                               {isPdf ? (
                                 <div className="flex flex-col items-center justify-center py-8 bg-muted gap-2">
                                   <FileText className="w-12 h-12 text-muted-foreground" />
-                                  <span className="text-sm text-muted-foreground font-medium">Tap to view PDF</span>
+                                  <span className="text-sm text-muted-foreground font-medium">{t.tapToViewPdf}</span>
                                 </div>
                               ) : isImage ? (
                                 <img 
@@ -792,7 +1003,7 @@ export default function TechnicianPortal() {
                                     if (parent) {
                                       const div = document.createElement('div');
                                       div.className = 'flex flex-col items-center justify-center py-8 gap-2';
-                                      div.innerHTML = '<span class="text-sm text-muted-foreground">Tap to view document</span>';
+                                      div.innerHTML = `<span class="text-sm text-muted-foreground">${t.tapToViewDocument}</span>`;
                                       parent.appendChild(div);
                                     }
                                   }}
@@ -800,7 +1011,7 @@ export default function TechnicianPortal() {
                               ) : (
                                 <div className="flex flex-col items-center justify-center py-8 bg-muted gap-2">
                                   <FileText className="w-12 h-12 text-muted-foreground" />
-                                  <span className="text-sm text-muted-foreground font-medium">Tap to view document</span>
+                                  <span className="text-sm text-muted-foreground font-medium">{t.tapToViewDocument}</span>
                                 </div>
                               )}
                             </a>
@@ -818,9 +1029,9 @@ export default function TechnicianPortal() {
                         <div className="flex items-center gap-3 p-3 bg-green-500/10 border border-green-500/30 rounded-lg">
                           <CheckCircle2 className="w-5 h-5 text-green-600 flex-shrink-0" />
                           <div>
-                            <p className="text-sm font-medium text-green-700 dark:text-green-400">License Verified</p>
+                            <p className="text-sm font-medium text-green-700 dark:text-green-400">{t.licenseVerified}</p>
                             <p className="text-xs text-muted-foreground">
-                              Last verified: {formatDateTime(user.irataVerifiedAt)}
+                              {t.lastVerified}: {formatDateTime(user.irataVerifiedAt)}
                               {user.irataVerificationStatus && ` (${user.irataVerificationStatus})`}
                             </p>
                           </div>
@@ -831,19 +1042,18 @@ export default function TechnicianPortal() {
                         <CheckCircle2 className="w-5 h-5 text-primary mt-0.5 flex-shrink-0" />
                         <div className="space-y-2">
                           <h4 className="font-medium text-sm">
-                            {user.irataVerifiedAt ? "Re-verify Your License" : "Verify Your License Validity"}
+                            {user.irataVerifiedAt ? t.reverifyLicense : t.verifyLicenseValidity}
                           </h4>
                           <p className="text-xs text-muted-foreground leading-relaxed">
-                            Employers require verified certification status to ensure compliance with safety regulations and insurance requirements. 
-                            Verifying your license helps your employer confirm you're qualified for rope access work.
+                            {t.verificationExplanation}
                           </p>
                           <div className="text-xs text-muted-foreground space-y-1 pt-1">
-                            <p className="font-medium">How it works:</p>
+                            <p className="font-medium">{t.howItWorks}</p>
                             <ol className="list-decimal list-inside space-y-0.5 pl-1">
-                              <li>Click "Open IRATA Portal" to open the verification page</li>
-                              <li>Enter your last name and license number</li>
-                              <li>Take a screenshot of the verification result</li>
-                              <li>Come back here and click "Upload Screenshot"</li>
+                              <li>{t.step1}</li>
+                              <li>{t.step2}</li>
+                              <li>{t.step3}</li>
+                              <li>{t.step4}</li>
                             </ol>
                           </div>
                         </div>
@@ -858,7 +1068,7 @@ export default function TechnicianPortal() {
                           data-testid="button-open-irata-portal"
                         >
                           <ExternalLink className="w-4 h-4 mr-2" />
-                          Open IRATA Portal
+                          {t.openIrataPortal}
                         </Button>
                         
                         <input
@@ -880,12 +1090,12 @@ export default function TechnicianPortal() {
                           {isVerifying ? (
                             <>
                               <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                              Analyzing Screenshot...
+                              {t.analyzingScreenshot}
                             </>
                           ) : (
                             <>
                               <Upload className="w-4 h-4 mr-2" />
-                              Upload Verification Screenshot
+                              {t.uploadVerificationScreenshot}
                             </>
                           )}
                         </Button>
@@ -1048,7 +1258,7 @@ export default function TechnicianPortal() {
                     <div className="space-y-3">
                       <h3 className="font-medium flex items-center gap-2 text-muted-foreground">
                         <CreditCard className="w-4 h-4" />
-                        Driver's License
+                        {t.driversLicense}
                       </h3>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <InfoItem label="License #" value="••••••••" masked />
@@ -1191,7 +1401,7 @@ export default function TechnicianPortal() {
                     <div className="space-y-3">
                       <h3 className="font-medium flex items-center gap-2 text-muted-foreground">
                         <AlertCircle className="w-4 h-4" />
-                        Medical Conditions
+                        {t.medicalConditions}
                       </h3>
                       <p className="text-sm">{user.specialMedicalConditions}</p>
                     </div>
