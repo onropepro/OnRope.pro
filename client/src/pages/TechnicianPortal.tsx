@@ -30,7 +30,9 @@ import {
   Calendar,
   AlertCircle,
   HardHat,
-  Clock
+  Clock,
+  FileText,
+  Image as ImageIcon
 } from "lucide-react";
 import onRopeProLogo from "@assets/OnRopePro-logo_1764625558626.png";
 
@@ -716,6 +718,69 @@ export default function TechnicianPortal() {
                           label="Expiry" 
                           value={user.driversLicenseExpiry ? formatLocalDate(user.driversLicenseExpiry) : null} 
                         />
+                      </div>
+                      {user.driversLicenseDocuments && user.driversLicenseDocuments.length > 0 && (
+                        <div className="pt-2">
+                          <p className="text-xs text-muted-foreground mb-2">Uploaded Documents</p>
+                          <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+                            {user.driversLicenseDocuments.map((url: string, index: number) => (
+                              <a 
+                                key={index} 
+                                href={url} 
+                                target="_blank" 
+                                rel="noopener noreferrer"
+                                className="block border rounded-md overflow-hidden hover:opacity-80 transition-opacity"
+                              >
+                                {url.toLowerCase().endsWith('.pdf') ? (
+                                  <div className="flex items-center justify-center h-24 bg-muted">
+                                    <FileText className="w-8 h-8 text-muted-foreground" />
+                                  </div>
+                                ) : (
+                                  <img 
+                                    src={url} 
+                                    alt={`License document ${index + 1}`}
+                                    className="w-full h-24 object-cover"
+                                  />
+                                )}
+                              </a>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </>
+                )}
+
+                {user.bankDocuments && user.bankDocuments.length > 0 && (
+                  <>
+                    <Separator />
+                    <div className="space-y-3">
+                      <h3 className="font-medium flex items-center gap-2 text-muted-foreground">
+                        <ImageIcon className="w-4 h-4" />
+                        Banking Documents
+                      </h3>
+                      <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+                        {user.bankDocuments.map((url: string, index: number) => (
+                          <a 
+                            key={index} 
+                            href={url} 
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                            className="block border rounded-md overflow-hidden hover:opacity-80 transition-opacity"
+                          >
+                            {url.toLowerCase().endsWith('.pdf') ? (
+                              <div className="flex items-center justify-center h-24 bg-muted">
+                                <FileText className="w-8 h-8 text-muted-foreground" />
+                              </div>
+                            ) : (
+                              <img 
+                                src={url} 
+                                alt={`Banking document ${index + 1}`}
+                                className="w-full h-24 object-cover"
+                              />
+                            )}
+                          </a>
+                        ))}
                       </div>
                     </div>
                   </>
