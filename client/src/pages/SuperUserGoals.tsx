@@ -1,19 +1,9 @@
 import { useQuery } from "@tanstack/react-query";
 import SuperUserLayout from "@/components/SuperUserLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Skeleton } from "@/components/ui/skeleton";
-import { 
-  Target, 
-  Users, 
-  Building2, 
-  TrendingUp,
-  CheckCircle2,
-  Circle,
-  Zap,
-  Trophy
-} from "lucide-react";
+import { CheckCircle2, Circle } from "lucide-react";
 
 interface MetricsSummary {
   mrr: number;
@@ -33,9 +23,9 @@ interface MetricsSummary {
 }
 
 const TIPPING_POINTS = {
-  techAccounts: { target: 2500, label: "Tech Accounts", icon: Users, description: "Total technician accounts across all companies" },
-  propertyManagers: { target: 150, label: "Property Manager Accounts", icon: Building2, description: "Active property manager logins" },
-  pmEngagement: { target: 50, label: "PM Engagement Depth", icon: TrendingUp, description: "Property managers logging in monthly", suffix: "%" },
+  techAccounts: { target: 2500, label: "Tech Accounts", description: "Total technician accounts across all companies" },
+  propertyManagers: { target: 150, label: "Property Manager Accounts", description: "Active property manager logins" },
+  pmEngagement: { target: 50, label: "PM Engagement Depth", description: "Property managers logging in monthly", suffix: "%" },
 };
 
 const BUILDING_GOALS = [1000, 2000, 5000, 10000, 20000];
@@ -82,8 +72,7 @@ export default function SuperUserGoals() {
         <div className="max-w-7xl mx-auto space-y-8">
           {/* Header */}
           <div className="space-y-2">
-            <h1 className="text-2xl font-semibold flex items-center gap-3">
-              <Target className="h-7 w-7 text-primary" />
+            <h1 className="text-2xl font-semibold">
               Goals, KPIs & Tipping Points
             </h1>
             <p className="text-muted-foreground">
@@ -93,12 +82,8 @@ export default function SuperUserGoals() {
 
           {/* Tipping Points Section */}
           <div className="space-y-4">
-            <div className="flex items-center gap-2">
-              <Zap className="h-5 w-5 text-amber-500" />
+            <div>
               <h2 className="text-lg font-semibold">Tipping Points</h2>
-              <Badge variant="outline" className="text-amber-600 border-amber-300 bg-amber-50 dark:bg-amber-950/30">
-                Product Launch Triggers
-              </Badge>
             </div>
             <p className="text-sm text-muted-foreground">
               When these metrics are achieved, we unlock the ability to launch new product features.
@@ -108,16 +93,8 @@ export default function SuperUserGoals() {
               {/* Tech Accounts */}
               <Card>
                 <CardHeader className="pb-2">
-                  <CardTitle className="flex items-center justify-between gap-2 text-base">
-                    <span className="flex items-center gap-2">
-                      <Users className="h-5 w-5 text-blue-500" />
-                      Tech Accounts
-                    </span>
-                    {currentTechAccounts >= TIPPING_POINTS.techAccounts.target ? (
-                      <Badge className="bg-green-500">Achieved</Badge>
-                    ) : (
-                      <Badge variant="secondary">In Progress</Badge>
-                    )}
+                  <CardTitle className="text-base">
+                    Tech Accounts
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-3">
@@ -138,16 +115,8 @@ export default function SuperUserGoals() {
               {/* Property Manager Accounts */}
               <Card>
                 <CardHeader className="pb-2">
-                  <CardTitle className="flex items-center justify-between gap-2 text-base">
-                    <span className="flex items-center gap-2">
-                      <Building2 className="h-5 w-5 text-emerald-500" />
-                      PM Accounts
-                    </span>
-                    {currentPropertyManagers >= TIPPING_POINTS.propertyManagers.target ? (
-                      <Badge className="bg-green-500">Achieved</Badge>
-                    ) : (
-                      <Badge variant="secondary">In Progress</Badge>
-                    )}
+                  <CardTitle className="text-base">
+                    PM Accounts
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-3">
@@ -168,16 +137,8 @@ export default function SuperUserGoals() {
               {/* PM Engagement Depth */}
               <Card>
                 <CardHeader className="pb-2">
-                  <CardTitle className="flex items-center justify-between gap-2 text-base">
-                    <span className="flex items-center gap-2">
-                      <TrendingUp className="h-5 w-5 text-purple-500" />
-                      PM Engagement
-                    </span>
-                    {currentPmEngagement >= TIPPING_POINTS.pmEngagement.target ? (
-                      <Badge className="bg-green-500">Achieved</Badge>
-                    ) : (
-                      <Badge variant="secondary">In Progress</Badge>
-                    )}
+                  <CardTitle className="text-base">
+                    PM Engagement
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-3">
@@ -199,12 +160,8 @@ export default function SuperUserGoals() {
 
           {/* Building Goals Section */}
           <div className="space-y-4">
-            <div className="flex items-center gap-2">
-              <Trophy className="h-5 w-5 text-yellow-500" />
+            <div>
               <h2 className="text-lg font-semibold">Building Milestones</h2>
-              <Badge variant="outline" className="text-yellow-600 border-yellow-300 bg-yellow-50 dark:bg-yellow-950/30">
-                Growth Goals
-              </Badge>
             </div>
             <p className="text-sm text-muted-foreground">
               Track our building database growth. Each milestone unlocks new opportunities.
@@ -271,11 +228,6 @@ export default function SuperUserGoals() {
                         }`}>
                           {goal >= 1000 ? `${goal / 1000}K` : goal}
                         </span>
-                        {isAchieved && (
-                          <Badge className="mt-1 bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400 text-xs">
-                            Done
-                          </Badge>
-                        )}
                       </div>
                     );
                   })}
