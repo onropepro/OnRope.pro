@@ -406,6 +406,51 @@ async function generatePropertyManagerCode(): Promise<string> {
 }
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // ==================== ADDRESS AUTOCOMPLETE ====================
+  
+  // Address autocomplete endpoint using Geoapify API
+  app.get("/api/address-autocomplete", async (req: Request, res: Response) => {
+    try {
+      const { query } = req.query;
+      
+      if (!query || typeof query !== 'string' || query.length < 3) {
+        return res.json({ results: [] });
+      }
+      
+      const apiKey = process.env.GEOAPIFY_API_KEY;
+      if (!apiKey) {
+        console.error("GEOAPIFY_API_KEY not configured");
+        return res.status(500).json({ message: "Address service not configured" });
+      }
+      
+      const response = await fetch(
+        `https://api.geoapify.com/v1/geocode/autocomplete?text=${encodeURIComponent(query)}&format=json&apiKey=${apiKey}`
+      );
+      
+      if (!response.ok) {
+        console.error("Geoapify API error:", response.status);
+        return res.status(500).json({ message: "Address lookup failed" });
+      }
+      
+      const data = await response.json();
+      
+      const results = (data.results || []).map((result: any) => ({
+        formatted: result.formatted || "",
+        street: result.street || "",
+        houseNumber: result.housenumber || "",
+        city: result.city || result.town || result.village || "",
+        state: result.state || result.province || "",
+        country: result.country || "",
+        postcode: result.postcode || ""
+      }));
+      
+      return res.json({ results });
+    } catch (error) {
+      console.error("Address autocomplete error:", error);
+      return res.status(500).json({ message: "Address lookup failed" });
+    }
+  });
+
   // ==================== AUTH ROUTES ====================
   
   // Check if a unit is already linked to a resident account

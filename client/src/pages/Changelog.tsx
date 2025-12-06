@@ -87,6 +87,12 @@ type RecentChange = {
 const recentChangesData: RecentChange[] = [
   {
     date: "December 6, 2025",
+    title: "Address Autocomplete",
+    description: "Smart address lookup in technician registration - start typing your address and get real-time suggestions from Geoapify. Selecting a suggestion auto-fills street, city, province, country, and postal code. Full bilingual support (EN/FR)",
+    type: "feature"
+  },
+  {
+    date: "December 6, 2025",
     title: "Technician Account Protection",
     description: "Critical security fix: Employers can no longer permanently delete technician accounts. When removing an employee from their team, the technician is only unlinked (companyId set to null) - their account remains intact, they can still log in to their portal, and can be invited by other companies",
     type: "fix"

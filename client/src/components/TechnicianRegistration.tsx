@@ -9,7 +9,8 @@ import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
-import { User, ArrowRight, ArrowLeft, Award, MapPin, Loader2, Phone, Mail, Lock, Heart, Building, CreditCard, Car, Calendar, Upload, Shield, Info, CheckCircle, Check, X, FileText, Languages } from "lucide-react";
+import { User, ArrowRight, ArrowLeft, Award, MapPin, Loader2, Phone, Mail, Lock, Heart, Building, CreditCard, Car, Calendar, Upload, Shield, Info, CheckCircle, Check, X, FileText, Languages, Search } from "lucide-react";
+import { AddressAutocomplete } from "@/components/AddressAutocomplete";
 import { apiRequest } from "@/lib/queryClient";
 
 type Language = 'en' | 'fr';
@@ -69,6 +70,8 @@ const translations = {
     address: "Home Address",
     whereDoYouLive: "Where do you live?",
     addressSubtitle: "Enter your current address",
+    searchAddress: "Start typing your address...",
+    orEnterManually: "Or enter manually:",
     streetAddress: "Street Address",
     city: "City",
     provinceState: "Province/State",
@@ -212,6 +215,8 @@ const translations = {
     address: "Adresse domicile",
     whereDoYouLive: "Où habitez-vous?",
     addressSubtitle: "Entrez votre adresse actuelle",
+    searchAddress: "Commencez à taper votre adresse...",
+    orEnterManually: "Ou entrez manuellement:",
     streetAddress: "Adresse civique",
     city: "Ville",
     provinceState: "Province/État",
@@ -1468,7 +1473,42 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
             </DialogHeader>
             <div className="py-6 space-y-4 max-h-[60vh] overflow-y-auto">
               <div className="space-y-2">
-                <Label htmlFor="streetAddress">Street Address</Label>
+                <Label className="flex items-center gap-2">
+                  <Search className="w-4 h-4" />
+                  {t.searchAddress.replace("...", "")}
+                </Label>
+                <AddressAutocomplete
+                  data-testid="input-address-autocomplete"
+                  placeholder={t.searchAddress}
+                  onSelect={(address) => {
+                    const streetAddress = address.houseNumber 
+                      ? `${address.houseNumber} ${address.street}`.trim()
+                      : address.street;
+                    setData({
+                      ...data,
+                      streetAddress: streetAddress || data.streetAddress,
+                      city: address.city || data.city,
+                      provinceState: address.state || data.provinceState,
+                      country: address.country || data.country,
+                      postalCode: address.postcode || data.postalCode,
+                    });
+                  }}
+                />
+              </div>
+              
+              <div className="relative my-4">
+                <div className="absolute inset-0 flex items-center">
+                  <span className="w-full border-t" />
+                </div>
+                <div className="relative flex justify-center text-xs uppercase">
+                  <span className="bg-background px-2 text-muted-foreground">
+                    {t.orEnterManually}
+                  </span>
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="streetAddress">{t.streetAddress}</Label>
                 <Input
                   id="streetAddress"
                   data-testid="input-street-address"
@@ -1479,7 +1519,7 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="city">City</Label>
+                  <Label htmlFor="city">{t.city}</Label>
                   <Input
                     id="city"
                     data-testid="input-city"
@@ -1489,7 +1529,7 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="provinceState">Province/State</Label>
+                  <Label htmlFor="provinceState">{t.provinceState}</Label>
                   <Input
                     id="provinceState"
                     data-testid="input-province-state"
@@ -1501,7 +1541,7 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="country">Country</Label>
+                  <Label htmlFor="country">{t.country}</Label>
                   <Input
                     id="country"
                     data-testid="input-country"
@@ -1511,7 +1551,7 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="postalCode">Postal Code</Label>
+                  <Label htmlFor="postalCode">{t.postalCode}</Label>
                   <Input
                     id="postalCode"
                     data-testid="input-postal-code"
