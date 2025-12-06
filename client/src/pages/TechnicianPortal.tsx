@@ -672,6 +672,61 @@ export default function TechnicianPortal() {
                       <InfoItem label="Baseline Hours" value={`${user.irataBaselineHours} hours`} icon={<Clock className="w-4 h-4" />} />
                     )}
                   </div>
+                  {user.irataDocuments && user.irataDocuments.filter((u: string) => u && u.trim()).length > 0 && (
+                    <div className="pt-3">
+                      <p className="text-sm text-muted-foreground mb-3">Certification Card</p>
+                      <div className="space-y-3">
+                        {user.irataDocuments.filter((u: string) => u && u.trim()).map((url: string, index: number) => {
+                          const lowerUrl = url.toLowerCase();
+                          const isPdf = lowerUrl.endsWith('.pdf');
+                          const isImage = lowerUrl.match(/\.(jpg|jpeg|png|gif|webp|bmp)(\?|$)/i) || 
+                                        lowerUrl.includes('image') || 
+                                        (!isPdf && !lowerUrl.endsWith('.doc') && !lowerUrl.endsWith('.docx'));
+                          
+                          return (
+                            <a 
+                              key={index} 
+                              href={url} 
+                              target="_blank" 
+                              rel="noopener noreferrer"
+                              className="block border-2 rounded-lg overflow-hidden active:opacity-70 transition-opacity bg-muted/30"
+                            >
+                              {isPdf ? (
+                                <div className="flex flex-col items-center justify-center py-8 bg-muted gap-2">
+                                  <FileText className="w-12 h-12 text-muted-foreground" />
+                                  <span className="text-sm text-muted-foreground font-medium">Tap to view PDF</span>
+                                </div>
+                              ) : isImage ? (
+                                <img 
+                                  src={url} 
+                                  alt={`IRATA certification ${index + 1}`}
+                                  className="w-full object-contain"
+                                  style={{ maxHeight: '300px', minHeight: '100px' }}
+                                  onError={(e) => {
+                                    const target = e.target as HTMLImageElement;
+                                    target.onerror = null;
+                                    target.style.display = 'none';
+                                    const parent = target.parentElement;
+                                    if (parent) {
+                                      const div = document.createElement('div');
+                                      div.className = 'flex flex-col items-center justify-center py-8 gap-2';
+                                      div.innerHTML = '<span class="text-sm text-muted-foreground">Tap to view document</span>';
+                                      parent.appendChild(div);
+                                    }
+                                  }}
+                                />
+                              ) : (
+                                <div className="flex flex-col items-center justify-center py-8 bg-muted gap-2">
+                                  <FileText className="w-12 h-12 text-muted-foreground" />
+                                  <span className="text-sm text-muted-foreground font-medium">Tap to view document</span>
+                                </div>
+                              )}
+                            </a>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  )}
                 </div>
 
                 <Separator />
@@ -720,32 +775,58 @@ export default function TechnicianPortal() {
                           value={user.driversLicenseExpiry ? formatLocalDate(user.driversLicenseExpiry) : null} 
                         />
                       </div>
-                      {user.driversLicenseDocuments && user.driversLicenseDocuments.length > 0 && (
+                      {user.driversLicenseDocuments && user.driversLicenseDocuments.filter((u: string) => u && u.trim()).length > 0 && (
                         <div className="pt-3">
                           <p className="text-sm text-muted-foreground mb-3">Uploaded Documents</p>
-                          <div className="grid grid-cols-2 gap-3">
-                            {user.driversLicenseDocuments.map((url: string, index: number) => (
-                              <a 
-                                key={index} 
-                                href={url} 
-                                target="_blank" 
-                                rel="noopener noreferrer"
-                                className="block border-2 rounded-lg overflow-hidden active:opacity-70 transition-opacity"
-                              >
-                                {url.toLowerCase().endsWith('.pdf') ? (
-                                  <div className="flex flex-col items-center justify-center h-32 sm:h-28 bg-muted gap-2">
-                                    <FileText className="w-10 h-10 text-muted-foreground" />
-                                    <span className="text-xs text-muted-foreground">View PDF</span>
-                                  </div>
-                                ) : (
-                                  <img 
-                                    src={url} 
-                                    alt={`License document ${index + 1}`}
-                                    className="w-full h-32 sm:h-28 object-cover"
-                                  />
-                                )}
-                              </a>
-                            ))}
+                          <div className="space-y-3">
+                            {user.driversLicenseDocuments.filter((u: string) => u && u.trim()).map((url: string, index: number) => {
+                              const lowerUrl = url.toLowerCase();
+                              const isPdf = lowerUrl.endsWith('.pdf');
+                              const isImage = lowerUrl.match(/\.(jpg|jpeg|png|gif|webp|bmp)(\?|$)/i) || 
+                                            lowerUrl.includes('image') || 
+                                            (!isPdf && !lowerUrl.endsWith('.doc') && !lowerUrl.endsWith('.docx'));
+                              
+                              return (
+                                <a 
+                                  key={index} 
+                                  href={url} 
+                                  target="_blank" 
+                                  rel="noopener noreferrer"
+                                  className="block border-2 rounded-lg overflow-hidden active:opacity-70 transition-opacity bg-muted/30"
+                                >
+                                  {isPdf ? (
+                                    <div className="flex flex-col items-center justify-center py-8 bg-muted gap-2">
+                                      <FileText className="w-12 h-12 text-muted-foreground" />
+                                      <span className="text-sm text-muted-foreground font-medium">Tap to view PDF</span>
+                                    </div>
+                                  ) : isImage ? (
+                                    <img 
+                                      src={url} 
+                                      alt={`License document ${index + 1}`}
+                                      className="w-full object-contain"
+                                      style={{ maxHeight: '300px', minHeight: '100px' }}
+                                      onError={(e) => {
+                                        const target = e.target as HTMLImageElement;
+                                        target.onerror = null;
+                                        target.style.display = 'none';
+                                        const parent = target.parentElement;
+                                        if (parent) {
+                                          const div = document.createElement('div');
+                                          div.className = 'flex flex-col items-center justify-center py-8 gap-2';
+                                          div.innerHTML = '<span class="text-sm text-muted-foreground">Tap to view document</span>';
+                                          parent.appendChild(div);
+                                        }
+                                      }}
+                                    />
+                                  ) : (
+                                    <div className="flex flex-col items-center justify-center py-8 bg-muted gap-2">
+                                      <FileText className="w-12 h-12 text-muted-foreground" />
+                                      <span className="text-sm text-muted-foreground font-medium">Tap to view document</span>
+                                    </div>
+                                  )}
+                                </a>
+                              );
+                            })}
                           </div>
                         </div>
                       )}
@@ -753,7 +834,7 @@ export default function TechnicianPortal() {
                   </>
                 )}
 
-                {user.bankDocuments && user.bankDocuments.length > 0 && (
+                {user.bankDocuments && user.bankDocuments.filter((u: string) => u && u.trim()).length > 0 && (
                   <>
                     <Separator />
                     <div className="space-y-3">
@@ -761,29 +842,55 @@ export default function TechnicianPortal() {
                         <ImageIcon className="w-4 h-4" />
                         Banking Documents (Void Cheque)
                       </h3>
-                      <div className="grid grid-cols-2 gap-3">
-                        {user.bankDocuments.map((url: string, index: number) => (
-                          <a 
-                            key={index} 
-                            href={url} 
-                            target="_blank" 
-                            rel="noopener noreferrer"
-                            className="block border-2 rounded-lg overflow-hidden active:opacity-70 transition-opacity"
-                          >
-                            {url.toLowerCase().endsWith('.pdf') ? (
-                              <div className="flex flex-col items-center justify-center h-32 sm:h-28 bg-muted gap-2">
-                                <FileText className="w-10 h-10 text-muted-foreground" />
-                                <span className="text-xs text-muted-foreground">View PDF</span>
-                              </div>
-                            ) : (
-                              <img 
-                                src={url} 
-                                alt={`Banking document ${index + 1}`}
-                                className="w-full h-32 sm:h-28 object-cover"
-                              />
-                            )}
-                          </a>
-                        ))}
+                      <div className="space-y-3">
+                        {user.bankDocuments.filter((u: string) => u && u.trim()).map((url: string, index: number) => {
+                          const lowerUrl = url.toLowerCase();
+                          const isPdf = lowerUrl.endsWith('.pdf');
+                          const isImage = lowerUrl.match(/\.(jpg|jpeg|png|gif|webp|bmp)(\?|$)/i) || 
+                                        lowerUrl.includes('image') || 
+                                        (!isPdf && !lowerUrl.endsWith('.doc') && !lowerUrl.endsWith('.docx'));
+                          
+                          return (
+                            <a 
+                              key={index} 
+                              href={url} 
+                              target="_blank" 
+                              rel="noopener noreferrer"
+                              className="block border-2 rounded-lg overflow-hidden active:opacity-70 transition-opacity bg-muted/30"
+                            >
+                              {isPdf ? (
+                                <div className="flex flex-col items-center justify-center py-8 bg-muted gap-2">
+                                  <FileText className="w-12 h-12 text-muted-foreground" />
+                                  <span className="text-sm text-muted-foreground font-medium">Tap to view PDF</span>
+                                </div>
+                              ) : isImage ? (
+                                <img 
+                                  src={url} 
+                                  alt={`Banking document ${index + 1}`}
+                                  className="w-full object-contain"
+                                  style={{ maxHeight: '300px', minHeight: '100px' }}
+                                  onError={(e) => {
+                                    const target = e.target as HTMLImageElement;
+                                    target.onerror = null;
+                                    target.style.display = 'none';
+                                    const parent = target.parentElement;
+                                    if (parent) {
+                                      const div = document.createElement('div');
+                                      div.className = 'flex flex-col items-center justify-center py-8 gap-2';
+                                      div.innerHTML = '<span class="text-sm text-muted-foreground">Tap to view document</span>';
+                                      parent.appendChild(div);
+                                    }
+                                  }}
+                                />
+                              ) : (
+                                <div className="flex flex-col items-center justify-center py-8 bg-muted gap-2">
+                                  <FileText className="w-12 h-12 text-muted-foreground" />
+                                  <span className="text-sm text-muted-foreground font-medium">Tap to view document</span>
+                                </div>
+                              )}
+                            </a>
+                          );
+                        })}
                       </div>
                     </div>
                   </>
