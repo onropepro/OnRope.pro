@@ -4809,6 +4809,146 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
+  // ==================== ONROPEPRO TECHNICIAN LINKING ====================
+  
+  // Search for unlinked technicians (self-registered but not linked to any company)
+  app.get("/api/technicians/search", requireAuth, requireRole("company", "operations_manager"), async (req: Request, res: Response) => {
+    try {
+      const { searchType, searchValue } = req.query;
+      
+      if (!searchType || !searchValue) {
+        return res.status(400).json({ message: "Search type and value are required" });
+      }
+      
+      if (!['irata', 'sprat', 'email'].includes(searchType as string)) {
+        return res.status(400).json({ message: "Invalid search type. Must be 'irata', 'sprat', or 'email'" });
+      }
+      
+      const searchVal = (searchValue as string).trim();
+      if (!searchVal) {
+        return res.status(400).json({ message: "Search value cannot be empty" });
+      }
+      
+      // Search for unlinked technicians (companyId is null)
+      let technician = null;
+      
+      if (searchType === 'email') {
+        const user = await storage.getUserByEmail(searchVal);
+        if (user && user.role === 'rope_access_tech' && !user.companyId) {
+          technician = user;
+        }
+      } else if (searchType === 'irata') {
+        // Search by IRATA license number (exact match or partial with level prefix)
+        const allUsers = await storage.getAllUsersForSuperuser();
+        technician = allUsers.find(u => {
+          if (u.role !== 'rope_access_tech' || u.companyId) return false;
+          if (!u.irataLicenseNumber) return false;
+          // Match either "X/XXXXXX" format or just the number part
+          const licenseNum = u.irataLicenseNumber;
+          return licenseNum === searchVal || 
+                 licenseNum.endsWith(`/${searchVal}`) || 
+                 licenseNum.split('/')[1] === searchVal;
+        });
+      } else if (searchType === 'sprat') {
+        // Search by SPRAT license number
+        const allUsers = await storage.getAllUsersForSuperuser();
+        technician = allUsers.find(u => {
+          if (u.role !== 'rope_access_tech' || u.companyId) return false;
+          if (!u.spratLicenseNumber) return false;
+          return u.spratLicenseNumber === searchVal;
+        });
+      }
+      
+      if (!technician) {
+        return res.json({ found: false, message: "No unlinked technician found with that information" });
+      }
+      
+      // Return limited info for privacy (don't expose sensitive fields)
+      const { passwordHash, socialInsuranceNumber, bankTransitNumber, bankInstitutionNumber, 
+              bankAccountNumber, driversLicenseNumber, specialMedicalConditions, ...safeInfo } = technician;
+      
+      res.json({ 
+        found: true, 
+        technician: {
+          id: safeInfo.id,
+          name: safeInfo.name,
+          email: safeInfo.email,
+          irataLevel: safeInfo.irataLevel,
+          irataLicenseNumber: safeInfo.irataLicenseNumber,
+          spratLevel: safeInfo.spratLevel,
+          spratLicenseNumber: safeInfo.spratLicenseNumber,
+          employeeCity: safeInfo.employeeCity,
+          employeeProvinceState: safeInfo.employeeProvinceState,
+          hasFirstAid: safeInfo.hasFirstAid,
+          firstAidType: safeInfo.firstAidType,
+        }
+      });
+    } catch (error) {
+      console.error("Search technicians error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+  
+  // Link an existing OnRopePro technician to a company
+  app.post("/api/technicians/:technicianId/link", requireAuth, requireRole("company", "operations_manager"), async (req: Request, res: Response) => {
+    try {
+      const { technicianId } = req.params;
+      const { hourlyRate, isSalary, salary } = req.body;
+      
+      const currentUser = await storage.getUserById(req.session.userId!);
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      const companyId = currentUser.role === "company" ? currentUser.id : currentUser.companyId;
+      if (!companyId) {
+        return res.status(400).json({ message: "Unable to determine company" });
+      }
+      
+      // Check seat limits before linking
+      const limitsCheck = await checkSubscriptionLimits(companyId);
+      const employees = await storage.getAllEmployees(companyId);
+      const activeEmployeeCount = employees.filter(emp => !emp.terminatedDate).length;
+      
+      if (limitsCheck.limits.maxSeats > 0 && activeEmployeeCount >= limitsCheck.limits.maxSeats) {
+        return res.status(400).json({ message: "Seat limit reached. Please upgrade your subscription or add more seats." });
+      }
+      
+      // Find the technician and verify they're unlinked
+      const technician = await storage.getUserById(technicianId);
+      if (!technician) {
+        return res.status(404).json({ message: "Technician not found" });
+      }
+      
+      if (technician.role !== 'rope_access_tech') {
+        return res.status(400).json({ message: "This user is not a technician" });
+      }
+      
+      if (technician.companyId) {
+        return res.status(400).json({ message: "This technician is already linked to a company" });
+      }
+      
+      // Link the technician to this company
+      await storage.updateUser(technicianId, {
+        companyId,
+        hourlyRate: hourlyRate || null,
+        isSalary: isSalary || false,
+        salary: salary || null,
+        startDate: getTodayString(),
+      });
+      
+      console.log(`[Technician-Link] Linked technician ${technicianId} (${technician.name}) to company ${companyId}`);
+      
+      res.json({ 
+        success: true, 
+        message: `${technician.name} has been added to your team!` 
+      });
+    } catch (error) {
+      console.error("Link technician error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+  
   // ==================== PROJECT ROUTES ====================
   
   // Upload rope access plan PDF
