@@ -107,61 +107,57 @@ function KpiCard({
   trendValue?: string;
   variant?: 'default' | 'success' | 'warning' | 'danger';
 }) {
-  const variantStyles = {
-    default: 'bg-primary/10 text-primary',
-    success: 'bg-green-500/10 text-green-600 dark:text-green-400',
-    warning: 'bg-yellow-500/10 text-yellow-600 dark:text-yellow-400',
-    danger: 'bg-red-500/10 text-red-600 dark:text-red-400',
+  const iconStyles = {
+    default: 'bg-blue-50 dark:bg-blue-500/10 text-blue-500',
+    success: 'bg-emerald-50 dark:bg-emerald-500/10 text-emerald-500',
+    warning: 'bg-amber-50 dark:bg-amber-500/10 text-amber-500',
+    danger: 'bg-red-50 dark:bg-red-500/10 text-red-500',
   };
 
   return (
-    <Card data-testid={`kpi-card-${title.toLowerCase().replace(/\s+/g, '-')}`}>
-      <CardContent className="pt-6">
-        <div className="flex items-start justify-between">
-          <div className="space-y-1">
-            <p className="text-sm text-muted-foreground">{title}</p>
-            <p className="text-2xl font-bold tracking-tight">{value}</p>
-            {subtitle && (
-              <p className="text-xs text-muted-foreground">{subtitle}</p>
-            )}
-          </div>
-          <div className={`h-12 w-12 rounded-full ${variantStyles[variant]} flex items-center justify-center`}>
-            <Icon className="h-6 w-6" />
-          </div>
+    <div className="su-metric-card" data-testid={`kpi-card-${title.toLowerCase().replace(/\s+/g, '-')}`}>
+      <div className="flex items-center justify-between">
+        <div className="space-y-1">
+          <p className="su-metric-label">{title}</p>
+          <p className="su-metric-value">{value}</p>
+          {subtitle && (
+            <p className="text-xs text-gray-500 dark:text-gray-400">{subtitle}</p>
+          )}
         </div>
-        {trend && trendValue && (
-          <div className="mt-4 flex items-center gap-1 text-xs">
-            {trend === 'up' && <ArrowUp className="h-3 w-3 text-green-500" />}
-            {trend === 'down' && <ArrowDown className="h-3 w-3 text-red-500" />}
-            {trend === 'neutral' && <Minus className="h-3 w-3 text-muted-foreground" />}
-            <span className={
-              trend === 'up' ? 'text-green-500' : 
-              trend === 'down' ? 'text-red-500' : 
-              'text-muted-foreground'
-            }>
-              {trendValue}
-            </span>
-          </div>
-        )}
-      </CardContent>
-    </Card>
+        <div className={`su-metric-icon ${iconStyles[variant]}`}>
+          <Icon className="h-6 w-6" />
+        </div>
+      </div>
+      {trend && trendValue && (
+        <div className="mt-4 flex items-center gap-1 text-xs">
+          {trend === 'up' && <ArrowUp className="h-3 w-3 text-emerald-500" />}
+          {trend === 'down' && <ArrowDown className="h-3 w-3 text-red-500" />}
+          {trend === 'neutral' && <Minus className="h-3 w-3 text-gray-400" />}
+          <span className={
+            trend === 'up' ? 'text-emerald-500' : 
+            trend === 'down' ? 'text-red-500' : 
+            'text-gray-400'
+          }>
+            {trendValue}
+          </span>
+        </div>
+      )}
+    </div>
   );
 }
 
 function LoadingKpiCard() {
   return (
-    <Card>
-      <CardContent className="pt-6">
-        <div className="flex items-start justify-between">
-          <div className="space-y-2">
-            <Skeleton className="h-4 w-20" />
-            <Skeleton className="h-8 w-28" />
-            <Skeleton className="h-3 w-24" />
-          </div>
-          <Skeleton className="h-12 w-12 rounded-full" />
+    <div className="su-metric-card">
+      <div className="flex items-start justify-between">
+        <div className="space-y-2">
+          <Skeleton className="h-4 w-20" />
+          <Skeleton className="h-8 w-28" />
+          <Skeleton className="h-3 w-24" />
         </div>
-      </CardContent>
-    </Card>
+        <Skeleton className="h-12 w-12 rounded-full" />
+      </div>
+    </div>
   );
 }
 

@@ -125,140 +125,130 @@ export default function SuperUser() {
   return (
     <SuperUserLayout title="Dashboard">
       <div className="p-6 space-y-6">
-        {/* Welcome Section */}
+        {/* Welcome Section - TailAdmin Style */}
         <div className="space-y-1">
-          <h2 className="text-2xl font-bold">Welcome back</h2>
-          <p className="text-muted-foreground">
+          <h2 className="text-2xl font-bold text-gray-800 dark:text-white/90">Welcome back</h2>
+          <p className="text-gray-500 dark:text-gray-400">
             Here's an overview of your platform activity
           </p>
         </div>
 
-        {/* Quick Stats */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <Card>
-            <CardContent className="pt-6">
-              <div className="flex items-center gap-4">
-                <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
-                  <span className="material-icons text-primary text-2xl">business</span>
-                </div>
-                <div>
-                  <p className="text-2xl font-bold">{companies.length}</p>
-                  <p className="text-sm text-muted-foreground">Total Companies</p>
-                </div>
+        {/* Quick Stats - TailAdmin Metric Cards */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+          <div className="su-metric-card">
+            <div className="flex items-center gap-4">
+              <div className="su-metric-icon bg-blue-50 dark:bg-blue-500/10">
+                <span className="material-icons text-blue-500 text-xl">business</span>
               </div>
-            </CardContent>
-          </Card>
+              <div>
+                <p className="su-metric-value">{companies.length}</p>
+                <p className="su-metric-label">Total Companies</p>
+              </div>
+            </div>
+          </div>
 
-          <Card>
-            <CardContent className="pt-6">
-              <div className="flex items-center gap-4">
-                <div className="h-12 w-12 rounded-full bg-cyan-500/10 flex items-center justify-center">
-                  <span className="material-icons text-cyan-500 text-2xl">apartment</span>
-                </div>
-                <div>
-                  <p className="text-2xl font-bold">{buildings.length}</p>
-                  <p className="text-sm text-muted-foreground">Global Buildings</p>
-                </div>
+          <div className="su-metric-card">
+            <div className="flex items-center gap-4">
+              <div className="su-metric-icon bg-cyan-50 dark:bg-cyan-500/10">
+                <span className="material-icons text-cyan-500 text-xl">apartment</span>
               </div>
-            </CardContent>
-          </Card>
+              <div>
+                <p className="su-metric-value">{buildings.length}</p>
+                <p className="su-metric-label">Global Buildings</p>
+              </div>
+            </div>
+          </div>
 
-          <Card>
-            <CardContent className="pt-6">
-              <div className="flex items-center gap-4">
-                <div className="h-12 w-12 rounded-full bg-indigo-500/10 flex items-center justify-center">
-                  <span className="material-icons text-indigo-500 text-2xl">checklist</span>
-                </div>
-                <div>
-                  <p className="text-2xl font-bold">{pendingTasks}</p>
-                  <p className="text-sm text-muted-foreground">Pending Tasks</p>
-                </div>
+          <div className="su-metric-card">
+            <div className="flex items-center gap-4">
+              <div className="su-metric-icon bg-indigo-50 dark:bg-indigo-500/10">
+                <span className="material-icons text-indigo-500 text-xl">checklist</span>
               </div>
-            </CardContent>
-          </Card>
+              <div>
+                <p className="su-metric-value">{pendingTasks}</p>
+                <p className="su-metric-label">Pending Tasks</p>
+              </div>
+            </div>
+          </div>
 
-          <Card>
-            <CardContent className="pt-6">
-              <div className="flex items-center gap-4">
-                <div className="h-12 w-12 rounded-full bg-purple-500/10 flex items-center justify-center">
-                  <span className="material-icons text-purple-500 text-2xl">lightbulb</span>
-                </div>
-                <div>
-                  <p className="text-2xl font-bold">{pendingRequests}</p>
-                  <p className="text-sm text-muted-foreground">Pending Requests</p>
-                </div>
+          <div className="su-metric-card">
+            <div className="flex items-center gap-4">
+              <div className="su-metric-icon bg-purple-50 dark:bg-purple-500/10">
+                <span className="material-icons text-purple-500 text-xl">lightbulb</span>
               </div>
-            </CardContent>
-          </Card>
+              <div>
+                <p className="su-metric-value">{pendingRequests}</p>
+                <p className="su-metric-label">Pending Requests</p>
+              </div>
+            </div>
+          </div>
         </div>
 
-        {/* Revenue Stats */}
+        {/* Revenue Stats - TailAdmin Style */}
         {metricsData && (
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <Card className="bg-gradient-to-br from-green-500/10 to-green-600/5 border-green-500/20">
-              <CardContent className="pt-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm text-muted-foreground">Monthly Revenue</p>
-                    <p className="text-2xl font-bold text-green-600 dark:text-green-400">
-                      ${metricsData.mrr?.toLocaleString() || '0'}
-                    </p>
-                  </div>
-                  <span className="material-icons text-green-500 text-3xl">trending_up</span>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
+            <div className="su-metric-card">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="su-metric-label mb-1">Monthly Revenue</p>
+                  <p className="su-metric-value text-emerald-600 dark:text-emerald-400">
+                    ${metricsData.mrr?.toLocaleString() || '0'}
+                  </p>
                 </div>
-              </CardContent>
-            </Card>
+                <div className="su-metric-icon bg-emerald-50 dark:bg-emerald-500/10">
+                  <span className="material-icons text-emerald-500 text-xl">trending_up</span>
+                </div>
+              </div>
+            </div>
 
-            <Card className="bg-gradient-to-br from-blue-500/10 to-blue-600/5 border-blue-500/20">
-              <CardContent className="pt-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm text-muted-foreground">Annual Revenue</p>
-                    <p className="text-2xl font-bold text-blue-600 dark:text-blue-400">
-                      ${metricsData.arr?.toLocaleString() || '0'}
-                    </p>
-                  </div>
-                  <span className="material-icons text-blue-500 text-3xl">assessment</span>
+            <div className="su-metric-card">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="su-metric-label mb-1">Annual Revenue</p>
+                  <p className="su-metric-value text-blue-600 dark:text-blue-400">
+                    ${metricsData.arr?.toLocaleString() || '0'}
+                  </p>
                 </div>
-              </CardContent>
-            </Card>
+                <div className="su-metric-icon bg-blue-50 dark:bg-blue-500/10">
+                  <span className="material-icons text-blue-500 text-xl">assessment</span>
+                </div>
+              </div>
+            </div>
 
-            <Card className="bg-gradient-to-br from-amber-500/10 to-amber-600/5 border-amber-500/20">
-              <CardContent className="pt-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm text-muted-foreground">Total Revenue</p>
-                    <p className="text-2xl font-bold text-amber-600 dark:text-amber-400">
-                      ${metricsData.totalRevenue?.toLocaleString() || '0'}
-                    </p>
-                  </div>
-                  <span className="material-icons text-amber-500 text-3xl">account_balance</span>
+            <div className="su-metric-card">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="su-metric-label mb-1">Total Revenue</p>
+                  <p className="su-metric-value text-amber-600 dark:text-amber-400">
+                    ${metricsData.totalRevenue?.toLocaleString() || '0'}
+                  </p>
                 </div>
-              </CardContent>
-            </Card>
+                <div className="su-metric-icon bg-amber-50 dark:bg-amber-500/10">
+                  <span className="material-icons text-amber-500 text-xl">account_balance</span>
+                </div>
+              </div>
+            </div>
           </div>
         )}
 
-        {/* Quick Actions */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-lg flex items-center gap-2">
-              <span className="material-icons text-primary">bolt</span>
+        {/* Quick Actions - TailAdmin Card Style */}
+        <div className="su-card">
+          <div className="su-card-header">
+            <h3 className="su-section-title flex items-center gap-2">
+              <span className="material-icons text-blue-500">bolt</span>
               Quick Actions
-            </CardTitle>
-            <CardDescription>Common administrative tasks</CardDescription>
-          </CardHeader>
-          <CardContent>
+            </h3>
+            <p className="su-section-subtitle text-sm mt-1">Common administrative tasks</p>
+          </div>
+          <div className="su-card-body">
             <div className="flex flex-wrap gap-3">
               <Button onClick={openGiftDialog} data-testid="button-gift-company">
                 <span className="material-icons mr-2">card_giftcard</span>
                 Gift Company Account
               </Button>
             </div>
-          </CardContent>
-        </Card>
-
-        {/* Recent Activity would go here in the future */}
+          </div>
+        </div>
       </div>
 
       {/* Gift Company Dialog */}

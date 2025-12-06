@@ -72,7 +72,7 @@
 
 /* TailAdmin badge styles */
 .superuser-root .su-badge-success {
-  @apply inline-flex items-center gap-1 px-2 py-1 text-xs font-medium rounded-full bg-success-50 text-success-600 dark:bg-success-500/15 dark:text-success-500;
+  @apply inline-flex items-center gap-1 px-2 py-1 text-xs font-medium rounded-full bg-emerald-50 text-emerald-600 dark:bg-emerald-500/15 dark:text-emerald-500;
 }
 
 .superuser-root .su-badge-error {
@@ -636,34 +636,9 @@
   font-family: 'Outfit', sans-serif !important;
 }
 
-/* Enforce minimum 16px for all small text classes */
-.superuser-root .text-xs:not(.material-icons),
-.superuser-root .text-\[10px\]:not(.material-icons),
-.superuser-root .text-\[11px\]:not(.material-icons),
-.superuser-root .text-\[12px\]:not(.material-icons),
-.superuser-root .text-\[13px\]:not(.material-icons),
-.superuser-root .text-\[14px\]:not(.material-icons),
-.superuser-root .text-\[15px\]:not(.material-icons) {
-  font-size: 16px !important;
-}
-
+/* Enforce minimum 16px for all content in SuperUser section */
 .superuser-root small {
   font-size: 16px !important;
-}
-
-.superuser-root .text-sm:not(.material-icons) {
-  font-size: 16px !important;
-}
-
-/* Also enforce 16px for muted/secondary text which often uses smaller sizes */
-.superuser-root .text-muted-foreground {
-  font-size: 16px !important;
-}
-
-.superuser-root p,
-.superuser-root span:not(.material-icons):not(.material-icons-outlined):not(.material-symbols-outlined),
-.superuser-root div {
-  font-size: max(16px, inherit);
 }
 
 /* Preserve Material Icons font */
