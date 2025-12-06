@@ -756,7 +756,7 @@ export default function TechnicianPortal() {
                       <Button
                         variant="default"
                         className="w-full mt-2"
-                        onClick={() => window.open('https://techconnect.irata.org/check-certificate', '_blank')}
+                        onClick={() => window.open('https://techconnect.irata.org/#/check-certificate', '_blank')}
                         data-testid="button-verify-license"
                       >
                         <ExternalLink className="w-4 h-4 mr-2" />
