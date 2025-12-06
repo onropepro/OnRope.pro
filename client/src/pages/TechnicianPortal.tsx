@@ -33,7 +33,9 @@ import {
   Clock,
   FileText,
   Image as ImageIcon,
-  Shield
+  Shield,
+  ExternalLink,
+  CheckCircle2
 } from "lucide-react";
 import onRopeProLogo from "@assets/OnRopePro-logo_1764625558626.png";
 
@@ -726,6 +728,40 @@ export default function TechnicianPortal() {
                           );
                         })}
                       </div>
+                    </div>
+                  )}
+                  
+                  {/* License Verification Section */}
+                  {(user.irataLevel || user.spratLevel) && (
+                    <div className="mt-6 p-4 bg-primary/5 border border-primary/20 rounded-lg space-y-3">
+                      <div className="flex items-start gap-3">
+                        <CheckCircle2 className="w-5 h-5 text-primary mt-0.5 flex-shrink-0" />
+                        <div className="space-y-2">
+                          <h4 className="font-medium text-sm">Verify Your License Validity</h4>
+                          <p className="text-xs text-muted-foreground leading-relaxed">
+                            Employers require verified certification status to ensure compliance with safety regulations and insurance requirements. 
+                            Verifying your license helps your employer confirm you're qualified for rope access work.
+                          </p>
+                          <div className="text-xs text-muted-foreground space-y-1 pt-1">
+                            <p className="font-medium">How it works:</p>
+                            <ol className="list-decimal list-inside space-y-0.5 pl-1">
+                              <li>Click the button below to open the verification page</li>
+                              <li>Enter your last name and license number</li>
+                              <li>Take a screenshot of the verification result</li>
+                              <li>Upload the screenshot when prompted</li>
+                            </ol>
+                          </div>
+                        </div>
+                      </div>
+                      <Button
+                        variant="default"
+                        className="w-full mt-2"
+                        onClick={() => window.open('https://techconnect.irata.org/check-certificate', '_blank')}
+                        data-testid="button-verify-license"
+                      >
+                        <ExternalLink className="w-4 h-4 mr-2" />
+                        Verify My Rope Access License
+                      </Button>
                     </div>
                   )}
                 </div>
