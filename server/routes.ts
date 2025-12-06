@@ -4980,9 +4980,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // If verification was successful, update the user's verification status
       if (result.isValid && result.confidence !== "low") {
-        // Store verification result timestamp
+        // Store verification result timestamp (pass Date object for timestamp column)
         await storage.updateUser(user.id, {
-          irataVerifiedAt: new Date().toISOString(),
+          irataVerifiedAt: new Date(),
           irataVerificationStatus: result.status || "Verified",
         });
         
