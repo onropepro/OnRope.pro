@@ -127,6 +127,38 @@ export class Storage {
       .where(eq(users.id, userId));
   }
 
+  async getUnlinkedTechnicianByIrataLicense(licenseNumber: string): Promise<User | undefined> {
+    // Search for unlinked technicians by IRATA license number
+    // The stored format is "level/number" (e.g., "1/123456"), so we search with multiple patterns
+    const results = await db.select().from(users).where(
+      and(
+        eq(users.role, "rope_access_tech"),
+        isNull(users.companyId),
+        or(
+          eq(users.irataLicenseNumber, licenseNumber),
+          sql`${users.irataLicenseNumber} LIKE '%/' || ${licenseNumber}`,
+          sql`split_part(${users.irataLicenseNumber}, '/', 2) = ${licenseNumber}`
+        )
+      )
+    ).limit(1);
+    return results[0] ? decryptSensitiveFields(results[0]) : undefined;
+  }
+
+  async getUnlinkedTechnicianBySpratLicense(licenseNumber: string): Promise<User | undefined> {
+    // Search for unlinked technicians by SPRAT license number
+    const results = await db.select().from(users).where(
+      and(
+        eq(users.role, "rope_access_tech"),
+        isNull(users.companyId),
+        or(
+          eq(users.spratLicenseNumber, licenseNumber),
+          sql`split_part(${users.spratLicenseNumber}, '/', 2) = ${licenseNumber}`
+        )
+      )
+    ).limit(1);
+    return results[0] ? decryptSensitiveFields(results[0]) : undefined;
+  }
+
   async getResidentsByStrataPlan(strataPlanNumber: string): Promise<User[]> {
     const results = await db.select().from(users)
       .where(

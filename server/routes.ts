@@ -4838,25 +4838,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
           technician = user;
         }
       } else if (searchType === 'irata') {
-        // Search by IRATA license number (exact match or partial with level prefix)
-        const allUsers = await storage.getAllUsersForSuperuser();
-        technician = allUsers.find(u => {
-          if (u.role !== 'rope_access_tech' || u.companyId) return false;
-          if (!u.irataLicenseNumber) return false;
-          // Match either "X/XXXXXX" format or just the number part
-          const licenseNum = u.irataLicenseNumber;
-          return licenseNum === searchVal || 
-                 licenseNum.endsWith(`/${searchVal}`) || 
-                 licenseNum.split('/')[1] === searchVal;
-        });
+        // Search by IRATA license number using dedicated storage function
+        technician = await storage.getUnlinkedTechnicianByIrataLicense(searchVal);
       } else if (searchType === 'sprat') {
-        // Search by SPRAT license number
-        const allUsers = await storage.getAllUsersForSuperuser();
-        technician = allUsers.find(u => {
-          if (u.role !== 'rope_access_tech' || u.companyId) return false;
-          if (!u.spratLicenseNumber) return false;
-          return u.spratLicenseNumber === searchVal;
-        });
+        // Search by SPRAT license number using dedicated storage function
+        technician = await storage.getUnlinkedTechnicianBySpratLicense(searchVal);
       }
       
       if (!technician) {
