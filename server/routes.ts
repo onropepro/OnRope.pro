@@ -4939,6 +4939,201 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
+  // ==================== TEAM INVITATIONS ====================
+  
+  // Send an invitation to a technician to join the company team
+  app.post("/api/technicians/:technicianId/invite", requireAuth, requireRole("company", "operations_manager"), async (req: Request, res: Response) => {
+    try {
+      const { technicianId } = req.params;
+      const { message } = req.body;
+      
+      const currentUser = await storage.getUserById(req.session.userId!);
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      const companyId = currentUser.role === "company" ? currentUser.id : currentUser.companyId;
+      if (!companyId) {
+        return res.status(400).json({ message: "Unable to determine company" });
+      }
+      
+      // Check seat limits before inviting
+      const limitsCheck = await checkSubscriptionLimits(companyId);
+      const employees = await storage.getAllEmployees(companyId);
+      const activeEmployeeCount = employees.filter(emp => !emp.terminatedDate).length;
+      
+      if (limitsCheck.limits.maxSeats > 0 && activeEmployeeCount >= limitsCheck.limits.maxSeats) {
+        return res.status(400).json({ message: "Seat limit reached. Please upgrade your subscription or add more seats." });
+      }
+      
+      // Find the technician and verify they're unlinked
+      const technician = await storage.getUserById(technicianId);
+      if (!technician) {
+        return res.status(404).json({ message: "Technician not found" });
+      }
+      
+      if (technician.role !== 'rope_access_tech') {
+        return res.status(400).json({ message: "This user is not a technician" });
+      }
+      
+      if (technician.companyId) {
+        return res.status(400).json({ message: "This technician is already linked to a company" });
+      }
+      
+      // Check if there's already a pending invitation
+      const existingInvitation = await storage.getPendingInvitationForTechnicianAndCompany(technicianId, companyId);
+      if (existingInvitation) {
+        return res.status(400).json({ message: "An invitation has already been sent to this technician" });
+      }
+      
+      // Create the invitation
+      const invitation = await storage.createTeamInvitation({
+        technicianId,
+        companyId,
+        invitedBy: currentUser.id,
+        status: "pending",
+        message: message || null,
+      });
+      
+      console.log(`[Team-Invite] Company ${companyId} sent invitation ${invitation.id} to technician ${technicianId} (${technician.name})`);
+      
+      res.json({ 
+        success: true, 
+        message: `Invitation sent to ${technician.name}!`,
+        invitationId: invitation.id
+      });
+    } catch (error) {
+      console.error("Send team invitation error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+  
+  // Get pending invitations for the logged-in technician
+  app.get("/api/my-invitations", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const user = await storage.getUserById(req.session.userId!);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      if (user.role !== 'rope_access_tech') {
+        return res.status(403).json({ message: "Only technicians can view invitations" });
+      }
+      
+      const invitations = await storage.getPendingInvitationsForTechnician(user.id);
+      
+      // Return limited company info for privacy
+      const safeInvitations = invitations.map(inv => ({
+        id: inv.id,
+        message: inv.message,
+        createdAt: inv.createdAt,
+        company: {
+          id: inv.company.id,
+          name: inv.company.companyName || inv.company.name,
+          email: inv.company.email,
+        }
+      }));
+      
+      res.json({ invitations: safeInvitations });
+    } catch (error) {
+      console.error("Get my invitations error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+  
+  // Accept a team invitation
+  app.post("/api/invitations/:invitationId/accept", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const { invitationId } = req.params;
+      
+      const user = await storage.getUserById(req.session.userId!);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      const invitation = await storage.getTeamInvitationById(invitationId);
+      if (!invitation) {
+        return res.status(404).json({ message: "Invitation not found" });
+      }
+      
+      // Verify the invitation is for this technician
+      if (invitation.technicianId !== user.id) {
+        return res.status(403).json({ message: "This invitation is not for you" });
+      }
+      
+      if (invitation.status !== "pending") {
+        return res.status(400).json({ message: "This invitation has already been processed" });
+      }
+      
+      // Check if technician is already linked to a company
+      if (user.companyId) {
+        return res.status(400).json({ message: "You are already linked to a company" });
+      }
+      
+      // Accept the invitation and link the technician
+      await storage.acceptTeamInvitation(invitationId);
+      
+      // Link the technician to the company
+      await storage.updateUser(user.id, {
+        companyId: invitation.companyId,
+        startDate: getTodayString(),
+      });
+      
+      const company = await storage.getUserById(invitation.companyId);
+      const companyName = company?.companyName || company?.name || "the company";
+      
+      console.log(`[Team-Invite] Technician ${user.id} (${user.name}) accepted invitation ${invitationId} from company ${invitation.companyId}`);
+      
+      res.json({ 
+        success: true, 
+        message: `Welcome to ${companyName}!`,
+        companyId: invitation.companyId
+      });
+    } catch (error) {
+      console.error("Accept invitation error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+  
+  // Decline a team invitation
+  app.post("/api/invitations/:invitationId/decline", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const { invitationId } = req.params;
+      
+      const user = await storage.getUserById(req.session.userId!);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      const invitation = await storage.getTeamInvitationById(invitationId);
+      if (!invitation) {
+        return res.status(404).json({ message: "Invitation not found" });
+      }
+      
+      // Verify the invitation is for this technician
+      if (invitation.technicianId !== user.id) {
+        return res.status(403).json({ message: "This invitation is not for you" });
+      }
+      
+      if (invitation.status !== "pending") {
+        return res.status(400).json({ message: "This invitation has already been processed" });
+      }
+      
+      // Decline the invitation
+      await storage.declineTeamInvitation(invitationId);
+      
+      console.log(`[Team-Invite] Technician ${user.id} (${user.name}) declined invitation ${invitationId}`);
+      
+      res.json({ 
+        success: true, 
+        message: "Invitation declined"
+      });
+    } catch (error) {
+      console.error("Decline invitation error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+  
   // ==================== IRATA/SPRAT VERIFICATION ROUTES ====================
   
   // Verify IRATA/SPRAT license via screenshot analysis
