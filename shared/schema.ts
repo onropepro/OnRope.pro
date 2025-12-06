@@ -133,6 +133,12 @@ export const users = pgTable("users", {
   spratExpirationDate: date("sprat_expiration_date"), // SPRAT certification expiration date
   spratDocuments: text("sprat_documents").array().default(sql`ARRAY[]::text[]`), // Array of SPRAT certification document URLs
   
+  // First Aid certification fields (optional)
+  hasFirstAid: boolean("has_first_aid").default(false), // Whether employee has first aid certification
+  firstAidType: varchar("first_aid_type"), // Type of first aid certification (e.g., "Standard First Aid", "Emergency First Aid", "CPR/AED", etc.)
+  firstAidExpiry: date("first_aid_expiry"), // First aid certification expiry date
+  firstAidDocuments: text("first_aid_documents").array().default(sql`ARRAY[]::text[]`), // Array of first aid certification document URLs
+  
   // Employee photo
   photoUrl: text("photo_url"), // Employee profile photo URL
   

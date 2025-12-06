@@ -9,7 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
-import { User, ArrowRight, ArrowLeft, Award, MapPin, Loader2, Phone, Mail, Lock, Heart, Building, CreditCard, Car, Calendar, Upload, Shield, Info, CheckCircle, X, FileText } from "lucide-react";
+import { User, ArrowRight, ArrowLeft, Award, MapPin, Loader2, Phone, Mail, Lock, Heart, Building, CreditCard, Car, Calendar, Upload, Shield, Info, CheckCircle, Check, X, FileText } from "lucide-react";
 import { apiRequest } from "@/lib/queryClient";
 
 function FileUploadButton({ 
@@ -147,6 +147,7 @@ type RegistrationStep =
   | "certification"
   | "licenseNumbers"
   | "logbookHours"
+  | "firstAid"
   | "address"
   | "email"
   | "phone"
@@ -169,6 +170,10 @@ interface TechnicianData {
   spratLicenseNumber: string;
   certificationCardFile: File | null;
   logbookTotalHours: string;
+  hasFirstAid: boolean;
+  firstAidType: string;
+  firstAidExpiry: string;
+  firstAidFile: File | null;
   streetAddress: string;
   city: string;
   provinceState: string;
@@ -213,6 +218,10 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
     spratLicenseNumber: "",
     certificationCardFile: null,
     logbookTotalHours: "",
+    hasFirstAid: false,
+    firstAidType: "",
+    firstAidExpiry: "",
+    firstAidFile: null,
     streetAddress: "",
     city: "",
     provinceState: "",
@@ -251,6 +260,10 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
       spratLicenseNumber: "",
       certificationCardFile: null,
       logbookTotalHours: "",
+      hasFirstAid: false,
+      firstAidType: "",
+      firstAidExpiry: "",
+      firstAidFile: null,
       streetAddress: "",
       city: "",
       provinceState: "",
@@ -289,6 +302,7 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
     "certification",
     "licenseNumbers",
     "logbookHours",
+    "firstAid",
     "address",
     "email",
     "phone",
@@ -436,6 +450,12 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
           return;
         }
         break;
+      case "firstAid":
+        if (data.hasFirstAid && !data.firstAidType.trim()) {
+          setError("Please enter the type of first aid certification you have");
+          return;
+        }
+        break;
       case "socialInsurance":
         break;
       case "bankInfo":
@@ -496,9 +516,15 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
       formData.append('driversLicenseExpiry', data.driversLicenseExpiry);
       formData.append('birthday', data.birthday);
       formData.append('specialMedicalConditions', data.specialMedicalConditions);
+      formData.append('hasFirstAid', data.hasFirstAid.toString());
+      formData.append('firstAidType', data.firstAidType);
+      formData.append('firstAidExpiry', data.firstAidExpiry);
       
       if (data.certificationCardFile) {
         formData.append('certificationCard', data.certificationCardFile);
+      }
+      if (data.firstAidFile) {
+        formData.append('firstAidCertificate', data.firstAidFile);
       }
       if (data.voidChequeFile) {
         formData.append('voidCheque', data.voidChequeFile);
@@ -962,6 +988,141 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
                 data-testid="button-continue-logbook"
               >
                 {data.logbookTotalHours ? "Continue" : "Skip for now"}
+                <ArrowRight className="w-4 h-4 ml-2" />
+              </Button>
+              <Button 
+                variant="ghost" 
+                onClick={handleBack}
+                className="w-full"
+              >
+                <ArrowLeft className="w-4 h-4 mr-2" />
+                Back
+              </Button>
+            </DialogFooter>
+          </>
+        );
+
+      case "firstAid":
+        return (
+          <>
+            <DialogHeader>
+              <div className="flex items-center justify-center mb-4">
+                <div className="p-3 rounded-full bg-red-500/10">
+                  <Heart className="w-8 h-8 text-red-500" />
+                </div>
+              </div>
+              <DialogTitle className="text-center text-xl">
+                First Aid Certification
+              </DialogTitle>
+              <DialogDescription className="text-center">
+                Do you have any first aid certification?
+              </DialogDescription>
+            </DialogHeader>
+            <div className="py-6 space-y-4">
+              <div className="grid grid-cols-2 gap-3">
+                <Button
+                  type="button"
+                  variant={data.hasFirstAid ? "default" : "outline"}
+                  className="h-16 flex flex-col items-center justify-center gap-1"
+                  onClick={() => setData({ ...data, hasFirstAid: true })}
+                  data-testid="button-has-first-aid-yes"
+                >
+                  <Check className="w-5 h-5" />
+                  <span>Yes</span>
+                </Button>
+                <Button
+                  type="button"
+                  variant={!data.hasFirstAid && data.hasFirstAid !== undefined ? "default" : "outline"}
+                  className="h-16 flex flex-col items-center justify-center gap-1"
+                  onClick={() => setData({ ...data, hasFirstAid: false, firstAidType: "", firstAidExpiry: "", firstAidFile: null })}
+                  data-testid="button-has-first-aid-no"
+                >
+                  <X className="w-5 h-5" />
+                  <span>No</span>
+                </Button>
+              </div>
+
+              {data.hasFirstAid && (
+                <div className="space-y-4 pt-4 border-t">
+                  <div className="space-y-2">
+                    <Label htmlFor="firstAidType">Type of First Aid Certification</Label>
+                    <Input
+                      id="firstAidType"
+                      data-testid="input-first-aid-type"
+                      placeholder="e.g., Standard First Aid, CPR/AED, OFA Level 1"
+                      value={data.firstAidType}
+                      onChange={(e) => setData({ ...data, firstAidType: e.target.value })}
+                    />
+                    <p className="text-xs text-muted-foreground">
+                      Enter the name/type of your first aid certification
+                    </p>
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="firstAidExpiry">Expiry Date (Optional)</Label>
+                    <Input
+                      id="firstAidExpiry"
+                      data-testid="input-first-aid-expiry"
+                      type="date"
+                      value={data.firstAidExpiry}
+                      onChange={(e) => setData({ ...data, firstAidExpiry: e.target.value })}
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label>Upload Certificate (Optional)</Label>
+                    <div className="border-2 border-dashed rounded-lg p-4 text-center">
+                      {data.firstAidFile ? (
+                        <div className="space-y-2">
+                          <p className="text-sm text-muted-foreground">{data.firstAidFile.name}</p>
+                          <Button 
+                            variant="outline" 
+                            size="sm"
+                            onClick={() => setData({ ...data, firstAidFile: null })}
+                          >
+                            Remove
+                          </Button>
+                        </div>
+                      ) : (
+                        <>
+                          <input
+                            type="file"
+                            id="firstAidFile"
+                            data-testid="input-first-aid-file"
+                            accept="image/*,.pdf"
+                            className="hidden"
+                            onChange={(e) => {
+                              const file = e.target.files?.[0];
+                              if (file) {
+                                setData({ ...data, firstAidFile: file });
+                              }
+                            }}
+                          />
+                          <label
+                            htmlFor="firstAidFile"
+                            className="cursor-pointer flex flex-col items-center gap-2"
+                          >
+                            <Upload className="w-8 h-8 text-muted-foreground" />
+                            <span className="text-sm text-muted-foreground">
+                              Tap to upload certificate photo or PDF
+                            </span>
+                          </label>
+                        </>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {error && <p className="text-destructive text-sm text-center">{error}</p>}
+            </div>
+            <DialogFooter className="flex-col gap-2 sm:flex-col">
+              <Button 
+                onClick={handleContinue} 
+                className="w-full"
+                data-testid="button-continue-first-aid"
+              >
+                Continue
                 <ArrowRight className="w-4 h-4 ml-2" />
               </Button>
               <Button 

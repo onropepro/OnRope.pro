@@ -793,6 +793,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     { name: 'voidCheque', maxCount: 1 },
     { name: 'driversLicense', maxCount: 1 },
     { name: 'driversAbstract', maxCount: 1 },
+    { name: 'firstAidCertificate', maxCount: 1 },
   ]);
 
   app.post("/api/technician-register", registrationRateLimiter, technicianUpload, async (req: Request, res: Response) => {
@@ -825,6 +826,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         driversLicenseExpiry,
         birthday,
         specialMedicalConditions,
+        hasFirstAid,
+        firstAidType,
+        firstAidExpiry,
         companyCode, // Optional - code to link to a specific company
       } = req.body;
 
@@ -922,6 +926,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         bankDocuments.push(uploadedUrls.voidCheque);
       }
 
+      // Build first aid documents array
+      const firstAidDocuments: string[] = [];
+      if (uploadedUrls.firstAidCertificate) {
+        firstAidDocuments.push(uploadedUrls.firstAidCertificate);
+      }
+
       // Determine tech level from IRATA or SPRAT
       let techLevel = null;
       if (certification === 'irata' || certification === 'both') {
@@ -983,6 +993,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         // SPRAT certification
         spratLevel: spratLevel ? `Level ${spratLevel}` : null,
         spratLicenseNumber: spratLicenseNumber || null,
+        
+        // First aid certification
+        hasFirstAid: hasFirstAid === 'true',
+        firstAidType: firstAidType || null,
+        firstAidExpiry: firstAidExpiry || null,
+        firstAidDocuments: firstAidDocuments.length > 0 ? firstAidDocuments : [],
         
         // Baseline logbook hours (optional - for future hour tracking accuracy)
         irataBaselineHours: logbookTotalHours ? logbookTotalHours : "0",
