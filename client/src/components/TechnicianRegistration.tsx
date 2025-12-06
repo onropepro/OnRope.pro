@@ -146,6 +146,7 @@ type RegistrationStep =
   | "lastName"
   | "certification"
   | "licenseNumbers"
+  | "logbookHours"
   | "address"
   | "email"
   | "phone"
@@ -167,6 +168,7 @@ interface TechnicianData {
   spratLevel: string;
   spratLicenseNumber: string;
   certificationCardFile: File | null;
+  logbookTotalHours: string;
   streetAddress: string;
   city: string;
   provinceState: string;
@@ -209,6 +211,7 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
     spratLevel: "",
     spratLicenseNumber: "",
     certificationCardFile: null,
+    logbookTotalHours: "",
     streetAddress: "",
     city: "",
     provinceState: "",
@@ -245,6 +248,7 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
       spratLevel: "",
       spratLicenseNumber: "",
       certificationCardFile: null,
+      logbookTotalHours: "",
       streetAddress: "",
       city: "",
       provinceState: "",
@@ -281,6 +285,7 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
     "lastName", 
     "certification",
     "licenseNumbers",
+    "logbookHours",
     "address",
     "email",
     "phone",
@@ -468,6 +473,7 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
       formData.append('irataLicenseNumber', data.irataLicenseNumber);
       formData.append('spratLevel', data.spratLevel);
       formData.append('spratLicenseNumber', data.spratLicenseNumber);
+      formData.append('logbookTotalHours', data.logbookTotalHours);
       formData.append('streetAddress', data.streetAddress);
       formData.append('city', data.city);
       formData.append('provinceState', data.provinceState);
@@ -867,6 +873,90 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
                 data-testid="button-continue-license"
               >
                 Continue
+                <ArrowRight className="w-4 h-4 ml-2" />
+              </Button>
+              <Button 
+                variant="ghost" 
+                onClick={handleBack}
+                className="w-full"
+              >
+                <ArrowLeft className="w-4 h-4 mr-2" />
+                Back
+              </Button>
+            </DialogFooter>
+          </>
+        );
+
+      case "logbookHours":
+        return (
+          <>
+            <DialogHeader>
+              <div className="flex items-center justify-center mb-4">
+                <div className="p-3 rounded-full bg-purple-500/10">
+                  <Calendar className="w-8 h-8 text-purple-500" />
+                </div>
+              </div>
+              <DialogTitle className="text-center text-xl">
+                Current Logbook Hours
+              </DialogTitle>
+              <DialogDescription className="text-center">
+                Optional: Enter your current total hours
+              </DialogDescription>
+            </DialogHeader>
+            <div className="py-6 space-y-4">
+              <div className="p-4 rounded-lg bg-muted/50 border">
+                <div className="flex items-start gap-3">
+                  <Info className="w-5 h-5 text-muted-foreground flex-shrink-0 mt-0.5" />
+                  <div className="space-y-2 text-sm text-muted-foreground">
+                    <p>
+                      <strong>Why we ask for this (optional):</strong>
+                    </p>
+                    <p>
+                      Your current logbook total hours help us provide accurate hour tracking going forward. 
+                      When you log future work hours, we can show you your cumulative total based on this starting point.
+                    </p>
+                    <p>
+                      This is especially useful for tracking your progression towards IRATA level upgrades, 
+                      which require documented rope access hours.
+                    </p>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="logbookHours">Total Logbook Hours (Optional)</Label>
+                <Input
+                  id="logbookHours"
+                  data-testid="input-logbook-hours"
+                  type="number"
+                  min="0"
+                  step="0.5"
+                  placeholder="e.g., 1500"
+                  value={data.logbookTotalHours}
+                  onChange={(e) => setData({ ...data, logbookTotalHours: e.target.value })}
+                />
+                <p className="text-xs text-muted-foreground">
+                  Enter the total hours from your current IRATA logbook. You can leave this blank if unsure.
+                </p>
+              </div>
+
+              {data.logbookTotalHours && (
+                <div className="p-3 rounded-lg bg-purple-500/10 border border-purple-500/20">
+                  <p className="text-sm text-center">
+                    Starting logbook hours: <Badge variant="secondary">{parseFloat(data.logbookTotalHours).toLocaleString()} hours</Badge>
+                  </p>
+                </div>
+              )}
+
+              {error && <p className="text-destructive text-sm text-center">{error}</p>}
+            </div>
+            <DialogFooter className="flex-col gap-2 sm:flex-col">
+              <Button 
+                onClick={handleContinue} 
+                className="w-full"
+                data-testid="button-continue-logbook"
+              >
+                {data.logbookTotalHours ? "Continue" : "Skip for now"}
                 <ArrowRight className="w-4 h-4 ml-2" />
               </Button>
               <Button 

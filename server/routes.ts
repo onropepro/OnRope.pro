@@ -805,6 +805,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         irataLicenseNumber,
         spratLevel,
         spratLicenseNumber,
+        logbookTotalHours,
         streetAddress,
         city,
         provinceState,
@@ -980,6 +981,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         // SPRAT certification
         spratLevel: spratLevel ? `Level ${spratLevel}` : null,
         spratLicenseNumber: spratLicenseNumber || null,
+        
+        // Baseline logbook hours (optional - for future hour tracking accuracy)
+        irataBaselineHours: logbookTotalHours ? logbookTotalHours : "0",
         
         // Start date - use timezone-safe utility
         startDate: getTodayString(),
