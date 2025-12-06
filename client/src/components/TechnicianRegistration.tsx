@@ -180,6 +180,7 @@ interface TechnicianData {
   confirmPassword: string;
   emergencyContactName: string;
   emergencyContactPhone: string;
+  emergencyContactRelationship: string;
   socialInsuranceNumber: string;
   bankTransitNumber: string;
   bankInstitutionNumber: string;
@@ -223,6 +224,7 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
     confirmPassword: "",
     emergencyContactName: "",
     emergencyContactPhone: "",
+    emergencyContactRelationship: "",
     socialInsuranceNumber: "",
     bankTransitNumber: "",
     bankInstitutionNumber: "",
@@ -260,6 +262,7 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
       confirmPassword: "",
       emergencyContactName: "",
       emergencyContactPhone: "",
+      emergencyContactRelationship: "",
       socialInsuranceNumber: "",
       bankTransitNumber: "",
       bankInstitutionNumber: "",
@@ -484,6 +487,7 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
       formData.append('password', data.password);
       formData.append('emergencyContactName', data.emergencyContactName);
       formData.append('emergencyContactPhone', data.emergencyContactPhone);
+      formData.append('emergencyContactRelationship', data.emergencyContactRelationship);
       formData.append('socialInsuranceNumber', data.socialInsuranceNumber);
       formData.append('bankTransitNumber', data.bankTransitNumber);
       formData.append('bankInstitutionNumber', data.bankInstitutionNumber);
@@ -1280,6 +1284,16 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
                   placeholder="(604) 555-0123"
                   value={data.emergencyContactPhone}
                   onChange={(e) => setData({ ...data, emergencyContactPhone: e.target.value })}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="emergencyRelationship">Relationship</Label>
+                <Input
+                  id="emergencyRelationship"
+                  data-testid="input-emergency-relationship"
+                  placeholder="e.g., Spouse, Parent, Sibling, Friend"
+                  value={data.emergencyContactRelationship}
+                  onChange={(e) => setData({ ...data, emergencyContactRelationship: e.target.value })}
                   onKeyDown={(e) => e.key === "Enter" && handleContinue()}
                 />
               </div>

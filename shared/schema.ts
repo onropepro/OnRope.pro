@@ -115,6 +115,7 @@ export const users = pgTable("users", {
   employeePhoneNumber: varchar("employee_phone_number"), // Employee phone number (optional, separate from resident phoneNumber)
   emergencyContactName: varchar("emergency_contact_name"), // Emergency contact name (optional)
   emergencyContactPhone: varchar("emergency_contact_phone"), // Emergency contact phone (optional)
+  emergencyContactRelationship: varchar("emergency_contact_relationship"), // Emergency contact relationship (e.g., spouse, parent, sibling)
   specialMedicalConditions: text("special_medical_conditions"), // Special medical conditions (optional)
   
   // IRATA certification fields (optional)

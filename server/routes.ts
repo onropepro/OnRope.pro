@@ -816,6 +816,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         password,
         emergencyContactName,
         emergencyContactPhone,
+        emergencyContactRelationship,
         socialInsuranceNumber,
         bankTransitNumber,
         bankInstitutionNumber,
@@ -954,6 +955,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         employeePhoneNumber: phone,
         emergencyContactName,
         emergencyContactPhone,
+        emergencyContactRelationship: emergencyContactRelationship || null,
         
         // Sensitive data
         socialInsuranceNumber: socialInsuranceNumber || null,
