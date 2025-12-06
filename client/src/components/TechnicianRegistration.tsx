@@ -9,8 +9,77 @@ import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
-import { User, ArrowRight, ArrowLeft, Award, MapPin, Loader2, Phone, Mail, Lock, Heart, Building, CreditCard, Car, Calendar, Upload, Shield, Info } from "lucide-react";
+import { User, ArrowRight, ArrowLeft, Award, MapPin, Loader2, Phone, Mail, Lock, Heart, Building, CreditCard, Car, Calendar, Upload, Shield, Info, CheckCircle, X } from "lucide-react";
 import { apiRequest } from "@/lib/queryClient";
+
+function FileUploadButton({ 
+  label, 
+  file, 
+  onFileChange,
+  accept = "image/*,.pdf",
+  testId
+}: { 
+  label: string; 
+  file: File | null; 
+  onFileChange: (file: File | null) => void;
+  accept?: string;
+  testId: string;
+}) {
+  const inputRef = useRef<HTMLInputElement>(null);
+  
+  const handleClick = () => {
+    inputRef.current?.click();
+  };
+  
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const selectedFile = e.target.files?.[0] || null;
+    onFileChange(selectedFile);
+  };
+  
+  const handleRemove = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    onFileChange(null);
+    if (inputRef.current) {
+      inputRef.current.value = '';
+    }
+  };
+  
+  return (
+    <div className="space-y-2">
+      <input
+        type="file"
+        ref={inputRef}
+        className="hidden"
+        accept={accept}
+        onChange={handleChange}
+        data-testid={testId}
+      />
+      <Button
+        type="button"
+        variant={file ? "default" : "outline"}
+        className={`w-full justify-start gap-2 ${file ? "bg-green-600 hover:bg-green-700 text-white" : ""}`}
+        onClick={handleClick}
+      >
+        {file ? <CheckCircle className="w-4 h-4" /> : <Upload className="w-4 h-4" />}
+        <span className="truncate flex-1 text-left">
+          {file ? file.name : label}
+        </span>
+        {file && (
+          <X 
+            className="w-4 h-4 ml-auto hover:text-red-200" 
+            onClick={handleRemove}
+          />
+        )}
+      </Button>
+      {file && (
+        <p className="text-xs text-green-600 dark:text-green-400 flex items-center gap-1">
+          <CheckCircle className="w-3 h-3" />
+          Selected: {file.name} ({(file.size / 1024).toFixed(1)} KB)
+        </p>
+      )}
+    </div>
+  );
+}
 
 type CertificationType = "irata" | "sprat" | "both" | "none" | null;
 
@@ -106,11 +175,6 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
     specialMedicalConditions: "",
   });
   const [error, setError] = useState("");
-
-  const certCardInputRef = useRef<HTMLInputElement>(null);
-  const voidChequeInputRef = useRef<HTMLInputElement>(null);
-  const driversLicenseInputRef = useRef<HTMLInputElement>(null);
-  const driversAbstractInputRef = useRef<HTMLInputElement>(null);
 
   const resetForm = () => {
     setStep("firstName");
@@ -433,47 +497,6 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
     </div>
   );
 
-  const FileUploadButton = ({ 
-    label, 
-    file, 
-    inputRef, 
-    onFileChange,
-    accept = "image/*,.pdf",
-    testId
-  }: { 
-    label: string; 
-    file: File | null; 
-    inputRef: React.RefObject<HTMLInputElement>;
-    onFileChange: (file: File | null) => void;
-    accept?: string;
-    testId: string;
-  }) => (
-    <div className="space-y-2">
-      <input
-        type="file"
-        ref={inputRef}
-        className="hidden"
-        accept={accept}
-        onChange={(e) => onFileChange(e.target.files?.[0] || null)}
-        data-testid={testId}
-      />
-      <Button
-        type="button"
-        variant="outline"
-        className="w-full justify-start gap-2"
-        onClick={() => inputRef.current?.click()}
-      >
-        <Upload className="w-4 h-4" />
-        {file ? file.name : label}
-      </Button>
-      {file && (
-        <p className="text-xs text-muted-foreground">
-          Selected: {file.name} ({(file.size / 1024).toFixed(1)} KB)
-        </p>
-      )}
-    </div>
-  );
-
   const renderStepContent = () => {
     switch (step) {
       case "firstName":
@@ -729,7 +752,6 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
                     <FileUploadButton
                       label="Upload IRATA certification card photo"
                       file={data.certificationCardFile}
-                      inputRef={certCardInputRef}
                       onFileChange={(file) => handleFileChange('certificationCardFile', file)}
                       testId="input-cert-card-upload"
                     />
@@ -1260,7 +1282,6 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
                 <FileUploadButton
                   label="Upload void cheque photo"
                   file={data.voidChequeFile}
-                  inputRef={voidChequeInputRef}
                   onFileChange={(file) => handleFileChange('voidChequeFile', file)}
                   testId="input-void-cheque-upload"
                 />
@@ -1337,7 +1358,6 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
                 <FileUploadButton
                   label="Upload driver's license photo"
                   file={data.driversLicenseFile}
-                  inputRef={driversLicenseInputRef}
                   onFileChange={(file) => handleFileChange('driversLicenseFile', file)}
                   testId="input-dl-photo-upload"
                 />
@@ -1347,7 +1367,6 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
                 <FileUploadButton
                   label="Upload driver's abstract"
                   file={data.driversAbstractFile}
-                  inputRef={driversAbstractInputRef}
                   onFileChange={(file) => handleFileChange('driversAbstractFile', file)}
                   testId="input-dl-abstract-upload"
                 />
