@@ -35,16 +35,14 @@ export default function TechnicianLogin() {
     },
   });
 
-  const { data: userData, isLoading: isCheckingAuth, error: authError } = useQuery<{ user: any }>({
+  const { data: userData } = useQuery<{ user: any }>({
     queryKey: ["/api/user"],
     retry: false,
+    staleTime: 30000,
+    refetchOnMount: false,
   });
 
   useEffect(() => {
-    if (isCheckingAuth || authError) {
-      return;
-    }
-    
     if (userData?.user) {
       if (userData.user.role === "rope_access_tech") {
         setLocation("/technician-portal");
@@ -58,7 +56,7 @@ export default function TechnicianLogin() {
         setLocation("/dashboard");
       }
     }
-  }, [userData, isCheckingAuth, authError, setLocation]);
+  }, [userData, setLocation]);
 
   const onSubmit = async (data: LoginFormData) => {
     try {
@@ -106,14 +104,6 @@ export default function TechnicianLogin() {
       form.setError("identifier", { message: "An error occurred. Please try again." });
     }
   };
-
-  if (isCheckingAuth) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
-        <div className="animate-pulse">Loading...</div>
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-br from-background via-background to-muted/30">
