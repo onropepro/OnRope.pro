@@ -1,6 +1,6 @@
 import { db } from "./db";
-import { users, clients, projects, customJobTypes, dropLogs, workSessions, nonBillableWorkSessions, complaints, complaintNotes, projectPhotos, jobComments, harnessInspections, toolboxMeetings, flhaForms, incidentReports, methodStatements, companyDocuments, payPeriodConfig, payPeriods, quotes, quoteServices, quoteHistory, gearItems, gearAssignments, gearSerialNumbers, scheduledJobs, jobAssignments, userPreferences, propertyManagerCompanyLinks, irataTaskLogs, employeeTimeOff, documentReviewSignatures, equipmentDamageReports, featureRequests, featureRequestMessages, churnEvents, buildings, normalizeStrataPlan } from "@shared/schema";
-import type { User, InsertUser, Client, InsertClient, Project, InsertProject, CustomJobType, InsertCustomJobType, DropLog, InsertDropLog, WorkSession, InsertWorkSession, Complaint, InsertComplaint, ComplaintNote, InsertComplaintNote, ProjectPhoto, InsertProjectPhoto, JobComment, InsertJobComment, HarnessInspection, InsertHarnessInspection, ToolboxMeeting, InsertToolboxMeeting, FlhaForm, InsertFlhaForm, IncidentReport, InsertIncidentReport, MethodStatement, InsertMethodStatement, PayPeriodConfig, InsertPayPeriodConfig, PayPeriod, InsertPayPeriod, EmployeeHoursSummary, Quote, InsertQuote, QuoteService, InsertQuoteService, QuoteWithServices, QuoteHistory, InsertQuoteHistory, GearItem, InsertGearItem, GearAssignment, InsertGearAssignment, GearSerialNumber, InsertGearSerialNumber, ScheduledJob, InsertScheduledJob, JobAssignment, InsertJobAssignment, ScheduledJobWithAssignments, UserPreferences, InsertUserPreferences, PropertyManagerCompanyLink, InsertPropertyManagerCompanyLink, IrataTaskLog, InsertIrataTaskLog, EmployeeTimeOff, InsertEmployeeTimeOff, DocumentReviewSignature, InsertDocumentReviewSignature, EquipmentDamageReport, InsertEquipmentDamageReport, FeatureRequest, InsertFeatureRequest, FeatureRequestMessage, InsertFeatureRequestMessage, FeatureRequestWithMessages, ChurnEvent, InsertChurnEvent, Building, InsertBuilding } from "@shared/schema";
+import { users, clients, projects, customJobTypes, dropLogs, workSessions, nonBillableWorkSessions, complaints, complaintNotes, projectPhotos, jobComments, harnessInspections, toolboxMeetings, flhaForms, incidentReports, methodStatements, companyDocuments, payPeriodConfig, payPeriods, quotes, quoteServices, quoteHistory, gearItems, gearAssignments, gearSerialNumbers, scheduledJobs, jobAssignments, userPreferences, propertyManagerCompanyLinks, irataTaskLogs, employeeTimeOff, documentReviewSignatures, equipmentDamageReports, featureRequests, featureRequestMessages, churnEvents, buildings, normalizeStrataPlan, teamInvitations } from "@shared/schema";
+import type { User, InsertUser, Client, InsertClient, Project, InsertProject, CustomJobType, InsertCustomJobType, DropLog, InsertDropLog, WorkSession, InsertWorkSession, Complaint, InsertComplaint, ComplaintNote, InsertComplaintNote, ProjectPhoto, InsertProjectPhoto, JobComment, InsertJobComment, HarnessInspection, InsertHarnessInspection, ToolboxMeeting, InsertToolboxMeeting, FlhaForm, InsertFlhaForm, IncidentReport, InsertIncidentReport, MethodStatement, InsertMethodStatement, PayPeriodConfig, InsertPayPeriodConfig, PayPeriod, InsertPayPeriod, EmployeeHoursSummary, Quote, InsertQuote, QuoteService, InsertQuoteService, QuoteWithServices, QuoteHistory, InsertQuoteHistory, GearItem, InsertGearItem, GearAssignment, InsertGearAssignment, GearSerialNumber, InsertGearSerialNumber, ScheduledJob, InsertScheduledJob, JobAssignment, InsertJobAssignment, ScheduledJobWithAssignments, UserPreferences, InsertUserPreferences, PropertyManagerCompanyLink, InsertPropertyManagerCompanyLink, IrataTaskLog, InsertIrataTaskLog, EmployeeTimeOff, InsertEmployeeTimeOff, DocumentReviewSignature, InsertDocumentReviewSignature, EquipmentDamageReport, InsertEquipmentDamageReport, FeatureRequest, InsertFeatureRequest, FeatureRequestMessage, InsertFeatureRequestMessage, FeatureRequestWithMessages, ChurnEvent, InsertChurnEvent, Building, InsertBuilding, TeamInvitation, InsertTeamInvitation } from "@shared/schema";
 import { eq, and, or, desc, sql, isNull, isNotNull, not, gte, lte, between, inArray } from "drizzle-orm";
 import bcrypt from "bcrypt";
 import { encryptSensitiveFields, decryptSensitiveFields } from "./encryption";
@@ -3580,6 +3580,118 @@ export class Storage {
         updatedAt: new Date()
       })
       .where(eq(buildings.strataPlanNumber, normalized));
+  }
+
+  // Team Invitation operations
+  async createTeamInvitation(invitation: InsertTeamInvitation): Promise<TeamInvitation> {
+    const result = await db.insert(teamInvitations).values(invitation).returning();
+    return result[0];
+  }
+
+  async getTeamInvitationById(id: string): Promise<TeamInvitation | undefined> {
+    const result = await db.select().from(teamInvitations).where(eq(teamInvitations.id, id)).limit(1);
+    return result[0];
+  }
+
+  async getPendingInvitationsForTechnician(technicianId: string): Promise<(TeamInvitation & { company: User })[]> {
+    const results = await db.select({
+      invitation: teamInvitations,
+      company: users,
+    })
+      .from(teamInvitations)
+      .innerJoin(users, eq(teamInvitations.companyId, users.id))
+      .where(
+        and(
+          eq(teamInvitations.technicianId, technicianId),
+          eq(teamInvitations.status, "pending")
+        )
+      )
+      .orderBy(desc(teamInvitations.createdAt));
+    
+    return results.map(r => ({
+      ...r.invitation,
+      company: r.company
+    }));
+  }
+
+  async getPendingInvitationForTechnicianAndCompany(technicianId: string, companyId: string): Promise<TeamInvitation | undefined> {
+    const result = await db.select()
+      .from(teamInvitations)
+      .where(
+        and(
+          eq(teamInvitations.technicianId, technicianId),
+          eq(teamInvitations.companyId, companyId),
+          eq(teamInvitations.status, "pending")
+        )
+      )
+      .limit(1);
+    return result[0];
+  }
+
+  async acceptTeamInvitation(invitationId: string): Promise<TeamInvitation> {
+    const result = await db.update(teamInvitations)
+      .set({ 
+        status: "accepted",
+        respondedAt: new Date()
+      })
+      .where(eq(teamInvitations.id, invitationId))
+      .returning();
+    return result[0];
+  }
+
+  async declineTeamInvitation(invitationId: string): Promise<TeamInvitation> {
+    const result = await db.update(teamInvitations)
+      .set({ 
+        status: "declined",
+        respondedAt: new Date()
+      })
+      .where(eq(teamInvitations.id, invitationId))
+      .returning();
+    return result[0];
+  }
+
+  async getInvitationsForCompany(companyId: string): Promise<TeamInvitation[]> {
+    return db.select()
+      .from(teamInvitations)
+      .where(eq(teamInvitations.companyId, companyId))
+      .orderBy(desc(teamInvitations.createdAt));
+  }
+
+  async getUnacknowledgedAcceptedInvitationsForCompany(companyId: string): Promise<(TeamInvitation & { technician: User })[]> {
+    const results = await db.select({
+      invitation: teamInvitations,
+      technician: users,
+    })
+      .from(teamInvitations)
+      .innerJoin(users, eq(teamInvitations.technicianId, users.id))
+      .where(
+        and(
+          eq(teamInvitations.companyId, companyId),
+          eq(teamInvitations.status, "accepted"),
+          isNull(teamInvitations.ownerAcknowledgedAt)
+        )
+      )
+      .orderBy(desc(teamInvitations.respondedAt));
+    
+    return results.map(r => ({
+      ...r.invitation,
+      technician: r.technician
+    }));
+  }
+
+  async acknowledgeTeamInvitation(invitationId: string, companyId: string): Promise<TeamInvitation | undefined> {
+    const result = await db.update(teamInvitations)
+      .set({ 
+        ownerAcknowledgedAt: new Date()
+      })
+      .where(
+        and(
+          eq(teamInvitations.id, invitationId),
+          eq(teamInvitations.companyId, companyId)
+        )
+      )
+      .returning();
+    return result[0];
   }
 }
 

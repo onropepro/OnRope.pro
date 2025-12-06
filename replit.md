@@ -112,6 +112,16 @@ The following employee fields are encrypted at rest using AES-256-GCM:
 
 **Privacy Commitment:** All sensitive employee data is securely stored, limited to authorized employer staff only, and never sold or shared outside your company without consent or legal requirement. Information is used for HR purposes including payroll processing, certification compliance, driving eligibility verification, and emergency contact procedures.
 
+### Technician Account Protection (CRITICAL)
+**Employers have absolutely NO permission under any circumstances to delete a technician's account.** When an employer removes a technician from their team:
+- The technician is **unlinked** from the company (companyId set to null)
+- The technician's account remains intact in the system
+- The technician can still log in to their Technician Portal
+- The technician can be invited by other companies
+- All personal data, certifications, and credentials are preserved
+
+This protection exists because technician accounts are self-registered and belong to the technician, not the employer. Employers can only manage the employment relationship, not the technician's identity in the system.
+
 ## Known Limitations
 
 ### IRATA License Verification (Manual Only)

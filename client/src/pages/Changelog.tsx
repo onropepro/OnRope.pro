@@ -86,6 +86,42 @@ type RecentChange = {
 
 const recentChangesData: RecentChange[] = [
   {
+    date: "December 6, 2025",
+    title: "Address Autocomplete",
+    description: "Smart address lookup in technician registration - start typing your address and get real-time suggestions from Geoapify. Selecting a suggestion auto-fills street, city, province, country, and postal code. Full bilingual support (EN/FR)",
+    type: "feature"
+  },
+  {
+    date: "December 6, 2025",
+    title: "Technician Account Protection",
+    description: "Critical security fix: Employers can no longer permanently delete technician accounts. When removing an employee from their team, the technician is only unlinked (companyId set to null) - their account remains intact, they can still log in to their portal, and can be invited by other companies",
+    type: "fix"
+  },
+  {
+    date: "December 6, 2025",
+    title: "Owner Notification System",
+    description: "Bidirectional invitation notifications complete: When a technician accepts an invitation, the company owner now sees a celebration dialog on their Dashboard showing the new team member's name, email, and certifications with a 'Next' button to acknowledge",
+    type: "feature"
+  },
+  {
+    date: "December 6, 2025",
+    title: "Team Invitation System",
+    description: "Complete invitation-based workflow for adding technicians to your team. Search for self-registered technicians by IRATA license, SPRAT license, or email. Send invitations that appear in the technician's portal with accept/decline options. Full bilingual support (EN/FR)",
+    type: "feature"
+  },
+  {
+    date: "December 6, 2025",
+    title: "AI License Verification",
+    description: "IRATA and SPRAT license verification using Gemini AI screenshot analysis. Technicians upload a screenshot from the official verification portal, and AI validates their license number, level, and expiration date against their registered credentials",
+    type: "feature"
+  },
+  {
+    date: "December 6, 2025",
+    title: "Bilingual Technician Portal",
+    description: "Complete French/English language support in the Technician Portal with language toggle in header, translated UI elements, form validation messages, and persistent language preference",
+    type: "feature"
+  },
+  {
     date: "December 5, 2025",
     title: "Resident Unit Conflict Detection",
     description: "New resident registration now detects when a unit is already linked to another account. Shows confirmation dialog explaining the takeover scenario, with atomic database transactions ensuring safe unit transfers between residents",
