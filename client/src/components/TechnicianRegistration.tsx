@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect, useMemo } from "react";
 import { useLocation } from "wouter";
 import { useMutation } from "@tanstack/react-query";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
@@ -9,7 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
-import { User, ArrowRight, ArrowLeft, Award, MapPin, Loader2, Phone, Mail, Lock, Heart, Building, CreditCard, Car, Calendar, Upload, Shield, Info, CheckCircle, X } from "lucide-react";
+import { User, ArrowRight, ArrowLeft, Award, MapPin, Loader2, Phone, Mail, Lock, Heart, Building, CreditCard, Car, Calendar, Upload, Shield, Info, CheckCircle, X, FileText } from "lucide-react";
 import { apiRequest } from "@/lib/queryClient";
 
 function FileUploadButton({ 
@@ -26,6 +26,27 @@ function FileUploadButton({
   testId: string;
 }) {
   const inputRef = useRef<HTMLInputElement>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  
+  const isImage = useMemo(() => {
+    return file?.type.startsWith('image/') ?? false;
+  }, [file]);
+  
+  const isPdf = useMemo(() => {
+    return file?.type === 'application/pdf';
+  }, [file]);
+  
+  useEffect(() => {
+    if (file && isImage) {
+      const url = URL.createObjectURL(file);
+      setPreviewUrl(url);
+      return () => {
+        URL.revokeObjectURL(url);
+      };
+    } else {
+      setPreviewUrl(null);
+    }
+  }, [file, isImage]);
   
   const handleClick = () => {
     inputRef.current?.click();
@@ -76,6 +97,43 @@ function FileUploadButton({
           <CheckCircle className="w-3 h-3" />
           Selected: {file.name} ({(file.size / 1024).toFixed(1)} KB)
         </p>
+      )}
+      {previewUrl && isImage && (
+        <div className="relative mt-2 rounded-md overflow-hidden border border-border">
+          <img 
+            src={previewUrl} 
+            alt="Preview" 
+            className="w-full h-auto max-h-48 object-contain bg-muted"
+            data-testid={`${testId}-preview`}
+          />
+          <Button
+            type="button"
+            size="icon"
+            variant="destructive"
+            className="absolute top-2 right-2 h-6 w-6"
+            onClick={handleRemove}
+          >
+            <X className="w-3 h-3" />
+          </Button>
+        </div>
+      )}
+      {file && isPdf && (
+        <div className="relative mt-2 rounded-md overflow-hidden border border-border bg-muted p-4 flex items-center gap-3">
+          <FileText className="w-8 h-8 text-red-500" />
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-medium truncate">{file.name}</p>
+            <p className="text-xs text-muted-foreground">PDF Document</p>
+          </div>
+          <Button
+            type="button"
+            size="icon"
+            variant="destructive"
+            className="h-6 w-6 flex-shrink-0"
+            onClick={handleRemove}
+          >
+            <X className="w-3 h-3" />
+          </Button>
+        </div>
       )}
     </div>
   );
