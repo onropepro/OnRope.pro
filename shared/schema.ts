@@ -2266,6 +2266,7 @@ export const teamInvitations = pgTable("team_invitations", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
   respondedAt: timestamp("responded_at"), // When the technician responded
   expiresAt: timestamp("expires_at"), // Optional expiration date
+  ownerAcknowledgedAt: timestamp("owner_acknowledged_at"), // When the owner clicked "Next" on the acceptance notification
 }, (table) => [
   index("IDX_team_invitations_technician").on(table.technicianId),
   index("IDX_team_invitations_company").on(table.companyId),

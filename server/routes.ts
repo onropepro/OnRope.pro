@@ -5134,6 +5134,96 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
+  // Get accepted invitations that owner hasn't acknowledged yet
+  app.get("/api/accepted-invitations", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const user = await storage.getUserById(req.session.userId!);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      const companyId = user.role === 'owner' ? user.id : user.companyId;
+      if (!companyId) {
+        return res.status(403).json({ message: "Not authorized" });
+      }
+      
+      // Only owners and admins can view accepted invitations
+      if (user.role !== 'owner' && user.role !== 'admin') {
+        return res.status(403).json({ message: "Only owners and admins can view accepted invitations" });
+      }
+      
+      const invitations = await storage.getUnacknowledgedAcceptedInvitationsForCompany(companyId);
+      
+      // Return safe technician info
+      const safeInvitations = invitations.map(inv => ({
+        id: inv.id,
+        respondedAt: inv.respondedAt,
+        technician: {
+          id: inv.technician.id,
+          name: inv.technician.name,
+          email: inv.technician.email,
+          irataLevel: inv.technician.irataLevel,
+          irataNumber: inv.technician.irataNumber,
+          spratLevel: inv.technician.spratLevel,
+          spratNumber: inv.technician.spratNumber,
+        }
+      }));
+      
+      res.json({ invitations: safeInvitations });
+    } catch (error) {
+      console.error("Get accepted invitations error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+  
+  // Acknowledge an accepted invitation (owner clicks "Next")
+  app.post("/api/invitations/:invitationId/acknowledge", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const { invitationId } = req.params;
+      
+      const user = await storage.getUserById(req.session.userId!);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      const companyId = user.role === 'owner' ? user.id : user.companyId;
+      if (!companyId) {
+        return res.status(403).json({ message: "Not authorized" });
+      }
+      
+      // Only owners and admins can acknowledge invitations
+      if (user.role !== 'owner' && user.role !== 'admin') {
+        return res.status(403).json({ message: "Only owners and admins can acknowledge invitations" });
+      }
+      
+      const invitation = await storage.getTeamInvitationById(invitationId);
+      if (!invitation) {
+        return res.status(404).json({ message: "Invitation not found" });
+      }
+      
+      // Verify invitation belongs to this company
+      if (invitation.companyId !== companyId) {
+        return res.status(403).json({ message: "This invitation does not belong to your company" });
+      }
+      
+      if (invitation.status !== "accepted") {
+        return res.status(400).json({ message: "This invitation has not been accepted" });
+      }
+      
+      await storage.acknowledgeTeamInvitation(invitationId, companyId);
+      
+      console.log(`[Team-Invite] Owner ${user.id} acknowledged invitation ${invitationId}`);
+      
+      res.json({ 
+        success: true, 
+        message: "Invitation acknowledged"
+      });
+    } catch (error) {
+      console.error("Acknowledge invitation error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+  
   // ==================== IRATA/SPRAT VERIFICATION ROUTES ====================
   
   // Verify IRATA/SPRAT license via screenshot analysis

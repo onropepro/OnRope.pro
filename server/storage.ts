@@ -3656,6 +3656,43 @@ export class Storage {
       .where(eq(teamInvitations.companyId, companyId))
       .orderBy(desc(teamInvitations.createdAt));
   }
+
+  async getUnacknowledgedAcceptedInvitationsForCompany(companyId: string): Promise<(TeamInvitation & { technician: User })[]> {
+    const results = await db.select({
+      invitation: teamInvitations,
+      technician: users,
+    })
+      .from(teamInvitations)
+      .innerJoin(users, eq(teamInvitations.technicianId, users.id))
+      .where(
+        and(
+          eq(teamInvitations.companyId, companyId),
+          eq(teamInvitations.status, "accepted"),
+          isNull(teamInvitations.ownerAcknowledgedAt)
+        )
+      )
+      .orderBy(desc(teamInvitations.respondedAt));
+    
+    return results.map(r => ({
+      ...r.invitation,
+      technician: r.technician
+    }));
+  }
+
+  async acknowledgeTeamInvitation(invitationId: string, companyId: string): Promise<TeamInvitation | undefined> {
+    const result = await db.update(teamInvitations)
+      .set({ 
+        ownerAcknowledgedAt: new Date()
+      })
+      .where(
+        and(
+          eq(teamInvitations.id, invitationId),
+          eq(teamInvitations.companyId, companyId)
+        )
+      )
+      .returning();
+    return result[0];
+  }
 }
 
 export const storage = new Storage();

@@ -739,6 +739,49 @@ export default function Dashboard() {
     queryKey: ["/api/toolbox-meetings"],
   });
 
+  // Fetch accepted team invitations (for owner notification)
+  const { data: acceptedInvitationsData, refetch: refetchAcceptedInvitations } = useQuery<{
+    invitations: Array<{
+      id: string;
+      respondedAt: string;
+      technician: {
+        id: string;
+        name: string;
+        email: string;
+        irataLevel?: string;
+        irataNumber?: string;
+        spratLevel?: string;
+        spratNumber?: string;
+      };
+    }>;
+  }>({
+    queryKey: ["/api/accepted-invitations"],
+    enabled: userData?.user?.role === 'owner' || userData?.user?.role === 'company',
+    refetchInterval: 10000, // Check every 10 seconds
+  });
+
+  const acceptedInvitations = acceptedInvitationsData?.invitations || [];
+
+  // Mutation to acknowledge accepted invitation
+  const acknowledgeInvitationMutation = useMutation({
+    mutationFn: async (invitationId: string) => {
+      const response = await fetch(`/api/invitations/${invitationId}/acknowledge`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+      });
+      if (!response.ok) throw new Error('Failed to acknowledge');
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/accepted-invitations"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/employees/all"] });
+      toast({
+        title: t('dashboard.invitations.acknowledged', 'Team Updated'),
+        description: t('dashboard.invitations.acknowledgedDesc', 'New team member has been added to your roster.'),
+      });
+    },
+  });
+
   // Fetch company documents
   const { data: companyDocumentsData } = useQuery({
     queryKey: ["/api/company-documents"],
@@ -8117,6 +8160,88 @@ export default function Dashboard() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* Accepted Team Invitation Notification Dialog */}
+      <Dialog open={acceptedInvitations.length > 0}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <span className="material-icons text-primary">celebration</span>
+              {t('dashboard.invitations.newMemberTitle', 'New Team Member Joined!')}
+            </DialogTitle>
+            <DialogDescription>
+              {t('dashboard.invitations.newMemberDesc', 'A technician has accepted your team invitation.')}
+            </DialogDescription>
+          </DialogHeader>
+          {acceptedInvitations.length > 0 && (
+            <div className="space-y-4">
+              <div className="p-4 bg-muted rounded-lg" data-testid={`accepted-invitation-${acceptedInvitations[0]?.id}`}>
+                <div className="flex items-center gap-3">
+                  <div className="p-2 rounded-full bg-primary/10">
+                    <span className="material-icons text-primary">person</span>
+                  </div>
+                  <div>
+                    <p className="font-semibold text-lg" data-testid="text-accepted-tech-name">
+                      {acceptedInvitations[0]?.technician?.name}
+                    </p>
+                    <p className="text-sm text-muted-foreground">
+                      {acceptedInvitations[0]?.technician?.email}
+                    </p>
+                    {(acceptedInvitations[0]?.technician?.irataLevel || acceptedInvitations[0]?.technician?.spratLevel) && (
+                      <div className="flex items-center gap-2 mt-1">
+                        {acceptedInvitations[0]?.technician?.irataLevel && (
+                          <Badge variant="secondary" className="text-xs">
+                            IRATA {acceptedInvitations[0]?.technician?.irataLevel}
+                          </Badge>
+                        )}
+                        {acceptedInvitations[0]?.technician?.spratLevel && (
+                          <Badge variant="secondary" className="text-xs">
+                            SPRAT {acceptedInvitations[0]?.technician?.spratLevel}
+                          </Badge>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+              <p className="text-sm text-muted-foreground text-center">
+                {t('dashboard.invitations.addedToRoster', 'This technician has been added to your team roster and can now be assigned to projects.')}
+              </p>
+              <Button
+                className="w-full h-12"
+                onClick={() => {
+                  if (acceptedInvitations[0]?.id) {
+                    acknowledgeInvitationMutation.mutate(acceptedInvitations[0].id);
+                  }
+                }}
+                disabled={acknowledgeInvitationMutation.isPending}
+                data-testid="button-next-invitation"
+              >
+                {acknowledgeInvitationMutation.isPending ? (
+                  <>
+                    <span className="material-icons animate-spin mr-2">sync</span>
+                    {t('common.loading', 'Loading...')}
+                  </>
+                ) : (
+                  <>
+                    {acceptedInvitations.length > 1 ? (
+                      <>
+                        <span className="material-icons mr-2">arrow_forward</span>
+                        {t('dashboard.invitations.next', 'Next')} ({acceptedInvitations.length - 1} {t('dashboard.invitations.more', 'more')})
+                      </>
+                    ) : (
+                      <>
+                        <span className="material-icons mr-2">check</span>
+                        {t('dashboard.invitations.gotIt', 'Got It')}
+                      </>
+                    )}
+                  </>
+                )}
+              </Button>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
