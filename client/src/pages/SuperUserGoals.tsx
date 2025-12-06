@@ -3,7 +3,8 @@ import SuperUserLayout from "@/components/SuperUserLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Skeleton } from "@/components/ui/skeleton";
-import { CheckCircle2, Circle, AlertTriangle } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { CheckCircle2, Circle, AlertTriangle, Target, TrendingUp, Users, Building2, Globe, Zap, CreditCard, Rocket } from "lucide-react";
 
 interface MetricsSummary {
   mrr: number;
@@ -22,15 +23,7 @@ interface MetricsSummary {
   };
 }
 
-const CRITICAL_TIPPING_POINTS = [
-  { id: 1, name: "Tech Premium Launch", trigger: "2,500 tech accounts", targetDate: "Q4 Year 2", revenueImpact: "$22K → $108K ARR" },
-  { id: 2, name: "PM Premium Launch", trigger: "150 PMs + 50% engagement", targetDate: "Q2 Year 2", revenueImpact: "$9K → $94K ARR" },
-  { id: 3, name: "Building Manager Portal (Free)", trigger: "500 buildings in database", targetDate: "Q4 Year 1", revenueImpact: "Enables PM network" },
-  { id: 4, name: "US West Coast Launch", trigger: "40% Canada penetration", targetDate: "Q1 Year 3", revenueImpact: "+$634K ARR by Y3 end" },
-  { id: 5, name: "US East Coast Expansion", trigger: "75 US customers", targetDate: "Q1 Year 4", revenueImpact: "Path to $6.7M ARR" },
-  { id: 6, name: "Unlimited Tier Push", trigger: "10 Enterprise customers", targetDate: "Q3 Year 2", revenueImpact: "+$200K ARPU lift" },
-  { id: 7, name: "Transaction Fees", trigger: "50K platform transactions/yr", targetDate: "Year 4+", revenueImpact: "+15-25% revenue" },
-];
+const BUILDING_GOALS = [500, 800, 2000, 5000, 10000, 20000];
 
 const NORTH_STAR_METRICS = [
   { name: "Buildings in Database", year1: 800, year2: 3500, year3: 15000, why: "The moat" },
@@ -65,8 +58,6 @@ const RISK_TRIGGERS = [
   { stage: "Any", warning: "NPS <20", response: "Fundamental product issues" },
 ];
 
-const BUILDING_GOALS = [500, 800, 2000, 5000, 10000, 20000];
-
 export default function SuperUserGoals() {
   const { data: metrics, isLoading } = useQuery<MetricsSummary>({
     queryKey: ["/api/superuser/metrics/summary"],
@@ -87,36 +78,6 @@ export default function SuperUserGoals() {
     return goals.find(goal => current < goal) || goals[goals.length - 1];
   };
 
-  const getAchievedGoals = (current: number, goals: number[]) => {
-    return goals.filter(goal => current >= goal);
-  };
-
-  const isTippingPointMet = (id: number): boolean => {
-    switch (id) {
-      case 1: return currentTechAccounts >= 2500;
-      case 2: return currentPropertyManagers >= 150 && currentPmEngagement >= 50;
-      case 3: return currentBuildings >= 500;
-      case 4: return currentEmployers >= 35;
-      case 5: return false;
-      case 6: return false;
-      case 7: return false;
-      default: return false;
-    }
-  };
-
-  const getTippingPointProgress = (id: number): number => {
-    switch (id) {
-      case 1: return getProgressPercentage(currentTechAccounts, 2500);
-      case 2: return Math.min(getProgressPercentage(currentPropertyManagers, 150), getProgressPercentage(currentPmEngagement, 50));
-      case 3: return getProgressPercentage(currentBuildings, 500);
-      case 4: return getProgressPercentage(currentEmployers, 35);
-      case 5: return 0;
-      case 6: return 0;
-      case 7: return 0;
-      default: return 0;
-    }
-  };
-
   if (isLoading) {
     return (
       <SuperUserLayout title="Goals, KPIs & Tipping Points">
@@ -134,18 +95,16 @@ export default function SuperUserGoals() {
   return (
     <SuperUserLayout title="Goals, KPIs & Tipping Points">
       <div className="p-6">
-        <div className="max-w-7xl mx-auto space-y-8">
+        <div className="max-w-7xl mx-auto space-y-10">
           {/* Header */}
           <div className="space-y-2">
-            <h1 className="text-2xl font-semibold">
-              KPIs & Tipping Points Framework
-            </h1>
+            <h1 className="text-2xl font-semibold">KPIs & Tipping Points Framework</h1>
             <p className="text-muted-foreground">
               Strategic milestones for premium launches & market expansion. Every major decision has quantifiable triggers.
             </p>
           </div>
 
-          {/* The 7 Critical Tipping Points */}
+          {/* Executive Summary Table */}
           <div className="space-y-4">
             <h2 className="text-lg font-semibold">The 7 Critical Tipping Points</h2>
             <div className="overflow-x-auto">
@@ -157,109 +116,335 @@ export default function SuperUserGoals() {
                     <th className="text-left py-3 px-2 font-medium">Primary Trigger</th>
                     <th className="text-left py-3 px-2 font-medium">Target Date</th>
                     <th className="text-left py-3 px-2 font-medium">Revenue Impact</th>
-                    <th className="text-left py-3 px-2 font-medium">Status</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {CRITICAL_TIPPING_POINTS.map((point) => {
-                    const isMet = isTippingPointMet(point.id);
-                    const progress = getTippingPointProgress(point.id);
-                    return (
-                      <tr key={point.id} className="border-b hover-elevate">
-                        <td className="py-3 px-2">{point.id}</td>
-                        <td className="py-3 px-2 font-medium">{point.name}</td>
-                        <td className="py-3 px-2">{point.trigger}</td>
-                        <td className="py-3 px-2 text-muted-foreground">{point.targetDate}</td>
-                        <td className="py-3 px-2 text-muted-foreground">{point.revenueImpact}</td>
-                        <td className="py-3 px-2">
-                          <div className="flex items-center gap-2">
-                            {isMet ? (
-                              <CheckCircle2 className="h-4 w-4 text-green-500" />
-                            ) : (
-                              <span className="text-muted-foreground">{Math.round(progress)}%</span>
-                            )}
-                          </div>
-                        </td>
-                      </tr>
-                    );
-                  })}
+                  <tr className="border-b"><td className="py-2 px-2">1</td><td className="py-2 px-2">Tech Premium Launch</td><td className="py-2 px-2">2,500 tech accounts</td><td className="py-2 px-2 text-muted-foreground">Q4 Year 2</td><td className="py-2 px-2 text-muted-foreground">$22K → $108K ARR</td></tr>
+                  <tr className="border-b"><td className="py-2 px-2">2</td><td className="py-2 px-2">PM Premium Launch</td><td className="py-2 px-2">150 PMs + 50% engagement</td><td className="py-2 px-2 text-muted-foreground">Q2 Year 2</td><td className="py-2 px-2 text-muted-foreground">$9K → $94K ARR</td></tr>
+                  <tr className="border-b"><td className="py-2 px-2">3</td><td className="py-2 px-2">Building Manager Portal (Free)</td><td className="py-2 px-2">500 buildings in database</td><td className="py-2 px-2 text-muted-foreground">Q4 Year 1</td><td className="py-2 px-2 text-muted-foreground">Enables PM network</td></tr>
+                  <tr className="border-b"><td className="py-2 px-2">4</td><td className="py-2 px-2">US West Coast Launch</td><td className="py-2 px-2">40% Canada penetration</td><td className="py-2 px-2 text-muted-foreground">Q1 Year 3</td><td className="py-2 px-2 text-muted-foreground">+$634K ARR by Y3 end</td></tr>
+                  <tr className="border-b"><td className="py-2 px-2">5</td><td className="py-2 px-2">US East Coast Expansion</td><td className="py-2 px-2">75 US customers</td><td className="py-2 px-2 text-muted-foreground">Q1 Year 4</td><td className="py-2 px-2 text-muted-foreground">Path to $6.7M ARR</td></tr>
+                  <tr className="border-b"><td className="py-2 px-2">6</td><td className="py-2 px-2">Unlimited Tier Push</td><td className="py-2 px-2">10 Enterprise customers</td><td className="py-2 px-2 text-muted-foreground">Q3 Year 2</td><td className="py-2 px-2 text-muted-foreground">+$200K ARPU lift</td></tr>
+                  <tr className="border-b"><td className="py-2 px-2">7</td><td className="py-2 px-2">Transaction Fees</td><td className="py-2 px-2">50K platform transactions/yr</td><td className="py-2 px-2 text-muted-foreground">Year 4+</td><td className="py-2 px-2 text-muted-foreground">+15-25% revenue</td></tr>
                 </tbody>
               </table>
             </div>
           </div>
 
-          {/* Current Progress Cards */}
-          <div className="space-y-4">
-            <h2 className="text-lg font-semibold">Current Progress</h2>
-            <div className="grid gap-4 md:grid-cols-4">
-              {/* Tech Accounts */}
+          {/* ============================================ */}
+          {/* PART 1: TECH PREMIUM LAUNCH */}
+          {/* ============================================ */}
+          <div className="space-y-4 border-t pt-8">
+            <div className="flex items-center gap-3">
+              <div className="p-2 rounded-md bg-blue-500/10">
+                <Users className="h-5 w-5 text-blue-500" />
+              </div>
+              <div>
+                <h2 className="text-lg font-semibold">Part 1: Tech Premium Launch ($14.99/mo)</h2>
+                <p className="text-sm text-muted-foreground">Target: Q4 Year 2 | Revenue Impact: $22K → $108K ARR</p>
+              </div>
+            </div>
+
+            {/* Primary Metrics */}
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
               <Card>
                 <CardHeader className="pb-2">
-                  <CardTitle className="text-base">Tech Accounts</CardTitle>
+                  <CardTitle className="text-base flex items-center justify-between gap-2">
+                    Tech Accounts
+                    <Badge variant="outline" className="text-xs">Trigger</Badge>
+                  </CardTitle>
                 </CardHeader>
-                <CardContent className="space-y-3">
-                  <div className="flex items-end justify-between gap-2">
+                <CardContent>
+                  <div className="flex items-end justify-between gap-2 mb-2">
                     <span className="text-3xl font-bold">{currentTechAccounts.toLocaleString()}</span>
                     <span className="text-muted-foreground">/ 2,500</span>
                   </div>
                   <Progress value={getProgressPercentage(currentTechAccounts, 2500)} className="h-2" />
-                  <p className="text-xs text-muted-foreground">Tech Premium Launch trigger</p>
                 </CardContent>
               </Card>
 
-              {/* PM Accounts */}
               <Card>
                 <CardHeader className="pb-2">
-                  <CardTitle className="text-base">PM Accounts</CardTitle>
+                  <CardTitle className="text-base flex items-center justify-between gap-2">
+                    New Tech Signups
+                    <Badge variant="outline" className="text-xs">Monthly</Badge>
+                  </CardTitle>
                 </CardHeader>
-                <CardContent className="space-y-3">
-                  <div className="flex items-end justify-between gap-2">
-                    <span className="text-3xl font-bold">{currentPropertyManagers.toLocaleString()}</span>
-                    <span className="text-muted-foreground">/ 150</span>
+                <CardContent>
+                  <div className="flex items-end justify-between gap-2 mb-2">
+                    <span className="text-3xl font-bold">--</span>
+                    <span className="text-muted-foreground">/ 400+</span>
                   </div>
-                  <Progress value={getProgressPercentage(currentPropertyManagers, 150)} className="h-2" />
-                  <p className="text-xs text-muted-foreground">PM Premium Launch trigger</p>
+                  <p className="text-xs text-muted-foreground">Network growth velocity</p>
                 </CardContent>
               </Card>
 
-              {/* PM Engagement */}
               <Card>
                 <CardHeader className="pb-2">
-                  <CardTitle className="text-base">PM Engagement</CardTitle>
+                  <CardTitle className="text-base flex items-center justify-between gap-2">
+                    Work History Depth
+                    <Badge variant="outline" className="text-xs">Trigger</Badge>
+                  </CardTitle>
                 </CardHeader>
-                <CardContent className="space-y-3">
-                  <div className="flex items-end justify-between gap-2">
-                    <span className="text-3xl font-bold">{currentPmEngagement}%</span>
-                    <span className="text-muted-foreground">/ 50%+</span>
+                <CardContent>
+                  <div className="flex items-end justify-between gap-2 mb-2">
+                    <span className="text-3xl font-bold">--%</span>
+                    <span className="text-muted-foreground">/ 60%</span>
                   </div>
-                  <Progress value={getProgressPercentage(currentPmEngagement, 50)} className="h-2" />
-                  <p className="text-xs text-muted-foreground">Monthly login rate</p>
+                  <p className="text-xs text-muted-foreground">Techs with 12+ months history</p>
                 </CardContent>
               </Card>
 
-              {/* Paying Employers */}
               <Card>
                 <CardHeader className="pb-2">
-                  <CardTitle className="text-base">Paying Employers</CardTitle>
+                  <CardTitle className="text-base flex items-center justify-between gap-2">
+                    Multi-Employer Rate
+                    <Badge variant="outline" className="text-xs">Trigger</Badge>
+                  </CardTitle>
                 </CardHeader>
-                <CardContent className="space-y-3">
-                  <div className="flex items-end justify-between gap-2">
-                    <span className="text-3xl font-bold">{currentEmployers}</span>
-                    <span className="text-muted-foreground">/ 35 (40%)</span>
+                <CardContent>
+                  <div className="flex items-end justify-between gap-2 mb-2">
+                    <span className="text-3xl font-bold">--%</span>
+                    <span className="text-muted-foreground">/ 25%</span>
                   </div>
-                  <Progress value={getProgressPercentage(currentEmployers, 35)} className="h-2" />
-                  <p className="text-xs text-muted-foreground">Canada penetration for US launch</p>
+                  <p className="text-xs text-muted-foreground">Worked for 2+ employers</p>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* KPIs */}
+            <div className="grid gap-4 md:grid-cols-5">
+              <Card className="bg-muted/30">
+                <CardContent className="pt-4">
+                  <p className="text-xs text-muted-foreground mb-1">Employer connections/tech</p>
+                  <p className="text-xl font-semibold">-- <span className="text-sm text-muted-foreground font-normal">/ 1.3+</span></p>
+                </CardContent>
+              </Card>
+              <Card className="bg-muted/30">
+                <CardContent className="pt-4">
+                  <p className="text-xs text-muted-foreground mb-1">Profile completion rate</p>
+                  <p className="text-xl font-semibold">--% <span className="text-sm text-muted-foreground font-normal">/ 70%+</span></p>
+                </CardContent>
+              </Card>
+              <Card className="bg-muted/30">
+                <CardContent className="pt-4">
+                  <p className="text-xs text-muted-foreground mb-1">Return login rate (30-day)</p>
+                  <p className="text-xl font-semibold">--% <span className="text-sm text-muted-foreground font-normal">/ 50%+</span></p>
+                </CardContent>
+              </Card>
+              <Card className="bg-muted/30">
+                <CardContent className="pt-4">
+                  <p className="text-xs text-muted-foreground mb-1">Referral rate (tech → tech)</p>
+                  <p className="text-xl font-semibold">--% <span className="text-sm text-muted-foreground font-normal">/ 15%+</span></p>
+                </CardContent>
+              </Card>
+              <Card className="bg-muted/30">
+                <CardContent className="pt-4">
+                  <p className="text-xs text-muted-foreground mb-1">PM profile views/month</p>
+                  <p className="text-xl font-semibold">-- <span className="text-sm text-muted-foreground font-normal">/ 100+</span></p>
                 </CardContent>
               </Card>
             </div>
           </div>
 
-          {/* Building Milestones */}
-          <div className="space-y-4">
-            <h2 className="text-lg font-semibold">Building Database Growth</h2>
-            <p className="text-sm text-muted-foreground">
-              Buildings are the moat. 500 buildings triggers the free Building Manager Portal launch.
-            </p>
+          {/* ============================================ */}
+          {/* PART 2: PM PREMIUM LAUNCH */}
+          {/* ============================================ */}
+          <div className="space-y-4 border-t pt-8">
+            <div className="flex items-center gap-3">
+              <div className="p-2 rounded-md bg-purple-500/10">
+                <Target className="h-5 w-5 text-purple-500" />
+              </div>
+              <div>
+                <h2 className="text-lg font-semibold">Part 2: PM Premium Launch ($49/building/mo)</h2>
+                <p className="text-sm text-muted-foreground">Target: Q2 Year 2 | Revenue Impact: $9K → $94K ARR</p>
+              </div>
+            </div>
+
+            {/* Primary Metrics */}
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+              <Card>
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-base flex items-center justify-between gap-2">
+                    PM Accounts
+                    <Badge variant="outline" className="text-xs">Trigger</Badge>
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="flex items-end justify-between gap-2 mb-2">
+                    <span className="text-3xl font-bold">{currentPropertyManagers}</span>
+                    <span className="text-muted-foreground">/ 150+</span>
+                  </div>
+                  <Progress value={getProgressPercentage(currentPropertyManagers, 150)} className="h-2" />
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-base flex items-center justify-between gap-2">
+                    Monthly Engagement
+                    <Badge variant="outline" className="text-xs">Trigger</Badge>
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="flex items-end justify-between gap-2 mb-2">
+                    <span className="text-3xl font-bold">{currentPmEngagement}%</span>
+                    <span className="text-muted-foreground">/ 50%+</span>
+                  </div>
+                  <Progress value={getProgressPercentage(currentPmEngagement, 50)} className="h-2" />
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-base flex items-center justify-between gap-2">
+                    New PM Signups
+                    <Badge variant="outline" className="text-xs">Monthly</Badge>
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="flex items-end justify-between gap-2 mb-2">
+                    <span className="text-3xl font-bold">--</span>
+                    <span className="text-muted-foreground">/ 15+</span>
+                  </div>
+                  <p className="text-xs text-muted-foreground">Network growth</p>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-base flex items-center justify-between gap-2">
+                    Buildings Linked/PM
+                    <Badge variant="outline" className="text-xs">Trigger</Badge>
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="flex items-end justify-between gap-2 mb-2">
+                    <span className="text-3xl font-bold">--</span>
+                    <span className="text-muted-foreground">/ 3.0+</span>
+                  </div>
+                  <p className="text-xs text-muted-foreground">Avg buildings per PM</p>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* KPIs */}
+            <div className="grid gap-4 md:grid-cols-5">
+              <Card className="bg-muted/30">
+                <CardContent className="pt-4">
+                  <p className="text-xs text-muted-foreground mb-1">Compliance mandates issued</p>
+                  <p className="text-xl font-semibold">-- <span className="text-sm text-muted-foreground font-normal">/ 3+</span></p>
+                </CardContent>
+              </Card>
+              <Card className="bg-muted/30">
+                <CardContent className="pt-4">
+                  <p className="text-xs text-muted-foreground mb-1">Vendor searches/month</p>
+                  <p className="text-xl font-semibold">-- <span className="text-sm text-muted-foreground font-normal">/ 200+</span></p>
+                </CardContent>
+              </Card>
+              <Card className="bg-muted/30">
+                <CardContent className="pt-4">
+                  <p className="text-xs text-muted-foreground mb-1">Vendor compliance checks</p>
+                  <p className="text-xl font-semibold">-- <span className="text-sm text-muted-foreground font-normal">/ 100+</span></p>
+                </CardContent>
+              </Card>
+              <Card className="bg-muted/30">
+                <CardContent className="pt-4">
+                  <p className="text-xs text-muted-foreground mb-1">Project visibility views</p>
+                  <p className="text-xl font-semibold">-- <span className="text-sm text-muted-foreground font-normal">/ 500+</span></p>
+                </CardContent>
+              </Card>
+              <Card className="bg-muted/30">
+                <CardContent className="pt-4">
+                  <p className="text-xs text-muted-foreground mb-1">PM → Vendor mandates</p>
+                  <p className="text-xl font-semibold">-- <span className="text-sm text-muted-foreground font-normal">/ 5+</span></p>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+
+          {/* ============================================ */}
+          {/* PART 3: BUILDING MANAGER PORTAL (FREE) */}
+          {/* ============================================ */}
+          <div className="space-y-4 border-t pt-8">
+            <div className="flex items-center gap-3">
+              <div className="p-2 rounded-md bg-green-500/10">
+                <Building2 className="h-5 w-5 text-green-500" />
+              </div>
+              <div>
+                <h2 className="text-lg font-semibold">Part 3: Building Manager Portal (Free) Launch</h2>
+                <p className="text-sm text-muted-foreground">Target: Q4 Year 1 | Purpose: PM acquisition funnel</p>
+              </div>
+            </div>
+
+            {/* Primary Metrics */}
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+              <Card>
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-base flex items-center justify-between gap-2">
+                    Buildings in Database
+                    <Badge variant="outline" className="text-xs">Trigger</Badge>
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="flex items-end justify-between gap-2 mb-2">
+                    <span className="text-3xl font-bold">{currentBuildings}</span>
+                    <span className="text-muted-foreground">/ 500+</span>
+                  </div>
+                  <Progress value={getProgressPercentage(currentBuildings, 500)} className="h-2" />
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-base flex items-center justify-between gap-2">
+                    Active Employers
+                    <Badge variant="outline" className="text-xs">Trigger</Badge>
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="flex items-end justify-between gap-2 mb-2">
+                    <span className="text-3xl font-bold">{currentEmployers}</span>
+                    <span className="text-muted-foreground">/ 10+</span>
+                  </div>
+                  <Progress value={getProgressPercentage(currentEmployers, 10)} className="h-2" />
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-base flex items-center justify-between gap-2">
+                    Service Records
+                    <Badge variant="outline" className="text-xs">Trigger</Badge>
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="flex items-end justify-between gap-2 mb-2">
+                    <span className="text-3xl font-bold">--</span>
+                    <span className="text-muted-foreground">/ 600+</span>
+                  </div>
+                  <p className="text-xs text-muted-foreground">Maintenance records</p>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-base flex items-center justify-between gap-2">
+                    Vancouver Buildings
+                    <Badge variant="outline" className="text-xs">Trigger</Badge>
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="flex items-end justify-between gap-2 mb-2">
+                    <span className="text-3xl font-bold">--</span>
+                    <span className="text-muted-foreground">/ 200+</span>
+                  </div>
+                  <p className="text-xs text-muted-foreground">Geographic density</p>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Building Milestone Timeline */}
             <Card>
               <CardContent className="pt-6">
                 <div className="flex items-center justify-between mb-4">
@@ -294,11 +479,7 @@ export default function SuperUserGoals() {
                               ? "bg-primary text-primary-foreground ring-4 ring-primary/20" 
                               : "bg-muted text-muted-foreground"
                         }`}>
-                          {isAchieved ? (
-                            <CheckCircle2 className="h-5 w-5" />
-                          ) : (
-                            <Circle className="h-4 w-4" />
-                          )}
+                          {isAchieved ? <CheckCircle2 className="h-5 w-5" /> : <Circle className="h-4 w-4" />}
                         </div>
                         <span className={`mt-2 text-sm font-medium ${
                           isAchieved ? "text-green-600 dark:text-green-400" : isCurrent ? "text-primary" : "text-muted-foreground"
@@ -311,10 +492,518 @@ export default function SuperUserGoals() {
                 </div>
               </CardContent>
             </Card>
+
+            {/* Success KPIs (First 90 Days) */}
+            <div className="grid gap-4 md:grid-cols-5">
+              <Card className="bg-muted/30">
+                <CardContent className="pt-4">
+                  <p className="text-xs text-muted-foreground mb-1">PM signups from portal</p>
+                  <p className="text-xl font-semibold">-- <span className="text-sm text-muted-foreground font-normal">/ 30+</span></p>
+                </CardContent>
+              </Card>
+              <Card className="bg-muted/30">
+                <CardContent className="pt-4">
+                  <p className="text-xs text-muted-foreground mb-1">Buildings claimed by PMs</p>
+                  <p className="text-xl font-semibold">-- <span className="text-sm text-muted-foreground font-normal">/ 150+</span></p>
+                </CardContent>
+              </Card>
+              <Card className="bg-muted/30">
+                <CardContent className="pt-4">
+                  <p className="text-xs text-muted-foreground mb-1">Return visits (30-day)</p>
+                  <p className="text-xl font-semibold">--% <span className="text-sm text-muted-foreground font-normal">/ 40%+</span></p>
+                </CardContent>
+              </Card>
+              <Card className="bg-muted/30">
+                <CardContent className="pt-4">
+                  <p className="text-xs text-muted-foreground mb-1">Vendor mandates issued</p>
+                  <p className="text-xl font-semibold">-- <span className="text-sm text-muted-foreground font-normal">/ 10+</span></p>
+                </CardContent>
+              </Card>
+              <Card className="bg-muted/30">
+                <CardContent className="pt-4">
+                  <p className="text-xs text-muted-foreground mb-1">Avg session duration</p>
+                  <p className="text-xl font-semibold">-- <span className="text-sm text-muted-foreground font-normal">/ 5+ min</span></p>
+                </CardContent>
+              </Card>
+            </div>
           </div>
 
-          {/* North Star Metrics */}
-          <div className="space-y-4">
+          {/* ============================================ */}
+          {/* PART 4: US WEST COAST LAUNCH */}
+          {/* ============================================ */}
+          <div className="space-y-4 border-t pt-8">
+            <div className="flex items-center gap-3">
+              <div className="p-2 rounded-md bg-orange-500/10">
+                <Globe className="h-5 w-5 text-orange-500" />
+              </div>
+              <div>
+                <h2 className="text-lg font-semibold">Part 4: US West Coast Launch</h2>
+                <p className="text-sm text-muted-foreground">Target: Q1 Year 3 | Revenue Impact: +$634K ARR by Y3 end</p>
+              </div>
+            </div>
+
+            {/* Primary Metrics */}
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5">
+              <Card>
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-base flex items-center justify-between gap-2">
+                    Canada Penetration
+                    <Badge variant="outline" className="text-xs">Trigger</Badge>
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="flex items-end justify-between gap-2 mb-2">
+                    <span className="text-3xl font-bold">{currentEmployers}</span>
+                    <span className="text-muted-foreground">/ 35 (40%)</span>
+                  </div>
+                  <Progress value={getProgressPercentage(currentEmployers, 35)} className="h-2" />
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-base flex items-center justify-between gap-2">
+                    Canada ARR
+                    <Badge variant="outline" className="text-xs">Trigger</Badge>
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="flex items-end justify-between gap-2 mb-2">
+                    <span className="text-3xl font-bold">${Math.round(currentARR / 1000)}K</span>
+                    <span className="text-muted-foreground">/ $400K+</span>
+                  </div>
+                  <Progress value={getProgressPercentage(currentARR, 400000)} className="h-2" />
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-base flex items-center justify-between gap-2">
+                    Churn Rate
+                    <Badge variant="outline" className="text-xs">Trigger</Badge>
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="flex items-end justify-between gap-2 mb-2">
+                    <span className="text-3xl font-bold">--%</span>
+                    <span className="text-muted-foreground">/ &lt;8%</span>
+                  </div>
+                  <p className="text-xs text-muted-foreground">Annual churn stabilized</p>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-base flex items-center justify-between gap-2">
+                    Forced Adoption
+                    <Badge variant="outline" className="text-xs">Trigger</Badge>
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="flex items-end justify-between gap-2 mb-2">
+                    <span className="text-3xl font-bold">--%</span>
+                    <span className="text-muted-foreground">/ 60%+</span>
+                  </div>
+                  <p className="text-xs text-muted-foreground">Network effects working</p>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-base flex items-center justify-between gap-2">
+                    Support Hours
+                    <Badge variant="outline" className="text-xs">Trigger</Badge>
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="flex items-end justify-between gap-2 mb-2">
+                    <span className="text-3xl font-bold">--</span>
+                    <span className="text-muted-foreground">/ &lt;2 hrs/cust</span>
+                  </div>
+                  <p className="text-xs text-muted-foreground">Monthly support load</p>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Rollout Phases */}
+            <Card className="bg-muted/30">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-base">Geographic Rollout Sequence</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid gap-2 md:grid-cols-4 text-sm">
+                  <div className="p-3 rounded-md bg-background">
+                    <p className="font-medium">Phase 1: Q1 Y3</p>
+                    <p className="text-muted-foreground">Seattle, Portland</p>
+                  </div>
+                  <div className="p-3 rounded-md bg-background">
+                    <p className="font-medium">Phase 2: Q2 Y3</p>
+                    <p className="text-muted-foreground">San Francisco Bay Area</p>
+                  </div>
+                  <div className="p-3 rounded-md bg-background">
+                    <p className="font-medium">Phase 3: Q3 Y3</p>
+                    <p className="text-muted-foreground">Los Angeles, San Diego</p>
+                  </div>
+                  <div className="p-3 rounded-md bg-background">
+                    <p className="font-medium">Phase 4: Q4 Y3</p>
+                    <p className="text-muted-foreground">Denver, Phoenix</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* ============================================ */}
+          {/* PART 5: US EAST COAST EXPANSION */}
+          {/* ============================================ */}
+          <div className="space-y-4 border-t pt-8">
+            <div className="flex items-center gap-3">
+              <div className="p-2 rounded-md bg-red-500/10">
+                <Rocket className="h-5 w-5 text-red-500" />
+              </div>
+              <div>
+                <h2 className="text-lg font-semibold">Part 5: US East Coast Expansion</h2>
+                <p className="text-sm text-muted-foreground">Target: Q1 Year 4 | Revenue Impact: Path to $6.7M ARR</p>
+              </div>
+            </div>
+
+            {/* Primary Metrics */}
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5">
+              <Card>
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-base flex items-center justify-between gap-2">
+                    West Coast Customers
+                    <Badge variant="outline" className="text-xs">Trigger</Badge>
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="flex items-end justify-between gap-2 mb-2">
+                    <span className="text-3xl font-bold">--</span>
+                    <span className="text-muted-foreground">/ 75+</span>
+                  </div>
+                  <p className="text-xs text-muted-foreground">US West proven</p>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-base flex items-center justify-between gap-2">
+                    US ARR
+                    <Badge variant="outline" className="text-xs">Trigger</Badge>
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="flex items-end justify-between gap-2 mb-2">
+                    <span className="text-3xl font-bold">$--</span>
+                    <span className="text-muted-foreground">/ $800K+</span>
+                  </div>
+                  <p className="text-xs text-muted-foreground">Sustainable US operations</p>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-base flex items-center justify-between gap-2">
+                    US Forced Adoption
+                    <Badge variant="outline" className="text-xs">Trigger</Badge>
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="flex items-end justify-between gap-2 mb-2">
+                    <span className="text-3xl font-bold">--%</span>
+                    <span className="text-muted-foreground">/ 50%+</span>
+                  </div>
+                  <p className="text-xs text-muted-foreground">Network effects replicating</p>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-base flex items-center justify-between gap-2">
+                    US Churn
+                    <Badge variant="outline" className="text-xs">Trigger</Badge>
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="flex items-end justify-between gap-2 mb-2">
+                    <span className="text-3xl font-bold">--%</span>
+                    <span className="text-muted-foreground">/ &lt;10%</span>
+                  </div>
+                  <p className="text-xs text-muted-foreground">Retention in new market</p>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-base flex items-center justify-between gap-2">
+                    Operational Efficiency
+                    <Badge variant="outline" className="text-xs">Trigger</Badge>
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="flex items-end justify-between gap-2 mb-2">
+                    <span className="text-3xl font-bold">--</span>
+                    <span className="text-muted-foreground">/ &lt;1.5 hrs</span>
+                  </div>
+                  <p className="text-xs text-muted-foreground">Per customer/month</p>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* East Coast Markets */}
+            <Card className="bg-muted/30">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-base">East Coast Market Sizing</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid gap-2 md:grid-cols-5 text-sm">
+                  <div className="p-3 rounded-md bg-background">
+                    <p className="font-medium">NYC Metro</p>
+                    <p className="text-muted-foreground">200+ operators (#1)</p>
+                  </div>
+                  <div className="p-3 rounded-md bg-background">
+                    <p className="font-medium">Boston</p>
+                    <p className="text-muted-foreground">50+ operators (#2)</p>
+                  </div>
+                  <div className="p-3 rounded-md bg-background">
+                    <p className="font-medium">Miami/S. Florida</p>
+                    <p className="text-muted-foreground">75+ operators (#3)</p>
+                  </div>
+                  <div className="p-3 rounded-md bg-background">
+                    <p className="font-medium">Chicago</p>
+                    <p className="text-muted-foreground">60+ operators (#4)</p>
+                  </div>
+                  <div className="p-3 rounded-md bg-background">
+                    <p className="font-medium">DC/Baltimore</p>
+                    <p className="text-muted-foreground">40+ operators (#5)</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* ============================================ */}
+          {/* PART 6: UNLIMITED TIER PUSH */}
+          {/* ============================================ */}
+          <div className="space-y-4 border-t pt-8">
+            <div className="flex items-center gap-3">
+              <div className="p-2 rounded-md bg-yellow-500/10">
+                <Zap className="h-5 w-5 text-yellow-500" />
+              </div>
+              <div>
+                <h2 className="text-lg font-semibold">Part 6: Unlimited Tier Promotion Push</h2>
+                <p className="text-sm text-muted-foreground">Target: Q3 Year 2 | Revenue Impact: +$200K ARPU lift</p>
+              </div>
+            </div>
+
+            {/* Primary Metrics */}
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+              <Card>
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-base flex items-center justify-between gap-2">
+                    Enterprise Customers
+                    <Badge variant="outline" className="text-xs">Trigger</Badge>
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="flex items-end justify-between gap-2 mb-2">
+                    <span className="text-3xl font-bold">--</span>
+                    <span className="text-muted-foreground">/ 10+</span>
+                  </div>
+                  <p className="text-xs text-muted-foreground">Proves market for large operators</p>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-base flex items-center justify-between gap-2">
+                    Enterprise NPS
+                    <Badge variant="outline" className="text-xs">Trigger</Badge>
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="flex items-end justify-between gap-2 mb-2">
+                    <span className="text-3xl font-bold">--</span>
+                    <span className="text-muted-foreground">/ 50+</span>
+                  </div>
+                  <p className="text-xs text-muted-foreground">Happy customers upgrade</p>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-base flex items-center justify-between gap-2">
+                    Limit Hits
+                    <Badge variant="outline" className="text-xs">Trigger</Badge>
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="flex items-end justify-between gap-2 mb-2">
+                    <span className="text-3xl font-bold">--</span>
+                    <span className="text-muted-foreground">/ 5+</span>
+                  </div>
+                  <p className="text-xs text-muted-foreground">Enterprise hitting limits</p>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-base flex items-center justify-between gap-2">
+                    40+ Tech Prospects
+                    <Badge variant="outline" className="text-xs">Trigger</Badge>
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="flex items-end justify-between gap-2 mb-2">
+                    <span className="text-3xl font-bold">--</span>
+                    <span className="text-muted-foreground">/ 20+</span>
+                  </div>
+                  <p className="text-xs text-muted-foreground">In pipeline (CRM)</p>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Unlimited Value Props */}
+            <Card className="bg-muted/30">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-base">Unlimited Tier Value Props ($1,999/mo vs Enterprise $999/mo)</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid gap-2 md:grid-cols-4 text-sm">
+                  <div className="p-3 rounded-md bg-background">
+                    <p className="font-medium">Projects</p>
+                    <p className="text-muted-foreground">Unlimited (vs 30/mo)</p>
+                  </div>
+                  <div className="p-3 rounded-md bg-background">
+                    <p className="font-medium">Seats</p>
+                    <p className="text-muted-foreground">Unlimited (vs 40)</p>
+                  </div>
+                  <div className="p-3 rounded-md bg-background">
+                    <p className="font-medium">Resident Logins</p>
+                    <p className="text-muted-foreground">Unlimited (vs 1,000/mo)</p>
+                  </div>
+                  <div className="p-3 rounded-md bg-background">
+                    <p className="font-medium">Support</p>
+                    <p className="text-muted-foreground">Priority 4-hour SLA</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* ============================================ */}
+          {/* PART 7: TRANSACTION FEES (FUTURE) */}
+          {/* ============================================ */}
+          <div className="space-y-4 border-t pt-8">
+            <div className="flex items-center gap-3">
+              <div className="p-2 rounded-md bg-cyan-500/10">
+                <CreditCard className="h-5 w-5 text-cyan-500" />
+              </div>
+              <div>
+                <h2 className="text-lg font-semibold">Part 7: Transaction Fees (Future)</h2>
+                <p className="text-sm text-muted-foreground">Target: Year 4+ | Revenue Impact: +15-25% revenue</p>
+              </div>
+            </div>
+
+            {/* Primary Metrics */}
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+              <Card>
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-base flex items-center justify-between gap-2">
+                    Platform Transactions
+                    <Badge variant="outline" className="text-xs">Trigger</Badge>
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="flex items-end justify-between gap-2 mb-2">
+                    <span className="text-3xl font-bold">--</span>
+                    <span className="text-muted-foreground">/ 50K+/yr</span>
+                  </div>
+                  <p className="text-xs text-muted-foreground">Volume for meaningful revenue</p>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-base flex items-center justify-between gap-2">
+                    PM-Initiated Projects
+                    <Badge variant="outline" className="text-xs">Trigger</Badge>
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="flex items-end justify-between gap-2 mb-2">
+                    <span className="text-3xl font-bold">--%</span>
+                    <span className="text-muted-foreground">/ 20%</span>
+                  </div>
+                  <p className="text-xs text-muted-foreground">PMs sourcing through platform</p>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-base flex items-center justify-between gap-2">
+                    Marketplace Behavior
+                    <Badge variant="outline" className="text-xs">Trigger</Badge>
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="flex items-end justify-between gap-2 mb-2">
+                    <span className="text-3xl font-bold">--</span>
+                    <span className="text-muted-foreground">Active</span>
+                  </div>
+                  <p className="text-xs text-muted-foreground">True marketplace dynamics</p>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-base flex items-center justify-between gap-2">
+                    Trust Score Adoption
+                    <Badge variant="outline" className="text-xs">Trigger</Badge>
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="flex items-end justify-between gap-2 mb-2">
+                    <span className="text-3xl font-bold">--%</span>
+                    <span className="text-muted-foreground">/ 80%</span>
+                  </div>
+                  <p className="text-xs text-muted-foreground">Vendors rated</p>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Fee Model */}
+            <Card className="bg-muted/30">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-base">Transaction Fee Model (Conceptual - Est. Y4 Revenue)</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid gap-2 md:grid-cols-4 text-sm">
+                  <div className="p-3 rounded-md bg-background">
+                    <p className="font-medium">Booking Fee (2.5%)</p>
+                    <p className="text-muted-foreground">PM-sourced: $150K</p>
+                  </div>
+                  <div className="p-3 rounded-md bg-background">
+                    <p className="font-medium">Payment Processing (1.5%)</p>
+                    <p className="text-muted-foreground">Platform payments: $100K</p>
+                  </div>
+                  <div className="p-3 rounded-md bg-background">
+                    <p className="font-medium">Premium Placement ($99/mo)</p>
+                    <p className="text-muted-foreground">Featured vendor: $50K</p>
+                  </div>
+                  <div className="p-3 rounded-md bg-background">
+                    <p className="font-medium">Lead Fee ($25/lead)</p>
+                    <p className="text-muted-foreground">Qualified PM intros: $75K</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* ============================================ */}
+          {/* NORTH STAR METRICS */}
+          {/* ============================================ */}
+          <div className="space-y-4 border-t pt-8">
             <h2 className="text-lg font-semibold">North Star Metrics (Annual Targets)</h2>
             <div className="overflow-x-auto">
               <table className="w-full text-sm border-collapse">
@@ -342,9 +1031,10 @@ export default function SuperUserGoals() {
             </div>
           </div>
 
-          {/* Weekly & Monthly Tracking */}
-          <div className="grid gap-6 md:grid-cols-2">
-            {/* Weekly */}
+          {/* ============================================ */}
+          {/* WEEKLY & MONTHLY TRACKING */}
+          {/* ============================================ */}
+          <div className="grid gap-6 md:grid-cols-2 border-t pt-8">
             <div className="space-y-4">
               <h2 className="text-lg font-semibold">Weekly Tracking</h2>
               <Card>
@@ -376,7 +1066,6 @@ export default function SuperUserGoals() {
               </Card>
             </div>
 
-            {/* Monthly */}
             <div className="space-y-4">
               <h2 className="text-lg font-semibold">Monthly Tracking</h2>
               <Card>
@@ -404,8 +1093,10 @@ export default function SuperUserGoals() {
             </div>
           </div>
 
-          {/* Risk Triggers */}
-          <div className="space-y-4">
+          {/* ============================================ */}
+          {/* RISK TRIGGERS */}
+          {/* ============================================ */}
+          <div className="space-y-4 border-t pt-8">
             <h2 className="text-lg font-semibold">Risk Triggers (When to Pivot)</h2>
             <Card>
               <CardContent className="pt-4">
@@ -431,7 +1122,9 @@ export default function SuperUserGoals() {
             </Card>
           </div>
 
-          {/* The Hierarchy */}
+          {/* ============================================ */}
+          {/* THE HIERARCHY */}
+          {/* ============================================ */}
           <Card className="bg-gradient-to-br from-primary/5 to-primary/10 border-primary/20">
             <CardHeader>
               <CardTitle className="text-base">The Hierarchy</CardTitle>
@@ -462,48 +1155,10 @@ export default function SuperUserGoals() {
             </CardContent>
           </Card>
 
-          {/* Summary Stats */}
-          <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-            <Card>
-              <CardContent className="pt-4 text-center">
-                <p className="text-3xl font-bold text-primary">
-                  {CRITICAL_TIPPING_POINTS.filter(p => isTippingPointMet(p.id)).length}
-                </p>
-                <p className="text-sm text-muted-foreground">Tipping Points Met</p>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardContent className="pt-4 text-center">
-                <p className="text-3xl font-bold text-primary">
-                  {getAchievedGoals(currentBuildings, BUILDING_GOALS).length}
-                </p>
-                <p className="text-sm text-muted-foreground">Building Goals Met</p>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardContent className="pt-4 text-center">
-                <p className="text-3xl font-bold text-primary">
-                  {currentBuildings.toLocaleString()}
-                </p>
-                <p className="text-sm text-muted-foreground">Buildings (The Moat)</p>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardContent className="pt-4 text-center">
-                <p className="text-3xl font-bold text-primary">
-                  ${Math.round(currentARR / 1000)}K
-                </p>
-                <p className="text-sm text-muted-foreground">Current ARR</p>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardContent className="pt-4 text-center">
-                <p className="text-3xl font-bold text-primary">
-                  {currentEmployers}
-                </p>
-                <p className="text-sm text-muted-foreground">Active Employers</p>
-              </CardContent>
-            </Card>
+          {/* Key Principle */}
+          <div className="text-center text-sm text-muted-foreground py-4 border-t">
+            <p className="font-medium">Key Principle: Every major decision has quantifiable triggers.</p>
+            <p>No launches based on intuition alone — let the data tell us when the market is ready.</p>
           </div>
         </div>
       </div>
