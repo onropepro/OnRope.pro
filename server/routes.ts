@@ -4939,10 +4939,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
-  // ==================== IRATA VERIFICATION ROUTES ====================
+  // ==================== IRATA/SPRAT VERIFICATION ROUTES ====================
   
-  // Verify IRATA license via screenshot analysis
-  const { analyzeIrataScreenshot } = await import("./gemini");
+  // Verify IRATA/SPRAT license via screenshot analysis
+  const { analyzeIrataScreenshot, analyzeSpratScreenshot } = await import("./gemini");
   
   const verificationUpload = multer({
     storage: multer.memoryStorage(),
@@ -4998,6 +4998,53 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
     } catch (error: any) {
       console.error("IRATA screenshot verification error:", error);
+      res.status(500).json({ message: error.message || "Failed to analyze screenshot" });
+    }
+  });
+  
+  // SPRAT screenshot verification endpoint
+  app.post("/api/verify-sprat-screenshot", requireAuth, verificationUpload.single('screenshot'), async (req: Request, res: Response) => {
+    try {
+      if (!req.file) {
+        return res.status(400).json({ message: "No screenshot file provided" });
+      }
+      
+      const user = await storage.getUserById(req.session.userId!);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      // Convert file buffer to base64
+      const imageBase64 = req.file.buffer.toString('base64');
+      const mimeType = req.file.mimetype;
+      
+      console.log(`[SPRAT-Verify] Analyzing screenshot for user ${user.id} (${user.name})`);
+      
+      // Analyze the screenshot with Gemini
+      const result = await analyzeSpratScreenshot(imageBase64, mimeType);
+      
+      console.log(`[SPRAT-Verify] Result:`, JSON.stringify(result));
+      
+      // If verification was successful, update the user's verification status
+      if (result.isValid && result.confidence !== "low") {
+        // Store verification result timestamp (pass Date object for timestamp column)
+        await storage.updateUser(user.id, {
+          spratVerifiedAt: new Date(),
+          spratVerificationStatus: result.status || "Verified",
+        });
+        
+        console.log(`[SPRAT-Verify] User ${user.id} SPRAT license verified successfully`);
+      }
+      
+      res.json({
+        success: result.isValid,
+        verification: result,
+        message: result.isValid 
+          ? "SPRAT license verification successful!" 
+          : result.error || "Could not verify SPRAT license from this screenshot"
+      });
+    } catch (error: any) {
+      console.error("SPRAT screenshot verification error:", error);
       res.status(500).json({ message: error.message || "Failed to analyze screenshot" });
     }
   });
