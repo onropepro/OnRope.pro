@@ -20,6 +20,7 @@ The platform is built with a React 18 frontend using TypeScript and Wouter for r
 *   **Multi-Tenant Role-Based Access Control (RBAC):** Supports various roles with granular permissions.
 *   **Project Management System:** Manages diverse job types with visual selection and multiple progress tracking systems.
 *   **Workforce & Time Tracking:** Includes employee management, real-time clock-in/out with GPS, billable/non-billable hours, and payroll-ready reporting. Includes IRATA certification expiration tracking and compensation type toggles.
+*   **Technician Self-Registration:** Comprehensive multi-step registration wizard collecting: name, certification (IRATA/SPRAT with split level/number format), address (street, city, province, country, postal code), email, phone, password, emergency contact, SIN (optional), bank info (transit, institution, account numbers) with void cheque upload, driver's license with expiry and abstract upload, birthday, and medical conditions. Includes clear privacy notice explaining data is used only by employer for HR/payroll/driving privileges and is never shared externally.
 *   **IRATA Task Logging System:** Comprehensive work hours logging system for IRATA technicians to track specific rope access tasks for certification progression.
 *   **Client Relationship Management (CRM):** Manages client and building records, offers autofill intelligence, and streamlines client-to-project workflows.
 *   **Scheduling & Resource Allocation:** Features a dual-calendar system with color-coding, drag-and-drop assignment, and conflict detection.
@@ -91,6 +92,25 @@ Contains all timezone-safe parsing and formatting utilities.
 *   **File Storage:** Replit Object Storage
 *   **Mapping:** Leaflet
 *   **Payment Processing:** Stripe
+
+## Security Considerations
+
+### Sensitive Data Storage (Implemented)
+The following employee fields are encrypted at rest using AES-256-GCM:
+- Social Insurance Number (SIN)
+- Bank transit, institution, and account numbers
+- Driver's license number
+- Special medical conditions
+
+**Implementation:** Field-level encryption is implemented in `server/encryption.ts` using AES-256-GCM with:
+- Random IV per encryption operation
+- Authentication tag for integrity verification
+- Key management via `ENCRYPTION_KEY` environment variable (32-byte hex string)
+- Backward compatibility: Unencrypted legacy data is returned as-is during decryption
+
+**Storage Integration:** All user CRUD operations in `server/storage.ts` automatically encrypt/decrypt sensitive fields via `encryptSensitiveFields()` and `decryptSensitiveFields()` helpers.
+
+**Privacy Commitment:** All sensitive employee data is securely stored, limited to authorized employer staff only, and never sold or shared outside your company without consent or legal requirement. Information is used for HR purposes including payroll processing, certification compliance, driving eligibility verification, and emergency contact procedures.
 
 ## Known Limitations
 

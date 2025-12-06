@@ -279,6 +279,18 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
           setError("Password must be at least 8 characters");
           return;
         }
+        if (!/[A-Z]/.test(data.password)) {
+          setError("Password must contain at least one uppercase letter");
+          return;
+        }
+        if (!/[a-z]/.test(data.password)) {
+          setError("Password must contain at least one lowercase letter");
+          return;
+        }
+        if (!/[0-9]/.test(data.password)) {
+          setError("Password must contain at least one number");
+          return;
+        }
         if (data.password !== data.confirmPassword) {
           setError("Passwords do not match");
           return;
@@ -321,6 +333,82 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
 
   const handleFileChange = (field: keyof TechnicianData, file: File | null) => {
     setData({ ...data, [field]: file });
+  };
+
+  const registrationMutation = useMutation({
+    mutationFn: async () => {
+      const formData = new FormData();
+      
+      formData.append('firstName', data.firstName);
+      formData.append('lastName', data.lastName);
+      formData.append('certification', data.certification || 'none');
+      formData.append('irataLevel', data.irataLevel);
+      formData.append('irataLicenseNumber', data.irataLicenseNumber);
+      formData.append('spratLevel', data.spratLevel);
+      formData.append('spratLicenseNumber', data.spratLicenseNumber);
+      formData.append('streetAddress', data.streetAddress);
+      formData.append('city', data.city);
+      formData.append('provinceState', data.provinceState);
+      formData.append('country', data.country);
+      formData.append('postalCode', data.postalCode);
+      formData.append('email', data.email);
+      formData.append('phone', data.phone);
+      formData.append('password', data.password);
+      formData.append('emergencyContactName', data.emergencyContactName);
+      formData.append('emergencyContactPhone', data.emergencyContactPhone);
+      formData.append('socialInsuranceNumber', data.socialInsuranceNumber);
+      formData.append('bankTransitNumber', data.bankTransitNumber);
+      formData.append('bankInstitutionNumber', data.bankInstitutionNumber);
+      formData.append('bankAccountNumber', data.bankAccountNumber);
+      formData.append('driversLicenseNumber', data.driversLicenseNumber);
+      formData.append('driversLicenseExpiry', data.driversLicenseExpiry);
+      formData.append('birthday', data.birthday);
+      formData.append('specialMedicalConditions', data.specialMedicalConditions);
+      
+      if (data.certificationCardFile) {
+        formData.append('certificationCard', data.certificationCardFile);
+      }
+      if (data.voidChequeFile) {
+        formData.append('voidCheque', data.voidChequeFile);
+      }
+      if (data.driversLicenseFile) {
+        formData.append('driversLicense', data.driversLicenseFile);
+      }
+      if (data.driversAbstractFile) {
+        formData.append('driversAbstract', data.driversAbstractFile);
+      }
+
+      const response = await fetch('/api/technician-register', {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Registration failed');
+      }
+
+      return response.json();
+    },
+    onSuccess: () => {
+      toast({
+        title: "Registration Submitted",
+        description: "Your registration has been submitted successfully.",
+      });
+      setStep("complete");
+    },
+    onError: (error: Error) => {
+      setError(error.message);
+      toast({
+        title: "Registration Failed",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
+
+  const handleSubmit = () => {
+    registrationMutation.mutate();
   };
 
   const PrivacyNotice = () => (
@@ -924,10 +1012,19 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
                 Create a password
               </DialogTitle>
               <DialogDescription className="text-center">
-                Choose a secure password (at least 8 characters)
+                Choose a secure password
               </DialogDescription>
             </DialogHeader>
             <div className="py-6 space-y-4">
+              <div className="p-3 rounded-lg bg-muted/50 text-xs text-muted-foreground space-y-1">
+                <p className="font-medium text-foreground">Password requirements:</p>
+                <ul className="list-disc list-inside space-y-0.5">
+                  <li>At least 8 characters</li>
+                  <li>At least one uppercase letter (A-Z)</li>
+                  <li>At least one lowercase letter (a-z)</li>
+                  <li>At least one number (0-9)</li>
+                </ul>
+              </div>
               <div className="space-y-2">
                 <Label htmlFor="password">Password</Label>
                 <Input
@@ -1368,17 +1465,28 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
             </div>
             <DialogFooter className="flex-col gap-2 sm:flex-col">
               <Button 
-                onClick={handleContinue} 
+                onClick={handleSubmit} 
                 className="w-full"
+                disabled={registrationMutation.isPending}
                 data-testid="button-save-registration"
               >
-                Save Registration
-                <ArrowRight className="w-4 h-4 ml-2" />
+                {registrationMutation.isPending ? (
+                  <>
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    Submitting...
+                  </>
+                ) : (
+                  <>
+                    Save Registration
+                    <ArrowRight className="w-4 h-4 ml-2" />
+                  </>
+                )}
               </Button>
               <Button 
                 variant="ghost" 
                 onClick={handleBack}
                 className="w-full"
+                disabled={registrationMutation.isPending}
               >
                 <ArrowLeft className="w-4 h-4 mr-2" />
                 Back

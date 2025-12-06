@@ -777,6 +777,227 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Technician Self-Registration - SECURITY: Rate limited, public endpoint
+  const technicianUpload = multer({
+    storage: multer.memoryStorage(),
+    limits: { fileSize: 10 * 1024 * 1024 }, // 10MB max per file
+    fileFilter: (req, file, cb) => {
+      if (file.mimetype.startsWith('image/') || file.mimetype === 'application/pdf') {
+        cb(null, true);
+      } else {
+        cb(new Error('Only image or PDF files are allowed'));
+      }
+    }
+  }).fields([
+    { name: 'certificationCard', maxCount: 1 },
+    { name: 'voidCheque', maxCount: 1 },
+    { name: 'driversLicense', maxCount: 1 },
+    { name: 'driversAbstract', maxCount: 1 },
+  ]);
+
+  app.post("/api/technician-register", registrationRateLimiter, technicianUpload, async (req: Request, res: Response) => {
+    try {
+      const {
+        firstName,
+        lastName,
+        certification,
+        irataLevel,
+        irataLicenseNumber,
+        spratLevel,
+        spratLicenseNumber,
+        streetAddress,
+        city,
+        provinceState,
+        country,
+        postalCode,
+        email,
+        phone,
+        password,
+        emergencyContactName,
+        emergencyContactPhone,
+        socialInsuranceNumber,
+        bankTransitNumber,
+        bankInstitutionNumber,
+        bankAccountNumber,
+        driversLicenseNumber,
+        driversLicenseExpiry,
+        birthday,
+        specialMedicalConditions,
+        companyCode, // Optional - code to link to a specific company
+      } = req.body;
+
+      console.log('[Technician-Register] Received registration:', { firstName, lastName, email, certification });
+
+      // Validate required fields
+      if (!firstName || !lastName) {
+        return res.status(400).json({ message: "First and last name are required" });
+      }
+      if (!email) {
+        return res.status(400).json({ message: "Email is required" });
+      }
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        return res.status(400).json({ message: "Invalid email format" });
+      }
+      if (!phone) {
+        return res.status(400).json({ message: "Phone number is required" });
+      }
+      if (!password) {
+        return res.status(400).json({ message: "Password is required" });
+      }
+      if (!emergencyContactName || !emergencyContactPhone) {
+        return res.status(400).json({ message: "Emergency contact is required" });
+      }
+      if (!streetAddress || !city || !provinceState || !country || !postalCode) {
+        return res.status(400).json({ message: "Full address is required" });
+      }
+
+      // Validate password strength
+      const passwordValidation = validatePasswordStrength(password);
+      if (!passwordValidation.valid) {
+        return res.status(400).json({ message: passwordValidation.message });
+      }
+
+      // Validate certification and license numbers
+      if (certification === 'irata' || certification === 'both') {
+        if (!irataLevel || !irataLicenseNumber) {
+          return res.status(400).json({ message: "IRATA level and license number are required" });
+        }
+      }
+      if (certification === 'sprat' || certification === 'both') {
+        if (!spratLevel || !spratLicenseNumber) {
+          return res.status(400).json({ message: "SPRAT level and license number are required" });
+        }
+      }
+
+      // Check if user already exists
+      const existingUser = await storage.getUserByEmail(email);
+      if (existingUser) {
+        return res.status(400).json({ message: "An account with this email already exists. Please log in instead." });
+      }
+
+      // Handle file uploads
+      const files = req.files as { [fieldname: string]: Express.Multer.File[] };
+      const uploadedUrls: { [key: string]: string } = {};
+      const objectStorageService = new ObjectStorageService();
+
+      if (files) {
+        for (const [fieldName, fileArray] of Object.entries(files)) {
+          if (fileArray && fileArray.length > 0) {
+            const file = fileArray[0];
+            const timestamp = Date.now();
+            const extension = file.mimetype === 'application/pdf' ? 'pdf' : file.mimetype.split('/')[1];
+            const filename = `technician-${fieldName}-${timestamp}.${extension}`;
+            
+            try {
+              const url = await objectStorageService.uploadPublicFile(filename, file.buffer, file.mimetype);
+              uploadedUrls[fieldName] = url;
+              console.log(`[Technician-Register] Uploaded ${fieldName}:`, url);
+            } catch (uploadError) {
+              console.error(`[Technician-Register] Failed to upload ${fieldName}:`, uploadError);
+            }
+          }
+        }
+      }
+
+      // Build IRATA documents array
+      const irataDocuments: string[] = [];
+      if (uploadedUrls.certificationCard) {
+        irataDocuments.push(uploadedUrls.certificationCard);
+      }
+
+      // Build driver's license documents array
+      const driversLicenseDocuments: string[] = [];
+      if (uploadedUrls.driversLicense) {
+        driversLicenseDocuments.push(uploadedUrls.driversLicense);
+      }
+      if (uploadedUrls.driversAbstract) {
+        driversLicenseDocuments.push(uploadedUrls.driversAbstract);
+      }
+
+      // Build bank documents array
+      const bankDocuments: string[] = [];
+      if (uploadedUrls.voidCheque) {
+        bankDocuments.push(uploadedUrls.voidCheque);
+      }
+
+      // Determine tech level from IRATA or SPRAT
+      let techLevel = null;
+      if (certification === 'irata' || certification === 'both') {
+        techLevel = `Level ${irataLevel}`;
+      } else if (certification === 'sprat') {
+        techLevel = `Level ${spratLevel}`;
+      }
+
+      // Format IRATA license number with prefix (e.g., "1/123456")
+      const formattedIrataLicense = irataLevel && irataLicenseNumber 
+        ? `${irataLevel}/${irataLicenseNumber}` 
+        : null;
+
+      // Create the technician user (pending company approval)
+      const user = await storage.createUser({
+        name: `${firstName} ${lastName}`,
+        email,
+        role: 'rope_access_tech',
+        passwordHash: password, // storage.createUser will hash this
+        techLevel,
+        companyId: null, // Will be linked to company after approval
+        
+        // Address fields
+        employeeStreetAddress: streetAddress,
+        employeeCity: city,
+        employeeProvinceState: provinceState,
+        employeeCountry: country,
+        employeePostalCode: postalCode,
+        
+        // Contact info
+        employeePhoneNumber: phone,
+        emergencyContactName,
+        emergencyContactPhone,
+        
+        // Sensitive data
+        socialInsuranceNumber: socialInsuranceNumber || null,
+        
+        // Bank info
+        bankTransitNumber: bankTransitNumber || null,
+        bankInstitutionNumber: bankInstitutionNumber || null,
+        bankAccountNumber: bankAccountNumber || null,
+        bankDocuments: bankDocuments.length > 0 ? bankDocuments : [],
+        
+        // Driver's license
+        driversLicenseNumber: driversLicenseNumber || null,
+        driversLicenseExpiry: driversLicenseExpiry || null,
+        driversLicenseDocuments: driversLicenseDocuments.length > 0 ? driversLicenseDocuments : [],
+        
+        // Personal info
+        birthday: birthday || null,
+        specialMedicalConditions: specialMedicalConditions || null,
+        
+        // IRATA certification
+        irataLevel: irataLevel ? `Level ${irataLevel}` : null,
+        irataLicenseNumber: formattedIrataLicense,
+        irataDocuments: irataDocuments.length > 0 ? irataDocuments : [],
+        
+        // SPRAT certification
+        spratLevel: spratLevel ? `Level ${spratLevel}` : null,
+        spratLicenseNumber: spratLicenseNumber || null,
+        
+        // Start date - use timezone-safe utility
+        startDate: getTodayString(),
+      });
+
+      console.log('[Technician-Register] User created:', user.id);
+
+      // Return success (don't log them in - they need to be approved first)
+      res.json({ 
+        success: true,
+        message: "Registration submitted successfully. You will receive an email once your account is approved."
+      });
+    } catch (error: any) {
+      console.error('[Technician-Register] Error:', error);
+      res.status(500).json({ message: error.message || "Registration failed" });
+    }
+  });
+
   // Login endpoint - SECURITY: Rate limited to prevent brute force attacks
   app.post("/api/login", loginRateLimiter, async (req: Request, res: Response) => {
     try {
