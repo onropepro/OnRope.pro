@@ -1045,11 +1045,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       }
       
-      // Try to find user by email or company name
+      // Try to find user by email, company name, or rope access license number
       let user = await storage.getUserByEmail(identifier);
       
       if (!user) {
         user = await storage.getUserByCompanyName(identifier);
+      }
+      
+      // Also check for IRATA/SPRAT license number (for technician login)
+      if (!user) {
+        user = await storage.getUserByRopeAccessLicense(identifier);
       }
       
       if (!user) {
@@ -2409,6 +2414,135 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Get user error:", error);
       res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Technician: Update own profile
+  app.patch("/api/technician/profile", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const userId = req.session.userId;
+      if (!userId) {
+        return res.status(401).json({ message: "Not authenticated" });
+      }
+
+      const user = await storage.getUserById(userId);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      // Allow technicians and employees to update their own profile
+      const allowedRoles = ['rope_access_tech', 'operations_manager', 'office_admin', 'safety_officer', 'ground_crew'];
+      if (!allowedRoles.includes(user.role)) {
+        return res.status(403).json({ message: "Only technicians can update their profile via this endpoint" });
+      }
+
+      const {
+        name,
+        email,
+        employeePhoneNumber,
+        employeeStreetAddress,
+        employeeCity,
+        employeeProvinceState,
+        employeeCountry,
+        employeePostalCode,
+        emergencyContactName,
+        emergencyContactPhone,
+        emergencyContactRelationship,
+        socialInsuranceNumber,
+        bankTransitNumber,
+        bankInstitutionNumber,
+        bankAccountNumber,
+        driversLicenseNumber,
+        driversLicenseExpiry,
+        birthday,
+        specialMedicalConditions,
+        irataBaselineHours,
+      } = req.body;
+
+      // Validate required fields
+      if (!name || !email || !employeePhoneNumber) {
+        return res.status(400).json({ message: "Name, email, and phone are required" });
+      }
+
+      if (!emergencyContactName || !emergencyContactPhone) {
+        return res.status(400).json({ message: "Emergency contact is required" });
+      }
+
+      // Check if email is being changed to one that already exists
+      if (email !== user.email) {
+        const existingUser = await storage.getUserByEmail(email);
+        if (existingUser && existingUser.id !== userId) {
+          return res.status(400).json({ message: "Email is already in use by another account" });
+        }
+      }
+
+      // Build update object - storage.updateUser handles encryption automatically
+      // via encryptSensitiveFields for SIN, bank info, and medical conditions
+      const updateData: any = {
+        name,
+        email,
+        employeePhoneNumber,
+        emergencyContactName,
+        emergencyContactPhone,
+      };
+
+      // Add optional address fields only if provided
+      if (employeeStreetAddress !== undefined) updateData.employeeStreetAddress = employeeStreetAddress || null;
+      if (employeeCity !== undefined) updateData.employeeCity = employeeCity || null;
+      if (employeeProvinceState !== undefined) updateData.employeeProvinceState = employeeProvinceState || null;
+      if (employeeCountry !== undefined) updateData.employeeCountry = employeeCountry || null;
+      if (employeePostalCode !== undefined) updateData.employeePostalCode = employeePostalCode || null;
+      if (emergencyContactRelationship !== undefined) updateData.emergencyContactRelationship = emergencyContactRelationship || null;
+      if (birthday !== undefined) updateData.birthday = birthday || null;
+      if (driversLicenseExpiry !== undefined) updateData.driversLicenseExpiry = driversLicenseExpiry || null;
+      if (irataBaselineHours !== undefined) updateData.irataBaselineHours = irataBaselineHours || "0";
+
+      // Sensitive fields - these are encrypted by storage.updateUser via encryptSensitiveFields
+      if (socialInsuranceNumber !== undefined) updateData.socialInsuranceNumber = socialInsuranceNumber || null;
+      if (bankTransitNumber !== undefined) updateData.bankTransitNumber = bankTransitNumber || null;
+      if (bankInstitutionNumber !== undefined) updateData.bankInstitutionNumber = bankInstitutionNumber || null;
+      if (bankAccountNumber !== undefined) updateData.bankAccountNumber = bankAccountNumber || null;
+      if (driversLicenseNumber !== undefined) updateData.driversLicenseNumber = driversLicenseNumber || null;
+      if (specialMedicalConditions !== undefined) updateData.specialMedicalConditions = specialMedicalConditions || null;
+
+      // Update the user profile - storage.updateUser applies encryption to sensitive fields
+      const updatedUser = await storage.updateUser(userId, updateData);
+
+      console.log(`[Technician-Profile] Profile updated for user ${userId}`);
+
+      // Strip/mask sensitive fields before returning to minimize transport exposure
+      const { 
+        passwordHash, 
+        socialInsuranceNumber: sinValue,
+        bankTransitNumber: transitValue,
+        bankInstitutionNumber: instValue,
+        bankAccountNumber: acctValue,
+        driversLicenseNumber: dlValue,
+        specialMedicalConditions: medValue,
+        ...safeUser 
+      } = updatedUser;
+
+      // Mask sensitive values - show only last 4 chars if they exist
+      const maskValue = (val: string | null) => {
+        if (!val) return null;
+        if (val.length <= 4) return '****';
+        return '*'.repeat(val.length - 4) + val.slice(-4);
+      };
+
+      const maskedUser = {
+        ...safeUser,
+        socialInsuranceNumber: maskValue(sinValue),
+        bankTransitNumber: maskValue(transitValue),
+        bankInstitutionNumber: maskValue(instValue),
+        bankAccountNumber: maskValue(acctValue),
+        driversLicenseNumber: maskValue(dlValue),
+        specialMedicalConditions: medValue ? '[Recorded]' : null,
+      };
+
+      res.json({ user: maskedUser });
+    } catch (error: any) {
+      console.error("[Technician-Profile] Error updating profile:", error);
+      res.status(500).json({ message: error.message || "Failed to update profile" });
     }
   });
 

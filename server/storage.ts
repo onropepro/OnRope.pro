@@ -39,6 +39,19 @@ export class Storage {
     return result[0] ? decryptSensitiveFields(result[0]) : undefined;
   }
 
+  async getUserByRopeAccessLicense(licenseNumber: string): Promise<User | undefined> {
+    // Search for users by IRATA or SPRAT license number
+    // For IRATA, the stored format is "level/number" (e.g., "1/123456"), so we search with LIKE %/number
+    // For SPRAT, the stored format is just the number
+    const result = await db.select().from(users).where(
+      or(
+        sql`${users.irataLicenseNumber} LIKE '%/' || ${licenseNumber}`,
+        eq(users.spratLicenseNumber, licenseNumber)
+      )
+    ).limit(1);
+    return result[0] ? decryptSensitiveFields(result[0]) : undefined;
+  }
+
   async createUser(user: InsertUser): Promise<User> {
     // Hash password before storing
     const hashedPassword = await bcrypt.hash(user.passwordHash, SALT_ROUNDS);
