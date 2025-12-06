@@ -286,7 +286,23 @@ export default function TechnicianPortal() {
     };
     message: string;
   } | null>(null);
+  const [isVerifyingSprat, setIsVerifyingSprat] = useState(false);
+  const [spratVerificationResult, setSpratVerificationResult] = useState<{
+    success: boolean;
+    verification?: {
+      isValid: boolean;
+      technicianName: string | null;
+      spratNumber: string | null;
+      spratLevel: number | null;
+      expiryDate: string | null;
+      status: string | null;
+      confidence: string;
+      error: string | null;
+    };
+    message: string;
+  } | null>(null);
   const screenshotInputRef = useRef<HTMLInputElement>(null);
+  const spratScreenshotInputRef = useRef<HTMLInputElement>(null);
 
   const { data: userData, isLoading } = useQuery<{ user: any }>({
     queryKey: ["/api/user"],
@@ -417,6 +433,67 @@ export default function TechnicianPortal() {
       setIsVerifying(false);
       if (screenshotInputRef.current) {
         screenshotInputRef.current.value = '';
+      }
+    }
+  };
+
+  const handleSpratScreenshotUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
+      toast({
+        title: t.invalidFile,
+        description: t.uploadImageFile,
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsVerifyingSprat(true);
+    setSpratVerificationResult(null);
+
+    try {
+      const formData = new FormData();
+      formData.append('screenshot', file);
+
+      const response = await fetch('/api/verify-sprat-screenshot', {
+        method: 'POST',
+        credentials: 'include',
+        body: formData,
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.message || t.verificationFailed);
+      }
+
+      setSpratVerificationResult(result);
+      
+      if (result.success) {
+        toast({
+          title: t.verificationSuccessful,
+          description: t.spratVerified,
+        });
+        queryClient.invalidateQueries({ queryKey: ["/api/user"] });
+      } else {
+        toast({
+          title: t.verificationIssue,
+          description: result.message || t.couldNotVerify,
+          variant: "destructive",
+        });
+      }
+    } catch (error: any) {
+      toast({
+        title: t.verificationFailed,
+        description: error.message || t.failedToAnalyze,
+        variant: "destructive",
+      });
+    } finally {
+      setIsVerifyingSprat(false);
+      if (spratScreenshotInputRef.current) {
+        spratScreenshotInputRef.current.value = '';
       }
     }
   };
@@ -1029,15 +1106,15 @@ export default function TechnicianPortal() {
                     </div>
                   )}
                   
-                  {/* License Verification Section */}
-                  {(user.irataLevel || user.spratLevel) && (
+                  {/* IRATA License Verification Section */}
+                  {user.irataLevel && (
                     <div className="mt-6 p-4 bg-primary/5 border border-primary/20 rounded-lg space-y-4">
                       {/* Show verified status if already verified */}
                       {user.irataVerifiedAt && (
                         <div className="flex items-center gap-3 p-3 bg-green-500/10 border border-green-500/30 rounded-lg">
                           <CheckCircle2 className="w-5 h-5 text-green-600 flex-shrink-0" />
                           <div>
-                            <p className="text-sm font-medium text-green-700 dark:text-green-400">{t.licenseVerified}</p>
+                            <p className="text-sm font-medium text-green-700 dark:text-green-400">IRATA {t.licenseVerified}</p>
                             <p className="text-xs text-muted-foreground">
                               {t.lastVerified}: {formatDateTime(user.irataVerifiedAt)}
                               {user.irataVerificationStatus && ` (${user.irataVerificationStatus})`}
@@ -1050,7 +1127,7 @@ export default function TechnicianPortal() {
                         <CheckCircle2 className="w-5 h-5 text-primary mt-0.5 flex-shrink-0" />
                         <div className="space-y-2">
                           <h4 className="font-medium text-sm">
-                            {user.irataVerifiedAt ? t.reverifyLicense : t.verifyLicenseValidity}
+                            {user.irataVerifiedAt ? t.reverifyLicense : t.verifyLicenseValidity} (IRATA)
                           </h4>
                           <p className="text-xs text-muted-foreground leading-relaxed">
                             {t.verificationExplanation}
@@ -1085,7 +1162,7 @@ export default function TechnicianPortal() {
                           accept="image/*"
                           onChange={handleScreenshotUpload}
                           className="hidden"
-                          data-testid="input-screenshot-upload"
+                          data-testid="input-irata-screenshot-upload"
                         />
                         
                         <Button
@@ -1093,7 +1170,7 @@ export default function TechnicianPortal() {
                           className="w-full"
                           onClick={() => screenshotInputRef.current?.click()}
                           disabled={isVerifying}
-                          data-testid="button-upload-screenshot"
+                          data-testid="button-upload-irata-screenshot"
                         >
                           {isVerifying ? (
                             <>
@@ -1131,19 +1208,144 @@ export default function TechnicianPortal() {
                               {verificationResult.verification && verificationResult.success && (
                                 <div className="text-xs text-muted-foreground space-y-0.5">
                                   {verificationResult.verification.technicianName && (
-                                    <p>Name: {verificationResult.verification.technicianName}</p>
+                                    <p>{t.name}: {verificationResult.verification.technicianName}</p>
                                   )}
                                   {verificationResult.verification.irataNumber && (
-                                    <p>License: {verificationResult.verification.irataNumber}</p>
+                                    <p>{t.license}: {verificationResult.verification.irataNumber}</p>
                                   )}
                                   {verificationResult.verification.irataLevel && (
-                                    <p>Level: {verificationResult.verification.irataLevel}</p>
+                                    <p>{t.level}: {verificationResult.verification.irataLevel}</p>
                                   )}
                                   {verificationResult.verification.expiryDate && (
-                                    <p>Valid Until: {verificationResult.verification.expiryDate}</p>
+                                    <p>{t.validUntil}: {verificationResult.verification.expiryDate}</p>
                                   )}
                                   <p className="text-xs opacity-70">
-                                    Confidence: {verificationResult.verification.confidence}
+                                    {t.confidence}: {verificationResult.verification.confidence}
+                                  </p>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {/* SPRAT License Verification Section */}
+                  {user.spratLevel && (
+                    <div className="mt-6 p-4 bg-primary/5 border border-primary/20 rounded-lg space-y-4">
+                      {/* Show verified status if already verified */}
+                      {user.spratVerifiedAt && (
+                        <div className="flex items-center gap-3 p-3 bg-green-500/10 border border-green-500/30 rounded-lg">
+                          <CheckCircle2 className="w-5 h-5 text-green-600 flex-shrink-0" />
+                          <div>
+                            <p className="text-sm font-medium text-green-700 dark:text-green-400">SPRAT {t.licenseVerified}</p>
+                            <p className="text-xs text-muted-foreground">
+                              {t.lastVerified}: {formatDateTime(user.spratVerifiedAt)}
+                              {user.spratVerificationStatus && ` (${user.spratVerificationStatus})`}
+                            </p>
+                          </div>
+                        </div>
+                      )}
+                      
+                      <div className="flex items-start gap-3">
+                        <CheckCircle2 className="w-5 h-5 text-primary mt-0.5 flex-shrink-0" />
+                        <div className="space-y-2">
+                          <h4 className="font-medium text-sm">
+                            {user.spratVerifiedAt ? t.reverifyLicense : t.verifyLicenseValidity} (SPRAT)
+                          </h4>
+                          <p className="text-xs text-muted-foreground leading-relaxed">
+                            {t.spratVerificationExplanation}
+                          </p>
+                          <div className="text-xs text-muted-foreground space-y-1 pt-1">
+                            <p className="font-medium">{t.howItWorks}</p>
+                            <ol className="list-decimal list-inside space-y-0.5 pl-1">
+                              <li>{t.spratStep1}</li>
+                              <li>{t.step2}</li>
+                              <li>{t.step3}</li>
+                              <li>{t.step4}</li>
+                            </ol>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      {/* Action buttons */}
+                      <div className="flex flex-col gap-2">
+                        <Button
+                          variant="outline"
+                          className="w-full"
+                          onClick={() => window.open('https://sprat.org/verify/', '_blank')}
+                          data-testid="button-open-sprat-portal"
+                        >
+                          <ExternalLink className="w-4 h-4 mr-2" />
+                          {t.openSpratPortal}
+                        </Button>
+                        
+                        <input
+                          type="file"
+                          ref={spratScreenshotInputRef}
+                          accept="image/*"
+                          onChange={handleSpratScreenshotUpload}
+                          className="hidden"
+                          data-testid="input-sprat-screenshot-upload"
+                        />
+                        
+                        <Button
+                          variant="default"
+                          className="w-full"
+                          onClick={() => spratScreenshotInputRef.current?.click()}
+                          disabled={isVerifyingSprat}
+                          data-testid="button-upload-sprat-screenshot"
+                        >
+                          {isVerifyingSprat ? (
+                            <>
+                              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                              {t.analyzingScreenshot}
+                            </>
+                          ) : (
+                            <>
+                              <Upload className="w-4 h-4 mr-2" />
+                              {t.uploadVerificationScreenshot}
+                            </>
+                          )}
+                        </Button>
+                      </div>
+                      
+                      {/* SPRAT Verification Result Display */}
+                      {spratVerificationResult && (
+                        <div className={`p-3 rounded-lg border ${
+                          spratVerificationResult.success 
+                            ? 'bg-green-500/10 border-green-500/30' 
+                            : 'bg-destructive/10 border-destructive/30'
+                        }`}>
+                          <div className="flex items-start gap-2">
+                            {spratVerificationResult.success ? (
+                              <CheckCircle2 className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                            ) : (
+                              <AlertCircle className="w-5 h-5 text-destructive flex-shrink-0 mt-0.5" />
+                            )}
+                            <div className="space-y-1 text-sm">
+                              <p className={`font-medium ${
+                                spratVerificationResult.success ? 'text-green-700 dark:text-green-400' : 'text-destructive'
+                              }`}>
+                                {spratVerificationResult.message}
+                              </p>
+                              {spratVerificationResult.verification && spratVerificationResult.success && (
+                                <div className="text-xs text-muted-foreground space-y-0.5">
+                                  {spratVerificationResult.verification.technicianName && (
+                                    <p>{t.name}: {spratVerificationResult.verification.technicianName}</p>
+                                  )}
+                                  {spratVerificationResult.verification.spratNumber && (
+                                    <p>{t.license}: {spratVerificationResult.verification.spratNumber}</p>
+                                  )}
+                                  {spratVerificationResult.verification.spratLevel && (
+                                    <p>{t.level}: {spratVerificationResult.verification.spratLevel}</p>
+                                  )}
+                                  {spratVerificationResult.verification.expiryDate && (
+                                    <p>{t.validUntil}: {spratVerificationResult.verification.expiryDate}</p>
+                                  )}
+                                  <p className="text-xs opacity-70">
+                                    {t.confidence}: {spratVerificationResult.verification.confidence}
                                   </p>
                                 </div>
                               )}
