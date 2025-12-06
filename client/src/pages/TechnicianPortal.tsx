@@ -217,59 +217,60 @@ export default function TechnicianPortal() {
 
       <main className="max-w-4xl mx-auto px-4 py-6 space-y-6">
         <Card>
-          <CardHeader className="flex flex-row items-start justify-between gap-4">
-            <div className="flex items-center gap-4">
-              <div className="p-3 rounded-full bg-primary/10">
-                <HardHat className="w-8 h-8 text-primary" />
-              </div>
-              <div>
-                <CardTitle className="text-xl">{user.name}</CardTitle>
-                <CardDescription className="flex items-center gap-2 mt-1">
-                  {user.irataLevel && (
-                    <Badge variant="secondary" className="gap-1">
-                      <Award className="w-3 h-3" />
-                      IRATA {user.irataLevel}
-                    </Badge>
-                  )}
-                  {user.spratLevel && (
-                    <Badge variant="secondary" className="gap-1">
-                      <Award className="w-3 h-3" />
-                      SPRAT {user.spratLevel}
-                    </Badge>
-                  )}
-                </CardDescription>
+          <CardHeader className="space-y-4">
+            <div className="flex items-center justify-between gap-4">
+              <div className="flex items-center gap-3 sm:gap-4">
+                <div className="p-2 sm:p-3 rounded-full bg-primary/10">
+                  <HardHat className="w-6 h-6 sm:w-8 sm:h-8 text-primary" />
+                </div>
+                <div>
+                  <CardTitle className="text-lg sm:text-xl">{user.name}</CardTitle>
+                  <CardDescription className="flex flex-wrap items-center gap-2 mt-1">
+                    {user.irataLevel && (
+                      <Badge variant="secondary" className="gap-1">
+                        <Award className="w-3 h-3" />
+                        IRATA {user.irataLevel}
+                      </Badge>
+                    )}
+                    {user.spratLevel && (
+                      <Badge variant="secondary" className="gap-1">
+                        <Award className="w-3 h-3" />
+                        SPRAT {user.spratLevel}
+                      </Badge>
+                    )}
+                  </CardDescription>
+                </div>
               </div>
             </div>
             {!isEditing ? (
               <Button
                 variant="outline"
-                size="sm"
                 onClick={startEditing}
-                className="gap-2"
+                className="w-full sm:w-auto gap-2 h-11"
                 data-testid="button-edit-profile"
               >
                 <Edit2 className="w-4 h-4" />
                 Edit Profile
               </Button>
             ) : (
-              <div className="flex gap-2">
+              <div className="flex gap-2 w-full sm:w-auto">
                 <Button
                   variant="outline"
-                  size="sm"
                   onClick={() => setIsEditing(false)}
+                  className="flex-1 sm:flex-none h-11"
                   data-testid="button-cancel-edit"
                 >
-                  <X className="w-4 h-4" />
+                  <X className="w-4 h-4 mr-2" />
+                  Cancel
                 </Button>
                 <Button
-                  size="sm"
                   onClick={form.handleSubmit(onSubmit)}
                   disabled={updateMutation.isPending}
-                  className="gap-2"
+                  className="flex-1 sm:flex-none gap-2 h-11"
                   data-testid="button-save-profile"
                 >
                   <Save className="w-4 h-4" />
-                  {updateMutation.isPending ? "Saving..." : "Save"}
+                  {updateMutation.isPending ? "Saving..." : "Save Changes"}
                 </Button>
               </div>
             )}
@@ -720,26 +721,27 @@ export default function TechnicianPortal() {
                         />
                       </div>
                       {user.driversLicenseDocuments && user.driversLicenseDocuments.length > 0 && (
-                        <div className="pt-2">
-                          <p className="text-xs text-muted-foreground mb-2">Uploaded Documents</p>
-                          <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+                        <div className="pt-3">
+                          <p className="text-sm text-muted-foreground mb-3">Uploaded Documents</p>
+                          <div className="grid grid-cols-2 gap-3">
                             {user.driversLicenseDocuments.map((url: string, index: number) => (
                               <a 
                                 key={index} 
                                 href={url} 
                                 target="_blank" 
                                 rel="noopener noreferrer"
-                                className="block border rounded-md overflow-hidden hover:opacity-80 transition-opacity"
+                                className="block border-2 rounded-lg overflow-hidden active:opacity-70 transition-opacity"
                               >
                                 {url.toLowerCase().endsWith('.pdf') ? (
-                                  <div className="flex items-center justify-center h-24 bg-muted">
-                                    <FileText className="w-8 h-8 text-muted-foreground" />
+                                  <div className="flex flex-col items-center justify-center h-32 sm:h-28 bg-muted gap-2">
+                                    <FileText className="w-10 h-10 text-muted-foreground" />
+                                    <span className="text-xs text-muted-foreground">View PDF</span>
                                   </div>
                                 ) : (
                                   <img 
                                     src={url} 
                                     alt={`License document ${index + 1}`}
-                                    className="w-full h-24 object-cover"
+                                    className="w-full h-32 sm:h-28 object-cover"
                                   />
                                 )}
                               </a>
@@ -757,26 +759,27 @@ export default function TechnicianPortal() {
                     <div className="space-y-3">
                       <h3 className="font-medium flex items-center gap-2 text-muted-foreground">
                         <ImageIcon className="w-4 h-4" />
-                        Banking Documents
+                        Banking Documents (Void Cheque)
                       </h3>
-                      <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+                      <div className="grid grid-cols-2 gap-3">
                         {user.bankDocuments.map((url: string, index: number) => (
                           <a 
                             key={index} 
                             href={url} 
                             target="_blank" 
                             rel="noopener noreferrer"
-                            className="block border rounded-md overflow-hidden hover:opacity-80 transition-opacity"
+                            className="block border-2 rounded-lg overflow-hidden active:opacity-70 transition-opacity"
                           >
                             {url.toLowerCase().endsWith('.pdf') ? (
-                              <div className="flex items-center justify-center h-24 bg-muted">
-                                <FileText className="w-8 h-8 text-muted-foreground" />
+                              <div className="flex flex-col items-center justify-center h-32 sm:h-28 bg-muted gap-2">
+                                <FileText className="w-10 h-10 text-muted-foreground" />
+                                <span className="text-xs text-muted-foreground">View PDF</span>
                               </div>
                             ) : (
                               <img 
                                 src={url} 
                                 alt={`Banking document ${index + 1}`}
-                                className="w-full h-24 object-cover"
+                                className="w-full h-32 sm:h-28 object-cover"
                               />
                             )}
                           </a>
