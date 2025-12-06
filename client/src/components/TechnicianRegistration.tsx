@@ -915,9 +915,10 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
                       Your current logbook total hours help us provide accurate hour tracking going forward. 
                       When you log future work hours, we can show you your cumulative total based on this starting point.
                     </p>
-                    <p>
-                      This is especially useful for tracking your progression towards IRATA level upgrades, 
-                      which require documented rope access hours.
+                    <p className="text-xs border-t pt-2 mt-2">
+                      <strong>Important:</strong> This is a personal tracking tool only. It is NOT an official 
+                      IRATA or SPRAT approved method for logging hours. Your official logbook remains the 
+                      authoritative record for certification purposes.
                     </p>
                   </div>
                 </div>
@@ -936,7 +937,7 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
                   onChange={(e) => setData({ ...data, logbookTotalHours: e.target.value })}
                 />
                 <p className="text-xs text-muted-foreground">
-                  Enter the total hours from your current IRATA logbook. You can leave this blank if unsure.
+                  Enter your approximate total hours for personal tracking. This does not replace your official logbook.
                 </p>
               </div>
 
