@@ -138,6 +138,22 @@ const translations = {
     errorPhoneRequired: "Phone is required",
     errorEmergencyNameRequired: "Emergency contact name is required",
     errorEmergencyPhoneRequired: "Emergency contact phone is required",
+    teamInvitations: "Team Invitations",
+    pendingInvitations: "Pending Invitations",
+    noInvitations: "No pending invitations",
+    noInvitationsDesc: "When a company invites you to join their team, it will appear here.",
+    invitedBy: "Invitation from",
+    acceptInvitation: "Accept",
+    declineInvitation: "Decline",
+    acceptingInvitation: "Accepting...",
+    decliningInvitation: "Declining...",
+    invitationAccepted: "Invitation Accepted",
+    welcomeToTeam: "Welcome to the team!",
+    invitationDeclined: "Invitation Declined",
+    declinedMessage: "You have declined this invitation.",
+    invitationError: "Error",
+    invitationMessage: "Message",
+    invitedOn: "Invited on",
   },
   fr: {
     technicianPortal: "Portail du technicien",
@@ -232,6 +248,22 @@ const translations = {
     errorPhoneRequired: "Le téléphone est requis",
     errorEmergencyNameRequired: "Le nom du contact d'urgence est requis",
     errorEmergencyPhoneRequired: "Le téléphone du contact d'urgence est requis",
+    teamInvitations: "Invitations d'équipe",
+    pendingInvitations: "Invitations en attente",
+    noInvitations: "Aucune invitation en attente",
+    noInvitationsDesc: "Lorsqu'une entreprise vous invite à rejoindre son équipe, cela apparaîtra ici.",
+    invitedBy: "Invitation de",
+    acceptInvitation: "Accepter",
+    declineInvitation: "Refuser",
+    acceptingInvitation: "Acceptation...",
+    decliningInvitation: "Refus...",
+    invitationAccepted: "Invitation acceptée",
+    welcomeToTeam: "Bienvenue dans l'équipe!",
+    invitationDeclined: "Invitation refusée",
+    declinedMessage: "Vous avez refusé cette invitation.",
+    invitationError: "Erreur",
+    invitationMessage: "Message",
+    invitedOn: "Invité le",
   }
 };
 
@@ -360,6 +392,85 @@ export default function TechnicianPortal() {
         description: error.message || t.updateFailed,
         variant: "destructive",
       });
+    },
+  });
+
+  const [processingInvitationId, setProcessingInvitationId] = useState<string | null>(null);
+
+  const { data: invitationsData } = useQuery<{
+    invitations: Array<{
+      id: string;
+      message: string | null;
+      createdAt: string;
+      company: {
+        id: string;
+        name: string;
+        email: string;
+      };
+    }>;
+  }>({
+    queryKey: ["/api/my-invitations"],
+    enabled: !!user && user.role === 'rope_access_tech' && !user.companyId,
+  });
+
+  const pendingInvitations = invitationsData?.invitations || [];
+
+  const acceptInvitationMutation = useMutation({
+    mutationFn: async (invitationId: string) => {
+      setProcessingInvitationId(invitationId);
+      const response = await fetch(`/api/invitations/${invitationId}/accept`, {
+        method: "POST",
+        credentials: "include",
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.message || "Failed to accept invitation");
+      return data;
+    },
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ["/api/my-invitations"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/user"] });
+      toast({
+        title: t.invitationAccepted,
+        description: data.message || t.welcomeToTeam,
+      });
+      setProcessingInvitationId(null);
+    },
+    onError: (error: any) => {
+      toast({
+        title: t.invitationError,
+        description: error.message,
+        variant: "destructive",
+      });
+      setProcessingInvitationId(null);
+    },
+  });
+
+  const declineInvitationMutation = useMutation({
+    mutationFn: async (invitationId: string) => {
+      setProcessingInvitationId(invitationId);
+      const response = await fetch(`/api/invitations/${invitationId}/decline`, {
+        method: "POST",
+        credentials: "include",
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.message || "Failed to decline invitation");
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/my-invitations"] });
+      toast({
+        title: t.invitationDeclined,
+        description: t.declinedMessage,
+      });
+      setProcessingInvitationId(null);
+    },
+    onError: (error: any) => {
+      toast({
+        title: t.invitationError,
+        description: error.message,
+        variant: "destructive",
+      });
+      setProcessingInvitationId(null);
     },
   });
 
@@ -594,6 +705,102 @@ export default function TechnicianPortal() {
       </header>
 
       <main className="max-w-4xl mx-auto px-4 py-6 space-y-6">
+        {/* Team Invitations Section - Only show for unlinked technicians */}
+        {user && user.role === 'rope_access_tech' && !user.companyId && (
+          <Card className="border-primary/30 bg-primary/5">
+            <CardHeader>
+              <div className="flex items-center gap-3">
+                <div className="p-2 rounded-full bg-primary/10">
+                  <Mail className="w-5 h-5 text-primary" />
+                </div>
+                <div>
+                  <CardTitle className="text-lg">{t.teamInvitations}</CardTitle>
+                  <CardDescription>{t.pendingInvitations}</CardDescription>
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {pendingInvitations.length === 0 ? (
+                <div className="text-center py-6 text-muted-foreground">
+                  <Building className="w-10 h-10 mx-auto mb-3 opacity-50" />
+                  <p className="font-medium">{t.noInvitations}</p>
+                  <p className="text-sm mt-1">{t.noInvitationsDesc}</p>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {pendingInvitations.map((invitation) => (
+                    <div
+                      key={invitation.id}
+                      className="p-4 rounded-lg border bg-card shadow-sm"
+                      data-testid={`invitation-card-${invitation.id}`}
+                    >
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                        <div className="space-y-1">
+                          <p className="font-medium text-lg flex items-center gap-2">
+                            <Building className="w-4 h-4 text-muted-foreground" />
+                            {invitation.company.name}
+                          </p>
+                          <p className="text-sm text-muted-foreground">
+                            {t.invitedOn} {formatLocalDate(invitation.createdAt)}
+                          </p>
+                          {invitation.message && (
+                            <div className="mt-2 p-3 bg-muted rounded-md">
+                              <p className="text-sm">
+                                <span className="font-medium">{t.invitationMessage}:</span> {invitation.message}
+                              </p>
+                            </div>
+                          )}
+                        </div>
+                        <div className="flex gap-2 sm:flex-shrink-0">
+                          <Button
+                            variant="outline"
+                            size="default"
+                            onClick={() => declineInvitationMutation.mutate(invitation.id)}
+                            disabled={processingInvitationId === invitation.id}
+                            className="flex-1 sm:flex-none gap-2"
+                            data-testid={`button-decline-invitation-${invitation.id}`}
+                          >
+                            {processingInvitationId === invitation.id && declineInvitationMutation.isPending ? (
+                              <>
+                                <Loader2 className="w-4 h-4 animate-spin" />
+                                {t.decliningInvitation}
+                              </>
+                            ) : (
+                              <>
+                                <X className="w-4 h-4" />
+                                {t.declineInvitation}
+                              </>
+                            )}
+                          </Button>
+                          <Button
+                            size="default"
+                            onClick={() => acceptInvitationMutation.mutate(invitation.id)}
+                            disabled={processingInvitationId === invitation.id}
+                            className="flex-1 sm:flex-none gap-2"
+                            data-testid={`button-accept-invitation-${invitation.id}`}
+                          >
+                            {processingInvitationId === invitation.id && acceptInvitationMutation.isPending ? (
+                              <>
+                                <Loader2 className="w-4 h-4 animate-spin" />
+                                {t.acceptingInvitation}
+                              </>
+                            ) : (
+                              <>
+                                <CheckCircle2 className="w-4 h-4" />
+                                {t.acceptInvitation}
+                              </>
+                            )}
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        )}
+
         <Card>
           <CardHeader className="space-y-4">
             <div className="flex items-center justify-between gap-4">
