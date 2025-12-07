@@ -64,6 +64,16 @@ const changelogSubItems: SubMenuItem[] = [
   { title: "Property Manager Guide", path: "/changelog/property-manager" },
 ];
 
+const goalsSubItems: SubMenuItem[] = [
+  { title: "Tech Premium Launch", path: "/superuser/goals/tech-premium" },
+  { title: "PM Premium Launch", path: "/superuser/goals/pm-premium" },
+  { title: "PM Feature Definition", path: "/superuser/goals/pm-feature-definition" },
+  { title: "US West Coast Launch", path: "/superuser/goals/us-west" },
+  { title: "US East Coast Expansion", path: "/superuser/goals/us-east" },
+  { title: "Unlimited Tier Push", path: "/superuser/goals/unlimited-tier" },
+  { title: "Transaction Fees", path: "/superuser/goals/transaction-fees" },
+];
+
 interface SuperUserLayoutProps {
   children: React.ReactNode;
   title?: string;
@@ -123,6 +133,7 @@ const menuGroups: MenuGroup[] = [
         title: "Goals & KPIs",
         icon: "flag",
         path: "/superuser/goals",
+        subItems: goalsSubItems,
       },
     ],
   },
@@ -154,9 +165,11 @@ function SidebarContents() {
   });
   
   const isOnChangelogPage = location.startsWith("/changelog");
+  const isOnGoalsPage = location.startsWith("/superuser/goals");
   
   const [expandedSubMenus, setExpandedSubMenus] = useState<Record<string, boolean>>({
     Changelog: isOnChangelogPage,
+    "Goals & KPIs": isOnGoalsPage,
   });
   const { state } = useSidebar();
   const isCollapsed = state === "collapsed";
@@ -165,7 +178,10 @@ function SidebarContents() {
     if (isOnChangelogPage && !expandedSubMenus.Changelog) {
       setExpandedSubMenus(prev => ({ ...prev, Changelog: true }));
     }
-  }, [isOnChangelogPage]);
+    if (isOnGoalsPage && !expandedSubMenus["Goals & KPIs"]) {
+      setExpandedSubMenus(prev => ({ ...prev, "Goals & KPIs": true }));
+    }
+  }, [isOnChangelogPage, isOnGoalsPage]);
 
   const toggleGroup = (label: string) => {
     setExpandedGroups((prev) => ({
@@ -251,7 +267,7 @@ function SidebarContents() {
                                   className="justify-between"
                                 >
                                   <div className="flex items-center gap-2">
-                                    <span className="material-icons text-lg">
+                                    <span className="material-icons text-lg text-muted-foreground">
                                       {item.icon}
                                     </span>
                                     <span>{item.title}</span>
@@ -297,7 +313,7 @@ function SidebarContents() {
                               tooltip={item.title}
                             >
                               <Link href={item.path}>
-                                <span className="material-icons text-lg">
+                                <span className="material-icons text-lg text-muted-foreground">
                                   {item.icon}
                                 </span>
                                 <span>{item.title}</span>
@@ -321,7 +337,7 @@ function SidebarContents() {
                         tooltip={item.title}
                       >
                         <Link href={item.path}>
-                          <span className="material-icons text-lg">
+                          <span className="material-icons text-lg text-muted-foreground">
                             {item.icon}
                           </span>
                           <span>{item.title}</span>
@@ -345,7 +361,7 @@ function SidebarContents() {
               className="text-destructive hover:text-destructive"
               data-testid="button-logout"
             >
-              <span className="material-icons text-lg">logout</span>
+              <span className="material-icons text-lg text-muted-foreground">logout</span>
               <span>Logout</span>
             </SidebarMenuButton>
           </SidebarMenuItem>
