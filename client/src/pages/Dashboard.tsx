@@ -57,6 +57,7 @@ import {
   useSortable,
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
+import { AddressAutocomplete } from "@/components/AddressAutocomplete";
 
 const projectSchema = z.object({
   strataPlanNumber: z.string().optional(),
@@ -2886,7 +2887,16 @@ export default function Dashboard() {
                             <FormItem>
                               <FormLabel>{t('dashboard.createProject.buildingAddress', 'Building Address')}</FormLabel>
                               <FormControl>
-                                <Input placeholder={t('dashboard.createProject.buildingAddressPlaceholder', '123 Main St, Vancouver, BC')} {...field} data-testid="input-building-address" className="h-12" />
+                                <AddressAutocomplete
+                                  data-testid="input-building-address"
+                                  placeholder={t('dashboard.createProject.buildingAddressPlaceholder', 'Start typing address...')}
+                                  value={field.value || ""}
+                                  onChange={field.onChange}
+                                  onBlur={field.onBlur}
+                                  onSelect={(address) => {
+                                    field.onChange(address.formatted);
+                                  }}
+                                />
                               </FormControl>
                               <FormDescription className="text-xs">
                                 {t('dashboard.createProject.visibleToEmployees', 'Visible to all employees')}

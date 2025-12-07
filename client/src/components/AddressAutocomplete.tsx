@@ -14,18 +14,24 @@ type AddressResult = {
 
 type AddressAutocompleteProps = {
   onSelect: (address: AddressResult) => void;
+  onChange?: (value: string) => void;
+  onBlur?: () => void;
   placeholder?: string;
   initialValue?: string;
+  value?: string;
   "data-testid"?: string;
 };
 
 export function AddressAutocomplete({ 
   onSelect, 
+  onChange,
+  onBlur,
   placeholder = "Start typing your address...",
   initialValue = "",
+  value,
   "data-testid": testId
 }: AddressAutocompleteProps) {
-  const [query, setQuery] = useState(initialValue);
+  const [query, setQuery] = useState(value || initialValue);
   const [suggestions, setSuggestions] = useState<AddressResult[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [showSuggestions, setShowSuggestions] = useState(false);
@@ -52,6 +58,12 @@ export function AddressAutocomplete({
     };
   }, []);
 
+  useEffect(() => {
+    if (value !== undefined && value !== query) {
+      setQuery(value);
+    }
+  }, [value]);
+
   const searchAddresses = async (searchQuery: string) => {
     if (searchQuery.length < 3) {
       setSuggestions([]);
@@ -74,15 +86,16 @@ export function AddressAutocomplete({
     }
   };
 
-  const handleInputChange = (value: string) => {
-    setQuery(value);
+  const handleInputChange = (inputValue: string) => {
+    setQuery(inputValue);
+    onChange?.(inputValue);
     
     if (debounceRef.current) {
       clearTimeout(debounceRef.current);
     }
 
     debounceRef.current = setTimeout(() => {
-      searchAddresses(value);
+      searchAddresses(inputValue);
     }, 300);
   };
 
@@ -129,6 +142,7 @@ export function AddressAutocomplete({
           value={query}
           onChange={(e) => handleInputChange(e.target.value)}
           onFocus={() => suggestions.length > 0 && setShowSuggestions(true)}
+          onBlur={() => onBlur?.()}
           onKeyDown={handleKeyDown}
           placeholder={placeholder}
           className="pl-10 pr-10"
