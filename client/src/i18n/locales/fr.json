@@ -844,7 +844,22 @@
       "addedToRoster": "Ce technicien a été ajouté à votre liste d'équipe et peut maintenant être assigné aux projets.",
       "next": "Suivant",
       "gotIt": "Compris",
-      "hourlyRateRequired": "Veuillez entrer un taux horaire valide"
+      "hourlyRateRequired": "Veuillez entrer un taux horaire valide",
+      "documentsAndCertifications": "Documents et certifications",
+      "irataLicense": "Licence IRATA",
+      "spratLicense": "Licence SPRAT",
+      "driversLicense": "Permis de conduire",
+      "bankDocuments": "Documents bancaires",
+      "firstAidCertificate": "Certificat de premiers soins",
+      "verified": "Vérifié",
+      "notVerified": "Non vérifié",
+      "pendingVerification": "Vérification en attente",
+      "verificationInProgress": "Vérification en cours...",
+      "noDocumentsUploaded": "Aucun document téléversé",
+      "viewDocument": "Voir le document",
+      "licenseNumber": "N° de licence",
+      "expiryDate": "Expiration",
+      "checkingVerification": "Vérification du statut..."
     },
     "performance": {
       "overallTargetPerformance": "Performance globale des objectifs",

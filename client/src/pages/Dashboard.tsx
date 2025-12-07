@@ -1122,6 +1122,59 @@ export default function Dashboard() {
     return () => subscription.unsubscribe();
   }, [editEmployeeForm]);
 
+  // Poll for verification status updates when the invitation form is open
+  // This checks if the technician has verified their IRATA/SPRAT license
+  useEffect(() => {
+    // Only poll if the invitation form is open and there's a technician to check
+    if (!showInvitationEmployeeForm || !invitationToConvert?.technician) {
+      return;
+    }
+
+    const tech = invitationToConvert.technician;
+    const needsIrataCheck = tech.irataLicenseNumber && !tech.irataVerifiedAt;
+    const needsSpratCheck = tech.spratLicenseNumber && !tech.spratVerifiedAt;
+
+    // If both are already verified (or don't exist), no need to poll
+    if (!needsIrataCheck && !needsSpratCheck) {
+      return;
+    }
+
+    const pollVerificationStatus = async () => {
+      try {
+        const response = await fetch('/api/accepted-invitations', {
+          credentials: 'include',
+        });
+        if (response.ok) {
+          const data = await response.json();
+          const updatedInvitation = data.invitations?.find(
+            (inv: any) => inv.id === invitationToConvert.id
+          );
+          if (updatedInvitation?.technician) {
+            const updatedTech = updatedInvitation.technician;
+            // Check if verification status has changed
+            if (
+              (needsIrataCheck && updatedTech.irataVerifiedAt) ||
+              (needsSpratCheck && updatedTech.spratVerifiedAt)
+            ) {
+              // Update the invitation with new verification data
+              setInvitationToConvert(updatedInvitation);
+            }
+          }
+        }
+      } catch (error) {
+        console.error('Error polling verification status:', error);
+      }
+    };
+
+    // Poll every 10 seconds
+    const intervalId = setInterval(pollVerificationStatus, 10000);
+
+    // Also do an initial check
+    pollVerificationStatus();
+
+    return () => clearInterval(intervalId);
+  }, [showInvitationEmployeeForm, invitationToConvert?.id, invitationToConvert?.technician?.irataVerifiedAt, invitationToConvert?.technician?.spratVerifiedAt]);
+
   // Check for active session on component mount - only run once
   useEffect(() => {
     const checkActiveSession = async () => {
@@ -8548,6 +8601,202 @@ export default function Dashboard() {
                         <div className="col-span-2">
                           <span className="text-muted-foreground">{t('dashboard.employeeForm.firstAid', 'First Aid')}:</span>
                           <Badge variant="outline" className="ml-2">{employeeForm.watch("firstAidType")}</Badge>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Documents & Certifications Section */}
+                  <div className="p-4 bg-muted/50 rounded-lg space-y-4">
+                    <h4 className="font-semibold flex items-center gap-2">
+                      <span className="material-icons text-primary text-lg">folder_open</span>
+                      {t('dashboard.invitations.documentsAndCertifications', 'Documents & Certifications')}
+                    </h4>
+                    
+                    <div className="space-y-3">
+                      {/* IRATA License */}
+                      {(invitationToConvert?.technician?.irataLicenseNumber || invitationToConvert?.technician?.irataDocuments?.length > 0) && (
+                        <div className="flex items-center justify-between p-3 bg-background rounded-md border">
+                          <div className="flex items-center gap-3">
+                            <span className="material-icons text-orange-500">badge</span>
+                            <div>
+                              <p className="font-medium text-sm">{t('dashboard.invitations.irataLicense', 'IRATA License')}</p>
+                              {invitationToConvert?.technician?.irataLicenseNumber && (
+                                <p className="text-xs text-muted-foreground">
+                                  {t('dashboard.invitations.licenseNumber', 'License #')}: {invitationToConvert.technician.irataLicenseNumber}
+                                </p>
+                              )}
+                              {invitationToConvert?.technician?.irataExpirationDate && (
+                                <p className="text-xs text-muted-foreground">
+                                  {t('dashboard.invitations.expiryDate', 'Expiry')}: {invitationToConvert.technician.irataExpirationDate}
+                                </p>
+                              )}
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            {invitationToConvert?.technician?.irataVerifiedAt ? (
+                              <Badge variant="default" className="bg-green-600">
+                                <span className="material-icons text-xs mr-1">verified</span>
+                                {t('dashboard.invitations.verified', 'Verified')}
+                              </Badge>
+                            ) : (
+                              <Badge variant="outline" className="border-amber-500 text-amber-600">
+                                <span className="material-icons text-xs mr-1">pending</span>
+                                {t('dashboard.invitations.notVerified', 'Not Verified')}
+                              </Badge>
+                            )}
+                            {invitationToConvert?.technician?.irataDocuments?.map((doc: string, idx: number) => (
+                              <Button key={idx} variant="ghost" size="icon" asChild>
+                                <a href={doc} target="_blank" rel="noopener noreferrer" title={t('dashboard.invitations.viewDocument', 'View Document')}>
+                                  <span className="material-icons text-sm">open_in_new</span>
+                                </a>
+                              </Button>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* SPRAT License */}
+                      {(invitationToConvert?.technician?.spratLicenseNumber || invitationToConvert?.technician?.spratDocuments?.length > 0) && (
+                        <div className="flex items-center justify-between p-3 bg-background rounded-md border">
+                          <div className="flex items-center gap-3">
+                            <span className="material-icons text-blue-500">badge</span>
+                            <div>
+                              <p className="font-medium text-sm">{t('dashboard.invitations.spratLicense', 'SPRAT License')}</p>
+                              {invitationToConvert?.technician?.spratLicenseNumber && (
+                                <p className="text-xs text-muted-foreground">
+                                  {t('dashboard.invitations.licenseNumber', 'License #')}: {invitationToConvert.technician.spratLicenseNumber}
+                                </p>
+                              )}
+                              {invitationToConvert?.technician?.spratExpirationDate && (
+                                <p className="text-xs text-muted-foreground">
+                                  {t('dashboard.invitations.expiryDate', 'Expiry')}: {invitationToConvert.technician.spratExpirationDate}
+                                </p>
+                              )}
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            {invitationToConvert?.technician?.spratVerifiedAt ? (
+                              <Badge variant="default" className="bg-green-600">
+                                <span className="material-icons text-xs mr-1">verified</span>
+                                {t('dashboard.invitations.verified', 'Verified')}
+                              </Badge>
+                            ) : (
+                              <Badge variant="outline" className="border-amber-500 text-amber-600">
+                                <span className="material-icons text-xs mr-1">pending</span>
+                                {t('dashboard.invitations.notVerified', 'Not Verified')}
+                              </Badge>
+                            )}
+                            {invitationToConvert?.technician?.spratDocuments?.map((doc: string, idx: number) => (
+                              <Button key={idx} variant="ghost" size="icon" asChild>
+                                <a href={doc} target="_blank" rel="noopener noreferrer" title={t('dashboard.invitations.viewDocument', 'View Document')}>
+                                  <span className="material-icons text-sm">open_in_new</span>
+                                </a>
+                              </Button>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Driver's License */}
+                      {(invitationToConvert?.technician?.driversLicenseNumber || invitationToConvert?.technician?.driversLicenseDocuments?.length > 0) && (
+                        <div className="flex items-center justify-between p-3 bg-background rounded-md border">
+                          <div className="flex items-center gap-3">
+                            <span className="material-icons text-purple-500">credit_card</span>
+                            <div>
+                              <p className="font-medium text-sm">{t('dashboard.invitations.driversLicense', "Driver's License")}</p>
+                              {invitationToConvert?.technician?.driversLicenseNumber && (
+                                <p className="text-xs text-muted-foreground">
+                                  {t('dashboard.invitations.licenseNumber', 'License #')}: {invitationToConvert.technician.driversLicenseNumber}
+                                </p>
+                              )}
+                              {invitationToConvert?.technician?.driversLicenseExpiry && (
+                                <p className="text-xs text-muted-foreground">
+                                  {t('dashboard.invitations.expiryDate', 'Expiry')}: {invitationToConvert.technician.driversLicenseExpiry}
+                                </p>
+                              )}
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            {invitationToConvert?.technician?.driversLicenseDocuments?.map((doc: string, idx: number) => (
+                              <Button key={idx} variant="ghost" size="icon" asChild>
+                                <a href={doc} target="_blank" rel="noopener noreferrer" title={t('dashboard.invitations.viewDocument', 'View Document')}>
+                                  <span className="material-icons text-sm">open_in_new</span>
+                                </a>
+                              </Button>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Bank Documents */}
+                      {invitationToConvert?.technician?.bankDocuments?.length > 0 && (
+                        <div className="flex items-center justify-between p-3 bg-background rounded-md border">
+                          <div className="flex items-center gap-3">
+                            <span className="material-icons text-green-500">account_balance</span>
+                            <div>
+                              <p className="font-medium text-sm">{t('dashboard.invitations.bankDocuments', 'Bank Documents')}</p>
+                              <p className="text-xs text-muted-foreground">
+                                {invitationToConvert.technician.bankDocuments.length} {invitationToConvert.technician.bankDocuments.length === 1 ? 'document' : 'documents'}
+                              </p>
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            {invitationToConvert?.technician?.bankDocuments?.map((doc: string, idx: number) => (
+                              <Button key={idx} variant="ghost" size="icon" asChild>
+                                <a href={doc} target="_blank" rel="noopener noreferrer" title={t('dashboard.invitations.viewDocument', 'View Document')}>
+                                  <span className="material-icons text-sm">open_in_new</span>
+                                </a>
+                              </Button>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* First Aid Certificate */}
+                      {(invitationToConvert?.technician?.hasFirstAid || invitationToConvert?.technician?.firstAidDocuments?.length > 0) && (
+                        <div className="flex items-center justify-between p-3 bg-background rounded-md border">
+                          <div className="flex items-center gap-3">
+                            <span className="material-icons text-red-500">medical_services</span>
+                            <div>
+                              <p className="font-medium text-sm">{t('dashboard.invitations.firstAidCertificate', 'First Aid Certificate')}</p>
+                              {invitationToConvert?.technician?.firstAidType && (
+                                <p className="text-xs text-muted-foreground">
+                                  {invitationToConvert.technician.firstAidType}
+                                </p>
+                              )}
+                              {invitationToConvert?.technician?.firstAidExpiry && (
+                                <p className="text-xs text-muted-foreground">
+                                  {t('dashboard.invitations.expiryDate', 'Expiry')}: {invitationToConvert.technician.firstAidExpiry}
+                                </p>
+                              )}
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            {invitationToConvert?.technician?.firstAidDocuments?.map((doc: string, idx: number) => (
+                              <Button key={idx} variant="ghost" size="icon" asChild>
+                                <a href={doc} target="_blank" rel="noopener noreferrer" title={t('dashboard.invitations.viewDocument', 'View Document')}>
+                                  <span className="material-icons text-sm">open_in_new</span>
+                                </a>
+                              </Button>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* No documents message */}
+                      {!invitationToConvert?.technician?.irataLicenseNumber && 
+                       !invitationToConvert?.technician?.irataDocuments?.length &&
+                       !invitationToConvert?.technician?.spratLicenseNumber &&
+                       !invitationToConvert?.technician?.spratDocuments?.length &&
+                       !invitationToConvert?.technician?.driversLicenseNumber &&
+                       !invitationToConvert?.technician?.driversLicenseDocuments?.length &&
+                       !invitationToConvert?.technician?.bankDocuments?.length &&
+                       !invitationToConvert?.technician?.hasFirstAid &&
+                       !invitationToConvert?.technician?.firstAidDocuments?.length && (
+                        <div className="text-center py-4 text-muted-foreground text-sm">
+                          <span className="material-icons text-2xl mb-2 block">description</span>
+                          {t('dashboard.invitations.noDocumentsUploaded', 'No documents uploaded')}
                         </div>
                       )}
                     </div>
