@@ -141,11 +141,12 @@ const TIPPING_POINTS = [
 ];
 
 const arrTrajectory = [
-  { year: "Y1", arr: 124000, employers: 15, arpu: 639, label: "$124K" },
-  { year: "Y2", arr: 533000, employers: 55, arpu: 689, label: "$533K" },
-  { year: "Y3", arr: 1880000, employers: 150, arpu: 856, label: "$1.88M" },
-  { year: "Y4", arr: 3900000, employers: 320, arpu: 932, label: "$3.9M" },
-  { year: "Y5", arr: 6900000, employers: 500, arpu: 1022, label: "$6.9M" },
+  { year: "Now", target: 0, actual: 0, projected: 0, employers: 0, label: "$0" },
+  { year: "Y1", target: 124000, actual: 124000, projected: 124000, employers: 15, label: "$124K" },
+  { year: "Y2", target: 533000, actual: 533000, projected: 533000, employers: 55, label: "$533K" },
+  { year: "Y3", target: 1880000, actual: 1880000, projected: 1880000, employers: 150, label: "$1.88M" },
+  { year: "Y4", target: 3900000, actual: 3900000, projected: 3900000, employers: 320, label: "$3.9M" },
+  { year: "Y5", target: 6700000, actual: 6900000, projected: 6900000, employers: 500, label: "$6.9M" },
 ];
 
 const tierMixEvolution = [
@@ -310,7 +311,7 @@ export default function SuperUserGoalsOverview() {
             <div className="su-card">
               <div className="su-card-header">
                 <h3 className="font-semibold text-gray-800 dark:text-white/90">5-Year ARR Trajectory</h3>
-                <p className="text-sm text-gray-500 dark:text-gray-400">Path from $124K to $6.7M ARR</p>
+                <p className="text-sm text-gray-500 dark:text-gray-400">Goal vs Projected (Target: $6.7M for $100M valuation)</p>
               </div>
               <div className="su-card-body">
                 <div className="h-64">
@@ -323,32 +324,75 @@ export default function SuperUserGoalsOverview() {
                         tickFormatter={(value) => value >= 1000000 ? `$${(value / 1000000).toFixed(1)}M` : `$${value / 1000}K`}
                       />
                       <Tooltip 
-                        formatter={(value: number) => [`$${value.toLocaleString()}`, 'ARR']}
-                        labelFormatter={(label) => `Year ${label.replace('Y', '')}`}
+                        formatter={(value: number, name: string) => {
+                          if (value === null || value === undefined) return ['--', name];
+                          const labelMap: Record<string, string> = {
+                            target: 'Goal ($6.7M)',
+                            projected: 'Projected ($6.9M)',
+                            actual: 'Actual Progress'
+                          };
+                          return [`$${value.toLocaleString()}`, labelMap[name] || name];
+                        }}
+                        labelFormatter={(label) => label === 'Now' ? 'Current' : `Year ${label.replace('Y', '')}`}
                         contentStyle={{ 
                           backgroundColor: 'hsl(var(--card))', 
                           border: '1px solid hsl(var(--border))',
                           borderRadius: '8px'
                         }} 
                       />
+                      <Legend 
+                        formatter={(value) => {
+                          const labelMap: Record<string, string> = {
+                            target: 'Goal ($6.7M)',
+                            projected: 'Projected ($6.9M)',
+                            actual: 'Actual Progress'
+                          };
+                          return labelMap[value] || value;
+                        }}
+                      />
                       <Area 
                         type="monotone" 
-                        dataKey="arr" 
+                        dataKey="projected" 
                         stroke="#10b981" 
                         fill="#10b981" 
-                        fillOpacity={0.3}
+                        fillOpacity={0.2}
+                        strokeWidth={2}
+                        name="projected"
+                      />
+                      <Line 
+                        type="monotone" 
+                        dataKey="target" 
+                        stroke="#6366f1" 
+                        strokeWidth={2}
+                        strokeDasharray="5 5"
+                        dot={{ fill: '#6366f1', strokeWidth: 2 }}
+                        name="target"
+                      />
+                      <Line 
+                        type="monotone" 
+                        dataKey="actual" 
+                        stroke="#f59e0b" 
                         strokeWidth={3}
+                        dot={{ fill: '#f59e0b', strokeWidth: 2, r: 5 }}
+                        name="actual"
+                        connectNulls={false}
                       />
                     </AreaChart>
                   </ResponsiveContainer>
                 </div>
-                <div className="mt-4 grid grid-cols-5 gap-2 text-center">
-                  {arrTrajectory.map((d) => (
-                    <div key={d.year} className="text-xs">
-                      <p className="font-semibold text-gray-800 dark:text-white/90">{d.label}</p>
-                      <p className="text-gray-500">{d.employers} employers</p>
-                    </div>
-                  ))}
+                <div className="mt-4 flex items-center justify-center gap-6 text-xs">
+                  <div className="flex items-center gap-2">
+                    <div className="w-4 h-0.5 bg-amber-500"></div>
+                    <span className="text-gray-600 dark:text-gray-400">Actual Progress</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-4 h-0.5 bg-indigo-500" style={{ borderTop: '2px dashed' }}></div>
+                    <span className="text-gray-600 dark:text-gray-400">Goal ($6.7M)</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-4 h-2 bg-emerald-500/30 border border-emerald-500"></div>
+                    <span className="text-gray-600 dark:text-gray-400">Projected ($6.9M)</span>
+                  </div>
                 </div>
               </div>
             </div>
