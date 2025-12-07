@@ -5347,7 +5347,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       const invitations = await storage.getUnacknowledgedAcceptedInvitationsForCompany(companyId);
       
-      // Return safe technician info
+      // Return full technician info for employee form pre-population
+      // Note: Sensitive fields (SIN, bank info) are decrypted by storage layer
       const safeInvitations = invitations.map(inv => ({
         id: inv.id,
         respondedAt: inv.respondedAt,
@@ -5355,10 +5356,56 @@ export async function registerRoutes(app: Express): Promise<Server> {
           id: inv.technician.id,
           name: inv.technician.name,
           email: inv.technician.email,
+          // Phone and address
+          employeePhoneNumber: inv.technician.employeePhoneNumber,
+          employeeStreetAddress: inv.technician.employeeStreetAddress,
+          employeeCity: inv.technician.employeeCity,
+          employeeProvinceState: inv.technician.employeeProvinceState,
+          employeeCountry: inv.technician.employeeCountry,
+          employeePostalCode: inv.technician.employeePostalCode,
+          homeAddress: inv.technician.homeAddress,
+          // Personal info
+          birthday: inv.technician.birthday,
+          // Emergency contact
+          emergencyContactName: inv.technician.emergencyContactName,
+          emergencyContactPhone: inv.technician.emergencyContactPhone,
+          emergencyContactRelationship: inv.technician.emergencyContactRelationship,
+          specialMedicalConditions: inv.technician.specialMedicalConditions,
+          // IRATA certification
           irataLevel: inv.technician.irataLevel,
-          irataNumber: inv.technician.irataNumber,
+          irataLicenseNumber: inv.technician.irataLicenseNumber,
+          irataIssuedDate: inv.technician.irataIssuedDate,
+          irataExpirationDate: inv.technician.irataExpirationDate,
+          irataDocuments: inv.technician.irataDocuments,
+          irataVerifiedAt: inv.technician.irataVerifiedAt,
+          irataVerificationStatus: inv.technician.irataVerificationStatus,
+          // SPRAT certification
           spratLevel: inv.technician.spratLevel,
-          spratNumber: inv.technician.spratNumber,
+          spratLicenseNumber: inv.technician.spratLicenseNumber,
+          spratIssuedDate: inv.technician.spratIssuedDate,
+          spratExpirationDate: inv.technician.spratExpirationDate,
+          spratDocuments: inv.technician.spratDocuments,
+          spratVerifiedAt: inv.technician.spratVerifiedAt,
+          spratVerificationStatus: inv.technician.spratVerificationStatus,
+          // First Aid certification
+          hasFirstAid: inv.technician.hasFirstAid,
+          firstAidType: inv.technician.firstAidType,
+          firstAidExpiry: inv.technician.firstAidExpiry,
+          firstAidDocuments: inv.technician.firstAidDocuments,
+          // Driver's license
+          driversLicenseNumber: inv.technician.driversLicenseNumber,
+          driversLicenseProvince: inv.technician.driversLicenseProvince,
+          driversLicenseExpiry: inv.technician.driversLicenseExpiry,
+          driversLicenseDocuments: inv.technician.driversLicenseDocuments,
+          // Bank info (encrypted - decrypted by storage)
+          bankTransitNumber: inv.technician.bankTransitNumber,
+          bankInstitutionNumber: inv.technician.bankInstitutionNumber,
+          bankAccountNumber: inv.technician.bankAccountNumber,
+          bankDocuments: inv.technician.bankDocuments,
+          // SIN (encrypted - decrypted by storage)
+          socialInsuranceNumber: inv.technician.socialInsuranceNumber,
+          // Photo
+          photoUrl: inv.technician.photoUrl,
         }
       }));
       
@@ -5418,6 +5465,159 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
     } catch (error) {
       console.error("Acknowledge invitation error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+  
+  // Convert accepted invitation to employee (set salary, permissions, link to company)
+  app.post("/api/accepted-invitations/:invitationId/convert", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const { invitationId } = req.params;
+      const { 
+        hourlyRate, 
+        isSalary, 
+        salary, 
+        role,
+        permissions,
+        hasFirstAid,
+        firstAidType,
+        firstAidExpiry,
+        firstAidDocuments,
+      } = req.body;
+      
+      const user = await storage.getUserById(req.session.userId!);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      const companyId = user.role === 'owner' ? user.id : user.companyId;
+      if (!companyId) {
+        return res.status(403).json({ message: "Not authorized" });
+      }
+      
+      // Only owners and admins can convert invitations
+      if (user.role !== 'owner' && user.role !== 'admin') {
+        return res.status(403).json({ message: "Only owners and admins can add employees" });
+      }
+      
+      const invitation = await storage.getTeamInvitationById(invitationId);
+      if (!invitation) {
+        return res.status(404).json({ message: "Invitation not found" });
+      }
+      
+      // Verify invitation belongs to this company
+      if (invitation.companyId !== companyId) {
+        return res.status(403).json({ message: "This invitation does not belong to your company" });
+      }
+      
+      if (invitation.status !== "accepted") {
+        return res.status(400).json({ message: "This invitation has not been accepted" });
+      }
+      
+      // Check if already acknowledged/converted
+      if (invitation.ownerAcknowledgedAt) {
+        return res.status(400).json({ message: "This invitation has already been processed" });
+      }
+      
+      // Get the technician
+      const technician = await storage.getUserById(invitation.technicianId);
+      if (!technician) {
+        return res.status(404).json({ message: "Technician not found" });
+      }
+      
+      // Check if technician is already linked to a company
+      if (technician.companyId) {
+        return res.status(400).json({ message: "This technician is already linked to a company" });
+      }
+      
+      // Check seat limits
+      const company = await storage.getUserById(companyId);
+      if (company) {
+        const employees = await db.select({ id: users.id })
+          .from(users)
+          .where(eq(users.companyId, companyId));
+        
+        const currentSeats = employees.length;
+        const tier = company.subscriptionTier || 'none';
+        
+        // Get seat limits based on tier
+        const seatLimits: Record<string, number> = {
+          'none': 0,
+          'basic': 5,
+          'starter': 15,
+          'premium': 50,
+          'enterprise': 999999,
+        };
+        const baseLimit = seatLimits[tier] || 0;
+        const additionalSeats = company.additionalSeatsCount || 0;
+        const totalLimit = baseLimit + additionalSeats;
+        
+        if (currentSeats >= totalLimit && tier !== 'enterprise') {
+          return res.status(400).json({ 
+            message: "Seat limit reached. Please upgrade your plan or purchase additional seats.",
+            seatLimitReached: true 
+          });
+        }
+      }
+      
+      // Get current date for start date
+      const today = new Date();
+      const startDate = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+      
+      // Update the technician record to link to company and set employee details
+      const updateData: any = {
+        companyId: companyId,
+        role: role || 'rope_access_tech',
+        permissions: permissions || [],
+        startDate: startDate,
+        isSalary: isSalary || false,
+      };
+      
+      // Set compensation
+      if (isSalary && salary) {
+        updateData.salary = salary;
+        updateData.hourlyRate = null;
+      } else if (hourlyRate) {
+        updateData.hourlyRate = hourlyRate;
+        updateData.salary = null;
+      }
+      
+      // Update first aid info if provided
+      if (hasFirstAid !== undefined) {
+        updateData.hasFirstAid = hasFirstAid;
+      }
+      if (firstAidType !== undefined) {
+        updateData.firstAidType = firstAidType;
+      }
+      if (firstAidExpiry !== undefined) {
+        updateData.firstAidExpiry = firstAidExpiry;
+      }
+      if (firstAidDocuments !== undefined) {
+        updateData.firstAidDocuments = firstAidDocuments;
+      }
+      
+      await storage.updateUser(invitation.technicianId, updateData);
+      
+      // Mark invitation as acknowledged
+      await storage.acknowledgeTeamInvitation(invitationId, companyId);
+      
+      console.log(`[Team-Invite] Owner ${user.id} converted invitation ${invitationId} to employee for technician ${invitation.technicianId}`);
+      
+      // Get updated employee data
+      const updatedEmployee = await storage.getUserById(invitation.technicianId);
+      
+      res.json({ 
+        success: true, 
+        message: "Employee added successfully",
+        employee: updatedEmployee ? {
+          id: updatedEmployee.id,
+          name: updatedEmployee.name,
+          email: updatedEmployee.email,
+          role: updatedEmployee.role,
+        } : null
+      });
+    } catch (error) {
+      console.error("Convert invitation error:", error);
       res.status(500).json({ message: "Internal server error" });
     }
   });
