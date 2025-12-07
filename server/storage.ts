@@ -94,6 +94,102 @@ export class Storage {
     return results.map(user => decryptSensitiveFields(user));
   }
 
+  // SuperUser: Get all technicians with pagination and search
+  async getAllTechnicians(options: { 
+    page?: number; 
+    pageSize?: number; 
+    search?: string;
+    companyId?: string;
+    linkedOnly?: boolean;
+  } = {}): Promise<{ technicians: User[]; total: number; companies: Map<string, { name: string; id: string }> }> {
+    const { page = 1, pageSize = 50, search, companyId, linkedOnly } = options;
+    const offset = (page - 1) * pageSize;
+    
+    // Build conditions
+    const conditions = [eq(users.role, "rope_access_tech")];
+    
+    if (search) {
+      conditions.push(
+        or(
+          sql`LOWER(${users.name}) LIKE LOWER(${'%' + search + '%'})`,
+          sql`LOWER(${users.email}) LIKE LOWER(${'%' + search + '%'})`,
+          sql`${users.irataLicenseNumber} LIKE ${'%' + search + '%'}`,
+          sql`${users.spratLicenseNumber} LIKE ${'%' + search + '%'}`
+        )!
+      );
+    }
+    
+    if (companyId) {
+      conditions.push(eq(users.companyId, companyId));
+    }
+    
+    if (linkedOnly === true) {
+      conditions.push(isNotNull(users.companyId));
+    } else if (linkedOnly === false) {
+      conditions.push(isNull(users.companyId));
+    }
+    
+    // Get total count
+    const countResult = await db.select({ count: sql<number>`count(*)` })
+      .from(users)
+      .where(and(...conditions));
+    const total = Number(countResult[0]?.count || 0);
+    
+    // Get paginated results
+    const results = await db.select()
+      .from(users)
+      .where(and(...conditions))
+      .orderBy(desc(users.createdAt))
+      .limit(pageSize)
+      .offset(offset);
+    
+    const decryptedTechnicians = results.map(user => decryptSensitiveFields(user));
+    
+    // Get company names for linked technicians
+    const companyIds = [...new Set(decryptedTechnicians.filter(t => t.companyId).map(t => t.companyId!))];
+    const companies = new Map<string, { name: string; id: string }>();
+    
+    if (companyIds.length > 0) {
+      const companyResults = await db.select({ id: users.id, companyName: users.companyName })
+        .from(users)
+        .where(inArray(users.id, companyIds));
+      
+      for (const company of companyResults) {
+        companies.set(company.id, { name: company.companyName || 'Unknown Company', id: company.id });
+      }
+    }
+    
+    return { technicians: decryptedTechnicians, total, companies };
+  }
+
+  // SuperUser: Get single technician with full details
+  async getTechnicianWithCompanyDetails(technicianId: string): Promise<{ technician: User; company: User | null } | null> {
+    const techResult = await db.select().from(users)
+      .where(and(
+        eq(users.id, technicianId),
+        eq(users.role, "rope_access_tech")
+      ))
+      .limit(1);
+    
+    if (!techResult[0]) {
+      return null;
+    }
+    
+    const technician = decryptSensitiveFields(techResult[0]);
+    let company: User | null = null;
+    
+    if (technician.companyId) {
+      const companyResult = await db.select().from(users)
+        .where(eq(users.id, technician.companyId))
+        .limit(1);
+      if (companyResult[0]) {
+        company = decryptSensitiveFields(companyResult[0]);
+      }
+    }
+    
+    return { technician, company };
+  }
+
   async deleteUser(userId: string): Promise<void> {
     await db.delete(users).where(eq(users.id, userId));
   }
