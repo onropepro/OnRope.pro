@@ -3675,7 +3675,33 @@ export class Storage {
     
     return results.map(r => ({
       ...r.invitation,
-      technician: r.technician
+      technician: decryptSensitiveFields(r.technician)
+    }));
+  }
+
+  // Get pending onboarding invitations (acknowledged but technician has no hourlyRate)
+  async getPendingOnboardingInvitationsForCompany(companyId: string): Promise<(TeamInvitation & { technician: User })[]> {
+    const results = await db.select({
+      invitation: teamInvitations,
+      technician: users,
+    })
+      .from(teamInvitations)
+      .innerJoin(users, eq(teamInvitations.technicianId, users.id))
+      .where(
+        and(
+          eq(teamInvitations.companyId, companyId),
+          eq(teamInvitations.status, "accepted"),
+          // Must be acknowledged (user clicked "Do it later" or proceeded to form)
+          not(isNull(teamInvitations.ownerAcknowledgedAt)),
+          // Technician has no hourlyRate set (onboarding not complete)
+          isNull(users.hourlyRate)
+        )
+      )
+      .orderBy(desc(teamInvitations.respondedAt));
+    
+    return results.map(r => ({
+      ...r.invitation,
+      technician: decryptSensitiveFields(r.technician)
     }));
   }
 

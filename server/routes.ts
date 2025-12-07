@@ -5420,6 +5420,86 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
+  // Get pending onboarding invitations (acknowledged but not converted - technician has no hourlyRate)
+  app.get("/api/pending-onboarding-invitations", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const user = await storage.getUserById(req.session.userId!);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      const companyId = (user.role === 'owner' || user.role === 'company') ? user.id : user.companyId;
+      if (!companyId) {
+        return res.status(403).json({ message: "Not authorized" });
+      }
+      
+      // Only company owners and admins can view pending onboarding invitations
+      if (user.role !== 'owner' && user.role !== 'company' && user.role !== 'admin') {
+        return res.status(403).json({ message: "Only owners and admins can view pending onboarding" });
+      }
+      
+      // Get all accepted invitations that have been acknowledged but technician has no hourlyRate
+      const invitations = await storage.getPendingOnboardingInvitationsForCompany(companyId);
+      
+      // Return full technician info for employee form pre-population
+      const safeInvitations = invitations.map(inv => ({
+        id: inv.id,
+        respondedAt: inv.respondedAt,
+        acknowledgedAt: inv.ownerAcknowledgedAt,
+        technician: {
+          id: inv.technician.id,
+          name: inv.technician.name,
+          email: inv.technician.email,
+          employeePhoneNumber: inv.technician.employeePhoneNumber,
+          employeeStreetAddress: inv.technician.employeeStreetAddress,
+          employeeCity: inv.technician.employeeCity,
+          employeeProvinceState: inv.technician.employeeProvinceState,
+          employeeCountry: inv.technician.employeeCountry,
+          employeePostalCode: inv.technician.employeePostalCode,
+          homeAddress: inv.technician.homeAddress,
+          birthday: inv.technician.birthday,
+          emergencyContactName: inv.technician.emergencyContactName,
+          emergencyContactPhone: inv.technician.emergencyContactPhone,
+          emergencyContactRelationship: inv.technician.emergencyContactRelationship,
+          specialMedicalConditions: inv.technician.specialMedicalConditions,
+          irataLevel: inv.technician.irataLevel,
+          irataLicenseNumber: inv.technician.irataLicenseNumber,
+          irataIssuedDate: inv.technician.irataIssuedDate,
+          irataExpirationDate: inv.technician.irataExpirationDate,
+          irataDocuments: inv.technician.irataDocuments,
+          irataVerifiedAt: inv.technician.irataVerifiedAt,
+          irataVerificationStatus: inv.technician.irataVerificationStatus,
+          spratLevel: inv.technician.spratLevel,
+          spratLicenseNumber: inv.technician.spratLicenseNumber,
+          spratIssuedDate: inv.technician.spratIssuedDate,
+          spratExpirationDate: inv.technician.spratExpirationDate,
+          spratDocuments: inv.technician.spratDocuments,
+          spratVerifiedAt: inv.technician.spratVerifiedAt,
+          spratVerificationStatus: inv.technician.spratVerificationStatus,
+          hasFirstAid: inv.technician.hasFirstAid,
+          firstAidType: inv.technician.firstAidType,
+          firstAidExpiry: inv.technician.firstAidExpiry,
+          firstAidDocuments: inv.technician.firstAidDocuments,
+          driversLicenseNumber: inv.technician.driversLicenseNumber,
+          driversLicenseProvince: inv.technician.driversLicenseProvince,
+          driversLicenseExpiry: inv.technician.driversLicenseExpiry,
+          driversLicenseDocuments: inv.technician.driversLicenseDocuments,
+          bankTransitNumber: inv.technician.bankTransitNumber,
+          bankInstitutionNumber: inv.technician.bankInstitutionNumber,
+          bankAccountNumber: inv.technician.bankAccountNumber,
+          bankDocuments: inv.technician.bankDocuments,
+          socialInsuranceNumber: inv.technician.socialInsuranceNumber,
+          photoUrl: inv.technician.photoUrl,
+        }
+      }));
+      
+      res.json({ invitations: safeInvitations });
+    } catch (error) {
+      console.error("Get pending onboarding invitations error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+  
   // Acknowledge an accepted invitation (owner clicks "Next")
   app.post("/api/invitations/:invitationId/acknowledge", requireAuth, async (req: Request, res: Response) => {
     try {

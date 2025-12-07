@@ -811,6 +811,65 @@ export default function Dashboard() {
 
   const acceptedInvitations = acceptedInvitationsData?.invitations || [];
 
+  // Fetch pending onboarding invitations (acknowledged but not yet converted)
+  const { data: pendingOnboardingData, refetch: refetchPendingOnboarding } = useQuery<{
+    invitations: Array<{
+      id: string;
+      respondedAt: string;
+      acknowledgedAt: string;
+      technician: {
+        id: string;
+        name: string;
+        email: string;
+        employeePhoneNumber?: string;
+        employeeStreetAddress?: string;
+        employeeCity?: string;
+        employeeProvinceState?: string;
+        employeeCountry?: string;
+        employeePostalCode?: string;
+        homeAddress?: string;
+        birthday?: string;
+        emergencyContactName?: string;
+        emergencyContactPhone?: string;
+        emergencyContactRelationship?: string;
+        specialMedicalConditions?: string;
+        irataLevel?: string;
+        irataLicenseNumber?: string;
+        irataIssuedDate?: string;
+        irataExpirationDate?: string;
+        irataDocuments?: string[];
+        irataVerifiedAt?: string;
+        irataVerificationStatus?: string;
+        spratLevel?: string;
+        spratLicenseNumber?: string;
+        spratIssuedDate?: string;
+        spratExpirationDate?: string;
+        spratDocuments?: string[];
+        spratVerifiedAt?: string;
+        spratVerificationStatus?: string;
+        hasFirstAid?: boolean;
+        firstAidType?: string;
+        firstAidExpiry?: string;
+        firstAidDocuments?: string[];
+        driversLicenseNumber?: string;
+        driversLicenseProvince?: string;
+        driversLicenseExpiry?: string;
+        driversLicenseDocuments?: string[];
+        bankTransitNumber?: string;
+        bankInstitutionNumber?: string;
+        bankAccountNumber?: string;
+        bankDocuments?: string[];
+        socialInsuranceNumber?: string;
+        photoUrl?: string;
+      };
+    }>;
+  }>({
+    queryKey: ["/api/pending-onboarding-invitations"],
+    enabled: userData?.user?.role === 'owner' || userData?.user?.role === 'company' || userData?.user?.role === 'admin',
+  });
+
+  const pendingOnboardingInvitations = pendingOnboardingData?.invitations || [];
+
   // Mutation to acknowledge accepted invitation
   const acknowledgeInvitationMutation = useMutation({
     mutationFn: async (invitationId: string) => {
@@ -823,6 +882,7 @@ export default function Dashboard() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/accepted-invitations"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/pending-onboarding-invitations"] });
       queryClient.invalidateQueries({ queryKey: ["/api/employees/all"] });
       toast({
         title: t('dashboard.invitations.acknowledged', 'Team Updated'),
@@ -865,6 +925,7 @@ export default function Dashboard() {
       
       // Then invalidate queries to trigger refetch
       await queryClient.invalidateQueries({ queryKey: ["/api/accepted-invitations"] });
+      await queryClient.invalidateQueries({ queryKey: ["/api/pending-onboarding-invitations"] });
       await queryClient.invalidateQueries({ queryKey: ["/api/employees/all"] });
       
       toast({
@@ -5053,6 +5114,90 @@ export default function Dashboard() {
 
               {/* Employee List */}
               <div className="space-y-6">
+                {/* Pending Onboarding Section */}
+                {pendingOnboardingInvitations.length > 0 && (
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-2">
+                      <h3 className="text-lg font-medium">{t('dashboard.employees.pendingOnboarding', 'Pending Onboarding')}</h3>
+                      <Badge variant="secondary" data-testid="badge-pending-onboarding-count">
+                        {pendingOnboardingInvitations.length}
+                      </Badge>
+                    </div>
+                    <p className="text-sm text-muted-foreground">
+                      {t('dashboard.employees.pendingOnboardingDesc', 'These technicians have accepted your invitation but need salary and permissions set up.')}
+                    </p>
+                    <div className="space-y-2">
+                      {pendingOnboardingInvitations.map((inv) => (
+                        <Card 
+                          key={inv.id} 
+                          data-testid={`pending-onboarding-card-${inv.id}`}
+                          className="border-dashed border-2 border-primary/30 bg-primary/5"
+                        >
+                          <CardContent className="p-4">
+                            <div className="flex items-center justify-between gap-3 flex-wrap">
+                              <div className="flex-1 min-w-0">
+                                <div className="font-medium">{inv.technician.name}</div>
+                                <div className="text-sm text-muted-foreground">{inv.technician.email}</div>
+                                {inv.technician.irataLevel && (
+                                  <Badge variant="outline" className="text-xs mt-1">
+                                    IRATA {inv.technician.irataLevel}
+                                  </Badge>
+                                )}
+                                {inv.technician.spratLevel && !inv.technician.irataLevel && (
+                                  <Badge variant="outline" className="text-xs mt-1">
+                                    SPRAT {inv.technician.spratLevel}
+                                  </Badge>
+                                )}
+                              </div>
+                              <Button
+                                onClick={() => {
+                                  const tech = inv.technician;
+                                  employeeForm.reset({
+                                    name: tech.name || "",
+                                    email: tech.email || "",
+                                    password: "",
+                                    role: "rope_access_tech",
+                                    hourlyRate: "",
+                                    isSalary: false,
+                                    salary: "",
+                                    permissions: [],
+                                    startDate: "",
+                                    birthday: tech.birthday || "",
+                                    socialInsuranceNumber: tech.socialInsuranceNumber || "",
+                                    driversLicenseNumber: tech.driversLicenseNumber || "",
+                                    driversLicenseProvince: tech.driversLicenseProvince || "",
+                                    driversLicenseDocuments: tech.driversLicenseDocuments || [],
+                                    homeAddress: tech.homeAddress || "",
+                                    employeePhoneNumber: tech.employeePhoneNumber || "",
+                                    emergencyContactName: tech.emergencyContactName || "",
+                                    emergencyContactPhone: tech.emergencyContactPhone || "",
+                                    specialMedicalConditions: tech.specialMedicalConditions || "",
+                                    irataLevel: tech.irataLevel || "",
+                                    irataLicenseNumber: tech.irataLicenseNumber || "",
+                                    irataIssuedDate: tech.irataIssuedDate || "",
+                                    irataExpirationDate: tech.irataExpirationDate || "",
+                                    hasFirstAid: tech.hasFirstAid || false,
+                                    firstAidType: tech.firstAidType || "",
+                                    firstAidExpiry: tech.firstAidExpiry || "",
+                                    firstAidDocuments: tech.firstAidDocuments || [],
+                                  });
+                                  setInvitationToConvert(inv);
+                                  setEmployeeFormStep(1);
+                                  setShowInvitationEmployeeForm(true);
+                                }}
+                                data-testid={`button-complete-onboarding-${inv.id}`}
+                              >
+                                <span className="material-icons mr-2 text-sm">person_add</span>
+                                {t('dashboard.employees.completeOnboarding', 'Complete Onboarding')}
+                              </Button>
+                            </div>
+                          </CardContent>
+                        </Card>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
                 {/* Active Employees */}
                 <div className="space-y-2">
                   <h3 className="text-lg font-medium">{t('dashboard.employees.activeEmployees', 'Active Employees')}</h3>
@@ -8457,58 +8602,78 @@ export default function Dashboard() {
               <p className="text-sm text-muted-foreground text-center">
                 {t('dashboard.invitations.setSalaryPermissions', 'Set their salary and permissions to complete the onboarding process.')}
               </p>
-              <Button
-                className="w-full h-12"
-                onClick={() => {
-                  const inv = acceptedInvitations[0];
-                  if (inv?.id && inv?.technician) {
-                    const tech = inv.technician;
-                    // Pre-populate the employee form with technician data
-                    // Only set fields that exist in employeeSchema
-                    employeeForm.reset({
-                      name: tech.name || "",
-                      email: tech.email || "",
-                      password: "", // Empty - not needed for invitation conversion
-                      role: "rope_access_tech", // Default role for technicians
-                      hourlyRate: "",
-                      isSalary: false,
-                      salary: "", // String type as per schema
-                      permissions: [],
-                      startDate: "",
-                      birthday: tech.birthday || "",
-                      socialInsuranceNumber: tech.socialInsuranceNumber || "",
-                      driversLicenseNumber: tech.driversLicenseNumber || "",
-                      driversLicenseProvince: tech.driversLicenseProvince || "",
-                      driversLicenseDocuments: tech.driversLicenseDocuments || [],
-                      homeAddress: tech.homeAddress || "",
-                      employeePhoneNumber: tech.employeePhoneNumber || "",
-                      emergencyContactName: tech.emergencyContactName || "",
-                      emergencyContactPhone: tech.emergencyContactPhone || "",
-                      specialMedicalConditions: tech.specialMedicalConditions || "",
-                      irataLevel: tech.irataLevel || "",
-                      irataLicenseNumber: tech.irataLicenseNumber || "",
-                      irataIssuedDate: tech.irataIssuedDate || "",
-                      irataExpirationDate: tech.irataExpirationDate || "",
-                      hasFirstAid: tech.hasFirstAid || false,
-                      firstAidType: tech.firstAidType || "",
-                      firstAidExpiry: tech.firstAidExpiry || "",
-                      firstAidDocuments: tech.firstAidDocuments || [],
-                    });
-                    setInvitationToConvert(inv);
-                    setEmployeeFormStep(1); // Start at info step
-                    setShowInvitationEmployeeForm(true);
-                  }
-                }}
-                data-testid="button-save-new-employee"
-              >
-                <span className="material-icons mr-2">person_add</span>
-                {t('dashboard.invitations.saveNewEmployee', 'Save New Employee')}
-                {acceptedInvitations.length > 1 && (
-                  <Badge variant="secondary" className="ml-2">
-                    +{acceptedInvitations.length - 1} {t('dashboard.invitations.more', 'more')}
-                  </Badge>
-                )}
-              </Button>
+              <div className="flex flex-col gap-2">
+                <Button
+                  className="w-full h-12"
+                  onClick={() => {
+                    const inv = acceptedInvitations[0];
+                    if (inv?.id && inv?.technician) {
+                      const tech = inv.technician;
+                      // Pre-populate the employee form with technician data
+                      // Only set fields that exist in employeeSchema
+                      employeeForm.reset({
+                        name: tech.name || "",
+                        email: tech.email || "",
+                        password: "", // Empty - not needed for invitation conversion
+                        role: "rope_access_tech", // Default role for technicians
+                        hourlyRate: "",
+                        isSalary: false,
+                        salary: "", // String type as per schema
+                        permissions: [],
+                        startDate: "",
+                        birthday: tech.birthday || "",
+                        socialInsuranceNumber: tech.socialInsuranceNumber || "",
+                        driversLicenseNumber: tech.driversLicenseNumber || "",
+                        driversLicenseProvince: tech.driversLicenseProvince || "",
+                        driversLicenseDocuments: tech.driversLicenseDocuments || [],
+                        homeAddress: tech.homeAddress || "",
+                        employeePhoneNumber: tech.employeePhoneNumber || "",
+                        emergencyContactName: tech.emergencyContactName || "",
+                        emergencyContactPhone: tech.emergencyContactPhone || "",
+                        specialMedicalConditions: tech.specialMedicalConditions || "",
+                        irataLevel: tech.irataLevel || "",
+                        irataLicenseNumber: tech.irataLicenseNumber || "",
+                        irataIssuedDate: tech.irataIssuedDate || "",
+                        irataExpirationDate: tech.irataExpirationDate || "",
+                        hasFirstAid: tech.hasFirstAid || false,
+                        firstAidType: tech.firstAidType || "",
+                        firstAidExpiry: tech.firstAidExpiry || "",
+                        firstAidDocuments: tech.firstAidDocuments || [],
+                      });
+                      setInvitationToConvert(inv);
+                      setEmployeeFormStep(1); // Start at info step
+                      setShowInvitationEmployeeForm(true);
+                    }
+                  }}
+                  data-testid="button-save-new-employee"
+                >
+                  <span className="material-icons mr-2">person_add</span>
+                  {t('dashboard.invitations.completeNow', 'Complete Onboarding Now')}
+                  {acceptedInvitations.length > 1 && (
+                    <Badge variant="secondary" className="ml-2">
+                      +{acceptedInvitations.length - 1} {t('dashboard.invitations.more', 'more')}
+                    </Badge>
+                  )}
+                </Button>
+                <Button
+                  variant="outline"
+                  className="w-full"
+                  onClick={() => {
+                    const inv = acceptedInvitations[0];
+                    if (inv?.id) {
+                      // Just acknowledge the invitation without opening the form
+                      acknowledgeInvitationMutation.mutate(inv.id);
+                    }
+                  }}
+                  data-testid="button-do-later"
+                >
+                  <span className="material-icons mr-2 text-sm">schedule</span>
+                  {t('dashboard.invitations.doLater', 'Do it Later')}
+                </Button>
+                <p className="text-xs text-muted-foreground text-center">
+                  {t('dashboard.invitations.doLaterHint', 'You can complete the onboarding from the Employees section')}
+                </p>
+              </div>
             </div>
           )}
         </DialogContent>
