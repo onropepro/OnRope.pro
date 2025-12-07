@@ -2507,6 +2507,17 @@ export default function Dashboard() {
       borderColor: "#8b5cf6",
       category: "communication",
     },
+    {
+      id: "my-profile",
+      label: t('dashboard.cards.myProfile.label', 'My Profile'),
+      description: t('dashboard.cards.myProfile.description', 'Certifications & docs'),
+      icon: "badge",
+      onClick: () => setLocation("/technician-portal"),
+      testId: "button-my-profile",
+      isVisible: (user: any) => user?.role === 'rope_access_tech', // Technicians only
+      borderColor: "#f59e0b",
+      category: "team",
+    },
   ].filter(card => {
     try {
       return card.isVisible(currentUser);

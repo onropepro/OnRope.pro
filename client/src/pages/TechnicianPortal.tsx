@@ -1,4 +1,4 @@
-import { useState, useRef, useMemo } from "react";
+import { useState, useRef, useMemo, useEffect } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useLocation } from "wouter";
 import { useForm } from "react-hook-form";
@@ -51,7 +51,9 @@ import {
   Loader2,
   Languages,
   UserMinus,
-  DollarSign
+  DollarSign,
+  ArrowRight,
+  Briefcase
 } from "lucide-react";
 import onRopeProLogo from "@assets/OnRopePro-logo_1764625558626.png";
 
@@ -192,6 +194,8 @@ const translations = {
     yourCompensation: "Your Compensation",
     year: "year",
     hour: "hr",
+    goToWorkDashboard: "Go to Work Dashboard",
+    accessProjects: "Access projects, clock in/out, and safety forms",
   },
   fr: {
     technicianPortal: "Portail du technicien",
@@ -327,6 +331,8 @@ const translations = {
     yourCompensation: "Votre rémunération",
     year: "an",
     hour: "h",
+    goToWorkDashboard: "Accéder au tableau de bord",
+    accessProjects: "Accéder aux projets, pointage et formulaires de sécurité",
   }
 };
 
@@ -848,6 +854,33 @@ export default function TechnicianPortal() {
       </header>
 
       <main className="max-w-4xl mx-auto px-4 py-6 space-y-6">
+        {/* Work Dashboard Quick Access - Show for linked technicians */}
+        {user && user.role === 'rope_access_tech' && user.companyId && !user.terminatedDate && (
+          <Card className="border-primary bg-primary/5">
+            <CardContent className="p-4">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 rounded-full bg-primary/10">
+                    <Briefcase className="w-5 h-5 text-primary" />
+                  </div>
+                  <div>
+                    <p className="font-medium">{t.goToWorkDashboard}</p>
+                    <p className="text-sm text-muted-foreground">{t.accessProjects}</p>
+                  </div>
+                </div>
+                <Button
+                  onClick={() => setLocation("/dashboard")}
+                  className="gap-2"
+                  data-testid="button-go-to-dashboard"
+                >
+                  {t.goToWorkDashboard}
+                  <ArrowRight className="w-4 h-4" />
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
         {/* Team Invitations Section - Show for unlinked technicians OR self-resigned technicians */}
         {user && user.role === 'rope_access_tech' && (!user.companyId || user.terminatedDate) && (
           <Card className="border-primary/30 bg-primary/5">

@@ -45,7 +45,13 @@ export default function TechnicianLogin() {
   useEffect(() => {
     if (userData?.user) {
       if (userData.user.role === "rope_access_tech") {
-        setLocation("/technician-portal");
+        // If technician is linked to a company and not terminated, go to main dashboard
+        if (userData.user.companyId && !userData.user.terminatedDate) {
+          setLocation("/dashboard");
+        } else {
+          // Otherwise go to technician portal for onboarding/invitations
+          setLocation("/technician-portal");
+        }
       } else if (userData.user.role === "resident") {
         setLocation("/resident");
       } else if (userData.user.role === "property_manager") {
@@ -96,7 +102,13 @@ export default function TechnicianLogin() {
       });
       
       if (user.role === "rope_access_tech") {
-        setLocation("/technician-portal");
+        // If technician is linked to a company and not terminated, go to main dashboard
+        if (user.companyId && !user.terminatedDate) {
+          setLocation("/dashboard");
+        } else {
+          // Otherwise go to technician portal for onboarding/invitations
+          setLocation("/technician-portal");
+        }
       } else {
         setLocation("/dashboard");
       }
