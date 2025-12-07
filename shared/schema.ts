@@ -200,6 +200,10 @@ export const buildings = pgTable("buildings", {
   province: varchar("province"),
   postalCode: varchar("postal_code"),
   
+  // Geolocation for map display
+  latitude: numeric("latitude", { precision: 10, scale: 7 }),
+  longitude: numeric("longitude", { precision: 10, scale: 7 }),
+  
   // Building specifications
   floorCount: integer("floor_count"),
   parkingStalls: integer("parking_stalls"),

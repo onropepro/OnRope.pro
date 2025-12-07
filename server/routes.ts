@@ -3777,6 +3777,144 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // SuperUser: Geocode a building's address to get lat/lng
+  app.post("/api/superuser/buildings/:id/geocode", requireAuth, async (req: Request, res: Response) => {
+    try {
+      if (req.session.userId !== 'superuser') {
+        return res.status(403).json({ message: "Access denied. SuperUser only." });
+      }
+
+      const building = await storage.getBuildingById(req.params.id);
+      
+      if (!building) {
+        return res.status(404).json({ message: "Building not found" });
+      }
+
+      // Build address string for geocoding
+      const addressParts = [
+        building.buildingAddress,
+        building.city,
+        building.province,
+        building.postalCode,
+      ].filter(Boolean);
+
+      if (addressParts.length === 0) {
+        return res.status(400).json({ message: "Building has no address to geocode" });
+      }
+
+      const addressString = addressParts.join(", ");
+      
+      const apiKey = process.env.GEOAPIFY_API_KEY;
+      if (!apiKey) {
+        return res.status(500).json({ message: "Geocoding service not configured" });
+      }
+
+      const response = await fetch(
+        `https://api.geoapify.com/v1/geocode/search?text=${encodeURIComponent(addressString)}&apiKey=${apiKey}`
+      );
+
+      if (!response.ok) {
+        return res.status(500).json({ message: "Geocoding service error" });
+      }
+
+      const data = await response.json();
+      
+      if (!data.features || data.features.length === 0) {
+        return res.status(404).json({ message: "Could not find coordinates for this address" });
+      }
+
+      const [longitude, latitude] = data.features[0].geometry.coordinates;
+      
+      // Update building with new coordinates
+      const updated = await storage.updateBuilding(req.params.id, {
+        latitude: latitude.toString(),
+        longitude: longitude.toString(),
+      });
+
+      if (updated) {
+        const { passwordHash, ...buildingData } = updated;
+        res.json({ building: buildingData, geocoded: true });
+      } else {
+        res.status(500).json({ message: "Failed to update building coordinates" });
+      }
+    } catch (error) {
+      console.error('[SuperUser] Geocode building error:', error);
+      res.status(500).json({ message: "Failed to geocode building" });
+    }
+  });
+
+  // SuperUser: Batch geocode all buildings without coordinates
+  app.post("/api/superuser/buildings/geocode-all", requireAuth, async (req: Request, res: Response) => {
+    try {
+      if (req.session.userId !== 'superuser') {
+        return res.status(403).json({ message: "Access denied. SuperUser only." });
+      }
+
+      const allBuildings = await storage.getAllBuildings();
+      const buildingsToGeocode = allBuildings.filter(b => !b.latitude || !b.longitude);
+      
+      const apiKey = process.env.GEOAPIFY_API_KEY;
+      if (!apiKey) {
+        return res.status(500).json({ message: "Geocoding service not configured" });
+      }
+
+      let successCount = 0;
+      let failCount = 0;
+
+      for (const building of buildingsToGeocode) {
+        const addressParts = [
+          building.buildingAddress,
+          building.city,
+          building.province,
+          building.postalCode,
+        ].filter(Boolean);
+
+        if (addressParts.length === 0) {
+          failCount++;
+          continue;
+        }
+
+        try {
+          const addressString = addressParts.join(", ");
+          const response = await fetch(
+            `https://api.geoapify.com/v1/geocode/search?text=${encodeURIComponent(addressString)}&apiKey=${apiKey}`
+          );
+
+          if (response.ok) {
+            const data = await response.json();
+            if (data.features && data.features.length > 0) {
+              const [longitude, latitude] = data.features[0].geometry.coordinates;
+              await storage.updateBuilding(building.id, {
+                latitude: latitude.toString(),
+                longitude: longitude.toString(),
+              });
+              successCount++;
+            } else {
+              failCount++;
+            }
+          } else {
+            failCount++;
+          }
+          
+          // Rate limit: wait 200ms between requests
+          await new Promise(resolve => setTimeout(resolve, 200));
+        } catch (err) {
+          failCount++;
+        }
+      }
+
+      res.json({ 
+        message: `Geocoded ${successCount} buildings, ${failCount} failed`,
+        successCount,
+        failCount,
+        total: buildingsToGeocode.length
+      });
+    } catch (error) {
+      console.error('[SuperUser] Batch geocode error:', error);
+      res.status(500).json({ message: "Failed to batch geocode buildings" });
+    }
+  });
+
   // ==================== SUPERUSER TASK MANAGEMENT ====================
 
   // Get all SuperUser tasks with comments
