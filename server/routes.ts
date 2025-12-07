@@ -4857,7 +4857,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // Remove employee from team (unlink, don't delete - technician accounts persist)
-  app.delete("/api/employees/:id", requireAuth, requireRole("company", "operations_manager"), async (req: Request, res: Response) => {
+  app.delete("/api/employees/:id", requireAuth, requireRole("company", "admin", "operations_manager"), async (req: Request, res: Response) => {
     try {
       const currentUser = await storage.getUserById(req.session.userId!);
       
@@ -4874,8 +4874,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Get the employee to verify they belong to this company
       const employee = await storage.getUserById(req.params.id);
       
-      if (!employee || employee.companyId !== companyId) {
-        return res.status(403).json({ message: "Access denied" });
+      if (!employee) {
+        return res.status(404).json({ message: "Employee not found" });
+      }
+      
+      if (employee.companyId !== companyId) {
+        return res.status(403).json({ message: "This employee does not belong to your company" });
       }
       
       // IMPORTANT: Don't delete the user - just unlink them from the company
