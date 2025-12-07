@@ -4049,6 +4049,171 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // ==================== SUPERUSER TECHNICIAN DATABASE ====================
+
+  // Get all technicians (SuperUser only)
+  app.get("/api/superuser/technicians", requireAuth, async (req: Request, res: Response) => {
+    try {
+      if (req.session.userId !== 'superuser') {
+        return res.status(403).json({ message: "Access denied. SuperUser only." });
+      }
+
+      const page = parseInt(req.query.page as string) || 1;
+      const pageSize = Math.min(parseInt(req.query.pageSize as string) || 50, 100);
+      const search = (req.query.search as string) || undefined;
+      const companyId = (req.query.companyId as string) || undefined;
+      const linkedOnly = req.query.linkedOnly === 'true' ? true : 
+                        req.query.linkedOnly === 'false' ? false : undefined;
+
+      const result = await storage.getAllTechnicians({ 
+        page, 
+        pageSize, 
+        search, 
+        companyId, 
+        linkedOnly 
+      });
+
+      // Convert Map to object for JSON serialization
+      const companiesObject: Record<string, { name: string; id: string }> = {};
+      result.companies.forEach((value, key) => {
+        companiesObject[key] = value;
+      });
+
+      // Format technicians for response (exclude sensitive fields)
+      const technicians = result.technicians.map(tech => ({
+        id: tech.id,
+        name: tech.name,
+        email: tech.email,
+        companyId: tech.companyId,
+        companyName: tech.companyId ? companiesObject[tech.companyId]?.name : null,
+        irataLevel: tech.irataLevel,
+        irataLicenseNumber: tech.irataLicenseNumber,
+        irataExpiry: tech.irataExpiry,
+        irataVerified: tech.irataVerified,
+        spratLevel: tech.spratLevel,
+        spratLicenseNumber: tech.spratLicenseNumber,
+        spratExpiry: tech.spratExpiry,
+        spratVerified: tech.spratVerified,
+        startDate: tech.startDate,
+        terminatedDate: tech.terminatedDate,
+        terminationReason: tech.terminationReason,
+        createdAt: tech.createdAt,
+        employeeCity: tech.employeeCity,
+        employeeProvinceState: tech.employeeProvinceState,
+        employeeCountry: tech.employeeCountry,
+      }));
+
+      res.json({ 
+        technicians, 
+        total: result.total,
+        page,
+        pageSize,
+        totalPages: Math.ceil(result.total / pageSize)
+      });
+    } catch (error) {
+      console.error('[SuperUser] Get technicians error:', error);
+      res.status(500).json({ message: "Failed to fetch technicians" });
+    }
+  });
+
+  // Get single technician details (SuperUser only)
+  app.get("/api/superuser/technicians/:technicianId", requireAuth, async (req: Request, res: Response) => {
+    try {
+      if (req.session.userId !== 'superuser') {
+        return res.status(403).json({ message: "Access denied. SuperUser only." });
+      }
+
+      const { technicianId } = req.params;
+      const result = await storage.getTechnicianWithCompanyDetails(technicianId);
+
+      if (!result) {
+        return res.status(404).json({ message: "Technician not found" });
+      }
+
+      const { technician, company } = result;
+
+      // Return full technician details (excluding password hash and raw sensitive data)
+      const technicianDetails = {
+        id: technician.id,
+        name: technician.name,
+        email: technician.email,
+        role: technician.role,
+        companyId: technician.companyId,
+        
+        // Certification Info
+        irataLevel: technician.irataLevel,
+        irataLicenseNumber: technician.irataLicenseNumber,
+        irataExpiry: technician.irataExpiry,
+        irataVerified: technician.irataVerified,
+        irataVerifiedAt: technician.irataVerifiedAt,
+        spratLevel: technician.spratLevel,
+        spratLicenseNumber: technician.spratLicenseNumber,
+        spratExpiry: technician.spratExpiry,
+        spratVerified: technician.spratVerified,
+        spratVerifiedAt: technician.spratVerifiedAt,
+        
+        // Employment Info
+        startDate: technician.startDate,
+        terminatedDate: technician.terminatedDate,
+        terminationReason: technician.terminationReason,
+        hourlyRate: technician.hourlyRate,
+        isSalary: technician.isSalary,
+        salary: technician.salary,
+        permissions: technician.permissions,
+        
+        // Personal Info
+        birthday: technician.birthday,
+        employeePhoneNumber: technician.employeePhoneNumber,
+        employeeStreetAddress: technician.employeeStreetAddress,
+        employeeCity: technician.employeeCity,
+        employeeProvinceState: technician.employeeProvinceState,
+        employeeCountry: technician.employeeCountry,
+        employeePostalCode: technician.employeePostalCode,
+        
+        // Emergency Contact
+        emergencyContactName: technician.emergencyContactName,
+        emergencyContactPhone: technician.emergencyContactPhone,
+        emergencyContactRelationship: technician.emergencyContactRelationship,
+        
+        // Driver's License
+        driversLicenseNumber: technician.driversLicenseNumber ? '****' + technician.driversLicenseNumber.slice(-4) : null,
+        driversLicenseExpiry: technician.driversLicenseExpiry,
+        driversLicenseProvince: technician.driversLicenseProvince,
+        
+        // Documents
+        bankDocuments: technician.bankDocuments,
+        driversLicenseDocuments: technician.driversLicenseDocuments,
+        firstAidDocuments: technician.firstAidDocuments,
+        irataDocuments: technician.irataDocuments,
+        spratDocuments: technician.spratDocuments,
+        
+        // Medical
+        specialMedicalConditions: technician.specialMedicalConditions,
+        
+        // Metadata
+        createdAt: technician.createdAt,
+        irataBaselineHours: technician.irataBaselineHours,
+      };
+
+      // Company info (if linked)
+      const companyInfo = company ? {
+        id: company.id,
+        name: company.companyName,
+        email: company.email,
+        subscriptionTier: company.subscriptionTier,
+        licenseVerified: company.licenseVerified,
+      } : null;
+
+      res.json({ 
+        technician: technicianDetails, 
+        company: companyInfo 
+      });
+    } catch (error) {
+      console.error('[SuperUser] Get technician details error:', error);
+      res.status(500).json({ message: "Failed to fetch technician details" });
+    }
+  });
+
   // ==================== SUPERUSER TASK MANAGEMENT ====================
 
   // Get all SuperUser tasks with comments
