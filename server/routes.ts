@@ -8780,6 +8780,111 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: "Internal server error" });
     }
   });
+
+  // ==================== HISTORICAL HOURS ROUTES ====================
+  
+  // Get my historical hours (previous work not counted toward totals)
+  // Only technicians can access historical hours
+  app.get("/api/my-historical-hours", requireAuth, requireRole("rope_access_tech"), async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      const historicalHours = await storage.getHistoricalHoursByEmployee(currentUser.id);
+      res.json({ historicalHours });
+    } catch (error) {
+      console.error("Get historical hours error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+  
+  // Create historical hours entry
+  const historicalHoursSchema = z.object({
+    startDate: z.string().min(1, "Start date is required"),
+    endDate: z.string().min(1, "End date is required"),
+    hoursWorked: z.string().or(z.number()).transform(v => {
+      const num = parseFloat(String(v));
+      if (isNaN(num) || num <= 0) {
+        throw new Error("Hours must be a positive number");
+      }
+      return String(num);
+    }),
+    buildingName: z.string().optional().nullable(),
+    buildingAddress: z.string().optional().nullable(),
+    buildingHeight: z.string().optional().nullable(),
+    tasksPerformed: z.array(z.string()).min(1, "At least one task is required"),
+    notes: z.string().optional().nullable(),
+    previousEmployer: z.string().optional().nullable(),
+  });
+  
+  // Only technicians can add historical hours
+  app.post("/api/my-historical-hours", requireAuth, requireRole("rope_access_tech"), async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      const parseResult = historicalHoursSchema.safeParse(req.body);
+      if (!parseResult.success) {
+        return res.status(400).json({ 
+          message: "Invalid input", 
+          errors: parseResult.error.flatten().fieldErrors 
+        });
+      }
+      
+      const data = parseResult.data;
+      
+      const entry = await storage.createHistoricalHours({
+        employeeId: currentUser.id,
+        startDate: data.startDate,
+        endDate: data.endDate,
+        hoursWorked: data.hoursWorked,
+        buildingName: data.buildingName || null,
+        buildingAddress: data.buildingAddress || null,
+        buildingHeight: data.buildingHeight || null,
+        tasksPerformed: data.tasksPerformed,
+        notes: data.notes || null,
+        previousEmployer: data.previousEmployer || null,
+      });
+      
+      res.json({ historicalHours: entry, message: "Previous hours added successfully" });
+    } catch (error) {
+      console.error("Create historical hours error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+  
+  // Delete historical hours entry - only technicians can delete their own entries
+  app.delete("/api/my-historical-hours/:id", requireAuth, requireRole("rope_access_tech"), async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      const entry = await storage.getHistoricalHoursById(req.params.id);
+      
+      if (!entry) {
+        return res.status(404).json({ message: "Historical hours entry not found" });
+      }
+      
+      if (entry.employeeId !== currentUser.id) {
+        return res.status(403).json({ message: "Not authorized to delete this entry" });
+      }
+      
+      await storage.deleteHistoricalHours(req.params.id);
+      res.json({ success: true, message: "Previous hours deleted successfully" });
+    } catch (error) {
+      console.error("Delete historical hours error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
   
   // ==================== COMPLAINT ROUTES ====================
   

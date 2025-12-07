@@ -1886,6 +1886,46 @@ export const IRATA_TASK_TYPES = [
 
 export type IrataTaskType = typeof IRATA_TASK_TYPES[number]['id'];
 
+// Historical/Previous Hours - for technicians to log work from before joining platform
+// These hours are tracked separately and NOT counted toward certification totals
+export const historicalHours = pgTable("historical_hours", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  employeeId: varchar("employee_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  
+  // Date range of work
+  startDate: date("start_date").notNull(),
+  endDate: date("end_date").notNull(),
+  
+  // Hours worked (total for the date range)
+  hoursWorked: numeric("hours_worked", { precision: 6, scale: 2 }).notNull(),
+  
+  // Building/Location info
+  buildingName: varchar("building_name"),
+  buildingAddress: text("building_address"),
+  buildingHeight: varchar("building_height"), // e.g., "25 floors", "100m", etc.
+  
+  // Tasks performed (stored as array of task type strings - same as IRATA_TASK_TYPES)
+  tasksPerformed: text("tasks_performed").array().default(sql`ARRAY[]::text[]`).notNull(),
+  
+  // Optional notes
+  notes: text("notes"),
+  
+  // Company name at time of work (for reference, not linked)
+  previousEmployer: varchar("previous_employer"),
+  
+  createdAt: timestamp("created_at").defaultNow(),
+}, (table) => ({
+  employeeIdx: index("IDX_historical_hours_employee").on(table.employeeId),
+}));
+
+export const insertHistoricalHoursSchema = createInsertSchema(historicalHours).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type HistoricalHours = typeof historicalHours.$inferSelect;
+export type InsertHistoricalHours = z.infer<typeof insertHistoricalHoursSchema>;
+
 // Document Review Signatures table - tracks employee acknowledgment of company documents
 export const documentReviewSignatures = pgTable("document_review_signatures", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),

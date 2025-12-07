@@ -76,6 +76,7 @@ import Pricing from "@/pages/Pricing";
 import ROICalculator from "@/pages/ROICalculator";
 import TechnicianLogin from "@/pages/TechnicianLogin";
 import TechnicianPortal from "@/pages/TechnicianPortal";
+import TechnicianLoggedHours from "@/pages/TechnicianLoggedHours";
 import NotFound from "@/pages/not-found";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import { EMPLOYEE_ROLES } from "@/lib/permissions";
@@ -178,6 +179,11 @@ function Router() {
       <Route path="/technician-portal">
         <ProtectedRoute allowedRoles={["rope_access_tech"]}>
           <TechnicianPortal />
+        </ProtectedRoute>
+      </Route>
+      <Route path="/technician-logged-hours">
+        <ProtectedRoute allowedRoles={["rope_access_tech"]}>
+          <TechnicianLoggedHours />
         </ProtectedRoute>
       </Route>
       <Route path="/resident">

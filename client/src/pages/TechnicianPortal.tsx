@@ -196,6 +196,44 @@ const translations = {
     hour: "hr",
     goToWorkDashboard: "Go to Work Dashboard",
     accessProjects: "Access projects, clock in/out, and safety forms",
+    myLoggedHours: "My Logged Hours",
+    viewLoggedHoursDesc: "View your work sessions and add previous work experience",
+    viewLoggedHours: "View Logged Hours",
+    totalHoursLogged: "Total Hours Logged",
+    workSessions: "Work Sessions",
+    previousHours: "Previous Hours",
+    previousHoursDesc: "Hours from work before joining this platform (not counted in totals)",
+    addPreviousHours: "Add Previous Hours",
+    noLoggedHours: "No logged hours yet",
+    noLoggedHoursDesc: "Your work sessions will appear here after you clock in and out.",
+    noPreviousHours: "No previous hours recorded",
+    noPreviousHoursDesc: "Add historical work experience that won't count toward your certification totals.",
+    dateRange: "Date Range",
+    to: "to",
+    building: "Building",
+    buildingName: "Building Name",
+    buildingAddress: "Building Address",
+    buildingHeight: "Building Height",
+    heightPlaceholder: "e.g., 25 floors, 100m",
+    tasksPerformed: "Tasks Performed",
+    selectTasks: "Select tasks performed",
+    hoursWorked: "Hours Worked",
+    previousEmployer: "Previous Employer",
+    previousEmployerPlaceholder: "Company name (optional)",
+    notes: "Notes",
+    notesPlaceholder: "Any additional details (optional)",
+    startDate: "Start Date",
+    endDate: "End Date",
+    savePreviousHours: "Save Previous Hours",
+    savingHours: "Saving...",
+    previousHoursAdded: "Previous Hours Added",
+    previousHoursAddedDesc: "Your previous work experience has been recorded.",
+    previousHoursDeleted: "Previous Hours Deleted",
+    previousHoursDeletedDesc: "The previous hours entry has been removed.",
+    deletePreviousHours: "Delete",
+    confirmDeletePreviousHours: "Are you sure you want to delete this previous hours entry?",
+    deleteConfirm: "Delete",
+    cancelDelete: "Cancel",
   },
   fr: {
     technicianPortal: "Portail du technicien",
@@ -333,6 +371,44 @@ const translations = {
     hour: "h",
     goToWorkDashboard: "Accéder au tableau de bord",
     accessProjects: "Accéder aux projets, pointage et formulaires de sécurité",
+    myLoggedHours: "Mes heures enregistrées",
+    viewLoggedHoursDesc: "Voir vos sessions de travail et ajouter des expériences antérieures",
+    viewLoggedHours: "Voir les heures enregistrées",
+    totalHoursLogged: "Total des heures enregistrées",
+    workSessions: "Sessions de travail",
+    previousHours: "Heures précédentes",
+    previousHoursDesc: "Heures de travail avant de rejoindre cette plateforme (non comptabilisées dans les totaux)",
+    addPreviousHours: "Ajouter des heures précédentes",
+    noLoggedHours: "Aucune heure enregistrée",
+    noLoggedHoursDesc: "Vos sessions de travail apparaîtront ici après vos pointages.",
+    noPreviousHours: "Aucune heure précédente enregistrée",
+    noPreviousHoursDesc: "Ajoutez des expériences de travail historiques qui ne seront pas comptabilisées dans vos totaux de certification.",
+    dateRange: "Période",
+    to: "au",
+    building: "Bâtiment",
+    buildingName: "Nom du bâtiment",
+    buildingAddress: "Adresse du bâtiment",
+    buildingHeight: "Hauteur du bâtiment",
+    heightPlaceholder: "ex: 25 étages, 100m",
+    tasksPerformed: "Tâches effectuées",
+    selectTasks: "Sélectionner les tâches effectuées",
+    hoursWorked: "Heures travaillées",
+    previousEmployer: "Employeur précédent",
+    previousEmployerPlaceholder: "Nom de l'entreprise (facultatif)",
+    notes: "Notes",
+    notesPlaceholder: "Détails supplémentaires (facultatif)",
+    startDate: "Date de début",
+    endDate: "Date de fin",
+    savePreviousHours: "Enregistrer les heures précédentes",
+    savingHours: "Enregistrement...",
+    previousHoursAdded: "Heures précédentes ajoutées",
+    previousHoursAddedDesc: "Votre expérience de travail précédente a été enregistrée.",
+    previousHoursDeleted: "Heures précédentes supprimées",
+    previousHoursDeletedDesc: "L'entrée des heures précédentes a été supprimée.",
+    deletePreviousHours: "Supprimer",
+    confirmDeletePreviousHours: "Êtes-vous sûr de vouloir supprimer cette entrée d'heures précédentes ?",
+    deleteConfirm: "Supprimer",
+    cancelDelete: "Annuler",
   }
 };
 
@@ -874,6 +950,34 @@ export default function TechnicianPortal() {
                   data-testid="button-go-to-dashboard"
                 >
                   {t.goToWorkDashboard}
+                  <ArrowRight className="w-4 h-4" />
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* My Logged Hours - Show for all technicians */}
+        {user && user.role === 'rope_access_tech' && (
+          <Card>
+            <CardContent className="p-4">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 rounded-full bg-muted">
+                    <Clock className="w-5 h-5 text-muted-foreground" />
+                  </div>
+                  <div>
+                    <p className="font-medium">{t.myLoggedHours}</p>
+                    <p className="text-sm text-muted-foreground">{t.viewLoggedHoursDesc}</p>
+                  </div>
+                </div>
+                <Button
+                  variant="outline"
+                  onClick={() => setLocation("/technician-logged-hours")}
+                  className="gap-2"
+                  data-testid="button-view-logged-hours"
+                >
+                  {t.viewLoggedHours}
                   <ArrowRight className="w-4 h-4" />
                 </Button>
               </div>
