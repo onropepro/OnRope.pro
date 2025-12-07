@@ -5666,9 +5666,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "Technician not found" });
       }
       
-      // Check if technician is already linked to a company
-      if (technician.companyId) {
-        return res.status(400).json({ message: "This technician is already linked to a company" });
+      // Check if technician is linked to a DIFFERENT company (protect against cross-company hijacking)
+      // If linked to THIS company (via accepting invitation), that's expected and allowed
+      if (technician.companyId && technician.companyId !== companyId) {
+        return res.status(400).json({ message: "This technician is already linked to a different company" });
       }
       
       // Check seat limits
