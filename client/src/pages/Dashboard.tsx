@@ -805,7 +805,7 @@ export default function Dashboard() {
     }>;
   }>({
     queryKey: ["/api/accepted-invitations"],
-    enabled: userData?.user?.role === 'owner' || userData?.user?.role === 'company',
+    enabled: userData?.user?.role === 'owner' || userData?.user?.role === 'company' || userData?.user?.role === 'admin',
     refetchInterval: 10000, // Check every 10 seconds
   });
 

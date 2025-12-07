@@ -5335,13 +5335,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "User not found" });
       }
       
-      const companyId = user.role === 'owner' ? user.id : user.companyId;
+      const companyId = (user.role === 'owner' || user.role === 'company') ? user.id : user.companyId;
       if (!companyId) {
         return res.status(403).json({ message: "Not authorized" });
       }
       
-      // Only owners and admins can view accepted invitations
-      if (user.role !== 'owner' && user.role !== 'admin') {
+      // Only company owners and admins can view accepted invitations
+      if (user.role !== 'owner' && user.role !== 'company' && user.role !== 'admin') {
         return res.status(403).json({ message: "Only owners and admins can view accepted invitations" });
       }
       
@@ -5426,13 +5426,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "User not found" });
       }
       
-      const companyId = user.role === 'owner' ? user.id : user.companyId;
+      const companyId = (user.role === 'owner' || user.role === 'company') ? user.id : user.companyId;
       if (!companyId) {
         return res.status(403).json({ message: "Not authorized" });
       }
       
-      // Only owners and admins can acknowledge invitations
-      if (user.role !== 'owner' && user.role !== 'admin') {
+      // Only company owners and admins can acknowledge invitations
+      if (user.role !== 'owner' && user.role !== 'company' && user.role !== 'admin') {
         return res.status(403).json({ message: "Only owners and admins can acknowledge invitations" });
       }
       
@@ -5490,13 +5490,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "User not found" });
       }
       
-      const companyId = user.role === 'owner' ? user.id : user.companyId;
+      const companyId = (user.role === 'owner' || user.role === 'company') ? user.id : user.companyId;
       if (!companyId) {
         return res.status(403).json({ message: "Not authorized" });
       }
       
-      // Only owners and admins can convert invitations
-      if (user.role !== 'owner' && user.role !== 'admin') {
+      // Only company owners and admins can convert invitations
+      if (user.role !== 'owner' && user.role !== 'company' && user.role !== 'admin') {
         return res.status(403).json({ message: "Only owners and admins can add employees" });
       }
       
