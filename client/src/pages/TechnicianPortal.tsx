@@ -11,6 +11,17 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { useToast } from "@/hooks/use-toast";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { formatLocalDate, formatDateTime } from "@/lib/dateUtils";
@@ -38,7 +49,8 @@ import {
   CheckCircle2,
   Upload,
   Loader2,
-  Languages
+  Languages,
+  UserMinus
 } from "lucide-react";
 import onRopeProLogo from "@assets/OnRopePro-logo_1764625558626.png";
 
@@ -154,6 +166,17 @@ const translations = {
     invitationError: "Error",
     invitationMessage: "Message",
     invitedOn: "Invited on",
+    currentEmployer: "Current Employer",
+    currentlyEmployedBy: "You are currently employed by",
+    leaveCompany: "Leave Company",
+    leavingCompany: "Leaving...",
+    leaveCompanyConfirm: "Are you sure you want to leave this company?",
+    leaveCompanyWarning: "This will remove you from their active roster. You can still be invited by other companies.",
+    confirmLeave: "Yes, Leave Company",
+    cancelLeave: "Cancel",
+    leftCompany: "Left Company",
+    leftCompanyDesc: "You have successfully left the company. You can now accept invitations from other companies.",
+    leaveError: "Error",
   },
   fr: {
     technicianPortal: "Portail du technicien",
@@ -264,6 +287,17 @@ const translations = {
     invitationError: "Erreur",
     invitationMessage: "Message",
     invitedOn: "Invité le",
+    currentEmployer: "Employeur actuel",
+    currentlyEmployedBy: "Vous êtes actuellement employé par",
+    leaveCompany: "Quitter l'entreprise",
+    leavingCompany: "Départ en cours...",
+    leaveCompanyConfirm: "Êtes-vous sûr de vouloir quitter cette entreprise?",
+    leaveCompanyWarning: "Cela vous retirera de leur liste active. Vous pouvez toujours être invité par d'autres entreprises.",
+    confirmLeave: "Oui, quitter l'entreprise",
+    cancelLeave: "Annuler",
+    leftCompany: "Entreprise quittée",
+    leftCompanyDesc: "Vous avez quitté l'entreprise avec succès. Vous pouvez maintenant accepter des invitations d'autres entreprises.",
+    leaveError: "Erreur",
   }
 };
 
@@ -410,7 +444,7 @@ export default function TechnicianPortal() {
     }>;
   }>({
     queryKey: ["/api/my-invitations"],
-    enabled: !!user && user.role === 'rope_access_tech' && !user.companyId,
+    enabled: !!user && user.role === 'rope_access_tech' && (!user.companyId || !!user.terminatedDate),
   });
 
   const pendingInvitations = invitationsData?.invitations || [];
@@ -471,6 +505,26 @@ export default function TechnicianPortal() {
         variant: "destructive",
       });
       setProcessingInvitationId(null);
+    },
+  });
+
+  const leaveCompanyMutation = useMutation({
+    mutationFn: async () => {
+      return apiRequest("POST", "/api/technician/leave-company");
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/user"] });
+      toast({
+        title: t.leftCompany,
+        description: t.leftCompanyDesc,
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: t.leaveError,
+        description: error.message || "Failed to leave company",
+        variant: "destructive",
+      });
     },
   });
 
@@ -705,8 +759,8 @@ export default function TechnicianPortal() {
       </header>
 
       <main className="max-w-4xl mx-auto px-4 py-6 space-y-6">
-        {/* Team Invitations Section - Only show for unlinked technicians */}
-        {user && user.role === 'rope_access_tech' && !user.companyId && (
+        {/* Team Invitations Section - Show for unlinked technicians OR self-resigned technicians */}
+        {user && user.role === 'rope_access_tech' && (!user.companyId || user.terminatedDate) && (
           <Card className="border-primary/30 bg-primary/5">
             <CardHeader>
               <div className="flex items-center gap-3">
@@ -798,6 +852,65 @@ export default function TechnicianPortal() {
                 </div>
               )}
             </CardContent>
+          </Card>
+        )}
+
+        {/* Current Employer Section - Show for linked technicians (not terminated) */}
+        {user && user.role === 'rope_access_tech' && user.companyId && !user.terminatedDate && (
+          <Card className="border-muted">
+            <CardHeader>
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 rounded-full bg-muted">
+                    <Building className="w-5 h-5 text-muted-foreground" />
+                  </div>
+                  <div>
+                    <CardTitle className="text-lg">{t.currentEmployer}</CardTitle>
+                    <CardDescription>
+                      {t.currentlyEmployedBy} <span className="font-medium text-foreground">{user.companyName || "your company"}</span>
+                    </CardDescription>
+                  </div>
+                </div>
+                <AlertDialog>
+                  <AlertDialogTrigger asChild>
+                    <Button 
+                      variant="outline" 
+                      className="gap-2 text-destructive border-destructive/30"
+                      data-testid="button-leave-company"
+                    >
+                      <UserMinus className="w-4 h-4" />
+                      {t.leaveCompany}
+                    </Button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>{t.leaveCompanyConfirm}</AlertDialogTitle>
+                      <AlertDialogDescription>
+                        {t.leaveCompanyWarning}
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel data-testid="button-cancel-leave">{t.cancelLeave}</AlertDialogCancel>
+                      <AlertDialogAction 
+                        onClick={() => leaveCompanyMutation.mutate()}
+                        disabled={leaveCompanyMutation.isPending}
+                        className="bg-destructive text-destructive-foreground gap-2"
+                        data-testid="button-confirm-leave"
+                      >
+                        {leaveCompanyMutation.isPending ? (
+                          <>
+                            <Loader2 className="w-4 h-4 animate-spin" />
+                            {t.leavingCompany}
+                          </>
+                        ) : (
+                          t.confirmLeave
+                        )}
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
+              </div>
+            </CardHeader>
           </Card>
         )}
 

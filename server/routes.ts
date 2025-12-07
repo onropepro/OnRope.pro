@@ -2435,20 +2435,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       // Check if user has been terminated - destroy session if so
-      if (user.terminatedDate) {
+      // Exception: Self-resigned technicians can still log in to accept new invitations
+      if (user.terminatedDate && user.terminationReason !== "Self-resigned") {
         req.session.destroy(() => {});
         return res.status(403).json({ message: "Your employment has been terminated. Please contact your administrator for more information." });
       }
       
-      // For employees: include parent company's license verification status AND resident code
+      // For employees: include parent company's license verification status, resident code, AND company name
       let companyLicenseVerified: boolean | undefined = undefined;
       let companyResidentCode: string | undefined = undefined;
+      let employerCompanyName: string | undefined = undefined;
       if (user.role !== 'company' && user.role !== 'resident' && user.companyId) {
         try {
           const parentCompany = await storage.getUserById(user.companyId);
           if (parentCompany) {
             companyLicenseVerified = parentCompany.licenseVerified;
             companyResidentCode = parentCompany.residentCode || undefined;
+            employerCompanyName = parentCompany.companyName || parentCompany.name || undefined;
           } else {
             console.warn(`[/api/user] Parent company not found for employee ${user.id}, companyId: ${user.companyId}`);
           }
@@ -2469,7 +2472,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         user: {
           ...userWithoutPassword,
           ...(companyLicenseVerified !== undefined && { companyLicenseVerified }),
-          ...(companyResidentCode && { residentCode: companyResidentCode })
+          ...(companyResidentCode && { residentCode: companyResidentCode }),
+          ...(employerCompanyName && { companyName: employerCompanyName })
         }
       });
     } catch (error) {
@@ -2604,6 +2608,55 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error: any) {
       console.error("[Technician-Profile] Error updating profile:", error);
       res.status(500).json({ message: error.message || "Failed to update profile" });
+    }
+  });
+
+  // Technician: Leave company (self-unlink)
+  // This sets a terminated date so the technician appears in the employer's terminated section
+  // for historical HR/payroll records, while allowing the technician to be invited by other companies
+  app.post("/api/technician/leave-company", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const userId = req.session.userId;
+      if (!userId) {
+        return res.status(401).json({ message: "Not authenticated" });
+      }
+
+      const user = await storage.getUserById(userId);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      // Only technicians can use this endpoint
+      if (user.role !== 'rope_access_tech') {
+        return res.status(403).json({ message: "Only technicians can leave a company" });
+      }
+
+      // Must be linked to a company to leave
+      if (!user.companyId) {
+        return res.status(400).json({ message: "You are not currently linked to any company" });
+      }
+
+      const companyId = user.companyId;
+      const company = await storage.getUserById(companyId);
+      const companyName = company?.companyName || company?.name || 'Unknown Company';
+
+      // Set terminated date and reason, but KEEP companyId for historical records
+      // This puts them in the "terminated employees" section for the employer
+      await storage.updateUser(userId, {
+        terminatedDate: new Date().toISOString().split('T')[0],
+        terminationReason: "Self-resigned",
+        terminationNotes: `Technician voluntarily left the company on ${new Date().toLocaleDateString()}`
+      });
+
+      console.log(`[Team] Technician ${user.name} (${userId}) self-resigned from company ${companyId}`);
+
+      res.json({ 
+        message: "Successfully left the company",
+        companyName
+      });
+    } catch (error: any) {
+      console.error("[Technician] Error leaving company:", error);
+      res.status(500).json({ message: error.message || "Failed to leave company" });
     }
   });
 
@@ -5262,18 +5315,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "This invitation has already been processed" });
       }
       
-      // Check if technician is already linked to a company
-      if (user.companyId) {
+      // Check if technician is already linked to an ACTIVE company
+      // Self-resigned technicians (with terminatedDate) can still accept new invitations
+      if (user.companyId && !user.terminatedDate) {
         return res.status(400).json({ message: "You are already linked to a company" });
       }
       
       // Accept the invitation and link the technician
       await storage.acceptTeamInvitation(invitationId);
       
-      // Link the technician to the company
+      // Link the technician to the company and clear any previous termination status
       await storage.updateUser(user.id, {
         companyId: invitation.companyId,
         startDate: getTodayString(),
+        terminatedDate: null,
+        terminationReason: null,
+        terminationNotes: null,
       });
       
       const company = await storage.getUserById(invitation.companyId);
