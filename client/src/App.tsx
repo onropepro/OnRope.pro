@@ -37,7 +37,8 @@ import CompanyDetail from "@/pages/CompanyDetail";
 import ViewAsCompany from "@/pages/ViewAsCompany";
 import SuperUserFeatureRequests from "@/pages/SuperUserFeatureRequests";
 import SuperUserMetrics from "@/pages/SuperUserMetrics";
-import SuperUserGoals from "@/pages/SuperUserGoals";
+import SuperUserGoalsOverview from "@/pages/SuperUserGoalsOverview";
+import SuperUserGoalDetail from "@/pages/SuperUserGoalDetail";
 import FounderResources from "@/pages/FounderResources";
 import BuildingPortal from "@/pages/BuildingPortal";
 import SuperUserBuildings from "@/pages/SuperUserBuildings";
@@ -118,9 +119,14 @@ function Router() {
           <SuperUserMetrics />
         </ProtectedRoute>
       </Route>
+      <Route path="/superuser/goals/:goalId">
+        <ProtectedRoute allowedRoles={["superuser"]}>
+          <SuperUserGoalDetail />
+        </ProtectedRoute>
+      </Route>
       <Route path="/superuser/goals">
         <ProtectedRoute allowedRoles={["superuser"]}>
-          <SuperUserGoals />
+          <SuperUserGoalsOverview />
         </ProtectedRoute>
       </Route>
       <Route path="/superuser/companies">
