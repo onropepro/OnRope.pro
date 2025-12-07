@@ -5514,10 +5514,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "This invitation has not been accepted" });
       }
       
-      // Check if already acknowledged/converted
-      if (invitation.ownerAcknowledgedAt) {
-        return res.status(400).json({ message: "This invitation has already been processed" });
-      }
+      // Note: ownerAcknowledgedAt being set is EXPECTED here
+      // The acknowledge step happens when owner sees the celebration dialog
+      // The convert step happens when they submit the employee form
+      // So we should NOT reject if ownerAcknowledgedAt is set
       
       // Get the technician
       const technician = await storage.getUserById(invitation.technicianId);
