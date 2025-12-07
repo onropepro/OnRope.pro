@@ -2660,6 +2660,87 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Multer config for technician document uploads (images or PDFs)
+  const technicianDocumentUpload = multer({
+    storage: multer.memoryStorage(),
+    limits: { fileSize: 10 * 1024 * 1024 }, // 10MB max per file
+    fileFilter: (req, file, cb) => {
+      if (file.mimetype.startsWith('image/') || file.mimetype === 'application/pdf') {
+        cb(null, true);
+      } else {
+        cb(new Error('Only image or PDF files are allowed'));
+      }
+    }
+  });
+
+  // Technician: Upload documents (void cheque, driver's license, first aid, certification card)
+  app.post("/api/technician/upload-document", requireAuth, technicianDocumentUpload.single('file'), async (req: Request, res: Response) => {
+    try {
+      const userId = req.session.userId!;
+      const user = await storage.getUserById(userId);
+      
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      if (user.role !== 'rope_access_tech') {
+        return res.status(403).json({ message: "Only technicians can upload documents through this endpoint" });
+      }
+
+      if (!req.file) {
+        return res.status(400).json({ message: "No file uploaded" });
+      }
+
+      const { documentType } = req.body;
+      if (!documentType) {
+        return res.status(400).json({ message: "Document type is required" });
+      }
+
+      const validTypes = ['voidCheque', 'driversLicense', 'driversAbstract', 'firstAidCertificate', 'certificationCard'];
+      if (!validTypes.includes(documentType)) {
+        return res.status(400).json({ message: `Invalid document type. Must be one of: ${validTypes.join(', ')}` });
+      }
+
+      // Upload file to object storage
+      const objectStorageService = new ObjectStorageService();
+      const timestamp = Date.now();
+      const extension = req.file.mimetype === 'application/pdf' ? 'pdf' : req.file.mimetype.split('/')[1];
+      const filename = `technician-${userId}-${documentType}-${timestamp}.${extension}`;
+      
+      const url = await objectStorageService.uploadPublicFile(filename, req.file.buffer, req.file.mimetype);
+      
+      console.log(`[Technician] Uploaded ${documentType} for user ${userId}:`, url);
+
+      // Update the user's document arrays based on document type
+      let updateData: any = {};
+      
+      if (documentType === 'voidCheque') {
+        const existingDocs = user.bankDocuments || [];
+        updateData.bankDocuments = [...existingDocs, url];
+      } else if (documentType === 'driversLicense' || documentType === 'driversAbstract') {
+        const existingDocs = user.driversLicenseDocuments || [];
+        updateData.driversLicenseDocuments = [...existingDocs, url];
+      } else if (documentType === 'firstAidCertificate') {
+        const existingDocs = user.firstAidDocuments || [];
+        updateData.firstAidDocuments = [...existingDocs, url];
+      } else if (documentType === 'certificationCard') {
+        const existingDocs = user.irataDocuments || [];
+        updateData.irataDocuments = [...existingDocs, url];
+      }
+
+      await storage.updateUser(userId, updateData);
+
+      res.json({ 
+        message: "Document uploaded successfully",
+        url,
+        documentType
+      });
+    } catch (error: any) {
+      console.error("[Technician] Error uploading document:", error);
+      res.status(500).json({ message: error.message || "Failed to upload document" });
+    }
+  });
+
   // Property Manager: Get all company links
   app.get("/api/property-manager/company-links", requireAuth, requireRole("property_manager"), async (req: Request, res: Response) => {
     try {
