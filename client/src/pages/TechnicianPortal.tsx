@@ -124,6 +124,17 @@ const translations = {
     licensePhoto: "License Photo",
     driverAbstract: "Driver Abstract",
     voidCheque: "Void Cheque / Bank Info",
+    uploadDocument: "Upload Document",
+    uploadVoidCheque: "Upload Void Cheque",
+    uploadDriversLicense: "Upload Driver's License",
+    uploadDriversAbstract: "Upload Driver's Abstract",
+    uploadFirstAidCert: "Upload First Aid Certificate",
+    uploadCertificationCard: "Upload Certification Card",
+    documentUploaded: "Document Uploaded",
+    documentUploadedDesc: "Your document has been uploaded successfully.",
+    uploadFailed: "Upload Failed",
+    selectFile: "Select a file to upload",
+    uploading: "Uploading...",
     notProvided: "Not provided",
     loadingProfile: "Loading your profile...",
     pleaseLogin: "Please log in to view your profile.",
@@ -245,6 +256,17 @@ const translations = {
     licensePhoto: "Photo du permis",
     driverAbstract: "Relevé de conduite",
     voidCheque: "Chèque annulé / Info bancaire",
+    uploadDocument: "Téléverser un document",
+    uploadVoidCheque: "Téléverser un chèque annulé",
+    uploadDriversLicense: "Téléverser le permis de conduire",
+    uploadDriversAbstract: "Téléverser le relevé de conduite",
+    uploadFirstAidCert: "Téléverser le certificat de premiers soins",
+    uploadCertificationCard: "Téléverser la carte de certification",
+    documentUploaded: "Document téléversé",
+    documentUploadedDesc: "Votre document a été téléversé avec succès.",
+    uploadFailed: "Échec du téléversement",
+    selectFile: "Sélectionner un fichier à téléverser",
+    uploading: "Téléversement...",
     notProvided: "Non fourni",
     loadingProfile: "Chargement de votre profil...",
     pleaseLogin: "Veuillez vous connecter pour voir votre profil.",
@@ -369,6 +391,8 @@ export default function TechnicianPortal() {
   } | null>(null);
   const screenshotInputRef = useRef<HTMLInputElement>(null);
   const spratScreenshotInputRef = useRef<HTMLInputElement>(null);
+  const documentInputRef = useRef<HTMLInputElement>(null);
+  const [uploadingDocType, setUploadingDocType] = useState<string | null>(null);
 
   const { data: userData, isLoading } = useQuery<{ user: any }>({
     queryKey: ["/api/user"],
@@ -661,6 +685,64 @@ export default function TechnicianPortal() {
         spratScreenshotInputRef.current.value = '';
       }
     }
+  };
+
+  // Handler for uploading documents (void cheque, driver's license, etc.)
+  const handleDocumentUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file || !uploadingDocType) return;
+
+    const isValidType = file.type.startsWith('image/') || file.type === 'application/pdf';
+    if (!isValidType) {
+      toast({
+        title: t.invalidFile,
+        description: t.uploadImageFile,
+        variant: "destructive",
+      });
+      setUploadingDocType(null);
+      return;
+    }
+
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('documentType', uploadingDocType);
+
+      const response = await fetch('/api/technician/upload-document', {
+        method: 'POST',
+        credentials: 'include',
+        body: formData,
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.message || t.uploadFailed);
+      }
+
+      toast({
+        title: t.documentUploaded,
+        description: t.documentUploadedDesc,
+      });
+      queryClient.invalidateQueries({ queryKey: ["/api/user"] });
+    } catch (error: any) {
+      toast({
+        title: t.uploadFailed,
+        description: error.message || "Failed to upload document",
+        variant: "destructive",
+      });
+    } finally {
+      setUploadingDocType(null);
+      if (documentInputRef.current) {
+        documentInputRef.current.value = '';
+      }
+    }
+  };
+
+  // Trigger document upload for a specific type
+  const triggerDocumentUpload = (docType: string) => {
+    setUploadingDocType(docType);
+    documentInputRef.current?.click();
   };
 
   const startEditing = () => {
@@ -1484,6 +1566,16 @@ export default function TechnicianPortal() {
                           data-testid="input-irata-screenshot-upload"
                         />
                         
+                        {/* Hidden file input for document uploads */}
+                        <input
+                          type="file"
+                          ref={documentInputRef}
+                          accept="image/*,.pdf"
+                          onChange={handleDocumentUpload}
+                          className="hidden"
+                          data-testid="input-document-upload"
+                        />
+                        
                         <Button
                           variant="default"
                           className="w-full"
@@ -1933,6 +2025,119 @@ export default function TechnicianPortal() {
                     </div>
                   </>
                 )}
+
+                {/* Document Upload Section */}
+                <Separator />
+                <div className="space-y-4">
+                  <h3 className="font-medium flex items-center gap-2 text-muted-foreground">
+                    <Upload className="w-4 h-4" />
+                    {t.uploadDocument}
+                  </h3>
+                  <div className="grid grid-cols-1 gap-3">
+                    <Button
+                      variant="outline"
+                      className="justify-start"
+                      onClick={() => triggerDocumentUpload('voidCheque')}
+                      disabled={uploadingDocType === 'voidCheque'}
+                      data-testid="button-upload-void-cheque"
+                    >
+                      {uploadingDocType === 'voidCheque' ? (
+                        <>
+                          <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                          {t.uploading}
+                        </>
+                      ) : (
+                        <>
+                          <Upload className="w-4 h-4 mr-2" />
+                          {t.uploadVoidCheque}
+                        </>
+                      )}
+                    </Button>
+                    
+                    <Button
+                      variant="outline"
+                      className="justify-start"
+                      onClick={() => triggerDocumentUpload('driversLicense')}
+                      disabled={uploadingDocType === 'driversLicense'}
+                      data-testid="button-upload-drivers-license"
+                    >
+                      {uploadingDocType === 'driversLicense' ? (
+                        <>
+                          <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                          {t.uploading}
+                        </>
+                      ) : (
+                        <>
+                          <Upload className="w-4 h-4 mr-2" />
+                          {t.uploadDriversLicense}
+                        </>
+                      )}
+                    </Button>
+                    
+                    <Button
+                      variant="outline"
+                      className="justify-start"
+                      onClick={() => triggerDocumentUpload('driversAbstract')}
+                      disabled={uploadingDocType === 'driversAbstract'}
+                      data-testid="button-upload-drivers-abstract"
+                    >
+                      {uploadingDocType === 'driversAbstract' ? (
+                        <>
+                          <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                          {t.uploading}
+                        </>
+                      ) : (
+                        <>
+                          <Upload className="w-4 h-4 mr-2" />
+                          {t.uploadDriversAbstract}
+                        </>
+                      )}
+                    </Button>
+                    
+                    <Button
+                      variant="outline"
+                      className="justify-start"
+                      onClick={() => triggerDocumentUpload('firstAidCertificate')}
+                      disabled={uploadingDocType === 'firstAidCertificate'}
+                      data-testid="button-upload-first-aid"
+                    >
+                      {uploadingDocType === 'firstAidCertificate' ? (
+                        <>
+                          <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                          {t.uploading}
+                        </>
+                      ) : (
+                        <>
+                          <Upload className="w-4 h-4 mr-2" />
+                          {t.uploadFirstAidCert}
+                        </>
+                      )}
+                    </Button>
+                    
+                    <Button
+                      variant="outline"
+                      className="justify-start"
+                      onClick={() => triggerDocumentUpload('certificationCard')}
+                      disabled={uploadingDocType === 'certificationCard'}
+                      data-testid="button-upload-certification-card"
+                    >
+                      {uploadingDocType === 'certificationCard' ? (
+                        <>
+                          <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                          {t.uploading}
+                        </>
+                      ) : (
+                        <>
+                          <Upload className="w-4 h-4 mr-2" />
+                          {t.uploadCertificationCard}
+                        </>
+                      )}
+                    </Button>
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    {t.selectFile}
+                  </p>
+                </div>
               </div>
             )}
           </CardContent>
