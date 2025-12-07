@@ -50,7 +50,8 @@ import {
   Upload,
   Loader2,
   Languages,
-  UserMinus
+  UserMinus,
+  DollarSign
 } from "lucide-react";
 import onRopeProLogo from "@assets/OnRopePro-logo_1764625558626.png";
 
@@ -188,6 +189,9 @@ const translations = {
     leftCompany: "Left Company",
     leftCompanyDesc: "You have successfully left the company. You can now accept invitations from other companies.",
     leaveError: "Error",
+    yourCompensation: "Your Compensation",
+    year: "year",
+    hour: "hr",
   },
   fr: {
     technicianPortal: "Portail du technicien",
@@ -320,6 +324,9 @@ const translations = {
     leftCompany: "Entreprise quittée",
     leftCompanyDesc: "Vous avez quitté l'entreprise avec succès. Vous pouvez maintenant accepter des invitations d'autres entreprises.",
     leaveError: "Erreur",
+    yourCompensation: "Votre rémunération",
+    year: "an",
+    hour: "h",
   }
 };
 
@@ -993,6 +1000,30 @@ export default function TechnicianPortal() {
                 </AlertDialog>
               </div>
             </CardHeader>
+            {/* Compensation Display */}
+            {(user.hourlyRate || user.salary) && (
+              <CardContent className="pt-0">
+                <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
+                  <div className="p-2 rounded-full bg-green-500/10">
+                    <DollarSign className="w-5 h-5 text-green-600 dark:text-green-400" />
+                  </div>
+                  <div>
+                    <p className="text-xs text-muted-foreground">{t.yourCompensation}</p>
+                    <p className="text-lg font-semibold">
+                      {user.isSalary && user.salary ? (
+                        <>
+                          ${Number(user.salary).toLocaleString()}<span className="text-sm font-normal text-muted-foreground">/{t.year}</span>
+                        </>
+                      ) : user.hourlyRate ? (
+                        <>
+                          ${Number(user.hourlyRate).toFixed(2)}<span className="text-sm font-normal text-muted-foreground">/{t.hour}</span>
+                        </>
+                      ) : null}
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            )}
           </Card>
         )}
 
