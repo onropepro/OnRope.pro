@@ -45,6 +45,7 @@ import SuperUserRiskTriggers from "@/pages/SuperUserRiskTriggers";
 import FounderResources from "@/pages/FounderResources";
 import BuildingPortal from "@/pages/BuildingPortal";
 import SuperUserBuildings from "@/pages/SuperUserBuildings";
+import SuperUserTechnicians from "@/pages/SuperUserTechnicians";
 import SuperUserTasks from "@/pages/SuperUserTasks";
 import ResidentsManagement from "@/pages/ResidentsManagement";
 import Documents from "@/pages/Documents";
@@ -155,6 +156,11 @@ function Router() {
       <Route path="/superuser/founder-resources">
         <ProtectedRoute allowedRoles={["superuser"]}>
           <FounderResources />
+        </ProtectedRoute>
+      </Route>
+      <Route path="/superuser/technicians">
+        <ProtectedRoute allowedRoles={["superuser"]}>
+          <SuperUserTechnicians />
         </ProtectedRoute>
       </Route>
       <Route path="/superuser/buildings">

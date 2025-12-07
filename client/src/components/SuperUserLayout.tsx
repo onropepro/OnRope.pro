@@ -105,6 +105,11 @@ const menuGroups: MenuGroup[] = [
     label: "MANAGEMENT",
     items: [
       {
+        title: "Technician Database",
+        icon: "engineering",
+        path: "/superuser/technicians",
+      },
+      {
         title: "Global Buildings",
         icon: "apartment",
         path: "/superuser/buildings",
