@@ -8411,48 +8411,35 @@ export default function Dashboard() {
                   if (inv?.id && inv?.technician) {
                     const tech = inv.technician;
                     // Pre-populate the employee form with technician data
+                    // Only set fields that exist in employeeSchema
                     employeeForm.reset({
                       name: tech.name || "",
                       email: tech.email || "",
-                      role: "employee",
-                      salary: 0,
+                      password: "", // Empty - not needed for invitation conversion
+                      role: "rope_access_tech", // Default role for technicians
+                      hourlyRate: "",
+                      isSalary: false,
+                      salary: "", // String type as per schema
                       permissions: [],
-                      employeePhoneNumber: tech.employeePhoneNumber || "",
-                      employeeStreetAddress: tech.employeeStreetAddress || "",
-                      employeeCity: tech.employeeCity || "",
-                      employeeProvinceState: tech.employeeProvinceState || "",
-                      employeeCountry: tech.employeeCountry || "",
-                      employeePostalCode: tech.employeePostalCode || "",
-                      homeAddress: tech.homeAddress || "",
+                      startDate: "",
                       birthday: tech.birthday || "",
+                      socialInsuranceNumber: tech.socialInsuranceNumber || "",
+                      driversLicenseNumber: tech.driversLicenseNumber || "",
+                      driversLicenseProvince: tech.driversLicenseProvince || "",
+                      driversLicenseDocuments: tech.driversLicenseDocuments || [],
+                      homeAddress: tech.homeAddress || "",
+                      employeePhoneNumber: tech.employeePhoneNumber || "",
                       emergencyContactName: tech.emergencyContactName || "",
                       emergencyContactPhone: tech.emergencyContactPhone || "",
-                      emergencyContactRelationship: tech.emergencyContactRelationship || "",
                       specialMedicalConditions: tech.specialMedicalConditions || "",
                       irataLevel: tech.irataLevel || "",
                       irataLicenseNumber: tech.irataLicenseNumber || "",
                       irataIssuedDate: tech.irataIssuedDate || "",
                       irataExpirationDate: tech.irataExpirationDate || "",
-                      irataDocuments: tech.irataDocuments || [],
-                      spratLevel: tech.spratLevel || "",
-                      spratLicenseNumber: tech.spratLicenseNumber || "",
-                      spratIssuedDate: tech.spratIssuedDate || "",
-                      spratExpirationDate: tech.spratExpirationDate || "",
-                      spratDocuments: tech.spratDocuments || [],
                       hasFirstAid: tech.hasFirstAid || false,
                       firstAidType: tech.firstAidType || "",
                       firstAidExpiry: tech.firstAidExpiry || "",
                       firstAidDocuments: tech.firstAidDocuments || [],
-                      driversLicenseNumber: tech.driversLicenseNumber || "",
-                      driversLicenseProvince: tech.driversLicenseProvince || "",
-                      driversLicenseExpiry: tech.driversLicenseExpiry || "",
-                      driversLicenseDocuments: tech.driversLicenseDocuments || [],
-                      bankTransitNumber: tech.bankTransitNumber || "",
-                      bankInstitutionNumber: tech.bankInstitutionNumber || "",
-                      bankAccountNumber: tech.bankAccountNumber || "",
-                      bankDocuments: tech.bankDocuments || [],
-                      socialInsuranceNumber: tech.socialInsuranceNumber || "",
-                      photoUrl: tech.photoUrl || "",
                     });
                     setInvitationToConvert(inv);
                     setEmployeeFormStep(1); // Start at info step
@@ -8551,15 +8538,10 @@ export default function Dashboard() {
                           <span className="ml-2">{employeeForm.watch("birthday")}</span>
                         </div>
                       )}
-                      {(employeeForm.watch("irataLevel") || employeeForm.watch("spratLevel")) && (
+                      {employeeForm.watch("irataLevel") && (
                         <div className="col-span-2 flex items-center gap-2">
                           <span className="text-muted-foreground">{t('dashboard.employeeForm.certifications', 'Certifications')}:</span>
-                          {employeeForm.watch("irataLevel") && (
-                            <Badge variant="secondary">IRATA Level {employeeForm.watch("irataLevel")}</Badge>
-                          )}
-                          {employeeForm.watch("spratLevel") && (
-                            <Badge variant="secondary">SPRAT Level {employeeForm.watch("spratLevel")}</Badge>
-                          )}
+                          <Badge variant="secondary">IRATA Level {employeeForm.watch("irataLevel")}</Badge>
                         </div>
                       )}
                       {employeeForm.watch("hasFirstAid") && (
