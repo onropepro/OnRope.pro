@@ -177,7 +177,7 @@ export default function CompanyJobBoard() {
       salaryPeriod: formData.salaryPeriod || null,
       requiredIrataLevel: formData.requiredIrataLevel || null,
       requiredSpratLevel: formData.requiredSpratLevel || null,
-      expiresAt: formData.expiresAt || null,
+      expiresAt: formData.expiresAt ? new Date(formData.expiresAt) : null,
     });
   };
 
@@ -201,7 +201,7 @@ export default function CompanyJobBoard() {
         salaryPeriod: formData.salaryPeriod || null,
         requiredIrataLevel: formData.requiredIrataLevel || null,
         requiredSpratLevel: formData.requiredSpratLevel || null,
-        expiresAt: formData.expiresAt || null,
+        expiresAt: formData.expiresAt ? new Date(formData.expiresAt) : null,
       },
     });
   };
