@@ -230,6 +230,7 @@ const translations = {
     viewLoggedHoursDesc: "View your work sessions and add previous work experience",
     viewLoggedHours: "View Logged Hours",
     totalHoursLogged: "Total Hours Logged",
+    hoursLogged: "hours logged",
     workSessions: "Work Sessions",
     previousHours: "Previous Hours",
     previousHoursDesc: "Hours from work before joining this platform (not counted in totals)",
@@ -436,6 +437,7 @@ const translations = {
     viewLoggedHoursDesc: "Voir vos sessions de travail et ajouter des expériences antérieures",
     viewLoggedHours: "Voir les heures enregistrées",
     totalHoursLogged: "Total des heures enregistrées",
+    hoursLogged: "heures enregistrées",
     workSessions: "Sessions de travail",
     previousHours: "Heures précédentes",
     previousHoursDesc: "Heures de travail avant de rejoindre cette plateforme (non comptabilisées dans les totaux)",
@@ -627,6 +629,17 @@ export default function TechnicianPortal() {
   });
 
   const pendingInvitations = invitationsData?.invitations || [];
+
+  // Fetch logged hours for display on portal
+  const { data: loggedHoursData } = useQuery<{ logs: Array<{ hoursWorked: string }> }>({
+    queryKey: ["/api/my-irata-task-logs"],
+    enabled: !!user && user.role === 'rope_access_tech',
+  });
+  
+  const totalLoggedHours = useMemo(() => {
+    if (!loggedHoursData?.logs) return 0;
+    return loggedHoursData.logs.reduce((sum, log) => sum + parseFloat(log.hoursWorked || "0"), 0);
+  }, [loggedHoursData]);
 
   const acceptInvitationMutation = useMutation({
     mutationFn: async (invitationId: string) => {
@@ -1890,6 +1903,11 @@ export default function TechnicianPortal() {
                         <div>
                           <p className="font-medium text-sm">{t.myLoggedHours}</p>
                           <p className="text-xs text-muted-foreground">{t.viewLoggedHoursDesc}</p>
+                          {totalLoggedHours > 0 && (
+                            <p className="text-sm font-semibold text-primary mt-1" data-testid="text-total-logged-hours">
+                              {totalLoggedHours.toFixed(1)} {t.hoursLogged}
+                            </p>
+                          )}
                         </div>
                       </div>
                       <Button
