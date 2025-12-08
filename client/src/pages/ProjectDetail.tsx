@@ -2683,6 +2683,7 @@ export default function ProjectDetail() {
                   jobType: formData.get('jobType'),
                   targetCompletionDate: formData.get('targetCompletionDate') || undefined,
                   estimatedHours: formData.get('estimatedHours') ? parseInt(formData.get('estimatedHours') as string) : undefined,
+                  buildingHeight: formData.get('buildingHeight') || undefined,
                   startDate: formData.get('startDate') || undefined,
                   endDate: formData.get('endDate') || undefined,
                 };
@@ -2938,6 +2939,21 @@ export default function ProjectDetail() {
                   />
                   <p className="text-xs text-muted-foreground mt-1">
                     {t('projectDetail.dialogs.editProject.estimatedHoursHelp', 'Total hours estimated for the entire project')}
+                  </p>
+                </div>
+                
+                <div>
+                  <Label htmlFor="buildingHeight">{t('projectDetail.dialogs.editProject.buildingHeight', 'Building Height')}</Label>
+                  <Input
+                    id="buildingHeight"
+                    name="buildingHeight"
+                    type="text"
+                    placeholder={t('projectDetail.dialogs.editProject.buildingHeightPlaceholder', 'e.g., 25 floors, 100m, 300ft')}
+                    defaultValue={project.buildingHeight || ""}
+                    data-testid="input-edit-building-height"
+                  />
+                  <p className="text-xs text-muted-foreground mt-1">
+                    {t('projectDetail.dialogs.editProject.buildingHeightHelp', 'Required for IRATA logbook - enter floors, meters, or feet')}
                   </p>
                 </div>
                 

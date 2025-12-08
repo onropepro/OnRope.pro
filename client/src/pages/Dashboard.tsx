@@ -3504,6 +3504,29 @@ export default function Dashboard() {
 
                         <FormField
                           control={projectForm.control}
+                          name="buildingHeight"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>{t('dashboard.projectForm.buildingHeight', 'Building Height')}</FormLabel>
+                              <FormControl>
+                                <Input 
+                                  type="text" 
+                                  placeholder={t('dashboard.projectForm.buildingHeightPlaceholder', 'e.g., 25 floors, 100m, 300ft')} 
+                                  {...field} 
+                                  data-testid="input-building-height" 
+                                  className="h-12" 
+                                />
+                              </FormControl>
+                              <FormDescription className="text-xs">
+                                {t('dashboard.projectForm.buildingHeightDesc', 'Required for IRATA logbook - enter floors, meters, or feet')}
+                              </FormDescription>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+
+                        <FormField
+                          control={projectForm.control}
                           name="calendarColor"
                           render={({ field }) => (
                             <FormItem>
