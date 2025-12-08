@@ -8623,7 +8623,52 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const inspections = await storage.getHarnessInspectionsByWorker(currentUser.id);
       const inspectionDates = new Set(inspections.map(i => i.inspectionDate));
       
+      // Get document compliance data
+      // If tech has a company, get company documents and their signatures
+      let documentCompliance = 100; // Default to 100% if no company or no required documents
+      let requiredDocsCount = 0;
+      let signedDocsCount = 0;
+      
+      if (currentUser.companyId) {
+        // Get all company documents (health_safety_manual and company_policy types require review)
+        const companyDocs = await storage.getCompanyDocuments(currentUser.companyId);
+        const requiredDocs = companyDocs.filter(
+          (d: any) => d.documentType === 'health_safety_manual' || d.documentType === 'company_policy'
+        );
+        requiredDocsCount = requiredDocs.length;
+        
+        if (requiredDocsCount > 0) {
+          // Get employee's document signatures for this company only
+          const employeeSignatures = await storage.getDocumentReviewSignaturesByEmployee(currentUser.id);
+          // Filter to only signatures from current company that are signed
+          const signedDocIds = new Set(
+            employeeSignatures
+              .filter(s => s.signedAt !== null && s.companyId === currentUser.companyId)
+              .map(s => s.documentId)
+          );
+          
+          // Count how many specific required documents have been signed by ID
+          // For documents without a documentId in the signature, fall back to checking by type
+          signedDocsCount = requiredDocs.filter((doc: any) => {
+            // Check if this specific document ID is in the signed set
+            if (signedDocIds.has(doc.id)) return true;
+            
+            // Also check for signatures that match by document type (legacy signatures)
+            const signedByType = employeeSignatures.some(
+              s => s.signedAt !== null && 
+                   s.companyId === currentUser.companyId && 
+                   s.documentType === doc.documentType &&
+                   !s.documentId // Only for signatures without specific document ID
+            );
+            return signedByType;
+          }).length;
+          
+          documentCompliance = Math.round((signedDocsCount / requiredDocsCount) * 100);
+        }
+      }
+      
       // Calculate metrics for each session
+      // New weighting: Drops 35%, Harness 25%, Hours 20%, Document Compliance 20%
       const sessionMetrics: Array<{
         sessionId: string;
         projectId: string;
@@ -8635,6 +8680,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         hoursWorked: number;
         hoursRating: 'excellent' | 'good' | 'short' | 'na';
         harnessInspectionDone: boolean;
+        documentCompliance: number; // 0-100
         overallScore: number; // 0-100
         overallRating: 'excellent' | 'good' | 'needs_improvement' | 'poor';
       }> = [];
@@ -8650,7 +8696,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
                           (session.dropsCompletedSouth || 0) + 
                           (session.dropsCompletedWest || 0);
         
-        // Drop performance calculation (40% weight)
+        // Drop performance calculation (35% weight)
         let dropPerformance = 100;
         let dropRating: 'exceeded' | 'on_target' | 'below_target' | 'na' = 'na';
         
@@ -8667,7 +8713,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           }
         }
         
-        // Hours calculation (30% weight)
+        // Hours calculation (20% weight)
         const startTime = new Date(session.startTime);
         const endTime = new Date(session.endTime!);
         const hoursWorked = (endTime.getTime() - startTime.getTime()) / (1000 * 60 * 60);
@@ -8690,17 +8736,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
           hoursRating = 'short';
         }
         
-        // Harness inspection check (30% weight)
+        // Harness inspection check (25% weight)
         const harnessInspectionDone = inspectionDates.has(session.workDate);
-        const safetyScore = harnessInspectionDone ? 100 : 0;
+        const harnessScore = harnessInspectionDone ? 100 : 0;
+        
+        // Document compliance score (20% weight) - calculated once at the top, same for all sessions
+        const docScore = documentCompliance;
         
         // Calculate overall score (weighted average)
-        // If no drop target, use 50/50 hours/safety
+        // Weights: Drops 35%, Harness 25%, Hours 20%, Document Compliance 20%
+        // If no drop target, redistribute: Harness 35%, Hours 30%, Docs 35%
         let overallScore: number;
         if (dailyDropTarget && dailyDropTarget > 0) {
-          overallScore = (dropPerformance * 0.4) + (hoursScore * 0.3) + (safetyScore * 0.3);
+          overallScore = (dropPerformance * 0.35) + (harnessScore * 0.25) + (hoursScore * 0.20) + (docScore * 0.20);
         } else {
-          overallScore = (hoursScore * 0.5) + (safetyScore * 0.5);
+          overallScore = (harnessScore * 0.35) + (hoursScore * 0.30) + (docScore * 0.35);
         }
         overallScore = Math.min(Math.round(overallScore), 100);
         
@@ -8727,6 +8777,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           hoursWorked: Math.round(hoursWorked * 10) / 10,
           hoursRating,
           harnessInspectionDone,
+          documentCompliance,
           overallScore,
           overallRating,
         });
@@ -8734,12 +8785,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Calculate overall average
       let averageScore = 0;
-      let safetyCompliance = 0;
+      let harnessCompliance = 0;
       if (sessionMetrics.length > 0) {
         averageScore = Math.round(
           sessionMetrics.reduce((sum, m) => sum + m.overallScore, 0) / sessionMetrics.length
         );
-        safetyCompliance = Math.round(
+        harnessCompliance = Math.round(
           (sessionMetrics.filter(m => m.harnessInspectionDone).length / sessionMetrics.length) * 100
         );
       }
@@ -8763,7 +8814,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         summary: {
           totalSessions: sessionMetrics.length,
           averageScore,
-          safetyCompliance,
+          harnessCompliance,
+          documentCompliance,
           overallRating: overallAverageRating,
         },
       });

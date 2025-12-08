@@ -324,7 +324,8 @@ const translations = {
     // Performance & Safety Rating
     performanceSafetyRating: "Performance & Safety Rating",
     overallScore: "Overall Score",
-    safetyCompliance: "Safety Compliance",
+    harnessCompliance: "Harness Inspections",
+    documentCompliance: "Documents Signed",
     sessionsAnalyzed: "Sessions Analyzed",
     noPerformanceData: "No performance data yet",
     noPerformanceDataDesc: "Complete work sessions to see your performance rating",
@@ -587,7 +588,8 @@ const translations = {
     // Performance & Safety Rating
     performanceSafetyRating: "Évaluation Performance & Sécurité",
     overallScore: "Score Global",
-    safetyCompliance: "Conformité Sécurité",
+    harnessCompliance: "Inspections Harnais",
+    documentCompliance: "Documents Signés",
     sessionsAnalyzed: "Sessions Analysées",
     noPerformanceData: "Aucune donnée de performance",
     noPerformanceDataDesc: "Complétez des sessions de travail pour voir votre évaluation",
@@ -837,13 +839,15 @@ export default function TechnicianPortal() {
       hoursWorked: number;
       hoursRating: 'excellent' | 'good' | 'short' | 'na';
       harnessInspectionDone: boolean;
+      documentCompliance: number;
       overallScore: number;
       overallRating: 'excellent' | 'good' | 'needs_improvement' | 'poor';
     }>;
     summary: {
       totalSessions: number;
       averageScore: number;
-      safetyCompliance: number;
+      harnessCompliance: number;
+      documentCompliance: number;
       overallRating: 'excellent' | 'good' | 'needs_improvement' | 'poor' | 'no_data';
     };
   }>({
@@ -1639,15 +1643,21 @@ export default function TechnicianPortal() {
                   </div>
                   
                   {/* Stats Row */}
-                  <div className="grid grid-cols-2 gap-3">
+                  <div className="grid grid-cols-3 gap-2">
                     <div className="p-3 rounded-lg bg-muted/50 text-center">
-                      <p className="text-2xl font-semibold" data-testid="text-safety-compliance">
-                        {performanceData.summary.safetyCompliance}%
+                      <p className="text-xl font-semibold" data-testid="text-harness-compliance">
+                        {performanceData.summary.harnessCompliance}%
                       </p>
-                      <p className="text-xs text-muted-foreground">{t.safetyCompliance}</p>
+                      <p className="text-xs text-muted-foreground">{t.harnessCompliance}</p>
                     </div>
                     <div className="p-3 rounded-lg bg-muted/50 text-center">
-                      <p className="text-2xl font-semibold" data-testid="text-sessions-count">
+                      <p className="text-xl font-semibold" data-testid="text-document-compliance">
+                        {performanceData.summary.documentCompliance}%
+                      </p>
+                      <p className="text-xs text-muted-foreground">{t.documentCompliance}</p>
+                    </div>
+                    <div className="p-3 rounded-lg bg-muted/50 text-center">
+                      <p className="text-xl font-semibold" data-testid="text-sessions-count">
                         {performanceData.summary.totalSessions}
                       </p>
                       <p className="text-xs text-muted-foreground">{t.sessionsAnalyzed}</p>
