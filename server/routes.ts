@@ -7432,6 +7432,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         endDate: req.body.endDate || null,
       };
       
+      // Add building height fields (for IRATA logbook tracking)
+      if (req.body.buildingHeight !== undefined) allowedUpdates.buildingHeight = req.body.buildingHeight || null;
+      if (req.body.floorCount !== undefined) allowedUpdates.floorCount = req.body.floorCount;
+      if (req.body.buildingFloors !== undefined) allowedUpdates.buildingFloors = req.body.buildingFloors;
+      
       // Add job-type specific fields
       if (req.body.totalDropsNorth !== undefined) allowedUpdates.totalDropsNorth = req.body.totalDropsNorth;
       if (req.body.totalDropsEast !== undefined) allowedUpdates.totalDropsEast = req.body.totalDropsEast;
