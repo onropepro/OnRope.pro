@@ -301,6 +301,8 @@ export async function analyzeLogbookPage(
   mimeType: string = "image/jpeg"
 ): Promise<LogbookAnalysisResult> {
   try {
+    // Use gemini-2.5-flash for better compatibility and speed
+    // Note: We don't use responseSchema because it can cause strict validation errors
     const response = await ai.models.generateContent({
       model: "gemini-2.5-flash",
       contents: [
@@ -308,44 +310,59 @@ export async function analyzeLogbookPage(
           role: "user",
           parts: [
             {
-              text: `You are analyzing a photograph of an IRATA or SPRAT rope access logbook page. 
-Extract ALL work entries visible on this page. Each entry typically includes:
-- Date(s) of work (may be a single date or date range)
-- Building/Site name and address
-- Building height (if visible)
-- Tasks performed (rope access techniques like: rope transfer, re-anchor, ascending, descending, rigging, deviation, aid climbing, edge transition, knot passing, rope to rope transfer, mid-rope changeover, rescue technique, hauling, lowering, tensioned rope work, horizontal traverse, window cleaning, building inspection, maintenance work)
-- Hours worked
-- Employer/Company name
-- Any notes or comments
+              text: `You are an expert at analyzing IRATA and SPRAT rope access logbook pages. Your task is to CAREFULLY extract EVERY work entry visible on this logbook page.
 
-For each entry found, extract all available information. Dates should be in YYYY-MM-DD format. If only partial information is available for an entry, still include it with what you can read. If dates only show day/month, assume the current year unless context suggests otherwise.
+CRITICAL INSTRUCTIONS FOR HOURS:
+- The "Hours Worked" field is MANDATORY for each entry
+- Look for columns labeled: "Hours", "Hrs", "Time", "Duration", "Total", or similar
+- Hours may be written as: "8", "8.5", "8h", "8 hours", "8:00", etc.
+- If you see a time range (e.g., "08:00-16:00"), calculate the duration (8 hours)
+- IRATA logbooks ALWAYS record hours - look carefully at every column
+- If hours column is unclear/illegible, estimate based on a typical 8-hour workday and set confidence to "low"
+- NEVER return null for hoursWorked unless the entry is clearly incomplete
 
-Common rope access task types to look for:
-- rope_transfer, re_anchor, ascending, descending, rigging, deviation
-- aid_climbing, edge_transition, knot_passing, rope_to_rope_transfer
-- mid_rope_changeover, rescue_technique, hauling, lowering
-- tensioned_rope, horizontal_traverse, window_cleaning
-- building_inspection, maintenance_work, other
+For EACH entry on the page, extract:
+1. DATE(S): Start and end date in YYYY-MM-DD format. If only day/month visible, use current year (2024 or 2025).
+2. HOURS WORKED: This is CRITICAL - always extract or estimate this value
+3. BUILDING/SITE: Name and address of the work location
+4. BUILDING HEIGHT: If visible (floors, meters, feet)
+5. TASKS: Rope access work performed (use task IDs below)
+6. EMPLOYER: Company name if visible
+7. NOTES: Any additional information
+
+Task IDs to use:
+rope_transfer, re_anchor, ascending, descending, rigging, deviation,
+aid_climbing, edge_transition, knot_passing, rope_to_rope_transfer,
+mid_rope_changeover, rescue_technique, hauling, lowering,
+tensioned_rope, horizontal_traverse, window_cleaning,
+building_inspection, maintenance_work, other
+
+RULES:
+- Extract EVERY entry visible, even if partially readable
+- ALWAYS provide hoursWorked (estimate 8 if truly unclear)
+- For unclear entries, set confidence to "low"
+- Use "other" for unrecognizable tasks
+- If handwriting is unclear, make your best interpretation
 
 Respond ONLY with valid JSON matching this structure:
 {
-  "success": boolean (true if this appears to be a valid logbook page),
+  "success": true,
   "entries": [
     {
-      "startDate": "YYYY-MM-DD" or null,
-      "endDate": "YYYY-MM-DD" or null (same as startDate for single day),
-      "hoursWorked": number or null,
-      "buildingName": string or null,
-      "buildingAddress": string or null,
-      "buildingHeight": string or null (e.g., "25 floors", "100m"),
-      "tasksPerformed": ["task_id", ...] (use the task IDs listed above),
-      "previousEmployer": string or null,
-      "notes": string or null,
-      "confidence": "high" | "medium" | "low"
+      "startDate": "YYYY-MM-DD",
+      "endDate": "YYYY-MM-DD",
+      "hoursWorked": 8,
+      "buildingName": "string or null",
+      "buildingAddress": "string or null",
+      "buildingHeight": "string or null",
+      "tasksPerformed": ["task_id"],
+      "previousEmployer": "string or null",
+      "notes": "string or null",
+      "confidence": "high"
     }
   ],
-  "pageWarnings": ["warning about unreadable sections or issues"],
-  "error": null or "error message if not a logbook page"
+  "pageWarnings": [],
+  "error": null
 }`
             },
             {
@@ -358,38 +375,25 @@ Respond ONLY with valid JSON matching this structure:
         }
       ],
       config: {
-        responseMimeType: "application/json",
-        responseSchema: {
-          type: Type.OBJECT,
-          properties: {
-            success: { type: Type.BOOLEAN },
-            entries: {
-              type: Type.ARRAY,
-              items: {
-                type: Type.OBJECT,
-                properties: {
-                  startDate: { type: Type.STRING, nullable: true },
-                  endDate: { type: Type.STRING, nullable: true },
-                  hoursWorked: { type: Type.NUMBER, nullable: true },
-                  buildingName: { type: Type.STRING, nullable: true },
-                  buildingAddress: { type: Type.STRING, nullable: true },
-                  buildingHeight: { type: Type.STRING, nullable: true },
-                  tasksPerformed: { type: Type.ARRAY, items: { type: Type.STRING } },
-                  previousEmployer: { type: Type.STRING, nullable: true },
-                  notes: { type: Type.STRING, nullable: true },
-                  confidence: { type: Type.STRING }
-                }
-              }
-            },
-            pageWarnings: { type: Type.ARRAY, items: { type: Type.STRING } },
-            error: { type: Type.STRING, nullable: true }
-          },
-          required: ["success", "entries", "pageWarnings"]
-        }
+        responseMimeType: "application/json"
+        // Note: Not using responseSchema to avoid strict validation errors
       }
     });
 
-    const result = JSON.parse(response.text || "{}");
+    // Parse JSON response, handling potential issues
+    let result: any;
+    try {
+      const responseText = response.text || "{}";
+      result = JSON.parse(responseText);
+    } catch (parseError) {
+      console.error("Failed to parse Gemini response:", parseError);
+      return {
+        success: false,
+        entries: [],
+        pageWarnings: [],
+        error: "Failed to parse AI response. Please try again with a clearer image."
+      };
+    }
     
     // Normalize dates in the entries
     const normalizedEntries: LogbookEntry[] = (result.entries || []).map((entry: any) => ({

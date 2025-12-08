@@ -227,8 +227,9 @@ const translations = {
     dashboardDisabledNoCompany: "You need to be linked with a company to access the Work Dashboard. Accept an invitation below to get started.",
     dashboardDisabledTerminated: "Your employment has been terminated. Accept a new invitation to access the Work Dashboard.",
     myLoggedHours: "My Logged Hours",
-    viewLoggedHoursDesc: "View your work sessions and add previous work experience",
+    viewLoggedHoursDesc: "Track your rope access career progress",
     viewLoggedHours: "View Logged Hours",
+    loggedHoursFeatures: "Scan your logbook pages with AI or manually add previous work experience",
     totalHoursLogged: "Total Hours Logged",
     hoursLogged: "hours logged",
     totalHoursLabel: "total hours",
@@ -437,8 +438,9 @@ const translations = {
     dashboardDisabledNoCompany: "Vous devez être lié à une entreprise pour accéder au tableau de bord. Acceptez une invitation ci-dessous pour commencer.",
     dashboardDisabledTerminated: "Votre emploi a été résilié. Acceptez une nouvelle invitation pour accéder au tableau de bord.",
     myLoggedHours: "Mes heures enregistrées",
-    viewLoggedHoursDesc: "Voir vos sessions de travail et ajouter des expériences antérieures",
+    viewLoggedHoursDesc: "Suivez votre progression de carrière en accès sur corde",
     viewLoggedHours: "Voir les heures enregistrées",
+    loggedHoursFeatures: "Numérisez vos pages de carnet avec l'IA ou ajoutez manuellement vos heures précédentes",
     totalHoursLogged: "Total des heures enregistrées",
     hoursLogged: "heures enregistrées",
     totalHoursLabel: "heures totales",
@@ -1912,40 +1914,43 @@ export default function TechnicianPortal() {
                   )}
                   
                   {/* My Logged Hours - inside Certifications section */}
-                  <div className="mt-4 p-3 bg-muted/50 rounded-lg border">
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                      <div className="flex items-center gap-3">
-                        <Clock className="w-5 h-5 text-muted-foreground" />
-                        <div>
-                          <p className="font-medium text-sm">{t.myLoggedHours}</p>
-                          <p className="text-xs text-muted-foreground">{t.viewLoggedHoursDesc}</p>
+                  <div className="mt-4 p-4 bg-primary/5 border-2 border-primary/30 rounded-lg">
+                    <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
+                      <div className="flex items-start gap-3">
+                        <div className="p-2 bg-primary/10 rounded-lg">
+                          <Clock className="w-6 h-6 text-primary" />
+                        </div>
+                        <div className="space-y-1">
+                          <p className="font-semibold text-base">{t.myLoggedHours}</p>
+                          <p className="text-sm text-muted-foreground">{t.viewLoggedHoursDesc}</p>
+                          <p className="text-xs text-primary/80 font-medium">{t.loggedHoursFeatures}</p>
                           {(combinedTotalHours > 0 || workSessionHours > 0) && (
-                            <p className="text-sm font-semibold text-primary mt-1" data-testid="text-total-logged-hours">
-                              {combinedTotalHours.toFixed(1)} {t.totalHoursLabel}
+                            <div className="pt-2">
+                              <p className="text-lg font-bold text-primary" data-testid="text-total-logged-hours">
+                                {combinedTotalHours.toFixed(1)} {t.totalHoursLabel}
+                              </p>
                               {workSessionHours > 0 && baselineHours > 0 && (
-                                <span className="text-xs font-normal text-muted-foreground ml-1">
-                                  ({baselineHours.toFixed(1)} {t.baselinePlus} {workSessionHours.toFixed(1)} {t.fromSessions})
-                                </span>
+                                <p className="text-xs text-muted-foreground">
+                                  {baselineHours.toFixed(1)} {t.baselinePlus} {workSessionHours.toFixed(1)} {t.fromSessions}
+                                </p>
                               )}
-                            </p>
+                            </div>
                           )}
                         </div>
                       </div>
                       <Button
-                        variant="outline"
-                        size="sm"
                         onClick={() => setLocation("/technician-logged-hours")}
-                        className="gap-2"
+                        className="gap-2 whitespace-nowrap"
                         data-testid="button-view-logged-hours"
                       >
                         {t.viewLoggedHours}
                         <ArrowRight className="w-4 h-4" />
                       </Button>
                     </div>
-                    <div className="mt-3 p-3 bg-red-500/15 border-2 border-red-500/40 rounded-lg">
+                    <div className="mt-4 p-3 bg-red-500/15 border border-red-500/40 rounded-lg">
                       <div className="flex items-start gap-2">
-                        <AlertCircle className="w-5 h-5 text-red-600 dark:text-red-400 flex-shrink-0 mt-0.5" />
-                        <p className="text-sm font-semibold text-red-700 dark:text-red-300">
+                        <AlertCircle className="w-4 h-4 text-red-600 dark:text-red-400 flex-shrink-0 mt-0.5" />
+                        <p className="text-xs text-red-700 dark:text-red-300">
                           {t.logbookDisclaimer}
                         </p>
                       </div>
