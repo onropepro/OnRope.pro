@@ -74,6 +74,7 @@ import ROICalculator from "@/pages/ROICalculator";
 import TechnicianLogin from "@/pages/TechnicianLogin";
 import TechnicianPortal from "@/pages/TechnicianPortal";
 import TechnicianLoggedHours from "@/pages/TechnicianLoggedHours";
+import TechnicianJobBoard from "@/pages/TechnicianJobBoard";
 import CompanyJobBoard from "@/pages/CompanyJobBoard";
 import NotFound from "@/pages/not-found";
 import ProtectedRoute from "@/components/ProtectedRoute";
@@ -167,6 +168,11 @@ function Router() {
       <Route path="/technician-logged-hours">
         <ProtectedRoute allowedRoles={EMPLOYEE_ROLES}>
           <TechnicianLoggedHours />
+        </ProtectedRoute>
+      </Route>
+      <Route path="/technician-job-board">
+        <ProtectedRoute allowedRoles={EMPLOYEE_ROLES}>
+          <TechnicianJobBoard />
         </ProtectedRoute>
       </Route>
       <Route path="/resident">

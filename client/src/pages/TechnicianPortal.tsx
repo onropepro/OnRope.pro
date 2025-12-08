@@ -293,6 +293,9 @@ const translations = {
     deleteConfirm: "Delete",
     cancelDelete: "Cancel",
     logbookDisclaimer: "This is a personal tracking tool only. You must still record all hours in your official IRATA/SPRAT logbook - this digital log does not replace it.",
+    jobBoard: "Job Board",
+    jobBoardDesc: "Browse opportunities and make your profile visible to employers",
+    browseJobs: "Browse Jobs",
     yourReferralCode: "Your Referral Code",
     shareReferralCode: "Share this code with fellow technicians to invite them to OnRopePro",
     referralPremiumBenefit: "You'll get PLUS access when your code is used!",
@@ -560,6 +563,9 @@ const translations = {
     deleteConfirm: "Supprimer",
     cancelDelete: "Annuler",
     logbookDisclaimer: "Ceci est un outil de suivi personnel uniquement. Vous devez toujours enregistrer toutes vos heures dans votre carnet IRATA/SPRAT officiel - ce journal numérique ne le remplace pas.",
+    jobBoard: "Offres d'emploi",
+    jobBoardDesc: "Parcourir les opportunites et rendre votre profil visible aux employeurs",
+    browseJobs: "Parcourir les offres",
     yourReferralCode: "Votre code de parrainage",
     shareReferralCode: "Partagez ce code avec d'autres techniciens pour les inviter sur OnRopePro",
     referralPremiumBenefit: "Vous obtiendrez un accès PLUS lorsque votre code sera utilisé!",
@@ -2929,6 +2935,31 @@ export default function TechnicianPortal() {
                     </div>
                   </div>
                   
+                </div>
+
+                {/* Job Board Navigation */}
+                <Separator />
+                <div className="space-y-3">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <div className="flex items-start gap-3">
+                      <div className="p-2 rounded-full bg-blue-500/10 mt-1">
+                        <Briefcase className="w-5 h-5 text-blue-500" />
+                      </div>
+                      <div className="space-y-1">
+                        <p className="font-semibold text-base">{t.jobBoard}</p>
+                        <p className="text-sm text-muted-foreground">{t.jobBoardDesc}</p>
+                      </div>
+                    </div>
+                    <Button
+                      onClick={() => setLocation("/technician-job-board")}
+                      variant="outline"
+                      className="gap-2 whitespace-nowrap"
+                      data-testid="button-browse-jobs"
+                    >
+                      {t.browseJobs}
+                      <ArrowRight className="w-4 h-4" />
+                    </Button>
+                  </div>
                 </div>
 
                 {user.hasFirstAid && (
