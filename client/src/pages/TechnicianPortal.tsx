@@ -321,6 +321,24 @@ const translations = {
     whenDidYouStart: "When did you start your rope access career?",
     addExperience: "Add your experience start date",
     referralCodeGenerating: "Your referral code will be generated when you complete registration",
+    // Performance & Safety Rating
+    performanceSafetyRating: "Performance & Safety Rating",
+    overallScore: "Overall Score",
+    safetyCompliance: "Safety Compliance",
+    sessionsAnalyzed: "Sessions Analyzed",
+    noPerformanceData: "No performance data yet",
+    noPerformanceDataDesc: "Complete work sessions to see your performance rating",
+    ratingExcellent: "Excellent",
+    ratingGood: "Good",
+    ratingNeedsImprovement: "Needs Improvement",
+    ratingPoor: "Poor",
+    dropsExceeded: "Exceeded Target",
+    dropsOnTarget: "On Target",
+    dropsBelowTarget: "Below Target",
+    dropsNa: "N/A",
+    harnessYes: "Inspection Done",
+    harnessNo: "No Inspection",
+    sessionRating: "Session Rating",
   },
   fr: {
     technicianPortal: "Portail du technicien",
@@ -566,6 +584,24 @@ const translations = {
     whenDidYouStart: "Quand avez-vous commencé votre carrière d'accès sur corde?",
     addExperience: "Ajouter votre date de début d'expérience",
     referralCodeGenerating: "Votre code de parrainage sera généré lorsque vous terminerez l'inscription",
+    // Performance & Safety Rating
+    performanceSafetyRating: "Évaluation Performance & Sécurité",
+    overallScore: "Score Global",
+    safetyCompliance: "Conformité Sécurité",
+    sessionsAnalyzed: "Sessions Analysées",
+    noPerformanceData: "Aucune donnée de performance",
+    noPerformanceDataDesc: "Complétez des sessions de travail pour voir votre évaluation",
+    ratingExcellent: "Excellent",
+    ratingGood: "Bon",
+    ratingNeedsImprovement: "À Améliorer",
+    ratingPoor: "Faible",
+    dropsExceeded: "Objectif Dépassé",
+    dropsOnTarget: "Sur Cible",
+    dropsBelowTarget: "Sous l'Objectif",
+    dropsNa: "N/A",
+    harnessYes: "Inspection Faite",
+    harnessNo: "Pas d'Inspection",
+    sessionRating: "Note de Session",
   }
 };
 
@@ -785,6 +821,33 @@ export default function TechnicianPortal() {
   // Fetch referral count for the technician
   const { data: referralCountData } = useQuery<{ count: number }>({
     queryKey: ["/api/my-referral-count"],
+    enabled: !!user && user.role === 'rope_access_tech',
+  });
+  
+  // Fetch performance metrics for the technician
+  const { data: performanceData } = useQuery<{
+    metrics: Array<{
+      sessionId: string;
+      projectId: string;
+      workDate: string;
+      totalDrops: number;
+      dailyDropTarget: number | null;
+      dropPerformance: number;
+      dropRating: 'exceeded' | 'on_target' | 'below_target' | 'na';
+      hoursWorked: number;
+      hoursRating: 'excellent' | 'good' | 'short' | 'na';
+      harnessInspectionDone: boolean;
+      overallScore: number;
+      overallRating: 'excellent' | 'good' | 'needs_improvement' | 'poor';
+    }>;
+    summary: {
+      totalSessions: number;
+      averageScore: number;
+      safetyCompliance: number;
+      overallRating: 'excellent' | 'good' | 'needs_improvement' | 'poor' | 'no_data';
+    };
+  }>({
+    queryKey: ["/api/my-performance-metrics"],
     enabled: !!user && user.role === 'rope_access_tech',
   });
   
@@ -1529,6 +1592,75 @@ export default function TechnicianPortal() {
                   </div>
                 )}
               </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Performance & Safety Rating Card */}
+        {user && user.role === 'rope_access_tech' && (
+          <Card className="border-muted overflow-visible">
+            <CardHeader className="pb-2">
+              <div className="flex items-center gap-3">
+                <div className="p-2 rounded-full bg-gradient-to-br from-amber-500/20 to-yellow-400/20">
+                  <Shield className="w-5 h-5 text-amber-600 dark:text-amber-400" />
+                </div>
+                <div className="flex-1">
+                  <CardTitle className="text-lg">{t.performanceSafetyRating}</CardTitle>
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent>
+              {performanceData?.summary?.totalSessions && performanceData.summary.totalSessions > 0 ? (
+                <div className="space-y-4">
+                  {/* Main Score Display */}
+                  <div className="flex items-center justify-between p-4 rounded-lg bg-gradient-to-r from-amber-500/10 to-yellow-400/10 border border-amber-200/30 dark:border-amber-800/30">
+                    <div className="flex items-center gap-4">
+                      <div className="text-4xl font-bold text-amber-600 dark:text-amber-400" data-testid="text-performance-score">
+                        {performanceData.summary.averageScore}
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium">{t.overallScore}</p>
+                        <Badge 
+                          variant={performanceData.summary.overallRating === 'excellent' ? 'default' : 
+                                   performanceData.summary.overallRating === 'good' ? 'secondary' : 'destructive'}
+                          className={performanceData.summary.overallRating === 'excellent' ? 
+                            'bg-green-500 text-white' : 
+                            performanceData.summary.overallRating === 'good' ? 
+                            'bg-blue-500 text-white' : ''}
+                          data-testid="badge-performance-rating"
+                        >
+                          {performanceData.summary.overallRating === 'excellent' ? t.ratingExcellent :
+                           performanceData.summary.overallRating === 'good' ? t.ratingGood :
+                           performanceData.summary.overallRating === 'needs_improvement' ? t.ratingNeedsImprovement :
+                           t.ratingPoor}
+                        </Badge>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  {/* Stats Row */}
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="p-3 rounded-lg bg-muted/50 text-center">
+                      <p className="text-2xl font-semibold" data-testid="text-safety-compliance">
+                        {performanceData.summary.safetyCompliance}%
+                      </p>
+                      <p className="text-xs text-muted-foreground">{t.safetyCompliance}</p>
+                    </div>
+                    <div className="p-3 rounded-lg bg-muted/50 text-center">
+                      <p className="text-2xl font-semibold" data-testid="text-sessions-count">
+                        {performanceData.summary.totalSessions}
+                      </p>
+                      <p className="text-xs text-muted-foreground">{t.sessionsAnalyzed}</p>
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <div className="text-center py-6">
+                  <Shield className="w-12 h-12 mx-auto text-muted-foreground/30 mb-3" />
+                  <p className="font-medium text-muted-foreground">{t.noPerformanceData}</p>
+                  <p className="text-sm text-muted-foreground">{t.noPerformanceDataDesc}</p>
+                </div>
+              )}
             </CardContent>
           </Card>
         )}

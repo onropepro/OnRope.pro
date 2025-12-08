@@ -971,6 +971,12 @@ export class Storage {
       .orderBy(desc(workSessions.workDate));
   }
 
+  async getAllWorkSessionsByEmployee(employeeId: string): Promise<WorkSession[]> {
+    return db.select().from(workSessions)
+      .where(eq(workSessions.employeeId, employeeId))
+      .orderBy(desc(workSessions.workDate), desc(workSessions.startTime));
+  }
+
   async getWorkSessionsByCompany(companyId: string): Promise<WorkSession[]> {
     return db.select().from(workSessions)
       .where(eq(workSessions.companyId, companyId))

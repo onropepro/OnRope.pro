@@ -8604,6 +8604,175 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
+  // ==================== TECHNICIAN PERFORMANCE METRICS ====================
+  
+  // Get technician performance metrics for their work sessions
+  app.get("/api/my-performance-metrics", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      // Get all completed work sessions for this tech
+      const allSessions = await storage.getAllWorkSessionsByEmployee(currentUser.id);
+      const completedSessions = allSessions.filter(s => s.endTime !== null);
+      
+      // Get all harness inspections for this tech
+      const inspections = await storage.getHarnessInspectionsByWorker(currentUser.id);
+      const inspectionDates = new Set(inspections.map(i => i.inspectionDate));
+      
+      // Calculate metrics for each session
+      const sessionMetrics: Array<{
+        sessionId: string;
+        projectId: string;
+        workDate: string;
+        totalDrops: number;
+        dailyDropTarget: number | null;
+        dropPerformance: number; // 0-100+
+        dropRating: 'exceeded' | 'on_target' | 'below_target' | 'na';
+        hoursWorked: number;
+        hoursRating: 'excellent' | 'good' | 'short' | 'na';
+        harnessInspectionDone: boolean;
+        overallScore: number; // 0-100
+        overallRating: 'excellent' | 'good' | 'needs_improvement' | 'poor';
+      }> = [];
+      
+      for (const session of completedSessions) {
+        // Get project for daily drop target
+        const project = await storage.getProjectById(session.projectId);
+        const dailyDropTarget = project?.dailyDropTarget || null;
+        
+        // Calculate total drops for this session
+        const totalDrops = (session.dropsCompletedNorth || 0) + 
+                          (session.dropsCompletedEast || 0) + 
+                          (session.dropsCompletedSouth || 0) + 
+                          (session.dropsCompletedWest || 0);
+        
+        // Drop performance calculation (40% weight)
+        let dropPerformance = 100;
+        let dropRating: 'exceeded' | 'on_target' | 'below_target' | 'na' = 'na';
+        
+        if (dailyDropTarget && dailyDropTarget > 0) {
+          const dropRatio = totalDrops / dailyDropTarget;
+          dropPerformance = Math.min(dropRatio * 100, 120); // Cap at 120%
+          
+          if (dropRatio >= 1.1) {
+            dropRating = 'exceeded';
+          } else if (dropRatio >= 0.9) {
+            dropRating = 'on_target';
+          } else {
+            dropRating = 'below_target';
+          }
+        }
+        
+        // Hours calculation (30% weight)
+        const startTime = new Date(session.startTime);
+        const endTime = new Date(session.endTime!);
+        const hoursWorked = (endTime.getTime() - startTime.getTime()) / (1000 * 60 * 60);
+        
+        // Standard workday is 8 hours - rate based on actual work
+        let hoursScore = 100;
+        let hoursRating: 'excellent' | 'good' | 'short' | 'na' = 'na';
+        
+        if (hoursWorked >= 7) {
+          hoursScore = 100;
+          hoursRating = 'excellent';
+        } else if (hoursWorked >= 5) {
+          hoursScore = 80;
+          hoursRating = 'good';
+        } else if (hoursWorked >= 3) {
+          hoursScore = 60;
+          hoursRating = 'short';
+        } else {
+          hoursScore = 40;
+          hoursRating = 'short';
+        }
+        
+        // Harness inspection check (30% weight)
+        const harnessInspectionDone = inspectionDates.has(session.workDate);
+        const safetyScore = harnessInspectionDone ? 100 : 0;
+        
+        // Calculate overall score (weighted average)
+        // If no drop target, use 50/50 hours/safety
+        let overallScore: number;
+        if (dailyDropTarget && dailyDropTarget > 0) {
+          overallScore = (dropPerformance * 0.4) + (hoursScore * 0.3) + (safetyScore * 0.3);
+        } else {
+          overallScore = (hoursScore * 0.5) + (safetyScore * 0.5);
+        }
+        overallScore = Math.min(Math.round(overallScore), 100);
+        
+        // Overall rating
+        let overallRating: 'excellent' | 'good' | 'needs_improvement' | 'poor';
+        if (overallScore >= 85) {
+          overallRating = 'excellent';
+        } else if (overallScore >= 70) {
+          overallRating = 'good';
+        } else if (overallScore >= 50) {
+          overallRating = 'needs_improvement';
+        } else {
+          overallRating = 'poor';
+        }
+        
+        sessionMetrics.push({
+          sessionId: session.id,
+          projectId: session.projectId,
+          workDate: session.workDate,
+          totalDrops,
+          dailyDropTarget,
+          dropPerformance: Math.round(dropPerformance),
+          dropRating,
+          hoursWorked: Math.round(hoursWorked * 10) / 10,
+          hoursRating,
+          harnessInspectionDone,
+          overallScore,
+          overallRating,
+        });
+      }
+      
+      // Calculate overall average
+      let averageScore = 0;
+      let safetyCompliance = 0;
+      if (sessionMetrics.length > 0) {
+        averageScore = Math.round(
+          sessionMetrics.reduce((sum, m) => sum + m.overallScore, 0) / sessionMetrics.length
+        );
+        safetyCompliance = Math.round(
+          (sessionMetrics.filter(m => m.harnessInspectionDone).length / sessionMetrics.length) * 100
+        );
+      }
+      
+      // Determine overall rating
+      let overallAverageRating: 'excellent' | 'good' | 'needs_improvement' | 'poor' | 'no_data';
+      if (sessionMetrics.length === 0) {
+        overallAverageRating = 'no_data';
+      } else if (averageScore >= 85) {
+        overallAverageRating = 'excellent';
+      } else if (averageScore >= 70) {
+        overallAverageRating = 'good';
+      } else if (averageScore >= 50) {
+        overallAverageRating = 'needs_improvement';
+      } else {
+        overallAverageRating = 'poor';
+      }
+      
+      res.json({
+        metrics: sessionMetrics,
+        summary: {
+          totalSessions: sessionMetrics.length,
+          averageScore,
+          safetyCompliance,
+          overallRating: overallAverageRating,
+        },
+      });
+    } catch (error) {
+      console.error("Get performance metrics error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+  
   // ==================== NON-BILLABLE WORK SESSION ROUTES ====================
   
   // Start a non-billable work session
