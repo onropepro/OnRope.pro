@@ -2728,6 +2728,49 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Technician: Update experience start date only
+  // This is a simpler endpoint that only updates the rope access start date
+  app.patch("/api/technician/experience-date", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const userId = req.session.userId;
+      if (!userId) {
+        return res.status(401).json({ message: "Not authenticated" });
+      }
+
+      const user = await storage.getUserById(userId);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      // Only technicians and employees can update their own experience date
+      const allowedRoles = ['rope_access_tech', 'operations_manager', 'office_admin', 'safety_officer', 'ground_crew'];
+      if (!allowedRoles.includes(user.role)) {
+        return res.status(403).json({ message: "Only technicians can update experience date via this endpoint" });
+      }
+
+      const { date } = req.body;
+
+      if (!date) {
+        return res.status(400).json({ message: "Date is required" });
+      }
+
+      // Validate date format (YYYY-MM-DD)
+      const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
+      if (!dateRegex.test(date)) {
+        return res.status(400).json({ message: "Invalid date format. Use YYYY-MM-DD" });
+      }
+
+      await storage.updateUser(userId, { ropeAccessStartDate: date });
+
+      console.log(`[Technician-Experience] Experience start date updated to ${date} for user ${userId}`);
+
+      res.json({ success: true, message: "Experience start date updated" });
+    } catch (error: any) {
+      console.error("[Technician-Experience] Error updating experience date:", error);
+      res.status(500).json({ message: error.message || "Failed to update experience date" });
+    }
+  });
+
   // Technician: Leave company (self-unlink)
   // This sets a terminated date so the technician appears in the employer's terminated section
   // for historical HR/payroll records, while allowing the technician to be invited by other companies
