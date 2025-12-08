@@ -15864,12 +15864,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.json({ counts: [] });
       }
 
-      // Count applications per job
+      // Count only UNVIEWED applications per job (for notification badge)
       const counts = await Promise.all(
         jobIds.map(async (jobId) => {
           const apps = await db.select()
             .from(jobApplications)
-            .where(eq(jobApplications.jobPostingId, jobId));
+            .where(
+              and(
+                eq(jobApplications.jobPostingId, jobId),
+                isNull(jobApplications.viewedByEmployerAt)
+              )
+            );
           return { jobPostingId: jobId, count: apps.length };
         })
       );
@@ -15903,6 +15908,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
         .from(jobApplications)
         .where(eq(jobApplications.jobPostingId, req.params.jobId))
         .orderBy(desc(jobApplications.appliedAt));
+
+      // Mark all unviewed applications for this job as viewed
+      const unviewedAppIds = applications
+        .filter(app => !app.viewedByEmployerAt)
+        .map(app => app.id);
+      
+      if (unviewedAppIds.length > 0) {
+        await db.update(jobApplications)
+          .set({ viewedByEmployerAt: new Date() })
+          .where(
+            and(
+              eq(jobApplications.jobPostingId, req.params.jobId),
+              isNull(jobApplications.viewedByEmployerAt)
+            )
+          );
+      }
 
       // Fetch technician details for each application
       const applicationsWithTechnicians = await Promise.all(

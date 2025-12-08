@@ -2421,6 +2421,7 @@ export const jobApplications = pgTable("job_applications", {
   appliedAt: timestamp("applied_at").defaultNow().notNull(),
   reviewedAt: timestamp("reviewed_at"),
   statusUpdatedAt: timestamp("status_updated_at"),
+  viewedByEmployerAt: timestamp("viewed_by_employer_at"), // When employer first saw this application in the dashboard
 }, (table) => [
   index("IDX_job_applications_job").on(table.jobPostingId),
   index("IDX_job_applications_technician").on(table.technicianId),
@@ -2432,6 +2433,7 @@ export const insertJobApplicationSchema = createInsertSchema(jobApplications).om
   appliedAt: true,
   reviewedAt: true,
   statusUpdatedAt: true,
+  viewedByEmployerAt: true,
 });
 
 export type JobApplication = typeof jobApplications.$inferSelect;

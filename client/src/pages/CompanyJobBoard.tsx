@@ -793,7 +793,12 @@ export default function CompanyJobBoard() {
         </DialogContent>
       </Dialog>
 
-      <Dialog open={!!viewingApplicationsFor} onOpenChange={() => setViewingApplicationsFor(null)}>
+      <Dialog open={!!viewingApplicationsFor} onOpenChange={(open) => {
+        if (!open) {
+          setViewingApplicationsFor(null);
+          queryClient.invalidateQueries({ queryKey: ["/api/job-applications/counts"] });
+        }
+      }}>
         <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
