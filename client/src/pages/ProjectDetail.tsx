@@ -20,7 +20,7 @@ import { SessionDetailsDialog } from "@/components/SessionDetailsDialog";
 import { useToast } from "@/hooks/use-toast";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { AlertCircle, MapPin } from "lucide-react";
+import { AlertCircle, MapPin, Calculator } from "lucide-react";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -2944,17 +2944,65 @@ export default function ProjectDetail() {
                 
                 <div>
                   <Label htmlFor="buildingHeight">{t('projectDetail.dialogs.editProject.buildingHeight', 'Building Height')}</Label>
-                  <Input
-                    id="buildingHeight"
-                    name="buildingHeight"
-                    type="text"
-                    placeholder={t('projectDetail.dialogs.editProject.buildingHeightPlaceholder', 'e.g., 25 floors, 100m, 300ft')}
-                    defaultValue={project.buildingHeight || ""}
-                    data-testid="input-edit-building-height"
-                  />
+                  <div className="flex gap-2 mt-1">
+                    <Input
+                      id="buildingHeight"
+                      name="buildingHeight"
+                      type="text"
+                      placeholder={t('projectDetail.dialogs.editProject.buildingHeightPlaceholder', 'e.g., 100m or 300ft')}
+                      defaultValue={project.buildingHeight || ""}
+                      data-testid="input-edit-building-height"
+                      onChange={(e) => {
+                        const value = e.target.value;
+                        const conversionEl = document.getElementById('height-conversion');
+                        if (conversionEl) {
+                          const metersMatch = value.match(/^(\d+(?:\.\d+)?)\s*m$/i);
+                          const feetMatch = value.match(/^(\d+(?:\.\d+)?)\s*ft$/i);
+                          if (metersMatch) {
+                            const meters = parseFloat(metersMatch[1]);
+                            const feet = Math.round(meters / 0.3048);
+                            conversionEl.textContent = `= ${feet}ft`;
+                          } else if (feetMatch) {
+                            const feet = parseFloat(feetMatch[1]);
+                            const meters = Math.round(feet * 0.3048);
+                            conversionEl.textContent = `= ${meters}m`;
+                          } else {
+                            conversionEl.textContent = '';
+                          }
+                        }
+                      }}
+                    />
+                    {project.floorCount && project.floorCount > 0 && (
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={() => {
+                          const floors = project.floorCount || 0;
+                          const feet = floors * 9;
+                          const meters = Math.round(feet * 0.3048);
+                          const input = document.getElementById('buildingHeight') as HTMLInputElement;
+                          if (input) {
+                            input.value = `${feet}ft (${meters}m)`;
+                          }
+                        }}
+                        className="whitespace-nowrap"
+                        data-testid="button-calculate-height-edit"
+                      >
+                        <Calculator className="w-4 h-4 mr-1" />
+                        {t('projectDetail.dialogs.editProject.calculateHeight', 'Calculate')}
+                      </Button>
+                    )}
+                  </div>
+                  <p id="height-conversion" className="text-sm text-muted-foreground font-medium mt-1"></p>
                   <p className="text-xs text-muted-foreground mt-1">
-                    {t('projectDetail.dialogs.editProject.buildingHeightHelp', 'Required for IRATA logbook - enter floors, meters, or feet')}
+                    <span className="font-medium text-foreground">{t('projectDetail.dialogs.editProject.buildingHeightImportant', 'Important for technicians:')}</span>{' '}
+                    {t('projectDetail.dialogs.editProject.buildingHeightExplain', 'Building height is required for IRATA logbook entries to track work at height for certification.')}
                   </p>
+                  {project.floorCount && project.floorCount > 0 && (
+                    <p className="text-xs text-muted-foreground">
+                      {t('projectDetail.dialogs.editProject.buildingHeightCalcHint', 'Click Calculate to estimate height from floor count (floors × 9ft)')}
+                    </p>
+                  )}
                 </div>
                 
                 <div className="grid grid-cols-2 gap-3">

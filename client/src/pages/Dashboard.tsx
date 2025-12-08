@@ -20,7 +20,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Check, ChevronsUpDown, Star } from "lucide-react";
+import { Check, ChevronsUpDown, Star, Calculator } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { Progress } from "@/components/ui/progress";
 import { HighRiseBuilding } from "@/components/HighRiseBuilding";
@@ -3505,24 +3505,82 @@ export default function Dashboard() {
                         <FormField
                           control={projectForm.control}
                           name="buildingHeight"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>{t('dashboard.projectForm.buildingHeight', 'Building Height')}</FormLabel>
-                              <FormControl>
-                                <Input 
-                                  type="text" 
-                                  placeholder={t('dashboard.projectForm.buildingHeightPlaceholder', 'e.g., 25 floors, 100m, 300ft')} 
-                                  {...field} 
-                                  data-testid="input-building-height" 
-                                  className="h-12" 
-                                />
-                              </FormControl>
-                              <FormDescription className="text-xs">
-                                {t('dashboard.projectForm.buildingHeightDesc', 'Required for IRATA logbook - enter floors, meters, or feet')}
-                              </FormDescription>
-                              <FormMessage />
-                            </FormItem>
-                          )}
+                          render={({ field }) => {
+                            const floorCount = projectForm.watch("floorCount");
+                            const heightValue = field.value || "";
+                            
+                            const calculateFromFloors = () => {
+                              const floors = parseInt(floorCount);
+                              if (floors && floors > 0) {
+                                const feet = floors * 9;
+                                const meters = Math.round(feet * 0.3048);
+                                field.onChange(`${feet}ft (${meters}m)`);
+                              }
+                            };
+                            
+                            const getConversion = () => {
+                              if (!heightValue) return null;
+                              const metersMatch = heightValue.match(/^(\d+(?:\.\d+)?)\s*m$/i);
+                              const feetMatch = heightValue.match(/^(\d+(?:\.\d+)?)\s*ft$/i);
+                              if (metersMatch) {
+                                const meters = parseFloat(metersMatch[1]);
+                                const feet = Math.round(meters / 0.3048);
+                                return `= ${feet}ft`;
+                              }
+                              if (feetMatch) {
+                                const feet = parseFloat(feetMatch[1]);
+                                const meters = Math.round(feet * 0.3048);
+                                return `= ${meters}m`;
+                              }
+                              return null;
+                            };
+                            
+                            const conversion = getConversion();
+                            
+                            return (
+                              <FormItem>
+                                <FormLabel>{t('dashboard.projectForm.buildingHeight', 'Building Height')}</FormLabel>
+                                <div className="space-y-2">
+                                  <div className="flex gap-2">
+                                    <FormControl>
+                                      <Input 
+                                        type="text" 
+                                        placeholder={t('dashboard.projectForm.buildingHeightPlaceholder', 'e.g., 100m or 300ft')} 
+                                        {...field} 
+                                        data-testid="input-building-height" 
+                                        className="h-12" 
+                                      />
+                                    </FormControl>
+                                    {floorCount && parseInt(floorCount) > 0 && (
+                                      <Button
+                                        type="button"
+                                        variant="outline"
+                                        onClick={calculateFromFloors}
+                                        className="whitespace-nowrap"
+                                        data-testid="button-calculate-height"
+                                      >
+                                        <Calculator className="w-4 h-4 mr-1" />
+                                        {t('dashboard.projectForm.calculateHeight', 'Calculate')}
+                                      </Button>
+                                    )}
+                                  </div>
+                                  {conversion && (
+                                    <p className="text-sm text-muted-foreground font-medium">{conversion}</p>
+                                  )}
+                                </div>
+                                <FormDescription className="text-xs mt-2">
+                                  <span className="font-medium text-foreground">{t('dashboard.projectForm.buildingHeightImportant', 'Important for technicians:')}</span>{' '}
+                                  {t('dashboard.projectForm.buildingHeightExplain', 'Building height is required for IRATA logbook entries. Technicians need this to track work at height for certification progression.')}
+                                </FormDescription>
+                                {floorCount && parseInt(floorCount) > 0 && (
+                                  <FormDescription className="text-xs">
+                                    {t('dashboard.projectForm.buildingHeightCalcHint', 'Click Calculate to estimate height from floor count (floors × 9ft)')}
+                                  </FormDescription>
+                                )}
+                                <FormMessage />
+                              </FormItem>
+                            );
+                          }}
                         />
 
                         <FormField
