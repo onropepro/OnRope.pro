@@ -3,7 +3,7 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { db } from "./db";
 import { wsHub } from "./websocket-hub";
-import { insertUserSchema, insertClientSchema, insertProjectSchema, insertDropLogSchema, insertComplaintSchema, insertComplaintNoteSchema, insertJobCommentSchema, insertHarnessInspectionSchema, insertToolboxMeetingSchema, insertFlhaFormSchema, insertIncidentReportSchema, insertMethodStatementSchema, insertPayPeriodConfigSchema, insertQuoteSchema, insertQuoteServiceSchema, insertGearItemSchema, insertGearAssignmentSchema, insertGearSerialNumberSchema, insertEquipmentDamageReportSchema, insertScheduledJobSchema, insertJobAssignmentSchema, updatePropertyManagerAccountSchema, insertFeatureRequestSchema, insertFeatureRequestMessageSchema, insertHistoricalHoursSchema, normalizeStrataPlan, type InsertGearItem, type InsertGearAssignment, type InsertGearSerialNumber, type Project, gearAssignments, gearSerialNumbers, gearItems, jobAssignments, workSessions, nonBillableWorkSessions, licenseKeys, users, propertyManagerCompanyLinks, IRATA_TASK_TYPES, quotes, quoteServices, quoteHistory, superuserTasks, superuserTaskComments, superuserTaskAttachments } from "@shared/schema";
+import { insertUserSchema, insertClientSchema, insertProjectSchema, insertDropLogSchema, insertComplaintSchema, insertComplaintNoteSchema, insertJobCommentSchema, insertHarnessInspectionSchema, insertToolboxMeetingSchema, insertFlhaFormSchema, insertIncidentReportSchema, insertMethodStatementSchema, insertPayPeriodConfigSchema, insertQuoteSchema, insertQuoteServiceSchema, insertGearItemSchema, insertGearAssignmentSchema, insertGearSerialNumberSchema, insertEquipmentDamageReportSchema, insertScheduledJobSchema, insertJobAssignmentSchema, updatePropertyManagerAccountSchema, insertFeatureRequestSchema, insertFeatureRequestMessageSchema, insertHistoricalHoursSchema, normalizeStrataPlan, type InsertGearItem, type InsertGearAssignment, type InsertGearSerialNumber, type Project, gearAssignments, gearSerialNumbers, gearItems, jobAssignments, workSessions, nonBillableWorkSessions, licenseKeys, users, propertyManagerCompanyLinks, IRATA_TASK_TYPES, quotes, quoteServices, quoteHistory, superuserTasks, superuserTaskComments, superuserTaskAttachments, jobPostings, insertJobPostingSchema } from "@shared/schema";
 import { eq, sql, and } from "drizzle-orm";
 import { z } from "zod";
 import bcrypt from "bcrypt";
@@ -15561,6 +15561,274 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({ preferences });
     } catch (error) {
       console.error("Update user preferences error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // ============================================================================
+  // JOB BOARD ROUTES
+  // ============================================================================
+
+  // List all job postings (different views for different roles)
+  app.get("/api/job-postings", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      let result;
+      
+      if (currentUser.role === "superuser") {
+        // SuperUser sees all job postings (platform-wide)
+        result = await db.select().from(jobPostings).orderBy(sql`${jobPostings.createdAt} DESC`);
+      } else if (currentUser.role === "company") {
+        // Company owners see their own postings
+        result = await db.select().from(jobPostings)
+          .where(eq(jobPostings.companyId, currentUser.id))
+          .orderBy(sql`${jobPostings.createdAt} DESC`);
+      } else {
+        // Technicians/employees see all active job postings (platform + company)
+        result = await db.select({
+          job: jobPostings,
+          companyName: users.companyName,
+        }).from(jobPostings)
+          .leftJoin(users, eq(jobPostings.companyId, users.id))
+          .where(eq(jobPostings.status, "active"))
+          .orderBy(sql`${jobPostings.createdAt} DESC`);
+        
+        // Flatten the result for technicians
+        result = result.map(r => ({
+          ...r.job,
+          companyName: r.companyName || "Platform",
+        }));
+      }
+
+      res.json({ jobPostings: result });
+    } catch (error) {
+      console.error("Get job postings error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Get single job posting
+  app.get("/api/job-postings/:id", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const [job] = await db.select({
+        job: jobPostings,
+        companyName: users.companyName,
+      }).from(jobPostings)
+        .leftJoin(users, eq(jobPostings.companyId, users.id))
+        .where(eq(jobPostings.id, req.params.id));
+
+      if (!job) {
+        return res.status(404).json({ message: "Job posting not found" });
+      }
+
+      res.json({ 
+        jobPosting: {
+          ...job.job,
+          companyName: job.companyName || "Platform",
+        }
+      });
+    } catch (error) {
+      console.error("Get job posting error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Create job posting (SuperUser or Company owner)
+  app.post("/api/job-postings", requireAuth, requireRole("company", "superuser"), async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      const isPlatformPost = currentUser.role === "superuser";
+      
+      const jobData = insertJobPostingSchema.parse({
+        ...req.body,
+        companyId: isPlatformPost ? null : currentUser.id,
+        isPlatformPost,
+      });
+
+      const [newJob] = await db.insert(jobPostings).values(jobData).returning();
+      
+      res.json({ jobPosting: newJob });
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Validation error", errors: error.errors });
+      }
+      console.error("Create job posting error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Update job posting (SuperUser or owning Company)
+  app.patch("/api/job-postings/:id", requireAuth, requireRole("company", "superuser"), async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      // Get existing job to verify ownership
+      const [existingJob] = await db.select().from(jobPostings).where(eq(jobPostings.id, req.params.id));
+      if (!existingJob) {
+        return res.status(404).json({ message: "Job posting not found" });
+      }
+
+      // Verify ownership (company can only edit their own, superuser can edit platform posts)
+      if (currentUser.role === "company" && existingJob.companyId !== currentUser.id) {
+        return res.status(403).json({ message: "Access denied" });
+      }
+      if (currentUser.role === "superuser" && !existingJob.isPlatformPost) {
+        return res.status(403).json({ message: "SuperUser can only edit platform posts" });
+      }
+
+      const allowedUpdates: any = {
+        title: req.body.title,
+        description: req.body.description,
+        requirements: req.body.requirements,
+        location: req.body.location,
+        isRemote: req.body.isRemote,
+        jobType: req.body.jobType,
+        employmentType: req.body.employmentType,
+        salaryMin: req.body.salaryMin,
+        salaryMax: req.body.salaryMax,
+        salaryPeriod: req.body.salaryPeriod,
+        requiredIrataLevel: req.body.requiredIrataLevel,
+        requiredSpratLevel: req.body.requiredSpratLevel,
+        status: req.body.status,
+        expiresAt: req.body.expiresAt,
+        updatedAt: new Date(),
+      };
+
+      // Remove undefined values
+      Object.keys(allowedUpdates).forEach(key => {
+        if (allowedUpdates[key] === undefined) {
+          delete allowedUpdates[key];
+        }
+      });
+
+      const [updatedJob] = await db.update(jobPostings)
+        .set(allowedUpdates)
+        .where(eq(jobPostings.id, req.params.id))
+        .returning();
+
+      res.json({ jobPosting: updatedJob });
+    } catch (error) {
+      console.error("Update job posting error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Delete job posting (SuperUser or owning Company)
+  app.delete("/api/job-postings/:id", requireAuth, requireRole("company", "superuser"), async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      // Get existing job to verify ownership
+      const [existingJob] = await db.select().from(jobPostings).where(eq(jobPostings.id, req.params.id));
+      if (!existingJob) {
+        return res.status(404).json({ message: "Job posting not found" });
+      }
+
+      // Verify ownership
+      if (currentUser.role === "company" && existingJob.companyId !== currentUser.id) {
+        return res.status(403).json({ message: "Access denied" });
+      }
+      if (currentUser.role === "superuser" && !existingJob.isPlatformPost) {
+        return res.status(403).json({ message: "SuperUser can only delete platform posts" });
+      }
+
+      await db.delete(jobPostings).where(eq(jobPostings.id, req.params.id));
+
+      res.json({ message: "Job posting deleted successfully" });
+    } catch (error) {
+      console.error("Delete job posting error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Toggle technician visibility to employers
+  app.patch("/api/technician/visibility", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      // Only technicians can toggle their visibility
+      const EMPLOYEE_ROLES = ["rope_access_tech", "ground_crew", "ground_crew_supervisor", "supervisor", "operations_manager", "manager"];
+      if (!EMPLOYEE_ROLES.includes(currentUser.role)) {
+        return res.status(403).json({ message: "Only technicians can update visibility" });
+      }
+
+      const { isVisible } = req.body;
+      
+      const updates: any = {
+        isVisibleToEmployers: isVisible,
+      };
+      
+      // Set timestamp when visibility is enabled
+      if (isVisible) {
+        updates.visibilityEnabledAt = new Date();
+      }
+
+      const [updatedUser] = await db.update(users)
+        .set(updates)
+        .where(eq(users.id, currentUser.id))
+        .returning();
+
+      res.json({ 
+        isVisibleToEmployers: updatedUser.isVisibleToEmployers,
+        visibilityEnabledAt: updatedUser.visibilityEnabledAt,
+      });
+    } catch (error) {
+      console.error("Update technician visibility error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Get visible technicians (for companies browsing)
+  app.get("/api/visible-technicians", requireAuth, requireRole("company", "superuser"), async (req: Request, res: Response) => {
+    try {
+      const EMPLOYEE_ROLES = ["rope_access_tech", "ground_crew", "ground_crew_supervisor", "supervisor", "operations_manager", "manager"];
+      
+      // Get technicians who opted in to visibility
+      const visibleTechs = await db.select({
+        id: users.id,
+        firstName: users.firstName,
+        lastName: users.lastName,
+        name: users.name,
+        photoUrl: users.photoUrl,
+        irataLevel: users.irataLevel,
+        irataLicenseNumber: users.irataLicenseNumber,
+        irataExpirationDate: users.irataExpirationDate,
+        spratLevel: users.spratLevel,
+        spratLicenseNumber: users.spratLicenseNumber,
+        spratExpirationDate: users.spratExpirationDate,
+        ropeAccessStartDate: users.ropeAccessStartDate,
+        resumeDocuments: users.resumeDocuments,
+        employeeCity: users.employeeCity,
+        employeeProvinceState: users.employeeProvinceState,
+        employeeCountry: users.employeeCountry,
+        visibilityEnabledAt: users.visibilityEnabledAt,
+      }).from(users)
+        .where(and(
+          eq(users.isVisibleToEmployers, true),
+          sql`${users.role} = ANY(ARRAY['rope_access_tech', 'ground_crew', 'ground_crew_supervisor', 'supervisor', 'operations_manager', 'manager'])`
+        ))
+        .orderBy(sql`${users.visibilityEnabledAt} DESC`);
+
+      res.json({ technicians: visibleTechs });
+    } catch (error) {
+      console.error("Get visible technicians error:", error);
       res.status(500).json({ message: "Internal server error" });
     }
   });
