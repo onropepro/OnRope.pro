@@ -409,7 +409,7 @@ export default function TechnicianLogin() {
               <div className="p-2 rounded-full bg-primary/10">
                 <HardHat className="w-5 h-5 text-primary" />
               </div>
-              <span className="text-sm font-medium text-muted-foreground">For IRATA & SPRAT Technicians</span>
+              <span className="text-sm font-medium text-muted-foreground">For IRATA & SPRAT Technicians / Employees Working In Rope Access</span>
             </div>
             
             <h1 className="text-4xl lg:text-5xl font-bold tracking-tight mb-6">
