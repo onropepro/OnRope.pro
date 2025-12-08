@@ -15615,6 +15615,41 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Public job postings - for technicians to browse (only active jobs)
+  // IMPORTANT: This route must come BEFORE /api/job-postings/:id to avoid "public" being treated as an ID
+  app.get("/api/job-postings/public", requireAuth, async (req: Request, res: Response) => {
+    try {
+      // Get only active, non-expired job postings
+      const now = new Date();
+      
+      const activeJobs = await db.select({
+        job: jobPostings,
+        companyName: users.companyName,
+      }).from(jobPostings)
+        .leftJoin(users, eq(jobPostings.companyId, users.id))
+        .where(
+          and(
+            eq(jobPostings.status, "active"),
+            or(
+              isNull(jobPostings.expiresAt),
+              gt(jobPostings.expiresAt, now)
+            )
+          )
+        )
+        .orderBy(desc(jobPostings.createdAt));
+
+      const jobsWithCompany = activeJobs.map(item => ({
+        ...item.job,
+        companyName: item.job.isPlatformPost ? "OnRopePro Platform" : (item.companyName || "Unknown Company"),
+      }));
+
+      res.json({ jobPostings: jobsWithCompany });
+    } catch (error) {
+      console.error("Fetch public job postings error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
   // Get single job posting
   app.get("/api/job-postings/:id", requireAuth, async (req: Request, res: Response) => {
     try {
@@ -15766,40 +15801,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({ message: "Job posting deleted successfully" });
     } catch (error) {
       console.error("Delete job posting error:", error);
-      res.status(500).json({ message: "Internal server error" });
-    }
-  });
-
-  // Public job postings - for technicians to browse (only active jobs)
-  app.get("/api/job-postings/public", requireAuth, async (req: Request, res: Response) => {
-    try {
-      // Get only active, non-expired job postings
-      const now = new Date();
-      
-      const activeJobs = await db.select({
-        job: jobPostings,
-        companyName: users.companyName,
-      }).from(jobPostings)
-        .leftJoin(users, eq(jobPostings.companyId, users.id))
-        .where(
-          and(
-            eq(jobPostings.status, "active"),
-            or(
-              isNull(jobPostings.expiresAt),
-              gt(jobPostings.expiresAt, now)
-            )
-          )
-        )
-        .orderBy(desc(jobPostings.createdAt));
-
-      const jobsWithCompany = activeJobs.map(item => ({
-        ...item.job,
-        companyName: item.job.isPlatformPost ? "OnRopePro Platform" : (item.companyName || "Unknown Company"),
-      }));
-
-      res.json({ jobPostings: jobsWithCompany });
-    } catch (error) {
-      console.error("Fetch public job postings error:", error);
       res.status(500).json({ message: "Internal server error" });
     }
   });
