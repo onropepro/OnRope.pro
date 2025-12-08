@@ -86,6 +86,24 @@ type RecentChange = {
 
 const recentChangesData: RecentChange[] = [
   {
+    date: "December 8, 2025",
+    title: "My Logged Hours for Technicians",
+    description: "Technicians can now view all their logged work hours from the Technician Portal. The new 'My Logged Hours' page shows work sessions grouped by building with total hours, tasks performed, and dates. Includes bilingual support (EN/FR)",
+    type: "feature"
+  },
+  {
+    date: "December 8, 2025",
+    title: "Previous Work Experience Entry",
+    description: "Technicians can record prior rope access work experience in their personal logbook. Enter date ranges, hours worked, building name/address/height, select from 19 IRATA task types, and add notes. These entries are stored separately and clearly marked as 'not counted in certification totals'",
+    type: "feature"
+  },
+  {
+    date: "December 8, 2025",
+    title: "Dual-Portal Navigation",
+    description: "Improved navigation flow: Linked technicians (with active company) now land on the Work Dashboard after login with easy access to their Technician Portal via 'My Profile' card. Unlinked or terminated technicians go directly to Technician Portal with a 'Go to Work Dashboard' card for navigation",
+    type: "improvement"
+  },
+  {
     date: "December 6, 2025",
     title: "Address Autocomplete",
     description: "Smart address lookup in technician registration - start typing your address and get real-time suggestions from Geoapify. Selecting a suggestion auto-fills street, city, province, country, and postal code. Full bilingual support (EN/FR)",
