@@ -286,6 +286,7 @@ const translations = {
     yourReferralCode: "Your Referral Code",
     shareReferralCode: "Share this code with fellow technicians to invite them to OnRopePro",
     referralPremiumBenefit: "You'll get PLUS access when your code is used!",
+    viewPlusBenefits: "View PLUS Benefits",
     copyCode: "Copy Code",
     codeCopied: "Copied!",
     referredTimes: "Referred {count} technician(s)",
@@ -516,6 +517,7 @@ const translations = {
     yourReferralCode: "Votre code de parrainage",
     shareReferralCode: "Partagez ce code avec d'autres techniciens pour les inviter sur OnRopePro",
     referralPremiumBenefit: "Vous obtiendrez un accès PLUS lorsque votre code sera utilisé!",
+    viewPlusBenefits: "Voir les avantages PLUS",
     copyCode: "Copier le code",
     codeCopied: "Copié!",
     referredTimes: "Parrainé {count} technicien(s)",
@@ -1362,9 +1364,19 @@ export default function TechnicianPortal() {
                     <CardDescription>
                       {t.shareReferralCode}
                     </CardDescription>
-                    <p className="text-sm font-medium text-green-600 dark:text-green-400 mt-1">
-                      {t.referralPremiumBenefit}
-                    </p>
+                    <div className="flex flex-wrap items-center gap-2 mt-1">
+                      <p className="text-sm font-medium text-green-600 dark:text-green-400">
+                        {t.referralPremiumBenefit}
+                      </p>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-auto px-2 py-0.5 text-sm text-primary underline"
+                        data-testid="button-view-plus-benefits"
+                      >
+                        {t.viewPlusBenefits}
+                      </Button>
+                    </div>
                   </div>
                 </div>
               </div>
