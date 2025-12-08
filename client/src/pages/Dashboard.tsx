@@ -7304,6 +7304,12 @@ export default function Dashboard() {
                           <div>
                             <div className="text-xs text-muted-foreground">{t('dashboard.employeeDetails.verifiedOn', 'Verified On')}</div>
                             <div className="text-sm font-medium">{formatLocalDate(employeeToView.irataVerifiedAt)}</div>
+                            <div className="mt-2 p-2 rounded bg-green-500/10 border border-green-500/20">
+                              <p className="text-xs text-muted-foreground flex items-start gap-1.5">
+                                <span className="material-icons text-green-600 text-sm flex-shrink-0">info</span>
+                                <span>{t('dashboard.employeeDetails.verifiedExplanation', 'Verified means we have confirmed this certification by reviewing the uploaded certification card using AI-powered document verification. The license details have been validated against the uploaded document.')}</span>
+                              </p>
+                            </div>
                           </div>
                         )}
                         {employeeToView.irataDocuments && employeeToView.irataDocuments.length > 0 && (
@@ -7389,6 +7395,12 @@ export default function Dashboard() {
                           <div>
                             <div className="text-xs text-muted-foreground">{t('dashboard.employeeDetails.verifiedOn', 'Verified On')}</div>
                             <div className="text-sm font-medium">{formatLocalDate(employeeToView.spratVerifiedAt)}</div>
+                            <div className="mt-2 p-2 rounded bg-green-500/10 border border-green-500/20">
+                              <p className="text-xs text-muted-foreground flex items-start gap-1.5">
+                                <span className="material-icons text-green-600 text-sm flex-shrink-0">info</span>
+                                <span>{t('dashboard.employeeDetails.verifiedExplanation', 'Verified means we have confirmed this certification by reviewing the uploaded certification card using AI-powered document verification. The license details have been validated against the uploaded document.')}</span>
+                              </p>
+                            </div>
                           </div>
                         )}
                         {employeeToView.spratDocuments && employeeToView.spratDocuments.length > 0 && (
