@@ -974,6 +974,26 @@ export default function TechnicianPortal() {
     },
   });
 
+  // Mutation to generate referral code for users who don't have one
+  const generateReferralCodeMutation = useMutation({
+    mutationFn: async () => {
+      return apiRequest("POST", "/api/user/generate-referral-code");
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/user"] });
+    },
+    onError: (error: any) => {
+      console.error("Failed to generate referral code:", error);
+    },
+  });
+
+  // Auto-generate referral code if user doesn't have one
+  useEffect(() => {
+    if (user && !user.referralCode && !generateReferralCodeMutation.isPending) {
+      generateReferralCodeMutation.mutate();
+    }
+  }, [user?.id, user?.referralCode]);
+
   const handleLogout = async () => {
     try {
       await fetch("/api/logout", {

@@ -2820,6 +2820,46 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Generate referral code for users who don't have one
+  // This allows company owners and other users to get a referral code
+  app.post("/api/user/generate-referral-code", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const userId = req.session.userId;
+      if (!userId) {
+        return res.status(401).json({ message: "Not authenticated" });
+      }
+
+      const user = await storage.getUserById(userId);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      // If user already has a referral code, return it
+      if (user.referralCode) {
+        return res.json({ 
+          referralCode: user.referralCode,
+          message: "Referral code already exists"
+        });
+      }
+
+      // Generate a new referral code
+      const newReferralCode = await generateReferralCode();
+      
+      // Update the user with the new referral code
+      await storage.updateUser(userId, { referralCode: newReferralCode });
+
+      console.log(`[Referral] Generated referral code ${newReferralCode} for user ${userId} (${user.role})`);
+
+      res.json({ 
+        referralCode: newReferralCode,
+        message: "Referral code generated successfully"
+      });
+    } catch (error: any) {
+      console.error("[Referral] Error generating referral code:", error);
+      res.status(500).json({ message: error.message || "Failed to generate referral code" });
+    }
+  });
+
   // Multer config for technician document uploads (images or PDFs)
   const technicianDocumentUpload = multer({
     storage: multer.memoryStorage(),
