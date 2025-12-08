@@ -271,3 +271,153 @@ Respond ONLY with valid JSON matching this exact structure:
     };
   }
 }
+
+// Logbook Entry extracted from a scanned logbook page
+export interface LogbookEntry {
+  startDate: string | null;
+  endDate: string | null;
+  hoursWorked: number | null;
+  buildingName: string | null;
+  buildingAddress: string | null;
+  buildingHeight: string | null;
+  tasksPerformed: string[];
+  previousEmployer: string | null;
+  notes: string | null;
+  confidence: "high" | "medium" | "low";
+}
+
+export interface LogbookAnalysisResult {
+  success: boolean;
+  entries: LogbookEntry[];
+  pageWarnings: string[];
+  error: string | null;
+}
+
+/**
+ * Analyze a logbook page image and extract work entries
+ */
+export async function analyzeLogbookPage(
+  imageBase64: string,
+  mimeType: string = "image/jpeg"
+): Promise<LogbookAnalysisResult> {
+  try {
+    const response = await ai.models.generateContent({
+      model: "gemini-2.5-flash",
+      contents: [
+        {
+          role: "user",
+          parts: [
+            {
+              text: `You are analyzing a photograph of an IRATA or SPRAT rope access logbook page. 
+Extract ALL work entries visible on this page. Each entry typically includes:
+- Date(s) of work (may be a single date or date range)
+- Building/Site name and address
+- Building height (if visible)
+- Tasks performed (rope access techniques like: rope transfer, re-anchor, ascending, descending, rigging, deviation, aid climbing, edge transition, knot passing, rope to rope transfer, mid-rope changeover, rescue technique, hauling, lowering, tensioned rope work, horizontal traverse, window cleaning, building inspection, maintenance work)
+- Hours worked
+- Employer/Company name
+- Any notes or comments
+
+For each entry found, extract all available information. Dates should be in YYYY-MM-DD format. If only partial information is available for an entry, still include it with what you can read. If dates only show day/month, assume the current year unless context suggests otherwise.
+
+Common rope access task types to look for:
+- rope_transfer, re_anchor, ascending, descending, rigging, deviation
+- aid_climbing, edge_transition, knot_passing, rope_to_rope_transfer
+- mid_rope_changeover, rescue_technique, hauling, lowering
+- tensioned_rope, horizontal_traverse, window_cleaning
+- building_inspection, maintenance_work, other
+
+Respond ONLY with valid JSON matching this structure:
+{
+  "success": boolean (true if this appears to be a valid logbook page),
+  "entries": [
+    {
+      "startDate": "YYYY-MM-DD" or null,
+      "endDate": "YYYY-MM-DD" or null (same as startDate for single day),
+      "hoursWorked": number or null,
+      "buildingName": string or null,
+      "buildingAddress": string or null,
+      "buildingHeight": string or null (e.g., "25 floors", "100m"),
+      "tasksPerformed": ["task_id", ...] (use the task IDs listed above),
+      "previousEmployer": string or null,
+      "notes": string or null,
+      "confidence": "high" | "medium" | "low"
+    }
+  ],
+  "pageWarnings": ["warning about unreadable sections or issues"],
+  "error": null or "error message if not a logbook page"
+}`
+            },
+            {
+              inlineData: {
+                mimeType,
+                data: imageBase64
+              }
+            }
+          ]
+        }
+      ],
+      config: {
+        responseMimeType: "application/json",
+        responseSchema: {
+          type: Type.OBJECT,
+          properties: {
+            success: { type: Type.BOOLEAN },
+            entries: {
+              type: Type.ARRAY,
+              items: {
+                type: Type.OBJECT,
+                properties: {
+                  startDate: { type: Type.STRING, nullable: true },
+                  endDate: { type: Type.STRING, nullable: true },
+                  hoursWorked: { type: Type.NUMBER, nullable: true },
+                  buildingName: { type: Type.STRING, nullable: true },
+                  buildingAddress: { type: Type.STRING, nullable: true },
+                  buildingHeight: { type: Type.STRING, nullable: true },
+                  tasksPerformed: { type: Type.ARRAY, items: { type: Type.STRING } },
+                  previousEmployer: { type: Type.STRING, nullable: true },
+                  notes: { type: Type.STRING, nullable: true },
+                  confidence: { type: Type.STRING }
+                }
+              }
+            },
+            pageWarnings: { type: Type.ARRAY, items: { type: Type.STRING } },
+            error: { type: Type.STRING, nullable: true }
+          },
+          required: ["success", "entries", "pageWarnings"]
+        }
+      }
+    });
+
+    const result = JSON.parse(response.text || "{}");
+    
+    // Normalize dates in the entries
+    const normalizedEntries: LogbookEntry[] = (result.entries || []).map((entry: any) => ({
+      startDate: normalizeExpiryDate(entry.startDate),
+      endDate: normalizeExpiryDate(entry.endDate) || normalizeExpiryDate(entry.startDate),
+      hoursWorked: typeof entry.hoursWorked === 'number' ? entry.hoursWorked : null,
+      buildingName: entry.buildingName || null,
+      buildingAddress: entry.buildingAddress || null,
+      buildingHeight: entry.buildingHeight || null,
+      tasksPerformed: Array.isArray(entry.tasksPerformed) ? entry.tasksPerformed : [],
+      previousEmployer: entry.previousEmployer || null,
+      notes: entry.notes || null,
+      confidence: entry.confidence || "medium"
+    }));
+
+    return {
+      success: result.success ?? false,
+      entries: normalizedEntries,
+      pageWarnings: result.pageWarnings || [],
+      error: result.error || null
+    };
+  } catch (error: any) {
+    console.error("Gemini logbook analysis error:", error);
+    return {
+      success: false,
+      entries: [],
+      pageWarnings: [],
+      error: `Analysis failed: ${error.message || "Unknown error"}`
+    };
+  }
+}

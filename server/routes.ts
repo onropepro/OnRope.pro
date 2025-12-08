@@ -3,7 +3,7 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { db } from "./db";
 import { wsHub } from "./websocket-hub";
-import { insertUserSchema, insertClientSchema, insertProjectSchema, insertDropLogSchema, insertComplaintSchema, insertComplaintNoteSchema, insertJobCommentSchema, insertHarnessInspectionSchema, insertToolboxMeetingSchema, insertFlhaFormSchema, insertIncidentReportSchema, insertMethodStatementSchema, insertPayPeriodConfigSchema, insertQuoteSchema, insertQuoteServiceSchema, insertGearItemSchema, insertGearAssignmentSchema, insertGearSerialNumberSchema, insertEquipmentDamageReportSchema, insertScheduledJobSchema, insertJobAssignmentSchema, updatePropertyManagerAccountSchema, insertFeatureRequestSchema, insertFeatureRequestMessageSchema, normalizeStrataPlan, type InsertGearItem, type InsertGearAssignment, type InsertGearSerialNumber, type Project, gearAssignments, gearSerialNumbers, gearItems, jobAssignments, workSessions, nonBillableWorkSessions, licenseKeys, users, propertyManagerCompanyLinks, IRATA_TASK_TYPES, quotes, quoteServices, quoteHistory, superuserTasks, superuserTaskComments, superuserTaskAttachments } from "@shared/schema";
+import { insertUserSchema, insertClientSchema, insertProjectSchema, insertDropLogSchema, insertComplaintSchema, insertComplaintNoteSchema, insertJobCommentSchema, insertHarnessInspectionSchema, insertToolboxMeetingSchema, insertFlhaFormSchema, insertIncidentReportSchema, insertMethodStatementSchema, insertPayPeriodConfigSchema, insertQuoteSchema, insertQuoteServiceSchema, insertGearItemSchema, insertGearAssignmentSchema, insertGearSerialNumberSchema, insertEquipmentDamageReportSchema, insertScheduledJobSchema, insertJobAssignmentSchema, updatePropertyManagerAccountSchema, insertFeatureRequestSchema, insertFeatureRequestMessageSchema, insertHistoricalHoursSchema, normalizeStrataPlan, type InsertGearItem, type InsertGearAssignment, type InsertGearSerialNumber, type Project, gearAssignments, gearSerialNumbers, gearItems, jobAssignments, workSessions, nonBillableWorkSessions, licenseKeys, users, propertyManagerCompanyLinks, IRATA_TASK_TYPES, quotes, quoteServices, quoteHistory, superuserTasks, superuserTaskComments, superuserTaskAttachments } from "@shared/schema";
 import { eq, sql, and } from "drizzle-orm";
 import { z } from "zod";
 import bcrypt from "bcrypt";
@@ -8950,6 +8950,119 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({ success: true, message: "Previous hours deleted successfully" });
     } catch (error) {
       console.error("Delete historical hours error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+  
+  // Scan logbook page with Gemini AI to extract historical hours entries
+  const { analyzeLogbookPage } = await import("./gemini");
+  
+  app.post("/api/my-historical-hours/scan-logbook", requireAuth, requireRole("rope_access_tech"), imageUpload.single('image'), async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      if (!req.file) {
+        return res.status(400).json({ message: "No image provided" });
+      }
+      
+      // Validate file type
+      const validMimeTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/heic', 'image/heif'];
+      if (!validMimeTypes.includes(req.file.mimetype)) {
+        return res.status(400).json({ message: "Invalid image type. Please upload a JPEG, PNG, or WebP image." });
+      }
+      
+      // Convert buffer to base64
+      const imageBase64 = req.file.buffer.toString('base64');
+      
+      console.log(`[Logbook-Scan] Analyzing logbook page for user ${currentUser.id}`);
+      
+      // Analyze with Gemini
+      const result = await analyzeLogbookPage(imageBase64, req.file.mimetype);
+      
+      if (!result.success) {
+        return res.status(400).json({ 
+          message: result.error || "Failed to analyze logbook page",
+          warnings: result.pageWarnings
+        });
+      }
+      
+      console.log(`[Logbook-Scan] Extracted ${result.entries.length} entries`);
+      
+      res.json({
+        success: true,
+        entries: result.entries,
+        warnings: result.pageWarnings
+      });
+    } catch (error) {
+      console.error("Logbook scan error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+  
+  // Bulk create historical hours entries (for committing scanned logbook entries)
+  app.post("/api/my-historical-hours/bulk", requireAuth, requireRole("rope_access_tech"), async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      const { entries } = req.body;
+      
+      if (!Array.isArray(entries) || entries.length === 0) {
+        return res.status(400).json({ message: "No entries provided" });
+      }
+      
+      // Validate and create each entry
+      const createdEntries = [];
+      const errors = [];
+      
+      for (let i = 0; i < entries.length; i++) {
+        const entry = entries[i];
+        
+        try {
+          // Validate required fields
+          if (!entry.startDate || !entry.endDate || !entry.hoursWorked) {
+            errors.push({ index: i, message: "Missing required fields (startDate, endDate, hoursWorked)" });
+            continue;
+          }
+          
+          const historicalData = insertHistoricalHoursSchema.parse({
+            employeeId: currentUser.id,
+            startDate: entry.startDate,
+            endDate: entry.endDate,
+            hoursWorked: entry.hoursWorked.toString(),
+            buildingName: entry.buildingName || null,
+            buildingAddress: entry.buildingAddress || null,
+            buildingHeight: entry.buildingHeight || null,
+            tasksPerformed: entry.tasksPerformed || [],
+            notes: entry.notes || null,
+            previousEmployer: entry.previousEmployer || null,
+          });
+          
+          const created = await storage.createHistoricalHours(historicalData);
+          createdEntries.push(created);
+        } catch (entryError) {
+          console.error(`Error creating entry ${i}:`, entryError);
+          errors.push({ index: i, message: "Validation error" });
+        }
+      }
+      
+      console.log(`[Logbook-Scan] Created ${createdEntries.length} entries, ${errors.length} errors`);
+      
+      res.json({
+        success: true,
+        created: createdEntries.length,
+        errors: errors.length > 0 ? errors : undefined,
+        message: `Successfully added ${createdEntries.length} previous hours entries`
+      });
+    } catch (error) {
+      console.error("Bulk create historical hours error:", error);
       res.status(500).json({ message: "Internal server error" });
     }
   });

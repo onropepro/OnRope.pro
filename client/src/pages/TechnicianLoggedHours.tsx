@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
@@ -27,8 +27,12 @@ import {
   CheckCircle2,
   MapPin,
   ChevronRight,
-  AlertTriangle
+  AlertTriangle,
+  Camera,
+  Scan,
+  Check
 } from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox";
 import { format } from "date-fns";
 import { fr, enUS } from "date-fns/locale";
 
@@ -91,6 +95,26 @@ const translations = {
     unknownProject: "Unknown Project",
     importantNotice: "Important Notice",
     logbookDisclaimer: "This is a personal tracking tool to help you monitor your rope access hours. You must still record all hours in your official IRATA/SPRAT logbook - this digital log does not replace it and is not valid for certification purposes.",
+    scanLogbook: "Scan Logbook Page",
+    scanning: "Analyzing...",
+    scanLogbookDesc: "Take a photo of your logbook page to automatically extract entries",
+    reviewScannedEntries: "Review Scanned Entries",
+    reviewScannedDesc: "Review and confirm the entries extracted from your logbook",
+    foundEntries: "Found {count} entries",
+    noEntriesFound: "No entries found",
+    noEntriesFoundDesc: "Could not extract any entries from this image. Make sure the logbook page is clearly visible.",
+    addSelectedEntries: "Add Selected Entries",
+    addingEntries: "Adding...",
+    entriesAdded: "Entries Added",
+    entriesAddedDesc: "{count} entries have been added to your previous hours.",
+    scanFailed: "Scan Failed",
+    lowConfidence: "Low confidence",
+    mediumConfidence: "Medium confidence",
+    highConfidence: "High confidence",
+    selectAll: "Select All",
+    deselectAll: "Deselect All",
+    missingRequired: "Missing required fields",
+    retryPhoto: "Try Another Photo",
   },
   fr: {
     title: "Mes heures enregistrées",
@@ -148,6 +172,26 @@ const translations = {
     unknownProject: "Projet inconnu",
     importantNotice: "Avis important",
     logbookDisclaimer: "Ceci est un outil de suivi personnel pour vous aider à surveiller vos heures d'accès sur corde. Vous devez toujours enregistrer toutes vos heures dans votre carnet IRATA/SPRAT officiel - ce journal numérique ne le remplace pas et n'est pas valide pour les fins de certification.",
+    scanLogbook: "Scanner une page",
+    scanning: "Analyse...",
+    scanLogbookDesc: "Prenez une photo de votre page de carnet pour extraire automatiquement les entrées",
+    reviewScannedEntries: "Vérifier les entrées scannées",
+    reviewScannedDesc: "Vérifiez et confirmez les entrées extraites de votre carnet",
+    foundEntries: "{count} entrées trouvées",
+    noEntriesFound: "Aucune entrée trouvée",
+    noEntriesFoundDesc: "Impossible d'extraire des entrées de cette image. Assurez-vous que la page du carnet est clairement visible.",
+    addSelectedEntries: "Ajouter les entrées sélectionnées",
+    addingEntries: "Ajout en cours...",
+    entriesAdded: "Entrées ajoutées",
+    entriesAddedDesc: "{count} entrées ont été ajoutées à vos heures précédentes.",
+    scanFailed: "Échec du scan",
+    lowConfidence: "Faible confiance",
+    mediumConfidence: "Confiance moyenne",
+    highConfidence: "Haute confiance",
+    selectAll: "Tout sélectionner",
+    deselectAll: "Tout désélectionner",
+    missingRequired: "Champs requis manquants",
+    retryPhoto: "Essayer une autre photo",
   }
 };
 
@@ -204,6 +248,23 @@ export default function TechnicianLoggedHours() {
     previousEmployer: "",
     notes: "",
   });
+
+  // Logbook scanning state
+  const logbookInputRef = useRef<HTMLInputElement>(null);
+  const [isScanning, setIsScanning] = useState(false);
+  const [showReviewDialog, setShowReviewDialog] = useState(false);
+  const [scannedEntries, setScannedEntries] = useState<Array<{
+    id: string;
+    selected: boolean;
+    date: string | null;
+    building: string | null;
+    employer: string | null;
+    tasks: string[];
+    hours: number | null;
+    notes: string | null;
+    confidence: 'low' | 'medium' | 'high';
+  }>>([]);
+  const [isCommitting, setIsCommitting] = useState(false);
 
   const { data: logsData, isLoading: logsLoading } = useQuery<{ logs: IrataTaskLog[] }>({
     queryKey: ["/api/my-irata-task-logs"],
@@ -323,6 +384,204 @@ export default function TechnicianLoggedHours() {
         ? prev.filter(t => t !== taskId)
         : [...prev, taskId]
     );
+  };
+
+  // Handle logbook scan
+  const handleLogbookScan = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    setIsScanning(true);
+    
+    try {
+      const formDataPayload = new FormData();
+      formDataPayload.append('image', file);
+
+      const response = await fetch('/api/my-historical-hours/scan-logbook', {
+        method: 'POST',
+        body: formDataPayload,
+        credentials: 'include',
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || 'Scan failed');
+      }
+
+      const result = await response.json();
+      
+      if (result.entries && result.entries.length > 0) {
+        // Transform entries and add IDs for selection tracking
+        // Map backend LogbookEntry fields to frontend format
+        const entriesWithIds = result.entries.map((entry: any, index: number) => {
+          // Safely extract date - prefer startDate, fall back to endDate
+          const extractedDate = (entry.startDate && typeof entry.startDate === 'string' && entry.startDate.trim()) 
+            ? entry.startDate.trim()
+            : (entry.endDate && typeof entry.endDate === 'string' && entry.endDate.trim())
+              ? entry.endDate.trim()
+              : null;
+          
+          // Safely extract hours - ensure it's a valid number
+          const extractedHours = (entry.hoursWorked !== null && entry.hoursWorked !== undefined && !isNaN(Number(entry.hoursWorked)))
+            ? Number(entry.hoursWorked)
+            : null;
+          
+          // Safely extract tasks array
+          const extractedTasks = Array.isArray(entry.tasksPerformed) 
+            ? entry.tasksPerformed.filter((t: any) => typeof t === 'string' && t.trim())
+            : [];
+          
+          return {
+            id: `scan-${Date.now()}-${index}`,
+            selected: Boolean(extractedDate && extractedHours && extractedHours > 0), // Auto-select if has required fields
+            date: extractedDate,
+            building: entry.buildingName || null,
+            employer: entry.previousEmployer || null,
+            tasks: extractedTasks,
+            hours: extractedHours,
+            notes: entry.notes || null,
+            confidence: entry.confidence || 'medium',
+          };
+        });
+        
+        setScannedEntries(entriesWithIds);
+        setShowReviewDialog(true);
+      } else {
+        toast({
+          title: t.noEntriesFound,
+          description: t.noEntriesFoundDesc,
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      toast({
+        title: t.scanFailed,
+        description: error instanceof Error ? error.message : 'Unknown error',
+        variant: "destructive",
+      });
+    } finally {
+      setIsScanning(false);
+      // Reset file input
+      if (logbookInputRef.current) {
+        logbookInputRef.current.value = '';
+      }
+    }
+  };
+
+  // Toggle entry selection
+  const toggleEntrySelection = (entryId: string) => {
+    setScannedEntries(prev => 
+      prev.map(entry => 
+        entry.id === entryId 
+          ? { ...entry, selected: !entry.selected }
+          : entry
+      )
+    );
+  };
+
+  // Select/deselect all entries
+  const toggleSelectAll = () => {
+    const allSelected = scannedEntries.every(e => e.selected);
+    setScannedEntries(prev => 
+      prev.map(entry => ({ ...entry, selected: !allSelected }))
+    );
+  };
+
+  // Commit selected scanned entries
+  const handleCommitScannedEntries = async () => {
+    // Filter to only valid entries with all required fields
+    const validEntries = scannedEntries.filter(e => {
+      // Must be selected
+      if (!e.selected) return false;
+      // Must have a valid date string
+      if (!e.date || typeof e.date !== 'string' || e.date.trim() === '') return false;
+      // Must have valid hours (number and positive)
+      if (e.hours === null || e.hours === undefined || isNaN(Number(e.hours)) || Number(e.hours) <= 0) return false;
+      return true;
+    });
+    
+    if (validEntries.length === 0) {
+      toast({
+        title: t.error,
+        description: t.missingRequired,
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsCommitting(true);
+    let successCount = 0;
+    
+    try {
+      // Commit each entry individually using the existing endpoint
+      for (const entry of validEntries) {
+        // Ensure tasks is a valid array with at least one entry
+        const tasks: string[] = Array.isArray(entry.tasks) && entry.tasks.length > 0 
+          ? entry.tasks.filter(t => typeof t === 'string' && t.trim() !== '')
+          : [];
+        
+        // If no valid tasks after filtering, default to 'other'
+        const finalTasks = tasks.length > 0 ? tasks : ['other'];
+        
+        // Parse and validate hours
+        const hoursNum = Number(entry.hours);
+        if (isNaN(hoursNum) || hoursNum <= 0) {
+          continue; // Skip invalid entries
+        }
+        
+        // Build the payload matching historicalHoursSchema
+        const payload = {
+          startDate: entry.date as string,
+          endDate: entry.date as string, // Same day for single entries from logbook
+          hoursWorked: hoursNum.toFixed(2),
+          buildingName: entry.building || null,
+          buildingAddress: null,
+          buildingHeight: null,
+          previousEmployer: entry.employer || null,
+          notes: entry.notes || null,
+          tasksPerformed: finalTasks,
+        };
+        
+        await apiRequest("POST", "/api/my-historical-hours", payload);
+        successCount++;
+      }
+      
+      if (successCount === 0) {
+        toast({
+          title: t.error,
+          description: t.missingRequired,
+          variant: "destructive",
+        });
+        return;
+      }
+      
+      queryClient.invalidateQueries({ queryKey: ["/api/my-historical-hours"] });
+      setShowReviewDialog(false);
+      setScannedEntries([]);
+      
+      toast({
+        title: t.entriesAdded,
+        description: t.entriesAddedDesc.replace('{count}', String(successCount)),
+      });
+    } catch (error) {
+      toast({
+        title: t.error,
+        description: error instanceof Error ? error.message : 'Unknown error',
+        variant: "destructive",
+      });
+    } finally {
+      setIsCommitting(false);
+    }
+  };
+
+  // Get confidence badge color
+  const getConfidenceBadgeVariant = (confidence: 'low' | 'medium' | 'high') => {
+    switch (confidence) {
+      case 'high': return 'default';
+      case 'medium': return 'secondary';
+      case 'low': return 'destructive';
+      default: return 'secondary';
+    }
   };
 
   const groupedByProject: Record<string, { 
@@ -524,14 +783,45 @@ export default function TechnicianLoggedHours() {
                       </p>
                     )}
                   </div>
-                  <Button
-                    onClick={() => setShowAddDialog(true)}
-                    className="gap-2"
-                    data-testid="button-add-previous-hours"
-                  >
-                    <Plus className="w-4 h-4" />
-                    {t.addPreviousHours}
-                  </Button>
+                  <div className="flex flex-col sm:flex-row gap-2">
+                    {/* Hidden file input for logbook scan */}
+                    <input
+                      type="file"
+                      ref={logbookInputRef}
+                      accept="image/*"
+                      capture="environment"
+                      className="hidden"
+                      onChange={handleLogbookScan}
+                      data-testid="input-logbook-scan"
+                    />
+                    <Button
+                      variant="outline"
+                      onClick={() => logbookInputRef.current?.click()}
+                      disabled={isScanning}
+                      className="gap-2"
+                      data-testid="button-scan-logbook"
+                    >
+                      {isScanning ? (
+                        <>
+                          <Loader2 className="w-4 h-4 animate-spin" />
+                          {t.scanning}
+                        </>
+                      ) : (
+                        <>
+                          <Camera className="w-4 h-4" />
+                          {t.scanLogbook}
+                        </>
+                      )}
+                    </Button>
+                    <Button
+                      onClick={() => setShowAddDialog(true)}
+                      className="gap-2"
+                      data-testid="button-add-previous-hours"
+                    >
+                      <Plus className="w-4 h-4" />
+                      {t.addPreviousHours}
+                    </Button>
+                  </div>
                 </div>
               </CardContent>
             </Card>
@@ -779,6 +1069,175 @@ export default function TechnicianLoggedHours() {
                 </>
               ) : (
                 t.save
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Logbook Scan Review Dialog */}
+      <Dialog open={showReviewDialog} onOpenChange={setShowReviewDialog}>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-hidden flex flex-col">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Scan className="w-5 h-5" />
+              {t.reviewScannedEntries}
+            </DialogTitle>
+            <DialogDescription>
+              {t.reviewScannedDesc}
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="flex items-center justify-between py-2 border-b">
+            <span className="text-sm text-muted-foreground">
+              {t.foundEntries.replace('{count}', String(scannedEntries.length))}
+            </span>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={toggleSelectAll}
+              className="gap-2"
+              data-testid="button-toggle-select-all"
+            >
+              {scannedEntries.every(e => e.selected) ? t.deselectAll : t.selectAll}
+            </Button>
+          </div>
+
+          <ScrollArea className="flex-1 max-h-[50vh]">
+            <div className="space-y-3 py-2 pr-4">
+              {scannedEntries.map((entry) => {
+                const isValid = entry.date && entry.hours;
+                return (
+                  <div
+                    key={entry.id}
+                    className={`p-4 border rounded-lg ${
+                      !isValid ? 'border-destructive/50 bg-destructive/5' : 
+                      entry.selected ? 'border-primary/50 bg-primary/5' : ''
+                    }`}
+                    data-testid={`scanned-entry-${entry.id}`}
+                  >
+                    <div className="flex items-start gap-3">
+                      <Checkbox
+                        id={entry.id}
+                        checked={entry.selected}
+                        onCheckedChange={() => toggleEntrySelection(entry.id)}
+                        disabled={!isValid}
+                        data-testid={`checkbox-entry-${entry.id}`}
+                      />
+                      <div className="flex-1 min-w-0">
+                        <div className="flex flex-wrap items-center gap-2 mb-2">
+                          {entry.date ? (
+                            <Badge variant="outline" className="gap-1">
+                              <Calendar className="w-3 h-3" />
+                              {formatLocalDate(entry.date)}
+                            </Badge>
+                          ) : (
+                            <Badge variant="destructive" className="gap-1">
+                              {t.date}: -
+                            </Badge>
+                          )}
+                          {entry.hours ? (
+                            <Badge variant="secondary" className="gap-1">
+                              <Clock className="w-3 h-3" />
+                              {entry.hours} {t.hr}
+                            </Badge>
+                          ) : (
+                            <Badge variant="destructive" className="gap-1">
+                              {t.hoursWorked}: -
+                            </Badge>
+                          )}
+                          <Badge variant={getConfidenceBadgeVariant(entry.confidence) as any}>
+                            {entry.confidence === 'high' ? t.highConfidence :
+                             entry.confidence === 'medium' ? t.mediumConfidence :
+                             t.lowConfidence}
+                          </Badge>
+                        </div>
+                        
+                        {entry.building && (
+                          <p className="text-sm flex items-center gap-1 text-muted-foreground">
+                            <Building className="w-3 h-3" />
+                            {entry.building}
+                          </p>
+                        )}
+                        {entry.employer && (
+                          <p className="text-sm text-muted-foreground mt-1">
+                            {t.previousEmployer}: {entry.employer}
+                          </p>
+                        )}
+                        {entry.tasks.length > 0 && (
+                          <div className="flex flex-wrap gap-1 mt-2">
+                            {entry.tasks.slice(0, 3).map((task, i) => (
+                              <Badge key={i} variant="outline" className="text-xs">
+                                {getTaskLabel(task, language)}
+                              </Badge>
+                            ))}
+                            {entry.tasks.length > 3 && (
+                              <Badge variant="outline" className="text-xs">
+                                +{entry.tasks.length - 3}
+                              </Badge>
+                            )}
+                          </div>
+                        )}
+                        {entry.notes && (
+                          <p className="text-xs text-muted-foreground mt-2 line-clamp-2">
+                            {entry.notes}
+                          </p>
+                        )}
+                        
+                        {!isValid && (
+                          <p className="text-xs text-destructive mt-2 flex items-center gap-1">
+                            <AlertTriangle className="w-3 h-3" />
+                            {t.missingRequired}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </ScrollArea>
+
+          <DialogFooter className="border-t pt-4 gap-2">
+            <Button
+              variant="outline"
+              onClick={() => {
+                setShowReviewDialog(false);
+                setScannedEntries([]);
+                logbookInputRef.current?.click();
+              }}
+              className="gap-2"
+              data-testid="button-retry-scan"
+            >
+              <Camera className="w-4 h-4" />
+              {t.retryPhoto}
+            </Button>
+            <Button
+              variant="outline"
+              onClick={() => {
+                setShowReviewDialog(false);
+                setScannedEntries([]);
+              }}
+              data-testid="button-cancel-scan"
+            >
+              {t.cancel}
+            </Button>
+            <Button
+              onClick={handleCommitScannedEntries}
+              disabled={isCommitting || !scannedEntries.some(e => e.selected && e.date && e.hours)}
+              className="gap-2"
+              data-testid="button-commit-scanned"
+            >
+              {isCommitting ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  {t.addingEntries}
+                </>
+              ) : (
+                <>
+                  <Check className="w-4 h-4" />
+                  {t.addSelectedEntries} ({scannedEntries.filter(e => e.selected && e.date && e.hours).length})
+                </>
               )}
             </Button>
           </DialogFooter>
