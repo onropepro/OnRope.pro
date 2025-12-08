@@ -17,6 +17,20 @@ type Language = 'en' | 'fr';
 
 const translations = {
   en: {
+    welcomeTitle: "Welcome to Technician Registration",
+    welcomeSubtitle: "Before we begin, here's what you may want to have ready",
+    welcomeDocumentsTitle: "Documents You May Need",
+    welcomeDocumentsSubtitle: "All documents are optional but recommended",
+    welcomeGetStarted: "Get Started",
+    welcomeCertCard: "Certification Card",
+    welcomeCertCardDesc: "Your IRATA or SPRAT certification card to verify your credentials",
+    welcomeFirstAid: "First Aid Certificate",
+    welcomeFirstAidDesc: "Proof of valid first aid training for job site requirements",
+    welcomeVoidCheque: "Void Cheque",
+    welcomeVoidChequeDesc: "For setting up direct deposit payroll payments",
+    welcomeDriversLicense: "Driver's License",
+    welcomeDriversLicenseDesc: "License photo and driver abstract if you may drive company vehicles",
+    welcomeOptionalNote: "Don't worry if you don't have these documents right now. You can complete registration and add them later.",
     continue: "Continue",
     back: "Back",
     cancel: "Cancel",
@@ -162,6 +176,20 @@ const translations = {
     errorBirthday: "Please enter your birthday",
   },
   fr: {
+    welcomeTitle: "Bienvenue à l'inscription des techniciens",
+    welcomeSubtitle: "Avant de commencer, voici ce que vous pourriez vouloir préparer",
+    welcomeDocumentsTitle: "Documents dont vous pourriez avoir besoin",
+    welcomeDocumentsSubtitle: "Tous les documents sont facultatifs mais recommandés",
+    welcomeGetStarted: "Commencer",
+    welcomeCertCard: "Carte de certification",
+    welcomeCertCardDesc: "Votre carte de certification IRATA ou SPRAT pour vérifier vos qualifications",
+    welcomeFirstAid: "Certificat de premiers soins",
+    welcomeFirstAidDesc: "Preuve de formation valide en premiers soins pour les exigences du chantier",
+    welcomeVoidCheque: "Chèque annulé",
+    welcomeVoidChequeDesc: "Pour configurer les paiements de paie par dépôt direct",
+    welcomeDriversLicense: "Permis de conduire",
+    welcomeDriversLicenseDesc: "Photo du permis et relevé de conduite si vous devez conduire des véhicules de l'entreprise",
+    welcomeOptionalNote: "Ne vous inquiétez pas si vous n'avez pas ces documents maintenant. Vous pouvez terminer l'inscription et les ajouter plus tard.",
     continue: "Continuer",
     back: "Retour",
     cancel: "Annuler",
@@ -438,6 +466,7 @@ function FileUploadButton({
 type CertificationType = "irata" | "sprat" | "both" | "none" | null;
 
 type RegistrationStep = 
+  | "welcome"
   | "firstName"
   | "lastName"
   | "certification"
@@ -503,7 +532,7 @@ interface TechnicianRegistrationProps {
 export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistrationProps) {
   const { toast } = useToast();
   const [, setLocation] = useLocation();
-  const [step, setStep] = useState<RegistrationStep>("firstName");
+  const [step, setStep] = useState<RegistrationStep>("welcome");
   const [data, setData] = useState<TechnicianData>({
     firstName: "",
     lastName: "",
@@ -607,6 +636,7 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
   };
 
   const stepOrder: RegistrationStep[] = [
+    "welcome",
     "firstName",
     "lastName", 
     "certification",
@@ -639,7 +669,7 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
     if (currentStep === "address" && data.certification === "none") {
       return "certification";
     }
-    return stepOrder[currentIndex - 1] || "firstName";
+    return stepOrder[currentIndex - 1] || "welcome";
   };
 
   const handleContinue = () => {
@@ -901,6 +931,104 @@ export function TechnicianRegistration({ open, onOpenChange }: TechnicianRegistr
 
   const renderStepContent = () => {
     switch (step) {
+      case "welcome":
+        return (
+          <>
+            <DialogHeader>
+              <div className="flex items-center justify-between mb-4">
+                <div className="w-9" />
+                <div className="p-3 rounded-full bg-primary/10">
+                  <FileText className="w-8 h-8 text-primary" />
+                </div>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={toggleLanguage}
+                  data-testid="button-toggle-language-welcome"
+                  title={language === 'en' ? 'Passer au français' : 'Switch to English'}
+                >
+                  <Languages className="w-5 h-5" />
+                </Button>
+              </div>
+              <DialogTitle className="text-center text-xl">{t.welcomeTitle}</DialogTitle>
+              <DialogDescription className="text-center">
+                {t.welcomeSubtitle}
+              </DialogDescription>
+            </DialogHeader>
+            <div className="py-4 space-y-4">
+              <div className="p-3 rounded-lg bg-muted/50 border">
+                <h4 className="font-medium text-sm mb-3 flex items-center gap-2">
+                  <Info className="w-4 h-4 text-primary" />
+                  {t.welcomeDocumentsTitle}
+                </h4>
+                <p className="text-xs text-muted-foreground mb-3">{t.welcomeDocumentsSubtitle}</p>
+                <div className="space-y-3">
+                  <div className="flex items-start gap-3">
+                    <div className="p-1.5 rounded bg-primary/10 flex-shrink-0">
+                      <Award className="w-4 h-4 text-primary" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium">{t.welcomeCertCard}</p>
+                      <p className="text-xs text-muted-foreground">{t.welcomeCertCardDesc}</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <div className="p-1.5 rounded bg-primary/10 flex-shrink-0">
+                      <Heart className="w-4 h-4 text-primary" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium">{t.welcomeFirstAid}</p>
+                      <p className="text-xs text-muted-foreground">{t.welcomeFirstAidDesc}</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <div className="p-1.5 rounded bg-primary/10 flex-shrink-0">
+                      <CreditCard className="w-4 h-4 text-primary" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium">{t.welcomeVoidCheque}</p>
+                      <p className="text-xs text-muted-foreground">{t.welcomeVoidChequeDesc}</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <div className="p-1.5 rounded bg-primary/10 flex-shrink-0">
+                      <Car className="w-4 h-4 text-primary" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium">{t.welcomeDriversLicense}</p>
+                      <p className="text-xs text-muted-foreground">{t.welcomeDriversLicenseDesc}</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div className="p-3 rounded-lg border border-primary/20 bg-primary/5">
+                <p className="text-xs text-muted-foreground flex items-start gap-2">
+                  <CheckCircle className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
+                  {t.welcomeOptionalNote}
+                </p>
+              </div>
+            </div>
+            <DialogFooter className="flex-col gap-2 sm:flex-col">
+              <Button 
+                onClick={handleContinue} 
+                className="w-full"
+                data-testid="button-get-started"
+              >
+                {t.welcomeGetStarted}
+                <ArrowRight className="w-4 h-4 ml-2" />
+              </Button>
+              <Button 
+                variant="ghost" 
+                onClick={handleClose}
+                className="w-full"
+                data-testid="button-cancel-registration"
+              >
+                {t.cancel}
+              </Button>
+            </DialogFooter>
+          </>
+        );
+
       case "firstName":
         return (
           <>
