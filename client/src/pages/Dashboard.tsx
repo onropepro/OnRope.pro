@@ -20,7 +20,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Check, ChevronsUpDown } from "lucide-react";
+import { Check, ChevronsUpDown, Star, Calculator } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { Progress } from "@/components/ui/progress";
 import { HighRiseBuilding } from "@/components/HighRiseBuilding";
@@ -71,6 +71,7 @@ const projectSchema = z.object({
   totalDropsWest: z.string().optional(),
   dailyDropTarget: z.string().optional(),
   floorCount: z.string().optional(),
+  buildingHeight: z.string().optional(),
   startDate: z.string().optional(),
   endDate: z.string().optional(),
   targetCompletionDate: z.string().optional(),
@@ -990,6 +991,7 @@ export default function Dashboard() {
       totalDropsWest: "",
       dailyDropTarget: "",
       floorCount: "",
+      buildingHeight: "",
       startDate: "",
       endDate: "",
       targetCompletionDate: "",
@@ -1350,7 +1352,8 @@ export default function Dashboard() {
                      (data.totalDropsSouth ? parseInt(data.totalDropsSouth) : 0) + 
                      (data.totalDropsWest ? parseInt(data.totalDropsWest) : 0),
           dailyDropTarget: data.dailyDropTarget ? parseInt(data.dailyDropTarget) : undefined,
-          floorCount: parseInt(data.floorCount),
+          floorCount: data.floorCount ? parseInt(data.floorCount) : undefined,
+          buildingHeight: data.buildingHeight || undefined,
           startDate: data.startDate || undefined,
           endDate: data.endDate || undefined,
           estimatedHours: data.estimatedHours ? parseInt(data.estimatedHours) : undefined,
@@ -3327,6 +3330,29 @@ export default function Dashboard() {
                           />
                         )}
 
+                        {/* Building Height - for IRATA logbook */}
+                        <FormField
+                          control={projectForm.control}
+                          name="buildingHeight"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>{t('dashboard.projectForm.buildingHeight', 'Building Height')}</FormLabel>
+                              <FormControl>
+                                <Input 
+                                  placeholder={t('dashboard.projectForm.buildingHeightPlaceholder', 'e.g., 25 floors, 100m, 300ft')} 
+                                  {...field} 
+                                  data-testid="input-building-height" 
+                                  className="h-12" 
+                                />
+                              </FormControl>
+                              <p className="text-xs text-muted-foreground">
+                                {t('dashboard.projectForm.buildingHeightHint', 'Used for IRATA logbook hour tracking')}
+                              </p>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+
                         {(projectForm.watch("jobType") === "window_cleaning" || 
                           projectForm.watch("jobType") === "building_wash" || 
                           projectForm.watch("jobType") === "dryer_vent_cleaning" ||
@@ -3474,6 +3500,87 @@ export default function Dashboard() {
                               <FormMessage />
                             </FormItem>
                           )}
+                        />
+
+                        <FormField
+                          control={projectForm.control}
+                          name="buildingHeight"
+                          render={({ field }) => {
+                            const floorCount = projectForm.watch("floorCount");
+                            const heightValue = field.value || "";
+                            
+                            const calculateFromFloors = () => {
+                              const floors = parseInt(floorCount);
+                              if (floors && floors > 0) {
+                                const feet = floors * 9;
+                                const meters = Math.round(feet * 0.3048);
+                                field.onChange(`${feet}ft (${meters}m)`);
+                              }
+                            };
+                            
+                            const getConversion = () => {
+                              if (!heightValue) return null;
+                              const metersMatch = heightValue.match(/^(\d+(?:\.\d+)?)\s*m$/i);
+                              const feetMatch = heightValue.match(/^(\d+(?:\.\d+)?)\s*ft$/i);
+                              if (metersMatch) {
+                                const meters = parseFloat(metersMatch[1]);
+                                const feet = Math.round(meters / 0.3048);
+                                return `= ${feet}ft`;
+                              }
+                              if (feetMatch) {
+                                const feet = parseFloat(feetMatch[1]);
+                                const meters = Math.round(feet * 0.3048);
+                                return `= ${meters}m`;
+                              }
+                              return null;
+                            };
+                            
+                            const conversion = getConversion();
+                            
+                            return (
+                              <FormItem>
+                                <FormLabel>{t('dashboard.projectForm.buildingHeight', 'Building Height')}</FormLabel>
+                                <div className="space-y-2">
+                                  <div className="flex gap-2">
+                                    <FormControl>
+                                      <Input 
+                                        type="text" 
+                                        placeholder={t('dashboard.projectForm.buildingHeightPlaceholder', 'e.g., 100m or 300ft')} 
+                                        {...field} 
+                                        data-testid="input-building-height" 
+                                        className="h-12" 
+                                      />
+                                    </FormControl>
+                                    {floorCount && parseInt(floorCount) > 0 && (
+                                      <Button
+                                        type="button"
+                                        variant="outline"
+                                        onClick={calculateFromFloors}
+                                        className="whitespace-nowrap"
+                                        data-testid="button-calculate-height"
+                                      >
+                                        <Calculator className="w-4 h-4 mr-1" />
+                                        {t('dashboard.projectForm.calculateHeight', 'Calculate')}
+                                      </Button>
+                                    )}
+                                  </div>
+                                  {conversion && (
+                                    <p className="text-sm text-muted-foreground font-medium">{conversion}</p>
+                                  )}
+                                </div>
+                                <FormDescription className="text-xs mt-2">
+                                  <span className="font-medium text-foreground">{t('dashboard.projectForm.buildingHeightImportant', 'Important for technicians:')}</span>{' '}
+                                  {t('dashboard.projectForm.buildingHeightExplain', 'Building height is required for IRATA logbook entries. Technicians need this to track work at height for certification progression.')}
+                                </FormDescription>
+                                {floorCount && parseInt(floorCount) > 0 && (
+                                  <FormDescription className="text-xs">
+                                    {t('dashboard.projectForm.buildingHeightCalcHint', 'Click Calculate to estimate height from floor count (floors × 9ft)')}
+                                  </FormDescription>
+                                )}
+                                <FormMessage />
+                              </FormItem>
+                            );
+                          }}
                         />
 
                         <FormField
@@ -5263,6 +5370,17 @@ export default function Dashboard() {
                               <div className="flex-1">
                                 <div className="flex items-center gap-2">
                                   <div className="font-medium text-lg">{employee.name || employee.companyName || employee.email}</div>
+                                  {/* PRO Badge - Always shown for now, will be gated behind PLUS access later */}
+                                  {employee.role === 'rope_access_tech' && (
+                                    <Badge 
+                                      variant="default" 
+                                      className="bg-gradient-to-r from-amber-500 to-yellow-400 text-white text-[10px] px-1.5 py-0 h-4 font-bold border-0" 
+                                      data-testid={`badge-pro-${employee.id}`}
+                                    >
+                                      <Star className="w-2.5 h-2.5 mr-0.5 fill-current" />
+                                      PRO
+                                    </Badge>
+                                  )}
                                   {irataStatus === 'expired' && (
                                     <Badge variant="destructive" className="text-xs flex items-center gap-1" data-testid={`badge-irata-expired-${employee.id}`}>
                                       <span className="material-icons text-xs">error</span>

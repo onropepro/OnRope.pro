@@ -405,6 +405,33 @@ async function generatePropertyManagerCode(): Promise<string> {
   throw new Error('Unable to generate unique property manager code. Please try again.');
 }
 
+// Generate unique 12-character referral code for technicians using cryptographically secure randomness
+async function generateReferralCode(): Promise<string> {
+  const crypto = await import('crypto');
+  const characters = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; // Excluding confusing characters like 0, O, 1, I
+  const codeLength = 12;
+  const maxAttempts = 10; // Prevent infinite loops in case of database issues
+  
+  for (let attempt = 0; attempt < maxAttempts; attempt++) {
+    // Generate 12-character code using crypto.randomBytes for security
+    const randomBytes = crypto.randomBytes(codeLength);
+    let code = '';
+    
+    for (let i = 0; i < codeLength; i++) {
+      const randomIndex = randomBytes[i] % characters.length;
+      code += characters.charAt(randomIndex);
+    }
+    
+    // Check if code already exists
+    const existing = await storage.getUserByReferralCode(code);
+    if (!existing) {
+      return code;
+    }
+  }
+  
+  throw new Error('Failed to generate unique referral code after maximum attempts');
+}
+
 export async function registerRoutes(app: Express): Promise<Server> {
   // ==================== ADDRESS AUTOCOMPLETE ====================
   
@@ -876,9 +903,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         firstAidType,
         firstAidExpiry,
         companyCode, // Optional - code to link to a specific company
+        referralCodeInput, // Optional - referral code from another technician
       } = req.body;
 
-      console.log('[Technician-Register] Received registration:', { firstName, lastName, email, certification });
+      console.log('[Technician-Register] Received registration:', { firstName, lastName, email, certification, referralCodeInput });
 
       // Validate required fields
       if (!firstName || !lastName) {
@@ -926,6 +954,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (existingUser) {
         return res.status(400).json({ message: "An account with this email already exists. Please log in instead." });
       }
+
+      // Validate referral code if provided and get referrer info
+      let referredByUserId: string | null = null;
+      let referredByCode: string | null = null;
+      
+      if (referralCodeInput && referralCodeInput.trim()) {
+        const referrer = await storage.getUserByReferralCode(referralCodeInput.trim().toUpperCase());
+        if (!referrer) {
+          return res.status(400).json({ message: "Invalid referral code. Please check and try again." });
+        }
+        // Verify the referrer is an active technician
+        if (referrer.role !== 'rope_access_tech') {
+          return res.status(400).json({ message: "Invalid referral code. Please check and try again." });
+        }
+        referredByUserId = referrer.id;
+        referredByCode = referralCodeInput.trim().toUpperCase();
+        console.log(`[Technician-Register] Valid referral code from ${referrer.name} (${referrer.id})`);
+      }
+
+      // Generate unique referral code for the new technician
+      const newReferralCode = await generateReferralCode();
+      console.log(`[Technician-Register] Generated referral code: ${newReferralCode}`);
 
       // Handle file uploads
       const files = req.files as { [fieldname: string]: Express.Multer.File[] };
@@ -1054,6 +1104,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         
         // Start date - use timezone-safe utility
         startDate: getTodayString(),
+        
+        // Referral tracking
+        referralCode: newReferralCode,
+        referredByUserId: referredByUserId,
+        referredByCode: referredByCode,
       });
 
       console.log('[Technician-Register] User created:', user.id);
@@ -2526,6 +2581,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         birthday,
         specialMedicalConditions,
         irataBaselineHours,
+        irataExpirationDate,
+        spratExpirationDate,
       } = req.body;
 
       // Validate required fields
@@ -2565,6 +2622,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (birthday !== undefined) updateData.birthday = birthday || null;
       if (driversLicenseExpiry !== undefined) updateData.driversLicenseExpiry = driversLicenseExpiry || null;
       if (irataBaselineHours !== undefined) updateData.irataBaselineHours = irataBaselineHours || "0";
+      if (irataExpirationDate !== undefined) updateData.irataExpirationDate = irataExpirationDate || null;
+      if (spratExpirationDate !== undefined) updateData.spratExpirationDate = spratExpirationDate || null;
 
       // Sensitive fields - these are encrypted by storage.updateUser via encryptSensitiveFields
       if (socialInsuranceNumber !== undefined) updateData.socialInsuranceNumber = socialInsuranceNumber || null;
@@ -2612,6 +2671,103 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error: any) {
       console.error("[Technician-Profile] Error updating profile:", error);
       res.status(500).json({ message: error.message || "Failed to update profile" });
+    }
+  });
+
+  // Technician: Update certification expiration date only
+  // This is a simpler endpoint that only updates expiration dates without requiring full profile data
+  app.patch("/api/technician/expiration-date", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const userId = req.session.userId;
+      if (!userId) {
+        return res.status(401).json({ message: "Not authenticated" });
+      }
+
+      const user = await storage.getUserById(userId);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      // Only technicians and employees can update their own expiration dates
+      const allowedRoles = ['rope_access_tech', 'operations_manager', 'office_admin', 'safety_officer', 'ground_crew'];
+      if (!allowedRoles.includes(user.role)) {
+        return res.status(403).json({ message: "Only technicians can update expiration dates via this endpoint" });
+      }
+
+      const { type, date } = req.body;
+
+      if (!type || !['irata', 'sprat'].includes(type)) {
+        return res.status(400).json({ message: "Invalid type. Must be 'irata' or 'sprat'" });
+      }
+
+      if (!date) {
+        return res.status(400).json({ message: "Date is required" });
+      }
+
+      // Validate date format (YYYY-MM-DD)
+      const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
+      if (!dateRegex.test(date)) {
+        return res.status(400).json({ message: "Invalid date format. Use YYYY-MM-DD" });
+      }
+
+      const updateData: any = {};
+      if (type === 'irata') {
+        updateData.irataExpirationDate = date;
+      } else {
+        updateData.spratExpirationDate = date;
+      }
+
+      await storage.updateUser(userId, updateData);
+
+      console.log(`[Technician-Expiration] ${type.toUpperCase()} expiration date updated to ${date} for user ${userId}`);
+
+      res.json({ success: true, message: `${type.toUpperCase()} expiration date updated` });
+    } catch (error: any) {
+      console.error("[Technician-Expiration] Error updating expiration date:", error);
+      res.status(500).json({ message: error.message || "Failed to update expiration date" });
+    }
+  });
+
+  // Technician: Update experience start date only
+  // This is a simpler endpoint that only updates the rope access start date
+  app.patch("/api/technician/experience-date", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const userId = req.session.userId;
+      if (!userId) {
+        return res.status(401).json({ message: "Not authenticated" });
+      }
+
+      const user = await storage.getUserById(userId);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      // Only technicians and employees can update their own experience date
+      const allowedRoles = ['rope_access_tech', 'operations_manager', 'office_admin', 'safety_officer', 'ground_crew'];
+      if (!allowedRoles.includes(user.role)) {
+        return res.status(403).json({ message: "Only technicians can update experience date via this endpoint" });
+      }
+
+      const { date } = req.body;
+
+      if (!date) {
+        return res.status(400).json({ message: "Date is required" });
+      }
+
+      // Validate date format (YYYY-MM-DD)
+      const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
+      if (!dateRegex.test(date)) {
+        return res.status(400).json({ message: "Invalid date format. Use YYYY-MM-DD" });
+      }
+
+      await storage.updateUser(userId, { ropeAccessStartDate: date });
+
+      console.log(`[Technician-Experience] Experience start date updated to ${date} for user ${userId}`);
+
+      res.json({ success: true, message: "Experience start date updated" });
+    } catch (error: any) {
+      console.error("[Technician-Experience] Error updating experience date:", error);
+      res.status(500).json({ message: error.message || "Failed to update experience date" });
     }
   });
 
@@ -4089,6 +4245,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
         companiesObject[key] = value;
       });
 
+      // Get referral counts for all technicians in this batch
+      const referralCounts = new Map<string, number>();
+      for (const tech of result.technicians) {
+        const count = await storage.getReferralCount(tech.id);
+        referralCounts.set(tech.id, count);
+      }
+
       // Format technicians for response (exclude sensitive fields)
       const technicians = result.technicians.map(tech => ({
         id: tech.id,
@@ -4112,6 +4275,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         employeeCity: tech.employeeCity,
         employeeProvinceState: tech.employeeProvinceState,
         employeeCountry: tech.employeeCountry,
+        referralCode: tech.referralCode,
+        referralCount: referralCounts.get(tech.id) || 0,
       }));
 
       res.json({ 
@@ -5516,6 +5681,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
+  // Get the count of technicians referred by the logged-in user
+  app.get("/api/my-referral-count", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const user = await storage.getUserById(req.session.userId!);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      if (user.role !== 'rope_access_tech') {
+        return res.status(403).json({ message: "Only technicians can view referral count" });
+      }
+      
+      const count = await storage.getReferralCount(user.id);
+      return res.json({ count });
+    } catch (error) {
+      console.error('[Referral] Error getting referral count:', error);
+      return res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
   // Get pending invitations for the logged-in technician
   app.get("/api/my-invitations", requireAuth, async (req: Request, res: Response) => {
     try {
@@ -8419,6 +8604,203 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
+  // ==================== TECHNICIAN PERFORMANCE METRICS ====================
+  
+  // Get technician performance metrics for their work sessions
+  app.get("/api/my-performance-metrics", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      // Get all completed work sessions for this tech
+      const allSessions = await storage.getAllWorkSessionsByEmployee(currentUser.id);
+      const completedSessions = allSessions.filter(s => s.endTime !== null);
+      
+      // Get all harness inspections for this tech
+      const inspections = await storage.getHarnessInspectionsByWorker(currentUser.id);
+      const inspectionDates = new Set(inspections.map(i => i.inspectionDate));
+      
+      // Get document compliance data
+      // Count all documents assigned to this employee for review and how many are signed
+      let documentCompliance = 100; // Default to 100% if no assigned documents
+      let requiredDocsCount = 0;
+      let signedDocsCount = 0;
+      
+      if (currentUser.companyId) {
+        // Get all document review assignments for this employee at their current company
+        const employeeSignatures = await storage.getDocumentReviewSignaturesByEmployee(currentUser.id);
+        // Filter to only documents from current company
+        const assignedDocs = employeeSignatures.filter(s => s.companyId === currentUser.companyId);
+        requiredDocsCount = assignedDocs.length;
+        
+        if (requiredDocsCount > 0) {
+          // Count how many have been signed
+          signedDocsCount = assignedDocs.filter(s => s.signedAt !== null).length;
+          documentCompliance = Math.round((signedDocsCount / requiredDocsCount) * 100);
+        }
+      }
+      
+      // Calculate metrics for each session
+      // New weighting: Drops 35%, Harness 25%, Hours 20%, Document Compliance 20%
+      const sessionMetrics: Array<{
+        sessionId: string;
+        projectId: string;
+        workDate: string;
+        totalDrops: number;
+        dailyDropTarget: number | null;
+        dropPerformance: number; // 0-100+
+        dropRating: 'exceeded' | 'on_target' | 'below_target' | 'na';
+        hoursWorked: number;
+        hoursRating: 'excellent' | 'good' | 'short' | 'na';
+        harnessInspectionDone: boolean;
+        documentCompliance: number; // 0-100
+        overallScore: number; // 0-100
+        overallRating: 'excellent' | 'good' | 'needs_improvement' | 'poor';
+      }> = [];
+      
+      for (const session of completedSessions) {
+        // Get project for daily drop target
+        const project = await storage.getProjectById(session.projectId);
+        const dailyDropTarget = project?.dailyDropTarget || null;
+        
+        // Calculate total drops for this session
+        const totalDrops = (session.dropsCompletedNorth || 0) + 
+                          (session.dropsCompletedEast || 0) + 
+                          (session.dropsCompletedSouth || 0) + 
+                          (session.dropsCompletedWest || 0);
+        
+        // Drop performance calculation (35% weight)
+        let dropPerformance = 100;
+        let dropRating: 'exceeded' | 'on_target' | 'below_target' | 'na' = 'na';
+        
+        if (dailyDropTarget && dailyDropTarget > 0) {
+          const dropRatio = totalDrops / dailyDropTarget;
+          dropPerformance = Math.min(dropRatio * 100, 120); // Cap at 120%
+          
+          if (dropRatio >= 1.1) {
+            dropRating = 'exceeded';
+          } else if (dropRatio >= 0.9) {
+            dropRating = 'on_target';
+          } else {
+            dropRating = 'below_target';
+          }
+        }
+        
+        // Hours calculation (20% weight)
+        const startTime = new Date(session.startTime);
+        const endTime = new Date(session.endTime!);
+        const hoursWorked = (endTime.getTime() - startTime.getTime()) / (1000 * 60 * 60);
+        
+        // Standard workday is 8 hours - rate based on actual work
+        let hoursScore = 100;
+        let hoursRating: 'excellent' | 'good' | 'short' | 'na' = 'na';
+        
+        if (hoursWorked >= 7) {
+          hoursScore = 100;
+          hoursRating = 'excellent';
+        } else if (hoursWorked >= 5) {
+          hoursScore = 80;
+          hoursRating = 'good';
+        } else if (hoursWorked >= 3) {
+          hoursScore = 60;
+          hoursRating = 'short';
+        } else {
+          hoursScore = 40;
+          hoursRating = 'short';
+        }
+        
+        // Harness inspection check (25% weight)
+        const harnessInspectionDone = inspectionDates.has(session.workDate);
+        const harnessScore = harnessInspectionDone ? 100 : 0;
+        
+        // Document compliance score (20% weight) - calculated once at the top, same for all sessions
+        const docScore = documentCompliance;
+        
+        // Calculate overall score (weighted average)
+        // Weights: Drops 35%, Harness 25%, Hours 20%, Document Compliance 20%
+        // If no drop target, redistribute: Harness 35%, Hours 30%, Docs 35%
+        let overallScore: number;
+        if (dailyDropTarget && dailyDropTarget > 0) {
+          overallScore = (dropPerformance * 0.35) + (harnessScore * 0.25) + (hoursScore * 0.20) + (docScore * 0.20);
+        } else {
+          overallScore = (harnessScore * 0.35) + (hoursScore * 0.30) + (docScore * 0.35);
+        }
+        overallScore = Math.min(Math.round(overallScore), 100);
+        
+        // Overall rating
+        let overallRating: 'excellent' | 'good' | 'needs_improvement' | 'poor';
+        if (overallScore >= 85) {
+          overallRating = 'excellent';
+        } else if (overallScore >= 70) {
+          overallRating = 'good';
+        } else if (overallScore >= 50) {
+          overallRating = 'needs_improvement';
+        } else {
+          overallRating = 'poor';
+        }
+        
+        sessionMetrics.push({
+          sessionId: session.id,
+          projectId: session.projectId,
+          workDate: session.workDate,
+          totalDrops,
+          dailyDropTarget,
+          dropPerformance: Math.round(dropPerformance),
+          dropRating,
+          hoursWorked: Math.round(hoursWorked * 10) / 10,
+          hoursRating,
+          harnessInspectionDone,
+          documentCompliance,
+          overallScore,
+          overallRating,
+        });
+      }
+      
+      // Calculate overall average
+      let averageScore = 0;
+      let harnessCompliance = 0;
+      if (sessionMetrics.length > 0) {
+        averageScore = Math.round(
+          sessionMetrics.reduce((sum, m) => sum + m.overallScore, 0) / sessionMetrics.length
+        );
+        harnessCompliance = Math.round(
+          (sessionMetrics.filter(m => m.harnessInspectionDone).length / sessionMetrics.length) * 100
+        );
+      }
+      
+      // Determine overall rating
+      let overallAverageRating: 'excellent' | 'good' | 'needs_improvement' | 'poor' | 'no_data';
+      if (sessionMetrics.length === 0) {
+        overallAverageRating = 'no_data';
+      } else if (averageScore >= 85) {
+        overallAverageRating = 'excellent';
+      } else if (averageScore >= 70) {
+        overallAverageRating = 'good';
+      } else if (averageScore >= 50) {
+        overallAverageRating = 'needs_improvement';
+      } else {
+        overallAverageRating = 'poor';
+      }
+      
+      res.json({
+        metrics: sessionMetrics,
+        summary: {
+          totalSessions: sessionMetrics.length,
+          averageScore,
+          harnessCompliance,
+          documentCompliance,
+          overallRating: overallAverageRating,
+        },
+      });
+    } catch (error) {
+      console.error("Get performance metrics error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+  
   // ==================== NON-BILLABLE WORK SESSION ROUTES ====================
   
   // Start a non-billable work session
@@ -8645,6 +9027,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const project = await storage.getProjectById(workSession.projectId);
       const derivedBuildingName = project?.buildingName || null;
       const derivedBuildingAddress = project?.buildingAddress || null;
+      const derivedBuildingHeight = project?.buildingHeight || null;
       
       // Get company ID from work session (authoritative source)
       const companyId = workSession.companyId;
@@ -8657,6 +9040,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           projectId: workSession.projectId,
           buildingName: derivedBuildingName,
           buildingAddress: derivedBuildingAddress,
+          buildingHeight: derivedBuildingHeight,
           tasksPerformed: canonicalTasks,
           workDate,
           hoursWorked,

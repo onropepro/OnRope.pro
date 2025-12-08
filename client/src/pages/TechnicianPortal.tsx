@@ -22,6 +22,16 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { useToast } from "@/hooks/use-toast";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { formatLocalDate, formatDateTime, parseLocalDate } from "@/lib/dateUtils";
@@ -40,6 +50,7 @@ import {
   CreditCard,
   Calendar,
   AlertCircle,
+  AlertTriangle,
   HardHat,
   Clock,
   FileText,
@@ -53,7 +64,13 @@ import {
   UserMinus,
   DollarSign,
   ArrowRight,
-  Briefcase
+  Briefcase,
+  Copy,
+  Share2,
+  Users,
+  Pencil,
+  Star,
+  Gift
 } from "lucide-react";
 import onRopeProLogo from "@assets/OnRopePro-logo_1764625558626.png";
 
@@ -123,6 +140,12 @@ const translations = {
     expiresOn: "Expires on",
     expired: "Expired",
     expiringSoon: "Expiring Soon",
+    expiringIn60Days: "Expiring in 60 days",
+    expiringIn30Days: "Urgent: 30 days",
+    certificationExpiryBannerTitle: "Certification Expiring Soon!",
+    certificationExpiryBannerMessage: "Your {cert} certification expires on {date}. Renew now to avoid work interruption.",
+    proBadge: "PRO",
+    proBadgeTooltip: "PLUS Member",
     verified: "Verified",
     firstAidCertificate: "First Aid Certificate",
     uploadedDocuments: "Uploaded Documents",
@@ -270,6 +293,56 @@ const translations = {
     deleteConfirm: "Delete",
     cancelDelete: "Cancel",
     logbookDisclaimer: "This is a personal tracking tool only. You must still record all hours in your official IRATA/SPRAT logbook - this digital log does not replace it.",
+    yourReferralCode: "Your Referral Code",
+    shareReferralCode: "Share this code with fellow technicians to invite them to OnRopePro",
+    referralPremiumBenefit: "You'll get PLUS access when your code is used!",
+    viewPlusBenefits: "View PLUS Benefits",
+    plusBenefitsTitle: "PLUS Benefits",
+    plusBenefit1: "Unlimited employer connections",
+    plusBenefit2: "Enhanced task detail logging",
+    plusBenefit3: "Exportable work history (PDF/CSV)",
+    plusBenefit4: "Work history analytics",
+    plusBenefit5: "60-day certification expiry alerts",
+    plusBenefit6: "Rope access company profile visibility (opt-in)",
+    plusUnlockInfo: "Unlock: Refer 1 verified tech who completes account creation",
+    copyCode: "Copy Code",
+    codeCopied: "Copied!",
+    referredTimes: "Referred {count} technician(s)",
+    noReferralCodeYet: "No referral code yet",
+    editExpirationDate: "Edit Expiration Date",
+    setExpirationDate: "Set Expiration Date",
+    expirationDateUpdated: "Expiration date updated",
+    expirationDateUpdateFailed: "Failed to update expiration date",
+    selectDate: "Select date",
+    setExperience: "Set Experience",
+    editExperience: "Edit Experience",
+    experienceUpdated: "Experience start date updated",
+    experienceUpdateFailed: "Failed to update experience start date",
+    whenDidYouStart: "When did you start your rope access career?",
+    addExperience: "Add your experience start date",
+    referralCodeGenerating: "Your referral code will be generated when you complete registration",
+    // Performance & Safety Rating
+    performanceSafetyRating: "Performance & Safety Rating",
+    overallScore: "Overall Score",
+    harnessCompliance: "Harness Inspections",
+    documentCompliance: "Documents Signed",
+    sessionsAnalyzed: "Sessions Analyzed",
+    noPerformanceData: "No performance data yet",
+    noPerformanceDataDesc: "Complete work sessions to see your performance rating",
+    ratingExcellent: "Excellent",
+    ratingGood: "Good",
+    ratingNeedsImprovement: "Needs Improvement",
+    ratingPoor: "Poor",
+    dropsExceeded: "Exceeded Target",
+    dropsOnTarget: "On Target",
+    dropsBelowTarget: "Below Target",
+    dropsNa: "N/A",
+    harnessYes: "Inspection Done",
+    harnessNo: "No Inspection",
+    sessionRating: "Session Rating",
+    improvementNeeded: "Areas to improve:",
+    improveHarness: "Complete harness inspection before clocking in",
+    improveDocs: "Sign all assigned safety documents",
   },
   fr: {
     technicianPortal: "Portail du technicien",
@@ -334,6 +407,12 @@ const translations = {
     expiresOn: "Expire le",
     expired: "Expiré",
     expiringSoon: "Expire bientôt",
+    expiringIn60Days: "Expire dans 60 jours",
+    expiringIn30Days: "Urgent: 30 jours",
+    certificationExpiryBannerTitle: "Certification expire bientôt!",
+    certificationExpiryBannerMessage: "Votre certification {cert} expire le {date}. Renouvelez maintenant pour éviter une interruption de travail.",
+    proBadge: "PRO",
+    proBadgeTooltip: "Membre PLUS",
     verified: "Vérifié",
     firstAidCertificate: "Certificat de premiers soins",
     uploadedDocuments: "Documents téléversés",
@@ -481,6 +560,56 @@ const translations = {
     deleteConfirm: "Supprimer",
     cancelDelete: "Annuler",
     logbookDisclaimer: "Ceci est un outil de suivi personnel uniquement. Vous devez toujours enregistrer toutes vos heures dans votre carnet IRATA/SPRAT officiel - ce journal numérique ne le remplace pas.",
+    yourReferralCode: "Votre code de parrainage",
+    shareReferralCode: "Partagez ce code avec d'autres techniciens pour les inviter sur OnRopePro",
+    referralPremiumBenefit: "Vous obtiendrez un accès PLUS lorsque votre code sera utilisé!",
+    viewPlusBenefits: "Voir les avantages PLUS",
+    plusBenefitsTitle: "Avantages PLUS",
+    plusBenefit1: "Connexions employeurs illimitées",
+    plusBenefit2: "Journalisation détaillée des tâches améliorée",
+    plusBenefit3: "Historique de travail exportable (PDF/CSV)",
+    plusBenefit4: "Analytique de l'historique de travail",
+    plusBenefit5: "Alertes d'expiration de certification à 60 jours",
+    plusBenefit6: "Visibilité du profil d'entreprise de travaux sur cordes (opt-in)",
+    plusUnlockInfo: "Débloquer: Parrainez 1 technicien vérifié qui complète la création de son compte",
+    copyCode: "Copier le code",
+    codeCopied: "Copié!",
+    referredTimes: "Parrainé {count} technicien(s)",
+    noReferralCodeYet: "Pas encore de code de parrainage",
+    editExpirationDate: "Modifier la date d'expiration",
+    setExpirationDate: "Définir la date d'expiration",
+    expirationDateUpdated: "Date d'expiration mise à jour",
+    expirationDateUpdateFailed: "Échec de la mise à jour de la date d'expiration",
+    selectDate: "Sélectionner une date",
+    setExperience: "Définir l'expérience",
+    editExperience: "Modifier l'expérience",
+    experienceUpdated: "Date de début d'expérience mise à jour",
+    experienceUpdateFailed: "Échec de la mise à jour de la date d'expérience",
+    whenDidYouStart: "Quand avez-vous commencé votre carrière d'accès sur corde?",
+    addExperience: "Ajouter votre date de début d'expérience",
+    referralCodeGenerating: "Votre code de parrainage sera généré lorsque vous terminerez l'inscription",
+    // Performance & Safety Rating
+    performanceSafetyRating: "Évaluation Performance & Sécurité",
+    overallScore: "Score Global",
+    harnessCompliance: "Inspections Harnais",
+    documentCompliance: "Documents Signés",
+    sessionsAnalyzed: "Sessions Analysées",
+    noPerformanceData: "Aucune donnée de performance",
+    noPerformanceDataDesc: "Complétez des sessions de travail pour voir votre évaluation",
+    ratingExcellent: "Excellent",
+    ratingGood: "Bon",
+    ratingNeedsImprovement: "À Améliorer",
+    ratingPoor: "Faible",
+    dropsExceeded: "Objectif Dépassé",
+    dropsOnTarget: "Sur Cible",
+    dropsBelowTarget: "Sous l'Objectif",
+    dropsNa: "N/A",
+    harnessYes: "Inspection Faite",
+    harnessNo: "Pas d'Inspection",
+    sessionRating: "Note de Session",
+    improvementNeeded: "Points à améliorer:",
+    improveHarness: "Effectuer l'inspection du harnais avant de pointer",
+    improveDocs: "Signer tous les documents de sécurité assignés",
   }
 };
 
@@ -619,6 +748,59 @@ export default function TechnicianPortal() {
   });
 
   const [processingInvitationId, setProcessingInvitationId] = useState<string | null>(null);
+  
+  // Expiration date editing state
+  const [editingExpirationDate, setEditingExpirationDate] = useState<'irata' | 'sprat' | null>(null);
+  const [expirationDateValue, setExpirationDateValue] = useState<string>("");
+  
+  // Experience start date editing state
+  const [editingExperience, setEditingExperience] = useState(false);
+  const [experienceStartDateValue, setExperienceStartDateValue] = useState<string>("");
+
+  // Mutation for updating expiration date (uses dedicated endpoint)
+  const updateExpirationDateMutation = useMutation({
+    mutationFn: async ({ type, date }: { type: 'irata' | 'sprat'; date: string }) => {
+      return apiRequest("PATCH", "/api/technician/expiration-date", { type, date });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/user"] });
+      setEditingExpirationDate(null);
+      setExpirationDateValue("");
+      toast({
+        title: t.expirationDateUpdated,
+        description: editingExpirationDate?.toUpperCase() + " " + t.expirationDateUpdated.toLowerCase(),
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: t.expirationDateUpdateFailed,
+        description: error.message || t.expirationDateUpdateFailed,
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Mutation for updating experience start date (uses dedicated endpoint)
+  const updateExperienceMutation = useMutation({
+    mutationFn: async (date: string) => {
+      return apiRequest("PATCH", "/api/technician/experience-date", { date });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/user"] });
+      setEditingExperience(false);
+      setExperienceStartDateValue("");
+      toast({
+        title: t.experienceUpdated,
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: t.experienceUpdateFailed,
+        description: error.message || t.experienceUpdateFailed,
+        variant: "destructive",
+      });
+    },
+  });
 
   const { data: invitationsData } = useQuery<{
     invitations: Array<{
@@ -643,6 +825,60 @@ export default function TechnicianPortal() {
     queryKey: ["/api/my-irata-task-logs"],
     enabled: !!user && user.role === 'rope_access_tech',
   });
+  
+  // Fetch referral count for the technician
+  const { data: referralCountData } = useQuery<{ count: number }>({
+    queryKey: ["/api/my-referral-count"],
+    enabled: !!user && user.role === 'rope_access_tech',
+  });
+  
+  // Fetch performance metrics for the technician
+  const { data: performanceData } = useQuery<{
+    metrics: Array<{
+      sessionId: string;
+      projectId: string;
+      workDate: string;
+      totalDrops: number;
+      dailyDropTarget: number | null;
+      dropPerformance: number;
+      dropRating: 'exceeded' | 'on_target' | 'below_target' | 'na';
+      hoursWorked: number;
+      hoursRating: 'excellent' | 'good' | 'short' | 'na';
+      harnessInspectionDone: boolean;
+      documentCompliance: number;
+      overallScore: number;
+      overallRating: 'excellent' | 'good' | 'needs_improvement' | 'poor';
+    }>;
+    summary: {
+      totalSessions: number;
+      averageScore: number;
+      harnessCompliance: number;
+      documentCompliance: number;
+      overallRating: 'excellent' | 'good' | 'needs_improvement' | 'poor' | 'no_data';
+    };
+  }>({
+    queryKey: ["/api/my-performance-metrics"],
+    enabled: !!user && user.role === 'rope_access_tech',
+  });
+  
+  // State for copy button
+  const [codeCopied, setCodeCopied] = useState(false);
+  
+  // State for PLUS benefits dialog
+  const [showPlusBenefits, setShowPlusBenefits] = useState(false);
+  
+  // Handle copy referral code
+  const handleCopyReferralCode = () => {
+    if (user?.referralCode) {
+      navigator.clipboard.writeText(user.referralCode);
+      setCodeCopied(true);
+      toast({
+        title: t.codeCopied,
+        description: `${user.referralCode} (${user.referralCode.length} characters)`,
+      });
+      setTimeout(() => setCodeCopied(false), 2000);
+    }
+  };
   
   // Calculate work session hours from task logs
   const workSessionHours = useMemo(() => {
@@ -1063,7 +1299,25 @@ export default function TechnicianPortal() {
             />
             <div className="hidden sm:block">
               <h1 className="font-semibold text-sm">{t.technicianPortal}</h1>
-              <p className="text-xs text-muted-foreground">{user.name}</p>
+              <div className="flex items-center gap-1.5">
+                <p className="text-xs text-muted-foreground">{user.name}</p>
+                {/* PRO Badge - Always shown for now, will be gated behind PLUS access later */}
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Badge 
+                      variant="default" 
+                      className="bg-gradient-to-r from-amber-500 to-yellow-400 text-white text-[10px] px-1.5 py-0 h-4 font-bold border-0" 
+                      data-testid="badge-pro"
+                    >
+                      <Star className="w-2.5 h-2.5 mr-0.5 fill-current" />
+                      {t.proBadge}
+                    </Badge>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>{t.proBadgeTooltip}</p>
+                  </TooltipContent>
+                </Tooltip>
+              </div>
             </div>
           </div>
           <div className="flex items-center gap-2">
@@ -1090,6 +1344,57 @@ export default function TechnicianPortal() {
           </div>
         </div>
       </header>
+
+      {/* Certification Expiry Warning Banner - Shows when cert expires within 30 days */}
+      {(() => {
+        const urgentCerts: { type: string; expiryDate: string }[] = [];
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        const thirtyDaysFromNow = new Date();
+        thirtyDaysFromNow.setDate(today.getDate() + 30);
+        
+        if (user.irataExpirationDate) {
+          try {
+            const irataExpiry = parseLocalDate(user.irataExpirationDate);
+            if (irataExpiry >= today && irataExpiry <= thirtyDaysFromNow) {
+              urgentCerts.push({ type: 'IRATA', expiryDate: user.irataExpirationDate });
+            }
+          } catch (e) {}
+        }
+        
+        if (user.spratExpirationDate) {
+          try {
+            const spratExpiry = parseLocalDate(user.spratExpirationDate);
+            if (spratExpiry >= today && spratExpiry <= thirtyDaysFromNow) {
+              urgentCerts.push({ type: 'SPRAT', expiryDate: user.spratExpirationDate });
+            }
+          } catch (e) {}
+        }
+        
+        if (urgentCerts.length === 0) return null;
+        
+        return (
+          <div className="bg-red-600 dark:bg-red-700 text-white" data-testid="banner-certification-expiry">
+            <div className="max-w-4xl mx-auto px-4 py-3">
+              <div className="flex items-center gap-3 flex-wrap">
+                <AlertTriangle className="w-5 h-5 flex-shrink-0" />
+                <div className="flex-1 min-w-0">
+                  <p className="font-semibold text-sm">{t.certificationExpiryBannerTitle}</p>
+                  <div className="text-xs mt-0.5 space-y-0.5">
+                    {urgentCerts.map((cert) => (
+                      <p key={cert.type}>
+                        {t.certificationExpiryBannerMessage
+                          .replace('{cert}', cert.type)
+                          .replace('{date}', formatLocalDate(cert.expiryDate))}
+                      </p>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+      })()}
 
       <main className="max-w-4xl mx-auto px-4 py-6 space-y-6">
         {/* Work Dashboard Quick Access - Show for all technicians */}
@@ -1216,6 +1521,183 @@ export default function TechnicianPortal() {
                       </div>
                     </div>
                   ))}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Your Referral Code Section - Show for all technicians */}
+        {user && user.role === 'rope_access_tech' && (
+          <Card className="border-2 border-primary/30 bg-primary/5">
+            <CardHeader className="pb-2">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 bg-primary/10 rounded-lg">
+                    <Share2 className="w-5 h-5 text-primary" />
+                  </div>
+                  <div>
+                    <CardTitle className="text-lg">{t.yourReferralCode}</CardTitle>
+                    <CardDescription>
+                      {t.shareReferralCode}
+                    </CardDescription>
+                    <div className="flex flex-wrap items-center gap-2 mt-1">
+                      <p className="text-sm font-medium text-green-600 dark:text-green-400">
+                        {t.referralPremiumBenefit}
+                      </p>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-auto px-2 py-0.5 text-sm text-primary underline"
+                        onClick={() => setShowPlusBenefits(true)}
+                        data-testid="button-view-plus-benefits"
+                      >
+                        {t.viewPlusBenefits}
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+                {user.referralCode ? (
+                  <>
+                    <div className="flex items-center gap-3 bg-background border-2 border-primary/40 rounded-lg px-4 py-3">
+                      <span className="text-xl sm:text-2xl font-mono font-bold tracking-wider text-primary" data-testid="text-referral-code">
+                        {user.referralCode}
+                      </span>
+                      <Button
+                        variant={codeCopied ? "default" : "outline"}
+                        size="sm"
+                        onClick={handleCopyReferralCode}
+                        className="gap-2"
+                        data-testid="button-copy-referral-code"
+                      >
+                        {codeCopied ? (
+                          <>
+                            <CheckCircle2 className="w-4 h-4" />
+                            {t.codeCopied}
+                          </>
+                        ) : (
+                          <>
+                            <Copy className="w-4 h-4" />
+                            {t.copyCode}
+                          </>
+                        )}
+                      </Button>
+                    </div>
+                    {(referralCountData?.count ?? 0) > 0 && (
+                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                        <Users className="w-4 h-4 text-primary" />
+                        <span data-testid="text-referral-count">
+                          {t.referredTimes.replace('{count}', String(referralCountData?.count ?? 0))}
+                        </span>
+                      </div>
+                    )}
+                  </>
+                ) : (
+                  <div className="text-muted-foreground text-sm">
+                    {t.referralCodeGenerating}
+                  </div>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Performance & Safety Rating Card */}
+        {user && user.role === 'rope_access_tech' && (
+          <Card className="border-muted overflow-visible">
+            <CardHeader className="pb-2">
+              <div className="flex items-center gap-3">
+                <div className="p-2 rounded-full bg-gradient-to-br from-amber-500/20 to-yellow-400/20">
+                  <Shield className="w-5 h-5 text-amber-600 dark:text-amber-400" />
+                </div>
+                <div className="flex-1">
+                  <CardTitle className="text-lg">{t.performanceSafetyRating}</CardTitle>
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent>
+              {performanceData?.summary?.totalSessions && performanceData.summary.totalSessions > 0 ? (
+                <div className="space-y-4">
+                  {/* Main Score Display */}
+                  <div className="p-4 rounded-lg bg-gradient-to-r from-amber-500/10 to-yellow-400/10 border border-amber-200/30 dark:border-amber-800/30">
+                    <div className="flex items-center gap-4">
+                      <div className="text-4xl font-bold text-amber-600 dark:text-amber-400" data-testid="text-performance-score">
+                        {performanceData.summary.averageScore}
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium">{t.overallScore}</p>
+                        <Badge 
+                          variant={performanceData.summary.overallRating === 'excellent' ? 'default' : 
+                                   performanceData.summary.overallRating === 'good' ? 'secondary' : 'destructive'}
+                          className={performanceData.summary.overallRating === 'excellent' ? 
+                            'bg-green-500 text-white' : 
+                            performanceData.summary.overallRating === 'good' ? 
+                            'bg-blue-500 text-white' : ''}
+                          data-testid="badge-performance-rating"
+                        >
+                          {performanceData.summary.overallRating === 'excellent' ? t.ratingExcellent :
+                           performanceData.summary.overallRating === 'good' ? t.ratingGood :
+                           performanceData.summary.overallRating === 'needs_improvement' ? t.ratingNeedsImprovement :
+                           t.ratingPoor}
+                        </Badge>
+                      </div>
+                    </div>
+                    
+                    {/* Improvement hints - show when not excellent */}
+                    {(performanceData.summary.overallRating === 'needs_improvement' || 
+                      performanceData.summary.overallRating === 'poor') && 
+                      (performanceData.summary.harnessCompliance < 80 || performanceData.summary.documentCompliance < 100) && (
+                      <div className="mt-3 pt-3 border-t border-amber-200/30 dark:border-amber-800/30">
+                        <p className="text-xs font-medium text-muted-foreground mb-1">{t.improvementNeeded}</p>
+                        <ul className="text-xs text-muted-foreground space-y-1">
+                          {performanceData.summary.harnessCompliance < 80 && (
+                            <li className="flex items-center gap-1.5" data-testid="hint-harness">
+                              <AlertTriangle className="w-3 h-3 text-amber-500" />
+                              {t.improveHarness}
+                            </li>
+                          )}
+                          {performanceData.summary.documentCompliance < 100 && (
+                            <li className="flex items-center gap-1.5" data-testid="hint-docs">
+                              <AlertTriangle className="w-3 h-3 text-amber-500" />
+                              {t.improveDocs}
+                            </li>
+                          )}
+                        </ul>
+                      </div>
+                    )}
+                  </div>
+                  
+                  {/* Stats Row */}
+                  <div className="grid grid-cols-3 gap-2">
+                    <div className="p-3 rounded-lg bg-muted/50 text-center">
+                      <p className="text-xl font-semibold" data-testid="text-harness-compliance">
+                        {performanceData.summary.harnessCompliance}%
+                      </p>
+                      <p className="text-xs text-muted-foreground">{t.harnessCompliance}</p>
+                    </div>
+                    <div className="p-3 rounded-lg bg-muted/50 text-center">
+                      <p className="text-xl font-semibold" data-testid="text-document-compliance">
+                        {performanceData.summary.documentCompliance}%
+                      </p>
+                      <p className="text-xs text-muted-foreground">{t.documentCompliance}</p>
+                    </div>
+                    <div className="p-3 rounded-lg bg-muted/50 text-center">
+                      <p className="text-xl font-semibold" data-testid="text-sessions-count">
+                        {performanceData.summary.totalSessions}
+                      </p>
+                      <p className="text-xs text-muted-foreground">{t.sessionsAnalyzed}</p>
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <div className="text-center py-6">
+                  <Shield className="w-12 h-12 mx-auto text-muted-foreground/30 mb-3" />
+                  <p className="font-medium text-muted-foreground">{t.noPerformanceData}</p>
+                  <p className="text-sm text-muted-foreground">{t.noPerformanceDataDesc}</p>
                 </div>
               )}
             </CardContent>
@@ -1785,7 +2267,7 @@ export default function TechnicianPortal() {
                         <div className="mt-2 space-y-1 text-sm">
                           <p data-testid="text-irata-level"><span className="text-muted-foreground">{t.level}:</span> {user.irataLevel}</p>
                           <p data-testid="text-irata-license"><span className="text-muted-foreground">{t.licenseNumber}:</span> {user.irataLicenseNumber || 'N/A'}</p>
-                          <p data-testid="text-irata-expiry">
+                          <div data-testid="text-irata-expiry" className="flex items-center gap-2 flex-wrap">
                             <span className="text-muted-foreground">{t.expiresOn}:</span>{' '}
                             {user.irataExpirationDate ? (
                               (() => {
@@ -1801,11 +2283,18 @@ export default function TechnicianPortal() {
                                   } else {
                                     const thirtyDaysFromNow = new Date();
                                     thirtyDaysFromNow.setDate(today.getDate() + 30);
+                                    const sixtyDaysFromNow = new Date();
+                                    sixtyDaysFromNow.setDate(today.getDate() + 60);
+                                    
                                     if (expirationDate <= thirtyDaysFromNow) {
-                                      badge = <Badge variant="outline" className="ml-2 bg-yellow-500/10 border-yellow-500 text-yellow-700 dark:text-yellow-400 text-xs" data-testid="badge-irata-expiring">{t.expiringSoon}</Badge>;
+                                      // 30 days or less - RED urgent badge
+                                      badge = <Badge variant="destructive" className="ml-2 text-xs" data-testid="badge-irata-expiring-30">{t.expiringIn30Days}</Badge>;
+                                    } else if (expirationDate <= sixtyDaysFromNow) {
+                                      // 31-60 days - YELLOW warning badge
+                                      badge = <Badge variant="outline" className="ml-2 bg-yellow-500/10 border-yellow-500 text-yellow-700 dark:text-yellow-400 text-xs" data-testid="badge-irata-expiring-60">{t.expiringIn60Days}</Badge>;
                                     }
                                   }
-                                  return <>{formattedDate}{badge}</>;
+                                  return <><span>{formattedDate}</span>{badge}</>;
                                 } catch (e) {
                                   console.error('Failed to parse IRATA expiration date:', e);
                                   return <span className="text-muted-foreground italic">{t.notSet}</span>;
@@ -1814,7 +2303,20 @@ export default function TechnicianPortal() {
                             ) : (
                               <span className="text-muted-foreground italic">{t.notSet}</span>
                             )}
-                          </p>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="h-6 px-2 text-xs"
+                              onClick={() => {
+                                setEditingExpirationDate('irata');
+                                setExpirationDateValue(user.irataExpirationDate || '');
+                              }}
+                              data-testid="button-edit-irata-expiry"
+                            >
+                              <Pencil className="w-3 h-3 mr-1" />
+                              {user.irataExpirationDate ? t.editExpirationDate : t.setExpirationDate}
+                            </Button>
+                          </div>
                         </div>
                       </div>
                     )}
@@ -1835,7 +2337,7 @@ export default function TechnicianPortal() {
                         <div className="mt-2 space-y-1 text-sm">
                           <p data-testid="text-sprat-level"><span className="text-muted-foreground">{t.level}:</span> {user.spratLevel}</p>
                           <p data-testid="text-sprat-license"><span className="text-muted-foreground">{t.licenseNumber}:</span> {user.spratLicenseNumber || 'N/A'}</p>
-                          <p data-testid="text-sprat-expiry">
+                          <div data-testid="text-sprat-expiry" className="flex items-center gap-2 flex-wrap">
                             <span className="text-muted-foreground">{t.expiresOn}:</span>{' '}
                             {user.spratExpirationDate ? (
                               (() => {
@@ -1851,11 +2353,18 @@ export default function TechnicianPortal() {
                                   } else {
                                     const thirtyDaysFromNow = new Date();
                                     thirtyDaysFromNow.setDate(today.getDate() + 30);
+                                    const sixtyDaysFromNow = new Date();
+                                    sixtyDaysFromNow.setDate(today.getDate() + 60);
+                                    
                                     if (expirationDate <= thirtyDaysFromNow) {
-                                      badge = <Badge variant="outline" className="ml-2 bg-yellow-500/10 border-yellow-500 text-yellow-700 dark:text-yellow-400 text-xs" data-testid="badge-sprat-expiring">{t.expiringSoon}</Badge>;
+                                      // 30 days or less - RED urgent badge
+                                      badge = <Badge variant="destructive" className="ml-2 text-xs" data-testid="badge-sprat-expiring-30">{t.expiringIn30Days}</Badge>;
+                                    } else if (expirationDate <= sixtyDaysFromNow) {
+                                      // 31-60 days - YELLOW warning badge
+                                      badge = <Badge variant="outline" className="ml-2 bg-yellow-500/10 border-yellow-500 text-yellow-700 dark:text-yellow-400 text-xs" data-testid="badge-sprat-expiring-60">{t.expiringIn60Days}</Badge>;
                                     }
                                   }
-                                  return <>{formattedDate}{badge}</>;
+                                  return <><span>{formattedDate}</span>{badge}</>;
                                 } catch (e) {
                                   console.error('Failed to parse SPRAT expiration date:', e);
                                   return <span className="text-muted-foreground italic">{t.notSet}</span>;
@@ -1864,7 +2373,20 @@ export default function TechnicianPortal() {
                             ) : (
                               <span className="text-muted-foreground italic">{t.notSet}</span>
                             )}
-                          </p>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="h-6 px-2 text-xs"
+                              onClick={() => {
+                                setEditingExpirationDate('sprat');
+                                setExpirationDateValue(user.spratExpirationDate || '');
+                              }}
+                              data-testid="button-edit-sprat-expiry"
+                            >
+                              <Pencil className="w-3 h-3 mr-1" />
+                              {user.spratExpirationDate ? t.editExpirationDate : t.setExpirationDate}
+                            </Button>
+                          </div>
                         </div>
                       </div>
                     )}
@@ -1873,87 +2395,60 @@ export default function TechnicianPortal() {
                     )}
                   </div>
                   
-                  {/* Experience Display */}
-                  {user.ropeAccessStartDate && (
-                    <div className="mt-4 p-3 bg-indigo-500/10 border border-indigo-500/30 rounded-lg">
+                  {/* Experience Display - Always visible */}
+                  <div className="mt-4 p-3 bg-indigo-500/10 border border-indigo-500/30 rounded-lg">
+                    <div className="flex items-center justify-between gap-3 flex-wrap">
                       <div className="flex items-center gap-3">
                         <Calendar className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
                         <div>
                           <p className="font-medium text-sm">{t.ropeAccessExperience}</p>
-                          <p className="text-sm text-indigo-700 dark:text-indigo-300">
-                            {(() => {
-                              const startDate = parseLocalDate(user.ropeAccessStartDate);
-                              const now = new Date();
-                              // Calculate years and months using proper date math
-                              let years = now.getFullYear() - startDate.getFullYear();
-                              let months = now.getMonth() - startDate.getMonth();
-                              if (months < 0 || (months === 0 && now.getDate() < startDate.getDate())) {
-                                years--;
-                                months += 12;
-                              }
-                              if (now.getDate() < startDate.getDate()) {
-                                months--;
-                                if (months < 0) months += 12;
-                              }
-                              
-                              let expString = t.lessThanMonth;
-                              if (years > 0 || months > 0) {
-                                expString = t.yearsMonths
-                                  .replace('{years}', years.toString())
-                                  .replace('{months}', months.toString());
-                              }
-                              return expString;
-                            })()}
-                          </p>
-                          <p className="text-xs text-muted-foreground mt-1">
-                            {t.startedOn}: {formatLocalDate(user.ropeAccessStartDate)}
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-                  
-                  {/* My Logged Hours - inside Certifications section */}
-                  <div className="mt-4 p-4 bg-primary/5 border-2 border-primary/30 rounded-lg">
-                    <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
-                      <div className="flex items-start gap-3">
-                        <div className="p-2 bg-primary/10 rounded-lg">
-                          <Clock className="w-6 h-6 text-primary" />
-                        </div>
-                        <div className="space-y-1">
-                          <p className="font-semibold text-base">{t.myLoggedHours}</p>
-                          <p className="text-sm text-muted-foreground">{t.viewLoggedHoursDesc}</p>
-                          <p className="text-xs text-primary/80 font-medium">{t.loggedHoursFeatures}</p>
-                          {(combinedTotalHours > 0 || workSessionHours > 0) && (
-                            <div className="pt-2">
-                              <p className="text-lg font-bold text-primary" data-testid="text-total-logged-hours">
-                                {combinedTotalHours.toFixed(1)} {t.totalHoursLabel}
+                          {user.ropeAccessStartDate ? (
+                            <>
+                              <p className="text-sm text-indigo-700 dark:text-indigo-300">
+                                {(() => {
+                                  const startDate = parseLocalDate(user.ropeAccessStartDate);
+                                  const now = new Date();
+                                  let years = now.getFullYear() - startDate.getFullYear();
+                                  let months = now.getMonth() - startDate.getMonth();
+                                  if (months < 0 || (months === 0 && now.getDate() < startDate.getDate())) {
+                                    years--;
+                                    months += 12;
+                                  }
+                                  if (now.getDate() < startDate.getDate()) {
+                                    months--;
+                                    if (months < 0) months += 12;
+                                  }
+                                  
+                                  let expString = t.lessThanMonth;
+                                  if (years > 0 || months > 0) {
+                                    expString = t.yearsMonths
+                                      .replace('{years}', years.toString())
+                                      .replace('{months}', months.toString());
+                                  }
+                                  return expString;
+                                })()}
                               </p>
-                              {workSessionHours > 0 && baselineHours > 0 && (
-                                <p className="text-xs text-muted-foreground">
-                                  {baselineHours.toFixed(1)} {t.baselinePlus} {workSessionHours.toFixed(1)} {t.fromSessions}
-                                </p>
-                              )}
-                            </div>
+                              <p className="text-xs text-muted-foreground mt-1">
+                                {t.startedOn}: {formatLocalDate(user.ropeAccessStartDate)}
+                              </p>
+                            </>
+                          ) : (
+                            <p className="text-sm text-muted-foreground italic">{t.addExperience}</p>
                           )}
                         </div>
                       </div>
                       <Button
-                        onClick={() => setLocation("/technician-logged-hours")}
-                        className="gap-2 whitespace-nowrap"
-                        data-testid="button-view-logged-hours"
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => {
+                          setEditingExperience(true);
+                          setExperienceStartDateValue(user.ropeAccessStartDate || '');
+                        }}
+                        data-testid="button-edit-experience"
                       >
-                        {t.viewLoggedHours}
-                        <ArrowRight className="w-4 h-4" />
+                        <Pencil className="w-4 h-4 mr-2" />
+                        {user.ropeAccessStartDate ? t.editExperience : t.setExperience}
                       </Button>
-                    </div>
-                    <div className="mt-4 p-3 bg-red-500/15 border border-red-500/40 rounded-lg">
-                      <div className="flex items-start gap-2">
-                        <AlertCircle className="w-4 h-4 text-red-600 dark:text-red-400 flex-shrink-0 mt-0.5" />
-                        <p className="text-xs text-red-700 dark:text-red-300">
-                          {t.logbookDisclaimer}
-                        </p>
-                      </div>
                     </div>
                   </div>
                   
@@ -2355,6 +2850,50 @@ export default function TechnicianPortal() {
                           )}
                         </Button>
                       </div>
+                  </div>
+                  
+                  {/* My Logged Hours - After all certification verification sections */}
+                  <div className="mt-6 p-4 bg-primary/5 border-2 border-primary/30 rounded-lg">
+                    <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
+                      <div className="flex items-start gap-3">
+                        <div className="p-2 bg-primary/10 rounded-lg">
+                          <Clock className="w-6 h-6 text-primary" />
+                        </div>
+                        <div className="space-y-1">
+                          <p className="font-semibold text-base">{t.myLoggedHours}</p>
+                          <p className="text-sm text-muted-foreground">{t.viewLoggedHoursDesc}</p>
+                          <p className="text-xs text-primary/80 font-medium">{t.loggedHoursFeatures}</p>
+                          {(combinedTotalHours > 0 || workSessionHours > 0) && (
+                            <div className="pt-2">
+                              <p className="text-lg font-bold text-primary" data-testid="text-total-logged-hours">
+                                {combinedTotalHours.toFixed(1)} {t.totalHoursLabel}
+                              </p>
+                              {workSessionHours > 0 && baselineHours > 0 && (
+                                <p className="text-xs text-muted-foreground">
+                                  {baselineHours.toFixed(1)} {t.baselinePlus} {workSessionHours.toFixed(1)} {t.fromSessions}
+                                </p>
+                              )}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                      <Button
+                        onClick={() => setLocation("/technician-logged-hours")}
+                        className="gap-2 whitespace-nowrap"
+                        data-testid="button-view-logged-hours"
+                      >
+                        {t.viewLoggedHours}
+                        <ArrowRight className="w-4 h-4" />
+                      </Button>
+                    </div>
+                    <div className="mt-4 p-3 bg-red-500/15 border border-red-500/40 rounded-lg">
+                      <div className="flex items-start gap-2">
+                        <AlertCircle className="w-4 h-4 text-red-600 dark:text-red-400 flex-shrink-0 mt-0.5" />
+                        <p className="text-xs text-red-700 dark:text-red-300">
+                          {t.logbookDisclaimer}
+                        </p>
+                      </div>
+                    </div>
                   </div>
                   
                 </div>
@@ -2815,6 +3354,184 @@ export default function TechnicianPortal() {
           </CardContent>
         </Card>
       </main>
+
+      {/* Experience Start Date Edit Dialog */}
+      <Dialog open={editingExperience} onOpenChange={(open) => {
+        if (!open) {
+          setEditingExperience(false);
+          setExperienceStartDateValue("");
+        }
+      }}>
+        <DialogContent className="sm:max-w-md" data-testid="dialog-edit-experience">
+          <DialogHeader>
+            <DialogTitle>
+              {user?.ropeAccessStartDate ? t.editExperience : t.setExperience}
+            </DialogTitle>
+            <DialogDescription>
+              {t.whenDidYouStart}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="experience-start-date">{t.experienceStartDate}</Label>
+              <Input
+                id="experience-start-date"
+                type="date"
+                value={experienceStartDateValue}
+                onChange={(e) => setExperienceStartDateValue(e.target.value)}
+                max={new Date().toISOString().split('T')[0]}
+                data-testid="input-experience-start-date-dialog"
+              />
+              <p className="text-xs text-muted-foreground">{t.experienceStartDateHelp}</p>
+            </div>
+          </div>
+          <DialogFooter className="gap-2">
+            <Button
+              variant="outline"
+              onClick={() => {
+                setEditingExperience(false);
+                setExperienceStartDateValue("");
+              }}
+              data-testid="button-cancel-experience"
+            >
+              {t.cancel}
+            </Button>
+            <Button
+              onClick={() => {
+                if (experienceStartDateValue) {
+                  updateExperienceMutation.mutate(experienceStartDateValue);
+                }
+              }}
+              disabled={!experienceStartDateValue || updateExperienceMutation.isPending}
+              data-testid="button-save-experience"
+            >
+              {updateExperienceMutation.isPending ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  {t.saving}
+                </>
+              ) : (
+                t.saveChanges
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Expiration Date Edit Dialog */}
+      <Dialog open={editingExpirationDate !== null} onOpenChange={(open) => {
+        if (!open) {
+          setEditingExpirationDate(null);
+          setExpirationDateValue("");
+        }
+      }}>
+        <DialogContent className="sm:max-w-md" data-testid="dialog-edit-expiration">
+          <DialogHeader>
+            <DialogTitle>
+              {editingExpirationDate?.toUpperCase()} {expirationDateValue ? t.editExpirationDate : t.setExpirationDate}
+            </DialogTitle>
+            <DialogDescription>
+              {t.selectDate}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="expiration-date">{t.expiresOn}</Label>
+              <Input
+                id="expiration-date"
+                type="date"
+                value={expirationDateValue}
+                onChange={(e) => setExpirationDateValue(e.target.value)}
+                data-testid="input-expiration-date"
+              />
+            </div>
+          </div>
+          <DialogFooter className="gap-2">
+            <Button
+              variant="outline"
+              onClick={() => {
+                setEditingExpirationDate(null);
+                setExpirationDateValue("");
+              }}
+              data-testid="button-cancel-expiration"
+            >
+              {t.cancel}
+            </Button>
+            <Button
+              onClick={() => {
+                if (editingExpirationDate && expirationDateValue) {
+                  updateExpirationDateMutation.mutate({
+                    type: editingExpirationDate,
+                    date: expirationDateValue,
+                  });
+                }
+              }}
+              disabled={!expirationDateValue || updateExpirationDateMutation.isPending}
+              data-testid="button-save-expiration"
+            >
+              {updateExpirationDateMutation.isPending ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  {t.saving}
+                </>
+              ) : (
+                t.saveChanges
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* PLUS Benefits Dialog */}
+      <Dialog open={showPlusBenefits} onOpenChange={setShowPlusBenefits}>
+        <DialogContent className="sm:max-w-md" data-testid="dialog-plus-benefits">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Star className="w-5 h-5 text-primary" />
+              {t.plusBenefitsTitle}
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <ul className="space-y-3">
+              <li className="flex items-start gap-3">
+                <CheckCircle2 className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" />
+                <span>{t.plusBenefit1}</span>
+              </li>
+              <li className="flex items-start gap-3">
+                <CheckCircle2 className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" />
+                <span>{t.plusBenefit2}</span>
+              </li>
+              <li className="flex items-start gap-3">
+                <CheckCircle2 className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" />
+                <span>{t.plusBenefit3}</span>
+              </li>
+              <li className="flex items-start gap-3">
+                <CheckCircle2 className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" />
+                <span>{t.plusBenefit4}</span>
+              </li>
+              <li className="flex items-start gap-3">
+                <CheckCircle2 className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" />
+                <span>{t.plusBenefit5}</span>
+              </li>
+              <li className="flex items-start gap-3">
+                <CheckCircle2 className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" />
+                <span>{t.plusBenefit6}</span>
+              </li>
+            </ul>
+            <div className="mt-4 pt-4 border-t">
+              <p className="text-sm font-medium text-primary flex items-center gap-2">
+                <Gift className="w-4 h-4" />
+                {t.plusUnlockInfo}
+              </p>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button onClick={() => setShowPlusBenefits(false)} data-testid="button-close-plus-benefits">
+              {t.cancel}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

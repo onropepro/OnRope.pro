@@ -32,6 +32,8 @@ interface Technician {
   employeeCity: string | null;
   employeeProvinceState: string | null;
   employeeCountry: string | null;
+  referralCode: string | null;
+  referralCount: number;
 }
 
 interface TechnicianDetail {
@@ -302,6 +304,12 @@ export default function SuperUserTechnicians() {
                           <Badge variant="outline" className="gap-1">
                             <span className="material-icons text-xs">business</span>
                             {tech.companyName}
+                          </Badge>
+                        )}
+                        {tech.referralCount > 0 && (
+                          <Badge variant="secondary" className="gap-1" title={`Referred ${tech.referralCount} technician(s)`}>
+                            <span className="material-icons text-xs">people</span>
+                            {tech.referralCount}
                           </Badge>
                         )}
                         <div className="flex items-center gap-1 text-xs text-muted-foreground" title={tech.lastActivityAt ? `Last active: ${new Date(tech.lastActivityAt).toLocaleString()}` : 'Never active'}>

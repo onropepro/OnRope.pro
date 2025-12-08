@@ -172,6 +172,14 @@ export const users = pgTable("users", {
   // Property Manager linking code (company role only)
   propertyManagerCode: varchar("property_manager_code", { length: 10 }).unique(), // 10-character code for property managers to link to company - UNIQUE
   
+  // Technician referral system (rope_access_tech role)
+  referralCode: varchar("referral_code", { length: 20 }).unique(), // Unique 10-char referral code for this technician (generated on registration)
+  referredByUserId: varchar("referred_by_user_id").references(() => users.id, { onDelete: "set null" }), // User ID of the technician who referred them
+  referredByCode: varchar("referred_by_code", { length: 20 }), // The referral code they used to register (for tracking purposes)
+  
+  // Technician PLUS access (premium tier)
+  hasPlusAccess: boolean("has_plus_access").default(false), // Whether technician has PLUS benefits (from referrals or subscription)
+  
   // White label branding (company role only)
   brandingLogoUrl: text("branding_logo_url"), // Custom logo URL for resident portal
   brandingColors: text("branding_colors").array().default(sql`ARRAY[]::text[]`), // Array of brand colors (hex codes)
@@ -287,6 +295,7 @@ export const projects = pgTable("projects", {
   
   dailyDropTarget: integer("daily_drop_target"),
   floorCount: integer("floor_count"),
+  buildingHeight: varchar("building_height"), // e.g., "25 floors", "100m", "300ft" - for IRATA logbook hours
   targetCompletionDate: date("target_completion_date"), // Optional target completion date
   estimatedHours: integer("estimated_hours"), // Estimated total hours for the entire building
   startDate: date("start_date"), // Schedule start date
@@ -1835,6 +1844,7 @@ export const irataTaskLogs = pgTable("irata_task_logs", {
   projectId: varchar("project_id").references(() => projects.id, { onDelete: "set null" }),
   buildingName: varchar("building_name"),
   buildingAddress: text("building_address"),
+  buildingHeight: varchar("building_height"), // e.g., "25 floors", "100m", etc.
   
   // Tasks performed (stored as array of task type strings)
   tasksPerformed: text("tasks_performed").array().default(sql`ARRAY[]::text[]`).notNull(),

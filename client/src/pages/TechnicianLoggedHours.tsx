@@ -30,8 +30,11 @@ import {
   AlertTriangle,
   Camera,
   Scan,
-  Check
+  Check,
+  FileDown,
+  Star
 } from "lucide-react";
+import { jsPDF } from "jspdf";
 import { Checkbox } from "@/components/ui/checkbox";
 import { format } from "date-fns";
 import { fr, enUS } from "date-fns/locale";
@@ -70,8 +73,8 @@ const translations = {
     buildingAddress: "Building Address",
     buildingHeight: "Building Height",
     heightPlaceholder: "e.g., 25 floors, 100m",
-    previousEmployer: "Previous Employer",
-    previousEmployerPlaceholder: "Company name (optional)",
+    employer: "Employer",
+    employerPlaceholder: "Company name (optional)",
     notes: "Notes",
     notesPlaceholder: "Any additional details (optional)",
     selectTasks: "Select Tasks Performed",
@@ -118,6 +121,25 @@ const translations = {
     missingRequired: "Missing required fields",
     enterHoursToSelect: "Enter hours to select this entry",
     retryPhoto: "Try Another Photo",
+    exportPdf: "Export PDF",
+    exportWorkHistory: "Export Work History",
+    exportWorkHistoryDesc: "Generate a PDF report of your work history for a selected date range",
+    selectDateRange: "Select Date Range",
+    from: "From",
+    exportingPdf: "Generating PDF...",
+    pdfExported: "PDF Exported",
+    pdfExportedDesc: "Your work history has been downloaded",
+    noDataInRange: "No Data Found",
+    noDataInRangeDesc: "No work history found for the selected date range",
+    workHistoryReport: "Work History Report",
+    generatedOn: "Generated on",
+    period: "Period",
+    summarySection: "Summary",
+    totalWorkHours: "Total Work Hours",
+    workSessionsCount: "Work Sessions",
+    previousHoursCount: "Previous Hours Entries",
+    detailedLog: "Detailed Log",
+    plusFeature: "PLUS Feature",
   },
   fr: {
     title: "Mes heures enregistrées",
@@ -150,8 +172,8 @@ const translations = {
     buildingAddress: "Adresse du bâtiment",
     buildingHeight: "Hauteur du bâtiment",
     heightPlaceholder: "ex: 25 étages, 100m",
-    previousEmployer: "Employeur précédent",
-    previousEmployerPlaceholder: "Nom de l'entreprise (facultatif)",
+    employer: "Employeur",
+    employerPlaceholder: "Nom de l'entreprise (facultatif)",
     notes: "Notes",
     notesPlaceholder: "Détails supplémentaires (facultatif)",
     selectTasks: "Sélectionner les tâches effectuées",
@@ -198,6 +220,25 @@ const translations = {
     missingRequired: "Champs requis manquants",
     enterHoursToSelect: "Entrez les heures pour sélectionner cette entrée",
     retryPhoto: "Essayer une autre photo",
+    exportPdf: "Exporter PDF",
+    exportWorkHistory: "Exporter l'historique de travail",
+    exportWorkHistoryDesc: "Générez un rapport PDF de votre historique de travail pour une période sélectionnée",
+    selectDateRange: "Sélectionner la période",
+    from: "Du",
+    exportingPdf: "Génération du PDF...",
+    pdfExported: "PDF exporté",
+    pdfExportedDesc: "Votre historique de travail a été téléchargé",
+    noDataInRange: "Aucune donnée trouvée",
+    noDataInRangeDesc: "Aucun historique de travail trouvé pour la période sélectionnée",
+    workHistoryReport: "Rapport d'historique de travail",
+    generatedOn: "Généré le",
+    period: "Période",
+    summarySection: "Résumé",
+    totalWorkHours: "Total des heures de travail",
+    workSessionsCount: "Sessions de travail",
+    previousHoursCount: "Entrées d'heures précédentes",
+    detailedLog: "Journal détaillé",
+    plusFeature: "Fonctionnalité PLUS",
   }
 };
 
@@ -264,6 +305,7 @@ export default function TechnicianLoggedHours() {
     selected: boolean;
     date: string | null;
     building: string | null;
+    address: string | null;
     employer: string | null;
     tasks: string[];
     hours: number | null;
@@ -271,6 +313,12 @@ export default function TechnicianLoggedHours() {
     confidence: 'low' | 'medium' | 'high';
   }>>([]);
   const [isCommitting, setIsCommitting] = useState(false);
+
+  // PDF Export state
+  const [showExportDialog, setShowExportDialog] = useState(false);
+  const [exportStartDate, setExportStartDate] = useState("");
+  const [exportEndDate, setExportEndDate] = useState("");
+  const [isExporting, setIsExporting] = useState(false);
 
   const { data: userData } = useQuery<{ user: any }>({
     queryKey: ["/api/user"],
@@ -405,6 +453,241 @@ export default function TechnicianLoggedHours() {
     );
   };
 
+  // PDF Export function
+  const handleExportPdf = async () => {
+    if (!exportStartDate || !exportEndDate) {
+      toast({ title: t.error, description: t.dateRequired, variant: "destructive" });
+      return;
+    }
+
+    setIsExporting(true);
+
+    try {
+      const startDate = parseLocalDate(exportStartDate);
+      const endDate = parseLocalDate(exportEndDate);
+
+      // Filter work sessions by date range
+      const filteredLogs = logs.filter(log => {
+        const logDate = parseLocalDate(log.workDate);
+        return logDate >= startDate && logDate <= endDate;
+      });
+
+      // Filter historical hours by date range (include if date ranges overlap)
+      const filteredHistorical = historicalHours.filter(entry => {
+        const entryStartDate = parseLocalDate(entry.startDate);
+        const entryEndDate = parseLocalDate(entry.endDate);
+        // Include entry if its date range overlaps with the selected range
+        return entryEndDate >= startDate && entryStartDate <= endDate;
+      });
+
+      if (filteredLogs.length === 0 && filteredHistorical.length === 0) {
+        toast({
+          title: t.noDataInRange,
+          description: t.noDataInRangeDesc,
+          variant: "destructive",
+        });
+        setIsExporting(false);
+        return;
+      }
+
+      // Calculate totals for filtered data
+      const filteredWorkHours = filteredLogs.reduce((sum, log) => sum + parseFloat(log.hoursWorked || "0"), 0);
+      const filteredHistoricalTotal = filteredHistorical.reduce((sum, entry) => sum + parseFloat(entry.hoursWorked || "0"), 0);
+
+      // Create PDF
+      const doc = new jsPDF();
+      const pageWidth = doc.internal.pageSize.getWidth();
+      const margin = 20;
+      let yPos = 20;
+
+      // Header with PLUS badge
+      doc.setFillColor(245, 158, 11); // Amber-500
+      doc.roundedRect(margin, yPos, 35, 8, 2, 2, 'F');
+      doc.setFontSize(8);
+      doc.setTextColor(255, 255, 255);
+      doc.text(t.plusFeature, margin + 17.5, yPos + 5.5, { align: 'center' });
+
+      // Title
+      yPos += 15;
+      doc.setFontSize(22);
+      doc.setTextColor(0, 0, 0);
+      doc.text(t.workHistoryReport, margin, yPos);
+
+      // Generated date and period
+      yPos += 10;
+      doc.setFontSize(10);
+      doc.setTextColor(100, 100, 100);
+      doc.text(`${t.generatedOn}: ${format(new Date(), 'PPP', { locale: dateLocale })}`, margin, yPos);
+      yPos += 6;
+      doc.text(`${t.period}: ${format(startDate, 'PPP', { locale: dateLocale })} - ${format(endDate, 'PPP', { locale: dateLocale })}`, margin, yPos);
+
+      // Technician name
+      if (user?.firstName && user?.lastName) {
+        yPos += 6;
+        doc.text(`${user.firstName} ${user.lastName}`, margin, yPos);
+      }
+
+      // Summary section
+      yPos += 15;
+      doc.setFontSize(14);
+      doc.setTextColor(0, 0, 0);
+      doc.text(t.summarySection, margin, yPos);
+
+      yPos += 8;
+      doc.setFontSize(10);
+      doc.setTextColor(60, 60, 60);
+      
+      // Summary table
+      const summaryData = [
+        [t.totalWorkHours, `${(filteredWorkHours + filteredHistoricalTotal).toFixed(1)} ${t.hr}`],
+        [t.workSessionsCount, `${filteredLogs.length}`],
+        [t.previousHoursCount, `${filteredHistorical.length}`],
+      ];
+
+      doc.setFillColor(245, 245, 245);
+      doc.roundedRect(margin, yPos, pageWidth - (margin * 2), 30, 3, 3, 'F');
+      yPos += 8;
+
+      summaryData.forEach((row, index) => {
+        doc.setTextColor(100, 100, 100);
+        doc.text(row[0], margin + 5, yPos);
+        doc.setTextColor(0, 0, 0);
+        doc.setFont(undefined as any, 'bold');
+        doc.text(row[1], pageWidth - margin - 5, yPos, { align: 'right' });
+        doc.setFont(undefined as any, 'normal');
+        yPos += 8;
+      });
+
+      yPos += 10;
+
+      // Detailed Log section
+      doc.setFontSize(14);
+      doc.setTextColor(0, 0, 0);
+      doc.text(t.detailedLog, margin, yPos);
+      yPos += 10;
+
+      // Work Sessions
+      if (filteredLogs.length > 0) {
+        doc.setFontSize(12);
+        doc.setTextColor(60, 60, 60);
+        doc.text(t.workSessions, margin, yPos);
+        yPos += 8;
+
+        filteredLogs.forEach((log) => {
+          // Check if we need a new page
+          if (yPos > 260) {
+            doc.addPage();
+            yPos = 20;
+          }
+
+          doc.setFontSize(9);
+          doc.setTextColor(0, 0, 0);
+          const logDate = format(parseLocalDate(log.workDate), 'PP', { locale: dateLocale });
+          doc.text(`${logDate} - ${parseFloat(log.hoursWorked).toFixed(1)} ${t.hr}`, margin + 5, yPos);
+          yPos += 5;
+
+          if (log.buildingName) {
+            doc.setTextColor(100, 100, 100);
+            doc.text(`${log.buildingName}${log.buildingHeight ? ` (${log.buildingHeight})` : ''}`, margin + 5, yPos);
+            yPos += 5;
+          }
+
+          if (log.tasksPerformed && log.tasksPerformed.length > 0) {
+            doc.setTextColor(120, 120, 120);
+            const tasks = log.tasksPerformed.map(taskId => getTaskLabel(taskId, language)).join(', ');
+            const taskLines = doc.splitTextToSize(tasks, pageWidth - margin * 2 - 10);
+            doc.text(taskLines, margin + 5, yPos);
+            yPos += taskLines.length * 4;
+          }
+
+          if (log.notes) {
+            doc.setTextColor(140, 140, 140);
+            doc.setFontStyle('italic');
+            const noteLines = doc.splitTextToSize(log.notes, pageWidth - margin * 2 - 10);
+            doc.text(noteLines, margin + 5, yPos);
+            doc.setFontStyle('normal');
+            yPos += noteLines.length * 4;
+          }
+
+          yPos += 5;
+        });
+      }
+
+      // Previous Hours
+      if (filteredHistorical.length > 0) {
+        yPos += 5;
+        
+        if (yPos > 240) {
+          doc.addPage();
+          yPos = 20;
+        }
+
+        doc.setFontSize(12);
+        doc.setTextColor(60, 60, 60);
+        doc.text(t.previousHours, margin, yPos);
+        yPos += 8;
+
+        filteredHistorical.forEach((entry) => {
+          if (yPos > 260) {
+            doc.addPage();
+            yPos = 20;
+          }
+
+          doc.setFontSize(9);
+          doc.setTextColor(0, 0, 0);
+          const entryStartDate = format(parseLocalDate(entry.startDate), 'PP', { locale: dateLocale });
+          const entryEndDate = format(parseLocalDate(entry.endDate), 'PP', { locale: dateLocale });
+          doc.text(`${entryStartDate} - ${entryEndDate}: ${parseFloat(entry.hoursWorked).toFixed(1)} ${t.hr}`, margin + 5, yPos);
+          yPos += 5;
+
+          if (entry.buildingName) {
+            doc.setTextColor(100, 100, 100);
+            doc.text(`${entry.buildingName}${entry.buildingHeight ? ` (${entry.buildingHeight})` : ''}`, margin + 5, yPos);
+            yPos += 5;
+          }
+
+          if (entry.previousEmployer) {
+            doc.setTextColor(100, 100, 100);
+            doc.text(`${t.employer}: ${entry.previousEmployer}`, margin + 5, yPos);
+            yPos += 5;
+          }
+
+          if (entry.tasksPerformed && entry.tasksPerformed.length > 0) {
+            doc.setTextColor(120, 120, 120);
+            const tasks = entry.tasksPerformed.map(taskId => getTaskLabel(taskId, language)).join(', ');
+            const taskLines = doc.splitTextToSize(tasks, pageWidth - margin * 2 - 10);
+            doc.text(taskLines, margin + 5, yPos);
+            yPos += taskLines.length * 4;
+          }
+
+          yPos += 5;
+        });
+      }
+
+      // Save the PDF
+      const fileName = `work-history-${format(startDate, 'yyyy-MM-dd')}-${format(endDate, 'yyyy-MM-dd')}.pdf`;
+      doc.save(fileName);
+
+      toast({
+        title: t.pdfExported,
+        description: t.pdfExportedDesc,
+      });
+
+      setShowExportDialog(false);
+      setExportStartDate("");
+      setExportEndDate("");
+    } catch (error) {
+      console.error('PDF export error:', error);
+      toast({
+        title: t.error,
+        description: error instanceof Error ? error.message : 'Failed to export PDF',
+        variant: "destructive",
+      });
+    } finally {
+      setIsExporting(false);
+    }
+  };
+
   // Handle logbook scan
   const handleLogbookScan = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -455,6 +738,7 @@ export default function TechnicianLoggedHours() {
             selected: Boolean(extractedDate && extractedHours && extractedHours > 0), // Auto-select if has required fields
             date: extractedDate,
             building: entry.buildingName || null,
+            address: entry.buildingAddress || null,
             employer: entry.previousEmployer || null,
             tasks: extractedTasks,
             hours: extractedHours,
@@ -576,7 +860,7 @@ export default function TechnicianLoggedHours() {
           endDate: entry.date as string, // Same day for single entries from logbook
           hoursWorked: hoursNum.toFixed(2),
           buildingName: entry.building || null,
-          buildingAddress: null,
+          buildingAddress: entry.address || null,
           buildingHeight: null,
           previousEmployer: entry.employer || null,
           notes: entry.notes || null,
@@ -628,6 +912,7 @@ export default function TechnicianLoggedHours() {
   const groupedByProject: Record<string, { 
     buildingName: string; 
     buildingAddress: string; 
+    buildingHeight: string;
     logs: IrataTaskLog[];
     totalHours: number;
   }> = {};
@@ -638,6 +923,7 @@ export default function TechnicianLoggedHours() {
       groupedByProject[projectKey] = {
         buildingName: log.buildingName || t.unknownProject,
         buildingAddress: log.buildingAddress || "",
+        buildingHeight: log.buildingHeight || "",
         logs: [],
         totalHours: 0,
       };
@@ -671,18 +957,37 @@ export default function TechnicianLoggedHours() {
   return (
     <div className="min-h-screen bg-background pb-20">
       <header className="sticky top-0 z-[100] bg-card border-b shadow-sm">
-        <div className="px-4 py-3 flex items-center gap-3 max-w-4xl mx-auto">
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => setLocation("/technician-portal")}
-            data-testid="button-back-to-portal"
-          >
-            <ArrowLeft className="w-5 h-5" />
-          </Button>
-          <div>
-            <h1 className="font-semibold text-lg">{t.title}</h1>
+        <div className="px-4 py-3 flex items-center justify-between gap-3 max-w-4xl mx-auto">
+          <div className="flex items-center gap-3">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setLocation("/technician-portal")}
+              data-testid="button-back-to-portal"
+            >
+              <ArrowLeft className="w-5 h-5" />
+            </Button>
+            <div>
+              <h1 className="font-semibold text-lg">{t.title}</h1>
+            </div>
           </div>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setShowExportDialog(true)}
+            className="gap-2"
+            data-testid="button-export-pdf"
+          >
+            <FileDown className="w-4 h-4" />
+            <span className="hidden sm:inline">{t.exportPdf}</span>
+            <Badge 
+              variant="secondary" 
+              className="bg-gradient-to-r from-amber-500 to-yellow-400 text-white border-0 text-[10px] px-1.5 py-0 hidden sm:flex"
+            >
+              <Star className="w-2.5 h-2.5 mr-0.5" />
+              PRO
+            </Badge>
+          </Button>
         </div>
       </header>
 
@@ -774,6 +1079,9 @@ export default function TechnicianLoggedHours() {
                             <p className="font-medium">{project.buildingName}</p>
                             {project.buildingAddress && (
                               <p className="text-sm text-muted-foreground">{project.buildingAddress}</p>
+                            )}
+                            {project.buildingHeight && (
+                              <p className="text-sm text-muted-foreground">{t.buildingHeight}: {project.buildingHeight}</p>
                             )}
                           </div>
                         </div>
@@ -924,7 +1232,7 @@ export default function TechnicianLoggedHours() {
                           
                           {entry.previousEmployer && (
                             <p className="text-sm text-muted-foreground mb-2">
-                              {t.previousEmployer}: {entry.previousEmployer}
+                              {t.employer}: {entry.previousEmployer}
                             </p>
                           )}
                           
@@ -1079,13 +1387,13 @@ export default function TechnicianLoggedHours() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="previousEmployer">{t.previousEmployer}</Label>
+              <Label htmlFor="previousEmployer">{t.employer}</Label>
               <Input
                 id="previousEmployer"
-                placeholder={t.previousEmployerPlaceholder}
+                placeholder={t.employerPlaceholder}
                 value={formData.previousEmployer}
                 onChange={(e) => setFormData({ ...formData, previousEmployer: e.target.value })}
-                data-testid="input-previous-employer"
+                data-testid="input-employer"
               />
             </div>
 
@@ -1225,15 +1533,25 @@ export default function TechnicianLoggedHours() {
                           </Badge>
                         </div>
                         
-                        {entry.building && (
-                          <p className="text-sm flex items-center gap-1 text-muted-foreground">
-                            <Building className="w-3 h-3" />
-                            {entry.building}
-                          </p>
+                        {(entry.building || entry.address) && (
+                          <div className="text-sm text-muted-foreground">
+                            {entry.building && (
+                              <p className="flex items-center gap-1">
+                                <Building className="w-3 h-3" />
+                                {entry.building}
+                              </p>
+                            )}
+                            {entry.address && (
+                              <p className="flex items-center gap-1 mt-0.5">
+                                <MapPin className="w-3 h-3" />
+                                {entry.address}
+                              </p>
+                            )}
+                          </div>
                         )}
                         {entry.employer && (
                           <p className="text-sm text-muted-foreground mt-1">
-                            {t.previousEmployer}: {entry.employer}
+                            {t.employer}: {entry.employer}
                           </p>
                         )}
                         {entry.tasks.length > 0 && (
@@ -1309,6 +1627,82 @@ export default function TechnicianLoggedHours() {
                 <>
                   <Check className="w-4 h-4" />
                   {t.addSelectedEntries} ({scannedEntries.filter(e => e.selected && e.date && e.hours).length})
+                </>
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* PDF Export Dialog */}
+      <Dialog open={showExportDialog} onOpenChange={setShowExportDialog}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <div className="flex items-center gap-2">
+              <DialogTitle>{t.exportWorkHistory}</DialogTitle>
+              <Badge 
+                variant="secondary" 
+                className="bg-gradient-to-r from-amber-500 to-yellow-400 text-white border-0 text-[10px] px-1.5 py-0"
+              >
+                <Star className="w-2.5 h-2.5 mr-0.5" />
+                PRO
+              </Badge>
+            </div>
+            <DialogDescription>
+              {t.exportWorkHistoryDesc}
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="export-start-date">{t.from}</Label>
+              <Input
+                id="export-start-date"
+                type="date"
+                value={exportStartDate}
+                onChange={(e) => setExportStartDate(e.target.value)}
+                data-testid="input-export-start-date"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="export-end-date">{t.to}</Label>
+              <Input
+                id="export-end-date"
+                type="date"
+                value={exportEndDate}
+                onChange={(e) => setExportEndDate(e.target.value)}
+                data-testid="input-export-end-date"
+              />
+            </div>
+          </div>
+
+          <DialogFooter className="gap-2">
+            <Button
+              variant="outline"
+              onClick={() => {
+                setShowExportDialog(false);
+                setExportStartDate("");
+                setExportEndDate("");
+              }}
+              data-testid="button-cancel-export"
+            >
+              {t.cancel}
+            </Button>
+            <Button
+              onClick={handleExportPdf}
+              disabled={isExporting || !exportStartDate || !exportEndDate}
+              className="gap-2"
+              data-testid="button-confirm-export"
+            >
+              {isExporting ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  {t.exportingPdf}
+                </>
+              ) : (
+                <>
+                  <FileDown className="w-4 h-4" />
+                  {t.exportPdf}
                 </>
               )}
             </Button>
