@@ -16065,7 +16065,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Withdraw application (technician)
+  // Withdraw/Delete application (technician or employer)
   app.delete("/api/job-applications/:id", requireAuth, async (req: Request, res: Response) => {
     try {
       const currentUser = await storage.getUserById(req.session.userId!);
@@ -16081,16 +16081,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "Application not found" });
       }
 
-      // Only the technician who applied can withdraw
-      if (application.technicianId !== currentUser.id) {
+      // Check if user is the technician who applied
+      const isTechnician = application.technicianId === currentUser.id;
+
+      // Check if user is the employer who owns the job posting
+      let isEmployer = false;
+      if (currentUser.role === "company") {
+        const [job] = await db.select()
+          .from(jobPostings)
+          .where(eq(jobPostings.id, application.jobPostingId));
+        if (job && job.companyId === currentUser.companyId) {
+          isEmployer = true;
+        }
+      }
+
+      if (!isTechnician && !isEmployer) {
         return res.status(403).json({ message: "Access denied" });
       }
 
       await db.delete(jobApplications).where(eq(jobApplications.id, req.params.id));
 
-      res.json({ message: "Application withdrawn successfully" });
+      res.json({ message: "Application deleted successfully" });
     } catch (error) {
-      console.error("Withdraw application error:", error);
+      console.error("Delete application error:", error);
       res.status(500).json({ message: "Internal server error" });
     }
   });

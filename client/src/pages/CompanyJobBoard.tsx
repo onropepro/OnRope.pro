@@ -12,7 +12,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/hooks/use-toast";
-import { Plus, Briefcase, MapPin, DollarSign, Calendar, Edit, Trash2, Pause, Play, ArrowLeft, Users, FileText, Eye, Mail, Award, X } from "lucide-react";
+import { Plus, Briefcase, MapPin, DollarSign, Calendar, Edit, Trash2, Pause, Play, ArrowLeft, Users, FileText, Eye, Mail, Award, X, Clock, Download, Send, Loader2 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { format } from "date-fns";
 import { useTranslation } from "react-i18next";
@@ -43,6 +43,8 @@ type JobPosting = {
   expiresAt: string | null;
 };
 
+type ResumeDocument = { name: string; url: string } | string;
+
 type Technician = {
   id: string;
   name: string;
@@ -51,10 +53,17 @@ type Technician = {
   photoUrl: string | null;
   irataLevel: string | null;
   spratLevel: string | null;
+  irataLicenseNumber: string | null;
+  spratLicenseNumber: string | null;
+  irataExpirationDate: string | null;
+  spratExpirationDate: string | null;
   employeeCity: string | null;
   employeeProvinceState: string | null;
+  employeeCountry: string | null;
   ropeAccessStartDate: string | null;
-  resumeDocuments: string[] | null;
+  resumeDocuments: ResumeDocument[] | null;
+  isVisibleToEmployers: boolean | null;
+  visibilityEnabledAt: string | null;
 };
 
 type JobApplication = {
@@ -64,6 +73,7 @@ type JobApplication = {
   status: string;
   coverMessage: string | null;
   appliedAt: string;
+  viewedByEmployerAt: string | null;
   technician: Technician | null;
 };
 
@@ -122,6 +132,11 @@ export default function CompanyJobBoard() {
   const [editingJob, setEditingJob] = useState<JobPosting | null>(null);
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
   const [viewingApplicationsFor, setViewingApplicationsFor] = useState<JobPosting | null>(null);
+  const [selectedApplication, setSelectedApplication] = useState<JobApplication | null>(null);
+  const [showJobOfferDialog, setShowJobOfferDialog] = useState(false);
+  const [selectedJobIdForOffer, setSelectedJobIdForOffer] = useState<string>("");
+  const [offerMessage, setOfferMessage] = useState("");
+  const [deleteApplicationId, setDeleteApplicationId] = useState<string | null>(null);
 
   const [formData, setFormData] = useState({
     title: "",
@@ -215,6 +230,80 @@ export default function CompanyJobBoard() {
       toast({ title: t("jobBoard.deleteFailed", "Failed to delete job posting"), description: error.message, variant: "destructive" });
     },
   });
+
+  const deleteApplicationMutation = useMutation({
+    mutationFn: async (applicationId: string) => {
+      return apiRequest("DELETE", `/api/job-applications/${applicationId}`);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/job-applications/job", viewingApplicationsFor?.id] });
+      queryClient.invalidateQueries({ queryKey: ["/api/job-applications/counts"] });
+      setDeleteApplicationId(null);
+      toast({ title: t("jobBoard.applicationDeleted", "Application removed") });
+    },
+    onError: (error: any) => {
+      toast({ title: t("jobBoard.deleteApplicationFailed", "Failed to remove application"), description: error.message, variant: "destructive" });
+    },
+  });
+
+  const sendOfferMutation = useMutation({
+    mutationFn: async ({ technicianId, jobPostingId, message }: { technicianId: string; jobPostingId: string; message?: string }) => {
+      return apiRequest("POST", "/api/job-applications/offer", { technicianId, jobPostingId, message });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/job-applications/job", viewingApplicationsFor?.id] });
+      setShowJobOfferDialog(false);
+      setSelectedJobIdForOffer("");
+      setOfferMessage("");
+      toast({ title: t("jobBoard.offerSent", "Job offer sent successfully") });
+    },
+    onError: (error: any) => {
+      if (error.message?.includes("unavailable") || error.message?.includes("403")) {
+        toast({ title: t("jobBoard.technicianUnavailable", "Technician Unavailable"), description: t("jobBoard.technicianNotVisible", "This technician is no longer accepting job offers"), variant: "destructive" });
+      } else {
+        toast({ title: t("jobBoard.offerFailed", "Failed to send offer"), description: error.message, variant: "destructive" });
+      }
+    },
+  });
+
+  const newApplications = currentApplications.filter(app => !app.viewedByEmployerAt);
+  const viewedApplications = currentApplications.filter(app => !!app.viewedByEmployerAt);
+  const activeJobs = jobPostings.filter(j => j.status === "active");
+
+  const getDisplayName = (tech: Technician) => {
+    if (tech.firstName && tech.lastName) {
+      return `${tech.firstName} ${tech.lastName}`;
+    }
+    return tech.name || t("common.unknown", "Unknown");
+  };
+
+  const getLocation = (tech: Technician) => {
+    const parts = [tech.employeeCity, tech.employeeProvinceState, tech.employeeCountry].filter(Boolean);
+    return parts.length > 0 ? parts.join(", ") : null;
+  };
+
+  const getYearsExperience = (startDate: string | null) => {
+    if (!startDate) return null;
+    const date = new Date(startDate);
+    return Math.floor((Date.now() - date.getTime()) / (365.25 * 24 * 60 * 60 * 1000));
+  };
+
+  const formatDate = (date: string | null) => {
+    if (!date) return null;
+    return format(new Date(date), "MMM d, yyyy");
+  };
+
+  const isExpired = (date: string | null) => {
+    if (!date) return false;
+    return new Date(date) < new Date();
+  };
+
+  const isExpiringSoon = (date: string | null) => {
+    if (!date) return false;
+    const d = new Date(date);
+    const daysUntil = Math.ceil((d.getTime() - Date.now()) / (1000 * 60 * 60 * 24));
+    return daysUntil <= 60 && daysUntil > 0;
+  };
 
   const resetForm = () => {
     setFormData({
@@ -810,79 +899,467 @@ export default function CompanyJobBoard() {
             </DialogDescription>
           </DialogHeader>
 
-          <div className="space-y-4 py-4">
+          <div className="space-y-6 py-4">
             {currentApplications.length === 0 ? (
               <div className="text-center py-8">
                 <Users className="w-12 h-12 mx-auto text-muted-foreground/50 mb-3" />
                 <p className="text-muted-foreground">{t("jobBoard.noApplications", "No applications yet")}</p>
               </div>
             ) : (
-              currentApplications.filter(app => app.technician).map((app) => (
-                <Card key={app.id} data-testid={`card-application-${app.id}`}>
-                  <CardContent className="p-4">
-                    <div className="flex items-start gap-4">
-                      <Avatar className="w-12 h-12">
-                        <AvatarImage src={app.technician?.photoUrl || undefined} />
-                        <AvatarFallback>
-                          {app.technician?.name?.split(' ').map(n => n[0]).join('').toUpperCase() || '?'}
-                        </AvatarFallback>
-                      </Avatar>
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 flex-wrap">
-                          <h4 className="font-semibold">{app.technician?.name || 'Unknown'}</h4>
-                          {app.technician?.irataLevel && (
-                            <Badge variant="outline" className="text-xs border-amber-500 text-amber-600">
-                              IRATA {app.technician.irataLevel}
-                            </Badge>
-                          )}
-                          {app.technician?.spratLevel && (
-                            <Badge variant="outline" className="text-xs border-purple-500 text-purple-600">
-                              SPRAT {app.technician.spratLevel}
-                            </Badge>
-                          )}
-                        </div>
-                        <div className="flex items-center gap-3 text-sm text-muted-foreground mt-1 flex-wrap">
-                          {app.technician?.employeeCity && (
-                            <span className="flex items-center gap-1">
-                              <MapPin className="w-3 h-3" />
-                              {app.technician.employeeCity}{app.technician.employeeProvinceState ? `, ${app.technician.employeeProvinceState}` : ''}
-                            </span>
-                          )}
-                          {app.technician?.ropeAccessStartDate && (
-                            <span className="flex items-center gap-1">
-                              <Award className="w-3 h-3" />
-                              {Math.floor((Date.now() - new Date(app.technician.ropeAccessStartDate).getTime()) / (365.25 * 24 * 60 * 60 * 1000))} {t("jobBoard.yearsExp", "years exp.")}
-                            </span>
-                          )}
-                        </div>
-                        {app.coverMessage && (
-                          <p className="text-sm mt-2 bg-muted/50 p-2 rounded-md">{app.coverMessage}</p>
-                        )}
-                        <div className="flex items-center justify-between mt-3">
-                          <span className="text-xs text-muted-foreground">
-                            {t("jobBoard.appliedOn", "Applied")} {format(new Date(app.appliedAt), "MMM d, yyyy")}
-                          </span>
-                          <Button 
-                            variant="outline" 
-                            size="sm"
-                            onClick={() => setLocation(`/talent-browser?applicant=${app.technicianId}`)}
-                            data-testid={`button-view-profile-${app.id}`}
-                          >
-                            <Eye className="w-3 h-3 mr-1" />
-                            {t("jobBoard.viewProfile", "View Profile")}
-                          </Button>
-                        </div>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))
+              <>
+                {newApplications.length > 0 && (
+                  <div className="space-y-3">
+                    <h3 className="font-semibold flex items-center gap-2">
+                      <Badge variant="default">{newApplications.length}</Badge>
+                      {t("jobBoard.newApplications", "New Applications")}
+                    </h3>
+                    {newApplications.filter(app => app.technician).map((app) => (
+                      <Card key={app.id} className="border-primary/50" data-testid={`card-new-application-${app.id}`}>
+                        <CardContent className="p-4">
+                          <div className="flex items-start gap-4">
+                            <Avatar className="w-12 h-12">
+                              <AvatarImage src={app.technician?.photoUrl || undefined} />
+                              <AvatarFallback>
+                                {app.technician?.name?.split(' ').map(n => n[0]).join('').toUpperCase() || '?'}
+                              </AvatarFallback>
+                            </Avatar>
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-center gap-2 flex-wrap">
+                                <h4 className="font-semibold">{app.technician ? getDisplayName(app.technician) : 'Unknown'}</h4>
+                                {app.technician?.irataLevel && (
+                                  <Badge variant="outline" className="text-xs border-amber-500 text-amber-600">
+                                    IRATA {app.technician.irataLevel}
+                                  </Badge>
+                                )}
+                                {app.technician?.spratLevel && (
+                                  <Badge variant="outline" className="text-xs border-purple-500 text-purple-600">
+                                    SPRAT {app.technician.spratLevel}
+                                  </Badge>
+                                )}
+                              </div>
+                              <div className="flex items-center gap-3 text-sm text-muted-foreground mt-1 flex-wrap">
+                                {app.technician && getLocation(app.technician) && (
+                                  <span className="flex items-center gap-1">
+                                    <MapPin className="w-3 h-3" />
+                                    {getLocation(app.technician)}
+                                  </span>
+                                )}
+                                {app.technician?.ropeAccessStartDate && (
+                                  <span className="flex items-center gap-1">
+                                    <Award className="w-3 h-3" />
+                                    {getYearsExperience(app.technician.ropeAccessStartDate)} {t("jobBoard.yearsExp", "years exp.")}
+                                  </span>
+                                )}
+                              </div>
+                              {app.coverMessage && (
+                                <p className="text-sm mt-2 bg-muted/50 p-2 rounded-md">{app.coverMessage}</p>
+                              )}
+                              <div className="flex items-center justify-between mt-3 flex-wrap gap-2">
+                                <span className="text-xs text-muted-foreground">
+                                  {t("jobBoard.appliedOn", "Applied")} {format(new Date(app.appliedAt), "MMM d, yyyy")}
+                                </span>
+                                <div className="flex items-center gap-2">
+                                  <Button 
+                                    variant="outline" 
+                                    size="sm"
+                                    onClick={() => setSelectedApplication(app)}
+                                    data-testid={`button-view-profile-${app.id}`}
+                                  >
+                                    <Eye className="w-3 h-3 mr-1" />
+                                    {t("jobBoard.viewProfile", "View Profile")}
+                                  </Button>
+                                  <Button 
+                                    size="sm"
+                                    onClick={() => {
+                                      setSelectedApplication(app);
+                                      setShowJobOfferDialog(true);
+                                    }}
+                                    data-testid={`button-send-offer-${app.id}`}
+                                  >
+                                    <Send className="w-3 h-3 mr-1" />
+                                    {t("jobBoard.sendOffer", "Send Offer")}
+                                  </Button>
+                                  <Button 
+                                    variant="ghost" 
+                                    size="sm"
+                                    onClick={() => setDeleteApplicationId(app.id)}
+                                    data-testid={`button-delete-application-${app.id}`}
+                                  >
+                                    <Trash2 className="w-3 h-3 text-destructive" />
+                                  </Button>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+                )}
+
+                {viewedApplications.length > 0 && (
+                  <div className="space-y-3">
+                    <h3 className="font-semibold text-muted-foreground flex items-center gap-2">
+                      <Badge variant="secondary">{viewedApplications.length}</Badge>
+                      {t("jobBoard.viewedApplications", "Viewed Applications")}
+                    </h3>
+                    {viewedApplications.filter(app => app.technician).map((app) => (
+                      <Card key={app.id} data-testid={`card-viewed-application-${app.id}`}>
+                        <CardContent className="p-4">
+                          <div className="flex items-start gap-4">
+                            <Avatar className="w-12 h-12">
+                              <AvatarImage src={app.technician?.photoUrl || undefined} />
+                              <AvatarFallback>
+                                {app.technician?.name?.split(' ').map(n => n[0]).join('').toUpperCase() || '?'}
+                              </AvatarFallback>
+                            </Avatar>
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-center gap-2 flex-wrap">
+                                <h4 className="font-semibold">{app.technician ? getDisplayName(app.technician) : 'Unknown'}</h4>
+                                {app.technician?.irataLevel && (
+                                  <Badge variant="outline" className="text-xs border-amber-500 text-amber-600">
+                                    IRATA {app.technician.irataLevel}
+                                  </Badge>
+                                )}
+                                {app.technician?.spratLevel && (
+                                  <Badge variant="outline" className="text-xs border-purple-500 text-purple-600">
+                                    SPRAT {app.technician.spratLevel}
+                                  </Badge>
+                                )}
+                              </div>
+                              <div className="flex items-center gap-3 text-sm text-muted-foreground mt-1 flex-wrap">
+                                {app.technician && getLocation(app.technician) && (
+                                  <span className="flex items-center gap-1">
+                                    <MapPin className="w-3 h-3" />
+                                    {getLocation(app.technician)}
+                                  </span>
+                                )}
+                                {app.technician?.ropeAccessStartDate && (
+                                  <span className="flex items-center gap-1">
+                                    <Award className="w-3 h-3" />
+                                    {getYearsExperience(app.technician.ropeAccessStartDate)} {t("jobBoard.yearsExp", "years exp.")}
+                                  </span>
+                                )}
+                              </div>
+                              {app.coverMessage && (
+                                <p className="text-sm mt-2 bg-muted/50 p-2 rounded-md">{app.coverMessage}</p>
+                              )}
+                              <div className="flex items-center justify-between mt-3 flex-wrap gap-2">
+                                <span className="text-xs text-muted-foreground">
+                                  {t("jobBoard.appliedOn", "Applied")} {format(new Date(app.appliedAt), "MMM d, yyyy")}
+                                </span>
+                                <div className="flex items-center gap-2">
+                                  <Button 
+                                    variant="outline" 
+                                    size="sm"
+                                    onClick={() => setSelectedApplication(app)}
+                                    data-testid={`button-view-profile-viewed-${app.id}`}
+                                  >
+                                    <Eye className="w-3 h-3 mr-1" />
+                                    {t("jobBoard.viewProfile", "View Profile")}
+                                  </Button>
+                                  <Button 
+                                    size="sm"
+                                    onClick={() => {
+                                      setSelectedApplication(app);
+                                      setShowJobOfferDialog(true);
+                                    }}
+                                    data-testid={`button-send-offer-viewed-${app.id}`}
+                                  >
+                                    <Send className="w-3 h-3 mr-1" />
+                                    {t("jobBoard.sendOffer", "Send Offer")}
+                                  </Button>
+                                  <Button 
+                                    variant="ghost" 
+                                    size="sm"
+                                    onClick={() => setDeleteApplicationId(app.id)}
+                                    data-testid={`button-delete-application-viewed-${app.id}`}
+                                  >
+                                    <Trash2 className="w-3 h-3 text-destructive" />
+                                  </Button>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+                )}
+              </>
             )}
           </div>
 
           <DialogFooter>
             <Button variant="outline" onClick={() => setViewingApplicationsFor(null)}>
               {t("common.close", "Close")}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Technician Profile Dialog */}
+      <Dialog open={!!selectedApplication && !showJobOfferDialog} onOpenChange={(open) => !open && setSelectedApplication(null)}>
+        <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
+          {selectedApplication?.technician && (
+            <>
+              <DialogHeader>
+                <div className="flex items-center gap-4">
+                  <Avatar className="w-16 h-16">
+                    <AvatarImage src={selectedApplication.technician.photoUrl || undefined} />
+                    <AvatarFallback className="bg-primary/10 text-primary font-medium text-xl">
+                      {selectedApplication.technician.name?.split(' ').map(n => n[0]).join('').toUpperCase() || '?'}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div>
+                    <DialogTitle className="text-xl">{getDisplayName(selectedApplication.technician)}</DialogTitle>
+                    {getLocation(selectedApplication.technician) && (
+                      <DialogDescription className="flex items-center gap-1 mt-1">
+                        <MapPin className="w-4 h-4" />
+                        {getLocation(selectedApplication.technician)}
+                      </DialogDescription>
+                    )}
+                  </div>
+                </div>
+              </DialogHeader>
+
+              <div className="space-y-4 mt-4">
+                {selectedApplication.technician.ropeAccessStartDate && (
+                  <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
+                    <Clock className="w-5 h-5 text-muted-foreground" />
+                    <div>
+                      <p className="text-sm text-muted-foreground">{t("jobBoard.experience", "Experience")}</p>
+                      <p className="font-medium">
+                        {getYearsExperience(selectedApplication.technician.ropeAccessStartDate)}+ {t("jobBoard.yearsInRopeAccess", "years in rope access")}
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        {t("jobBoard.since", "Since")} {formatDate(selectedApplication.technician.ropeAccessStartDate)}
+                      </p>
+                    </div>
+                  </div>
+                )}
+
+                <div className="space-y-3">
+                  <h4 className="font-semibold flex items-center gap-2">
+                    <Award className="w-4 h-4" />
+                    {t("jobBoard.certifications", "Certifications")}
+                  </h4>
+
+                  {selectedApplication.technician.irataLevel && (
+                    <div className="p-3 rounded-lg border">
+                      <div className="flex items-center gap-2">
+                        <Badge>IRATA {selectedApplication.technician.irataLevel}</Badge>
+                        {isExpired(selectedApplication.technician.irataExpirationDate) && (
+                          <Badge variant="destructive">{t("jobBoard.expired", "Expired")}</Badge>
+                        )}
+                        {isExpiringSoon(selectedApplication.technician.irataExpirationDate) && !isExpired(selectedApplication.technician.irataExpirationDate) && (
+                          <Badge variant="secondary">{t("jobBoard.expiringSoon", "Expiring Soon")}</Badge>
+                        )}
+                      </div>
+                      <div className="mt-2 text-sm text-muted-foreground space-y-1">
+                        {selectedApplication.technician.irataLicenseNumber && (
+                          <p>{t("jobBoard.license", "License")}: {selectedApplication.technician.irataLicenseNumber}</p>
+                        )}
+                        {selectedApplication.technician.irataExpirationDate && (
+                          <p>{t("jobBoard.expires", "Expires")}: {formatDate(selectedApplication.technician.irataExpirationDate)}</p>
+                        )}
+                      </div>
+                    </div>
+                  )}
+
+                  {selectedApplication.technician.spratLevel && (
+                    <div className="p-3 rounded-lg border">
+                      <div className="flex items-center gap-2">
+                        <Badge>SPRAT {selectedApplication.technician.spratLevel}</Badge>
+                        {isExpired(selectedApplication.technician.spratExpirationDate) && (
+                          <Badge variant="destructive">{t("jobBoard.expired", "Expired")}</Badge>
+                        )}
+                        {isExpiringSoon(selectedApplication.technician.spratExpirationDate) && !isExpired(selectedApplication.technician.spratExpirationDate) && (
+                          <Badge variant="secondary">{t("jobBoard.expiringSoon", "Expiring Soon")}</Badge>
+                        )}
+                      </div>
+                      <div className="mt-2 text-sm text-muted-foreground space-y-1">
+                        {selectedApplication.technician.spratLicenseNumber && (
+                          <p>{t("jobBoard.license", "License")}: {selectedApplication.technician.spratLicenseNumber}</p>
+                        )}
+                        {selectedApplication.technician.spratExpirationDate && (
+                          <p>{t("jobBoard.expires", "Expires")}: {formatDate(selectedApplication.technician.spratExpirationDate)}</p>
+                        )}
+                      </div>
+                    </div>
+                  )}
+
+                  {!selectedApplication.technician.irataLevel && !selectedApplication.technician.spratLevel && (
+                    <p className="text-sm text-muted-foreground italic">{t("jobBoard.noCertifications", "No certifications listed")}</p>
+                  )}
+                </div>
+
+                {selectedApplication.technician.resumeDocuments && selectedApplication.technician.resumeDocuments.length > 0 && (
+                  <div className="space-y-3">
+                    <h4 className="font-semibold flex items-center gap-2">
+                      <FileText className="w-4 h-4" />
+                      {t("jobBoard.resumeCV", "Resume/CV")}
+                    </h4>
+                    <div className="space-y-2">
+                      {selectedApplication.technician.resumeDocuments.map((doc, index) => {
+                        const docUrl = typeof doc === 'string' ? doc : doc.url;
+                        const docName = typeof doc === 'string' ? `Resume ${index + 1}` : (doc.name || `Resume ${index + 1}`);
+                        return (
+                          <a
+                            key={index}
+                            href={docUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex items-center gap-2 p-2 rounded-lg border hover-elevate"
+                            data-testid={`link-resume-${index}`}
+                          >
+                            <FileText className="w-4 h-4 text-muted-foreground" />
+                            <span className="flex-1 truncate text-sm">{docName}</span>
+                            <Download className="w-4 h-4 text-muted-foreground" />
+                          </a>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
+
+                {selectedApplication.coverMessage && (
+                  <div className="space-y-2">
+                    <h4 className="font-semibold">{t("jobBoard.coverMessage", "Cover Message")}</h4>
+                    <p className="text-sm p-3 rounded-lg bg-muted/50">{selectedApplication.coverMessage}</p>
+                  </div>
+                )}
+
+                <div className="pt-4 border-t">
+                  <Button 
+                    onClick={() => setShowJobOfferDialog(true)}
+                    className="w-full gap-2"
+                    data-testid="button-send-job-offer-profile"
+                  >
+                    <Send className="w-4 h-4" />
+                    {t("jobBoard.sendJobOffer", "Send Job Offer")}
+                  </Button>
+                </div>
+              </div>
+            </>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Job Offer Dialog */}
+      <Dialog open={showJobOfferDialog} onOpenChange={(open) => {
+        setShowJobOfferDialog(open);
+        if (!open) {
+          setSelectedJobIdForOffer("");
+          setOfferMessage("");
+        }
+      }}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Briefcase className="w-5 h-5" />
+              {t("jobBoard.sendJobOffer", "Send Job Offer")}
+            </DialogTitle>
+            {selectedApplication?.technician && (
+              <DialogDescription>
+                {getDisplayName(selectedApplication.technician)}
+              </DialogDescription>
+            )}
+          </DialogHeader>
+
+          {activeJobs.length === 0 ? (
+            <div className="py-6 text-center">
+              <Briefcase className="w-12 h-12 mx-auto text-muted-foreground/50 mb-3" />
+              <h4 className="font-semibold mb-1">{t("jobBoard.noActiveJobsForOffer", "No Active Jobs")}</h4>
+              <p className="text-sm text-muted-foreground mb-4">{t("jobBoard.createJobFirst", "Create a job posting first to send offers")}</p>
+              <Button onClick={() => {
+                setShowJobOfferDialog(false);
+                setIsCreateOpen(true);
+              }} data-testid="button-create-job-from-offer">
+                {t("jobBoard.createJob", "Create Job")}
+              </Button>
+            </div>
+          ) : (
+            <div className="space-y-4 py-2">
+              <div className="space-y-2">
+                <Label>{t("jobBoard.selectJob", "Select Job")}</Label>
+                <Select value={selectedJobIdForOffer} onValueChange={setSelectedJobIdForOffer}>
+                  <SelectTrigger data-testid="select-job-for-offer">
+                    <SelectValue placeholder={t("jobBoard.selectJobPlaceholder", "Choose a job posting...")} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {activeJobs.map((job) => (
+                      <SelectItem key={job.id} value={job.id}>
+                        <div className="flex items-center gap-2">
+                          <span>{job.title}</span>
+                          {job.location && (
+                            <span className="text-xs text-muted-foreground">- {job.location}</span>
+                          )}
+                        </div>
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2">
+                <Label>{t("jobBoard.message", "Message")} ({t("common.optional", "optional")})</Label>
+                <Textarea
+                  value={offerMessage}
+                  onChange={(e) => setOfferMessage(e.target.value)}
+                  placeholder={t("jobBoard.offerMessagePlaceholder", "Add a personal message to your offer...")}
+                  rows={3}
+                  data-testid="input-offer-message"
+                />
+              </div>
+            </div>
+          )}
+
+          {activeJobs.length > 0 && (
+            <DialogFooter className="gap-2 sm:gap-0">
+              <Button variant="outline" onClick={() => setShowJobOfferDialog(false)}>
+                {t("common.cancel", "Cancel")}
+              </Button>
+              <Button
+                onClick={() => {
+                  if (selectedApplication && selectedJobIdForOffer) {
+                    sendOfferMutation.mutate({
+                      technicianId: selectedApplication.technicianId,
+                      jobPostingId: selectedJobIdForOffer,
+                      message: offerMessage || undefined,
+                    });
+                  }
+                }}
+                disabled={!selectedJobIdForOffer || sendOfferMutation.isPending}
+                data-testid="button-confirm-send-offer"
+              >
+                {sendOfferMutation.isPending && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
+                <Send className="w-4 h-4 mr-2" />
+                {t("jobBoard.sendOffer", "Send Offer")}
+              </Button>
+            </DialogFooter>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete Application Confirmation */}
+      <Dialog open={!!deleteApplicationId} onOpenChange={() => setDeleteApplicationId(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{t("jobBoard.deleteApplicationConfirm", "Remove Application?")}</DialogTitle>
+            <DialogDescription>
+              {t("jobBoard.deleteApplicationDesc", "This application will be removed. The technician will no longer appear in your applicants list.")}
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setDeleteApplicationId(null)}>{t("common.cancel", "Cancel")}</Button>
+            <Button
+              variant="destructive"
+              onClick={() => deleteApplicationId && deleteApplicationMutation.mutate(deleteApplicationId)}
+              disabled={deleteApplicationMutation.isPending}
+              data-testid="button-confirm-delete-application"
+            >
+              {deleteApplicationMutation.isPending ? t("common.removing", "Removing...") : t("common.remove", "Remove")}
             </Button>
           </DialogFooter>
         </DialogContent>
