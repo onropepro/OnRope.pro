@@ -1341,6 +1341,19 @@ export default function TechnicianPortal() {
             </div>
           </div>
           <div className="flex items-center gap-2">
+            {/* Return to Dashboard button - Only show for company owners */}
+            {user.role === 'company' && (
+              <Button
+                variant="default"
+                size="sm"
+                onClick={() => setLocation('/dashboard')}
+                className="gap-1.5"
+                data-testid="button-return-dashboard"
+              >
+                <span className="material-icons text-base">dashboard</span>
+                <span className="hidden sm:inline">{language === 'en' ? 'Dashboard' : 'Tableau de bord'}</span>
+              </Button>
+            )}
             <Button
               variant="ghost"
               size="sm"
