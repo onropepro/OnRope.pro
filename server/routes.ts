@@ -8760,14 +8760,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         const docScore = documentCompliance;
         
         // Calculate overall score (weighted average)
-        // Weights: Drops 35%, Harness 25%, Hours 20%, Document Compliance 20%
-        // If no drop target, redistribute: Harness 35%, Hours 30%, Docs 35%
+        // Rating is based ONLY on safety compliance: Harness Inspection 50%, Document Review 50%
+        // Performance metrics (drops, hours) are tracked but not included in the rating
         let overallScore: number;
-        if (dailyDropTarget && dailyDropTarget > 0) {
-          overallScore = (dropPerformance * 0.35) + (harnessScore * 0.25) + (hoursScore * 0.20) + (docScore * 0.20);
-        } else {
-          overallScore = (harnessScore * 0.35) + (hoursScore * 0.30) + (docScore * 0.35);
-        }
+        overallScore = (harnessScore * 0.50) + (docScore * 0.50);
         overallScore = Math.min(Math.round(overallScore), 100);
         
         // Overall rating

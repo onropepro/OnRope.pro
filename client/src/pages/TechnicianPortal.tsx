@@ -321,8 +321,8 @@ const translations = {
     whenDidYouStart: "When did you start your rope access career?",
     addExperience: "Add your experience start date",
     referralCodeGenerating: "Your referral code will be generated when you complete registration",
-    // Performance & Safety Rating
-    performanceSafetyRating: "Performance & Safety Rating",
+    // Safety Rating
+    performanceSafetyRating: "Safety Rating",
     overallScore: "Overall Score",
     harnessCompliance: "Harness Inspections",
     documentCompliance: "Documents Signed",
@@ -588,8 +588,8 @@ const translations = {
     whenDidYouStart: "Quand avez-vous commencé votre carrière d'accès sur corde?",
     addExperience: "Ajouter votre date de début d'expérience",
     referralCodeGenerating: "Votre code de parrainage sera généré lorsque vous terminerez l'inscription",
-    // Performance & Safety Rating
-    performanceSafetyRating: "Évaluation Performance & Sécurité",
+    // Safety Rating
+    performanceSafetyRating: "Évaluation Sécurité",
     overallScore: "Score Global",
     harnessCompliance: "Inspections Harnais",
     documentCompliance: "Documents Signés",
