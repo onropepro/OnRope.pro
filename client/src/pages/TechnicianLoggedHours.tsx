@@ -140,6 +140,11 @@ const translations = {
     previousHoursCount: "Previous Hours Entries",
     detailedLog: "Detailed Log",
     plusFeature: "PLUS Feature",
+    sessionDetails: "Session Details",
+    viewDetails: "Tap to view details",
+    projectInfo: "Project Information",
+    workInfo: "Work Information",
+    close: "Close",
   },
   fr: {
     title: "Mes heures enregistrées",
@@ -239,6 +244,11 @@ const translations = {
     previousHoursCount: "Entrées d'heures précédentes",
     detailedLog: "Journal détaillé",
     plusFeature: "Fonctionnalité PLUS",
+    sessionDetails: "Détails de la session",
+    viewDetails: "Appuyez pour voir les détails",
+    projectInfo: "Informations du projet",
+    workInfo: "Informations de travail",
+    close: "Fermer",
   }
 };
 
@@ -319,6 +329,10 @@ export default function TechnicianLoggedHours() {
   const [exportStartDate, setExportStartDate] = useState("");
   const [exportEndDate, setExportEndDate] = useState("");
   const [isExporting, setIsExporting] = useState(false);
+  
+  // Session details dialog state
+  const [selectedLog, setSelectedLog] = useState<IrataTaskLog | null>(null);
+  const [showLogDetailsDialog, setShowLogDetailsDialog] = useState(false);
 
   const { data: userData } = useQuery<{ user: any }>({
     queryKey: ["/api/user"],
@@ -1099,16 +1113,24 @@ export default function TechnicianLoggedHours() {
                           {project.logs.map((log) => (
                             <div 
                               key={log.id}
-                              className="p-3 bg-muted/50 rounded-lg"
+                              className="p-3 bg-muted/50 rounded-lg cursor-pointer hover-elevate active-elevate-2"
+                              onClick={() => {
+                                setSelectedLog(log);
+                                setShowLogDetailsDialog(true);
+                              }}
+                              data-testid={`log-entry-${log.id}`}
                             >
                               <div className="flex items-start justify-between mb-2">
                                 <div className="flex items-center gap-2 text-sm text-muted-foreground">
                                   <Calendar className="w-4 h-4" />
                                   {format(parseLocalDate(log.workDate), 'PPP', { locale: dateLocale })}
                                 </div>
-                                <Badge variant="secondary">
-                                  {parseFloat(log.hoursWorked).toFixed(1)} {t.hr}
-                                </Badge>
+                                <div className="flex items-center gap-2">
+                                  <Badge variant="secondary">
+                                    {parseFloat(log.hoursWorked).toFixed(1)} {t.hr}
+                                  </Badge>
+                                  <ChevronRight className="w-4 h-4 text-muted-foreground" />
+                                </div>
                               </div>
                               <div className="flex flex-wrap gap-1">
                                 {(log.tasksPerformed || []).map((taskId) => (
@@ -1118,11 +1140,6 @@ export default function TechnicianLoggedHours() {
                                   </Badge>
                                 ))}
                               </div>
-                              {log.notes && (
-                                <p className="text-sm text-muted-foreground mt-2 italic">
-                                  {log.notes}
-                                </p>
-                              )}
                             </div>
                           ))}
                         </div>
@@ -1705,6 +1722,99 @@ export default function TechnicianLoggedHours() {
                   {t.exportPdf}
                 </>
               )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Session Details Dialog */}
+      <Dialog open={showLogDetailsDialog} onOpenChange={setShowLogDetailsDialog}>
+        <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Clock className="w-5 h-5" />
+              {t.sessionDetails}
+            </DialogTitle>
+            <DialogDescription>
+              {selectedLog && format(parseLocalDate(selectedLog.workDate), 'PPP', { locale: dateLocale })}
+            </DialogDescription>
+          </DialogHeader>
+
+          {selectedLog && (
+            <div className="space-y-4">
+              {/* Project Information */}
+              <div className="space-y-3">
+                <h4 className="font-medium text-sm flex items-center gap-2">
+                  <Building className="w-4 h-4" />
+                  {t.projectInfo}
+                </h4>
+                <div className="bg-muted/50 rounded-lg p-3 space-y-2">
+                  <div>
+                    <p className="text-xs text-muted-foreground">{t.buildingName}</p>
+                    <p className="font-medium">{selectedLog.buildingName || '-'}</p>
+                  </div>
+                  {selectedLog.buildingAddress && (
+                    <div>
+                      <p className="text-xs text-muted-foreground">{t.buildingAddress}</p>
+                      <p className="text-sm">{selectedLog.buildingAddress}</p>
+                    </div>
+                  )}
+                  {selectedLog.buildingHeight && (
+                    <div>
+                      <p className="text-xs text-muted-foreground">{t.buildingHeight}</p>
+                      <p className="text-sm font-medium text-primary">{selectedLog.buildingHeight}</p>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Work Information */}
+              <div className="space-y-3">
+                <h4 className="font-medium text-sm flex items-center gap-2">
+                  <Clock className="w-4 h-4" />
+                  {t.workInfo}
+                </h4>
+                <div className="bg-muted/50 rounded-lg p-3 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-xs text-muted-foreground">{t.hoursWorked}</p>
+                      <p className="text-xl font-bold text-primary">{parseFloat(selectedLog.hoursWorked).toFixed(1)} {t.hr}</p>
+                    </div>
+                    <div>
+                      <p className="text-xs text-muted-foreground">{t.date}</p>
+                      <p className="font-medium">{format(parseLocalDate(selectedLog.workDate), 'PPP', { locale: dateLocale })}</p>
+                    </div>
+                  </div>
+                  
+                  <div>
+                    <p className="text-xs text-muted-foreground mb-2">{t.tasksPerformed}</p>
+                    <div className="flex flex-wrap gap-1.5">
+                      {(selectedLog.tasksPerformed || []).map((taskId) => (
+                        <Badge key={taskId} variant="outline" className="text-xs">
+                          <span className="material-icons text-xs mr-1">{getTaskIcon(taskId)}</span>
+                          {getTaskLabel(taskId, language)}
+                        </Badge>
+                      ))}
+                    </div>
+                  </div>
+
+                  {selectedLog.notes && (
+                    <div>
+                      <p className="text-xs text-muted-foreground">{t.notes}</p>
+                      <p className="text-sm italic mt-1">{selectedLog.notes}</p>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
+
+          <DialogFooter>
+            <Button 
+              onClick={() => setShowLogDetailsDialog(false)}
+              data-testid="button-close-log-details"
+            >
+              {t.close}
             </Button>
           </DialogFooter>
         </DialogContent>

@@ -9027,7 +9027,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const project = await storage.getProjectById(workSession.projectId);
       const derivedBuildingName = project?.buildingName || null;
       const derivedBuildingAddress = project?.buildingAddress || null;
-      const derivedBuildingHeight = project?.buildingHeight || null;
+      
+      // Derive building height from buildingHeight field, or calculate from buildingFloors if available
+      let derivedBuildingHeight = project?.buildingHeight || null;
+      if (!derivedBuildingHeight && project?.buildingFloors) {
+        const floors = project.buildingFloors;
+        const heightFeet = floors * 9;
+        const heightMeters = Math.round(heightFeet / 3.281);
+        derivedBuildingHeight = `${heightFeet}ft (${heightMeters}m)`;
+      }
       
       // Get company ID from work session (authoritative source)
       const companyId = workSession.companyId;
