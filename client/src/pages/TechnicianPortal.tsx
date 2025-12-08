@@ -914,15 +914,17 @@ export default function TechnicianPortal() {
     
     // Handle case where user cancels the file dialog
     // When the file dialog is closed, window regains focus
+    // Use a longer timeout to ensure onChange has time to fire first
     const handleDialogClose = () => {
-      // Small delay to allow the change event to fire first if a file was selected
+      // Use a longer delay (1 second) to allow the change event to fire first
+      // Only reset the STATE (for UI), NOT the ref (which onChange needs)
       setTimeout(() => {
         if (documentInputRef.current && !documentInputRef.current.files?.length) {
-          console.log('[TechnicianPortal] No file selected, resetting uploadingDocType');
+          console.log('[TechnicianPortal] No file selected after dialog close, resetting state only');
           setUploadingDocType(null);
-          uploadingDocTypeRef.current = null;
+          // Don't reset the ref here - let handleDocumentUpload do it after processing
         }
-      }, 300);
+      }, 1000);
       window.removeEventListener('focus', handleDialogClose);
     };
     
