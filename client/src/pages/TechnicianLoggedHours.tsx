@@ -134,6 +134,8 @@ const translations = {
     east: "East",
     south: "South",
     west: "West",
+    allTimeTasks: "All-Time Tasks",
+    times: "times",
     pdfExported: "PDF Exported",
     pdfExportedDesc: "Your work history has been downloaded",
     noDataInRange: "No Data Found",
@@ -245,6 +247,8 @@ const translations = {
     east: "Est",
     south: "Sud",
     west: "Ouest",
+    allTimeTasks: "Tâches totales",
+    times: "fois",
     pdfExported: "PDF exporté",
     pdfExportedDesc: "Votre historique de travail a été téléchargé",
     noDataInRange: "Aucune donnée trouvée",
@@ -975,6 +979,18 @@ export default function TechnicianLoggedHours() {
   
   // Calculate grand total drops across all sessions
   const grandTotalDrops = logs.reduce((sum: number, log: any) => sum + (log.totalDrops || 0), 0);
+  
+  // Calculate all-time task counts
+  const allTimeTaskCounts: Record<string, number> = {};
+  logs.forEach((log: any) => {
+    (log.tasksPerformed || []).forEach((taskId: string) => {
+      allTimeTaskCounts[taskId] = (allTimeTaskCounts[taskId] || 0) + 1;
+    });
+  });
+  
+  // Sort tasks by count (highest first)
+  const sortedTaskCounts = Object.entries(allTimeTaskCounts)
+    .sort(([, a], [, b]) => b - a);
 
   Object.values(groupedByProject).forEach((project) => {
     project.logs.sort((a, b) => {
@@ -1090,6 +1106,29 @@ export default function TechnicianLoggedHours() {
                   <p className="text-xs text-muted-foreground">{t.fromWorkSessions}</p>
                 </div>
               </div>
+              
+              {/* All-Time Tasks */}
+              {sortedTaskCounts.length > 0 && (
+                <div className="pt-3 border-t">
+                  <p className="text-sm font-medium mb-2">{t.allTimeTasks}</p>
+                  <div className="flex flex-wrap gap-2">
+                    {sortedTaskCounts.map(([taskId, count]) => (
+                      <Badge 
+                        key={taskId} 
+                        variant="outline" 
+                        className="text-xs py-1"
+                        data-testid={`badge-task-count-${taskId}`}
+                      >
+                        <span className="material-icons text-xs mr-1">{getTaskIcon(taskId)}</span>
+                        {getTaskLabel(taskId, language)}
+                        <span className="ml-1.5 px-1.5 py-0.5 rounded bg-primary/10 text-primary font-semibold">
+                          {count}
+                        </span>
+                      </Badge>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           </CardContent>
         </Card>
