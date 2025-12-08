@@ -1,13 +1,17 @@
 import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import { useLocation } from "wouter";
+import { queryClient, apiRequest } from "@/lib/queryClient";
+import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { Separator } from "@/components/ui/separator";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { 
   ArrowLeft, 
@@ -26,7 +30,9 @@ import {
   AlertCircle,
   ChevronRight,
   Building,
-  User
+  User,
+  Briefcase,
+  Send
 } from "lucide-react";
 import { format, differenceInYears } from "date-fns";
 import type { User as UserType } from "@shared/schema";
@@ -70,6 +76,20 @@ const translations = {
     unknown: "Unknown",
     irataLevelLabel: "IRATA Level",
     spratLevelLabel: "SPRAT Level",
+    sendJobOffer: "Send Job Offer",
+    selectJob: "Select a job to offer",
+    selectJobPlaceholder: "Choose a job posting...",
+    message: "Message (optional)",
+    messagePlaceholder: "Add a personal message to the technician...",
+    sendOffer: "Send Offer",
+    offerSent: "Job Offer Sent",
+    offerSentDesc: "The technician will be notified of your job offer.",
+    offerFailed: "Failed to send offer",
+    technicianUnavailable: "This technician is no longer available",
+    noActiveJobs: "No Active Jobs",
+    noActiveJobsDesc: "You need to create a job posting first.",
+    createJob: "Create Job",
+    cancel: "Cancel",
   },
   fr: {
     title: "Navigateur de talents",
@@ -107,7 +127,29 @@ const translations = {
     unknown: "Inconnu",
     irataLevelLabel: "IRATA Niveau",
     spratLevelLabel: "SPRAT Niveau",
+    sendJobOffer: "Envoyer une offre d'emploi",
+    selectJob: "Selectionnez un emploi a offrir",
+    selectJobPlaceholder: "Choisir une offre d'emploi...",
+    message: "Message (optionnel)",
+    messagePlaceholder: "Ajoutez un message personnel au technicien...",
+    sendOffer: "Envoyer l'offre",
+    offerSent: "Offre d'emploi envoyee",
+    offerSentDesc: "Le technicien sera informe de votre offre d'emploi.",
+    offerFailed: "Echec de l'envoi de l'offre",
+    technicianUnavailable: "Ce technicien n'est plus disponible",
+    noActiveJobs: "Aucun emploi actif",
+    noActiveJobsDesc: "Vous devez d'abord creer une offre d'emploi.",
+    createJob: "Creer un emploi",
+    cancel: "Annuler",
   }
+};
+
+type JobPosting = {
+  id: string;
+  title: string;
+  status: string;
+  location: string | null;
+  jobType: string;
 };
 
 interface VisibleTechnician {
@@ -132,10 +174,14 @@ interface VisibleTechnician {
 
 export default function VisibleTechniciansBrowser() {
   const [, setLocation] = useLocation();
+  const { toast } = useToast();
   const [searchQuery, setSearchQuery] = useState("");
   const [certFilter, setCertFilter] = useState<string>("all");
   const [levelFilter, setLevelFilter] = useState<string>("all");
   const [selectedTech, setSelectedTech] = useState<VisibleTechnician | null>(null);
+  const [showJobOfferDialog, setShowJobOfferDialog] = useState(false);
+  const [selectedJobId, setSelectedJobId] = useState<string>("");
+  const [offerMessage, setOfferMessage] = useState("");
   const [language, setLanguage] = useState<Language>(() => {
     const saved = localStorage.getItem("dashboardLanguage");
     return (saved === "fr" ? "fr" : "en") as Language;
@@ -148,6 +194,37 @@ export default function VisibleTechniciansBrowser() {
 
   const { data: techsData, isLoading } = useQuery<{ technicians: VisibleTechnician[] }>({
     queryKey: ["/api/visible-technicians"],
+  });
+
+  const { data: jobsData } = useQuery<{ jobPostings: JobPosting[] }>({
+    queryKey: ["/api/job-postings"],
+    enabled: userData?.user?.role === 'company',
+  });
+
+  const activeJobs = (jobsData?.jobPostings || []).filter(j => j.status === 'active');
+
+  const sendOfferMutation = useMutation({
+    mutationFn: async ({ technicianId, jobPostingId, message }: { technicianId: string; jobPostingId: string; message?: string }) => {
+      return apiRequest("POST", "/api/job-applications/offer", { technicianId, jobPostingId, message });
+    },
+    onSuccess: () => {
+      toast({
+        title: t.offerSent,
+        description: t.offerSentDesc,
+      });
+      setShowJobOfferDialog(false);
+      setSelectedJobId("");
+      setOfferMessage("");
+      queryClient.invalidateQueries({ queryKey: ["/api/job-applications"] });
+    },
+    onError: (error: any) => {
+      const errorMessage = error?.message || "";
+      const isTechUnavailable = errorMessage.includes("no longer available") || errorMessage.includes("not a technician");
+      toast({
+        title: isTechUnavailable ? t.technicianUnavailable : t.offerFailed,
+        variant: "destructive",
+      });
+    },
   });
 
   const user = userData?.user;
@@ -548,8 +625,109 @@ export default function VisibleTechniciansBrowser() {
                     </p>
                   </div>
                 )}
+
+                {/* Send Job Offer Button - Only for company users */}
+                {user?.role === 'company' && (
+                  <div className="pt-4 border-t">
+                    <Button 
+                      onClick={() => setShowJobOfferDialog(true)}
+                      className="w-full gap-2"
+                      data-testid="button-send-job-offer"
+                    >
+                      <Send className="w-4 h-4" />
+                      {t.sendJobOffer}
+                    </Button>
+                  </div>
+                )}
               </div>
             </>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Job Offer Dialog */}
+      <Dialog open={showJobOfferDialog} onOpenChange={setShowJobOfferDialog}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Briefcase className="w-5 h-5" />
+              {t.sendJobOffer}
+            </DialogTitle>
+            {selectedTech && (
+              <DialogDescription>
+                {getDisplayName(selectedTech)}
+              </DialogDescription>
+            )}
+          </DialogHeader>
+
+          {activeJobs.length === 0 ? (
+            <div className="py-6 text-center">
+              <Briefcase className="w-12 h-12 mx-auto text-muted-foreground/50 mb-3" />
+              <h4 className="font-semibold mb-1">{t.noActiveJobs}</h4>
+              <p className="text-sm text-muted-foreground mb-4">{t.noActiveJobsDesc}</p>
+              <Button onClick={() => setLocation("/job-board")} data-testid="button-create-job-from-offer">
+                {t.createJob}
+              </Button>
+            </div>
+          ) : (
+            <div className="space-y-4 py-2">
+              <div className="space-y-2">
+                <Label>{t.selectJob}</Label>
+                <Select value={selectedJobId} onValueChange={setSelectedJobId}>
+                  <SelectTrigger data-testid="select-job-for-offer">
+                    <SelectValue placeholder={t.selectJobPlaceholder} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {activeJobs.map((job) => (
+                      <SelectItem key={job.id} value={job.id}>
+                        <div className="flex items-center gap-2">
+                          <span>{job.title}</span>
+                          {job.location && (
+                            <span className="text-xs text-muted-foreground">- {job.location}</span>
+                          )}
+                        </div>
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2">
+                <Label>{t.message}</Label>
+                <Textarea
+                  value={offerMessage}
+                  onChange={(e) => setOfferMessage(e.target.value)}
+                  placeholder={t.messagePlaceholder}
+                  rows={3}
+                  data-testid="input-offer-message"
+                />
+              </div>
+            </div>
+          )}
+
+          {activeJobs.length > 0 && (
+            <DialogFooter className="gap-2 sm:gap-0">
+              <Button variant="outline" onClick={() => setShowJobOfferDialog(false)}>
+                {t.cancel}
+              </Button>
+              <Button
+                onClick={() => {
+                  if (selectedTech && selectedJobId) {
+                    sendOfferMutation.mutate({
+                      technicianId: selectedTech.id,
+                      jobPostingId: selectedJobId,
+                      message: offerMessage || undefined,
+                    });
+                  }
+                }}
+                disabled={!selectedJobId || sendOfferMutation.isPending}
+                data-testid="button-confirm-send-offer"
+              >
+                {sendOfferMutation.isPending && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
+                <Send className="w-4 h-4 mr-2" />
+                {t.sendOffer}
+              </Button>
+            </DialogFooter>
           )}
         </DialogContent>
       </Dialog>

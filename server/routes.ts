@@ -16074,6 +16074,108 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Send job offer to technician (employer-initiated)
+  app.post("/api/job-applications/offer", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      // Only company owners can send job offers
+      if (currentUser.role !== "company") {
+        return res.status(403).json({ message: "Only employers can send job offers" });
+      }
+
+      // Validate request body
+      const offerSchema = z.object({
+        technicianId: z.string().min(1),
+        jobPostingId: z.string().min(1),
+        message: z.string().optional(),
+      });
+
+      const parseResult = offerSchema.safeParse(req.body);
+      if (!parseResult.success) {
+        return res.status(400).json({ message: "technicianId and jobPostingId are required" });
+      }
+
+      const { technicianId, jobPostingId, message } = parseResult.data;
+
+      // Verify the job posting belongs to this company and is active
+      const [job] = await db.select()
+        .from(jobPostings)
+        .where(
+          and(
+            eq(jobPostings.id, jobPostingId),
+            eq(jobPostings.companyId, currentUser.id)
+          )
+        );
+
+      if (!job) {
+        return res.status(404).json({ message: "Job posting not found" });
+      }
+
+      if (job.status !== "active") {
+        return res.status(400).json({ message: "Job posting is not active" });
+      }
+
+      // Verify the technician exists
+      const technician = await storage.getUserById(technicianId);
+      if (!technician) {
+        return res.status(404).json({ message: "Technician not found" });
+      }
+
+      // Verify the technician has opted into visibility (privacy requirement)
+      const EMPLOYEE_ROLES = ["rope_access_tech", "ground_crew", "ground_crew_supervisor", "supervisor", "operations_manager", "manager"];
+      if (!EMPLOYEE_ROLES.includes(technician.role)) {
+        return res.status(403).json({ message: "Target user is not a technician" });
+      }
+
+      if (!technician.isVisibleToEmployers) {
+        return res.status(403).json({ message: "This technician is no longer available" });
+      }
+
+      // Check if an application/offer already exists
+      const [existingApplication] = await db.select()
+        .from(jobApplications)
+        .where(
+          and(
+            eq(jobApplications.technicianId, technicianId),
+            eq(jobApplications.jobPostingId, jobPostingId)
+          )
+        );
+
+      if (existingApplication) {
+        // If already exists, just update status to 'offered'
+        const [updatedApplication] = await db.update(jobApplications)
+          .set({
+            status: "offered",
+            employerNotes: message || existingApplication.employerNotes,
+            statusUpdatedAt: new Date(),
+          })
+          .where(eq(jobApplications.id, existingApplication.id))
+          .returning();
+
+        return res.json({ application: updatedApplication, message: "Job offer sent" });
+      }
+
+      // Create new application with 'offered' status (employer-initiated)
+      const [newApplication] = await db.insert(jobApplications).values({
+        technicianId,
+        jobPostingId,
+        status: "offered",
+        employerNotes: message || null,
+        appliedAt: new Date(),
+        statusUpdatedAt: new Date(),
+      }).returning();
+
+      res.status(201).json({ application: newApplication, message: "Job offer sent" });
+    } catch (error) {
+      console.error("Send job offer error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
   // =====================================================================
   // END JOB APPLICATIONS ENDPOINTS
   // =====================================================================
