@@ -206,6 +206,8 @@ const translations = {
     hour: "hr",
     goToWorkDashboard: "Go to Work Dashboard",
     accessProjects: "Access projects, clock in/out, and safety forms",
+    dashboardDisabledNoCompany: "You need to be linked with a company to access the Work Dashboard. Accept an invitation below to get started.",
+    dashboardDisabledTerminated: "Your employment has been terminated. Accept a new invitation to access the Work Dashboard.",
     myLoggedHours: "My Logged Hours",
     viewLoggedHoursDesc: "View your work sessions and add previous work experience",
     viewLoggedHours: "View Logged Hours",
@@ -392,6 +394,8 @@ const translations = {
     hour: "h",
     goToWorkDashboard: "Accéder au tableau de bord",
     accessProjects: "Accéder aux projets, pointage et formulaires de sécurité",
+    dashboardDisabledNoCompany: "Vous devez être lié à une entreprise pour accéder au tableau de bord. Acceptez une invitation ci-dessous pour commencer.",
+    dashboardDisabledTerminated: "Votre emploi a été résilié. Acceptez une nouvelle invitation pour accéder au tableau de bord.",
     myLoggedHours: "Mes heures enregistrées",
     viewLoggedHoursDesc: "Voir vos sessions de travail et ajouter des expériences antérieures",
     viewLoggedHours: "Voir les heures enregistrées",
@@ -966,29 +970,36 @@ export default function TechnicianPortal() {
       </header>
 
       <main className="max-w-4xl mx-auto px-4 py-6 space-y-6">
-        {/* Work Dashboard Quick Access - Show for linked technicians */}
-        {user && user.role === 'rope_access_tech' && user.companyId && !user.terminatedDate && (
-          <Card className="border-primary bg-primary/5">
+        {/* Work Dashboard Quick Access - Show for all technicians */}
+        {user && user.role === 'rope_access_tech' && (
+          <Card className={user.companyId && !user.terminatedDate ? "border-primary bg-primary/5" : "border-muted bg-muted/30"}>
             <CardContent className="p-4">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div className="flex items-center gap-3">
-                  <div className="p-2 rounded-full bg-primary/10">
-                    <Briefcase className="w-5 h-5 text-primary" />
+                  <div className={`p-2 rounded-full ${user.companyId && !user.terminatedDate ? "bg-primary/10" : "bg-muted"}`}>
+                    <Briefcase className={`w-5 h-5 ${user.companyId && !user.terminatedDate ? "text-primary" : "text-muted-foreground"}`} />
                   </div>
                   <div>
-                    <p className="font-medium">{t.goToWorkDashboard}</p>
+                    <p className={`font-medium ${!user.companyId || user.terminatedDate ? "text-muted-foreground" : ""}`}>{t.goToWorkDashboard}</p>
                     <p className="text-sm text-muted-foreground">{t.accessProjects}</p>
                   </div>
                 </div>
                 <Button
                   onClick={() => setLocation("/dashboard")}
                   className="gap-2"
+                  disabled={!user.companyId || !!user.terminatedDate}
                   data-testid="button-go-to-dashboard"
                 >
                   {t.goToWorkDashboard}
                   <ArrowRight className="w-4 h-4" />
                 </Button>
               </div>
+              {/* Explanation when disabled */}
+              {(!user.companyId || user.terminatedDate) && (
+                <p className="text-sm text-muted-foreground mt-3 pt-3 border-t">
+                  {user.terminatedDate ? t.dashboardDisabledTerminated : t.dashboardDisabledNoCompany}
+                </p>
+              )}
             </CardContent>
           </Card>
         )}
