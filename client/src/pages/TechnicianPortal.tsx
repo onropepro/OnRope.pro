@@ -1810,6 +1810,78 @@ export default function TechnicianPortal() {
                           </div>
                         </div>
                       )}
+                      
+                      {/* IRATA Certification Card Upload - inside verification section */}
+                      <div className="pt-3 border-t border-primary/20 space-y-3">
+                        <p className="text-sm font-medium">{t.irataCertificationCard}</p>
+                        
+                        {/* Display existing IRATA documents */}
+                        {user.irataDocuments && user.irataDocuments.filter((u: string) => u && u.trim()).length > 0 && (
+                          <div className="space-y-2">
+                            {user.irataDocuments.filter((u: string) => u && u.trim()).map((url: string, index: number) => {
+                              const lowerUrl = url.toLowerCase();
+                              const isPdf = lowerUrl.endsWith('.pdf');
+                              const isImage = lowerUrl.match(/\.(jpg|jpeg|png|gif|webp|bmp)(\?|$)/i) || 
+                                            lowerUrl.includes('image') || 
+                                            (!isPdf && !lowerUrl.endsWith('.doc') && !lowerUrl.endsWith('.docx'));
+                              
+                              return (
+                                <a 
+                                  key={index} 
+                                  href={url} 
+                                  target="_blank" 
+                                  rel="noopener noreferrer"
+                                  className="block border-2 rounded-lg overflow-hidden active:opacity-70 transition-opacity bg-background"
+                                >
+                                  {isPdf ? (
+                                    <div className="flex flex-col items-center justify-center py-6 bg-muted gap-2">
+                                      <FileText className="w-10 h-10 text-muted-foreground" />
+                                      <span className="text-sm text-muted-foreground font-medium">{t.tapToViewPdf}</span>
+                                    </div>
+                                  ) : isImage ? (
+                                    <img 
+                                      src={url} 
+                                      alt={`IRATA certification ${index + 1}`}
+                                      className="w-full object-contain"
+                                      style={{ maxHeight: '200px', minHeight: '80px' }}
+                                      onError={(e) => {
+                                        const target = e.target as HTMLImageElement;
+                                        target.onerror = null;
+                                        target.style.display = 'none';
+                                      }}
+                                    />
+                                  ) : (
+                                    <div className="flex flex-col items-center justify-center py-6 bg-muted gap-2">
+                                      <FileText className="w-10 h-10 text-muted-foreground" />
+                                      <span className="text-sm text-muted-foreground font-medium">{t.tapToViewDocument}</span>
+                                    </div>
+                                  )}
+                                </a>
+                              );
+                            })}
+                          </div>
+                        )}
+                        
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => triggerDocumentUpload('irataCertificationCard')}
+                          disabled={uploadingDocType === 'irataCertificationCard'}
+                          data-testid="button-upload-irata-certification-card"
+                        >
+                          {uploadingDocType === 'irataCertificationCard' ? (
+                            <>
+                              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                              {t.uploading}
+                            </>
+                          ) : (
+                            <>
+                              <Upload className="w-4 h-4 mr-2" />
+                              {t.uploadIrataCertificationCard}
+                            </>
+                          )}
+                        </Button>
+                      </div>
                   </div>
 
                   {/* SPRAT License Verification Section - Available to all technicians */}
@@ -1933,155 +2005,80 @@ export default function TechnicianPortal() {
                           </div>
                         </div>
                       )}
+                      
+                      {/* SPRAT Certification Card Upload - inside verification section */}
+                      <div className="pt-3 border-t border-primary/20 space-y-3">
+                        <p className="text-sm font-medium">{t.spratCertificationCard}</p>
+                        
+                        {/* Display existing SPRAT documents */}
+                        {user.spratDocuments && user.spratDocuments.filter((u: string) => u && u.trim()).length > 0 && (
+                          <div className="space-y-2">
+                            {user.spratDocuments.filter((u: string) => u && u.trim()).map((url: string, index: number) => {
+                              const lowerUrl = url.toLowerCase();
+                              const isPdf = lowerUrl.endsWith('.pdf');
+                              const isImage = lowerUrl.match(/\.(jpg|jpeg|png|gif|webp|bmp)(\?|$)/i) || 
+                                            lowerUrl.includes('image') || 
+                                            (!isPdf && !lowerUrl.endsWith('.doc') && !lowerUrl.endsWith('.docx'));
+                              
+                              return (
+                                <a 
+                                  key={index} 
+                                  href={url} 
+                                  target="_blank" 
+                                  rel="noopener noreferrer"
+                                  className="block border-2 rounded-lg overflow-hidden active:opacity-70 transition-opacity bg-background"
+                                >
+                                  {isPdf ? (
+                                    <div className="flex flex-col items-center justify-center py-6 bg-muted gap-2">
+                                      <FileText className="w-10 h-10 text-muted-foreground" />
+                                      <span className="text-sm text-muted-foreground font-medium">{t.tapToViewPdf}</span>
+                                    </div>
+                                  ) : isImage ? (
+                                    <img 
+                                      src={url} 
+                                      alt={`SPRAT certification ${index + 1}`}
+                                      className="w-full object-contain"
+                                      style={{ maxHeight: '200px', minHeight: '80px' }}
+                                      onError={(e) => {
+                                        const target = e.target as HTMLImageElement;
+                                        target.onerror = null;
+                                        target.style.display = 'none';
+                                      }}
+                                    />
+                                  ) : (
+                                    <div className="flex flex-col items-center justify-center py-6 bg-muted gap-2">
+                                      <FileText className="w-10 h-10 text-muted-foreground" />
+                                      <span className="text-sm text-muted-foreground font-medium">{t.tapToViewDocument}</span>
+                                    </div>
+                                  )}
+                                </a>
+                              );
+                            })}
+                          </div>
+                        )}
+                        
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => triggerDocumentUpload('spratCertificationCard')}
+                          disabled={uploadingDocType === 'spratCertificationCard'}
+                          data-testid="button-upload-sprat-certification-card"
+                        >
+                          {uploadingDocType === 'spratCertificationCard' ? (
+                            <>
+                              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                              {t.uploading}
+                            </>
+                          ) : (
+                            <>
+                              <Upload className="w-4 h-4 mr-2" />
+                              {t.uploadSpratCertificationCard}
+                            </>
+                          )}
+                        </Button>
+                      </div>
                   </div>
                   
-                  {/* IRATA Certification Card Upload Section */}
-                  {user.irataLevel && (
-                    <div className="mt-4 p-3 bg-muted/30 rounded-lg border space-y-3">
-                      <p className="text-sm font-medium">{t.irataCertificationCard}</p>
-                      
-                      {/* Display existing IRATA documents */}
-                      {user.irataDocuments && user.irataDocuments.filter((u: string) => u && u.trim()).length > 0 && (
-                        <div className="space-y-2">
-                          {user.irataDocuments.filter((u: string) => u && u.trim()).map((url: string, index: number) => {
-                            const lowerUrl = url.toLowerCase();
-                            const isPdf = lowerUrl.endsWith('.pdf');
-                            const isImage = lowerUrl.match(/\.(jpg|jpeg|png|gif|webp|bmp)(\?|$)/i) || 
-                                          lowerUrl.includes('image') || 
-                                          (!isPdf && !lowerUrl.endsWith('.doc') && !lowerUrl.endsWith('.docx'));
-                            
-                            return (
-                              <a 
-                                key={index} 
-                                href={url} 
-                                target="_blank" 
-                                rel="noopener noreferrer"
-                                className="block border-2 rounded-lg overflow-hidden active:opacity-70 transition-opacity bg-background"
-                              >
-                                {isPdf ? (
-                                  <div className="flex flex-col items-center justify-center py-6 bg-muted gap-2">
-                                    <FileText className="w-10 h-10 text-muted-foreground" />
-                                    <span className="text-sm text-muted-foreground font-medium">{t.tapToViewPdf}</span>
-                                  </div>
-                                ) : isImage ? (
-                                  <img 
-                                    src={url} 
-                                    alt={`IRATA certification ${index + 1}`}
-                                    className="w-full object-contain"
-                                    style={{ maxHeight: '200px', minHeight: '80px' }}
-                                    onError={(e) => {
-                                      const target = e.target as HTMLImageElement;
-                                      target.onerror = null;
-                                      target.style.display = 'none';
-                                    }}
-                                  />
-                                ) : (
-                                  <div className="flex flex-col items-center justify-center py-6 bg-muted gap-2">
-                                    <FileText className="w-10 h-10 text-muted-foreground" />
-                                    <span className="text-sm text-muted-foreground font-medium">{t.tapToViewDocument}</span>
-                                  </div>
-                                )}
-                              </a>
-                            );
-                          })}
-                        </div>
-                      )}
-                      
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => triggerDocumentUpload('irataCertificationCard')}
-                        disabled={uploadingDocType === 'irataCertificationCard'}
-                        data-testid="button-upload-irata-certification-card"
-                      >
-                        {uploadingDocType === 'irataCertificationCard' ? (
-                          <>
-                            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                            {t.uploading}
-                          </>
-                        ) : (
-                          <>
-                            <Upload className="w-4 h-4 mr-2" />
-                            {t.uploadIrataCertificationCard}
-                          </>
-                        )}
-                      </Button>
-                    </div>
-                  )}
-                  
-                  {/* SPRAT Certification Card Upload Section */}
-                  {user.spratLevel && (
-                    <div className="mt-4 p-3 bg-muted/30 rounded-lg border space-y-3">
-                      <p className="text-sm font-medium">{t.spratCertificationCard}</p>
-                      
-                      {/* Display existing SPRAT documents */}
-                      {user.spratDocuments && user.spratDocuments.filter((u: string) => u && u.trim()).length > 0 && (
-                        <div className="space-y-2">
-                          {user.spratDocuments.filter((u: string) => u && u.trim()).map((url: string, index: number) => {
-                            const lowerUrl = url.toLowerCase();
-                            const isPdf = lowerUrl.endsWith('.pdf');
-                            const isImage = lowerUrl.match(/\.(jpg|jpeg|png|gif|webp|bmp)(\?|$)/i) || 
-                                          lowerUrl.includes('image') || 
-                                          (!isPdf && !lowerUrl.endsWith('.doc') && !lowerUrl.endsWith('.docx'));
-                            
-                            return (
-                              <a 
-                                key={index} 
-                                href={url} 
-                                target="_blank" 
-                                rel="noopener noreferrer"
-                                className="block border-2 rounded-lg overflow-hidden active:opacity-70 transition-opacity bg-background"
-                              >
-                                {isPdf ? (
-                                  <div className="flex flex-col items-center justify-center py-6 bg-muted gap-2">
-                                    <FileText className="w-10 h-10 text-muted-foreground" />
-                                    <span className="text-sm text-muted-foreground font-medium">{t.tapToViewPdf}</span>
-                                  </div>
-                                ) : isImage ? (
-                                  <img 
-                                    src={url} 
-                                    alt={`SPRAT certification ${index + 1}`}
-                                    className="w-full object-contain"
-                                    style={{ maxHeight: '200px', minHeight: '80px' }}
-                                    onError={(e) => {
-                                      const target = e.target as HTMLImageElement;
-                                      target.onerror = null;
-                                      target.style.display = 'none';
-                                    }}
-                                  />
-                                ) : (
-                                  <div className="flex flex-col items-center justify-center py-6 bg-muted gap-2">
-                                    <FileText className="w-10 h-10 text-muted-foreground" />
-                                    <span className="text-sm text-muted-foreground font-medium">{t.tapToViewDocument}</span>
-                                  </div>
-                                )}
-                              </a>
-                            );
-                          })}
-                        </div>
-                      )}
-                      
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => triggerDocumentUpload('spratCertificationCard')}
-                        disabled={uploadingDocType === 'spratCertificationCard'}
-                        data-testid="button-upload-sprat-certification-card"
-                      >
-                        {uploadingDocType === 'spratCertificationCard' ? (
-                          <>
-                            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                            {t.uploading}
-                          </>
-                        ) : (
-                          <>
-                            <Upload className="w-4 h-4 mr-2" />
-                            {t.uploadSpratCertificationCard}
-                          </>
-                        )}
-                      </Button>
-                    </div>
-                  )}
                 </div>
 
                 {user.hasFirstAid && (
