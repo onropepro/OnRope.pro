@@ -285,6 +285,7 @@ const translations = {
     logbookDisclaimer: "This is a personal tracking tool only. You must still record all hours in your official IRATA/SPRAT logbook - this digital log does not replace it.",
     yourReferralCode: "Your Referral Code",
     shareReferralCode: "Share this code with fellow technicians to invite them to OnRopePro",
+    referralPremiumBenefit: "You'll get premium access when your code is used!",
     copyCode: "Copy Code",
     codeCopied: "Copied!",
     referredTimes: "Referred {count} technician(s)",
@@ -514,6 +515,7 @@ const translations = {
     logbookDisclaimer: "Ceci est un outil de suivi personnel uniquement. Vous devez toujours enregistrer toutes vos heures dans votre carnet IRATA/SPRAT officiel - ce journal numérique ne le remplace pas.",
     yourReferralCode: "Votre code de parrainage",
     shareReferralCode: "Partagez ce code avec d'autres techniciens pour les inviter sur OnRopePro",
+    referralPremiumBenefit: "Vous obtiendrez un accès premium lorsque votre code sera utilisé!",
     copyCode: "Copier le code",
     codeCopied: "Copié!",
     referredTimes: "Parrainé {count} technicien(s)",
@@ -1360,6 +1362,9 @@ export default function TechnicianPortal() {
                     <CardDescription>
                       {t.shareReferralCode}
                     </CardDescription>
+                    <p className="text-sm font-medium text-green-600 dark:text-green-400 mt-1">
+                      {t.referralPremiumBenefit}
+                    </p>
                   </div>
                 </div>
               </div>
