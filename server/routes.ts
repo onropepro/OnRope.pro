@@ -3,7 +3,7 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { db } from "./db";
 import { wsHub } from "./websocket-hub";
-import { insertUserSchema, insertClientSchema, insertProjectSchema, insertDropLogSchema, insertComplaintSchema, insertComplaintNoteSchema, insertJobCommentSchema, insertHarnessInspectionSchema, insertToolboxMeetingSchema, insertFlhaFormSchema, insertIncidentReportSchema, insertMethodStatementSchema, insertPayPeriodConfigSchema, insertQuoteSchema, insertQuoteServiceSchema, insertGearItemSchema, insertGearAssignmentSchema, insertGearSerialNumberSchema, insertEquipmentDamageReportSchema, insertScheduledJobSchema, insertJobAssignmentSchema, updatePropertyManagerAccountSchema, insertFeatureRequestSchema, insertFeatureRequestMessageSchema, insertHistoricalHoursSchema, normalizeStrataPlan, type InsertGearItem, type InsertGearAssignment, type InsertGearSerialNumber, type Project, gearAssignments, gearSerialNumbers, gearItems, jobAssignments, workSessions, nonBillableWorkSessions, licenseKeys, users, propertyManagerCompanyLinks, IRATA_TASK_TYPES, quotes, quoteServices, quoteHistory, superuserTasks, superuserTaskComments, superuserTaskAttachments, jobPostings, insertJobPostingSchema } from "@shared/schema";
+import { insertUserSchema, insertClientSchema, insertProjectSchema, insertDropLogSchema, insertComplaintSchema, insertComplaintNoteSchema, insertJobCommentSchema, insertHarnessInspectionSchema, insertToolboxMeetingSchema, insertFlhaFormSchema, insertIncidentReportSchema, insertMethodStatementSchema, insertPayPeriodConfigSchema, insertQuoteSchema, insertQuoteServiceSchema, insertGearItemSchema, insertGearAssignmentSchema, insertGearSerialNumberSchema, insertEquipmentDamageReportSchema, insertScheduledJobSchema, insertJobAssignmentSchema, updatePropertyManagerAccountSchema, insertFeatureRequestSchema, insertFeatureRequestMessageSchema, insertHistoricalHoursSchema, normalizeStrataPlan, type InsertGearItem, type InsertGearAssignment, type InsertGearSerialNumber, type Project, gearAssignments, gearSerialNumbers, gearItems, jobAssignments, workSessions, nonBillableWorkSessions, licenseKeys, users, propertyManagerCompanyLinks, IRATA_TASK_TYPES, quotes, quoteServices, quoteHistory, superuserTasks, superuserTaskComments, superuserTaskAttachments, jobPostings, insertJobPostingSchema, jobApplications } from "@shared/schema";
 import { eq, sql, and, or, isNull, gt, desc } from "drizzle-orm";
 import { z } from "zod";
 import bcrypt from "bcrypt";
@@ -15804,6 +15804,235 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: "Internal server error" });
     }
   });
+
+  // =====================================================================
+  // JOB APPLICATIONS ENDPOINTS
+  // =====================================================================
+
+  // Get applications for a technician (their own applications)
+  app.get("/api/job-applications/my", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      const applications = await db.select()
+        .from(jobApplications)
+        .where(eq(jobApplications.technicianId, currentUser.id))
+        .orderBy(desc(jobApplications.appliedAt));
+
+      // Fetch job posting details for each application
+      const applicationsWithJobs = await Promise.all(
+        applications.map(async (app) => {
+          const [job] = await db.select().from(jobPostings).where(eq(jobPostings.id, app.jobPostingId));
+          return { ...app, jobPosting: job };
+        })
+      );
+
+      res.json({ applications: applicationsWithJobs });
+    } catch (error) {
+      console.error("Get my applications error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Get applications for a job posting (for company/superuser)
+  app.get("/api/job-applications/job/:jobId", requireAuth, requireRole("company", "superuser"), async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      // Verify ownership of job posting
+      const [job] = await db.select().from(jobPostings).where(eq(jobPostings.id, req.params.jobId));
+      if (!job) {
+        return res.status(404).json({ message: "Job posting not found" });
+      }
+
+      if (currentUser.role === "company" && job.companyId !== currentUser.id) {
+        return res.status(403).json({ message: "Access denied" });
+      }
+
+      const applications = await db.select()
+        .from(jobApplications)
+        .where(eq(jobApplications.jobPostingId, req.params.jobId))
+        .orderBy(desc(jobApplications.appliedAt));
+
+      // Fetch technician details for each application
+      const applicationsWithTechnicians = await Promise.all(
+        applications.map(async (app) => {
+          const technician = await storage.getUserById(app.technicianId);
+          if (!technician) return { ...app, technician: null };
+          return {
+            ...app,
+            technician: {
+              id: technician.id,
+              firstName: technician.firstName,
+              lastName: technician.lastName,
+              name: technician.name,
+              photoUrl: technician.photoUrl,
+              irataLevel: technician.irataLevel,
+              spratLevel: technician.spratLevel,
+              employeeCity: technician.employeeCity,
+              employeeProvinceState: technician.employeeProvinceState,
+              ropeAccessStartDate: technician.ropeAccessStartDate,
+              resumeDocuments: technician.resumeDocuments,
+            },
+          };
+        })
+      );
+
+      res.json({ applications: applicationsWithTechnicians });
+    } catch (error) {
+      console.error("Get job applications error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Apply to a job (technician)
+  app.post("/api/job-applications", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      // Only technician roles can apply
+      const EMPLOYEE_ROLES = ["rope_access_tech", "ground_crew", "ground_crew_supervisor", "supervisor", "operations_manager", "manager"];
+      if (!EMPLOYEE_ROLES.includes(currentUser.role)) {
+        return res.status(403).json({ message: "Only technicians can apply to jobs" });
+      }
+
+      const { jobPostingId, coverMessage } = req.body;
+      if (!jobPostingId) {
+        return res.status(400).json({ message: "Job posting ID is required" });
+      }
+
+      // Check if job exists and is active
+      const [job] = await db.select().from(jobPostings).where(eq(jobPostings.id, jobPostingId));
+      if (!job) {
+        return res.status(404).json({ message: "Job posting not found" });
+      }
+      if (job.status !== "active") {
+        return res.status(400).json({ message: "This job is no longer accepting applications" });
+      }
+
+      // Check if already applied
+      const existingApplication = await db.select()
+        .from(jobApplications)
+        .where(and(
+          eq(jobApplications.jobPostingId, jobPostingId),
+          eq(jobApplications.technicianId, currentUser.id)
+        ));
+
+      if (existingApplication.length > 0) {
+        return res.status(400).json({ message: "You have already applied to this job" });
+      }
+
+      const [newApplication] = await db.insert(jobApplications)
+        .values({
+          jobPostingId,
+          technicianId: currentUser.id,
+          coverMessage: coverMessage || null,
+          status: "applied",
+        })
+        .returning();
+
+      res.json({ application: newApplication, message: "Application submitted successfully" });
+    } catch (error) {
+      console.error("Apply to job error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Update application status (company/superuser)
+  app.patch("/api/job-applications/:id", requireAuth, requireRole("company", "superuser"), async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      const [application] = await db.select()
+        .from(jobApplications)
+        .where(eq(jobApplications.id, req.params.id));
+
+      if (!application) {
+        return res.status(404).json({ message: "Application not found" });
+      }
+
+      // Verify ownership via job posting
+      const [job] = await db.select().from(jobPostings).where(eq(jobPostings.id, application.jobPostingId));
+      if (!job) {
+        return res.status(404).json({ message: "Job posting not found" });
+      }
+
+      if (currentUser.role === "company" && job.companyId !== currentUser.id) {
+        return res.status(403).json({ message: "Access denied" });
+      }
+
+      const { status, employerNotes } = req.body;
+      const validStatuses = ["applied", "reviewing", "interviewed", "offered", "hired", "rejected"];
+      if (status && !validStatuses.includes(status)) {
+        return res.status(400).json({ message: "Invalid status" });
+      }
+
+      const updates: any = {
+        statusUpdatedAt: new Date(),
+      };
+      if (status) updates.status = status;
+      if (employerNotes !== undefined) updates.employerNotes = employerNotes;
+      if (status === "reviewing" && !application.reviewedAt) {
+        updates.reviewedAt = new Date();
+      }
+
+      const [updatedApplication] = await db.update(jobApplications)
+        .set(updates)
+        .where(eq(jobApplications.id, req.params.id))
+        .returning();
+
+      res.json({ application: updatedApplication });
+    } catch (error) {
+      console.error("Update application error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Withdraw application (technician)
+  app.delete("/api/job-applications/:id", requireAuth, async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      const [application] = await db.select()
+        .from(jobApplications)
+        .where(eq(jobApplications.id, req.params.id));
+
+      if (!application) {
+        return res.status(404).json({ message: "Application not found" });
+      }
+
+      // Only the technician who applied can withdraw
+      if (application.technicianId !== currentUser.id) {
+        return res.status(403).json({ message: "Access denied" });
+      }
+
+      await db.delete(jobApplications).where(eq(jobApplications.id, req.params.id));
+
+      res.json({ message: "Application withdrawn successfully" });
+    } catch (error) {
+      console.error("Withdraw application error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // =====================================================================
+  // END JOB APPLICATIONS ENDPOINTS
+  // =====================================================================
 
   // Toggle technician visibility to employers
   app.patch("/api/technician/visibility", requireAuth, async (req: Request, res: Response) => {

@@ -2399,3 +2399,40 @@ export const insertJobPostingSchema = createInsertSchema(jobPostings).omit({
 
 export type JobPosting = typeof jobPostings.$inferSelect;
 export type InsertJobPosting = z.infer<typeof insertJobPostingSchema>;
+
+// Job Applications - Technicians applying to job postings
+export const jobApplications = pgTable("job_applications", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  
+  // References
+  jobPostingId: varchar("job_posting_id").notNull().references(() => jobPostings.id, { onDelete: "cascade" }),
+  technicianId: varchar("technician_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  
+  // Application details
+  coverMessage: text("cover_message"), // Optional message from technician
+  
+  // Status tracking
+  status: varchar("status").notNull().default("applied"), // applied | reviewing | interviewed | offered | hired | rejected | withdrawn
+  
+  // Employer notes (only visible to employer)
+  employerNotes: text("employer_notes"),
+  
+  // Timestamps
+  appliedAt: timestamp("applied_at").defaultNow().notNull(),
+  reviewedAt: timestamp("reviewed_at"),
+  statusUpdatedAt: timestamp("status_updated_at"),
+}, (table) => [
+  index("IDX_job_applications_job").on(table.jobPostingId),
+  index("IDX_job_applications_technician").on(table.technicianId),
+  index("IDX_job_applications_status").on(table.status),
+]);
+
+export const insertJobApplicationSchema = createInsertSchema(jobApplications).omit({
+  id: true,
+  appliedAt: true,
+  reviewedAt: true,
+  statusUpdatedAt: true,
+});
+
+export type JobApplication = typeof jobApplications.$inferSelect;
+export type InsertJobApplication = z.infer<typeof insertJobApplicationSchema>;
