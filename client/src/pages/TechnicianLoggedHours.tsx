@@ -305,6 +305,7 @@ export default function TechnicianLoggedHours() {
     selected: boolean;
     date: string | null;
     building: string | null;
+    address: string | null;
     employer: string | null;
     tasks: string[];
     hours: number | null;
@@ -737,6 +738,7 @@ export default function TechnicianLoggedHours() {
             selected: Boolean(extractedDate && extractedHours && extractedHours > 0), // Auto-select if has required fields
             date: extractedDate,
             building: entry.buildingName || null,
+            address: entry.buildingAddress || null,
             employer: entry.previousEmployer || null,
             tasks: extractedTasks,
             hours: extractedHours,
@@ -858,7 +860,7 @@ export default function TechnicianLoggedHours() {
           endDate: entry.date as string, // Same day for single entries from logbook
           hoursWorked: hoursNum.toFixed(2),
           buildingName: entry.building || null,
-          buildingAddress: null,
+          buildingAddress: entry.address || null,
           buildingHeight: null,
           previousEmployer: entry.employer || null,
           notes: entry.notes || null,
@@ -1531,11 +1533,21 @@ export default function TechnicianLoggedHours() {
                           </Badge>
                         </div>
                         
-                        {entry.building && (
-                          <p className="text-sm flex items-center gap-1 text-muted-foreground">
-                            <Building className="w-3 h-3" />
-                            {entry.building}
-                          </p>
+                        {(entry.building || entry.address) && (
+                          <div className="text-sm text-muted-foreground">
+                            {entry.building && (
+                              <p className="flex items-center gap-1">
+                                <Building className="w-3 h-3" />
+                                {entry.building}
+                              </p>
+                            )}
+                            {entry.address && (
+                              <p className="flex items-center gap-1 mt-0.5">
+                                <MapPin className="w-3 h-3" />
+                                {entry.address}
+                              </p>
+                            )}
+                          </div>
                         )}
                         {entry.employer && (
                           <p className="text-sm text-muted-foreground mt-1">
