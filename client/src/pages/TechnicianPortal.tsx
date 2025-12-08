@@ -49,6 +49,7 @@ import {
   CreditCard,
   Calendar,
   AlertCircle,
+  AlertTriangle,
   HardHat,
   Clock,
   FileText,
@@ -138,6 +139,10 @@ const translations = {
     expiresOn: "Expires on",
     expired: "Expired",
     expiringSoon: "Expiring Soon",
+    expiringIn60Days: "Expiring in 60 days",
+    expiringIn30Days: "Urgent: 30 days",
+    certificationExpiryBannerTitle: "Certification Expiring Soon!",
+    certificationExpiryBannerMessage: "Your {cert} certification expires on {date}. Renew now to avoid work interruption.",
     verified: "Verified",
     firstAidCertificate: "First Aid Certificate",
     uploadedDocuments: "Uploaded Documents",
@@ -377,6 +382,10 @@ const translations = {
     expiresOn: "Expire le",
     expired: "Expiré",
     expiringSoon: "Expire bientôt",
+    expiringIn60Days: "Expire dans 60 jours",
+    expiringIn30Days: "Urgent: 30 jours",
+    certificationExpiryBannerTitle: "Certification expire bientôt!",
+    certificationExpiryBannerMessage: "Votre certification {cert} expire le {date}. Renouvelez maintenant pour éviter une interruption de travail.",
     verified: "Vérifié",
     firstAidCertificate: "Certificat de premiers soins",
     uploadedDocuments: "Documents téléversés",
@@ -1240,6 +1249,57 @@ export default function TechnicianPortal() {
         </div>
       </header>
 
+      {/* Certification Expiry Warning Banner - Shows when cert expires within 30 days */}
+      {(() => {
+        const urgentCerts: { type: string; expiryDate: string }[] = [];
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        const thirtyDaysFromNow = new Date();
+        thirtyDaysFromNow.setDate(today.getDate() + 30);
+        
+        if (user.irataExpirationDate) {
+          try {
+            const irataExpiry = parseLocalDate(user.irataExpirationDate);
+            if (irataExpiry >= today && irataExpiry <= thirtyDaysFromNow) {
+              urgentCerts.push({ type: 'IRATA', expiryDate: user.irataExpirationDate });
+            }
+          } catch (e) {}
+        }
+        
+        if (user.spratExpirationDate) {
+          try {
+            const spratExpiry = parseLocalDate(user.spratExpirationDate);
+            if (spratExpiry >= today && spratExpiry <= thirtyDaysFromNow) {
+              urgentCerts.push({ type: 'SPRAT', expiryDate: user.spratExpirationDate });
+            }
+          } catch (e) {}
+        }
+        
+        if (urgentCerts.length === 0) return null;
+        
+        return (
+          <div className="bg-red-600 dark:bg-red-700 text-white" data-testid="banner-certification-expiry">
+            <div className="max-w-4xl mx-auto px-4 py-3">
+              <div className="flex items-center gap-3 flex-wrap">
+                <AlertTriangle className="w-5 h-5 flex-shrink-0" />
+                <div className="flex-1 min-w-0">
+                  <p className="font-semibold text-sm">{t.certificationExpiryBannerTitle}</p>
+                  <div className="text-xs mt-0.5 space-y-0.5">
+                    {urgentCerts.map((cert) => (
+                      <p key={cert.type}>
+                        {t.certificationExpiryBannerMessage
+                          .replace('{cert}', cert.type)
+                          .replace('{date}', formatLocalDate(cert.expiryDate))}
+                      </p>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+      })()}
+
       <main className="max-w-4xl mx-auto px-4 py-6 space-y-6">
         {/* Work Dashboard Quick Access - Show for all technicians */}
         {user && user.role === 'rope_access_tech' && (
@@ -2029,8 +2089,15 @@ export default function TechnicianPortal() {
                                   } else {
                                     const thirtyDaysFromNow = new Date();
                                     thirtyDaysFromNow.setDate(today.getDate() + 30);
+                                    const sixtyDaysFromNow = new Date();
+                                    sixtyDaysFromNow.setDate(today.getDate() + 60);
+                                    
                                     if (expirationDate <= thirtyDaysFromNow) {
-                                      badge = <Badge variant="outline" className="ml-2 bg-yellow-500/10 border-yellow-500 text-yellow-700 dark:text-yellow-400 text-xs" data-testid="badge-irata-expiring">{t.expiringSoon}</Badge>;
+                                      // 30 days or less - RED urgent badge
+                                      badge = <Badge variant="destructive" className="ml-2 text-xs" data-testid="badge-irata-expiring-30">{t.expiringIn30Days}</Badge>;
+                                    } else if (expirationDate <= sixtyDaysFromNow) {
+                                      // 31-60 days - YELLOW warning badge
+                                      badge = <Badge variant="outline" className="ml-2 bg-yellow-500/10 border-yellow-500 text-yellow-700 dark:text-yellow-400 text-xs" data-testid="badge-irata-expiring-60">{t.expiringIn60Days}</Badge>;
                                     }
                                   }
                                   return <><span>{formattedDate}</span>{badge}</>;
@@ -2092,8 +2159,15 @@ export default function TechnicianPortal() {
                                   } else {
                                     const thirtyDaysFromNow = new Date();
                                     thirtyDaysFromNow.setDate(today.getDate() + 30);
+                                    const sixtyDaysFromNow = new Date();
+                                    sixtyDaysFromNow.setDate(today.getDate() + 60);
+                                    
                                     if (expirationDate <= thirtyDaysFromNow) {
-                                      badge = <Badge variant="outline" className="ml-2 bg-yellow-500/10 border-yellow-500 text-yellow-700 dark:text-yellow-400 text-xs" data-testid="badge-sprat-expiring">{t.expiringSoon}</Badge>;
+                                      // 30 days or less - RED urgent badge
+                                      badge = <Badge variant="destructive" className="ml-2 text-xs" data-testid="badge-sprat-expiring-30">{t.expiringIn30Days}</Badge>;
+                                    } else if (expirationDate <= sixtyDaysFromNow) {
+                                      // 31-60 days - YELLOW warning badge
+                                      badge = <Badge variant="outline" className="ml-2 bg-yellow-500/10 border-yellow-500 text-yellow-700 dark:text-yellow-400 text-xs" data-testid="badge-sprat-expiring-60">{t.expiringIn60Days}</Badge>;
                                     }
                                   }
                                   return <><span>{formattedDate}</span>{badge}</>;
