@@ -1765,6 +1765,12 @@ export default function TechnicianLoggedHours() {
                       <p className="text-sm font-medium text-primary">{selectedLog.buildingHeight}</p>
                     </div>
                   )}
+                  {(selectedLog as any).companyName && (
+                    <div>
+                      <p className="text-xs text-muted-foreground">{t.employer}</p>
+                      <p className="text-sm font-medium">{(selectedLog as any).companyName}</p>
+                    </div>
+                  )}
                 </div>
               </div>
 

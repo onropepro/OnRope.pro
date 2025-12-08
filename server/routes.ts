@@ -9116,15 +9116,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       const logs = await storage.getIrataTaskLogsByEmployee(currentUser.id);
       
-      // Enrich logs with building height from project if not already set
+      // Enrich logs with building height from project and company name
       const enrichedLogs = await Promise.all(logs.map(async (log) => {
-        // If log already has building height, return as-is
-        if (log.buildingHeight) {
-          return log;
+        let enrichedLog: any = { ...log };
+        
+        // Get company name from companyId
+        if (log.companyId) {
+          const company = await storage.getUserById(log.companyId);
+          if (company) {
+            enrichedLog.companyName = company.companyName || company.name || null;
+          }
         }
         
-        // Try to get building height from the associated project
-        if (log.projectId) {
+        // If log already has building height, skip height derivation
+        if (!log.buildingHeight && log.projectId) {
+          // Try to get building height from the associated project
           const project = await storage.getProjectById(log.projectId);
           if (project) {
             let derivedHeight = project.buildingHeight || null;
@@ -9138,12 +9144,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
             }
             
             if (derivedHeight) {
-              return { ...log, buildingHeight: derivedHeight };
+              enrichedLog.buildingHeight = derivedHeight;
             }
           }
         }
         
-        return log;
+        return enrichedLog;
       }));
       
       res.json({ logs: enrichedLogs });
