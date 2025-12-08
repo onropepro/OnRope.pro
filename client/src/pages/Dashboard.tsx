@@ -7282,6 +7282,132 @@ export default function Dashboard() {
                     </Card>
                   )}
 
+                  {/* SPRAT Certification */}
+                  {employeeToView.spratLevel && (
+                    <Card>
+                      <CardHeader>
+                        <CardTitle className="text-base flex items-center gap-2">
+                          <span className="material-icons text-lg">verified</span>
+                          {t('dashboard.employeeDetails.spratCertification', 'SPRAT Certification')}
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent className="space-y-3">
+                        <div>
+                          <div className="text-xs text-muted-foreground">{t('dashboard.employeeDetails.level', 'Level')}</div>
+                          <div className="text-sm font-medium">{t('dashboard.employeeDetails.levelValue', 'Level')} {employeeToView.spratLevel}</div>
+                        </div>
+                        {employeeToView.spratLicenseNumber && (
+                          <div>
+                            <div className="text-xs text-muted-foreground">{t('dashboard.employeeDetails.licenseNumber', 'License Number')}</div>
+                            <div className="text-sm font-medium">{employeeToView.spratLicenseNumber}</div>
+                          </div>
+                        )}
+                        {employeeToView.spratExpirationDate && (
+                          <div>
+                            <div className="text-xs text-muted-foreground">{t('dashboard.employeeDetails.expirationDate', 'Expiration Date')}</div>
+                            <div className="text-sm font-medium">
+                              {formatLocalDate(employeeToView.spratExpirationDate)}
+                              {(() => {
+                                const expirationDate = parseLocalDate(employeeToView.spratExpirationDate);
+                                const today = new Date();
+                                today.setHours(0, 0, 0, 0);
+                                if (expirationDate < today) {
+                                  return <Badge variant="destructive" className="ml-2">{t('dashboard.employeeDetails.expired', 'Expired')}</Badge>;
+                                }
+                                const thirtyDaysFromNow = new Date();
+                                thirtyDaysFromNow.setDate(today.getDate() + 30);
+                                if (expirationDate <= thirtyDaysFromNow) {
+                                  return <Badge variant="outline" className="ml-2 bg-yellow-500/10 border-yellow-500 text-yellow-700 dark:text-yellow-400">{t('dashboard.employeeDetails.expiringSoon', 'Expiring Soon')}</Badge>;
+                                }
+                                return null;
+                              })()}
+                            </div>
+                          </div>
+                        )}
+                        {employeeToView.spratDocuments && employeeToView.spratDocuments.length > 0 && (
+                          <div>
+                            <div className="text-xs text-muted-foreground mb-2">{t('dashboard.employeeDetails.documents', 'Documents')}</div>
+                            <div className="space-y-1">
+                              {employeeToView.spratDocuments.map((doc: string, idx: number) => (
+                                <a 
+                                  key={idx} 
+                                  href={doc} 
+                                  target="_blank" 
+                                  rel="noopener noreferrer"
+                                  className="flex items-center gap-2 text-sm text-primary hover:underline"
+                                >
+                                  <span className="material-icons text-sm">description</span>
+                                  {t('dashboard.employeeDetails.document', 'Document')} {idx + 1}
+                                </a>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                      </CardContent>
+                    </Card>
+                  )}
+
+                  {/* First Aid Certification */}
+                  {employeeToView.hasFirstAid && (
+                    <Card>
+                      <CardHeader>
+                        <CardTitle className="text-base flex items-center gap-2">
+                          <span className="material-icons text-lg">medical_services</span>
+                          {t('dashboard.employeeDetails.firstAidCertification', 'First Aid Certification')}
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent className="space-y-3">
+                        {employeeToView.firstAidType && (
+                          <div>
+                            <div className="text-xs text-muted-foreground">{t('dashboard.employeeDetails.certType', 'Certification Type')}</div>
+                            <div className="text-sm font-medium">{employeeToView.firstAidType}</div>
+                          </div>
+                        )}
+                        {employeeToView.firstAidExpiry && (
+                          <div>
+                            <div className="text-xs text-muted-foreground">{t('dashboard.employeeDetails.expirationDate', 'Expiration Date')}</div>
+                            <div className="text-sm font-medium">
+                              {formatLocalDate(employeeToView.firstAidExpiry)}
+                              {(() => {
+                                const expirationDate = parseLocalDate(employeeToView.firstAidExpiry);
+                                const today = new Date();
+                                today.setHours(0, 0, 0, 0);
+                                if (expirationDate < today) {
+                                  return <Badge variant="destructive" className="ml-2">{t('dashboard.employeeDetails.expired', 'Expired')}</Badge>;
+                                }
+                                const thirtyDaysFromNow = new Date();
+                                thirtyDaysFromNow.setDate(today.getDate() + 30);
+                                if (expirationDate <= thirtyDaysFromNow) {
+                                  return <Badge variant="outline" className="ml-2 bg-yellow-500/10 border-yellow-500 text-yellow-700 dark:text-yellow-400">{t('dashboard.employeeDetails.expiringSoon', 'Expiring Soon')}</Badge>;
+                                }
+                                return null;
+                              })()}
+                            </div>
+                          </div>
+                        )}
+                        {employeeToView.firstAidDocuments && employeeToView.firstAidDocuments.length > 0 && (
+                          <div>
+                            <div className="text-xs text-muted-foreground mb-2">{t('dashboard.employeeDetails.documents', 'Documents')}</div>
+                            <div className="space-y-1">
+                              {employeeToView.firstAidDocuments.map((doc: string, idx: number) => (
+                                <a 
+                                  key={idx} 
+                                  href={doc} 
+                                  target="_blank" 
+                                  rel="noopener noreferrer"
+                                  className="flex items-center gap-2 text-sm text-primary hover:underline"
+                                >
+                                  <span className="material-icons text-sm">description</span>
+                                  {t('dashboard.employeeDetails.document', 'Document')} {idx + 1}
+                                </a>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                      </CardContent>
+                    </Card>
+                  )}
+
                   {/* Driver's License */}
                   {(employeeToView.driversLicenseNumber || employeeToView.driversLicenseProvince) && (
                     <Card>
@@ -7345,6 +7471,89 @@ export default function Dashboard() {
                           <div>
                             <div className="text-xs text-muted-foreground">{t('dashboard.employeeDetails.phone', 'Phone')}</div>
                             <div className="text-sm font-medium">{employeeToView.emergencyContactPhone}</div>
+                          </div>
+                        )}
+                      </CardContent>
+                    </Card>
+                  )}
+
+                  {/* Personal Information - Birthday, SIN, Medical Conditions */}
+                  {(employeeToView.birthday || employeeToView.socialInsuranceNumber || employeeToView.specialMedicalConditions) && (
+                    <Card>
+                      <CardHeader>
+                        <CardTitle className="text-base flex items-center gap-2">
+                          <span className="material-icons text-lg">person</span>
+                          {t('dashboard.employeeDetails.personalInfo', 'Personal Information')}
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent className="space-y-3">
+                        {employeeToView.birthday && (
+                          <div>
+                            <div className="text-xs text-muted-foreground">{t('dashboard.employeeDetails.birthday', 'Birthday')}</div>
+                            <div className="text-sm font-medium">{formatLocalDate(employeeToView.birthday)}</div>
+                          </div>
+                        )}
+                        {employeeToView.socialInsuranceNumber && (
+                          <div>
+                            <div className="text-xs text-muted-foreground">{t('dashboard.employeeDetails.sin', 'Social Insurance Number')}</div>
+                            <div className="text-sm font-medium font-mono">{employeeToView.socialInsuranceNumber}</div>
+                          </div>
+                        )}
+                        {employeeToView.specialMedicalConditions && (
+                          <div>
+                            <div className="text-xs text-muted-foreground">{t('dashboard.employeeDetails.medicalConditions', 'Medical Conditions')}</div>
+                            <div className="text-sm font-medium">{employeeToView.specialMedicalConditions}</div>
+                          </div>
+                        )}
+                      </CardContent>
+                    </Card>
+                  )}
+
+                  {/* Banking Information */}
+                  {(employeeToView.bankTransitNumber || employeeToView.bankInstitutionNumber || employeeToView.bankAccountNumber) && (
+                    <Card>
+                      <CardHeader>
+                        <CardTitle className="text-base flex items-center gap-2">
+                          <span className="material-icons text-lg">account_balance</span>
+                          {t('dashboard.employeeDetails.bankingInfo', 'Banking Information')}
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent className="space-y-3">
+                        {employeeToView.bankTransitNumber && (
+                          <div>
+                            <div className="text-xs text-muted-foreground">{t('dashboard.employeeDetails.transitNumber', 'Transit Number')}</div>
+                            <div className="text-sm font-medium font-mono">{employeeToView.bankTransitNumber}</div>
+                          </div>
+                        )}
+                        {employeeToView.bankInstitutionNumber && (
+                          <div>
+                            <div className="text-xs text-muted-foreground">{t('dashboard.employeeDetails.institutionNumber', 'Institution Number')}</div>
+                            <div className="text-sm font-medium font-mono">{employeeToView.bankInstitutionNumber}</div>
+                          </div>
+                        )}
+                        {employeeToView.bankAccountNumber && (
+                          <div>
+                            <div className="text-xs text-muted-foreground">{t('dashboard.employeeDetails.accountNumber', 'Account Number')}</div>
+                            <div className="text-sm font-medium font-mono">{employeeToView.bankAccountNumber}</div>
+                          </div>
+                        )}
+                        {employeeToView.voidChequeDocuments && employeeToView.voidChequeDocuments.length > 0 && (
+                          <div>
+                            <div className="text-xs text-muted-foreground mb-2">{t('dashboard.employeeDetails.voidCheque', 'Void Cheque')}</div>
+                            <div className="space-y-1">
+                              {employeeToView.voidChequeDocuments.map((doc: string, idx: number) => (
+                                <a 
+                                  key={idx} 
+                                  href={doc} 
+                                  target="_blank" 
+                                  rel="noopener noreferrer"
+                                  className="flex items-center gap-2 text-sm text-primary hover:underline"
+                                >
+                                  <span className="material-icons text-sm">description</span>
+                                  {t('dashboard.employeeDetails.document', 'Document')} {idx + 1}
+                                </a>
+                              ))}
+                            </div>
                           </div>
                         )}
                       </CardContent>
