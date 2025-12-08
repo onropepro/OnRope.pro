@@ -1107,26 +1107,44 @@ export default function TechnicianLoggedHours() {
                 </div>
               </div>
               
-              {/* All-Time Tasks */}
-              {sortedTaskCounts.length > 0 && (
-                <div className="pt-3 border-t">
-                  <p className="text-sm font-medium mb-2">{t.allTimeTasks}</p>
-                  <div className="flex flex-wrap gap-2">
-                    {sortedTaskCounts.map(([taskId, count]) => (
-                      <Badge 
-                        key={taskId} 
-                        variant="outline" 
-                        className="text-xs py-1"
-                        data-testid={`badge-task-count-${taskId}`}
-                      >
-                        <span className="material-icons text-xs mr-1">{getTaskIcon(taskId)}</span>
-                        {getTaskLabel(taskId, language)}
-                        <span className="ml-1.5 px-1.5 py-0.5 rounded bg-primary/10 text-primary font-semibold">
-                          {count}
-                        </span>
-                      </Badge>
-                    ))}
-                  </div>
+              {/* All-Time Stats */}
+              {(sortedTaskCounts.length > 0 || grandTotalDrops > 0) && (
+                <div className="pt-3 border-t space-y-3">
+                  {/* Total Drops - Prominent Display */}
+                  {grandTotalDrops > 0 && (
+                    <div className="flex items-center gap-3 p-3 rounded-lg bg-primary/5 border border-primary/20">
+                      <div className="p-2 rounded-full bg-primary/10">
+                        <span className="material-icons text-primary text-lg">trending_down</span>
+                      </div>
+                      <div>
+                        <p className="text-2xl font-bold text-primary" data-testid="text-alltime-drops">{grandTotalDrops}</p>
+                        <p className="text-sm text-muted-foreground">{t.totalDrops}</p>
+                      </div>
+                    </div>
+                  )}
+                  
+                  {/* All-Time Tasks */}
+                  {sortedTaskCounts.length > 0 && (
+                    <div>
+                      <p className="text-sm font-medium mb-2">{t.allTimeTasks}</p>
+                      <div className="flex flex-wrap gap-2">
+                        {sortedTaskCounts.map(([taskId, count]) => (
+                          <Badge 
+                            key={taskId} 
+                            variant="outline" 
+                            className="text-xs py-1"
+                            data-testid={`badge-task-count-${taskId}`}
+                          >
+                            <span className="material-icons text-xs mr-1">{getTaskIcon(taskId)}</span>
+                            {getTaskLabel(taskId, language)}
+                            <span className="ml-1.5 px-1.5 py-0.5 rounded bg-primary/10 text-primary font-semibold">
+                              {count}
+                            </span>
+                          </Badge>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </div>
               )}
             </div>
