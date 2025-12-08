@@ -12,7 +12,8 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/hooks/use-toast";
-import { Plus, Briefcase, MapPin, DollarSign, Calendar, Edit, Trash2, Pause, Play, ArrowLeft, Users } from "lucide-react";
+import { Plus, Briefcase, MapPin, DollarSign, Calendar, Edit, Trash2, Pause, Play, ArrowLeft, Users, FileText, Eye, Mail, Award, X } from "lucide-react";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { format } from "date-fns";
 import { useTranslation } from "react-i18next";
 
@@ -40,6 +41,30 @@ type JobPosting = {
   createdAt: string;
   updatedAt: string;
   expiresAt: string | null;
+};
+
+type Technician = {
+  id: string;
+  name: string;
+  firstName: string | null;
+  lastName: string | null;
+  photoUrl: string | null;
+  irataLevel: string | null;
+  spratLevel: string | null;
+  employeeCity: string | null;
+  employeeProvinceState: string | null;
+  ropeAccessStartDate: string | null;
+  resumeDocuments: string[] | null;
+};
+
+type JobApplication = {
+  id: string;
+  technicianId: string;
+  jobPostingId: string;
+  status: string;
+  coverMessage: string | null;
+  appliedAt: string;
+  technician: Technician | null;
 };
 
 const JOB_TYPES = [
@@ -96,6 +121,7 @@ export default function CompanyJobBoard() {
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [editingJob, setEditingJob] = useState<JobPosting | null>(null);
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
+  const [viewingApplicationsFor, setViewingApplicationsFor] = useState<JobPosting | null>(null);
 
   const [formData, setFormData] = useState({
     title: "",
@@ -121,7 +147,30 @@ export default function CompanyJobBoard() {
     queryKey: ["/api/job-postings"],
   });
 
+  const { data: applicationsData, refetch: refetchApplications } = useQuery<{ applications: JobApplication[] }>({
+    queryKey: ["/api/job-applications/job", viewingApplicationsFor?.id],
+    enabled: !!viewingApplicationsFor,
+    queryFn: async () => {
+      const res = await fetch(`/api/job-applications/job/${viewingApplicationsFor?.id}`, {
+        credentials: 'include'
+      });
+      if (!res.ok) throw new Error('Failed to fetch');
+      return res.json();
+    }
+  });
+
+  const { data: countsData } = useQuery<{ counts: { jobPostingId: string; count: number }[] }>({
+    queryKey: ["/api/job-applications/counts"],
+  });
+
   const jobPostings = data?.jobPostings || [];
+  const currentApplications = applicationsData?.applications || [];
+  const applicationCounts = countsData?.counts || [];
+
+  const getApplicationCount = (jobId: string) => {
+    const found = applicationCounts.find(a => a.jobPostingId === jobId);
+    return found?.count || 0;
+  };
 
   const createMutation = useMutation({
     mutationFn: async (data: any) => {
@@ -440,6 +489,23 @@ export default function CompanyJobBoard() {
                     )}
                   </div>
                 </CardContent>
+                <CardFooter className="pt-0 border-t mt-3">
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    className="gap-2"
+                    onClick={() => setViewingApplicationsFor(job)}
+                    data-testid={`button-view-applications-${job.id}`}
+                  >
+                    <FileText className="w-4 h-4" />
+                    {t("jobBoard.viewApplications", "View Applications")}
+                    {getApplicationCount(job.id) > 0 && (
+                      <Badge variant="secondary" className="ml-1">
+                        {getApplicationCount(job.id)}
+                      </Badge>
+                    )}
+                  </Button>
+                </CardFooter>
               </Card>
             ))}
           </div>
@@ -722,6 +788,96 @@ export default function CompanyJobBoard() {
               data-testid="button-confirm-delete"
             >
               {deleteMutation.isPending ? t("common.deleting", "Deleting...") : t("common.delete", "Delete")}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={!!viewingApplicationsFor} onOpenChange={() => setViewingApplicationsFor(null)}>
+        <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <FileText className="w-5 h-5" />
+              {t("jobBoard.applications", "Applications")}
+            </DialogTitle>
+            <DialogDescription>
+              {viewingApplicationsFor?.title} - {currentApplications.length} {currentApplications.length === 1 ? t("jobBoard.applicant", "applicant") : t("jobBoard.applicants", "applicants")}
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-4 py-4">
+            {currentApplications.length === 0 ? (
+              <div className="text-center py-8">
+                <Users className="w-12 h-12 mx-auto text-muted-foreground/50 mb-3" />
+                <p className="text-muted-foreground">{t("jobBoard.noApplications", "No applications yet")}</p>
+              </div>
+            ) : (
+              currentApplications.filter(app => app.technician).map((app) => (
+                <Card key={app.id} data-testid={`card-application-${app.id}`}>
+                  <CardContent className="p-4">
+                    <div className="flex items-start gap-4">
+                      <Avatar className="w-12 h-12">
+                        <AvatarImage src={app.technician?.photoUrl || undefined} />
+                        <AvatarFallback>
+                          {app.technician?.name?.split(' ').map(n => n[0]).join('').toUpperCase() || '?'}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <h4 className="font-semibold">{app.technician?.name || 'Unknown'}</h4>
+                          {app.technician?.irataLevel && (
+                            <Badge variant="outline" className="text-xs border-amber-500 text-amber-600">
+                              IRATA {app.technician.irataLevel}
+                            </Badge>
+                          )}
+                          {app.technician?.spratLevel && (
+                            <Badge variant="outline" className="text-xs border-purple-500 text-purple-600">
+                              SPRAT {app.technician.spratLevel}
+                            </Badge>
+                          )}
+                        </div>
+                        <div className="flex items-center gap-3 text-sm text-muted-foreground mt-1 flex-wrap">
+                          {app.technician?.employeeCity && (
+                            <span className="flex items-center gap-1">
+                              <MapPin className="w-3 h-3" />
+                              {app.technician.employeeCity}{app.technician.employeeProvinceState ? `, ${app.technician.employeeProvinceState}` : ''}
+                            </span>
+                          )}
+                          {app.technician?.ropeAccessStartDate && (
+                            <span className="flex items-center gap-1">
+                              <Award className="w-3 h-3" />
+                              {Math.floor((Date.now() - new Date(app.technician.ropeAccessStartDate).getTime()) / (365.25 * 24 * 60 * 60 * 1000))} {t("jobBoard.yearsExp", "years exp.")}
+                            </span>
+                          )}
+                        </div>
+                        {app.coverMessage && (
+                          <p className="text-sm mt-2 bg-muted/50 p-2 rounded-md">{app.coverMessage}</p>
+                        )}
+                        <div className="flex items-center justify-between mt-3">
+                          <span className="text-xs text-muted-foreground">
+                            {t("jobBoard.appliedOn", "Applied")} {format(new Date(app.appliedAt), "MMM d, yyyy")}
+                          </span>
+                          <Button 
+                            variant="outline" 
+                            size="sm"
+                            onClick={() => setLocation(`/talent-browser?applicant=${app.technicianId}`)}
+                            data-testid={`button-view-profile-${app.id}`}
+                          >
+                            <Eye className="w-3 h-3 mr-1" />
+                            {t("jobBoard.viewProfile", "View Profile")}
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))
+            )}
+          </div>
+
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setViewingApplicationsFor(null)}>
+              {t("common.close", "Close")}
             </Button>
           </DialogFooter>
         </DialogContent>

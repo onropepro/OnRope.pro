@@ -15837,6 +15837,50 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get application counts for company's job postings
+  app.get("/api/job-applications/counts", requireAuth, requireRole("company", "superuser"), async (req: Request, res: Response) => {
+    try {
+      const currentUser = await storage.getUserById(req.session.userId!);
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      // Get the company's job postings
+      let companyJobs;
+      if (currentUser.role === "superuser") {
+        // SuperUser sees platform posts
+        companyJobs = await db.select({ id: jobPostings.id })
+          .from(jobPostings)
+          .where(eq(jobPostings.isPlatformPost, true));
+      } else {
+        // Company sees their own posts
+        companyJobs = await db.select({ id: jobPostings.id })
+          .from(jobPostings)
+          .where(eq(jobPostings.companyId, currentUser.id));
+      }
+
+      const jobIds = companyJobs.map(j => j.id);
+      if (jobIds.length === 0) {
+        return res.json({ counts: [] });
+      }
+
+      // Count applications per job
+      const counts = await Promise.all(
+        jobIds.map(async (jobId) => {
+          const apps = await db.select()
+            .from(jobApplications)
+            .where(eq(jobApplications.jobPostingId, jobId));
+          return { jobPostingId: jobId, count: apps.length };
+        })
+      );
+
+      res.json({ counts });
+    } catch (error) {
+      console.error("Get application counts error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
   // Get applications for a job posting (for company/superuser)
   app.get("/api/job-applications/job/:jobId", requireAuth, requireRole("company", "superuser"), async (req: Request, res: Response) => {
     try {
